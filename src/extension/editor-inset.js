@@ -6,7 +6,7 @@
 
 const vscode = require("vscode");
 
-// The folder of OUT in src/scripts/bundle.js, under the extension, spelled again here because the extension imports no script of the tree. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
+// The folder the drawing bundle lands in under the extension, spelled again here because the extension imports its own folder alone. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
 const DRAWING = "drawing";
 const SCRIPT = "route.mjs";
 const STYLE = "route.css";

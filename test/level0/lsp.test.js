@@ -61,7 +61,7 @@ test("the client watches markdown and every file a two-file rule reads", () => {
   for (const one of [
     "**/.vscode/settings.json",
     "**/.vscode/extensions.json",
-    "**/src/scripts/install.sh",
+    "**/install.sh",
     "**/.vale.ini",
   ]) {
     assert.ok(patterns.includes(one), one);

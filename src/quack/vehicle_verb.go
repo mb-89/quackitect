@@ -90,7 +90,7 @@ func vehicleDisk(dry bool) vehicle.Disk {
 	return vehicle.OS()
 }
 
-// The vehicle verb: here, produce, into, attach, detach and register, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
+// The vehicle verb: here, produce, into, attach, detach, register and settle, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 func vehicleTwin(doorsOf func() vehicleDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		doors := doorsOf()
@@ -117,6 +117,8 @@ func vehicleTwin(doorsOf func() vehicleDoors) twin {
 			}
 			fmt.Fprintf(out, "%s names %s as the vehicle driving it, at port %s.\n", pair.Work, id, vehicle.Number(settled.Port))
 			return 0
+		case "settle":
+			return vehicleSettle(disk, doors, pair, out, errs)
 		case "detach":
 			if err := vehicle.Detach(disk, pair.Work); err != nil {
 				fmt.Fprintln(errs, err)
@@ -134,6 +136,17 @@ func vehicleTwin(doorsOf func() vehicleDoors) twin {
 		}
 		return vehicleHere(disk, doors, pair, id, out)
 	}
+}
+
+// Names the method root the work reaches, making the work a project of this vehicle where it reaches none. [[spec/tickets/extension-imports-stay-inside]]
+func vehicleSettle(disk vehicle.Disk, doors vehicleDoors, pair vehicle.Pair, out, errs io.Writer) int {
+	settled, err := vehicle.Settles(disk, doors.env, doors.now, pair.Work, pair.Method, doors.pid, doors.windows)
+	if err != nil {
+		fmt.Fprintln(errs, err)
+		return exitFailed
+	}
+	fmt.Fprintf(out, "method %s\n", settled.Method)
+	return 0
 }
 
 // Copies the method where the words say, a folder standing there refused unless into says so. [[spec/design_output/vehicle#what-travels-into-a-vehicle]]

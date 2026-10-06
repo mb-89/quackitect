@@ -3,19 +3,20 @@
 // [[spec/design_output/extension#the-hook-button]]
 
 const vscode = require("vscode");
-const { mkdirSync, readFileSync, realpathSync } = require("node:fs");
+const { execFile } = require("node:child_process");
+const { readFileSync, realpathSync } = require("node:fs");
 const http = require("node:http");
-const { dirname, join } = require("node:path");
+const { join } = require("node:path");
 
-// The index binary and the standing file of its hooks door, held again here because this module loads as CommonJS and imports no lib. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const INDEX = ".se/.runtime/bin/se-index"; // a copy of BIN, which .claude/skills/level0/lib/folders.js roots
-const HOOKS = ".se/.runtime/hooks.json"; // a copy of inRun, in .claude/skills/level0/lib/folders.js
+// The index binary and the standing file of its hooks door, serveIndexBin in src/quack/serve_verb.go and StandingFile in src/modules/hooks/hooks.go, held again here because the extension imports its own folder alone. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const INDEX = ".se/.runtime/bin/se-index"; // in the runtime folder folders.js owns
+const HOOKS = ".se/.runtime/hooks.json"; // in the runtime folder folders.js owns
 const WIRE_WAIT = 500;
 const STOP_WAIT = 10_000;
-// The file every server start writes a line to, a respawn and a start by hand alike. [[spec/design_output/extension#the-light-follows-the-server]]
-const SERVE_LOG = ".se/.log/serve.log";
-// The window a start watches before it takes the server as standing, the span a restart watches its child. [[spec/design_output/level0#a-restart-watches-its-child]]
-const START_WAIT = 3000;
+// The span the index takes to answer its standing, which starts its door where none answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const STANDING_WAIT = 60_000;
+// The span the vehicle verb takes to settle the method root. [[spec/tickets/extension-imports-stay-inside]]
+const SETTLE_WAIT = 30_000;
 
 // [[spec/design_output/extension#the-hook-button]]
 function processDoor(context, folder) {
@@ -40,8 +41,9 @@ function processDoor(context, folder) {
       changed();
     }
   };
+  // The hooks door writes its standing file on each start, a start by hand alike. [[spec/tickets/extension-imports-stay-inside]]
   const log = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(folder, SERVE_LOG),
+    new vscode.RelativePattern(folder, HOOKS),
   );
   log.onDidChange(rechecks);
   log.onDidCreate(rechecks);
@@ -74,18 +76,16 @@ function processDoor(context, folder) {
       const held = { how: "on", adopted: true, starting: true };
       processes.set(key, held);
       changed();
-      const out = join(work, ...SERVE_LOG.split("/"));
-      mkdirSync(dirname(out), { recursive: true });
-      const born = await (await procDoor(context)).respawn(
-        [join(vehicle.method, ...INDEX.split("/")), "serve"],
-        { cwd: work, out, waitMs: START_WAIT },
-      );
+      const born = await runs([join(vehicle.method, ...INDEX.split("/")), "standing"], {
+        cwd: work,
+        timeout: STANDING_WAIT,
+      });
       held.starting = false;
       held.port = doorPort(work);
-      if (born.fell && processes.get(key) === held) {
+      if (born.exitCode !== 0 && processes.get(key) === held) {
         processes.delete(key);
         vscode.window.showWarningMessage(
-          `the index falls with exit ${born.exitCode}, and ${SERVE_LOG} says why`,
+          `the index falls with exit ${born.exitCode}: ${saidBy(born)}`,
         );
       }
       changed();
@@ -97,13 +97,10 @@ function processDoor(context, folder) {
       processes.delete(key);
       const vehicle = await settled(context, work);
       if (vehicle) {
-        (await procDoor(context)).run(
-          [join(vehicle.method, ...INDEX.split("/")), "stop"],
-          {
-            cwd: work,
-            timeoutMs: STOP_WAIT,
-          },
-        );
+        await runs([join(vehicle.method, ...INDEX.split("/")), "stop"], {
+          cwd: work,
+          timeout: STOP_WAIT,
+        });
       }
       changed();
     },
@@ -114,33 +111,33 @@ function homeOf(context) {
   return join(realpathSync.native(context.extensionPath), "..", "..");
 }
 
-// The proc door's detached start, the one a restart takes. [[spec/design_output/level0#a-restart-watches-its-child]]
-async function procDoor(context) {
-  const door = join(homeOf(context), "src", "doors", "proc.js");
-  return (await import(vscode.Uri.file(door).toString())).proc();
+// Runs a program to its end, and answers its exit code and what it printed. This file stands as the extension's process door. [[spec/tickets/extension-imports-stay-inside]]
+function runs(argv, options) {
+  return new Promise((resolve) => {
+    execFile(argv[0], argv.slice(1), { windowsHide: true, ...options }, (error, stdout, stderr) => {
+      const exitCode = !error ? 0 : typeof error.code === "number" ? error.code : 1;
+      resolve({ exitCode, stdout: String(stdout ?? ""), stderr: String(stderr ?? "") });
+    });
+  });
 }
 
-// [[spec/design_output/vehicle#the-register-holds-the-port]]
+// What a run says about itself, its error stream first. [[spec/tickets/extension-imports-stay-inside]]
+function saidBy(ran) {
+  return (ran.stderr || ran.stdout).trim() || `exit ${ran.exitCode}`;
+}
+
+// The method root the vehicle verb settles for the work root, off the binary of the extension's home. [[spec/design_output/vehicle#the-register-holds-the-port]]
 async function settled(context, work) {
   const home = homeOf(context);
-  try {
-    const bridge = await import(
-      vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString()
-    );
-    const disk = (
-      await import(vscode.Uri.file(join(home, "src", "doors", "disk.js")).toString())
-    ).disk();
-    const clock = (
-      await import(vscode.Uri.file(join(home, "src", "doors", "clock.js")).toString())
-    ).clock();
-    const windows = process.platform === "win32";
-    return bridge.settles(disk, process.env, clock, work, home, process.pid, windows);
-  } catch (error) {
-    vscode.window.showWarningMessage(
-      `the hook finds no vehicle: ${error?.message ?? error}`,
-    );
-    return null;
-  }
+  const said = await runs([join(home, ...INDEX.split("/")), "verb", ".", "vehicle", "settle"], {
+    cwd: home,
+    env: { ...process.env, SE_WORK_ROOT: work },
+    timeout: SETTLE_WAIT,
+  });
+  const method = /^method (.+)$/m.exec(said.stdout)?.[1]?.trim();
+  if (said.exitCode === 0 && method) return { method };
+  vscode.window.showWarningMessage(`the hook finds no vehicle: ${saidBy(said)}`);
+  return null;
 }
 
 // The port the hooks door's standing file names in the work root, or nothing where none stands. [[spec/design_output/extension#the-hook-button]]

@@ -65,3 +65,14 @@ test("a line below the level now posts nothing", async () => {
   assert.equal(row, undefined);
   assert.equal(door.files.exists(SESSION), false);
 });
+
+test("a line's extra fields ride its row, and its own fields stand over them", async () => {
+  const door = doorOf();
+  const row = await logbookOf(door, async () => "info").say("info", "sidebar", "a press", {
+    detail: "on",
+    said: "not this",
+  });
+  assert.equal(row.detail, "on");
+  assert.equal(row.said, "a press");
+  assert.equal(row.kind, "sidebar");
+});

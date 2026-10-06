@@ -19,7 +19,7 @@ const WATCHES = [
   { scheme: "file", language: "markdown" },
   { scheme: "file", pattern: "**/.vscode/settings.json" },
   { scheme: "file", pattern: "**/.vscode/extensions.json" },
-  { scheme: "file", pattern: "**/src/scripts/install.sh" },
+  { scheme: "file", pattern: "**/install.sh" },
   { scheme: "file", pattern: "**/.vale.ini" },
 ];
 

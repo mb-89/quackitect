@@ -5,13 +5,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  countIn,
-  lineArgvOf,
-  nameIn,
-  nextIn,
-  ticketPathOf,
-} from "../../src/extension/lib/work.js";
+import * as work from "../../src/extension/lib/work.js";
+
+const { countIn, lineArgvOf, nameIn, nextIn, ticketPathOf } = work;
+
+test("the work module holds no bare ticket text, which the ticket verb holds", () => {
+  assert.equal(work.NEW_TICKET, undefined);
+});
 
 test("a config line drops its RUNME head and splits into the verb's argv", () => {
   assert.deepEqual(lineArgvOf("./RUNME.sh ticket yours --count"), [
