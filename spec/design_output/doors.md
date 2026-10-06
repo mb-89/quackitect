@@ -275,9 +275,11 @@ the narrowing.
 | 2 | [[spec/tickets/quack-repos-meet-fake-git]] | `Repo` |
 | 3 | [[spec/tickets/quack-spawns-meet-fake-process]] | the `Runner` |
 | 4 | [[spec/tickets/branch-verbs-meet-fake-git]] | `Repo`, the `Runner`, and the `FakeDisk` the repository's work tree stands on |
+| 5 | [[spec/tickets/lsp-tools-take-the-runner]] | the `Runner`, with the halt and the wait its tool runs take |
 
 The pull goes first, because its git already stands behind one `Run`. The
-branch verbs go last, because their disk moves with their git.
+branch verbs go last of the git moves, because their disk moves with their git.
+The lsp move touches no git, so it stands apart from that order.
 
 # A rule test spawns once
 
