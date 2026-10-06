@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 0fd6e826035c23a2
         size: 1008
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 977815cb8590e1b193c5b47929676fabf2a79c86
+    hash_after: 977815cb8590e1b193c5b47929676fabf2a79c86
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: src/quack/commit.go and src/branches/rescue.go and take.go carry the change, spec/design_output/work.md carries its section, and the size golden moves with that note
+every door the change reaches has a fake: the change reaches git and the clock; both packages drive git through a temp origin, as their other cases do, and the clock through the fake pcClock
+a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-a-rescue-branch
+every fact stands in one place: the section in work.md owns the design, and both packages point at it; the rescue prefix stands once per package, since the two share no module, and each comment says so
 
 ## tests-green
 
