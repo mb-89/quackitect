@@ -33,6 +33,7 @@ frontmatter:
 `
 
 func TestWeighs(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct{ key, said, want string }{
 		{"state", "closed", "state is the verbs' to write, so ./RUNME.sh ticket moves it and the door refuses the edit."},
 		{"colour", "red", "colour stands in no ticket's front, so set writes it nowhere."},
@@ -57,6 +58,7 @@ func TestWeighs(t *testing.T) {
 }
 
 func TestJSNumber(t *testing.T) {
+	t.Parallel()
 	for said, want := range map[string]float64{"2": 2, " 2 ": 2, "02": 2, "2.0": 2, "2e0": 2, "0x2": 2, ".5": 0.5, "": 0, "+4": 4, "0o17": 15, "0B11": 3, "0XfF": 255} {
 		if got, ok := JSNumber(said); !ok || got != want {
 			t.Errorf("%q reads %v, %v, and wants %v", said, got, ok, want)
@@ -71,6 +73,7 @@ func TestJSNumber(t *testing.T) {
 
 // The cases the work tab and the JS verb share. [[spec/tickets/view-actions-run-through-verbs]]
 func TestPlaceValueOverTheSharedCases(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile("../tui/work/testdata/places.json")
 	if err != nil {
 		t.Fatal(err)
@@ -100,6 +103,7 @@ func TestPlaceValueOverTheSharedCases(t *testing.T) {
 }
 
 func TestPlacesWritten(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct{ plan, name, value, want string }{
 		{"", "a", "true", "{\n  \"places\": {\n    \"a\": \"true\"\n  }\n}\n"},
 		{"not json", "a", "b", "{\n  \"places\": {\n    \"a\": \"b\"\n  }\n}\n"},
@@ -114,6 +118,7 @@ func TestPlacesWritten(t *testing.T) {
 }
 
 func TestFieldWriters(t *testing.T) {
+	t.Parallel()
 	text := "---\nkind: [[ticket]]\n---\n\n# Ask\n"
 	set, err := WithField(text, "todo", "true")
 	if err != nil || set != "---\nkind: [[ticket]]\ntodo: true\n---\n\n# Ask\n" {
@@ -128,6 +133,7 @@ func TestFieldWriters(t *testing.T) {
 }
 
 func TestNewTicketPath(t *testing.T) {
+	t.Parallel()
 	for path, want := range map[string]bool{"spec/tickets/a-new-one.md": true, ".se/tickets/x1.md": true, "spec/tickets/A.md": false, "spec/a.md": false, "": false, "spec/tickets/a.txt": false} {
 		if got := NewTicketPath(path); got != want {
 			t.Errorf("%q reads %v, and wants %v", path, got, want)

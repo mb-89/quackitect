@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-check-fits-its-budget
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 6b15b62b0ab55396
         size: 784
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c7dec0a36dda · claude-code-remote
+    hash_before: 678b39072b01a7f4b0030b06f8e53604a36e95cc
+    hash_after: 678b39072b01a7f4b0030b06f8e53604a36e95cc
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -298,14 +307,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: src/pull/*_test.go stands in the Discussion's size, beside the four the draft names
+- every door the change reaches has a fake: the change adds t.Parallel alone, and reaches no door
+- a comment names the approach: the header of src/imports/serial.go names the rule the guard holds, and the tests carry no comment by spec/guidance/code/code
+- one place: the guard in src/imports/serial_test.go owns the list of slow packages
 
 ## tests-green
 

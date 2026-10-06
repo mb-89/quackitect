@@ -23,6 +23,7 @@ record:
 `
 
 func TestWalk(t *testing.T) {
+	t.Parallel()
 	front := yaml.AsDoc(yaml.Read(walkFront))
 	walk := EntriesIn(front.Get("steps"))
 	paths := []string{}

@@ -48,6 +48,7 @@ func diskSuite(t *testing.T, disk Disk) {
 }
 
 func TestDiskContract(t *testing.T) {
+	t.Parallel()
 	t.Run("the fake", func(t *testing.T) { diskSuite(t, FakeDisk{}) })
 	t.Run("the disk on this box", func(t *testing.T) { diskSuite(t, OSDisk{Root: t.TempDir()}) })
 }

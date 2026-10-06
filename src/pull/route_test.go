@@ -26,6 +26,7 @@ const routeTwo = `steps:
 `
 
 func TestRouteAheadOnly(t *testing.T) {
+	t.Parallel()
 	front := yamlOf("step: design/review\nrecord:\n  - step: design/draft\n" + routeTwo)
 	if why, at := RouteAheadOnly(front, yaml.AsList(front.Get("steps"))); why != "" || at != "" {
 		t.Errorf("a route standing as it stood is refused: %s at %s", why, at)
@@ -41,6 +42,7 @@ func TestRouteAheadOnly(t *testing.T) {
 }
 
 func TestRouteDrift(t *testing.T) {
+	t.Parallel()
 	t.Run("an added, a dropped and a changed step, and the reached skipped", func(t *testing.T) {
 		front := yamlOf("step: do\nsteps:\n  - name: do\n    does: edited, and reached\n  - name: check\n    does: changed\n  - name: sign\n    does: added\n")
 		base := yaml.AsList(yamlOf("steps:\n  - name: do\n    does: makes the change\n  - name: check\n    does: checks it\n  - name: land\n    does: dropped\n").Get("steps"))
@@ -58,6 +60,7 @@ func TestRouteDrift(t *testing.T) {
 }
 
 func TestDriftBase(t *testing.T) {
+	t.Parallel()
 	older, newer := "steps:\n  - name: do\n", "steps:\n  - name: do\n  - name: check\n"
 	shows := map[string]string{"bbb": newer, "aaa": older}
 	show := func(sha string) string { return shows[sha] }
@@ -75,6 +78,7 @@ func TestDriftBase(t *testing.T) {
 }
 
 func TestUpdatedRoute(t *testing.T) {
+	t.Parallel()
 	t.Run("the new leaf lands where the ticket has yet to reach it", func(t *testing.T) {
 		front := yamlOf("step: one\nsteps:\n  - name: one\n    does: the old first\n  - name: two\n    does: the old second\n")
 		route := yaml.AsList(yamlOf("steps:\n  - name: one\n    does: the new first\n  - name: two\n    does: the new second\n").Get("steps"))
@@ -102,6 +106,7 @@ func TestUpdatedRoute(t *testing.T) {
 }
 
 func TestRouteOf(t *testing.T) {
+	t.Parallel()
 	for _, said := range []string{"", "not json", `{"name":"do"}`, "[] and more"} {
 		if _, ok := RouteOf(said); ok {
 			t.Errorf("%q reads as a route", said)
