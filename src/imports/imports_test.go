@@ -43,8 +43,13 @@ func plant(t *testing.T) string {
 
 // The planted trees build once a run, and every case reads them, since no analyzer writes there. [[spec/tickets/each-door-meets-one-test]]
 func TestThePlantedTreeBuildsOnce(t *testing.T) {
+	t.Parallel()
 	if plant(t) != plant(t) || plantFlagged(t) != plantFlagged(t) {
 		t.Fatal("a planted tree builds again for each case, where one build serves every case")
+	}
+	// The flagged packages stand in a folder of their own, so none leaks into the clean cases.
+	if plant(t) == plantFlagged(t) {
+		t.Fatal("the flagged tree shares the clean tree's folder")
 	}
 }
 

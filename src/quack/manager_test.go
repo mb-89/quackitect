@@ -179,6 +179,7 @@ var quackBuilds atomic.Int32
 
 // Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
+	t.Parallel()
 	built(t, t.TempDir())
 	built(t, t.TempDir())
 	if got := quackBuilds.Load(); got != 1 {

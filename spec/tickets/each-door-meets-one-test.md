@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 38931247381717a6
         size: 3463
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b4c8cb96d125 · claude-code-remote · helper-4
+    hash_before: a82a010ba9754ae3733df040c5060abddc8d3580
+    hash_after: a82a010ba9754ae3733df040c5060abddc8d3580
+    inputs:
+      - name: design/draft
+        hash: 38931247381717a6
+        size: 3463
+      - name: design/tests-red
+        hash: 53d57e1376be6ada
+        size: 1107
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -297,8 +309,12 @@ The four cases fail on their own assertion. The planted tree builds twice for tw
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- stop-join-test-stands-red: the draft names TestAStopJoinsTheSpawnerBeforeItAnswers, and no red case holds it, so the join lands unproven
+- shared-plant-outlives-each-case: a plant shared through sync.OnceValue cannot sit in t.TempDir, which the first case removes, so it needs os.MkdirTemp and a TestMain cleanup
+- door-table-joins-contract-chapter: the doors note already holds One contract test per door, so the audit table extends that chapter and opens no second one
 
 # implement
 
