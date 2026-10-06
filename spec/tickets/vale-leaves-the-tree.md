@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 413cfeb6b012b800
         size: 5070
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 09cf21ad3c5d · claude-code-remote · helper-4
+    hash_before: f00fc7aab70f4dd78af8954c3580a7216073ed00
+    hash_after: f00fc7aab70f4dd78af8954c3580a7216073ed00
+    inputs:
+      - name: design/draft
+        hash: 413cfeb6b012b800
+        size: 5070
+      - name: design/tests-red
+        hash: 2ca6d5ec6b7e972b
+        size: 1255
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -341,8 +353,11 @@ Each case fails on its own assertion. `Apply` answers the text unchanged, `measu
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- done-when-grep-meets-testdata: the ask's grep holds no testdata exclusion, while the approach says it does. Four goldens answer it today: src/modules/check/testdata/vale.golden.json and vale.out, src/modules/queue/testdata/queue.golden.json and src/quack/testdata/tree.golden.json. The check's pair leaves with the Vale twin. The queue and tree goldens snapshot ticket names and asks, so the done_when line gains a `:!*testdata*` pathspec, or it stays red.
+- vale-size-misses-files: the grep names files the size list leaves out. These are src/rules/scope.go (a comment naming .vale.ini), src/branches/dispatch_write_test.go (it runs the real Vale over .vale.ini), src/vehicle/vehicle_test.go, test/contract/fetching.js and ruled.js. The draft puts the RulesLoad case in src/modules/lsp/tools_test.go, while the red case stands in src/quack/rules_test.go, and tools_test.go still names vale-ls. The builder fixes these in place.
 
 # implement
 
