@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  118.8  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 70f4135a841a2ce9f4fbbf2a285050557c930c17
+    hash_after: 70f4135a841a2ce9f4fbbf2a285050557c930c17
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  113.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c21254153cb4aa35
+        size: 872
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -333,26 +356,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/beat_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A box holding a group beats: branch beat pushes a parentless commit to the branch beats/<group>, at most once every half of work.beatAfter, and branch beat --end ends the hold. Stop and SessionEnd hooks run it, and the take writes the first beat. A hold reads dead at once on an end at or past its tip, live on a beat inside work.beatAfter, and by its tip age otherwise. branch take --over takes a dead hold and refuses a live one, and branch list writes live beside a beating hold. The beat stands on a branch because the cloud git proxy refuses refs outside refs/heads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change reaches the branches package, the push hook, the settings declaration and the hook settings, each through a child the gate minted
+- the beat reaches git through the doors the package holds, and the push hook cases drive its repo fake
+- beat.go opens on a header naming the approach, and each function points at the design section
+- the span stands in work.beatAfter alone, and the rules in the work design section
 
 # accept
 
