@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/draft
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -175,6 +175,22 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/failures]]
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: aa289ce84550ee162c76aa05f66bdbc32187eab5
+    hash_after: aa289ce84550ee162c76aa05f66bdbc32187eab5
+    inputs:
+      - name: ask
+        hash: ebd72578966d3bfc
+        size: 766
+      - name: [[spec/design_output/failures]]
+        hash: 8e785cc94e2e32f9
+        size: 4503
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    skipped: true
+    kept: fc2c608f22299b4a2b46ffd5924e3ac9334c4c4c
+    why: its red tests stand as fc2c608f2 landed them, and a later leaf passed since
 ---
 
 # Ask
@@ -212,22 +228,24 @@ Without it, a stall or a loop stands unseen until a person reads the log.
 
 [[spec/design_output/failures#the-sentinel-fires-a-watch]] holds the approach.
 
-The clock door gains After(span, hand) (stop func()). The real clock arms time.AfterFunc, and FakeClock keeps a one-shot hand that Tick calls once its span passes. The contract case holds both: the hand runs once, and a stop before the span keeps it from running. The real side waits on a channel the hand closes, not on a sleep.
+- The clock door gains `After(span, hand)`, which answers a stop. The real clock arms `time.AfterFunc`. `FakeClock` keeps a one-shot hand, and `Tick` calls it once its span passes.
+- `src/failure/sentinel.go` holds `Sentinel`. `NewSentinel` takes the registry, a `Timer`, a hand taking each `Raised`, and a `Runner`. It arms each quiet watch at once.
+- `Hear` fires each matching watch with no quiet span. It arms each matching quiet watch again.
+- A mutex holds the armed watches, and a round number drops a stale fire.
+- A fire raises the node through `Raise`, hands the `Raised` on, and runs the reaction through the `Runner`. A failing reaction raises `failure-reaction-fails`.
+- `src/failure/door.go` holds `Runner`: `Shell` runs `./RUNME.sh` under the root, and `FakeRunner` keeps each line.
+- `NodeOf` compiles each watch match, and names a match that reads as no pattern.
 
-src/failure/sentinel.go adds Sentinel. NewSentinel(registry, clock, fire, run) takes the registry, a Timer (After alone, which clock.Clock answers, so src/failure imports no module), a hand taking each Raised, and a Runner. It arms each quiet watch at once. Hear(Event{Kind, Text}) matches each watch whose event names the kind and whose match, a regular expression, finds the text. A watch with no quiet span fires on the event. A quiet watch stops its armed hand and arms After again. A fire raises the node's id through Raise and hands the Raised to fire, which writes the row. It then runs the node's reaction through the Runner. A quiet watch fires once and stays unarmed until a matching event arms it again.
-
-src/failure/door.go gains Runner, the process door: Shell{Root} runs ./RUNME.sh with the reaction's words under the root, and FakeRunner keeps each line it gets. The contract case holds the two over a temp root carrying a RUNME.sh that echoes its words.
-
-Assumed: the hooks door handing each post to the sentinel stands outside this ask's done_when lines. A note parks it for the retro.
+Assumed: the hooks door wiring stands outside the done_when lines. The note `sentinel-hears-the-hooks` carries it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- none today: Sentinel, After and Runner are new
-- src/modules/clock: Clock gains After, and New and FakeClock answer it
-- the hooks door, which hands each post to Hear once the wiring lands
+- src/modules/clock/clock.go Clock, whose interface gains After, answered by clock and FakeClock
+- src/failure/node.go NodeOf, which now compiles each watch match
+- none for Sentinel, Hear and Runner today: the hooks door calls Hear once the note sentinel-hears-the-hooks lands
 
 ### tests
 
@@ -237,15 +255,25 @@ Assumed: the hooks door handing each post to the sentinel stands outside this as
 - src/failure/sentinel_test.go TestAnEventMatchingAWatchFiresItsFailure
 - src/failure/sentinel_test.go TestAQuietSpanFiresOnceAndAMatchingEventArmsItAgain
 - src/failure/sentinel_test.go TestAFiredFailureRunsItsReaction
+- src/failure/sentinel_test.go TestAQuietWatchArmsAtOnceAndFiresWithNoEvent
+- src/failure/sentinel_test.go TestAFailingReactionRaisesItsOwnFailure
 - src/modules/clock/clock_contract_test.go TestAfterKeepsItsContract
 - src/failure/door_contract_test.go TestShellAndFakeRunnerAnswerAlike
+- src/failure/door_contract_test.go TestShellAndFakeRunnerAnswerAFailingExit
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first draft
+- no case shows a quiet watch armed at once: TestAQuietWatchArmsAtOnceAndFiresWithNoEvent decides it
+- a real hand races Hear: a mutex holds the armed watches, and a round drops a stale fire
+- a match regexp refuses reaches run time: NodeOf compiles each match and names the fault
+- the fake After hand runs twice: Tick deletes the hand once it calls it
+- TestClockKeepsItsContract slept: the real side waits on a channel an After hand closes, and no test under src/modules/clock sleeps
+- a failing reaction goes unsaid: the sentinel raises failure-reaction-fails, and TestAFailingReactionRaisesItsOwnFailure decides it
+- the After contract hides under the contract tag: the check runs go test with that tag, which decides the line
+- the hooks wiring stands outside the ask: the note sentinel-hears-the-hooks carries it to the retro
 
 ### size
 
@@ -256,17 +284,19 @@ Assumed: the hooks door handing each post to the sentinel stands outside this as
 - src/failure/sentinel_test.go
 - src/failure/door.go
 - src/failure/door_contract_test.go
+- src/failure/node.go
 - src/modules/clock/clock.go
 - src/modules/clock/clock_contract_test.go
+- spec/failures/failure-reaction-fails.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened src/modules/clock/clock.go and clock_contract_test.go, src/failure/node.go, raise.go and door.go, and src/pull/pull_doors.go Shell, and checked each claim the approach makes against them
-- the callers list names the clock module, whose interface grows, and the hooks door, which calls Hear once wired
-- each done_when line maps to a test: the event to TestAnEventMatchingAWatchFiresItsFailure, the quiet span to TestAQuietSpanFiresOnceAndAMatchingEventArmsItAgain, After to TestAfterKeepsItsContract, the reaction to TestAFiredFailureRunsItsReaction, and the check to ./RUNME.sh check
+- opened src/failure/sentinel.go, door.go and node.go, src/modules/clock/clock.go and its contract test, and spec/failures, and checked each claim there
+- a search over src finds no caller of NewSentinel or Hear outside sentinel.go, so the list names the clock, NodeOf and the hooks note
+- each done_when line names its case: the event, the quiet span, After, the reaction, and ./RUNME.sh check for the last
 
 ## tests-red
 
