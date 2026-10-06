@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 7cb116066181fffb
         size: 407
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 3b2dfa04ec460911ce6f0ea5509dc618e5f6299c
+    hash_after: 3b2dfa04ec460911ce6f0ea5509dc618e5f6299c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 71b107baaebbbb4d
+        size: 3908
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -256,26 +269,36 @@ Assumed: start.js keeps INSTALL_SKIP and STARTING until level0-hooks-forward-to-
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/session_start_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/session_start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All ten tests fail on their own assertion, and the test file stands alone in the change.
+
+- Each install case copies install.sh into a short temporary tree, with a fake index that writes down the skip list it meets.
+- The environment builds from nothing, because this box sets CLAUDE_CODE_REMOTE and would read as a cloud box.
+- install.sh ignores its words today, so the two cases running the install first check the word is read, or they pass for the wrong reason.
+- The start span comes off STARTING in start.js, which Go holds no constant for. The forwarder sibling moves it, and this test then needs a new source.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- TestNoTrackedFileNamesTheNodeBoot fails on lines one and two, a live probe cold answers line three, and a live check line four
+- the install runs against a fake index in a temporary tree, with every want skipped, so no case reaches the network
 
 # gate
 
