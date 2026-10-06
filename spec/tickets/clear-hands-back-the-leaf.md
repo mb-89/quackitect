@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box 156418b839c4 · claude-code-remote
     hash_before: 4450569fccb58c3a9f7136fe3ceeb83fada71971
+  - step: sync
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: fbeabf1f0c7331f85c58bd4a1140ea0d8db2c25a
+    hash_after: fbeabf1f0c7331f85c58bd4a1140ea0d8db2c25a
+    answered:
+      - name: sync
+        exit: 0
+        said: work/clear-hands-back-the-leaf already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -104,8 +113,9 @@ The group carries the name the owner ordered with its article cut, because a bra
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
