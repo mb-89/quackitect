@@ -197,12 +197,13 @@ test("the harness reads the clone's files, records each post and tool, and hands
     join: (...parts) => parts.join("/").replace(/\/[^/]+\/\.\.(?=\/|$)/g, ""),
     http: { send: async () => ({ status: 503, text: "" }) },
   };
-  const { $, seen } = harnessOf(it, "/t/tree", { CLAUDE_CODE_REMOTE: "true" });
+  const { $, seen } = harnessOf(it, "/t/tree", { ...SESSION_ENV });
 
   assert.equal(await $.fs.read("a.md"), "a");
   await $.fs.write(".se/x.json", "{}");
   assert.equal(disk.read("/t/tree/.se/x.json"), "{}");
   assert.equal(await $.env.get("CLAUDE_CODE_REMOTE"), "true");
+  assert.equal(await $.env.get("CLAUDE_CODE_ENABLE_FUNCTION_HOOKS"), undefined);
   const said = await $.http.fetch("http://127.0.0.1:1/hook", {
     method: "POST",
     body: JSON.stringify({ event: "tool.call" }),
