@@ -58,7 +58,9 @@ type Placements struct {
 	after time.Duration
 	// The wait between two spawns. [[spec/tickets/the-modules-start-together]]
 	gap  time.Duration
-	quit chan struct{}
+	// The timer the spawner waits the start window and each gap on, which a case swaps for one it answers. [[spec/tickets/each-door-meets-one-test]]
+	timer func(time.Duration) <-chan time.Time
+	quit  chan struct{}
 	// The instances a reader waits on: each until its first answer, and again from each run sent until the next. idle wakes the wait. [[spec/tickets/the-split-deployment-takes-over]]
 	pending map[string]bool
 	idle    *sync.Cond
@@ -115,12 +117,18 @@ func (p *Placements) Gap(span time.Duration) *Placements {
 	return p
 }
 
+// Names the timer the spawner waits on, so a case answers each wait it asks and sleeps none. [[spec/tickets/each-door-meets-one-test]]
+func (p *Placements) Timer(timer func(time.Duration) <-chan time.Time) *Placements {
+	p.timer = timer
+	return p
+}
+
 // The gap between two spawns. The door stands while they run, and a read waits for every process's first answer, so the gap stays short. [[spec/tickets/the-modules-start-together]]
 const spawnGap = 20 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, gap: spawnGap, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
+	p := &Placements{bus: bus, store: store, gap: spawnGap, timer: time.After, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {

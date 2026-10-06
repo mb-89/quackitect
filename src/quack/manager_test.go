@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -164,12 +165,25 @@ func stopped(t *testing.T, bin, root string) {
 func built(t *testing.T, folder string) string {
 	t.Helper()
 	bin := binaryIn(folder, "quack")
+	quackBuilds.Add(1)
 	build := exec.Command("go", "build", "-o", bin, "./src/quack")
 	build.Dir = filepath.Join("..", "..")
 	if said, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("the root does not build: %v\n%s", err, said)
 	}
 	return bin
+}
+
+// The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
+var quackBuilds atomic.Int32
+
+// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
+func TestTheQuackBinaryBuildsOnce(t *testing.T) {
+	built(t, t.TempDir())
+	built(t, t.TempDir())
+	if got := quackBuilds.Load(); got != 1 {
+		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
+	}
 }
 
 // A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]

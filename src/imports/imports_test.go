@@ -41,6 +41,13 @@ func plant(t *testing.T) string {
 	return dir
 }
 
+// The planted trees build once a run, and every case reads them, since no analyzer writes there. [[spec/tickets/each-door-meets-one-test]]
+func TestThePlantedTreeBuildsOnce(t *testing.T) {
+	if plant(t) != plant(t) || plantFlagged(t) != plantFlagged(t) {
+		t.Fatal("a planted tree builds again for each case, where one build serves every case")
+	}
+}
+
 func TestADoorImportingAModuleIsNamed(t *testing.T) {
 	t.Parallel()
 	analysistest.Run(t, plant(t), NoModule, "quackitect/src/doors/nosy")

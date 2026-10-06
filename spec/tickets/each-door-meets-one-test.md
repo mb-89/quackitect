@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 1daecf3515b870ee
         size: 848
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: 1dcd491ccd73ca39174d5f8e0f027896c98f0152
+    hash_after: 1dcd491ccd73ca39174d5f8e0f027896c98f0152
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 38931247381717a6
+        size: 3463
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -249,26 +262,33 @@ The audit reads wall time, because a test reaching a real door pays real seconds
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/placements_test.go src/imports/imports_test.go src/quack/manager_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/placements_test.go
+- src/imports/imports_test.go
+- src/quack/manager_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four cases fail on their own assertion. The planted tree builds twice for two calls, and the quack binary takes two go builds for two folders. The spawner asks no wait of the timer the case names, because it still reads the real clock. The quack case alone costs four and a half seconds, two go builds. A surprise: plantFlagged writes its files into the tree plant answers, so the two fixtures share a folder today. Shared, each needs a folder of its own, or the flagged packages leak into the clean cases.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a test or the table: the three moves meet these cases, the table and the child tickets land under implement, and the check decides the last
+- the doors these cases reach stand faked where the case is no door test: the spawner's timer is fake, and the bus and process stay real in the index package, the door package of both
 
 # gate
 
