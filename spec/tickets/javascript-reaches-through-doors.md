@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: acdc248052365f28
         size: 635
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 1b96f8fab62a95d4bf6c5e063675074e461d1b20
+    hash_after: 1b96f8fab62a95d4bf6c5e063675074e461d1b20
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: 70af77eecb1a5860
+        size: 3573
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -251,26 +264,32 @@ the first done_when line falls to `./RUNME.sh doors`, the second to the two decl
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/scripts_tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case reads every production script of the tree and names each walk-around past a marked line. It names the same walk-arounds `./RUNME.sh doors` lists for production JavaScript, so it decides the first done_when line, and goes green once the two declarations land and each file takes its door. It stands in a file of its own, because the red list leaves a whole file out of the check, and `tree_test.go` keeps its green cases inside it. The module tests the draft names already exist, and change with the code.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the case names its claim and asserts it per walk-around, naming the file, line and door
+the case reads the tree and writes nothing
+the case goes red on each walk-around the change removes, as the run shows
 
 # gate
 
