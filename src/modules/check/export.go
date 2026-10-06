@@ -14,7 +14,6 @@ var (
 	ChaptersWanted           = chaptersWanted
 	CheckNote                = checkNote
 	CheckNoteIn              = checkNoteIn
-	EditorDrawsWriteRules    = editorDrawsWriteRules
 	EveryPointerResolvesOver = everyPointerResolves
 	ExtensionsOnOffer        = extensionsOnOffer
 	Fault                    = fault

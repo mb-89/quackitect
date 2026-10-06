@@ -49,7 +49,7 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 		}
 		labels = append(labels, strings.TrimRight(line[:toolColumn], " "))
 	}
-	want := "node vale biome vale-ls go git claude sh python biome lsp-proxy quack lsp editor sidebar browser commit hook vale rules survey server"
+	want := "node biome go git claude sh python biome lsp-proxy quack lsp editor sidebar browser commit hook vale rules survey server"
 	if got := strings.Join(labels, " "); got != want {
 		t.Errorf("the rows read\n%s\nwant\n%s", got, want)
 	}

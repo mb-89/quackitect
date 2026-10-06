@@ -65,7 +65,7 @@ test("a fresh box runs the survey at session start, and the block names what it 
 
 test("a surveyed box reads the file and runs nothing", () => {
   const survey = JSON.stringify({
-    vale: { path: "/usr/bin/vale", version: "3.20.0" },
+    biome: { path: "/usr/bin/biome", version: "2.5.12" },
     node: null,
   });
   const it = box({ [at(TOOLS)]: survey });
@@ -74,13 +74,13 @@ test("a surveyed box reads the file and runs nothing", () => {
 
   const surveyed = it.proc.ran.filter((one) => !one.argv.includes("tools"));
   assert.equal(surveyed.length, 0, "the survey stays as it stands");
-  assert.match(tools.text, /- `vale` 3\.20\.0, for the prose rules/);
+  assert.match(tools.text, /- `biome` 2\.5\.12, for formatting and linting the JavaScript/);
   assert.doesNotMatch(tools.text, /`node`/);
 });
 
 // The index's tool list stands as the one source of the verbs, so a fresh session reads each verb as the tool it calls. [[spec/tickets/agents-call-quack-directly]]
 test("the tools block names each verb as the index tool standing for it", () => {
-  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
+  const survey = JSON.stringify({ biome: { path: "/usr/bin/biome", version: "2.5.12" } });
   const listed = JSON.stringify([
     {
       name: "index_verb_check",
@@ -109,7 +109,7 @@ test("the tools block names each verb as the index tool standing for it", () => 
 
 // A binary answering no list leaves the part out, since the hook registers no tool there. [[spec/tickets/agents-call-quack-directly]]
 test("the tools block leaves the verbs out where the index lists no tool", () => {
-  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
+  const survey = JSON.stringify({ biome: { path: "/usr/bin/biome", version: "2.5.12" } });
   const it = box(
     { [at(TOOLS)]: survey },
     { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { exitCode: 1 } },
@@ -123,7 +123,7 @@ test("the tools block leaves the verbs out where the index lists no tool", () =>
 // [[spec/design_output/level0#a-spawn-names-its-tier]]
 test("the tools block names each tier and its model where the config names them", () => {
   const config = { helper: { find: "haiku", change: "sonnet", decide: "opus" } };
-  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
+  const survey = JSON.stringify({ biome: { path: "/usr/bin/biome", version: "2.5.12" } });
   const it = box({
     [at(TOOLS)]: survey,
     [at("spec/config/level0.json")]: JSON.stringify(config),

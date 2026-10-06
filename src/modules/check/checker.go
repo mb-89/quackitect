@@ -21,12 +21,10 @@ func CheckerOver(tree *Tree, pointer, rule int) *Checker {
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
 var readers = map[string][]func(*Tree) []Finding{
-	Settings:  {settingsNameBinaries, editorDrawsWriteRules, biomeOnWindows, extensionsOnOffer},
-	Install:   {settingsNameBinaries, surveyNamesInstalls},
-	ValeIni:   {editorDrawsWriteRules},
-	EditorIni: {editorDrawsWriteRules},
-	Offered:   {extensionsOnOffer},
-	ToolsAt:   {surveyFindsNode},
+	Settings: {settingsNameBinaries, biomeOnWindows, extensionsOnOffer},
+	Install:  {settingsNameBinaries, surveyNamesInstalls},
+	Offered:  {extensionsOnOffer},
+	ToolsAt:  {surveyFindsNode},
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -82,7 +80,6 @@ func (one *Checker) restatedAll() []Finding {
 // Every rule over the whole tree, which the sweep runs. [[spec/design_output/tree#what-a-rule-answers]]
 var Rules = []func(*Tree) []Finding{
 	settingsNameBinaries,
-	editorDrawsWriteRules,
 	biomeOnWindows,
 	extensionsOnOffer,
 	noLogDeleted,

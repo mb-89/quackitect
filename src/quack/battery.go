@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"regexp"
 	"slices"
 	"strings"
 )
@@ -29,8 +28,6 @@ const (
 const valeSource = "vale"
 
 var ticketFolders = []string{"spec/tickets", ".se/tickets"}
-
-var valeBinary = regexp.MustCompile(`(?i)(^|[\\/])vale(\.exe)?$`)
 
 // One case the runner's reporter wrote. [[spec/guidance/retro/effect]]
 type caseRow struct {
@@ -61,8 +58,7 @@ type redCase struct {
 }
 
 type spawnTally struct {
-	All  int `json:"all"`
-	Vale int `json:"vale"`
+	All int `json:"all"`
 }
 
 // One report of the battery. [[spec/guidance/retro/effect]]
@@ -152,7 +148,7 @@ func redIn(lines string) []redCase {
 	return out
 }
 
-// The tally the process door writes, one line a spawn: how many in all, and how many are Vale. [[spec/guidance/retro/effect]]
+// The tally the process door writes, one line a spawn: how many in all. [[spec/guidance/retro/effect]]
 func spawnsIn(tally string) spawnTally {
 	out := spawnTally{}
 	for _, line := range strings.Split(tally, "\n") {
@@ -160,9 +156,6 @@ func spawnsIn(tally string) spawnTally {
 			continue
 		}
 		out.All++
-		if valeBinary.MatchString(line) {
-			out.Vale++
-		}
 	}
 	return out
 }

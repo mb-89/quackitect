@@ -2,20 +2,9 @@
 // run(argv, { stdin, cwd }); the rules live in spec/config/styles.
 // [[spec/design_output/level0#where-a-rule-lives]]
 
-export const CONFIG = ".vale.ini";
-
 export const PROSE = /\.(md|markdown|txt)$/i;
 // The rule an exemption with no reason draws, named once so the panel labels its source. [[spec/design_output/level0#where-a-rule-lives]]
 export const UNREASONED = "ExemptionCarriesAReason";
-
-const STYLES_PATH = /^[ \t]*StylesPath[ \t]*=.*$/m;
-
-// The config the assembly writes names the styles standing beside it, so Vale reads the pair as one. [[spec/design_output/vehicle#the-styles-assemble-once]]
-export function stylesIn(text, at) {
-  const said = String(text ?? "");
-  const line = `StylesPath = ${at}`;
-  return STYLES_PATH.test(said) ? said.replace(STYLES_PATH, line) : `${line}\n${said}`;
-}
 
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 

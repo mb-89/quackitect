@@ -63,6 +63,10 @@ func TestTheToolsBlockReadsTheSurvey(t *testing.T) {
 	if ToolsText("", tiers) != "" {
 		t.Fatal("a missing survey answers a tools block")
 	}
+	// The Go rules own the prose, so a survey still naming Vale lists no row of it. [[spec/tickets/vale-leaves-the-tree]]
+	if old := ToolsText(`{"vale":{"version":"3.20.0"},"git":{"version":"2.43.0"}}`, tiers); strings.Contains(old, "vale") {
+		t.Fatalf("the tools block names vale:\n%s", old)
+	}
 }
 
 // The canary opening an answer reads same, another count reads other, and a line past the first reads none. [[spec/tickets/brief-answers-off-the-door]]

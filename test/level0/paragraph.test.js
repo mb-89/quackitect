@@ -187,35 +187,25 @@ test("a cap moves in the schema, and the rule file carrying it follows", () => {
   assert.match(files.get(`${TARGET}/Paragraph.yml`), /max: 6/);
   assert.match(files.get(`${TARGET}/ParagraphAnswer.yml`), /max: 3/);
   assert.match(files.get(`${TARGET}/Sentence.yml`), /max: 25/);
-  assert.match(files.get(`${TARGET}/Shape.yml`), /run > 3/);
-  assert.match(files.get(`${TARGET}/ShapeAnswer.yml`), /run > 2/);
-  assert.match(files.get(`${TARGET}/ListItem.yml`), /n > 20/);
-  assert.match(files.get(`${TARGET}/CodeSpans.yml`), /len\(seen\) > 4/);
+  assert.match(files.get(`${TARGET}/Shape.yml`), /A run holds 3 paragraphs\./);
+  assert.match(files.get(`${TARGET}/ShapeAnswer.yml`), /A run holds 2 paragraphs in an answer\./);
+  assert.match(files.get(`${TARGET}/ListItem.yml`), /holds 20 words\./);
+  assert.match(files.get(`${TARGET}/CodeSpans.yml`), /holds 4 code spans\./);
 
   const tighter = rulesFrom({
     layers: { shape: { sentencesPerParagraph: 4, paragraphsPerRun: 2 } },
   });
   assert.match(tighter.get("Paragraph.yml"), /max: 4/);
-  assert.match(tighter.get("Shape.yml"), /run > 2/);
+  assert.match(tighter.get("Shape.yml"), /A run holds 2 paragraphs\./);
 });
 
-// [[spec/design_output/projection#the-list-opens-an-answer]]
-test("the answer rule holds the opening list, and the prose rule holds none", () => {
-  const files = drawn();
-  const answer = files.get(`${TARGET}/ShapeAnswer.yml`);
-  assert.match(answer, /An answer opens with a list/);
-  assert.match(answer, /A heading stands under the TL;DR list/);
-  assert.ok(!files.get(`${TARGET}/Shape.yml`).includes("opens with a list"));
-
-  // [[spec/design_output/projection#the-list-opens-an-answer]]
-  assert.ok(!answer.includes('has_prefix(line, "|")'));
-
-  const asked = rulesFrom({
-    registers: {
-      answer: { opens: [{ block: "questions" }, { block: "tldr" }] },
-    },
-  });
-  assert.match(asked.get("ShapeAnswer.yml"), /has_prefix\(line, "\|"\)/);
+// The Go rules run each script by its check id, so a script rule file carries its head alone. [[spec/tickets/vale-leaves-the-tree]]
+test("a script rule file carries its head, and no script body", () => {
+  for (const [name, text] of drawn()) {
+    if (!/^extends: script$/m.test(text)) continue;
+    assert.doesNotMatch(text, /^script:/m, name);
+    assert.match(text, /^scope: raw\n$/m, name);
+  }
 });
 
 // [[spec/tickets/one-list-holds-the-warnings]]
@@ -244,17 +234,11 @@ test("the tree's own schema names no side, so every rule it writes reads error",
   }
 });
 
-// [[spec/design_output/projection#the-list-opens-an-answer]]
-test("an answer register naming no tldr block writes no opening rule", () => {
-  const bare = rulesFrom({ registers: { answer: { opens: [] } } });
-  assert.ok(!bare.get("ShapeAnswer.yml").includes("opens with a list"));
-});
-
 // [[spec/design_output/projection#the-schema-names-a-mark]]
 test("the punctuation stands by name, and the rule carries the character", () => {
   const said = drawn().get(`${TARGET}/Characters.yml`);
-  assert.match(said, /\\\.\\,\\-/, "the set reads full stop, comma and hyphen");
-  assert.ok(!said.includes("\\?"), "a mark the schema leaves out stands nowhere");
+  assert.match(said, /letters, digits, space, and \. , -\./, "the set reads full stop, comma and hyphen");
+  assert.ok(!said.includes(" ? "), "a mark the schema leaves out stands nowhere");
 });
 
 // [[spec/design_output/projection#the-grammar-rules]]
@@ -263,11 +247,6 @@ test("a word the retro leaves standing reaches every rule reading a tag", () => 
   assert.match(files.get(`${TARGET}/PastTense.yml`), /^ {2}- held$/m);
   assert.match(files.get(`${TARGET}/Auxiliary.yml`), /^ {2}- has held$/m);
   assert.match(files.get(`${TARGET}/Progressive.yml`), /^ {2}- is held$/m);
-  assert.match(
-    files.get(`${TARGET}/Characters.yml`),
-    /blanked\(said, "TL;DR"\)/,
-    "a phrase the characters layer leaves standing is blanked before the scan",
-  );
 });
 
 // [[spec/design_output/projection#the-grammar-rules]]

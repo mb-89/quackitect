@@ -1,22 +1,9 @@
-// The paragraph schema, projected into Vale. The schema hands over the values
-// and this module holds the Tengo, so a cap moves in the schema and the rule
-// files follow at the next projection.
+// The paragraph schema, projected into rule files. The schema hands over the
+// values, so a cap moves in the schema and the rule files follow at the next
+// projection. A script rule carries its head alone.
 // [[spec/design_output/projection#the-second-target]]
 
-import {
-  counted,
-  escaped,
-  FRONT,
-  grouped,
-  LINK,
-  pattern,
-  prelude,
-  quoted,
-  scripted,
-  sequenced,
-  swapped,
-  WIDTH,
-} from "./snippets.js";
+import { counted, grouped, LINK, scripted, sequenced, swapped, WIDTH } from "./snippets.js";
 import { codeSpans, restatedTable } from "./paragraph-rules.js";
 import { vocabularyRule, wordsOf } from "./vocabulary.js";
 
@@ -160,15 +147,15 @@ export function rulesFrom(said, banner = "", lists = null) {
   const held = { ...layer("shape"), ...(answer.shape ?? {}), prose };
 
   put("Characters.yml", characters(layer("characters")));
-  put("Markup.yml", markup(layer("markup")));
-  put("Shape.yml", run(layer("shape"), "", []));
-  put("ShapeAnswer.yml", run(held, " in an answer", answer.opens ?? []));
+  put("Markup.yml", markup());
+  put("Shape.yml", run(layer("shape"), ""));
+  put("ShapeAnswer.yml", run(held, " in an answer"));
   put("Paragraph.yml", paragraph(layer("shape"), ""));
   put("ParagraphAnswer.yml", paragraph(held, " in an answer"));
   put("Sentence.yml", sentence(layer("sentence")));
   put("ListItem.yml", listItem(layer("sentence")));
   put("CodeSpans.yml", codeSpans(layer("sentence")));
-  put("RestatedTable.yml", restatedTable(layer("restated")));
+  put("RestatedTable.yml", restatedTable());
   for (const [name, body] of grammar(layers.grammar ?? {})) put(name, body);
 
   // [[spec/design_output/projection#a-layer-writes-two-files]]
@@ -180,7 +167,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   if (modals) put("ModalRequirement.yml", modals);
   // [[spec/design_output/projection#the-second-target]]
   const words = wordsOf(lists);
-  if (words.length) put("Vocabulary.yml", vocabularyRule(layer("vocabulary"), lists));
+  if (words.length) put("Vocabulary.yml", vocabularyRule(layer("vocabulary")));
   return out;
 }
 
@@ -205,219 +192,25 @@ function file(banner, body) {
   return `${rows.map((one) => `# ${one}`).join("\n")}\n${body}`;
 }
 
-// [[spec/design_output/projection#the-grammar-rules]]
-function left(layer) {
-  return (layer?.exceptions ?? [])
-    .map((one) => String(one?.word ?? one))
-    .filter(Boolean);
-}
-
 // [[spec/design_output/projection#the-second-target]]
 function characters(layer) {
   const marks = (layer.punctuation ?? []).map((name) => MARKS.get(String(name)) ?? "");
   const set = [...new Set(marks.join("").split(""))].join("");
   const shown = set.split("").join(" ");
   const tail = `stands outside the set a paragraph admits: letters, digits, space, and ${shown}. Write it in words, or put it in a code span.`;
-  const message = `A character ${tail}`;
-
-  return scripted(message, [
-    ...prelude([], true, layer.prose),
-    "said := plain(scope)",
-    "said = blanked(said, `(?m)^#{1,6} +`)",
-    "said = blanked(said, `(?m)^[ \\t]*(?:[-*+]|[0-9]+[.)]) +`)",
-    "said = blanked(said, `(?m)^[ \\t]*> ?`)",
-    "said = blanked(said, `\\|`)",
-    "said = blanked(said, `[*_]`)",
-    ...left(layer).map((one) => `said = blanked(said, ${quoted(pattern(one))})`),
-    "",
-    `found := text.re_find(\`[^\\pL\\pN\\s${escaped(set)}]\`, said, -1)`,
-    "if !is_undefined(found) {",
-    "  for one in found {",
-    "    m := one[0]",
-    "    matches = append(matches, {",
-    "      begin: m.begin,",
-    "      end: m.end,",
-    `      message: "The character " + m.text + " " + ${quoted(tail)}`,
-    "    })",
-    "  }",
-    "}",
-  ]);
+  return scripted(`A character ${tail}`);
 }
 
 // [[spec/design_output/projection#the-second-target]]
-function markup(layer) {
-  const cap = Number(layer.heading?.words);
-  const lead = Number(layer.strongLead?.words);
-  const one = layer.heading?.oneTitle === true;
-
-  return scripted("This markup stands outside what a paragraph admits.", [
-    ...prelude(["rows", "words"], true, layer.prose),
-    "said := plain(scope)",
-    "",
-    "for row in rows(said) {",
-    "  line := text.trim_space(row.said)",
-    "",
-    "  if text.re_match(`^#{1,6}\\s`, line) {",
-    '    title := text.re_replace(`^#+\\s*`, line, "")',
-    '    title = text.re_replace(`^[0-9]+[.)]\\s*`, title, "")',
-    '    title = text.re_replace(`[*_]`, title, "")',
-    `    if words(title) > ${cap} {`,
-    "      matches = append(matches, {",
-    "        begin: row.begin,",
-    "        end: row.end,",
-    `        message: "A heading holds ${cap} words, and this one holds " + string(words(title)) + ". Cut it, and let the prose carry the rest."`,
-    "      })",
-    "    }",
-    ...(one
-      ? [
-          "    if text.re_match(`\\s[-]\\s|:\\s`, title) {",
-          "      matches = append(matches, {",
-          "        begin: row.begin,",
-          "        end: row.end,",
-          '        message: "A dash or a colon makes a heading into two. Name one thing."',
-          "      })",
-          "    }",
-        ]
-      : []),
-    "  }",
-    "",
-    "  found := text.re_find(`^[ \\t]*(?:[-*+]|[0-9]+[.)])\\s+\\*\\*([^*]+)\\*\\*`, row.said, 1)",
-    "  if !is_undefined(found) {",
-    `    if words(found[0][1].text) > ${lead} {`,
-    "      matches = append(matches, {",
-    "        begin: row.begin,",
-    "        end: row.end,",
-    `        message: "A strong lead holds ${lead} words, and this one holds " + string(words(found[0][1].text)) + ". Cut it."`,
-    "      })",
-    "    }",
-    "  }",
-    "}",
-    "",
-    "outside := text.re_find(`!\\[[^\\]]*\\]\\(|</?[A-Za-z][A-Za-z0-9]*(?:\\s[^>]*)?>`, said, -1)",
-    "if !is_undefined(outside) {",
-    "  for one in outside {",
-    "    matches = append(matches, {",
-    "      begin: one[0].begin,",
-    "      end: one[0].end,",
-    '      message: "An image and a tag stand outside the markup a paragraph admits. Write a code span, a link, a fence, a table, a list item, a heading or a strong lead."',
-    "    })",
-    "  }",
-    "}",
-  ]);
+function markup() {
+  return scripted("This markup stands outside what a paragraph admits.");
 }
 
 // [[spec/design_output/projection#the-list-opens-an-answer]]
-const OPENS_LIST = [
-  "An answer opens with a list, one sentence an item and one bottom line each.",
-  "Write that list here.",
-].join(" ");
-
-// [[spec/design_output/projection#the-list-opens-an-answer]]
-const OPENS_HEADING = [
-  "A heading stands under the TL;DR list, and this one opens the answer.",
-  "Write the list first.",
-].join(" ");
-
-// [[spec/design_output/projection#the-list-opens-an-answer]]
-function opening(opens) {
-  const list = Array.isArray(opens) ? opens : [];
-  if (!list.some((one) => String(one?.block) === "tldr")) return [];
-  const table = list.some((one) => String(one?.block) === "questions");
-
-  return [
-    "",
-    "opened := false",
-    'first := {said: "", begin: 0, end: 0}',
-    "fence := false",
-    "",
-    "for row in rows(said) {",
-    "  if opened { break }",
-    "  line := text.trim_space(row.said)",
-    '  if text.has_prefix(line, "```") {',
-    "    fence = !fence",
-    "    continue",
-    "  }",
-    "  if fence { continue }",
-    "  if len(line) == 0 { continue }",
-    ...(table ? ['  if text.has_prefix(line, "|") { continue }'] : []),
-    "  first = row",
-    "  opened = true",
-    "}",
-    "",
-    "if opened {",
-    "  head := text.trim_space(first.said)",
-    "  if !text.re_match(`^(?:[-*+]|[0-9]+[.)])\\s+\\S`, head) {",
-    `    why := ${quoted(OPENS_LIST)}`,
-    '    if text.has_prefix(head, "#") {',
-    `      why = ${quoted(OPENS_HEADING)}`,
-    "    }",
-    "    matches = append(matches, {",
-    "      begin: first.begin,",
-    "      end: first.end,",
-    "      message: why",
-    "    })",
-    "  }",
-    "}",
-  ];
-}
-
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-function run(layer, where, opens = []) {
+function run(layer, where) {
   const most = Number(layer.paragraphsPerRun);
-
-  return scripted(`A run holds ${most} paragraphs${where}.`, [
-    ...prelude(["rows", "structure"], true, layer.prose),
-    FRONT,
-    "",
-    "fenced := false",
-    "inPara := false",
-    "run := 0",
-    "runStart := 0",
-    "runEnd := 0",
-    "",
-    "closeRun := func() {",
-    `  if run > ${most} {`,
-    "    matches = append(matches, {",
-    "      begin: runStart,",
-    "      end: runEnd,",
-    `      message: "A run holds ${most} paragraphs${where} with no list, table or diagram between them, and this one holds " + string(run) + ". Carry the rest as structure."`,
-    "    })",
-    "  }",
-    "  run = 0",
-    "}",
-    "",
-    "for row in rows(said) {",
-    "  trimmed := text.trim_space(row.said)",
-    "",
-    '  if text.has_prefix(trimmed, "```") {',
-    "    inPara = false",
-    "    closeRun()",
-    "    fenced = !fenced",
-    "    continue",
-    "  }",
-    "  if fenced { continue }",
-    "",
-    "  if len(trimmed) == 0 {",
-    "    inPara = false",
-    "    continue",
-    "  }",
-    "",
-    "  if structure(row.said) {",
-    "    inPara = false",
-    "    closeRun()",
-    "    continue",
-    "  }",
-    "",
-    "  if !inPara {",
-    "    inPara = true",
-    "    if run == 0 { runStart = row.begin }",
-    "    run++",
-    "  }",
-    "  runEnd = row.end",
-    "}",
-    "closeRun()",
-    ...opening(opens),
-  ]);
+  return scripted(`A run holds ${most} paragraphs${where}.`);
 }
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
@@ -445,34 +238,7 @@ function sentence(layer) {
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function listItem(layer) {
   const most = Number(layer.words?.listItem);
-
-  return scripted(`A sentence in a list item holds ${most} words.`, [
-    ...prelude(["rows", "words"], true, layer.prose),
-    FRONT,
-    "fenced := false",
-    "",
-    "for row in rows(said) {",
-    "  trimmed := text.trim_space(row.said)",
-    '  if text.has_prefix(trimmed, "```") {',
-    "    fenced = !fenced",
-    "    continue",
-    "  }",
-    "  if fenced { continue }",
-    "  if !text.re_match(`^[ \\t]*(?:[-*+]|[0-9]+[.)])\\s`, row.said) { continue }",
-    "",
-    '  item := text.re_replace(`^[ \\t]*(?:[-*+]|[0-9]+[.)])\\s+`, trimmed, "")',
-    "  for part in text.re_split(`[.!?]+(?:\\s|$)`, item, -1) {",
-    "    n := words(part)",
-    `    if n > ${most} {`,
-    "      matches = append(matches, {",
-    "        begin: row.begin,",
-    "        end: row.end,",
-    `        message: "A sentence in a list item holds ${most} words, and this one holds " + string(n) + ". Cut it."`,
-    "      })",
-    "    }",
-    "  }",
-    "}",
-  ]);
+  return scripted(`A sentence in a list item holds ${most} words.`);
 }
 
 

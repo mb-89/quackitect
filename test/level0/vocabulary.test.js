@@ -168,16 +168,12 @@ test("a means line answers every word the lists leave out, and a stem stands", (
   ]);
 });
 
-// The rule and the check read one table of endings, and the lists hand it in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+// The check reads the table of endings the lists hand in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 test("the table of endings stands a stem, a prefix, and nothing past them", () => {
   const stems = stemsOf(readYaml(STEMS_TEXT));
   const known = knownIn(new Set(["read", "refuse", "stop", "cay"]), stems);
   for (const w of ["reads", "refused", "stopped", "cazz", "unread"]) assert.ok(known(w), w);
   for (const w of ["reader", "reading", "cities", "reread", "azz"]) assert.ok(!known(w), w);
-  const rule = rulesFrom(readYaml(SCHEMA), "", lists()).get("Vocabulary.yml") ?? "";
-  assert.match(rule, /has_suffix\(w, "zz"\)/);
-  assert.doesNotMatch(rule, /has_suffix\(w, "ing"\)/);
-  assert.match(rule, /for pre in \["un"\]/);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -209,12 +205,13 @@ test("a swap hands a refused word its core word, and wins over a listed word", (
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-test("the projector writes one rule inlining the words and the swaps", () => {
+// The Go rules read the lists themselves, so the rule file carries its head alone. [[spec/tickets/vale-leaves-the-tree]]
+test("the projector writes one rule head naming the terms list, and inlines no word", () => {
   const rules = rulesFrom(readYaml(SCHEMA), "", lists());
   const rule = rules.get("Vocabulary.yml");
   assert.ok(rule, "the rule stands");
-  assert.match(rule, /\bdoor\b/);
-  assert.match(rule, /deny=refuse/);
+  assert.match(rule, /^extends: script$/m);
+  assert.doesNotMatch(rule, /deny=refuse|^script:/m);
   assert.match(rule, /spec\/vocabulary\/terms\.yml with one line that says what it means/);
   assert.equal(rulesFrom(readYaml(SCHEMA), "", null).has("Vocabulary.yml"), false);
 });
@@ -229,7 +226,7 @@ test("the projection reads the three lists the schema names, beside the schema",
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-test("readAll takes the lists off the disk, and the rule carries the words", () => {
+test("readAll takes the lists off the disk, and a list holding a word writes the rule", () => {
   const disk = fakeDisk({
     [SOURCE]: SCHEMA,
     [CORE]: CORE_TEXT,
@@ -238,8 +235,7 @@ test("readAll takes the lists off the disk, and the rule carries the words", () 
   });
   const said = readAll([ENTRY], disk);
   const rule = said.wanted.get(`${TARGET}/Vocabulary.yml`);
-  assert.match(rule, /\bdoor\b/);
-  assert.match(rule, /however=but/);
+  assert.match(rule, /^message: "A word stands outside the words this tree writes\./m);
 
   const texts = new Map([[SOURCE, SCHEMA]]);
   assert.equal(

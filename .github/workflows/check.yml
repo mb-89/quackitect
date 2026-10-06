@@ -35,6 +35,6 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: .se/bin
-          key: se-bin-${{ runner.os }}-vale3.20.0-biome2.5.12
+          key: se-bin-${{ runner.os }}-biome2.5.12
 
       - run: ./RUNME.sh check

@@ -1,47 +1,16 @@
-// The language servers and their release assets. A wrong asset name costs
-// a person one failed install. The cases that read the tracked settings drive
-// the real disk, so they stand in test/contract.
+// The extensions the tracked settings offer. The cases that read the tracked
+// settings drive the real disk, so they stand in test/contract.
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  EXTENSIONS,
-  VALE_LS_VERSION,
-  valeLsAsset,
-  valeLsUrl,
-} from "../../.claude/skills/level0/lib/servers.js";
-
-test("every platform the installer knows names an asset", () => {
-  for (const os of ["Linux", "macOS", "Windows"]) {
-    for (const arch of ["64-bit", "arm64"]) {
-      assert.match(valeLsAsset(os, arch), /^vale-ls-.+\.zip$/, `${os} ${arch}`);
-    }
-  }
-});
-
-test("Windows on x86 takes the gnu asset, and on arm64 the msvc one", () => {
-  assert.equal(valeLsAsset("Windows", "64-bit"), "vale-ls-x86_64-pc-windows-gnu.zip");
-  assert.equal(valeLsAsset("Windows", "arm64"), "vale-ls-aarch64-pc-windows-msvc.zip");
-});
-
-test("a platform the release skips answers an empty string", () => {
-  assert.equal(valeLsAsset("Plan9", "64-bit"), "");
-  assert.equal(valeLsUrl("Plan9", "64-bit"), "");
-});
-
-test("the url carries the pinned version and the release host", () => {
-  assert.equal(
-    valeLsUrl("Linux", "64-bit"),
-    "https://github.com/vale-cli/vale-ls/releases/download/" +
-      `v${VALE_LS_VERSION}/vale-ls-x86_64-unknown-linux-gnu.zip`,
-  );
-});
+import { EXTENSIONS, namesTheBinaries } from "../../.claude/skills/level0/lib/servers.js";
 
 // The design draws its diagrams in Mermaid, so the editor's preview takes the extension that renders them. [[spec/design_output/editor#what-the-tracked-settings-say]]
-test("the extensions on offer carry the Mermaid preview beside Vale and Biome", () => {
-  assert.deepEqual(EXTENSIONS, [
-    "chrischinchilla.vale-vscode",
-    "biomejs.biome",
-    "bierner.markdown-mermaid",
-  ]);
+test("the extensions on offer carry the Mermaid preview beside Biome", () => {
+  assert.deepEqual(EXTENSIONS, ["biomejs.biome", "bierner.markdown-mermaid"]);
+});
+
+// The Go rules draw every prose rule in the editor, so the settings name Biome alone. [[spec/tickets/vale-leaves-the-tree]]
+test("the settings check names Biome's binary and config, and no prose linter", () => {
+  assert.deepEqual(Object.keys(namesTheBinaries({})), ["biome", "biomeConfig"]);
 });

@@ -7,11 +7,6 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import {
-  VALE_LS_RELEASES,
-  VALE_LS_VERSION,
-  valeLsAsset,
-} from "../../.claude/skills/level0/lib/servers.js";
 import { rebuilt } from "../../.claude/skills/level0/lib/tools.js";
 import { disk } from "../../src/doors/disk.js";
 import { FETCHING } from "./fetching.js";
@@ -69,24 +64,6 @@ test("the install hands its JavaScript steps to the setup verb, and goes on wher
     "the verb registers in the index",
   );
   assert.ok(WANTS.length > 0, "the verb names its wants");
-});
-
-// The shell spells the asset table servers.js owns, because a shell script imports nothing. [[spec/design_output/editor#the-asset-matrix]]
-test("the vale-ls assets the install spells match the ones servers.js names", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  assert.match(
-    said,
-    new RegExp(`^vale_ls_version=${VALE_LS_VERSION.replaceAll(".", "\\.")}$`, "m"),
-  );
-  assert.ok(
-    said.includes(VALE_LS_RELEASES),
-    "the script downloads from the releases servers.js names",
-  );
-  const rows = [...said.matchAll(/^\s*(\w+)-([\w-]+)\)\s+target=(\S+) ;;$/gm)];
-  assert.equal(rows.length, 6, "the script names every platform servers.js names");
-  for (const [, os, arch, target] of rows) {
-    assert.equal(`vale-ls-${target}.zip`, valeLsAsset(os, arch), `${os} ${arch}`);
-  }
 });
 
 // The modules land after Go and before the builds, so the first check fetches nothing, and a skip names the want. [[spec/tickets/the-install-fetches-go-modules]]
@@ -168,5 +145,5 @@ test("the install downloads no Zig", () => {
 // The Go rules hold every prose rule, so the install fetches no Vale and no language server of it. [[spec/tickets/vale-leaves-the-tree]]
 test("the install fetches no Vale and no vale language server", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  assert.doesNotMatch(said, /errata-ai|vale-cli|get_vale/);
+  assert.deepEqual(said.match(/vale/gi) ?? [], []);
 });

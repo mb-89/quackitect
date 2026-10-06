@@ -3,6 +3,7 @@
 package rules
 
 import (
+	"os"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -51,5 +52,25 @@ func TestARootHoldingNoRuleFileNamesTheFirstPathItReadsEmpty(t *testing.T) {
 	_, err := Load(func(string) string { return "" })
 	if err == nil || err.Error() != "no rule stands at "+ruleFiles[0] {
 		t.Errorf("Load over an empty root answers %v", err)
+	}
+}
+
+// The scope reads a vocabulary file as YAML under VoiceShape, which the ini's formats block held before. [[spec/tickets/vale-leaves-the-tree]]
+func TestAYAMLFileUnderTheVocabularyMeetsItsRules(t *testing.T) {
+	t.Parallel()
+	set := loaded(t)
+	broken := ofRule(set.Lint("spec/vocabulary/terms.yml", "terms:\n  - {word: splice}\n"), "VoiceShape.VocabularyEntry")
+	if len(broken) == 0 {
+		t.Error("an entry missing its meaning draws no VocabularyEntry under spec/vocabulary")
+	}
+	text, err := os.ReadFile(filepath.Join("..", "..", "spec", "vocabulary", "terms.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if found := ofRule(set.Lint("spec/vocabulary/terms.yml", string(text)), "VoiceShape.VocabularyEntry"); len(found) != 0 {
+		t.Errorf("the tree's own terms draw %+v", found)
+	}
+	if found := ofRule(set.Lint("spec/other/terms.yml", "terms:\n  - {word: splice}\n"), "VoiceShape.VocabularyEntry"); len(found) != 0 {
+		t.Errorf("a YAML file outside the vocabulary draws %+v", found)
 	}
 }

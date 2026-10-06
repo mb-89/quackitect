@@ -59,10 +59,10 @@ func TestBatteryReport(t *testing.T) {
 			t.Fatalf("green lines read red %v", got)
 		}
 	})
-	t.Run("the tally counts a line a spawn, and the ones that are Vale", func(t *testing.T) {
-		tally := strings.Join([]string{"/tree/.se/.runtime/bin/vale", "/usr/bin/node", `C:\tree\.se\.runtime\bin\vale.exe`, "sh", ""}, "\n")
-		if got := spawnsIn(tally); got != (spawnTally{4, 2}) {
-			t.Fatalf("the tally reads %v, and wants 4 and 2", got)
+	t.Run("the tally counts a line a spawn", func(t *testing.T) {
+		tally := strings.Join([]string{"/tree/.se/.runtime/bin/biome", "/usr/bin/node", `C:\tree\.se\.runtime\bin\biome.exe`, "sh", ""}, "\n")
+		if got := spawnsIn(tally); got != (spawnTally{4}) {
+			t.Fatalf("the tally reads %v, and wants 4", got)
 		}
 		if got := spawnsIn(""); got != (spawnTally{}) {
 			t.Fatalf("no tally reads %v", got)
@@ -75,14 +75,14 @@ func TestBatteryReport(t *testing.T) {
 		}
 	})
 	t.Run("a report carries each part rounded, their sum, the slowest, the files, the unrun, the red and the spawns", func(t *testing.T) {
-		said := batteryOf(map[string]float64{"tests": 1200.6, "go": 300.2, "rules": 0}, redLines, 1, []string{"go", "rules"}, &spawnTally{4, 2}, -1)
+		said := batteryOf(map[string]float64{"tests": 1200.6, "go": 300.2, "rules": 0}, redLines, 1, []string{"go", "rules"}, &spawnTally{4}, -1)
 		if !reflect.DeepEqual(said.Parts, map[string]int64{"tests": 1201, "go": 300, "rules": 0}) || said.Total != 1501 {
 			t.Fatalf("the parts read %v in %d", said.Parts, said.Total)
 		}
 		if len(said.Slowest) != 1 || !reflect.DeepEqual(said.Files, []fileTime{{"test/contract/stub.test.js", 21}}) {
 			t.Fatalf("the slowest read %v, and the files %v", said.Slowest, said.Files)
 		}
-		if !reflect.DeepEqual(said.Unrun, []string{"go", "rules"}) || len(said.Red) != 1 || *said.Spawns != (spawnTally{4, 2}) {
+		if !reflect.DeepEqual(said.Unrun, []string{"go", "rules"}) || len(said.Red) != 1 || *said.Spawns != (spawnTally{4}) {
 			t.Fatalf("the unrun read %v, the red %v, the spawns %v", said.Unrun, said.Red, said.Spawns)
 		}
 		bare := batteryOf(map[string]float64{"tests": 5}, caseLines, 10, nil, nil, -1)

@@ -8,12 +8,6 @@
       "message": "A file holds 600 lines, and the file holds 843. Split it by topic."
     },
     {
-      "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
-      "rule": "FileCeiling",
-      "line": 1,
-      "message": "A file holds 600 lines, and the file holds 2480. Split it by topic."
-    },
-    {
       "file": "spec/design_input/the-agent-pulls-tickets.md",
       "rule": "FileCeiling",
       "line": 1,

@@ -101,7 +101,7 @@ func paraLeft(layer *yaml.Doc) []string {
 	return out
 }
 
-// The frontmatter blanked past the fields the schema calls prose, as frontless in helpers.js writes it. [[spec/tickets/voice-rules-skip-the-record]]
+// The frontmatter blanked past the fields the schema calls prose. [[spec/tickets/voice-rules-skip-the-record]]
 func paraFrontless(keys []string, said string) string {
 	lines := strings.Split(said, "\n")
 	if len(lines) < 2 || strings.TrimSpace(lines[0]) != "---" {

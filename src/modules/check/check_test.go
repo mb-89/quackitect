@@ -5,6 +5,7 @@ package check
 
 import (
 	"slices"
+	"strings"
 	"testing"
 
 	"quackitect/src/q"
@@ -27,5 +28,19 @@ func TestEveryTwinNameStands(t *testing.T) {
 func TestTheTwinsHoldNoVale(t *testing.T) {
 	if slices.Contains(Twins, "vale") {
 		t.Fatalf("the twins %v hold vale, and the Go rules own the prose", Twins)
+	}
+}
+
+// The Go rules own every prose rule, so the survey, the editor offer and the two-file rules name no Vale. [[spec/tickets/vale-leaves-the-tree]]
+func TestTheListsAndTheEditorRulesNameNoVale(t *testing.T) {
+	for _, one := range append(slices.Clone(Wanted), Extensions...) {
+		if strings.Contains(one, "vale") {
+			t.Errorf("%s stands among the tools and the extensions", one)
+		}
+	}
+	for path := range readers {
+		if strings.Contains(path, "vale") {
+			t.Errorf("a two-file rule reads %s", path)
+		}
 	}
 }

@@ -198,8 +198,8 @@ func TestParagraphRulesTakeTheirSideAndTheBanner(t *testing.T) {
 	if markup := said.Wanted["r/Markup.yml"]; !strings.Contains(markup, "\nlevel: error\n") {
 		t.Error("a side outside error and warning reads as other than error")
 	}
-	if chars := said.Wanted["r/Characters.yml"]; !strings.Contains(chars, "`[^\\pL\\pN\\s\\,\\(\\)]`") {
-		t.Errorf("the character rule's class reads wrong:\n%s", chars)
+	if chars := said.Wanted["r/Characters.yml"]; !strings.Contains(chars, "letters, digits, space, and , ( ).") || strings.Contains(chars, "script:") {
+		t.Errorf("the character rule's set reads wrong, or it carries a script body:\n%s", chars)
 	}
 	if _, held := said.Wanted["r/Vocabulary.yml"]; held {
 		t.Error("the vocabulary rule stands, and no list names a word")
