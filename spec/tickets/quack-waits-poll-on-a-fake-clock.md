@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 5639100f0502124e
         size: 578
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4117c4229ee95a8707cf3c235d41314dae6b8efc
+    hash_after: 4117c4229ee95a8707cf3c235d41314dae6b8efc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: a9ea4ea99c1ddc56
+        size: 2261
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,31 @@ The cost: a wait that never ends costs the battery its whole timeout, where the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/clock_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/imports/clock_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The guard names src/quack/waits_test.go and its time.Sleep once the row leaves the family table, which is the assertion done_when 1 reads. No surprise: the sleep in ended is the one wait on the wall clock the file holds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 meets the guard, red now, and done_when 2 is the check
+- the tests reach no door: the guard reads the tree, and the wait cases run the manager in memory
 
 # gate
 
