@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 1149de53e89605c65bf25da051bcb40d30f889f2
+    hash_after: 1149de53e89605c65bf25da051bcb40d30f889f2
+    inputs:
+      - name: ask
+        hash: 91948bcaf972bb1f
+        size: 615
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +167,64 @@ Without it, a node loses its remedy, or a site raises an id nobody registers, an
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/failures#the-check-holds-the-registry]] holds the approach. The tree cases follow src/imports/tree_test.go: pure fault functions, and one case a rule that reads the tree under ../.. through the package's door.
+
+src/failure/check.go adds three fault functions. NodeFaults(reader) answers each fault NodeOf names over every node under spec/failures. RaiseFaults(registry, files) reads each source text it is handed for a literal id inside a Go Raise call or a JavaScript raise call, and answers each id the registry lacks. DoorFaults(moved, files) answers each moved file whose text still holds the refusal call it held before the move.
+
+Moved maps a file to that refusal call, and stands empty until the refusal move fills it.
+
+The door gains Walk(folder), which lists every file under a folder by slashed path. Dir and FakeDir both answer it, and the contract case holds the two to the same answer. The raise scan walks src and .claude/skills/level0, and skips test files and test/, since a case raises made-up ids against a fake.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- none today: the fault functions, Moved and Walk are new
+- the check, through go test ./src/..., which runs the tree cases
+- the refusal move, which adds each moved file to Moved
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/failure/check_test.go TestNodeFaultsNameANodeWithNoRemedy
+- src/failure/check_test.go TestRaiseFaultsNameAnIdWithNoNode
+- src/failure/check_test.go TestDoorFaultsNameAMovedFileHoldingItsRefusal
+- src/failure/tree_test.go TestEveryNodeNamesARemedy
+- src/failure/tree_test.go TestEveryRaisedIdStandsAsANode
+- src/failure/tree_test.go TestTheMovedFilesWriteNoRefusalPastTheDoor
+- src/failure/door_contract_test.go TestDirAndFakeDirAnswerAlike, extended to Walk
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/failure/check.go
+- src/failure/check_test.go
+- src/failure/tree_test.go
+- src/failure/door.go
+- src/failure/door_contract_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened src/failure/node.go, registry.go, door.go, raise.go, src/doors/failure.js and src/imports/tree_test.go, and checked each claim the approach makes against them
+- the callers list names the check and the refusal move, since no caller stands today
+- each done_when line maps to a tree case: the remedy line to TestEveryNodeNamesARemedy, the raised id line to TestEveryRaisedIdStandsAsANode, the moved files line to TestTheMovedFilesWriteNoRefusalPastTheDoor, and the check to ./RUNME.sh check
 
 ## tests-red
 
