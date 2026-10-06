@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ".claude/skills/work/SKILL.md:14:1: ListItem: A sentence in a list item holds 20 words, and this one holds 26. Cut it."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: eca24cc712d1790591a500b2e636bcfe3c8b163c
+    hash_after: eca24cc712d1790591a500b2e636bcfe3c8b163c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 903a5e28ce3cdf10
+        size: 700
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -339,26 +362,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_test.go src/branches/dispatch_fire_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A red check now ends on its red cases, each as file, line, name and what it said, for a runner case and a Go test alike. The reporter writes the line, and the loud Go run keeps its output so the check reads the FAIL lines. The dispatch reads the open pull requests and their check runs, and fires one worker at each red work pull request whose branch stands at done, within the fire cap. dispatch.yml wakes when the check workflow fails on a work branch, so the fire comes at once. The read of check runs rides PULL_TOKEN, which needs read access to checks and pull requests. A worker that switches onto a done branch leaves it at done, so an hourly run can fire twice during a long fix, and a note carries that to the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus one line in src/branches/dispatch.go the fire guard reads
+- every door the change reaches runs over its fake: checkFake, the fake hub, and a helper process for the loud run
+- the workflow and the skill point at this ticket
+- the red row format stands once, in saysParts
 
 # accept
 

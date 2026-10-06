@@ -18,6 +18,7 @@ const fakeGoRedEnv = "QUACK_FAKE_GO_RED"
 
 // A process printing what a red go test prints, run as this test binary under the variable. [[spec/guidance/code/testing]]
 func TestFakeGoRedProcess(t *testing.T) {
+	t.Parallel()
 	if os.Getenv(fakeGoRedEnv) == "" {
 		return
 	}
