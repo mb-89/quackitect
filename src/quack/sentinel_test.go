@@ -26,6 +26,7 @@ A box takes a branch.
 
 // A post a watch matches writes the fired failure's row, its id under the id field. [[spec/tickets/the-hooks-feed-the-sentinel]]
 func TestSentinelOverWritesTheFiredRow(t *testing.T) {
+	t.Parallel()
 	rows := []map[string]any{}
 	say := func(row map[string]any) error { rows = append(rows, row); return nil }
 	dir := failure.FakeDir{failure.Folder + "/take-watched.md": watchedNode}

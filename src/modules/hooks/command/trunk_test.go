@@ -4,18 +4,15 @@
 package command
 
 import (
-	"strings"
 	"testing"
 )
 
 // [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-func TestDeskSaidBuildsTheMessageTheDeskRefusalOpensOn(t *testing.T) {
+// The message alone, since the node desk-works-on-trunk holds the remedy. [[spec/tickets/the-twins-leave-whole]]
+func TestDeskSaidBuildsTheMessage(t *testing.T) {
 	said := DeskSaid("this push lands nowhere on work/one")
 	if want := "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/one."; said != want {
 		t.Errorf("DeskSaid answers %q, want %q", said, want)
-	}
-	if first, _, _ := strings.Cut(DeskRefusal("this push lands nowhere on work/one"), "\n"); first != said {
-		t.Errorf("the desk refusal opens on %q, want %q", first, said)
 	}
 }
 
