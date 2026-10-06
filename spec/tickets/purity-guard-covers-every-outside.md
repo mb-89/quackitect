@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -159,6 +159,11 @@ record:
       - name: tests
         exit: 0
         said: ok  	quackitect/src/imports	3.915s
+  - step: design/person-1
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 9bee25cd0939c581d3770b70e2f9adbd184c17a7
+    hash_after: 9bee25cd0939c581d3770b70e2f9adbd184c17a7
+    def: cd6d0838fccd52f3
 group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
 ---
@@ -298,8 +303,9 @@ done_when 1 is the Discussion table; done_when 2 and 3 meet the walkaround_test.
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Redraft, as the owner says: code is pure by default, and every impure function carries a one-line reason. The guard stands as a fifth guard in src/imports beside the four this group landed, in report mode against a baseline. It names every Go function outside a door folder that reaches an outside kind and carries no one-line Impure reason. It builds on nothing past main.
 
 ## tests-red
 
