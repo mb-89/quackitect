@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"testing"
 )
 
@@ -157,5 +159,28 @@ func TestEachRulePlacesItsFindingWhereValeDid(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// Every rule the styles hold as a script finds its Go function, keyed by its check id. [[spec/design_output/rules#a-script-answers-offsets]]
+func TestEveryScriptRuleHasItsFunction(t *testing.T) {
+	t.Parallel()
+	makers := scriptMakers()
+	files, err := filepath.Glob(filepath.Join("..", "..", "spec", "config", "styles", "*", "*.yml"))
+	if err != nil || len(files) == 0 {
+		t.Fatalf("the styles read nothing: %v", err)
+	}
+	for _, path := range files {
+		text, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !slices.Contains(strings.Split(string(text), "\n"), "extends: script") {
+			continue
+		}
+		check := filepath.Base(filepath.Dir(path)) + "." + strings.TrimSuffix(filepath.Base(path), ".yml")
+		if makers[check] == nil {
+			t.Errorf("%s stands as a script and has no Go function", check)
+		}
 	}
 }

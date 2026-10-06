@@ -36,3 +36,24 @@ its line and column.
 A region with no closing marker runs to the end of the file. The spelling
 stays Vale's, so every standing marker holds as it is, and
 `ExemptionCarriesAReason` reads the same marker.
+
+# A script answers offsets
+
+Each rule a style holds as `extends: script` runs as a Go function over the
+raw text, in place of its Tengo script. `src/rules/script.go` holds the
+contract.
+
+| the part | what it does |
+|---|---|
+| `scriptMaker` | reads what the rule needs past the file once, at Load |
+| `script` | takes the path and the raw text, and answers its matches |
+| `scriptMatch` | holds byte offsets, the end past the last byte, and an optional message |
+
+A message names `%s` where the match goes, and the rule's own message stands
+where the match names none. Lint places a match at the line of its begin,
+with a span counted in runes from 1 and holding both ends.
+
+| the file | the styles its makers serve |
+|---|---|
+| `scripts_paragraph.go` | VoiceParagraph, reading `spec/schemas/paragraph.schema.yaml` |
+| `scripts_voice.go` | VoiceVale, VoiceShape and VoiceScript |
