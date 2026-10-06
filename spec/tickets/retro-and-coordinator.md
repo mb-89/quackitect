@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -150,7 +150,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: d81b9e7596281d039c69ec9dffb808f924043ef0
+    hash_after: d81b9e7596281d039c69ec9dffb808f924043ef0
+    inputs:
+      - name: retro/write
+        hash: b8d2bf37f6ca4f64
+        size: 4289
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -313,20 +323,30 @@ The run spent its first half hour waiting on a stale hold, and the waiting paid 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- a client key for the claude probe, at accept, so the start refusal stays unchecked on a live client
+- a handler behind the branch take MCP tool, at the take
+- the index MCP road for a span mid-run, at the first change hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at sync in the work skill file, where main added a subscribe step beside the red-fire step, and both stand
+- the commit door, refusing code with no test beside it and a home path naming a person
+- the stop hook, refusing a turn end while helpers ran
+- the index contract case and the dry probe, each failing once inside the check and passing alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- `start-refusal-stops-trial`, a person trial loose on main, which carries the commands the owner runs on a desk
+- no ticket minted with no group past that trial
+- no handover, since the group ends at done and the pull request carries the rest
 
 # Discussion
 
