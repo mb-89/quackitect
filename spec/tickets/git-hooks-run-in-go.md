@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 02691120d1bf56c02f242637fd20bbfb35bdbf85
+    hash_after: 02691120d1bf56c02f242637fd20bbfb35bdbf85
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/branches passes; green, src/modules/hooks/command passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+    inputs:
+      - name: design/tests-red
+        hash: 7e42663b12491bc4
+        size: 962
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -376,26 +399,33 @@ the marker scan stands once in land.go, and the hold, stale and todo rules reuse
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/githooks_test.go src/branches/hook_reads_test.go src/modules/hooks/command/trunk_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Both git hooks now run se-index verb src/scripts hook pre-commit or pre-push, taking se-index.exe first as RUNME.sh does, and exit 0 where no binary stands. So a commit and a push need no Node, and precommit.js and prepush.js leave with their tests. The hooks module holds PreCommit and PrePush. The pre-commit road reuses the marker scan land.go now exports. The version, cloud-to-trunk, hold, stale and todo rules run on every push, and the battery and the unchecked tip gate an agent push alone. Every git-hook case in src/quack/hook_verb_test.go passes, with an added case for the owner pushing onto a held branch. That file also holds red cases of copilot-hooks-run-in-go, so the tests field names the three module test files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the size field files and the four gate findings, each named in the commit
+the module cases run over the taughtGit fake, and the hook verb cases over real git in a temporary repository
+githooks.go and hook_verb.go point at spec/tickets/git-hooks-run-in-go
+the marker scan stands once in land.go, and the rules reuse the functions they share with the Bash door
 
 # accept
 
