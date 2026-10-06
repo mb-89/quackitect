@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/notes
+step: retro/write
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -130,6 +130,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 34eba3f85616 · claude-code-remote
+    hash_before: 687205e82b21c32ff5fb7cff607d36b2d9b3b9ef
+    hash_after: 687205e82b21c32ff5fb7cff607d36b2d9b3b9ef
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 cloud: true
 ---
 
@@ -204,8 +213,9 @@ accept
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
