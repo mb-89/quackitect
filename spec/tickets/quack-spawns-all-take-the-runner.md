@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: ae92722ea762d1ae
         size: 5304
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 4dd19bed531604110764f2e441a355d82b9eabc8
+    hash_after: 4dd19bed531604110764f2e441a355d82b9eabc8
+    inputs:
+      - name: design/draft
+        hash: ae92722ea762d1ae
+        size: 5304
+      - name: design/tests-red
+        hash: 15db91747755d405
+        size: 842
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -325,8 +337,12 @@ Ten new cases fail on their own assertions. The two contract cases fail on both 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- signalled-meets-notstarted-readers: `Signalled` moves a run a signal ends off `NotStarted`, so `voiceRunsValeOver` in src/quack/voice_verb.go and `ShellOver` in src/pull/door.go answer code -2 with no fault where they answered the fault before. Neither file stands in size, and voice_verb.go stands in no callers line. The builder decides each reader at its spot.
+- spawn-stubs-match-the-draft: the tests-red stubs `toolRunsOver(proc.Runner, io.Reader)` and `tuiLaunchOver(proc.Runner, io.Reader)` take an input reader, and the approach names `toolRunsOver(run)` with `Streams{In: os.Stdin}`. The builder settles one shape and keeps the two cases in src/quack/spawns_runner_test.go driving it.
+- quack-git-reads-take-door: done_when 1 names a grep for `exec.Command` under src/quack, and that grep still finds the git reads in command.go, vehicle_verb.go, retro_chapters.go, verb_lint.go and retro_collect.go, and the spawns in checkdoors.go and boxdoors.go. The draft narrows the line to the eight functions and parks the rest as a private note. Mint the git reads as a follow-up in the group, so the grep comes clean.
 
 # implement
 
