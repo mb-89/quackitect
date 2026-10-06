@@ -109,6 +109,22 @@ record:
     hand: the engine
     hash_before: ff2257b6b611f1477630afe8e211a6e993edfcca
     hash_after: ff2257b6b611f1477630afe8e211a6e993edfcca
+  - step: accept
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: edc2f2c7047e6b9486cbd16e9b8ec4bb269c31e1
+    hash_after: edc2f2c7047e6b9486cbd16e9b8ec4bb269c31e1
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/boxes-hold-and-hand-back already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1d203dacf8882c98
+        size: 453
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -165,8 +181,10 @@ no child waits on another now: every child stands closed, and the rescue childre
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- clear-keeps-the-hold: SessionEnd fires on a clear, so a live box writes an end beat and frees its branch
 
 # retro
 
