@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  113.3  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: b37b8248cc6b511d300c8271fc5c08dc9690e803
+    hash_after: b37b8248cc6b511d300c8271fc5c08dc9690e803
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+    inputs:
+      - name: design/tests-red
+        hash: aec90133ee67a7eb
+        size: 822
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -344,26 +367,33 @@ every fact the change adds stands in one place: the row walk moves into rowsSaid
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/named_test.go src/branches/free_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A note or a comment naming a path in the tree now names one that stands, and work.staleAfter keeps one default. EveryNamedPathStands in src/modules/check/named.go reads the code spans of notes and the comments of code, and refuses a path under src, spec, test or .claude that the tree holds nowhere. A glob or a placeholder passes, and tickets stay out. The change fixes every dead path the rule found across the design notes, rationales and comments. The stale span reads the config, then the schema default, through its two children. The dry probe now carries untracked files into its clone, since a check before the commit lost a new source file and failed the build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the rule, the dead paths it names, the stale span, and the probe fault the check met.
+every door the change reaches has a fake: the rule cases plant notes, the span cases build Doors, and the delta case fakes the process door.
+a comment names the approach the change implements: named.go, staleSpan and deltaOf each carry it.
+every fact the change adds stands in one place: the schema holds the default, and rowsSaid holds the row walk both rules read.
 
 # accept
 

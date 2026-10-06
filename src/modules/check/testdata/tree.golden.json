@@ -28,6 +28,12 @@
   "go": [
     {
       "file": "",
+      "rule": "everyNamedPathStands",
+      "line": 0,
+      "message": "runs"
+    },
+    {
+      "file": "",
       "rule": "everyPointerResolves",
       "line": 0,
       "message": "runs"
