@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 86086f797ef7 · claude-code-remote
+    hash_before: 745b3854dd9a5283637173dc78d0ca705cc8f6ea
+    hash_after: 9a738cdceedde0458942ac46b981282df8039e8c
+    inputs:
+      - name: ask
+        hash: 8eacce0f20b584e2
+        size: 1278
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +170,73 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/doors#a-door-declares-what-it-owns]]. A new pure package src/owns parses every owns.yaml and finds walk-arounds: Go through go/parser, with an import of a whole-owned package or a selector on a member-owned one; JS through a scan that skips comments and strings. The check module's textFaults adds WalksAroundADoor over .go and .js files, at error for a refusing door and as a hint in an editor buffer for a door at report. A tree rule DoorDeclares names a q.IO() package or a src/doors file that no declaration covers, and an owns.yaml that reads as no declaration. src/imports adds the walkaround analyzer, and ioonly's outside and onlyq's impure derive from the declarations. ./RUNME.sh doors lists each door, its walk-arounds and its marked lines. Every door stands at report until its own child migrates it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/imports/imports.go reachesOut, pastQ: read the derived lists
+- src/imports/tree_test.go TestTheTreeHoldsTheImportRules: runs walkaround over the tree
+- src/modules/check/textfaults.go textFaults: adds the walk-arounds
+- src/modules/check/checker.go Rules: adds DoorDeclares
+- src/modules/lsp/tools.go textFaults: draws them, unchanged
+- src/quack/lsp.go lspChecks: hands TextFaults across, unchanged
+- src/quack/verb_doors.go doorsVerb: lists walk-arounds and marked lines
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/owns/owns_test.go: the declaration's form, the Go and JS walk per door, the marker with and without a reason, report
+- src/owns/tree_test.go TestEveryDoorRefusesAPlantedWalk: per real declaration, a planted file outside the door names a walk, and one inside names none
+- src/imports/walkaround_test.go: the analyzer over a planted tree
+- src/imports/imports_test.go TestTheListsComeOffTheDeclarations
+- src/modules/check/doors_test.go: WalksAroundADoor and DoorDeclares
+- src/quack/verb_doors_test.go: the walk-arounds and marked lines listed
+- src/quack/lsp_test.go TestAWalkAroundDrawsAsADiagnostic
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/owns/owns.go
+- src/owns/golang.go
+- src/owns/script.go
+- src/owns/*_test.go
+- src/imports/imports.go
+- src/imports/walkaround.go
+- src/imports/*_test.go
+- src/modules/check/doors.go
+- src/modules/check/textfaults.go
+- src/modules/check/checker.go
+- src/quack/verb_doors.go
+- src/quack/lsp_test.go
+- owns.yaml in each door's folder
+- spec/design_output/doors.md
+- spec/design_output/model.md
+- spec/vocabulary/terms.yml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files and functions named stand opened: imports.go, tree_test.go, textfaults.go, checker.go, sweep.go, lsp.go, tools.go, verb_lint.go, verb_doors.go
+- the callers cover every reader of outside, impure, textFaults and the doors verb
+- each done_when line maps to a test above, and ./RUNME.sh check decides the report mode
 
 ## tests-red
 

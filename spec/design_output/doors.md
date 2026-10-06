@@ -167,3 +167,59 @@ comes after that run, so the helper runs again for it.
 The helper reads the config's own sections too, with Vale's glob, where a star
 spans a slash. So a case proving a path stands off a rule reads the section
 that switches it off, and spawns nothing.
+
+# A door declares what it owns
+
+A door and an IO module are one thing: an IO module is a door written in Go,
+whose registration carries `q.IO()`. Every door, Go and JavaScript, declares
+what it owns in `owns.yaml` in its own folder, and one guard reads every
+declaration. A new door adds its declaration and nothing else.
+
+    # The clock: the one reach of time.
+    clock:
+      go: [time.Now, time.Sleep, context.WithTimeout]
+      js: [Date.now, new Date(), setTimeout]
+      files: [clock.js, fake/clock.js]
+
+| key | what it holds |
+|---|---|
+| the door's name | one entry, and a folder holds one entry a door standing there |
+| `go` | a package, which the door owns whole, or `package.Member`, where the package is shared and the door owns that member alone |
+| `js` | `node:<module>`, a global such as `setTimeout`, a member of one such as `Date.now`, or `new Date()`, the constructor reading the time now |
+| `files` | the door's files, under the folder. With none named, every file standing in the folder is the door |
+| `report` | `true` while walk-arounds of the door remain, so the guard lists them and refuses none |
+
+Several doors may own one name. A package's `door.go` owns `os` beside the
+files IO module, and each reads the disk for its own package.
+
+## Nothing walks around a door
+
+A walk-around is a use of an owned name in a file outside every door owning
+it. `src/owns` reads the declarations and finds the walk-arounds, and every
+surface asks it:
+
+| the surface | what it does with a walk-around |
+|---|---|
+| `WalksAroundADoor` in `src/modules/check` | refuses it in the lint, so `./RUNME.sh check`, the commit, the push and CI refuse it, and the lsp IO module draws it as the line is typed |
+| `walkaround` in `src/imports` | names it in a Go package, beside `onlyq` |
+| `./RUNME.sh doors` | lists every door, its walk-arounds and its marked lines |
+
+A door standing at `report` lists its walk-arounds through `./RUNME.sh doors`
+and refuses none, and the editor draws each as a hint in a file it holds
+open. A door drops `report` once its list reaches zero.
+
+The one escape is the marker on the line or the line above:
+
+    // level0: OutsideInDoors - <why the door cannot serve>
+
+A marker naming no reason passes nothing.
+
+## Time is a door
+
+The clock owns time. Code waits on the event a duration stands for: a channel,
+a ready signal, a watcher event, a process exit, an index sweep. A test moves
+the fake clock with `Tick`, or waits on that event.
+
+Go shares `time` and `context`, so the clock owns their members reading or
+waiting on the time now. `time.Duration` and `time.Date` stay free to every
+file.
