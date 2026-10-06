@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -165,6 +165,15 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 44051c13afc5ffb7bb5cb55411b964dd606b62da
+    hash_after: 44051c13afc5ffb7bb5cb55411b964dd606b62da
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.3  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -313,14 +322,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/failure/registry.go alone, the file the ask names
+- Load reads through the Reader door, and FakeDir stands as its fake under door_contract_test.go
+- the comment on Load names the approach: NodeOf reads each node, and Load keeps the ones with no fault
+- the folder and the note ending stay in node.go's constants, and registry.go reads them from there
 
 ## tests-green
 
