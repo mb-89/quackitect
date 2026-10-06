@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { awake, holdArgv } from "../../src/doors/awake.js";
 import { fakeAwake } from "../../src/doors/fake/awake.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 
 const shaped = (held) => ({
   held: typeof held.held === "boolean",
@@ -30,8 +31,8 @@ test("each box names the child that holds it, and an unknown box names none", ()
   assert.deepEqual(holdArgv("sunos", 1), []);
 });
 
-test("the real door holds a child while the server lives, and the release ends it", async () => {
-  const held = awake().hold();
+test("the real door holds a child while the server lives, and the release settles on its end while the clock stands still", async () => {
+  const held = awake(process.platform, process.pid, fakeClock()).hold();
   if (!held.held) {
     assert.match(
       held.why,

@@ -3,6 +3,7 @@
 // [[spec/design_output/level0#the-server-holds-off-sleep]]
 
 import { spawn } from "node:child_process";
+import { clock } from "./clock.js";
 
 // The flags the Windows call takes: the hold stands until cleared, and the system stays up. [[spec/design_output/level0#the-server-holds-off-sleep]]
 const CONTINUOUS_SYSTEM = "0x80000001";
@@ -37,7 +38,8 @@ export function holdArgv(platform, pid) {
   return [];
 }
 
-export function awake(platform = process.platform, pid = process.pid) {
+// The door stands on the clock, which caps the release's wait. [[spec/design_output/doors#a-door-standing-on-another]]
+export function awake(platform = process.platform, pid = process.pid, time = clock()) {
   return {
     // The hold stands while the child lives, and the child ends with its input. [[spec/design_output/level0#the-server-holds-off-sleep]]
     hold() {
@@ -66,7 +68,7 @@ export function awake(platform = process.platform, pid = process.pid) {
           try {
             child.kill();
           } catch {}
-          return Promise.race([ended, waited(ENDS_WITHIN)]);
+          return Promise.race([ended, time.wait(ENDS_WITHIN, { unref: true })]);
         },
       };
     },
@@ -78,6 +80,3 @@ function unheld(why) {
   return { held: false, why, release: () => Promise.resolve() };
 }
 
-function waited(ms) {
-  return new Promise((done) => setTimeout(done, ms).unref());
-}

@@ -71,6 +71,8 @@ above, and one file holds each pairing under one name.
 |---|---|---|
 | `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
 | `log` | `disk` and `clock` | `src/doors/fake/log.js`, over the fake disk |
+| `proc` | `clock`, for a respawn's window | `src/doors/fake/proc.js` |
+| `awake` | `clock`, for a release's cap | `src/doors/fake/awake.js` |
 
 The fake git answers `ran`, the commands it takes, in order. The fake log
 answers `files`, the fake disk holding what it writes. For what one log line
