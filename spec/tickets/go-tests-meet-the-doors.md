@@ -157,6 +157,16 @@ record:
         hash: 55348f9e242faeab
         size: 815
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 37a2e9e22b208692d2389cb78210a56ee97f1b16
+    hash_after: 5dbf75bb35efe8f1205005f4615431cb757537f6
+    returns: 1
+    why: Part one landed in 5dbf75bb3 with the check green. Part two moves the test walks onto fakes, and the draft holds it until tests-meet-the-doors-once merges into main, because that group moves the same tests on its open branch. The leaf waits for that merge and a branch sync.
+    answered:
+      - name: lint
+        exit: 0
+        said: "    1.9  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
 ---
 
 # Ask
@@ -312,14 +322,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft sizes for part one, plus src/vehicle/owns.yaml, since the vehicle shim test is a contract test and its door stood undeclared
+every door the change reaches keeps its fake, and the vehicle door is its disk.go and its dry twin
+owns.go points each new name at spec/design_output/doors#a-door-names-its-contract-tests
+the contract key stands once in the doors note, and the key table points at its chapter
 
 ## tests-green
 
