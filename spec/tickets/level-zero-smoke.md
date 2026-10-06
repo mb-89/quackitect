@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/level-zero-smoke already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 7757d107cc1007e54d491cfabe8424002f59b659
+    hash_after: 7757d107cc1007e54d491cfabe8424002f59b659
+    inputs:
+      - name: ask
+        hash: ee168782689e2bf1
+        size: 576
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -120,14 +129,30 @@ A pull request that breaks level zero cannot go green. A fast smoke test with th
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/level0-smoke-runs-in-seconds]] standard
+- [[spec/tickets/probe-at-revision-guards-merges]] standard
+- [[spec/tickets/probe-at-stays-dry]] trivial
+- [[spec/tickets/merge-deny-every-connector]] trivial
+- [[spec/tickets/the-index-outlives-the-check]] standard
+- [[spec/tickets/door-outlives-taskkill-tree]] trivial
+- [[spec/tickets/level0-claims-name-the-platform]] standard
+- [[spec/tickets/platform-draft-names-checkdoors]] trivial
+- [[spec/tickets/platform-red-line-tested]] trivial
+- [[spec/tickets/runme-road-waits-on-ready]] standard
+- [[spec/tickets/the-check-ends-what-it-drops]] standard
+- [[spec/tickets/ending-windows-tree-tested]] trivial
+- [[spec/tickets/vale-call-takes-endswhole]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one change a reviewer reads whole, and every child stands closed
+- the smoke test, the dry probe at a revision, the merge deny, the index server, the platform claim, the ready wait and the ended child process each have a child, so the goal stands covered
+- every child closed in order on this branch, so none waits on another
 
 # children
 
