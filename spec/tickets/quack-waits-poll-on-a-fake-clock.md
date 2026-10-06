@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: a9ea4ea99c1ddc56
         size: 2261
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 9116763bc90b57b5e7f6d82f70648757ee3c0c71
+    hash_after: 9116763bc90b57b5e7f6d82f70648757ee3c0c71
+    inputs:
+      - name: design/draft
+        hash: a9ea4ea99c1ddc56
+        size: 2261
+      - name: design/tests-red
+        hash: f28dd0498cc38dea
+        size: 514
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -281,8 +293,13 @@ The guard names src/quack/waits_test.go and its time.Sleep once the row leaves t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: Book.end saves the ended op through rowsKeep as JSON carrying id, action, result and ended, so ended() reads the end off the saved body with no time.Sleep, and the doors.md row already left the family table at tests-red, so TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit stands red on the sleep and decides done_when 1, and ./RUNME.sh check decides done_when 2
+- fix in place: savedTable's Save sends on its channel without blocking, or the buffer outlasts every save a case makes, since Book.save calls Save on the manager's path and a full channel stalls the manager instead of failing the case
+- fix in place: savedTable keeps opRows' All and Drop over the held map under the same mutex, so the book's sweep and restart read stay safe
+- form: the tests list names TestAWaitPastTheCallWaitAnswersARunningHandle as added, where the change rewrites a standing case
 
 # implement
 
