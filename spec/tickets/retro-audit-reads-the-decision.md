@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: retro-and-coordinator
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: d54a1312578af5a9cd5738cdf9af6bda1d676bb3
+    hash_after: d54a1312578af5a9cd5738cdf9af6bda1d676bb3
+    inputs:
+      - name: ask
+        hash: c4cd700ddee2f0f9
+        size: 325
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: f39555b0ae8a21e805480919ebd9c12fe74f625f
+    hash_after: f39555b0ae8a21e805480919ebd9c12fe74f625f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 8fdf0e78c29f3b82
+        size: 1478
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 5e767b0ac4bd025ea5759be2eb2cfe93f81f7521
+    hash_after: 5e767b0ac4bd025ea5759be2eb2cfe93f81f7521
+    inputs:
+      - name: design/draft
+        hash: 8fdf0e78c29f3b82
+        size: 1478
+      - name: design/tests-red
+        hash: 8cbd15eac786f9db
+        size: 533
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: da7e404be24523ead9534d11a6679c397447cf73
+    hash_after: da7e404be24523ead9534d11a6679c397447cf73
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/design_output/work.md:836:73: PastTense: Write the present tense: 'closed'. The past belongs in spec/rationales."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 472ac3a8f56fd1a65973f72863b741875dee3591
+    hash_after: 472ac3a8f56fd1a65973f72863b741875dee3591
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/index.test.js the door stands where the binary is built, and a glob comes out of the rows"
+    inputs:
+      - name: design/tests-red
+        hash: 8cbd15eac786f9db
+        size: 533
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -148,38 +218,51 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`src/quack/retro_audit.go` gains `retroAuditUndecided`. It lists the closed tickets on the experiment process that keep nothing they found. `retroAuditKept` reads a trial as keeping it where the decision field under its decide step holds a row, through `pull.ChapterOf`, or its front names a successor under `successors`. The verb passes only where no trial stands open and none stands closed and silent, and it names each silent trial under its own line. The standing test of the clear case writes a decision on its closed trial, since a closed trial with none now fails. `spec/design_output/work.md` says the audit also names a closed trial with no decision and no successor.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit.go init, which registers retro audit
+src/quack/retro_audit.go retroAuditVerb
+spec/processes/retro.yaml, the audit step, which needs retro audit
+src/quack/retro_audit_test.go TestRetroAuditAnswersAWaitOverAnOpenTrialAndPassesOverNone
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit_test.go TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit.go
+src/quack/retro_audit_test.go
+spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+retro_audit.go, experiment.yaml's decide step, pull.ChapterOf and pull.FrontOf, and the one closed trial in the tree stand opened
+the callers come from a grep of retroAuditVerb and retroAuditOpenTrials
+the one done_when line meets TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty
 
 ## tests-red
 
@@ -188,26 +271,31 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_audit_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The audit reads open trials alone, so a closed trial with an empty decision passes it and the verb answers 0. The standing clear case now writes a decision on its closed trial, and it stays green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the one done_when line meets TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty, red on its assertion
+the test reaches a temp folder the case seeds, as every retro audit test does, and no other door
 
 # gate
 
@@ -216,8 +304,11 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- where open trials and silent trials both stand, the verb prints the open-trial message first, byte for byte as it stands, then the silent list
+- successors reads as a list off the front, so an empty list keeps nothing
 
 # implement
 
@@ -228,14 +319,19 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_audit.go spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the size golden that reads work.md at its new length
+- the audit reads a temp folder the cases seed, and no other door
+- retro_audit.go points at the audit section of spec/design_output/work
+- the rule that a trial keeps its decision or a successor stands once, in spec/design_output/work.md
 
 ## tests-green
 
@@ -244,26 +340,33 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_audit_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+retro audit now names every closed trial that keeps nothing it found. A trial keeps it where the decision field under its decide step holds a row, or its front names a successor. The verb prints the open trials first as before, then the closed trials with no decision and no successor, and fails while either stands. The one closed trial in the tree names a successor, so the audit on the tree stays at 0.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the size golden that reads work.md at its new length
+- the audit reads a temp folder the cases seed, and no other door
+- retro_audit.go points at the audit section of spec/design_output/work
+- the rule that a trial keeps its decision or a successor stands once, in spec/design_output/work.md
 
 # accept
 

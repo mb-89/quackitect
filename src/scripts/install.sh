@@ -16,12 +16,23 @@ run="$root/.se/.runtime"
 home_run="${HOME:-}/.se/.runtime"
 bin="$run/bin"
 
-# The boot word the SessionStart hook runs. A cloud box lacking the plugin
-# manifest installs under the session skip list, which installSkip in
-# src/quack/probe_cold.go pins, and a failed install holds no session up.
-# [[spec/design_output/level0#the-boot-hook]]
+# The boot word the SessionStart hook runs. A desk session hands its hook input
+# to the start verb and prints what it answers, and a binary failing, missing or
+# slow holds no session up. A cloud box lacking the plugin manifest installs
+# under the session skip list, which installSkip in src/quack/probe_cold.go
+# pins, and a failed install holds no session up.
+# [[spec/design_output/level0#the-boot-hook]] [[spec/tickets/the-coordinator-runs-under-level0]]
 if [ "${1:-}" = boot ]; then
-  [ -n "${CLAUDE_CODE_REMOTE:-}" ] || [ -n "${SE_CLOUD:-}" ] || exit 0
+  if [ -z "${CLAUDE_CODE_REMOTE:-}" ] && [ -z "${SE_CLOUD:-}" ]; then
+    index="$bin/se-index"
+    [ -x "$index.exe" ] && index="$index.exe"
+    [ -x "$index" ] || exit 0
+    cap=""
+    command -v timeout >/dev/null 2>&1 && cap="timeout 10"
+    said=$($cap "$index" verb "$root/src/scripts" start 2>/dev/null) || exit 0
+    [ -n "$said" ] && printf '%s\n' "$said"
+    exit 0
+  fi
   [ -f "$root/.claude/skills/level0/.claude-plugin/plugin.json" ] && exit 0
   SE_INSTALL_SKIP="editor-link editor-extensions editor-client go ${SE_INSTALL_SKIP:-}" sh "$0" || true
   exit 0

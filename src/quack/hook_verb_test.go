@@ -37,13 +37,45 @@ func hookDoorsOver(root string, cloud bool, env map[string]string, stdin string,
 	}
 }
 
+// A real repository and its bare origin, holding an open ticket, a closed one and a readme on main, since a git hook runs over real git. [[spec/tickets/git-hooks-run-in-go]]
+func hookRepo(t *testing.T) (string, string) {
+	t.Helper()
+	root := shortDir(t)
+	origin := filepath.Join(shortDir(t), "origin.git")
+	gitDoes(t, "", "init", "-q", "--bare", origin)
+	gitDoes(t, "", "init", "-q", "-b", "main", root)
+	for _, one := range [][]string{{"user.name", "a hand"}, {"user.email", "hand@example.invalid"}, {"commit.gpgsign", "false"}, {"core.autocrlf", "false"}} {
+		gitDoes(t, root, "config", one[0], one[1])
+	}
+	lays(t, root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n")
+	lays(t, root, "spec/tickets/shut.md", "---\nstate: closed\n---\n\n# Ask\n")
+	lays(t, root, "README.md", "a tree\n")
+	gitDoes(t, root, "add", "-A")
+	gitDoes(t, root, "commit", "-q", "-m", "a-ticket: the tree opens")
+	gitDoes(t, root, "remote", "add", "origin", origin)
+	gitDoes(t, root, "push", "-q", "origin", "main")
+	return root, origin
+}
+
+// Runs git under the dir, and stops the test where it fails. [[spec/tickets/git-hooks-run-in-go]]
+func gitDoes(t *testing.T, dir string, args ...string) string {
+	t.Helper()
+	run := exec.Command("git", args...)
+	run.Dir = dir
+	said, err := run.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %s answers %v: %s", strings.Join(args, " "), err, said)
+	}
+	return strings.TrimSpace(string(said))
+}
+
 // The agent's environment: the engine runs. [[spec/tickets/git-hooks-run-in-go]]
 var hookAgent = map[string]string{"SE_ENGINE": "1"}
 
 // Stages a file and runs the pre-commit event. [[spec/tickets/git-hooks-run-in-go]]
 func preCommits(t *testing.T, path, text string) (int, string) {
 	t.Helper()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	lays(t, root, path, text)
 	gitDoes(t, root, "add", "-A")
 	code, _, errs := runsTwin(hookVerb(hookDoorsOver(root, false, nil, "", time.Now())), "hook", "pre-commit")
@@ -64,7 +96,7 @@ func prePushes(root string, cloud bool, env map[string]string, lines string, now
 // A work branch whose group ticket holds an open take by the holder, pushed to origin, with one more local commit on it. [[spec/tickets/git-hooks-run-in-go]]
 func heldBranch(t *testing.T) (string, string) {
 	t.Helper()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/x")
 	lays(t, root, "spec/tickets/x.md", "---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: design/draft\n    hand: "+hookHolder+"\n    hash_before: abc123\n---\n\n# Ask\n")
 	gitDoes(t, root, "add", "-A")
@@ -109,7 +141,7 @@ func TestHookPreCommitPassesACleanDelta(t *testing.T) {
 
 func TestHookPrePushRefusesAVersionDelete(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	code, errs := prePushes(root, false, nil, "(delete) "+hookZeros+" refs/heads/v1 "+gitDoes(t, root, "rev-parse", "HEAD")+"\n", time.Now())
 	if code != exitFailed || !strings.Contains(errs, "v1") || !strings.Contains(errs, "delete") {
 		t.Fatalf("pre-push answers %d, %q, and wants the delete of a version branch refused", code, errs)
@@ -118,7 +150,7 @@ func TestHookPrePushRefusesAVersionDelete(t *testing.T) {
 
 func TestHookPrePushRefusesACloudPushToTrunk(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
 	code, errs := prePushes(root, true, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.HasPrefix(errs, "A cloud box pushes its own work branch alone, and main stands for the desk.") {
@@ -128,7 +160,7 @@ func TestHookPrePushRefusesACloudPushToTrunk(t *testing.T) {
 
 func TestHookPrePushRefusesARedBatteryOnTrunk(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	code, errs := prePushes(root, false, hookAgent, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.HasPrefix(errs, "main takes a green battery, and ") || !strings.Contains(errs, "Run `./RUNME.sh check` last") {
 		t.Fatalf("pre-push answers %d, %q, and wants an agent's push to main refused without a stamp", code, errs)
@@ -137,7 +169,7 @@ func TestHookPrePushRefusesARedBatteryOnTrunk(t *testing.T) {
 
 func TestHookPrePushRefusesAnUncheckedTip(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/y")
 	stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
 	lays(t, root, "src/bridge/two.js", "export const two = 2;\n")
@@ -180,7 +212,7 @@ func TestHookPrePushRefusesTheOwnersPushOntoABranchAnotherBoxHolds(t *testing.T)
 
 func TestHookPrePushRefusesATodoTag(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/z")
 	lays(t, root, "spec/tickets/z.md", "---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n")
 	gitDoes(t, root, "add", "-A")
@@ -193,7 +225,7 @@ func TestHookPrePushRefusesATodoTag(t *testing.T) {
 
 func TestHookPrePushLetsTheOwnersTerminalThrough(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "a-ticket: no check")
 	code, errs := prePushes(root, false, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != 0 || errs != "" {
@@ -203,7 +235,7 @@ func TestHookPrePushLetsTheOwnersTerminalThrough(t *testing.T) {
 
 func TestHookPrePushLetsARedWorkBranchThroughUnderCI(t *testing.T) {
 	t.Parallel()
-	root, _ := landingRepo(t)
+	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/y")
 	lays(t, root, ".github/workflows/check.yml", "name: check\n")
 	gitDoes(t, root, "add", "-A")

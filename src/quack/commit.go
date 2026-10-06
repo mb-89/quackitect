@@ -5,13 +5,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -19,7 +16,9 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 )
 
 // The usage, the flag keeping a commit home, the name a finding of the message stands under, and the road the message names its ticket by. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -30,8 +29,11 @@ const (
 	messageHow   = "Open the message with <ticket>:, where <ticket> names the open ticket this commit serves: its file name under spec/tickets or .se/tickets, without .md."
 )
 
-// The cells of a rename row git diff --name-status prints: the status, the old path and the new one. [[spec/tickets/landing-verbs-port-to-go]]
-const renameCells = 3
+// The status git spells a staged move with, and the path a reset over no named path unstages. [[spec/design_output/doors#the-git-door-carries-writes]]
+const (
+	movedStatus = "R"
+	every       = "."
+)
 
 // The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
 var coldPath = []string{
@@ -51,9 +53,10 @@ func init() {
 	})
 }
 
-// What the landing verbs reach: the root, the cloud flag, a verb run through the road, where claude stands, Vale over a message, the session log and the clock. [[spec/tickets/landing-verbs-port-to-go]]
+// What the landing verbs reach: the root, the repository under it, the cloud flag, a verb run through the road, where claude stands, Vale over a message, the session log and the clock. [[spec/tickets/landing-verbs-port-to-go]] [[spec/design_output/doors#the-git-door-carries-writes]]
 type landingDoors struct {
 	root   string
+	git    git.Repo
 	cloud  bool
 	verb   func(words ...string) (int, string)
 	claude string
@@ -70,6 +73,7 @@ func landingHere() landingDoors {
 	}
 	return landingDoors{
 		root:   root,
+		git:    git.NewRepo(root, proc.Real),
 		cloud:  commandSettings(root).Cloud,
 		verb:   roadVerb(root),
 		claude: claudeAt(root),
@@ -77,69 +81,6 @@ func landingHere() landingDoors {
 		log:    appendsRow(root, time.Now),
 		now:    time.Now,
 	}
-}
-
-// A verb through the road this binary answers, its two streams as one text. [[spec/tickets/landing-verbs-port-to-go]]
-func roadVerb(root string) func(words ...string) (int, string) {
-	return func(words ...string) (int, string) {
-		self, err := os.Executable()
-		if err != nil {
-			return exitFailed, err.Error()
-		}
-		run := exec.Command(self, append([]string{"verb", filepath.Join(root, "src", "scripts")}, words...)...)
-		run.Dir = root
-		said, err := run.CombinedOutput()
-		if err != nil {
-			var exited *exec.ExitError
-			if errors.As(err, &exited) {
-				return exited.ExitCode(), strings.TrimSpace(string(said))
-			}
-			return exitFailed, strings.TrimSpace(string(said) + "\n" + err.Error())
-		}
-		return 0, strings.TrimSpace(string(said))
-	}
-}
-
-// The claude the survey names where it stands, else the one on the PATH, else nothing. [[spec/design_output/tools#where-a-caller-looks]]
-func claudeAt(root string) string {
-	var survey map[string]struct {
-		Path string `json:"path"`
-	}
-	if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
-		if said := survey["claude"].Path; said != "" && standsUnder("", said) {
-			return said
-		}
-	}
-	found, _ := exec.LookPath("claude")
-	return found
-}
-
-// What a git run answers: its standard output, both streams, and whether it exits 0. [[spec/tickets/landing-verbs-port-to-go]]
-type gitRan struct {
-	out  string
-	said string
-	ok   bool
-}
-
-// Runs git under the root. [[spec/tickets/landing-verbs-port-to-go]]
-func gitRun(root string, args ...string) gitRan {
-	run := exec.Command("git", args...)
-	run.Dir = root
-	var stdout, stderr bytes.Buffer
-	run.Stdout, run.Stderr = &stdout, &stderr
-	err := run.Run()
-	return gitRan{out: stdout.String(), said: saidBy(stderr.String(), stdout.String()), ok: err == nil}
-}
-
-// A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-func saidBy(streams ...string) string {
-	var out []string
-	for _, one := range streams {
-		if said := strings.TrimSpace(one); said != "" {
-			out = append(out, said)
-		}
-	}
-	return strings.Join(out, "\n")
 }
 
 // The commit verb over the doors. A dry run reads the message and writes nothing. [[spec/design_output/work#the-battery-answers-first]]
@@ -213,14 +154,14 @@ func messageNote(rows []heard) string {
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 func (d landingDoors) lands(message string, paths []string, noPush bool, out, errs io.Writer) int {
-	branch := strings.TrimSpace(gitRun(d.root, "rev-parse", "--abbrev-ref", "HEAD").out)
+	branch, _ := d.git.Head()
 	// A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !d.cloud && strings.HasPrefix(branch, command.WorkBranch) {
 		fmt.Fprintln(errs, command.DeskRefusal("this commit lands nowhere on "+branch))
 		return exitUsage
 	}
 	// A merge lands through this verb once its files carry no marker, so a marker refuses before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
-	if said := markedUnmerged(d.root); said != "" {
+	if said := d.markedUnmerged(); said != "" {
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
@@ -231,50 +172,46 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		return exitFailed
 	}
 	// The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-	moved := movedFrom(d.root, paths)
-	named := append(slices.Clone(paths), moved...)
-	var only []string
-	if len(named) > 0 {
-		only = append([]string{"--"}, named...)
-	}
+	moved := d.movedFrom(paths)
+	only := append(slices.Clone(paths), moved...)
 	// git add refuses a path standing neither on disk nor in the index, and the commit still reaches it through HEAD. [[spec/tickets/commit-stages-a-moved-path]]
 	adds := slices.Clone(paths)
 	for _, from := range moved {
-		if stagable(d.root, from) {
+		if d.stagable(from) {
 			adds = append(adds, from)
 		}
 	}
-	addArgs := []string{"add", "-A"}
+	stage := d.git.AddAll
 	if len(adds) > 0 {
-		addArgs = append(append(addArgs, "--"), adds...)
+		stage = func() error { return d.git.Add(adds) }
 	}
-	if staged := gitRun(d.root, addArgs...); !staged.ok {
+	if err := stage(); err != nil {
 		fmt.Fprintln(errs, "The staging comes back refused, so the commit stands undone:")
-		fmt.Fprintln(errs, staged.said)
+		fmt.Fprintln(errs, err)
 		return exitFailed
 	}
-	if said := stagedMarkers(d.root, only); said != "" {
-		unstages(d.root, only)
+	if said := d.stagedMarkers(only); said != "" {
+		d.unstages(only)
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	cold := coldIn(strings.Fields(gitRun(d.root, append([]string{"diff", "--cached", "--name-only", "--no-renames"}, only...)...).out))
+	cold := coldIn(d.stagedPaths(only))
 	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
-		unstages(d.root, only)
+		d.unstages(only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
 		return exitFailed
 	}
-	if made := gitRun(d.root, append([]string{"commit", "-m", message}, only...)...); !made.ok {
-		unstages(d.root, only)
+	if _, err := d.git.Commit(message, only); err != nil {
+		d.unstages(only)
 		fmt.Fprintln(errs, "The commit comes back refused, so nothing lands:")
-		fmt.Fprintln(errs, made.said)
+		fmt.Fprintln(errs, err)
 		return exitFailed
 	}
 	// The probe clones HEAD, so the commit lands first and leaves again on a FAIL, before any push. [[spec/design_output/level0#the-cold-probe]]
 	if len(cold) > 0 {
 		if code, said := d.verb("probe", "cold"); code != 0 {
-			takesBack(d.root)
-			unstages(d.root, only)
+			d.takesBack()
+			d.unstages(only)
 			fmt.Fprintln(errs, "The cold probe answers FAIL on the staged change, so nothing lands:")
 			fmt.Fprintln(errs, orNothing(said, "the probe answers nothing"))
 			return exitFailed
@@ -285,6 +222,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, "The check answers red on this commit, so no push reaches origin.")
 		// The check writes its faults to the error stream, so one stream names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
 		fmt.Fprintln(errs, orNothing(said, "the check answers nothing"))
+		d.rescues(branch, errs)
 		return exitFailed
 	}
 	fmt.Fprintln(out, "The commit lands, and the check answers green on it.")
@@ -292,13 +230,50 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	if noPush || !d.cloud {
 		return 0
 	}
-	if !gitRun(d.root, "push", "origin", branch).ok {
+	if !d.git.Push(branch, false).OK {
 		fmt.Fprintf(errs, "The push of %s came back refused. The commit stands here.\n", branch)
 		return exitFailed
 	}
 	fmt.Fprintf(out, "%s stands pushed.\n", branch)
+	d.dropsRescue(branch)
 	return 0
 }
+
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+const rescueBranch = "rescue/"
+
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+func (d landingDoors) rescues(branch string, errs io.Writer) {
+	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
+	if !d.cloud || !onWork {
+		return
+	}
+	rescue := rescueBranch + group
+	head, _ := d.git.Resolve("HEAD")
+	if !d.git.ForcePushTo(head, rescue).OK {
+		fmt.Fprintf(errs, "The push of %s came back refused too, so the commit stands on this box alone.\n", rescue)
+		return
+	}
+	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
+}
+
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+func (d landingDoors) dropsRescue(branch string) {
+	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
+	if !onWork {
+		return
+	}
+	rescue := rescueBranch + group
+	refs, _ := d.git.RemoteRefs(rescueRef + rescue)
+	for _, one := range refs {
+		if one.Name == rescueRef+rescue && d.git.IsAncestor(one.Hash, "HEAD") {
+			_ = d.git.DeleteRemote(rescue)
+		}
+	}
+}
+
+// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+const rescueRef = "refs/heads/"
 
 func orNothing(said, nothing string) string {
 	if said == "" {
@@ -308,20 +283,33 @@ func orNothing(said, nothing string) string {
 }
 
 // The commit leaves HEAD and its change stays staged. A merge it concluded stands open again, so the hand lands it once more. [[spec/design_output/level0#the-cold-probe]]
-func takesBack(root string) {
-	theirs := gitRun(root, "rev-parse", "--verify", "-q", "HEAD^2")
-	gitRun(root, "reset", "-q", "--soft", "HEAD~1")
-	if theirs.ok {
-		gitRun(root, "update-ref", "MERGE_HEAD", strings.TrimSpace(theirs.out))
+func (d landingDoors) takesBack() {
+	theirs, merged := d.git.Resolve("HEAD^2")
+	_ = d.git.SoftReset("HEAD~1")
+	if merged {
+		_ = d.git.UpdateRef("MERGE_HEAD", theirs)
 	}
 }
 
 // A reset naming a pathspec unstages and leaves MERGE_HEAD standing, so a refused merge commit stays a merge. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-func unstages(root string, only []string) {
+func (d landingDoors) unstages(only []string) {
 	if len(only) == 0 {
-		only = []string{"--", "."}
+		only = []string{every}
 	}
-	gitRun(root, append([]string{"reset", "-q"}, only...)...)
+	_ = d.git.Reset(only)
+}
+
+// The paths the index stages against HEAD under the paths named, a move by both its sides. [[spec/design_output/level0#the-cold-probe]]
+func (d landingDoors) stagedPaths(only []string) []string {
+	staged, _ := d.git.Staged(only)
+	var out []string
+	for _, one := range staged {
+		if one.From != "" {
+			out = append(out, one.From)
+		}
+		out = append(out, one.Path)
+	}
+	return out
 }
 
 // The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
@@ -360,16 +348,11 @@ func mergeRefusal(unmerged []string, marked []markedLine) string {
 }
 
 // Each unmerged file still carrying a marker on disk, by the line it stands on. [[spec/design_output/work#no-commit-carries-a-marker]]
-func markedUnmerged(root string) string {
+func (d landingDoors) markedUnmerged() string {
 	var marked []markedLine
-	seen := map[string]bool{}
-	for _, row := range strings.Split(gitRun(root, "ls-files", "-u").out, "\n") {
-		_, file, ok := strings.Cut(strings.TrimSpace(row), "\t")
-		if !ok || seen[file] {
-			continue
-		}
-		seen[file] = true
-		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
+	unmerged, _ := d.git.Unmerged()
+	for _, file := range unmerged {
+		text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(file)))
 		if err != nil {
 			continue
 		}
@@ -381,9 +364,10 @@ func markedUnmerged(root string) string {
 }
 
 // What a verb meets once it stages: an opener the staged delta adds refuses it. [[spec/design_output/work#no-commit-carries-a-marker]]
-func stagedMarkers(root string, only []string) string {
+func (d landingDoors) stagedMarkers(only []string) string {
 	var marked []markedLine
-	for _, one := range command.AddedIn(gitRun(root, append([]string{"diff", "--cached", "--unified=0"}, only...)...).out) {
+	added, _ := d.git.StagedAdds(only)
+	for _, one := range added {
 		if len(check.MarkerLines(one.Text)) > 0 {
 			marked = append(marked, markedLine{one.File, one.Line})
 		}
@@ -392,24 +376,25 @@ func stagedMarkers(root string, only []string) string {
 }
 
 // A named path a staged rename lands takes its old path with it, so the deletion rides the same commit. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-func movedFrom(root string, paths []string) []string {
+func (d landingDoors) movedFrom(paths []string) []string {
 	if len(paths) == 0 {
 		return nil
 	}
 	var out []string
 	touched := map[string]bool{}
-	for _, row := range strings.Split(gitRun(root, "diff", "--cached", "--name-status", "-M").out, "\n") {
-		cells := strings.Split(row, "\t")
-		if len(cells) < 2 {
+	staged, _ := d.git.Staged(nil)
+	for _, one := range staged {
+		if one.Status != movedStatus {
+			touched[one.Path] = true
 			continue
 		}
-		touched[cells[1]] = true
-		if len(cells) == renameCells && strings.HasPrefix(cells[0], "R") && slices.Contains(paths, cells[2]) && !slices.Contains(paths, cells[1]) {
-			out = append(out, cells[1])
+		touched[one.From] = true
+		if slices.Contains(paths, one.Path) && !slices.Contains(paths, one.From) {
+			out = append(out, one.From)
 		}
 	}
 	// A journaled old path joins where the staged delta names it or git still holds it, so a move that landed long ago adds no pathspec git refuses. [[spec/tickets/commit-skips-landed-moves]]
-	for _, one := range journaledMoves(root) {
+	for _, one := range journaledMoves(d.root) {
 		for _, path := range paths {
 			var under string
 			switch {
@@ -420,7 +405,7 @@ func movedFrom(root string, paths []string) []string {
 				continue
 			}
 			from := one.From + under
-			if !slices.Contains(paths, from) && !slices.Contains(out, from) && (touched[from] || stagable(root, from)) {
+			if !slices.Contains(paths, from) && !slices.Contains(out, from) && (touched[from] || d.stagable(from)) {
 				out = append(out, from)
 			}
 		}
@@ -429,11 +414,8 @@ func movedFrom(root string, paths []string) []string {
 }
 
 // A path git add matches stands on disk or in the index. [[spec/tickets/commit-stages-a-moved-path]]
-func stagable(root, path string) bool {
-	if standsUnder(root, path) {
-		return true
-	}
-	return strings.TrimSpace(gitRun(root, "ls-files", "--cached", "--", path).out) != ""
+func (d landingDoors) stagable(path string) bool {
+	return standsUnder(d.root, path) || d.git.Tracked(path)
 }
 
 // A move the rename verb journals: its old path and its new one. [[spec/tickets/rename-detection-misses-rewrites]]

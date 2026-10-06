@@ -89,6 +89,33 @@ func TestPrePushRefusesAnAgentsTipPastTheCheck(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/beats-pass-the-push-gate]] [[spec/tickets/rescue-passes-the-stamp-gate]]
+func TestPrePushPassesAnAgentsBeatAndRescueWhereNoCheckRan(t *testing.T) {
+	t.Parallel()
+	for _, branch := range []string{"beats/x", "rescue/x"} {
+		if said := New(Outside{Git: taughtGit(nil)}).PrePush(t.TempDir(), Push{Refs: ghLine(branch, ghTip), Agent: true}); said != "" {
+			t.Fatalf("pre-push answers %q, and wants an agent's push to %s through on no stamp", said, branch)
+		}
+	}
+}
+
+// [[spec/design_output/work#a-hold-beats-with-its-session]]
+func TestPrePushReadsTheHoldsBeatBeforeItsTip(t *testing.T) {
+	t.Parallel()
+	now := time.Now()
+	beatRead := "log -1 --format=%ct %s origin/beats/x"
+	root, reads := ghHeld(t, ghOther, now.Add(-ghStale))
+	reads[beatRead] = strconv.FormatInt(now.Unix()-60, 10) + " " + ghOther + " beats"
+	if said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now}); !strings.HasPrefix(said, "work/x stands in the hand of "+ghOther) {
+		t.Fatalf("pre-push answers %q, and wants a hold whose box still beats held past the stale span", said)
+	}
+	root, reads = ghHeld(t, ghOther, now.Add(-time.Minute))
+	reads[beatRead] = strconv.FormatInt(now.Unix(), 10) + " " + ghOther + " ends"
+	if said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now}); !strings.Contains(said, "./RUNME.sh branch take x") {
+		t.Fatalf("pre-push answers %q, and wants a hold whose box ended read stale at once, naming the take", said)
+	}
+}
+
 func TestPreCommitRefusesAMarker(t *testing.T) {
 	t.Parallel()
 	delta := "diff --git a/b.md b/b.md\n--- a/b.md\n+++ b/b.md\n@@ -0,0 +3 @@\n+<<<<<<< ours\n"

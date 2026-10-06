@@ -144,6 +144,12 @@
           "asks": "name",
           "opens": "spec/tickets/<name>.md"
         },
+        "beatAfter": {
+          "type": "string",
+          "default": "10m",
+          "help": "The age of a box's last beat past which its hold reads dead, shorter than staleAfter.",
+          "unit": "a span, as 90m, 12h or 3d"
+        },
         "failsBeforePerson": {
           "type": "number",
           "default": 2,
@@ -308,6 +314,17 @@
         }
       }
     },
+    "cloud": {
+      "type": "object",
+      "properties": {
+        "fleetRoutine": {
+          "type": "string",
+          "default": "",
+          "help": "The id of the stored routine that checks the fleet, which ./RUNME.sh cloud trigger names.",
+          "unit": "a routine id, opening on trig_"
+        }
+      }
+    },
     "code": {
       "type": "object",
       "properties": {
@@ -333,6 +350,17 @@
           "default": 300000,
           "help": "The context past which the next pull after the ticket in hand hands the handover, the clear and the read of the handover. 0 switches it off.",
           "unit": "tokens"
+        }
+      }
+    },
+    "fleet": {
+      "type": "object",
+      "properties": {
+        "idleAfter": {
+          "type": "string",
+          "default": "30m",
+          "help": "The age of a held box's tip past which ./RUNME.sh cloud fleet raises an idle wake.",
+          "unit": "a span, as 90m, 12h or 3d"
         }
       }
     },

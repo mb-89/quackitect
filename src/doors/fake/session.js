@@ -9,6 +9,8 @@ export function fakeSession(root) {
   return behaves({
     records,
     path(name) {
+      if (typeof name !== "string" || !name)
+        throw new Error("Missing file path.");
       if (name.includes("..")) throw new Error("Path outside this tree.");
       return name.startsWith(`${root}/`) ? name : `${root}/${name}`;
     },

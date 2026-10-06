@@ -7,6 +7,7 @@ package pull
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -18,7 +19,6 @@ import (
 // The trunk a desk works on, and the process a draft opens itself on. [[spec/design_output/work#a-desk-works-on-trunk]]
 const (
 	floatBits = 64
-	decimal   = 10
 	Trunk     = "main"
 	trivial   = "trivial"
 	helper    = "helper"
@@ -138,6 +138,17 @@ func taggedIn(list []*Held) []*Held {
 	return out
 }
 
+// The tagged tickets a work branch takes: its group's children and the private notes, so a tagged ticket of another group waits for its own branch. [[spec/tickets/cloud-question-check-leaves-readstext]]
+func taggedHere(tagged, children []*Held) []*Held {
+	out := []*Held{}
+	for _, one := range tagged {
+		if one.Private || slices.Contains(children, one) {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
 // The score orders the queue, off the queue module's one decider. [[spec/design_output/pull#the-queue-is-a-score]]
 func (it *It) sorted(list, all []*Held) []*Held {
 	rows := func(from []*Held) []queue.Row {
@@ -170,26 +181,11 @@ func (it *It) sorted(list, all []*Held) []*Held {
 
 // When each ticket came in, off one git log over the folder holding them. [[spec/design_output/pull#the-queue-is-a-score]]
 func (it *It) stoodHere() map[string]int64 {
-	out := map[string]int64{}
-	said := it.Git.Run("log", "--diff-filter=A", "--format=%ct", "--name-only", "--", Tickets)
-	if !said.OK {
-		return out
+	said, err := it.Git.Added(Tickets)
+	if err != nil {
+		return map[string]int64{}
 	}
-	var when int64
-	for _, row := range strings.Split(said.Out, "\n") {
-		line := strings.TrimSpace(row)
-		if line == "" {
-			continue
-		}
-		if number, err := strconv.ParseInt(line, decimal, floatBits); err == nil {
-			when = number
-			continue
-		}
-		if _, ok := out[line]; !ok {
-			out[line] = when
-		}
-	}
-	return out
+	return said
 }
 
 // The children stand before their group, the group's own ticket after them, and the notes last. [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -229,7 +225,8 @@ func (it *It) handOut(who *Who) int {
 	}
 	var pools [][]*Held
 	if who.Group != "" {
-		pools = append([][]*Held{tagged, it.sorted(heldChildren(all, who.Group), all)}, late...)
+		children := heldChildren(all, who.Group)
+		pools = append([][]*Held{taggedHere(tagged, children), it.sorted(children, all)}, late...)
 	} else {
 		pools = [][]*Held{tagged, it.sorted(freeIn(all), all), notes}
 		it.cutForGroups(all)
@@ -397,8 +394,8 @@ func (it *It) closedHere(all []*Held, dep string) bool {
 			return FieldOf(one.Text, "state") == Closed
 		}
 	}
-	said := it.Git.Run("show", "origin/"+Trunk+":"+Tickets+"/"+dep+".md")
-	return !said.OK || FieldOf(said.Out, "state") == Closed
+	said, ok := it.Git.Show("origin/"+Trunk, Tickets+"/"+dep+".md")
+	return !ok || FieldOf(said, "state") == Closed
 }
 
 // The walk past every leaf a condition skips, a kept red leaf, or a children step whose children all stand closed, to the leaf a hand takes. [[spec/design_output/pull#a-condition-skips-a-leaf]]

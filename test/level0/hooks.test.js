@@ -60,4 +60,3 @@ test("an edit to a file nobody wrote yet reads as the new text alone", () => {
   const e = { tool: "Edit", file_path: PATH, old_string: "a", new_string: "b" };
   assert.equal(wholeAfter(e, { path: PATH, text: "b" }, disk), "b");
 });
-

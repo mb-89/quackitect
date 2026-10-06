@@ -5,13 +5,14 @@
 package pull
 
 import (
-	"bytes"
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"quackitect/src/modules/files"
+	"quackitect/src/proc"
 )
 
 // The disk under the root, by slashed paths relative to it. [[spec/tickets/ticket-verbs-port-to-go]]
@@ -120,33 +121,44 @@ func containsSlash(said string) bool {
 	return false
 }
 
-// Git under a root on this box, its streams trimmed as the JavaScript door trims them. [[spec/design_output/doors#a-door-standing-on-another]]
-type GitDoor struct{ Root string }
+// The disk a git work tree stands on, so the pull and the repository read one tree. [[spec/design_output/doors#the-git-door-carries-writes]]
+type TreeDisk struct{ Tree files.Disk }
 
-func (one GitDoor) Run(args ...string) Ran {
-	run := exec.Command("git", args...)
-	run.Dir = one.Root
-	var out, errs bytes.Buffer
-	run.Stdout, run.Stderr = &out, &errs
-	err := run.Run()
-	return Ran{OK: err == nil, Out: strings.TrimSpace(out.String()), Err: strings.TrimSpace(errs.String())}
+func (one TreeDisk) Read(path string) (string, bool) {
+	text, ok, err := one.Tree.Read(path)
+	return text, ok && err == nil
 }
 
-// A command line through sh under a root: what it printed, its exit code, and why where it starts not. [[spec/design_output/pull#the-commands-answer]]
-func OSShell(root string) Shell {
+func (one TreeDisk) Exists(path string) bool {
+	if _, ok := one.Read(path); ok {
+		return true
+	}
+	under, _ := one.Tree.List(path)
+	return len(under) > 0
+}
+
+func (one TreeDisk) Files(folder string) []string {
+	under, _ := one.Tree.List(folder)
+	out := []string{}
+	for _, path := range under {
+		if name := strings.TrimPrefix(path, folder+"/"); !containsSlash(name) {
+			out = append(out, name)
+		}
+	}
+	return out
+}
+
+func (one TreeDisk) Write(path, text string) error { return one.Tree.Write(path, text) }
+
+func (one TreeDisk) Remove(path string) error { return one.Tree.Remove(path) }
+
+// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program fails to start or a signal ends it. [[spec/design_output/doors#the-process-door]]
+func ShellOver(run proc.Runner, root string) Shell {
 	return func(line string) (string, int, error) {
-		run := exec.Command("sh", "-c", line)
-		run.Dir = root
-		var out bytes.Buffer
-		run.Stdout = &out
-		err := run.Run()
-		var exit *exec.ExitError
-		if errors.As(err, &exit) {
-			return out.String(), exit.ExitCode(), nil
+		said := run(proc.Command{Argv: []string{"sh", "-c", line}, Dir: root})
+		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
+			return "", 0, errors.New(said.Err)
 		}
-		if err != nil {
-			return "", 0, err
-		}
-		return out.String(), 0, nil
+		return said.Out, said.Code, nil
 	}
 }

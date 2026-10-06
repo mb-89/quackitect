@@ -117,6 +117,18 @@ case. A hook hands `c:\` and a shell hands `C:\`, and both name one tree. So
 standing file, the `meta` row and the door's own. A caller passing either case
 meets the warm door and keeps the file.
 
+A start waits on readiness, and on no fixed span:
+
+| the caller | it waits until |
+|---|---|
+| the one holding the claim | the door stands, or the index it spawned exits, and it renews the claim each poll |
+| one meeting a fresh claim | the door stands, or the claim goes stale and it takes the claim itself |
+| either | the hang guard `startHang` passes, where the index neither stands nor exits |
+
+So a first build on a cold box takes what it takes, and every caller shares the
+one index the claim spawns. The guard stands under the timer a contract suite
+gives one run of the entry, so the start names the hang first.
+
 A cold build of the index takes about seventy seconds, because cgo compiles
 SQLite. It runs as a want. So a session starts with the disk answering, and
 picks the index up on the first question after the build lands.

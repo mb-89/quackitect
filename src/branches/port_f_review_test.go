@@ -1,17 +1,19 @@
-// The review over a real clone, ported off test/level0/review.test.js: what it
+// The review over a fake clone, ported off test/level0/review.test.js: what it
 // gathers, the check a worktree of the branch runs, the report and the cases a
-// red run names. The branch carries a stand-in for se-index, so the check runs.
+// red run names. The runner builds se-index off the branch, and the built
+// stand-in runs the case's check, so the check runs.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
 import (
 	"encoding/json"
-	"os"
-	"os/exec"
-	"path/filepath"
+	"path"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/proc"
 )
 
 // The group the review cases read, its ask and its handback. [[spec/tickets/work-verbs-port-to-go]]
@@ -24,65 +26,53 @@ const (
 // The handback: the ask with its retro filled. [[spec/tickets/work-verbs-port-to-go]]
 var pfHandback = strings.Replace(pfAsk, "<!-- what was done -->", "- it holds", 1)
 
-// A stand-in for se-index that runs the checks named and answers red on the first that fails. [[spec/tickets/work-verbs-port-to-go]]
-func pfProbe(checks string) string {
-	return `package main
-
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-)
-
-var _ = strings.HasSuffix
-var _ = filepath.Join
-
-func fail(why string) {
-	fmt.Println("not ok 1 - " + why)
-	os.Exit(1)
-}
-
-func stands(at string) bool {
-	_, err := os.Stat(at)
-	return err == nil
-}
-
-func linked(at string) bool {
-	info, err := os.Lstat(at)
-	return err == nil && info.Mode()&os.ModeSymlink != 0
-}
-
-func main() {
-	here, _ := os.Getwd()
-	_ = here
-` + checks + `
-	fmt.Println("1..3")
-	fmt.Println("# pass 3")
-}
-`
-}
+// What the stand-in for se-index prints and exits with, run in the worktree at the path named. [[spec/tickets/work-verbs-port-to-go]]
+type pfCheck func(one *tree, at string) (string, int)
 
 // A stand-in answering green. [[spec/tickets/work-verbs-port-to-go]]
-var pfGreen = pfProbe("")
+func pfGreen(*tree, string) (string, int) { return "1..3\n# pass 3\n", 0 }
 
-// A tree whose work branch carries the ask in one commit, then the handback, a source and the check's stand-in. [[spec/tickets/work-verbs-port-to-go]]
-func pfReviewTree(t *testing.T, probe, handback string) *tree {
+// A stand-in failing with the line the case answers, and green where it answers none. [[spec/tickets/work-verbs-port-to-go]]
+func pfProbe(fails func(one *tree, at string) string) pfCheck {
+	return func(one *tree, at string) (string, int) {
+		if why := fails(one, at); why != "" {
+			return "not ok 1 - " + why + "\n", 1
+		}
+		return pfGreen(one, at)
+	}
+}
+
+// Whether a path of the fake disk stands as a link, listed whole beside its folder's files. [[spec/tickets/work-verbs-port-to-go]]
+func (one *tree) pfLinked(at string) bool {
+	under, _ := one.disk.List(path.Dir(at))
+	return slices.Contains(under, at) && !one.stands(at)
+}
+
+// A tree whose work branch carries the ask in one commit, then the handback, a source and the packages the worktree builds, with the built se-index running the check. [[spec/tickets/work-verbs-port-to-go]]
+func pfReviewTree(t *testing.T, check pfCheck, handback string) *tree {
 	t.Helper()
 	one := newTree(t, nil)
-	one.git("switch", "-q", "-c", workBranch+pfName, "main")
+	one.cut(workBranch+pfName, "main")
 	one.land("the ask", map[string]string{ticketAt(pfName): pfAsk})
 	one.land("the work", map[string]string{
 		ticketAt(pfName):        handback,
 		"go.mod":                "module pfreview\n\ngo 1.24\n",
-		"src/quack/main.go":     probe,
+		"src/quack/main.go":     "package main\n\nfunc main() {}\n",
 		"src/front/cmd/main.go": "package main\n\nfunc main() {}\n",
 		"src/a.js":              "export const a = 1;\n",
 	})
-	one.git("push", "-q", "origin", workBranch+pfName)
-	one.git("switch", "-q", "main")
-	one.git("branch", "-q", "-D", workBranch+pfName)
-	one.git("fetch", "-q", "origin")
+	one.push(workBranch + pfName)
+	one.switchTo("main")
+	one.drop(workBranch + pfName)
+	one.fetch()
+	bin := pfWorktree + "/" + binFolder + "/se-index" + exe()
+	one.teach(one.d.at(bin), func(ran proc.Command) proc.Said {
+		if one.rel(ran.Dir) != pfWorktree || !one.stands(bin) {
+			return proc.Said{Err: "no se-index stands built in the worktree", Code: proc.NotStarted}
+		}
+		out, code := check(one, pfWorktree)
+		return proc.Said{Out: out, Code: code}
+	})
 	return one
 }
 
@@ -146,19 +136,18 @@ func TestPFTheReviewAnswersTheCheckAndTheRetro(t *testing.T) {
 	}
 }
 
-// The check runs inside the worktree, with the caller's survey landed there first. [[spec/tickets/work-verbs-port-to-go]]
+// The check runs inside the worktree, with the caller's survey landed there first, and builds with the go the survey names. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheCheckRunsInTheWorktreeOnTheSurvey(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	if !strings.HasSuffix(filepath.ToSlash(here), "/`+pfWorktree+`") {
-		fail("the check runs at " + here)
-	}
-	if !stands(".se/.runtime/tools.json") {
-		fail("no survey stands")
-	}`), pfHandback)
-	goAt, err := exec.LookPath("go")
-	if err != nil {
-		t.Skip("no go on this box")
-	}
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		if !one.stands(at + "/" + toolsFile) {
+			return "no survey stands"
+		}
+		return ""
+	}), pfHandback)
+	const goAt = "/fake/bin/go"
+	one.teach(goAt, one.pfGo)
+	delete(one.run.Programs, "go")
 	survey, _ := json.Marshal(map[string]map[string]string{"go": {"path": goAt}, "node": {"path": "/node"}})
 	one.write(map[string]string{toolsFile: string(survey)})
 	pfGreenCheck(t, pfMaterial(t, one))
@@ -167,9 +156,12 @@ func TestPFTheCheckRunsInTheWorktreeOnTheSurvey(t *testing.T) {
 // The worktree carries the caller's brand before the check runs. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeCarriesTheBrand(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	if !stands(".claude-plugin/marketplace.json") {
-		fail("no brand stands")
-	}`), pfHandback)
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		if !one.stands(at + "/.claude-plugin/marketplace.json") {
+			return "no brand stands"
+		}
+		return ""
+	}), pfHandback)
 	one.write(map[string]string{".claude-plugin/marketplace.json": "{}\n"})
 	pfGreenCheck(t, pfMaterial(t, one))
 }
@@ -177,42 +169,51 @@ func TestPFTheWorktreeCarriesTheBrand(t *testing.T) {
 // The worktree borrows the caller's two module folders, and gives them back before git removes it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsTheModules(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	for _, at := range []string{"node_modules", "src/extension/webview/node_modules"} {
-		if !linked(at) || !stands(at+"/held") {
-			fail(at + " stands borrowed not")
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		for _, rel := range []string{"node_modules", "src/extension/webview/node_modules"} {
+			if !one.pfLinked(at+"/"+rel) || !one.stands(at+"/"+rel+"/held") {
+				return rel + " stands borrowed not"
+			}
 		}
-	}`), pfHandback)
+		return ""
+	}), pfHandback)
 	one.write(map[string]string{"node_modules/held": "", "src/extension/webview/node_modules/held": ""})
 	pfGreenCheck(t, pfMaterial(t, one))
 	for _, rel := range []string{"node_modules/held", "src/extension/webview/node_modules/held"} {
-		if _, err := os.Stat(filepath.Join(one.root, rel)); err != nil {
-			t.Fatalf("the caller's %s stands not: %v", rel, err)
+		if !one.stands(rel) {
+			t.Fatalf("the caller's %s stands not", rel)
 		}
 	}
-	if _, err := os.Lstat(filepath.Join(one.root, filepath.FromSlash(pfWorktree))); err == nil {
-		t.Fatal("the worktree and its links stay")
+	if under, _ := one.disk.List(pfWorktree); len(under) > 0 {
+		t.Fatalf("the worktree and its links stay: %v", under)
 	}
 }
 
 // The worktree borrows the webview's modules alone where the caller carries those, and gives them back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsTheWebviewModules(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	if !linked("src/extension/webview/node_modules") || !stands("src/extension/webview/node_modules/held") {
-		fail("the webview modules stand borrowed not")
-	}`), pfHandback)
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		if !one.pfLinked(at+"/src/extension/webview/node_modules") || !one.stands(at+"/src/extension/webview/node_modules/held") {
+			return "the webview modules stand borrowed not"
+		}
+		return ""
+	}), pfHandback)
 	one.write(map[string]string{"src/extension/webview/node_modules/held": ""})
 	pfGreenCheck(t, pfMaterial(t, one))
-	if _, err := os.Stat(filepath.Join(one.root, "src/extension/webview/node_modules/held")); err != nil {
-		t.Fatalf("the caller's modules stand not: %v", err)
+	if !one.stands("src/extension/webview/node_modules/held") {
+		t.Fatal("the caller's modules stand not")
 	}
 }
 
 // The worktree borrows nothing out of the caller's bin, so a branch's build lands in its own. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	if linked(".se/.runtime/bin") || stands(".se/.runtime/bin/logview") {
-		fail("the caller's bin stands borrowed")
-	}`), pfHandback)
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		if one.pfLinked(at+"/"+binFolder) || one.stands(at+"/"+binFolder+"/logview") {
+			return "the caller's bin stands borrowed"
+		}
+		return ""
+	}), pfHandback)
 	one.write(map[string]string{binFolder + "/logview": ""})
 	pfGreenCheck(t, pfMaterial(t, one))
 }
@@ -220,31 +221,21 @@ func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
 // The worktree builds the branch's own se-front into its own bin before the check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBuildsItsOwnFront(t *testing.T) {
 	t.Parallel()
-	one := pfReviewTree(t, pfProbe(`	if !stands(".se/.runtime/bin/se-front") && !stands(".se/.runtime/bin/se-front.exe") {
-		fail("no se-front stands in the worktree's bin")
-	}
-	self, _ := os.Executable()
-	if filepath.Dir(self) != filepath.Join(here, ".se", ".runtime", "bin") {
-		fail("the check runs off " + self)
-	}`), pfHandback)
+	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
+		if !one.stands(at + "/" + binFolder + "/se-front" + exe()) {
+			return "no se-front stands in the worktree's bin"
+		}
+		return ""
+	}), pfHandback)
 	pfGreenCheck(t, pfMaterial(t, one))
 }
 
 // A red check comes back with its code and the rows the runner refused. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedCheckNamesTheRowsRefused(t *testing.T) {
 	t.Parallel()
-	red := `package main
-
-import (
-	"fmt"
-	"os"
-)
-
-func main() {
-	fmt.Println("ok 1 - a\nnot ok 2 - the door holds\nnot ok 3 - the rule fires")
-	os.Exit(1)
-}
-`
+	red := func(*tree, string) (string, int) {
+		return "ok 1 - a\nnot ok 2 - the door holds\nnot ok 3 - the rule fires\n", 1
+	}
 	said := pfMaterial(t, pfReviewTree(t, red, pfHandback))
 	if said.Check.OK || said.Check.Code == nil || *said.Check.Code != 1 {
 		t.Fatalf("the check reads %+v", said.Check)
@@ -267,7 +258,7 @@ func TestPFAReviewOfNothingRefuses(t *testing.T) {
 func TestPFABranchCarryingNoCommitRefuses(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
-	one.git("push", "-q", "origin", "main:"+workBranch+pfName)
+	one.pushAt("main", "refs/heads/"+workBranch+pfName)
 	if code := one.branchSays("review", pfName); code != codeRed {
 		t.Fatalf("the review answers %d", code)
 	}
@@ -369,7 +360,7 @@ func TestPFTheDiffRunsFromTheMergeBase(t *testing.T) {
 	t.Parallel()
 	one := pfReviewTree(t, pfGreen, pfHandback)
 	one.land("trunk moves", map[string]string{"trunk-only.txt": "trunk\n"})
-	one.git("push", "-q", "origin", "main")
+	one.push("main")
 	said := pfMaterial(t, one)
 	holds(t, said.Diff, "src/a.js")
 	if strings.Contains(said.Diff, "trunk-only.txt") || strings.Contains(said.Stat, "trunk-only.txt") {

@@ -1,4 +1,4 @@
-// The pull over a real git origin and clone: the hand-out, the hold, the
+// The pull over an origin and a clone in memory: the hand-out, the hold, the
 // hand-back's checks, the pass and its commit, the drop, the todo in hand and
 // the queue binding, off the roads test/level0/pull.test.js covers.
 // [[spec/design_output/pull#the-answers]]
@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -16,6 +15,9 @@ import (
 	"time"
 
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
+	"quackitect/src/proc"
 )
 
 // The tree this package stands in, whose processes and schemas the cases read. [[spec/design_output/pull#the-answers]]
@@ -94,39 +96,48 @@ Some change the owner asks for.
 # Discussion
 `
 
-func gitIn(t *testing.T, dir string, args ...string) string {
+// The work root the fake box names, which no disk reads. [[spec/design_output/pull#the-answers]]
+const workRoot = "work"
+
+func must(t *testing.T, err error) {
 	t.Helper()
-	run := exec.Command("git", args...)
-	run.Dir = dir
-	said, err := run.CombinedOutput()
 	if err != nil {
-		t.Fatalf("git %v: %v %s", args, err, said)
+		t.Fatal(err)
 	}
-	return strings.TrimSpace(string(said))
 }
 
-// A clone on work/g of an origin holding the group and its child, and the pull over it on a cloud box. [[spec/design_output/pull#the-answers]]
+// The one program the fake box knows: sh running an echo, and exit 127 on any other line. [[spec/design_output/doors#the-process-door]]
+func echoes(one proc.Command) proc.Said {
+	if said, ok := strings.CutPrefix(one.Argv[len(one.Argv)-1], "echo "); ok {
+		return proc.Said{Out: said + "\n"}
+	}
+	return proc.Said{Err: "sh: not found\n", Code: 127}
+}
+
+// A clone on work/g of an origin holding the group and its child, and the pull over it on a cloud box, all of it in memory. [[spec/design_output/pull#the-answers]]
 func cloudPull(t *testing.T) (*It, *bytes.Buffer, *bytes.Buffer) {
 	t.Helper()
-	base := t.TempDir()
-	seed, origin, work := filepath.Join(base, "seed"), filepath.Join(base, "origin.git"), filepath.Join(base, "work")
-	gitIn(t, base, "init", "-q", "--bare", "-b", "main", origin)
-	gitIn(t, base, "init", "-q", "-b", "main", seed)
-	disk := OSDisk{Root: seed}
-	_ = disk.Write("spec/tickets/g.md", groupTicket)
-	_ = disk.Write("spec/tickets/alpha.md", childTicket)
-	_ = disk.Write(".gitignore", ".se/\n")
-	gitIn(t, seed, "add", "-A")
-	gitIn(t, seed, "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed")
-	gitIn(t, seed, "push", "-q", origin, "main", "main:work/g")
-	gitIn(t, base, "clone", "-q", "-b", "work/g", origin, work)
-	gitIn(t, work, "config", "user.name", "t")
-	gitIn(t, work, "config", "user.email", "t@t")
+	now := func() time.Time { return time.Unix(0, 0) }
+	seed := files.NewFakeDisk()
+	for path, text := range map[string]string{"spec/tickets/g.md": groupTicket, "spec/tickets/alpha.md": childTicket, ".gitignore": ".se/\n"} {
+		must(t, seed.Write(path, text))
+	}
+	origin := git.NewFakeRepo(seed, now)
+	must(t, origin.AddAll())
+	_, err := origin.Commit("seed", nil)
+	must(t, err)
+	must(t, origin.Branch("work/g", "main"))
+	tree := files.NewFakeDisk()
+	repo := origin.Clone(tree)
+	must(t, repo.Switch("work/g", false))
+	repo.Set("user.name", "t")
+	repo.Set("user.email", "t@t")
+	box := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": echoes}}
 	out, errs := &bytes.Buffer{}, &bytes.Buffer{}
 	it := &It{
-		Disk: OSDisk{Root: work}, Git: GitDoor{Root: work}, Now: func() time.Time { return time.Unix(0, 0) },
-		Out: out, Err: errs, Root: work, Method: method, Agent: true, Cloud: true,
-		Env: map[string]string{"CLAUDE_CODE_REMOTE": "true"}, Binding: bindQueue, Shell: OSShell(work),
+		Disk: TreeDisk{Tree: tree}, Git: repo, Now: now,
+		Out: out, Err: errs, Root: workRoot, Method: method, Agent: true, Cloud: true,
+		Env: map[string]string{"CLAUDE_CODE_REMOTE": "true"}, Binding: bindQueue, Shell: ShellOver(box.Run, workRoot),
 		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, folderSource{method})) },
 	}
 	_ = it.Disk.Write(boxFile, `{"id":"cafecafecafe"}`+"\n")
@@ -144,6 +155,13 @@ func TestPull(t *testing.T) {
 		held := it.HoldOf("box cafecafecafe · claude-code-remote")
 		if held == nil || held.Ticket != "alpha" || held.Step != "do" || held.Group != "g" || len(held.Hash) != 40 {
 			t.Fatalf("the hold reads %+v", held)
+		}
+	})
+	t.Run("a tagged ticket of another group stays out of the pull on work/g", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write("spec/tickets/aside.md", strings.Replace(strings.Replace(childTicket, "group: g\n", "group: other\n", 1), "process:", "todo: true\nprocess:", 1))
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
 		}
 	})
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {
@@ -177,8 +195,8 @@ func TestPull(t *testing.T) {
 				t.Fatalf("the ticket lacks %q:\n%s", want, text)
 			}
 		}
-		if subject := it.Git.Run("log", "-1", "--format=%s", "origin/work/g").Out; subject != "alpha: passes do, closes done" {
-			t.Fatalf("origin's tip reads %q", subject)
+		if said, err := it.Git.Log("", "origin/work/g", false); err != nil || len(said) == 0 || said[0].Subject != "alpha: passes do, closes done" {
+			t.Fatalf("origin's log reads %+v, %v", said, err)
 		}
 		if !strings.Contains(out.String(), "wait\n  g stands at no step, which its route lacks") {
 			t.Fatalf("the next hand-out reads:\n%s", out)

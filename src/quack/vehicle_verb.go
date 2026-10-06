@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/proc"
 	"quackitect/src/vehicle"
 )
 
@@ -76,10 +76,8 @@ func vehicleRootHere() string {
 
 // Git in a folder: its trimmed output, and whether it exited zero, its errors kept quiet. [[spec/design_output/doors#a-door-standing-on-another]]
 func vehicleGit(dir string, args ...string) (string, bool) {
-	run := exec.Command("git", args...)
-	run.Dir = dir
-	said, err := run.Output()
-	return strings.TrimSpace(string(said)), err == nil
+	said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: dir})
+	return strings.TrimSpace(said.Out), said.Code == 0
 }
 
 // The disk the verb writes through, which writes nothing where the run is dry. [[spec/tickets/runme-hands-verbs-to-quack]]

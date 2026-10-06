@@ -19,6 +19,7 @@ const (
 	preCommit     = "pre-commit"
 	prePush       = "pre-push"
 	staleAfterKey = "work.staleAfter"
+	beatAfterKey  = "work.beatAfter"
 	engineVar     = "SE_ENGINE"
 	claudeVar     = "CLAUDECODE"
 )
@@ -78,7 +79,7 @@ func hookVerb(d hookDoors) twin {
 			refs, _ := io.ReadAll(d.stdin)
 			said = door.PrePush(d.root, hooks.Push{
 				Refs: string(refs), Cloud: d.cloud, Agent: agentPushes(d),
-				StaleAfter: textSetting(d.root, staleAfterKey), Now: d.now(),
+				StaleAfter: textSetting(d.root, staleAfterKey), BeatAfter: textSetting(d.root, beatAfterKey), Now: d.now(),
 			})
 		default:
 			said = hookUsage

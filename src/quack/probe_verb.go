@@ -8,13 +8,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 )
 
 // The words the probe answers, and the line an unknown word prints. [[spec/tickets/box-verbs-port-to-go]]
-const probeUsage = "Usage: ./RUNME.sh probe compact|cold|dry|reply"
+const probeUsage = "Usage: ./RUNME.sh probe compact|cold|dry|smoke|reply"
 
 // The width of the float a JSON number reads as. [[spec/tickets/box-verbs-port-to-go]]
 const jsonFloatBits = 64
@@ -27,6 +28,9 @@ const pluginFolder = ".claude/skills/level0"
 
 // The dry probe's own program, as ENTRY in src/scripts/probe-dry.js names it. [[spec/tickets/probe-dry-entry]]
 const dryEntry = "src/scripts/probe-dry.js"
+
+// The word naming the revision the dry road runs at, as AT in src/scripts/probe-dry.js reads it. [[spec/tickets/probe-at-revision-guards-merges]]
+const atFlag = "--at"
 
 // What each canary row says, which HEARD in .claude/skills/level0/lib/guidance.js owns, spelled again here because Go reads no JavaScript. [[spec/design_output/level0#the-canary]]
 const (
@@ -68,14 +72,44 @@ func probeVerb(d boxDoors, argv []string) int {
 	case "cold":
 		return probeCold(d, client, func(line string) { fmt.Fprintln(d.out, line) }, "")
 	// Level zero runs on a fresh box with no model and no key. [[spec/tickets/level0-runs-on-the-door]]
-	case "dry":
-		return probeDry(d, argv)
+	// Level zero runs over the tree as it stands, in seconds. [[spec/tickets/level0-smoke-runs-in-seconds]]
+	case "dry", "smoke":
+		resolved, code := resolvedAt(d, argv)
+		if code != 0 {
+			return code
+		}
+		return probeDry(d, resolved)
 	// [[spec/tickets/the-reply-probe-runs]]
 	case "reply":
 		return probeReply(d, client)
 	}
 	fmt.Fprintln(d.errs, probeUsage)
 	return exitUsage
+}
+
+// The words with the revision --at names resolved to its commit, on the dry road alone. The smoke and the working change stand on the tree as it is, with the root's built tools, so neither takes another revision. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/probe-at-stays-dry]]
+func resolvedAt(d boxDoors, argv []string) ([]string, int) {
+	at := slices.Index(argv, atFlag)
+	if at < 0 {
+		return argv, 0
+	}
+	if argv[0] != "dry" || slices.Contains(argv, workingFlag) {
+		fmt.Fprintf(d.errs, "%s runs on the dry road alone and with no %s beside it, since the smoke and the working change stand on the tree as it is.\n", atFlag, workingFlag)
+		return nil, exitUsage
+	}
+	if at+1 >= len(argv) {
+		fmt.Fprintf(d.errs, "%s names no revision.\n", atFlag)
+		return nil, exitUsage
+	}
+	revision := argv[at+1]
+	ran := d.run([]string{"git", "rev-parse", "--verify", "--quiet", revision + "^{commit}"}, runOpts{cwd: d.root})
+	if ran.missing || ran.code != 0 {
+		fmt.Fprintf(d.errs, "git resolves no commit at %s, so the dry road runs nowhere.\n", revision)
+		return nil, exitFailed
+	}
+	resolved := slices.Clone(argv)
+	resolved[at+1] = strings.TrimSpace(ran.stdout)
+	return resolved, 0
 }
 
 // Hands the dry road to its JavaScript entry with the words as they stand, since its session loads the plugin's hook module in process. [[spec/tickets/probe-dry-leaves-node]]

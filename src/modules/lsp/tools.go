@@ -6,12 +6,14 @@ package lsp
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"slices"
 	"sort"
 	"strings"
 
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 )
 
@@ -38,9 +40,6 @@ var (
 	proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
 )
 
-// A tool run: the folder, the input, the binary and its words. The door runs one, and a case hands in its own. [[spec/tickets/lsp-module-draws-the-tools]]
-type Runner func(dir, input, name string, argv ...string) (string, error)
-
 // The tools a run takes, where the box holds them, and the ceilings the code faults read. [[spec/tickets/lsp-module-draws-the-tools]]
 type Tools struct {
 	Root     string
@@ -49,7 +48,7 @@ type Tools struct {
 	Config   string
 	Function int
 	File     int
-	Run      Runner
+	Run      proc.Runner
 	// Ends every run the door started, which the listen's stop calls. [[spec/tickets/the-index-stops-its-tools]]
 	Halt func()
 	// Reads the tools and the ceilings again before a whole run, which the door does and a case does not. [[spec/design_output/lsp#the-panel-follows-the-index]]
@@ -215,11 +214,20 @@ func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
 }
 
 func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
-	out, err := one.Run(one.Root, input, one.Vale, argv...)
-	if err != nil {
-		return nil, err.Error()
+	out, fault := one.runs(input, one.Vale, argv)
+	if fault != "" {
+		return nil, fault
 	}
 	return one.valeRowsOf(out)
+}
+
+// One tool run through the process door in the root, up to the wait, and the fault a run answering no output and a nonzero code reads as. [[spec/design_output/doors#the-process-door]]
+func (one *Tools) runs(input, name string, argv []string) (string, string) {
+	said := one.Run(proc.Command{Argv: append([]string{name}, argv...), Dir: one.Root, Stdin: input, Wait: toolWait})
+	if said.Code != 0 && said.Out == "" {
+		return "", fmt.Sprintf("exit status %d: %s", said.Code, strings.TrimSpace(said.Err))
+	}
+	return said.Out, ""
 }
 
 func (one *Tools) valeFault(why string) Finding {
@@ -309,8 +317,8 @@ func (one *Tools) biome(where []string) []Finding {
 		return nil
 	}
 	argv := append([]string{"lint", "--config-path=" + biomeConfig, "--reporter=json", "--max-diagnostics=none"}, where...)
-	out, err := one.Run(one.Root, "", one.Biome, argv...)
-	if err != nil {
+	out, fault := one.runs("", one.Biome, argv)
+	if fault != "" {
 		return nil
 	}
 	return one.biomeRowsOf(out, where[0])

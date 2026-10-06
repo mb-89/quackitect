@@ -55,6 +55,17 @@ func bootHooks(t *testing.T) []struct {
 	return all
 }
 
+// A fake index: the start verb writes down its input, prints start-says and exits on start-code, and any other call writes down the skip list it meets. [[spec/tickets/the-coordinator-runs-under-level0]]
+const bootIndex = `#!/bin/sh
+here=$(dirname "$0")
+case "$*" in *" start")
+  cat > "$here/start-seen"
+  [ -f "$here/start-says" ] && cat "$here/start-says"
+  exit "$(cat "$here/start-code" 2>/dev/null || echo 0)";;
+esac
+printf '%s' "${SE_INSTALL_SKIP:-}" > "$here/skip-seen"
+`
+
 // A temporary tree holding a copy of install.sh and a fake index that writes down the skip list it meets. [[spec/tickets/session-start-leaves-node]]
 func bootTree(t *testing.T) string {
 	t.Helper()
@@ -64,8 +75,7 @@ func bootTree(t *testing.T) string {
 		t.Fatal(err)
 	}
 	bootWrite(t, filepath.Join(tree, "src", "scripts", "install.sh"), string(body), 0o755)
-	bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "se-index"),
-		"#!/bin/sh\nprintf '%s' \"${SE_INSTALL_SKIP:-}\" > \"$(dirname \"$0\")/skip-seen\"\n", 0o755)
+	bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), bootIndex, 0o755)
 	return tree
 }
 
@@ -83,10 +93,17 @@ func bootWrite(t *testing.T, path, text string, mode os.FileMode) {
 // Runs sh install.sh boot in the tree under the env named and no other, and answers its exit code and output. [[spec/tickets/session-start-leaves-node]]
 func bootRun(t *testing.T, tree string, env map[string]string) (int, string) {
 	t.Helper()
+	return bootRunOn(t, tree, env, "")
+}
+
+// Runs the boot word as bootRun does, with the hook input on its stdin. [[spec/tickets/the-coordinator-runs-under-level0]]
+func bootRunOn(t *testing.T, tree string, env map[string]string, input string) (int, string) {
+	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "src", "scripts", "install.sh"), "boot")
 	run.Dir = tree
+	run.Stdin = strings.NewReader(input)
 	home := filepath.Join(filepath.Dir(tree), "home")
 	_ = os.MkdirAll(home, 0o755)
 	run.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + home}
@@ -185,6 +202,34 @@ func TestTheBootRunsNoInstallOffACloudBox(t *testing.T) {
 	code, said := bootRun(t, tree, map[string]string{"SE_INSTALL_SKIP": bootSkipAll})
 	if _, ran := bootSaw(tree); ran || code != 0 {
 		t.Errorf("off a cloud box, the boot answers %d and runs the install %v: %s", code, ran, said)
+	}
+}
+
+// [[spec/tickets/the-coordinator-runs-under-level0]]
+func TestTheBootHandsADesksHookInputToTheStartVerbAndPrintsItsStop(t *testing.T) {
+	t.Parallel()
+	const input, stop = `{"permission_mode":"default"}`, `{"continue":false,"stopReason":"open it in the repo folder"}` + "\n"
+	tree := bootTree(t)
+	bin := filepath.Join(tree, ".se", ".runtime", "bin")
+	bootWrite(t, filepath.Join(bin, "start-says"), stop, 0o644)
+	code, said := bootRunOn(t, tree, nil, input)
+	seen, _ := os.ReadFile(filepath.Join(bin, "start-seen"))
+	if code != 0 || said != stop || string(seen) != input {
+		t.Errorf("at a desk, the boot answers %d and prints %q, and the start verb meets %q; wants 0, %q and %q", code, said, seen, stop, input)
+	}
+}
+
+// [[spec/tickets/the-coordinator-runs-under-level0]]
+func TestTheBootStartsADeskSessionWhereTheStartVerbFailsOrAnswersNothing(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct{ says, code string }{{"stop\n", "2"}, {"", "0"}} {
+		tree := bootTree(t)
+		bin := filepath.Join(tree, ".se", ".runtime", "bin")
+		bootWrite(t, filepath.Join(bin, "start-says"), one.says, 0o644)
+		bootWrite(t, filepath.Join(bin, "start-code"), one.code, 0o644)
+		if code, said := bootRunOn(t, tree, nil, "{}"); code != 0 || said != "" {
+			t.Errorf("at a desk, a start verb exiting %s on %q leaves the boot answering %d and printing %q; wants 0 and nothing", one.code, one.says, code, said)
+		}
 	}
 }
 

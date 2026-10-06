@@ -5,7 +5,7 @@
       "file": "spec/config/level0.schema.json",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 821. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 849. Split it by topic."
     },
     {
       "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
@@ -41,13 +41,13 @@
       "file": "spec/design_output/pull.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 930. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 931. Split it by topic."
     },
     {
       "file": "spec/design_output/work.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 889. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 953. Split it by topic."
     },
     {
       "file": "spec/pages/the-agent-pulls-tickets.html",
@@ -102,6 +102,12 @@
       "rule": "FileCeiling",
       "line": 1,
       "message": "A file holds 600 lines, and the file holds 703. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/quack-repos-meet-fake-git.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 742. Split it by topic."
     },
     {
       "file": "spec/tickets/sessions-boot-from-the-repo.md",

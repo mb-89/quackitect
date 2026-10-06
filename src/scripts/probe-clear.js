@@ -118,10 +118,16 @@ export function grouped(it, tree, env) {
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
   it.disk.write(it.join(tree, "spec", "tickets", `${LEAF}.md`), LEAF_TEXT);
+  unparked(it, tree);
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
     timeoutMs: PULL_WAIT,
   });
+  // The untag lands as a commit on the probe's branch, so the handover meets no tracked change the box alone holds. [[spec/tickets/probe-clone-drops-free-tags]]
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
   // A box's work branch stands on origin, so the handover finds no commit the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
   const pushed = it.proc.run(["git", "update-ref", `refs/remotes/origin/work/${GROUP}`, "HEAD"], {
     cwd: tree,
@@ -129,6 +135,21 @@ export function grouped(it, tree, env) {
   });
   const fell = [minted, branched, pushed].find((one) => one.exitCode !== 0);
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
+}
+
+// The clone carries the tickets its source box parks, and a parked ticket goes out ahead of the probe's leaf, so the clone drops every park. [[spec/tickets/prompt-flags-follow-prompt-verb]]
+function unparked(it, tree) {
+  const parked = it.proc.run(["git", "grep", "-l", "^todo: true$", "--", "spec/tickets"], { cwd: tree, timeoutMs: PULL_WAIT });
+  const files = String(parked.stdout ?? "").split("\n").filter(Boolean);
+  for (const file of files) {
+    const at = it.join(tree, file);
+    it.disk.write(at, it.disk.read(at).replace(/^todo: true\r?\n/m, ""));
+  }
+  if (files.length === 0) return;
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-m", "the probe unparks its clone", "--", ...files],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
 }
 
 function keyed(it, tree) {

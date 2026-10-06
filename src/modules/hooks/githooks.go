@@ -31,12 +31,13 @@ var (
 	boxOfHand = regexp.MustCompile(`\bbox (\S+)`)
 )
 
-// What a push reads past the door's git: the refs git pipes in, whether a cloud box pushes, whether an agent pushes, work.staleAfter off the config, and the clock. [[spec/tickets/git-hooks-run-in-go]]
+// What a push reads past the door's git: the refs git pipes in, whether a cloud box pushes, whether an agent pushes, work.staleAfter and work.beatAfter off the config, and the clock. [[spec/tickets/git-hooks-run-in-go]]
 type Push struct {
 	Refs       string
 	Cloud      bool
 	Agent      bool
 	StaleAfter string
+	BeatAfter  string
 	Now        time.Time
 }
 
@@ -70,7 +71,7 @@ func (d *Door) PreCommit(root string, settings Settings) string {
 	tree := disk{root}
 	for _, guard := range []func() string{
 		func() string {
-			return branches.MergeRefusal(nil, branches.MarkedIn(d.git(root, "diff", "--cached", "--unified=0")))
+			return branches.MergeRefusal(nil, branches.MarkersIn(d.git(root, "diff", "--cached", "--unified=0")))
 		},
 		func() string { return d.privateDelta(root, settings, tree) },
 		func() string { return d.testedDelta(root, tree) },
@@ -140,7 +141,7 @@ func (d *Door) uncheckedIn(root string, refs []pushedRef, stamp string, stands b
 		sha = command.StampSha(stamp)
 	}
 	for _, one := range refs {
-		if one.branch() == command.Trunk || one.drops() {
+		if one.branch() == command.Trunk || one.drops() || branches.PassesTheStamp(one.branch()) {
 			continue
 		}
 		green, says := command.Battery(stamp, stands, sha)
@@ -180,7 +181,7 @@ func (d *Door) heldRefusal(root string, refs []pushedRef, push Push, box string)
 		if hand == "" || holderOf(hand) == box {
 			continue
 		}
-		if !d.staleTip(root, branch, branches.StaleSpan(push.StaleAfter), push.Now) {
+		if !d.staleTip(root, branch, push) {
 			return heldElsewhere(branch, hand)
 		}
 		if !movesHold(d.git(root, "show", one.sha+":"+ticket), box) {
@@ -198,13 +199,14 @@ func holderOf(hand string) string {
 	return ""
 }
 
-// Whether the branch's tip on origin stands older than the span. [[spec/tickets/stale-hold-frees-the-branch]]
-func (d *Door) staleTip(root, branch string, span int64, now time.Time) bool {
+// Whether the hold on origin stands dead: its beat decides where it says anything, and the tip's age past the stale span otherwise. [[spec/design_output/work#a-hold-beats-with-its-session]]
+func (d *Door) staleTip(root, branch string, push Push) bool {
 	when, err := strconv.ParseInt(d.git(root, "log", "-1", "--format=%ct", "origin/"+branch), timeBase, timeBits)
-	if err != nil || when == 0 || now.IsZero() {
+	if err != nil || when == 0 || push.Now.IsZero() {
 		return false
 	}
-	return now.Unix()-when > span
+	beat := d.git(root, "log", "-1", "--format=%ct %s", "origin/"+branches.BeatBranch(strings.TrimPrefix(branch, command.WorkBranch)))
+	return branches.HoldStale(when, beat, push.Now.Unix(), branches.StaleSpan(push.StaleAfter), branches.BeatSpan(push.BeatAfter))
 }
 
 // A tip moves the hold where its ticket names this box, or nobody. A tip carrying no ticket moves nothing. [[spec/tickets/stale-hold-moves-by-take]]

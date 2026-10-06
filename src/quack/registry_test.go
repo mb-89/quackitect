@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
+	"quackitect/src/proc"
 	"quackitect/src/q"
 )
 
@@ -22,6 +24,7 @@ func registersFor(t *testing.T, words string, one twin) {
 
 func TestVerbRegistry(t *testing.T) {
 	t.Parallel()
+	t.Run("a person's run drops the harness and names its root", aPersonRunDropsTheHarnessAndNamesItsRoot)
 	t.Run("a registered verb runs in Go", func(t *testing.T) {
 		registersFor(t, "registry probe", twinSaying("go\n", &[]bool{}))
 		reached := false
@@ -60,15 +63,26 @@ func TestVerbRegistry(t *testing.T) {
 	t.Run("a person's call to a registered verb runs the road in a child, under the person's environment", func(t *testing.T) {
 		ran := false
 		registersFor(t, "registry probe", func([]string, bool, io.Writer, io.Writer) int { ran = true; return 0 })
-		was := selfPath
-		selfPath = func() (string, error) { return "/no/such/quack", nil }
-		t.Cleanup(func() { selfPath = was })
-		_, err := nodeAccept(t.TempDir())(q.Request{Args: map[string]any{"words": []any{"registry", "probe"}, "person": true}})
+		var roads [][]string
+		fake := &proc.FakeRunner{Programs: map[string]proc.Program{fakeQuack: func(one proc.Command) proc.Said {
+			roads = append(roads, one.Argv)
+			return proc.Said{Out: "child\n"}
+		}}}
+		said, err := nodeAcceptOver(fake.Run, fakeSelf, t.TempDir())(q.Request{Args: map[string]any{"words": []any{"registry", "probe"}, "person": true}})
 		if ran {
 			t.Fatal("a person's call runs the twin in the index's own process")
 		}
-		if err == nil {
-			t.Fatal("the child road answers no fault, and the test binary takes no verb")
+		if err != nil || said != "child" || len(roads) != 1 || !slices.Equal(roads[0][len(roads[0])-2:], []string{"registry", "probe"}) {
+			t.Fatalf("a person's call answers %v, %v over the roads %q, and wants one child road answering child", said, err, roads)
+		}
+	})
+	t.Run("a person's call whose road never starts answers its fault", func(t *testing.T) {
+		registersFor(t, "registry probe", func([]string, bool, io.Writer, io.Writer) int { return 0 })
+		fake := &proc.FakeRunner{}
+		want := fake.Run(proc.Command{Argv: []string{fakeQuack}}).Err
+		_, err := nodeAcceptOver(fake.Run, fakeSelf, t.TempDir())(q.Request{Args: map[string]any{"words": []any{"registry", "probe"}, "person": true}})
+		if err == nil || !strings.Contains(err.Error(), want) {
+			t.Fatalf("a road that never starts answers %v, and wants the fault %q", err, want)
 		}
 	})
 	t.Run("the twins register through the registry", func(t *testing.T) {
