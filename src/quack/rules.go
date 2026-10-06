@@ -46,20 +46,38 @@ var loadedRules = struct {
 
 // The Go rules over a root's own schema and lists, loaded once a run. [[spec/tickets/go-rules-replace-vale]]
 func rulesAt(root string) (*rules.Set, error) {
+	return rulesUnder(root, vehicleOf(os.Executable()))
+}
+
+// The Go rules over a work root, each file from the root and else from its vehicle, as the wiring reads. [[spec/tickets/vehicle-rules-come-down]]
+func rulesUnder(root, vehicle string) (*rules.Set, error) {
+	key := root + "\x00" + vehicle
 	loadedRules.Lock()
 	defer loadedRules.Unlock()
-	if set := loadedRules.by[root]; set != nil {
+	if set := loadedRules.by[key]; set != nil {
 		return set, nil
 	}
-	set, err := rules.Load(func(path string) string {
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		return string(text)
-	})
+	set, err := rules.Load(readUnder(root, vehicle))
 	if err != nil {
 		return nil, err
 	}
-	loadedRules.by[root] = set
+	loadedRules.by[key] = set
 	return set, nil
+}
+
+// A reader of a slashed path under the first root holding it, and empty where none does. [[spec/tickets/vehicle-rules-come-down]]
+func readUnder(roots ...string) func(path string) string {
+	return func(path string) string {
+		for _, root := range roots {
+			if root == "" {
+				continue
+			}
+			if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path))); err == nil {
+				return string(text)
+			}
+		}
+		return ""
+	}
 }
 
 // The Go rules over the tree the verb stands in. [[spec/tickets/go-rules-replace-vale]]

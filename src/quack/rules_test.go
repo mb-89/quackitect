@@ -42,3 +42,27 @@ func TestARulesLoadThatFailsNamesRulesLoad(t *testing.T) {
 		t.Fatalf("the rules answer %+v, and want one RulesLoad row", said)
 	}
 }
+
+func TestAVehicleLendsTheRulesTheWorkRootLacks(t *testing.T) {
+	t.Parallel()
+	method, work := t.TempDir(), t.TempDir()
+	seedsRules(t, method)
+	if _, err := rulesAt(work); err == nil {
+		t.Fatal("a bare work root loads rules, and wants a failed load")
+	}
+	if _, err := rulesUnder(work, method); err != nil {
+		t.Fatalf("the work root under its vehicle loads no rules: %v", err)
+	}
+}
+
+func TestTheWorkRootsFileStandsOverTheVehicles(t *testing.T) {
+	t.Parallel()
+	method, work := t.TempDir(), t.TempDir()
+	seedsFile(t, method, "spec/a.yml", "method")
+	seedsFile(t, method, "spec/b.yml", "method")
+	seedsFile(t, work, "spec/a.yml", "work")
+	read := readUnder(work, method)
+	if read("spec/a.yml") != "work" || read("spec/b.yml") != "method" || read("spec/c.yml") != "" {
+		t.Fatalf("reads %q, %q and %q, and wants work, method and nothing", read("spec/a.yml"), read("spec/b.yml"), read("spec/c.yml"))
+	}
+}
