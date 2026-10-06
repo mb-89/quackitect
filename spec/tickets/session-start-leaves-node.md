@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 345c545bd2b0dce5
         size: 996
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 70b427dabf948570139556d9ab44c67d249f9d56
+    hash_after: 55d12d31cc77b26ccef83bf4e3e94fcdaba0f7f8
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -333,14 +342,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint .
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size field names, and no other: boot.js, install.sh, settings.json, hooks.test.js and level0.md
+the boot word reaches the disk and a process through sh alone, adds no door, and the Go cases run the real install.sh in a temporary tree over a fake index
+the boot block in install.sh points at spec/design_output/level0#the-boot-hook, which names the boot word
+the skip list stands in install.sh because a shell script imports nothing, and TestTheBootSkipsWhatTheColdProbeSkips pins it to installSkip; the span stands once as startSpan, and settings.json and level0.md point there
 
 ## tests-green
 
