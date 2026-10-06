@@ -388,7 +388,7 @@ asks after it later.
 
 Under `migration.cage` at `new`, the hooks door decides the events it ports,
 and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
-moves them. `.claude/skills/level0/hooks/cage.ts` holds the road.
+moves them. `src/modules/hooks/guard.go` holds the rule, and the hook reaches it through the `cage` verb of the index binary, which stands while the server is down. A verb that answers nothing passes the call, and the fall line says the cage stands down.
 
 | the event | who answers |
 |---|---|
@@ -406,6 +406,8 @@ and `./RUNME.sh serve`. These pass, and so does every other event:
   index stands unbuilt brings the door back
 
 For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
+
+The stub's bridgehead keeps its vehicle roads, the home order and the clone in TypeScript, because no index binary stands on a stub before its clone. [[spec/tickets/level0-hooks-hold-no-rule]]
 
 ## A session says its cage
 

@@ -501,3 +501,118 @@ test("under new a door the start road stands up says no fall to the session, and
   assert.equal(down.$.logged.length, 1, "a door still down past the road says so once");
   assert.match(down.$.logged[0], /answers nothing at http:\/\/127\.0\.0\.1:7001\/hook/);
 });
+
+// A box whose door stands down, and whose cage verb prints what the test hands it. [[spec/tickets/level0-hooks-hold-no-rule]]
+function cagedBy(box, printed) {
+  const cages = [];
+  const run = box.$.process.run;
+  box.$.process.run = async (argv, init) => {
+    if (argv.includes("verb") && argv.includes("cage")) {
+      cages.push({ argv, init });
+      return { exitCode: 0, stdout: printed, stderr: "" };
+    }
+    return run(argv, init);
+  };
+  return cages;
+}
+
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("a tool.call meets the cage verb while the door stands down, and its deny answers", async () => {
+  const box = caged();
+  const cages = cagedBy(box, '{"deny":"from go"}');
+  const call = { tool: "Bash", command: "ls" };
+
+  const said = await box.hooks["*"](box.$, call, box.handed);
+
+  assert.deepEqual(said, { deny: "from go" }, "the cage verb's deny answers the call");
+  assert.equal(cages.length, 1, "the hook runs the cage verb once");
+  const stdin = JSON.parse(String(cages[0].init?.stdin ?? "{}"));
+  assert.equal(stdin.event, "tool.call", "the verb reads the event");
+  assert.deepEqual(stdin.e, call, "and the call it guards");
+});
+
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("a down door passes the call the cage verb leaves alone", async () => {
+  const box = caged();
+  const cages = cagedBy(box, "");
+  const call = { tool: "Bash", command: "rm -rf ." };
+
+  const said = await box.hooks["*"](box.$, call, box.handed);
+
+  assert.deepEqual(said, { handed: call }, "the call goes on to the harness");
+  assert.equal(cages.length, 1, "once the cage verb answers nothing");
+});
+
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("the hook reads the step the door answers", async () => {
+  const box = caged();
+  box.$.http = {
+    fetch: async () => ({
+      ok: true,
+      status: 200,
+      text: JSON.stringify({
+        effects: [{ kind: "after", text: "the effects say this" }],
+        step: { answer: { deny: "door step" } },
+      }),
+    }),
+  };
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  assert.deepEqual(said, { deny: "door step" }, "the door's step answers, not the hook's reading of its effects");
+});
+
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("the hook posts the after to the door's merge", async () => {
+  const box = caged();
+  const posts = [];
+  box.$.http = {
+    fetch: async (url, init) => {
+      posts.push({ url, body: JSON.parse(String(init?.body ?? "{}")) });
+      const answer = url.endsWith("/merge")
+        ? { merged: true }
+        : { effects: [], step: { after: ["x"] } };
+      return { ok: true, status: 200, text: JSON.stringify(answer) };
+    },
+  };
+  const call = { tool: "Bash", command: "ls" };
+
+  const said = await box.hooks["*"](box.$, call, box.handed);
+
+  const merge = posts.find((one) => one.url.endsWith("/merge"));
+  assert.ok(merge, "the hook posts to the door's merge");
+  assert.equal(merge.url, "http://127.0.0.1:7001/merge");
+  assert.deepEqual(merge.body.said, { handed: call }, "with what next(e) answered");
+  assert.deepEqual(merge.body.adds, { context: ["x"] }, "and the adds");
+  assert.deepEqual(said, { merged: true }, "and the door's merged value answers");
+});
+
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("the hook doors the events the standing file names", async () => {
+  const box = caged({
+    [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({
+      port: 7001,
+      token: "t0k",
+      raw: true,
+      events: ["tool.call"],
+    }),
+  });
+  const posts = [];
+  box.$.http = {
+    fetch: async (url, init) => {
+      posts.push({ url, event: JSON.parse(String(init?.body ?? "{}")).event });
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [] }) };
+    },
+  };
+  const submit = Object.assign(async (e) => e, { event: "prompt.submit" });
+
+  await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
+
+  assert.deepEqual(posts, [], "an event the standing file leaves out posts nothing");
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  assert.deepEqual(
+    posts.map((one) => one.event),
+    ["tool.call"],
+    "and one it names reaches the door",
+  );
+});

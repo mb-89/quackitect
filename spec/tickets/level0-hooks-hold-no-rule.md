@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 780972e44202b6f6
         size: 888
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 5ab6815c7d9fdc5ec7cff63e1d50397ab10f493a
+    hash_after: 5ab6815c7d9fdc5ec7cff63e1d50397ab10f493a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: cae73f308ee5debe
+        size: 3833
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -259,26 +272,35 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/guard_test.go src/modules/hooks/step_test.go src/modules/hooks/listen_test.go src/quack/verb_cage_test.go test/level0/caged-door.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/guard_test.go
+- src/modules/hooks/step_test.go
+- src/modules/hooks/listen_test.go
+- src/quack/verb_cage_test.go
+- test/level0/caged-door.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The Go tests port every guard, step and merge case from test/level0/cage.test.js and shape.test.js, and fail on stubs that return nothing. Five caged-door cases fail on the hook today: the cage verb, a pass the verb leaves, the step off the door, the merge post and the doored events. The merge body names said and adds, and the cage verb reads event and e on stdin when it runs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestGuarded, TestRecovers, TestWordsOf, TestRefusedText, TestStepOf, TestMerged, TestStandingNamesEvents and TestCageVerb decide the first done_when line, the caged-door cases the second, and the check the third
+the Go tests reach no door, and the caged-door cases fake the fetch, the disk and the process
 
 # gate
 
