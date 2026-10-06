@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -143,6 +143,15 @@ record:
         hash: 517c62490a836544
         size: 5375
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 5170d177e2a878ea2f45eed17d946c9d93c994f9
+    hash_after: 5170d177e2a878ea2f45eed17d946c9d93c994f9
+    inputs:
+      - name: ask
+        hash: e1dd042af4ef6bcc
+        size: 765
+    def: c01ae0f2ace0cecb
 group: javascript-leaves
 ---
 
@@ -247,7 +256,7 @@ Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- first on this route: the standard process changed, and the ticket restarts at the draft. Main changed none of the files the approach names past `src/doors/fake/session.js`, which leaves with it.
 
 ### size
 
@@ -287,9 +296,10 @@ Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- a helper opened the seven files, cage.js, mutations.js, the hook verb, copilotsetup.go, setup_verb.go, main.go and listen.go, and I checked copilotRunner, setupCopilot, the workflow and the removed hook.go there
+- on the merged tree I opened `copilotsetup.go`, `setup_verb.go`, `hook_verb.go`, `copilot.go`, `down.go`, `mutations.go` and the fake session, and checked `copilotRunner`, `setupCopilot` and `hookVerb` there
 - the callers come off a git grep on each file name and the dispatch mode, across code, workflows and notes
-- TestCopilotScriptsLeave decides line one, TestCopilotHooksNameNoScript line two, the TestHook cases line three, and a live check line four
+- `TestCopilotScriptsLeave` decides line one, `TestCopilotHooksNameNoScript` line two, the hook cases line three, and a live check line four
+- the approach adds no config key
 
 ## tests-red
 
