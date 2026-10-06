@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 7d33ff4dc7616eba
         size: 501
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 8721572abbbdb1ce50cfb6dfc7d16be36877005a
+    hash_after: 8721572abbbdb1ce50cfb6dfc7d16be36877005a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 02f7a5a3a638d3f9
+        size: 2318
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,31 @@ Weighed: the disk read over a read off `origin/main`, since the coordinator runs
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/prompt_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/prompt_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the cloud verb answers its usage, code 2, for the prompt word. The box rules constant stands in `src/branches/prompt.go` already, so the file builds and the first case reads it. The package tests run over a temp folder through the disk doors, as every case in the package does, so the prompt cases need no git.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done_when line meets TestPromptWritesTheGroupsPromptFromItsRoute, and the second meets TestPromptRefusesATicketThatStandsNowhere and TestPromptRefusesARouteThatStandsNowhere. The check line meets the command at tests-green.
+- The disk is the one door these cases reach, and they reach it over a temp folder, as the package's other cases do.
 
 # gate
 
