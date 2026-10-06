@@ -183,6 +183,12 @@ test("an agent's beat lands where no stamp reaches it", () => {
   assert.deepEqual(holds(beat, ""), { code: 0, said: "" });
 });
 
+// A rescue carries red work on purpose, so an agent pushes it on any stamp. [[spec/tickets/rescue-passes-the-stamp-gate]]
+test("an agent's rescue lands where no stamp reaches it", () => {
+  const rescue = refsIn("abc123 abc123 refs/heads/rescue/x 0000000000000000000000000000000000000000");
+  assert.deepEqual(holds(rescue, ""), { code: 0, said: "" });
+});
+
 // An end at or past the tip reads dead at once, and a beat inside its span reads live past the stale span. [[spec/tickets/beats-pass-the-push-gate]]
 test("the stale reader reads the beat before the tip's age", () => {
   const now = Date.parse("2026-01-01T12:00:00.000Z");

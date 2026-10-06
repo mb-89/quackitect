@@ -41,6 +41,8 @@ export const ZEROS = /^0+$/;
 const HEADS = /^refs\/heads\//;
 // A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#a-hold-beats-with-its-session]]
 const BEATS = "refs/heads/beats/";
+// A rescue carries a red commit off a dying box on purpose, so no stamp gates it. [[spec/tickets/rescue-passes-the-stamp-gate]]
+const RESCUE = "refs/heads/rescue/";
 const ENDS = " ends";
 const BOX = /\bbox (\S+)/;
 
@@ -105,6 +107,7 @@ export function holds(
   for (const one of engine && !ciGuards ? refs : []) {
     if (one.remote === `refs/heads/${TRUNK}` || ZEROS.test(String(one.sha ?? ""))) continue;
     if (String(one.remote ?? "").startsWith(BEATS)) continue;
+    if (String(one.remote ?? "").startsWith(RESCUE)) continue;
     const battery = saysGreen(stamp, stamp.sha);
     const covered = stamp.sha === one.sha || checkedThrough(stamp.sha, one.sha);
     if (battery.green && covered) continue;
