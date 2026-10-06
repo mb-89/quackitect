@@ -46,7 +46,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	self, _ := os.Executable()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, now: time.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
+	d := checkDoors{root: root, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
 	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {

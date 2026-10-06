@@ -30,7 +30,7 @@ func reviewOver(method string) func(root, branch string) (review.Material, strin
 		span, stop := context.WithTimeout(context.Background(), reviewGathering)
 		defer stop()
 		road := append(selfRoad(method), "branch", "review", branch, "--json")
-		run := exec.CommandContext(span, road[0], road[1:]...)
+		run := endsWhole(exec.CommandContext(span, road[0], road[1:]...))
 		run.Dir = root
 		run.Env = append(os.Environ(), "QUACKITECT_ROOT="+method, workRootVar+"="+root)
 		var out, errs bytes.Buffer
