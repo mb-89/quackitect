@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 7fa3340f46d52f58b440fa8dc2ce458589236066
+    hash_after: 7fa3340f46d52f58b440fa8dc2ce458589236066
+    inputs:
+      - name: ask
+        hash: 63e9e156266d562d
+        size: 658
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,54 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks door stays pure: hooks.Outside gains Hear, a hand taking failure.Event, and None hears nothing. Hook in src/modules/hooks/hooks.go hands each post to Hear before it answers, as Event{Kind: the post's event as the door names it, such as tool.call, Text: the event payload as compact JSON}, so a watch matches a tool's command inside it. The wiring builds the sentinel: sentinelOver in a new src/quack/sentinel.go takes the root, a failure.Timer, a failure.Runner and a row writer, loads failure.Load(failure.Dir{Root: root}), and answers Hear. A fired failure writes raised.Row, stamped through the clock door at logStamp, through the writer. listens in src/quack/main.go builds it over clock.New(), failure.Shell{Root: root} and hooks.ShadowTo over the session log, and hands its Hear to the door. The design note's watch example names event tool, which no post carries, so it reads tool.call.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: listens, which builds hooks.Outside
+- src/modules/hooks/hooks.go: Hook, which hands each post on
+- src/modules/hooks tests building hooks.Outside, which leave Hear unset and hear nothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks_test.go: TestHookHandsEachPostToHear
+- src/quack/sentinel_test.go: TestSentinelOverWritesTheFiredRow
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go
+- src/modules/hooks/hooks_test.go
+- src/quack/sentinel.go
+- src/quack/sentinel_test.go
+- src/quack/main.go
+- spec/design_output/failures.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every name the approach uses stands opened: NewSentinel, Hear, Event, Load, Dir, Shell, Raised.Row, Hook, New, Outside, ShadowTo, listens and the clock's After
+the callers list names listens, the one builder of hooks.Outside in the wiring, and Hook, the one entry of a post
+each done_when line meets a test: the door's case hands a post on, the wiring's case reads the fired row over the fakes, and the check decides the last line
 
 ## tests-red
 
