@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 4ed0dfbcf1eb4026
         size: 528
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 4fca338d9f4141a63bb191bb54f03c5f2928d13a
+    hash_after: 4fca338d9f4141a63bb191bb54f03c5f2928d13a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 413cfeb6b012b800
+        size: 5070
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -291,26 +304,35 @@ The done_when grep excludes `testdata`. Those goldens snapshot ticket names such
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/rules/apply_test.go src/voice/voice_test.go src/quack/verb_fix_test.go src/quack/rules_test.go test/contract/install.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/rules/apply_test.go
+- src/voice/voice_test.go
+- src/quack/verb_fix_test.go
+- src/quack/rules_test.go
+- test/contract/install.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. `Apply` answers the text unchanged, `measure` and `fix` stop on Vale is missing, the failed load names `ValeRuns`, and the install still fetches Vale. The stubs are `Apply` in `src/rules/apply.go`, the `Lint` door on `voice.Doors` and the `RulesLoad` name in the lsp module. The ask lint's cases build a fake Vale, so they move with the change in place of a red case of their own. The YAML case under `spec/vocabulary` lands with the change as a guard, since the formats block leaves there. A surprise: `src/rules` already loads `spec/config/styles` and reads no ini, so the ini leaves with no rule moving.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the install case for the grep, the voice and quack cases for the go test line, and the check runs them all
+- every door the cases reach has its fake: the voice fake disk with its Lint door, the fix runner, and a seeded rules root
 
 # gate
 

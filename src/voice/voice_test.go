@@ -169,6 +169,27 @@ func TestVoiceMeasureScoresAFolderLineForLine(t *testing.T) {
 	}
 }
 
+// The measure reads the Go rules a file at a time, so no binary stands in its road. [[spec/tickets/vale-leaves-the-tree]]
+func TestVoiceMeasureReadsTheRulesAndRunsNoBinary(t *testing.T) {
+	d, _, ran := doorsOf(map[string]string{"/tree/docs/a.md": ten + "\n", "/tree/docs/b.md": ten + "\n"}, nil, "2026-09-12T00:00:00Z")
+	d.Bin = ""
+	var read []string
+	d.Lint = func(path, text string) []Finding {
+		read = append(read, path)
+		if path == "docs/a.md" {
+			return []Finding{{File: path, Rule: "VoiceVale.Passive", Line: 1}}
+		}
+		return nil
+	}
+	got := run(d, false, "measure", "docs")
+	if got.code != 0 || !strings.Contains(got.out, "docs/a.md      10         1") || !strings.Contains(got.out, "Passive           1") {
+		t.Fatalf("measure answers %+v", got)
+	}
+	if len(*ran) != 0 || !reflect.DeepEqual(read, []string{"docs/a.md", "docs/b.md"}) {
+		t.Fatalf("measure runs %q and reads %q", *ran, read)
+	}
+}
+
 func TestVoiceMeasureTranscriptsWritesTheAnswers(t *testing.T) {
 	rows := strings.Join([]string{
 		spoke(t, ten+" "+ten+" "+ten, nil),

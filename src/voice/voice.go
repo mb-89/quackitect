@@ -119,6 +119,8 @@ type Doors struct {
 	Write   func(path, text string) error
 	MakeDir func(path string) error
 	Vale    func(argv []string, cwd string) (string, error)
+	// The rules over one file's text, by its path under the root. [[spec/tickets/vale-leaves-the-tree]]
+	Lint func(path, text string) []Finding
 	Now     func() time.Time
 }
 

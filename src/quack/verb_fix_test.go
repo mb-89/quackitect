@@ -52,6 +52,24 @@ func fixRoot(t *testing.T) string {
 	return root
 }
 
+// The fix swaps and calms through the Go rules, so a box with no Vale fixes. [[spec/tickets/vale-leaves-the-tree]]
+func TestFixSwapsAndCalmsThroughTheRulesWithNoVale(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedsRules(t, root)
+	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and we can't go.\n")
+	code, out, errs, ran := fixRan(root, "a.md")
+	text, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	if code != 0 || string(text) != "# Notes\n\nNothing at all works here, and we cannot go.\n" {
+		t.Fatalf("fix answers %d, %q, %q, and leaves %q", code, out, errs, text)
+	}
+	for _, one := range ran {
+		if strings.Contains(one, "vale") {
+			t.Fatalf("fix runs %q", one)
+		}
+	}
+}
+
 func TestFixRefusesAnUnknownFlag(t *testing.T) {
 	t.Parallel()
 	code, _, errs, ran := fixRan(fixRoot(t), "--apply-everything", "src")

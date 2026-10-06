@@ -164,3 +164,9 @@ test("the install downloads no Zig", () => {
   assert.doesNotMatch(said, /zig/i);
   assert.doesNotMatch(said, /CGO_ENABLED=1|sqlite_fts5/);
 });
+
+// The Go rules hold every prose rule, so the install fetches no Vale and no language server of it. [[spec/tickets/vale-leaves-the-tree]]
+test("the install fetches no Vale and no vale language server", () => {
+  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  assert.doesNotMatch(said, /errata-ai|vale-cli|get_vale/);
+});

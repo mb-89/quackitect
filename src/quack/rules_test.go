@@ -33,3 +33,12 @@ func TestTheRulesOverVerbAnswersValesJSON(t *testing.T) {
 		t.Fatalf("rules with no path answers %d, %q, and wants the usage", code, errs)
 	}
 }
+
+// A rules load that fails names its own rule, past Vale's name. [[spec/tickets/vale-leaves-the-tree]]
+func TestARulesLoadThatFailsNamesRulesLoad(t *testing.T) {
+	t.Parallel()
+	said := lspRules(t.TempDir())("a.md", "a line\n")
+	if len(said) != 1 || said[0].Rule != "RulesLoad" {
+		t.Fatalf("the rules answer %+v, and want one RulesLoad row", said)
+	}
+}
