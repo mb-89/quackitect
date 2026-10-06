@@ -7,8 +7,34 @@ package branches
 const sessionVar = "CLAUDE_CODE_REMOTE_SESSION_ID"
 
 // One box on a work branch: its standing, the last hand its record names, and that hand's session and final record. [[spec/tickets/boxes-write-their-final-record]]
+// The tip, its age and the pull request come off the refs. [[spec/tickets/the-fleet-verb-watches-boxes]]
 type boxRow struct {
 	Branch, Standing, Hand, Session, Model, Cost, Final string
+	Tip, Age, Pull                                     string
+	AgeSeconds                                         int64
+}
+
+// The config key naming the span a held box sits idle past, and its default. [[spec/tickets/the-fleet-verb-watches-boxes]]
+const (
+	idleKey  = "fleet.idleAfter"
+	idleSpan = "30m"
+)
+
+// A box that stalls: its branch and why. [[spec/tickets/the-fleet-verb-watches-boxes]]
+type wake struct {
+	Branch, Why string
+}
+
+// The ways a box stalls. [[spec/tickets/the-fleet-verb-watches-boxes]]
+const (
+	wakeIdle    = "idle"
+	wakeStopped = "stopped"
+	wakeFailed  = "failed"
+)
+
+// One wake a box that stalls. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func wakesOf(_ []boxRow, _ int64) []wake {
+	return nil
 }
 
 // One row a work branch, off its group's record. [[spec/tickets/boxes-write-their-final-record]]

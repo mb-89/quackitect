@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: d3b64a5b3f02c0c4
         size: 607
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 59f09e0ed28f6bec1617c45dc2a5147440591213
+    hash_after: 59f09e0ed28f6bec1617c45dc2a5147440591213
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 160354a317c405d6
+        size: 2623
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -233,26 +246,31 @@ Weighed: the pull refs over the GitHub API, since a desk and a box both hold git
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/fleet_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/fleet_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The idle, stopped and failed cases fail on their own assertion, since the stub wakes nothing. The two verb cases fail where the cloud verb answers its usage for the fleet word. The busy case passes against the stub, and it stands as the guard that a fresh or merged box wakes nothing. The tree cases date the tip through the committer date and read the clock the doors carry, so no case waits.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The listing line meets TestFleetListsEachBranchWithTipAgeHolderAndPullRequest. The wake line meets TestAnIdleBoxRaisesAWake, TestAStoppedBoxRaisesAWake, TestAFailedBoxRaisesAWake and TestFleetExitsRedOnAWake. The check line meets the command at tests-green, and the sentinel line is a checkpoint on that ticket's Discussion.
+- The wake cases stand pure. The verb cases reach git over a temp clone and a bare origin carrying a pull ref, and the clock is the function the doors carry.
 
 # gate
 
