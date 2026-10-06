@@ -29,7 +29,7 @@ const pluginFolder = ".claude/skills/level0"
 // The dry probe's own program, as ENTRY in src/scripts/probe-dry.js names it. [[spec/tickets/probe-dry-entry]]
 const dryEntry = "src/scripts/probe-dry.js"
 
-// The word naming the revision the dry road runs at, as AT in src/scripts/probe-dry.js reads it. [[spec/tickets/probe-at-revision-guards-merges]]
+// The word naming the revision the dry road runs at. [[spec/tickets/probe-at-revision-guards-merges]]
 const atFlag = "--at"
 
 // What each canary row says, which HEARD in .claude/skills/level0/lib/guidance.js owns, spelled again here because Go reads no JavaScript. [[spec/design_output/level0#the-canary]]
