@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -347,6 +347,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: e5cefa142e886b71e335fe7c80a205f6df3fe636
+    hash_after: 1df3d840bc999a5b2d2fba868ce8c24db5008c92
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  103.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2f3eb8f8cfebc0ce
+        size: 718
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -659,26 +682,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/repos_moved_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The quack commit, push, rename, ticket and mint verbs reach git through git.Repo, and their cases build each repository through FakeRepo over the case's own folder, so they spawn no git. Before, each case built a repository through real git, which a loaded box turned red and which cost the battery real seconds. The real Repo stands in two seams alone, realRepo and landingHere, and a guard in repos_moved_test.go fails once a verb file imports os/exec or builds the real Repo elsewhere, or a test file spawns, or the doors chapter lists one. The four refusal cases take refusals git and the fake share. roadVerb, claudeAt and takesBranch move unchanged to spawndoors.go, where quack-spawns-meet-fake-process takes them up. The git contract suite leaves the red list, since it stands green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list and spawndoors.go, whose three functions move unchanged
+- the git door has FakeRepo, held to real git by its contract suite
+- each changed function points at the git door section of the doors chapter
+- the git operations stand once, in src/modules/git/repo.go
 
 # accept
 
