@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -172,6 +172,21 @@ record:
     skipped: true
     kept: 18f9e64f61fc6c30d0b025f7a38c2b4f006ec933
     why: its red tests stand as 18f9e64f6 landed them, and a later leaf passed since
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-8
+    hash_before: 9bac441efbf3feb711ec8382ab0b47d4ea0a2b2d
+    hash_after: 9bac441efbf3feb711ec8382ab0b47d4ea0a2b2d
+    inputs:
+      - name: design/draft
+        hash: 2e87095745369753
+        size: 1218
+      - name: design/tests-red
+        hash: 2a9158664f043493
+        size: 860
+      - name: [[spec/design_output/doors]]
+        hash: c949ed4a09724318
+        size: 17410
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -300,9 +315,7 @@ A design adds no code, so the red test is the process door contract suite, the h
 <!-- the form is verdict -->
 
 accept with points
-- proc-contract-holds-the-folder: Command carries Dir and the door takes a folder, yet src/proc/proc_contract_test.go holds no case running a command in a folder, so a fake ignoring Dir passes
-- proc-empty-argv-never-starts: proc.Real indexes Argv[0] and panics on an empty Argv, where the door answers NotStarted for a program that never starts
-- fake-repo-absorbs-fake-git: the chapter puts FakeRepo beside FakeGit in src/modules/git and names no fate for FakeGit four reads, so the package keeps two git fakes, the drift the ask names
+- lsp-takes-the-process-door: the chapter says the lsp module moves onto the Runner in src/proc, yet the lsp Runner in src/modules/lsp/tools.go keeps its own signature with no env and no exit code, and neither the moves table nor any ticket carries that move
 
 # implement
 
