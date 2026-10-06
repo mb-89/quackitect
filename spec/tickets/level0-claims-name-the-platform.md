@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,61 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: level-zero-smoke
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: c147f74925e7b70fbba5f10fef3672cd90266297
+    hash_after: c147f74925e7b70fbba5f10fef3672cd90266297
+    inputs:
+      - name: ask
+        hash: f2b473ba57ff3686
+        size: 326
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: c7e91ca468d252f900122b16ec7f3a945126b549
+    hash_after: c7e91ca468d252f900122b16ec7f3a945126b549
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: b9bab6ddb10cb2bd
+        size: 1203
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: 02727c9fef6f94b54aad7ebd6157206707778365
+    hash_after: 02727c9fef6f94b54aad7ebd6157206707778365
+    inputs:
+      - name: design/draft
+        hash: b9bab6ddb10cb2bd
+        size: 1203
+      - name: design/tests-red
+        hash: b9c2ed36934e28a6
+        size: 581
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 302374d50444627c5371db7eb2cea663f2c7599a
+    hash_after: 5dc70d242f9a09ae310c58d56da1d136f2d741a5
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: e2501fa68ca48baa074a3b2ca6188bb26ea83eab
+    hash_after: 74e6486d3349c740100cc64f62095ed9414ffd28
+reason: became
+successors: [level0-smoke-runs-in-seconds]
 ---
 
 # Ask
@@ -148,38 +201,49 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+level0Runs names the platform in every line it prints, as runtime.GOOS reads through the windows door: green names the platform it ran on, red names it beside the tree going red. On Windows the line names spec/tickets/desk-probe-reply-trial, the open trial that runs the live client on the owner's Windows desk, which no box reaches. One constant in src/quack/check.go holds that trial's name. The smoke ticket in this group later runs level zero on Windows as well, and keeps the trial line, since the smoke fakes the client.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf, the level0 part
+- src/quack/check_test.go TestCheckReads
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go TestCheckReads/a Windows box names the desk trial covering it
+- src/quack/check_test.go TestCheckReads/a green level zero names the platform it ran on
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/check.go
+- src/quack/check_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- level0Runs, partsOf, checkDoors.windows and the desk trial ticket stand opened, and the trial stands open
+- grep finds level0Runs in check.go and check_test.go alone among the sources
+- each done_when line names its go test case above, and the check line its own command
 
 ## tests-red
 
@@ -188,26 +252,31 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their assertion: the green run prints nothing, and the Windows box names neither its platform nor the trial. checkDoors carried a windows flag, so the platform name rides in as a string now, and the fake reads linux on every runner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when go test line meets a case failing on its assertion, and the check line stays with tests-green
+- the platform rides through the check's doors, and the fake names linux, so a Windows runner reads the fake and no box
 
 # gate
 
@@ -216,8 +285,11 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- platform-draft-names-checkdoors: the draft's size and callers lists leave out src/quack/checkdoors.go checkDoorsOf, which tests-red already changes from the windows flag to platform: runtime.GOOS, and src/quack/check_test.go TestCheckParts, whose Windows case the rename reaches; the builder names both in place
+- platform-red-line-tested: the approach has the red line name the platform beside the tree going red, and no test decides it; the builder adds the platform to the existing case 'level zero going red says the tree is red', or drops that claim from the approach
 
 # implement
 
@@ -228,14 +300,19 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go vet ./quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go alone, inside the size list
+the change reaches the platform and the streams through checkDoors, whose fake names linux
+the comment over level0Runs links this ticket and level0-runs-on-the-door
+the desk trial name stands once, in deskTrial, and the line reads it there
 
 ## tests-green
 
@@ -244,26 +321,33 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go test -count=1 ./quack/ -run "TestCheckReads/(a_green_level_zero|a_Windows_box)" -v
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+level0Runs now names the platform in every line it prints. A green run says level zero runs whole on the platform. A red run says the tree is red on the platform. A Windows box names spec/tickets/desk-probe-reply-trial, the trial on the owner desk that covers it, since every box proof runs on Linux. The red case keys on probe smoke, so it goes green when level0-smoke-runs-in-seconds switches the verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go alone, which the size list names
+the platform and the streams ride through checkDoors, and the fake names linux
+the comment over level0Runs links this ticket
+the trial name stands once, in the deskTrial constant
 
 # accept
 
@@ -288,3 +372,9 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's callers list also takes `src/quack/checkdoors.go` `checkDoorsOf`, which fills `platform` from `runtime.GOOS`. It also takes `src/quack/check_test.go` `TestCheckParts`, whose Windows case sets `platform`. The size list also takes `src/quack/checkdoors.go`. [[spec/tickets/platform-draft-names-checkdoors]]
+
+The platform cases in `src/quack/check_test.go` cover the change to `level0Runs`. The red case takes the platform through [[spec/tickets/platform-red-line-tested]]. It keys on `probe smoke --working`, so it goes green at the implement step of [[spec/tickets/level0-smoke-runs-in-seconds]].
+
+    grep -n "platform it ran on\|desk trial" src/quack/check_test.go

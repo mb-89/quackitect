@@ -238,7 +238,7 @@ export async function probeCold(root, it, client, say = console.log, delta = "")
 }
 
 // The fresh box both probes stand on: the clone of the commit, the staged delta, the install a cloud setup runs, and the pointer to a port of its own. It answers the config folder, or nothing where the clone or the delta falls. [[spec/design_output/level0#the-cold-probe]] [[spec/tickets/level0-runs-on-the-door]]
-export function coldTree(root, it, say, { temp, tree, port, delta }) {
+export function coldTree(root, it, say, { temp, tree, port, delta, at = "" }) {
   const cloned = it.proc.run(
     ["git", "clone", "--quiet", "--no-hardlinks", root, tree],
     {
@@ -249,6 +249,7 @@ export function coldTree(root, it, say, { temp, tree, port, delta }) {
     say(`FAIL clone: ${tail(cloned.stderr)}`);
     return "";
   }
+  if (at && !checksOut(it, tree, at, say)) return "";
   if (!takesDelta(it, temp, tree, delta, say)) return "";
   const installed = it.proc.run(["sh", it.join(tree, "src", "scripts", "install.sh")], {
     cwd: tree,
@@ -310,7 +311,18 @@ export function carriesLogin(it, config) {
 }
 
 // [[spec/design_output/level0#the-cold-probe]]
-function takesDelta(it, temp, tree, delta, say) {
+// The clone stands at the revision the probe names, so one call runs level zero at any merge. [[spec/tickets/probe-at-revision-guards-merges]]
+function checksOut(it, tree, at, say) {
+  const checked = it.proc.run(["git", "checkout", "--quiet", "--detach", at], {
+    cwd: tree,
+    timeoutMs: WAIT,
+  });
+  if (checked.exitCode === 0) return true;
+  say(`FAIL checkout: ${tail(checked.stderr || checked.stdout)}`);
+  return false;
+}
+
+export function takesDelta(it, temp, tree, delta, say) {
   if (!delta) return true;
   const patch = it.join(temp, "staged.patch");
   it.disk.write(patch, delta.endsWith("\n") ? delta : `${delta}\n`);

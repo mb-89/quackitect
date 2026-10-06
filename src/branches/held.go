@@ -4,7 +4,11 @@
 // [[spec/design_output/work#the-take-writes-the-record]]
 package branches
 
-import "strings"
+import (
+	"strings"
+
+	"quackitect/src/front"
+)
 
 // The branch this box holds, its group, its hand and its ticket. [[spec/design_output/work#the-take-writes-the-record]]
 type mine struct {
@@ -63,7 +67,7 @@ func handedOver(text, role, tip string) (string, string) {
 }
 
 // Closes every open take, commits and pushes, and switches back. [[spec/design_output/work#a-stale-group-is-yours]]
-func (d *Doors) letGo(branch, name, here string) int {
+func (d *Doors) letGo(branch, name, here string, final front.Ordered) int {
 	at := ticketAt(name)
 	taken := heldIn(d.read(at))
 	if taken == nil {
@@ -75,7 +79,7 @@ func (d *Doors) letGo(branch, name, here string) int {
 	from, base := handedOver(d.read(at), role, tip)
 	closed := base
 	if from == "" {
-		closed = withEveryTakeClosed(base, tip)
+		closed = withEveryTakeClosed(withFinal(base, tip, final), tip)
 	}
 	_ = d.write(at, closed)
 	d.quiet("add", at)

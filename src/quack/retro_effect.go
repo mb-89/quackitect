@@ -18,6 +18,9 @@ const (
 	retroEffectCollected = "collected.json"
 )
 
+// The tracked folder the mint keeps a retro's classes, rates and collect time in, so a fresh box finds them. [[spec/tickets/retro-read-reads-every-record]]
+const retroKept = "spec/retros"
+
 // A case grown past this share of its last time reads as grown, and the files the effect keeps, the slowest first. [[spec/guidance/retro/effect]]
 const (
 	retroBatteryGrown   = 0.5
@@ -268,11 +271,18 @@ func retroBatteryValue(root, name, last string) *retroJSDict {
 	return out
 }
 
-// The retro before this one holding class fixes, by the time its collect ran. [[spec/guidance/retro/effect]]
+// A retro's file: in its private home where it stands there, and in the tracked folder otherwise. [[spec/tickets/retro-read-reads-every-record]]
+func retroKeptAt(root, name, file string) string {
+	if private := filepath.Join(retroHome(root, name), file); retroIsThere(private) {
+		return private
+	}
+	return filepath.Join(root, filepath.FromSlash(retroKept), name, file)
+}
+
+// The retro before this one holding class fixes, by the time its collect ran, from its private home or the tracked folder. [[spec/tickets/retro-read-reads-every-record]]
 func retroLastRetro(root, name string) string {
-	folder := filepath.Join(root, filepath.FromSlash(retroFolder))
 	when := func(one string) float64 {
-		read, ok := retroJSParse(retroFileText(filepath.Join(folder, one, retroEffectCollected)))
+		read, ok := retroJSParse(retroFileText(retroKeptAt(root, one, retroEffectCollected)))
 		if !ok {
 			return 0
 		}
@@ -286,20 +296,23 @@ func retroLastRetro(root, name string) string {
 		name string
 		at   float64
 	}
-	list := []found{}
-	entries, _ := os.ReadDir(folder)
-	for _, one := range entries {
-		if !one.IsDir() || one.Name() == name {
-			continue
+	list, seen := []found{}, map[string]bool{name: true}
+	for _, folder := range []string{retroFolder, retroKept} {
+		entries, _ := os.ReadDir(filepath.Join(root, filepath.FromSlash(folder)))
+		for _, one := range entries {
+			if !one.IsDir() || seen[one.Name()] {
+				continue
+			}
+			if !retroIsThere(retroKeptAt(root, one.Name(), retroClassesFile)) || !retroIsThere(retroKeptAt(root, one.Name(), retroRatesFile)) {
+				continue
+			}
+			seen[one.Name()] = true
+			at := when(one.Name())
+			if now != 0 && !(at < now) {
+				continue
+			}
+			list = append(list, found{name: one.Name(), at: at})
 		}
-		if !retroIsThere(filepath.Join(folder, one.Name(), retroClassesFile)) || !retroIsThere(filepath.Join(folder, one.Name(), retroRatesFile)) {
-			continue
-		}
-		at := when(one.Name())
-		if now != 0 && !(at < now) {
-			continue
-		}
-		list = append(list, found{name: one.Name(), at: at})
 	}
 	sort.SliceStable(list, func(i, j int) bool { return list[i].at > list[j].at })
 	if len(list) == 0 {
@@ -348,8 +361,8 @@ func retroEffectVerb(root func() string) twin {
 			}
 			return 0
 		}
-		record := retroRecordOf(retroFileText(filepath.Join(retroHome(base, last), retroClassesFile)))
-		before, ok := retroJSParse(retroFileText(filepath.Join(retroHome(base, last), retroRatesFile)))
+		record := retroRecordOf(retroFileText(retroKeptAt(base, last, retroClassesFile)))
+		before, ok := retroJSParse(retroFileText(retroKeptAt(base, last, retroRatesFile)))
 		if record == nil || !ok {
 			fmt.Fprintf(errs, "%s of %s reads as no JSON\n", retroClassesFile+" or "+retroRatesFile, last)
 			return 1

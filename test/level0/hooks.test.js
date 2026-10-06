@@ -4,12 +4,12 @@
 
 import assert from "node:assert/strict";
 import { posix } from "node:path";
-import settings from "../../.claude/settings.json" with { type: "json" };
 import { test } from "node:test";
+import settings from "../../.claude/settings.json" with { type: "json" };
+import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.js";
-import { boots } from "../../src/scripts/boot.js";
+import { ASKING, boots } from "../../src/scripts/boot.js";
 
 // The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the rest. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
@@ -24,8 +24,53 @@ const STANDING = {
 function booting(files, env = CLOUD) {
   const disk = fakeDisk(files);
   const proc = fakeProc({ [`sh ${INSTALL}`]: { exitCode: 0 } });
-  return { it: { root: BOOT_ROOT, disk, proc, join: posix.join, env }, disk, proc };
+  const said = [];
+  const it = {
+    root: BOOT_ROOT,
+    disk,
+    proc,
+    join: posix.join,
+    env,
+    input: () => HOOK_INPUT,
+    say: (text) => said.push(text),
+  };
+  return { it, disk, proc, said };
 }
+
+const BINARY = `${BOOT_ROOT}/.se/.runtime/bin/se-index`;
+const START_VERB = `${BINARY} verb ${BOOT_ROOT}/src/scripts start`;
+const HOOK_INPUT = '{"permission_mode":"default"}';
+const STOP = '{"continue":false,"stopReason":"open it in the repo folder"}\n';
+
+// [[spec/tickets/the-coordinator-runs-under-level0]]
+test("boot hands a desk session's hook input to the start verb, and prints the stop it answers", () => {
+  const { it, proc, said } = booting({ ...without(MANIFEST), [BINARY]: "" }, {});
+  proc.teach(START_VERB.split(" "), { exitCode: 0, stdout: STOP });
+  assert.equal(boots(it), 0);
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv.join(" ")),
+    [START_VERB],
+  );
+  assert.equal(proc.ran[0].init.stdin, HOOK_INPUT);
+  assert.equal(proc.ran[0].init.timeoutMs, ASKING);
+  assert.deepEqual(said, [STOP]);
+});
+
+// [[spec/tickets/the-coordinator-runs-under-level0]]
+test("boot starts a desk session where the start verb fails, outlives its span, or answers nothing", () => {
+  for (const answer of [
+    () => {
+      throw Object.assign(new Error("spawnSync ETIMEDOUT"), { code: "ETIMEDOUT" });
+    },
+    { exitCode: 2, stdout: STOP },
+    { exitCode: 0, stdout: "" },
+  ]) {
+    const { it, proc, said } = booting({ ...without(MANIFEST), [BINARY]: "" }, {});
+    proc.teach(START_VERB.split(" "), answer);
+    assert.equal(boots(it), 0);
+    assert.deepEqual(said, []);
+  }
+});
 
 const without = (path) =>
   Object.fromEntries(Object.entries(STANDING).filter(([at]) => at !== path));

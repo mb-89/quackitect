@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: boxes-hold-and-hand-back
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 568546eb4e62e78e5c8b425214588d1f44bada68
+    hash_after: 568546eb4e62e78e5c8b425214588d1f44bada68
+    inputs:
+      - name: ask
+        hash: fdf45284927fd4e5
+        size: 500
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: e62846d07a424c74f2da8386a5412543af08120d
+    hash_after: e62846d07a424c74f2da8386a5412543af08120d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks/stop fails
+    inputs:
+      - name: design/draft
+        hash: 1bda716d7939779c
+        size: 2025
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3341fdcd540f · claude-code-remote · helper-4
+    hash_before: 2e50d31a006653b5b37c2f4a827dc79c2aa542e7
+    hash_after: 2e50d31a006653b5b37c2f4a827dc79c2aa542e7
+    inputs:
+      - name: design/draft
+        hash: 1bda716d7939779c
+        size: 2025
+      - name: design/tests-red
+        hash: 1f088f57a6ca77e2
+        size: 699
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: d1a2fcc508a7980703793e420d96abe3b86bc408
+    hash_after: 5dd11cdea4d4fc86e02860348c467f6ef01b33c2
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.6  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: aee280c2fb7c1d3a26cf15a92c7bbb76ed98e214
+    hash_after: aee280c2fb7c1d3a26cf15a92c7bbb76ed98e214
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks/stop passes
+      - name: check
+        exit: 0
+        said: "  115.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 1f088f57a6ca77e2
+        size: 699
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,53 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new mechanical check, ends-on-a-question, answers true where the box is a cloud box and the last prose paragraph of the answer ends on a question mark. EndsOnQuestion in src/modules/hooks/stop/vote.go reads the paragraphs the way NamesNext does: it skips a table, a heading, the stop line and the holds line, strips a trailing emphasis, code or bracket mark, and reads the last character. A new continue rule, a-cloud-box-decides, at priority 83 in spec/config/stop/level0.yml, runs the check. Its says tells the box to decide the question itself, say what it weighs, and carry on. Priority 83 stands below the owner holds at 85 and 84, so an owner hold still ends the turn, and above the-work-stands-complete at 45, which yields to it anyway. The check reads the answer text, so it joins ReadsText, and the stop call, which carries no text, skips it at claim time. On a desk the check answers false, so the vote stands as it does today. The design note spec/design_output/stop.md takes a row in the mechanical checks table and a section, A cloud box decides.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go Stops.stops, through stop.Decide and stop.Ran
+- src/modules/hooks/stops.go Stops.claims, through stop.ReadsText
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/stop_test.go TestACloudTurnEndingOnAQuestionHearsDecide
+- src/modules/hooks/stop/stop_test.go TestADeskTurnEndingOnAQuestionStopsAsToday
+- src/modules/hooks/stop/stop_test.go TestEndsOnQuestionReadsTheLastProse
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/checks.go
+- src/modules/hooks/stop/vote.go
+- src/modules/hooks/stop/stop_test.go
+- spec/config/stop/level0.yml
+- spec/design_output/stop.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened checks.go, vote.go, rules.go, stops.go and level0.yml, and checked the priorities and the ReadsText skip there
+- the callers are Stops.stops and Stops.claims, the only callers of Decide, Ran and ReadsText outside tests
+- each done_when line meets a named test: the cloud case, the desk case, and the check for the third
 
 ## tests-red
 
@@ -189,26 +274,31 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/stop/stop_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/stop_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud case ends today: the claim the-work-stands-complete stands on an empty plan and no continue fires, so the box stops on its question. The check ends-on-a-question stands unknown, so every case of it reads false and it stands outside ReadsText. The desk case passes already, which is what it pins: the desk keeps today's stop.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a test: the cloud case fails on its assertion, the desk case pins today, and the check runs green on the commit
+- the tests reach no door, since the stop package reads facts and rules alone
 
 # gate
 
@@ -217,8 +307,10 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- cloud-question-check-leaves-readstext: the draft puts ends-on-a-question in ReadsText so the stop call skips it, but ReadsText gates only the reason a stop call names (src/modules/hooks/stops.go Stops.claims), and a-cloud-box-decides is a continue, never a reason; implement drops the entry and the last assertion of TestEndsOnQuestionReadsTheLastProse, or keeps both as harmless
 
 # implement
 
@@ -229,14 +321,19 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the stop module, the rule file, the stop design note, the JS stop door with its lib and test, and one quack test; the JS door joined because the contract test holds every mechanical check in both doors
+- the check reads the facts alone, and the quack test reads the real rule file, so no new door stands
+- each new function and check carries a comment pointing at spec/design_output/stop#a-cloud-box-decides
+- the rule text stands in spec/config/stop/level0.yml, the check meaning in the design table, and the code points at the section
 
 ## tests-green
 
@@ -245,26 +342,33 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/stop/stop_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud box asks nobody, so the stop vote now holds a cloud turn whose last prose paragraph ends on a question mark. The rule a-cloud-box-decides runs the check ends-on-a-question at priority 83 and says decide. A desk reads the check as false and stops as before, and the owner holds still end the turn.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the stop module, its rule file, its design note and the JS stop door the contract test pairs with it
+- the check reads the facts alone, so no door joins
+- each new function points at the design section a-cloud-box-decides
+- the rule text stands in the rule file alone, and the design table names the check once
 
 # accept
 
