@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1052dcc7a5584885
         size: 1931
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 4e6da9d7216d6220424e99701b98d8304cb84618
+    hash_after: 4e6da9d7216d6220424e99701b98d8304cb84618
+    inputs:
+      - name: design/draft
+        hash: 1052dcc7a5584885
+        size: 1931
+      - name: design/tests-red
+        hash: 2826846c8851c458
+        size: 789
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -270,8 +282,12 @@ the cases reach the clock, the process door and the folder through their fakes: 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- hooks-test-reads-fired-row: src/modules/hooks/hooks_test.go, the done_when line asks for a test under src/modules/hooks that posts a matched event over the fakes and reads the row in the log, and TestHookHandsEachPostToHear reads only the heard event while the row lands in src/quack/sentinel_test.go. Add a case to hooks_test.go that sets Hear to failure.NewSentinel over FakeDir, FakeClock and FakeRunner, firing through a say the case holds, posts tool.call with the watched command, and reads the row.
+- wiring-names-listens-hooks: src/quack/main.go, the callers list names listens, and the hooks.Outside builder is listensHooks. Wire Hear there, and fix the callers line in place.
+- sentinel-say-error-lands: src/quack/sentinel.go, sentinelOver drops the error say returns, since the fire hand returns nothing. Raise or log a failed write so a lost row shows.
 
 # implement
 
