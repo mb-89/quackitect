@@ -10,6 +10,7 @@ import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { RESUME } from "../../src/bridge/handover.js";
+import { coldTree } from "../../src/scripts/probe-cold.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
 import {
   DRY,
@@ -93,6 +94,18 @@ test("the smoke stands the clone with the root's built tools and installs nothin
   assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
   assert.equal(disk.exists("/t/tree/.se/.runtime/bin/se-index.old"), false, "a kept old build stays behind");
   assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), { method: "/t/tree", port: 7001 });
+});
+
+// [[spec/tickets/probe-at-revision-guards-merges]]
+test("the cold tree checks the clone out at the revision it names", () => {
+  const proc = fakeProc({ git: { exitCode: 0 }, sh: { exitCode: 0 } });
+  const it = { disk: fakeDisk({}), proc, join: (...parts) => parts.join("/") };
+  coldTree("/r", it, () => {}, { temp: "/t", tree: "/t/tree", port: 7001, delta: "", at: "abc123" });
+  const runs = proc.ran.map((one) => one.argv.slice(0, 5).join(" "));
+  const at = runs.indexOf("git checkout --quiet --detach abc123");
+  assert.ok(at > 0, `the clone checks out the revision: ${runs.join("; ")}`);
+  assert.equal(proc.ran[at].init.cwd, "/t/tree");
+  assert.ok(at < runs.findIndex((one) => one.startsWith("sh ")), "the checkout comes before the install");
 });
 
 // [[spec/tickets/level0-smoke-runs-in-seconds]]

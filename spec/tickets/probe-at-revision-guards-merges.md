@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 015d35ecc32e1941
         size: 508
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: b9f7e4c21686cf5c1793461d51997171ced44646
+    hash_after: b9f7e4c21686cf5c1793461d51997171ced44646
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f921a3ccf020b7c5
+        size: 2014
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,33 @@ Two parts. The probe at a revision: the Go probe verb reads --at <rev> on the dr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/probe_verb_test.go
+- src/quack/settings_test.go
+- test/level0/probe-dry.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its assertion: the verb hands --at to node unresolved and runs node on a revision git cannot read, the settings deny Artifact alone, and the cold tree never checks out a revision. The verb's pass-through already carried --at, so the Go half earns its keep by refusing a revision before a forty-second run starts.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the --at line meets the two probe_verb cases and the cold tree case, the deny line meets settings_test, and the check line waits for tests-green
+- the verb cases run over fakeBoxDoors and the cold tree case over fakeDisk and fakeProc, and settings_test reads the tracked file as config_test reads spec/wiring.yaml
 
 # gate
 

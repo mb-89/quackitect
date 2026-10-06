@@ -177,6 +177,34 @@ func TestTheDryProbeHandsItsRoadToTheEntry(t *testing.T) {
 	}
 }
 
+// The dry road at a revision resolves it to a commit, and hands the entry that commit. [[spec/tickets/probe-at-revision-guards-merges]]
+func TestTheDryProbeRunsAtARevision(t *testing.T) {
+	t.Parallel()
+	d, runner, _, errs := fakeBoxDoors(t)
+	runner.answers["git rev-parse"] = ranResult{stdout: "abc123\n"}
+	runner.answers["node"] = ranResult{}
+	if code := probeVerb(d, []string{"dry", "--at", "HEAD~1"}); code != 0 {
+		t.Fatalf("the dry road at a revision answers %d: %s", code, errs)
+	}
+	if len(runner.ran) != 2 || !slices.Equal(runner.ran[0][1:], []string{"rev-parse", "--verify", "--quiet", "HEAD~1^{commit}"}) {
+		t.Fatalf("the dry road runs %v", runner.ran)
+	}
+	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "dry", "--at", "abc123"}
+	if !slices.Equal(runner.ran[1], want) {
+		t.Errorf("the entry runs %v", runner.ran[1])
+	}
+}
+
+// A revision git cannot resolve stops the road before node starts. [[spec/tickets/probe-at-revision-guards-merges]]
+func TestTheDryProbeRefusesARevisionGitCannotResolve(t *testing.T) {
+	t.Parallel()
+	d, runner, _, errs := fakeBoxDoors(t)
+	runner.answers["git rev-parse"] = ranResult{code: 1}
+	if code := probeVerb(d, []string{"dry", "--at", "nowhere"}); code != exitFailed || len(runner.ran) != 1 || !strings.Contains(errs.String(), "nowhere") {
+		t.Errorf("an unknown revision answers %d, runs %v, says %q", code, runner.ran, errs)
+	}
+}
+
 // The smoke road starts the same entry with its words, as the dry road does. [[spec/tickets/level0-smoke-runs-in-seconds]]
 func TestTheSmokeProbeHandsItsRoadToTheEntry(t *testing.T) {
 	t.Parallel()
