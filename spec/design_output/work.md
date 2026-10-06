@@ -261,7 +261,8 @@ nothing dead. So a box holding a group beats: `branch beat` pushes a
 parentless commit on the empty tree to the branch `beats/<group>`, by force, with
 the clock door's time and the subject `<hand> beats`. `branch beat --end`
 writes `<hand> ends`. The take writes the first beat, a Stop command hook
-beats at each turn's end, and a SessionEnd command hook ends the hold.
+beats at each turn's end, and a SessionEnd command hook ends the hold. Its
+matcher leaves out `clear`, since a clear goes on inside a living box.
 
 | the last beat | the hold reads |
 |---|---|

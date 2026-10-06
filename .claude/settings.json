@@ -32,6 +32,7 @@
     ],
     "SessionEnd": [
       {
+        "matcher": "resume|logout|prompt_input_exit|other",
         "hooks": [
           {
             "type": "command",
