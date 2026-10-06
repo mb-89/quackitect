@@ -81,7 +81,7 @@ func deskRefusal(what string) string {
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
 func take(d *Doors, name string, argv []string) int {
-	over := name == overFlag
+	over := word(argv, 1) == overFlag
 	if over {
 		name = word(argv, 2)
 	}

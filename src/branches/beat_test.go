@@ -29,7 +29,7 @@ func (one *tree) beatTip(group string) string {
 	return strings.TrimSpace(strings.Split(said+"\t", "\t")[0])
 }
 
-// A hold whose session ended moves under branch take --over at once, though its tip stands fresh. [[spec/tickets/holds-beat-with-the-session]]
+// A hold whose session ended moves under branch take --over at once, though its tip stands fresh. The flag stands before the name, which Branch reads empty. [[spec/tickets/holds-beat-with-the-session]] [[spec/tickets/boxes-hold-and-hand-back]]
 func TestAnEndedHoldMovesUnderTakeOverAtOnce(t *testing.T) {
 	t.Parallel()
 	one := pcTakingHeld(t, 0, 0)
