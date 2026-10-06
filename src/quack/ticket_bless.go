@@ -9,16 +9,17 @@ import (
 	"strings"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/git"
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket bless", ticketBless(index.Root)) }
+func init() { register("ticket bless", ticketBless(index.Root, registeredRepo)) }
 
 // [[spec/design_output/pull#the-bless]]
-func ticketBless(rootOf func() (string, error)) twin {
+func ticketBless(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
-		it, code := pullHere(rootOf, out, errs)
+		it, code := pullHere(rootOf, repoAt, out, errs)
 		if it == nil {
 			return code
 		}

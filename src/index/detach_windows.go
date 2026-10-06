@@ -34,3 +34,6 @@ func detached(run *exec.Cmd) *exec.Cmd {
 	}
 	return starter
 }
+
+// The starter exits clean once it launches the door, so a failed exit alone ends the door. [[spec/tickets/the-doors-pr-goes-green]]
+func exitEnds(said error) bool { return said != nil }

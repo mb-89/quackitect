@@ -23,7 +23,7 @@ func TestAMergeStandsAsideForAPullRequest(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/7/head")
+	one.pushAt("origin/work/g", "refs/pull/7/head")
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d", code)
 	}
@@ -39,7 +39,7 @@ func TestCloseKeepsAnUnmergedBranch(t *testing.T) {
 		t.Fatalf("close answers %d", code)
 	}
 	holds(t, one.errs.String(), "work/g is outside main, so closing it drops its work.")
-	if !one.d.quiet("rev-parse", "--verify", "origin/work/g").OK {
+	if one.rev("origin/work/g") == "" {
 		t.Fatal("the close drops the branch")
 	}
 }
@@ -49,8 +49,8 @@ func TestCloseDeletesAMergedBranch(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
-	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/g")
-	one.git("push", "-q", "origin", "main")
+	one.mergeIn("origin/work/g", "")
+	one.push("main")
 	if code := one.branchSays("close"); code != 0 {
 		t.Fatalf("close answers %d: %s", code, one.errs.String())
 	}

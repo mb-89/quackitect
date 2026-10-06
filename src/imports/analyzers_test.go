@@ -4,8 +4,7 @@
 package imports
 
 import (
-	"os"
-	"path/filepath"
+	"sync"
 	"testing"
 
 	"golang.org/x/tools/go/analysis"
@@ -24,17 +23,14 @@ var flagged = map[string]string{
 	"modules/lonely/lonely.go":           "package lonely\n\ntype FakeThing struct{} // want `quackitect/src/modules/lonely declares FakeThing with no contract suite beside it`\n",
 }
 
+// The clean tree with the flagged packages beside it, built once a run in a folder of its own, so none leaks into the clean cases. [[spec/tickets/shared-plant-outlives-each-case]]
+var flaggedTree = sync.OnceValues(func() (string, error) { return plantedTree(planted, flagged) })
+
 func plantFlagged(t *testing.T) string {
 	t.Helper()
-	dir := plant(t)
-	for rel, text := range flagged {
-		at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
+	dir, err := flaggedTree()
+	if err != nil {
+		t.Fatal(err)
 	}
 	return dir
 }

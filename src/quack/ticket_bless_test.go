@@ -5,7 +5,6 @@
 package main
 
 import (
-	"os/exec"
 	"strings"
 	"testing"
 
@@ -98,21 +97,19 @@ func blessWaiting() string {
 	return strings.Replace(blessGated(record), "## verdict\n", "## verdict\n\naccept\n", 1)
 }
 
-// A git tree holding the ticket and the files, committed once, with a hand git names. [[spec/design_output/pull#the-bless]]
+// A FakeRepo over a folder holding the ticket and the files, committed once, with a hand git names. [[spec/tickets/quack-repos-meet-fake-git]]
 func blessTree(t *testing.T, ticket string, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
 	t.Setenv(workRootVar, "")
-	gitsIn(t, root, "init", "-q")
-	for _, one := range [][]string{{"user.name", "a hand"}, {"user.email", "hand@example.invalid"}, {"commit.gpgsign", "false"}} {
-		gitsIn(t, root, "config", one[0], one[1])
-	}
+	repo := standsInRepo(t, root)
+	repo.Set("user.name", "a hand")
+	repo.Set("user.email", "hand@example.invalid")
 	seedsFile(t, root, blessTicket, ticket)
 	for path, text := range files {
 		seedsFile(t, root, path, text)
 	}
-	gitsIn(t, root, "add", "-A")
-	gitsIn(t, root, "commit", "-q", "-m", "the tree opens")
+	commitsAll(t, repo, "the tree opens")
 	return root
 }
 
@@ -130,17 +127,8 @@ func blessHand(t *testing.T, agent, cloud bool) {
 	}
 }
 
-// The last commit's subject in the tree. [[spec/design_output/pull#the-refused-commit]]
-func blessSubject(t *testing.T, root string) string {
-	t.Helper()
-	run := exec.Command("git", "log", "-1", "--format=%s")
-	run.Dir = root
-	said, err := run.Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return strings.TrimSpace(string(said))
-}
+// The last commit's subject in the repository the verbs reach under the root. [[spec/tickets/quack-repos-meet-fake-git]]
+func blessSubject(root string) string { return subjectOf(standingRepo(root), "HEAD") }
 
 func TestTicketBless(t *testing.T) {
 	refused := func(t *testing.T, root string, code int, out, errs, want string) {
@@ -164,7 +152,7 @@ func TestTicketBless(t *testing.T) {
 		if !strings.Contains(got, blessHashed) {
 			t.Fatalf("the record carries no bless of the hash the JS writes:\n%s", got)
 		}
-		if subject := blessSubject(t, root); subject != "a-child: blesses gate" {
+		if subject := blessSubject(root); subject != "a-child: blesses gate" {
 			t.Fatalf("the last commit reads %q", subject)
 		}
 	}

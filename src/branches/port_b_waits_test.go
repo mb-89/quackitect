@@ -31,7 +31,7 @@ func TestPBTakeLeavesAGroupWhoseParentWaits(t *testing.T) {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
 	holds(t, pbSaid(one), "work/one-group stands at no free todo")
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != trunk {
+	if one.here() != trunk {
 		t.Fatal("the take switches")
 	}
 }
@@ -79,9 +79,9 @@ func pbTwoGroups(t *testing.T, gate string) (*tree, int, string, string) {
 	atChildren := withField(pbGroupNote, "step", "children")
 	one.branch("a-gated", map[string]string{ticketAt("a-gated"): pbGated(atChildren), ticketAt("a-child"): pbGated(pbChild("a-gated", "open"))})
 	one.branch("b-free", map[string]string{ticketAt("b-free"): atChildren, ticketAt("b-child"): pbChild("b-free", "open")})
-	a, b := one.git("rev-parse", "origin/work/a-gated"), one.git("rev-parse", "origin/work/b-free")
+	a, b := one.rev("origin/work/a-gated"), one.rev("origin/work/b-free")
 	code := one.branchSays("take")
-	one.git("fetch", "-q", "origin")
+	one.fetch()
 	return one, code, a, b
 }
 
@@ -92,13 +92,13 @@ func TestPBTakeWalksPastAnOpenGate(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
-	if one.git("rev-parse", "origin/work/a-gated") != a {
+	if one.rev("origin/work/a-gated") != a {
 		t.Error("the gated group takes a claim")
 	}
-	if one.git("rev-parse", "origin/work/b-free") == b {
+	if one.rev("origin/work/b-free") == b {
 		t.Error("the next free group takes no claim")
 	}
-	if taken := heldIn(one.git("show", "origin/work/b-free:"+ticketAt("b-free"))); taken == nil || !strings.HasPrefix(taken.Hand, pbBox) {
+	if taken := heldIn(one.show("origin/work/b-free", ticketAt("b-free"))); taken == nil || !strings.HasPrefix(taken.Hand, pbBox) {
 		t.Errorf("the claim on b-free reads %+v", taken)
 	}
 	one.out.Reset()
@@ -115,10 +115,10 @@ func TestPBAClosedGateFreesItsGroup(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
-	if one.git("rev-parse", "origin/work/a-gated") == a {
+	if one.rev("origin/work/a-gated") == a {
 		t.Error("the first group takes no claim once its gate stands closed")
 	}
-	if one.git("rev-parse", "origin/work/b-free") != b {
+	if one.rev("origin/work/b-free") != b {
 		t.Error("the second group takes a claim too")
 	}
 }

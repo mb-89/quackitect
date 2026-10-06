@@ -4,8 +4,6 @@
 package branches
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"quackitect/src/front"
@@ -76,11 +74,10 @@ func TestRouteReadsTheEventFile(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): routineHeld("cse_holder")})
-	event := filepath.Join(t.TempDir(), "event.json")
-	if err := os.WriteFile(event, []byte(`{"action":"synchronize","pull_request":{"number":7,"head":{"ref":"work/g"}}}`), 0o644); err != nil {
+	if err := one.disk.Write(".se/event.json", `{"action":"synchronize","pull_request":{"number":7,"head":{"ref":"work/g"}}}`); err != nil {
 		t.Fatal(err)
 	}
-	one.d.Env["GITHUB_EVENT_PATH"] = event
+	one.d.Env["GITHUB_EVENT_PATH"] = ".se/event.json"
 	if code := one.cloudSays("route"); code != codeOK {
 		t.Fatalf("cloud route answers %d: %s", code, one.errs.String())
 	}

@@ -24,11 +24,10 @@ const (
 )
 
 var (
-	unmergedRow = regexp.MustCompile(`^\d+ [0-9a-f]+ ([123])\t(.+)$`)
-	markOpens   = regexp.MustCompile(`^<{7}(?: |$)`)
-	markParts   = regexp.MustCompile(`^(?:={7}|\|{7}(?: .*)?)$`)
-	markShuts   = regexp.MustCompile(`^>{7}(?: |$)`)
-	topKey      = regexp.MustCompile(`^([^\s#\-][^:]*):(?:\s|$)`)
+	markOpens = regexp.MustCompile(`^<{7}(?: |$)`)
+	markParts = regexp.MustCompile(`^(?:={7}|\|{7}(?: .*)?)$`)
+	markShuts = regexp.MustCompile(`^>{7}(?: |$)`)
+	topKey    = regexp.MustCompile(`^([^\s#\-][^:]*):(?:\s|$)`)
 )
 
 // Takes trunk into the branch HEAD stands on, and the remote's own commits first on a work branch. [[spec/design_output/work#trunk-comes-in-first]]
@@ -47,57 +46,53 @@ func (d *Doors) sync() int {
 	if branch == trunk {
 		from = "origin/" + trunk
 	}
-	d.quiet("fetch", "origin", trunk)
-	behind := d.quiet("rev-list", "--count", "HEAD..origin/"+trunk).Out
-	if behind == "0" {
+	_ = d.Repo.Fetch(trunk)
+	behind := d.ahead("HEAD", "origin/"+trunk)
+	if behind == 0 {
 		d.say("%s already carries every commit on %s.", branch, trunk)
 		return codeOK
 	}
 	message := branch + ": take " + from + " in"
-	if !d.loud("merge", "origin/"+trunk, "--no-edit", "-m", message).OK {
+	if !d.loudly(second(d.Repo.Merge("origin/"+trunk, message, false))) {
 		return d.settles(branch, from, behind, message)
 	}
-	d.say("%s took %s commit(s) from %s.", branch, behind, from)
+	d.say("%s took %d commit(s) from %s.", branch, behind, from)
 	return codeOK
 }
 
 // Another hand's push onto the branch comes in by a plain merge, so both sides' commits stand. [[spec/design_output/work#trunk-comes-in-first]]
 func (d *Doors) ownIn(branch string) int {
 	from := "origin/" + branch
-	d.quiet("fetch", "origin", branch)
-	behind := d.quiet("rev-list", "--count", "HEAD.."+from).Out
-	if behind == "" || behind == "0" {
+	_ = d.Repo.Fetch(branch)
+	behind := d.ahead("HEAD", from)
+	if behind <= 0 {
 		return codeOK
 	}
 	message := branch + ": take " + from + " in"
-	if !d.loud("merge", from, "--no-edit", "-m", message).OK {
+	if !d.loudly(second(d.Repo.Merge(from, message, false))) {
 		return d.settles(branch, from, behind, message)
 	}
-	d.say("%s took %s commit(s) from %s.", branch, behind, from)
+	d.say("%s took %d commit(s) from %s.", branch, behind, from)
 	return codeOK
 }
 
 // Each path git lists unmerged, with the stages it holds. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) unmerged() (map[string]map[int]bool, []string) {
 	out := map[string]map[int]bool{}
-	var order []string
-	for _, row := range strings.Split(d.quiet("ls-files", "-u").Out, "\n") {
-		found := unmergedRow.FindStringSubmatch(strings.TrimSpace(row))
-		if found == nil {
-			continue
+	order, _ := d.Repo.Unmerged()
+	for _, path := range order {
+		out[path] = map[int]bool{}
+		for _, stage := range []int{stageBase, stageOurs, stageTheirs} {
+			if _, held := d.Repo.Show(":"+strconv.Itoa(stage), path); held {
+				out[path][stage] = true
+			}
 		}
-		if out[found[2]] == nil {
-			out[found[2]] = map[int]bool{}
-			order = append(order, found[2])
-		}
-		stage, _ := strconv.Atoi(found[1])
-		out[found[2]][stage] = true
 	}
 	return out, order
 }
 
 // A conflict whose ticket fronts alone clash merges here, and commits once nothing stays for a hand. [[spec/design_output/work#a-conflicted-front-resolves-itself]]
-func (d *Doors) settles(branch, from, behind, message string) int {
+func (d *Doors) settles(branch, from string, behind int, message string) int {
 	stages, order := d.unmerged()
 	if len(order) == 0 {
 		d.warn("%s conflicts with %s. Resolve it, commit, and go on.", from, branch)
@@ -117,15 +112,11 @@ func (d *Doors) settles(branch, from, behind, message string) int {
 		}
 	}
 	if len(left) == 0 && len(retired) == 0 {
-		made := d.quiet("commit", "-m", message)
-		if made.OK {
-			d.say("%s took %s commit(s) from %s.", branch, behind, from)
+		said := d.committed(message, nil)
+		if said == "" {
+			d.say("%s took %d commit(s) from %s.", branch, behind, from)
 			d.say("The front of %s merges on its own.", strings.Join(took, ", "))
 			return codeOK
-		}
-		said := made.Err
-		if said == "" {
-			said = made.Out
 		}
 		d.warn("The merge commit comes back refused: %s", said)
 		return codeRed
@@ -163,7 +154,7 @@ func (d *Doors) frontSettles(path string, held map[int]bool) bool {
 		return false
 	}
 	_ = d.write(path, text)
-	return d.quiet("add", "--", path).OK
+	return d.Repo.Add([]string{path}) == nil
 }
 
 // The lines a conflict marks: an opener alone, and a split or a closer past an opener. [[spec/design_output/work#no-commit-carries-a-marker]]

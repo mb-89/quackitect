@@ -94,8 +94,8 @@ func (d *Doors) retroOpen(text string) string {
 
 // Whether trunk stands in and the check passes on HEAD, and what the check says. [[spec/design_output/work#trunk-comes-in-last-too]]
 func (d *Doors) ready(branch string) (string, int) {
-	d.quiet("fetch", "origin", trunk)
-	if behind, err := strconv.Atoi(d.quiet("rev-list", "--count", "HEAD..origin/"+trunk).Out); err == nil && behind > 0 {
+	_ = d.Repo.Fetch(trunk)
+	if behind := d.ahead("HEAD", "origin/"+trunk); behind > 0 {
 		d.warn("%s holds %d commit(s) %s lacks.", trunk, behind, branch)
 		d.warn("Run ./RUNME.sh branch sync, then check, then branch done.")
 		d.warn("A branch older than a rule greens itself and reddens trunk.")
@@ -180,10 +180,10 @@ func (d *Doors) leaves(branch, at, says string, moved []string, final front.Orde
 	now = withField(withField(now, "state", closedState), "reason", doneReason)
 	now = withoutField(now, "todo")
 	_ = d.write(at, now)
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 	d.marks(name, false)
-	d.quiet("commit", "-m", branch+": the box leaves")
-	if !d.loud("push", "origin", branch).OK {
+	_, _ = d.Repo.Commit(branch+": the box leaves", nil)
+	if !d.push(branch) {
 		return codeRed
 	}
 	d.say("%s carries %s, and %s.", branch, shortOf(after), says)

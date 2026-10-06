@@ -119,7 +119,7 @@ func (d *Doors) guidanceText(path string) string {
 	if d.exists(path + noteEnd) {
 		return d.read(path + noteEnd)
 	}
-	return readFile(d.methodAt(path + noteEnd))
+	return d.methodRead(path + noteEnd)
 }
 
 // Every note under the guidance folder binding here: one naming no env, or one whose env reads true. [[spec/design_input/level-two#guidance]]

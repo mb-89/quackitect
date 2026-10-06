@@ -15,7 +15,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -28,6 +27,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/proc"
 	"quackitect/src/tui/frame"
 )
 
@@ -610,20 +610,23 @@ func tuiGoOf(root string) string {
 	return "go"
 }
 
-// Runs the viewer on the caller's terminal: its input, and its output and error streams, which pass straight through where they are files. [[spec/design_output/tui#the-verb-builds-it]]
+// Runs the viewer on the caller's terminal over the real process door. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiLaunch(argv []string, cwd string, out, errs io.Writer) (int, error) {
-	cmd := exec.Command(argv[0], argv[1:]...)
-	cmd.Dir = cwd
-	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, out, errs
-	err := cmd.Run()
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		if code := exit.ExitCode(); code >= 0 {
-			return code, nil
+	return tuiLaunchOver(proc.Real, os.Stdin)(argv, cwd, out, errs)
+}
+
+// Runs the viewer through the process door on the input it hands through and the caller's output and error streams, which pass straight through where they are files. A signal's end reads as 1. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func tuiLaunchOver(run proc.Runner, in io.Reader) func(argv []string, cwd string, out, errs io.Writer) (int, error) {
+	return func(argv []string, cwd string, out, errs io.Writer) (int, error) {
+		said := run(proc.Command{Argv: argv, Dir: cwd, Streams: &proc.Streams{In: in, Out: out, Err: errs}})
+		switch said.Code {
+		case proc.Signalled:
+			return 1, nil
+		case proc.NotStarted:
+			return 0, errors.New(said.Err)
 		}
-		return 1, nil
+		return said.Code, nil
 	}
-	return 0, err
 }
 
 // The tell to whatever window stands on a port, which answers whether it took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]

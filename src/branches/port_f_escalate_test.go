@@ -1,4 +1,4 @@
-// The escalation over a real clone, ported off test/level0/pull-escalate.test.js:
+// The escalation over a fake clone, ported off test/level0/pull-escalate.test.js:
 // the person step it puts in, the choice its options write, the hand it reads,
 // and the roads it refuses on.
 // [[spec/tickets/work-verbs-port-to-go]]
@@ -13,12 +13,12 @@ import (
 // A tree holding a-child at design/draft, a schema to re-route by, and a pull that answers green. [[spec/tickets/work-verbs-port-to-go]]
 func pfEscalateTree(t *testing.T, group string, more map[string]string) *tree {
 	t.Helper()
-	files := map[string]string{ticketAt("a-child"): pfChild("design/draft", group)}
+	seeded := map[string]string{ticketAt("a-child"): pfChild("design/draft", group)}
 	for at, text := range more {
-		files[at] = text
+		seeded[at] = text
 	}
-	one := newTree(t, files)
-	one.d.Method = pfMethod(t)
+	one := newTree(t, seeded)
+	one.pfMethodRoot()
 	one.d.Runme = []string{"true"}
 	return one
 }
@@ -29,7 +29,7 @@ func TestPFADeskEscalationInsertsAPersonStep(t *testing.T) {
 	one := pfEscalateTree(t, "", nil).desk()
 	hand := one.d.handOf()
 	pfHold(one, hand, "a-child", "design/draft")
-	before := one.sh(one.from, "git", "rev-parse", "main")
+	before := one.originAt("main")
 	if code := one.branchSays("escalate", "which road does the owner want"); code != 0 {
 		t.Fatalf("the escalation answers %d: %s", code, one.errs.String())
 	}
@@ -44,8 +44,8 @@ func TestPFADeskEscalationInsertsAPersonStep(t *testing.T) {
 	if held := one.d.holdOf(hand); held != nil && held.Step == "design/draft" {
 		t.Fatal("the hold on the escalated leaf stands")
 	}
-	holds(t, one.git("log", "-1", "--format=%s"), "a-child: ")
-	if after := one.sh(one.from, "git", "rev-parse", "main"); after != before {
+	holds(t, one.subject("HEAD"), "a-child: ")
+	if after := one.originAt("main"); after != before {
 		t.Fatal("a desk's escalation pushes main")
 	}
 }
@@ -77,7 +77,7 @@ func TestPFEscalationOptionsWriteAChoice(t *testing.T) {
 	holds(t, now, "form: choice")
 	holds(t, now, "left")
 	holds(t, now, "right")
-	holds(t, one.sh(one.from, "git", "log", "-1", "--format=%s", workBranch+"one-group"), "a-child: ")
+	holds(t, one.originSubject(workBranch+"one-group"), "a-child: ")
 }
 
 // An escalation under --as reads that hand's hold, and keeps the name out of the question. [[spec/tickets/work-verbs-port-to-go]]
