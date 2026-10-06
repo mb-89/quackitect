@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -197,6 +197,15 @@ record:
         hash: 8f2f939387c0fe86
         size: 17697
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 0ab27e19bbbf07d086d01eaa18ca9d8696e0e721
+    hash_after: 0ab27e19bbbf07d086d01eaa18ca9d8696e0e721
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
