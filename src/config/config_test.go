@@ -207,6 +207,7 @@ func TestDefaultReadsTheSchemaAlone(t *testing.T) {
 		t.Fatal("a key the schema leaves out holds a default")
 	}
 }
+
 // A key the schema leaves out, or names with no default, holds no built-in. [[spec/tickets/the-config-schema-gets-generated]]
 func TestAKeyTheSchemaLeavesOutHoldsNoBuiltIn(t *testing.T) {
 	root := rootWith(t, map[string]string{Schema: `{"properties": {"names": {"properties": {"words": {"type": "number"}}}}}`})

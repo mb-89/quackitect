@@ -24,6 +24,7 @@ func TestGoldenReadersNameEveryPackageReadingAChangedGolden(t *testing.T) {
 		t.Errorf("a change touching no golden reads %v", got)
 	}
 }
+
 // A changed Go test names its package folder, and a named folder names itself. [[spec/tickets/go-code-shares-one-module]]
 func TestAChangedGoTestNamesItsPackage(t *testing.T) {
 	t.Parallel()
