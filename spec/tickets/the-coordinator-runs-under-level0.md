@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -131,6 +131,19 @@ record:
         hash: da7b88681a0c5ede
         size: 487
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 7f09a32007f9cb1df9a6924a8e449360c15cc373
+    hash_after: 7f09a32007f9cb1df9a6924a8e449360c15cc373
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 78b69127c29d82cc
+        size: 3117
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,32 @@ The approach adds no config key: measure reads answer.ceiling, which stands in i
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/start_test.go src/voice/voice_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/hooks/start_test.go
+src/voice/voice_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestStartRefusesADeskSessionWritingWithNoPlugin fails on its assertion. The stub answers nothing for the default mode and the missing mode, while the plan, plugin and cloud rows pass. TestVoiceMeasureExitsOneWhereAnAnswerRunsPastTheCeiling fails because measure exits 0 at a score of 300 against a ceiling of 100. The branch test verb names only the first failing package, the hooks one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each done_when line meets a test red on its assertion: the hooks line meets the StartRefusal table, the voice line meets the measure ceiling case, and ./RUNME.sh check covers the third.
+Every door the tests reach has a fake: StartRefusal is pure and takes its inputs as arguments, and the voice case runs over the doorsOf fake disk, Vale and clock.
 
 # gate
 

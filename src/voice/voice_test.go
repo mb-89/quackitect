@@ -169,6 +169,27 @@ func TestVoiceMeasureScoresAFolderLineForLine(t *testing.T) {
 	}
 }
 
+func TestVoiceMeasureExitsOneWhereAnAnswerRunsPastTheCeiling(t *testing.T) {
+	t.Parallel()
+	stdout := jsonOf(t, map[string]any{
+		"docs/a.md": []any{finding("VoiceVale.LongSentence"), finding("VoiceParagraph.Passive"), finding("Schema.Kind")},
+	})
+	d, _, _ := doorsOf(map[string]string{
+		"/tree/docs/a.md": ten + "\n",
+		"/tree/docs/b.md": ten + "\n",
+		testBin:           "",
+	}, map[string]string{"docs": stdout}, "2026-09-12T00:00:00Z")
+	d.Ceiling = 100
+
+	got := run(d, false, "measure", "docs")
+	if got.code != 1 {
+		t.Fatalf("measure past the ceiling exits %d, want 1: %+v", got.code, got)
+	}
+	if !strings.Contains(got.errs, "docs/a.md") || strings.Contains(got.errs, "docs/b.md") {
+		t.Fatalf("measure past the ceiling names %q, want docs/a.md alone", got.errs)
+	}
+}
+
 func TestVoiceMeasureTranscriptsWritesTheAnswers(t *testing.T) {
 	rows := strings.Join([]string{
 		spoke(t, ten+" "+ten+" "+ten, nil),

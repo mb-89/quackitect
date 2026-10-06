@@ -120,6 +120,7 @@ type Doors struct {
 	MakeDir func(path string) error
 	Vale    func(argv []string, cwd string) (string, error)
 	Now     func() time.Time
+	Ceiling int
 }
 
 // Runs the voice verb over the words past it, and answers its exit code; a dry run writes no answer file. [[spec/design_output/projection#the-second-target]]
