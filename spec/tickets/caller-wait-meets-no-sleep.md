@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["the-testing-rules-name-the-doors"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: bd05809591ad6e05
         size: 753
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: af4dc3382e9fcc37ff421dca3eb15ddf0494ba0d
+    hash_after: af4dc3382e9fcc37ff421dca3eb15ddf0494ba0d
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ The approach answers the ask: Book.Wait arms its span through the book's after f
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/modules/index/call.go and spec/design_output/doors.md, both on the draft's size list, and ops.go and call_test.go took their part at tests-red and gate
+- the wait reaches the clock alone, and the book's after field stands as its fake, filled with time.After by NewBook
+- Book.Wait points at the wait chapter of spec/design_output/model.md, and the draft names the approach
+- the timer stands once, in the book's after field, and the doors chapter no longer lists the case
 
 ## tests-green
 
