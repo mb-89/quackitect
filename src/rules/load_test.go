@@ -34,7 +34,7 @@ func TestARuleFileReadsItsQuotedSwapsInOrderWithItsDefaults(t *testing.T) {
 	if !slices.Equal(file.swaps, want) {
 		t.Errorf("the swaps read %v, and want %v", file.swaps, want)
 	}
-	if file.head.check != "Probe.Swap" || file.head.level != defaultLevel || !slices.Equal(file.scope, []string{defaultScope}) || file.action.Name != actionReplace {
+	if file.head.check != "Probe.Swap" || file.head.level != defaultLevel || !slices.Equal(file.scope, []string{defaultScope}) || file.action.Name != ActionReplace {
 		t.Errorf("the rule reads %+v", file)
 	}
 }

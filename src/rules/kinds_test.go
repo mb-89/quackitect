@@ -13,8 +13,8 @@ func TestASubstitutionOffersItsSwapAndItsFixAsValeDid(t *testing.T) {
 	t.Parallel()
 	found := loaded(t).Lint("notes.md", "The door doesn't read it, e.g. a note, etc.\n")
 	want := map[string]Finding{
-		"VoiceParagraph.Contraction": {Line: 1, Span: [2]int{10, 16}, Match: "doesn't", Message: "Write both words: 'does not' instead of 'doesn't'.", Action: &Action{Name: actionReplace, Params: []string{"does not"}}},
-		"VoiceParagraph.Latin":       {Line: 1, Span: [2]int{27, 30}, Match: "e.g.", Message: "Write it out: 'for example' instead of 'e.g.'.", Action: &Action{Name: actionReplace, Params: []string{"for example"}}},
+		"VoiceParagraph.Contraction": {Line: 1, Span: [2]int{10, 16}, Match: "doesn't", Message: "Write both words: 'does not' instead of 'doesn't'.", Action: &Action{Name: ActionReplace, Params: []string{"does not"}}},
+		"VoiceParagraph.Latin":       {Line: 1, Span: [2]int{27, 30}, Match: "e.g.", Message: "Write it out: 'for example' instead of 'e.g.'.", Action: &Action{Name: ActionReplace, Params: []string{"for example"}}},
 		"VoiceParagraph.EtCetera":    {Line: 1, Span: [2]int{40, 43}, Match: "etc.", Message: "Write it out: 'and so on' instead of 'etc.', and keep the full stop the sentence needs."},
 	}
 	for check, row := range want {

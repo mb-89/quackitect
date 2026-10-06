@@ -18,7 +18,6 @@ import (
 
 const (
 	testRoot = "/tree"
-	testBin  = "/tree/.se/.runtime/bin/vale"
 	ten      = "one two three four five six seven eight nine ten"
 )
 
@@ -69,22 +68,21 @@ func (f *fakeDisk) read(path string) (string, error) {
 	return text, nil
 }
 
-// The doors over a fake disk, a Vale taught one answer a folder, and a clock fixed at now. [[spec/guidance/code/testing]]
-func doorsOf(files map[string]string, vale map[string]string, now string) (Doors, *fakeDisk, *[]string) {
+// The doors over a fake disk, rules taught the findings of each file, which keep every path they read, and a clock fixed at now. [[spec/guidance/code/testing]]
+func doorsOf(files map[string]string, lint map[string][]Finding, now string) (Doors, *fakeDisk, *[]string) {
 	disk := &fakeDisk{files: files}
 	ran := &[]string{}
 	at, _ := time.Parse(time.RFC3339Nano, now)
 	return Doors{
 		Root:    testRoot,
-		Bin:     testBin,
 		Exists:  disk.exists,
 		List:    disk.list,
 		Read:    disk.read,
 		Write:   func(path, text string) error { disk.files[filepath.ToSlash(path)] = text; return nil },
 		MakeDir: func(string) error { return nil },
-		Vale: func(argv []string, cwd string) (string, error) {
-			*ran = append(*ran, cwd+" "+strings.Join(argv, " "))
-			return vale[argv[len(argv)-1]], nil
+		Lint: func(path, _ string) []Finding {
+			*ran = append(*ran, path)
+			return lint[path]
 		},
 		Now: func() time.Time { return at },
 	}, disk, ran
@@ -102,8 +100,8 @@ func run(d Doors, dry bool, words ...string) said {
 	return said{code, out.String(), errs.String()}
 }
 
-func finding(rule string) map[string]any {
-	return map[string]any{"Check": rule, "Line": 1, "Span": []int{1, 4}, "Match": "x", "Message": "m", "Severity": "error"}
+func finding(rule string) Finding {
+	return Finding{Rule: rule, Line: 1, Column: 1, Said: "x", Message: "m", Severity: "error"}
 }
 
 func jsonOf(t *testing.T, v any) string {
@@ -135,18 +133,17 @@ const usage = "Usage: ./RUNME.sh voice <verb>\n\n" +
 	"  refused [days]             rank what the doors turn away, seven by default\n"
 
 func TestVoiceMeasureScoresAFolderLineForLine(t *testing.T) {
-	stdout := jsonOf(t, map[string]any{
-		"docs/a.md":        []any{finding("VoiceVale.LongSentence"), finding("VoiceParagraph.Passive"), finding("Schema.Kind")},
-		"/tree/docs/c.txt": []any{finding("VoiceVale.LongSentence")},
-		"docs/z.md":        []any{finding("Other.Rule")},
-	})
+	lint := map[string][]Finding{
+		"docs/a.md":  {finding("VoiceVale.LongSentence"), finding("VoiceParagraph.Passive"), finding("Schema.Kind")},
+		"docs/c.txt": {finding("VoiceVale.LongSentence")},
+		"docs/z.md":  {finding("Other.Rule")},
+	}
 	d, _, ran := doorsOf(map[string]string{
 		"/tree/docs/a.md":  ten + "\n",
 		"/tree/docs/b.md":  ten + "\n",
 		"/tree/docs/_x.md": ten,
 		"/tree/docs/c.txt": ten + " " + ten,
-		testBin:            "",
-	}, map[string]string{"docs": stdout}, "2026-09-12T00:00:00Z")
+	}, lint, "2026-09-12T00:00:00Z")
 
 	got := run(d, false, "measure", "docs")
 	want := "file        words  findings  per 1000 words  top rules\n" +
@@ -162,15 +159,14 @@ func TestVoiceMeasureScoresAFolderLineForLine(t *testing.T) {
 	if got != (said{0, want, ""}) {
 		t.Fatalf("measure answers %+v, want %q", got, want)
 	}
-	if call := "/tree " + testBin + " --config=.vale.ini --output=JSON --no-exit docs"; !reflect.DeepEqual(*ran, []string{call}) {
-		t.Fatalf("Vale runs %q, want %q", *ran, call)
+	if want := []string{"docs/a.md", "docs/b.md", "docs/c.txt"}; !reflect.DeepEqual(*ran, want) {
+		t.Fatalf("the rules read %q, want %q", *ran, want)
 	}
 }
 
 // The measure reads the Go rules a file at a time, so no binary stands in its road. [[spec/tickets/vale-leaves-the-tree]]
 func TestVoiceMeasureReadsTheRulesAndRunsNoBinary(t *testing.T) {
 	d, _, ran := doorsOf(map[string]string{"/tree/docs/a.md": ten + "\n", "/tree/docs/b.md": ten + "\n"}, nil, "2026-09-12T00:00:00Z")
-	d.Bin = ""
 	var read []string
 	d.Lint = func(path, text string) []Finding {
 		read = append(read, path)
@@ -180,7 +176,7 @@ func TestVoiceMeasureReadsTheRulesAndRunsNoBinary(t *testing.T) {
 		return nil
 	}
 	got := run(d, false, "measure", "docs")
-	if got.code != 0 || !strings.Contains(got.out, "docs/a.md      10         1") || !strings.Contains(got.out, "Passive           1") {
+	if got.code != 0 || !strings.Contains(got.out, "docs/a.md     10         1") || !strings.Contains(got.out, "Passive      1") {
 		t.Fatalf("measure answers %+v", got)
 	}
 	if len(*ran) != 0 || !reflect.DeepEqual(read, []string{"docs/a.md", "docs/b.md"}) {
@@ -194,8 +190,7 @@ func TestVoiceMeasureTranscriptsWritesTheAnswers(t *testing.T) {
 		spoke(t, ten+" "+ten+" "+ten, map[string]any{"isSidechain": true}),
 		owner(t, []any{map[string]any{"type": "text", "text": ten}}),
 	}, "\n")
-	d, disk, ran := doorsOf(map[string]string{"/tree/logs/sess.jsonl": rows, testBin: ""},
-		map[string]string{".se/.runtime/measure": "{}"}, "2026-09-12T00:00:00Z")
+	d, disk, ran := doorsOf(map[string]string{"/tree/logs/sess.jsonl": rows}, nil, "2026-09-12T00:00:00Z")
 
 	got := run(d, false, "measure", "--transcripts", "logs")
 	want := "1 answer(s) under .se/.runtime/measure.\n\n" +
@@ -211,14 +206,14 @@ func TestVoiceMeasureTranscriptsWritesTheAnswers(t *testing.T) {
 	if disk.exists("/tree/.se/.runtime/measure/sess/002-answer.md") {
 		t.Fatal("the sidechain and the user turn write nothing")
 	}
-	if len(*ran) != 1 || !strings.HasSuffix((*ran)[0], " .se/.runtime/measure") {
-		t.Fatalf("Vale runs over %q, want the measured folder", *ran)
+	if want := []string{".se/.runtime/measure/sess/001-answer.md"}; !reflect.DeepEqual(*ran, want) {
+		t.Fatalf("the rules read %q, want the measured answer", *ran)
 	}
 }
 
 func TestVoiceMeasureDryWritesNothing(t *testing.T) {
 	rows := spoke(t, ten+" "+ten+" "+ten, nil)
-	d, disk, _ := doorsOf(map[string]string{"/tree/logs/sess.jsonl": rows, testBin: ""}, nil, "2026-09-12T00:00:00Z")
+	d, disk, _ := doorsOf(map[string]string{"/tree/logs/sess.jsonl": rows}, nil, "2026-09-12T00:00:00Z")
 	got := run(d, true, "measure", "--transcripts", "logs")
 	if _, wrote := disk.files["/tree/.se/.runtime/measure/sess/001-answer.md"]; wrote {
 		t.Fatal("a dry run writes no answer file")
@@ -295,19 +290,9 @@ func TestVoiceHelpNamesBothVerbsAndRefusesAnUnknownOne(t *testing.T) {
 	}
 }
 
-func TestVoiceMeasureSaysSoWhereValeOrFilesAreAbsent(t *testing.T) {
-	d, _, _ := doorsOf(map[string]string{"/tree/docs/a.md": ten, testBin: ""}, nil, "2026-09-12T00:00:00Z")
+func TestVoiceMeasureSaysSoWhereNoFileStands(t *testing.T) {
+	d, _, _ := doorsOf(map[string]string{"/tree/docs/a.md": ten}, nil, "2026-09-12T00:00:00Z")
 
-	gone := d
-	gone.Bin = "/nowhere/vale"
-	if got := run(gone, false, "measure", "docs"); got != (said{2, "", "Vale is missing. Run ./RUNME.sh once and it installs.\n"}) {
-		t.Fatalf("no Vale answers %+v", got)
-	}
-	none := d
-	none.Bin = ""
-	if got := run(none, false, "measure", "docs"); got.code != 2 {
-		t.Fatalf("an empty Vale path answers %+v", got)
-	}
 	if got := run(d, false, "measure", "nothing"); got != (said{1, "", "No markdown file stands under nothing.\n"}) {
 		t.Fatalf("an empty folder answers %+v", got)
 	}
@@ -324,7 +309,6 @@ func TestVoiceMeasureReadsOneFileAndSkipsTheNoise(t *testing.T) {
 		"/tree/node_modules/d.md":   ten,
 		"/tree/sub/_hid/e.md":       ten,
 		"/tree/sub/F.MARKDOWN":      ten,
-		testBin:                     "",
 		"/tree/.se/.runtime/x.json": "",
 	}, nil, "2026-09-12T00:00:00Z")
 
@@ -333,8 +317,8 @@ func TestVoiceMeasureReadsOneFileAndSkipsTheNoise(t *testing.T) {
 		strings.Contains(got.out, "c.md") || strings.Contains(got.out, "d.md") || strings.Contains(got.out, "e.md") {
 		t.Fatalf("the root folder reads past the noise, got %q", got.out)
 	}
-	if !strings.HasSuffix((*ran)[0], " .") {
-		t.Fatalf("Vale runs over the root, got %q", *ran)
+	if want := []string{"a.md", "sub/F.MARKDOWN"}; !reflect.DeepEqual(*ran, want) {
+		t.Fatalf("the rules read %q over the root, want %q", *ran, want)
 	}
 	if got := run(d, false, "measure", ".se"); !strings.Contains(got.out, "\n.se/b.md ") {
 		t.Fatalf("a folder under .se reads .se, got %q", got.out)

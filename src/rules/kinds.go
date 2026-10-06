@@ -19,7 +19,7 @@ const (
 	wordTemplate    = `(?m)\b(?:%s)\b`
 	nonwordTemplate = `(?m)(?:%s)`
 	tokenTemplate   = `^(?:%s)$`
-	actionReplace   = "replace"
+	ActionReplace   = "replace"
 	choiceWord      = "or"
 )
 
@@ -214,13 +214,13 @@ func substitutionOf(file ruleFile) (func(string) []hit, error) {
 				action := file.action
 				said := message
 				var same bool
-				if action.Name == actionReplace {
+				if action.Name == ActionReplace {
 					same = contains(optionsOf(expected), observed)
 				} else {
 					same = matchToken(expected, observed)
 				}
 				if !same && !matches(except, observed) {
-					if action.Name == actionReplace && len(action.Params) == 0 {
+					if action.Name == ActionReplace && len(action.Params) == 0 {
 						action.Params = optionsOf(expected)
 						expected = toSentence(action.Params)
 						said = unquoteFirst(said)

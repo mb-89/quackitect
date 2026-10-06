@@ -13,13 +13,10 @@ func TestCommitVoiceReadsNothingWhereNoValeStands(t *testing.T) {
 	}
 }
 
-// Vale over the message answers the kept findings, and a private shape refuses. [[spec/tickets/cage-commit-guards-port]]
+// The rules over the message answer the kept findings, and a private shape refuses. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/vale-leaves-the-tree]]
 func TestCommitVoiceRefusesAPrivateShape(t *testing.T) {
 	t.Parallel()
 	root := filepath.Join("..", "..")
-	if valeAt(root) == "" {
-		t.Skip("no Vale stands under the tree")
-	}
 	rows := commitVoice(root, "cage-commit-guards-port: the guard lands\n\nmail somebody at someone"+"@"+"somewhere.net\n")
 	for _, one := range rows {
 		if one.Rule == "Private" {

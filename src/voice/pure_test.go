@@ -246,21 +246,3 @@ func TestVoiceTabledPadsByUTF16AndTrims(t *testing.T) {
 		t.Fatalf("Tabled pads by UTF-16 length, got %q", wide)
 	}
 }
-
-func TestVoiceFromJSONReadsValeRows(t *testing.T) {
-	got := FromJSON(`{"b.md":[{"Check":"VoiceVale.X","Line":3,"Span":[2,4],"Match":"m","Message":"say","Severity":"warning","Action":{"Name":"replace"}}],` +
-		`"a.md":[{"Check":"Other.Y","Line":1}],"c.md":"not rows"}`)
-	want := []Finding{
-		{File: "a.md", Rule: "Other.Y", Line: 1, Column: 1, Severity: "error"},
-		{File: "b.md", Rule: "X", Line: 3, Column: 2, Said: "m", Message: "say", Severity: "warning", Fixable: true},
-	}
-	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("FromJSON answers %+v", got)
-	}
-	if got := FromJSON("not json"); len(got) != 0 {
-		t.Fatalf("FromJSON of no JSON answers %v", got)
-	}
-	if got := FromJSON(""); len(got) != 0 {
-		t.Fatalf("FromJSON of nothing answers %v", got)
-	}
-}

@@ -1,6 +1,6 @@
-// The voice verbs in Go. `measure` scores a folder of prose through Vale, and
-// `refused` ranks what the doors turn away. The pure half takes rows and
-// answers rows, and Run reaches the disk, Vale and the clock through Doors,
+// The voice verbs in Go. `measure` scores a folder of prose through the rules,
+// and `refused` ranks what the doors turn away. The pure half takes rows and
+// answers rows, and Run reaches the disk, the rules and the clock through Doors,
 // so a test drives it over a fixture. It prints what
 // .claude/skills/level0/lib/voice.js prints, line for line.
 // [[spec/design_output/projection#the-second-target]]
@@ -19,13 +19,12 @@ import (
 	"time"
 )
 
-// The folders and names the verbs read and write, as lib/voice.js, lib/vale.js and lib/log.js name them. [[spec/design_output/projection#the-second-target]]
+// The folders and names the verbs read and write, as lib/voice.js and lib/log.js name them. [[spec/design_output/projection#the-second-target]]
 const (
 	Measured = ".se/.runtime/measure" // the runtime folder .claude/skills/level0/lib/folders.js owns
 	Shortest = 25
 	Days     = 7
 	Answer   = "answer.md"
-	Config   = ".vale.ini"
 	Folder   = ".se/.log"
 )
 
@@ -41,17 +40,16 @@ const (
 )
 
 var (
-	word      = regexp.MustCompile(`[A-Za-z0-9]+(?:['-][A-Za-z0-9]+)*`)
-	lines     = regexp.MustCompile(`\r?\n`)
-	prose     = regexp.MustCompile(`(?i)\.(md|markdown|txt)$`)
-	rowsFile  = regexp.MustCompile(`(?i)\.jsonl$`)
-	drive     = regexp.MustCompile(`^[A-Za-z]:[\\/]`)
-	proseRule = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
-	decimal   = regexp.MustCompile(`^[+-]?(?:Infinity|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)$`)
-	radix     = regexp.MustCompile(`^0([xXoObB])([0-9A-Fa-f]+)$`)
-	heads     = []string{"file", "words", "findings", fmt.Sprintf("per %d words", per), "top rules"}
-	numeric   = []int{1, 2, scoreColumn}
-	noise     = []string{".git", "node_modules"}
+	word     = regexp.MustCompile(`[A-Za-z0-9]+(?:['-][A-Za-z0-9]+)*`)
+	lines    = regexp.MustCompile(`\r?\n`)
+	prose    = regexp.MustCompile(`(?i)\.(md|markdown|txt)$`)
+	rowsFile = regexp.MustCompile(`(?i)\.jsonl$`)
+	drive    = regexp.MustCompile(`^[A-Za-z]:[\\/]`)
+	decimal  = regexp.MustCompile(`^[+-]?(?:Infinity|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)$`)
+	radix    = regexp.MustCompile(`^0([xXoObB])([0-9A-Fa-f]+)$`)
+	heads    = []string{"file", "words", "findings", fmt.Sprintf("per %d words", per), "top rules"}
+	numeric  = []int{1, 2, scoreColumn}
+	noise    = []string{".git", "node_modules"}
 )
 
 // The error toISOString throws past the range a date holds. [[spec/design_output/projection#the-second-target]]
@@ -63,11 +61,10 @@ type Row = map[string]any
 // One answer file the transcripts yield: its path under the root, and its text. [[spec/design_output/projection#the-second-target]]
 type File struct{ Path, Text string }
 
-// One Vale finding as fromJson in lib/vale.js reads it. [[spec/design_output/projection#the-second-target]]
+// One finding the rules answer over a file. [[spec/tickets/vale-leaves-the-tree]]
 type Finding struct {
 	File, Rule, Said, Message, Severity string
 	Line, Column                        int
-	Fixable                             bool
 }
 
 // A rule and how often it fires. [[spec/design_output/projection#the-second-target]]
@@ -104,19 +101,16 @@ type Entry struct {
 	Dir  bool
 }
 
-// The outside the verbs reach: the root, Vale's path, the disk, a Vale run answering its stdout, and the clock. [[spec/design_output/doors#one-door-per-outside-thing]]
+// The outside the verbs reach: the root, the disk, the rules over one file's text by its path under the root, and the clock. [[spec/design_output/doors#one-door-per-outside-thing]] [[spec/tickets/vale-leaves-the-tree]]
 type Doors struct {
 	Root    string
-	Bin     string
 	Exists  func(path string) bool
 	List    func(path string) ([]Entry, error)
 	Read    func(path string) (string, error)
 	Write   func(path, text string) error
 	MakeDir func(path string) error
-	Vale    func(argv []string, cwd string) (string, error)
-	// The rules over one file's text, by its path under the root. [[spec/tickets/vale-leaves-the-tree]]
-	Lint func(path, text string) []Finding
-	Now  func() time.Time
+	Lint    func(path, text string) []Finding
+	Now     func() time.Time
 }
 
 // Runs the voice verb over the words past it, and answers its exit code; a dry run writes no answer file. [[spec/design_output/projection#the-second-target]]
@@ -141,13 +135,8 @@ func Run(d Doors, words []string, dry bool, out, errs io.Writer) int {
 	return 0
 }
 
-// Scores every prose file under a folder through Vale, after pulling the answers out of the transcripts where asked. [[spec/design_output/projection#the-second-target]]
+// Scores every prose file under a folder through the rules, a file at a time, after pulling the answers out of the transcripts where asked. [[spec/design_output/projection#the-second-target]] [[spec/tickets/vale-leaves-the-tree]]
 func measure(d Doors, words []string, dry bool, out, errs io.Writer) int {
-	if d.Bin == "" || !d.Exists(d.Bin) {
-		fmt.Fprintln(errs, "Vale is missing. Run ./RUNME.sh once and it installs.")
-		return 2
-	}
-
 	pulling := slices.Contains(words, transcripts)
 	folder := "."
 	for _, one := range words {
@@ -180,16 +169,6 @@ func measure(d Doors, words []string, dry bool, out, errs io.Writer) int {
 		return 1
 	}
 
-	said, err := d.Vale([]string{d.Bin, "--config=" + Config, "--output=JSON", "--no-exit", folder}, d.Root)
-	if err != nil {
-		return fails(errs, err)
-	}
-	found := map[string][]Finding{}
-	for _, one := range FromJSON(said) {
-		key := shown(d.Root, one.File)
-		found[key] = append(found[key], one)
-	}
-
 	var mine []Scored
 	var all []Finding
 	for _, path := range paths {
@@ -198,8 +177,9 @@ func measure(d Doors, words []string, dry bool, out, errs io.Writer) int {
 			return fails(errs, err)
 		}
 		file := shown(d.Root, path)
-		mine = append(mine, Scored{File: file, Words: WordsIn(text), Found: found[file]})
-		all = append(all, found[file]...)
+		found := d.Lint(file, text)
+		mine = append(mine, Scored{File: file, Words: WordsIn(text), Found: found})
+		all = append(all, found...)
 	}
 	rows := MeasuredRows(mine)
 	fmt.Fprintln(out, MeasureTable(append(rows, TotalOf(rows))))

@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,7 +14,6 @@ import (
 	"time"
 
 	settingsreader "quackitect/src/config"
-	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/prose"
@@ -179,24 +177,6 @@ func heardIn(root, name, text, mode string) valeHeard {
 		}
 	}
 	return out
-}
-
-// The Vale the survey names where it stands, else the one in the runtime binary folder, else nothing. [[spec/tickets/cage-commit-guards-port]]
-func valeAt(root string) string {
-	var survey map[string]struct {
-		Path string `json:"path"`
-	}
-	if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
-		if said := survey["vale"].Path; said != "" && standsUnder("", said) {
-			return said
-		}
-	}
-	for _, name := range []string{"vale", "vale.exe"} {
-		if guess := filepath.Join(root, filepath.FromSlash(check.Bin), name); standsUnder("", guess) {
-			return guess
-		}
-	}
-	return ""
 }
 
 // Whether a file stands at the path, under the root where one names it. [[spec/tickets/cage-commit-guards-port]]

@@ -1,30 +1,27 @@
 // The voice verb in Go: the words past voice handed to src/voice over the
-// real disk, the Vale the survey names, and the clock.
+// real disk, the Go rules as the lsp tools draw them, and the clock.
 // [[spec/design_output/projection#the-second-target]]
 package main
 
 import (
-	"errors"
 	"io"
 	"os"
-	"os/exec"
-	"strings"
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/lsp"
 	"quackitect/src/voice"
 )
 
-// What the voice verb reaches past the disk: the root, Vale's path under it, a Vale run, and the clock. [[spec/design_output/doors#one-door-per-outside-thing]]
+// What the voice verb reaches past the disk: the root, the rules over a root, and the clock. [[spec/design_output/doors#one-door-per-outside-thing]] [[spec/tickets/vale-leaves-the-tree]]
 type voiceOutside struct {
-	root func() (string, error)
-	vale func(root string) string
-	run  func(argv []string, cwd string) (string, error)
-	now  func() time.Time
+	root  func() (string, error)
+	rules func(root string) func(path, text string) []lsp.Finding
+	now   func() time.Time
 }
 
 func init() {
-	register("voice", voiceVerb(voiceOutside{root: index.Root, vale: valeAt, run: voiceRunsVale, now: time.Now}))
+	register("voice", voiceVerb(voiceOutside{root: index.Root, rules: lspRules, now: time.Now}))
 }
 
 // The voice twin over the outside it binds, the root falling back to here as the road's does. [[spec/design_output/projection#the-second-target]]
@@ -42,7 +39,6 @@ func voiceVerb(outside voiceOutside) twin {
 func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 	return voice.Doors{
 		Root: root,
-		Bin:  outside.vale(root),
 		Exists: func(path string) bool {
 			_, err := os.Stat(path)
 			return err == nil
@@ -61,19 +57,18 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		},
 		Write:   func(path, text string) error { return os.WriteFile(path, []byte(text), 0o644) },
 		MakeDir: func(path string) error { return os.MkdirAll(path, 0o755) },
-		Vale:    outside.run,
+		Lint:    voiceLint(outside.rules(root)),
 		Now:     outside.now,
 	}
 }
 
-// Runs Vale in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/design_output/projection#the-second-target]]
-func voiceRunsVale(argv []string, cwd string) (string, error) {
-	run := exec.Command(argv[0], argv[1:]...)
-	run.Dir, run.Stdin = cwd, strings.NewReader("")
-	said, err := run.Output()
-	var exit *exec.ExitError
-	if err != nil && !errors.As(err, &exit) {
-		return "", err
+// The rules' rows over one file as the voice module reads them. [[spec/tickets/vale-leaves-the-tree]]
+func voiceLint(rules func(path, text string) []lsp.Finding) func(path, text string) []voice.Finding {
+	return func(path, text string) []voice.Finding {
+		var out []voice.Finding
+		for _, one := range rules(path, text) {
+			out = append(out, voice.Finding{File: path, Rule: one.Rule, Line: one.Line, Column: one.Column, Message: one.Message, Severity: one.Severity})
+		}
+		return out
 	}
-	return string(said), nil
 }

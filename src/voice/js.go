@@ -1,86 +1,16 @@
-// What the voice verbs read as JavaScript reads it: Vale's JSON as findings,
-// truthiness, String, trim, UTF-16 lengths and the root order of localeCompare.
+// What the voice verbs read as JavaScript reads it: truthiness, String, trim,
+// UTF-16 lengths and the root order of localeCompare.
 // [[spec/design_output/projection#the-second-target]]
 package voice
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"math"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf16"
 )
-
-// Vale's JSON as findings, in the file order Vale writes, sorted by line and column; the prose styles drop off each rule. [[spec/design_output/projection#the-second-target]]
-func FromJSON(stdout string) []Finding {
-	out := []Finding{}
-	if stdout == "" {
-		return out
-	}
-	var whole json.RawMessage
-	if json.Unmarshal([]byte(stdout), &whole) != nil {
-		return out
-	}
-	read := json.NewDecoder(bytes.NewReader(whole))
-	if open, err := read.Token(); err != nil || open != json.Delim('{') {
-		return out
-	}
-	for read.More() {
-		key, err := read.Token()
-		if err != nil {
-			return out
-		}
-		var rows any
-		if read.Decode(&rows) != nil {
-			return out
-		}
-		list, ok := rows.([]any)
-		if !ok {
-			continue
-		}
-		for _, one := range list {
-			row, _ := one.(map[string]any)
-			out = append(out, findingOf(fmt.Sprint(key), row))
-		}
-	}
-	sort.SliceStable(out, func(a, b int) bool {
-		if out[a].Line != out[b].Line {
-			return out[a].Line < out[b].Line
-		}
-		return out[a].Column < out[b].Column
-	})
-	return out
-}
-
-// One Vale row as a finding, each field falling back as fromJson's does. [[spec/design_output/projection#the-second-target]]
-func findingOf(file string, row map[string]any) Finding {
-	one := Finding{File: file, Rule: proseRule.ReplaceAllString(jsString(row["Check"]), ""), Line: 1, Column: 1, Severity: "error"}
-	if line, ok := row["Line"].(float64); ok {
-		one.Line = int(line)
-	}
-	if span, ok := row["Span"].([]any); ok && len(span) > 0 {
-		if column, ok := span[0].(float64); ok {
-			one.Column = int(column)
-		}
-	}
-	if row["Match"] != nil {
-		one.Said = jsString(row["Match"])
-	}
-	if row["Message"] != nil {
-		one.Message = jsString(row["Message"])
-	}
-	if row["Severity"] != nil {
-		one.Severity = jsString(row["Severity"])
-	}
-	action, _ := row["Action"].(map[string]any)
-	one.Fixable = truthy(action["Name"])
-	return one
-}
 
 // Whether a JSON value reads as true in JavaScript. [[spec/design_output/projection#the-second-target]]
 func truthy(v any) bool {
