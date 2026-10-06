@@ -27,8 +27,8 @@ func runmeRoot(t *testing.T) string {
 		t.Fatal(err)
 	}
 	files := map[string]string{
-		"RUNME.sh":                 string(shim),
-		"src/scripts/install.sh":   "#!/usr/bin/env sh\n",
+		"RUNME.sh":                  string(shim),
+		"src/scripts/install.sh":    "#!/usr/bin/env sh\n",
 		".se/.runtime/bin/se-index": "#!/bin/sh\nprintf '%s\\n' \"$*\"\n",
 	}
 	for name, text := range files {

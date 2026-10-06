@@ -4,12 +4,16 @@
 package check
 
 import (
+	_ "embed"
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
+
+// The size golden, riding in through embed as a module test takes a fixture. [[spec/guidance/code/testing]]
+//
+//go:embed testdata/size.golden.json
+var sizeGolden []byte
 
 // The size ceilings the cases read: the function ceiling and the file ceiling. [[spec/tickets/size-golden-drops-line-counts]]
 const (
@@ -26,14 +30,10 @@ func TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds(t *testing.T) {
 			t.Errorf("%s draws %+v", path, rows)
 		}
 	}
-	said, err := os.ReadFile(filepath.Join("testdata", "size.golden.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
 	var golden map[string][]struct {
 		File string `json:"file"`
 	}
-	if err := json.Unmarshal(said, &golden); err != nil {
+	if err := json.Unmarshal(sizeGolden, &golden); err != nil {
 		t.Fatal(err)
 	}
 	for side, rows := range golden {

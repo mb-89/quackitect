@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 685b8ebc541a468019c9b6df1b7b7b99d2de7b06
+    hash_after: 685b8ebc541a468019c9b6df1b7b7b99d2de7b06
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  107.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: da25498fea11bdac
+        size: 688
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ The cloud rule points at cloudVariables in src/quack/command.go, and the script 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/runme_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A bare RUNME.sh on a cloud box now hands help to the binary, which prints the verbs and exits 0, in place of the editor note and exit 1. The cloud rule matches cloudVariables in src/quack/command.go, so a cloud variable at false, 0 or empty still reads as a desk and keeps the editor road. The check module size test now takes its golden through embed, since its os import broke the import rule and held the check red for every child.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches RUNME.sh and src/quack/runme_test.go, plus two sibling test files whose faults held the check red: an os import in src/modules/check and a gofmt alignment in src/branches. Cloud rule 11 asks for those fixes whoever made the fault.
+The test runs the real script with a fake install and a fake binary in a temporary root, so no real install, index or editor runs.
+A comment above cloud_box names the approach and links the ticket.
+The cloud rule points at cloudVariables in src/quack/command.go and follows it, and no other place repeats it.
 
 # accept
 

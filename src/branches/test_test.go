@@ -11,7 +11,7 @@ import (
 func TestGoldenReadersNameEveryPackageReadingAChangedGolden(t *testing.T) {
 	t.Parallel()
 	tests := map[string]string{
-		"src/quack/check_twins_test.go":       `var twinsAt = filepath.FromSlash("../modules/check/testdata")`,
+		"src/quack/check_twins_test.go":        `var twinsAt = filepath.FromSlash("../modules/check/testdata")`,
 		"src/modules/check/textfaults_test.go": `os.ReadFile(filepath.Join("testdata", "size.golden.json"))`,
 		"src/pull/pull_test.go":                `os.ReadFile("testdata/other.json")`,
 	}
