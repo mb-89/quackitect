@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 41e4c8078b0ef917
         size: 812
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 463e5b005b5c494a502258adfd11812c99907869
+    hash_after: 463e5b005b5c494a502258adfd11812c99907869
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -298,14 +307,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go vet ./quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches probe_verb.go, probe-cold.js, probe-dry.js and settings.json, which the size list names, and landed through probe-at-stays-dry and merge-deny-every-connector
+the verb reaches git through the run door, whose fake its cases drive, and coldTree reaches git through it.proc, whose fake the cold tree case drives
+resolvedAt, checksOut and the deny case carry comments linking this ticket
+the flag stands once a language, and the merge roads once in .claude/settings.json
 
 ## tests-green
 
