@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -156,6 +156,15 @@ record:
         hash: e67ae0eb78415dd4
         size: 657
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 6fe169e6045bcc8ebcde91dba692f351d60791e9
+    hash_after: 010e826fed476ed63fc75d240f6e77e980a33920
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -308,14 +317,19 @@ accept. The approach answers the ask, TestCheckParts decides the validate and ts
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/stub/.claude/skills/level0/hooks/bridgehead.ts test/level0/stub-typed.test.js test/level0/bridgehead.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the stub bridgehead, its manifest, the plugin tsconfig, the vale section over it and the tests naming it, all glue the ask names
+the port reaches the engine through $ alone, and test/level0/bridgehead.test.js fakes every call
+the header of bridgehead.ts names the approach and links this ticket
+the include list in the plugin tsconfig holds the stub path once, and the test reads it there
 
 ## tests-green
 
