@@ -3,7 +3,23 @@
 // [[spec/tickets/check-patterns-compile-once]]
 package check
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
+
+// The file ceiling covers code files alone, so a long note or data file meets none. [[spec/design_output/level0#the-size-ceiling]]
+func TestTheFileCeilingReadsCodeFilesAlone(t *testing.T) {
+	long := strings.Repeat("x\n", 4)
+	if said := sizeFaults("a.go", long, 0, 2); len(said) != 1 || said[0].Rule != FileCeiling {
+		t.Fatalf("a Go file past its ceiling answers %v", said)
+	}
+	for _, path := range []string{"a.md", "a.json", "a.yml", "a.html"} {
+		if said := sizeFaults(path, long, 0, 2); len(said) != 0 {
+			t.Fatalf("%s answers %v, and holds no code", path, said)
+		}
+	}
+}
 
 // Lines a brace language writes, with the shapes each pattern reads and the ones it refuses. [[spec/tickets/check-patterns-compile-once]]
 var codeLines = []string{
