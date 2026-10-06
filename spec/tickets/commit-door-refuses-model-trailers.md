@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    2.4  test/contract/one-reading.test.js the lint reads each row of the sweep once"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 7c5819c2ea7ea49ff962af36d652d005ffd050b1
+    hash_after: 7c5819c2ea7ea49ff962af36d652d005ffd050b1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks/command passes; green, src/modules/hooks passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: ada1bd682add724a
+        size: 1023
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,33 @@ every fact the change adds stands in one place: ModelTrailers in voice.go owns t
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/command/voice_test.go src/modules/hooks/commits_test.go src/quack/commit_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Both commit roads now refuse a message whose trailer names a model. ModelTrailers in src/modules/hooks/command/voice.go reads the closing trailer paragraph and names each trailer matching a model name. The commit hook in src/modules/hooks/commits.go and the commit verb in src/quack/commit.go call it before any Vale run, so a box with no Vale refuses too. The door landed in the commit of model-trailer-refuses-in-place, and this ticket greens the red cases it wrote for the same door.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the door spans the hook, the verb and their tests, which the ask names through its two packages.
+every door the change reaches has a fake: the verb case runs ./RUNME.sh commit over a fake root, and the hook case reads a message in memory.
+a comment names the approach the change implements: voice.go points at spec/design_output/bash#a-commit-message-meets-voice.
+every fact the change adds stands in one place: ModelTrailers owns the pattern, and both roads call it.
 
 # accept
 
