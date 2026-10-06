@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9d1f32ff4065dbb1
         size: 2867
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-4
+    hash_before: fe01f57a728b2d1ef546ca13d6f4df39a285623b
+    hash_after: fe01f57a728b2d1ef546ca13d6f4df39a285623b
+    inputs:
+      - name: design/draft
+        hash: 9d1f32ff4065dbb1
+        size: 2867
+      - name: design/tests-red
+        hash: 9df8337c88a371ff
+        size: 656
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +288,10 @@ Both settle cases fail on their assertion: the verb takes the word for here and 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- logbook-test-leaves-level0-lib: test/level0/logbook.test.js imports SESSION from .claude/skills/level0/lib/log.js and fakeDisk from src/doors/fake/disk.js, so the done test itself pins the log library and the doors the ask means to free. The done grep reads src/extension alone and misses it. Give the test its own session path and fake, or name the Go owner, so both files can leave.
 
 # implement
 
@@ -348,3 +362,6 @@ Both settle cases fail on their assertion: the verb takes the word for here and 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- gate, for the builder to fix in place: `src/extension/lib/lsp.js` WATCHES carries the pattern `**/src/scripts/install.sh`, a document selector and no comment, so step (4) of the approach leaves it and the done grep still answers it. Rewrite the pattern so the selector still finds `install.sh`.
+- gate, for the builder: the draft's tests field names `src/quack/vehicle_verb_test.go`, and the red cases stand in `src/quack/vehicle_settle_test.go`. The red field rules.
