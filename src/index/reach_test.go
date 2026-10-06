@@ -391,7 +391,7 @@ func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 	exitingSpawn(t, errors.New("exit status 2"))
 	waited := fakeStartClock(t, nil)
 	err := starts(root)
-	if err == nil || !strings.Contains(err.Error(), "exit status 2") {
+	if err == nil || !strings.Contains(err.Error(), "exits before its door stands: exit status 2") {
 		t.Fatalf("a start answers %v, and wants the index's exit", err)
 	}
 	if waited() > startPollPause {
@@ -405,8 +405,8 @@ func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 	builtIndex(t, root, "the index build")
 	exitingSpawn(t, nil)
 	waited := fakeStartClock(t, nil)
-	if err := starts(root); err == nil {
-		t.Fatal("a start answers no fault over a hung index")
+	if err := starts(root); err == nil || !strings.Contains(err.Error(), "hangs") {
+		t.Fatalf("a start answers %v over a hung index, and wants the hang named", err)
 	}
 	if waited() < startHang {
 		t.Fatalf("a start gives up after %v, and wants the hang guard of %v", waited(), startHang)

@@ -24,8 +24,8 @@ const (
 	callArgsWithParams = 3
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
-	// The span a start waits on an index that neither stands nor exits, past which it names the index hung. [[spec/design_output/index#a-door-comes-back]]
-	startHang = 5 * time.Minute
+	// The span a start waits on an index that neither stands nor exits, past which it names the index hung. It stands under the five minutes a contract suite gives one run of the entry, so the start names the hang first. [[spec/design_output/index#a-door-comes-back]]
+	startHang = 4 * time.Minute
 	postWait  = 30 * time.Second
 	// The span between two looks at the standing file, and the misses in a row that tell a door another stands in its place. [[spec/tickets/process-shadow-reads-clean]]
 	displacedEvery = 5 * time.Second
