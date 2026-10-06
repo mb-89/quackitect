@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: dc205034cc7c66d94c6a4ce202ab3b2560eeef45
+    hash_after: dc205034cc7c66d94c6a4ce202ab3b2560eeef45
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/voice passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 77f21a5dc041a8f5
+        size: 921
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/start_test.go src/voice/voice_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A desk session opened in the repo folder that writes, in any mode but plan, and loads no level-zero plugin now meets a refusal at its start. boot.js hands the hook input to a new start verb, which asks StartRefusal and prints continue false with a reason naming the repo folder and ./RUNME.sh. A missing, failing or slow binary starts the session all the same, and a cloud box passes. voice measure over transcripts exits 1 and names each answer past answer.ceiling, while a plain folder run keeps exit 0. Coordinator rule 8 asks the coordinator to open in the repo folder with SE_COORDINATOR set, since a session opened elsewhere meets no hook at all. Unchecked: the installed client builds permission_mode into the hook input, and whether a SessionStart continue false stops the session waits on the claude probe.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, and drops the tree.go row the verb needed none of
+- StartRefusal is pure, the start verb runs over its input reader, boot.js over the fake disk and proc doors, and measure over the doorsOf fake
+- each change points at this ticket or the section it implements
+- the ceiling stands once, as answer.ceiling, and the refusal reason once, in StartRefusal
 
 # accept
 
