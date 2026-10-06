@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -320,6 +320,24 @@ record:
     skipped: true
     kept: 54cdce1b356329fa4bba1498bf8ab9328928c738
     why: its red tests stand as 54cdce1b3 landed them, and a later leaf passed since
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-21
+    hash_before: b9c11755708af31f67882d257f9f1f5cb91c5f07
+    hash_after: b9c11755708af31f67882d257f9f1f5cb91c5f07
+    inputs:
+      - name: design/draft
+        hash: 959f88c063abaa29
+        size: 11380
+      - name: design/tests-red
+        hash: 2f3eb8f8cfebc0ce
+        size: 718
+      - name: [[spec/design_output/doors]]
+        hash: 288301764bba3bce
+        size: 18292
+      - name: [[spec/tickets/pull-meets-fake-git]]
+        hash: 0ecf0b21dbd1a30f
+        size: 430
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -600,11 +618,7 @@ The step went stale twice, each time a sibling ticket added a row to the doors c
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- route-cases-hand-their-repo: runsJSCases in src/quack/ticket_route_test.go reaches the ticket verbs through registry, whose repoAt each init fixes to realRepo, so a FakeRepo the case seeds never reaches copiedBase; implement adds a seam handing the case's repository to the registry verb
-- repo-guard-reads-the-verbs: src/quack/repos_moved_test.go reads the test files alone, so a verb still reaching git.NewRepo with proc.Real passes it, and spawn no git on the verb side rests on the cases failing
-- quack-repos-red-list-current: design/tests-red lists src/modules/git/repo_contract_test.go as red, yet go test ./src/modules/git passes on this commit, so the check skips a green suite; tests-green drops it from the list
-- quack-repos-draft-counts-four: the draft says Five cases lean on a refusal and lists four, the index lock, the commit hook, the open hook and the remote URL, so Four stands and no case goes missing
+accept
 
 # implement
 
