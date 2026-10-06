@@ -7,6 +7,7 @@ package pull
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -138,6 +139,17 @@ func taggedIn(list []*Held) []*Held {
 	return out
 }
 
+// The tagged tickets a work branch takes: its group's children and the private notes, so a tagged ticket of another group waits for its own branch. [[spec/tickets/cloud-question-check-leaves-readstext]]
+func taggedHere(tagged, children []*Held) []*Held {
+	out := []*Held{}
+	for _, one := range tagged {
+		if one.Private || slices.Contains(children, one) {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
 // The score orders the queue, off the queue module's one decider. [[spec/design_output/pull#the-queue-is-a-score]]
 func (it *It) sorted(list, all []*Held) []*Held {
 	rows := func(from []*Held) []queue.Row {
@@ -229,7 +241,8 @@ func (it *It) handOut(who *Who) int {
 	}
 	var pools [][]*Held
 	if who.Group != "" {
-		pools = append([][]*Held{tagged, it.sorted(heldChildren(all, who.Group), all)}, late...)
+		children := heldChildren(all, who.Group)
+		pools = append([][]*Held{taggedHere(tagged, children), it.sorted(children, all)}, late...)
 	} else {
 		pools = [][]*Held{tagged, it.sorted(freeIn(all), all), notes}
 		it.cutForGroups(all)

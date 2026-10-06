@@ -101,7 +101,7 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer bus.Close()
-	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
+	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 2 * time.Second}
 	stop, err := index.NewPlacements(wall, bus, store, []index.Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
