@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 646a8dca9a84c1c2
         size: 888
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4f2fbdfeaa6fc40afb0e5f68faef05ef75ef50c6
+    hash_after: 4f2fbdfeaa6fc40afb0e5f68faef05ef75ef50c6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: 4f5a7bb93fcd9872
+        size: 2717
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,31 @@ The guard reads a sleep and a spawn, and leaves `time.After` and a ticker alone.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/clock_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/imports/clock_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The pass case fails on its own assertion: the stub names no wait, where the planted file holds a sleep, a spawn under an alias, and a process start. The tree case passes over the stub, and turns red once the pass reads the tree, until the doors note lists the seven files the survey finds. A surprise: the alias case matters, since a file may name os/exec under another name.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a test or a checkpoint: the pass case and the tree case decide the guard, the rules and the rationale stand as files the gate reads, and the check decides the last
+- the cases reach no door: they parse planted text and read the tree, as the serial guard does
 
 # gate
 
