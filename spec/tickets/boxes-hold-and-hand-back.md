@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
     hash_before: 51be8a910c58dae0ebcdbe7a7d9c224a8f50314a
+  - step: sync
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: e423bdcbb0794321960db6acc36c8135c2d65e0d
+    hash_after: e423bdcbb0794321960db6acc36c8135c2d65e0d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/boxes-hold-and-hand-back already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -100,8 +109,9 @@ A cloud box holds its branch while it lives, and hands its work on whole when it
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
