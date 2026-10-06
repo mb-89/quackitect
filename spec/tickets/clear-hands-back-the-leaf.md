@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -146,6 +146,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: 8719fe198977c01f5cd8dbe7dcf53cbdd9e51bf9
+    hash_after: 8719fe198977c01f5cd8dbe7dcf53cbdd9e51bf9
+    inputs:
+      - name: retro/write
+        hash: c208215450c5f11f
+        size: 2336
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -282,20 +292,26 @@ The owner reads the loop as a fault of the pull alone. The cause stands one door
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- none: every tool the run asked stood on the box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit hook asking a test beside each code file, at the probe change and at the change step
+- the write door binding each edit to the ticket in hand, while the point stood before the fix
+- the stop hook refusing the helpers reason, since a cloud box stops its helpers with its turn
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside this group
 
 # Discussion
 
