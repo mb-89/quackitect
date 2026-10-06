@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 0e884188e97ecfdf3cbe113cdba38930a86e783f
+    hash_after: 4c6146c219d45b66b33f92b30fec857e70e5a02a
+    inputs:
+      - name: ask
+        hash: 2c7231ba7aced856
+        size: 1214
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,85 @@ Refusals are free text written at each site. Many name no fix, two point at each
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The design stands in [[spec/design_output/failures]]. The group cuts it into slices, and this ticket is the last of them: it moves the refusals onto nodes, and its ask reads the whole.
+
+- The pull's `It` takes a `failure.Registry`, and `it.Refuse(id, rows...)` takes the place of each `it.Say(Refused, ...)`. Each refusal keeps the message it builds, and the door adds the id and the remedies.
+- The take's `Doors` takes the registry, and `d.refuse(id, format, args...)` takes the place of each refusal `d.warn` in `src/branches/take.go`.
+- The mint verb raises each refusal through the door, and the schema's refusal takes one id.
+- `failure new` writes one node a refusal, each with a remedy the message names or implies.
+- `Moved` in `src/failure` names the three files, so the check refuses a refusal past the door there.
+- The pull cases hand in the fake registry, and read the ids the fake door keeps.
+
+Weighed: messages on the nodes against messages at the site. A message builds off the site's values, so it stays there, and the node holds the id, the level and the remedies.
+Assumed: `src/scripts/work.js` stays, since the Go take answers first, and its refusals move with a later slice.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/pull/pull.go: every it.Say(Refused, ...)
+src/pull/pull_back.go: every it.Say(Refused, ...)
+src/pull/pull_bless.go: every it.Say(Refused, ...)
+src/pull/pull_branch.go: deskRefused
+src/pull/pull_ephemeral.go: every it.Say(Refused, ...)
+src/pull/pull_gate.go: the refusal it says
+src/pull/pull_writes.go: every it.Say(Refused, ...)
+src/branches/take.go: openGroup, take and claimGroup
+src/quack/verb_mint.go: mintVerb
+src/quack/ticket_doors.go: the doors the pull and the take build, which hand in the registry
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/pull/pull_failure_test.go: TestRefusalsNameTheirIds
+src/branches/take_failure_test.go: TestTakeRefusalsNameTheirIds
+src/quack/verb_mint_failure_test.go: TestMintRefusalsNameTheirIds
+src/failure/moved_test.go: TestMovedFilesRefuseThroughTheDoor
+./...: go test ./src/pull/
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+spec/design_output/failures.md
+spec/failures/*.md, one node a refusal
+src/pull/pull.go
+src/pull/pull_back.go
+src/pull/pull_bless.go
+src/pull/pull_branch.go
+src/pull/pull_ephemeral.go
+src/pull/pull_gate.go
+src/pull/pull_writes.go
+src/pull/pull_route.go
+src/branches/take.go
+src/branches/doors.go
+src/quack/verb_mint.go
+src/quack/ticket_doors.go
+src/failure/moved.go
+the four test files above
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened the pull's Say and its refusal sites, the take's warn sites, the mint verb and the log module, and checked each claim there.
+The callers come off a grep for `Say(Refused`, `d.warn` in take.go and `Fprint` in verb_mint.go.
+Each done_when line names its case, `go test ./src/pull/` or the check, and the earlier slices hold the rest.
 
 ## tests-red
 
