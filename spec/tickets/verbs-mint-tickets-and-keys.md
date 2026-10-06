@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: d87b2e80815b0007
         size: 3699
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-6
+    hash_before: 163417f183f3c802daeaa389f244f082a68fee18
+    hash_after: 163417f183f3c802daeaa389f244f082a68fee18
+    inputs:
+      - name: design/draft
+        hash: d87b2e80815b0007
+        size: 3699
+      - name: design/tests-red
+        hash: 34b83b8d5ff9d575
+        size: 959
+    def: dc4904ab364efa10
 group: engine-verbs-hold
 ---
 
@@ -304,8 +316,11 @@ The mint and config cases write a temporary root through the verbs own disk door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- config-note-names-tracked: spec/design_output/config.md under The verb writes one layer says the write lands in .se/.runtime/config.json alone, so the build adds the --tracked road there and lists the note under size.
+- retro-ask-feeds-askfrom: retroMintAskOf takes a retroMintTicket and holds no process ask, so the delegation builds the gain, breaks and done_when fields as the list AskFrom reads, or reads the ticket's process through pull.ProcessAt.
 
 # implement
 
