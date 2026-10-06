@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: green
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 67b57503a183e57777b6854f2893244aced5294c
+    hash_after: 8b8c4aa71d9f12b8b1dd684a3f92788073a768db
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: green
+    inputs:
+      - name: design/tests-red
+        hash: ed08e844123f91a5
+        size: 861
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/search-door.test.js test/contract/index.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index door in src/doors/index.js hands the index binary QUACKITECT_ROOT set to its own work root. Before, a check run as a child of the index inherited the real root there, and rootHere in src/index/main.go reads that variable before the working folder. So the contract case over a temp folder stopped the real index, which came back on a new port, and the pull tool call met connection refused. This hand-back runs through the pull tool call and holds the check, so it proves the ask's second line. The contract case now carries the name the draft lists, as the gate asked.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/doors/index.js and the two test files the size names, and the reviewer's point on src/index/main.go stands as the note the-index-keeps-its-root
+- the door reaches proc, and its fake records the env the unit case reads
+- a comment over ROOT_VAR names the approach by its ticket
+- the variable's name stands once in the door, as ROOT_VAR
 
 # accept
 
