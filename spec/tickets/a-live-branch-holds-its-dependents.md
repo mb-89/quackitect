@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 09c93060e1e21929
         size: 1706
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: 236f41a1ee7ca1ac2337cafc0e6d0bb66534512f
+    hash_after: 236f41a1ee7ca1ac2337cafc0e6d0bb66534512f
+    inputs:
+      - name: design/draft
+        hash: 09c93060e1e21929
+        size: 1706
+      - name: design/tests-red
+        hash: 89a9877eb7823356
+        size: 785
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,9 @@ both cases drive a real git repository in a temporary folder, as every case besi
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
