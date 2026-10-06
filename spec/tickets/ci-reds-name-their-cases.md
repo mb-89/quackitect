@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: b38871be887b12e4
         size: 444
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: 106ae83307eef0d3d149613207f6a5481702ac41
+    hash_after: 106ae83307eef0d3d149613207f6a5481702ac41
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: fae2abb9b10e4632
+        size: 2309
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +245,32 @@ the first done_when line meets TestCheckEndsOnTheRedCases, the second TestDispat
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_test.go src/branches/dispatch_fire_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/check_test.go
+src/branches/dispatch_fire_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The red check ends on its timing table, and no red case follows it, for a runner case and a Go test alike. The fire sends the ready group alone, since no road reads the pull requests' check runs. The fake hub gains a check-runs route keyed by the head commit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets TestCheckEndsOnTheRedCases, the second TestDispatchFiresAWorkerAtARedWorkPullRequest, both red on their assertion
+the check test runs over checkFake's doors, and the dispatch test over the fake hub behind the send door
 
 # gate
 
