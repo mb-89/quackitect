@@ -154,12 +154,14 @@ record:
   - step: retro/cloud
     hand: box e97c7a20bbd2 · claude-code-remote
     hash_before: 825aa75f13d8ba9d11dc2542f9e2ed206573adfe
-    hash_after: 825aa75f13d8ba9d11dc2542f9e2ed206573adfe
+    hash_after: 34272845115238ce6113b004169d08a68b1c469a
     inputs:
       - name: retro/write
         hash: 8da0babf5f0728a1
         size: 1047
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    final: "PR 116 head 3427284 carries main through #119 and the Ubuntu and three Windows fixes; CI on both runners decides."
 reason: done
 ---
 
