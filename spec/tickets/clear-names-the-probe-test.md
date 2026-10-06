@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: clear-hands-back-the-leaf
 parent: the-clear-hands-back-the-leaf
+record:
+  - step: do
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: e27dc7f7514dfb2ddbc47e9402a88fec73c59da8
+    hash_after: e27dc7f7514dfb2ddbc47e9402a88fec73c59da8
+    why: the-clear-hands-back-the-leaf answers this ask
+reason: answered
 ---
 
 # Ask
@@ -47,26 +54,32 @@ the draft's tests and size lists name test/level0/probe-dry.test.js for the prob
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+node --test test/level0/probe-clear.test.js test/level0/probe-dry.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Discussion of the-clear-hands-back-the-leaf names `test/level0/probe-clear.test.js` as the file the probe clear cases stand in. The draft lists name `test/level0/probe-dry.test.js`, and the draft stands locked, so the Discussion carries the correction.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change names the file in place, as the ask says, under the Discussion, the one place an open ticket takes a write
+- the change reveals no cleanup
+- the file name stands once, in the Discussion
 
 # Discussion
 

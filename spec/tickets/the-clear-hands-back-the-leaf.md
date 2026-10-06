@@ -396,3 +396,7 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The probe's clear cases stand in `test/level0/probe-clear.test.js`, beside `src/scripts/probe-clear.js`, where the commit hook looks for them. The draft's tests and size lists name `test/level0/probe-dry.test.js` in its place. Both lists take `test/level0/probe-clear.test.js`, and `test/level0/probe-dry.test.js` keeps one change: the whole run in `whole()` carries the cycle past the clear.
+
+The owner asks for a ticket on the normal route. The tree holds no `normal` process, so this ticket takes `standard`, the full route. The owner's name runs past the five words a branch name holds, so the group takes `clear-hands-back-the-leaf` and this ticket keeps the name as ordered. `branch open` reads the group off `main` and a box pushes no `main`, so the box made the work branch off `origin/main` by hand.
