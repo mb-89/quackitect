@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -247,6 +247,25 @@ record:
     hand: the engine
     hash_before: e6a61975f7cf8128f5d51f59101eff0dd329491b
     hash_after: e6a61975f7cf8128f5d51f59101eff0dd329491b
+  - step: accept
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 6eefb3972718f054b52670b6a9edd7173474a4f9
+    hash_after: 6eefb3972718f054b52670b6a9edd7173474a4f9
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-check-runs-beside already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 07c43ae7253713ec
 reason: done
 ---
 
@@ -306,7 +325,8 @@ The check's parts block each other no more: every part starts at once, so the ch
 <!-- the form is verdict -->
 
 accept
-- the diff since the last verdict carries ticket evidence alone, and the check stands green on the merge
+- the Vale run goes again on its own timeout, with a case for one timeout and a case for every run timing out
+- the check stands green on the commit
 
 # retro
 
