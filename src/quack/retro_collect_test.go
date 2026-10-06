@@ -134,6 +134,7 @@ func (w *retroCollectWorld) run(argv ...string) (int, string) {
 		temp: w.temp,
 		now:  func() time.Time { return retroWhen(retroCollectNow) },
 		git:  w.trunk.run,
+		disk: realDisk(),
 		move: w.move,
 	}
 	var said strings.Builder

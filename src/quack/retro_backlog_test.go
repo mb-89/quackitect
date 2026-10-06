@@ -59,7 +59,7 @@ func retroRunBacklog(t *testing.T, verdicts string) (int, string) {
 			t.Fatal(err)
 		}
 	}
-	doors := retroBacklogDoors{root: root, git: retroBacklogTrunk().run}
+	doors := retroBacklogDoors{root: root, disk: realDisk(), git: retroBacklogTrunk().run}
 	var said strings.Builder
 	code := retroBacklogVerb(func() retroBacklogDoors { return doors })([]string{"retro", "backlog", retroBacklogName}, false, &said, &said)
 	return code, said.String()

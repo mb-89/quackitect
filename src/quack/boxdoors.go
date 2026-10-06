@@ -45,6 +45,7 @@ type boxDoors struct {
 	run       func(argv []string, o runOpts) ranResult
 	get       func(url string, wait time.Duration) (string, error)
 	now       func() time.Time
+	disk      diskDoors
 	out, errs io.Writer
 }
 
@@ -76,6 +77,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		run:  realRun(out, errs),
 		get:  realGet,
 		now:  time.Now,
+		disk: realDisk(),
 		out:  out,
 		errs: errs,
 	}

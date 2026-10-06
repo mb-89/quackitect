@@ -47,7 +47,7 @@ func retroNewTree(t *testing.T, name string) (string, *retroMintFake) {
 
 // Runs retro new over the tree with the fake runner. [[spec/design_input/the-agent-pulls-tickets]]
 func retroNewRuns(root string, fake *retroMintFake, words ...string) (int, string, string) {
-	return retroMintHeard(retroNewVerb(func() string { return root }, fake.run), append([]string{"retro", "new"}, words...)...)
+	return retroMintHeard(retroNewVerb(retroBoxAt(root), fake.run), append([]string{"retro", "new"}, words...)...)
 }
 
 // The words of each call the fake heard, one a line. [[spec/design_input/the-agent-pulls-tickets]]

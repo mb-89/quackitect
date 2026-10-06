@@ -158,7 +158,7 @@ func retroMintRead(t *testing.T, root string) retroMintRecord {
 
 // Runs retro mint over the tree with the fake runner. [[spec/guidance/retro/check]]
 func retroMintRuns(root string, fake *retroMintFake) (int, string, string) {
-	return retroMintHeard(retroMintVerb(func() string { return root }, fake.run), "retro", "mint", retroMintName)
+	return retroMintHeard(retroMintVerb(retroBoxAt(root), fake.run), "retro", "mint", retroMintName)
 }
 
 // The record lands as recordOf and JSON.stringify with two spaces write it: its five keys, each object's keys in their order, a twice-named key at its first place, and numbers and strings as JavaScript prints them. [[spec/guidance/retro/check]]
@@ -171,7 +171,7 @@ func TestRetroMintWritesTheRecordAsJsonStringifyDoes(t *testing.T) {
 		t.Fatal(err)
 	}
 	at := filepath.Join(t.TempDir(), "classes.json")
-	if !retroMintWrites(at, retroMintKept(read), os.Stderr) {
+	if !retroMintWrites(realDisk(), at, retroMintKept(read), os.Stderr) {
 		t.Fatal("the record lands nowhere")
 	}
 	if got, _ := os.ReadFile(at); string(got) != want {
@@ -290,7 +290,7 @@ func TestRetroMintPromotionNameReadsItsWhatOrItsPlace(t *testing.T) {
 func TestRetroMintChecksAPromotionsTicketAlone(t *testing.T) {
 	t.Parallel()
 	record := retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule"}}}
-	if got := retroMintFaults(record, ""); len(got) != 5 {
+	if got := retroMintFaults(realDisk(), record, ""); len(got) != 5 {
 		t.Fatalf("the mint names %v", got)
 	}
 }
@@ -300,7 +300,7 @@ func TestRetroMintRefusesAPromotionNamingAProcessThatStandsNowhere(t *testing.T)
 	t.Parallel()
 	root, _ := retroMintTree(t, nil, nil)
 	ticket := retroMintTicket{Name: "the-rule-lands", Process: "nowhere", Gain: "a commit lands in one call", Breaks: "every commit costs a round of refusals", DoneWhen: []string{"./RUNME.sh land answers 0 over a clean tree"}}
-	got := retroMintFaults(retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
+	got := retroMintFaults(realDisk(), retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
 	want := `promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.`
 	if len(got) != 1 || got[0] != want {
 		t.Fatalf("the mint names %q", got)

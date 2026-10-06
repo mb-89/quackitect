@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -23,14 +22,15 @@ type retroScoreNote struct {
 	name, text string
 }
 
-func init() { register("retro score", retroScoreVerb(retroRoot)) }
+func init() { register("retro score", retroScoreVerb(retroBox)) }
 
 // The verb: every improvement a retro mints, and how many stay open. [[spec/design_input/the-agent-pulls-tickets]]
-func retroScoreVerb(root func() string) twin {
+func retroScoreVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		type row struct{ name, group, state string }
 		rows := []row{}
-		for _, one := range retroScoreNotes(root()) {
+		d := box()
+		for _, one := range retroScoreNotes(d.disk, retroRootOf(d)) {
 			group := retroScoreField(one.text, "group")
 			if strings.HasPrefix(one.name, retroScoreRetro) || !strings.HasPrefix(group, retroScoreRetro) {
 				continue
@@ -61,9 +61,9 @@ func retroScoreVerb(root func() string) twin {
 }
 
 // Every ticket file under spec/tickets, in the order the folder lists them; a file that reads not reads as empty. [[spec/design_input/the-agent-pulls-tickets]]
-func retroScoreNotes(root string) []retroScoreNote {
+func retroScoreNotes(disk diskDoors, root string) []retroScoreNote {
 	at := filepath.Join(root, filepath.FromSlash(retroMintTickets))
-	entries, err := os.ReadDir(at)
+	entries, err := disk.list(at)
 	if err != nil {
 		return nil
 	}
@@ -72,8 +72,8 @@ func retroScoreNotes(root string) []retroScoreNote {
 		if !one.Type().IsRegular() || !strings.HasSuffix(one.Name(), ".md") {
 			continue
 		}
-		text, _ := os.ReadFile(filepath.Join(at, one.Name()))
-		out = append(out, retroScoreNote{name: strings.TrimSuffix(one.Name(), ".md"), text: string(text)})
+		text := disk.text(filepath.Join(at, one.Name()))
+		out = append(out, retroScoreNote{name: strings.TrimSuffix(one.Name(), ".md"), text: text})
 	}
 	return out
 }

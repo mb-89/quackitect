@@ -90,7 +90,7 @@ func TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros(t *testing.T) {
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
 
-	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
+	said := retroBatteryEffectOf(realDisk(), root, "retro-b", "retro-a")
 
 	if said == nil {
 		t.Fatal("the effect reads no battery")
@@ -115,7 +115,7 @@ func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t 
 	root := t.TempDir()
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 
-	said := retroBatteryEffectOf(root, "retro-b", "")
+	said := retroBatteryEffectOf(realDisk(), root, "retro-b", "")
 
 	if said == nil || said.Last != "" {
 		t.Fatalf("the effect reads %+v", said)
@@ -127,7 +127,7 @@ func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t 
 	if !reflect.DeepEqual(befores, []float64{0, 0}) {
 		t.Fatalf("the parts read before %v, want [0 0]", befores)
 	}
-	if got := retroBatteryEffectOf(t.TempDir(), "retro-b", "retro-a"); got != nil {
+	if got := retroBatteryEffectOf(realDisk(), t.TempDir(), "retro-b", "retro-a"); got != nil {
 		t.Fatalf("no report reads %+v, want nil", got)
 	}
 }
@@ -161,7 +161,7 @@ func TestRetroEffectWithAnEarlierRetroReadsNoBaseline(t *testing.T) {
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
 
-	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
+	said := retroBatteryEffectOf(realDisk(), root, "retro-b", "retro-a")
 
 	if said == nil || said.Baseline {
 		t.Fatalf("the effect reads %+v, want no baseline", said)

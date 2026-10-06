@@ -29,7 +29,7 @@ type retroRow struct {
 	text string
 }
 
-func init() { register("retro read", retroReadVerb(retroRoot)) }
+func init() { register("retro read", retroReadVerb(retroBox)) }
 
 // The text of a message's content: the string, or its text parts joined. [[spec/tickets/the-retro-finishes-its-asks]]
 func retroTextOf(content any) string {
@@ -96,9 +96,11 @@ func retroRowsOf(path, line string) []retroRow {
 }
 
 // The verb: prints each row of the chapter's lines as `path:line  kind  text`. [[spec/tickets/the-retro-finishes-its-asks]]
-func retroReadVerb(root func() string) twin {
+func retroReadVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name, id := root(), retroWordAt(argv, 2), retroWordAt(argv, retroReadIdAt)
+		d := box()
+		disk := d.disk
+		base, name, id := retroRootOf(d), retroWordAt(argv, 2), retroWordAt(argv, retroReadIdAt)
 		home, at := "", ""
 		if name != "" {
 			home = retroHome(base, name)
@@ -106,7 +108,7 @@ func retroReadVerb(root func() string) twin {
 		if home != "" && id != "" {
 			at = filepath.Join(home, retroChaptersFolder, id+".json")
 		}
-		if at == "" || !retroIsThere(at) {
+		if at == "" || !disk.stands(at) {
 			shown := id
 			if shown == "" {
 				shown = "none"
@@ -115,14 +117,14 @@ func retroReadVerb(root func() string) twin {
 			fmt.Fprintln(errs, "  ./RUNME.sh retro read <retro> <chapter>")
 			return 2
 		}
-		chapter, _ := retroJSParse(retroFileText(at))
+		chapter, _ := retroJSParse(disk.text(at))
 		lines, _ := retroJSField(chapter, "lines").(*retroJSDict)
 		for _, path := range lines.order() {
 			file := filepath.Join(home, retroInput, filepath.FromSlash(path))
-			if !retroIsThere(file) {
+			if !disk.stands(file) {
 				continue
 			}
-			text := strings.Split(retroFileText(file), "\n")
+			text := strings.Split(disk.text(file), "\n")
 			for _, pair := range retroJSList(lines.get(path)) {
 				bounds := retroJSList(pair)
 				if len(bounds) < 2 {

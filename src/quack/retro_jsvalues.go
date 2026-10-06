@@ -9,7 +9,6 @@ import (
 	"io"
 	"math"
 	"math/big"
-	"os"
 	"regexp"
 	"slices"
 	"sort"
@@ -267,8 +266,8 @@ func retroJSQuote(text string) string {
 }
 
 // A value written to its file as JSON, two spaces deep, and a newline after. [[spec/tickets/retro-verbs-port-to-go]]
-func retroJSWrite(path string, value any) error {
-	return os.WriteFile(path, []byte(retroJSStringify(value)+"\n"), 0o666)
+func retroJSWrite(disk diskDoors, path string, value any) error {
+	return disk.write(path, []byte(retroJSStringify(value)+"\n"), 0o666)
 }
 
 // A number as JavaScript's String writes it. [[spec/tickets/retro-verbs-port-to-go]]

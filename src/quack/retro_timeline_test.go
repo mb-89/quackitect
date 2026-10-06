@@ -66,9 +66,9 @@ func retroReadingFile(t *testing.T, root, name, rel string) string {
 }
 
 // Runs a verb over the root, and answers its code, its output and its errors. [[spec/guidance/retro/chapter]]
-func retroReadingRun(verb func(func() string) twin, root string, argv ...string) (int, string, string) {
+func retroReadingRun(verb func(func() boxDoors) twin, root string, argv ...string) (int, string, string) {
 	var out, errs strings.Builder
-	code := verb(func() string { return root })(argv, false, &out, &errs)
+	code := verb(retroBoxAt(root))(argv, false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 
