@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: d54a1312578af5a9cd5738cdf9af6bda1d676bb3
+    hash_after: d54a1312578af5a9cd5738cdf9af6bda1d676bb3
+    inputs:
+      - name: ask
+        hash: c4cd700ddee2f0f9
+        size: 325
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,51 @@ A trial closed with an empty decision passes the audit, and nobody reads what it
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`src/quack/retro_audit.go` gains `retroAuditUndecided`. It lists the closed tickets on the experiment process that keep nothing they found. `retroAuditKept` reads a trial as keeping it where the decision field under its decide step holds a row, through `pull.ChapterOf`, or its front names a successor under `successors`. The verb passes only where no trial stands open and none stands closed and silent, and it names each silent trial under its own line. The standing test of the clear case writes a decision on its closed trial, since a closed trial with none now fails. `spec/design_output/work.md` says the audit also names a closed trial with no decision and no successor.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit.go init, which registers retro audit
+src/quack/retro_audit.go retroAuditVerb
+spec/processes/retro.yaml, the audit step, which needs retro audit
+src/quack/retro_audit_test.go TestRetroAuditAnswersAWaitOverAnOpenTrialAndPassesOverNone
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit_test.go TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit.go
+src/quack/retro_audit_test.go
+spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+retro_audit.go, experiment.yaml's decide step, pull.ChapterOf and pull.FrontOf, and the one closed trial in the tree stand opened
+the callers come from a grep of retroAuditVerb and retroAuditOpenTrials
+the one done_when line meets TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty
 
 ## tests-red
 
