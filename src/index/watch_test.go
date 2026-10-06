@@ -1,4 +1,4 @@
-package index
+package index // level0: InPackageTest - it drives the unexported watches and the door's fields
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ import (
 )
 
 // The door's stop closes the watch while its loop adds a folder. [[spec/tickets/a-watch-stops-mid-add]]
+// level0: FixtureOutsideHome - the case makes folders appear under its own root
 func TestTheIndexWatchStopsWhileFoldersAppear(t *testing.T) {
 	t.Parallel()
 	for round := 0; round < 20; round++ {

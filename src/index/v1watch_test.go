@@ -1,7 +1,7 @@
 // The watch over /v1 sends each named value once it opens, then each change
 // to one, and refuses a name the catalog lacks before it streams.
 // [[spec/tickets/v1-watch-streams-changes]]
-package index
+package index // level0: InPackageTest - it reads the unexported standingOf, and declares watchPatience other cases share
 
 import (
 	"bufio"
@@ -93,6 +93,7 @@ func nextEvent(t *testing.T, events <-chan watched) watched {
 	return watched{}
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
 	t.Parallel()
 	standing, _ := watchingV1(t)
@@ -106,6 +107,7 @@ func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
 	t.Parallel()
 	standing, writes := watchingV1(t)
@@ -126,6 +128,7 @@ func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsNothingWhereTheValueStands(t *testing.T) {
 	t.Parallel()
 	standing, writes := watchingV1(t)

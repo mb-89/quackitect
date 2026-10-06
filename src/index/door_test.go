@@ -1,7 +1,7 @@
 // The door, driven over loopback. A case puts one up on a tree it wrote, asks
 // it the questions a verb asks, and reads the answers back as JSON.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package index
+package index // level0: InPackageTest - it asks through the unexported posts, standingOf and stands
 
 import (
 	"encoding/json"
@@ -21,18 +21,7 @@ const topicPolls = 100
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	_ = listen
-
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	standing := bareDoor(t)
 	if standing.Pid == 0 || standing.Port == 0 {
 		t.Fatalf("the standing file says %+v", standing)
 	}
@@ -56,6 +45,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 }
 
 // The door answers the settled value of one name, the one a reader beside the old path compares. [[spec/tickets/open-tasks-run-in-shadow]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -82,17 +72,7 @@ func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 // A name nobody registered answers an error, so a reader beside the old path compares nothing. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	said, err := posts(standing, []string{"value", "work/open-tasks"})
+	said, err := posts(bareDoor(t), []string{"value", "work/open-tasks"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,18 +83,7 @@ func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	said, err := posts(standing, []string{"nonsense"})
+	said, err := posts(bareDoor(t), []string{"nonsense"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,6 +93,7 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 }
 
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -152,6 +122,7 @@ func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	t.Fatal("a file written under the tree never reached the index")
 }
 
+// level0: FixtureOutsideHome - the case reads a fresh root of its own
 func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
@@ -173,6 +144,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 }
 
 // [[spec/design_output/index#the-index-fires-on-change]]
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -210,6 +182,7 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 }
 
 // [[spec/design_output/index#the-index-fires-on-change]]
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -256,6 +229,7 @@ func tickOf(t *testing.T, said answer) int64 {
 	return int64(tick)
 }
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersWhy(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -291,18 +265,7 @@ func TestTheWhyVerbAsksTheName(t *testing.T) {
 // The engine asks the door for the hash of a note, so the door answers the hashes method. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	said, err := posts(standing, []string{"call", "hashes", `{"asks":[{"path":"src/plain.js","size":10}]}`})
+	said, err := posts(bareDoor(t), []string{"call", "hashes", `{"asks":[{"path":"src/plain.js","size":10}]}`})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -314,6 +277,7 @@ func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 }
 
 // Serve builds the scheduler over its store, so a move an IO module commits runs the provider reading it. [[spec/tickets/the-scheduler-runs-providers]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 	t.Parallel()
 	type countOf struct {
@@ -350,6 +314,7 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 }
 
 // The manager's step runs on the work loop, and the loop's idle tick runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -374,6 +339,7 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 }
 
 // The value answer drains through the manager's settle, so a reader reads what the placed processes answer before it. [[spec/tickets/callers-name-drains-readers]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -399,6 +365,7 @@ func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 }
 
 // The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
 	t.Parallel()
 	root := tree(t)

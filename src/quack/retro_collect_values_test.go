@@ -1,7 +1,7 @@
 // The battery report collect keeps beside its record: each part read as its
 // median over the runs, and the last run's cases and files.
 // [[spec/guidance/retro/effect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"

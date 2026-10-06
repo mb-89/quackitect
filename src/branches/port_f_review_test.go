@@ -2,7 +2,7 @@
 // gathers, the check a worktree of the branch runs, the report and the cases a
 // red run names. The branch carries a stand-in for se-index, so the check runs.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported review steps: material, checked, report and whatFailed
 
 import (
 	"encoding/json"

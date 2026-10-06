@@ -1,7 +1,7 @@
 // The box verbs setup, probe, tools and doctor answer in Go, each registered
 // from its own file, and their programs leave the scripts folder.
 // [[spec/tickets/box-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

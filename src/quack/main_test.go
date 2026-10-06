@@ -1,7 +1,7 @@
 // The root loads the IO modules the wiring file names, and each start commits
 // under the names the wiring binds.
 // [[spec/design_output/model#the-wiring-file]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

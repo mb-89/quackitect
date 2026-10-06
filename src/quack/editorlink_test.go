@@ -1,7 +1,7 @@
 // The editor's own extension list, and the rules v3 and v4 paid for. Each
 // case here is one of those failures, so a later writer cannot bring it back.
 // [[spec/design_output/extension#a-file-another-program-owns]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

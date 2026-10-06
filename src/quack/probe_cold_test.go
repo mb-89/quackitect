@@ -1,7 +1,7 @@
 // The cold probe over fake doors: its reading of the log rows and the
 // client's stream, and the runner over the clone, the install and the client.
 // [[spec/design_output/level0#the-cold-probe]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

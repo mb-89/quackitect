@@ -1,7 +1,7 @@
 // The config verb in Go: every key with its value and layer, one key alone,
 // the refusal of a key no layer answers, and a write to the local layer.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

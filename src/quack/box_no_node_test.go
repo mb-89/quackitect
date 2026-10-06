@@ -1,7 +1,7 @@
 // Every box verb starts no node to run JavaScript: over fakes, no run it makes
 // names node past asking its version. The probe's dry road stands apart, on
 // its own ticket. [[spec/tickets/box-verbs-no-node-test]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"

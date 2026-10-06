@@ -2,7 +2,7 @@
 // topic restarts its own processes, and the index answers the inputs and
 // publishes a run where a commit moves one.
 // [[spec/design_output/model#the-placements]]
-package index
+package index // level0: InPackageTest - it reaches the fakeStore and until helpers procs_test declares
 
 import (
 	"os"

@@ -2,7 +2,7 @@
 // every process in this tree, on a box binding no env. The Go test owns the
 // module's section, and test/level0/guidance-golden.js writes the old one.
 // [[spec/tickets/the-guidance-topic-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

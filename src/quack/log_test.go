@@ -2,7 +2,7 @@
 // session log. The Go tests own the module's section here and ParseRecord's
 // in src/tui/log, and test/level0/log-golden.js writes the JavaScript ones.
 // [[spec/tickets/the-log-topic-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

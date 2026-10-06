@@ -1,6 +1,6 @@
 // The disk doors: the names in a folder, the files under one, and a link.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported file doors: filesUnder, link, unlink, readFile and names
 
 import (
 	"path/filepath"

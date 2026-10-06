@@ -1,7 +1,7 @@
 // The leave over a real clone, as test/level0/work.test.js drives it through
 // fake doors: done and its log row, release over an unpushed branch, and read.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported checkStamp, entryField and recordIn after leave runs
 
 import (
 	"fmt"

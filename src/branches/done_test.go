@@ -1,7 +1,7 @@
 // The leave: done refuses off a work branch and short of a green stamp, and
 // read prints a group.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported retroOpen and saysGreen through the tree fixture
 
 import "testing"
 

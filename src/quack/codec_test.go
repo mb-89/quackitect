@@ -1,7 +1,7 @@
 // Every codec the root wires writes back every committed file of its glob,
 // every local one standing, and the fixture the case seeds, byte for byte.
 // [[spec/design_output/model#everything-on-disk-mirrors]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"

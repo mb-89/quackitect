@@ -1,6 +1,6 @@
 // The guidance verb: a named note, and a hand holding nothing.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs the verb through the unexported tree fixture and reads codeRed
 
 import "testing"
 

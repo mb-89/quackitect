@@ -2,7 +2,7 @@
 // and test/level0/work-gate.test.js: a parent on main waiting on an open group,
 // and a gate question on trunk the take walks past.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported heldIn, openState and closedState through the pb helpers
 
 import (
 	"strings"

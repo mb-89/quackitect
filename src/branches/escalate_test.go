@@ -1,6 +1,6 @@
 // The escalation: the question, and the person step it puts in.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported escalate parsers askedIn, wordsIn and optionsFlag, and the route readers
 
 import (
 	"slices"

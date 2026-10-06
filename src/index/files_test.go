@@ -1,13 +1,14 @@
 // The rows a reader of the whole tree takes: the list with its hashes and the
 // tracked flag, and the texts it names.
 // [[spec/design_output/index#a-reader-takes-the-tree]]
-package index
+package index // level0: InPackageTest - it reaches the shared tree, opened and sweptDB helpers
 
 import (
 	"os/exec"
 	"testing"
 )
 
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -33,6 +34,7 @@ func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(
 	}
 }
 
+// level0: FixtureOutsideHome - the case runs git in its own tree
 func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -58,7 +60,7 @@ func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
 
 func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	named, err := Texts(db, []string{"src/plain.js", "nowhere.md"})
 	if err != nil {
@@ -79,7 +81,7 @@ func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
 // The hash reads the text as the engine's hashText does, so a note hashed on either side matches. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Hashes(db, []HashAsk{{Path: "src/plain.js", Size: 10}, {Path: "nowhere.md"}})
 	if err != nil {

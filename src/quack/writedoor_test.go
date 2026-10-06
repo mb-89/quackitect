@@ -1,7 +1,7 @@
 // The write door's ports against the tree: the schema answers each write
 // table teaches the hooks door, and the voice a box with no Vale reads.
 // [[spec/tickets/cage-write-door-port]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

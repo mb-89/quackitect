@@ -2,7 +2,7 @@
 // read through the fake index by the tickets module's port all. A row compares
 // while its ticket and its group read as they did when the file was written.
 // [[spec/tickets/tickets-becomes-a-module]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"crypto/sha256"

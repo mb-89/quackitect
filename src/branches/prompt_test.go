@@ -1,7 +1,7 @@
 // The prompt verb's cases: the prompt a box starts with, off the group ticket
 // and its route, and the refusals where either stands nowhere.
 // [[spec/tickets/a-verb-writes-box-prompts]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported boxRules and exit codes
 
 import (
 	"bytes"

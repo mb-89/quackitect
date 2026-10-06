@@ -1,7 +1,7 @@
 // What stands, ported off test/level0/work-stands.test.js: each changed file
 // and whether a tag parks it, what a dependency waits on, and a ref behind trunk.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported standing readers: standingIn, refsHere, waitsOf and readFree
 
 import (
 	"sort"

@@ -1,7 +1,7 @@
 // A take naming a branch on a box holding another, a take over a stale hold,
 // and a release of another box's hold, ported from test/level0/work-held.test.js.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported heldIn, recordIn and staleKey, and declares pcOther and pcClock
 
 import (
 	"strings"

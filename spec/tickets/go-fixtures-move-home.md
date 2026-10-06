@@ -73,3 +73,27 @@ The slow packages pay a fixture per case, and the guard holds new cases alone.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+## What moves
+
+- `src/imports`: every case reads one of two trees `qtest.Shared` builds once in `main_test.go`, and no case stays in the baseline.
+- `src/index`: each case reading a shared fixture reads it from `main_test.go`, and each case writing its own tree carries the marker with that reason.
+
+## The times
+
+One run of `go test -count=1` over the four packages together, on this box, before and after:
+
+| the package | before | after |
+|---|---|---|
+| `src/imports` | 9.9s | 8.6s |
+| `src/index` | 4.3s | 3.6s |
+| `src/branches` | 42.3s | 31.4s |
+| `src/quack` | 32.3s | 26.3s |
+
+The `src/branches` and `src/quack` cases moved nothing, so their drop reads as the box's noise between runs, and the fixture move in `src/imports` and `src/index` saves little next to the analysis loads and the door starts.
+
+## What stays, and why
+
+The fixture cases of `src/branches` and `src/quack` stand in the baseline: `grep -c '^src/branches/' src/imports/baseline/fixture.txt` and the same for `src/quack` count them. Each one writes its own repository or tree: a `git commit` into a clone, a push remote, a collect into a home folder. A shared read-only home serves none of them, so each moves when it runs on the fake of the git door or the disk door instead.
+
+That move belongs to the tests-meet-the-doors-once group, as the group ask says. Its branch closes every ticket, and none of them moves these cases, so no sibling ticket stands to name. The guards refuse from the-test-guards-refuse on, so this baseline only shrinks, and a new case building its own tree takes the marker with its reason.

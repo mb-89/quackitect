@@ -1,6 +1,6 @@
 // The wiring loads the mcp IO module, and binds its wait under its instance.
 // [[spec/tickets/the-mcp-module-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

@@ -1,7 +1,7 @@
 // The browser the drawing's test drives, off a temporary tree, so each rung of
 // the order answers alone.
 // [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

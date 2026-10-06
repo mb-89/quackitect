@@ -1,6 +1,6 @@
 // The sync: trunk comes in, and a ticket whose front alone conflicts merges.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported mergedFront through the tree fixture
 
 import "testing"
 

@@ -1,7 +1,7 @@
 // The retro's hold on an open trial: the audit names each experiment standing
 // open, and passes once each stands decided.
 // [[spec/design_output/work#an-experiment-decides]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

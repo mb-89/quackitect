@@ -2,7 +2,7 @@
 // rows, the handover to a standing window, the launch, and the viewer build
 // with its source stamp, each held to what the JavaScript answers.
 // [[spec/design_output/tui#the-verb-builds-it]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

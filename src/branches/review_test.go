@@ -1,7 +1,7 @@
 // The review: the refusals, the retro read, the report and the cases a red
 // check names.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported review steps: material, checked, report and retroOnTicket
 
 import "testing"
 

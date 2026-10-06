@@ -1,7 +1,7 @@
 // ticket yours reads work/yours off the index and prints what the verb's program prints,
 // and the node module answers a registered verb through the accepts.
 // [[spec/tickets/ticket-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"

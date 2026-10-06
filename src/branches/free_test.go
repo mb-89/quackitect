@@ -1,6 +1,6 @@
 // The cloud trigger: the routine, and the branches free.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported staleClaim and the stand and routineID readers
 
 import "testing"
 

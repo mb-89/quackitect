@@ -1,6 +1,6 @@
 // The door's calls answer a method nobody registers with its name.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package index
+package index // level0: InPackageTest - it drives the door's unexported answers
 
 import (
 	"strings"

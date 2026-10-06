@@ -1,6 +1,6 @@
 // The watch over /v1 sends a keyed name of a wired family, parsed off its file.
 // [[spec/tickets/the-lens-reads-v1]]
-package index
+package index // level0: InPackageTest - it reads the unexported standingOf
 
 import (
 	"bufio"
@@ -88,6 +88,7 @@ func firstKeyed(t *testing.T, standing Standing, name string) keyedEvent {
 }
 
 // A watch over a keyed name of a wired family sends its value, parsed off its file. [[spec/tickets/the-lens-reads-v1]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestWatchSendsAKeyedName(t *testing.T) {
 	t.Parallel()
 	first := firstKeyed(t, keyedDoor(t), keyedHold)

@@ -2,7 +2,7 @@
 // own file, the road under new reaches no node for it, and its JavaScript
 // leaves the tree with every importer of it.
 // [[spec/tickets/landing-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

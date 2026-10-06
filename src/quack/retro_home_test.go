@@ -1,7 +1,7 @@
 // The retro's folder stands under the private folder, and each timed source
 // reads the time its lines carry.
 // [[spec/guidance/retro/chapter]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"

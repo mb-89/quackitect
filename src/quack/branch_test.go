@@ -1,7 +1,7 @@
 // The branch and cloud verbs stand registered in Go, so the road hands
 // neither to node.
 // [[spec/tickets/work-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

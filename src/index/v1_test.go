@@ -1,14 +1,12 @@
 // One running index answers a name over /v1 and over the old API, a name the
 // catalog lacks as a problem, and its OpenAPI document.
 // [[spec/design_output/model#surfaces]]
-package index
+package index // level0: InPackageTest - it drives the unexported posts and valueOf, and declares getV1 other cases share
 
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -17,37 +15,9 @@ import (
 	"quackitect/src/q"
 )
 
-func standingV1(t *testing.T) Standing {
-	t.Helper()
-	root := tree(t)
-	c := q.New()
-	hand := q.OutIn(c, "files/<path...>", q.Content{})
-	file := func(_ string, commit Commit) (func(), error) {
-		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
-	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if standing.V1 == 0 || standing.V1 == standing.Port {
-		t.Fatalf("the standing file says %+v", standing)
-	}
-	return standing
-}
-
 func getV1(t *testing.T, standing Standing, path string) (*http.Response, []byte) {
 	t.Helper()
-	said, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d%s", standing.V1, path))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer said.Body.Close()
-	body, err := io.ReadAll(said.Body)
+	said, body, err := fetchV1(standing, path)
 	if err != nil {
 		t.Fatal(err)
 	}

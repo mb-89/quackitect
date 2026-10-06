@@ -1,7 +1,7 @@
 // The fix verb in Go: the flags it refuses, the rounds of Vale's fixes over
 // the paths with the shouted leads calmed first, and biome after them.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

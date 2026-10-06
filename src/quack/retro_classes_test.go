@@ -1,7 +1,7 @@
 // The retro's class fixes over a seeded retro: every finding, note and memory
 // carries a disposition, and each class a rate.
 // [[spec/guidance/retro/classify]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

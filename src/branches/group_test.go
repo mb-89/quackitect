@@ -1,6 +1,6 @@
 // The group reads: the front, the record, the step, the ask and the spans.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported group readers: fieldOf, spanOf, stepOf, aged, groupStanding and the with editors
 
 import (
 	"slices"

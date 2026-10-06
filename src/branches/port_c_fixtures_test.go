@@ -2,7 +2,7 @@
 // test/level0/work-doors.js, its children, and a tree with the group pushed
 // on its own work branch.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pc helpers on the tree fixture and reads handOf, roleOf and boxFile
 
 import (
 	"fmt"

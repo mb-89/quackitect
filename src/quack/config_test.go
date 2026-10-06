@@ -3,7 +3,7 @@
 // it stood, a local file and a few variables. The Go readers write and compare
 // their sections here, and test/level0/config-golden.js the JavaScript ones.
 // [[spec/tickets/cfg-topic-holds-one-resolver]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

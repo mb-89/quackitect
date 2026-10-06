@@ -1,6 +1,6 @@
 // The search and the file question, driven over a tree a case writes.
 // [[spec/guidance/code/testing]]
-package index
+package index // level0: InPackageTest - it drives the unexported matcher and the shared swept index
 
 import (
 	"strings"
@@ -9,7 +9,7 @@ import (
 
 func TestGrepFindsALineAndItsPath(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Grep(db, GrepAsk{Pattern: "const said"})
 	if err != nil {
@@ -25,7 +25,7 @@ func TestGrepFindsALineAndItsPath(t *testing.T) {
 
 func TestGrepTakesAGlobAndAFolder(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Grep(db, GrepAsk{Pattern: "note", Glob: "*.md"})
 	if err != nil {
@@ -46,7 +46,7 @@ func TestGrepTakesAGlobAndAFolder(t *testing.T) {
 
 func TestGrepReadsCaseAndTheLinesAround(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Grep(db, GrepAsk{Pattern: "THE FIRST NOTE", Insensitive: true, Before: 1})
 	if err != nil {
@@ -65,7 +65,7 @@ func TestGrepReadsCaseAndTheLinesAround(t *testing.T) {
 
 func TestGrepRefusesAPatternNobodyCompiles(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	if _, err := Grep(db, GrepAsk{Pattern: "a(b"}); err == nil {
 		t.Fatal("a broken pattern answers an error, so the caller falls back")
@@ -74,7 +74,7 @@ func TestGrepRefusesAPatternNobodyCompiles(t *testing.T) {
 
 func TestGlobNamesTheFilesAndSkipsTheRest(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Glob(db, GlobAsk{Pattern: "**/*.md"})
 	if err != nil {
@@ -118,7 +118,7 @@ func TestGlobTranslatesTheShapes(t *testing.T) {
 
 func TestGrepReadsAMatchAcrossLines(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Grep(db, GrepAsk{Pattern: `first note says.*\n.*`, Multiline: true})
 	if err != nil {
@@ -137,7 +137,7 @@ func TestGrepReadsAMatchAcrossLines(t *testing.T) {
 
 func TestGrepAnswersTheMatchAlone(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 
 	said, err := Grep(db, GrepAsk{Pattern: `\[\[\w+\]\]`, Only: true})
 	if err != nil {

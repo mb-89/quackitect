@@ -2,7 +2,7 @@
 // a stuck hand-over, up to the cap, and the write branch's pull request on the
 // owner's token, ported off test/level0/dispatch-fire.test.js.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported fire step, its fireCap and fireVersion, and the plan rows of dispatchPlan
 
 import (
 	"encoding/json"

@@ -1,6 +1,6 @@
 // The verb table: the usage, and a need naming a branch verb.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported holdsVerb and codeRefused, and declares contains for the dispatch tests
 
 import (
 	"strings"

@@ -2,7 +2,7 @@
 // words, the measure table, a dry run, and the lines the JavaScript prints
 // where Vale or the run falls.
 // [[spec/design_output/projection#the-second-target]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

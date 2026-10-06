@@ -1,7 +1,7 @@
 // The fake doors the box verbs run over in a test: a temporary tree, a PATH
 // of empty programs, a runner recording each run, and a GET that answers
 // nothing. [[spec/tickets/box-verbs-no-node-test]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

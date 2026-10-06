@@ -2,7 +2,7 @@
 // marked not provided, and its next commit clears the mark. The fake IO
 // process is this test binary, run again with the bus in its environment.
 // [[spec/design_output/model#a-process-ends]]
-package index
+package index // level0: InPackageTest - it declares the fakeStore, until and read helpers placements share
 
 import (
 	"flag"

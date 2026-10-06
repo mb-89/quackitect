@@ -1,7 +1,7 @@
 // The manager folds src/ops and src/watchdog into its module, and the root
 // loads it where the wiring loads nothing else.
 // [[spec/design_output/model#the-index-manager]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

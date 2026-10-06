@@ -1,7 +1,7 @@
 // The index generates one tool an action off the registry: its name, its doc
 // and its input schema, with a bare input carried as one property.
 // [[spec/tickets/the-hook-registers-index-tools]]
-package index
+package index // level0: InPackageTest - it drives the unexported opens and standingOf
 
 import (
 	"encoding/json"
@@ -36,27 +36,12 @@ const toolsGoldenAt = "testdata/tools.golden.json"
 
 var update = flag.Bool("update", false, "write the golden file again off the index")
 
-// The body /v1/tools answers over a door holding t/add and t/echo. [[spec/tickets/the-hook-registers-index-tools]]
-func toolsBody(t *testing.T) []byte {
-	t.Helper()
-	return toolsBodyWith(t, func(*q.Catalog) {})
-}
-
 // The same body over a catalog the case adds its own actions to. [[spec/tickets/tools-keep-their-own-names]]
 func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 	t.Helper()
 	root := tree(t)
-	c := q.New()
-	adds(c)
-	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
-	q.ActionIn(c, "t/add", func(in addIn) []q.Request {
-		return []q.Request{{Module: "t", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
-	}, q.Doc("adds two terms"))
-	q.ActionIn(c, "t/echo", func(in string) []q.Request {
-		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
-	}, q.Doc("echoes its input"))
-	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
+	c, manage := toolsCatalog(adds)
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,6 +98,7 @@ func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
 }
 
 // An action carrying its own tool name lists under that name, and still names its action. [[spec/tickets/tools-keep-their-own-names]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
 	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {
@@ -151,6 +137,7 @@ func TestEveryListedToolCarriesThePlanField(t *testing.T) {
 }
 
 // The plan tool takes the plan as its input, and carries no plan field of its own. [[spec/tickets/plan-writes-off-go]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestThePlanToolCarriesNoPlanField(t *testing.T) {
 	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {

@@ -1,7 +1,7 @@
 // The drafts module loads beside the others, and quack answers its checks
 // through the IO side, with Vale off heardOver.
 // [[spec/tickets/prose-tools-answer-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

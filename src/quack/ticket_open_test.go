@@ -2,7 +2,7 @@
 // through the voice and the group checks, off the roads
 // test/level0/ask-lint.test.js and pull-leaves.test.js cover.
 // [[spec/design_output/pull#a-draft-opens]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

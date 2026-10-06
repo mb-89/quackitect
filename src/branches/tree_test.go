@@ -2,7 +2,7 @@
 // with main pushed and the doors pointing at the clone, so every git read
 // meets a real repository.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported tree fixture every in-package test builds on, and reads workBranch
 
 import (
 	"bytes"

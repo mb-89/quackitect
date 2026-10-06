@@ -1,13 +1,15 @@
 // Every rule over every package of the module, so a single import that
 // breaks one turns the battery red.
 // [[spec/design_output/model#the-build-checks-imports]]
-package imports
+package imports_test
 
 import (
 	"strings"
 	"testing"
 
 	"golang.org/x/tools/go/packages"
+
+	"quackitect/src/imports"
 )
 
 func TestTheTreeHoldsTheImportRules(t *testing.T) {
@@ -27,13 +29,13 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for path := range one.Imports {
 			imported = append(imported, path)
 		}
-		for _, fault := range FaultsIn(one.PkgPath, imported, CarriesIO(one.Syntax)) {
+		for _, fault := range imports.FaultsIn(one.PkgPath, imported, imports.CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
-		for _, fault := range RendererFaults(one.PkgPath, one.Fset, one.Syntax) {
+		for _, fault := range imports.RendererFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
 		}
-		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
+		for _, fault := range imports.SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
 		}
 	}
@@ -41,10 +43,10 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 
 func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
 	t.Parallel()
-	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
 		t.Fatalf("src/modulesx reads as a module: %v", said)
 	}
-	if said := Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}); len(said) != 0 {
 		t.Fatalf("the q core reads as a door: %v", said)
 	}
 }

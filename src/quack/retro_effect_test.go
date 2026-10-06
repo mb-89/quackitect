@@ -1,7 +1,7 @@
 // The effect step: the last retro's class patterns counted again, each with
 // its verdict, and this retro's battery read against the last one's.
 // [[spec/guidance/retro/effect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

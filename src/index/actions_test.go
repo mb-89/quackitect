@@ -1,7 +1,7 @@
 // An action answers over /v1 within the wait its request sets: its result
 // where it ends in time, and 202 with its handle where the wait runs out.
 // [[spec/design_output/model#a-caller-sets-its-wait]]
-package index
+package index // level0: InPackageTest - it drives the unexported opens, and declares the fake manager other cases share
 
 import (
 	"encoding/json"
@@ -130,6 +130,7 @@ func postedOf(t *testing.T, body []byte) postedOut {
 	return out
 }
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestAnActionAnswersItsResultWithinTheWait(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -147,6 +148,7 @@ func TestAnActionAnswersItsResultWithinTheWait(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestAWaitOfNoneAnswersAcceptedWithTheHandle(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -169,6 +171,7 @@ func TestAWaitOfNoneAnswersAcceptedWithTheHandle(t *testing.T) {
 	t.Fatalf("the handle %s reads no operation done", out.Handle)
 }
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestNoPreferReadsTheDefaultWaitOffItsKey(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -185,6 +188,7 @@ func TestNoPreferReadsTheDefaultWaitOffItsKey(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -217,6 +221,7 @@ func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
 }
 
 // A body the input type refuses reads 400, and a module refusing a request reads 422 with its reason. [[spec/tickets/action-refusals-meet-cases]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestARefusedPostAnswersItsProblem(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -232,6 +237,7 @@ func TestARefusedPostAnswersItsProblem(t *testing.T) {
 }
 
 // A Prefer header holding two preferences applies the wait among them, per RFC 7240. [[spec/design_output/model#a-caller-sets-its-wait]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
 	t.Parallel()
 	hold := make(chan struct{})
@@ -246,6 +252,7 @@ func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
 }
 
 // A door with no manager calls nothing, so /v1 serves no action. [[spec/tickets/actions-answer-over-http]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestADoorWithNoManagerServesNoAction(t *testing.T) {
 	t.Parallel()
 	root := tree(t)

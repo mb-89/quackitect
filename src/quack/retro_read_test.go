@@ -1,7 +1,7 @@
 // The retro's reader verb over a seeded chapter: every owner prompt, fault and
 // command, each with its file and line.
 // [[spec/tickets/the-retro-finishes-its-asks]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"

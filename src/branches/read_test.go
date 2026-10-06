@@ -1,6 +1,6 @@
 // The batch framing and the tree names git answers.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported readers framed, nameBytes, namesIn and refsIn
 
 import (
 	"slices"

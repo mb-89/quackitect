@@ -1,7 +1,7 @@
 // The wiring loads the vehicle and stub topics, each verb an action through
 // the node module.
 // [[spec/tickets/vehicle-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

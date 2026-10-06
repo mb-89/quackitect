@@ -1,6 +1,6 @@
 // The battery's report and the stamp, read off fixtures.
 // [[spec/guidance/retro/effect]] [[spec/design_output/work#the-battery-answers-first]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

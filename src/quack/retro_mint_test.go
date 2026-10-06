@@ -1,7 +1,7 @@
 // The retro's minting: a class the check step leaves open gets one ticket,
 // a class the tree answers already gets none, and every promotion follows.
 // [[spec/guidance/retro/check]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

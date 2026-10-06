@@ -1,7 +1,7 @@
 // The branch twins and wiring, and the work/yours door their cases share
 // with the ticket cases in ticket_twins_test.go.
 // [[spec/tickets/work-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

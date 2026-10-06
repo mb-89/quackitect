@@ -1,7 +1,7 @@
 // Every retro verb registers a Go twin of its own, so ./RUNME.sh retro <verb>
 // reaches no node.
 // [[spec/tickets/retro-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"testing"

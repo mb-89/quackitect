@@ -1,7 +1,7 @@
 // The start: the door checks the catalog it takes, and a fault refuses it
 // before a listener or a standing file stands.
 // [[spec/design_output/model#the-index-resolves-in-passes]]
-package index
+package index // level0: InPackageTest - it reads the unexported standingPath
 
 import (
 	"os"
@@ -12,6 +12,7 @@ import (
 	"quackitect/src/q"
 )
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestABrokenCatalogRefusesTheStart(t *testing.T) {
 	t.Parallel()
 	root := tree(t)

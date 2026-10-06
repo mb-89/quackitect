@@ -1,6 +1,6 @@
 // The release: a held branch goes back to todo.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported groupStanding and todo through the tree fixture
 
 import "testing"
 

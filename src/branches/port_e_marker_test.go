@@ -2,7 +2,7 @@
 // stands, the merge and the close drop it, and the release leaves it, as
 // test/level0/work-cloud-marker.test.js holds.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported cloudMark and fieldOf through the pe helpers
 
 import (
 	"strings"

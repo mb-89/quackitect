@@ -2,7 +2,7 @@
 // the person step it puts in, the choice its options write, the hand it reads,
 // and the roads it refuses on.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported escalate parsers and holdOf, handOf and splitsKey
 
 import (
 	"regexp"

@@ -1,7 +1,7 @@
 // The tests that run alone, named over planted source and over the packages
 // the check spends its go part on.
 // [[spec/guidance/code/testing]]
-package imports
+package imports_test
 
 import (
 	"go/ast"
@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
+
+	"quackitect/src/imports"
 )
 
 // The packages whose tests the go part waits on longest, per the measure on [[spec/tickets/the-check-fits-its-budget]].
@@ -52,7 +54,7 @@ func TestATestRunningAloneWithNothingBarringItIsNamed(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if said := SerialTests([]*ast.File{file}); !slices.Equal(said, []string{"TestAlone"}) {
+	if said := imports.SerialTests([]*ast.File{file}); !slices.Equal(said, []string{"TestAlone"}) {
 		t.Fatalf("the tests named alone read %v", said)
 	}
 }
@@ -73,7 +75,7 @@ func TestTheSlowPackagesRunEveryTestBesideTheOthers(t *testing.T) {
 			}
 			files = append(files, file)
 		}
-		for _, name := range SerialTests(files) {
+		for _, name := range imports.SerialTests(files) {
 			t.Errorf("%s: %s runs alone, so call t.Parallel at its top", pkg, name)
 		}
 	}

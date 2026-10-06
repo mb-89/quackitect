@@ -1,7 +1,7 @@
 // The test binary answers as Vale where a case asks, so the fake runs on
 // every box, Windows included, and needs no shell.
 // [[spec/design_output/doors#a-fake-behaves]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

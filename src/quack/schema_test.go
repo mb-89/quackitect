@@ -1,7 +1,7 @@
 // The schema stands as the declarations write it, and the default file holds
 // no key the declarations do not name, and none at its built-in value.
 // [[spec/tickets/the-config-schema-gets-generated]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

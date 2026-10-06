@@ -1,7 +1,7 @@
 // The fleet routine the trigger names, and the pull request event the route
 // hands to the box that holds its branch.
 // [[spec/tickets/one-routine-checks-the-fleet]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported fleet routine parts fleetPrompt, fleetRoutineKey and pullRouteOf
 
 import (
 	"os"

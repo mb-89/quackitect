@@ -2,7 +2,7 @@
 // claim, a group no hand here takes, a named take, a refused push, a refused
 // commit and a sync conflict after the claim.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported heldIn, named and waitsAt after take runs
 
 import (
 	"path/filepath"

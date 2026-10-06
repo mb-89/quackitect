@@ -1,7 +1,7 @@
 // The fixtures the port_b cases share, ported from test/level0/work-doors.js:
 // the group note, its child, the box identity and the reads over a real tree.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pb helpers on the tree fixture and drives identity and withHashAfter
 
 import (
 	"os"

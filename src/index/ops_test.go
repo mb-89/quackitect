@@ -1,7 +1,7 @@
 // The table op keeps each operation's body past the door, and drops the row
 // the manager names.
 // [[spec/design_output/model#an-operation-outlives-callers]]
-package index
+package index // level0: InPackageTest - it reaches the shared tree and sweptDB helpers
 
 import (
 	"path/filepath"
@@ -11,6 +11,7 @@ import (
 	"quackitect/src/q"
 )
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -45,6 +46,7 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case opens and writes its own index
 func TestADroppedOpLeavesTheTable(t *testing.T) {
 	t.Parallel()
 	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
@@ -73,7 +75,7 @@ func TestADroppedOpLeavesTheTable(t *testing.T) {
 // The reads the door hands the manager find the same rows the index ranks. [[spec/tickets/find-and-wait-in-go]]
 func TestTheReadsFindTheRowsTheDoorFinds(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 	want, err := Find(db, "search", 0)
 	if err != nil {
 		t.Fatal(err)
@@ -93,7 +95,7 @@ func TestTheReadsFindTheRowsTheDoorFinds(t *testing.T) {
 // The reads the door hands the manager grep and glob the same lines and paths the door's own methods answer. [[spec/tickets/grep-glob-answer-off-index]]
 func TestTheReadsGrepAndGlobTheRowsTheDoorFinds(t *testing.T) {
 	t.Parallel()
-	db := opened(t, tree(t))
+	db := sweptDB(t)
 	grepAsk := GrepAsk{Pattern: "search finds", Limit: 250}
 	wantGrep, err := Grep(db, grepAsk)
 	if err != nil {

@@ -2,7 +2,7 @@
 // under the check module holds the rows one side reports alone. The JavaScript
 // side comes off node test/level0/check-twins.js, run from the root.
 // [[spec/tickets/check-names-meet-their-goldens]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

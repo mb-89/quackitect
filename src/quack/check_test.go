@@ -2,7 +2,7 @@
 // the server read, the Go gate, the test runner's files and the rows under
 // --errors.
 // [[spec/design_output/work#the-battery-answers-first]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

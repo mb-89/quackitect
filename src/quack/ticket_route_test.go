@@ -2,7 +2,7 @@
 // roads, each case read off what src/scripts/ticket.js answers over the same
 // tree, kept in testdata/ticket_route.json.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

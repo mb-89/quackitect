@@ -2,7 +2,7 @@
 // branch closes once trunk reaches origin, and a pull request at the tip holds
 // the merge back, as test/level0/work-merge-cloud.test.js holds.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs the cloud merge through the pe helpers and the unexported tree fixture
 
 import (
 	"strings"

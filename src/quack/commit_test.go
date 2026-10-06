@@ -2,7 +2,7 @@
 // cases of named.test.js covered: the message, the gates, the paths it lands,
 // the cold probe, the merge, and the push from a cloud box.
 // [[spec/tickets/landing-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
