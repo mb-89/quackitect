@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 9df8337c88a371ff
         size: 656
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 8faf0ae262d2344b2f5df5acbf838ad5e32b4871
+    hash_after: 0a2d725eed89fda7ad443faa993c605fc1d923fa
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/extension
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size field names, plus lsp.test.js, whose watch case pins the install pattern, and work-strings.test.js, which the commit door asks beside work.js
+the extension reaches Go through execFile inside editor-process.js, which stands as its process door, and the settle word runs vehicle.Settles over the fakes vehicle_settle_test.go holds
+editor-process.js and logbook.js each name spec/tickets/extension-imports-stay-inside beside the approach they implement
+each copied name points at its Go owner: serveIndexBin, StandingFile, standingPath, cloudMark, Local, BuiltIn and Ladder, and names folders.js where PrivateFolderOwned asks
 
 ## tests-green
 
