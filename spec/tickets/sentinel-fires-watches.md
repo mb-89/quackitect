@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -243,6 +243,15 @@ record:
         hash: c263fe950a83d49b
         size: 4620
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 45ae2cb575a5be95dd6a832b207748bf9153ed0b
+    hash_after: 45ae2cb575a5be95dd6a832b207748bf9153ed0b
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -403,14 +412,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the eight files the draft names, and no other
+- the clock door has FakeClock, the process door FakeRunner, and a contract case holds each to the real thing
+- the header and each function in src/failure/sentinel.go point at spec/design_output/failures#the-sentinel-fires-a-watch
+- the watch shape stands in node.go alone, and the note points at it
 
 ## tests-green
 
