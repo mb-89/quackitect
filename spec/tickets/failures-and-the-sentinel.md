@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,9 @@ record:
         hash: c263fe950a83d49b
         size: 4620
     def: dc4904ab364efa10
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/failures]]
 depends_on: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register
 ---
 
