@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -29,6 +29,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: a-guard-reads-door-declarations
+record:
+  - step: do
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 5fb0ce0d2050244da90ae27a12336c02882a645f
+    hash_after: a1cf0178e041425c75d6663b082c77eeda625f1d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "   90.5  in all"
+    inputs:
+      - name: ask
+        hash: 689f8887ac4174d5
+        size: 173
+    def: ce98b9e976552e83
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ src/modules/check importing quackitect/src/owns falls to onlyq unless pureTree i
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/imports
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`pureTree` in `src/imports/imports.go` names `src/owns` since 8de84c5c4, so `src/modules/check` imports the declaration reader and passes `onlyq`. `TestAModuleImportsTheDeclarationReader` pins that, as the other readers stand pinned, and goes red with `src/owns` out of `pureTree`. The guard ticket's Discussion adds `pureTree` to its draft's callers.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: `src/owns` stands in `pureTree`, a test pins it, and the callers list takes `pureTree`
+the cleanup: none further; `TestEveryPureReaderImportsThePureLibraryAlone` already holds `src/owns` to the pure library
+one place: `pureTree` stands once, and the test reads the analyzer
 
 # Discussion
 
