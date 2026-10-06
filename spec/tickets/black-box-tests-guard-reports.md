@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -181,6 +181,15 @@ record:
         hash: a1cec3f4220df26e
         size: 77706
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 77b00f45ce78d805b1f7e57e31bb3144550cf4c6
+    hash_after: 1494006ee7defb5b942430e7c670043f9dc9ad25
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -330,14 +339,19 @@ accept: the approach answers each done_when line; InPackageTests and Compare sta
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/imports ./src/quack ./src/modules/check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus src/modules/check/textfaults.go and its golden, where the size twin met prose files and the check stood red
+- the guard reads tracked text through a reader, so its tests reach no door
+- each new function names model.md#the-guards-hold-a-baseline
+- the baseline folder stands once, in guards.go, and the model points at it
 
 ## tests-green
 
