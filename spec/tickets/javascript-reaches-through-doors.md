@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: c8f29294cd586466
         size: 824
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 28342688820e63e080d8e5b5ef3ddb6865d46d0e
+    hash_after: 461e7c165ea65fb0bc6e59d792597149c6aad4b9
+    answered:
+      - name: lint
+        exit: 0
+        said: "    1.9  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -327,14 +336,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the ask names under src/extension, src/scripts and prototype, the doors they stand on, and the doors verb and owns parser the gate point doors-lists-declared-outsides asks for
+every door the change reaches has a fake: the clock fake gains after, wait and ms, the http fake takes the signal it ignores, and the vscode stand-in drops the extension modules an earlier fake bound
+a comment names the approach at each move: doors#time-is-a-door, doors#a-door-standing-on-another, and the outside key under doors#a-door-declares-what-it-owns
+the clock timers, the outside key and the stacked doors each stand once in spec/design_output/doors.md, and the code points there
 
 ## tests-green
 
