@@ -1,6 +1,5 @@
 // The drawing of a ticket: its graph, its route, and each leaf's fields with
-// the line a mark stands at and whether the chapter fills it, equal to what
-// test/level0/drawn-twin.js prints off the emitter.
+// the line a mark stands at and whether the chapter fills it.
 // [[spec/tickets/the-lens-reads-v1]]
 package tickets
 
@@ -15,14 +14,13 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-//go:embed testdata/drawn-one.md testdata/drawn-two.md testdata/drawn.golden.json
+//go:embed testdata/drawn-one.md testdata/drawn-two.md
 var drawnData embed.FS
 
 // The family the drawing stands under, by its local name, and the folder a fixture seeds into. [[spec/tickets/the-lens-reads-v1]]
 const (
 	drawnFamily = "drawn/<path...>"
 	drawnSeeded = "spec/tickets/"
-	drawnGolden = "testdata/drawn.golden.json"
 )
 
 var drawnFixtures = []string{"drawn-one.md", "drawn-two.md"}
@@ -125,25 +123,4 @@ func TestDrawnRefusesAWrite(t *testing.T) {
 		return
 	}
 	t.Fatalf("the catalog projects no %s", drawnFamily)
-}
-
-// The Go drawing of every fixture equals what the emitter draws, as test/level0/drawn-twin.js prints it into the golden file. [[spec/tickets/the-lens-reads-v1]]
-func TestDrawnMeetsTheEmitter(t *testing.T) {
-	body, err := drawnData.ReadFile(drawnGolden)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var golden map[string]any
-	if err := json.Unmarshal(body, &golden); err != nil {
-		t.Fatalf("%s reads as no JSON: %v", drawnGolden, err)
-	}
-	for path, said := range drawnOver(t) {
-		var got any
-		if err := json.Unmarshal(said, &got); err != nil {
-			t.Fatal(err)
-		}
-		if !reflect.DeepEqual(got, golden[path]) {
-			t.Errorf("drawn/%s reads %s, and the emitter draws otherwise: run node test/level0/drawn-twin.js and read the difference", path, said)
-		}
-	}
 }

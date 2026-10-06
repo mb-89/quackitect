@@ -14,9 +14,6 @@ import (
 	"quackitect/src/q/tool"
 )
 
-// The folder holding one program a verb, which the case reads as the verb table. [[spec/tickets/cli-js-leaves]]
-const programsFolder = "src/scripts/verbs"
-
 // The verbs a topic of its own answers, each with its list. [[spec/tickets/agents-call-quack-directly]]
 var topics = map[string][]verbsmodule.Verb{
 	"ticket":  verbsmodule.TicketVerbs,

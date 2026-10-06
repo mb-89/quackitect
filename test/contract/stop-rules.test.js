@@ -7,12 +7,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
-import {
-  ENGINE_CHECKS,
-  knowsCheck,
-  standsDown,
-  waitsForOwner,
-} from "../../src/bridge/stop.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -48,59 +42,12 @@ test("no stop rule claims an update", () => {
   assert.equal(by("an-update-is-worth-giving"), undefined);
 });
 
-// A stop waiting on the owner holds the clear, and a claim of done waits for nobody. [[spec/tickets/the-clear-keeps-questions]]
-test("the stops asking the owner wait for the owner, and a claim of done waits for nobody", () => {
-  const box = { stopRules: rules };
-  const ends = (reason) => ({ last_assistant_message: `Text.\n\nstop: ${reason}` });
-  for (const id of [
-    "the-owner-holds-the-step",
-    "the-chat-is-new",
-    "a-wrong-answer-leaves-the-box",
-  ]) {
-    assert.equal(waitsForOwner(ends(id), box), true, id);
-  }
-  assert.equal(waitsForOwner(ends("the-work-stands-complete"), box), false);
-  assert.equal(waitsForOwner({ last_assistant_message: "No line." }, box), false);
-  assert.equal(
-    waitsForOwner({}, { ...box, claim: "the-chat-is-new" }),
-    true,
-    "the call's claim",
-  );
-});
-
 // [[spec/design_output/stop#the-blast-radius-decides]]
 test("the stop rule asks the blast radius, and the person test goes", () => {
   assert.equal(by("a-person-holds-the-answer"), undefined, "the person test goes");
   const said = by("a-wrong-answer-leaves-the-box");
   assert.equal(said?.decides, "claimed");
   assert.match(said?.asks ?? "", /wrong answer/, "the question asks the cost");
-});
-
-// [[spec/design_output/stop#the-mechanical-checks]]
-test("the door answers every check the shipped rules name, and the gate names four", () => {
-  const where = join(root, "spec", "config", "stop");
-  const shipped = files
-    .list(where)
-    .filter((one) => one.name.endsWith(".yml"))
-    .flatMap(
-      (one) =>
-        pool([{ name: one.name, text: files.read(join(where, one.name)) }]).rules,
-    )
-    .map((one) => one.runs)
-    .filter((one) => one && one !== "never");
-  assert.ok(shipped.length, "the rules name a check");
-  for (const name of new Set(shipped)) {
-    assert.ok(knowsCheck(name), `the stop door answers ${name}`);
-  }
-  assert.equal(
-    knowsCheck("a-check-nobody-wrote"),
-    false,
-    "a name the door answers nowhere",
-  );
-  for (const name of ENGINE_CHECKS) {
-    assert.ok(shipped.includes(name), `${name} stands in the shipped rules`);
-    assert.equal(standsDown(name, "god"), true, name);
-  }
 });
 
 // The talk rule goes, and a turn waiting on the owner's step ends on a reason naming that step. [[spec/tickets/the-stop-reads-the-state]]

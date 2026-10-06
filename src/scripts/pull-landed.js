@@ -4,7 +4,7 @@
 
 import { stagedFault, unmergedFault } from "../../.claude/skills/level0/lib/markers.js";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
-import { everyHold } from "./guidance-hand.js";
+import { holdsIn } from "./ephemeral.js";
 
 // The hand's own paths stage beside the ticket, and a hand writing through no journal hands back the tree the other hands' journals leave. [[spec/design_output/pull#the-refused-commit]]
 export function landed(it, one, changes, also = []) {
@@ -85,7 +85,7 @@ function journaled(it, name) {
 }
 
 function takenOf(it, name) {
-  const found = everyHold(it).find(({ held }) => held?.ticket === name);
+  const found = holdsIn(it.disk, it.root).find(({ held }) => held?.ticket === name);
   return String(found?.held?.taken ?? "");
 }
 

@@ -5,28 +5,22 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	"maps"
 	"slices"
-	"strings"
 
 	"quackitect/src/q"
 )
 
-// The two files the layers stand in. src/config owns the names, and a module spells them again because it imports q alone. [[spec/design_output/config#the-layers]]
+// The two files the layers stand in, and the declaration the sidebar draws its widgets off over /v1. q owns the names. [[spec/design_output/config#the-layers]]
 const (
-	Tracked = "spec/config/level0.json"
-	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/config#the-layers]]
-	Local = ".se/.runtime/config.json"
-	// The declaration the sidebar draws its widgets off, which it reads over /v1. [[spec/tickets/the-sidebar-reads-v1]]
-	Schema = "spec/config/level0.schema.json"
+	Tracked = q.TrackedConfig
+	Local   = q.LocalConfig
+	Schema  = q.SchemaConfig
 )
 
-// The variable the environment layer reads for a key. src/config.EnvOf owns the spelling, and a module spells it again because it imports q alone. [[spec/design_output/config#the-go-reader]]
-func EnvOf(key string) string {
-	return "SE_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
-}
+// The variable the environment layer reads for a key, as q names it. [[spec/design_output/config#the-go-reader]]
+func EnvOf(key string) string { return q.EnvOf(key) }
 
 // The names the module writes past its projections: the contexts and overrides it holds, and the values it resolves. [[spec/design_output/model#the-config-module]]
 const (
@@ -183,34 +177,17 @@ func Layered(key q.Key, tracked, local q.Ordered, env map[string]string) (string
 	return winning(key, layersIn{Tracked: tracked, Local: local, Env: env})
 }
 
-// The highest layer setting the key, and its name: override, the innermost live context, environment, local file, default file. A shared key reads the default file alone. [[spec/design_output/model#a-keys-layers]]
+// The highest layer setting the key, and its name: override, the innermost live context, then the layers at rest q orders. A shared key reads the default file alone. [[spec/design_output/model#a-keys-layers]]
 func winning(key q.Key, in layersIn) (string, string, bool) {
-	if key.Shared {
-		return fileLayer(Tracked)(filed(in.Tracked, key))
-	}
-	if literal, ok := in.Held.Overrides[key.Name]; ok {
-		return literal, OverrideLayer, true
-	}
-	if literal, ok := contextual(in.Held.Contexts, in.Leases, key.Name); ok {
-		return literal, ContextLayer, true
-	}
-	if text, ok := in.Env[EnvOf(key.Dotted())]; ok {
-		return literalOfText(text), EnvOf(key.Dotted()), true
-	}
-	if literal, ok := filed(in.Local, key); ok {
-		return literal, Local, true
-	}
-	return fileLayer(Tracked)(filed(in.Tracked, key))
-}
-
-// A file's answer, named by its layer where it holds the key. [[spec/design_output/model#a-keys-layers]]
-func fileLayer(layer string) func(string, bool) (string, string, bool) {
-	return func(literal string, ok bool) (string, string, bool) {
-		if !ok {
-			return "", "", false
+	if !key.Shared {
+		if literal, ok := in.Held.Overrides[key.Name]; ok {
+			return literal, OverrideLayer, true
 		}
-		return literal, layer, true
+		if literal, ok := contextual(in.Held.Contexts, in.Leases, key.Name); ok {
+			return literal, ContextLayer, true
+		}
 	}
+	return q.AtRest(key, in.Tracked, in.Local, in.Env)
 }
 
 // The value the last opened live context sets for the key, since an inner context opens after the one it nests in. [[spec/design_output/model#a-context-holds-a-lease]]
@@ -222,41 +199,4 @@ func contextual(contexts []Context, leases []string, name string) (string, bool)
 		}
 	}
 	return "", false
-}
-
-// A variable's text stands as its JSON literal where it reads as JSON, and as a JSON string otherwise. [[spec/design_output/model#a-keys-layers]]
-func literalOfText(text string) string {
-	if json.Valid([]byte(text)) {
-		return text
-	}
-	quoted, _ := json.Marshal(text)
-	return string(quoted)
-}
-
-// The literal a layer file sets for the key, under its instance and then each segment of its key, as src/config reads a dotted key. [[spec/design_output/model#config-comes-off-the-registrations]]
-func filed(file q.Ordered, key q.Key) (string, bool) {
-	value, ok := file, true
-	for _, name := range key.Path() {
-		if value, ok = member(value, name); !ok {
-			return "", false
-		}
-	}
-	if !value.Object && !value.Array {
-		return value.Literal, value.Literal != ""
-	}
-	body, err := q.JSON.Serialize(value)
-	return string(body), err == nil
-}
-
-// The member of an object under its name. [[spec/design_output/model#config-comes-off-the-registrations]]
-func member(value q.Ordered, name string) (q.Ordered, bool) {
-	if !value.Object {
-		return q.Ordered{}, false
-	}
-	for i, key := range value.Keys {
-		if key == name {
-			return value.Fields[i], true
-		}
-	}
-	return q.Ordered{}, false
 }

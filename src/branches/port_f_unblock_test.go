@@ -146,7 +146,7 @@ func TestPFUnblockRefusesACloudBox(t *testing.T) {
 	if code := pfUnblock(one); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
 	}
-	holds(t, one.errs.String(), "hands no question out")
+	holds(t, one.errs.String(), "A cloud box hands no question out.")
 	holds(t, one.errs.String(), "ticket pull a-child")
 	pfStaysOpen(t, one)
 }
@@ -195,11 +195,12 @@ func TestPFTheSuccessorCarriesTheQuestion(t *testing.T) {
 	}
 	next := one.read(ticketAt("a-successor"))
 	holds(t, next, "no test drives the hook")
-	holds(t, next, "[[spec/tickets/a-child]]")
+	holds(t, next, "[[spec/tickets/a-child]] hands this over at `implement/person-1`, which waits for a person.")
 	holds(t, next, "# Discussion")
 	if strings.Contains(next, "Nothing stands here yet") {
 		t.Fatal("the empty line stays")
 	}
+	holds(t, one.subject("HEAD"), "a-child: closes became a-successor")
 }
 
 // A question carrying a table lands as that table, and TL;DR stays whole. [[spec/tickets/work-verbs-port-to-go]]
@@ -298,6 +299,7 @@ func TestPFASuccessorOffThePersonRouteNamesTheMint(t *testing.T) {
 	if code := pfUnblock(one); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
 	}
+	holds(t, one.errs.String(), "a-successor stands off the person route")
 	holds(t, one.errs.String(), "--process=person")
 	pfStaysOpen(t, one)
 }

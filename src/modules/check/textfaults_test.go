@@ -3,7 +3,60 @@
 // [[spec/tickets/check-patterns-compile-once]]
 package check
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
+
+// The ceilings the size cases hold a file and a function to. [[spec/design_output/level0#the-size-ceiling]]
+const (
+	caseFileCeiling     = 10
+	caseFunctionCeiling = 4
+)
+
+// A text of the given count of plain lines. [[spec/design_output/level0#the-size-ceiling]]
+func linesOf(count int) string {
+	return strings.Repeat("x\n", count-1) + "x"
+}
+
+// The rules of the named kind the text rules answer for one file under the case ceilings. [[spec/design_output/level0#the-size-ceiling]]
+func sizeFound(path, text, rule string) []Finding {
+	tree := TreeOver("/tree", Texts{path: text})
+	out := []Finding{}
+	for _, one := range textFaults(tree, path, caseFunctionCeiling, caseFileCeiling, "") {
+		if one.Rule == rule {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
+func TestACodeFileOneLinePastTheCeilingMeetsFileCeilingAtItsFirstLine(t *testing.T) {
+	said := sizeFound("src/a.go", linesOf(caseFileCeiling+1), FileCeiling)
+	if len(said) != 1 || said[0].Line != 1 || said[0].File != "src/a.go" {
+		t.Fatalf("the file past the ceiling meets %v, and wants one FileCeiling at line 1", said)
+	}
+}
+
+func TestACodeFileAtTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("src/a.go", linesOf(caseFileCeiling), FileCeiling); len(said) != 0 {
+		t.Fatalf("the file at the ceiling meets %v, and wants nothing", said)
+	}
+}
+
+func TestAProseFilePastTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("spec/a.md", linesOf(caseFileCeiling+1), FileCeiling); len(said) != 0 {
+		t.Fatalf("the prose file meets %v, and the ceiling covers code files alone", said)
+	}
+}
+
+func TestAFunctionPastItsCeilingMeetsFunctionCeilingAtItsOpeningLine(t *testing.T) {
+	text := "package a\n\nfunc long() {\n" + linesOf(caseFunctionCeiling) + "\n}\n"
+	said := sizeFound("src/a.go", text, FunctionCeiling)
+	if len(said) != 1 || said[0].Line != 3 {
+		t.Fatalf("the long function meets %v, and wants one FunctionCeiling at line 3", said)
+	}
+}
 
 // Lines a brace language writes, with the shapes each pattern reads and the ones it refuses. [[spec/tickets/check-patterns-compile-once]]
 var codeLines = []string{

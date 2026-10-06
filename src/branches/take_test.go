@@ -1,18 +1,8 @@
-// The take and the open: the desk refusal, nothing free, and the claim.
+// The take and the open: nothing free, the claim, and the open.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
 import "testing"
-
-// A desk takes no branch, and the refusal names the merge road. [[spec/design_output/work#a-desk-works-on-trunk]]
-func TestADeskTakesNoBranch(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil).desk()
-	if code := one.branchSays("take"); code != codeRefused {
-		t.Fatalf("a desk take answers %d", code)
-	}
-	holds(t, one.errs.String(), "A desk works on main alone")
-}
 
 // A cloud box with no branch at todo takes nothing, and says so. [[spec/design_output/work#the-take-writes-the-record]]
 func TestNothingAtTodoTakesNothing(t *testing.T) {

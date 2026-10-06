@@ -192,4 +192,11 @@ func TestPATakeHandsStaleByTheClock(t *testing.T) {
 		t.Fatal("the take leaves the box off the stale branch")
 	}
 	holds(t, paSaid(one), "You are on work/landing, whose hand-over stands stale")
+	now := from.Unix()
+	if got := one.d.staleClaim(stand{ref: ref{When: now - 13*hour}}, now); !got.Stale || got.Age != "13h" {
+		t.Fatalf("an old claim reads %+v", got)
+	}
+	if got := one.d.staleClaim(stand{ref: ref{When: now - hour}}, now); got.Stale {
+		t.Fatalf("a fresh claim reads %+v", got)
+	}
 }
