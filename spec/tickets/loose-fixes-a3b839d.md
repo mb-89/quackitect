@@ -84,12 +84,15 @@ steps:
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 fix: true
-cloud: true
 record:
   - step: sync
     hand: box 31f16efb1b52 · claude-code-remote
     hash_before: 55d4be592e683ed0e59322180c5ebc883a7303e1
     session: cse_01GEZAgNULgqsV7irZuWXYAw
+    hash_after: 423c5513baaa6c44edc0a5c08dfb2cb157f6340a
+    model: claude-opus-5-5
+    cost: 4
+    final: "all three loose fixes close: their merges stand on main"
   - step: sync
     hand: box 31f16efb1b52 · claude-code-remote
     hash_before: 1b817a69822f3db93cb199222b26bdd8cfe2f7d2
