@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 156418b839c4 · claude-code-remote
@@ -134,6 +134,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: d3263a74c6582071c1445efb240fefeef9eb409e
+    hash_after: d3263a74c6582071c1445efb240fefeef9eb409e
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -209,38 +221,59 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-clear-hands-back-the-leaf: the Stop that answers the clear puts the read in its place, the read's pass hands the leaf, a second handover hands the leaf back, and the clear's tickets hold no pull back
+- the dry probe walks past the clear: the read, the leaf, a commit, and no second clear
+- clear-names-the-probe-test: the Discussion names the file the probe cases stand in
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the dry probe reproduced the live loop through the real plugin and door before any fix, so the cause stood proven and not guessed
+- the Go pull tests run over a real origin and clone, so each case reads the exact answer a box reads
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 09:30 UTC, the owner prompt arrives as a background event naming a normal route, and the tree holds no normal process
+- 09:33 UTC, branch open refuses: it reads the group off main, and a box pushes no main
+- 09:35 UTC, the ticket name runs past the five words a branch name holds
+- 09:41 UTC, a plan working on a ticket name holds the pull at wait, twice
+- 09:52 UTC, the tests-red hand-back takes a raw go test as no assertion, and the commit hook asks a test file named beside probe-clear.js
+- 09:55 UTC, the index restarts mid hand-back, and the point waits on a check the main ticket turns red
+- 10:06 UTC, the commit hook refuses the change step, because its tests landed one step earlier
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- `src/branches/take.go` openGroup: a cloud box opens its own group branch off origin main, with no push to main
+- `src/pull/pull_holds.go` workingTodo: a plan naming a ticket that stands in the hold reads as no todo
+- `spec/processes/standard.yaml` tests-red: the probe a ticket extends joins the red list, so the check stands green between steps
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The owner reads the loop as a fault of the pull alone. The cause stands one door over: the port that retired the bridge server carried the clear onto the Go door and left out the step after it. So the box held the clear across the clear, and every resumed turn answered it again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in the ticket that owns it, and this chapter points at files by name
+- the change adds no number
+- the one header the change writes, on pull_clear_test.go, says what the file is for
+- the badly list carries the owner prompt and each error with its time
+- the chapter names the box by its role alone
 
 ## cloud
 
