@@ -53,7 +53,7 @@ Cases under `src/failure` read the tree, and the check runs them:
 A `watch` names an event kind, a pattern the event's text matches, and a quiet span in minutes:
 
     watch:
-      event: tool
+      event: tool.call
       match: "branch take"
       quiet: 30
 

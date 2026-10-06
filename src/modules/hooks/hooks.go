@@ -206,6 +206,18 @@ func New(from Outside) *Door {
 	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
 }
 
+// The sentinel hears each post as its event and its payload in compact JSON, so a watch matches a tool's command inside it. [[spec/tickets/the-hooks-feed-the-sentinel]]
+func (d *Door) hears(post Post) {
+	if d.from.Hear == nil {
+		return
+	}
+	text, err := json.Marshal(post.E)
+	if err != nil {
+		return
+	}
+	d.from.Hear(failure.Event{Kind: post.Event, Text: string(text)})
+}
+
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
 	root := post.Root
@@ -225,6 +237,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	d.rows(session, root)
 	d.repeats(session, root)
 	d.readsHealth(post)
+	d.hears(post)
 	effects := []Effect{}
 	if said, ok := d.rewrites(session, post); ok {
 		effects = append(effects, said)
