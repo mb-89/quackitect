@@ -290,6 +290,21 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	}
 }
 
+// A reach waits on its door's answer past the old thirty seconds, up to what the hang guard leaves of it. [[spec/tickets/cold-runner-waits-meet-readiness]]
+func TestAReachWaitsOnItsDoorUpToTheHangGuard(t *testing.T) {
+	fakeStartClock(t, nil)
+	now := startNow()
+	if got := postSpan(now); got != startHang || got <= 30*time.Second {
+		t.Fatalf("a fresh reach waits %v on its door, and wants the hang guard of %v", got, startHang)
+	}
+	if got := postSpan(now.Add(-3 * time.Minute)); got != startHang-3*time.Minute {
+		t.Fatalf("a reach three minutes in waits %v, and wants what the guard leaves", got)
+	}
+	if got := postSpan(now.Add(-2 * startHang)); got != startPollPause {
+		t.Fatalf("a reach past its guard waits %v, and wants one pause", got)
+	}
+}
+
 // A caller meeting a fresh claim spawns nothing, and reads the door the claiming caller's index stands. [[spec/tickets/reaches-keeps-the-post-fault]]
 func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 	root := t.TempDir()

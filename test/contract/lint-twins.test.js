@@ -35,5 +35,5 @@ test("the Go lint and the check's lint name the same finding lines", async () =>
     .sort();
 
   assert.ok(inNode.length > 0, "the file carries a finding, so the case compares findings; point WHERE at one that does");
-  assert.deepEqual(inGo, inNode);
+  assert.deepEqual(inGo, inNode, said.stderr);
 });
