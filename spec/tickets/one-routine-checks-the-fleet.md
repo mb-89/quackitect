@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: ac503a0377c565c7
         size: 2730
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 6af74b5ef2e97364c6561498259449cb00608017
+    hash_after: 6af74b5ef2e97364c6561498259449cb00608017
+    inputs:
+      - name: design/draft
+        hash: ac503a0377c565c7
+        size: 2730
+      - name: design/tests-red
+        hash: 733bb02b6ec002b3
+        size: 854
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,11 @@ Four cases fail on their own assertion. The trigger prints the work routine alon
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- pr-events-reach-their-box: `./RUNME.sh cloud route` stands with no caller. No workflow on `pull_request` and no routine runs it, so the session it prints never gets the event, and the ask's wake lands as a lookup alone. A caller runs the verb on the event and messages the session it names.
+- fleet-prompt-awaits-fleet-verb: `fleetPrompt` runs `./RUNME.sh cloud fleet`, which `Cloud` lacks until the-fleet-verb-watches-boxes lands its implement. The ticket names no `depends_on`, so the person ticket can store a routine whose verb answers the usage. The ticket gains `depends_on: the-fleet-verb-watches-boxes`, or the person ticket waits on it.
 
 # implement
 
