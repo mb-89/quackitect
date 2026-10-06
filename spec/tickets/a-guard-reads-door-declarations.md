@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 8eacce0f20b584e2
         size: 1278
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 86086f797ef7 · claude-code-remote
+    hash_before: 42379a37654ed05860308c5f296594c37de4c711
+    hash_after: 42379a37654ed05860308c5f296594c37de4c711
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: 71e1166244e6076f
+        size: 2764
+      - name: [[spec/design_output/doors]]
+        hash: 38bae238e57a16af
+        size: 10261
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -245,26 +261,36 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/owns/owns_test.go src/owns/tree_test.go src/imports/walkaround_test.go src/modules/check/doors_test.go src/quack/verb_doors_test.go src/quack/lsp_doors_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/owns/owns_test.go
+- src/owns/tree_test.go
+- src/imports/walkaround_test.go
+- src/modules/check/doors_test.go
+- src/quack/verb_doors_test.go
+- src/quack/lsp_doors_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion over the stub, and the old cases stay green. A first planting of net/smtp passed the module case already, since impure names net and its subpackages, so the cases plant expvar, which publishes over HTTP and stands in no hand-kept list. The lsp case stands in src/quack, beside the wiring, because the lsp IO module reads the check module through ports quack hands in, so only there does a test drive the real rule into a diagnostic.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: declarations by TestEveryIOModuleAndDoorDeclares, derived lists by the two ListComes cases, the guards by the walkaround and WalksAroundADoor cases with per-door plants in TestEveryDoorNamesAPlantedWalk, the marker by the Marked cases, report mode by the report cases and the doors verb, the lsp by lsp_doors_test.go, the one term by the accept gate reading the notes
+- every door the tests reach is planted text in memory or a temp folder, so no case reaches a real clock, disk or process past reading the tree's own declarations
 
 # gate
 

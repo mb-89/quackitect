@@ -25,6 +25,48 @@ func TestDoorsCountsWhereEveryDoorHoldsATest(t *testing.T) {
 	}
 }
 
+// A tree with the clock declared, a walk around it, and a line marked past it. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func walkedRoot(t *testing.T, report bool) string {
+	t.Helper()
+	root := t.TempDir()
+	declared := "clock:\n  go: [time.Sleep]\n"
+	if report {
+		declared += "  report: true\n"
+	}
+	seedFile(t, root, "src/modules/clock/owns.yaml", declared)
+	seedFile(t, root, "src/engine/wait.go", "package engine\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	seedFile(t, root, "src/engine/hung.go", "package engine\n\nimport \"time\"\n\nfunc Hung() {\n\ttime.Sleep(1) // level0: OutsideInDoors - a hung child needs a deadline\n}\n")
+	seedFile(t, root, ".claude/skills/one/wait.go", "package one\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	return root
+}
+
+func TestDoorsListsAWalkAroundADoorAtReport(t *testing.T) {
+	t.Parallel()
+	code, out, errs := doorsRan(walkedRoot(t, true))
+	for _, want := range []string{
+		"src/engine/wait.go:5:14: time.Sleep walks around clock\n",
+		"src/engine/hung.go:6:2: time.Sleep stands marked: a hung child needs a deadline\n",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("doors prints %q, and wants %q", out, want)
+		}
+	}
+	if code != 0 || strings.Contains(out+errs, ".claude") {
+		t.Fatalf("doors answers %d, %q and %q, and wants 0 with nothing the lint's walk passes", code, out, errs)
+	}
+}
+
+func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
+	t.Parallel()
+	code, out, errs := doorsRan(walkedRoot(t, false))
+	if code != exitFailed || !strings.Contains(errs, "src/engine/wait.go:5:14: time.Sleep walks around clock\n") {
+		t.Fatalf("doors answers %d, %q and %q, and wants the walk-around refused", code, out, errs)
+	}
+	if !strings.Contains(out, "src/engine/hung.go:6:2: time.Sleep stands marked: a hung child needs a deadline\n") {
+		t.Fatalf("doors prints %q, and wants the marked line listed", out)
+	}
+}
+
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
