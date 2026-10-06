@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 8a9506635862836c
         size: 722
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 1db8b6d58eb138fe66846992b1750c871e1598ba
+    hash_after: 1db8b6d58eb138fe66846992b1750c871e1598ba
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -290,14 +299,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/index/detach*.go and door.go alone, the files the ask names, plus the minted ticket note
+- the spawn reaches the process door, whose fake stands in q/qtest; the Windows case drives the real thing once
+- detach.go names the approach: the door stands apart from its starter group and session, and the platform files say how
+- the facts stand on the tickets the comments link, and the code repeats none of them
 
 ## tests-green
 
