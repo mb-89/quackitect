@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: clear-hands-back-the-leaf
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: f4417d4e23037a0016caeae2d0fe7d79d4cb2551
+    hash_after: f4417d4e23037a0016caeae2d0fe7d79d4cb2551
+    inputs:
+      - name: ask
+        hash: 1e318d444c0e3d69
+        size: 1525
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,78 @@ Cloud boxes lock into a handover loop after a context clear, and push nothing fo
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The cause: the bridge server left, and with it `readsNext` in `src/bridge/handover.js`. That step turned the `clear` hold into `read-handover` and dropped `.se/.runtime/due.json` at the clear. The Go door answers the clear at the Stop (`holdsForHandover` in `src/modules/hooks/stops.go`) and ports neither step. After the clear the box still holds `clear`, so its pull answers `clear stands in your hand. End the turn now`, the box ends the turn, and the Stop answers another clear. Where the `clear` hold goes some other way, `due.json` still stands, so the next hand-out hands `handover` again. The second handover finds no new commit, and `localWorkFault` tells the box to end the turn.
+
+The fix, in four parts:
+
+1. Hooks. The Stop that answers the clear sets a `ReadNext` mark. `Door.marks` in `src/modules/hooks/marks.go` rewrites each ephemeral `clear` hold into `read-handover`, keeping its hand and its taken stamp, and drops `due.json`. This ports `readsNext` onto the door that answers the Stop.
+2. Pull, the read. A `read-handover` pass in `ephemeralPull` drops `due.json` itself, then goes `onward`. So the hand-out after the clear hands a leaf, in the same pull answer, whatever the hook did.
+3. Pull, the second handover. `localWorkFault` splits. Work origin lacks still refuses and keeps `handover` in hand, because a push fixes it. A tip equal to the last handover tip refuses the handover and its clear: the pull drops the `handover` hold, says to continue the leaf in this turn, and hands the leaf, skipping the due check for that one hand-out. `due.json` stays, so the first hand-out after the next commit hands over again.
+4. Pull, the todo. `workingTodo` reads `handover`, `clear` and `read-handover` as no todo, so a plan naming the clear's tickets holds no pull back.
+
+What I weigh: the pull hands `handover` only once the ticket in hand stands done, or once its next leaf needs another hand. So no hold crosses the clear, and the leaf the box held is the leaf the queue hands it next, the one the manual pull showed. I add no resume field, because the queue already answers that leaf.
+
+The JS mirror under `src/scripts` stays as it stands, because the live pull runs in Go and no live road reaches `src/scripts/pull.js`.
+
+The dry probe `src/scripts/probe-clear.js` goes on past the clear: it pulls `read-handover`, passes it, reads a real leaf in the same answer, makes a commit, and checks that no second clear runs.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go holdsForHandover, which sets the mark
+- src/modules/hooks/hooks.go Door.Hook, which calls Door.marks
+- src/pull/pull.go Pull, which calls ephemeralPull and workingTodo
+- src/pull/pull_ephemeral.go ephemeralPull, which calls localWorkFault and onward
+- src/pull/pull_writes.go onward, which calls handOut
+- src/pull/pull_hand.go handOut, which calls dueHandOut
+- src/scripts/probe-dry.js session, which calls clearRun
+- src/scripts/probe-dry.js readsDry, which calls clearHeld
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/clear_test.go TestTheClearAtTheStopHandsTheReadAndDropsTheDueMark
+- src/pull/pull_clear_test.go TestAfterTheClearThePullHandsTheLeafInTheSameAnswer
+- src/pull/pull_clear_test.go TestASecondHandoverWithNoCommitHandsTheLeafBack
+- src/pull/pull_clear_test.go TestTheClearsTicketsHoldNoPullBackAsATodo
+- test/level0/probe-dry.test.js, the clear check reading the cycle past the clear
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/marks.go
+- src/modules/hooks/stops.go
+- src/modules/hooks/clear_test.go
+- src/pull/pull_ephemeral.go
+- src/pull/pull_hand.go
+- src/pull/pull_holds.go
+- src/pull/pull_clear_test.go
+- src/scripts/probe-clear.js
+- test/level0/probe-dry.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened handover.js, guidance.js, stops.go, marks.go, stopfacts.go, hooks.go, pull.go, pull_hand.go, pull_writes.go, pull_holds.go, pull_ephemeral.go, probe-clear.js and probe-dry.js, and checked each claim there
+- the callers come off a search for each changed function across src
+- each done_when line names its test in the tests list, and the check line names ./RUNME.sh check
 
 ## tests-red
 
