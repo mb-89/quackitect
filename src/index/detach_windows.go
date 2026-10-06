@@ -11,9 +11,6 @@ import (
 	"syscall"
 )
 
-// The process a spawn starts is the starter, which exits once the door stands apart. [[spec/tickets/door-outlives-taskkill-tree]]
-const starterIsDoor = false
-
 // The flag that starts the starter with no console window. [[spec/tickets/door-outlives-taskkill-tree]]
 const noWindow = 0x08000000
 
@@ -37,3 +34,6 @@ func detached(run *exec.Cmd) *exec.Cmd {
 	}
 	return starter
 }
+
+// The starter exits clean once it launches the door, so a failed exit alone ends the door. [[spec/tickets/the-doors-pr-goes-green]]
+func exitEnds(said error) bool { return said != nil }

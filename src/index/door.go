@@ -190,16 +190,11 @@ var spawns = func(bin, root string) (<-chan error, error) {
 	}
 	exited := make(chan error, 1)
 	go func() {
-		if err := one.Wait(); speaksForDoor(err, starterIsDoor) {
-			exited <- err
+		if said := one.Wait(); exitEnds(said) {
+			exited <- said
 		}
 	}()
 	return exited, nil
-}
-
-// Whether a spawned process's exit reads as the door's exit. A starter that launches the door apart and exits clean says nothing of the door, so the start waits on the door's standing or its hang. [[spec/tickets/door-outlives-taskkill-tree]]
-func speaksForDoor(err error, isDoor bool) bool {
-	return isDoor || err != nil
 }
 
 // The paths git tracks under the root. A root git holds nowhere tracks every file the walk reads, the way a reader of a bare folder reads it whole. [[spec/design_output/index#the-rows-the-walk-writes]]

@@ -9,9 +9,6 @@ import (
 	"syscall"
 )
 
-// The process a spawn starts is the door itself. [[spec/tickets/door-outlives-taskkill-tree]]
-const starterIsDoor = true
-
 // [[spec/tickets/the-index-outlives-the-check]]
 func detached(run *exec.Cmd) *exec.Cmd {
 	if run.SysProcAttr == nil {
@@ -20,3 +17,6 @@ func detached(run *exec.Cmd) *exec.Cmd {
 	run.SysProcAttr.Setsid = true
 	return run
 }
+
+// The detached process is the door itself, so its every exit ends the door. [[spec/tickets/the-doors-pr-goes-green]]
+func exitEnds(error) bool { return true }

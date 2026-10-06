@@ -24,3 +24,11 @@ func TestADoorStandsInASessionOfItsOwn(t *testing.T) {
 		t.Fatalf("the door stands in group %d, %v, and leads none of its own", group, err)
 	}
 }
+
+// The detached process is the door, so a start reads its clean exit as the door's end. [[spec/tickets/the-doors-pr-goes-green]]
+func TestADoorsCleanExitEndsIt(t *testing.T) {
+	t.Parallel()
+	if !exitEnds(nil) || !exitEnds(exec.ErrNotFound) {
+		t.Fatal("an exit of the door itself reads as no end")
+	}
+}
