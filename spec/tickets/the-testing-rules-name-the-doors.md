@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 4f5a7bb93fcd9872
         size: 2717
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: c16aeb2ee2722998b141785e081d8406d8877fba
+    hash_after: c16aeb2ee2722998b141785e081d8406d8877fba
+    inputs:
+      - name: design/draft
+        hash: 4f5a7bb93fcd9872
+        size: 2717
+      - name: design/tests-red
+        hash: d95620e81141fe84
+        size: 789
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,13 @@ The pass case fails on its own assertion: the stub names no wait, where the plan
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- guard-plants-command-context: the planted file in src/imports/clock_test.go holds no exec.CommandContext call, though the approach names it, so no case decides that name
+- audit-guard-fires-on-plant: the tree case proves no firing, since no case plants an audit and an unlisted test file that sleeps, so the span match through path.Match goes unproven while the tree stands clean
+- quack-audit-glob-narrows: the span src/quack/*_test.go in spec/design_output/doors.md admits every quack test, so a new sleep there passes the guard unnamed until quack-spawns-meet-fake-process narrows it
+- testing-rules-name-fakes-elsewhere: the five rules the approach lists leave out the done_when item fakes elsewhere, so the builder names it beside one door test a door
 
 # implement
 
