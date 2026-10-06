@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 10f921d0d674ecbc80c306df7527a5a38e987acd
+    hash_after: 10f921d0d674ecbc80c306df7527a5a38e987acd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "  103.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7aa476c87847d0d7
+        size: 750
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/session.test.js test/contract/index.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index and session contract suites run each case on the fake beside the real door, wherever the fake gives that answer, so a case on either fake proves what the real door does. The first run caught real drift: the session fake answered the root for an empty name, where the real door refuses with Missing file path. The fake now refuses the same way. The index fake answers hashes alone, so the index suite runs both doors on the hashes case, and its head comment and the doors chapter row say so.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the session fake, the index suite's head comment and the doors chapter row
+- each door the suites reach has its fake running beside it
+- the index suite's head comment names the approach
+- the refusal text stands in the real door and its fake alike, held together by the contract case
 
 # accept
 
