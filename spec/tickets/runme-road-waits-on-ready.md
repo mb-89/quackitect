@@ -124,62 +124,62 @@ record:
     why: the ask comes off no handover
   - step: design/draft
     hand: box a694567529c5 · claude-code-remote
-    hash_before: fb5e4eeffc38f2e329d3bbff1d61e517640f319f
-    hash_after: fb5e4eeffc38f2e329d3bbff1d61e517640f319f
+    hash_before: 3a96bb98609b7a6438067a336655ba3d4bb45fdc
+    hash_after: 3a96bb98609b7a6438067a336655ba3d4bb45fdc
     inputs:
       - name: ask
-        hash: 015d35ecc32e1941
-        size: 508
+        hash: 4db3bc82c38588d5
+        size: 401
     def: 7883b3d10633c780
   - step: design/tests-red
     hand: box a694567529c5 · claude-code-remote
-    hash_before: b9f7e4c21686cf5c1793461d51997171ced44646
-    hash_after: b9f7e4c21686cf5c1793461d51997171ced44646
+    hash_before: 97372e9c2fdb9429fcd97c00ae3e8e9e96096885
+    hash_after: 97372e9c2fdb9429fcd97c00ae3e8e9e96096885
     answered:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
     inputs:
       - name: design/draft
-        hash: f921a3ccf020b7c5
-        size: 2014
+        hash: b8bcc39ac74d8475
+        size: 1578
     def: 08e16d07b0de477c
   - step: gate
     hand: box a694567529c5 · claude-code-remote · helper-4
-    hash_before: 260bda669171cf2920ea954b9245f4c0db189266
-    hash_after: 260bda669171cf2920ea954b9245f4c0db189266
+    hash_before: e9878292e920630d4b8247ab7aebb224b72c4b4a
+    hash_after: e9878292e920630d4b8247ab7aebb224b72c4b4a
     inputs:
       - name: design/draft
-        hash: f921a3ccf020b7c5
-        size: 2014
+        hash: b8bcc39ac74d8475
+        size: 1578
       - name: design/tests-red
-        hash: 41e4c8078b0ef917
-        size: 812
+        hash: 64b0da3c99b2f4a9
+        size: 687
     def: dc4904ab364efa10
   - step: implement/change
     hand: box a694567529c5 · claude-code-remote
-    hash_before: 463e5b005b5c494a502258adfd11812c99907869
-    hash_after: 463e5b005b5c494a502258adfd11812c99907869
+    hash_before: d52661943b099f0cc8345636086e9ff53210a254
+    hash_after: c33f4f33876b30fc6b53e8103936800e5608cf90
     answered:
       - name: lint
         exit: 0
-        said: ""
+        said: The rules pass.
     def: f150b8c0dc20fe45
   - step: implement/tests-green
     hand: box a694567529c5 · claude-code-remote
-    hash_before: eecb76e5ea65b7a4df24a3173d57a04c92bd0cd8
-    hash_after: eecb76e5ea65b7a4df24a3173d57a04c92bd0cd8
+    hash_before: 2dd39abb6ea9a1d683bf009d0c6cdbe8bd937ec7
+    hash_after: 2dd39abb6ea9a1d683bf009d0c6cdbe8bd937ec7
     answered:
       - name: tests
         exit: 0
-        said: green, 14 test(s) pass in 1 file(s); green, src/quack passes
+        said: green, 9 test(s) pass in 2 file(s)
       - name: check
         exit: 0
-        said: "   89.0  in all"
+        said: "   89.3  in all"
     inputs:
       - name: design/tests-red
-        hash: 41e4c8078b0ef917
-        size: 812
+        hash: 64b0da3c99b2f4a9
+        size: 687
     def: ec253787263043a7
   - step: accept
     skipped: true
@@ -192,12 +192,11 @@ reason: done
 
 # Ask
 
-The dry probe runs at any revision, so the merge that breaks level zero shows in one call. Auto-merge stays the one road to main.
+The runme-road contract test waits on the index's ready event, so it passes on a slow box and fails only where the road breaks.
 
-A hand writes a probe loop over merges each time main goes red, and a hand merge skips the road the owner asks for.
+A timer in a test passes or fails on the box's speed, and a slow runner turns the check red on a sound tree.
 
-- `go test ./src/quack/` passes a case where `probe dry --at <rev>` runs the dry probe at that revision.
-- `go test ./src/quack/` passes a case that reads a deny on the merge tool of the GitHub connector in `.claude/settings.json`.
+- `node --test test/contract/runme-road.test.js` passes, and the file names no timer or timeout and waits on the index's ready event.
 - `./RUNME.sh check` exits 0
 
 # design
@@ -221,28 +220,25 @@ A hand writes a probe loop over merges each time main goes red, and a hand merge
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-Two parts. The probe at a revision: the Go probe verb reads --at <rev> on the dry road, resolves it with git rev-parse --verify <rev>^{commit} through its process door, refuses a revision git cannot resolve with one line and no node, and hands the entry --at <sha>. probeDry in src/scripts/probe-dry.js reads --at and hands it to coldTree in src/scripts/probe-cold.js, which checks the clone out at that commit before the install, and takes no working change beside it, since the two name different trees. One call then runs level zero at any merge on main. The guard on merges: .claude/settings.json denies mcp__github__merge_pull_request, so no session merges by hand and auto-merge stays the one road to main, and a Go case reads that deny off the tracked file, as config_test reads spec/wiring.yaml.
+The index door gains ready(): it runs se-index standing with no timeout, which returns once the door over the root stands, and answers whether it stands and why not. The fake index answers ready the way it answers warm. test/contract/runme-road.test.js waits on index(...).ready() in a before hook, and runs both RUNME.sh calls with no timeout, so RUN_TIMEOUT_MS leaves the file. A hung road then hangs the case, which the test runner names, in place of a timer guessing how slow the box is.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- src/quack/probe_verb.go probeVerb and probeDry
-- src/quack/check.go level0Runs (hands no --at, unchanged)
-- src/scripts/probe-dry.js probeDry and the verbMain entry
-- src/scripts/probe-cold.js coldTree, called by probeDry and coldRun
-- .claude/settings.json, read by the client
+- test/contract/runme-road.test.js both cases
+- src/doors/index.js index, read by src/scripts/cli-doors.js and every caller of it.index
+- src/doors/fake/index.js fakeIndex, read by every case faking the index
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-- src/quack/probe_verb_test.go TestTheDryProbeRunsAtARevision
-- src/quack/probe_verb_test.go TestTheDryProbeRefusesARevisionGitCannotResolve
-- src/quack/settings_test.go TestTheSettingsDenyTheMergeTool
-- test/level0/probe-dry.test.js the cold tree checks the clone out at the revision it names
+- test/contract/runme-road.test.js the file names no timer, and waits on the index's ready event
+- test/contract/index.test.js ready answers once the door stands, and a box with no binary says why
+- test/level0/fakes.test.js or the behaves check holds the fake index to the door's calls
 
 ### answers
 
@@ -256,22 +252,19 @@ Two parts. The probe at a revision: the Go probe verb reads --at <rev> on the dr
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-- src/quack/probe_verb.go
-- src/quack/probe_verb_test.go
-- src/quack/settings_test.go
-- src/scripts/probe-dry.js
-- src/scripts/probe-cold.js
-- test/level0/probe-dry.test.js
-- .claude/settings.json
+- src/doors/index.js
+- src/doors/fake/index.js
+- test/contract/runme-road.test.js
+- test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- probe_verb.go probeDry, probe-dry.js probeDry and entry, probe-cold.js coldTree and takesDelta, and .claude/settings.json stand opened
-- grep finds coldTree called by probeDry and coldRun, and probeDry by probeVerb alone in Go
-- the --at line meets the two probe_verb cases, the deny line meets settings_test, and the check line its own command
+- runme-road.test.js, src/doors/index.js warm and at, src/doors/fake/index.js, src/index/main.go V1 and the standing call stand opened
+- grep finds the index door built in cli-doors.js and its fake in the cases faking it, and ready is new, so nothing calls it yet
+- the done_when line on runme-road meets the case reading the file and the ready wait, and the check line its own command
 
 ## tests-red
 
@@ -289,24 +282,23 @@ Two parts. The probe at a revision: the Go probe verb reads --at <rev> on the dr
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-- src/quack/probe_verb_test.go
-- src/quack/settings_test.go
-- test/level0/probe-dry.test.js
+- test/contract/index.test.js
+- test/contract/runme-road.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Each case fails on its assertion: the verb hands --at to node unresolved and runs node on a revision git cannot read, the settings deny Artifact alone, and the cold tree never checks out a revision. The verb's pass-through already carried --at, so the Go half earns its keep by refusing a revision before a forty-second run starts.
+The three cases fail on their assertions once a stub ready stands on the door: the stub answers no door, and the road names its timer and no ready wait. The case over the road reads its own source, and spells the timer words in pieces, so the pattern never matches itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the --at line meets the two probe_verb cases and the cold tree case, the deny line meets settings_test, and the check line waits for tests-green
-- the verb cases run over fakeBoxDoors and the cold tree case over fakeDisk and fakeProc, and settings_test reads the tracked file as config_test reads spec/wiring.yaml
+- the runme-road line meets the case reading the file for the ready wait and no timer, and the check line waits for tests-green
+- the ready call meets its one contract case against the real binary and the no-binary box, and the fake index gains ready beside warm in the change
 
 # gate
 
@@ -317,9 +309,7 @@ Each case fails on its assertion: the verb hands --at to node unresolved and run
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- probe-at-stays-dry: the approach assumes the check runs `probe dry`, and level0Runs in src/quack/check.go now runs `probe smoke --working`, while probeVerb hands dry and smoke alike to the one Go probeDry and the entry picks probeSmoke on the smoke word. Resolve --at on the dry word alone, and refuse `smoke --at` and `--at` beside `--working` with one line, since smokeTree clones --shared and copies the root's built tools, which belong to another revision. A Go case decides each refusal. The four red cases fail on their own assertion at 260bda669, and TestTheSmokeProbeHandsItsRoadToTheEntry stays green beside them.
-- merge-deny-every-connector: the deny names mcp__github__merge_pull_request alone, and this box also carries a second GitHub connector whose merge_pull_request tool sits under its own mcp__<uuid>__ prefix, and gh pr merge through Bash. Deny the merge tool under every GitHub connector the box loads, and leave enable_pr_auto_merge open, since the work skill turns auto-merge on through the connector. Unchecked: whether the client takes a glob in a deny rule.
+accept
 
 # implement
 
@@ -332,17 +322,17 @@ accept with points
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-cd src && CGO_ENABLED=0 go vet ./quack/
+./RUNME.sh lint src/doors test/contract/runme-road.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change touches probe_verb.go, probe-cold.js, probe-dry.js and settings.json, which the size list names, and landed through probe-at-stays-dry and merge-deny-every-connector
-the verb reaches git through the run door, whose fake its cases drive, and coldTree reaches git through it.proc, whose fake the cold tree case drives
-resolvedAt, checksOut and the deny case carry comments linking this ticket
-the flag stands once a language, and the merge roads once in .claude/settings.json
+the change touches src/doors/index.js, src/doors/fake/index.js and the road test, which the size list and the gate name
+the fake index answers ready beside warm
+ready, the fake and the before hook link this ticket
+the road reads the binary through at() in the door, which owns it
 
 ## tests-green
 
@@ -353,7 +343,7 @@ the flag stands once a language, and the merge roads once in .claude/settings.js
 <!-- the same tests pass -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/quack/probe_verb_test.go src/quack/settings_test.go test/level0/probe-dry.test.js
+./RUNME.sh branch test test/contract/runme-road.test.js test/contract/index.test.js
 
 ### check
 
@@ -367,7 +357,7 @@ the flag stands once a language, and the merge roads once in .claude/settings.js
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-probe dry --at <rev> now runs the dry probe at that commit. The Go verb resolves the revision through git, refuses one git cannot read before node starts, and the cold tree checks the clone out at the commit before the install. One call then runs level zero at any merge on main. The smoke and the working change refuse --at, since both stand on the tree as it is. The tracked settings deny the merge tool under every GitHub connector the box loads, and gh pr merge, and leave auto-merge open, so auto-merge stays the one road to main.
+The index door gains ready, which runs se-index standing with no span and returns once the door over the root stands, or says why it stands not. The fake index answers ready beside warm. The runme-road contract test waits on ready in a before hook and runs RUNME.sh with no timeout, so a slow box waits and a broken road alone fails. The no-timer case matched its own pattern, so its pattern now splits the word it names, as it splits the others.
 
 ### checked
 
@@ -375,9 +365,9 @@ probe dry --at <rev> now runs the dry probe at that commit. The Go verb resolves
 <!-- the form is checklist -->
 
 the change touches the files the size list names
-every door the change reaches runs through its fake in the cases
-resolvedAt, checksOut and the deny case link this ticket
-the flag and the merge roads each stand in one place
+the fake index answers ready
+ready, the fake and the before hook link this ticket
+the binary path stays with at() in the door
 
 # accept
 
