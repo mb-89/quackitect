@@ -117,11 +117,23 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 832baf70c4ce2f160c89b17e82ec073a588df7d6
+    hash_after: 832baf70c4ce2f160c89b17e82ec073a588df7d6
+    inputs:
+      - name: ask
+        hash: dfee1caff0b0df9a
+        size: 1112
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +173,54 @@ Every part of the check starts at once, so the check's wall time is its slowest 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`batteryRun` in `src/quack/check.go` starts every part in its own goroutine at once, times each through the clock door `now`, and waits for all of them. The run answers the first red code in part order, and it hands back the red parts by name in place of the parts left unrun. `checkVerb` prints one line a red part to the error stream, so a red part names itself under `--errors` too, and every part beside it still reports its time in the table. The `beside` field leaves `part`, since every part now runs beside every other.
+
+No part waits on another, because no part reads another's output. The tests write `tests.jsonl` and the spawn tally, and the rules write the lint's found file. The check verb reads those after the battery ends, and push, commit and done read the stamp after the check. The dry probe clones the working change into a folder of its own. The one shared cost is the box's cores, which the five-checks run under the sibling ticket measures.
+
+The report keeps its `unrun` field empty, because old stamps carry it and the retro reads it. Output from parts running together interleaves on a loud run, line by line, and the table at the end stands whole.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go checkVerb, the one caller of batteryRun and partsOf
+- src/quack/check_test.go TestBatteryRun and TestCheckParts, which read part.beside and the unrun answer
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go TestBatteryRun: every part starts before any part ends, and the span reads as the slowest part
+- src/quack/check_test.go TestBatteryRun: a red part names itself, and every part beside it runs and reports its time
+- src/quack/check_test.go TestCheckVerb: a red part's name reaches the error stream
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/check.go
+- src/quack/check_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb opened: check.go batteryRun, partsOf, checkVerb, battery.go batteryOf, and the readers of each runtime file
+- the callers list names checkVerb and the two test functions, the only callers
+- every done_when line names TestBatteryRun or the check
 
 ## tests-red
 
