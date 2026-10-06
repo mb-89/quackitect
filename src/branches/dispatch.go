@@ -227,6 +227,10 @@ func Dispatch(d *Doors, send Send, argv []string) int {
 	if send != nil {
 		d.Send = send
 	}
+	// A push to main updates the open work pull requests and plans nothing, so the hourly fire keeps its own clock. [[spec/tickets/running-work-takes-main-fixes]]
+	if slices.Contains(argv, "--update") {
+		return d.updated(d.Send, argv)
+	}
 	// The plan reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
 	d.fetch()
 	plan, read := d.planned()

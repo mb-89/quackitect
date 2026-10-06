@@ -1,0 +1,43 @@
+# The update: a push to main brings every open work pull request up to main, so
+# a fix on main reaches the work in flight. [[spec/tickets/running-work-takes-main-fixes]]
+name: update
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run waits for the one before it, so two pushes update no branch twice at once.
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      # The updates ride the owner's token, so the check runs on the commits they make. [[spec/tickets/the-owner-stores-the-token]]
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PULL_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - uses: actions/cache@v4
+        with:
+          path: .se/bin
+          key: se-bin-${{ runner.os }}-vale3.20.0-biome2.5.12
+
+      - env:
+          PULL_TOKEN: ${{ secrets.PULL_TOKEN }}
+        run: ./RUNME.sh dispatch --update --json

@@ -272,6 +272,14 @@ func (it *It) Pull(argv []string) int {
 	if !it.fetched(branch) {
 		return 1
 	}
+	// A desk on trunk fast-forwards main in fetched, so the cold check reads a work branch alone. [[spec/tickets/running-work-takes-main-fixes]]
+	if !onTrunk {
+		if cold := it.coldMoved(); len(cold) > 0 {
+			it.Say(Refused, fmt.Sprintf("main moves the cold path past %s: %s.", branch, strings.Join(cold, ", ")),
+				fmt.Sprintf("Run ./RUNME.sh branch sync, then %s again.", CallOf("ticket", "pull")))
+			return 1
+		}
+	}
 	if group != "" && GroupClosed(it.Disk, group) {
 		it.Say(Done, fmt.Sprintf("%s stands closed, so work/%s takes no more work.", group, group),
 			fmt.Sprintf("Call %s, then %s from %s.", CallOf("branch", "done"), CallOf("ticket", "pull"), Trunk))
@@ -304,6 +312,12 @@ func (it *It) fetched(branch string) bool {
 	it.Say(Refused, fmt.Sprintf("origin/%s holds %s commit(s) this box lacks, and the two diverge.", branch, behind),
 		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch))
 	return false
+}
+
+// The cold path files origin/main moves past HEAD, which a running box takes in through a sync before it works on. [[spec/tickets/running-work-takes-main-fixes]]
+func (it *It) coldMoved() []string {
+	it.Git.Run("fetch", "origin", Trunk)
+	return ColdIn(strings.Fields(it.Git.Run("diff", "--name-only", "HEAD...origin/"+Trunk).Out))
 }
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]

@@ -7,6 +7,7 @@ package branches
 
 import (
 	"encoding/json"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -25,6 +26,9 @@ const (
 	okTo      = 300
 	whyCut    = 300
 )
+
+// The page of open pull requests the update lists, GitHub's largest, past its default of thirty. [[spec/tickets/running-work-takes-main-fixes]]
+const pullsPage = 100
 
 const autoMerge = "mutation($id: ID!) { enablePullRequestAutoMerge(input: {pullRequestId: $id, mergeMethod: MERGE}) { clientMutationId } }"
 
@@ -284,6 +288,84 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
 	}
 	out.Why = "Auto-merge came back refused: " + message
 	return codeRed
+}
+
+// A work branch's pull request and what its update answered. [[spec/tickets/running-work-takes-main-fixes]]
+type updateRow struct {
+	Branch string `json:"branch"`
+	Number int    `json:"number"`
+	State  string `json:"state"`
+	Why    string `json:"why"`
+}
+
+// Updates every open work pull request against main from main, and prints one line a branch or the rows as JSON. [[spec/tickets/running-work-takes-main-fixes]]
+func (d *Doors) updated(send Send, argv []string) int {
+	rows, why := d.updates(send)
+	code := codeOK
+	if why != "" {
+		code = codeRed
+	}
+	for _, one := range rows {
+		if one.State != "updated" {
+			code = codeRed
+		}
+	}
+	if slices.Contains(argv, "--json") {
+		d.say("%s", jsonLine(map[string]any{"update": rows, "why": why}))
+		return code
+	}
+	d.say("the update:")
+	for _, one := range rows {
+		line := "  " + one.Branch + ": " + one.State
+		if one.Why != "" {
+			line += ", " + one.Why
+		}
+		d.say("%s", line)
+	}
+	if why != "" {
+		d.say("  %s", why)
+	} else if len(rows) == 0 {
+		d.say("  none")
+	}
+	return code
+}
+
+// The rows of the open work pull requests and their updates, or why the list stands unread. [[spec/tickets/running-work-takes-main-fixes]]
+func (d *Doors) updates(send Send) ([]updateRow, string) {
+	rows := []updateRow{}
+	if send == nil {
+		return rows, "The run holds no send door."
+	}
+	gh, why := d.hubOf(d.pullToken(), "PULL_TOKEN")
+	if why != "" {
+		return rows, why
+	}
+	listed := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls?state=open&base="+trunk+"&per_page="+strconv.Itoa(pullsPage), Request{Method: "GET", Headers: gh.Headers})
+	if !okOf(listed) {
+		return rows, "The pull request list came back " + strconv.Itoa(listed.Status) + ": " + reasonOf(listed)
+	}
+	var pulls []struct {
+		Number int `json:"number"`
+		Head   struct {
+			Ref string `json:"ref"`
+		} `json:"head"`
+	}
+	if json.Unmarshal([]byte(listed.Text), &pulls) != nil {
+		pulls = nil
+	}
+	for _, one := range pulls {
+		if !strings.HasPrefix(one.Head.Ref, workBranch) {
+			continue
+		}
+		row := updateRow{Branch: one.Head.Ref, Number: one.Number, State: "updated"}
+		said := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls/"+strconv.Itoa(one.Number)+"/update-branch", Request{Method: "PUT", Headers: gh.Headers, Body: "{}"})
+		if !okOf(said) {
+			row.State = "refused"
+			row.Why = strconv.Itoa(said.Status) + ": " + reasonOf(said)
+		}
+		rows = append(rows, row)
+	}
+	return rows, ""
 }
 
 func refusedPull(out *pullRow, what string, said Reply) int {

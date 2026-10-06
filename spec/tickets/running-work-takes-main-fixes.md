@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 7b9d188e933022c6
         size: 961
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 79ec28660d4a5674c4fa1f16a87ad11e1d02f96a
+    hash_after: 79ec28660d4a5674c4fa1f16a87ad11e1d02f96a
+    answered:
+      - name: lint
+        exit: 0
+        said: "  119.4  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -305,14 +314,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list alone: src/pull/cold.go, pull.go, pull_test.go, src/quack/commit.go, src/branches/dispatch.go, dispatch_fire.go and .github/workflows/update.yml.
+The pull reaches git through it.Git, which mainMoves fakes in the case, and the update reaches GitHub through the send door, which dfHub fakes.
+Each new function and both new roads carry a link to spec/tickets/running-work-takes-main-fixes.
+The cold path list stands once in Go, in src/pull/cold.go, and commit.go calls pull.ColdIn; the page size is the constant pullsPage.
 
 ## tests-green
 

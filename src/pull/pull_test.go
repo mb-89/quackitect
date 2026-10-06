@@ -148,12 +148,12 @@ func (one mainMoves) Run(args ...string) Ran {
 func TestPull(t *testing.T) {
 	t.Parallel()
 	t.Run("main moving the cold path asks a sync before any hand-out", func(t *testing.T) {
-		it, out, _ := cloudPull(t)
+		it, out, errs := cloudPull(t)
 		it.Git = mainMoves{it.Git, "spec/a.md\nsrc/modules/hooks/a.go"}
 		if code := it.Pulling([]string{"pull"}); code != 1 || strings.Contains(out.String(), "work  alpha") {
 			t.Fatalf("the pull answers %d:\n%s", code, out)
 		}
-		said := out.String()
+		said := errs.String()
 		if !strings.Contains(said, "src/modules/hooks/a.go") || !strings.Contains(said, "./RUNME.sh branch sync") {
 			t.Fatalf("the pull says:\n%s", said)
 		}

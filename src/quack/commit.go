@@ -20,6 +20,7 @@ import (
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/pull"
 )
 
 // The usage, the flag keeping a commit home, the name a finding of the message stands under, and the road the message names its ticket by. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -32,18 +33,6 @@ const (
 
 // The cells of a rename row git diff --name-status prints: the status, the old path and the new one. [[spec/tickets/landing-verbs-port-to-go]]
 const renameCells = 3
-
-// The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
-var coldPath = []string{
-	".claude/skills/level0/hooks/",
-	".claude/skills/level0/lib/guidance.js",
-	"src/bridge/guidance.js",
-	"src/modules/hooks/",
-	"src/quack/",
-	"src/scripts/go-stamp.sh",
-	"src/scripts/install.sh",
-	"src/scripts/probe-cold.js",
-}
 
 func init() {
 	register("commit", func(argv []string, dry bool, out, errs io.Writer) int {
@@ -265,7 +254,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	cold := coldIn(strings.Fields(gitRun(d.root, append([]string{"diff", "--cached", "--name-only", "--no-renames"}, only...)...).out))
+	cold := pull.ColdIn(strings.Fields(gitRun(d.root, append([]string{"diff", "--cached", "--name-only", "--no-renames"}, only...)...).out))
 	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
 		unstages(d.root, only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
@@ -329,20 +318,6 @@ func unstages(root string, only []string) {
 		only = []string{"--", "."}
 	}
 	gitRun(root, append([]string{"reset", "-q"}, only...)...)
-}
-
-// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
-func coldIn(paths []string) []string {
-	var out []string
-	for _, path := range paths {
-		for _, cold := range coldPath {
-			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
-				out = append(out, path)
-				break
-			}
-		}
-	}
-	return out
 }
 
 // A marked file, by the line its first marker stands on. [[spec/design_output/work#no-commit-carries-a-marker]]

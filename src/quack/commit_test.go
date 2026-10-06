@@ -316,6 +316,15 @@ func TestCommitVerbGates(t *testing.T) {
 			t.Fatalf("commit ran %v and said %q", heard.ran, out)
 		}
 	})
+	t.Run("a staged file entry of the pull's cold path runs the probe", func(t *testing.T) {
+		root, _ := landingRepo(t)
+		lays(t, root, "src/scripts/install.sh", "#!/bin/sh\n")
+		d, heard, _ := fakeLanding(root)
+		d.claude = filepath.Join(root, "README.md")
+		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("probe cold") {
+			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
+		}
+	})
 	t.Run("a staged list off the cold path runs no probe", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		lays(t, root, "src/a.go", "package a\n")
