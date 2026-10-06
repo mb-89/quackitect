@@ -68,7 +68,7 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 		return file
 	}
 	files := map[string]*ast.File{
-		"a/listed_test.go": parsed(plantedWaits),
+		"a/listed_test.go":  parsed(plantedWaits),
 		"b/globbed_test.go": parsed(plantedWaits),
 		"c/outside_test.go": parsed(plantedWaits),
 		"c/quiet_test.go":   parsed(plantedQuiet),
