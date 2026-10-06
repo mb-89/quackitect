@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9514dcba4510cdaf
         size: 2246
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3341fdcd540f · claude-code-remote · helper-4
+    hash_before: 3b325d8bb6a58d970acdb133c6c5a3077b211425
+    hash_after: 3c9782b5e0cfe8c22dbe48384885378addeaebf4
+    inputs:
+      - name: design/draft
+        hash: 9514dcba4510cdaf
+        size: 2246
+      - name: design/tests-red
+        hash: 0fd6e826035c23a2
+        size: 1008
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -267,8 +279,11 @@ The red cloud commit stays on the box: the verb says no push reaches origin, and
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- rescue-passes-the-stamp-gate: `src/scripts/prepush.js` stands outside the size list. The rescue rides a branch under `refs/heads`, which the cloud proxy takes. Here `.github/workflows/check.yml` stands, so the stamp loop skips the rescue. A tree without that workflow refuses the red rescue push. Skip `refs/heads/rescue/` beside the beat skip in `holds`, with a case in `test/level0/prepush.test.js`.
+- ci-skips-rescue-and-beats: the check workflow runs on a push to every branch. So each rescue push starts a CI run that answers red, and each beat push starts one too. Add `branches-ignore` for `rescue/**` and `beats/**` under `on.push`.
 
 # implement
 
