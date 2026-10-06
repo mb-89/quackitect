@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -143,6 +143,15 @@ record:
         hash: a43bfbbf5a92e9eb
         size: 4413
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 4987c1bb38ad811d445dc6a7950bee0c5ea1bd71
+    hash_after: 4987c1bb38ad811d445dc6a7950bee0c5ea1bd71
+    inputs:
+      - name: ask
+        hash: ac3cdcab2c35b53e
+        size: 459
+    def: c01ae0f2ace0cecb
 group: javascript-leaves
 ---
 
@@ -182,28 +191,30 @@ none
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-1. A new file, src/quack/probe_dry.go, holds probeDry(d, argv). Under --working it reads the working delta with `git diff HEAD --binary --no-renames`, untrimmed, porting deltaOf.
-2. It stands the fresh box with coldTree, which the cold probe already uses. It runs `se-index standing` in the clone, as START in hooks/start.js does.
-3. It reads the door's address off hooks.StandingFile. It posts each event to the door with the bearer token, through a new post door on boxDoors.
-4. It raises session.start, prompt.submit, prompt.context, classic.MessageDisplay with the canary, tool.call Read, tool.call Bash, then classic.Stop. A rows effect gets an agent.spoke post carrying the held transcript.
-5. readsDry runs its eight checks off the effects the door answers and the clone's session log: door, rules, prompt, tools, guard, canary, quiet, clear.
-6. The clear road moves from probe-clear.js into the same file. It passes where the door's clear effect carries hooks.ResumePrompt and both turn ends answer one clear.
-7. stops.go exports resumePrompt as ResumePrompt, so Go owns that string. handover.js stays loaded through src/bridge/guidance.js until its own child removes it.
-8. probe_verb.go loses dryEntry. coldPath and coldIn move from commit.go into probe_cold.go, and the list drops probe-cold.js.
-9. The three probe scripts and their three tests go. cli-check.js drops the deltaOf export, and check-server.test.js drops its deltaOf case.
-Weighed: a kept node entry keeps in-process cover of the JavaScript forwarder, and keeps a probe in Node against the ask. Posting to the door costs that cover. hooks.test.js, cage.test.js and the cold probe still read the real module.
-Assumed: level0-hooks-forward-to-go cuts the plugin to a forwarder, so the door holds every decision the dry checks read.
+1. `src/quack/probe_dry.go` holds `probeDry(d, argv)` and `probeSmoke(d, argv)`, both over one `probed` road. Under `--working` each reads the working delta with `git diff HEAD --binary --no-renames`, untrimmed, porting `deltaOf` as `workingDelta`.
+2. The dry road stands the fresh box with `coldTree`, which the cold probe already uses. `coldBox` gains an `at` field, and `coldTree` checks the clone out with `git checkout --quiet --detach <at>` before the delta, porting `checksOut`. `probeVerb` keeps resolving the revision.
+3. The smoke road stands its tree with a Go `smokeTree`: `git clone --quiet --shared`, the delta through `takesDelta`, the root's built tools under the runtime `bin` folder copied in past any name ending `.old`, and the pointer file naming the tree and the port. It installs nothing.
+4. Each road runs `se-index standing` in the clone, as `START` in `hooks/start.js` does. It reads the door's address off `hooks.StandingFile`, and posts each event with the bearer token through a new post door on `boxDoors`.
+5. The session raises `session.start`, `prompt.submit`, `prompt.context`, `classic.MessageDisplay` with the canary, `tool.call` Read, `tool.call` Bash, then `classic.Stop`. A rows effect gets an `agent.spoke` post carrying the held transcript.
+6. `readsDry` runs its checks off the effects the door answers and the clone's session log: door, rules, prompt, tools, guard, canary, quiet, clear. The smoke reads every check but the clear, and its session skips the clear road.
+7. The clear road moves from `probe-clear.js` into the same file. Its clone drops every `todo: true` park and commits that, mints its group, then commits the untag and points origin's branch at its tip. It passes where the door's clear effect carries `hooks.ResumePrompt` and both turn ends answer one clear. `stops.go` already exports `ResumePrompt`.
+8. `leaves` removes the temp tree, and where the box still holds it, says `the temp tree stays at <path>` with the error, and the verdict stands.
+9. `probe_verb.go` loses `dryEntry`, and the dry and smoke cases call the Go roads. `coldPath` and `coldIn` move from `commit.go` into `probe_cold.go`, and the list drops `probe-cold.js`.
+10. The three probe scripts and their three tests go. `cli-check.js` drops the `deltaOf` export, and `check-server.test.js` drops its `deltaOf` case. `handover.js` stays loaded through `src/bridge/guidance.js` until its own child removes it.
+Weighed: a kept node entry keeps in-process cover of the JavaScript forwarder, and keeps a probe in Node against the ask. Posting to the door costs that cover. `hooks.test.js`, `cage.test.js` and the cold probe still read the real module.
+Assumed: `level0-hooks-forward-to-go` cuts the plugin to a forwarder, so the door holds every decision the dry checks read. The smoke stands in the check, so a red smoke reds the check, and the check decides it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- src/quack/check.go: level0Runs, runs probe dry --working
-- src/quack/probe_verb.go: probeVerb, case dry calls probeDry
+- src/quack/check.go: level0Runs, runs probe smoke --working
+- src/quack/probe_verb.go: probeVerb, the dry and smoke cases, and the revision resolver
 - src/quack/commit.go: lands, calls coldIn
-- src/quack/probe_cold.go: coldTree, coldPort, coldLines, tail, which the dry probe reuses
-- src/modules/hooks/stops.go: holdsForHandover, reads resumePrompt
+- src/quack/probe_cold.go: coldTree, coldBox, coldPort, coldLines, tail, which both roads reuse
+- src/quack/probe_cold.go: probeCold, builds a coldBox
+- src/modules/hooks/stops.go: ResumePrompt, which the clear reads
 - src/quack/boxdoors.go: realBoxDoors, gains the post door
 - src/quack/box_doors_test.go: fakeBoxDoors, gains a fake post
 - src/scripts/cli-check.js: re-exports deltaOf
@@ -223,16 +234,18 @@ Assumed: level0-hooks-forward-to-go cuts the plugin to a forwarder, so the door 
 - src/quack/probe_dry_test.go: TestTheDryProbeRaisesTheStopBeforeTheTurnsCompletion
 - src/quack/probe_dry_test.go: TestTheProbeMintsItsGroupUnderTheClonesRoot
 - src/quack/probe_dry_test.go: TestTheWorkingDeltaReadsTheDiffUntrimmed
-- src/quack/probe_cold_test.go: TestTheColdPathTakesTheHooksFolderAndTheNamedFiles
-- src/quack/probe_cold_test.go: TestAPathElsewhereSitsOffTheColdPath
-- src/quack/probe_cold_test.go: TestTheColdPathNamesNoScriptOfItsOwn
+- src/quack/probe_dry_test.go: TestTheSmokeStandsTheCloneWithTheRootsBuiltToolsAndInstallsNothing
+- src/quack/probe_dry_test.go: TestTheSmokeReadsEveryCheckButTheClear
+- src/quack/probe_dry_test.go: TestTheColdTreeChecksTheCloneOutAtTheRevisionItNames
+- src/quack/probe_dry_test.go: TestATempTreeTheBoxStillHoldsStaysNamedAndTheVerdictStands
+- src/quack/probe_dry_test.go: TestTheProbeDropsEveryParkInItsCloneAndCommitsIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- first on this route: the standard process changed, and the ticket restarts at the draft, so the approach takes in what main gave the probe scripts since the last draft
 
 ### size
 
@@ -256,7 +269,6 @@ Assumed: level0-hooks-forward-to-go cuts the plugin to a forwarder, so the door 
 - src/quack/commit.go
 - src/quack/boxdoors.go
 - src/quack/box_doors_test.go
-- src/modules/hooks/stops.go
 - spec/design_output/level0.md
 
 ### checked
@@ -264,9 +276,10 @@ Assumed: level0-hooks-forward-to-go cuts the plugin to a forwarder, so the door 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- a helper opened the three scripts, the probe, commit, check, boxdoors and stops Go files, cage.js, level0.js and start.js, and I checked resumePrompt, coldIn, StandingFile, the check's probe call and deltaOf there
-- the callers come off a git grep for dryEntry, probeDry, coldIn, deltaOf, RESUME, resumePrompt and the three script names
-- ls-files and the src/scripts grep run at tests-red as checkpoints, TestTheDryProbeStandsTheDoorAndPostsEveryEventToIt and a live probe dry decide line three, and a live check decides line four
+- on the merged tree I opened `probe-dry.js`, `probe-clear.js`, `probe-cold.js`, `probe_verb.go`, `probe_cold.go`, `probe_dry.go`, `commit.go`, `check.go`, `stops.go` and `hooks.go`, and checked `dryEntry`, `atFlag`, `coldIn`, `coldBox`, `coldTree`, `StandingFile`, `ResumePrompt`, `deltaOf`, `smokeTree`, `checksOut`, `unparked` and `leaves` there
+- the callers come off a git grep for `dryEntry`, `probeDry`, `coldIn`, `coldBox`, `deltaOf`, `ResumePrompt`, `probe smoke` and the three script names
+- `ls-files` and the `src/scripts` grep run at tests-red as checkpoints, `TestTheDryProbeStandsTheDoorAndPostsEveryEventToIt` and a live `probe dry` decide line three, and a live check, which runs the smoke, decides line four
+- the approach adds no config key
 
 ## tests-red
 
