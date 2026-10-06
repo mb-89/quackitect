@@ -200,6 +200,8 @@ test("the stale reader reads the beat before the tip's age", () => {
   assert.equal(staleBy(at(60, `${seconds - 120} box a ends`), "30m", now, "10m")(ref), false);
   assert.equal(staleBy(at(3600, `${seconds - 60} box a beats`), "30m", now, "10m")(ref), false);
   assert.equal(staleBy(at(3600, `${seconds - 1200} box a beats`), "30m", now, "10m")(ref), true);
+  assert.equal(staleBy(at(3600, `${seconds - 600} box a beats`), "30m", now, "10m")(ref), true, "a beat one span old reads dead");
+  assert.equal(staleBy(at(3600, `${seconds - 599} box a beats`), "30m", now, "10m")(ref), false);
 });
 
 // [[spec/tickets/one-writer-holds-a-branch]]

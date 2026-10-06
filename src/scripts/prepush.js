@@ -7,6 +7,7 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { MS } from "../../.claude/skills/level0/lib/log.js";
 import {
   ENGINE,
   STAMP,
@@ -208,7 +209,7 @@ export function staleBy(repo, span, now, beatSpan = "") {
       const at = Number(line.split(" ")[0]);
       if (line.endsWith(ENDS) && at >= when) return true;
       const live = spanOf(beatSpan);
-      if (!line.endsWith(ENDS) && live > 0 && Math.floor(now / 1000) - at < live) {
+      if (!line.endsWith(ENDS) && live > 0 && Math.floor(now / MS) - at < live) {
         return false;
       }
     }
