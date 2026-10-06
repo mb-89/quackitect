@@ -332,6 +332,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
 		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,
 		Review: reviewOver(root),
+		// [[spec/tickets/wiring-names-listens-hooks]]
+		Hear: sentinelHere(root, os.Stderr),
 	})
 	return hooks.Listen(root, door)
 }

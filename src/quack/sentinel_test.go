@@ -6,6 +6,8 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -51,5 +53,22 @@ func TestSentinelOverSaysALostRow(t *testing.T) {
 	hear(failure.Event{Kind: "tool.call", Text: `{"command":"./RUNME.sh branch take"}`})
 	if said := errs.String(); !strings.Contains(said, "take-watched") || !strings.Contains(said, "the log stands read-only") {
 		t.Fatalf("the sentinel says %q, and wants the lost row's id and the fault", said)
+	}
+}
+
+// The sentinel the wiring hands the hooks door reads the tree's nodes and writes a fired row into the session log. [[spec/tickets/wiring-names-listens-hooks]]
+func TestSentinelHereWritesTheSessionLog(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(failure.Folder)), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(failure.Folder), "take-watched.md"), []byte(watchedNode), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sentinelHere(root, io.Discard)(failure.Event{Kind: "tool.call", Text: `{"command":"./RUNME.sh branch take"}`})
+	said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+	if err != nil || !strings.Contains(string(said), `"take-watched"`) {
+		t.Fatalf("the session log reads %q (%v), and wants the row of take-watched", said, err)
 	}
 }

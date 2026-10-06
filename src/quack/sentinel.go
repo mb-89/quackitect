@@ -6,9 +6,12 @@ package main
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"time"
 
 	"quackitect/src/failure"
+	"quackitect/src/modules/clock"
+	"quackitect/src/modules/hooks"
 )
 
 // The clock door the sentinel arms a quiet watch on and stamps a fired row by. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
@@ -26,4 +29,9 @@ func sentinelOver(from failure.Reader, clock sentinelClock, run failure.Runner, 
 		}
 	}
 	return failure.NewSentinel(failure.Load(from), clock, fire, run).Hear
+}
+
+// The sentinel listensHooks hands the hooks door: the tree's nodes, the clock door, the process door at the root, and the session log. [[spec/tickets/wiring-names-listens-hooks]]
+func sentinelHere(root string, errs io.Writer) func(failure.Event) {
+	return sentinelOver(failure.Dir{Root: root}, clock.New(), failure.Shell{Root: root}, hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))), errs)
 }

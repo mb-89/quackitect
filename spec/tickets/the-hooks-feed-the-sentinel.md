@@ -358,3 +358,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's approach and callers name `listens` in `src/quack/main.go`. The builder of `hooks.Outside` is `listensHooks`, which now hands `Hear` through `sentinelHere` in `src/quack/sentinel.go`. The draft's chapter stays as the engine wrote it.
