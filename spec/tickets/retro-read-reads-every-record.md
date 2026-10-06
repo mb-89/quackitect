@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 70a72d6b73857176
         size: 2158
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 0b2ba603a0e45e58666d5fe16a3187c5c5bf23c9
+    hash_after: 0b2ba603a0e45e58666d5fe16a3187c5c5bf23c9
+    inputs:
+      - name: design/draft
+        hash: 70a72d6b73857176
+        size: 2158
+      - name: design/tests-red
+        hash: d4411837207b96b8
+        size: 888
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,12 @@ the tests reach temp folders the cases seed, and the mint test reaches git throu
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- src/modules/verbs/retro.go repeats the read doc line of retro_usage.go, so both change
+- the read test also covers a helper transcript earning no row, and a queued prompt naming no origin and not marked meta, and the mint test covers the copy of collected.json
+- the copy into spec/retros carries no disk path, name or date in prose, and a missing rates or collected file is skipped
 
 # implement
 
