@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: c18cc43dd43f8e57dad45ac5bb96b5815e71efa0
+    hash_after: c18cc43dd43f8e57dad45ac5bb96b5815e71efa0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   99.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 15db91747755d405
+        size: 842
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -383,26 +406,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/spawns_runner_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The eight quack spawns past the node module and Vale ran exec in place: toolRuns, roadVerb, takesBranch, retroMintRunme, heardIn, reviewOver, serveRuns and tuiLaunch. Each now runs through the process door. Its old name stays as a binding over proc.Real, beside an Over form a case hands a FakeRunner, so the cases in spawns_runner_test.go spawn nothing. The door gains Streams, which hand a run the caller input and output in place of the buffers, so the viewer and the fix tools keep the terminal. It also gains Signalled, which parts a run a signal ends from one that never starts, so serve and the viewer read a signal as exit 1. unreadWhy reads the door answer in place of an exec error. Under src/quack, exec.Command now stands in the box and check doors alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, branch.go and vale_why_test.go
+- the process door has FakeRunner, and its contract suite holds the streams and the signal on both runners
+- each Over form points at this ticket, and the process door section names the approach
+- Streams and Signalled stand once, in proc.go
 
 # accept
 
