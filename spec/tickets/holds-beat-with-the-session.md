@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 9bbdb2aba8d27d4fdada8f15a31d37fdf3c14e96
+    hash_after: 9bbdb2aba8d27d4fdada8f15a31d37fdf3c14e96
+    inputs:
+      - name: ask
+        hash: 3828144eeccd2c6f
+        size: 475
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,64 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A box beats on its group: a parentless commit over the empty tree, pushed by force to refs/beats/<group> on origin. Its committer date comes off the clock door, d.Now, and its subject names the hand and live or ended. A new verb, branch beat [--end], in src/branches/beat.go writes it. A beat younger than half of work.beatAfter, read off .se/.runtime/beat.json, writes nothing, so a beat per event costs one push per span. The take writes the first beat. A Stop command hook and a SessionEnd command hook in .claude/settings.json run ./RUNME.sh branch beat and ./RUNME.sh branch beat --end, so each turn end beats and a session end ends the hold at once. The fetch takes +refs/beats/*:refs/beats/*. The hold then reads three ways in d.holdOf(one, now), which staleClaim folds in. An ended beat newer than the tip reads dead at once. A live beat younger than work.beatAfter reads live, whatever the tip age says. Otherwise the tip age against work.staleAfter decides, as today. branch list writes live beside the age of a hold that beats, and leaves it out of Yours. branch take --over [name] takes a held branch whose hold reads dead, ahead of a branch at todo. It refuses a live hold, naming its last beat, and claimGroup writes the takeover record as a stale take does today. A container reclaimed with no SessionEnd stops beating, and its hold reads dead once work.beatAfter passes, which stands shorter than staleAfter.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/free.go Doors.freeIn, through staleClaim
+- src/branches/free.go Doors.stuckIn, through staleClaim
+- src/branches/held.go Doors.pastHold, through staleClaim
+- src/branches/list.go Doors.rowOf and list, through staleClaim
+- src/branches/take.go take, through readFree and the new --over
+- src/branches/doors.go Doors.fetch, every verb that fetches
+- src/branches/branch.go the verb table, for beat
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go TestAnEndedHoldMovesUnderTakeOverAtOnce
+- src/branches/beat_test.go TestTakeOverRefusesAHoldThatStillBeats
+- src/branches/beat_test.go TestListNamesAnOldHoldLiveWhileItsBoxBeats
+- src/branches/beat_test.go TestABeatInsideHalfTheSpanWritesNothing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/beat.go
+- src/branches/beat_test.go
+- src/branches/free.go
+- src/branches/take.go
+- src/branches/list.go
+- src/branches/doors.go
+- src/branches/branch.go
+- .claude/settings.json
+- spec/config/level0.json, for work.beatAfter
+- spec/design_output/work.md, a section A hold beats
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened free.go, held.go, hand.go, take.go, list.go, doors.go, branch.go and .claude/settings.json, and checked there that staleClaim decides every hold read and that take ignores its argv today
+- the callers list names every caller of staleClaim, readFree and fetch, and the verb table
+- the take case decides the first done_when line, the list case the second, and the check on the commit the third
 
 ## tests-red
 
