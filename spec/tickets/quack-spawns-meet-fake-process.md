@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: f33666fb0227dd86099e8f0c28e0de84dbe506bf
+    hash_after: 5a01d5c331fc8c9b32f0e1009b1b535b06a3c7ab
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  101.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2dbc33b2321c853d
+        size: 942
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -389,26 +412,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/registry_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The node module's child road and the voice verb's Vale run through the process door, so their cases teach a FakeRunner and spawn nothing. A person's call drops the harness variables through the new Command.Drop, which the real runner takes out of the box's env before it adds Env. The case spawning a shell script in place of quack leaves, and the person's case stands as a TestVerbRegistry subtest. The index import case walks the packages load the import rules already take, in place of go list. The battery case waits on a channel in place of a sleep. The family table re-files each quack file by what it waits on: the listener cases join the index door, split_test.go joins the placements, and waits_test.go waits under quack-waits-poll-on-a-fake-clock. Every other quack spawn waits under quack-spawns-all-take-the-runner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list, the spawndoors.go header and the process contract suite
+- the process door has FakeRunner, held to the real runner by its contract suite
+- each changed function points at this ticket, and the process door section names the approach
+- the harness names stand once, in src/quack/twins.go
 
 # accept
 
