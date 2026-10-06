@@ -133,7 +133,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: aad67b5c6f5f284505452d202a659c271e796dc2
+    hash_after: aad67b5c6f5f284505452d202a659c271e796dc2
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+step: retro/cloud
 ---
 
 # Ask
@@ -236,38 +248,72 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- failure-nodes-stand and failure-watch-shape: a failure is a node under spec/failures with an id, a level, remedies, and an optional reaction and watch
+- failure-door-raises: one failure door raises in Go and in its JavaScript twin, printing the id, the message and each remedy
+- failure-check-refuses: the check refuses a node with no remedy, a raised id with no node, and refusal text past the door
+- sentinel-fires-watches: the sentinel fires a matching watch, and arms a quiet one on the clock door with no poll
+- failure-verbs-raise-and-register: an agent raises and registers a failure by verb, and the log counts failures by id
+- pull-callers-name-stillheld, take-moves-stands-refusals, mint-refusals-keep-ids, js-refusals-move: the pull, take and mint refusals stand on nodes
+- pull-ids-test-written and moved-owns-the-files: the pull tests read each id off the fake registry, and failure.Moved names the moved places
+- failure-new-lands-untracked: failure new stages the node it writes
+- the gate fixes: check-skips-named-red-tests, failure-count-skips-no-id, failure-new-refusals-tested, failure-new-shape-once, the three failure-raise fixes, failure-verb-in-help, raise-scan-keys-failure-door, sentinel-callers-list-whole, sentinel-note-names-the-runner
+- the retro notes: three became index-survives-a-long-call, the-twins-leave-whole and the-hooks-feed-the-sentinel, and probe-meets-tagged-tickets closed done
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- each gate minted its fix tickets into the group, and every one closed on this branch
+- the red tests stood before each change, and the fake registry let the pull tests read ids with no real node
+- the scripts under .se/scripts wrote the failure nodes and the pull patch ops in bulk: pull-nodes.sh, take-nodes.sh, pull-sites.py with pull-ops.json, split-fields.py and mint-slices.sh
+- the retro notes each met a read of the code before a verdict, so a note whose fix had landed closed done in place of a duplicate ticket
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 16:26 to 21:18, every window: a Bash call opened its description with no ticket, and the door refused it
+- 16:26 to 17:15: a checkout of main met a refusal and a detached HEAD, and a push of main met the cloud box's own-branch rule
+- 16:26 to 18:21: the plan grace ran out between tickets, and calls met refusals until a plan answered
+- 16:26 to 18:21: the tests-green hand-back through the pull tool answered connection refused, and the index restarted on a new port
+- 17:15 to 18:21: hand-backs failed on red tests in src/quack and src/failure, gofmt answered exit 1, and a patch named a move op the tool holds none of
+- 19:44: the commit hook refused code with no test beside it
+- 21:21: the mint took the ask's fields as flags and refused them, since the ask rides in --Ask as written text
+- 21:26: a commit piped through tail ahead of a hand-back met LandingFollowsItsGate
+- 16:27 owner prompt: run the work skill on failures-stand-registered, with no timers or sleeps, each door tested once against the real thing, and the pull request against main with auto-merge on; nothing in the session turned it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the description rule: the work skill names the Bash description rule beside its first step, in .claude/skills/work/SKILL.md
+- the dropped index: index-survives-a-long-call, in this group
+- the plan grace: a plan rides each pull and each write, which the tools' plan field already carries
+- the mint form: the remedy of the node mint-fields-refused names --Ask as the home of a ticket's ask fields, under spec/failures
+- the piped gate: a gate joins its landing with && and no pipe, which LandingFollowsItsGate already says
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The session ran six windows over one group, with level zero clearing the context between them, and the handover carried the state each time. The cost sat in the doors: most refusals named a form, not a fault in the work. The one real fault the session met, the index dropping inside a long tool call, got worked around from the shell for hours before a note named it. The retro turns it into a ticket of the group, together with the twins' last callers and the sentinel's missing wiring. All three stay in the group, so the branch reaches done only after they close.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact stands once: each done line points at its ticket, and no rule is copied in
+no number: the lines name no count a command answers
+no header: this chapter writes no file header
+the owner prompt and the errors carry their times off the transcripts and the git log, a window's span where the minute stays unread
+the chapter names roles alone, and no person, address or box path
 
 ## cloud
 
