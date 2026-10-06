@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: c21254153cb4aa35
         size: 872
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: dc777f5c3c4d735ff47da9990729ab9300f289c4
+    hash_after: a438d525283bba0f08fc1d2b45286644d97549a2
+    answered:
+      - name: lint
+        exit: 0
+        said: "  118.8  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -303,14 +312,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change reaches the branches package, the push hook, the settings declaration and the hook settings; the hook and the declaration joined through the children the gate minted
+- the beat reaches git through the doors the package holds, and the push hook reads it through its repo door, whose cases drive a fake
+- beat.go opens on a header naming the approach, and each function points at the design section a-hold-beats-with-its-session
+- the span stands in work.beatAfter alone, the rules in the work design section, and the code points there
 
 ## tests-green
 
