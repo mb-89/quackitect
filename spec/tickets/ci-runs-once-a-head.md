@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box d040db23b249 · claude-code-remote
@@ -93,6 +93,15 @@ record:
         exit: 0
         said: work/ci-runs-once-a-head already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 07d2388b9cea84fa96feb1c2a784343375245f1c
+    hash_after: 07d2388b9cea84fa96feb1c2a784343375245f1c
+    inputs:
+      - name: ask
+        hash: 2f604c4e87630f58
+        size: 204
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -119,14 +128,18 @@ never waits behind the fleet's superseded ones.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/check-runs-once-a-head]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child changes one workflow, its contract test and one design section, small enough to review whole
+- the child covers the goal whole: the triggers, the groups, the names kept and the reason written
+- no child waits on another, since the group holds one
 
 # children
 
