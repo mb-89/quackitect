@@ -25,7 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: code-is-pure-tests-test-behavior
+group: code-is-pure-tests-behave
 depends_on: [go-tests-go-black-box, go-fixtures-move-home, js-tests-cut-to-the-ratio, hand-script-guard-reports, purity-guard-covers-every-outside]
 ---
 

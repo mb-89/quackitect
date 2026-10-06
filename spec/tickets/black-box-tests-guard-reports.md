@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: code-is-pure-tests-test-behavior
+group: code-is-pure-tests-behave
 ---
 
 # Ask
