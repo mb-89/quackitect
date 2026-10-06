@@ -6,10 +6,10 @@ rationale: [[spec/rationales/code]]
 
 # Actionables
 
-1. Write code that carries no comment. The name and the shape say what a comment says. The rules below are one principle over code: one place owns a thing. [[spec/guidance/working]] *
+1. Write code that carries no comment past its header, its pointers and its suppressions. The name and the shape say what a comment says, and `CodeComment` refuses any other line. The rules below are one principle over code: one place owns a thing. [[spec/guidance/working]] *
 2. Open a file with a header of five lines at most, saying what the file is for. It counts nothing and lists no section.
-3. Move an explanation into `spec/design_output/<file>.md`, under its own section. An explanation inside the code goes stale with the next edit, and nobody reads it there. *
-4. Point at that section from the code: `// [[spec/design_output/<file>#<section>]]`.
+3. End every comment line past the header on a pointer at the note owning its explanation. A line with no pointer goes stale with the next edit, and nobody reads it there. *
+4. Point at a section of `spec/design_output` where the explanation runs past a line, and at the ticket the change serves otherwise: `// [[spec/design_output/<file>#<section>]]`.
 5. Name a rule and a reason to switch one off: `// level0: <Rule> - <why>`.
 6. Let the formatter own the layout. It runs at the write door, and its result stands.
 7. Run `./RUNME.sh check` before you finish, and read what the linter names.
