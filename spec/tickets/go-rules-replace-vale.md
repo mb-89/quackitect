@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: e5e357354b7669b9
         size: 3124
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 09cf21ad3c5d · claude-code-remote · helper-4
+    hash_before: 2bc6c51d9ab2938cbd26886a53931952ccdf3e9b
+    hash_after: 2bc6c51d9ab2938cbd26886a53931952ccdf3e9b
+    inputs:
+      - name: design/draft
+        hash: e5e357354b7669b9
+        size: 3124
+      - name: design/tests-red
+        hash: 25b5ae1b04509dbe
+        size: 930
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -298,8 +310,13 @@ Every rule fails its fixture on its own assertion, the lsp case draws no row und
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- go-rules-rename-voicevale: the approach keeps the VoiceVale style under spec/config/styles and its name in src/rules/scope.go, src/rules/testdata and every check id, plus Tools.Vale and ValeRuns in src/modules/lsp, so the done_when grep `git grep -il vale -- src test RUNME.sh .github` cannot answer nothing; rename the style and the fields in the build, or narrow the done_when line
+- go-rules-exemption-marker: the `<!-- vale <Check> = NO -->` marker that test/level0/one-reader.test.js, findings.test.js, voice.test.js and the check's ExemptionCarriesAReason read has no place in the approach and no red case under src/rules; name whether Lint honours it (and under what new spelling) and add the case
+- go-rules-span-parity: src/rules/testdata/vale.json holds Vale's Line and Span for every fixture, and rules_test.go reads none of it, asserting presence alone; assert each row's Line and Span against it, since the lsp diagnostics and the fix verb place edits by span, or drop the file
+- go-rules-design-note: src/rules/scope.go links [[spec/design_output/rules#a-rule-reads-its-paths]], and no such note stands, nor does the draft's size list it; write the note or point the links at the ticket
 
 # implement
 
