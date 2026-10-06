@@ -5,6 +5,8 @@ package index
 
 import (
 	"errors"
+	"slices"
+	"sync"
 	"testing"
 	"time"
 
@@ -90,6 +92,21 @@ func TestAFailingCallAnswersItsReason(t *testing.T) {
 	}
 }
 
+// A wait arms its span through the timer the book holds, so a case reads when it waits. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestAWaitArmsItsSpanThroughTheBooksTimer(t *testing.T) {
+	t.Parallel()
+	b, _, _ := bookOf(t)
+	armed := []time.Duration{}
+	b.after = func(span time.Duration) <-chan time.Time {
+		armed = append(armed, span)
+		return make(chan time.Time)
+	}
+	b.Wait("no-such-handle", patience)
+	if !slices.Equal(armed, []time.Duration{patience}) {
+		t.Fatalf("the wait arms %v through the book's timer", armed)
+	}
+}
+
 func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
 	b, _, _ := bookOf(t)
 	mine, other := make(chan struct{}), make(chan struct{})
@@ -106,9 +123,19 @@ func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
 	if open := b.Open("s1"); len(open) != 2 {
 		t.Fatalf("s1 holds %v open", open)
 	}
+	armed := make(chan struct{})
+	var once sync.Once
+	b.after = func(span time.Duration) <-chan time.Time {
+		once.Do(func() { close(armed) })
+		return time.After(span)
+	}
 	waited := make(chan []Op)
 	go func() { waited <- b.WaitCaller("s1", patience) }()
-	time.Sleep(slow / 5)
+	select {
+	case <-armed:
+	case <-time.After(patience):
+		t.Fatal("the wait on s1 never arms through the book's timer")
+	}
 	close(mine)
 	ended := <-waited
 	if len(ended) != 2 || ended[0].State != Done || ended[1].State != Done || ended[0].Caller != "s1" {

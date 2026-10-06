@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["the-testing-rules-name-the-doors"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 519f80ce0658be38
         size: 556
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: ee0a6b84dfb1cf97e35682a365f4d13c789228cc
+    hash_after: ee0a6b84dfb1cf97e35682a365f4d13c789228cc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/index fails
+    inputs:
+      - name: design/draft
+        hash: 543b3deeb4147393
+        size: 1363
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,31 @@ Book.Wait reads the wall clock through time.After, against rule 8 of the testing
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/call_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/index/call_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the wait arms nothing through the book timer, and the case on s1 never sees it arm. The book takes the field and NewBook fills it, so the cases compile, and Wait still reads time.After. A surprise: the hang guard on the signal reads the wall clock through time.After, which the real-wait guard leaves alone, since it bounds a hang and waits on nothing that passes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets both cases, the second the real-wait guard once the row leaves, the third the check
+- the cases reach no door: the book runs on the fake clock and the memory keep bookOf hands in
 
 # gate
 
