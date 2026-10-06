@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -316,6 +316,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    skipped: true
+    kept: 54cdce1b356329fa4bba1498bf8ab9328928c738
+    why: its red tests stand as 54cdce1b3 landed them, and a later leaf passed since
 ---
 
 # Ask
