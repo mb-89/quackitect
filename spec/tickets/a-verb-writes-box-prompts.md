@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 02f7a5a3a638d3f9
         size: 2318
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 877282628a5f86de2c6db79c3d3477e18ad04c74
+    hash_after: 877282628a5f86de2c6db79c3d3477e18ad04c74
+    inputs:
+      - name: design/draft
+        hash: 02f7a5a3a638d3f9
+        size: 2318
+      - name: design/tests-red
+        hash: 31b422a6b4c97a95
+        size: 832
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -271,8 +283,12 @@ Each case fails on its own assertion: the cloud verb answers its usage, code 2, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach names the children as every ticket whose group names the group, and TestPromptWritesTheGroupsPromptFromItsRoute leaves the closed child c-shut out: the builder reads open children alone.
+- The route read reuses processAt in src/branches/dispatch_write.go, whose refusal `spec/processes holds no <name>.` is the line TestPromptRefusesARouteThatStandsNowhere holds, in place of a second reader of spec/processes.
+- The tests list misses TestPromptRefusesNoName, which stands in src/branches/prompt_test.go and wants `cloud prompt needs a group`: the builder answers it, and the Cloud usage row names prompt beside trigger.
 
 # implement
 
