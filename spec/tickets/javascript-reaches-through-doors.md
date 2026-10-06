@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 70af77eecb1a5860
         size: 3573
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: d40279ffb19c26e3fbce4378c5210cead009716e
+    hash_after: d40279ffb19c26e3fbce4378c5210cead009716e
+    inputs:
+      - name: design/draft
+        hash: 70af77eecb1a5860
+        size: 3573
+      - name: design/tests-red
+        hash: c8f29294cd586466
+        size: 824
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -298,8 +310,13 @@ the case goes red on each walk-around the change removes, as the run shows
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- extension-root-is-activate: the draft names `src/extension/editor.js activate` as the root, but `activate` stands in `src/extension/extension.js`, the package main, which builds the editor door through `editorDoor` and requires `lib/settle.js` and `lib/lsp.js`; add `extension.js` and `test/level0/editor.test.js` to callers and size
+- doors-lists-declared-outsides: `./RUNME.sh doors` prints a declaration only through its `contract` line in `walksOver`, so a page or prototype declaration with no contract test stands silent, and no red case decides the second done_when line; make the verb print each declared outside and its files, with a red case in `src/quack/verb_doors_test.go`, and list each prototype file under `files`, since `files` takes files and no folder
+- extension-loads-doors-async: the extension loads as CommonJS and reaches the ESM doors only by `await import` off `homeOf` in `editor-process.js`, which itself calls `realpathSync` from `node:fs`; name how activation awaits the doors before it builds the hand, and mark the `realpathSync` line with its reason
+- tests-list-misses-callers: the tests list leaves out `test/level0/wait.test.js` for `src/bridge/wait.js`, and `test/contract/editor-files.test.js` and `test/contract/editor-index.test.js`, which change with the extension files
 
 # implement
 
