@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c4cd700ddee2f0f9
         size: 325
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: f39555b0ae8a21e805480919ebd9c12fe74f625f
+    hash_after: f39555b0ae8a21e805480919ebd9c12fe74f625f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 8fdf0e78c29f3b82
+        size: 1478
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -214,26 +227,31 @@ the one done_when line meets TestRetroAuditNamesAClosedTrialWhoseDecisionStandsE
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_audit_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/retro_audit_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The audit reads open trials alone, so a closed trial with an empty decision passes it and the verb answers 0. The standing clear case now writes a decision on its closed trial, and it stays green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the one done_when line meets TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty, red on its assertion
+the test reaches a temp folder the case seeds, as every retro audit test does, and no other door
 
 # gate
 
