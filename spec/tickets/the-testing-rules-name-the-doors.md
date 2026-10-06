@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4789b88f5e4643b79ca8a7e0757963d11fb2ab04
+    hash_after: 4789b88f5e4643b79ca8a7e0757963d11fb2ab04
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "  116.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d95620e81141fe84
+        size: 789
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -342,26 +365,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/clock_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check now names a Go test that sleeps or spawns a process outside the door audit. src/imports/clock.go reads each test file for time.Sleep, exec.Command, exec.CommandContext and os.StartProcess through the names the file imports them by, and matches its path against every test span in the tables of spec/design_output/doors.md. The audit takes the seven files the guard first named, and a child moves the one module test sleeping on the wall clock. The testing guidance carries the owner rules within its cap, and the rationale argues each.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus one child ticket
+- every door the guard names holds a fake, or a child moving its family onto one
+- a comment on each new function points at this ticket or the testing guidance
+- the audit list stands once, in the doors note, and the guard and the rules point at it
 
 # accept
 
