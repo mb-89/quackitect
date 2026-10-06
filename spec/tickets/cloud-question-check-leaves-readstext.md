@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: boxes-hold-and-hand-back
 parent: cloud-turns-end-without-questions
+record:
+  - step: do
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 032321d28bee51533b73b4885e52b3a4b4b2eee3
+    hash_after: 5dd38ce8d03f955cba189b9d26ce297cfa7f613c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: ask
+        hash: 1ae5c0508934c0ec
+        size: 340
+    def: 4a3b325c93939cde
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the draft puts ends-on-a-question in ReadsText so the stop call skips it, but Re
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/pull_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The stop tests drop the ReadsText assertion, because ReadsText gates only the reason a stop call names, and a-cloud-box-decides is a continue rule. The gate had bound the question cases to spec/config/stop/level0.yml through os.ReadFile, and the import rules refuse os in a pure module. So the cases read the rules inline, with the claim in the facts as the gate found it must be. The binding to the real file moves to the implement step of cloud-turns-end-without-questions, as a test in src/quack. The change also reveals a pull fault. This ticket carries todo: true, and the pull served tagged tickets of every group ahead of the branch group. The dry probe clone then handed this ticket in place of its own leaf, and the check went red. The pull on a work branch now takes a tagged ticket of its own group or a private note alone, and a case in src/pull/pull_test.go holds it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and drops the assertion; the entry was never written
+- the cleanup the change reveals is in the change: the import fault and the tagged pool
+- the rule text stands in level0.yml once the implement lands, and taggedHere states the tagged scope once
 
 # Discussion
 
