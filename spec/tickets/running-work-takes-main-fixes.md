@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  119.4  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: c530f249b04aa03b7bc23b84c96216f5075b6f7c
+    hash_after: c530f249b04aa03b7bc23b84c96216f5075b6f7c
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 7b9d188e933022c6
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -335,26 +358,33 @@ The cold path list stands once in Go, in src/pull/cold.go, and commit.go calls p
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+CGO_ENABLED=0 go test -count=1 ./src/pull/ ./src/branches/ ./src/quack/ -run "^(TestColdIn.*|TestPull|TestDispatchUpdate.*|TestCommitVerbGates)$" && echo green
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A fix to the cold path on main now reaches work in flight on two roads. A pull on a work branch fetches main, and where main moves a cold path file past HEAD it refuses and asks ./RUNME.sh branch sync first. A push to main runs .github/workflows/update.yml, which calls ./RUNME.sh dispatch --update, and that updates every open work pull request from main and names any refused branch. The cold path list moves to src/pull/cold.go, and the commit verb reads it there. The tests line runs this ticket cases alone, because the same packages hold red cases of the waiting tickets verbs-mint-tickets-and-keys and size-golden-drops-line-counts.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list alone: src/pull/cold.go, pull.go, pull_test.go, src/quack/commit.go, src/branches/dispatch.go, dispatch_fire.go and .github/workflows/update.yml.
+The pull reaches git through it.Git, which mainMoves fakes in the case, and the update reaches GitHub through the send door, which dfHub fakes.
+Each new function and both new roads carry a link to spec/tickets/running-work-takes-main-fixes.
+The cold path list stands once in Go, in src/pull/cold.go, and commit.go calls pull.ColdIn; the page size is the constant pullsPage.
 
 # accept
 
