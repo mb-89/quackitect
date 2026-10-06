@@ -60,6 +60,10 @@ instances:
     module: context
   engine:
     module: engine
+  cloud:
+    module: cloud
+  fleet:
+    module: fleet
   grace:
     module: grace
   helper:
