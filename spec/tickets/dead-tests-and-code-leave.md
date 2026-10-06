@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -110,6 +110,10 @@ record:
         hash: 0c167c1dcc40d01c
         size: 477
     def: 19b6849b1f151cd5
+  - step: children
+    hand: the engine
+    hash_before: 00588f52e30d08d452d37e4eb25fc123fa7e50c5
+    hash_after: 00588f52e30d08d452d37e4eb25fc123fa7e50c5
 cloud: true
 ---
 
