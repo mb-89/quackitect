@@ -12,12 +12,13 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/note"
 	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
-func init() { register("ticket note", ticketNote(index.Root)) }
+func init() { register("ticket note", ticketNote(index.Root, registeredRepo)) }
 
 // The process a note mints off, and the kind its log row carries. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const noteProcess = "note"
@@ -38,7 +39,7 @@ var wordGap = regexp.MustCompile(`[^a-z0-9]+`)
 var nameGap = regexp.MustCompile(`[-_.]+`)
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func ticketNote(rootOf func() (string, error)) twin {
+func ticketNote(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
 		name := wordAt(said, 0)
@@ -55,7 +56,7 @@ func ticketNote(rootOf func() (string, error)) twin {
 			fmt.Fprintln(errs, `ticket note needs a name and a line: ./RUNME.sh ticket note slow-lint "..."`)
 			return exitUsage
 		}
-		it, code := pullHere(rootOf, out, errs)
+		it, code := pullHere(rootOf, repoAt, out, errs)
 		if it == nil {
 			return code
 		}
