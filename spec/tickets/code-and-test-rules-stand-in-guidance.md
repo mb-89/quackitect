@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports, fixture-home-guard-reports, test-ratio-measure-reports, hand-script-guard-reports, purity-guard-covers-every-outside]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 6dcace64ad189441
         size: 2449
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 7b5a2726379b · claude-code-remote · helper-4
+    hash_before: dab5eb92db58e5f932fae96009d15e7b3d3f0833
+    hash_after: dab5eb92db58e5f932fae96009d15e7b3d3f0833
+    inputs:
+      - name: design/draft
+        hash: 6dcace64ad189441
+        size: 2449
+      - name: design/tests-red
+        hash: 96c683892ae46d57
+        size: 744
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -282,8 +294,12 @@ the tests reach the tree files alone, as the tree test beside them does, so no d
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- no-timer-joins-rule-eight: testing.md rule 8 already says take the clock as an argument; the no-timer rule extends rule 8 with the purity guard's clock kind and its link, and stands as no second rule
+- door-once-meets-module-rules: the door-once rule (the command line first, a module port only for an edge the command line cannot reach) contradicts testing.md rules 11 to 14 as written, which send every Go module to the fake index; the implement step rewords 11 to 14 as the port tests for those edges
+- ratio-rule-carries-owner-words: the ratio rule says fixtures count toward the test lines and the ceiling stands near one to one per package, in the owner's words, beside the ratio guard link
 
 # implement
 

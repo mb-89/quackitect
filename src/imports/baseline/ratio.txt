@@ -1,5 +1,6 @@
 go src/branches	6903 test lines, 6516 code lines
 go src/config	204 test lines, 198 code lines
+go src/index	3547 test lines, 3318 code lines
 go src/modules	20 test lines, 4 code lines
 go src/modules/env	75 test lines, 57 code lines
 go src/modules/holds	158 test lines, 127 code lines
