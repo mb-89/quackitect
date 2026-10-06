@@ -147,6 +147,15 @@ func TestLintVerb(t *testing.T) {
 			t.Fatalf("a clean lint leaves %+v, and wants one empty list", clean.left)
 		}
 	})
+	// A red changed part names its warnings under --errors. [[spec/tickets/lint-strict-leaves-erred]]
+	t.Run("a warning under --strict leaves as an erred line, and stands under stood nowhere", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)}}
+		runsTwin(fake.verb(t, nil), "lint", "--strict")
+		want := lintFound{Stood: []finding{}, Erred: []string{"a.md:2:3: Sentence: Sentence says"}}
+		if len(fake.left) != 1 || !reflect.DeepEqual(fake.left[0], want) {
+			t.Fatalf("lint --strict leaves %+v, and wants %+v", fake.left, want)
+		}
+	})
 	t.Run("a finding at error exits 1 and names no warning note", func(t *testing.T) {
 		fake := &lintFake{tools: []check.Finding{lintRow("a.go", "FileCeiling", check.SeverityError)}}
 		code, out, _ := runsTwin(fake.verb(t, nil), "lint")

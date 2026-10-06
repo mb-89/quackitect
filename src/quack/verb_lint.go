@@ -63,8 +63,9 @@ func lintHere() (lintDoors, error) {
 		changed: func() []string {
 			return changedOver(gitAt(root), func(line string) { fmt.Fprintln(os.Stderr, line) })
 		},
-		log: keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
-		now: time.Now,
+		leave: leavesFoundAt(os.Getenv(lintEnv)),
+		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
+		now:   time.Now,
 	}, nil
 }
 
@@ -100,6 +101,11 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 			return exitFailed
 		}
 		ms := d.now().Sub(began).Milliseconds()
+		if d.leave != nil {
+			if err := d.leave(lintFoundOf(found, strict)); err != nil {
+				fmt.Fprintln(errs, "The lint leaves no findings for the check:", err)
+			}
+		}
 		// The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
 		if len(found) == 0 {
 			lintSays(d, errs, map[string]any{"level": "debug", "kind": lintKind, "said": "the rules pass over " + strings.Join(where, " "), "ms": ms})
@@ -214,6 +220,38 @@ func lintSays(d lintDoors, errs io.Writer, row map[string]any) {
 	}
 }
 
+// A finding the lint refuses leaves as its line under erred, so --errors names it, and a warning it lets pass stands by its file and source. [[spec/tickets/lint-strict-leaves-erred]]
+func lintFoundOf(found []check.Finding, strict bool) lintFound {
+	out := lintFound{Stood: []finding{}, Erred: []string{}}
+	for _, one := range found {
+		if strict || one.Severity != check.SeverityWarning {
+			out.Erred = append(out.Erred, lintLine(one))
+		} else {
+			out.Stood = append(out.Stood, finding{File: one.File, Source: one.Source})
+		}
+	}
+	return out
+}
+
+// A finding as one line: its place, its rule and its message. [[spec/design_output/lsp#the-lint-ends-on-findings]]
+func lintLine(one check.Finding) string {
+	return fmt.Sprintf("%s:%d:%d: %s: %s", one.File, one.Line, one.Column, one.Rule, one.Message)
+}
+
+// The findings as JSON where SE_LINT_FOUND points, and nothing where it points nowhere. [[spec/tickets/the-check-lint-runs-in-go]]
+func leavesFoundAt(at string) func(found lintFound) error {
+	return func(found lintFound) error {
+		if at == "" {
+			return nil
+		}
+		said, err := json.Marshal(found)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(at, said, 0o644)
+	}
+}
+
 // The count reads first, and the finding lines stand last, where the reader's eye lands. [[spec/design_output/lsp#the-lint-ends-on-findings]]
 func lintRows(found []check.Finding, refused int) []string {
 	per, order := map[string]int{}, []string{}
@@ -235,7 +273,7 @@ func lintRows(found []check.Finding, refused int) []string {
 	}
 	out = append(out, "")
 	for _, one := range found {
-		out = append(out, fmt.Sprintf("%s:%d:%d: %s: %s", one.File, one.Line, one.Column, one.Rule, one.Message))
+		out = append(out, lintLine(one))
 	}
 	return out
 }
