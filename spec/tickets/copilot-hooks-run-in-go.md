@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 4930cd6c20df5c82052011e358a3f91a0c382940
+    hash_after: 4930cd6c20df5c82052011e358a3f91a0c382940
+    inputs:
+      - name: ask
+        hash: e1dd042af4ef6bcc
+        size: 765
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,116 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. `.github/hooks/level0.json` runs `.se/.runtime/bin/se-index verb src/scripts hook <Event>` for SessionStart, PreToolUse, PostToolUse and Stop.
+2. `copilotRunner` in `src/quack/copilotsetup.go` becomes that binary line, so the registrations write it.
+3. The setup workflow swaps setup-node for setup-go off `go.mod`, and its last step runs `<runner> setup --cloud`.
+4. `setupVerb` reads `--cloud`, and `setupCopilot` passes `cloud` to `copilotSetup` in place of `auto`.
+5. `hookVerb` in `src/quack/hook_verb.go` routes the four Copilot words to `copilotHook`, beside pre-commit and pre-push.
+6. `hookDoors` gains `copilot` (vscode or cloud), an `ask` door posting to the hooks door, and `log`.
+7. The real `ask` reads `hooks.StandingFile`, posts to the door with the bearer token, and waits twenty seconds at most.
+8. `src/modules/hooks/copilot.go` ports `eventOf`, `callsOf`, `postedAs`, `answers`, `replyOf` and `failureOf`.
+9. `src/modules/hooks/down.go` ports `guarded`, `recovers`, `wordsOf` and `refusedText`, so a down door refuses a guarded call.
+10. `src/modules/edits/mutations.go` ports `mutations` and `patchChanges`, which `callsOf` needs to post an edit as Write.
+11. `copilotHook` reads the event JSON, posts each call, prints the reply, appends one `copilot` row, and exits zero.
+12. A fault prints the `failureOf` reply and a stderr line, so a broken hook still denies.
+13. The dispatch mode leaves with its files, since no Go caller, workflow or skill runs it.
+14. The seven named files and four JavaScript tests leave, and `spec/design_output/copilot.md` drops the dispatch lines.
+Weighed: posting to the running door, as the removed `src/quack/hook.go` did, against a door built in process without the index's store.
+Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking the binary fails as one lacking node did.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .github/hooks/level0.json: the four hook commands
+- .github/workflows/copilot-setup-steps.yml: the step preparing cloud hooks
+- src/quack/copilotsetup.go: copilotRegistrations, through copilotRunner
+- src/quack/setup_verb.go: setupVerb and setupCopilot
+- src/quack/hook_verb.go: hookVerb
+- src/scripts/copilot.js: the hook, setup and dispatch modes
+- src/scripts/copilot-door.js: answers
+- .claude/skills/level0/lib/copilot.js: eventOf, replyOf, failureOf, callsOf
+- .claude/skills/level0/lib/copilot-dispatch.js: dispatch
+- .claude/skills/level0/lib/copilot-setup.js: setup
+- src/doors/session.js: session
+- src/doors/fake/session.js: fakeSession
+- spec/design_output/copilot.md: the lines naming copilot.js and dispatch
+- test/contract/outside-in-doors.test.js: the lists naming copilot.js and session.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/hook_verb_test.go: TestHookSessionStartAnswersTheDoorsAftersAsContext
+- src/quack/hook_verb_test.go: TestHookPreToolUsePostsAShellCallAsBashAndAnswersTheDeny
+- src/quack/hook_verb_test.go: TestHookPreToolUsePostsAnEditAsOneWrite
+- src/quack/hook_verb_test.go: TestHookPreToolUseRefusesAGuardedCallWhileTheDoorStandsDown
+- src/quack/hook_verb_test.go: TestHookPostToolUsePostsClassicAndAnswersNothing
+- src/quack/hook_verb_test.go: TestHookStopAnswersTheDoorsBlock
+- src/quack/hook_verb_test.go: TestHookStopRetryEndsWithoutClaimingDone
+- src/quack/hook_verb_test.go: TestHookCloudTakesJSONStringArgumentsAndItsOwnEnvelope
+- src/quack/hook_verb_test.go: TestHookAsksTheDoorTheStandingFileNames
+- src/quack/hook_verb_test.go: TestCopilotScriptsLeave
+- src/quack/hook_verb_test.go: TestCopilotHooksNameNoScript
+- src/quack/setup_verb_test.go: TestTheSetupVerbWritesTheCloudMarkUnderCloud
+- src/modules/hooks/copilot_test.go: TestCopilotReplyShapesEachSurface
+- src/modules/hooks/copilot_test.go: TestCopilotEventKeepsTheLastToolName
+- src/modules/hooks/down_test.go: TestRecoversPassesTheSavingCommandsAlone
+- src/modules/edits/mutations_test.go: TestMutationsDecodeEachEditTool
+- src/modules/edits/mutations_test.go: TestAPatchDecodesAddUpdateAndDelete
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .github/hooks/level0.json
+- .github/workflows/copilot-setup-steps.yml
+- src/quack/copilotsetup.go
+- src/quack/copilotsetup_test.go
+- src/quack/setup_verb.go
+- src/quack/setup_verb_test.go
+- src/quack/hook_verb.go
+- src/quack/hook_verb_test.go
+- src/modules/hooks/copilot.go
+- src/modules/hooks/copilot_test.go
+- src/modules/hooks/down.go
+- src/modules/hooks/down_test.go
+- src/modules/edits/mutations.go
+- src/modules/edits/mutations_test.go
+- spec/design_output/copilot.md
+- spec/tickets/javascript-leaves.md
+- src/scripts/copilot.js
+- src/scripts/copilot-door.js
+- .claude/skills/level0/lib/copilot.js
+- .claude/skills/level0/lib/copilot-dispatch.js
+- .claude/skills/level0/lib/copilot-setup.js
+- src/doors/session.js
+- src/doors/fake/session.js
+- test/level0/copilot.test.js
+- test/level0/copilot-dispatch.test.js
+- test/level0/copilot-setup.test.js
+- test/contract/session.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- a helper opened the seven files, cage.js, mutations.js, the hook verb, copilotsetup.go, setup_verb.go, main.go and listen.go, and I checked copilotRunner, setupCopilot, the workflow and the removed hook.go there
+- the callers come off a git grep on each file name and the dispatch mode, across code, workflows and notes
+- TestCopilotScriptsLeave decides line one, TestCopilotHooksNameNoScript line two, the TestHook cases line three, and a live check line four
 
 ## tests-red
 
