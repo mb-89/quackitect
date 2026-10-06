@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -92,6 +92,15 @@ record:
   - step: sync
     hand: box 34eba3f85616 · claude-code-remote
     hash_before: 3e92d5bac4bc2165f0d7b54cd8368c7b732cac3f
+  - step: sync
+    hand: box 34eba3f85616 · claude-code-remote
+    hash_before: 12d4c5d6afc7f0a33f7d7ef8273a8204888c025b
+    hash_after: 12d4c5d6afc7f0a33f7d7ef8273a8204888c025b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/dead-tests-and-code-leave already carries every commit on main.
+    def: 8a9850a81227554b
 cloud: true
 ---
 
@@ -112,8 +121,9 @@ The check spends its time on code nothing loads and on comparisons whose migrati
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
