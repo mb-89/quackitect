@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4589742b8a0025b168e11145f5c8b14f9e824322
+    hash_after: 4589742b8a0025b168e11145f5c8b14f9e824322
+    inputs:
+      - name: ask
+        hash: 5639100f0502124e
+        size: 578
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -162,38 +171,62 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`ended` in `src/quack/waits_test.go` polls `served.Of` on the wall clock. The manager writes each op through `Outside.Rows`, and an op that ends lands there as its JSON. So the case waits on that write, as rule 8 of the testing guidance asks.
+
+- `waitWorldOf` hands the manager a `savedTable` in place of `opRows{heldTable{}}`: a `heldTable` behind a mutex, whose `Save` also sends the body on a buffered channel the world holds. The mutex holds because the manager saves off its own goroutines, which the plain map never guarded.
+- `ended(action)` reads that channel until a body decodes to an op of the action with `Ended` set, and answers it. It reads the saved op itself, not `Of`, so the order of the save and the book write cannot race it.
+- A case whose op never ends blocks until the test binary times out, which names the case. The span `endsWithin` stays as the call wait alone.
+- The row for `waits_test.go` leaves the family table in `spec/design_output/doors.md`.
+
+The cost: a wait that never ends costs the battery its whole timeout, where the poll gave up after `endsWithin`. I take it, because a fail there is a bug in the wait, and the timeout names the case.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/waits_test.go waitWorldOf
+- src/quack/waits_test.go waitWorld.ended
+- src/quack/waits_test.go TestAWaitReturnsOnAHelpersReport
+- src/quack/waits_test.go TestAWaitPastTheCallWaitAnswersARunningHandle
+- src/quack/waits_test.go TestTheDoorAnswersAWaitPastItsCallWaitAsRunning
+- src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit, red once the row leaves doors.md while the sleep stands
+- src/quack/waits_test.go TestAWaitPastTheCallWaitAnswersARunningHandle, which reads the end through the saved op
+- done_when 1: TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit
+- done_when 2: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/waits_test.go
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened waits_test.go, manager.go Served and Outside, ops.go rowsKeep, heldTable and opRows
+- The callers list names every case reaching waitWorldOf and ended, and the guard reading the table
+- Each done_when line names its test
 
 ## tests-red
 
