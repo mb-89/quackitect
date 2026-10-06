@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 3775347d2e198c47
         size: 483
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: a1225f5a261e0cd1d8206d3eeb76a723068c1a44
+    hash_after: bee37793e72e9c444bd24e2537b16de277a591ef
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint --changed --strict
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask and its approach name: `src/scripts/cli-read.js`, its cases in `test/level0/cli-read.test.js` and `test/contract/one-reading.test.js`, and `test/contract/lint-twins.test.js`. The exports the lint alone called in `quack-topic.js` and `findings.js` stand outside that list, so the note `js-lint-leftovers-stand-dead` carries them.
+- every door has a fake: the Go lint's leave door has `lintFake.leave`, and the removal adds no door
+- the header of `src/scripts/cli-read.js` points at this ticket, and the leave door's comment in `src/quack/verb_lint.go` does too
+- one place: the Go lint in `src/quack/verb_lint.go` owns the check's lint, and no JavaScript copy stands beside it
 
 ## tests-green
 
