@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: fdf45284927fd4e5
         size: 500
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: e62846d07a424c74f2da8386a5412543af08120d
+    hash_after: e62846d07a424c74f2da8386a5412543af08120d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks/stop fails
+    inputs:
+      - name: design/draft
+        hash: 1bda716d7939779c
+        size: 2025
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ first
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/stop/stop_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/stop_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud case ends today: the claim the-work-stands-complete stands on an empty plan and no continue fires, so the box stops on its question. The check ends-on-a-question stands unknown, so every case of it reads false and it stands outside ReadsText. The desk case passes already, which is what it pins: the desk keeps today's stop.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a test: the cloud case fails on its assertion, the desk case pins today, and the check runs green on the commit
+- the tests reach no door, since the stop package reads facts and rules alone
 
 # gate
 
