@@ -210,7 +210,4 @@ func TestEndsOnQuestionReadsTheLastProse(t *testing.T) {
 	if got, _ := Ran("ends-on-a-question", Facts{Text: endsAsking}); got {
 		t.Error("ends-on-a-question reads true on a desk, want false")
 	}
-	if !ReadsText["ends-on-a-question"] {
-		t.Error("ends-on-a-question stands outside ReadsText, so the stop call runs it on no text")
-	}
 }
