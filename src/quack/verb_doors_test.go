@@ -119,6 +119,13 @@ func TestDoorsListsTheContractTestOfTheRootDoor(t *testing.T) {
 	}
 }
 
+func TestDoorsReadsTheTreeWithNoMarkedLineOfItsOwn(t *testing.T) {
+	t.Parallel()
+	if _, out, _ := doorsRan(treeRoot); strings.Contains(out, "src/quack/verb_doors.go:") {
+		t.Fatalf("doors over the tree prints %q, and wants no line of src/quack/verb_doors.go", out)
+	}
+}
+
 func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os" // level0: OutsideInDoors - the verb reads the tree it lists, as the lint's walk reads it
 	"path"
 	"path/filepath"
 	"strings"
@@ -82,6 +81,7 @@ func ownFiles(door owns.Door) []string {
 
 // Every contract test a door names, then every walk-around and marked line of the files the lint's walk reaches: a door at report's walk-around and a marked line to out, a refusing door's to errs, and the count refused. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walksOver(root string, out, errs io.Writer) int {
+	disk := rootDisk{root}
 	declared, files := map[string]string{}, []string{}
 	_ = filepath.WalkDir(root, func(at string, entry fs.DirEntry, err error) error {
 		if err != nil {
@@ -101,15 +101,14 @@ func walksOver(root string, out, errs io.Writer) int {
 		switch {
 		case entry.IsDir():
 		case owns.Declares(rel):
-			if text, err := os.ReadFile(at); err == nil {
-				declared[rel] = string(text)
+			if text, ok := disk.Read(rel); ok {
+				declared[rel] = text
 			}
 		case path.Ext(rel) == ".go" || path.Ext(rel) == ".js" || path.Ext(rel) == ".mjs":
 			files = append(files, rel)
 		}
 		return nil
 	})
-	disk := rootDisk{root}
 	doors, _ := owns.Read(declared, disk.Exists)
 	if len(doors) == 0 {
 		return 0
