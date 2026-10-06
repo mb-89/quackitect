@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: 5ec0735c317d6537e884eb5a60df6d02c27baa0a
+    hash_after: 5ec0735c317d6537e884eb5a60df6d02c27baa0a
+    inputs:
+      - name: ask
+        hash: b38871be887b12e4
+        size: 444
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,68 @@ A red pull request waits unseen for half an hour, and a hand greps its log to fi
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The check: `redCase` and `caseRow` in `src/quack/battery.go` gain a line. The reporter in `src/scripts/battery-reporter.js` writes the line a failing runner case names. A new `redLine` feeds `errorsSaid` and a new `redSaid`, and `saysParts` in `src/quack/check.go` ends the log on the red cases. Go reds reach the same list: the loud run keeps its standard output too, `goGate` parses it through `goRedIn` into a runtime file, and `checkVerb` adds those cases to the report.
+
+The dispatch: `fire` in `src/branches/dispatch_fire.go` calls a new `redPulls`. It reads the open pull requests through the send door, keeps the ones whose head is a work branch the plan fires nowhere else, and reads each head's check runs. A failure or a timeout marks it red. Each red branch gets a fire whose text names the pull request and asks the worker to fix the cases its log ends on. `.github/workflows/dispatch.yml` also wakes on a completed check run that fails on a work pull request, so the fire comes at once. The work skill gains the step a red fire takes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/check.go checkVerb
+src/quack/check.go saysParts
+src/quack/check.go errorsSaid
+src/quack/check.go goGate, through partsOf
+src/quack/checkdoors.go checkDoorsOf, the run door
+src/quack/battery.go redIn, through batteryOf and errorsSaid
+src/quack/retro_report.go, which reads the stamp's red cases
+src/scripts/battery-reporter.js rowOf
+src/branches/dispatch.go Dispatch, which calls fire
+src/branches/dispatch_fire.go fire and fires
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/check_test.go TestCheckEndsOnTheRedCases
+src/branches/dispatch_fire_test.go TestDispatchFiresAWorkerAtARedWorkPullRequest
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/battery.go
+src/quack/battery_test.go
+src/quack/check.go
+src/quack/checkdoors.go
+src/quack/check_test.go
+src/scripts/battery-reporter.js
+test/level0/battery-reporter.test.js
+src/branches/dispatch_fire.go
+src/branches/dispatch_fire_test.go
+.github/workflows/dispatch.yml
+.claude/skills/work/SKILL.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+check.go, checkdoors.go, battery.go, the reporter, dispatch_fire.go, its fake hub and dispatch.yml stand opened
+the callers come from a grep of each changed function over src
+the first done_when line meets TestCheckEndsOnTheRedCases, the second TestDispatchFiresAWorkerAtARedWorkPullRequest
 
 ## tests-red
 
