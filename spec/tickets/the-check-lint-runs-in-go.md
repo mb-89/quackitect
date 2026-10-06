@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 02e43747428498406421da666f930b37baceb90a
+    hash_after: 02e43747428498406421da666f930b37baceb90a
+    inputs:
+      - name: ask
+        hash: 82a265ded38b7a2a
+        size: 557
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,60 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The check runs the Go lint verb already, and that verb writes nothing where SE_LINT_FOUND points, so the stamp counts no warning and the errors flag names no lint line. The Go lint gains a door that leaves its findings there, warnings under stood and one line per error under erred, as lintFoundOf did. Then lint, readingFor, findingsDoors, lintFoundOf, leavesFound and lintRows leave src/scripts/cli-read.js, and every JavaScript module they alone import leaves with them. The lint cases of test/level0/cli-read.test.js and test/contract/one-reading.test.js leave, and test/contract/lint-twins.test.js leaves whole.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/checkdoors.go checkDoorsOf, which sets SE_LINT_FOUND
+- src/quack/check.go checkVerb, which reads lint-found.json
+- src/quack/verb_lint.go lintVerb, lintHere
+- src/scripts/cli-check.js, which imports namesIn and show
+- test/level0/cli-read.test.js
+- test/contract/one-reading.test.js
+- test/contract/lint-twins.test.js
+- test/contract/cli-read.test.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_lint_test.go TestLintVerb: the lint leaves its warnings and its error lines where SE_LINT_FOUND points
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_lint.go
+- src/quack/verb_lint_test.go
+- src/scripts/cli-read.js
+- test/level0/cli-read.test.js
+- test/contract/one-reading.test.js
+- test/contract/lint-twins.test.js
+- spec/design_output/lsp.md
+- spec/design_output/schema.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- cli-read.js, its importers, check.go and checkdoors.go stand opened, and the Go lint writes no lint-found.json
+- the callers list names every importer of cli-read.js git grep finds
+- the done_when lines meet the new lint case, a grep over cli-read.js, and the gone twin test
 
 ## tests-red
 
