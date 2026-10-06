@@ -97,6 +97,9 @@ func TestASecondHandoverWithNoCommitHandsTheLeafBack(t *testing.T) {
 	if !it.Disk.Exists(due) {
 		t.Fatalf("the due mark drops at the refusal, so the next commit hands over nowhere")
 	}
+	if text, _ := it.Disk.Read(handoverTip); !strings.Contains(text, it.tipOf()) {
+		t.Fatalf("the handover tip after the refusal reads %q, and wants the tip it stood at", text)
+	}
 }
 
 // [[spec/tickets/the-clear-hands-back-the-leaf]]

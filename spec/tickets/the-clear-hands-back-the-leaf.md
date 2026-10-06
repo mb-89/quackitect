@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: clear-hands-back-the-leaf
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 289f5119dfb23cd8
         size: 1088
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: 12583edf5aecdc433949f28695f79db82159d771
+    hash_after: 12583edf5aecdc433949f28695f79db82159d771
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -336,14 +345,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hooks and pull files the draft names, the probe files the tests-red step wrote, and two of its tests
+- the hooks change runs over the temp tree the hooks tests seed, and the pull change over the temp origin and clone
+- each new function carries a pointer at this ticket, which holds the approach
+- the read ticket name stands once in each package, beside the clear ticket name it pairs with, and the hooks test reads it there
 
 ## tests-green
 

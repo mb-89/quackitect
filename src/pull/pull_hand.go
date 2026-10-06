@@ -39,6 +39,8 @@ type Who struct {
 	Held                           *Hold
 	OneStep                        bool
 	Wanted                         string
+	// PastDue hands one leaf past the due mark, after a handover the pull refuses. [[spec/tickets/the-clear-hands-back-the-leaf]]
+	PastDue bool
 }
 
 // What an offer answers: the leaf a hand takes, why it takes none, and a leaf another hand takes. [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -195,7 +197,7 @@ func (it *It) handOut(who *Who) int {
 	it.repairPersonSteps(who)
 	all := it.ticketsHere()
 	// A session due takes the clear's tickets once the ticket in hand stands done, and a helper takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
-	if who.Wanted == "" && !who.OneStep && it.Disk.Exists(due) {
+	if who.Wanted == "" && !who.OneStep && !who.PastDue && it.Disk.Exists(due) {
 		return it.dueHandOut(who, all)
 	}
 	var groupTicket *Held

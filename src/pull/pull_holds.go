@@ -243,7 +243,11 @@ func (it *It) workingTodo() string {
 	if text, ok := it.Disk.Read(planFile); ok {
 		_ = json.Unmarshal([]byte(text), &plan)
 	}
-	return strings.TrimSpace(plan.Working)
+	// The clear's tickets stand in the hold, so a plan naming one holds no pull back. [[spec/tickets/the-clear-hands-back-the-leaf]]
+	if working := strings.TrimSpace(plan.Working); !ephemeralName(working) {
+		return working
+	}
+	return ""
 }
 
 // The as a hold was taken under, read back off the hand it names. [[spec/design_output/pull#the-hand-and-the-hold]]

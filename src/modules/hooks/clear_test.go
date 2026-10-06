@@ -14,7 +14,6 @@ import (
 const (
 	clearEffect = "clear"
 	resumeOpens = "Level zero cleared the conversation"
-	readHold    = "read-handover"
 )
 
 // A session holding the clear under the binding named ends its answered turn, with the turn's two ends in the order named, and answers what each end answers. [[spec/tickets/the-clear-continues-the-session]]
@@ -100,8 +99,8 @@ func TestTheClearAtTheStopHandsTheReadAndDropsTheDueMark(t *testing.T) {
 	if !ok || json.Unmarshal([]byte(body), &held) != nil {
 		t.Fatalf("the hold after the clear reads %q", body)
 	}
-	if held["ticket"] != readHold || held["step"] != readHold || held["ephemeral"] != true || held["hand"] != myHand || held["taken"] != "t0" {
-		t.Fatalf("the hold after the clear reads %v, and wants %s in the clear's hand", held, readHold)
+	if held["ticket"] != readTicket || held["step"] != readTicket || held["ephemeral"] != true || held["hand"] != myHand || held["taken"] != "t0" {
+		t.Fatalf("the hold after the clear reads %v, and wants %s in the clear's hand", held, readTicket)
 	}
 	if _, ok := (disk{root}).Read(dueMark); ok {
 		t.Fatalf("the due mark stands after the clear, so the pull hands the handover again")
