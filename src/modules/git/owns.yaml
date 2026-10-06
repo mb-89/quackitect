@@ -1,4 +1,5 @@
 # The git IO module: the repository, through the git program.
 git:
   go: [os, os/exec]
+  contract: [src/modules/git/git_contract_test.go]
   report: true

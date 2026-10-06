@@ -187,10 +187,27 @@ declaration. A new door adds its declaration and nothing else.
 | `go` | a package, which the door owns whole, or `package.Member`, where the package is shared and the door owns that member alone |
 | `js` | `node:<module>`, a global such as `setTimeout`, a member of one such as `Date.now`, or `new Date()`, the constructor reading the time now |
 | `files` | the door's files, under the folder. With none named, every file standing in the folder is the door |
+| `contract` | the door's contract tests, as paths from the root. For details, see [[spec/design_output/doors#a-door-names-its-contract-tests]] |
 | `report` | `true` while walk-arounds of the door remain, so the guard lists them and refuses none |
 
 Several doors may own one name. A package's `door.go` owns `os` beside the
 files IO module, and each reads the disk for its own package.
+
+## A door names its contract tests
+
+A contract test drives the real thing, so it uses the names its door owns. The
+door names it under `contract`, and holds it beside its own files. The test
+still walks around every other door.
+
+| a contract test | where it stands |
+|---|---|
+| Go | a file ending `_contract_test.go` |
+| JavaScript | `test/contract/<door>.test.js`, beside `src/doors/<door>.js` |
+
+`TestEveryContractTestNamesItsDoor` in `src/owns` refuses a contract test no
+door names. A path naming no contract test, or standing nowhere, is a fault of
+the declaration. The rest of `test/contract` drives the tree, and meets its
+doors as every other test does.
 
 ## Nothing walks around a door
 
@@ -202,7 +219,7 @@ surface asks it:
 |---|---|
 | `WalksAroundADoor` in `src/modules/check` | refuses it in the lint, so `./RUNME.sh check`, the commit, the push and CI refuse it, and the lsp IO module draws it as the line is typed |
 | `walkaround` in `src/imports` | names it in a Go package, beside `onlyq` |
-| `./RUNME.sh doors` | lists every door, its walk-arounds and its marked lines |
+| `./RUNME.sh doors` | lists every door's contract tests, its walk-arounds and its marked lines |
 
 A door standing at `report` lists its walk-arounds through `./RUNME.sh doors`
 and refuses none, and the editor draws each as a hint in a file it holds

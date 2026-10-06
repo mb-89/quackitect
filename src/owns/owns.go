@@ -22,10 +22,17 @@ const (
 
 // The keys an entry takes. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 const (
-	goKey     = "go"
-	jsKey     = "js"
-	filesKey  = "files"
-	reportKey = "report"
+	goKey       = "go"
+	jsKey       = "js"
+	filesKey    = "files"
+	contractKey = "contract"
+	reportKey   = "report"
+)
+
+// Where a contract test stands: a Go test file ending so, or a file of the contract run. [[spec/design_output/doors#a-door-names-its-contract-tests]]
+const (
+	contractGo     = "_contract_test.go"
+	contractFolder = "test/contract/"
 )
 
 // The forms a door's name, a Go name, a JS name and the marker take. [[spec/design_output/doors#a-door-declares-what-it-owns]]
@@ -36,15 +43,16 @@ var (
 	markedAt = regexp.MustCompile(`(?://|/\*|#)\s*` + regexp.QuoteMeta(strings.TrimSpace(Marker)) + `(.*)$`)
 )
 
-// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, and whether it stands at report. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, and whether it stands at report. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 type Door struct {
-	Name   string
-	At     string
-	Line   int
-	Go     []string
-	JS     []string
-	Files  []string
-	Report bool
+	Name     string
+	At       string
+	Line     int
+	Go       []string
+	JS       []string
+	Files    []string
+	Contract []string
+	Report   bool
 }
 
 // One use of an owned name outside every door owning it. [[spec/design_output/doors#nothing-walks-around-a-door]]
@@ -162,6 +170,17 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 					open.Files = append(open.Files, joined)
 				}
 			}
+		case contractKey:
+			for _, name := range yaml.StringsOf(value) {
+				switch {
+				case !IsContract(name):
+					fault(line, name+" names no contract test: write a path ending "+contractGo+" or under "+contractFolder)
+				case !exists(name):
+					fault(line, name+" stands nowhere")
+				default:
+					open.Contract = append(open.Contract, name)
+				}
+			}
 		case reportKey:
 			flag, ok := value.(bool)
 			if !ok {
@@ -170,7 +189,7 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 			}
 			open.Report = flag
 		default:
-			fault(line, key+" is no key a declaration takes: write go, js, files or report")
+			fault(line, key+" is no key a declaration takes: write go, js, files, contract or report")
 		}
 	}
 	finish()
@@ -190,8 +209,16 @@ func Declares(at string) bool {
 	return path.Base(strings.ReplaceAll(at, "\\", "/")) == File
 }
 
-// Whether the door's files hold the path: the files it names, or every file standing in its folder. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether a path from the root names a contract test. [[spec/design_output/doors#a-door-names-its-contract-tests]]
+func IsContract(at string) bool {
+	return !path.IsAbs(at) && at == path.Clean(at) && (strings.HasSuffix(at, contractGo) || strings.HasPrefix(at, contractFolder))
+}
+
+// Whether the door's files hold the path: its contract tests, then the files it names, or every file standing in its folder. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 func (one Door) Holds(at string) bool {
+	if slices.Contains(one.Contract, at) {
+		return true
+	}
 	if one.Files != nil {
 		return slices.Contains(one.Files, at)
 	}

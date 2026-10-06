@@ -2,4 +2,5 @@
 pull:
   go: [os, os/exec]
   files: [door.go]
+  contract: [src/pull/disk_contract_test.go]
   report: true

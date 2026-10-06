@@ -161,3 +161,21 @@ func TestEveryIOModuleAndDoorDeclares(t *testing.T) {
 		}
 	}
 }
+
+func TestEveryContractTestNamesItsDoor(t *testing.T) {
+	t.Parallel()
+	doors, files := doorsOf(t)
+	named := map[string]bool{}
+	for _, one := range doors {
+		for _, at := range one.Contract {
+			named[at] = true
+		}
+	}
+	for at := range files {
+		door, isDoorsTest := strings.CutSuffix(strings.TrimPrefix(at, "test/contract/"), ".test.js")
+		isDoorsTest = isDoorsTest && path.Dir(at) == "test/contract" && files["src/doors/"+door+".js"]
+		if (isDoorsTest || strings.HasSuffix(at, "_contract_test.go")) && !named[at] {
+			t.Errorf("%s is a contract test, and no door names it under contract", at)
+		}
+	}
+}

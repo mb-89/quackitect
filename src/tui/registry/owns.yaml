@@ -2,4 +2,5 @@
 registry:
   go: [os, net/http]
   files: [door.go]
+  contract: [src/tui/registry/call_contract_test.go, src/tui/registry/catalog_contract_test.go]
   report: true

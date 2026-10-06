@@ -1,4 +1,5 @@
 # The env IO module: the process's environment.
 env:
   go: [os]
+  contract: [src/modules/env/env_contract_test.go]
   report: true

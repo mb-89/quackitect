@@ -100,7 +100,7 @@ func TestOnlyAnOwnsFileDeclares(t *testing.T) {
 func TestADoorHoldsItsFolderOrItsFiles(t *testing.T) {
 	t.Parallel()
 	folder := Door{Name: "clock", At: "src/modules/clock"}
-	files := Door{Name: "clock", At: "src/doors", Files: []string{"src/doors/clock.js"}}
+	files := Door{Name: "clock", At: "src/doors", Files: []string{"src/doors/clock.js"}, Contract: []string{"test/contract/clock.test.js"}}
 	cases := []struct {
 		door Door
 		path string
@@ -112,6 +112,8 @@ func TestADoorHoldsItsFolderOrItsFiles(t *testing.T) {
 		{folder, "src/modules/clockwork/clock.go", false},
 		{files, "src/doors/clock.js", true},
 		{files, "src/doors/disk.js", false},
+		{files, "test/contract/clock.test.js", true},
+		{files, "test/contract/disk.test.js", false},
 	}
 	for _, one := range cases {
 		if one.door.Holds(one.path) != one.want {
