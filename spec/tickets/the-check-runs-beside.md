@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,18 @@ record:
         hash: 2f27903492d3e8aa
         size: 574
     def: 07c43ae7253713ec
+  - step: split
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 0877db723f2affd6dabbe0ab3482c7591c2ce191
+    hash_after: 0877db723f2affd6dabbe0ab3482c7591c2ce191
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -183,15 +195,18 @@ The check's parts block each other no more: every part starts at once, so the ch
 
 - [[spec/tickets/the-parts-start-at-once]], standard
 - [[spec/tickets/the-budget-reads-the-span]], trivial
+- [[spec/tickets/index-cases-wait-for-it]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the-parts-start-at-once carries the overlap and its fake-clock test in one diff, and the-budget-reads-the-span carries one config number, so each reviews whole
-- the first child carries every part starting at once, the red part naming itself and the overlap test; the second carries the budget, so the goal stands inside the two
-- the-budget-reads-the-span names the-parts-start-at-once under depends_on, since it sizes the budget to the span the first child sets
+- each child carries one diff a reviewer reads whole
+- the first child starts the parts at once, the second sizes the budget, and the third adds the ready step, so the goal stands inside the three
+- the-budget-reads-the-span names the-parts-start-at-once under depends_on
+- the budget reads the span the first child sets, and the ready step reads the parts the first child starts, so they landed in that order
+- the group diff stays one review, so it needs no split
 
 # children
 
