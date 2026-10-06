@@ -6,7 +6,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MARKER, REGISTER } from "../../.claude/skills/level0/lib/vehicle.js";
-import { guidanceHere } from "../../src/bridge/guidance.js";
 import { registeredPort } from "../../src/bridge/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -48,11 +47,6 @@ test("the port reading takes the platform and reaches the same register", () => 
   });
   const env = { SE_REGISTRY: "/one;/two" };
   assert.equal(registeredPort(files, env, fakeClock(), "/tools", 7, true), 6543);
-});
-
-test("the guidance reading takes an empty map where nobody hands one", () => {
-  const said = guidanceHere(fakeDisk(), "/tree");
-  assert.equal(typeof said, "object");
 });
 
 test("the work verbs stand after the change", () => {

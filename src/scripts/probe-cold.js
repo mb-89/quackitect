@@ -47,7 +47,6 @@ export const COLD = {
 export const COLD_PATH = [
   ".claude/skills/level0/hooks/",
   ".claude/skills/level0/lib/guidance.js",
-  "src/bridge/guidance.js",
   "src/modules/hooks/",
   "src/quack/",
   "src/scripts/go-stamp.sh",

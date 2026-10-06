@@ -281,9 +281,9 @@ func TestTestArgv(t *testing.T) {
 	if len(testParts) != 2 || !testParts[0].shared || testParts[1].shared {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
-	red := "test/level0/battery.test.js"
+	red := "test/level0/trust.test.js"
 	argv := testArgv(root, []string{red}, testParts[0])
-	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/pull-gate.test.js") {
+	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/pull-kept.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
 	for _, one := range argv {
