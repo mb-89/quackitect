@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 21bf3069c0e18f63
         size: 421
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 15e0bf87db259864a76f8493ab14b7e959fc4c7f
+    hash_after: 15e0bf87db259864a76f8493ab14b7e959fc4c7f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: b9d2935fa7d8472b
+        size: 1701
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -218,26 +231,31 @@ One helper, endsWhole in src/quack/ending.go, readies a command so the end of it
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/ending_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its assertion: the stub leaves the child in the test's own group with no cancel of its own. Past that assertion the old road would hang on the pipe the grandchild holds, which is the hang the ask names, so the group check stands first and decides the red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the Vale line meets the case driving the road the Vale call takes, and the check line waits for tests-green
+- the case drives real processes, as the one test of the ending road, and every other case keeps its fake runner
 
 # gate
 
