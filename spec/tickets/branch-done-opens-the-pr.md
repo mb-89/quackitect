@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 878ca7e20145adfd5655dda8dc72134d298f0206
+    hash_after: 878ca7e20145adfd5655dda8dc72134d298f0206
+    inputs:
+      - name: ask
+        hash: 9c802087afbe9acf
+        size: 496
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,67 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One function opens a pull request with auto-merge on, and both roads call it. pulled in src/branches/dispatch_fire.go splits into a new pullOpens(send Send, branch, title, body string, out *pullRow) int. pullOpens holds the list, the open and the auto-merge mutation that pulled holds today, on PULL_TOKEN through hubOf. pulled keeps its write-branch guard and calls pullOpens for the write branch.
+
+Done: Doors in src/branches/doors.go takes a field Send Send. branchDoors in src/quack/branch.go sets it to httpSend, the send door src/quack/dispatch.go holds. leaves in src/branches/done.go calls pullOpens for work/<group> right after the push. Where pullOpens answers opened or standing, done prints the pull request's address. Where the run holds no token or the hub refuses, done prints the reason and the existing line naming the work skill, and still answers codeOK. The push stands, and the dispatch picks the branch up on its next run.
+
+Dispatch: dispatchPlan in src/branches/dispatch.go takes Done []string, every work branch planned() reads at done. fire calls pullOpens once per branch in plan.Done, after the write branch, and fireRow gathers each answer under Hands []pullRow. pullRow takes a Branch field, so fireLines prints one row a branch. A branch whose pull request stands open reads standing, and the hub sees no second POST.
+
+The owner's question is decided here: a box with no token keeps done green and leaves the pull request to the dispatch, so no new secret is asked.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_fire.go (*Doors).fire, which calls pulled and then pullOpens a done branch
+src/branches/dispatch.go Dispatch, which calls planned and fire
+src/branches/done.go finish, which calls leaves
+src/branches/branch.go the done row of the verb table, which runs finish
+src/quack/branch.go branchVerb, through branchDoors
+src/quack/dispatch.go dispatchVerb, through branchDoors
+src/quack/cloud.go the cloud verb, through branchDoors
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/branches/port_c_done_test.go TestPCDoneOpensThePullRequestWithAutoMergeThroughItsDoor
+src/branches/port_c_done_test.go TestPCDoneWithNoTokenNamesTheWorkSkillAndLeaves
+src/branches/dispatch_fire_test.go TestDispatchOpensAPullRequestForADoneBranchHoldingNone
+src/branches/dispatch_fire_test.go TestDispatchOpensNoSecondPullRequestForADoneBranch
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_fire.go
+src/branches/dispatch.go
+src/branches/done.go
+src/branches/doors.go
+src/quack/branch.go
+src/branches/port_c_done_test.go
+src/branches/dispatch_fire_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened done.go (finish, leaves), dispatch_fire.go (fire, pulled, hubOf, sent, fireLines, autoMerge), dispatch.go (planned, Dispatch, carried, dispatchPlan), doors.go (Doors), branch.go (table), quack/branch.go (branchVerb, branchDoors), quack/dispatch.go (dispatchVerb, httpSend), dispatch_fire_test.go (dfHub, dfEnv, dfFired), port_c_done_test.go (TestPCDoneClosesAFinishedGroup) and .claude/skills/work/SKILL.md.
+Callers came from greps for pulled, fire, planned, leaves, finish and branchDoors, and a grep for .planned( and branchDoors( confirms the rest.
+The first done_when line meets TestPCDoneOpensThePullRequestWithAutoMergeThroughItsDoor, the second meets TestDispatchOpensAPullRequestForADoneBranchHoldingNone, both under go test ./src/branches/; ./RUNME.sh check stands as its own command.
 
 ## tests-red
 
