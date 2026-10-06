@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 112331987b9f393147e0e77832ed177a7ba15ce5
+    hash_after: 112331987b9f393147e0e77832ed177a7ba15ce5
+    inputs:
+      - name: ask
+        hash: 87e003b9fd2e4022
+        size: 944
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -160,38 +169,79 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A pure Go package src/rules owns every rule. Load takes the texts it reads, the paragraph schema and the vocabulary lists, and Lint takes a path and a text and answers findings in the shape Vale answered. The package parses markdown through goldmark into blocks: paragraphs, headings, list items and table cells, with code spans, code blocks and front matter masked. A code file reads its comments, and a yml or shell file reads as markdown, as the formats section did. The token rules run in Go over those blocks: existence, substitution, occurrence, and the sequence rules through the tagger github.com/jdkato/prose. Each script rule becomes a Go function over the raw text. The paragraph rules read their numbers off spec/schemas/paragraph.schema.yaml, so the projection to VoiceParagraph leaves. A Go table scopes each rule by path, in place of .vale.ini. heardIn in src/quack/command.go and the vale call in src/modules/lsp/tools.go call Lint. A quack verb rules answers Vale's JSON over stdin, and lib/vale.js calls it, so every JavaScript caller stands as it is. A script under .se/scripts runs both engines over the whole tree once, and the retro names what differs. Then Vale, its install, its survey entry, its door, its configs and the vale-paths test leave. The removal waits on the-check-lint-runs-in-go, since cli-read.js reads the Vale door.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/command.go heardIn, valeAt
+- src/modules/lsp/tools.go Tools.vale, Sweep, Over
+- src/modules/lsp/door.go toolAt
+- src/quack/verb_lint.go lintReading
+- src/quack/writedoor.go writeProse
+- src/quack/drafts.go draftsLint
+- src/voice/voice.go
+- src/modules/check/textfaults.go
+- src/modules/hooks/command/findings.go
+- .claude/skills/level0/lib/vale.js lintText
+- src/scripts/install.sh
+- spec/config/projections.json the paragraph rules
+- .github/workflows/check.yml
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/rules/rules_test.go: each rule refuses its fixture and passes its plain twin, ported off test/contract/vale.test.js
+- src/rules/scope_test.go: a rule scoped to a path reads the files under it and none outside
+- src/rules/markdown_test.go: code spans, code blocks and front matter carry no finding
+- src/modules/lsp/tools_test.go: the diagnostics carry a finding of the Go rules
+- src/quack/rules_test.go: the rules verb answers Vale's JSON over stdin
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/rules/ (new package)
+- src/quack/command.go
+- src/quack/rules.go
+- src/modules/lsp/tools.go
+- src/modules/lsp/door.go
+- .claude/skills/level0/lib/vale.js
+- src/scripts/install.sh
+- .vale.ini
+- spec/config/editor.vale.ini
+- spec/config/styles/
+- spec/config/projections.json
+- .claude/skills/level0/lib/paragraph.js
+- test/contract/vale.test.js
+- test/contract/vale-paths.test.js
+- test/contract/vale-fix.test.js
+- .github/workflows/check.yml
+- spec/design_output/lsp.md
+- go.mod
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- heardIn, the lsp tools, lib/vale.js, the projection and the scoping stand opened
+- the callers list names every importer of the Vale door git grep finds
+- each done_when line meets a test under src/rules or src/modules/lsp, and the compare meets the retro
 
 ## tests-red
 
