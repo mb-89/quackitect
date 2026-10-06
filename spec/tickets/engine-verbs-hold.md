@@ -110,6 +110,22 @@ record:
     hand: the engine
     hash_before: 178d4a89409be22aad0ee925e4fd6b07412cbf26
     hash_after: 178d4a89409be22aad0ee925e4fd6b07412cbf26
+  - step: accept
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 7c8671449574184c4395638b76676d8659efbe69
+    hash_after: 7c8671449574184c4395638b76676d8659efbe69
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/engine-verbs-hold already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: c8bde0276841d2e6
+        size: 661
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -187,8 +203,12 @@ The diff stays one review: the folds the copy rule named landed under shared-hel
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- test-verb-comments-sit-home: In src/branches/test.go the testVerb doc comment now sits above goldenReaders, and the goTestNames comment above goTestTexts. Move each comment back onto its own function.
+- quack-ending-files-go: src/quack/ending_unix.go and ending_windows.go hold a package clause and a comment naming a mechanism they lack. Delete both files, since proc.Whole holds the code.
+- standing-pull-takes-auto-merge: pullOpens returns a standing pull request untouched, yet done prints it with auto-merge on. Read auto_merge off the list, and enable it where it stands unset.
 
 # retro
 
