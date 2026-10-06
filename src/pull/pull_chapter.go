@@ -7,6 +7,7 @@ package pull
 import (
 	"encoding/json"
 	"fmt"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,6 +39,7 @@ var (
 	trailBlank   = regexp.MustCompile(`[ \t]+$`)
 	starBullet   = regexp.MustCompile(`^(\s*)\* `)
 	manyBlanks   = regexp.MustCompile(`\n{3,}`)
+	backticked   = regexp.MustCompile("`([^`]+)`")
 	leadBlanks   = regexp.MustCompile(`^\n+`)
 )
 
@@ -321,6 +323,9 @@ func (it *It) formFault(field *yaml.Doc, rows []string, where string, one *Held,
 	}
 	switch form {
 	case "text", "list":
+		if len(rows) > 0 && form == "list" && field.Get("home") == true {
+			return it.homeFaults(rows, where)
+		}
 		if len(rows) > 0 {
 			return nil
 		}
@@ -393,6 +398,42 @@ func (it *It) formFault(field *yaml.Doc, rows []string, where string, one *Held,
 		}
 	}
 	return nil
+}
+
+// A list field marked home refuses each line naming no path, link or ticket that stands. [[spec/design_output/pull#the-fields-hold-their-forms]]
+func (it *It) homeFaults(rows []string, where string) []string {
+	out := []string{}
+	for _, row := range rows {
+		if !it.namesHome(row) {
+			out = append(out, fmt.Sprintf("%s holds %s, which names no path, link or ticket.", where, row))
+		}
+	}
+	return out
+}
+
+// A home: a link resolving in the tree, a ticket in backticks, or a backticked path whose file or folder stands. [[spec/design_output/pull#the-fields-hold-their-forms]]
+func (it *It) namesHome(row string) bool {
+	for _, link := range linkIn.FindAllStringSubmatch(row, -1) {
+		if said := strings.TrimSpace(link[1]); it.inherited(said) || it.inherited(said+".md") {
+			return true
+		}
+	}
+	for _, span := range backticked.FindAllStringSubmatch(row, -1) {
+		said := span[1]
+		if strings.ContainsAny(said, " \t") {
+			continue
+		}
+		if !strings.Contains(said, "/") {
+			if it.inherited("spec/tickets/" + said + ".md") {
+				return true
+			}
+			continue
+		}
+		if folder := path.Dir(said); it.inherited(said) || (folder != "." && folder != "/" && it.inherited(folder)) {
+			return true
+		}
+	}
+	return false
 }
 
 // Whether a path stands under the work root, or under the method root it inherits. [[spec/design_output/vehicle#the-work-root-inherits]]

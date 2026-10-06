@@ -4,6 +4,7 @@
 package pull
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -44,10 +45,42 @@ func TestImproveLinesNameTheirHome(t *testing.T) {
 			}
 		}
 	})
+	t.Run("the group route's improve field carries home", func(t *testing.T) {
+		text, err := os.ReadFile("../../spec/processes/group.yaml")
+		if err != nil {
+			t.Fatal(err)
+		}
+		improve := fieldNamed(yaml.Read(string(text)), "improve")
+		if improve == nil || improve.Get("home") != true {
+			t.Fatalf("the improve field reads %v", improve)
+		}
+	})
 	t.Run("a list field the step leaves unmarked takes any line", func(t *testing.T) {
 		plain := yaml.AsDoc(yaml.Read("name: well\nform: list\nsays: what went well\n"))
 		if got := it.formFault(plain, []string{"- read the tests first"}, where, nil, Hold{}); len(got) > 0 {
 			t.Fatalf("the unmarked field answers %q", got)
 		}
 	})
+}
+
+func fieldNamed(said any, name string) *yaml.Doc {
+	if one := yaml.AsDoc(said); one != nil {
+		if one.Get("name") == name && one.Has("form") {
+			return one
+		}
+		for _, key := range one.Keys() {
+			if got := fieldNamed(one.Get(key), name); got != nil {
+				return got
+			}
+		}
+		return nil
+	}
+	if list, held := said.([]any); held {
+		for _, item := range list {
+			if got := fieldNamed(item, name); got != nil {
+				return got
+			}
+		}
+	}
+	return nil
 }

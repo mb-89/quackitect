@@ -78,7 +78,8 @@ steps:
             says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
-            says: how each bad line stops happening, named by its home
+            home: true
+            says: how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks
           - name: thoughts
             form: text
             says: what the thoughts say that the actions do not, off the transcript

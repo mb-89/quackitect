@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: f823972b459c1de0
         size: 501
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 42f6cf5f469472b16c25224171d7b43d6df15c97
+    hash_after: 42f6cf5f469472b16c25224171d7b43d6df15c97
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/design_output/pull.md:470:179: Vocabulary: backticked stands outside the words this tree writes. Write a core word,"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -292,14 +301,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/pull/pull_chapter.go src/pull/pull_home_test.go src/scripts/pull-chapter.js src/scripts/pull-stale.js test/level0/pull-chapter.test.js test/level0/pull-stale.test.js spec/processes/group.yaml spec/schemas/ticket.schema.yaml spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, the JS twin the gate named, the tickets ticket update rewrites, and the size golden that reads pull.md at its new length
+- the Go test reads through FakeDisk, and the JS cases through the fake doors of test/level0
+- the home check points at the forms table of spec/design_output/pull
+- the three homes stand once, in the says line of the improve field
 
 ## tests-green
 

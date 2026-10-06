@@ -99,6 +99,53 @@ test("a gate point opening with a link is refused as no ticket name", () => {
   );
 });
 
+// An improve line names its home: a path, a link or a ticket that stands. [[spec/tickets/improve-lines-name-their-home]]
+test("a list field marked home refuses a line naming no path, link or ticket, and takes one naming a home that stands", () => {
+  const { it } = doors(
+    {
+      [at("spec/tickets/slow-lint.md")]: "---\nstate: open\n---\n",
+      [at("spec/guidance/working.md")]: "# Working\n",
+      [at("src/pull/pull_chapter.go")]: "package pull\n",
+    },
+    {},
+    { root: ROOT },
+  );
+  const field = { name: "improve", form: "list", home: true };
+  const where = "improve under retro/write";
+  const homeless = [
+    "- read the tests first",
+    "- `ghost-ticket` builds it",
+    "- [[spec/guidance/nowhere]] holds it",
+    "- `nowhere/at/all.go` holds it",
+    "- `./RUNME.sh check` runs it",
+  ];
+  for (const row of homeless) {
+    assert.deepEqual(formFault(it, field, [row], where, {}, null), [
+      `${where} holds ${row}, which names no path, link or ticket.`,
+    ]);
+  }
+  const homed = [
+    "- a case in `src/pull/pull_chapter.go` holds it",
+    "- a check in `src/pull/pull_home.go` holds it",
+    "- a rule in [[spec/guidance/working#rules]] holds it",
+    "- `slow-lint` builds it",
+  ];
+  for (const row of homed) {
+    assert.deepEqual(formFault(it, field, [row], where, {}, null), [], row);
+  }
+  assert.deepEqual(
+    formFault(
+      it,
+      { name: "well", form: "list" },
+      ["- read the tests first"],
+      where,
+      {},
+      null,
+    ),
+    [],
+  );
+});
+
 // A ticket carrying a draft step and a gate after it. [[spec/tickets/a-gate-names-its-question]]
 const GATED = `---
 kind: [[ticket]]
