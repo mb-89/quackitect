@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 160354a317c405d6
         size: 2623
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 1752207dd994322828c03fc417d9c09acfc10a79
+    hash_after: 1752207dd994322828c03fc417d9c09acfc10a79
+    inputs:
+      - name: design/draft
+        hash: 160354a317c405d6
+        size: 2623
+      - name: design/tests-red
+        hash: 6e6c55ed28e894ff
+        size: 1007
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -279,8 +291,13 @@ The idle, stopped and failed cases fail on their own assertion, since the stub w
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask: one verb row a work branch with tip, age, holder and pull request, and a wake with exit 1 for an idle, stopped or failed box. `go test ./src/branches/` stands red on the four wake and verb cases on their own assertion, the busy case guards the quiet path, and the check line meets the command at tests-green.
+- The sentinel done_when line rides a checkpoint on the Discussion of failures-and-the-sentinel, which stands open. Weighed: the ask says once that ticket lands, so a checkpoint answers it.
+- In place at implement: `fleetRows` gains the clock and the pull map, so its callers in `src/branches/routine_test.go` (two calls) and `TestFleetHoldsTheBoxesTheDispatchFires` in `src/branches/fleet_test.go` take the new arguments. The callers list misses them, and names `pullRouteOf` as a reader of `fleetRows`, where it takes `[]boxRow` alone.
+- In place at implement: `refs/pull/*/head` outlives a closed pull request, so a done branch matching a closed head reads as carrying one. Checked: `git ls-remote origin refs/pull/*/head` answers through this box's proxy.
 
 # implement
 
