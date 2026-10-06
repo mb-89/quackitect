@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 39c7a5f96138c952
         size: 1706
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: eadca5b2d91811e091fa7f6a9302922a6ab73742
+    hash_after: eadca5b2d91811e091fa7f6a9302922a6ab73742
+    inputs:
+      - name: design/draft
+        hash: 39c7a5f96138c952
+        size: 1706
+      - name: design/tests-red
+        hash: ff63dfed217d1aaa
+        size: 577
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,13 @@ the test reaches git through a real bare origin and clone, as every src/branches
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the test asserts the count of things to fix rises by one with the unreached row, since the fixture's red check and absent retro already count two; the implementer tightens it in place
+- the review_branch road in src/modules/hooks/review decodes review.Material and counts its own fixes; the implementer adds the unreached field and its count there, so both roads refuse
+- src/scripts/work-review.js, the twin review.go cites, changes with it where a live road still runs it, or the implementer names it dead in the says field
+- unreached reads go.mod and git grep at the branch ref, not the working tree, and matches the quoted import path, so src/used never hits src/usedfoo
 
 # implement
 
