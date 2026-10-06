@@ -147,6 +147,69 @@ Other contract tests stand there too, because they drive a real thing as well.
 `vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
 files this tree tracks.
 
+| door | real | fake | contract suite |
+|---|---|---|---|
+| `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
+| `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
+| `git` | `src/doors/git.js` | `src/doors/fake/git.js` | `test/contract/git.test.js` |
+| `clock` | `src/doors/clock.js` | `src/doors/fake/clock.js` | `test/contract/clock.test.js` |
+| `log` | `src/doors/log.js` | `src/doors/fake/log.js` | `test/contract/log.test.js` |
+| `http` | `src/doors/http.js` | `src/doors/fake/http.js` | `test/contract/http.test.js` |
+| `index` | `src/doors/index.js` | `src/doors/fake/index.js` | `test/contract/index.test.js` |
+| `awake` | `src/doors/awake.js` | `src/doors/fake/awake.js` | `test/contract/awake.test.js` |
+| `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
+| `session` | `src/doors/session.js` | `src/doors/fake/session.js` | `test/contract/session.test.js` |
+| `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
+| `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
+| `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
+
+The contract suite is the one test that drives the real door, and every other
+test runs on the fake. A door with no fake stands on its contract suite alone.
+The Go doors keep the same shape, a fake in the door's own file and a suite
+running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
+
+| door | real | fake | contract suite |
+|---|---|---|---|
+| git | `src/modules/git/git.go` | `FakeGit` | `src/modules/git/git_contract_test.go` |
+| env | `src/modules/env/env.go` | `FakeEnv` | `src/modules/env/env_contract_test.go` |
+| disk | `src/modules/files/disk.go` | `FakeDisk` | `src/modules/files/disk_contract_test.go` |
+| watch | `src/modules/files/watch.go` | `FakeWatch` | `src/modules/files/watch_contract_test.go` |
+| clock | `src/modules/clock/clock.go` | `FakeClock` | `src/modules/clock/clock_contract_test.go` |
+| the pull's disk | `src/pull/door.go` | `FakeDisk` | `src/pull/disk_contract_test.go` |
+| the viewer's caller | `src/tui/registry` | `Fake` | `src/tui/registry/call_contract_test.go` |
+| the viewer's catalog | `src/tui/registry` | `Fake` | `src/tui/registry/catalog_contract_test.go` |
+| index | `src/index` | `src/q/qtest` | `src/index/contract_test.go` |
+| bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
+| a placed process | `src/index/procs.go` | none | `src/index/procs_test.go` |
+| a tool's process | `src/modules/lsp` | none | `src/modules/lsp/door_test.go` |
+| the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
+| the pull's git and shell | `src/pull` | none | none |
+| the branch verbs' git, disk and env | `src/branches` | none | none |
+| the box and check doors of quack | `src/quack` | none | none |
+| the viewer's frame over the network | `src/tui/frame` | none | none |
+
+A test outside these suites reaching a real door stands in a family, and each
+family carries its fate:
+
+| family | files | fate |
+|---|---|---|
+| the placements over real processes | `src/index/placements_test.go`, `src/quack/placements_test.go`, `src/quack/io_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
+| the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
+| a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
+| the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
+| the branch verbs over a bare origin and a clone a case | `src/branches/tree_test.go`, `src/branches/dispatch_test.go`, `src/branches/dispatch_write_test.go` | moves onto `FakeGit` and a fake process, under a child ticket |
+| the quack verbs spawning git or the binary | `src/quack/*_test.go` reaching `exec.Command` or `os.Args[0]` | moves onto the process door's fake, under a child ticket |
+| the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under a child ticket |
+| the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
+| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go` | door tests of the index door |
+| the quack verbs over a repository a case | `src/quack/commit_test.go` and the ticket verbs' cases | move onto `FakeGit`, under a child ticket |
+| the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
+| the pull over a real repository | `src/pull/pull_test.go` | moves onto `FakeGit`, under a child ticket |
+
+The one state a module holds is `namePatterns` in
+`src/modules/check/private.go`, a memo of a pure compile, and it stands as the
+named exception.
+
 # A rule test spawns once
 
 A rule asserted against a stub is a rule nobody runs, so a case proving a

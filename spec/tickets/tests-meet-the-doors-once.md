@@ -241,3 +241,17 @@ Done when the lease flake and the two cold-box contract waits run on a fake cloc
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The check before, on the cloud box, warm, at commit bf2759cd9:
+
+| part | seconds |
+|---|---|
+| go | 97.9 |
+| level0 | 81.1 |
+| tests | 24.8 |
+| in all, by the check | 122.7 |
+| wall, by the shell | 125 |
+
+It answers red on one finding: `src/index/procs.go` reads otherwise than the formatter writes it.
+
+The cold-runner fixes land on this branch, in `cold-runner-waits-meet-readiness`, and in no pull request of their own. The owner asks for one where the group's plan allows, and the tree's notes hold that a session opens no branch of its own. A pull request red on the same three takes commits b3f1df35f and 157e9a2c9, which touch the two cases and the index client alone.
