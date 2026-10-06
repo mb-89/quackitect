@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  114.8  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 3badeb43b0aee66ab15b6ce697ba220aa2255f28
+    hash_after: 3badeb43b0aee66ab15b6ce697ba220aa2255f28
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: a98907ffdc8c3ac2
+        size: 930
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -345,26 +368,33 @@ every fact the change adds stands in one place: acceptsVerb owns the table, and 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/tools_test.go src/quack/accepts_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every tool the index lists now answers its call. The list and the action routes skip an action whose zero-input requests no IO module accepts, off acceptsVerb in src/quack/accepts.go, which accepts also routes by. An action the zero input cannot judge stays listed. The hook now runs act under a ten minute wait and answers a rejected run as a line, so a long hand-back no longer reads as a missing handler. Four children carried the parts: accepts-reads-away-modules, tool-list-keeps-unreadable-actions, real-catalog-reads-accepts and tool-call-hook-answers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the files are the tool list, the routes, the accept table, the hook and their tests.
+every door the change reaches has a fake: fakeManager, the hook engine fake and the real catalog read with no IO.
+a comment names the approach the change implements: accepted, acceptsVerb and callsIndexTool each carry it.
+every fact the change adds stands in one place: acceptsVerb owns the table and RUNNING owns the wait.
 
 # accept
 
