@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -143,6 +143,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: c1ccf97a8db4a744644e83f7d68ef8382b224e9b
+    hash_after: c1ccf97a8db4a744644e83f7d68ef8382b224e9b
+    inputs:
+      - name: retro/write
+        hash: 981425f204e93893
+        size: 2434
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -277,20 +287,27 @@ The ask was small, and the route around it was large: two pull requests and two 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 20:22 a verb that writes cloud: true on a group from a cloud box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 20:47 the trunk guard refused the cloud marker push of branch open
+- 20:55 the commit check went red on the size golden, and the commit landed on a rescue branch
+- 21:00 the 115 second cap a box sets on a command cut the hand-back of do
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the rescue branch rescue/ci-runs-once-a-head stands on origin, and its commit stands on the work branch too
 
 # Discussion
 
