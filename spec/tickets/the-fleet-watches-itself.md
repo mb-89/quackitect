@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -161,7 +161,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 0240041cccfe641e09a20443bee52ac78b918198
+    hash_after: 0240041cccfe641e09a20443bee52ac78b918198
+    inputs:
+      - name: retro/write
+        hash: efa423c4d4866fe7
+        size: 3466
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -311,20 +321,29 @@ The thoughts kept weighing whether a refusal was a fault of the tree or of the h
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 18:00 the right to store a routine: a box holds no claude.ai routine store, so the-fleet-routine-stands waits for a person
+- no tool, host or install went missing in this run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 16:28 and 16:33 the trunk guard refused a merge and a push to main, and the group commit went up as the work branch
+- 17:17 the MCP pull tool lost its tool.call hook, and the CLI ran the verb
+- 16:46 the stop hook fed back twice while helpers ran
+- 17:13 and 18:23 the context cap cleared the conversation, and the handover carried the work
+- no conflict at sync, and no test failed on the box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- the-fleet-routine-stands: a person ticket on main with no group, at do, for the owner to store the fleet routine
+- the handover says every child stands closed and the branch waits on done, the pull request and its subscription
 
 # Discussion
 
