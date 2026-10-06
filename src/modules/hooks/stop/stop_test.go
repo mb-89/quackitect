@@ -4,6 +4,7 @@
 package stop
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -16,15 +17,22 @@ const (
 	lowGo      = 50
 	lowStop    = 45
 	mostInARow = 2
-	ownerHolds = 85
-	cloudGo    = 83
 )
 
-// The rules a turn ending on a question meets, as spec/config/stop/level0.yml holds them. [[spec/tickets/cloud-turns-end-without-questions]]
-var questionRules = []Rule{
-	{ID: "the-owner-holds-this-session", Side: StopSide, Priority: ownerHolds, Decides: Mechanical, Runs: "owner-holds"},
-	{ID: "a-cloud-box-decides", Side: GoSide, Priority: cloudGo, Decides: Mechanical, Runs: "ends-on-a-question", Says: "A cloud box asks nobody, so decide the question yourself, say what you weigh and what you assume, and carry on."},
-	{ID: "the-work-stands-complete", Side: StopSide, Priority: lowStop, Decides: Claimed, Yields: true, Runs: "the-plan-is-empty", Asks: "Does the work stand complete?"},
+// The rules a turn ending on a question meets: the ones spec/config/stop/level0.yml holds, so the cases decide the rule there too. [[spec/tickets/cloud-turns-end-without-questions]]
+const treeRules = "../../../../spec/config/stop/level0.yml"
+
+func questionRules(t *testing.T) []Rule {
+	t.Helper()
+	text, err := os.ReadFile(treeRules)
+	if err != nil {
+		t.Fatalf("the tree's rules read no file: %v", err)
+	}
+	rules, broken := Pool([]File{{Name: "level0.yml", Text: string(text)}})
+	if len(broken) > 0 {
+		t.Fatalf("the tree's rules read broken: %v", broken)
+	}
+	return rules
 }
 
 const endsAsking = "I weigh the cheap road against the safe one.\n\nShould I take the cheap one?\n\nstop: the-work-stands-complete"
@@ -159,21 +167,23 @@ func TestEachCheckReadsItsFacts(t *testing.T) {
 
 // A cloud turn ending on a question meets a refusal that says decide, and an owner's hold still ends it. [[spec/tickets/cloud-turns-end-without-questions]]
 func TestACloudTurnEndingOnAQuestionHearsDecide(t *testing.T) {
-	facts := Facts{Cloud: true, Text: endsAsking}
-	said := Decide(questionRules, "the-work-stands-complete", func(name string) (bool, bool) { return Ran(name, facts) })
+	rules := questionRules(t)
+	facts := Facts{Cloud: true, Text: endsAsking, Rules: rules, Claimed: "the-work-stands-complete"}
+	said := Decide(rules, facts.Claimed, func(name string) (bool, bool) { return Ran(name, facts) })
 	if said.Ends || said.Go == nil || said.Go.ID != "a-cloud-box-decides" || !strings.Contains(said.Go.Says, "decide") {
 		t.Fatalf("a cloud turn ending on a question reads %+v, want it held by a-cloud-box-decides saying decide", said)
 	}
 	facts.Hold = StopHold
-	if said := Decide(questionRules, "", func(name string) (bool, bool) { return Ran(name, facts) }); !said.Ends {
+	if said := Decide(rules, "", func(name string) (bool, bool) { return Ran(name, facts) }); !said.Ends {
 		t.Fatalf("a cloud turn the owner holds at stop reads %+v, want it ended", said)
 	}
 }
 
 // A desk turn ending on the same question stops as it does today. [[spec/tickets/cloud-turns-end-without-questions]]
 func TestADeskTurnEndingOnAQuestionStopsAsToday(t *testing.T) {
-	facts := Facts{Text: endsAsking}
-	said := Decide(questionRules, "the-work-stands-complete", func(name string) (bool, bool) { return Ran(name, facts) })
+	rules := questionRules(t)
+	facts := Facts{Text: endsAsking, Rules: rules, Claimed: "the-work-stands-complete"}
+	said := Decide(rules, facts.Claimed, func(name string) (bool, bool) { return Ran(name, facts) })
 	if !said.Ends || said.Go != nil {
 		t.Fatalf("a desk turn ending on a question reads %+v, want it ended with no continue firing", said)
 	}

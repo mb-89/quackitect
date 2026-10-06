@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1bda716d7939779c
         size: 2025
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3341fdcd540f · claude-code-remote · helper-4
+    hash_before: 2e50d31a006653b5b37c2f4a827dc79c2aa542e7
+    hash_after: 2e50d31a006653b5b37c2f4a827dc79c2aa542e7
+    inputs:
+      - name: design/draft
+        hash: 1bda716d7939779c
+        size: 2025
+      - name: design/tests-red
+        hash: 1f088f57a6ca77e2
+        size: 699
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,10 @@ The cloud case ends today: the claim the-work-stands-complete stands on an empty
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- cloud-question-check-leaves-readstext: the draft puts ends-on-a-question in ReadsText so the stop call skips it, but ReadsText gates only the reason a stop call names (src/modules/hooks/stops.go Stops.claims), and a-cloud-box-decides is a continue, never a reason; implement drops the entry and the last assertion of TestEndsOnQuestionReadsTheLastProse, or keeps both as harmless
 
 # implement
 
