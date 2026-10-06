@@ -69,3 +69,25 @@ func TestAFiredFailureRunsItsReaction(t *testing.T) {
 		t.Fatalf("the sentinel runs %q, want %q", runner.Lines, want)
 	}
 }
+
+func TestAQuietWatchArmsAtOnceAndFiresWithNoEvent(t *testing.T) {
+	t.Parallel()
+	fired := &firedIds{}
+	fake := clock.NewFake(sentinelStart)
+	NewSentinel(Fake(stallNode), fake, fired.hand, &FakeRunner{})
+	fake.Tick(31 * time.Minute)
+	fake.Tick(31 * time.Minute)
+	if want := []string{"take-stalls"}; !reflect.DeepEqual(fired.ids, want) {
+		t.Fatalf("the sentinel fires %q with no event, want %q", fired.ids, want)
+	}
+}
+
+func TestAFailingReactionRaisesItsOwnFailure(t *testing.T) {
+	t.Parallel()
+	fired := &firedIds{}
+	runner := &FakeRunner{Exits: map[string]int{"branch release": 1}}
+	NewSentinel(Fake(reactsNode), clock.NewFake(sentinelStart), fired.hand, runner).Hear(take)
+	if want := []string{"take-reacts", "failure-reaction-fails"}; !reflect.DeepEqual(fired.ids, want) {
+		t.Fatalf("the sentinel fires %q, want %q", fired.ids, want)
+	}
+}

@@ -23,7 +23,8 @@ func TestRaiseFaultsNameAnIdWithNoNode(t *testing.T) {
 	t.Parallel()
 	files := map[string]string{
 		"src/a.go": "failure.Raise(registry, \"leaf-held\", \"x\")\nfailure.Raise(reg, \"ghost\")\n",
-		"src/b.js": "await door.raise(\"ghost-js\", \"x\");\nawait door.raise(\"leaf-held\");\n",
+		"src/b.js": "await failures.raise(\"ghost-js\", \"x\");\nawait failure(disk, log).raise(\"leaf-held\");\n",
+		"src/c.js": "engine.raise(\"session.start\", {});\nraise(\"tool.call\");\n",
 	}
 	want := []string{
 		"src/a.go raises ghost, and no node under spec/failures carries it",

@@ -63,3 +63,19 @@ func TestShellAndFakeRunnerAnswerAlike(t *testing.T) {
 		t.Errorf("the fake keeps %q", fake.Lines)
 	}
 }
+
+func TestShellAndFakeRunnerAnswerAFailingExit(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "RUNME.sh"), []byte("#!/bin/sh\nexit 3\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for name, runner := range map[string]Runner{"shell": Shell{Root: root}, "fake": &FakeRunner{Exits: map[string]int{"branch release": 3}}} {
+		if exit, err := runner.Run("branch release"); exit != 3 || err != nil {
+			t.Errorf("%s answers %d, %v, want 3", name, exit, err)
+		}
+	}
+	if exit, err := (Shell{Root: t.TempDir()}).Run("branch release"); exit == 0 && err == nil {
+		t.Error("the shell answers 0 under a root holding no RUNME.sh")
+	}
+}

@@ -5,6 +5,7 @@ package failure
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"quackitect/src/note"
@@ -76,6 +77,9 @@ func watchOf(id string, value any) (*Watch, []string) {
 				watch.Event = text
 			} else {
 				watch.Match = text
+				if _, err := regexp.Compile(text); ok && err != nil {
+					faults = append(faults, fmt.Sprintf("%s names a watch match that reads as no pattern", id))
+				}
 			}
 		case "quiet":
 			minutes, ok := value.(int)

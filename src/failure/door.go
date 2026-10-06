@@ -4,7 +4,9 @@
 package failure
 
 import (
+	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -39,7 +41,18 @@ func (one Dir) Files(folder string) []string {
 
 // Every file under a folder, at any depth, by slashed path from the root. [[spec/design_output/failures#the-check-holds-the-registry]]
 func (one Dir) Walk(folder string) []string {
-	return []string{}
+	out := []string{}
+	_ = filepath.WalkDir(one.at(folder), func(at string, entry os.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return nil
+		}
+		if path, err := filepath.Rel(one.Root, at); err == nil {
+			out = append(out, filepath.ToSlash(path))
+		}
+		return nil
+	})
+	sort.Strings(out)
+	return out
 }
 
 func (one Dir) Read(path string) (string, bool) {
@@ -55,15 +68,27 @@ type Runner interface {
 // The shell under a root, running ./RUNME.sh with a line's words. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
 type Shell struct{ Root string }
 
+// A nonzero exit answers its code, and a shell that starts nowhere answers its error. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
 func (one Shell) Run(line string) (int, error) {
-	return 0, nil
+	command := exec.Command("sh", "-c", "./RUNME.sh "+line)
+	command.Dir = one.Root
+	err := command.Run()
+	var exited *exec.ExitError
+	if errors.As(err, &exited) {
+		return exited.ExitCode(), nil
+	}
+	return 0, err
 }
 
 // A process door in memory, keeping each line it gets. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
-type FakeRunner struct{ Lines []string }
+type FakeRunner struct {
+	Lines []string
+	Exits map[string]int
+}
 
 func (one *FakeRunner) Run(line string) (int, error) {
-	return 0, nil
+	one.Lines = append(one.Lines, line)
+	return one.Exits[line], nil
 }
 
 // A folder in memory, keyed by slashed path. [[spec/design_output/failures#the-registry-reads-the-nodes]]
@@ -81,7 +106,14 @@ func (one FakeDir) Files(folder string) []string {
 }
 
 func (one FakeDir) Walk(folder string) []string {
-	return []string{}
+	out := []string{}
+	for held := range one {
+		if strings.HasPrefix(held, folder+"/") {
+			out = append(out, held)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 func (one FakeDir) Read(path string) (string, bool) {

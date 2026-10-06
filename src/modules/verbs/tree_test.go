@@ -71,3 +71,13 @@ func TestTreeVerbsReadAsCommandsLessTheTopics(t *testing.T) {
 		t.Fatalf("the tree verbs read %v, and the table less its topics reads %v", got, want)
 	}
 }
+
+// The failure verb stands in the table, so help and the agent's tools name it. [[spec/tickets/failure-verb-in-help]]
+func TestTheTreeVerbsListFailure(t *testing.T) {
+	for _, one := range TreeVerbs {
+		if one.Name == "failure" {
+			return
+		}
+	}
+	t.Fatal("the tree verbs list no failure")
+}

@@ -25,7 +25,14 @@ func clockSuite(t *testing.T, one Clock, pass func()) {
 func TestClockKeepsItsContract(t *testing.T) {
 	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
 	t.Run("fake", func(t *testing.T) { clockSuite(t, fake, func() { fake.Tick(time.Millisecond) }) })
-	t.Run("real", func(t *testing.T) { clockSuite(t, New(), func() { time.Sleep(time.Millisecond) }) })
+	real := New()
+	t.Run("real", func(t *testing.T) {
+		clockSuite(t, real, func() {
+			passed := make(chan struct{})
+			real.After(time.Millisecond, func(time.Time) { close(passed) })
+			<-passed
+		})
+	})
 }
 
 // The hand runs once its span passes, once alone, and never after a stop. Await reads whether the hand ran, the real clock blocking on it and the fake reading it at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]

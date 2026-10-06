@@ -107,6 +107,13 @@ func TestRedRows(t *testing.T) {
 			t.Fatalf("a leaf with no list reads %v, and wants none", got)
 		}
 	})
+	t.Run("a row naming its case after the path reads as the path", func(t *testing.T) {
+		text := "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\n- src/one/one_test.go TestOne\n- test/level0/a.test.js a case reads its words\n"
+		want := []string{"src/one/one_test.go", "test/level0/a.test.js"}
+		if got := RedRows(text, "design/tests-red"); !reflect.DeepEqual(got, want) {
+			t.Fatalf("the named rows read %v, and want %v", got, want)
+		}
+	})
 	t.Run("a comma-joined row reads one path each", func(t *testing.T) {
 		text := "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\nsrc/one/one_test.go,test/level0/a.test.js\n"
 		want := []string{"src/one/one_test.go", "test/level0/a.test.js"}
