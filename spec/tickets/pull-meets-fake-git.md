@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,21 @@ record:
         hash: ffaadf7c3fe494dd
         size: 17605
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: af47504daf1a0e58709689cefea02c9e6866a989
+    hash_after: af47504daf1a0e58709689cefea02c9e6866a989
+    inputs:
+      - name: design/draft
+        hash: 8eaac3060915d948
+        size: 12071
+      - name: design/tests-red
+        hash: e9b3cce58a3a8d57
+        size: 1098
+      - name: [[spec/design_output/doors]]
+        hash: ffaadf7c3fe494dd
+        size: 17605
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -416,8 +431,11 @@ the doors the tests reach are git, the disk and the process door, and FakeRepo, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: `Repo` and `FakeRepo` in src/modules/git carry every git line the src/pull call sites run, and `ShellOver` on a `FakeRunner` replaces `OSShell`. Done_when line one met a red test only once the pull row left the doors chapter, and nothing turned red while the row stood, so line two had none. The gate adds `TestThePullCasesSpawnNothingAndTheDoorsChapterListsThemNowhere` to src/pull/shell_test.go, on the red list already. It fails now on the `exec.Command` in `gitIn` and on the pull row of the doors chapter, and it passes once both leave. The Repo suite, the disk `List` case under the contract tag, which the check runs, and the shell case each fail on their own assertion against the stubs. The check decides line three.
 
 # implement
 
