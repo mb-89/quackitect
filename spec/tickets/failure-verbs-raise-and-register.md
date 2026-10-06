@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -215,6 +215,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: e048efeeaf56bba8e6817b9e9751fa3e9c2e5b99
+    hash_after: e048efeeaf56bba8e6817b9e9751fa3e9c2e5b99
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: design/tests-red
+        hash: 797be04a68e55ea3
+        size: 832
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -385,26 +408,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_failure_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+An agent now raises a failure by verb. failure raise prints the node lines and appends the row the door shapes onto the session log, and an id no node carries still prints and logs, then fails. failure new writes a node in the shape the failure schema names, and refuses an id off the shape, an id a node carries, a level off the ladder, no remedy and no when. failure count answers each id the session log holds with its count, the most first. Help names the verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the three files the draft names, and no other
+- the verb reaches the disk and the clock through failureDoors, and each case hands in a temp root and a fixed now
+- each subverb function points at spec/design_output/failures#an-agent-raises-by-verb
+- the row shape stays in Raised.Row, and the node shape in the failure schema
 
 # accept
 
