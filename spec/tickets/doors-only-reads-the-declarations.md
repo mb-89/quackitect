@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -29,6 +29,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: a-guard-reads-door-declarations
+record:
+  - step: do
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: da47eb2ed19780447242324d98ae27f5f57773a4
+    hash_after: 379d25da18a9c4cfefc9ee066b7a8390bc400b55
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "  101.6  in all"
+    inputs:
+      - name: ask
+        hash: 32371f26f64b1bf0
+        size: 208
+    def: ce98b9e976552e83
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ the Vale rule DoorsOnly keeps its own hand-kept list of node: imports, Date.now,
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/outside-in-doors.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`DoorsOnly` stays, and the doors note says what retires it. While every JavaScript door stands at report, the guard refuses none of it, and `DoorsOnly` is the one refusal left. It also refuses `Math.random` and every `node:` module, and no declaration owns those. It retires in the change that drops report from the last JavaScript door, once a declaration owns `Math.random` and the guard refuses an undeclared `node:` module, as the Go floor does.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: it says why the rule stays, and names the change that retires it
+the cleanup: the gap between the rule and the declarations, `Math.random` and undeclared `node:` modules, stands in the same note
+one place: the fate stands once, under the declarations section of the doors note
 
 # Discussion
 
