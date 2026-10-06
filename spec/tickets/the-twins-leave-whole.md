@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: e242c4d6149350f8
         size: 2818
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 5a2875c06e0b7a33305bcf15836eab613988cec7
+    hash_after: 36f677d1f32467be29fb69b94a48e1525d0f3233
+    inputs:
+      - name: design/draft
+        hash: e242c4d6149350f8
+        size: 2818
+      - name: design/tests-red
+        hash: 613a6eda8e875a5a
+        size: 1263
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -278,8 +290,14 @@ the JS cases reach git and the disk through fakeGit and fakeDisk, and the Go tak
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- the-twins-retire: the draft departs from done_when lines one and two and says why, and the tree bears it out: work.js has a caller outside the tests in .claude/skills/level0/lib/copilot-dispatch.js, and pull.js and pull-hand.js are imported by ephemeral-pull.js, pull-escalate.js, pull-writes.js, pull-gate.js, pull-chapter.js, pull-route.js, work-answer.js, work-unblock.js, work-free.js, work-held.js, work-review.js, ticket.js, ticket-yours.js and work-test.js. Moving those importers off the twins and deleting the three files is a migration of its own, so those two lines ride out as this child
+- go-pull-desk-remedy-once: the callers list misses deskRefused in src/pull/pull_branch.go, the Go pull. It passes the remedy as a second said line to failure.Raise, and Raised.Lines in src/failure/raise.go also prints the node's remedy, so the Go pull prints the remedy twice, the same fault as take.go. The builder fixes it in place with a test beside TestDeskTakePrintsTheRemedyOnce
+- desk-refusal-test-follows: dropping DeskRefusal from src/modules/hooks/command/trunk.go breaks TestDeskSaidBuildsTheMessageTheDeskRefusalOpensOn in trunk_test.go, which calls it. Neither size nor callers names that file. The builder rewrites that case to DeskSaid alone
+- desk-size-names-the-door: tests-red/seen says src/doors/failure.js answers lines alone, so the JS refusal prints them without waiting on the async raise. That file stands outside size, so the builder adds it there or drops the change
+- desk-remedy-names-the-group: the named pull's refusal used to name the group in the remedy (branch merge one-group). Under the new test it reads branch merge <name>, and only the message names the group, so a desk reader loses the exact command. Keep it, or carry the name into the node's remedy
 
 # implement
 
