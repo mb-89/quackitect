@@ -180,7 +180,7 @@ ifBuilt("a stopped index leaves no se-index process past the case", () => {
 });
 
 // A check run inside an index call inherits QUACKITECT_ROOT, and a case's stop reached the index that root names. [[spec/tickets/index-survives-a-long-call]]
-ifBuilt("a door over one work folder starts its own index, whatever root the environment names", () => {
+ifBuilt("a door over one work folder leaves the index an inherited QUACKITECT_ROOT names standing", () => {
   const other = files.tempDir("other-");
   files.makeDir(join(other, "spec", "tickets"));
   const work = files.tempDir("own-");
