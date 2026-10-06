@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 9ca66d3c771ba33e0678e5d7cbd2a8e36866ca24
+    hash_after: 9ca66d3c771ba33e0678e5d7cbd2a8e36866ca24
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/clock passes; green, src/q passes; green, src/q/qtest passes; green, src/engine/swap passes; green, s
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: 7a20935396b81582
+        size: 787
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -363,26 +386,33 @@ the header of `src/q/clock.go` points at the doors note section on time as a doo
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/clock src/q src/q/qtest src/engine/swap src/index src/modules/index src/modules/hooks src/modules/lsp src/tui/frame src/watcher/watchertest
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Go code outside the root now reads the time and waits through `q.Clock`, an interface in the core with `Now`, `Every`, `After`, `AfterFunc` and `WithTimeout`. The clock module holds the real clock. The fake moved to `q/qtest`, so a package that imports no module, such as the index, lsp or a renderer, can hand its tests a clock it moves with `Tick`. A test that needs real time takes `qtest.Wall()`, whose lines carry the marker with their reason, and which runs the same contract suite as the real clock. The root builds one clock and hands it to the index, the modules and the window. `./RUNME.sh doors` lists no unmarked walk-around of `time` or `context` in production Go outside the root.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the clock module, the core, `q/qtest`, each caller the draft names and the root that wires them, every one inside the ask
+the clock door has one fake, in `q/qtest`, and the wall meets the same contract
+the header of `src/q/clock.go` points at the doors note section on time as a door
+`q.Clock` stands once, in the core
 
 # accept
 
