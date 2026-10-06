@@ -35,7 +35,7 @@ const (
 	every       = "."
 )
 
-// The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
+// The cold path: a commit touching one runs the cold probe. [[spec/design_output/level0#the-cold-probe]]
 var coldPath = []string{
 	".claude/skills/level0/hooks/",
 	".claude/skills/level0/lib/guidance.js",
@@ -44,7 +44,6 @@ var coldPath = []string{
 	"src/quack/",
 	"src/scripts/go-stamp.sh",
 	"src/scripts/install.sh",
-	"src/scripts/probe-cold.js",
 }
 
 func init() {

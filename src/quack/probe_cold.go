@@ -17,7 +17,7 @@ import (
 	"quackitect/src/modules/hooks/brief"
 )
 
-// The cold probe's numbers and names, each as probe-cold.js and the level0 lib name it. [[spec/design_output/level0#the-cold-probe]]
+// The cold probe's numbers and names. A line naming a level0 lib names the twin it keeps in step with. [[spec/design_output/level0#the-cold-probe]]
 const (
 	// The tools the index serves start here. [[spec/design_output/level0#the-cold-probe]]
 	servedTools = "mcp__level0__"
@@ -43,7 +43,7 @@ const (
 // The checks the cold probe reads, in order. [[spec/design_output/level0#the-cold-probe]]
 var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 
-// The prompt the cold client runs, as COLD.prompt in src/scripts/probe-cold.js says it. [[spec/design_output/level0#the-cold-probe]]
+// The prompt the cold client runs. [[spec/design_output/level0#the-cold-probe]]
 var coldPrompt = strings.Join([]string{
 	"This session probes a fresh box. Make two tool calls, one after the other.",
 	"First read README.md with the Read tool.",
