@@ -352,3 +352,9 @@ The pull case wraps the clone git door in mainMoves for the one diff call, and t
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The pull road moves under this draft, so implement against it as it stands:
+
+- `Dispatch` puts its `send` on `d.Send`, and the fire reads it there. Write `d.updated()`, reading `d.Send`, and take no `send` argument.
+- Read the token through `d.pullToken()`, which falls back onto `GH_TOKEN`, and the hub through `d.hubOf(d.pullToken(), "PULL_TOKEN")`, as `pullOpens` does.
+- Put `updated` and `updateRow` beside `pullOpens` in `src/branches/dispatch_fire.go`. For details, see [[spec/tickets/dispatch-update-collides]].
