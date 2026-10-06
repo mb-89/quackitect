@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/quack/retro_read.go:65:108: Antithesis: Say what is. 'and not' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 45fc15f089570ee9e6f61ba25c8f8e6bc6dc256c
+    hash_after: 45fc15f089570ee9e6f61ba25c8f8e6bc6dc256c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: d4411837207b96b8
+        size: 888
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_read_test.go src/quack/retro_effect_test.go src/quack/retro_mint_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+retro read now lists every record a run leaves. A queued owner prompt earns a prompt row where its origin is human, or names none and carries no meta mark, and a helper transcript and the queue line earn none. A tool result with no error mark whose text opens on refused earns a refusal row with its reason line. retro effect looks for the last retro in its private home, then in the tracked folder spec/retros, and retro mint copies the classes, the rates and the collect time there, so a fresh box measures against the last retro. The usage line, the verb doc and the read note name the refusal row.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the doc line in src/modules/verbs/retro.go the gate named
+- the cases read temp folders they seed, and the mint case reaches git through retroMintFake
+- the code points at the retro read and effect sections it implements
+- the refusal row stands once in the usage line, and the verb doc and the read note point at the same words
 
 # accept
 
