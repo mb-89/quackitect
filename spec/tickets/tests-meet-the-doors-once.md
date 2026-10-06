@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box b4c8cb96d125 · claude-code-remote
@@ -138,6 +138,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 889fcad6bb88bbc1cb9d33ea152bbf005efea35e
+    hash_after: 889fcad6bb88bbc1cb9d33ea152bbf005efea35e
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -222,38 +234,51 @@ pass
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- every child of the group closes, unfaked-doors-take-fakes last, whose retro holds this window in full
+- the check stands green at 101.2 seconds against 122.7 before, in the Discussion
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the child group held the window, so the parent closes on its accept, its notes and this pointer
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- the errors of this window stand in the retro of unfaked-doors-take-fakes, each with its time
+- 19:27 UTC: the check carries one biome warning on unused imports in test/level0/work-stands.test.js, left at warning
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- each line of the child retro names its home there
+- the biome warning: the next hand editing work-stands.test.js clears its unused imports
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The parent adds nothing the child retro does not say, past the closing check time.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact points at the child retro or the Discussion
+- the one number, the check time, stands in the Discussion
+- the retro writes no file header
+- the error times stand in the child retro
+- the chapter says the agent, and names no box path
 
 ## cloud
 
