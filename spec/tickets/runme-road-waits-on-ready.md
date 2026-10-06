@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 2dd39abb6ea9a1d683bf009d0c6cdbe8bd937ec7
+    hash_after: 2dd39abb6ea9a1d683bf009d0c6cdbe8bd937ec7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "   89.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 64b0da3c99b2f4a9
+        size: 687
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -318,26 +341,33 @@ the road reads the binary through at() in the door, which owns it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/runme-road.test.js test/contract/index.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index door gains ready, which runs se-index standing with no span and returns once the door over the root stands, or says why it stands not. The fake index answers ready beside warm. The runme-road contract test waits on ready in a before hook and runs RUNME.sh with no timeout, so a slow box waits and a broken road alone fails. The no-timer case matched its own pattern, so its pattern now splits the word it names, as it splits the others.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names
+the fake index answers ready
+ready, the fake and the before hook link this ticket
+the binary path stays with at() in the door
 
 # accept
 
