@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -231,6 +231,18 @@ record:
     hash_after: ece6a6e50c5c99d5c91b9b6a9ba67295c60ce02b
     returns: 1
     why: the hand takes it back
+  - step: split
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: cfbfdc8b6ea806fba616039e70066fed6772382c
+    hash_after: cfbfdc8b6ea806fba616039e70066fed6772382c
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 19b6849b1f151cd5
 reason: done
 ---
 
@@ -265,6 +277,7 @@ The check's parts block each other no more: every part starts at once, so the ch
 - [[spec/tickets/the-parts-start-at-once]], standard
 - [[spec/tickets/the-budget-reads-the-span]], trivial
 - [[spec/tickets/index-cases-wait-for-it]], trivial
+- [[spec/tickets/vale-retries-its-timeout]], trivial
 
 ## checked
 
@@ -272,9 +285,9 @@ The check's parts block each other no more: every part starts at once, so the ch
 <!-- the form is checklist -->
 
 - each child carries one diff a reviewer reads whole
-- the first child starts the parts at once, the second sizes the budget, and the third adds the ready step, so the goal stands inside the three
+- the parts start at once, the budget reads the span, and the ready step and the Vale retry keep the parts sound under the load
 - the-budget-reads-the-span names the-parts-start-at-once under depends_on
-- the budget reads the span the first child sets, and the ready step reads the parts the first child starts, so they landed in that order
+- the later children read the parts the first child starts, so they landed after it
 - the group diff stays one review, so it needs no split
 
 # children
