@@ -33,20 +33,12 @@ func (d *Doors) staleSpan() int64 {
 	return 0
 }
 
-// A claim's age and whether it stands older than the span. [[spec/design_output/work#a-stale-group-is-yours]]
+// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#a-hold-beats-with-its-session]]
 type claim struct {
 	Age   string
 	Stale bool
-}
-
-// The age of the claim on a branch, and whether it stands stale. [[spec/design_output/work#a-stale-group-is-yours]]
-func (d *Doors) staleClaim(one stand, now int64) claim {
-	held := tipAge(one, now)
-	if held < 0 {
-		return claim{}
-	}
-	span := d.staleSpan()
-	return claim{Age: aged(held), Stale: span > 0 && held > span}
+	Live  bool
+	Beat  string
 }
 
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -147,11 +139,12 @@ func (d *Doors) trigger() int {
 	d.say("    action=run  trigger_id=%s\n", routineID)
 	if len(free) == 0 {
 		d.say("No branch stands free, so a box fired now takes nothing.")
-		return codeOK
+	} else {
+		d.say("These branches stand free, and a box takes one each:")
+		for _, one := range free {
+			d.say("  %s", one.Branch)
+		}
 	}
-	d.say("These branches stand free, and a box takes one each:")
-	for _, one := range free {
-		d.say("  %s", one.Branch)
-	}
+	d.fleetRoutine()
 	return codeOK
 }

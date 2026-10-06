@@ -7,6 +7,7 @@ package pull
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -138,15 +139,11 @@ func taggedIn(list []*Held) []*Held {
 	return out
 }
 
-// The tagged tickets a work branch takes first: its group's children alone, so a tag on another group's ticket waits for that group's branch. [[spec/tickets/box-opens-its-pr]]
-func taggedAmong(tagged, children []*Held) []*Held {
-	ours := map[*Held]bool{}
-	for _, one := range children {
-		ours[one] = true
-	}
+// The tagged tickets a work branch takes: its group's children and the private notes, so a tagged ticket of another group waits for its own branch. [[spec/tickets/cloud-question-check-leaves-readstext]]
+func taggedHere(tagged, children []*Held) []*Held {
 	out := []*Held{}
 	for _, one := range tagged {
-		if ours[one] {
+		if one.Private || slices.Contains(children, one) {
 			out = append(out, one)
 		}
 	}
@@ -245,7 +242,7 @@ func (it *It) handOut(who *Who) int {
 	var pools [][]*Held
 	if who.Group != "" {
 		children := heldChildren(all, who.Group)
-		pools = append([][]*Held{taggedAmong(tagged, children), it.sorted(children, all)}, late...)
+		pools = append([][]*Held{taggedHere(tagged, children), it.sorted(children, all)}, late...)
 	} else {
 		pools = [][]*Held{tagged, it.sorted(freeIn(all), all), notes}
 		it.cutForGroups(all)

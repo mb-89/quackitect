@@ -300,6 +300,60 @@ func TestCommitVerbRefusesAModelTrailer(t *testing.T) {
 	}
 }
 
+// Whether the origin carries the branch. [[spec/tickets/takeover-rescues-unpushed-commits]]
+func originHas(t *testing.T, origin, branch string) bool {
+	t.Helper()
+	return gitDoes(t, "", "--git-dir="+origin, "branch", "--list", branch) != ""
+}
+
+// A repository standing on work/one-group, pushed. [[spec/tickets/takeover-rescues-unpushed-commits]]
+func onWorkBranch(t *testing.T) (string, string) {
+	t.Helper()
+	root, origin := landingRepo(t)
+	gitDoes(t, root, "switch", "-q", "-c", "work/one-group")
+	gitDoes(t, root, "push", "-q", "origin", "work/one-group")
+	return root, origin
+}
+
+// A red cloud commit on a work branch still reaches origin on its rescue branch, and a green push drops the rescue. [[spec/tickets/takeover-rescues-unpushed-commits]]
+func TestCommitVerbRescue(t *testing.T) {
+	t.Parallel()
+	t.Run("a red cloud commit lands on rescue/<group> on origin, and the work branch there moves nowhere", func(t *testing.T) {
+		root, origin := onWorkBranch(t)
+		lays(t, root, "src/a.go", "package a\n")
+		d, heard, _ := fakeLanding(root)
+		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
+		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+		if code != exitFailed || originSubject(t, origin, "work/one-group") == opens {
+			t.Fatalf("commit answers %d, %q, and the work branch on origin reads %q", code, errs, originSubject(t, origin, "work/one-group"))
+		}
+		if !originHas(t, origin, "rescue/one-group") || originSubject(t, origin, "rescue/one-group") != opens || !strings.Contains(errs, "rescue/one-group") {
+			t.Fatalf("the red commit reaches no rescue branch: %q", errs)
+		}
+	})
+	t.Run("a red commit off a work branch writes no rescue", func(t *testing.T) {
+		root, origin := landingRepo(t)
+		lays(t, root, "src/a.go", "package a\n")
+		d, heard, _ := fakeLanding(root)
+		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
+		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != exitFailed || gitDoes(t, "", "--git-dir="+origin, "branch", "--list", "rescue/*") != "" {
+			t.Fatalf("commit answers %d, %q, and origin holds a rescue", code, errs)
+		}
+	})
+	t.Run("a green push on the work branch drops the rescue it carries", func(t *testing.T) {
+		root, origin := onWorkBranch(t)
+		lays(t, root, "src/a.go", "package a\n")
+		d, heard, _ := fakeLanding(root)
+		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
+		runsTwin(commitVerb(d), "commit", opens)
+		delete(heard.answers, "check")
+		lays(t, root, "src/b.go", "package a\n")
+		if code, _, errs := runsTwin(commitVerb(d), "commit", "a-ticket: the fix lands"); code != 0 || originHas(t, origin, "rescue/one-group") {
+			t.Fatalf("commit answers %d, %q, and the rescue stands: %v", code, errs, originHas(t, origin, "rescue/one-group"))
+		}
+	})
+}
+
 // The commit verb at its gates: the cold probe, the paths it names, and the conflict markers. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerbGates(t *testing.T) {
 	t.Parallel()

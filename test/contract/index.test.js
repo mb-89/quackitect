@@ -26,6 +26,8 @@ ifBuilt(
     const it = index(files, proc(), clock(), root, work);
     try {
       assert.equal(it.stands(), true);
+      // [[spec/tickets/runme-road-waits-on-ready]]
+      assert.deepEqual(it.ready(), { ready: true, dead: "" }, "ready answers once the door stands");
       assert.deepEqual(it.warm(), { warmed: true, dead: "" });
       const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
       assert.ok(Array.isArray(answer?.paths), "a glob answers paths");
@@ -48,6 +50,10 @@ test("a box with no binary answers nothing, and says so", () => {
   assert.equal(it.ask("glob", { pattern: "*" }), null);
   assert.equal(it.find("anything"), null);
   assert.match(it.warm().dead, /^no .*se-index stands on this box$/);
+  // [[spec/tickets/runme-road-waits-on-ready]]
+  const ready = it.ready();
+  assert.equal(ready.ready, false);
+  assert.match(ready.dead, /^no .*se-index stands on this box$/);
   assert.match(it.dead(), /stands on this box$/);
 });
 

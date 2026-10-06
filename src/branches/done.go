@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"quackitect/src/front"
 )
 
 // The stamp the check writes, the retro step a group writes before it leaves, the reason done closes on, and the length of a short commit. [[spec/design_output/work#the-battery-answers-first]]
@@ -22,7 +24,7 @@ const (
 )
 
 // Hands a finished group back: trunk in, the check green, every child closed, the retro written. [[spec/design_output/work#a-group-is-a-ticket]]
-func finish(d *Doors, _ string, _ []string) int {
+func finish(d *Doors, _ string, argv []string) int {
 	branch := d.workBranchHere("done")
 	if branch == "" {
 		return codeRefused
@@ -46,7 +48,21 @@ func finish(d *Doors, _ string, _ []string) int {
 		return codeRed
 	}
 	moved := d.filesUp(name, d.read(at))
-	return d.leaves(branch, at, says, moved)
+	return d.leaves(branch, at, says, moved, finalRows(argv))
+}
+
+// The final record a box hands back with its flags: its model, its cost and its last line. [[spec/tickets/boxes-write-their-final-record]]
+func finalRows(argv []string) front.Ordered {
+	return front.Ordered{{Key: "model", Value: flagIn(argv, "--model")}, {Key: "cost", Value: flagIn(argv, "--cost")}, {Key: "final", Value: flagIn(argv, "--final")}}
+}
+
+// hash_after on the open take, with the final record past it. [[spec/tickets/boxes-write-their-final-record]]
+func withFinal(text, after string, final front.Ordered) string {
+	said, err := front.AfterWith(text, after, final)
+	if err != nil {
+		return text
+	}
+	return said
 }
 
 // The first retro leaf that applies on this box and stands unwritten, or nothing. [[spec/design_output/work#a-box-leaves]]
@@ -157,10 +173,10 @@ func shortOf(sha string) string {
 }
 
 // Closes the group done on the branch, drops its cloud marker, commits and pushes, and says what comes next. [[spec/design_output/work#a-box-leaves]]
-func (d *Doors) leaves(branch, at, says string, moved []string) int {
+func (d *Doors) leaves(branch, at, says string, moved []string, final front.Ordered) int {
 	name := strings.TrimPrefix(branch, workBranch)
 	after := d.head()
-	now := withHashAfter(d.read(at), after)
+	now := withFinal(d.read(at), after, final)
 	now = withField(withField(now, "state", closedState), "reason", doneReason)
 	now = withoutField(now, "todo")
 	_ = d.write(at, now)
@@ -192,7 +208,7 @@ func (d *Doors) leaves(branch, at, says string, moved []string) int {
 }
 
 // Puts this branch, or the one named, back to todo. [[spec/design_output/work#a-stale-group-is-yours]]
-func release(d *Doors, name string, _ []string) int {
+func release(d *Doors, name string, argv []string) int {
 	here := d.here()
 	branch := workBranch + name
 	if name == "" {
@@ -214,7 +230,7 @@ func release(d *Doors, name string, _ []string) int {
 	if !d.onBranch(branch) {
 		return codeRed
 	}
-	return d.letGo(branch, group, here)
+	return d.letGo(branch, group, here, finalRows(argv))
 }
 
 // Prints the group ticket a work branch carries on origin. [[spec/design_output/work#a-group-is-a-ticket]]

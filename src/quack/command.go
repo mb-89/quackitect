@@ -184,7 +184,7 @@ func heardIn(root, name, text, mode string) valeHeard {
 	}
 	span, stop := context.WithTimeout(context.Background(), valeSpan)
 	defer stop()
-	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
+	run := endsWhole(exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit"))
 	run.Dir, run.Stdin = root, strings.NewReader(text)
 	said, err := run.Output()
 	var read map[string][]struct {
@@ -270,7 +270,7 @@ func textSetting(root, key string) string {
 func gitRead(root string, args ...string) string {
 	span, stop := context.WithTimeout(context.Background(), gitReadSpan)
 	defer stop()
-	run := exec.CommandContext(span, "git", args...)
+	run := endsWhole(exec.CommandContext(span, "git", args...))
 	run.Dir = root
 	said, err := run.Output()
 	if err != nil {

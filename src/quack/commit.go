@@ -281,6 +281,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, "The check answers red on this commit, so no push reaches origin.")
 		// The check writes its faults to the error stream, so one stream names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
 		fmt.Fprintln(errs, orNothing(said, "the check answers nothing"))
+		d.rescues(branch, errs)
 		return exitFailed
 	}
 	fmt.Fprintln(out, "The commit lands, and the check answers green on it.")
@@ -293,7 +294,40 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		return exitFailed
 	}
 	fmt.Fprintf(out, "%s stands pushed.\n", branch)
+	dropsRescue(d.root, branch)
 	return 0
+}
+
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+const rescueBranch = "rescue/"
+
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+func (d landingDoors) rescues(branch string, errs io.Writer) {
+	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
+	if !d.cloud || !onWork {
+		return
+	}
+	rescue := rescueBranch + group
+	if !gitRun(d.root, "push", "-q", "-f", "origin", "HEAD:refs/heads/"+rescue).ok {
+		fmt.Fprintf(errs, "The push of %s came back refused too, so the commit stands on this box alone.\n", rescue)
+		return
+	}
+	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
+}
+
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+func dropsRescue(root, branch string) {
+	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
+	if !onWork {
+		return
+	}
+	rescue := rescueBranch + group
+	if !gitRun(root, "fetch", "-q", "origin", "refs/heads/"+rescue).ok {
+		return
+	}
+	if gitRun(root, "merge-base", "--is-ancestor", "FETCH_HEAD", "HEAD").ok {
+		gitRun(root, "push", "-q", "origin", "--delete", rescue)
+	}
 }
 
 func orNothing(said, nothing string) string {

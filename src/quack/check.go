@@ -68,7 +68,7 @@ type checkDoors struct {
 	run       func(argv, env []string, quiet bool) (int, string, error)
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
-	windows   bool
+	platform  string
 	red       []string
 	config    func(key string) float64
 	git       func(args ...string) string
@@ -249,15 +249,19 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 }
 
-// Level zero runs on a fresh box, or the check is red. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
+// The trial that runs the live client on the owner's Windows desk, which no box reaches. [[spec/tickets/level0-claims-name-the-platform]]
+const deskTrial = "spec/tickets/desk-probe-reply-trial"
+
+// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]]
 func level0Runs(d checkDoors, quiet bool) int {
-	if d.windows {
-		fmt.Fprintln(d.out, "The start road stands a cloud box alone, so this Windows box runs no dry session.")
-		return 0
-	}
-	code := d.verb([]string{"probe", "dry", workingFlag}, quiet)
+	code := d.verb([]string{"probe", "smoke", workingFlag}, quiet)
 	if code != 0 {
-		fmt.Fprintln(d.errs, "Level zero does not run whole on a fresh box, so this tree is red.")
+		fmt.Fprintf(d.errs, "Level zero does not run whole on %s, so this tree is red.\n", d.platform)
+		return code
+	}
+	fmt.Fprintf(d.out, "Level zero runs whole on %s.\n", d.platform)
+	if d.platform == "windows" {
+		fmt.Fprintf(d.out, "The live client on %s stands with %s.\n", d.platform, deskTrial)
 	}
 	return code
 }
