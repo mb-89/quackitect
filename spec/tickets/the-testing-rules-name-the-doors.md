@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: d95620e81141fe84
         size: 789
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 29e9cdfa63fcadde2b4e5819c2fd220323473c20
+    hash_after: 29e9cdfa63fcadde2b4e5819c2fd220323473c20
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -312,14 +321,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the child caller-wait-meets-no-sleep, and the guidance departs from five new rules to five extended ones under the cap of fifteen
+- the change reaches no door: the guard parses text, and the doors it names each carry a fake or a child moving them onto one
+- a comment on each new function points at this ticket or the testing guidance
+- the audit list stands once, in the doors note, and the guard and the rules point at it
 
 ## tests-green
 
