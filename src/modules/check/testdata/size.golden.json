@@ -41,7 +41,7 @@
       "file": "spec/design_output/pull.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 930. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 934. Split it by topic."
     },
     {
       "file": "spec/design_output/work.md",
