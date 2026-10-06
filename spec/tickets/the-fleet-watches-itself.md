@@ -95,7 +95,16 @@ record:
         exit: 0
         said: work/the-fleet-watches-itself already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 39b545ea73c56411f6555e745457b92b0f9d4c14
+    hash_after: 39b545ea73c56411f6555e745457b92b0f9d4c14
+    inputs:
+      - name: ask
+        hash: 99540b9882270163
+        size: 510
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -122,14 +131,25 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/boxes-write-their-final-record]], standard
+- [[spec/tickets/the-fleet-verb-watches-boxes]], standard
+- [[spec/tickets/one-routine-checks-the-fleet]], standard
+- [[spec/tickets/a-verb-writes-box-prompts]], standard
+- [[spec/tickets/size-misses-held-and-branch]], trivial
+- [[spec/tickets/prompt-flags-follow-prompt-verb]], trivial
+- [[spec/tickets/fleet-prompt-awaits-fleet-verb]], trivial
+- [[spec/tickets/pr-events-reach-their-box]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Each standard child touches a handful of files in src/branches, and each trivial child one line or one field, so each reviews whole.
+- The four standard children cover the four clauses of the ask: the final record, the fleet verb, the routine with the pull request route, and the prompt verb. The trivial children are the gates' fixes.
+- one-routine-checks-the-fleet names the-fleet-verb-watches-boxes under depends_on, since its prompt runs the fleet verb.
 
 # children
 
