@@ -90,6 +90,14 @@ func TestAnIOModuleAndATestFileAreSpared(t *testing.T) {
 	}
 }
 
+func TestAGenericMethodAndAnAliasedVersionedImportAreNamed(t *testing.T) {
+	t.Parallel()
+	fset, files := parsed(t, map[string]string{"g/g.go": "package g\n\nimport (\n\t\"math/rand/v2\"\n\tclock \"time\"\n)\n\ntype box[T any] struct{}\n\nfunc (*box[T]) Pick() int { return rand.IntN(3) }\n\nfunc At() { clock.Now() }\n"})
+	if said := imports.ImpureFunctions(fset, files); !slices.Equal(said, []string{"g/g.go At", "g/g.go box.Pick"}) {
+		t.Fatalf("the guard names %v", said)
+	}
+}
+
 func TestEveryOutsideKindNamesAGoName(t *testing.T) {
 	t.Parallel()
 	kinds := []string{"clock", "files", "git", "index", "network", "processes", "random"}

@@ -21,7 +21,7 @@ func init() { register("guards", guardsVerb(index.Root)) }
 
 // guards over the root: every guard over the tracked tree against its baseline, or each baseline written again on --update. [[spec/design_output/model#the-guards-hold-a-baseline]]
 func guardsVerb(root func() (string, error)) twin {
-	// Impure: it reads the tracked tree and writes the baselines on the disk.
+	// level0: Impure - it reads the tracked tree and writes the baselines on the disk
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		at, err := root()
 		if err != nil {

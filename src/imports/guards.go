@@ -31,6 +31,7 @@ var Guards = []Guard{
 	{Name: "fixture", Names: fixturesTracked, PackageOf: fixturePackage},
 	{Name: "ratio", Names: RatioOffenders},
 	{Name: "script", Names: HandScripts},
+	{Name: "purity", Names: purityTracked, PackageOf: fixturePackage},
 }
 
 // The baseline a guard reads, one offender a line. [[spec/design_output/model#the-guards-hold-a-baseline]]

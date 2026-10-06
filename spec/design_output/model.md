@@ -903,6 +903,7 @@ stands pure in `src/imports`, and takes parsed files or a file list.
 | `fixture` | a top-level Go test reaching a fixture build outside the home, through its own body or a helper of its package | `level0: FixtureOutsideHome - <why>` on the call's line or in the test's doc |
 | `ratio` | a module whose test lines pass its code lines, per language | none: cut tests, or write code |
 | `script` | a tracked script outside the engine | `level0: HandScript - <why>` in the script's first lines |
+| `purity` | a Go function outside an IO module and its tests calling a name `OutsideKinds` lists: files, processes, network, clock, random numbers, git and the index | `level0: Impure - <why>` in the function's doc or body |
 
 | the term | what it holds |
 |---|---|
