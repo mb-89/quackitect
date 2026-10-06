@@ -13,11 +13,8 @@ import (
 	"testing"
 )
 
-// The Ask's own line in openDraft, and a line under the do chapter past it, as the lint names them. [[spec/design_output/pull#a-draft-opens]]
-const (
-	openAskLine = 10
-	openDoLine  = 14
-)
+// The Ask's own line in openDraft, as the lint names it. [[spec/design_output/pull#a-draft-opens]]
+const openAskLine = 10
 
 // A draft as ask-lint.test.js seeds it, with a plain Ask. [[spec/design_output/pull#a-draft-opens]]
 const openDraft = `---
@@ -43,8 +40,8 @@ Nothing yet.
 // A child naming a-thing under group, as ask-lint.test.js seeds it. [[spec/design_output/work#a-group-is-a-ticket]]
 const openChild = "---\nkind: [[ticket]]\nstate: draft\ngroup: a-thing\n---\n\n# Ask\n\nA part.\n"
 
-// The file the fake Vale keeps what it read in. [[spec/design_output/pull#a-draft-opens]]
-const openHeard = ".se/vale.stdin"
+// The Ask's line in openDraft, which a case rewrites. [[spec/tickets/go-rules-replace-vale]]
+const openAsk = "The verb clones the upstream into the folder.\n"
 
 // A tree in git holding the draft, git reading no config of this box's own. [[spec/design_output/pull#a-draft-opens]]
 func openTree(t *testing.T, draft string) string {
@@ -76,11 +73,12 @@ func openGit(t *testing.T, root string, args ...string) string {
 	return string(said)
 }
 
-// A Vale that keeps what it read and answers one finding of the rule at the line, at the severity. [[spec/design_output/pull#a-draft-opens]]
-func openValeSaying(t *testing.T, root, rule string, line int, severity string) {
+// A tree holding the draft with its Ask line in place of the plain one, and the rule files the voice loads. [[spec/tickets/go-rules-replace-vale]]
+func openRuledTree(t *testing.T, ask string) string {
 	t.Helper()
-	said := `{"stdin.md":[{"Check":"` + rule + `","Line":` + strconv.Itoa(line) + `,"Span":[17,17],"Message":"It breaks.","Severity":"` + severity + `"}]}`
-	fakeVale(t, root, said, filepath.Join(root, filepath.FromSlash(openHeard)))
+	root := openTree(t, strings.Replace(openDraft, openAsk, ask, 1))
+	seedsRules(t, root)
+	return root
 }
 
 func openState(t *testing.T, root, path string) string {
@@ -171,34 +169,28 @@ func TestTicketOpen(t *testing.T) {
 			t.Fatalf("open answers %d, %q, %q", code, out, errs)
 		}
 	})
-	t.Run("an Ask breaking a rule of form opens, naming the rule at the file's line, and Vale reads the whole ticket", func(t *testing.T) {
-		root := openTree(t, openDraft)
-		openValeSaying(t, root, "VoiceParagraph.Characters", openAskLine, "error")
+	t.Run("an Ask breaking a rule of form opens, naming the rule at the file's line", func(t *testing.T) {
+		root := openRuledTree(t, "The verb clones the upstream; the folder takes it.\n")
 		code, out, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
-		if code != 0 || !strings.Contains(errs, "breaks a rule of form, and it lands") || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Characters") || openState(t, root, aThing) != "open" {
+		if code != 0 || !strings.Contains(errs, "breaks a rule of form, and it lands") || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Characters: The character ; stands outside") || openState(t, root, aThing) != "open" {
 			t.Fatalf("open answers %d, %q, %q", code, out, errs)
-		}
-		if heard, _ := readsBack(t, root, openHeard); heard != openDraft {
-			t.Fatalf("Vale reads %q, and wants the whole ticket", heard)
 		}
 	})
 	t.Run("an Ask carrying a private name refuses the open, and the draft stands", func(t *testing.T) {
-		root := openTree(t, openDraft)
-		openValeSaying(t, root, "VoiceVale.Private", openAskLine, "error")
+		root := openRuledTree(t, "The verb mails "+"someone"+"@"+"somewhere.net"+" the folder.\n")
 		code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
 		if code != exitFailed || !strings.Contains(errs, "breaks the voice rules") || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Private") || openState(t, root, aThing) != "draft" {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
 	})
 	t.Run("a warning on the Ask opens with its line named, and a warning past the Ask stays unnamed", func(t *testing.T) {
-		root := openTree(t, openDraft)
-		openValeSaying(t, root, "VoiceParagraph.Wordy", openAskLine, "warning")
-		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Wordy") {
+		root := openRuledTree(t, "The verb clones the upstream; the folder takes it.\n")
+		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Characters") {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
-		root = openTree(t, openDraft)
-		openValeSaying(t, root, "VoiceParagraph.Wordy", openDoLine, "warning")
-		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || strings.Contains(errs, "breaks Wordy") {
+		root = openTree(t, strings.Replace(openDraft, "# do\n\nNothing yet.", "# do\n\nNothing; yet.", 1))
+		seedsRules(t, root)
+		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || strings.Contains(errs, "breaks Characters") {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
 	})

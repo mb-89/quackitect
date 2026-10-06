@@ -76,9 +76,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 		}
 		return said[key]
 	}
-	if valeAt(method) != "" {
-		it.Voice = pullVoice(method)
-	}
+	it.Voice = pullVoice(method)
 	scripts := filepath.Join(method, "src", "scripts")
 	it.Take = func(group string) int { return takesBranch(scripts, group, it) }
 	it.Ready = it.ReadyToMerge

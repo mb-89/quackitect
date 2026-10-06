@@ -235,7 +235,7 @@ func lintRows(found []check.Finding, refused int) []string {
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func toolsOver(root string, where []string) []check.Finding {
 	tree := lintTree(root)
-	tools := lsp.ToolsAt(root, lspChecks(root))
+	tools := toolsAt(root)
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {

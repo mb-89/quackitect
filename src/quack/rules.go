@@ -14,11 +14,16 @@ import (
 	"sync"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/lsp"
+	"quackitect/src/prose"
 	"quackitect/src/rules"
 )
 
 // The flag naming the path the text reads as. [[spec/tickets/go-rules-replace-vale]]
 const rulesPathFlag = "--path="
+
+// The rule the tense reader weighs. [[spec/tickets/go-rules-replace-vale]]
+const pastRule = "PastTense"
 
 // The usage the verb names where no path stands. [[spec/tickets/go-rules-replace-vale]]
 const rulesOverUsage = "Usage: ./RUNME.sh rules-over --path=<path> < text"
@@ -33,17 +38,65 @@ func init() {
 	})
 }
 
-// The Go rules over the tree's own schema and lists, loaded once a run. [[spec/tickets/go-rules-replace-vale]]
-var treeRules = sync.OnceValues(func() (*rules.Set, error) {
+// The rules a root loaded, each root once a run. [[spec/tickets/go-rules-replace-vale]]
+var loadedRules = struct {
+	sync.Mutex
+	by map[string]*rules.Set
+}{by: map[string]*rules.Set{}}
+
+// The Go rules over a root's own schema and lists, loaded once a run. [[spec/tickets/go-rules-replace-vale]]
+func rulesAt(root string) (*rules.Set, error) {
+	loadedRules.Lock()
+	defer loadedRules.Unlock()
+	if set := loadedRules.by[root]; set != nil {
+		return set, nil
+	}
+	set, err := rules.Load(func(path string) string {
+		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return string(text)
+	})
+	if err != nil {
+		return nil, err
+	}
+	loadedRules.by[root] = set
+	return set, nil
+}
+
+// The Go rules over the tree the verb stands in. [[spec/tickets/go-rules-replace-vale]]
+func treeRules() (*rules.Set, error) {
 	root, err := index.Root()
 	if err != nil {
 		return nil, err
 	}
-	return rules.Load(func(path string) string {
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		return string(text)
-	})
-})
+	return rulesAt(root)
+}
+
+// The lsp tools over a root, the Go rules handed in. [[spec/tickets/go-rules-replace-vale]]
+func toolsAt(root string) *lsp.Tools {
+	tools := lsp.ToolsAt(root, lspChecks(root))
+	tools.Rules = lspRules(root)
+	return tools
+}
+
+// The Go rules as the lsp tools draw them: the rule off the check, the column off the span, and a past tense row where the tense reader reads the past. [[spec/tickets/go-rules-replace-vale]]
+func lspRules(root string) func(path, text string) []lsp.Finding {
+	return func(path, text string) []lsp.Finding {
+		set, err := rulesAt(root)
+		if err != nil {
+			return []lsp.Finding{{Rule: lsp.ValeRuns, Line: 1, Column: 1, Message: "The rules load nothing, so every rule stands unchecked: " + err.Error(), Severity: "error"}}
+		}
+		lines := strings.Split(text, "\n")
+		out := []lsp.Finding{}
+		for _, one := range set.Lint(path, text) {
+			rule := lsp.RuleOf(one.Check)
+			if strings.HasSuffix(rule, pastRule) && (one.Line > len(lines) || !prose.ReadsAsPast(lines[one.Line-1], one.Match)) {
+				continue
+			}
+			out = append(out, lsp.Finding{Rule: rule, Line: max(one.Line, 1), Column: max(one.Span[0], 1), Message: one.Message, Severity: one.Severity})
+		}
+		return out
+	}
+}
 
 // The tree's rules over one text, and nothing where they load nothing. [[spec/tickets/go-rules-replace-vale]]
 func treeLint(path, text string) []rules.Finding {

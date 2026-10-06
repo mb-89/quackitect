@@ -4,6 +4,7 @@
 package rules
 
 import (
+	"fmt"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -50,7 +51,11 @@ func Load(read Read) (*Set, error) {
 	set := &Set{}
 	makers := scriptMakers()
 	for _, path := range ruleFiles {
-		file, err := parseRule(path, read(path))
+		text := read(path)
+		if strings.TrimSpace(text) == "" {
+			return nil, fmt.Errorf("no rule stands at %s", path)
+		}
+		file, err := parseRule(path, text)
 		if err != nil {
 			return nil, err
 		}

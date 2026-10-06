@@ -45,3 +45,11 @@ func TestARuleFileNamingNoKindRefusesToLoad(t *testing.T) {
 		t.Error("a rule file naming no kind loads")
 	}
 }
+
+func TestARootHoldingNoRuleFileNamesTheFirstPathItReadsEmpty(t *testing.T) {
+	t.Parallel()
+	_, err := Load(func(string) string { return "" })
+	if err == nil || err.Error() != "no rule stands at "+ruleFiles[0] {
+		t.Errorf("Load over an empty root answers %v", err)
+	}
+}

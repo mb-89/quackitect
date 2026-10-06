@@ -6,7 +6,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +19,7 @@ import (
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/prose"
+	"quackitect/src/rules"
 )
 
 // The key capping a name's words, and the span a git read takes. [[spec/tickets/cage-command-rules-port]]
@@ -60,13 +60,8 @@ var (
 	homeVariables = []string{"HOME", "USERPROFILE"}
 )
 
-// The name Vale reads a commit message under, the configs it takes, the style a prose rule's name drops, and the span it takes, off src/bridge/bash.js and lib/vale.js. [[spec/tickets/cage-commit-guards-port]]
-const (
-	commitName = "level0-commit.md"
-	valeOwn    = ".vale.ini"
-	valeBuilt  = ".se/vale/.vale.ini"
-	valeSpan   = 30 * time.Second
-)
+// The name the rules read a commit message under. [[spec/tickets/cage-commit-guards-port]]
+const commitName = "level0-commit.md"
 
 // [[spec/tickets/cage-commit-guards-port]]
 var proseStyle = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
@@ -145,59 +140,16 @@ type valeHeard struct {
 	why    string
 }
 
-// The reasons an unread Vale names, worded as lintText in .claude/skills/level0/lib/vale.js words them. [[spec/tickets/drafts-lint-seam-carries-why]]
-const (
-	noValeWhy    = "no vale stands here"
-	valeQuietWhy = "vale answered nothing"
-	valeNoJSON   = "vale answered no JSON: "
-)
-
-// Why a Vale answer reads as no JSON: its stderr where it exits on one, else the run's error, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
-func unreadWhy(said []byte, err error) string {
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		if stderr := strings.TrimSpace(string(exit.Stderr)); stderr != "" {
-			return stderr
-		}
-	}
-	if err != nil {
-		return err.Error()
-	}
-	if answer := strings.TrimSpace(string(said)); answer != "" {
-		return valeNoJSON + answer
-	}
-	return valeQuietWhy
-}
-
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
 func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
 
 // What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
 func heardIn(root, name, text, mode string) valeHeard {
-	vale := valeAt(root)
-	if vale == "" {
-		return valeHeard{why: noValeWhy}
+	set, err := rulesAt(root)
+	if err != nil {
+		return valeHeard{why: err.Error()}
 	}
-	config := valeOwn
-	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
-		config = valeBuilt
-	}
-	span, stop := context.WithTimeout(context.Background(), valeSpan)
-	defer stop()
-	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
-	run.Dir, run.Stdin = root, strings.NewReader(text)
-	said, err := run.Output()
-	var read map[string][]struct {
-		Check    string `json:"Check"`
-		Line     int    `json:"Line"`
-		Span     []int  `json:"Span"`
-		Match    string `json:"Match"`
-		Message  string `json:"Message"`
-		Severity string `json:"Severity"`
-	}
-	if json.Unmarshal(said, &read) != nil {
-		return valeHeard{stands: true, why: unreadWhy(said, err)}
-	}
+	read := map[string][]rules.Finding{name: set.Lint(name, text)}
 	body := func(path string) string {
 		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 		return string(text)
