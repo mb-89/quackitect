@@ -87,20 +87,47 @@ func (one disk) Remove(path string) error {
 	return nil
 }
 
-// The path to standing as an alias of path, a file or a folder, so a read under to reads path: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
-func (one disk) Link(path, to string) error { return nil }
+// The path to standing as an alias of path, a file or a folder, so a read under to reads path. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one disk) Link(path, to string) error {
+	if err := os.MkdirAll(filepath.Dir(one.at(to)), folderMode); err != nil {
+		return err
+	}
+	target, err := filepath.Abs(one.at(path))
+	if err != nil {
+		return err
+	}
+	return os.Symlink(target, one.at(to))
+}
 
 // A disk in memory, keyed by the forward-slash path, which tells its listeners each change. [[spec/design_output/model#io-modules-and-their-fakes]]
 type FakeDisk struct {
 	mu    sync.Mutex
 	files map[string]string
+	links map[string]string
 	hands []func(path, text string, gone bool)
 }
 
-func NewFakeDisk() *FakeDisk { return &FakeDisk{files: map[string]string{}} }
+func NewFakeDisk() *FakeDisk {
+	return &FakeDisk{files: map[string]string{}, links: map[string]string{}}
+}
+
+// The path a link stands in for, followed through every link on the way. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeDisk) target(path string) string {
+	for to, from := range one.links {
+		if rest, ok := strings.CutPrefix(path, to); ok && (rest == "" || strings.HasPrefix(rest, "/")) {
+			return one.target(from + rest)
+		}
+	}
+	return path
+}
 
 func (one *FakeDisk) Write(path, text string) error {
 	one.mu.Lock()
+	path = one.target(path)
+	if err := one.blocked(path); err != nil {
+		one.mu.Unlock()
+		return err
+	}
 	one.files[path] = text
 	hands := one.hands
 	one.mu.Unlock()
@@ -110,10 +137,26 @@ func (one *FakeDisk) Write(path, text string) error {
 	return nil
 }
 
+// Refuses a write whose folder a file holds, or onto a folder. [[spec/design_output/doors#a-fake-behaves]]
+func (one *FakeDisk) blocked(path string) error {
+	for at := path; strings.Contains(at, "/"); {
+		at = at[:strings.LastIndex(at, "/")]
+		if _, held := one.files[at]; held {
+			return fmt.Errorf("mkdir %s: not a directory", at)
+		}
+	}
+	for held := range one.files {
+		if strings.HasPrefix(held, path+"/") {
+			return fmt.Errorf("open %s: is a directory", path)
+		}
+	}
+	return nil
+}
+
 func (one *FakeDisk) Read(path string) (string, bool, error) {
 	one.mu.Lock()
 	defer one.mu.Unlock()
-	text, ok := one.files[path]
+	text, ok := one.files[one.target(path)]
 	return text, ok, nil
 }
 
@@ -122,6 +165,11 @@ func (one *FakeDisk) List(folder string) ([]string, error) {
 	one.mu.Lock()
 	defer one.mu.Unlock()
 	out := []string{}
+	for path := range one.links {
+		if folder == "" || strings.HasPrefix(path, folder+"/") {
+			out = append(out, path)
+		}
+	}
 	for path := range one.files {
 		if folder == "" || strings.HasPrefix(path, folder+"/") {
 			out = append(out, path)
@@ -133,6 +181,12 @@ func (one *FakeDisk) List(folder string) ([]string, error) {
 
 func (one *FakeDisk) Remove(path string) error {
 	one.mu.Lock()
+	if _, link := one.links[path]; link {
+		delete(one.links, path)
+		one.mu.Unlock()
+		return nil
+	}
+	path = one.target(path)
 	_, held := one.files[path]
 	delete(one.files, path)
 	hands := one.hands
@@ -145,8 +199,19 @@ func (one *FakeDisk) Remove(path string) error {
 	return nil
 }
 
-// [[spec/tickets/branch-verbs-meet-fake-git]]
-func (one *FakeDisk) Link(path, to string) error { return nil }
+// A link the fake keeps as an alias, which a read and a write under it follow, and a remove of it drops alone. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeDisk) Link(path, to string) error {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	if _, held := one.links[to]; held {
+		return fmt.Errorf("symlink %s %s: file exists", path, to)
+	}
+	if _, held := one.files[to]; held {
+		return fmt.Errorf("symlink %s %s: file exists", path, to)
+	}
+	one.links[to] = path
+	return nil
+}
 
 // [[spec/design_output/model#io-modules-and-their-fakes]]
 func (one *FakeDisk) Listen(hand func(path, text string, gone bool)) {

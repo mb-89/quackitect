@@ -98,6 +98,26 @@ func TestDiskLinksAPathAndTheUnlinkLeavesItsTarget(t *testing.T) {
 	}
 }
 
+// A write under a path a file holds, or onto a folder, refuses, and the file stands as it stood. [[spec/design_output/doors#a-fake-behaves]]
+func TestDiskRefusesAWriteThroughAFileOrOntoAFolder(t *testing.T) {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+		for path, text := range map[string]string{"a": "file", "b/c.md": "c"} {
+			if err := one.Write(path, text); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if err := one.Write("a/deep/x.md", "x"); err == nil {
+			t.Errorf("the %s disk writes under a file", name)
+		}
+		if err := one.Write("b", "over"); err == nil {
+			t.Errorf("the %s disk writes a file onto a folder", name)
+		}
+		if text, ok, err := one.Read("a"); err != nil || !ok || text != "file" {
+			t.Errorf("the %s disk reads a as %q, %v, %v", name, text, ok, err)
+		}
+	}
+}
+
 func TestDiskKeepsItsContract(t *testing.T) {
 	t.Run("fake", func(t *testing.T) { diskSuite(t, func(*testing.T) Disk { return NewFakeDisk() }) })
 	t.Run("real", func(t *testing.T) { diskSuite(t, func(t *testing.T) Disk { return NewDisk(t.TempDir()) }) })

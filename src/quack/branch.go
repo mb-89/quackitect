@@ -14,6 +14,9 @@ import (
 	"quackitect/src/branches"
 	"quackitect/src/config"
 	"quackitect/src/index"
+	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
+	"quackitect/src/proc"
 )
 
 func init() { register("branch", branchVerb(index.Root, index.V1)) }
@@ -36,11 +39,15 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 		work = at
 	}
 	return &branches.Doors{
-		Root:   work,
-		Method: method,
-		Now:    time.Now,
-		Out:    out,
-		Errs:   errs,
+		Root:    work,
+		Method:  method,
+		Repo:    git.NewRepo(work, proc.Real),
+		Run:     proc.Real,
+		Disk:    files.NewDisk(work),
+		Methods: files.NewDisk(method),
+		Now:     time.Now,
+		Out:     out,
+		Errs:    errs,
 		Log: func(level, kind, said string, more map[string]any) {
 			row := map[string]any{"level": level, "kind": kind, "said": said}
 			for key, value := range more {

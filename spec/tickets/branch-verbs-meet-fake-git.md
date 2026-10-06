@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -169,6 +169,15 @@ record:
         hash: 8f2f939387c0fe86
         size: 17697
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 054e2cf47eefae271de2c866f0dcea81aa337475
+    hash_after: 054e2cf47eefae271de2c866f0dcea81aa337475
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -413,14 +422,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names; it departs by adding fourteen Repo operations the verbs needed, each with its contract case, and the runtime spawn case the gate point asked for
+every door the change reaches has a fake: FakeRepo for git, FakeRunner for the processes, FakeDisk for the disk
+each changed door file points at the git door section of spec/design_output/doors.md, which names the approach
+the git operations stand once, in src/modules/git/repo.go, and the doors chapter names them in its operations table
 
 ## tests-green
 

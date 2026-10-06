@@ -185,7 +185,7 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | a tool's process | `src/modules/lsp` | none | `src/modules/lsp/door_test.go` |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
-| the branch verbs' git, disk and env | `src/branches` | none | none |
+| the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |
 | the box and check doors of quack | `src/quack` | none | none |
 | the viewer's frame over the network | `src/tui/frame` | none | none |
 
@@ -198,7 +198,6 @@ family carries its fate:
 | the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
-| the branch verbs over a bare origin and a clone a case | `src/branches/tree_test.go`, `src/branches/dispatch_test.go`, `src/branches/dispatch_write_test.go` | moves onto `FakeGit` and a fake process, under [[spec/tickets/branch-verbs-meet-fake-git]] |
 | the quack verbs sleeping, or spawning the binary or go | `src/quack/check_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go`, `src/quack/split_test.go`, `src/quack/waits_test.go` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
 | the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under [[spec/tickets/index-session-suites-run-fakes]] |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
@@ -224,7 +223,7 @@ into memory. [[spec/tickets/unfaked-doors-take-fakes]]
 | part | what it holds |
 |---|---|
 | `Repo` in `src/modules/git` | the typed operations below, each one git command line in the real door |
-| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, and the work tree on a `FakeDisk`, and the four reads of `Git` answered off them, so `FakeGit` leaves once its cases move |
+| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, a merge's stages, the worktrees, the hooks a case sets, and the work tree on a `FakeDisk`, and the four reads of `Git` answered off them, so `FakeGit` leaves once its cases move |
 | an origin | a second `FakeRepo`, which push and fetch move commits and refs between |
 | `src/modules/git/repo_contract_test.go` | each case run against `FakeRepo` and a real repository under a temporary folder, the one door test of git's writes |
 
@@ -232,9 +231,9 @@ The operations the three packages run:
 
 | kind | operations |
 |---|---|
-| reads | the head and its branch, a ref resolved, a file at a ref, the files at a ref, the paths two refs differ in, the commits one ref stands ahead and behind, the merge base, the work tree's status, the log over a range, the refs under a prefix, a config key, a commit's signature, the paths the ignore file holds out, whether the index tracks a path, the unmerged paths, the lines the index adds, the branches origin holds |
-| writes to the work tree | add, reset of paths or to a ref, commit, switch with or without a new branch, a worktree added and removed |
-| writes across refs | merge, naming the paths that conflict, rebase onto a ref, a fast-forward, update of a ref, push with a lease, fetch with prune |
+| reads | the head and its branch, a ref resolved, a file at a ref or at a merge's stage, many files at refs in one ask, the files at a ref under a folder, the paths two refs differ in, the patch or its stat between two refs, the commits one ref stands ahead and behind, the commits a ref carries whose patch another lacks, the merge base, the first-parent line, the work tree's status, the log over a range, the refs under a prefix, the refs under a prefix a ref holds, the second a commit was made, a config key, a commit's signature, the paths the ignore file holds out, whether the index tracks a path, the unmerged paths, the lines the index adds, the branches origin holds, the refs origin holds under a prefix with their commits |
+| writes to the work tree | add, reset of paths or to a ref, a reset that keeps or drops local changes, a path restored from `HEAD`, commit, an amend, switch with or without a new branch, a worktree added and removed |
+| writes across refs | merge under a message of its own or with no fast-forward, naming the paths that conflict, rebase onto a ref, a fast-forward, update or delete of a ref, a commit off a ref's tree or off files written over it that moves no ref, push with a lease, push of a commit to a branch, a branch deleted on origin, fetch of a branch or of every branch with prune, a shallow clone fetched whole |
 
 The fake merges three ways a path at a time. A path both sides change
 differently conflicts whole, where git merges hunks apart. A case needing a
