@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
 depends_on: [tests-meet-the-doors-once]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: c2cd0430e723236e
         size: 495
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 5a2f2f5deeb857b1cb27e04f9cf73865b1bf99fd
+    hash_after: 5a2f2f5deeb857b1cb27e04f9cf73865b1bf99fd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: 9b7ce7f57fcdf21c
+        size: 2406
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -236,26 +249,33 @@ the first done_when line falls to `./RUNME.sh doors`, the second to TestEveryCon
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/owns_test.go
+src/quack/verb_doors_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All four cases fail on the same line: a declaration holding `contract` reads as a fault, since the parse takes go, js, files and report alone. The doors verb test first passed, because a faulted declaration yields no door and so no walk. It now also asks for the walk in a file outside the contract test, which pins that the declaration reads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every case names its claim and asserts each word: the contract test uses its door's names, walks around another door, and a contract path standing nowhere or naming no contract test is a fault
+each case plants its own declarations and touches no shared fixture
+each case goes red for the reason the change answers, and the run shows it
 
 # gate
 

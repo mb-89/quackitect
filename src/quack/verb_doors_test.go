@@ -92,3 +92,15 @@ func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 		t.Fatalf("doors answers %d and %q, and wants %q", code, errs, want)
 	}
 }
+
+func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/modules/clock/owns.yaml", "clock:\n  go: [time.Sleep]\n  contract: [src/engine/clock_contract_test.go]\n  report: true\n")
+	seedFile(t, root, "src/engine/clock_contract_test.go", "package engine\n\nimport \"time\"\n\nfunc wait() { time.Sleep(1) }\n")
+	seedFile(t, root, "src/engine/wait.go", "package engine\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	code, out, errs := doorsRan(root)
+	if code != 0 || !strings.Contains(out, "src/engine/wait.go:5:14: time.Sleep walks around clock\n") || strings.Contains(out+errs, "clock_contract_test.go") {
+		t.Fatalf("doors answers %d, %q and %q, and wants the walk in wait.go and none in the clock's contract test", code, out, errs)
+	}
+}

@@ -270,3 +270,44 @@ func TestTheListsComeOffTheDeclarations(t *testing.T) {
 		t.Errorf("the whole packages read %v", got)
 	}
 }
+
+const shimAt = "src/vehicle/shim_contract_test.go"
+
+func contracted(t *testing.T) []Door {
+	t.Helper()
+	declared := map[string]string{clockAt: clockGo, diskAt: "files:\n  go: [os]\n  contract: [" + shimAt + "]\n"}
+	doors, faults := Read(declared, func(at string) bool { return at == shimAt })
+	if len(faults) != 0 {
+		t.Fatalf("the declaration naming a contract test reads as faults: %v", faults)
+	}
+	return doors
+}
+
+func TestAContractTestUsesItsOwnDoorsNames(t *testing.T) {
+	t.Parallel()
+	if walks := Walks(shimAt, "package vehicle\n\nimport \"os\"\n\nvar _ = os.Getpid\n", contracted(t)); len(walks) != 0 {
+		t.Fatalf("the contract test of files walks around it: %v", named(walks))
+	}
+}
+
+func TestAContractTestWalksAroundAnotherDoor(t *testing.T) {
+	t.Parallel()
+	walks := Walks(shimAt, "package vehicle\n\nimport \"time\"\n\nfunc wait() { time.Sleep(1) }\n", contracted(t))
+	if !slices.Equal(named(walks), []string{"time.Sleep"}) {
+		t.Fatalf("the contract test of files names %v, and wants the walk around the clock", named(walks))
+	}
+}
+
+func TestAContractPathOfNoContractTestIsAFault(t *testing.T) {
+	t.Parallel()
+	cases := map[string]string{
+		"a contract test standing nowhere": "test/contract/gone.test.js",
+		"a path of no contract test":       "src/vehicle/disk.go",
+	}
+	for name, at := range cases {
+		text := "files:\n  go: [os]\n  contract: [" + at + "]\n"
+		if _, faults := Read(map[string]string{diskAt: text}, func(one string) bool { return one == "src/vehicle/disk.go" }); len(faults) == 0 || !strings.Contains(faults[0].Says, at) {
+			t.Errorf("%s reads %v, and wants a fault naming %s", name, faults, at)
+		}
+	}
+}
