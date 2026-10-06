@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: eecb76e5ea65b7a4df24a3173d57a04c92bd0cd8
+    hash_after: eecb76e5ea65b7a4df24a3173d57a04c92bd0cd8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   89.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 41e4c8078b0ef917
+        size: 812
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -328,26 +351,33 @@ the flag stands once a language, and the merge roads once in .claude/settings.js
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/probe_verb_test.go src/quack/settings_test.go test/level0/probe-dry.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+probe dry --at <rev> now runs the dry probe at that commit. The Go verb resolves the revision through git, refuses one git cannot read before node starts, and the cold tree checks the clone out at the commit before the install. One call then runs level zero at any merge on main. The smoke and the working change refuse --at, since both stand on the tree as it is. The tracked settings deny the merge tool under every GitHub connector the box loads, and gh pr merge, and leave auto-merge open, so auto-merge stays the one road to main.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names
+every door the change reaches runs through its fake in the cases
+resolvedAt, checksOut and the deny case link this ticket
+the flag and the merge roads each stand in one place
 
 # accept
 
