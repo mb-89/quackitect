@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/draft
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -212,6 +212,22 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/failures]]
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 83329ee04156acac65f6e2fefa9b6595b4ade03f
+    hash_after: 83329ee04156acac65f6e2fefa9b6595b4ade03f
+    inputs:
+      - name: ask
+        hash: ebd72578966d3bfc
+        size: 766
+      - name: [[spec/design_output/failures]]
+        hash: c263fe950a83d49b
+        size: 4620
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    skipped: true
+    kept: fc2c608f22299b4a2b46ffd5924e3ac9334c4c4c
+    why: its red tests stand as fc2c608f2 landed them, and a later leaf passed since
 ---
 
 # Ask
@@ -265,7 +281,9 @@ Assumed: the hooks door wiring stands outside the done_when lines. The note `sen
 <!-- the form is list -->
 
 - src/modules/clock/clock.go Clock, whose interface gains After, answered by clock and FakeClock
-- src/failure/node.go NodeOf, which now compiles each watch match
+- src/failure/registry.go Load, which drops a node NodeOf names a fault on
+- src/failure/check.go, which names each fault NodeOf answers
+- src/quack/verb_failure.go failureWrites, which refuses a node NodeOf names a fault on
 - none for Sentinel, Hear and Runner today: the hooks door calls Hear once the note sentinel-hears-the-hooks lands
 
 ### tests
@@ -287,14 +305,8 @@ Assumed: the hooks door wiring stands outside the done_when lines. The note `sen
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- no case shows a quiet watch armed at once: TestAQuietWatchArmsAtOnceAndFiresWithNoEvent decides it
-- a real hand races Hear: a mutex holds the armed watches, and a round drops a stale fire
-- a match regexp refuses reaches run time: NodeOf compiles each match and names the fault
-- the fake After hand runs twice: Tick deletes the hand once it calls it
-- TestClockKeepsItsContract slept: the real side waits on a channel an After hand closes, and no test under src/modules/clock sleeps
-- a failing reaction goes unsaid: the sentinel raises failure-reaction-fails, and TestAFailingReactionRaisesItsOwnFailure decides it
-- the After contract hides under the contract tag: the check runs go test with that tag, which decides the line
-- the hooks wiring stands outside the ask: the note sentinel-hears-the-hooks carries it to the retro
+- sentinel-note-names-the-runner: the note now names the Runner and the sentinel running the reaction, and the fix ticket closed it
+- sentinel-callers-list-whole: the callers list names Load, the check and failure new, each green, and the fix ticket closed it
 
 ### size
 
@@ -315,8 +327,8 @@ Assumed: the hooks door wiring stands outside the done_when lines. The note `sen
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened src/failure/sentinel.go, door.go and node.go, src/modules/clock/clock.go and its contract test, and spec/failures, and checked each claim there
-- a search over src finds no caller of NewSentinel or Hear outside sentinel.go, so the list names the clock, NodeOf and the hooks note
+- opened src/failure/sentinel.go, door.go, node.go, registry.go and check.go, src/quack/verb_failure.go, src/modules/clock/clock.go and its contract test, and checked each claim there
+- a search over src finds three callers of NodeOf and none of NewSentinel or Hear outside sentinel.go, and the list names each
 - each done_when line names its case: the event, the quiet span, After, the reaction, and ./RUNME.sh check for the last
 
 ## tests-red
