@@ -60,10 +60,11 @@ var (
 	goFailRow  = regexp.MustCompile(`^\s*--- FAIL`)
 )
 
-// One part of the battery: its name and its run. [[spec/design_output/work#the-battery-answers-first]]
+// One part of the battery: its name, its run, and whether it leads, running before the parts that load the box. [[spec/design_output/work#the-battery-answers-first]]
 type part struct {
 	name string
 	run  func() int
+	lead bool
 }
 
 // What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
@@ -207,27 +208,34 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery: the ready step alone, then every part at once. The run reads every part's start, then starts every part and waits for all of them, each timed under its name, the ready step among them. It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another, and the total is the ready step's span and the slowest part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
+// The battery: the ready step alone, then the lead parts at once, then every other part at once. Each wave reads every start of its parts, then starts them and waits for all of them, each timed under its name, the ready step among them. A lead part runs a door start inside a bounded window, which a box loaded by the other parts runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, the slowest lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
 func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
 	readyCode := ready.run()
 	readyTook := float64(now().Sub(from).Milliseconds())
 	starts := make([]time.Time, len(parts))
-	for at := range parts {
-		starts[at] = now()
-	}
 	codes := make([]int, len(parts))
 	took := make([]float64, len(parts))
-	var all sync.WaitGroup
-	for at, one := range parts {
-		all.Add(1)
-		go func() {
-			defer all.Done()
-			codes[at] = one.run()
-			took[at] = float64(now().Sub(starts[at]).Milliseconds())
-		}()
+	for _, leads := range []bool{true, false} {
+		for at, one := range parts {
+			if one.lead == leads {
+				starts[at] = now()
+			}
+		}
+		var all sync.WaitGroup
+		for at, one := range parts {
+			if one.lead != leads {
+				continue
+			}
+			all.Add(1)
+			go func() {
+				defer all.Done()
+				codes[at] = one.run()
+				took[at] = float64(now().Sub(starts[at]).Milliseconds())
+			}()
+		}
+		all.Wait()
 	}
-	all.Wait()
 	code := readyCode
 	times := map[string]float64{ready.name: readyTook}
 	red := []string{}
@@ -288,7 +296,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 	return []part{
 		{name: "tests", run: func() int { return testsRun(d, quiet) }},
-		{name: "level0", run: func() int { return level0Runs(d, quiet) }},
+		{name: "level0", run: func() int { return level0Runs(d, quiet) }, lead: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},

@@ -753,13 +753,20 @@ so a part reading it reads nothing. No part reads another part's output, so no
 part waits on another. `readyOf` in `src/quack/check.go` holds the step.
 [[spec/tickets/index-cases-wait-for-it]]
 
+The level zero smoke leads: it runs alone after the ready step, and every
+other part starts once it ends. Its start road stands a door in a bounded
+window, and a box the go build and the whole-tree Vale load runs past it.
+Where no index door stands before the run, the check stops the one it stands
+up once every part ends, so a run leaves no process behind.
+[[spec/tickets/the-check-runs-beside]]
+
 The battery's report rides the stamp under `battery`, and a retro keeps one a
 retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 
 | field | holds |
 |---|---|
 | `parts` | a time a part, in the order each ends, the ready step among them |
-| `total` | the battery's span, start to end: the ready step, then the slowest part, since every part starts at once |
+| `total` | the battery's span, start to end: the ready step, the smoke, then the slowest other part, since every other part starts at once |
 | `slowest` | the slowest cases, each with its file |
 | `files` | a time a test file, the slowest first |
 | `unrun` | the parts a red run leaves unrun on an older stamp, and nothing on a new one, since every part runs |

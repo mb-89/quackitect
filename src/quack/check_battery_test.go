@@ -134,6 +134,34 @@ func TestBatteryRun(t *testing.T) {
 			t.Fatalf("the run timed %v over %v, and wants %v over the ready step's 5000 and the slowest part's 30000", got.times, got.total, want)
 		}
 	})
+	// [[spec/tickets/the-check-runs-beside]]
+	t.Run("a lead part ends before any other part starts", func(t *testing.T) {
+		var held sync.Mutex
+		led, early := false, []string{}
+		step := func(name string, lead bool) part {
+			return part{name: name, lead: lead, run: func() int {
+				held.Lock()
+				defer held.Unlock()
+				if lead {
+					led = true
+				} else if !led {
+					early = append(early, name)
+				}
+				return 0
+			}}
+		}
+		code, times, _, _ := batteryRun(part{name: "ready", run: func() int { return 0 }}, []part{step("tests", false), step("level0", true), step("rules", false)}, ticking(time.Millisecond))
+		if code != 0 || len(early) > 0 || len(times) != 4 {
+			t.Fatalf("the run answers %d, timed %v, and %v started before the lead part ended", code, times, early)
+		}
+	})
+	t.Run("level zero leads, and no other part does", func(t *testing.T) {
+		for _, one := range partsOf((&checkFake{}).doors(), nil, false) {
+			if one.lead != (one.name == "level0") {
+				t.Fatalf("%s leads %v", one.name, one.lead)
+			}
+		}
+	})
 	t.Run("a red part names itself, and every part beside it runs and reports its time", func(t *testing.T) {
 		var held sync.Mutex
 		ran := []string{}
