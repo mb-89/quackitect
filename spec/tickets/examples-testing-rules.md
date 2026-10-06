@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,7 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: examples-are-the-tests
 depends_on: [examples-design-note]
+step: do
 ---
 
 # Ask
