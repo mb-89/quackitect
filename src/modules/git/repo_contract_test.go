@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/src/modules/files"
 	"quackitect/src/proc"
 )
 
@@ -52,8 +51,8 @@ func worlds(t *testing.T) []world {
 	t.Helper()
 	return []world{
 		realWorld(t),
-		fakeWorld(t, "fake", func() files.Disk { return files.NewFakeDisk() }),
-		fakeWorld(t, "fake over a folder", func() files.Disk { return files.NewDisk(t.TempDir()) }),
+		fakeWorld(t, "fake", func() Tree { return newMemoryTree() }),
+		fakeWorld(t, "fake over a folder", func() Tree { return folderTree{t.TempDir()} }),
 	}
 }
 
@@ -132,13 +131,13 @@ func realWorld(t *testing.T) world {
 	return w
 }
 
-func fakeWorld(t *testing.T, name string, disk func() files.Disk) world {
+func fakeWorld(t *testing.T, name string, disk func() Tree) world {
 	t.Helper()
 	var clock atomic.Int64
 	clock.Store(seedSecond)
 	now := func() time.Time { return time.Unix(clock.Load(), 0) }
 	origin := NewFakeRepo(disk(), now)
-	open := func(repo *FakeRepo, tree files.Disk) side {
+	open := func(repo *FakeRepo, tree Tree) side {
 		return side{
 			Repo: repo,
 			write: func(path, text string) {

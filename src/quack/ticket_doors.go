@@ -15,7 +15,9 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 	"quackitect/src/pull"
 )
@@ -57,7 +59,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 	}
 	rows, _ := configAt(method)
 	it := &pull.It{
-		Disk: pull.OSDisk{Root: work}, Git: pull.GitDoor{Root: work}, Now: time.Now, Out: out, Err: errs,
+		Disk: pull.OSDisk{Root: work}, Git: git.NewRepo(work, proc.Real), Now: time.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),
 		Words: configInt(rows, "names.words"), Fails: configInt(rows, "work.failsBeforePerson"),
 		Refusals: configInt(rows, "work.refusalsBeforeFail"), Splits: configInt(rows, "work.stepsBeforeSplit"),
@@ -66,7 +68,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 		Binding:     configWord(rows, "engine.binding"), CapBytes: configInt(rows, "pull.cap"), CapMargin: configInt(rows, "pull.margin"),
 		Log:     pullLog(work, configWord(rows, "log.level")),
 		Rules:   brief.RulesOf,
-		Shell:   pull.OSShell(work),
+		Shell:   pull.ShellOver(proc.Real, work),
 		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
 	}
 	it.Notes = func(key string) []string {

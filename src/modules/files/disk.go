@@ -9,6 +9,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"sync"
 
 	"quackitect/src/q"
@@ -60,7 +62,22 @@ func (one disk) Read(path string) (string, bool, error) {
 }
 
 // Every file under the folder at any depth, by its slashed path from the root, sorted. [[spec/design_output/doors#the-git-door-carries-writes]]
-func (one disk) List(folder string) ([]string, error) { return nil, nil }
+func (one disk) List(folder string) ([]string, error) {
+	out := []string{}
+	err := filepath.WalkDir(one.at(folder), func(at string, entry fs.DirEntry, err error) error {
+		if errors.Is(err, fs.ErrNotExist) {
+			return fs.SkipAll
+		}
+		if err != nil || entry.IsDir() {
+			return err
+		}
+		path, err := filepath.Rel(one.root, at)
+		out = append(out, filepath.ToSlash(path))
+		return err
+	})
+	sort.Strings(out)
+	return out, err
+}
 
 func (one disk) Remove(path string) error {
 	if err := os.Remove(one.at(path)); err != nil && !errors.Is(err, fs.ErrNotExist) {
@@ -97,7 +114,18 @@ func (one *FakeDisk) Read(path string) (string, bool, error) {
 }
 
 // [[spec/design_output/doors#the-git-door-carries-writes]]
-func (one *FakeDisk) List(folder string) ([]string, error) { return nil, nil }
+func (one *FakeDisk) List(folder string) ([]string, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	out := []string{}
+	for path := range one.files {
+		if folder == "" || strings.HasPrefix(path, folder+"/") {
+			out = append(out, path)
+		}
+	}
+	sort.Strings(out)
+	return out, nil
+}
 
 func (one *FakeDisk) Remove(path string) error {
 	one.mu.Lock()

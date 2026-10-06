@@ -50,6 +50,12 @@ func TestDiskListsEveryFileUnderAFolder(t *testing.T) {
 		if said, err := one.List("none"); err != nil || len(said) != 0 {
 			t.Errorf("the %s disk lists %v, %v under a folder nothing holds", name, said, err)
 		}
+		if err := one.Remove("a/deep/c.md"); err != nil {
+			t.Fatal(err)
+		}
+		if said, err := one.List("a"); err != nil || !reflect.DeepEqual(said, []string{"a/b.md"}) {
+			t.Errorf("the %s disk lists %v, %v under a once a/deep/c.md is removed", name, said, err)
+		}
 	}
 }
 

@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -163,6 +163,15 @@ record:
         hash: ffaadf7c3fe494dd
         size: 17605
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: a9acb9e4033e757abb1d80ab32c545d07fdf4a6e
+    hash_after: a9acb9e4033e757abb1d80ab32c545d07fdf4a6e
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -446,14 +455,19 @@ The approach answers the ask: `Repo` and `FakeRepo` in src/modules/git carry eve
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, plus src/modules/git/tree_test.go, a local tree so the suite imports no other module, and the person-run case folded into TestVerbRegistry, since the check went red on it
+every door the change reaches has a fake: FakeRepo for git, FakeRunner for the shell, and FakeDisk and TreeDisk for the disk
+each new file opens with a header naming the git door section of spec/design_output/doors.md, which names the approach
+the git operations stand once, in src/modules/git/repo.go, and the doors chapter names them in its operations table
 
 ## tests-green
 

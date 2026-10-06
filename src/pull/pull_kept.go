@@ -100,12 +100,12 @@ func isPass(entry *yaml.Doc) bool {
 
 // [[spec/design_output/pull#kept-red-leaves]]
 func (it *It) redCommit(after, path, name string) string {
-	said := it.Git.Run("log", "--reverse", "--ancestry-path", "--format=%H%x09%s", after+"..HEAD")
-	if !said.OK {
+	said, err := it.Git.Log(after, "HEAD", true)
+	if err != nil {
 		return ""
 	}
-	for _, row := range strings.Split(said.Out, "\n") {
-		hash, subject, _ := strings.Cut(row, "\t")
+	for at := len(said) - 1; at >= 0; at-- {
+		hash, subject := said[at].Hash, said[at].Subject
 		cut := strings.Index(subject, ": ")
 		if cut < 0 || (name != "" && subject[:cut] != name) {
 			continue
@@ -119,46 +119,29 @@ func (it *It) redCommit(after, path, name string) string {
 	return ""
 }
 
-// The rows of a name-status answer: each row's status letter and its paths. [[spec/design_output/pull#kept-red-leaves]]
-func statusRows(out string) [][]string {
-	rows := [][]string{}
-	for _, row := range strings.Split(out, "\n") {
-		if strings.TrimSpace(row) == "" {
-			continue
-		}
-		parts := strings.Split(row, "\t")
-		if len(parts) < 2 {
-			continue
-		}
-		parts[0] = parts[0][:min(1, len(parts[0]))]
-		rows = append(rows, parts)
-	}
-	return rows
-}
-
 func (it *It) landedTests(commit string) []string {
-	said := it.Git.Run("show", "--name-status", "--format=", commit)
-	if !said.OK {
+	said, err := it.Git.Changed(commit)
+	if err != nil {
 		return nil
 	}
 	out := []string{}
-	for _, row := range statusRows(said.Out) {
-		if path := row[len(row)-1]; row[0] != gone && strings.HasPrefix(path, testsDir) {
-			out = append(out, path)
+	for _, row := range said {
+		if row.Status != gone && strings.HasPrefix(row.Path, testsDir) {
+			out = append(out, row.Path)
 		}
 	}
 	return out
 }
 
 func (it *It) goneSince(commit string) (map[string]bool, bool) {
-	said := it.Git.Run("diff", "-M", "--name-status", commit, "HEAD")
-	if !said.OK {
+	said, err := it.Git.Diff(commit, "HEAD")
+	if err != nil {
 		return nil, false
 	}
 	out := map[string]bool{}
-	for _, row := range statusRows(said.Out) {
-		if row[0] == gone {
-			out[row[1]] = true
+	for _, row := range said {
+		if row.Status == gone {
+			out[row.Path] = true
 		}
 	}
 	return out, true

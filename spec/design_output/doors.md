@@ -171,6 +171,7 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | door | real | fake | contract suite |
 |---|---|---|---|
 | git | `src/modules/git/git.go` | `FakeGit` | `src/modules/git/git_contract_test.go` |
+| git's writes | `src/modules/git/repo.go` | `FakeRepo` | `src/modules/git/repo_contract_test.go` |
 | env | `src/modules/env/env.go` | `FakeEnv` | `src/modules/env/env_contract_test.go` |
 | disk | `src/modules/files/disk.go` | `FakeDisk` | `src/modules/files/disk_contract_test.go` |
 | watch | `src/modules/files/watch.go` | `FakeWatch` | `src/modules/files/watch_contract_test.go` |
@@ -184,7 +185,6 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | a tool's process | `src/modules/lsp` | none | `src/modules/lsp/door_test.go` |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
-| the pull's git and shell | `src/pull` | none | none |
 | the branch verbs' git, disk and env | `src/branches` | none | none |
 | the box and check doors of quack | `src/quack` | none | none |
 | the viewer's frame over the network | `src/tui/frame` | none | none |
@@ -205,7 +205,6 @@ family carries its fate:
 | the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go` | door tests of the index door |
 | the quack verbs over a repository a case | `src/quack/commit_test.go`, `src/quack/codec_test.go`, `src/quack/landing_test.go`, `src/quack/ticket_bless_test.go`, `src/quack/ticket_open_test.go`, `src/quack/ticket_route_test.go`, `src/quack/verb_mint_test.go` | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
-| the pull over a real repository | `src/pull/pull_test.go` | moves onto `FakeGit`, under [[spec/tickets/pull-meets-fake-git]] |
 | a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
 | a wait on a session sleeping in a module test | `src/modules/index/call_test.go` | waits on a signal, under [[spec/tickets/caller-wait-meets-no-sleep]] |
 
@@ -233,9 +232,9 @@ The operations the three packages run:
 
 | kind | operations |
 |---|---|
-| reads | the head and its branch, a ref resolved, a file at a ref, the files at a ref, the paths two refs differ in, the commits one ref stands ahead and behind, the merge base, the work tree's status, the log over a range, the refs under a prefix, a config key |
+| reads | the head and its branch, a ref resolved, a file at a ref, the files at a ref, the paths two refs differ in, the commits one ref stands ahead and behind, the merge base, the work tree's status, the log over a range, the refs under a prefix, a config key, a commit's signature, the paths the ignore file holds out, whether the index tracks a path, the unmerged paths, the lines the index adds, the branches origin holds |
 | writes to the work tree | add, reset of paths or to a ref, commit, switch with or without a new branch, a worktree added and removed |
-| writes across refs | merge, naming the paths that conflict, rebase onto a ref, update of a ref, push with a lease, fetch with prune |
+| writes across refs | merge, naming the paths that conflict, rebase onto a ref, a fast-forward, update of a ref, push with a lease, fetch with prune |
 
 The fake merges three ways a path at a time. A path both sides change
 differently conflicts whole, where git merges hunks apart. A case needing a
@@ -259,7 +258,7 @@ shape, and the lsp module moves onto it.
 | `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does |
 | `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, and a program that never starts |
 
-The branch verbs' `rawEnv`, the pull's `OSShell`, and every `exec.Command` in
+The branch verbs' `rawEnv`, the pull's shell, and every `exec.Command` in
 the quack verbs outside the box and check doors take the `Runner`. A case
 teaching the fake `go` or the quack binary hands it a handler that runs the
 verb's main in process.

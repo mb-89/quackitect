@@ -24,7 +24,8 @@ const fakeQuack = "/fake/quack"
 // The binary the child road runs, as os.Executable answers it. [[spec/tickets/quack-spawns-meet-fake-process]]
 func fakeSelf() (string, error) { return fakeQuack, nil }
 
-func TestAPersonRunDropsTheHarnessAndNamesItsRoot(t *testing.T) {
+// A case of TestVerbRegistry, since it writes the registry the other cases write. [[spec/tickets/quack-spawns-meet-fake-process]]
+func aPersonRunDropsTheHarnessAndNamesItsRoot(t *testing.T) {
 	registersFor(t, "person probe", func([]string, bool, io.Writer, io.Writer) int { return 0 })
 	var ran []proc.Command
 	fake := &proc.FakeRunner{Programs: map[string]proc.Program{fakeQuack: func(one proc.Command) proc.Said {
