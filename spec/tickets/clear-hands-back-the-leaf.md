@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box 156418b839c4 · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/clear-hands-back-the-leaf already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: 5cd3e07bd327bf06bcb7db42315e594903dc63fd
+    hash_after: 5cd3e07bd327bf06bcb7db42315e594903dc63fd
+    inputs:
+      - name: ask
+        hash: 2ef6b9dde7e8eb45
+        size: 457
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -124,14 +133,19 @@ The group carries the name the owner ordered with its article cut, because a bra
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-clear-hands-back-the-leaf]], standard
+- [[spec/tickets/clear-names-the-probe-test]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix stands in one ticket, reviewable whole, and the point is a one-line correction
+- the fix ticket carries every done_when line of the goal, so nothing of the goal stands outside it
+- the point waits on nothing open, and both stand closed
 
 # children
 
