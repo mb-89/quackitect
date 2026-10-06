@@ -106,3 +106,20 @@ func TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal(t *testing.T) {
 		t.Fatalf("read answers %d, %q, %q, want %q", code, out, errs, want)
 	}
 }
+
+// A queued prompt naming no origin earns a prompt row unless marked meta, and a helper's queued prompt earns none. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroReadCountsAQueuedPromptOfNoOriginAndNoneOfAHelper(t *testing.T) {
+	t.Parallel()
+	bare := fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it"}}`, retroReaderWhen)
+	meta := fmt.Sprintf(`{"type":"attachment","isMeta":true,"timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it"}}`, retroReaderWhen)
+	human := fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it","origin":{"kind":"human"}}}`, retroReaderWhen)
+	if got := retroRowsOf("transcripts/one/a.jsonl", bare); len(got) != 1 || got[0] != (retroRow{kind: "prompt", text: "land it"}) {
+		t.Fatalf("a queued prompt of no origin earns %v", got)
+	}
+	if got := retroRowsOf("transcripts/one/a.jsonl", meta); len(got) != 0 {
+		t.Fatalf("a queued prompt marked meta earns %v", got)
+	}
+	if got := retroRowsOf("transcripts/one/a/subagents/b.jsonl", human); len(got) != 0 {
+		t.Fatalf("a helper's queued prompt earns %v", got)
+	}
+}

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d4411837207b96b8
         size: 888
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: c86fc4aeece65f963215bb02375307f6c7b0a6c1
+    hash_after: c86fc4aeece65f963215bb02375307f6c7b0a6c1
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/retro_read.go:65:108: Antithesis: Say what is. 'and not' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_read.go src/quack/retro_read_test.go src/quack/retro_effect.go src/quack/retro_mint.go src/quack/retro_mint_test.go src/quack/retro_usage.go src/quack/retro_usage_test.go src/modules/verbs/retro.go src/modules/verbs/retro_test.go spec/guidance/retro/read.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the doc line in src/modules/verbs/retro.go the gate named
+- the cases read temp folders they seed, and the mint case reaches git through retroMintFake
+- the code points at the retro read and effect sections it implements
+- the refusal row stands once in the usage line, and the verb doc and the read note point at the same words
 
 ## tests-green
 
