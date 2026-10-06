@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 46b55e4baeebd9a9
         size: 2934
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 6a86145f4ef57147834bd5f61eb2c92f1d718d9b
+    hash_after: 6a86145f4ef57147834bd5f61eb2c92f1d718d9b
+    inputs:
+      - name: design/draft
+        hash: 46b55e4baeebd9a9
+        size: 2934
+      - name: design/tests-red
+        hash: a98907ffdc8c3ac2
+        size: 930
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -286,8 +298,13 @@ The index cases run over the fake manager, and the quack case reads a pure table
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- accepts-reads-away-modules: Managed.Away holds instance names, not module names (src/quack/io.go ioProcesses), so widening acceptsVerb by split.Away matches no module; implement/change maps each away instance to the module it serves, or the list drops tools a split process answers
+- tool-list-keeps-unreadable-actions: servesTools reads store.Act over the zero input; an action whose zero input errors or names requests other inputs leave out must stay listed, and a case pins that
+- real-catalog-reads-accepts: tests-red dropped TestEveryWiredToolAnswersThroughAct, yet draft/tests and draft/size still name it and src/quack/cli_test.go; tests-green adds the pure read of the real catalog against acceptsVerb it promises, or the lists drop the name
+- tool-call-hook-answers: the ask names no handler and a refused connection beside the refused module; this approach answers the refused module alone, so a child carries the hook and connection causes
 
 # implement
 
