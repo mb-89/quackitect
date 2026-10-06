@@ -71,3 +71,7 @@ the case drives endsWhole over sh and never the Vale road, so no test decides th
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+No case drives the four callers, as the gate says. The case covering `endsWhole` itself stands in `src/quack/ending_test.go`:
+
+    grep -n endsWhole src/quack/ending_test.go
