@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: c992789f728d4f06
         size: 5765
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-4
+    hash_before: 0ef74deab922eec9b7aad93e26cf151883363095
+    hash_after: 0ef74deab922eec9b7aad93e26cf151883363095
+    inputs:
+      - name: design/draft
+        hash: c992789f728d4f06
+        size: 5765
+      - name: design/tests-red
+        hash: 7e42663b12491bc4
+        size: 962
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +329,13 @@ Eleven refusal cases and the two tree cases fail on their own assertion against 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- hook-markers-reuse-land-check: the approach adds a fourth Go marker scan as command.MarkedIn and command.RefusedMarker, beside markedIn and mergeRefusal in src/branches/land.go, stagedFault in src/pull/pull_landed.go and mergeRefusal in src/quack/commit.go. The hooks module imports branches under item 7 anyway, so export the branches pair and call it, and drop src/modules/hooks/command/markers.go from the size.
+- hook-holds-gate-every-push: item 6 gates the hold and stale rules on an agent's push and says agentPushes holds it so today, but prepush.js gates the battery and unchecked rules alone on engine, and runs the hold, stale, cloud-trunk and todo rules for every push. Keep the hold and stale rules ungated, and add a case where the owner's terminal meets a held branch.
+- hook-finds-the-exe-binary: both hooks name .se/.runtime/bin/se-index alone, while RUNME.sh takes se-index.exe first where it stands. Mirror that line in each hook, so a Windows desk keeps its gate.
+- vale-drops-hook-scripts: .vale.ini carries a glob naming precommit and prepush, a caller the callers list misses. Drop both names from that glob when the scripts leave.
 
 # implement
 
