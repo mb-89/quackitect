@@ -30,7 +30,7 @@ var Guards = []Guard{
 	{Name: "blackbox", Names: inPackageTracked, PackageOf: path.Dir},
 	{Name: "fixture", Names: fixturesTracked, PackageOf: fixturePackage},
 	{Name: "ratio", Names: RatioOffenders},
-	{Name: "script", Names: HandScripts, PackageOf: path.Dir},
+	{Name: "script", Names: HandScripts},
 }
 
 // The baseline a guard reads, one offender a line. [[spec/design_output/model#the-guards-hold-a-baseline]]

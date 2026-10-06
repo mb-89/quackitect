@@ -924,8 +924,9 @@ a line. The baseline holds the offenders standing on the guard's first commit.
 
 `./RUNME.sh guards` runs every guard over the tracked tree and reads each
 baseline. It prints each offender standing outside the baseline, and each
-baseline line the guard no longer names. A guard in report mode naming files
-also prints its offenders counted per package. The check runs it as its part
+baseline line the guard no longer names. A guard in report mode also prints
+its offenders: counted per package where it names files in Go packages, and
+each one whole otherwise. The check runs it as its part
 `guards`.
 
 | the mode | a new offender | a stale baseline line |

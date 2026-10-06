@@ -34,6 +34,11 @@ func TestTheGuardsListEveryGuardTheModelNames(t *testing.T) {
 	if want := []string{"blackbox", "fixture", "ratio", "script"}; !slices.Equal(names, want) {
 		t.Fatalf("the guards read %v, not %v", names, want)
 	}
+	for _, one := range imports.Guards {
+		if (one.Name == "ratio" || one.Name == "script") && one.PackageOf != nil {
+			t.Fatalf("the %s guard groups by package, so its report hides each offender", one.Name)
+		}
+	}
 }
 
 func TestTheBlackboxGuardNamesTrackedInPackageTests(t *testing.T) {

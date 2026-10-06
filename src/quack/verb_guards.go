@@ -63,8 +63,8 @@ func guardsSaid(guards []imports.Guard, tracked []string, read func(path string)
 	for _, guard := range guards {
 		named := guard.Names(tracked, read)
 		verdict := imports.Compare(linesOf(read(imports.BaselineOf(guard.Name))), named)
-		if !guard.Refuses && guard.PackageOf != nil {
-			lines = append(lines, perPackage(guard, named)...)
+		if !guard.Refuses {
+			lines = append(lines, reported(guard, named)...)
 		}
 		for _, one := range verdict.New {
 			lines = append(lines, fmt.Sprintf("%s: new %s", guard.Name, one))
@@ -106,8 +106,15 @@ func linesOf(text string) []string {
 	return slices.DeleteFunc(strings.Split(text, "\n"), func(line string) bool { return strings.TrimSpace(line) == "" })
 }
 
-// The offenders a report counts per package, one line a package, sorted. [[spec/design_output/model#the-guards-hold-a-baseline]]
-func perPackage(guard imports.Guard, named []string) []string {
+// What a report prints of a guard's offenders: each one whole where the guard names no package, or the count per package. [[spec/design_output/model#the-guards-hold-a-baseline]]
+func reported(guard imports.Guard, named []string) []string {
+	if guard.PackageOf == nil {
+		lines := []string{}
+		for _, one := range named {
+			lines = append(lines, fmt.Sprintf("%s: %s", guard.Name, one))
+		}
+		return lines
+	}
 	counts := map[string]int{}
 	for _, one := range named {
 		counts[guard.PackageOf(one)]++

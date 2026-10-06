@@ -25,7 +25,7 @@ func TestTheGuardsReportAnswersZeroAndNamesEachOffender(t *testing.T) {
 	t.Parallel()
 	lines, code := guardsSaid(plantedGuard(false), nil, baselineReads)
 	joined := strings.Join(lines, "\n")
-	if code != 0 || !strings.Contains(joined, "a") || !strings.Contains(joined, "c") || slices.ContainsFunc(lines, func(one string) bool { return strings.HasSuffix(one, " b") }) {
+	if code != 0 || !strings.Contains(joined, "a") || !strings.Contains(joined, "c") || slices.Contains(lines, "planted: new b") || !slices.Contains(lines, "planted: new a") || !slices.Contains(lines, "planted: stale c") {
 		t.Fatalf("the report answers %d over %q, not 0 naming a as new and c as stale", code, lines)
 	}
 }
@@ -38,6 +38,17 @@ func TestTheGuardsReportCountsTheOffendersPerPackage(t *testing.T) {
 	lines, _ := guardsSaid(guards, nil, func(string) string { return "" })
 	if !slices.Contains(lines, "planted: x holds 2") || !slices.Contains(lines, "planted: y holds 1") {
 		t.Fatalf("the report reads %q, not x holding 2 and y holding 1", lines)
+	}
+}
+
+func TestTheGuardsReportPrintsEachOffenderWholeWhereNoPackageGroups(t *testing.T) {
+	t.Parallel()
+	guards := []imports.Guard{{Name: "ratio", Names: func([]string, func(string) string) []string {
+		return []string{"go a\t3 test lines, 2 code lines"}
+	}}}
+	lines, _ := guardsSaid(guards, nil, func(string) string { return "" })
+	if !slices.Contains(lines, "ratio: go a\t3 test lines, 2 code lines") {
+		t.Fatalf("the report reads %q, not the module with both counts", lines)
 	}
 }
 
