@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 3157324235f0a831
         size: 2043
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: 89d23396010af88a630868e58ea764160d31b699
+    hash_after: c2afd406327fd790a03cb128d8d4ae4b494b0387
+    inputs:
+      - name: design/draft
+        hash: 3157324235f0a831
+        size: 2043
+      - name: design/tests-red
+        hash: e4908af626725415
+        size: 613
+    def: dc4904ab364efa10
 depends_on: [go-waits-on-events]
 ---
 
@@ -280,8 +292,9 @@ the case goes red on each read the change moves onto the hand, as the run shows
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
