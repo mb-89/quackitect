@@ -41,8 +41,10 @@ type lintDoors struct {
 	box   func() []check.Finding
 	// The files the branch changes since it left trunk, and the ones it changes in the working tree. [[spec/tickets/rules-lint-changed-files-first]]
 	changed func() []string
-	log     func(row map[string]any) error
-	now     func() time.Time
+	// Leaves the findings where SE_LINT_FOUND points, which the check's stamp and its errors flag read. [[spec/tickets/the-check-lint-runs-in-go]]
+	leave func(found lintFound) error
+	log   func(row map[string]any) error
+	now   func() time.Time
 }
 
 func init() { register("lint", lintVerb(lintHere)) }

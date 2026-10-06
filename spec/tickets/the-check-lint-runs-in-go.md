@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 82a265ded38b7a2a
         size: 557
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 0c19313276f3acd58e9ca64ebd092a762021edfe
+    hash_after: 0c19313276f3acd58e9ca64ebd092a762021edfe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 2f0e49e2fdcd8f7d
+        size: 1711
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ The check runs the Go lint verb already, and that verb writes nothing where SE_L
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verb_lint_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_lint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion: the Go lint leaves nothing for the check. The same file holds the red cases of rules-lint-changed-files-first, so both tickets turn it green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when line on the Go lint meets the new case, and the removal lines meet a grep and the gone file at accept
+- the case reaches the leave door through the lint fake
 
 # gate
 

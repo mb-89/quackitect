@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -26,6 +27,7 @@ type lintFake struct {
 	tools, swept, box []check.Finding
 	sweepFault        error
 	changed           []string
+	left              []lintFound
 	asked             [][]string
 	rows              []map[string]any
 }
@@ -52,6 +54,10 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 			sweep:   func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
 			box:     func() []check.Finding { return fake.box },
 			changed: func() []string { return fake.changed },
+			leave: func(found lintFound) error {
+				fake.left = append(fake.left, found)
+				return nil
+			},
 			log: func(row map[string]any) error {
 				fake.rows = append(fake.rows, row)
 				return nil
@@ -123,6 +129,22 @@ func TestLintVerb(t *testing.T) {
 		fake := &lintFake{}
 		if code, out, _ := runsTwin(fake.verb(t, nil), "lint", "--changed", "--strict"); code != 0 || len(fake.asked) != 0 || out != "The rules pass.\n" {
 			t.Fatalf("lint --changed answers %d, %q, asks %v", code, out, fake.asked)
+		}
+	})
+	// The check counts the warnings in its stamp and names the errors under --errors, off what the lint leaves. [[spec/tickets/the-check-lint-runs-in-go]]
+	t.Run("the lint leaves each warning by its file and source, and each error as its line", func(t *testing.T) {
+		warned := lintRow("a.md", "Sentence", check.SeverityWarning)
+		warned.Source = "rules"
+		fake := &lintFake{tools: []check.Finding{warned, lintRow("b.go", "FileCeiling", check.SeverityError)}}
+		runsTwin(fake.verb(t, nil), "lint")
+		want := lintFound{Stood: []finding{{File: "a.md", Source: "rules"}}, Erred: []string{"b.go:2:3: FileCeiling: FileCeiling says"}}
+		if len(fake.left) != 1 || !reflect.DeepEqual(fake.left[0], want) {
+			t.Fatalf("lint leaves %+v, and wants %+v", fake.left, want)
+		}
+		clean := &lintFake{}
+		runsTwin(clean.verb(t, nil), "lint")
+		if len(clean.left) != 1 || len(clean.left[0].Stood)+len(clean.left[0].Erred) != 0 {
+			t.Fatalf("a clean lint leaves %+v, and wants one empty list", clean.left)
 		}
 	})
 	t.Run("a finding at error exits 1 and names no warning note", func(t *testing.T) {
