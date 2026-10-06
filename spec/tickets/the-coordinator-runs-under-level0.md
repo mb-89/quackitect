@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -144,6 +144,18 @@ record:
         hash: 78b69127c29d82cc
         size: 3117
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote · helper-4
+    hash_before: c7f7d85b92c16efc7ccc77e93586c913b6a87bcd
+    hash_after: c7f7d85b92c16efc7ccc77e93586c913b6a87bcd
+    inputs:
+      - name: design/draft
+        hash: 78b69127c29d82cc
+        size: 3117
+      - name: design/tests-red
+        hash: 77f21a5dc041a8f5
+        size: 921
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -273,8 +285,15 @@ Every door the tests reach has a fake: StartRefusal is pure and takes its inputs
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- The start refusal reaches a session opened in the repo folder alone: a session opened anywhere else loads no .claude/settings.json, so boot.js never runs for it. Coordinator rule 8 alone covers the case the ask names, and the says field states that.
+- Probe with the claude probe, before the build leans on it, that a SessionStart hook answering continue false stops the session, and whether its input carries permission_mode. Where it stops nothing, the refusal prints and holds no session.
+- Hold the ceiling in measure to the --transcripts run, whose files are answers. A plain folder run over spec at answer.ceiling then exits 1 on most notes. Move the red test to measure --transcripts, or name in says why every folder run takes the ceiling.
+- StartRefusal takes cwd, and no test row sets cwd apart from root. Add a row for a cwd outside root, or drop the argument.
+- boot.js runs the Go verb on a desk box where the binary may stand unbuilt. A failed or slow verb holds no session up, as the install holds none.
+- Rule 8 in coordinator.md takes the star and two sentences as rules 3 to 7 do, and its argument lands in the rationale.
 
 # implement
 
