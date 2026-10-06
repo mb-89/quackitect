@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 3828144eeccd2c6f
         size: 475
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: f49e41063e47113ddb2f9c8208fe3887323635ba
+    hash_after: f49e41063e47113ddb2f9c8208fe3887323635ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 23739db1144f9d48
+        size: 2896
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +241,31 @@ first
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/beat_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The take reads --over as the group name, and finds no work/--over. A take without the flag goes over a stale tip whose box still beats, since nothing reads the beat. The list files the beating hold under Yours, held 3h. The beat verb stands unknown, so branch prints its usage and refuses. It surprised me that the take has no flag at all yet. Its argv reaches it unread, and the name it takes is the word after the verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing test: the ended hold under take --over, and the old beating hold in the list; the beat verb and the refusal of a beating hold back them
+- the tests reach git and the clock through the doors the tree fixture hands in: a real bare origin, which the branch tests use throughout, and d.Now
 
 # gate
 
