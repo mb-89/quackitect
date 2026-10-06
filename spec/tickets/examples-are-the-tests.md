@@ -124,7 +124,16 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
-step: retro/notes
+  - step: retro/notes
+    hand: box 2dca9acd8cb4 · claude-code-remote
+    hash_before: b96d35803f323ca4dc4e6dc4e97e02cc4cd45a45
+    hash_after: 75d6030d4bcaa5e275f4b88cb193188ef7fd09a5
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+step: retro/write
 ---
 
 # Ask
@@ -188,8 +197,9 @@ accept: the design input holds the seven points with pylib and the pyqtgraph exp
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
