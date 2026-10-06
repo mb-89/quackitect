@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/notes
+step: retro/write
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -266,6 +266,15 @@ record:
         hash: 2f27903492d3e8aa
         size: 574
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 94cc5c7924ad015b18e6555c3c912f5fc3e8036e
+    hash_after: 94cc5c7924ad015b18e6555c3c912f5fc3e8036e
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 reason: done
 ---
 
