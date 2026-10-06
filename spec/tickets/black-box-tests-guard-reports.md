@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,22 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/tests-red
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 9eace32f7ec36d9793e7cbeb53fc32e2cf70ed82
+    hash_after: 9eace32f7ec36d9793e7cbeb53fc32e2cf70ed82
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: c0a79dd2622f6ee7
+        size: 1537
+      - name: [[spec/design_output/model]]
+        hash: a1cec3f4220df26e
+        size: 77706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -269,14 +285,14 @@ none
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Each case fails on its own assertion over the stubs: the guard names nothing, the compare answers empty, and the verb core prints nothing. The new `src/imports` tests stand black-box in `package imports_test`, the first such files there. The `src/quack` test cannot, since a main package admits no outside test package, so its clause carries the marker with that reason. That bounds the guard: every test file of `src/quack` stays an offender until its logic leaves the main package.
+Each case fails on its own assertion over the stubs. The new `src/imports` tests stand black-box in `package imports_test`. The `src/quack` test cannot, since a main package admits no outside test package, so its clause carries the marker with that reason. Every test file of `src/quack` stays an offender until its logic leaves the main package.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each done_when line meets a red case: the guard and its marker in the two blackbox cases, the baseline in the compare and verb cases, and the design section stands written
+- each done_when line meets a red case, and the design section stands written
 - the tests reach no door: they parse planted text and read a map
 
 # gate

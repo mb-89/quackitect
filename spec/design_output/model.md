@@ -901,13 +901,23 @@ stands pure in `src/imports`, and takes parsed files or a file list.
 |---|---|---|
 | `blackbox` | a Go test file whose package clause lacks `_test` | `level0: InPackageTest - <why>` on the clause or in the file's doc |
 | `fixture` | a top-level Go test reaching a fixture build outside the home, through its own body or a helper of its package | `level0: FixtureOutsideHome - <why>` on the call's line or in the test's doc |
+| `ratio` | a module whose test lines pass its code lines, per language | none: cut tests, or write code |
+| `script` | a tracked script outside the engine | `level0: HandScript - <why>` in the script's first lines |
 
-A fixture build is a call to `TempDir`, `MkdirTemp`, `exec.Command`,
-`exec.CommandContext`, or an index start: `index.Run`, `index.Serve` or
-`index.StartBus`. The home is a package's `main_test.go`, whose `TestMain`
-builds once, and `src/q/qtest`. A shared builder there takes
-`qtest.Shared`, which builds on the first call and answers the same build after.
-A test reads a shared build and writes none of it.
+| the term | what it holds |
+|---|---|
+| a fixture build | a call to `TempDir`, `MkdirTemp`, `exec.Command` or `exec.CommandContext`, or an index start: `index.Run`, `index.Serve`, `index.StartBus` |
+| the fixture home | a package's `main_test.go`, whose `TestMain` builds once, and `src/q/qtest` |
+| a shared builder | `qtest.Shared`: it builds on the first call and answers that build after, and a test writes none of it |
+| a line | a line holding text, which the `ratio` guard counts |
+| a Go module | a package folder: its `_test.go` files against the rest |
+| a JavaScript module | the folder, under the root's top folder, of the first source file a test imports. A test importing none belongs to its own folder |
+| a script | a tracked file ending `.sh`, `.py` or `.bash`, or opening on `#!` |
+| the engine | `RUNME.sh`, `src/` and `.claude/skills/` |
+
+A script a hand writes under `.se/scripts` reaches the retro's input through
+`retro collect`. There `retro classes` refuses one that carries no disposition,
+as it refuses a note.
 
 Each guard keeps a baseline, `src/imports/baseline/<guard>.txt`, one offender
 a line. The baseline holds the offenders standing on the guard's first commit.
