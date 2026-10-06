@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: the-fleet-watches-itself
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: fe033274c17d7b49b264283634b44016f893accf
+    hash_after: fe033274c17d7b49b264283634b44016f893accf
+    inputs:
+      - name: ask
+        hash: 37c72798334cdf21
+        size: 480
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: c82ba6a7785f60562637604292adecf41d6bea19
+    hash_after: c82ba6a7785f60562637604292adecf41d6bea19
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: cbd2dd886d303b08
+        size: 3072
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 44f3d63c066fc94a222621c068fbcd055322c765
+    hash_after: 44f3d63c066fc94a222621c068fbcd055322c765
+    inputs:
+      - name: design/draft
+        hash: cbd2dd886d303b08
+        size: 3072
+      - name: design/tests-red
+        hash: f9d34cc63f54d15f
+        size: 973
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: e0cdc7eaf115ea5d14fa02da7d78d2e2117ee160
+    hash_after: e0cdc7eaf115ea5d14fa02da7d78d2e2117ee160
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 800b93012edb9c059affe436ec4777c7fc97887d
+    hash_after: 800b93012edb9c059affe436ec4777c7fc97887d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/front passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: f9d34cc63f54d15f
+        size: 973
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,73 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The group ticket's record carries every box, since each box takes its branch through `branch take` whoever fires it. The final record rides on the box's own hold entry, and the fleet reads the record, not the session list.
+
+- The take writes `session` on the claim entry, off `CLAUDE_CODE_REMOTE_SESSION_ID`, where the box carries one. `claimGroup` in `src/branches/take.go` adds the row.
+- `branch done` and `branch release` read `--model`, `--cost` and `--final`. They write each given one as `model`, `cost` and `final` on the entry they close.
+- `front.AfterWith(text, hash, more)` in `src/front/front.go` closes the open take with `hash_after` and the rows past it. `After` calls it with none, so its callers stand unchanged.
+- The ticket schema's record entry admits `session`, `model`, `cost` and `final`.
+- `fleetRows(stood, standing)` in the new `src/branches/fleet.go` stands pure. It answers one row a work branch, with the last hand its record names and that entry's session, model, cost and final line. The fleet verb ticket prints these rows.
+- The work skill's done line and the prompt's rules name the three flags, so every box writes them.
+
+Weighed: the hold entry over a new entry, because `retroOpen` reads the last entry a step names, and a second entry on the retro step reads as unwritten. Assumed: a box knows its model and cost only by its own report, so each flag stays optional and the record writes what the box gives.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/done.go: leaves, which closes the take with the final rows
+- src/branches/done.go: finish, which hands the flags to leaves
+- src/branches/done.go: release, through letGo, which closes the take with the final rows
+- src/branches/take.go: claimGroup, which writes the session
+- src/front/front.go: After, which now calls AfterWith
+- src/branches/group.go: withHashAfter and withEveryTakeClosed, which reach After unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/record_test.go: TestDoneWritesTheModelCostAndFinalLineToTheRecord
+- src/branches/record_test.go: TestReleaseWritesTheFinalLineToTheRecord
+- src/branches/record_test.go: TestTakeWritesTheSessionOnTheClaim
+- src/branches/fleet_test.go: TestFleetHoldsTheBoxesTheDispatchFires
+- src/front/front_test.go: TestAfterWithClosesTheTakeWithTheRowsPastIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/done.go
+- src/branches/take.go
+- src/branches/fleet.go
+- src/branches/record_test.go
+- src/branches/fleet_test.go
+- src/front/front.go
+- src/front/front_test.go
+- spec/schemas/ticket.schema.yaml
+- .claude/skills/work/SKILL.md
+- src/branches/prompt.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `done.go` (finish, leaves, release), `take.go` (claimGroup), `group.go` (heldIn, withHashAfter, entriesOf), `front.go` (After, Entry) and the record schema, and checked each claim there.
+- Callers: every caller of After, leaves, letGo and claimGroup stands in the list.
+- The first done_when line meets TestDoneWritesTheModelCostAndFinalLineToTheRecord, the second meets TestFleetHoldsTheBoxesTheDispatchFires, and the check line meets the command at tests-green.
 
 ## tests-red
 
@@ -189,26 +294,33 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/record_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/record_test.go
+- src/branches/fleet_test.go
+- src/front/front_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The take writes no session, done writes no model, and the fleet rows stand empty. Release reads `--final` as the branch name and answers `work/--final carries no group`. So the branch verb's name word must skip a flag, and the change takes that in. `AfterWith` and `fleetRows` stand as stubs, so the package builds and the cases reach their assertions.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done_when line meets TestDoneWritesTheModelCostAndFinalLineToTheRecord and TestReleaseWritesTheFinalLineToTheRecord. The second meets TestFleetHoldsTheBoxesTheDispatchFires, and the check line meets the command at tests-green.
+- The record cases reach git and the disk over a temp clone and a bare origin, as the package's other cases do. The fleet case and the front case stand pure.
 
 # gate
 
@@ -217,8 +329,11 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- size-misses-held-and-branch: the release path closes its take in held.go letGo, and release reads --final as the branch name through word(argv, 1) in branch.go, so both files change and the size list names neither; the builder adds them in place.
+- prompt-flags-follow-prompt-verb: src/branches/prompt.go belongs to the sibling a-verb-writes-box-prompts, so the three flags land on the rules that ticket writes, after it, not as a second write of the same file.
 
 # implement
 
@@ -229,14 +344,19 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/front/front.go src/branches/fleet.go src/branches/take.go src/branches/done.go src/branches/held.go src/branches/branch.go spec/schemas/ticket.schema.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list or on the note under Discussion, which adds held.go and branch.go.
+- The change opens no new door. The take reads the session through d.env, which the cases set on the fake env.
+- Each new function carries a link to this ticket, where the approach stands.
+- The flags read through the standing flagIn, and the record rows through recordIn and entryField, so no reader stands twice.
 
 ## tests-green
 
@@ -245,26 +365,33 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/record_test.go src/front/front_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every box now leaves its final record on the group ticket it holds, whoever fires it. The take writes the harness session on the claim. Done and release read --model, --cost and --final, and write each given one on the take they close, through front.AfterWith. The fleet rows read the last hand off each group's record, with its session, model, cost and final line. The branch verb's name word skips a flag, so release --final names no branch. The ticket schema admits the four fields. The fleet case TestFleetHoldsTheBoxesTheDispatchFires passes under go test, and fleet_test.go stays red on the fleet verb's own cases, which the-fleet-verb-watches-boxes owns.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list or on the note under Discussion.
+- The change opens no new door. The take reads the session through d.env, which the cases set.
+- Each new function carries a link to this ticket, where the approach stands.
+- The flags read through flagIn, and the rows through recordIn and entryField, so no reader stands twice.
 
 # accept
 
@@ -289,3 +416,5 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- size-misses-held-and-branch: the size list under design/draft also takes `src/branches/held.go`, where `letGo` closes the take on release, and `src/branches/branch.go`, where `Branch` reads the name through `word(argv, 1)`. The engine owns the draft's evidence, so the two files stand here, and implement reads them beside the list.

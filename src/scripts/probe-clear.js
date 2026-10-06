@@ -113,13 +113,12 @@ function inClone(tree, env) {
 
 // The probe mints its own group and stands on its work branch, as origin holds it. [[spec/tickets/the-clear-carries-no-local-work]]
 export function grouped(it, tree, env) {
-  const dropped = untodo(it, tree);
-  if (dropped) return dropped;
   const minted = it.proc.run(
     [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
   it.disk.write(it.join(tree, "spec", "tickets", `${LEAF}.md`), LEAF_TEXT);
+  unparked(it, tree);
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
     timeoutMs: PULL_WAIT,
@@ -133,26 +132,19 @@ export function grouped(it, tree, env) {
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
 }
 
-// A todo ranks first in the pull, so a tree carrying one hands it past the clear in place of the probe's leaf. The clone drops every mark and commits that, since the queue is the tree's and the clear is the probe's. [[spec/tickets/platform-draft-names-checkdoors]]
-function untodo(it, tree) {
-  const folder = it.join(tree, "spec", "tickets");
-  if (!it.disk.exists(folder)) return null;
-  let changed = false;
-  for (const name of it.disk.list(folder)) {
-    const at = it.join(folder, typeof name === "string" ? name : name.name);
-    if (!at.endsWith(".md")) continue;
-    const text = String(it.disk.read(at));
-    const left = text.replace(/^todo: true\r?\n/m, "");
-    if (left === text) continue;
-    it.disk.write(at, left);
-    changed = true;
+// The clone carries the tickets its source box parks, and a parked ticket goes out ahead of the probe's leaf, so the clone drops every park. [[spec/tickets/prompt-flags-follow-prompt-verb]]
+function unparked(it, tree) {
+  const parked = it.proc.run(["git", "grep", "-l", "^todo: true$", "--", "spec/tickets"], { cwd: tree, timeoutMs: PULL_WAIT });
+  const files = String(parked.stdout ?? "").split("\n").filter(Boolean);
+  for (const file of files) {
+    const at = it.join(tree, file);
+    it.disk.write(at, it.disk.read(at).replace(/^todo: true\r?\n/m, ""));
   }
-  if (!changed) return null;
-  const ran = it.proc.run(
-    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-a", "-m", "the probe's clone drops the todo marks"],
+  if (files.length === 0) return;
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-m", "the probe unparks its clone", "--", ...files],
     { cwd: tree, timeoutMs: PULL_WAIT },
   );
-  return ran.exitCode === 0 ? null : { words: "drop the todo marks", exit: ran.exitCode, said: `${ran.stdout}${ran.stderr}` };
 }
 
 function keyed(it, tree) {
