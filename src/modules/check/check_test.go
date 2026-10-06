@@ -4,6 +4,7 @@
 package check
 
 import (
+	"slices"
 	"testing"
 
 	"quackitect/src/q"
@@ -20,5 +21,11 @@ func TestEveryTwinNameStands(t *testing.T) {
 		if !ok || len(said) != 0 {
 			t.Fatalf("%s reads %v, and wants an empty list of findings", twin, said)
 		}
+	}
+}
+
+func TestTheTwinsHoldNoVale(t *testing.T) {
+	if slices.Contains(Twins, "vale") {
+		t.Fatalf("the twins %v hold vale, and the Go rules own the prose", Twins)
 	}
 }

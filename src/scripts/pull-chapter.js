@@ -6,7 +6,8 @@ import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
-import { voiceOver } from "../bridge/findings.js";
+import { REFUSES } from "../bridge/findings.js";
+import { vale } from "../doors/vale.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -19,7 +20,7 @@ import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { PERSON, roleOf } from "./pull-hand-of.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
-import { notesOf, processNameOf } from "./quack-topic.js";
+import { answerOf, keptOf, notesOf, PAST, processNameOf } from "./quack-topic.js";
 import { callOf } from "./tool-call.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
@@ -335,14 +336,27 @@ const HEADING = /^#{1,6}\s/;
 
 // The pull reads the ticket the way the lint reads it, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter: it answers the lines that refuse, and puts each break of form on `warned`, so the hand-back lands over it. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function voiceFaults(it, one, leaf, warned = []) {
-  if (!it.vale) return [];
   const read = voiceText(one.text, leaf);
   if (!read) return [];
-  const found = voiceOver(it, one.path, read.text, read);
+  const found = voiceIn(it, one.path, read.text, read);
   const row = (fault) =>
     `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`;
   warned.push(...formIn(found).map(row));
   return refusesIn(found).map(row);
+}
+
+// A ticket's text held in memory, read through the rules door past the tense reader, keeping what refuses on the lines the span names. The pull, the open, the note and the retro's mint read here, and a box with no rules reads nothing. [[spec/tickets/vale-leaves-the-tree]]
+export function voiceIn(it, path, text, span = {}) {
+  if (!String(text ?? "").trim()) return [];
+  const rules = vale(it.disk, it.proc, it.method ?? it.root, it.root);
+  if (!rules.stands()) return [];
+  const said = rules.lintNow(text, path);
+  if (!said.ran) return [];
+  const first = span.first ?? 1;
+  const last = span.last ?? Number.POSITIVE_INFINITY;
+  return answerOf(keptOf(it, text, said.found, PAST), "prose").filter(
+    (fault) => REFUSES.has(fault.severity) && fault.line >= first && fault.line <= last,
+  );
 }
 
 // A hand-back landing over a break of form names each line. [[spec/design_output/pull#the-voice-reads-the-evidence]]

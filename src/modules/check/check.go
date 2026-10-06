@@ -10,7 +10,7 @@ import "quackitect/src/q"
 const Prefix = "check/"
 
 // Every twin, by the name its check/ name and its golden file carry. src/scripts/check-twins.js spells the list again, since a script imports no Go. [[spec/tickets/check-names-meet-their-goldens]]
-var Twins = []string{"tree", "schema", "size", "magic", "names", "paths", "private", "slug", "vale", "biome"}
+var Twins = []string{"tree", "schema", "size", "magic", "names", "paths", "private", "slug", "biome"}
 
 // The module type the wiring loads as check: a name per twin, each an empty list until a rule answers it, and the sweep the LSP's rules answer. [[spec/tickets/lsp-rules-move-to-check]]
 func Registers(c *q.Catalog) q.Writer {

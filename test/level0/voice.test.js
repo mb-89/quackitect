@@ -5,12 +5,14 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { refusal, taught } from "../../.claude/skills/level0/lib/refuse.js";
-import {
-  fromJson,
-  lintText,
-  unreasoned,
-} from "../../.claude/skills/level0/lib/vale.js";
+import { fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
+import { vale } from "../../src/doors/vale.js";
+
+const BINARY = `/tree/${BIN}`;
 
 test("a finding is read out of Vale's JSON", () => {
   const found = fromJson(
@@ -59,32 +61,27 @@ test("an exemption naming a reason passes, and one naming none is refused", () =
   assert.equal(found[0].line, 1);
 });
 
-test("the lint asks the tree's rules-over verb with the path, and reads its rows", async () => {
-  const asked = [];
-  const said = await lintText("It holds; it stands.\n", "spec/a.md", {
-    bin: ["se-index", "verb", "src/scripts"],
-    cwd: "/tree",
-    run: async (argv, init) => {
-      asked.push({ argv, init });
-      return {
-        exitCode: 0,
-        stdout: JSON.stringify({ "spec/a.md": [{ Check: "VoiceParagraph.Characters", Line: 1, Span: [8, 8], Match: ";", Message: "No semicolon.", Severity: "warning" }] }),
-      };
-    },
+test("the door asks the tree's rules-over verb with the path, and reads its rows", async () => {
+  const proc = fakeProc();
+  proc.teach([BINARY], {
+    stdout: JSON.stringify({ "spec/a.md": [{ Check: "VoiceParagraph.Characters", Line: 1, Span: [8, 8], Match: ";", Message: "No semicolon.", Severity: "warning" }] }),
   });
-  assert.deepEqual(asked[0].argv, ["se-index", "verb", "src/scripts", "rules-over", "--path=spec/a.md"]);
-  assert.equal(asked[0].init.stdin, "It holds; it stands.\n");
+  const door = vale(fakeDisk({ [BINARY]: "" }), proc, "/tree");
+  const said = door.lintNow("It holds; it stands.\n", "spec/a.md");
+  assert.deepEqual(proc.ran[0].argv, [BINARY, "verb", "/tree/src/scripts", "rules-over", "--path=spec/a.md"]);
+  assert.equal(proc.ran[0].init.stdin, "It holds; it stands.\n");
   assert.equal(said.ran, true);
   assert.equal(said.found[0].rule, "Characters");
   assert.equal(said.found[0].column, 8);
+  assert.deepEqual(await door.lint("It holds; it stands.\n", "spec/a.md"), said);
 });
 
-test("a linter that cannot run degrades the call", async () => {
-  const said = await lintText("anything", "notes.md", {
-    run: async () => {
-      throw new Error("vale is not here");
-    },
+test("a binary that cannot run degrades the call", async () => {
+  const proc = fakeProc();
+  proc.teach([BINARY], () => {
+    throw new Error("the binary is not here");
   });
+  const said = await vale(fakeDisk({ [BINARY]: "" }), proc, "/tree").lint("anything", "notes.md");
   assert.equal(said.ran, false);
   assert.deepEqual(said.found, []);
 });

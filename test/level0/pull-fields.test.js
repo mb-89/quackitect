@@ -19,6 +19,7 @@ import {
   ROOT,
   standing,
 } from "./pull-doors.js";
+import { teachRules } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
@@ -69,15 +70,10 @@ test("the fields ride the payload, and the engine writes them under their headin
 
 // A break of form in the evidence warns, and the hand-back lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("a hand-back whose field breaks a rule of form lands, and names the line", () => {
-  const vale = "/tree/.se/.runtime/bin/vale";
   const { it, disk } = doors(
     standing(CHILD(), withField(GROUP_NOTE, "step", "children", fakeFront())),
-    {
-      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
-        semicolonVale(),
-    },
   );
-  it.vale = vale;
+  teachRules(it, semicolonVale());
   heard(() => pulling(ROOT, ["pull"], it));
 
   const said = heard(() =>
@@ -110,8 +106,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "the fence goes with the old text",
   );
 
-  const vale = "/tree/.se/.runtime/bin/vale";
-  const ranVale = [];
+  const ranRules = [];
   const route = CHILD("open", "verdict").replace(
     "group: one-group\n",
     "  - name: verdict\n    does: reads every hunk\n    input: [diff, implement]\n    to: retro\n    evidence:\n      - name: read\n        form: files\n        says: every file you read\n      - name: verdict\n        form: verdict\n        says: pass or fail\ngroup: one-group\n",
@@ -124,22 +119,20 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     standing(body, withField(GROUP_NOTE, "step", "children", fakeFront())),
     {
       "git status --porcelain -uall": {
-        stdout: "M spec/tickets/a-child.md\n?? .vale.ini",
+        stdout: "M spec/tickets/a-child.md\n?? notes/kept.txt",
       },
-      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
-        (_argv, init) => {
-          ranVale.push(init.stdin);
-          return { stdout: "{}" };
-        },
     },
   );
-  it.vale = vale;
+  teachRules(it, (_argv, init) => {
+    ranRules.push(init.stdin);
+    return { stdout: "{}" };
+  });
   heard(() => pulling(ROOT, ["pull"], it));
 
   const short = heard(() =>
     pulling(
       ROOT,
-      ["pull", "a-child", "--fields", '{"read": "- .vale.ini", "verdict": "pass"}'],
+      ["pull", "a-child", "--fields", '{"read": "- notes/kept.txt", "verdict": "pass"}'],
       it,
     ),
   );
@@ -157,14 +150,14 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
         "pull",
         "a-child",
         "--fields",
-        '{"read": "- .vale.ini\\n- spec/tickets/a-child.md", "verdict": "pass"}',
+        '{"read": "- notes/kept.txt\\n- spec/tickets/a-child.md", "verdict": "pass"}',
       ],
       it,
     ),
   );
   assert.equal(whole.code, 0, whole.said);
-  assert.ok(ranVale.length, "the voice reads the verdict");
-  assert.doesNotMatch(ranVale.at(-1), /vale\.ini/, "the voice skips the files field");
+  assert.ok(ranRules.length, "the voice reads the verdict");
+  assert.doesNotMatch(ranRules.at(-1), /kept\.txt/, "the voice skips the files field");
 });
 
 // The child at its tests-red, its red list a field of the leaf. [[spec/tickets/list-fields-split-lines]]

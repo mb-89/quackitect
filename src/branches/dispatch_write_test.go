@@ -5,14 +5,13 @@
 package branches
 
 import (
-	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
 
+	"quackitect/src/rules"
 	"quackitect/src/yaml"
 )
 
@@ -177,15 +176,16 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	}
 }
 
-// The fix ask meets the voice rules Vale holds, as askFaults read them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]]
+// The fix ask meets the tree's Go voice rules, as askFaults reads them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]] [[spec/tickets/vale-leaves-the-tree]]
 func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
-	vale, err := exec.LookPath(filepath.Join(one.d.Method, filepath.FromSlash(runtimeFolder), "bin", "vale"))
+	set, err := rules.Load(func(path string) string {
+		text, _ := os.ReadFile(filepath.Join(one.d.Method, filepath.FromSlash(path)))
+		return string(text)
+	})
 	if err != nil {
-		if vale, err = exec.LookPath("vale"); err != nil {
-			t.Skip("this box holds no vale")
-		}
+		t.Fatalf("the rules load nothing: %v", err)
 	}
 	one.dpGreen()
 	_, fix := one.dpWriteBranch()
@@ -193,28 +193,10 @@ func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
 	if !strings.Contains(text, "# Ask\n\nThe loose agent tickets") {
 		t.Fatalf("the ask holds no line:\n%s", text)
 	}
-	cmd := exec.Command(vale, "--config="+filepath.Join(one.d.Method, ".vale.ini"), "--output=JSON", "--no-exit", "--path="+ticketAt(fix))
-	cmd.Dir = one.d.Method
-	cmd.Stdin = strings.NewReader(text)
-	said, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("vale answers %v: %s", err, said)
-	}
-	var found map[string][]struct {
-		Line     int
-		Severity string
-		Check    string
-		Message  string
-	}
-	if err := json.Unmarshal(said, &found); err != nil {
-		t.Fatalf("vale prints no JSON: %s", said)
-	}
 	ask, last := dpAskSpan(text)
-	for _, rows := range found {
-		for _, row := range rows {
-			if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
-				t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
-			}
+	for _, row := range set.Lint(ticketAt(fix), text) {
+		if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
+			t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
 		}
 	}
 }

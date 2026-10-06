@@ -202,7 +202,7 @@ test("the vehicle carries the method and nothing private", () => {
   assert.equal(files.exists("/vehicle/.se/.runtime/identity.json"), false);
 
   assert.equal(travels(".git"), false);
-  assert.equal(travels(".se/.runtime/bin/vale"), false);
+  assert.equal(travels(".se/.runtime/bin/biome"), false);
   assert.equal(travels("src/parts/one.js"), true);
 });
 

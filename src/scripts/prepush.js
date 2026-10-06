@@ -23,8 +23,6 @@ import {
   TRUNK,
   VERSION,
 } from "../../.claude/skills/level0/lib/trunk.js";
-import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import { readThrough } from "../bridge/findings.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -280,21 +278,6 @@ export function carriedBy(repo) {
       if (held.ok) out.push({ name, text: held.out });
     }
     return out;
-  };
-}
-
-// The lint over the names a push carries, read as rows through the tense reader, so this door and the check hold one list. [[spec/design_output/level0#the-tense-reader]]
-export function lintedBy(outside, root, vale, files = disk()) {
-  return (names) => {
-    const read = names.filter((one) => PROSE.test(one));
-    if (!read.length || !vale) return [];
-    const ran = outside.run(
-      [vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", ...read],
-      {
-        cwd: root,
-      },
-    );
-    return readThrough({ disk: files, proc: outside, join, root }, fromJson(ran.stdout));
   };
 }
 

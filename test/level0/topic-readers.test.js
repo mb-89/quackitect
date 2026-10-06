@@ -8,7 +8,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { readsText, readThrough } from "../../src/bridge/findings.js";
 import { readsProse } from "../../src/bridge/prose.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -93,10 +92,6 @@ test("every reader on a new slice faults where its topic answers nothing, naming
     /quack prose answers nothing/,
   );
   assert.throws(
-    () => readsText(it, "n.md", "the door set the write\n", [set]),
-    /quack prose answers nothing/,
-  );
-  assert.throws(
     () => notesOf(it, "standard:draft", () => ["old"]),
     /quack guidance answers nothing/,
   );
@@ -117,11 +112,10 @@ test("each reader runs quack once, and no shadow runs beside it", async () => {
     config: { ask: async () => "shadow" },
   };
   readsProse(it, "the door set the write\n", [set]);
-  readsText(it, "n.md", "the door set the write\n", [set]);
   await new Promise((done) => setImmediate(done));
   assert.deepEqual(
     it.proc.ran.map((one) => one.argv.slice(1).join(" ")),
-    ["prose", "prose"],
+    ["prose"],
   );
 });
 
@@ -208,47 +202,6 @@ test("the pull hand-out takes the notes quack guidance answers for its leaf wher
   const hold = await printed(() => handed(it, { group: "", hand: "box" }, one, leaf));
   assert.match(hold, /spec\/guidance\/other/);
   assert.doesNotMatch(hold, /spec\/guidance\/code\/style/);
-});
-
-test("readsText keeps the findings quack prose keeps where the prose slice reads new", () => {
-  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
-  const it = itOf(
-    "new",
-    {},
-    {
-      [`${QUACK} prose`]: { stdout: JSON.stringify({ docs: [{ kept: [] }] }) },
-    },
-  );
-  const found = readsText(it, "n.md", "the door set the write\n", [set]);
-  assert.equal(found.filter((one) => one.rule === "Voice.Other").length, 0);
-});
-
-// The check reads every file in one request, so it pays one process. [[spec/tickets/go-prose-checks-stand-alone]]
-test("readThrough runs quack prose once over every file it reads, and keeps what each document keeps", () => {
-  const one = { rule: "Voice.PastTense", line: 1, column: 10, said: "set", file: "a.md" };
-  const two = { ...one, file: "b.md" };
-  const { file: _, ...bare } = two;
-  const it = itOf(
-    "new",
-    {
-      [join(ROOT, "a.md")]: "the door set the write\n",
-      [join(ROOT, "b.md")]: "the door set the write\n",
-    },
-    {
-      [`${QUACK} prose`]: {
-        stdout: JSON.stringify({ docs: [{ kept: [] }, { kept: [bare] }] }),
-      },
-    },
-  );
-  const kept = readThrough(it, [one, two]);
-  assert.deepEqual(
-    kept.map((found) => found.file),
-    ["b.md"],
-  );
-  assert.deepEqual(
-    it.proc.ran.map((ran) => ran.argv.slice(1).join(" ")),
-    ["prose"],
-  );
 });
 
 // A list holding no finding answers itself, so a clean file costs no process. [[spec/tickets/go-prose-checks-stand-alone]]

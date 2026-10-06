@@ -6,8 +6,8 @@ import { test } from "node:test";
 import * as read from "../../src/scripts/cli-read.js";
 import { version } from "../../src/scripts/cli-read.js";
 
-// readThrough in src/bridge/findings.js is the one road past Vale, so the command line exports no reader of its own. [[spec/tickets/go-prose-checks-stand-alone]]
-test("the command line exports no prose reader beside findings.js", () => {
+// The tense reader runs in Go, so the command line exports no prose reader of its own. [[spec/tickets/go-prose-checks-stand-alone]]
+test("the command line exports no prose reader", () => {
   assert.equal(read.readThroughTheReader, undefined);
 });
 

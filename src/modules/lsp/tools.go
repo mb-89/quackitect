@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// The names the lint spells in src/bridge/findings.js and .claude/skills/level0/lib/code.js, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The names the tools draw under, and the Biome config .claude/skills/level0/lib/code.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	biomeConfig = "spec/config"
 	// The rule a rules load that fails draws, so a broken rule stands in the panel. [[spec/tickets/vale-leaves-the-tree]]

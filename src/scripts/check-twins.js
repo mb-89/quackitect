@@ -12,7 +12,6 @@ import { schemasIn } from "../../.claude/skills/level0/lib/schema.js";
 import { sizeFaults } from "../../.claude/skills/level0/lib/size.js";
 import { slugOf } from "../../.claude/skills/level0/lib/slug.js";
 import { RULES, treeFaults } from "../../.claude/skills/level0/lib/tree.js";
-import { fromJson as valeRows } from "../../.claude/skills/level0/lib/vale.js";
 
 // Every twin, by the name its check/ name and its golden file carry. src/modules/check owns the list, and this copy stands because a script imports no Go. [[spec/tickets/check-names-meet-their-goldens]]
 export const TWINS = [
@@ -24,7 +23,6 @@ export const TWINS = [
   "paths",
   "private",
   "slug",
-  "vale",
   "biome",
 ];
 
@@ -80,9 +78,6 @@ export function twinsOf(tree, it) {
             return heading ? [row(path, "slugOf", i + 1, slugOf(heading[1]))] : [];
           })
         : [],
-    ),
-    vale: valeRows(it.vale).map((one) =>
-      row(one.file, one.rule, one.line, `${one.message} [${one.severity}]`),
     ),
     biome: biomeRows(it.biome, ".").map((one) =>
       row(one.file, one.rule, one.line, `${one.message} [${one.severity}]`),

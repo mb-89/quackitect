@@ -5,13 +5,12 @@
 
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
-import { voiceOver } from "../bridge/findings.js";
-import { chapterEnd } from "./pull-chapter.js";
+import { chapterEnd, voiceIn } from "./pull-chapter.js";
 
 const ASK = "ask";
 const TOP = 1;
 
-// The whole ticket goes to Vale, and the findings on the Ask's lines stay, so a line number names the file's line. The lines that refuse and the lines that warn come back apart. [[spec/design_output/pull#a-draft-opens]]
+// The whole ticket goes to the rules, and the findings on the Ask's lines stay, so a line number names the file's line. The lines that refuse and the lines that warn come back apart. [[spec/design_output/pull#a-draft-opens]]
 export function askFaults(it, path, text) {
   const said = String(text ?? "");
   const sections = readNote(said).sections;
@@ -21,7 +20,7 @@ export function askFaults(it, path, text) {
     first: sections[at].line,
     last: chapterEnd(sections, at, TOP, said.split(/\r?\n/).length),
   };
-  const found = voiceOver(it, path, said, span);
+  const found = voiceIn(it, path, said, span);
   const row = (fault) => `  line ${fault.line} breaks ${fault.rule}: ${fault.message}`;
   return { refused: refusesIn(found).map(row), warned: formIn(found).map(row) };
 }

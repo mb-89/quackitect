@@ -11,6 +11,7 @@ import { takeable } from "../../src/scripts/pull.js";
 import { excludes } from "../../src/scripts/pull-hand.js";
 import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
+import { teachRules } from "./quack-doors.js";
 import {
   at,
   BRANCH,
@@ -201,7 +202,6 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 
 // [[spec/design_output/pull#the-pass]]
 test("the voice rules read the evidence at the hand-back, and a break of form warns as it lands", () => {
-  const vale = "/tree/.se/.runtime/bin/vale";
   const TICKET = "spec/tickets/a-child.md";
   const lineIn = (text) => text.split("\n").indexOf("A long approach.") + 1;
   const long = (text) =>
@@ -216,16 +216,8 @@ test("the voice rules read the evidence at the hand-back, and a break of form wa
         },
       ],
     });
-  const { it, disk } = doors(
-    standing(filled(CHILD(), "### approach", "A long approach.")),
-    {
-      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=${TICKET}`]: (
-        _argv,
-        init,
-      ) => ({ stdout: long(init.stdin) }),
-    },
-  );
-  it.vale = vale;
+  const { it, disk } = doors(standing(filled(CHILD(), "### approach", "A long approach.")));
+  teachRules(it, (_argv, init) => ({ stdout: long(init.stdin) }));
   heard(() => pulling(ROOT, ["pull"], it));
   const line = lineIn(disk.read(at(TICKET)));
 

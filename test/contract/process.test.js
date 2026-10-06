@@ -129,7 +129,7 @@ test("the standard route gates the design once, and its last leaf hands on to th
 const ruled = rulesIn(root);
 const CLEAN = "A line the voice passes.";
 
-// Every route's minted ticket, declared up front, so one Vale run reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
+// Every route's minted ticket, declared up front, so one settle reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
 const routes = files
   .list(join(root, "spec", "processes"))
   .filter((one) => one.name.endsWith(".yaml"))
@@ -157,9 +157,9 @@ const minted = new Map(
   }),
 );
 
-// Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask: the rows past the tense reader, at a severity that refuses. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-ruled.ifVale(
-  "a ticket minted off every route draws no finding from the voice rules, in one Vale run",
+// Every route renders a ticket at its mint, and the tree's rules read it the way the verbs read an Ask: the rows past the tense reader, at a severity that refuses. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+ruled.ifRules(
+  "a ticket minted off every route draws no finding from the voice rules",
   ruled.proves(
     Object.fromEntries(
       routes.map((name) => [
@@ -181,7 +181,6 @@ ruled.ifVale(
         }
       }
       assert.deepEqual(faults, [], "a route writes no line the voice refuses");
-      assert.equal(ruled.spawned(), 1, "one Vale run reads every route");
     },
   ),
 );

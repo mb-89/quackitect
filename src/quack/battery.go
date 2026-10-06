@@ -25,7 +25,7 @@ const (
 	tenthsInSecond = 10
 )
 
-// The source whose warnings a ticket's prose holds, which FROM.vale in src/bridge/findings.js names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
+// The source whose warnings a ticket's prose holds, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
 const valeSource = "vale"
 
 var ticketFolders = []string{"spec/tickets", ".se/tickets"}

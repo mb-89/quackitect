@@ -6,7 +6,6 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import test from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   agentPushes,
   carriedBy,
@@ -14,7 +13,6 @@ import {
   CI,
   ciGuardsIn,
   holds,
-  lintedBy,
   namesIn,
   rangeOf,
   heldBy as readsHold,
@@ -22,7 +20,6 @@ import {
   refsIn,
   staleBy,
 } from "../../src/scripts/prepush.js";
-import { keepsProse, quackUnder } from "./quack-doors.js";
 
 const SHA = "a1b2c3d4e5f6a7b8";
 const WAS = "b7a6f5e4d3c2b1a0";
@@ -405,46 +402,6 @@ test("carriedBy reads every note the range names, and passes a file git lost", (
   const out = carriedBy(repo)({ sha: SHA, was: WAS });
   assert.deepEqual(out, [{ name: "spec/tickets/slow-lint.md", text: TAGGED }]);
   assert.deepEqual(repo.runs[0], ["log", "--format=", "--name-only", `${WAS}..${SHA}`]);
-});
-
-// The terminal door reads through the tense reader, so a word Vale takes for the past and the check lets stand holds no push. [[spec/design_output/level0#the-tense-reader]]
-test("a false past the check lets stand holds no push, and a true past does", () => {
-  const root = "/tree";
-  const past = (line, span, said) => ({
-    Check: "VoiceParagraph.PastTense",
-    Line: line,
-    Span: span,
-    Match: said,
-    Message: "past",
-    Severity: "warning",
-  });
-  const vale = JSON.stringify({
-    "notes.md": [past(1, [12, 15], "read"), past(2, [10, 15], "walked")],
-  });
-  const files = fakeDisk({
-    [join(root, "notes.md")]: "The reader read the note.\nThe hand walked away.\n",
-    [quackUnder(root)]: "",
-  });
-  // Go reads read as its own lemma, so the veto drops it. [[spec/tickets/go-prose-checks-stand-alone]]
-  const quack = keepsProse((row) => row.said === "read");
-
-  const found = lintedBy(
-    fakeProc({ vale: { stdout: vale }, [`${quackUnder(root)} prose`]: quack }),
-    root,
-    "vale",
-    files,
-  )(["notes.md", "a.js"]);
-
-  assert.deepEqual(
-    found.map((one) => one.said),
-    ["walked"],
-  );
-});
-
-test("a push carrying no prose asks Vale nothing", () => {
-  const outside = fakeProc();
-  assert.deepEqual(lintedBy(outside, "/tree", "vale", fakeDisk())(["a.js"]), []);
-  assert.deepEqual(outside.ran, []);
 });
 
 // [[spec/tickets/one-writer-holds-a-branch]]

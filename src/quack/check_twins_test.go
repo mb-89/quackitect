@@ -105,7 +105,7 @@ func funcName(fn any) string {
 }
 
 // Each Go twin's rows over the tree, as src/scripts/check-twins.js reports the JavaScript ones. [[spec/tickets/check-names-meet-their-goldens]]
-func goTwins(t *testing.T, tree *check.Tree, all []string, vale, biome string) map[string][]twinRow {
+func goTwins(t *testing.T, tree *check.Tree, all []string, biome string) map[string][]twinRow {
 	t.Helper()
 	paths := tree.Paths()
 	out := map[string][]twinRow{}
@@ -149,13 +149,6 @@ func goTwins(t *testing.T, tree *check.Tree, all []string, vale, biome string) m
 		}
 	}
 	tools := &lsp.Tools{Root: tree.Root, Check: lspChecks(tree.Root)}
-	rows, fault := tools.ValeRows(vale)
-	if fault != "" {
-		t.Fatalf("the captured Vale output reads as a fault: %s", fault)
-	}
-	for _, one := range rows {
-		out["vale"] = append(out["vale"], rowOf(one.File, one.Rule, one.Line, fmt.Sprintf("%s [%s]", one.Message, one.Severity)))
-	}
 	for _, one := range tools.BiomeRows(biome, ".") {
 		out["biome"] = append(out["biome"], rowOf(one.File, one.Rule, one.Line, fmt.Sprintf("%s [%s]", one.Message, one.Severity)))
 	}
@@ -205,15 +198,11 @@ func TestTwinGoldens(t *testing.T) {
 	all := strings.Fields(string(listed))
 	tree := check.TreeOver(root, trackedDisk{root: root, list: all})
 	tree.Words = config.Count(root, "names.words")
-	vale, err := os.ReadFile(filepath.Join(twinsAt, "vale.out"))
-	if err != nil {
-		t.Fatal(err)
-	}
 	biome, err := os.ReadFile(filepath.Join(twinsAt, "biome.out"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	goSide := goTwins(t, tree, all, string(vale), string(biome))
+	goSide := goTwins(t, tree, all, string(biome))
 
 	node := exec.Command("node", filepath.Join("test", "level0", "check-twins.js"))
 	node.Dir = root

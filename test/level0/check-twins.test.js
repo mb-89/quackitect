@@ -8,33 +8,7 @@ import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { NAME, TWINS, twinsOf } from "../../src/scripts/check-twins.js";
 
-// A Vale answer and a Biome answer, each in the shape its tool prints. [[spec/tickets/check-names-meet-their-goldens]]
-const vale = {
-  "spec/a.md": [
-    {
-      Check: "VoiceParagraph.Sentence",
-      Line: 3,
-      Span: [7, 9],
-      Message: "Cut it.",
-      Severity: "warning",
-    },
-    {
-      Check: "VoiceShape.GuidanceCap",
-      Line: 1,
-      Span: [1, 2],
-      Message: "Cap.",
-      Severity: "",
-    },
-  ],
-  "spec\\b.md": [
-    {
-      Check: "VoiceParagraph.Sentence",
-      Line: 2,
-      Message: "Cut it.",
-      Severity: "warning",
-    },
-  ],
-};
+// A Biome answer, in the shape the tool prints. [[spec/tickets/check-names-meet-their-goldens]]
 const biome = {
   diagnostics: [
     {
@@ -75,7 +49,6 @@ test("every twin answers over a tree it takes", () => {
     all: Object.keys(TREE),
     words: 5,
     ceilings: { file: 600, function: 150 },
-    vale: JSON.stringify(vale),
     biome: JSON.stringify(biome),
   });
   assert.deepEqual(Object.keys(said).sort(), [...TWINS].sort());
@@ -99,7 +72,6 @@ test("every twin answers over a tree it takes", () => {
     said.private.some((one) => one.file === "spec/note.md" && one.message === NAME),
   );
   assert.ok(said.slug.some((one) => one.message === "the-notes-head"));
-  assert.equal(said.vale.length, 3);
   assert.equal(said.biome.length, 2);
 });
 

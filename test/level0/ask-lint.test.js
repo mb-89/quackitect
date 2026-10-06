@@ -1,7 +1,7 @@
 // The voice rules over an Ask at the open, driven through the ticket verb with
-// a fake Vale: a broken Ask stands draft, a clean one opens, and a box with no
-// Vale opens as it stands.
-// [[spec/design_output/pull#a-draft-opens]]
+// the rules door's verb taught: a broken Ask stands draft, a clean one opens,
+// and a box with no rules opens as it stands.
+// [[spec/design_output/pull#a-draft-opens]] [[spec/tickets/vale-leaves-the-tree]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -9,13 +9,13 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
-import { carryQuack } from "./quack-doors.js";
+import { carryQuack, teachRules } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
-const VALE = "/tree/.se/.runtime/bin/vale";
 const AT = "spec/tickets/a-thing.md";
 const at = (path) => join(ROOT, ...path.split("/"));
 // The Ask's own line in DRAFT, and a line under the do chapter past it, as the lint names them. [[spec/design_output/pull#a-draft-opens]]
@@ -90,31 +90,16 @@ const FOUND = JSON.stringify({
 });
 
 function box(said) {
-  // The open reads through the lint's Vale call, on the config the assembly writes, and names the path last. [[spec/design_output/pull#a-draft-opens]]
-  const line = `${VALE} --config=.vale.ini --output=JSON --no-exit --path=${AT}`;
+  // The open reads through the rules door at the ticket's path. [[spec/design_output/pull#a-draft-opens]]
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
     [at(AT)]: DRAFT,
   });
-  const git = fakeGit(
-    { [line]: typeof said === "function" ? said : { stdout: said } },
-    ROOT,
-  );
+  const git = fakeGit({}, ROOT);
   const proc = git.proc;
-  return {
-    it: carryQuack({
-      disk,
-      proc,
-      git,
-      root: ROOT,
-      join,
-      words: 5,
-      vale: VALE,
-      front: fakeFront(),
-    }),
-    disk,
-    proc,
-  };
+  const it = carryQuack({ disk, proc, git, root: ROOT, join, words: 5, front: fakeFront() });
+  teachRules(it, typeof said === "function" ? said : { stdout: said });
+  return { it, disk, proc };
 }
 
 function heard(what) {
@@ -189,7 +174,7 @@ test("an Ask that passes opens the ticket at its first leaf", () => {
 });
 
 // The open reads at the lint's level, so a warning on the Ask warns as an error does. [[spec/design_output/pull#a-draft-opens]]
-test("a warning on the Ask opens with its line named, a warning past the Ask stays unnamed, and a box with no Vale opens as it stands", () => {
+test("a warning on the Ask opens with its line named, a warning past the Ask stays unnamed, and a box with no rules opens as it stands", () => {
   const warnedAt = (line) =>
     JSON.stringify({
       "stdin.md": [
@@ -211,12 +196,12 @@ test("a warning on the Ask opens with its line named, a warning past the Ask sta
   );
   assert.equal(past.code, 0, past.said);
   assert.doesNotMatch(past.said, /breaks Wordy/);
-  const bare = box("{}");
-  assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, DRAFT), {
+  const proc = fakeProc();
+  assert.deepEqual(askFaults({ disk: fakeDisk(), proc, root: ROOT, join }, AT, DRAFT), {
     refused: [],
     warned: [],
   });
-  assert.equal(bare.proc.ran.length, 0, "no Vale, no run");
+  assert.equal(proc.ran.length, 0, "no rules, no run");
 });
 
 // [[spec/design_output/pull#a-draft-opens]]
@@ -231,7 +216,7 @@ test("ticket open over an Ask carrying a semicolon opens, naming Characters at t
   assert.equal(said.code, 0, said.said);
   assert.match(said.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
   assert.match(disk.read(at(AT)), /^state: open$/m, "the ticket opens");
-  assert.equal(ran[0]?.stdin, text, "Vale reads the whole ticket");
+  assert.equal(ran[0]?.stdin, text, "the rules read the whole ticket");
 });
 
 // [[spec/design_output/pull#a-draft-opens]]
@@ -280,7 +265,6 @@ test("an open commits the ticket it opens, and names it", () => {
     root: ROOT,
     join,
     words: 5,
-    vale: "",
     front: fakeFront(),
   };
 

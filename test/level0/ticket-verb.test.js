@@ -16,7 +16,7 @@ import {
   ticket,
   updated,
 } from "../../src/scripts/ticket.js";
-import { carryQuack } from "./quack-doors.js";
+import { carryQuack, teachRules } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 import { at, heard, ROOT, treeWithProcesses } from "./ticket-doors.js";
 
@@ -174,12 +174,9 @@ test("ticket note cuts a name past the cap, writes under the cut name and says s
 
 // The note reads its minted text through the lint's road, and a break of form warns while the note lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("ticket note writes a line the lint warns on, and names Characters at its line", () => {
-  const VALE = "/tree/.se/.runtime/bin/vale";
   const ran = [];
   const said = treeWithProcesses();
-  const proc = fakeProc();
-  proc.teach([VALE], semicolonVale(ran));
-  const it = carryQuack({ ...said.it, proc, root: ROOT, vale: VALE });
+  const it = teachRules(carryQuack({ ...said.it, proc: fakeProc(), root: ROOT }), semicolonVale(ran));
 
   const warned = heard(() => ticket(ROOT, ["note", "a-name", "one; two"], it));
 
@@ -189,15 +186,15 @@ test("ticket note writes a line the lint warns on, and names Characters at its l
     String(ran[0]?.stdin ?? "")
       .split("\n")
       .indexOf("one; two") + 1;
-  assert.ok(line > 0, "Vale reads the minted ticket whole");
+  assert.ok(line > 0, "the rules read the minted ticket whole");
   assert.match(warned.said, new RegExp(`line ${line} breaks Characters`));
   assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), true, "the note stands");
 });
 
 const SECRET = "SECRET";
 
-// A Vale that behaves over stdin: it names each line holding the marker as a private name, at error. [[spec/design_output/doors#a-fake-behaves]]
-function privateVale(argv, init = {}) {
+// Rules that behave over stdin: they name each line holding the marker as a private name, at error. [[spec/design_output/doors#a-fake-behaves]]
+function privateRules(argv, init = {}) {
   const named = argv.find((one) => one.startsWith("--path="));
   const file = named ? named.slice("--path=".length) : "stdin.md";
   const rows = String(init.stdin ?? "")
@@ -221,11 +218,8 @@ function privateVale(argv, init = {}) {
 
 // A finding's child and a note mint through one function, which reads the Ask before it writes. [[spec/design_output/pull#a-finding-rides-out]]
 test("routedTicket mints a draft off the route, and a line carrying a private name mints nothing", () => {
-  const VALE = "/tree/.se/.runtime/bin/vale";
   const said = treeWithProcesses();
-  const proc = fakeProc();
-  proc.teach([VALE], privateVale);
-  const it = carryQuack({ ...said.it, proc, root: ROOT, vale: VALE });
+  const it = teachRules(carryQuack({ ...said.it, proc: fakeProc(), root: ROOT }), privateRules);
   const held = processAt(said.disk, ROOT, join, "trivial");
   const mint = (line) =>
     routedTicket(it, "spec/tickets/a-child.md", held, {

@@ -1,6 +1,6 @@
-// The pull's voice over a leaf: a box carrying no Vale reads no voice, and a
-// Vale that behaves names a finding on the leaf's chapter alone.
-// [[spec/design_output/pull#the-voice-reads-the-evidence]]
+// The pull's voice over a leaf: a box carrying no rules reads no voice, and
+// rules that behave name a finding on the leaf's chapter alone.
+// [[spec/design_output/pull#the-voice-reads-the-evidence]] [[spec/tickets/vale-leaves-the-tree]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -19,31 +19,30 @@ import {
 } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { at, doors, ROOT } from "./pull-doors.js";
-import { carryQuack } from "./quack-doors.js";
+import { carryQuack, teachRules } from "./quack-doors.js";
 import { CHARACTERS, semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
-test("a box carrying no Vale reads no voice, so the hand-back meets no voice finding", () => {
+test("a box carrying no rules reads no voice, so the hand-back meets no voice finding", () => {
   const leaf = { path: "do", evidence: [{ name: "says", form: "text" }] };
   const one = {
     path: "spec/tickets/one.md",
     text: "---\nkind: [[ticket]]\n---\n\n# do\n\n## says\n\nA line; and more.\n",
   };
-  assert.deepEqual(voiceFaults({ vale: "" }, one, leaf), []);
+  const proc = fakeProc();
+  assert.deepEqual(voiceFaults({ disk: fakeDisk(), proc, root: "/tree", join }, one, leaf), []);
+  assert.deepEqual(proc.ran, [], "no rules, no run");
 });
 
-// The pull reads through voiceOver, the road the open and the note share. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+// The pull reads through voiceIn, the road the open and the note share. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("a semicolon on the leaf's chapter warns, naming Characters at its file line, and one on the Ask names nothing", () => {
-  const VALE = "/tree/.se/.runtime/bin/vale";
-  const proc = fakeProc();
-  proc.teach([VALE], semicolonVale());
   const leaf = { path: "do", evidence: [{ name: "says", form: "text" }] };
   const one = {
     path: "spec/tickets/one.md",
     text: "---\nkind: [[ticket]]\n---\n\n# Ask\n\nOne; two.\n\n# do\n\n## says\n\nA line; and more.\n",
   };
   const warned = [];
-  const it = carryQuack({ vale: VALE, proc, root: "/tree", disk: fakeDisk() });
+  const it = teachRules(carryQuack({ proc: fakeProc(), root: "/tree", disk: fakeDisk(), join }), semicolonVale());
   const found = voiceFaults(it, one, leaf, warned);
   assert.deepEqual(found, [], "a break of form refuses nothing");
   assert.equal(warned.length, 1, warned.join("\n"));
@@ -52,20 +51,18 @@ test("a semicolon on the leaf's chapter warns, naming Characters at its file lin
 
 // A private name on the leaf's chapter still refuses the hand-back. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("a private name on the leaf's chapter refuses, and warns on nothing", () => {
-  const VALE = "/tree/.se/.runtime/bin/vale";
-  const proc = fakeProc();
   const shaped = semicolonVale();
-  proc.teach([VALE], (argv, init) => {
+  const privately = (argv, init) => {
     const said = shaped(argv, init);
     return { ...said, stdout: said.stdout.replaceAll(CHARACTERS, "VoiceVale.Private") };
-  });
+  };
   const leaf = { path: "do", evidence: [{ name: "says", form: "text" }] };
   const one = {
     path: "spec/tickets/one.md",
     text: "---\nkind: [[ticket]]\n---\n\n# do\n\n## says\n\nA line; and more.\n",
   };
   const warned = [];
-  const it = carryQuack({ vale: VALE, proc, root: "/tree", disk: fakeDisk() });
+  const it = teachRules(carryQuack({ proc: fakeProc(), root: "/tree", disk: fakeDisk(), join }), privately);
   const found = voiceFaults(it, one, leaf, warned);
   assert.equal(found.length, 1, found.join("\n"));
   assert.match(found[0], /^do breaks Private at line 9/);

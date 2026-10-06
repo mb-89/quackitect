@@ -73,7 +73,7 @@ test("an answer lands under a numbered name the answer register reads", () => {
       `.se/.runtime/measure/one-session/002-${ANSWER}`,
     ],
   );
-  assert.ok(files[0].path.endsWith(ANSWER), "so .vale.ini reads it as an answer");
+  assert.ok(files[0].path.endsWith(ANSWER), "so the rules read it as an answer");
   assert.equal(files[0].text, "first\n");
 });
 
