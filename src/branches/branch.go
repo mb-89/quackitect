@@ -4,7 +4,10 @@
 // [[spec/design_output/work#the-round-trip]]
 package branches
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // The exit codes a verb answers: done, red, and a call the verb refuses. [[spec/design_output/work#the-round-trip]]
 const (
@@ -60,7 +63,7 @@ func verbNames() []string {
 
 // Runs the branch verb its first word names, or prints the usage. [[spec/design_output/work#the-round-trip]]
 func Branch(d *Doors, argv []string) int {
-	what, name := word(argv, 0), word(argv, 1)
+	what, name := word(argv, 0), nameWord(argv)
 	for _, one := range table {
 		if one.Name != what {
 			continue
@@ -98,6 +101,14 @@ func Cloud(d *Doors, argv []string) int {
 func word(argv []string, at int) string {
 	if at < len(argv) {
 		return argv[at]
+	}
+	return ""
+}
+
+// The name past the verb, or nothing where a flag stands there. [[spec/tickets/boxes-write-their-final-record]]
+func nameWord(argv []string) string {
+	if said := word(argv, 1); !strings.HasPrefix(said, "--") {
+		return said
 	}
 	return ""
 }

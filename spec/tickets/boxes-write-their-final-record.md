@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: f9d34cc63f54d15f
         size: 973
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: e0cdc7eaf115ea5d14fa02da7d78d2e2117ee160
+    hash_after: e0cdc7eaf115ea5d14fa02da7d78d2e2117ee160
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -312,14 +321,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/front/front.go src/branches/fleet.go src/branches/take.go src/branches/done.go src/branches/held.go src/branches/branch.go spec/schemas/ticket.schema.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list or on the note under Discussion, which adds held.go and branch.go.
+- The change opens no new door. The take reads the session through d.env, which the cases set on the fake env.
+- Each new function carries a link to this ticket, where the approach stands.
+- The flags read through the standing flagIn, and the record rows through recordIn and entryField, so no reader stands twice.
 
 ## tests-green
 

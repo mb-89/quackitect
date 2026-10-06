@@ -122,6 +122,18 @@ func TestAfterWithClosesTheTakeWithTheRowsPastIt(t *testing.T) {
 	}
 }
 
+func TestAfterWithWritesTheRowsOnTheLastItemWhereNoTakeStandsOpen(t *testing.T) {
+	note := "---\nrecord:\n  - step: a\n    hash_before: abc\n    hash_after: old\n---\n" + body
+	got, err := AfterWith(note, "new", Ordered{{Key: "model", Value: ""}, {Key: "final", Value: "It stops."}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := "---\nrecord:\n  - step: a\n    hash_before: abc\n    hash_after: new\n    final: It stops.\n---\n" + body
+	if got != want {
+		t.Fatalf("after with writes\n%s\nnot\n%s", got, want)
+	}
+}
+
 func TestMintWritesAWholeFrontInTheOrderGiven(t *testing.T) {
 	got := Mint(ordered(t, `{"kind":"[[ticket]]","state":"open","needs":["branch sync"],"steps":[{"name":"a","does":"one: two","steps":[{"name":"b"}]}],"none":null,"when":{"at":"now"}}`))
 	want := "---\nkind: [[ticket]]\nstate: open\nneeds: [\"branch sync\"]\nsteps:\n  - name: a\n    does: \"one: two\"\n    steps:\n      - name: b\nnone:\nwhen:\n  at: now\n---\n"

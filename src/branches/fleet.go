@@ -38,6 +38,17 @@ func wakesOf(_ []boxRow, _ int64) []wake {
 }
 
 // One row a work branch, off its group's record. [[spec/tickets/boxes-write-their-final-record]]
-func fleetRows(_ []stand, _ map[string]string) []boxRow {
-	return nil
+func fleetRows(stood []stand, standing map[string]string) []boxRow {
+	out := make([]boxRow, 0, len(stood))
+	for _, one := range stood {
+		row := boxRow{Branch: one.Branch, Standing: standing[one.Branch]}
+		for _, entry := range recordIn(one.Ticket) {
+			if hand := entryField(entry, "hand"); hand != "" {
+				row.Hand, row.Session = hand, entryField(entry, "session")
+				row.Model, row.Cost, row.Final = entryField(entry, "model"), entryField(entry, "cost"), entryField(entry, "final")
+			}
+		}
+		out = append(out, row)
+	}
+	return out
 }
