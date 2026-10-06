@@ -87,6 +87,9 @@ record:
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
     hash_before: 51be8a910c58dae0ebcdbe7a7d9c224a8f50314a
+    hash_after: a88c9ca5e8c139b107c99d10ad43481980f7b793
+    model: claude-opus-5-5
+    final: "boxes-hold-and-hand-back stands done: holds beat, takeovers rescue red work, and a clear keeps the hold"
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
     hash_before: e423bdcbb0794321960db6acc36c8135c2d65e0d
