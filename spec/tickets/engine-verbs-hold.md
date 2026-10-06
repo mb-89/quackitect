@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -213,6 +213,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 05c99306a095023c509f3a642d06e4946f252e6c
+    hash_after: 05c99306a095023c509f3a642d06e4946f252e6c
+    inputs:
+      - name: retro/write
+        hash: a363fa901974280b
+        size: 4034
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -398,9 +408,10 @@ role: the chapter names the box and the owner by role, with no address and no bo
 <!-- the form is list -->
 
 - the shell door refused git rm at 23:16, and the commit verb landed the deletion
-- the door refused a hand-back joined by a semicolon at 23:24
-- the server restart after each commit at 23:21 to 23:27, which the tools met as connection refused and level zero is starting
-- the sync at 23:31 took main in with no conflict
+- the door refused a gate and a landing joined by a semicolon at 23:24 and 23:41
+- the server restart after each commit or test build, from 23:21 to 23:44
+- main moved the cold path at 23:36, and the sync met fourteen conflicts, seven of them deletions on main
+- the merge took the index down at 23:37, and serve rebuilt it
 
 ### left
 
@@ -408,8 +419,8 @@ role: the chapter names the box and the owner by role, with no address and no bo
 <!-- the form is list -->
 
 - no person step parked, and no ticket minted outside this group
-- inhand-skips-ticket-names stands in this group, to work before branch done
-- the handover names that ticket, then branch done and the pull request against main with auto-merge on
+- every child of the group stands closed, and the branch goes to branch done
+- the handover names the pull request against main with auto-merge on
 
 # Discussion
 
