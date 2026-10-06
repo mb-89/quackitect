@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: cd77d5b1da5f1daf
         size: 2552
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: 4cd306f70ef2c85eb3ce0e2a63b33d85bf292470
+    hash_after: 4cd306f70ef2c85eb3ce0e2a63b33d85bf292470
+    inputs:
+      - name: design/draft
+        hash: cd77d5b1da5f1daf
+        size: 2552
+      - name: design/tests-red
+        hash: 59f0b483526f19bf
+        size: 698
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -281,8 +293,13 @@ the case goes red on each import the change removes, as the run shows
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- quack-door-keeps-contract: the doors verb lists a door only through a contract line or an outside line (src/quack/verb_doors.go), so the root's owns.yaml names src/quack/box_doors_test.go under contract, and a case asserts the verb prints that it keeps the contract of the root door; the draft names no test deciding the second done_when line
+- quack-boxfiles-joins-door: src/quack/boxfiles.go reaches os for stands and readText, and the draft's door file list leaves it out; the change moves those reads onto the hand or names the file in the root's declaration
+- quack-marks-name-reasons: TestNoRootFileReachesTheBoxPastItsDoors in src/owns/quack_tree_test.go passes a marked walk, so each marker the change adds under src/quack names why no door serves it, and the accept reads every marker the diff adds
+- quack-size-names-files: size names every verb file in place of the files; ./RUNME.sh doors lists the root files walking around os, os/exec, net, net/http and syscall, and the implement step names each one it touches
 
 # implement
 
