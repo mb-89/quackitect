@@ -33,8 +33,14 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/person]]
 process_hash: 781b200dbb69dec3
-group: the-fleet-watches-itself
 step: do
+record:
+  - step: do
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 720c26dc1e5ef967ace0ef4744eacb1e2944a1d8
+    hash_after: 720c26dc1e5ef967ace0ef4744eacb1e2944a1d8
+    returns: 1
+    why: a box holds no claude.ai login, so the owner stores the routine; this step waits for the owner
 ---
 
 # Ask
@@ -59,8 +65,9 @@ The owner stores the fleet routine on claude.ai, so one routine checks the fleet
 ## result
 
 <!-- what came back, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Nothing came back yet. A box holds no claude.ai login, so the owner runs the commands in the ask.
 
 # follow
 
