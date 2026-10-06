@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2826846c8851c458
         size: 789
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: e5f353334531b6668dc7d636565726c2603fc90b
+    hash_after: cda41d1102bcee6690aa74816d025ccac3b0ebe7
+    answered:
+      - name: lint
+        exit: 0
+        said: green
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -298,14 +307,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches hooks.go and the design note the size names, with sentinel.go and main.go landed by the fix children
+- the door reaches Hear alone, which the cases fill with a recording hand and with a sentinel over FakeDir and FakeRunner
+- a comment over hears names the approach by its ticket
+- the event kind reads the post's own event name, and the watch example in spec/design_output/failures.md now names tool.call
 
 ## tests-green
 
