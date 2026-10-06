@@ -69,7 +69,7 @@ The hooks door hears every post the bridge sends, and hands each to the sentinel
 | verb | does |
 |---|---|
 | `./RUNME.sh failure raise <id> [said]` | raises the failure through the door, and prints its lines |
-| `./RUNME.sh failure new <id> --level=<level> --remedy=<line>` | writes the node, and refuses one with no remedy |
+| `./RUNME.sh failure new <id> --level=<level> --remedy=<line> --when=<line>` | writes the node, and refuses an id off the shape, an id a node carries, a level off the ladder, no remedy and no when |
 | `./RUNME.sh failure count` | counts each failure id in the session log |
 
 An agent meeting a failure with no id runs `failure new` first, then `failure raise`.
