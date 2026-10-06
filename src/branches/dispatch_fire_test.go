@@ -83,6 +83,17 @@ func (hub *dfHub) send(url string, request Request) (Reply, error) {
 		}
 		return dfJSON(202, map[string]any{"message": "Updating pull request branch."}, nil), nil
 	case url == dfAPI+"/graphql" && request.Method == "POST":
+		var body struct {
+			Variables struct {
+				ID string `json:"id"`
+			} `json:"variables"`
+		}
+		_ = json.Unmarshal([]byte(request.Body), &body)
+		for _, pull := range hub.pulls {
+			if pull["node_id"] == body.Variables.ID {
+				pull["auto_merge"] = map[string]any{"merge_method": "merge"}
+			}
+		}
 		return dfJSON(200, map[string]any{"data": map[string]any{"enablePullRequestAutoMerge": map[string]any{"clientMutationId": nil}}}, nil), nil
 	case strings.HasPrefix(url, dfAPI+"/repos/"+dfRepo+"/commits/") && request.Method == "GET":
 		sha, _, _ := strings.Cut(strings.TrimPrefix(url, dfAPI+"/repos/"+dfRepo+"/commits/"), "/")
@@ -324,7 +335,7 @@ func TestDispatchOpensTheWriteBranchsPullRequestOnPullTokenWithAutoMerge(t *test
 func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
 	t.Parallel()
 	hub := newHub()
-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
+	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}, "auto_merge": map[string]any{"merge_method": "merge"}})
 	plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "standing"})
 	dfFired(hub, plan, nil)
 	for _, one := range hub.sent {
@@ -333,6 +344,33 @@ func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
 		}
 	}
 	dpSame(t, plan.Fire.Pull.State, "standing")
+}
+
+func TestDispatchTurnsAutoMergeOnAStandingPullRequestOnceAndOpensNoSecond(t *testing.T) {
+	t.Parallel()
+	hub := newHub()
+	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}, "auto_merge": nil})
+	for range 2 {
+		plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "standing"})
+		if code := dfFired(hub, plan, nil); code != codeOK {
+			t.Fatalf("the fire answers %d: %s", code, plan.Fire.Pull.Why)
+		}
+		dpSame(t, plan.Fire.Pull.State, "standing")
+	}
+	var merges []dfSent
+	for _, one := range hub.sent {
+		if one.Method == "POST" && strings.HasSuffix(one.URL, "/pulls") {
+			t.Fatalf("the fire opens a second pull request")
+		}
+		if one.URL == dfAPI+"/graphql" {
+			merges = append(merges, one)
+		}
+	}
+	if len(merges) != 1 {
+		t.Fatalf("two fires merge %d times", len(merges))
+	}
+	dpSame(t, dfBody(t, merges[0])["variables"].(map[string]any)["id"], "PR_7")
+	dpSame(t, len(hub.pulls), 1)
 }
 
 func TestDispatchFiresNothingWithoutTheSecretsAndSaysWhich(t *testing.T) {

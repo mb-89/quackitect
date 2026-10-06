@@ -304,7 +304,7 @@ func (d *Doors) workPull(branch string, out *pullRow) int {
 	return d.pullOpens(branch, branch+": the group's work", "The group's work, per the work skill.", out)
 }
 
-// Opens the branch's pull request against main, or reads the one standing, and takes auto-merge on a new one. [[spec/tickets/branch-done-opens-the-pr]]
+// Opens the branch's pull request against main, or reads the one standing, and takes auto-merge where it stands unset. [[spec/tickets/branch-done-opens-the-pr]]
 func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
 	send := d.Send
 	if send == nil {
@@ -322,8 +322,10 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
 		return refusedPull(out, "The pull request list", listed)
 	}
 	var pulls []struct {
-		URL  string `json:"html_url"`
-		Head struct {
+		URL       string         `json:"html_url"`
+		NodeID    string         `json:"node_id"`
+		AutoMerge map[string]any `json:"auto_merge"`
+		Head      struct {
 			Ref string `json:"ref"`
 		} `json:"head"`
 	}
@@ -333,7 +335,10 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
 	for _, one := range pulls {
 		if one.Head.Ref == branch {
 			out.State, out.URL = "standing", one.URL
-			return codeOK
+			if one.AutoMerge != nil {
+				return codeOK
+			}
+			return autoMerged(send, gh, one.NodeID, out)
 		}
 	}
 	made := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]string{
@@ -347,9 +352,14 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
 	}
 	pull := readOf(made)
 	out.State, out.URL = "opened", jsonText(pull["html_url"])
+	return autoMerged(send, gh, jsonText(pull["node_id"]), out)
+}
+
+// Turns auto-merge on for the pull request the node id names. [[spec/tickets/branch-done-opens-the-pr]]
+func autoMerged(send Send, gh hub, id string, out *pullRow) int {
 	merge := sent(send, gh.API+"/graphql", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]any{
 		"query":     autoMerge,
-		"variables": map[string]any{"id": pull["node_id"]},
+		"variables": map[string]any{"id": id},
 	})})
 	errs, _ := readOf(merge)["errors"].([]any)
 	if okOf(merge) && len(errs) == 0 {

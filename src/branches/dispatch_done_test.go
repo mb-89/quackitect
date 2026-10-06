@@ -65,7 +65,7 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
 	t.Parallel()
 	one := dfDoneTree(t)
 	hub := newHub()
-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
+	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7", "auto_merge": map[string]any{"merge_method": "merge"}})
 	one.out.Reset()
 	Dispatch(one.d, hub.send, []string{"--fire"})
 	// The red fire lists every open pull request first, so the test reads the head lists alone. [[spec/tickets/ci-reds-name-their-cases]]
