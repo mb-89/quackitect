@@ -5,16 +5,16 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"maps"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The folder tickets stand in, the record of a retro's classes, the processes a ticket mints onto, the tree's own command line, and the status a class stands open at. [[spec/guidance/retro/check]]
@@ -70,30 +70,29 @@ type retroMintRecord struct {
 
 func init() { register("retro mint", retroMintVerb(retroRoot, retroMintRunme)) }
 
-// Runs a program under the root, with ./RUNME.sh read as the root's own, and the env added over the caller's. [[spec/design_output/vehicle#the-work-root-inherits]]
+// Runs a program under the root over the real process door. [[spec/design_output/vehicle#the-work-root-inherits]]
 func retroMintRunme(dir string, argv []string, env map[string]string) retroMintRan {
-	program := argv[0]
-	if program == retroMintRunmeAt {
-		program = filepath.Join(dir, "RUNME.sh")
+	return retroMintRunmeOver(proc.Real)(dir, argv, env)
+}
+
+// Runs a program under the root through the process door, with ./RUNME.sh read as the root's own, and the env added over the caller's in sorted order. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func retroMintRunmeOver(run proc.Runner) func(dir string, argv []string, env map[string]string) retroMintRan {
+	return func(dir string, argv []string, env map[string]string) retroMintRan {
+		program := argv[0]
+		if program == retroMintRunmeAt {
+			program = filepath.Join(dir, "RUNME.sh")
+		}
+		pairs := make([]string, 0, len(env))
+		for _, key := range slices.Sorted(maps.Keys(env)) {
+			pairs = append(pairs, key+"="+env[key])
+		}
+		said := run(proc.Command{Argv: append([]string{program}, argv[1:]...), Dir: dir, Env: pairs})
+		ran := retroMintRan{out: said.Out, errs: said.Err, code: said.Code}
+		if said.Code < 0 {
+			ran.code = exitFailed
+		}
+		return ran
 	}
-	cmd := exec.Command(program, argv[1:]...)
-	cmd.Dir = dir
-	cmd.Env = os.Environ()
-	for _, key := range slices.Sorted(maps.Keys(env)) {
-		cmd.Env = append(cmd.Env, key+"="+env[key])
-	}
-	var out, errs bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errs
-	err := cmd.Run()
-	ran := retroMintRan{out: out.String(), errs: errs.String()}
-	var exit *exec.ExitError
-	switch {
-	case errors.As(err, &exit):
-		ran.code = exit.ExitCode()
-	case err != nil:
-		ran.code, ran.errs = exitFailed, ran.errs+err.Error()
-	}
-	return ran
 }
 
 // The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/check]]

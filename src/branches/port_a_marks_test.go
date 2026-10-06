@@ -1,6 +1,6 @@
 // The pure reads behind the work verbs, as test/level0/work.test.js holds
 // them: the mark, the dependencies, what waits, the branches close reaches,
-// and the path a status row names.
+// and the paths the standing read names.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
@@ -89,20 +89,20 @@ func TestPACloseReachesOwnBranches(t *testing.T) {
 	}
 }
 
-// A porcelain row names its file, with the status gone and a rename at its end. [[spec/tickets/work-verbs-port-to-go]]
-func TestPAPorcelainRowNamesItsFile(t *testing.T) {
+// The standing read names each changed path, a move by the path it lands at. [[spec/tickets/work-verbs-port-to-go]]
+func TestPAStandingNamesEachChangedPath(t *testing.T) {
 	t.Parallel()
-	cases := map[string]string{
-		" M spec/tickets/slow-lint.md": "spec/tickets/slow-lint.md",
-		"M spec/tickets/slow-lint.md":  "spec/tickets/slow-lint.md",
-		"?? .se/tickets/slow-lint.md":  ".se/tickets/slow-lint.md",
-		"R  old.md -> new.md":          "new.md",
-		`A  "spec/one two.md"`:         "spec/one two.md",
+	one := newTree(t, map[string]string{"spec/tickets/slow-lint.md": "slow\n", "old.md": "moving\n"})
+	one.write(map[string]string{"spec/tickets/slow-lint.md": "slower\n", "spec/one two.md": "two\n", "new.md": "moving\n"})
+	one.erase("old.md")
+	one.must(one.repo.Add([]string{"old.md", "new.md"}))
+	var names []string
+	for _, each := range one.d.standingIn() {
+		names = append(names, each.Name)
 	}
-	for row, want := range cases {
-		if said := changedIn(row); said != want {
-			t.Fatalf("%q names %q", row, said)
-		}
+	sort.Strings(names)
+	if want := []string{"new.md", "spec/one two.md", "spec/tickets/slow-lint.md"}; !slices.Equal(names, want) {
+		t.Fatalf("the standing names %v, and wants %v", names, want)
 	}
 }
 

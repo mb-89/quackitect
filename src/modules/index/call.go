@@ -94,7 +94,7 @@ func (b *Book) answerOf(one Op) Answer {
 
 // The operation once it ends, or as it stands when the span runs out. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (b *Book) Wait(id string, span time.Duration) (Op, bool) {
-	until := time.After(span)
+	until := b.after(span)
 	for {
 		b.mu.Lock()
 		one, ok := b.ops[id]

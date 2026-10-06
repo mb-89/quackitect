@@ -9,23 +9,24 @@ import (
 	"io"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/git"
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket open", ticketOpen(index.Root)) }
+func init() { register("ticket open", ticketOpen(index.Root, registeredRepo)) }
 
 // The state a ticket opens from. [[spec/design_output/pull#a-draft-opens]]
 const openFrom = "draft"
 
 // [[spec/design_output/pull#a-draft-opens]]
-func ticketOpen(rootOf func() (string, error)) twin {
+func ticketOpen(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
 		if wordAt(said, 0) == "" {
 			fmt.Fprintln(errs, "ticket open needs a ticket: ./RUNME.sh ticket open slow-lint")
 			return exitUsage
 		}
-		it, code := pullHere(rootOf, out, errs)
+		it, code := pullHere(rootOf, repoAt, out, errs)
 		if it == nil {
 			return code
 		}

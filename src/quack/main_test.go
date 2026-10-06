@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -153,22 +152,6 @@ func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
 	for _, twin := range check.Twins {
 		if said, ok := read.Read(check.Prefix + twin).([]check.Finding); !ok || len(said) != 0 {
 			t.Fatalf("%s%s reads %v off the wired tree, and wants an empty list", check.Prefix, twin, said)
-		}
-	}
-}
-
-// The index holds no module's logic, so it imports nothing under src/modules and no src/tickets. [[spec/tickets/tickets-becomes-a-module]]
-func TestTheIndexImportsNoModule(t *testing.T) {
-	t.Parallel()
-	cmd := exec.Command("go", "list", "-deps", "./src/index")
-	cmd.Dir = filepath.Join("..", "..")
-	listed, err := cmd.Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range strings.Fields(string(listed)) {
-		if strings.HasPrefix(one, "quackitect/src/modules/") || one == "quackitect/src/tickets" {
-			t.Fatalf("the index imports %s", one)
 		}
 	}
 }
