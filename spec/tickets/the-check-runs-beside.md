@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -207,6 +207,25 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 6f20accd2805b189f026a2aee59fdc132e55d4ae
+    hash_after: 6f20accd2805b189f026a2aee59fdc132e55d4ae
+    inputs:
+      - name: retro/write
+        hash: 7a86bd9c22aa0d94
+        size: 2710
+      - name: [[spec/tickets/the-parts-start-at-once]]
+        hash: dfee1caff0b0df9a
+        size: 1112
+      - name: [[spec/tickets/the-budget-reads-the-span]]
+        hash: 2a6c87fb96da7541
+        size: 483
+      - name: [[spec/tickets/index-cases-wait-for-it]]
+        hash: 0ac7d2bb2c4c626e
+        size: 408
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -352,20 +371,27 @@ The worry through the run was whether the review reds came from this group or fr
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool stood on the box, and the review worktree fetched vale and biome on its own
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 21:5x: a conflict at sync in seven files, since main changed the check and the table rule beside this group
+- the write door refused a git rm and a hand edit of the projected yml, so rules.go took the change and the projection wrote the yml
+- the MCP pull tool lost its hook once, and RUNME.sh ticket pull carried the hand-back
+- the stop hook refused a stop while a helper ran, since the box stops with the turn
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket stands minted with no group
+- the handover says the group reaches branch done, then its pull request against main with auto-merge on
 
 # Discussion
 
