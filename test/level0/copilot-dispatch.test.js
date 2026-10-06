@@ -34,19 +34,18 @@ function fixture() {
     comments: [],
     claims: 0,
     fail: false,
-    work(root, args) {
-      assert.equal(root, it.root);
-      assert.deepEqual(args, ["take"]);
+  };
+  it.proc = fakeProc({
+    "./RUNME.sh branch take": (_argv, init) => {
+      assert.equal(init.cwd, it.root);
       assert.equal(it.branch, "main");
       assert.equal(it.disk.read(GROUP_AT), FREE);
       it.claims++;
       it.branch = "work/example";
       it.head = it.claims.toString(16).padStart(40, "0");
       it.disk.write(GROUP_AT, HELD);
-      return 0;
+      return {};
     },
-  };
-  it.proc = fakeProc({
     "git status --porcelain": {},
     "git rev-parse --abbrev-ref HEAD": () => ({ stdout: it.branch }),
     "git rev-parse HEAD": () => ({ stdout: it.head }),
