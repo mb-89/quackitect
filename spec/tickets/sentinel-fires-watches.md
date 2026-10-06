@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -252,6 +252,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: caf9fddb5a57c6c6ef194265d83a56763ee4d104
+    hash_after: caf9fddb5a57c6c6ef194265d83a56763ee4d104
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/failure passes; green, src/modules/clock passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 93953b6e9f5ee92f
+        size: 1038
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -433,26 +456,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/sentinel_test.go src/failure/door_contract_test.go src/modules/clock/clock_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A failure node may now declare a watch, and the sentinel fires the failure when its event arrives. A watch with no quiet span fires on each matching event. A quiet watch arms After on the clock door, fires once the span passes with no matching event, and each match arms it again, so nothing polls. A fired failure writes its row, and the sentinel runs its reaction through the Runner, raising failure-reaction-fails where the reaction fails. The hooks door hands it no event yet, and the note sentinel-hears-the-hooks carries that.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the eight files the draft names, and no other
+- FakeClock and FakeRunner stand beside the clock and the shell, each held by a contract case
+- each function in src/failure/sentinel.go points at the sentinel chapter of the failures note
+- the watch shape stands in node.go alone
 
 # accept
 
