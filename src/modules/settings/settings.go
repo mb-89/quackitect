@@ -16,7 +16,7 @@ const (
 	answerCeiling           = 15
 	answerWords             = 150
 	batteryRuns             = 5
-	batteryBudget           = 120000
+	batteryBudget           = 150000
 	budgetPull              = 1000
 	budgetHandBack          = 1000
 	budgetResolver          = 10
