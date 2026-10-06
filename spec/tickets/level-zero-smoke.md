@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -255,6 +255,15 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 21e07741db77a2487bfba2c728ad6445720b413e
+    hash_after: 21e07741db77a2487bfba2c728ad6445720b413e
+    inputs:
+      - name: retro/write
+        hash: b9067c90ffe62d96
+        size: 2111
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -402,26 +411,26 @@ the chapter names roles alone, and no box name, address or path
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- the gh command line, all through the run, so GitHub work rides the GitHub connector tools
+- 20:00 UTC: a Windows runner, so the box proves the Windows wait by a vet of the Windows build and leaves the run to CI
+- 20:05 UTC: the function hooks a desk client loads, so the box cannot run the reply probe
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- the index restart after a check, early in the run and at 19:06, which this group fixes
-- the GitWritesThroughAVerb hook at 19:11, which routes the push through the push verb
-- the ShellWritesNothing hook at 19:15, which routes a scratch file through the write door
-- no conflict at sync, since the branch carried every commit on main
+- 20:06 UTC: the trunk guard refused the push of the fail commit on main
+- 20:10 UTC: a conflict at sync in the probe clear script and its test
+- 20:12 UTC: the index dropped mid hand-back
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- [[spec/tickets/desk-probe-reply-trial]] stands open on main for the owner, since the live client on a Windows desk lies past every box
-- the Windows cases first run on the windows-latest runner, so the pull request CI reads their result
-- the handover names the pull request, its CI and the backlog findings the retro names
+- desk-probe-reply-trial stays at do for the owner's desk, with a fail entry saying why
+- the box mints no ticket
+- the handover names the pull request on the new head and the watch until it merges
 
 # Discussion
 
