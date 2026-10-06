@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: 214d2c12ba7a3ba4
         size: 3636
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-6
+    hash_before: 2aecdc41fbd4f7f9493b1aeaa5854978a47464d3
+    hash_after: 2aecdc41fbd4f7f9493b1aeaa5854978a47464d3
+    inputs:
+      - name: design/draft
+        hash: 214d2c12ba7a3ba4
+        size: 3636
+      - name: design/tests-red
+        hash: 6d000a52f89ddc69
+        size: 817
+    def: dc4904ab364efa10
 group: engine-verbs-hold
 ---
 
@@ -298,8 +310,10 @@ The size cases read pure text and the tracked golden, and the readers case reads
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- golden-readers-read-joined-paths: goldenReaders matches a slash path past src/, so src/tui/log/golden_test.go logGoldenAt, written filepath.Join("..", "..", "quack", "testdata"), names no reader for src/quack/testdata/log.golden.json; implement writes that reader FromSlash as it writes twinsAt, or goldenReaders reads the joined form too.
 
 # implement
 
