@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 92f5d70303b17323f7de99d98934b7a670834750
+    hash_after: 92f5d70303b17323f7de99d98934b7a670834750
+    inputs:
+      - name: ask
+        hash: c1f5561bef3f8127
+        size: 367
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,65 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The root builds one clock and hands it on.
+
+1. `main.go` builds `clock.New()` from `src/modules/clock` once, as the root that may import a module.
+2. `boxDoors.now` becomes `clock q.Clock`, the interface `go-waits-on-events` puts in the core. The check, ticket and write hands take the same clock.
+3. Every root file reading the time or waiting takes the clock off its hand: `Now` for a stamp, `After` for a wait, `WithTimeout` for a bounded context, `Every` for a beat. A wait on a thing that fires an event takes the event, as the index manager and a process exit do.
+4. A test hands `clock.NewFake` and moves it with `Tick`.
+
+This waits on `go-waits-on-events`, which lands `q.Clock` and its waits.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/main.go: builds the clock
+src/quack/boxdoors.go realBoxDoors and boxDoors
+src/quack/checkdoors.go, src/quack/ticket_doors.go, src/quack/writedoor.go: their hands
+src/quack/io.go, branch.go, cli.go, command.go, commit.go, finds.go, placements.go, plans.go, retro_collect.go, review.go, vehicle_verb.go, verb_config.go, verb_lint.go, verb_log.go, verb_split.go, verbs.go, voice_verb.go: each function `./RUNME.sh doors` names there
+every test building a hand, which takes the fake
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/owns/quack_clock_tree_test.go TestNoRootFileReadsTheClockPastItsHand: no production file under src/quack walks around the clock
+src/quack/box_doors_test.go: a box verb stamps the time the fake stands at
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/main.go
+src/quack/boxdoors.go
+src/quack/checkdoors.go
+src/quack/ticket_doors.go
+src/quack/writedoor.go
+every root file the callers list names
+src/owns/quack_clock_tree_test.go
+src/quack/box_doors_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened `src/quack/boxdoors.go` boxDoors and the per-file walk-arounds of the clock under src/quack, and each claim stands there
+the callers list names every root file the doors verb lists for the clock
+the first done_when line falls to TestNoRootFileReadsTheClockPastItsHand and `./RUNME.sh doors`, the second to `./RUNME.sh test src/quack`
 
 ## tests-red
 
