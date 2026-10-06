@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -195,6 +195,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 550d7aea7f4d1c9a7a7a762dfc763f064bc8ee06
+    hash_after: 550d7aea7f4d1c9a7a7a762dfc763f064bc8ee06
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -274,38 +286,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-parts-start-at-once]]: every part starts at once, and a red part names itself
+- [[spec/tickets/the-budget-reads-the-span]]: battery.budget reads a fifth over a clean check
+- [[spec/tickets/index-cases-wait-for-it]]: a ready step stands the binaries and the index door before the parts start
+- the branch took main in twice, and the second merge kept the table rule main carries
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a helper traced the door going down to a binary swap, with a watcher on the standing file, so the fix met the cause
+- the timing table the check prints showed the wall time at the slowest part, so the goal read off one run
+- the review in a fresh worktree caught a race the warm tree hid
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 19:5x: the queue answered wait, because the group stood at draft while both children stood closed
+- 19:5x: the first check after branch sync went red in lint-twins, while the index restarted on a new binary
+- 20:07: the review worktree went red in lint-twins and runme-road
+- 20:53: a review beside a second full check went red in lint-twins under load
+- 21:4x: a lone review went red once in vale-paths, and the next passed
+- 21:5x: the accept hand-back ran branch sync, and main conflicted in seven files, the check and the table rule among them
+- 22:01: the first check after the merge went red with no case named, and the rerun went green
+- no owner prompt turned the run, and the session started on the resume prompt level zero sends after a clear
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- a group whose children all close reads open at its own sync, so the queue hands it on: `spec/processes/group.md`
+- the ready step closes the restart race: `src/quack/check.go`
+- review.go writes the stamp after its builds, and a review takes a worktree path of its own: `src/branches/review.go`
+- the budget cases run apart from the parts that load the cores, or read a budget sized for a loaded box: `test/level0/budget.test.js`
+- the stamp names the red part where a red carries no case: `src/quack/check.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The worry through the run was whether the review reds came from this group or from load. A lone review settled it twice. Two branches changed the check at once, and the merge cost more than any child. The helper script watch-bin.sh polled the binaries and the standing file, and it stands gone from the box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ready step and its reason stand once in spec/design_output/work.md, and the code points there
+- calmBy and niceProgram stand named once in checkdoors.go
+- the new check_battery_test.go opens on a header saying what it tests
+- the badly list carries each error of the run with its time, and no owner prompt turned it
+- the chapter names the box by role alone
 
 ## cloud
 
