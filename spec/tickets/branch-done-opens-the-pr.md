@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 7c74d3048b683e3c
         size: 3365
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 439e2b7caac7bc18791dddcdec724085cd3bddcd
+    hash_after: 439e2b7caac7bc18791dddcdec724085cd3bddcd
+    inputs:
+      - name: design/draft
+        hash: 7c74d3048b683e3c
+        size: 3365
+      - name: design/tests-red
+        hash: 3b1ac24038e52881
+        size: 903
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -278,8 +290,13 @@ The hub fake `dfHub` stands for the send door in every case, and the done cases 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- dispatch-skips-merged-done-branches: plan.Done takes every work branch at done, and origin holds many closed work branches with no commit main lacks (git rev-list --count origin/main..origin/work/<name> reads 0, e.g. work/phase2-switch-turns-on). The hub refuses a pull request over such a branch with 422, so fire answers codeRed on every run. Keep a branch in Done only where that count stands above zero, and add a dispatch case on a done branch level with main that sends no POST. The builder fixes it in place in planned or fire.
+- box-opens-its-pr: a cloud box holds GH_TOKEN and GITHUB_TOKEN but no PULL_TOKEN and no GITHUB_REPOSITORY, so done on a box always takes the no-token road and the pull request waits for the next dispatch run. Weigh a fallback onto GH_TOKEN with the repository read off the origin URL, so the box opens it in the same call as the ask's first line says.
+- one-send-door: the draft adds Doors.Send while Dispatch still takes send as a parameter, so two roads carry one door. Make fire read the one the doors carry, or name why both stand.
+- dispatch-update-collides: running-work-takes-main-fixes adds updated, updateRow and its cases to src/branches/dispatch_fire.go and Dispatch. Sync before implement, and keep pullOpens beside updated so both read hubOf the same way.
 
 # implement
 
