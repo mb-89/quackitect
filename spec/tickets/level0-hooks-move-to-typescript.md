@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -131,6 +131,19 @@ record:
         hash: f98b8097d2cddb4b
         size: 1084
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: af8428d3eff8468f195dd50ababcbaa48c3fdce6
+    hash_after: af8428d3eff8468f195dd50ababcbaa48c3fdce6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 15f1e97e971aae3f
+        size: 1820
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,31 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/stub-typed.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/stub-typed.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The vehicle hooks, the plugin part and the types part landed before the route, and TestCheckParts in src/quack/check_test.go covers them. The stub still carries its hook as bridgehead.js, outside what tsc reads, so the glue stands untyped. These two cases decide that gap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the stub cases decide the glue half of the first done_when line, TestCheckParts decides the validate and tsc halves, level0-hooks-hold-no-rule decides the third line, and the check decides the fourth
+the cases read the tree files alone, and reach no door
 
 # gate
 
