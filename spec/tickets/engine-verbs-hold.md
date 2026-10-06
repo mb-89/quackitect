@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -97,6 +97,15 @@ record:
         exit: 0
         said: work/engine-verbs-hold took 2 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: ea5d1445cca91b590f5096ce1ffb609c9a220e36
+    hash_after: ea5d1445cca91b590f5096ce1ffb609c9a220e36
+    inputs:
+      - name: ask
+        hash: c8bde0276841d2e6
+        size: 661
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -123,14 +132,47 @@ Boxes now clone front matter with sed, open drafts by hand, push branches with n
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/accepts-reads-away-modules]] trivial
+[[spec/tickets/attribution-trailer-meets-the-door]] trivial
+[[spec/tickets/bare-runme-exits-clean]] standard
+[[spec/tickets/box-opens-its-pr]] trivial
+[[spec/tickets/branch-done-opens-the-pr]] standard
+[[spec/tickets/collect-truthy-joins-yaml]] trivial
+[[spec/tickets/commit-door-refuses-model-trailers]] standard
+[[spec/tickets/copy-rule-drops-twin-word]] trivial
+[[spec/tickets/dispatch-mints-fix-groups-open]] standard
+[[spec/tickets/dispatch-skips-merged-done-branches]] trivial
+[[spec/tickets/dispatch-update-collides]] trivial
+[[spec/tickets/every-index-tool-answers]] standard
+[[spec/tickets/every-named-path-resolves]] standard
+[[spec/tickets/golden-readers-read-joined-paths]] trivial
+[[spec/tickets/helpers-keep-the-plan-ticket]] trivial
+[[spec/tickets/js-stale-reads-settings-default]] trivial
+[[spec/tickets/model-trailer-refuses-in-place]] trivial
+[[spec/tickets/one-send-door]] trivial
+[[spec/tickets/pull-hands-the-working-ticket]] standard
+[[spec/tickets/real-catalog-reads-accepts]] trivial
+[[spec/tickets/running-work-takes-main-fixes]] standard
+[[spec/tickets/shared-helpers-stand-once]] standard
+[[spec/tickets/size-golden-drops-line-counts]] standard
+[[spec/tickets/stale-span-reads-schema-unset]] trivial
+[[spec/tickets/tool-call-hook-answers]] trivial
+[[spec/tickets/tool-list-keeps-unreadable-actions]] trivial
+[[spec/tickets/vehicle-truthy-joins-yaml]] trivial
+[[spec/tickets/verbs-mint-tickets-and-keys]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every child stands closed, each small enough for one review: a standard child carried one change with its tests, and a trivial child one fix a gate or a retro named.
+The children add up to the ask: verbs-mint-tickets-and-keys lands a ticket and a key, dispatch-mints-fix-groups-open a fix group, branch-done-opens-the-pr and box-opens-its-pr the pull request, pull-hands-the-working-ticket the work a plan names, running-work-takes-main-fixes a fix on main reaching each box, every-index-tool-answers the tools, every-named-path-resolves the paths, shared-helpers-stand-once each helper and default, commit-door-refuses-model-trailers the trailer, and bare-runme-exits-clean the bare call.
+No child waits on another, since each stands closed, and each fix child landed with the parent change it pointed at.
+Each child read its siblings through the branch it landed on, in the order the queue handed them, and the sync took main in last.
+The diff stays one review: the folds the copy rule named landed under shared-helpers-stand-once, so no further split stands.
 
 # children
 
