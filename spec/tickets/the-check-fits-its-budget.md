@@ -446,6 +446,22 @@ The draft's size list leaves out three files the approach touches, and the engin
 - `src/pull/*_test.go`
 - `src/quack/check.go`, where the gate runs the red packages apart
 
+## The measure after
+
+The box is a fresh cloud container, and the tree stands on this branch after main came in. The parts come off `battery` in `.se/.runtime/check.json`, in seconds.
+
+| run | go | total | under the budget |
+|---|---|---|---|
+| cold, before src/pull ran in parallel | 128.0 | 192.9 | no |
+| warm, the guard on the red list | 65.5 | 125.5 | no |
+| warm, the red list empty, first full run | 27.0 | 99.9 | yes |
+| warm, the red list empty, cache full | 6.5 | 89.6 | yes |
+| cold, `go clean -testcache` first | 81.4 | 137.8 | no |
+
+The cold go part reads lower than both cold runs before it. A cold total past the budget stays, and the ask holds the warm total alone to it.
+
+The warm go part falls from the measure before because `-skip` left the go run once the red list emptied, and Go's cache answers again. One run between the hand-back and these exited 1 after its go, level0 and tests parts, and its log stands nowhere. Two full uncached runs of `go test -tags contract -count=1 ./...` answered ok on every package, and every check after it answered green.
+
 ## The draft's tests, in full
 
 The draft's tests list names `src/branches/parallel_test.go TestEveryBranchesTestRunsBesideTheOthers`, which stands nowhere, and the engine keeps that field closed. These tests stand in its place:
