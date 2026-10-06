@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: ece7f09e348353050d0a96d02f0cfa4b3dc47eff
+    hash_after: ece7f09e348353050d0a96d02f0cfa4b3dc47eff
+    inputs:
+      - name: ask
+        hash: 74af97a0fdb11a41
+        size: 316
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,51 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+fixGroup in src/branches/dispatch_write.go writes the group at state open, with its step at the route's first leaf. After check.Minted and the fix mark, it sets withField(text, "state", openState) and withField(text, "step", firstLeaf(route.Steps, "")). This is the same pair escalate.go writes when it opens a ticket, and OpensDraft in src/pull/pull_ticket.go writes for ticket open. openState and firstLeaf stand in src/branches/group.go already, so the change adds no constant.
+
+The fix group then reads open on the write branch the dispatch lands. takeable in src/branches/route.go hands its children to the box the next dispatch opens, with no hand running ticket open. The comment above fixGroup names this ticket.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write.go (*Doors).writesOf
+src/branches/dispatch.go (*Doors).carried (calls writesOf)
+src/branches/dispatch.go Dispatch (calls carried)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write_test.go TestFixGroupWritesTheGroupOpenAtItsFirstStep
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write.go
+src/branches/dispatch_write_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened dispatch_write.go (fixGroup, writesOf, processAt, schemas), dispatch.go (carried, Dispatch, opensOf via dispatch_write.go, leftForPerson), group.go (openState, firstLeaf, withField), route.go takeable, escalate.go line writing step and state open, and pull_ticket.go OpensDraft.
+Callers came from a grep for fixGroup and writesOf across src; fixGroup has one caller, writesOf, and writesOf has one, carried.
+The done_when line 'go test ./src/branches/ passes a case where fixGroup writes the group at state open' meets TestFixGroupWritesTheGroupOpenAtItsFirstStep; ./RUNME.sh check stands as its own command.
 
 ## tests-red
 
