@@ -60,5 +60,12 @@ type FakeRunner struct {
 
 // [[spec/design_output/doors#the-process-door]]
 func (fake *FakeRunner) Run(one Command) Said {
-	return Said{}
+	if len(one.Argv) == 0 {
+		return Said{Err: "proc: a command names no program", Code: NotStarted}
+	}
+	program, ok := fake.Programs[one.Argv[0]]
+	if !ok {
+		return Said{Err: "proc: the fake runner knows no program " + one.Argv[0], Code: NotStarted}
+	}
+	return program(one)
 }

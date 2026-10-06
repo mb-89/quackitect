@@ -4,6 +4,7 @@
 package proc
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -21,6 +22,8 @@ func fakeSh(one Command) Said {
 		return Said{Out: "out", Err: "err", Code: 3}
 	case "cat":
 		return Said{Out: one.Stdin}
+	case "pwd -P":
+		return Said{Out: one.Dir + "\n"}
 	case "printf %s \"$PROC_CONTRACT\"":
 		for _, pair := range one.Env {
 			if value, ok := strings.CutPrefix(pair, "PROC_CONTRACT="); ok {
@@ -46,6 +49,19 @@ func TestARunReadsItsInput(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {
 		if said := run(Command{Argv: []string{"sh", "-c", "cat"}, Stdin: "in"}); said.Out != "in" || said.Code != 0 {
+			t.Errorf("the %s runner answers %+v", name, said)
+		}
+	}
+}
+
+func TestARunStandsInItsFolder(t *testing.T) {
+	t.Parallel()
+	folder, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	for name, run := range runners() {
+		if said := run(Command{Argv: []string{"sh", "-c", "pwd -P"}, Dir: folder}); said.Out != folder+"\n" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v", name, said)
 		}
 	}
