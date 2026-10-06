@@ -4,7 +4,7 @@ state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
-    from: anyone
+    from: holds-beat-with-the-session/gate
     by: anyone
     to: retro
     input: ask
@@ -23,38 +23,40 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+point: gate
+todo: false
+step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: boxes-hold-and-hand-back
-step: do
+parent: holds-beat-with-the-session
 record:
   - step: do
     hand: box 3341fdcd540f · claude-code-remote
-    hash_before: fb4596a8248a941fc70cb3a74e94f249fdeab727
-    hash_after: 3fcdcb36d36acd60d06bb879a7ed8c847b718af7
+    hash_before: 7319b4bac4d6af834f4125b79e48453eb7fe87ac
+    hash_after: 4407c78e5b00df7d551b7e814bbdc87626fa46a0
     answered:
       - name: tests
         exit: 0
-        said: green, 7 test(s) pass in 1 file(s)
+        said: green, src/modules/settings passes
       - name: check
         exit: 0
-        said: "  101.9  in all"
+        said: "  116.7  in all"
     inputs:
       - name: ask
-        hash: 17f64484dcd98687
-        size: 401
-    def: df12650931d480c9
+        hash: fa4644d0ca86e9d3
+        size: 319
+    def: 493538c21ebdc181
 reason: done
 ---
 
 # Ask
 
-A cloud box waits for its helpers and retries inside its turn, so no turn ends on a wait that nothing wakes.
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-Boxes end their turn on a helper or a retry, the container stops, and the work waits for a takeover.
-
-- `spec/guidance/cloud/cloud.md` holds a rule that a box waits for a helper or a retry inside its turn.
-- `.claude/skills/work/SKILL.md` names the same rule, and `./RUNME.sh check` exits 0.
+work.beatAfter takes a row in spec/config/level0.schema.json beside staleAfter, which the size leaves out. The approach also reads the span off .se/.runtime/beat.json, which clashes with the config key. Read the span off work.beatAfter, and keep the last beat off origin's ref or name the runtime file as a cache alone.
 
 # do
 
@@ -65,7 +67,7 @@ Boxes end their turn on a helper or a retry, the container stops, and the work w
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/guidance-tags.test.js
+./RUNME.sh branch test src/modules/settings/settings_test.go
 
 ## check
 
@@ -79,16 +81,17 @@ Boxes end their turn on a helper or a retry, the container stops, and the work w
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-Rule 10 of the cloud guidance now tells a box to wait for every helper and retry inside its turn, because a turn ending on a wait stops the container and the step waits for a takeover. The work skill points at the same rule. The guidance note holds its cap of items, so the wait joins rule 10, which already carries the branch to done.
+The key work.beatAfter joins the settings declarations at 10m, under work.staleAfter, so the generated schema, its command file and the size golden follow. A test holds the beat span shorter than the stale span. The parent ticket says under Discussion that the beat verb reads the span off this key alone, and the last beat off refs/beats.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change follows the ask, with the rule folded into rule 10, since the guidance schema caps the note items
-- the change reveals no cleanup
-- the rule stands once in the cloud guidance, and the work skill points at rule 10
+- the change touches the settings declaration, its test, and the files the generators write from it
+- the key reads through the config door, so no new door stands
+- the test names the approach in its comment
+- the span stands in the declaration alone, and the parent points at the key
 
 # Discussion
 

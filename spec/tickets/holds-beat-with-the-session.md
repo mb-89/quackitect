@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: boxes-hold-and-hand-back
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 9bbdb2aba8d27d4fdada8f15a31d37fdf3c14e96
+    hash_after: 9bbdb2aba8d27d4fdada8f15a31d37fdf3c14e96
+    inputs:
+      - name: ask
+        hash: 3828144eeccd2c6f
+        size: 475
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: f49e41063e47113ddb2f9c8208fe3887323635ba
+    hash_after: f49e41063e47113ddb2f9c8208fe3887323635ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 23739db1144f9d48
+        size: 2896
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3341fdcd540f · claude-code-remote · helper-4
+    hash_before: 6fdf86d60d056a43c143c1a1933f10d35ed3c775
+    hash_after: 6fdf86d60d056a43c143c1a1933f10d35ed3c775
+    inputs:
+      - name: design/draft
+        hash: 23739db1144f9d48
+        size: 2896
+      - name: design/tests-red
+        hash: c21254153cb4aa35
+        size: 872
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: dc777f5c3c4d735ff47da9990729ab9300f289c4
+    hash_after: a438d525283bba0f08fc1d2b45286644d97549a2
+    answered:
+      - name: lint
+        exit: 0
+        said: "  118.8  in all"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 70f4135a841a2ce9f4fbbf2a285050557c930c17
+    hash_after: 70f4135a841a2ce9f4fbbf2a285050557c930c17
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  113.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c21254153cb4aa35
+        size: 872
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,64 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A box beats on its group: a parentless commit over the empty tree, pushed by force to refs/beats/<group> on origin. Its committer date comes off the clock door, d.Now, and its subject names the hand and live or ended. A new verb, branch beat [--end], in src/branches/beat.go writes it. A beat younger than half of work.beatAfter, read off .se/.runtime/beat.json, writes nothing, so a beat per event costs one push per span. The take writes the first beat. A Stop command hook and a SessionEnd command hook in .claude/settings.json run ./RUNME.sh branch beat and ./RUNME.sh branch beat --end, so each turn end beats and a session end ends the hold at once. The fetch takes +refs/beats/*:refs/beats/*. The hold then reads three ways in d.holdOf(one, now), which staleClaim folds in. An ended beat newer than the tip reads dead at once. A live beat younger than work.beatAfter reads live, whatever the tip age says. Otherwise the tip age against work.staleAfter decides, as today. branch list writes live beside the age of a hold that beats, and leaves it out of Yours. branch take --over [name] takes a held branch whose hold reads dead, ahead of a branch at todo. It refuses a live hold, naming its last beat, and claimGroup writes the takeover record as a stale take does today. A container reclaimed with no SessionEnd stops beating, and its hold reads dead once work.beatAfter passes, which stands shorter than staleAfter.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/free.go Doors.freeIn, through staleClaim
+- src/branches/free.go Doors.stuckIn, through staleClaim
+- src/branches/held.go Doors.pastHold, through staleClaim
+- src/branches/list.go Doors.rowOf and list, through staleClaim
+- src/branches/take.go take, through readFree and the new --over
+- src/branches/doors.go Doors.fetch, every verb that fetches
+- src/branches/branch.go the verb table, for beat
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go TestAnEndedHoldMovesUnderTakeOverAtOnce
+- src/branches/beat_test.go TestTakeOverRefusesAHoldThatStillBeats
+- src/branches/beat_test.go TestListNamesAnOldHoldLiveWhileItsBoxBeats
+- src/branches/beat_test.go TestABeatInsideHalfTheSpanWritesNothing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/beat.go
+- src/branches/beat_test.go
+- src/branches/free.go
+- src/branches/take.go
+- src/branches/list.go
+- src/branches/doors.go
+- src/branches/branch.go
+- .claude/settings.json
+- spec/config/level0.json, for work.beatAfter
+- spec/design_output/work.md, a section A hold beats
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened free.go, held.go, hand.go, take.go, list.go, doors.go, branch.go and .claude/settings.json, and checked there that staleClaim decides every hold read and that take ignores its argv today
+- the callers list names every caller of staleClaim, readFree and fetch, and the verb table
+- the take case decides the first done_when line, the list case the second, and the check on the commit the third
 
 ## tests-red
 
@@ -189,26 +285,31 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/beat_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The take reads --over as the group name, and finds no work/--over. A take without the flag goes over a stale tip whose box still beats, since nothing reads the beat. The list files the beating hold under Yours, held 3h. The beat verb stands unknown, so branch prints its usage and refuses. It surprised me that the take has no flag at all yet. Its argv reaches it unread, and the name it takes is the word after the verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing test: the ended hold under take --over, and the old beating hold in the list; the beat verb and the refusal of a beating hold back them
+- the tests reach git and the clock through the doors the tree fixture hands in: a real bare origin, which the branch tests use throughout, and d.Now
 
 # gate
 
@@ -217,8 +318,13 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- beats-pass-the-push-gate: src/scripts/prepush.js refuses an agent push of refs/beats/<group>, since no green stamp reaches a parentless commit, and its staleBy reads tip age alone, so the door refuses the take --over claim on an ended hold whose tip stands fresh. The size leaves prepush.js and its test out, and the Go tests reach no hook, so they pass while a real box fails. Skip refs/beats/* in the stamp loop, and read the beat in staleBy.
+- ended-beat-ties-the-tip: the approach reads an ended beat dead where it stands newer than the tip, and dates carry seconds alone. TestAnEndedHoldMovesUnderTakeOverAtOnce stamps the beat in the same second as the tip, so a strict compare flakes. Read an ended beat dead at or after the tip.
+- beat-hook-stays-quiet: the Stop hook runs on every turn end, on a desk and on main too. branch beat answers 0 and writes nothing off a work branch this box holds, and answers 0 on a refused push, since a Stop hook exit of 2 blocks the turn end. Add a test deciding both.
+- beat-after-joins-schema: work.beatAfter takes a row in spec/config/level0.schema.json beside staleAfter, which the size leaves out. The approach also reads the span off .se/.runtime/beat.json, which clashes with the config key. Read the span off work.beatAfter, and keep the last beat off origin's ref or name the runtime file as a cache alone.
 
 # implement
 
@@ -229,14 +335,19 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change reaches the branches package, the push hook, the settings declaration and the hook settings; the hook and the declaration joined through the children the gate minted
+- the beat reaches git through the doors the package holds, and the push hook reads it through its repo door, whose cases drive a fake
+- beat.go opens on a header naming the approach, and each function points at the design section a-hold-beats-with-its-session
+- the span stands in work.beatAfter alone, the rules in the work design section, and the code points there
 
 ## tests-green
 
@@ -245,26 +356,33 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/beat_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A box holding a group beats: branch beat pushes a parentless commit to the branch beats/<group>, at most once every half of work.beatAfter, and branch beat --end ends the hold. Stop and SessionEnd hooks run it, and the take writes the first beat. A hold reads dead at once on an end at or past its tip, live on a beat inside work.beatAfter, and by its tip age otherwise. branch take --over takes a dead hold and refuses a live one, and branch list writes live beside a beating hold. The beat stands on a branch because the cloud git proxy refuses refs outside refs/heads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change reaches the branches package, the push hook, the settings declaration and the hook settings, each through a child the gate minted
+- the beat reaches git through the doors the package holds, and the push hook cases drive its repo fake
+- beat.go opens on a header naming the approach, and each function points at the design section
+- the span stands in work.beatAfter alone, and the rules in the work design section
 
 # accept
 
@@ -289,3 +407,6 @@ A dead box blocks a takeover for up to an hour, and a live box loses its branch 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- beat-after-joins-schema: `work.beatAfter` stands in `spec/config/level0.schema.json` beside `staleAfter`. The verb reads the span off that key alone, and reads the last beat off `origin/beats/<group>`, the branch the fetch brings. No runtime file holds the span or the beat.
+- beats-pass-the-push-gate: the cloud's git proxy answers 403 to a push of `refs/beats/<group>`, so the beat stands on the branch `beats/<group>`. For details, see [[spec/design_output/work#a-hold-beats-with-its-session]].

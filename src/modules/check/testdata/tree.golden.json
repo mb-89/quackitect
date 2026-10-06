@@ -91,6 +91,24 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
+    },
+    {
+      "file": "src/modules/check/testdata/size.golden.json",
+      "rule": "NoConflictMarkers",
+      "line": 50,
+      "message": "This file carries 3 conflict marker line(s) a merge leaves. Resolve the merge: keep the lines the file needs, and drop every marker line."
+    },
+    {
+      "file": "src/modules/check/testdata/size.golden.json",
+      "rule": "NoConflictMarkers",
+      "line": 50,
+      "message": "This file carries 3 conflict marker line(s) a merge leaves. Resolve the merge: keep the lines the file needs, and drop every marker line."
+    },
+    {
+      "file": "src/modules/check/testdata/size.golden.json",
+      "rule": "NoConflictMarkers",
+      "line": 50,
+      "message": "This file carries 3 conflict marker line(s) a merge leaves. Resolve the merge: keep the lines the file needs, and drop every marker line."
     }
   ]
 }
