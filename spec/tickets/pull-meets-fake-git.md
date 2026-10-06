@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -182,6 +182,21 @@ record:
     skipped: true
     kept: 41b561c3a5a66cfc00d616284f0a6a4baf6c54aa
     why: its red tests stand as 41b561c3a landed them, and a later leaf passed since
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-9
+    hash_before: 3fcf30ca25d661d425e3c80c8f350d295b8109b7
+    hash_after: 3fcf30ca25d661d425e3c80c8f350d295b8109b7
+    inputs:
+      - name: design/draft
+        hash: 8eaac3060915d948
+        size: 12071
+      - name: design/tests-red
+        hash: e9b3cce58a3a8d57
+        size: 1098
+      - name: [[spec/design_output/doors]]
+        hash: 8f2f939387c0fe86
+        size: 17697
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -454,7 +469,7 @@ the doors the tests reach are git, the disk and the process door, and FakeRepo, 
 
 accept
 
-The approach answers the ask: `Repo` and `FakeRepo` in src/modules/git carry every git line the src/pull call sites run, and `ShellOver` on a `FakeRunner` replaces `OSShell`. Done_when line one met a red test only once the pull row left the doors chapter, and nothing turned red while the row stood, so line two had none. The gate adds `TestThePullCasesSpawnNothingAndTheDoorsChapterListsThemNowhere` to src/pull/shell_test.go, on the red list already. It fails now on the `exec.Command` in `gitIn` and on the pull row of the doors chapter, and it passes once both leave. The Repo suite, the disk `List` case under the contract tag, which the check runs, and the shell case each fail on their own assertion against the stubs. The check decides line three.
+The approach still answers the ask. `Repo` and `FakeRepo` in src/modules/git carry the pull's git, and `ShellOver` on a `FakeRunner` carries its shell. `cloudPull` in src/pull/pull_test.go runs on `git.NewFakeRepo`, `TreeDisk` and a `FakeRunner` taught `sh`, and no file in src/pull imports os/exec or sleeps. Each done_when line meets its decider. Line one: `TestThePullCasesSpawnNothingAndTheDoorsChapterListsThemNowhere` in src/pull/shell_test.go, red at 41b561c3a and green now. Line two: the same case, which reads the doors chapter, together with `TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit` in src/imports/clock_test.go. The family table now holds no pull row, and the Go door table holds the `FakeRepo` row. Line three: `./RUNME.sh check`. The edits since the earlier gate leave each decider in place. The local tree in src/modules/git/tree_test.go keeps the suite off other modules, and the removed-file assertion in `TestDiskListsEveryFileUnderAFolder` only adds a check. go test passes on src/pull, src/modules/git, src/modules/files and src/imports, with and without the contract tag.
 
 # implement
 
