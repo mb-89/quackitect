@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 9c7dedd7188bd81b0137babeed9597d105dda9bd
+    hash_after: 9c7dedd7188bd81b0137babeed9597d105dda9bd
+    inputs:
+      - name: ask
+        hash: 19065eb63385a8de
+        size: 410
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,59 @@ The plan names the ticket the pull is about to hand, the pull answers wait, and 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The pull reads the plan's `working` as a todo only where it names no ticket. In src/pull/pull_holds.go, `workingTodo` returns the trimmed name as now. It returns empty where the name finds a ticket under spec/tickets or .se/tickets.
+
+The test for a ticket is a small helper `namesTicket(disk, name)` beside `TicketAt` in src/pull/ticket_at.go. It answers true where `TicketAt` finds a path other than the bare name, so a todo naming a file path stays a todo.
+
+`Pull` in src/pull/pull.go keeps its road unchanged. With the todo empty, the pull reaches `handOut`, and the queue hands the free leaf. On work/engine-verbs-hold, a plan naming the group ticket now hands the group's next child. A plan naming a child hands that child where it heads the queue.
+
+The `--as` road keeps reading `working` through the same function, so a helper naming a ticket stays bound to it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/pull/pull.go (*It).Pull
+src/pull/pull_test.go TestPull
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/pull/pull_test.go TestPull/a_plan_naming_a_free_ticket_hands_it_out
+src/pull/pull_test.go TestPull/a_plan_naming_the_group_ticket_hands_its_child
+src/pull/pull_test.go TestPull/a_working_todo_that_is_no_ticket_still_holds_the_pull
+src/pull/ticket_at_test.go TestNamesTicket
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/pull/pull_holds.go
+src/pull/ticket_at.go
+src/pull/ticket_at_test.go
+src/pull/pull_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+pull.go Pull, pull_holds.go workingTodo, ticket_at.go TicketAt, pull_hand.go handOut and its Wanted filter, and pull_test.go cloudPull stand opened and read.
+A grep for workingTodo over src names Pull as its one caller; TicketAt keeps its signature, so its caller in src/quack/ticket_set.go sees no change.
+The free-ticket case is TestPull/a_plan_naming_a_free_ticket_hands_it_out, the todo case is TestPull/a_working_todo_that_is_no_ticket_still_holds_the_pull, and ./RUNME.sh check runs both.
 
 ## tests-red
 
