@@ -363,3 +363,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- beat-after-joins-schema: `work.beatAfter` stands in `spec/config/level0.schema.json` beside `staleAfter`. The verb reads the span off that key alone, and reads the last beat off `refs/beats/<group>`, the ref the fetch brings. No runtime file holds the span or the beat.
