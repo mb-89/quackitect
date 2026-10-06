@@ -75,3 +75,35 @@ The ratio guard holds the JavaScript at a ratio far past one to one, and the bat
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Cut and landed: `src/scripts/battery.js` with `test/level0/battery.test.js`, as deleted code. No caller reaches the delta, and `src/quack/retro_collect_values_test.go` holds the median. `TestTestArgv` names `battery-reporter.test.js` in its place.
+
+Verified and waiting on the owner, since the box refuses the delete. The bridge modules these files test have no importer outside `src/bridge` and `test`, past a comment in `hooks/level0.js` and the cold-path list in `probe-cold.js`. The javascript-leaves branch touches none of the files.
+
+| file | class | evidence |
+|---|---|---|
+| `test/level0/command-cases.test.js` | twin | `src/modules/hooks/command_test.go` runs every row of the same case table |
+| `test/level0/commit-guards-cases.test.js` | twin | `src/modules/hooks/commits_test.go` runs the same table |
+| `test/contract/write-door-cases.test.js` | twin | `src/modules/hooks/writes_test.go` and `src/quack/writedoor_test.go` read the same table |
+| `test/level0/answer-read.test.js` | twin | `src/modules/drafts/drafts_test.go` reads the shared draft cases |
+| `test/level0/viewer.test.js` | twin | `src/quack/tui_verb_test.go` carries each claim |
+| `test/level0/agent.test.js` | deleted code | `src/bridge/agent.js` has no live importer |
+| `test/level0/cloud-ask.test.js` | deleted code | `src/bridge/cloud-ask.js` |
+| `test/level0/wait.test.js` | deleted code | `src/bridge/wait.js` |
+| `test/level0/code-door.test.js` | deleted code | `src/bridge/code.js` |
+| `test/level0/bash-engine.test.js` | deleted code | `src/bridge/bash.js` |
+| `test/level0/bash-desk.test.js` | deleted code | `src/bridge/bash.js` |
+| `test/level0/bash-commit.test.js` | deleted code | `src/bridge/bash.js` |
+| `test/level0/bash-bless.test.js` | deleted code | `src/bridge/bash.js` and `bless.js` |
+| `test/level0/trunk-door.test.js` | deleted code | `src/bridge/bash.js` |
+| `test/level0/write.test.js` | deleted code | `src/bridge/write.js` |
+| `test/level0/write-bless.test.js` | deleted code | `src/bridge/write.js` |
+| `test/level0/prose.test.js` | deleted code | `src/bridge/prose.js` |
+| `test/level0/tools-door.test.js` | deleted code | `src/bridge/guidance.js`, `bash.js` and `index-tools.js` |
+| `test/level0/hand-tools.test.js` | deleted code | `src/bridge/tools.js` |
+| `test/level0/handover-door.test.js` | deleted code | `src/bridge/guidance.js` |
+| `test/level0/style-top.test.js` | deleted code | `src/bridge/guidance.js` |
+| `test/level0/review-door.test.js` | deleted code | `src/bridge/review.js` |
+| `test/level0/ask-door.test.js` | deleted code | `src/bridge/ask.js` |
+
+Kept: the golden tests, since they hold the live JavaScript readers to the old section Go compares. Also kept: `check-twins`, which `src/quack/check_twins_test.go` runs, and every test that asserts a live function beside a dead bridge module.
