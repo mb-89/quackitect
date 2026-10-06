@@ -5,7 +5,7 @@
 package index
 
 import (
-	"os"
+	"os"      // level0: OutsideInDoors - the starter reads the shell Windows names, as the door's spawn reads its environment
 	"os/exec" // level0: OutsideInDoors - the door's spawn readies the process it starts, as procs.go spawns the ones it places
 	"strings"
 	"syscall"

@@ -71,3 +71,7 @@ ending_windows.go ends a child with taskkill /T /F, which walks the parent-child
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The Windows case covering the starter runs on the `windows-latest` runner of the check:
+
+    grep -n TestADoorOutlivesATreeKillOverWhatStartedIt src/index/detach_windows_test.go
