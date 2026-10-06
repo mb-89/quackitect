@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 2362b656d120e1b4
         size: 1779
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 0ab8b466e8e601b449bdddc4cc04ea676778f9c0
+    hash_after: 0ab8b466e8e601b449bdddc4cc04ea676778f9c0
+    inputs:
+      - name: design/draft
+        hash: 2362b656d120e1b4
+        size: 1779
+      - name: design/tests-red
+        hash: f823972b459c1de0
+        size: 501
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,13 @@ the test reaches the disk through FakeDisk alone
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the hand-back runs on src/scripts/pull-chapter.js by default, since migration.verbs stays unset, so formFault there takes the same home check, with a case under test/level0
+- ticket update rewrites every open ticket on the group route, the group ticket among them, and the size takes them
+- a path counts as a home where its file or its parent folder stands, and a backticked span holding a space counts as none
+- a case ties the improve field of spec/processes/group.yaml to the home key
 
 # implement
 
