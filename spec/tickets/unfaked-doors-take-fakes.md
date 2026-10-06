@@ -83,7 +83,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: tests-meet-the-doors-once
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box e97c7a20bbd2 · claude-code-remote
@@ -123,6 +123,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 47d76293764c8f9ebf3439c35a2b2cfb6aa44375
+    hash_after: 23e4f6ccefc2f85f8e81ddf79f8f6c1662692e80
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -193,8 +202,9 @@ pass
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
