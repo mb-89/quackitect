@@ -316,3 +316,32 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The collect step's reading, and what the later steps read past it:
+
+- The coordinator's transcript and the session records reach the input through the private folder, by hand. Collect reads transcripts filed under the tree's own path alone, and the coordinator runs from the home folder.
+- `transcripts/fleet-sessions/sessions.jsonl` times each session record at its start and its last update. So every chapter holds the boxes of its hours.
+- The boxes' own transcripts die with their containers. A session record keeps its title, cost, tokens and final status line alone.
+- Effect measures nothing, since the earlier retros keep their classes in a desk's private folder, which no box reads.
+- The input holds the owner's email and a token hint, so it stays private. A chapter's reader takes its lines from the coordinator, and git carries the cuts alone.
+- The first check on this box fails two contract tests under load: a 30-second client timeout and a Vale expectation. The second run passes untouched.
+- The owner narrows this hand to the chapters, so the ticket waits at audit. The cuts stand ahead of audit and backlog.
+
+The cuts in `chapters.json`:
+
+| id | from (UTC) | to (UTC) | what it holds |
+|---|---|---|---|
+| c1 | Sep 29 00:00 | Sep 30 16:00 | the boxes of phases 2 to 8 by their session records alone, and the first coordinator flagged |
+| c2 | Sep 30 16:00 | Oct 1 00:00 | phase 7 on (PR 63), lsp-door lands (PR 65), go-cage stalls and the dispatch takes it over |
+| c3 | Oct 1 00:00 | Oct 1 07:00 | go-cage through the night: stall after stall, stale holds, and a replacement box |
+| c4 | Oct 1 07:00 | Oct 1 14:00 | go-cage closes its last tickets, a finish box, and the coordinator opens PR 66 |
+| c5 | Oct 1 14:00 | Oct 1 19:00 | PR 66 lands level zero red on main, the cold probe, the fix forward (PR 67), and the owner asks why red reaches main |
+| c6 | Oct 1 19:00 | Oct 2 04:00 | the phase 9 shadow group: a double take, four unpushed commits stranded, the stale hold at 90 minutes (PR 68), and PR 69 |
+| c7 | Oct 2 04:00 | Oct 2 12:00 | the phase 9 shadow fix (PR 70), the Windows Vale timeout, phase 9 on (PR 71), and a takeover |
+| c8 | Oct 2 12:00 | Oct 2 18:00 | phase 10 on (PR 74), boxes stop at a handover, the slow check, and PR 75, PR 76 and PR 77 |
+| c9 | Oct 2 18:00 | Oct 3 14:00 | phase 10 lands (PR 82), the test-speed box loops on its handover, and an idle night |
+| c10 | Oct 3 14:00 | Oct 4 12:00 | the hold goes stale at 60 minutes with the handover guard (PR 83), the phase 11 groups, and idle hours |
+| c11 | Oct 4 12:00 | Oct 4 17:00 | phase 11 on (PR 86), the verb registry (PR 89), nine verb boxes, the cage lock-out (PR 91), the plan stall (PR 92) |
+| c12 | Oct 4 17:00 | Oct 5 19:00 | boxes replaced, groups merge past conflicts (PR 93, PR 96, PR 97), and the usage limit stops the fleet |
+| c13 | Oct 5 19:00 | Oct 6 07:00 | phase 11 closes (PR 105 to 107), the closed-group child (PR 108), the check budget (PR 109) |
+| c14 | Oct 6 07:00 | Oct 6 13:00 | the verbs port takes a phase (PR 110), a Windows-only red, the handover loop fix (PR 111), and the retro opens |
