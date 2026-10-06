@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,7 +165,30 @@ record:
         exit: 0
         said: The check names no red case and no finding at error.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote · helper-6
+    hash_before: 9417e13c5890f308da9d6c73a13d336f7d5df160
+    hash_after: 62179af79ff2e6ec969aa571525872e4491faf65
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    3.0  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: e4908af626725415
+        size: 613
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: [go-waits-on-events]
+reason: done
 ---
 
 # Ask
@@ -335,26 +358,33 @@ the clock stands once as wall in src/quack/main.go, and every door points at it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns/quack_clock_tree_test.go src/quack/box_doors_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The box doors carry the clock the root builds. boxDoors.now becomes clock q.Clock: realBoxDoors takes wall from src/quack/main.go, and the fake box doors in src/quack/box_doors_test.go take qtest.NewFake. The editor link and the retro collect read clock.Now off the box. TestABoxVerbStampsTheTimeTheFakeClockStandsAt in src/quack/box_doors_test.go runs the editor link over a fake clock and holds the installed timestamp to the time the fake stands at. It goes red on its own assertion while the verb still reads the old field, and green once the verb reads the clock. TestNoRootFileReadsTheClockPastItsHand in src/owns passes, so src/owns/quack_clock_tree_test.go leaves the red list.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/boxdoors.go, box_doors_test.go, editorlink.go and retro_collect.go, each named under size or callers
+the clock door has its fake in src/q/qtest/clock.go, and the fake box doors hand it
+the new case names spec/tickets/quack-waits-on-the-clock beside it, the approach it implements
+the clock stands once as wall in src/quack/main.go, and realBoxDoors points at it
 
 # accept
 
