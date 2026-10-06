@@ -5,12 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as applied from "../../.claude/skills/level0/lib/apply.js";
-import {
-  cloudHere,
-  deskRefusal,
-  deskSaid,
-  onDesk,
-} from "../../.claude/skills/level0/lib/cloud.js";
+import * as cloud from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere, deskSaid, onDesk } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   NOTE_END as PLUGIN_NOTE_END,
   TICKETS as PRIVATE_TICKETS,
@@ -39,12 +35,9 @@ test("the doors' own flag answers the cloud first, and the environment answers w
   assert.equal(cloudHere({}), false);
 });
 
-test("a desk's refusal says what stands undone, and names main and the merge", () => {
-  const said = deskRefusal("the pull hands nothing out", "one-group").join("\n");
-  assert.match(said, /the pull hands nothing out/);
-  assert.match(said, /git switch main/);
-  assert.match(said, /\.\/RUNME\.sh branch merge one-group/);
-  assert.match(deskRefusal("x").join("\n"), /branch merge <name>/);
+// The remedy stands on the node desk-works-on-trunk alone, so the plugin builds none. [[spec/tickets/the-twins-leave-whole]]
+test("the plugin builds no desk remedy, since the node holds it", () => {
+  assert.equal(cloud.deskRefusal, undefined);
 });
 
 // [[spec/design_output/failures#the-refusals-move-onto-nodes]]
@@ -54,7 +47,6 @@ test("deskSaid builds the message alone, and the desk refusal opens on it", () =
     said,
     "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/one-group.",
   );
-  assert.equal(deskRefusal("this commit lands nowhere on work/one-group")[0], said);
 });
 
 // A reader holding the doors' flag answers the way the Bash door does. handDoors in src/scripts/pull-hand-of.js reads inCloud, because it sets that flag. [[spec/tickets/each-fact-keeps-one-owner]]

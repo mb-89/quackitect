@@ -47,3 +47,15 @@ func TestTakeRefusalsNameTheirIds(t *testing.T) {
 		})
 	}
 }
+
+// The take's message carries no remedy, so the node's remedy prints once. [[spec/tickets/the-twins-leave-whole]]
+func TestDeskTakePrintsTheRemedyOnce(t *testing.T) {
+	t.Parallel()
+	at := newTree(t, nil)
+	at.d.Failures = failure.Fake(failure.Node{ID: "desk-works-on-trunk", Level: "warn", Remedies: []string{"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."}})
+	at.desk()
+	at.branchSays("take")
+	if count := strings.Count(at.errs.String(), "git switch main"); count != 1 {
+		t.Fatalf("the take prints the remedy %d times:\n%s", count, at.errs.String())
+	}
+}

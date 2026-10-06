@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: b7f931327270cefd
         size: 821
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 80caf3759422318bd925e4e5c2541244a04381f0
+    hash_after: 80caf3759422318bd925e4e5c2541244a04381f0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: e242c4d6149350f8
+        size: 2818
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,34 @@ the two done_when lines the approach keeps meet a test: deskRefusal gone from li
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/cloud-desk.test.js test/level0/pull-hand-desk.test.js src/branches/take_failure_test.go src/quack/commit_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/cloud-desk.test.js
+- test/level0/pull-hand-desk.test.js
+- src/branches/take_failure_test.go
+- src/quack/commit_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All four fail on their own assertion. The Go take prints the remedy twice, once in its message and once off the node, and the commit prints it past the door with no id. A surprise moves the approach: the JS pull answers its code at once, and heard in test/level0/work-doors.js reads it so, with no log on the doors, so the JS refusal cannot wait on the door's async raise. The JS door in src/doors/failure.js then answers lines alone as well, and deskRefused prints them, with the row riding beside where a log stands. The named pull's remedy reads <name> off the node, and its message names the group.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the done_when lines meet a failing case: no deskRefusal in the plugin, a desk pull through the door, the Go take and the commit printing the remedy once, and the check
+the JS cases reach git and the disk through fakeGit and fakeDisk, and the Go take reads the fake registry; the commit case writes the node into its own temp tree
 
 # gate
 

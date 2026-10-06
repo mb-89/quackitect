@@ -17,6 +17,26 @@ import {
   ranGit,
 } from "./work-doors.js";
 
+const DESK_NODE = {
+  [`${ROOT}/spec/failures/desk-works-on-trunk.md`]:
+    '---\nkind: [[failure]]\nlevel: warn\nremedies: ["Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."]\n---\n\n# When\n\nA desk works a work branch.\n',
+};
+
+// The refusal raises its node through the failure door, so its remedy prints once. [[spec/tickets/the-twins-leave-whole]]
+test("a desk's pull raises desk-works-on-trunk, and prints its remedy once", () => {
+  const { it } = doorsSaying(onBranch("work/one-group"), {
+    [on("one-group")]: GROUP_NOTE,
+    ...HAND,
+    ...DESK_NODE,
+  });
+
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], { ...it, cloud: false }));
+
+  assert.equal(code, 2, said);
+  assert.match(said, /failure desk-works-on-trunk at warn/);
+  assert.equal(said.split("git switch main").length - 1, 1, said);
+});
+
 // [[spec/design_output/work#a-desk-works-on-trunk]]
 test("a desk's pull on a work branch refuses, names main, and asks git nothing past the branch", () => {
   const { it, outside } = doorsSaying(onBranch("work/one-group"), {
@@ -36,7 +56,7 @@ test("a desk's pull on a work branch refuses, names main, and asks git nothing p
 test("a desk's pull naming a group refuses, names its merge, and moves onto no branch", () => {
   const { it, outside } = doorsSaying(
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: GROUP_NOTE, ...HAND },
+    { [on("one-group")]: GROUP_NOTE, ...HAND, ...DESK_NODE },
   );
 
   const { code, said } = heard(() =>
@@ -44,7 +64,7 @@ test("a desk's pull naming a group refuses, names its merge, and moves onto no b
   );
 
   assert.equal(code, 2, said);
-  assert.match(said, /\.\/RUNME\.sh branch merge one-group/);
-  assert.match(said, /git switch main/);
+  assert.match(said, /no branch for one-group/);
+  assert.match(said, /\.\/RUNME\.sh branch merge <name>/);
   assert.ok(!ranGit(outside).some((one) => one.startsWith("git switch")));
 });
