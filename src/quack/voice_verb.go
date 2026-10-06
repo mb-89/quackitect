@@ -10,6 +10,7 @@ import (
 
 	settingsreader "quackitect/src/config"
 	"quackitect/src/index"
+	"quackitect/src/proc"
 	"quackitect/src/voice"
 )
 
@@ -27,7 +28,7 @@ func init() {
 	register("voice", voiceVerb(voiceOutside{
 		root: index.Root,
 		vale: func(root string) string { return valeAt(disk, root) },
-		run:  voiceRunsVale(realRun(io.Discard, io.Discard)),
+		run:  voiceRunsValeOver(proc.Real),
 		now:  wall.Now,
 		disk: disk,
 	}))
@@ -77,13 +78,13 @@ const (
 	voiceFolderMode = 0o755
 )
 
-// Runs Vale in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/design_output/projection#the-second-target]]
-func voiceRunsVale(run func(argv []string, o runOpts) ranResult) func(argv []string, cwd string) (string, error) {
+// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start or a signal ends answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
+func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
 	return func(argv []string, cwd string) (string, error) {
-		ran := run(argv, runOpts{cwd: cwd})
-		if ran.fault != "" {
-			return "", errors.New(ran.fault)
+		said := run(proc.Command{Argv: argv, Dir: cwd})
+		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
+			return "", errors.New(said.Err)
 		}
-		return ran.stdout, nil
+		return said.Out, nil
 	}
 }

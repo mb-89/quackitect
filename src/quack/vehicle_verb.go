@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/proc"
 	"quackitect/src/vehicle"
 )
 
@@ -34,7 +35,7 @@ func vehicleOutside() vehicleDoors {
 		now:     wall.Now,
 		pid:     box.pid,
 		windows: box.windows(),
-		git:     vehicleGit(box),
+		git:     vehicleGit,
 	}
 }
 
@@ -69,11 +70,9 @@ func vehicleRootHere(box boxDoors) string {
 }
 
 // Git in a folder: its trimmed output, and whether it exited zero, its errors kept quiet. [[spec/design_output/doors#a-door-standing-on-another]]
-func vehicleGit(box boxDoors) func(dir string, args ...string) (string, bool) {
-	return func(dir string, args ...string) (string, bool) {
-		ran := box.run(append([]string{"git"}, args...), runOpts{cwd: dir})
-		return strings.TrimSpace(ran.stdout), ran.code == 0 && ran.fault == ""
-	}
+func vehicleGit(dir string, args ...string) (string, bool) {
+	said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: dir})
+	return strings.TrimSpace(said.Out), said.Code == 0
 }
 
 // The disk the verb writes through, which writes nothing where the run is dry. [[spec/tickets/runme-hands-verbs-to-quack]]

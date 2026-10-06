@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/q/qtest"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/tree"
@@ -21,7 +22,7 @@ func theWork(m frame.Model) *work.Tab { return m.Tabs[1].(*work.Tab) }
 // The window's catalog posts through the door over the root, and an action no index takes answers an error, whether an index stands or none does. [[spec/tickets/the-work-keys-call-actions]]
 func TestTheIndexCatalogAnswersAnErrorForAnActionNoIndexTakes(t *testing.T) {
 	t.Parallel()
-	var catalog work.Source = indexCatalog{}
+	var catalog work.Source = indexCatalog{clock: qtest.Wall()}
 	if _, err := catalog.Call("t/nowhere", struct{}{}); err == nil {
 		t.Fatal("a call of t/nowhere answers no error")
 	}

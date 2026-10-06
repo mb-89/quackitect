@@ -73,7 +73,7 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 	if said := commandSettings(quietBox(), root); !said.Cloud {
 		t.Fatalf("the settings read %+v, and want the cloud flag", said)
 	}
-	if said := gitRead(quietBox(), root, "no-such-verb"); said != "" {
+	if said := gitRead(root, "no-such-verb"); said != "" {
 		t.Fatalf("a failing git read prints %q, and wants nothing", said)
 	}
 }

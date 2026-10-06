@@ -37,7 +37,7 @@ func init() { register("retro backlog", retroBacklogVerb(retroBacklogLive)) }
 func retroBacklogLive() retroBacklogDoors {
 	d := quietBox()
 	root := retroRootOf(d)
-	return retroBacklogDoors{root: root, disk: d.disk, git: retroCollectGitIn(d.run, root)}
+	return retroBacklogDoors{root: root, disk: d.disk, git: retroCollectGitIn(root)}
 }
 
 // retro backlog <retro>: prints each prose criterion, and answers 0 once each holds a verdict with its reason. [[spec/tickets/the-retro-reads-the-backlog]]

@@ -165,9 +165,15 @@ func (it *It) Pulling(argv []string) int {
 		if code == 0 {
 			level = "debug"
 		}
-		it.Log(level, "work", fmt.Sprintf("pull answered %d", code), map[string]any{"branch": it.Git.Run("rev-parse", "--abbrev-ref", "HEAD").Out})
+		it.Log(level, "work", fmt.Sprintf("pull answered %d", code), map[string]any{"branch": it.branch()})
 	}
 	return code
+}
+
+// The branch HEAD stands on, and nothing before the first commit. [[spec/design_output/pull#the-answers]]
+func (it *It) branch() string {
+	head, _ := it.Git.Head()
+	return head
 }
 
 // The words past the verb: pull, a name, the flags. [[spec/design_output/pull#the-answers]]
@@ -183,7 +189,7 @@ func (it *It) Pull(argv []string) int {
 		it.Errorln(said.why)
 		return 2
 	}
-	branch := it.Git.Run("rev-parse", "--abbrev-ref", "HEAD").Out
+	branch := it.branch()
 	onTrunk := branch == Trunk
 	// A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !it.Cloud && strings.HasPrefix(branch, WorkBranch) {
@@ -292,15 +298,15 @@ func (it *It) dropped(who *Who) int {
 
 // [[spec/design_output/pull#the-pull-fetches-first]]
 func (it *It) fetched(branch string) bool {
-	it.Git.Run("fetch", "origin", branch)
-	behind := it.Git.Run("rev-list", "--count", "HEAD..origin/"+branch).Out
-	if behind == "" || behind == "0" {
+	_ = it.Git.Fetch(branch)
+	behind, ok := it.Git.Count("HEAD", "origin/"+branch)
+	if !ok || behind == 0 {
 		return true
 	}
-	if it.Git.Run("merge", "--ff-only", "origin/"+branch).OK {
+	if it.Git.FastForward("origin/"+branch) == nil {
 		return true
 	}
-	it.Say(Refused, fmt.Sprintf("origin/%s holds %s commit(s) this box lacks, and the two diverge.", branch, behind),
+	it.Say(Refused, fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
 		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch))
 	return false
 }

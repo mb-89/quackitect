@@ -9,9 +9,12 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The folder tickets stand in, the record of a retro's classes, the processes a ticket mints onto, the tree's own command line, and the status a class stands open at. [[spec/guidance/retro/check]]
@@ -66,18 +69,31 @@ type retroMintRecord struct {
 }
 
 func init() {
-	register("retro mint", retroMintVerb(quietBox, retroMintRunOver(realRun(io.Discard, io.Discard))))
+	register("retro mint", retroMintVerb(quietBox, retroMintRunme))
 }
 
-// Runs a program under the root through the box's runner, with ./RUNME.sh read as the root's own, and the env added over the caller's. [[spec/design_output/vehicle#the-work-root-inherits]]
-func retroMintRunOver(run func(argv []string, o runOpts) ranResult) retroMintRun {
+// Runs a program under the root over the real process door. [[spec/design_output/vehicle#the-work-root-inherits]]
+func retroMintRunme(dir string, argv []string, env map[string]string) retroMintRan {
+	return retroMintRunmeOver(proc.Real)(dir, argv, env)
+}
+
+// Runs a program under the root through the process door, with ./RUNME.sh read as the root's own, and the env added over the caller's in sorted order. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func retroMintRunmeOver(run proc.Runner) func(dir string, argv []string, env map[string]string) retroMintRan {
 	return func(dir string, argv []string, env map[string]string) retroMintRan {
 		program := argv[0]
 		if program == retroMintRunmeAt {
 			program = filepath.Join(dir, "RUNME.sh")
 		}
-		ran := run(append([]string{program}, argv[1:]...), runOpts{cwd: dir, env: env})
-		return retroMintRan{code: ran.code, out: ran.stdout, errs: ran.stderr + ran.fault}
+		pairs := make([]string, 0, len(env))
+		for _, key := range slices.Sorted(maps.Keys(env)) {
+			pairs = append(pairs, key+"="+env[key])
+		}
+		said := run(proc.Command{Argv: append([]string{program}, argv[1:]...), Dir: dir, Env: pairs})
+		ran := retroMintRan{out: said.Out, errs: said.Err, code: said.Code}
+		if said.Code < 0 {
+			ran.code = exitFailed
+		}
+		return ran
 	}
 }
 

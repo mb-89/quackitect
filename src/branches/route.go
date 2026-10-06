@@ -334,11 +334,12 @@ func (d *Doors) closedHere(all []named, dep string) bool {
 			return fieldOf(one.Text, "state") == closedState
 		}
 	}
-	said := d.quiet("show", "origin/"+trunk+":"+ticketsFolder+"/"+dep+noteEnd)
-	if !said.OK {
-		return !d.quiet("rev-parse", "--verify", "--quiet", "refs/remotes/origin/"+workBranch+dep).OK
+	said := d.textAt("origin/"+trunk, ticketsFolder+"/"+dep+noteEnd)
+	if said == "" {
+		_, live := d.Repo.Resolve("refs/remotes/origin/" + workBranch + dep)
+		return !live
 	}
-	return fieldOf(said.Out, "state") == closedState
+	return fieldOf(said, "state") == closedState
 }
 
 // The open tickets naming this one as parent or group, as a reason to wait. [[spec/design_output/pull#the-final-acceptance]]

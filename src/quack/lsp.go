@@ -66,7 +66,7 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 		Root: root, Store: store, As: one.as, Bound: one.bound,
 		Sweep: func() any { return store.Snapshot().Read(sweepName) },
 		// [[spec/tickets/lsp-module-draws-the-tools]]
-		Tools: lsp.ToolsAt(wall, root, lspChecks(root)), Quiet: -1, Clock: wall,
+		Tools: lsp.ToolsAt(root, lspChecks(root)), Quiet: -1, Clock: wall,
 		// [[spec/tickets/lsp-module-serves-the-features]]
 		Check: lspChecks(root),
 		Files: func() map[string]string {

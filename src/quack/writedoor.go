@@ -149,7 +149,7 @@ func unmerged(root, where string) bool {
 	if !strings.HasPrefix(where, write.TicketsOnGit) || !strings.HasSuffix(where, ".md") {
 		return false
 	}
-	return gitRead(quietBox(), root, "ls-files", "-u", "--", where) != ""
+	return gitRead(root, "ls-files", "-u", "--", where) != ""
 }
 
 // The front keys the ticket schema gives the engine. [[spec/design_output/schema#the-verbs-own-their-fields]]

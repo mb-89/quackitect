@@ -11,6 +11,7 @@ import (
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/lsp"
+	"quackitect/src/proc"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
@@ -38,7 +39,7 @@ func doorsServer(t *testing.T, files map[string]string) (*lsp.Server, func() [][
 	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
 	q.OutIn(c, "tracked", []string{}, q.Doc("the paths git tracks, as the case seeds them"))
 	checks := lspChecks("/tree")
-	quiet := func(_, _, _ string, _ ...string) (string, error) { return "{}", nil }
+	quiet := func(proc.Command) proc.Said { return proc.Said{Out: "{}"} }
 	tools := &lsp.Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: quiet, Check: checks}
 	server := lsp.New(lsp.Outside{
 		Root: "/tree", Store: qtest.Over(t, c, as).Store(), As: as, Bound: func(local string) string { return local },

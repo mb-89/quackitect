@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 )
 
 // The files a retro's home and input hold, the private folder, and the folders collect drains, keeps, and fills with the groups. [[spec/guidance/retro/collect]]
@@ -79,7 +80,7 @@ func retroCollectLive() retroCollectDoors {
 		home: homeOf(d.env),
 		temp: retroCollectFirst(d.env("TEMP"), d.env("TMP"), d.env("TMPDIR")),
 		now:  d.clock.Now,
-		git:  retroCollectGitIn(d.run, root),
+		git:  retroCollectGitIn(root),
 		disk: d.disk,
 		move: d.disk.rename,
 	}
@@ -96,10 +97,10 @@ func retroCollectFirst(said ...string) string {
 }
 
 // Git run in the root, its output and its error trimmed, as src/doors/git.js runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
-func retroCollectGitIn(run func(argv []string, o runOpts) ranResult, root string) func(args ...string) retroRan {
+func retroCollectGitIn(root string) func(args ...string) retroRan {
 	return func(args ...string) retroRan {
-		ran := run(append([]string{"git"}, args...), runOpts{cwd: root})
-		return retroRan{ok: ran.code == 0 && ran.fault == "", out: strings.TrimSpace(ran.stdout), err: strings.TrimSpace(ran.stderr)}
+		said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root})
+		return retroRan{ok: said.Code == 0, out: strings.TrimSpace(said.Out), err: strings.TrimSpace(said.Err)}
 	}
 }
 

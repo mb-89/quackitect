@@ -342,9 +342,9 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
 		Root:   root, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,
 		Config: func(root string) hooks.Settings { return commandSettings(box, root) },
-		Git:    func(root string, args ...string) string { return gitRead(box, root, args...) },
+		Git:    func(root string, args ...string) string { return gitRead(root, args...) },
 		Voice:  func(root, message string) []command.Row { return commitVoice(box, root, message) },
-		Review: reviewOver(box, root),
+		Review: reviewOver(root),
 	})
 	return hooks.Listen(root, door)
 }

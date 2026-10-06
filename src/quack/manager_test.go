@@ -5,11 +5,14 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -175,16 +178,59 @@ func stopped(t *testing.T, bin, root string) {
 	}
 }
 
-// The root built into a folder, as the install builds it. [[spec/design_output/model#the-wiring-file]]
+// The root built into a folder, as the install builds it, linked off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
+	built, err := quackBinary()
+	if err != nil {
+		t.Fatalf("the root does not build: %v", err)
+	}
 	bin := binaryIn(folder, "quack")
+	if err := os.MkdirAll(folder, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Link(built, bin); err != nil {
+		t.Fatalf("the build does not link into %s: %v", folder, err)
+	}
+	return bin
+}
+
+// The one go build of the root this run takes, into a folder of its own that the run removes. [[spec/tickets/each-door-meets-one-test]]
+var quackBinary = sync.OnceValues(func() (string, error) {
+	dir, err := os.MkdirTemp("", "quack-built-")
+	if err != nil {
+		return "", err
+	}
+	buildDirs.Lock()
+	buildDirs.dirs = append(buildDirs.dirs, dir)
+	buildDirs.Unlock()
+	bin := binaryIn(dir, "quack")
+	quackBuilds.Add(1)
 	build := exec.Command("go", "build", "-o", bin, "./src/quack")
 	build.Dir = filepath.Join("..", "..")
 	if said, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("the root does not build: %v\n%s", err, said)
+		return "", fmt.Errorf("%w\n%s", err, said)
 	}
-	return bin
+	return bin, nil
+})
+
+// The folders the shared build writes, which TestMain removes once the run ends. [[spec/tickets/each-door-meets-one-test]]
+var buildDirs struct {
+	sync.Mutex
+	dirs []string
+}
+
+// The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
+var quackBuilds atomic.Int32
+
+// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
+func TestTheQuackBinaryBuildsOnce(t *testing.T) {
+	t.Parallel()
+	built(t, t.TempDir())
+	built(t, t.TempDir())
+	if got := quackBuilds.Load(); got != 1 {
+		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
+	}
 }
 
 // A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]

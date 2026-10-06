@@ -17,3 +17,6 @@ func detached(run *exec.Cmd) *exec.Cmd {
 	run.SysProcAttr.Setsid = true
 	return run
 }
+
+// The detached process is the door itself, so its every exit ends the door. [[spec/tickets/the-doors-pr-goes-green]]
+func exitEnds(error) bool { return true }

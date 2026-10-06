@@ -49,8 +49,8 @@ func (it *It) acceptBase(one *Held, leaf *Leaf) string {
 		return last
 	}
 	if strings.Contains(FieldOf(one.Text, "process"), groupRoute) {
-		if said := it.Git.Run("merge-base", "origin/"+Trunk, "HEAD"); said.OK {
-			return strings.TrimSpace(said.Out)
+		if said, ok := it.Git.MergeBase("origin/"+Trunk, "HEAD"); ok {
+			return said
 		}
 	}
 	for _, entry := range entries {

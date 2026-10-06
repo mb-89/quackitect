@@ -71,6 +71,8 @@ type Book struct {
 	moved    func(Op)
 	// Each save closes it and lays a new one, so a waiter wakes on every move. [[spec/design_output/model#the-agent-does-not-poll]]
 	changed chan struct{}
+	// The timer a wait arms its span through: the clock's, which a case swaps. [[spec/tickets/caller-wait-meets-no-sleep]]
+	after func(time.Duration) <-chan time.Time
 }
 
 // [[spec/design_output/model#the-states]]
@@ -92,7 +94,7 @@ func NewBook(clock q.Clock, keep Keep, settings BookSettings) (*Book, error) {
 	if err != nil {
 		return nil, err
 	}
-	b := &Book{clock: clock, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{})}
+	b := &Book{clock: clock, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{}), after: clock.After}
 	for _, one := range all {
 		held := one
 		b.ops[one.ID] = &held

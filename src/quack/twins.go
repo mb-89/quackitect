@@ -14,6 +14,7 @@ import (
 
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
+	"quackitect/src/proc"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
@@ -156,8 +157,13 @@ func branchQueue(v1 func() (string, error)) twin {
 	}
 }
 
-// The node module: answers a registered verb's words, in process or as a person's child road under the root, and refuses a word nothing registers. [[spec/tickets/program-of-drops-node]]
+// The node module over the real process door and this binary. [[spec/tickets/program-of-drops-node]]
 func nodeAccept(root string) func(q.Request) (any, error) {
+	return nodeAcceptOver(proc.Real, selfPath, root)
+}
+
+// The node module: answers a registered verb's words, in process or as a person's child road under the root through the process door, and refuses a word nothing registers. [[spec/tickets/quack-spawns-meet-fake-process]]
+func nodeAcceptOver(run proc.Runner, self func() (string, error), root string) func(q.Request) (any, error) {
 	scripts := filepath.Join(root, "src", "scripts")
 	return func(asked q.Request) (any, error) {
 		words, person := asked.Args, false
@@ -180,20 +186,20 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 			return goAnswer(args, one)
 		}
 		// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
-		self, err := selfPath()
+		binary, err := self()
 		if err != nil {
 			return nil, err
 		}
-		box := quietBox()
-		ran := box.run(append([]string{self, "verb", scripts}, args...), runOpts{cwd: root, environ: personEnv(box.environ(), root), combined: true})
-		text := strings.TrimRight(ran.stdout, "\n")
-		if ran.fault != "" {
-			return nil, fmt.Errorf("%s answers %s: %s", strings.Join(args, " "), ran.fault, text)
+		said := run(proc.Command{
+			Argv: append([]string{binary, "verb", scripts}, args...),
+			Dir:  root,
+			Drop: harness,
+			Env:  []string{workRoot + "=" + root},
+		})
+		if said.Code != 0 {
+			return nil, fmt.Errorf("%s answers exit %d: %s", strings.Join(args, " "), said.Code, strings.TrimRight(said.Out+said.Err, "\n"))
 		}
-		if ran.code != 0 {
-			return nil, fmt.Errorf("%s answers exit status %d: %s", strings.Join(args, " "), ran.code, text)
-		}
-		return text, nil
+		return strings.TrimRight(said.Out, "\n"), nil
 	}
 }
 
@@ -201,18 +207,6 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}
 
 const workRoot = "SE_WORK_ROOT"
-
-// The environment a person's run takes: the harness variables left behind, and the root named. [[spec/tickets/the-lens-calls-actions]]
-func personEnv(env []string, root string) []string {
-	out := make([]string, 0, len(env)+1)
-	for _, one := range env {
-		name, _, _ := strings.Cut(one, "=")
-		if !slices.Contains(harness, name) && name != workRoot {
-			out = append(out, one)
-		}
-	}
-	return append(out, workRoot+"="+root)
-}
 
 // The words a request carries, as a list of strings or as the list JSON decodes. [[spec/tickets/ticket-verbs-become-actions]]
 func wordsOf(args any) ([]string, error) {

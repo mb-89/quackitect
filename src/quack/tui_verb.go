@@ -26,6 +26,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/proc"
 	"quackitect/src/tui/frame"
 )
 
@@ -585,7 +586,7 @@ func tuiReal() tuiDoors {
 		root:    root,
 		windows: box.windows(),
 		goTool:  tuiGoOf(box.disk, root),
-		run:     serveRuns(box.run),
+		run:     serveRuns,
 		launch:  tuiLaunch,
 		tell:    tuiTellAt(frame.WindowPort),
 		disk:    box.disk,
@@ -610,16 +611,23 @@ func tuiGoOf(disk diskDoors, root string) string {
 	return "go"
 }
 
-// Runs the viewer on the caller's terminal: its input, and its output and error streams, which pass straight through where they are files. [[spec/design_output/tui#the-verb-builds-it]]
+// Runs the viewer on the caller's terminal over the real process door. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiLaunch(argv []string, cwd string, out, errs io.Writer) (int, error) {
-	ran := realBoxDoors(out, errs).run(argv, runOpts{cwd: cwd, inherit: true, console: true})
-	if ran.fault != "" {
-		return 0, errors.New(ran.fault)
+	return tuiLaunchOver(proc.Real, realBoxDoors(out, errs).input)(argv, cwd, out, errs)
+}
+
+// Runs the viewer through the process door on the input it hands through and the caller's output and error streams, which pass straight through where they are files. A signal's end reads as 1. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func tuiLaunchOver(run proc.Runner, in io.Reader) func(argv []string, cwd string, out, errs io.Writer) (int, error) {
+	return func(argv []string, cwd string, out, errs io.Writer) (int, error) {
+		said := run(proc.Command{Argv: argv, Dir: cwd, Streams: &proc.Streams{In: in, Out: out, Err: errs}})
+		switch said.Code {
+		case proc.Signalled:
+			return 1, nil
+		case proc.NotStarted:
+			return 0, errors.New(said.Err)
+		}
+		return said.Code, nil
 	}
-	if ran.code < 0 {
-		return 1, nil
-	}
-	return ran.code, nil
 }
 
 // The tell to whatever window stands on a port, which answers whether it took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]

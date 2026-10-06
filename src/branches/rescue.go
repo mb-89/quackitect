@@ -11,20 +11,20 @@ const rescueBranch = "rescue/"
 func (d *Doors) takesRescue(one stand) {
 	rescue := rescueBranch + one.Name
 	at := "origin/" + rescue
-	if !d.quiet("rev-parse", "--verify", "-q", at).OK {
+	if _, ok := d.Repo.Resolve(at); !ok {
 		return
 	}
-	if !d.quiet("merge-base", "--is-ancestor", at, "HEAD").OK {
-		if !d.quiet("merge", "--no-edit", "-m", one.Branch+": takes in "+rescue, at).OK {
-			d.quiet("merge", "--abort")
+	if !d.Repo.IsAncestor(at, "HEAD") {
+		if _, err := d.Repo.Merge(at, one.Branch+": takes in "+rescue, false); err != nil {
+			_ = d.Repo.ResetTo("HEAD", true)
 			d.warn("%s conflicts with %s, so it stands on origin. Run git merge %s, resolve it, and land it.", rescue, one.Branch, at)
 			return
 		}
-		if !d.loud("push", "origin", one.Branch).OK {
+		if pushed := d.Repo.Push(one.Branch, false); !pushed.OK {
 			d.warn("%s took in %s, and its push came back refused, so the rescue stands on origin.", one.Branch, rescue)
 			return
 		}
 	}
-	d.quiet("push", "-q", "origin", "--delete", rescue)
+	_ = d.Repo.DeleteRemote(rescue)
 	d.say("%s takes in %s, the work the box before left there.", one.Branch, rescue)
 }

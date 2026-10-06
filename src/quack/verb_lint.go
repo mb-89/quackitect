@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/check"
 	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/lsp"
+	"quackitect/src/proc"
 )
 
 // The path naming the whole tree, the rule the box decides in place of the sweep, the rows the warn row names, the width of a count, and the log row's kind, as cli-read.js named them. [[spec/design_output/lsp#the-lint-ends-on-findings]]
@@ -232,7 +233,7 @@ func lintRows(found []check.Finding, refused int) []string {
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func toolsOver(hand boxDoors, root string, where []string) []check.Finding {
 	tree := lintTree(hand, root)
-	tools := lsp.ToolsAt(wall, root, lspChecks(root))
+	tools := lsp.ToolsAt(root, lspChecks(root))
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {
@@ -271,7 +272,7 @@ func filesUnder(disk diskDoors, tree *check.Tree, root string, where []string) [
 
 // The tree on the disk under the root, its paths the files git lists, and the survey this box wrote. [[spec/design_output/tree#the-tree-handed-in]]
 func lintTree(hand boxDoors, root string) *check.Tree {
-	tree := check.TreeOver(root, listedDisk{rootDisk{root}, hand.run})
+	tree := check.TreeOver(root, listedDisk{rootDisk{root}, proc.Real})
 	if said, err := hand.disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil {
 		tree.Survey = string(said)
 	}
@@ -281,16 +282,16 @@ func lintTree(hand boxDoors, root string) *check.Tree {
 // The disk under the root, whose paths are the files git tracks and the ones it leaves unignored. [[spec/design_output/tree#the-tree-handed-in]]
 type listedDisk struct {
 	rootDisk
-	run func(argv []string, o runOpts) ranResult
+	run proc.Runner
 }
 
 func (one listedDisk) Paths() []string {
-	said := one.run([]string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}, runOpts{})
-	if said.code != 0 || said.fault != "" {
+	said := one.run(proc.Command{Argv: []string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}})
+	if said.Code != 0 {
 		return nil
 	}
 	out, seen := []string{}, map[string]bool{}
-	for _, file := range strings.Split(said.stdout, "\x00") {
+	for _, file := range strings.Split(said.Out, "\x00") {
 		if file != "" && !seen[file] && one.Exists(file) {
 			seen[file] = true
 			out = append(out, file)

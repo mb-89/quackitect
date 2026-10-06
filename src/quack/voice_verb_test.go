@@ -11,6 +11,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/proc"
 )
 
 const voiceTen = "one two three four five six seven eight nine ten"
@@ -158,14 +160,44 @@ func TestVoiceVerbHelpAndRefused(t *testing.T) {
 	}
 }
 
+// The Vale a case teaches the fake runner, a path standing on no box. [[spec/tickets/quack-spawns-meet-fake-process]]
+const taughtVale = "/fake/vale"
+
 func TestVoiceRunsValeKeepsTheOutputOfAFailedExit(t *testing.T) {
 	t.Parallel()
-	vale := voiceRunsVale(quietBox().run)
-	said, err := vale([]string{"sh", "-c", "echo '{}'; exit 3"}, t.TempDir())
+	var ran []proc.Command
+	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(one proc.Command) proc.Said {
+		ran = append(ran, one)
+		return proc.Said{Out: "{}\n", Err: "vale warns", Code: 3}
+	}}}
+	cwd := t.TempDir()
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale, "--output=JSON"}, cwd)
 	if err != nil || said != "{}\n" {
-		t.Fatalf("a nonzero exit answers %q %v", said, err)
+		t.Fatalf("a nonzero exit answers %q %v, and wants Vale's output", said, err)
 	}
-	if _, err := vale([]string{filepath.Join(t.TempDir(), "none")}, t.TempDir()); err == nil {
-		t.Fatal("a Vale that cannot start answers its fault")
+	if len(ran) != 1 || strings.Join(ran[0].Argv, " ") != taughtVale+" --output=JSON" || ran[0].Dir != cwd || ran[0].Stdin != "" {
+		t.Fatalf("Vale runs %+v, and wants one run of the argv in %s", ran, cwd)
+	}
+}
+
+func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
+	t.Parallel()
+	fake := &proc.FakeRunner{}
+	want := fake.Run(proc.Command{Argv: []string{taughtVale}}).Err
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
+	if err == nil || !strings.Contains(err.Error(), want) || said != "" {
+		t.Fatalf("a Vale that never starts answers %q %v, and wants the fault %q", said, err, want)
+	}
+}
+
+// A Vale a signal ends answers its fault, as one that never starts does. [[spec/tickets/signalled-meets-notstarted-readers]]
+func TestVoiceRunsValeAnswersTheFaultOfAValeASignalEnds(t *testing.T) {
+	t.Parallel()
+	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
+		return proc.Said{Out: "{", Err: "killed", Code: proc.Signalled}
+	}}}
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
+	if err == nil || err.Error() != "killed" || said != "" {
+		t.Fatalf("a Vale a signal ends answers %q %v, and wants the fault killed", said, err)
 	}
 }

@@ -20,6 +20,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/proc"
 )
 
 // The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
@@ -127,13 +128,21 @@ func toolHere(disk diskDoors, root, name string) string {
 	return ""
 }
 
-// A tool run writing to the caller's streams, answering its exit code. [[spec/tickets/the-small-faults-land]]
+// A tool run over the real process door, on the box's input. [[spec/tickets/the-small-faults-land]]
 func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
-	ran := realRun(out, errs)(argv, runOpts{cwd: dir, inherit: true})
-	if ran.fault != "" {
-		fmt.Fprintln(errs, ran.fault)
+	return toolRunsOver(proc.Real, quietBox().input)(dir, out, errs, argv...)
+}
+
+// A tool run through the process door with the caller's streams and the input it hands through, answering its exit code, and exitFailed with the fault where it never starts or a signal ends it. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func toolRunsOver(run proc.Runner, in io.Reader) fixRunner {
+	return func(dir string, out, errs io.Writer, argv ...string) int {
+		said := run(proc.Command{Argv: argv, Dir: dir, Streams: &proc.Streams{In: in, Out: out, Err: errs}})
+		if said.Code < 0 {
+			fmt.Fprintln(errs, said.Err)
+			return exitFailed
+		}
+		return said.Code
 	}
-	return ran.code
 }
 
 // One row of Vale's JSON the calm reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]

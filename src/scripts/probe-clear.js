@@ -123,6 +123,11 @@ export function grouped(it, tree, env) {
     cwd: tree,
     timeoutMs: PULL_WAIT,
   });
+  // The untag lands as a commit on the probe's branch, so the handover meets no tracked change the box alone holds. [[spec/tickets/probe-clone-drops-free-tags]]
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
   // A box's work branch stands on origin, so the handover finds no commit the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
   const pushed = it.proc.run(["git", "update-ref", `refs/remotes/origin/work/${GROUP}`, "HEAD"], {
     cwd: tree,
