@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 54045218f4145c0f
         size: 966
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: f4c29a20ec5ac24695a3ec80c6d552072f21152f
+    hash_after: 3c059b5ad6cf8f1524b7752ab5c1c33aa84ce3e3
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -313,14 +322,19 @@ Weighed: the ask says no clone, and the draft takes `git clone --shared` with th
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go vet ./quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, plus src/scripts/probe-cold.js, where takesDelta takes an export so the smoke applies the working change through the one function that does it
+the smoke reaches the disk and processes through it.disk and it.proc, whose fakes the smoke tree case runs over, and the check reaches the verb through checkDoors
+every new function and constant carries a comment linking this ticket
+the tools folder comes from inRun in folders.js, the pointer from POINTER in vehicle.js, and the desk trial from deskTrial
 
 ## tests-green
 
