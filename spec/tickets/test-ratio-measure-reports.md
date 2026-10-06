@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 927a3e3f3b4c6d8c72aba1aa5fbb991646cd1526
+    hash_after: 927a3e3f3b4c6d8c72aba1aa5fbb991646cd1526
+    inputs:
+      - name: ask
+        hash: d164b39d8d6d574f
+        size: 655
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,54 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/model#the-guards-hold-a-baseline]]. A pure function, `RatioOffenders`, in `src/imports/ratio.go` counts the lines holding text per module and language over the tracked files, and names each module whose test lines pass its code lines. An offender reads as its language and folder, then a tab and both counts. `Compare` keys on the text before the tab, so the baseline holds the module alone and a count change churns nothing. A guard entry `ratio` in `src/imports/guards.go` runs it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/imports/guards.go` `Guards`, which gains the entry
+- `src/imports/guards.go` `Compare`, which keys on the text before a tab
+- the guards verb in `src/quack/verb_guards.go`, which prints each offender whole
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/imports/ratio_test.go` `TestAModulePastOneToOneIsNamedWithBothCounts`
+- `src/imports/ratio_test.go` `TestAJavaScriptTestBelongsToTheFolderItImports`
+- `src/imports/guards_test.go` `TestACompareKeysOnTheTextBeforeATab`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/imports/ratio.go`
+- `src/imports/ratio_test.go`
+- `src/imports/guards.go`
+- `src/imports/guards_test.go`
+- `src/imports/baseline/ratio.txt`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the guards registry, `Compare` and the module terms in the guards section stand opened
+- the callers line names the registry, the compare and the verb
+- each done_when line meets a case: the counts, the module mapping and the report through the verb
 
 ## tests-red
 
