@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: engine-verbs-hold
 parent: branch-done-opens-the-pr
+record:
+  - step: do
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: dae16da56ae7a6e58b856e02330e611d8feeafe2
+    hash_after: 973f55b0612a56b8ffe0a33685961ef23f822ed6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: ask
+        hash: c4945eae4b0e4ada
+        size: 497
+    def: aeb558b18945ff5c
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ plan.Done takes every work branch at done, and origin holds many closed work bra
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_level_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch keeps a done work branch in plan.Done only where origin holds a commit on it that main lacks, so a closed branch level with main draws no pull request and no 422 from the hub. The parent change lands with it, since this fix stands on it: done and the dispatch open a work branch pull request through workPull and pullOpens, on the one send door the doors carry.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: aheadOfTrunk in src/branches/dispatch.go reads the rev-list count, and planned keeps a done branch only where it stands above zero.
+The cleanup the change reveals is in the change: the parent pull road, which this fix needs, lands in the same commit, and its red tests pass.
+The ahead rule stands once, in aheadOfTrunk, and the pull road once, in pullOpens in src/branches/dispatch_fire.go.
 
 # Discussion
 
