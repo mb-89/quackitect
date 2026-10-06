@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/cloud
+step: split
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
@@ -195,6 +195,12 @@ record:
         hash: 933f016133cd9e76
         size: 232
     def: 4da1ca5da87d5bbc
+  - step: split
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: f5d2100d3bfbc25f744bd5f5b8b037e5b9f1bb5e
+    hash_after: f5d2100d3bfbc25f744bd5f5b8b037e5b9f1bb5e
+    returns: 1
+    why: the hand takes it back
 reason: done
 ---
 
