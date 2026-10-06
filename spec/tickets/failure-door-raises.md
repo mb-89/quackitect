@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -175,6 +175,29 @@ record:
         exit: 0
         said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: ce3294c328423729178216881cbb6bdb9cb158f8
+    hash_after: ce3294c328423729178216881cbb6bdb9cb158f8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 2 file(s); green, src/failure passes
+      - name: check
+        exit: 0
+        said: "    2.8  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: 6cd73660cfdaa4d4
+        size: 1131
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -345,26 +368,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/raise_test.go test/level0/failure-door.test.js test/contract/failure.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Raise answers a failure off the registry: the message, the id at its level, and each remedy, or a line naming an unregistered id. Its row carries the id under a failure field, and an unregistered id raises at error. The JavaScript door reads the same nodes through the disk door, prints the same lines and writes the same row through the log door. Its fake answers off nodes a case hands in, and keeps each raised id. The gate's points: the tests command runs the Go cases beside the JavaScript ones, the contract case stands under the door's name, a case holds the unregistered row in each twin, and the JavaScript raise takes several message lines as the Go door does.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, with the contract case under test/contract/failure.test.js, the name the check wants for the door
+- the JavaScript door reaches the disk and the log through their doors, and fakeFailure stands as its fake over fakeLog, held to the real door by the contract case
+- each function's comment names the approach and links the design note's section
+- the folder and the note ending stay in node.go for Go and in the door's constants for JavaScript, and the design note owns the line format
 
 # accept
 
