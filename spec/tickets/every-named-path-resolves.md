@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 1a9c14f7cd128ef3ef3cbfc621762867dc801139
+    hash_after: 1a9c14f7cd128ef3ef3cbfc621762867dc801139
+    inputs:
+      - name: ask
+        hash: 36f3cb64b0e2abfc
+        size: 436
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,76 @@ Deleted paths linger in notes and comments, and the two defaults of one key drif
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two changes, one a done_when line.
+
+The path rule. A new file src/modules/check/named.go holds `EveryNamedPathStands` and `namedPathFaultsIn(tree, held, path)`. It reads a note's code spans outside fences and front matter, and the comments of a code file, through the same row walk `pointersIn` uses. A span or comment word reads as a path where it matches `pathShape`: a tracked root (`src/`, `spec/`, `test/`, `.claude/`), plain path letters, and a file ending. A word carrying `*`, `<`, `{` or `$` reads as a shape, so a glob or a placeholder passes. `placesIn(tree).fileOf` decides whether the path stands, so a folder or a file both pass. A miss draws an error naming the path and telling the reader to name a file the tree holds. The rule joins `Rules` in src/modules/check/checker.go, and `Checker.Over` calls it beside `pointerFaultsIn`. It skips every note under spec/tickets, since an open ticket names files its own change writes. `pastHistory` already lets a closed ticket pass.
+
+The default. In src/branches/group.go, the constant `staleSpan` leaves. `(*Doors).staleSpan` in src/branches/free.go answers `spanOf(d.config(staleKey))`, and a span of zero reads as no claim standing stale. Production stays as it stands: src/quack/branch.go hands `config.Value`, which answers the schema default in spec/config/level0.schema.json where no layer sets the key. The tests' `newTree` in src/branches/tree_test.go sets `Config` to a fake reading `config.Value` over the repo root, so the tests read the same settings default. Cases that set `Config = nil` and lean on the old 12h span set the span they need.
+
+The rule lands at error, and this change fixes every path it names in the tree, so the check stays green on the commit. The JavaScript STALE copy in src/engine/group.js waits on a note, since the ask names the Go default.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/check/checker.go (*Checker).Over
+src/modules/check/checker.go treeFaults (through Rules)
+src/modules/check/checker.go (*Checker).Sweep
+src/modules/check/export.go (exports beside EveryPointerResolvesOver)
+src/branches/free.go (*Doors).staleClaim
+src/branches/free_test.go TestAClaimGoesStalePastTheSpan
+src/branches/port_c_held_test.go pcTakingPast
+src/branches/port_a_take_test.go TestPATakeHandsStaleByTheClock
+src/branches/dispatch_test.go TestDispatchReadsAStaleHoldReadyAndAFreshHoldHeld
+src/branches/dispatch_test.go TestDispatchReadsADoneGroupPastTheStaleSpanAsAStuckHandOver
+src/branches/tree_test.go newTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/check/named_test.go TestTheCheckRefusesANoteNamingADeletedFile
+src/modules/check/named_test.go TestACommentNamingADeletedFileDrawsTheRule
+src/modules/check/named_test.go TestAGlobAPlaceholderAndAStandingPathPass
+src/modules/check/named_test.go TestAnOpenTicketNamingANewFilePasses
+src/branches/free_test.go TestTheStaleSpanReadsTheSettingsDefault
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/check/named.go
+src/modules/check/named_test.go
+src/modules/check/checker.go
+src/modules/check/export.go
+src/modules/check/testdata/tree.golden.json
+src/branches/free.go
+src/branches/group.go
+src/branches/free_test.go
+src/branches/tree_test.go
+src/branches/port_c_held_test.go
+every tracked note or code file the new rule names, fixed in the same change
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+pointer.go pointersIn, placesIn, fileOf and unresolved, checker.go Over, Rules and Sweep, history.go isHistory and pastHistory, restated.go spanAt, branches free.go staleSpan, group.go staleSpan, doors.go config, quack branch.go Config, config.go Where and defaultIn, and the schema entry work.staleAfter stand opened and read.
+A grep for staleSpan, staleKey, Rules and pointerFaultsIn over src gives the callers list, the branch tests leaning on the span among them.
+The check line is TestTheCheckRefusesANoteNamingADeletedFile, the branches line is TestTheStaleSpanReadsTheSettingsDefault with the const gone, and ./RUNME.sh check runs both.
 
 ## tests-red
 
