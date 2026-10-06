@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: c147f74925e7b70fbba5f10fef3672cd90266297
+    hash_after: c147f74925e7b70fbba5f10fef3672cd90266297
+    inputs:
+      - name: ask
+        hash: f2b473ba57ff3686
+        size: 326
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,49 @@ Every proof runs on Linux, and a claim about the owner's Windows desk stands unr
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+level0Runs names the platform in every line it prints, as runtime.GOOS reads through the windows door: green names the platform it ran on, red names it beside the tree going red. On Windows the line names spec/tickets/desk-probe-reply-trial, the open trial that runs the live client on the owner's Windows desk, which no box reaches. One constant in src/quack/check.go holds that trial's name. The smoke ticket in this group later runs level zero on Windows as well, and keeps the trial line, since the smoke fakes the client.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf, the level0 part
+- src/quack/check_test.go TestCheckReads
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go TestCheckReads/a Windows box names the desk trial covering it
+- src/quack/check_test.go TestCheckReads/a green level zero names the platform it ran on
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/check.go
+- src/quack/check_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- level0Runs, partsOf, checkDoors.windows and the desk trial ticket stand opened, and the trial stands open
+- grep finds level0Runs in check.go and check_test.go alone among the sources
+- each done_when line names its go test case above, and the check line its own command
 
 ## tests-red
 
