@@ -347,6 +347,35 @@ func TestTheFreshBoxPointsTheHookAtAPortOfItsOwn(t *testing.T) {
 	}
 }
 
+// A commit touching the cold path runs the cold probe. [[spec/tickets/probes-leave-node]]
+func TestTheColdPathTakesTheHooksFolderAndTheNamedFiles(t *testing.T) {
+	t.Parallel()
+	paths := []string{".claude/skills/level0/hooks/start.js", "src/modules/hooks/stops.go", "src/quack/probe_dry.go", "src/scripts/install.sh", "src/bridge/guidance.js"}
+	if got := coldIn(paths); !slices.Equal(got, paths) {
+		t.Errorf("the cold path takes %v", got)
+	}
+}
+
+func TestAPathElsewhereSitsOffTheColdPath(t *testing.T) {
+	t.Parallel()
+	if got := coldIn([]string{"README.md", "src/scripts/install.sh.bak", "src/modules/hooksy/a.go", ".claude/skills/level0/lib/vehicle.js"}); len(got) != 0 {
+		t.Errorf("the cold path takes %v", got)
+	}
+}
+
+// The cold probe runs in Go, so the cold path names no probe script. [[spec/tickets/probes-leave-node]]
+func TestTheColdPathNamesNoScriptOfItsOwn(t *testing.T) {
+	t.Parallel()
+	for _, one := range coldPath {
+		if strings.HasPrefix(one, "src/scripts/probe-") {
+			t.Errorf("the cold path names %s", one)
+		}
+	}
+	if got := coldIn([]string{"src/scripts/probe-cold.js"}); len(got) != 0 {
+		t.Errorf("the cold path takes %v", got)
+	}
+}
+
 func TestATailKeepsTheLastLinesOnOne(t *testing.T) {
 	t.Parallel()
 	if got := tail("\n1\n2\n3\n4\n5\n6\n7\n"); got != "2 | 3 | 4 | 5 | 6 | 7" {

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ac3cdcab2c35b53e
         size: 459
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: ec844437150606cfebb7ffa1beada8f9a800ef16
+    hash_after: ec844437150606cfebb7ffa1beada8f9a800ef16
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: a43bfbbf5a92e9eb
+        size: 4413
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -262,26 +275,36 @@ Assumed: level0-hooks-forward-to-go cuts the plugin to a forwarder, so the door 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/probe_dry_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/probe_dry_test.go
+- src/quack/probe_cold_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Eight dry probe cases and the cold path case naming no script fail on their own assertion. The two cold path cases for standing behaviour pass, since coldIn already stands in commit.go.
+
+The tests fix the post door's signature and the shape of the session record, which the draft leaves open. The tools check reads the index's tool listing, where the JavaScript probe counted the plugin's tools in process.
+
+The stub holds no probeDry yet, because probe_verb.go still holds the one handing off to Node. The resume prompt now takes one exported name, and the clear case in stops_test.go asserts it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- lines one and two stand as checkpoints at implement, the door case decides line three before a live probe dry, and a live check decides line four
+- the process runs, the post, the disk and the clock each reach the tests through a fake door
 
 # gate
 

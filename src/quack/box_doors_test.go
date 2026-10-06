@@ -66,6 +66,7 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 		pid:  7,
 		run:  runner.run,
 		get:  func(string, time.Duration) (string, error) { return "", errors.New("no wire here") },
+		post: func(string, string, string, time.Duration) (int, string, error) { return 0, "", errors.New("no wire here") },
 		now:  func() time.Time { return time.Unix(0, 0) },
 		out:  &out,
 		errs: &errs,

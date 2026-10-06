@@ -44,6 +44,8 @@ type boxDoors struct {
 	pid       int
 	run       func(argv []string, o runOpts) ranResult
 	get       func(url string, wait time.Duration) (string, error)
+	// A POST of the body to the address under the bearer token, answering the status and the text. [[spec/tickets/probes-leave-node]]
+	post      func(url, token, body string, wait time.Duration) (int, string, error)
 	now       func() time.Time
 	out, errs io.Writer
 }
@@ -75,6 +77,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		pid:  os.Getpid(),
 		run:  realRun(out, errs),
 		get:  realGet,
+		post: realPost,
 		now:  time.Now,
 		out:  out,
 		errs: errs,
@@ -122,6 +125,11 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		}
 		return ran
 	}
+}
+
+// The post door, a stub until the implement step lands it. [[spec/tickets/probes-leave-node]]
+func realPost(string, string, string, time.Duration) (int, string, error) {
+	return 0, "", errors.New("the post door stands unbuilt")
 }
 
 func realGet(url string, wait time.Duration) (string, error) {
