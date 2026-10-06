@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,7 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: code-is-pure-tests-behave
+step: do
 ---
 
 # Ask
