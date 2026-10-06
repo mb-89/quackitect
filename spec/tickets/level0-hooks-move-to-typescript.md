@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -122,6 +122,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 5090e9523847 · claude-code-remote · the owner says so
+    hash_before: 9d9c1d3e57117f88eb8a3acc9fe35f8ffd553eb3
+    hash_after: 9d9c1d3e57117f88eb8a3acc9fe35f8ffd553eb3
+    inputs:
+      - name: ask
+        hash: f98b8097d2cddb4b
+        size: 1084
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -167,38 +176,59 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks module and its glue stand as .ts files under .claude/skills/level0/hooks, and hooks/hooks.json names ./pull-tool.ts. The plugin tsconfig extends the types claude lays under .claude-plugin/types. The check runs two parts in src/quack/check.go: plugin runs claude plugin validate over the plugin, and types lays the engine types through claude --plugin-dir and then runs tsc -p over the plugin. A box with no claude or no tsc says so and carries on. The rule logic the hooks still hold moves to Go under level0-hooks-hold-no-rule.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/hooks.json modules
+- .claude/skills/level0/hooks/pull-tool.ts register
+- src/scripts/probe-dry.js MODULE and session
+- src/quack/check.go partsOf, pluginHolds and typesHold
+- test/level0/hooks.test.js imports of level0.ts
+- src/vehicle vehicle ModulesOf, which reads the module list
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go the types part lays the engine types, then runs tsc over the plugin
+- src/quack/check_test.go the types part fails where tsc refuses the hooks
+- src/quack/check_test.go the plugin part runs claude plugin validate
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/*.ts
+- .claude/skills/level0/hooks/hooks.json
+- .claude/skills/level0/tsconfig.json
+- src/quack/check.go
+- src/quack/check_test.go
+- src/scripts/probe-dry.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+hooks.json, tsconfig.json, typesHold and pluginHolds in src/quack/check.go stand opened, and tsc -p and claude plugin validate both pass on this box
+the callers list names the manifest, the dry probe, the check and the tests importing level0.ts
+line one is decided by claude plugin validate in the plugin part, line two by tsc in the types part, line three by level0-hooks-hold-no-rule, line four by ./RUNME.sh check
+the approach adds no config key
 
 ## tests-red
 
