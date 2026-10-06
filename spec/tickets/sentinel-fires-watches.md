@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: implement/change
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -206,6 +206,12 @@ record:
         hash: 8e785cc94e2e32f9
         size: 4503
     def: dc4904ab364efa10
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/failures]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/failures]]
 ---
 
 # Ask
