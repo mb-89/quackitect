@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: effect
+step: audit
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -148,6 +148,19 @@ record:
         hash: ad7d848022d200b6
         size: 605
     def: 6cbd13ac719e276f
+  - step: effect
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: e3a3aa25d53d1fd1e6caccef4d8292312f0192fd
+    hash_after: e3a3aa25d53d1fd1e6caccef4d8292312f0192fd
+    answered:
+      - name: effect
+        exit: 0
+        said: battery  baseline 167981 ms, which the next retro reads against
+    inputs:
+      - name: collect
+        hash: f3cc2717aa4cc2f3
+        size: 47
+    def: 0a500fbc7d589467
 ---
 
 # Ask
@@ -204,8 +217,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## effect
 
 <!-- retro effect, which answers each earlier class with its rate before and now -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro effect retro-0d14eda
 
 # audit
 
