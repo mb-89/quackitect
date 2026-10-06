@@ -60,12 +60,12 @@ func TestTakeOverRefusesAHoldThatStillBeats(t *testing.T) {
 	}
 }
 
-// branch list names an old hold live while its box still beats, and asks nothing under Yours. [[spec/tickets/holds-beat-with-the-session]]
+// branch list names an old hold live while its box still beats, and asks nothing under Yours. Another box's beat reaches this clone through the fetch. [[spec/tickets/holds-beat-with-the-session]]
 func TestListNamesAnOldHoldLiveWhileItsBoxBeats(t *testing.T) {
 	t.Parallel()
 	one := pcTakingHeld(t, 3*time.Hour, 0)
 	one.beatOn(pcGroup, pcOther, "beats", time.Now().Add(3*time.Hour-time.Minute))
-	one.branchSays("list")
+	one.branchSays("list", "--fetch")
 	said := one.out.String()
 	if strings.Contains(said, "Yours") {
 		t.Fatalf("a beating hold stands under Yours: %s", said)
@@ -96,4 +96,20 @@ func TestABeatInsideHalfTheSpanWritesNothing(t *testing.T) {
 		t.Fatalf("the end answers %d: %s", code, one.pcSaid())
 	}
 	holds(t, one.git("log", "-1", "--format=%s", one.beatTip(pcGroup)), hand+" ends")
+}
+
+// The Stop hook runs the beat at every turn's end, so off a branch this box holds, and on a refused push, it answers 0, prints nothing and writes nothing. [[spec/tickets/beat-hook-stays-quiet]]
+func TestABeatStaysQuietWhereItWritesNothing(t *testing.T) {
+	t.Parallel()
+	offHold := newTree(t, nil)
+	if code := offHold.branchSays("beat"); code != codeOK || offHold.pcSaid() != "" || offHold.beatTip(pcGroup) != "" {
+		t.Fatalf("a beat on %s answers %d and prints %q", trunk, code, offHold.pcSaid())
+	}
+	refused := newTree(t, nil)
+	hand := refused.pcHand()
+	pcOnGroup(refused, map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, hand, "b818c390")})
+	refused.git("remote", "set-url", "--push", "origin", t.TempDir())
+	if code := refused.branchSays("beat", "--end"); code != codeOK || refused.pcSaid() != "" || refused.beatTip(pcGroup) != "" {
+		t.Fatalf("a refused beat answers %d and prints %q", code, refused.pcSaid())
+	}
 }

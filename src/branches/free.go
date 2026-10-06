@@ -27,20 +27,14 @@ func (d *Doors) staleSpan() int64 {
 	return int64(spanOf(staleSpan))
 }
 
-// A claim's age and whether it stands older than the span. [[spec/design_output/work#a-stale-group-is-yours]]
+// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#a-hold-beats-with-its-session]]
 type claim struct {
 	Age   string
 	Stale bool
+	Live  bool
+	Beat  string
 }
 
-// The age of the claim on a branch, and whether it stands stale. [[spec/design_output/work#a-stale-group-is-yours]]
-func (d *Doors) staleClaim(one stand, now int64) claim {
-	held := tipAge(one, now)
-	if held < 0 {
-		return claim{}
-	}
-	return claim{Age: aged(held), Stale: held > d.staleSpan()}
-}
 
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
 func (d *Doors) nowSeconds() int64 {
