@@ -91,10 +91,13 @@ func Cloud(d *Doors, argv []string) int {
 		return d.trigger()
 	case "prompt":
 		return d.prompt(word(argv, 1))
+	case "fleet":
+		return d.fleet()
 	}
 	d.say("Usage: ./RUNME.sh cloud <verb>\n")
 	d.say("  trigger       the routine that works a branch, and what stands free")
 	d.say("  prompt <group> the prompt a box starts with, off the group and its route")
+	d.say("  fleet         each box with its tip, age, holder and pull request, and a wake for each that stalls")
 	if word(argv, 0) != "" {
 		return codeRefused
 	}

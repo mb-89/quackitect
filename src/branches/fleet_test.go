@@ -81,6 +81,14 @@ func TestFleetExitsRedOnAWake(t *testing.T) {
 	holds(t, one.out.String(), "wake work/g idle")
 }
 
+func TestPullsReadEachPullHeadByItsTip(t *testing.T) {
+	t.Parallel()
+	said := pullsOf("a1b2\trefs/pull/7/head\nc3d4\trefs/heads/main\n")
+	if len(said) != 1 || said["a1b2"] != "#7" {
+		t.Fatalf("the pulls read %v", said)
+	}
+}
+
 // A box the dispatch fires takes its branch, and its take names the hand and the session the fire opened. [[spec/tickets/boxes-write-their-final-record]]
 func TestFleetHoldsTheBoxesTheDispatchFires(t *testing.T) {
 	t.Parallel()

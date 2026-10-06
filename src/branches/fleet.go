@@ -3,6 +3,12 @@
 // [[spec/tickets/boxes-write-their-final-record]]
 package branches
 
+import (
+	"cmp"
+	"slices"
+	"strings"
+)
+
 // The variable the harness names a cloud box's session in, which a pull request event routes to. [[spec/tickets/boxes-write-their-final-record]]
 const sessionVar = "CLAUDE_CODE_REMOTE_SESSION_ID"
 
@@ -33,8 +39,80 @@ const (
 )
 
 // One wake a box that stalls. [[spec/tickets/the-fleet-verb-watches-boxes]]
-func wakesOf(_ []boxRow, _ int64) []wake {
-	return nil
+func wakesOf(rows []boxRow, idle int64) []wake {
+	var out []wake
+	for _, one := range rows {
+		switch {
+		case one.Standing == held && one.AgeSeconds > idle:
+			out = append(out, wake{Branch: one.Branch, Why: wakeIdle})
+		case one.Standing == done && one.Pull == "":
+			out = append(out, wake{Branch: one.Branch, Why: wakeStopped})
+		case one.Standing == todo && one.Final != "":
+			out = append(out, wake{Branch: one.Branch, Why: wakeFailed})
+		}
+	}
+	return out
+}
+
+// The rows with each branch's tip, the tip's age at now, and the pull request whose head names that tip. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func withTips(rows []boxRow, stood []stand, now int64, pulls map[string]string) []boxRow {
+	out := slices.Clone(rows)
+	for at, one := range stood {
+		out[at].Tip = shortOf(one.Tip)
+		out[at].AgeSeconds = now - one.When
+		out[at].Age = aged(out[at].AgeSeconds)
+		out[at].Pull = pulls[one.Tip]
+	}
+	return out
+}
+
+// The pull request numbers by the tip their head names, off ls-remote's rows. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func pullsOf(said string) map[string]string {
+	out := map[string]string{}
+	for _, row := range strings.Split(said, "\n") {
+		sha, name, ok := strings.Cut(strings.TrimSpace(row), "\t")
+		number := strings.TrimSuffix(strings.TrimPrefix(name, "refs/pull/"), "/head")
+		if ok && number != name {
+			out[sha] = "#" + number
+		}
+	}
+	return out
+}
+
+// The idle span in seconds, off the config or its default. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func (d *Doors) idleSpan() int64 {
+	if said := spanOf(d.config(idleKey)); said > 0 {
+		return int64(said)
+	}
+	return int64(spanOf(idleSpan))
+}
+
+// Prints a row a work branch and a wake a stalled box, and exits red where a wake stands, so the watch running it wakes the coordinator. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func (d *Doors) fleet() int {
+	d.fetch()
+	stood, _ := d.readWork(false)
+	pulls := pullsOf(d.quiet("ls-remote", "origin", "refs/pull/*/head").Out)
+	rows := withTips(fleetRows(stood, standingAll(stood)), stood, d.nowSeconds(), pulls)
+	for _, one := range rows {
+		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull), "  "))
+	}
+	wakes := wakesOf(rows, d.idleSpan())
+	for _, one := range wakes {
+		d.say("wake %s %s", one.Branch, one.Why)
+	}
+	if len(wakes) > 0 {
+		return codeRed
+	}
+	return codeOK
+}
+
+// The fields, with a dash for each that stands empty. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func dashed(fields ...string) []string {
+	out := make([]string, len(fields))
+	for at, one := range fields {
+		out[at] = cmp.Or(one, "-")
+	}
+	return out
 }
 
 // One row a work branch, off its group's record. [[spec/tickets/boxes-write-their-final-record]]

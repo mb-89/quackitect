@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 6e6c55ed28e894ff
         size: 1007
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 3f2d309db007e5b083b372420a9d68525c990eaf
+    hash_after: 3f2d309db007e5b083b372420a9d68525c990eaf
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/failures-and-the-sentinel.md:298:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -308,14 +317,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/branches/fleet.go src/branches/fleet_test.go src/branches/branch.go spec/tickets/failures-and-the-sentinel.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches fleet.go, fleet_test.go, branch.go and the sentinel ticket, all on the size list. The gate asked fleetRows to gain arguments. withTips adds the tip, age and pull request beside it instead, so no caller changes.
+- The verb reaches git through the standing quiet door, and the cases drive it over a temp clone with a bare origin.
+- Each new function carries a link to this ticket, where the approach stands.
+- The span reads through spanOf and the age through aged, as the stale span does, so no reader stands twice.
 
 ## tests-green
 
