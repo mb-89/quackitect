@@ -25,6 +25,7 @@ const (
 	trunkBranch    = "main"
 	remotePrefix   = "origin/"
 	clearTicket    = "clear"
+	readTicket     = "read-handover"
 	retroStep      = "retro"
 )
 

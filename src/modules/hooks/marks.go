@@ -36,11 +36,12 @@ var harnesses = [][2]string{
 	{"CLAUDECODE", "claude-code"},
 }
 
-// What an event writes and drops: the due mark, the due mark's drop, and the clear held where the queue no longer clears. [[spec/tickets/cage-stop-marks-port]]
+// What an event writes and drops: the due mark, the due mark's drop, the clear held where the queue no longer clears, and the read put in the clear's place. [[spec/tickets/cage-stop-marks-port]] [[spec/tickets/the-clear-hands-back-the-leaf]]
 type Marks struct {
 	Due       *DueMark `json:"due,omitempty"`
 	DropDue   bool     `json:"dropDue,omitempty"`
 	DropClear bool     `json:"dropClear,omitempty"`
+	ReadNext  bool     `json:"readNext,omitempty"`
 }
 
 // The due mark as marksDue writes it: the fill, and the key it passed. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
@@ -78,11 +79,30 @@ func (d *Door) marks(session, root string) {
 			}
 		}
 	}
-	if marks.DropClear || marks.DropDue {
+	if marks.ReadNext {
+		readsNext(tree)
+	}
+	if marks.DropClear || marks.DropDue || marks.ReadNext {
 		_ = os.Remove(tree.at(dueFile))
 	}
 	if marks.Due != nil {
 		_ = writeMark(tree.at(dueFile), marks.Due)
+	}
+}
+
+// Each clear held turns into the read, keeping every other field, as readsNext in src/bridge/handover.js wrote it. [[spec/tickets/the-clear-hands-back-the-leaf]]
+func readsNext(tree disk) {
+	for _, name := range tree.List(holdsFolder) {
+		at := holdsFolder + "/" + name
+		text, found := tree.Read(at)
+		var held map[string]any
+		if !found || json.Unmarshal([]byte(text), &held) != nil || held["ephemeral"] != true || heldText(held["ticket"]) != clearTicket {
+			continue
+		}
+		held["ticket"], held["step"] = readTicket, readTicket
+		if body, err := json.MarshalIndent(held, "", markIndent); err == nil {
+			_ = os.WriteFile(tree.at(at), append(body, '\n'), fileMode)
+		}
 	}
 }
 

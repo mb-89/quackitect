@@ -1,14 +1,22 @@
-// The dry probe's clear check: the conversation clears, and the resume prompt
-// opens the next one.
-// [[spec/tickets/the-clear-continues-the-session]]
+// The dry probe's clear check: the conversation clears, the resume prompt opens
+// the next one, and the read past it hands the leaf with no second clear.
+// [[spec/tickets/the-clear-continues-the-session]] [[spec/tickets/the-clear-hands-back-the-leaf]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { RESUME } from "../../src/bridge/handover.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { clearHeld, ENDS, grouped } from "../../src/scripts/probe-clear.js";
 
 const FELL = { kind: "hook", said: "the clear the handover asks for fails", detail: "refused" };
+// What the cycle past the clear leaves: the read in hand, the leaf in the read's answer, the commit, and the one clear. [[spec/tickets/the-clear-hands-back-the-leaf]]
+const AFTER = {
+  pulled: "work\n  read-handover stands in your hand.",
+  read: "work\n  read-handover closes.\nwork  dry-probe-leaf at do, leaf 1 of 1",
+  committed: { exit: 0, said: "" },
+  clears: 1,
+};
 
 function run(over = {}) {
   return {
@@ -16,6 +24,7 @@ function run(over = {}) {
       runs: [{ words: "handover --pass", exit: 0, said: "Level zero clears the conversation." }],
       commands: ["clear"],
       prompts: [RESUME],
+      after: AFTER,
       ...over,
     },
   };
@@ -54,6 +63,18 @@ test("a pull that falls names what each pull before it answers", () => {
   assert.match(said.evidence, /^the pull alone answers Call branch done\.; the pull handover --pass answers 1: nothing stands/);
 });
 
+// Past the clear, each way the cycle loops fails the clear. [[spec/tickets/the-clear-hands-back-the-leaf]]
+for (const [name, broken] of [
+  ["the pull after the clear handing the clear again", { pulled: "work\n  clear stands in your hand." }],
+  ["the read's pass handing the handover again", { read: "work\n  handover stands in your hand." }],
+  ["the leaf's commit failing", { committed: { exit: 1, said: "nothing" } }],
+  ["a second clear at the next turn's end", { clears: 2 }],
+]) {
+  test(`${name} fails the clear`, () => {
+    assert.equal(clearHeld([], run({ after: { ...AFTER, ...broken } })).pass, false);
+  });
+}
+
 test("a clear the plugin meets refused names the refusal", () => {
   const said = clearHeld([FELL], run({ commands: [] }));
   assert.equal(said.pass, false);
@@ -63,9 +84,11 @@ test("a clear the plugin meets refused names the refusal", () => {
 // A box's work branch stands on origin, so the probe's handover meets no work the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
 test("the probe mints its group, stands on its work branch, and points origin's branch at its tip", () => {
   const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
-  const it = { proc, join: (...parts) => parts.join("/") };
+  const disk = fakeDisk();
+  const it = { proc, disk, join: (...parts) => parts.join("/") };
 
   assert.equal(grouped(it, "/t", {}), null);
+  assert.match(String(disk.read("/t/spec/tickets/dry-probe-leaf.md")), /state: open[\s\S]*group: dry-probe-clears/);
   const lines = proc.ran.map((one) => one.argv.join(" "));
   assert.ok(lines.some((one) => /^git checkout -q -B work\//.test(one)), lines.join("\n"));
   assert.ok(lines.some((one) => /^git update-ref refs\/remotes\/origin\/work\/\S+ HEAD$/.test(one)), lines.join("\n"));
@@ -74,7 +97,7 @@ test("the probe mints its group, stands on its work branch, and points origin's 
 // A verb reads QUACKITECT_ROOT before its folder, so a probe under the index still writes in its clone. [[spec/tickets/the-clear-carries-no-local-work]]
 test("the probe's mint names the clone as its root, whatever root the parent carries", () => {
   const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
-  const it = { proc, join: (...parts) => parts.join("/") };
+  const it = { proc, disk: fakeDisk(), join: (...parts) => parts.join("/") };
 
   grouped(it, "/t", { QUACKITECT_ROOT: "/srv/tree" });
   const minted = proc.ran.find((one) => one.argv.includes("mint"));

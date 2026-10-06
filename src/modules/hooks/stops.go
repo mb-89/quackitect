@@ -328,6 +328,8 @@ func (state *Stops) holdsForHandover(text string, held map[string]any, facts Sto
 		// The Stop answers the clear, since `turn.complete` lands before it or after it, and the plugin runs it once the session stands idle. [[spec/tickets/the-clear-continues-the-session]]
 		state.Handover = nil
 		state.Said.Word, state.Said.Text = ClearWord, resumePrompt
+		// The read takes the clear's place as the clear is answered, so the pull after it hands the next leaf. [[spec/tickets/the-clear-hands-back-the-leaf]]
+		state.marks().ReadNext = true
 		return true, ""
 	}
 	due := state.Handover
