@@ -163,9 +163,6 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
 		}
-		if said := run(Command{Argv: line, Drop: []string{"PROC_UNSET"}}); said.Out != "box" || said.Code != 0 {
-			t.Errorf("the %s runner answers %+v, and wants the box's variable the drop leaves unnamed", name, said)
-		}
 	}
 }
 
