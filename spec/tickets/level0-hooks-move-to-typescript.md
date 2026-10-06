@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 81571cd647f1c4b744c7df6203b339b43f004e74
+    hash_after: 81571cd647f1c4b744c7df6203b339b43f004e74
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "  103.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e67ae0eb78415dd4
+        size: 657
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -338,26 +361,33 @@ the include list in the plugin tsconfig holds the stub path once, and the test r
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/stub-typed.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The vehicle hooks already stood as TypeScript, with claude plugin validate and tsc as parts of the check. The stub carried the last hook still in JavaScript, so it moves to bridgehead.ts, typed against the engine, and the plugin tsconfig reaches it. Validate found the old file reaching $.ui through optional chaining, which the engine refuses, so the port spells the call whole.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the stub hook, its manifest, the tsconfig, the vale section and the tests naming the hook, and nothing past the glue the ask names
+the hook reaches the engine through $ alone, and the bridgehead tests fake it
+the header of bridgehead.ts names the approach and links this ticket
+the stub path stands once, in the include list, and the test reads it there
 
 # accept
 
