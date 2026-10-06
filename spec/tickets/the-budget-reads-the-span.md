@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 group: the-check-runs-beside
 depends_on: [the-parts-start-at-once]
 steps:
@@ -27,6 +27,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
+step: do
 ---
 
 # Ask
