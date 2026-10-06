@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 9d952661f907f30c
         size: 729
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4e6d2c07ff7ac3771bfb68871a1764536d80c1da
+    hash_after: 4e6d2c07ff7ac3771bfb68871a1764536d80c1da
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/proc fails
+    inputs:
+      - name: design/draft
+        hash: 2e87095745369753
+        size: 1218
+      - name: [[spec/design_output/doors]]
+        hash: 468995647948509f
+        size: 17322
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +239,31 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/proc/proc_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+A design adds no code, so the red test is the process door contract suite, the half of the design small enough to stand here. The real runner passes each case, and the stub fake fails each on its own assertion. The git door stays a design, and pull-meets-fake-git builds it first. A surprise: the lsp module already runs a tool process behind a Runner, so the door takes that shape, and the door lands at src/proc, since a package under src/modules registers ports.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the process door half meets the contract suite, and the git door half and the order of the moves meet a checkpoint the gate reads in the chapter
+- the suite reaches a real process, and it is the one door test of a spawned process, listed in the door table
 
 # gate
 

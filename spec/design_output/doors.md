@@ -182,6 +182,7 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
 | a placed process | `src/index/procs.go` | none | `src/index/procs_test.go` |
 | a tool's process | `src/modules/lsp` | none | `src/modules/lsp/door_test.go` |
+| a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the pull's git and shell | `src/pull` | none | none |
 | the branch verbs' git, disk and env | `src/branches` | none | none |
@@ -254,9 +255,9 @@ shape, and the lsp module moves onto it.
 
 | part | what it holds |
 |---|---|
-| `Runner` in `src/modules/proc` | the door, a function the real one fills with `exec` |
+| `Runner` in `src/proc` | the door, a function the real one fills with `exec`, outside `src/modules`, since it registers no ports |
 | `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does |
-| `src/modules/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, and env |
+| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, and a program that never starts |
 
 The branch verbs' `rawEnv`, the pull's `OSShell`, and every `exec.Command` in
 the quack verbs outside the box and check doors take the `Runner`. A case
