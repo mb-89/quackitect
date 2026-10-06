@@ -31,6 +31,7 @@ func TestTheReviewNamesAPackageNothingImports(t *testing.T) {
 	}
 	said := one.out.String()
 	holds(t, said, "unreached  src/lone/lone.go\n           src/lone/lone_test.go")
+	holds(t, said, "3 things to fix.")
 	for _, reached := range []string{"src/used/used.go", "src/cmd/main.go"} {
 		if strings.Contains(said, reached) {
 			t.Fatalf("the review names %s, which a main reaches:\n%s", reached, said)

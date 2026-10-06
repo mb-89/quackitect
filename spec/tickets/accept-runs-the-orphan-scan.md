@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ff63dfed217d1aaa
         size: 577
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: e3b12335cc913ea5c5a78643718b41b8e15095ba
+    hash_after: e3b12335cc913ea5c5a78643718b41b8e15095ba
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/branches/unreached.go:2:47: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -292,14 +301,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/branches/unreached.go src/branches/review.go src/branches/unreached_test.go src/modules/hooks/review/review.go src/modules/hooks/review/review_test.go spec/design_output/review.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the review_branch road the gate named
+- the scan reaches git through the branch Doors, which the tests drive over a real bare origin as every src/branches test does
+- review.go and unreached.go point at the unreached row section of spec/design_output/review
+- the unreached row stands once, in spec/design_output/review.md
 
 ## tests-green
 
