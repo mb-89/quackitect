@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: a45f4a162f7d0293e7a66db3e13dcf50012f1b65
+    hash_after: a45f4a162f7d0293e7a66db3e13dcf50012f1b65
+    inputs:
+      - name: ask
+        hash: 707753c399639aa5
+        size: 709
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,51 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The cause is the environment, not the lease. The index starts its door with QUACKITECT_ROOT set to the real root, in spawns in src/index/door.go, and every child of the index inherits it. A pull run through the tool call runs ./RUNME.sh check as such a child. The contract case in test/contract/index.test.js then runs se-index over a temp work folder through the JS door in src/doors/index.js, which sets cwd and no env. rootHere in src/index/main.go reads QUACKITECT_ROOT before the working folder, so the case's stop reaches the real index, which restarts on a new port, and the hand-back meets connection refused. A run proves it: the contract test with the variable unset leaves the index at its port and pid, and with it set to the root moves both, and three cases fail. The fix: run in src/doors/index.js hands the binary env QUACKITECT_ROOT set to its work root, so the door names its own root and no inherited value redirects it. The done_when lines named a test under src/modules/index, since the ask suspected the lease. The approach departs there: the tests sit beside the door the fix changes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/cli-doors.js: the index door built over roots.method and roots.work
+- test/level0/search-door.test.js: doorAnswering
+- test/contract/index.test.js: every case building index(files, proc(), clock(), root, work)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/search-door.test.js: the door hands the index its work root, so an inherited root names no other index
+- test/contract/index.test.js: a door over one work folder leaves the index an inherited QUACKITECT_ROOT names standing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/doors/index.js
+- test/level0/search-door.test.js
+- test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened: spawns and rootHere in src/index, run in src/doors/index.js, and the fake proc's ran record
+the callers list names every importer of src/doors/index.js, which a grep over src, test and .claude finds
+each done_when line meets its test: the contract case decides the index left running, and the hand-back through the tool call decides the second line at tests-green
 
 ## tests-red
 
