@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -122,6 +122,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 70672ee0ff0d · claude-code-remote
+    hash_before: d9e95dceec87c6db6cd24629c940a191c9fc878d
+    hash_after: d9e95dceec87c6db6cd24629c940a191c9fc878d
+    inputs:
+      - name: ask
+        hash: c53f269eb8381838
+        size: 808
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,71 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A pure package `src/example` owns the one parser. `example.Read(path, text)` answers an `Example` and its faults. The example holds the chapter off the path, whether that chapter is a `9xx_dev` one, the front fields and the steps. A step holds the prose since the last call, the call's words past `./RUNME.sh`, its line and its expect lines. An expect holds its form, its words and its line.
+
+The parser reads every `sh`, `bash` or `shell` fence. A line there is blank, a `./RUNME.sh` call or an `# expect:` line, and any other line is a fault. A call holding a pipe, a redirect, a `;`, a `&&` or a substitution outside quotes is a fault too. An expect line before any call faults, and so does a form outside the design table or one with the wrong words.
+
+`spec/schemas/example.schema.yaml` governs `spec/examples/**`. It asks for `kind`, `title`, `keywords` and `interface`. Its `edge` field carries `x-under`, a glob of the `9xx_dev` chapters, and the front checker reads that new key: the field stands under the glob and nowhere else. The body carries `x-steps: example` and no chapters, `isNoteSchema` takes a body naming either, and `checkNote` adds the parser's faults as `Example.<rule>` findings. So lint, the sweep, the write door and the mint all refuse an example out of shape off one road.
+
+`src/imports` lists `src/example` with the pure packages, so a module, the harness and the tab import it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/schema.go schemasIn, which calls isNoteSchema
+- src/modules/check/schema.go checkNoteIn, which calls checkNote
+- src/modules/check/mint.go, the mint's check, which calls checkNote
+- src/modules/check/checker.go, the file check and the sweep, which reach noteFaults
+- src/modules/check/schema.go checkNote, which calls frontFaults
+- src/imports/imports.go pastQ, which reads pureTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/example/example_test.go TestAPlantedExampleReadsEachExpectForm
+- src/example/example_test.go TestALinePastRunmeRefuses
+- src/example/example_test.go TestAnExpectFormOutsideTheTableRefuses
+- src/example/example_test.go TestAnExpectBeforeAnyCallRefuses
+- src/example/example_test.go TestTheChapterNamesADeveloperCase
+- src/modules/check/example_test.go TestAnExampleNamesTitleKeywordsAndInterface
+- src/modules/check/example_test.go TestADeveloperCaseAloneNamesItsEdge
+- src/modules/check/example_test.go TestTheCheckRefusesAStepOutOfShape
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/example/example.go
+- src/example/example_test.go
+- spec/schemas/example.schema.yaml
+- src/modules/check/schema.go
+- src/modules/check/example.go
+- src/modules/check/example_test.go
+- src/imports/imports.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: schema.go, schema-body.go, note.go, mint.go, checker.go and imports.go
+- the callers list names each caller of checkNote, frontFaults, isNoteSchema and pureTree
+- each done_when line names its test: the schema in the check tests, the parser in the example tests, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
