@@ -208,6 +208,12 @@ A door standing at `report` lists its walk-arounds through `./RUNME.sh doors`
 and refuses none, and the editor draws each as a hint in a file it holds
 open. A door drops `report` once its list reaches zero.
 
+`DoorsOnly` keeps refusing the JavaScript while the guard refuses none of it.
+It also refuses `Math.random` and every `node:` module, and no declaration
+owns those. It retires in the change that drops `report` from the last
+JavaScript door, once a declaration owns `Math.random` and the guard refuses
+a `node:` module no door declares.
+
 The one escape is the marker on the line or the line above:
 
     // level0: OutsideInDoors - <why the door cannot serve>
