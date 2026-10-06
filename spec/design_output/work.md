@@ -452,6 +452,23 @@ a rejected push and takes the next. For details, see
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].
 
+## The check runs once a head
+
+`.github/workflows/check.yml` runs on a push to `main` and on a pull request
+against `main`, and nowhere else.
+
+| event | concurrency group | a newer run |
+|---|---|---|
+| a pull request | one per pull request | cancels the run it supersedes |
+| a push to `main` | one per run | waits beside it, and cancels nothing |
+
+The fleet pushes often. A push run on every branch beside its pull request
+run doubled each head's jobs, and superseded runs kept their runners, so the
+queue held `main`'s own run back. A group per ref on `main` still drops a
+queued run when a newer one joins, so `main` takes a group per run. The job
+and its matrix keep their names, so the required checks still report under
+the names branch protection reads.
+
 # A branch moves clean
 
 `branch take` and `branch release` both switch onto a branch and reset it hard

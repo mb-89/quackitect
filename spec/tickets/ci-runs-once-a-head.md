@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -82,6 +82,80 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
+step: retro/cloud
+record:
+  - step: sync
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 8c0f79e4bdb5320a26034a65bb4f7a835cdd0c4a
+    hash_after: ab8db557a2278941081d5fd000033c4072f3914f
+    answered:
+      - name: sync
+        exit: 0
+        said: work/ci-runs-once-a-head already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 07d2388b9cea84fa96feb1c2a784343375245f1c
+    hash_after: 07d2388b9cea84fa96feb1c2a784343375245f1c
+    inputs:
+      - name: ask
+        hash: 2f604c4e87630f58
+        size: 204
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 26797bfdbd1b7a9445e7a987c5bf5094f087bc0e
+    hash_after: 26797bfdbd1b7a9445e7a987c5bf5094f087bc0e
+  - step: accept
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 0ffa2fc8f83d1377910f94bbbad1989c0441c4c4
+    hash_after: 0ffa2fc8f83d1377910f94bbbad1989c0441c4c4
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/ci-runs-once-a-head already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 2f604c4e87630f58
+        size: 204
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 2d06982ee69b278ad8cc9c2383b8bafc728fd391
+    hash_after: 2d06982ee69b278ad8cc9c2383b8bafc728fd391
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: a5044e4d3bbd6a797a9ec6be4d723146ae1d2a05
+    hash_after: a5044e4d3bbd6a797a9ec6be4d723146ae1d2a05
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: c1ccf97a8db4a744644e83f7d68ef8382b224e9b
+    hash_after: c57512058de879b7f547208b0d0fc2ef921d848c
+    inputs:
+      - name: retro/write
+        hash: 981425f204e93893
+        size: 2434
+    def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: "The check runs once a head: on a pull request or on main."
+reason: done
 ---
 
 # Ask
@@ -97,8 +171,9 @@ never waits behind the fleet's superseded ones.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -107,14 +182,18 @@ never waits behind the fleet's superseded ones.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/check-runs-once-a-head]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child changes one workflow, its contract test and one design section, small enough to review whole
+- the child covers the goal whole: the triggers, the groups, the names kept and the reason written
+- no child waits on another, since the group holds one
 
 # children
 
@@ -125,8 +204,9 @@ never waits behind the fleet's superseded ones.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -137,8 +217,9 @@ never waits behind the fleet's superseded ones.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -147,38 +228,60 @@ never waits behind the fleet's superseded ones.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-runs-once-a-head: the check runs on a push to main and on a pull request against main, with a concurrency group per pull request that cancels and a group per run on main
+- the contract test pins the triggers, the groups and the job name
+- work.md carries the reason under the check runs once a head
+- the group's tickets reached main through their own pull request, #119
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the contract test named the old trigger at once, so the workflow and its test moved together
+- the size golden named its own fix, the -twins flag, in its failure line
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 20:21 the mint refused the group before a child named it, and the door refused every call naming the group before its file stood
+- 20:22 the door refused cloud: true on the group, and no verb named in the ask writes it
+- 20:25 branch open refused to run off a detached head, then needed the group on origin main, so the tickets took their own pull request and its queued CI
+- 20:47 branch open tried to push its cloud marker to main, the push came back refused, and branch take then handed out another group's done branch
+- 20:55 the first commit's check went red on the size golden, so the commit landed on a rescue branch, which stays on origin
+- 21:00 the hand-back of do ran past a 115 second cap, and its tests field refused a node command where it wants branch test
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the cloud guidance names the order a box mints a group in: child first, then the group, then the mark
+- branch open on a cloud box writes its cloud marker on the work branch, so it needs no push to main
+- branch take on a cloud box hands the branch its own group names before a stuck hand-over
+- the do step of the trivial process names branch test in its tests field's line
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask was small, and the route around it was large: two pull requests and two CI queues for one workflow change. The choice the run weighed was the concurrency key on main. A group per ref drops a queued run when a third push joins, so the change takes a group per run there, and main never gives way.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands once: the reason lives in work.md, and the workflow and the test link it
+- the change adds no number
+- the workflow header says what the file is for, and counts nothing
+- the chapter carries the run's errors with their times, and the opening prompt stands as the only owner prompt
+- the chapter names roles alone, and no box path
 
 ## cloud
 
@@ -187,20 +290,27 @@ never waits behind the fleet's superseded ones.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 20:22 a verb that writes cloud: true on a group from a cloud box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 20:47 the trunk guard refused the cloud marker push of branch open
+- 20:55 the commit check went red on the size golden, and the commit landed on a rescue branch
+- 21:00 the 115 second cap a box sets on a command cut the hand-back of do
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the rescue branch rescue/ci-runs-once-a-head stands on origin, and its commit stands on the work branch too
 
 # Discussion
 
