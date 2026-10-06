@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: e2dfc6797d0ea176
         size: 507
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: d3a14c4637a8e94dd84d9a83dd5dd377d0aa6000
+    hash_after: d3a14c4637a8e94dd84d9a83dd5dd377d0aa6000
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: c992789f728d4f06
+        size: 5765
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -271,26 +284,31 @@ Weighed: one Go body for each rule over two doors, against a second copy in the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/hook_verb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/hook_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Eleven refusal cases and the two tree cases fail on their own assertion against a stub verb that exits 0. The owner's terminal case and the clean delta case pass already, since the stub refuses nothing. The tests run real git in a temporary repository with a bare origin, as the push and commit verb tests do, and the clock comes in through the doors, so a stale hold needs no faked commit date. A treeRoot constant already stood in codec_test.go, and the tree cases take it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red test: ls-files in TestHookScriptsLeave, the node grep in TestGitHooksNameNoNode, each refusal in its TestHook case, and the check at tests-green, where the hand answers it
+- git runs real in a temporary repository, the way the landing tests reach it, and the clock, the environment and stdin each come in as a door the test sets
 
 # gate
 
