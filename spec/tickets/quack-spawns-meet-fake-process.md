@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: a02393caec8b931ea22d5222262e2fd6a691b620
+    hash_after: a02393caec8b931ea22d5222262e2fd6a691b620
+    inputs:
+      - name: ask
+        hash: cb034706036a0d50
+        size: 568
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,106 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Of the six files the family row names, two spawn a process. `main_test.go` runs `go list -deps`, and `split_test.go` re-runs the test binary through `ioProcesses`. The other four sleep on the wall clock and spawn nothing. So the row splits by what each file waits on, and the process door's fake takes the spawns a quack case reaches.
+
+The quack cases reaching a spawn through a verb sit outside the row, because the guard in `src/imports/clock.go` sees a direct call alone. They are `TestVerbRegistry` and `TestAPersonRunCarriesNoHarness` through `nodeAccept`, and `TestVoiceRunsValeKeepsTheOutputOfAFailedExit` through `voiceRunsVale`.
+
+`nodeAccept(root)` stays as `nodeAcceptOver(proc.Real, os.Executable, root)`, and the package var `selfPath` goes. `nodeAcceptOver(run proc.Runner, self func() (string, error), root string)` builds one `proc.Command`: argv `self verb <root>/src/scripts <words>`, `Dir` the root, and for a person's call `Env` naming `SE_WORK_ROOT`. A nonzero `Code` answers an error carrying `Out` and `Err`, and `NotStarted` answers one too.
+
+`personEnv` takes harness variables out of the box's env, and `Command.Env` only adds pairs past the box's own. So `proc.Command` gains `Drop []string`. `Real` removes those names from `cmd.Environ()` before it appends `Env`. `FakeRunner.Run` strips them from `Env` before the program reads it. A person's call drops the `harness` names, as `HARNESS` in `src/extension/lib/lens.js` deletes them.
+
+`voiceRunsVale` becomes `voiceRunsValeOver(run proc.Runner)`, and the `init` in `voice_verb.go` registers `voiceRunsValeOver(proc.Real)`. A nonzero `Code` still answers `Out`, and `NotStarted` answers an error.
+
+Each rewritten case teaches a `FakeRunner` the program its command names. The person's case asserts the command the child road takes: its argv, its folder, the harness names in `Drop`, and `SE_WORK_ROOT` in `Env`. The contract case proves `Drop` on the real runner, so the quack case needs no shell script standing in for quack.
+
+`TestTheIndexImportsNoModule` leaves `main_test.go` for `src/imports/tree_test.go` as `TestTheIndexReachesNoModuleNorTheTickets`. It walks the in-module imports of `quackitect/src/index` over the `packages.Load` result that `TestTheTreeHoldsTheImportRules` already takes. One load serves both tests. A package outside the module imports nothing inside it, so the walk stays inside the module.
+
+I refuse to teach the fake `go` the answer to `go list`. A fake answering a planted list proves nothing about the tree. The cost: the claim moves to a package the ask leaves unnamed.
+
+The sleepers go to the family each one belongs to:
+- `split_test.go` joins the placements over real processes, because its spawn goes through `index.Placed` and its cases kill a pid, which no `Runner` holds. Its `git init` stays, because the io process's git module reads that repository.
+- `dump_test.go`, `cli_test.go` and the served-index cases of `main_test.go` serve the index over a real listener, so they join the index door's row.
+- `check_test.go` loses its sleep. The beside part closes a channel once it starts, and the `go` part waits on that channel, not on a spin.
+- `waits_test.go` polls `served.Of` on the wall clock. It takes a row of its own, under a follow-up ticket minted in the group.
+
+The row then names `registry_test.go`, `person_run_test.go` and `voice_verb_test.go` as moved onto the process door's fake.
+
+The doors.md line asking every `exec.Command` in the quack verbs to take the `Runner` narrows. It names the spawns a quack case reaches as moved, and every other spawn waits under a second follow-up ticket: `toolRuns`, `takesBranch`, `retroMintRunme`, `roadVerb`, `heardIn`, `reviewOver`, `serveRuns` and `tuiLaunch`. No quack case reaches those spawns, so converting them now changes files the ask leaves out, and no red test comes first. The cost: a later case reaching one of them spawns, and the guard sees nothing. `tuiLaunch` and `toolRuns` pass the terminal's input straight through, which a `Said` buffer cannot carry, so the follow-up decides their shape.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/accepts.go accepts
+- src/quack/twins.go nodeAccept
+- src/quack/no_program_test.go TestTheNodeModuleRefusesAWordNothingRegisters
+- src/quack/registry_test.go TestVerbRegistry
+- src/quack/person_run_test.go TestAPersonRunCarriesNoHarness
+- src/quack/voice_verb.go init
+- src/quack/voice_verb_test.go TestVoiceRunsValeKeepsTheOutputOfAFailedExit
+- src/proc/proc.go Real
+- src/proc/proc.go FakeRunner.Run
+- src/modules/git/repo.go NewRepo
+- src/pull/door.go ShellOver
+- src/modules/lsp/tools_test.go throughTheDoor
+- src/imports/tree_test.go TestTheTreeHoldsTheImportRules
+- src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go TestARunDropsTheVariablesItNames
+- src/quack/person_run_test.go TestAPersonRunDropsTheHarnessAndNamesItsRoot
+- src/quack/registry_test.go TestVerbRegistry/a_person's_call_to_a_registered_verb_runs_the_road_in_a_child,_under_the_person's_environment
+- src/quack/registry_test.go TestVerbRegistry/a_person's_call_whose_road_never_starts_answers_its_fault
+- src/quack/voice_verb_test.go TestVoiceRunsValeKeepsTheOutputOfAFailedExit
+- src/quack/voice_verb_test.go TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts
+- src/imports/tree_test.go TestTheIndexReachesNoModuleNorTheTickets
+- src/quack/check_test.go TestBatteryRun
+- done_when 1, direct spawns: src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit
+- done_when 1, spawns through a verb: the quack tests above on FakeRunner, since the guard sees a direct call alone
+- done_when 2: src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit decides each re-filed file. No command reads the word moved, so the gate reads it
+- done_when 3: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/proc/proc.go
+- src/proc/proc_contract_test.go
+- src/quack/twins.go
+- src/quack/voice_verb.go
+- src/quack/voice_verb_test.go
+- src/quack/person_run_test.go
+- src/quack/registry_test.go
+- src/quack/main_test.go
+- src/quack/check_test.go
+- src/imports/tree_test.go
+- spec/design_output/doors.md
+- spec/tickets/<follow-up for waits_test.go, minted in the group>.md
+- spec/tickets/<follow-up for the quack spawns no case reaches, minted in the group>.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened proc.go and its contract suite, doors.md, clock.go and its test, tree_test.go, imports.go, the six family files, and twins.go, voice_verb.go and their tests. Each spawn function was traced to its callers by grep
+- Callers list the users of nodeAccept, selfPath, voiceRunsVale and proc.Command, and the tests sharing the packages load
+- Each done_when line names its test above, and done_when 2's word moved falls to the gate's read
 
 ## tests-red
 
