@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -173,6 +173,9 @@ record:
         hash: 0ecf0b21dbd1a30f
         size: 430
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/doors]]
 ---
 
 # Ask
