@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 39484e1270aee1ef497f00d4ff06627bf71fd02b
+    hash_after: d7d0243a7edc066c5d744048f088395f673d29ca
+    inputs:
+      - name: ask
+        hash: 552f432cc5fd8d2d
+        size: 657
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +166,66 @@ Without it, every site keeps its own free text, and no door, check or sentinel h
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The node shape and the registry stand in [[spec/design_output/failures#a-failure-is-a-node]] and [[spec/design_output/failures#the-registry-reads-the-nodes]].
+
+- `spec/schemas/failure.schema.yaml` governs `spec/failures/**`. Its front takes `kind`, `level` off the ladder, `remedies` with one item at least, and an optional `reaction` and `watch`.
+- `src/failure/node.go` holds `Node` and `Watch`, and `NodeOf` reads one note's front into a node.
+- `src/failure/registry.go` holds `Registry`, keyed by id, and `Fake`, which answers the nodes a case hands in.
+- `src/failure/door.go` holds `Dir`, which reads the folder under a root, and `FakeDir`, a map in memory. `Load` reads every node through either.
+- `spec/failures/failure-unregistered.md` stands as the first node, which the door raises for an id with no node.
+
+Weighed: a reader of the failure package's own against `pull.Disk`. The pull imports this package in the last slice, so a shared reader makes a cycle.
+Assumed: the file name is the id, as a ticket's is, so two nodes never share one.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+none: the package is new, and the later slices call it
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/failure/registry_test.go: TestLoadKeysEveryNodeById
+src/failure/registry_test.go: TestFakeAnswersTheNodesHandedIn
+src/failure/schema_test.go: TestANodeNamingNoRemedyMeetsASchemaFault
+src/failure/door_contract_test.go: TestDirAndFakeDirAnswerAlike
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+spec/schemas/failure.schema.yaml
+spec/failures/failure-unregistered.md
+src/failure/node.go
+src/failure/registry.go
+src/failure/door.go
+src/failure/registry_test.go
+src/failure/schema_test.go
+src/failure/door_contract_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened the rationale schema, the check's CheckNote and SchemasIn, the yaml reader and the pull's disk door, and checked each claim there.
+The package is new, so nothing calls it yet.
+Each done_when line names its case, and the check decides the last.
 
 ## tests-red
 
