@@ -4,7 +4,6 @@
 package stop
 
 import (
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -19,16 +18,38 @@ const (
 	mostInARow = 2
 )
 
-// The rules a turn ending on a question meets: the ones spec/config/stop/level0.yml holds, so the cases decide the rule there too. [[spec/tickets/cloud-turns-end-without-questions]]
-const treeRules = "../../../../spec/config/stop/level0.yml"
+// The rules a turn ending on a question meets, as spec/config/stop/level0.yml writes them. The module reads no disk, so src/quack binds the file itself. [[spec/tickets/cloud-turns-end-without-questions]]
+const questionText = `- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+
+- id: a-cloud-box-decides
+  side: continue
+  priority: 83
+  decides: mechanical
+  runs: ends-on-a-question
+  says: A cloud box asks nobody, so decide the question yourself, say what you weigh and what you assume, and carry on.
+
+- id: the-last-line-names-no-stop
+  side: continue
+  priority: 50
+  decides: mechanical
+  runs: no-stop-line
+
+- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  yields: true
+  runs: the-plan-is-empty
+  asks: Does the work stand complete?
+`
 
 func questionRules(t *testing.T) []Rule {
 	t.Helper()
-	text, err := os.ReadFile(treeRules)
-	if err != nil {
-		t.Fatalf("the tree's rules read no file: %v", err)
-	}
-	rules, broken := Pool([]File{{Name: "level0.yml", Text: string(text)}})
+	rules, broken := Pool([]File{{Name: "level0.yml", Text: questionText}})
 	if len(broken) > 0 {
 		t.Fatalf("the tree's rules read broken: %v", broken)
 	}
