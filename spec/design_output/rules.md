@@ -57,3 +57,58 @@ with a span counted in runes from 1 and holding both ends.
 |---|---|
 | `scripts_paragraph.go` | VoiceParagraph, reading `spec/schemas/paragraph.schema.yaml` |
 | `scripts_voice.go` | VoiceVale, VoiceShape and VoiceScript |
+
+# Load reads the rule files
+
+`ruleFiles` in `src/rules/load.go` names every rule file under
+`spec/config/styles`, and `TestTheRuleTableNamesEveryStyleFile` holds it to
+the folder. Load reads each through its `Read`, and yaml.v3 parses it.
+
+| the kind | what Load does with it |
+|---|---|
+| `script` | calls its maker once, off the check id |
+| `existence`, `substitution`, `occurrence`, `sequence` | compiles it into a token rule |
+
+The YAML stays each rule's data: message, level, link, scope, tokens, swap,
+exceptions, action, max and token.
+
+# The text model
+
+The model ports Vale 3.20.0 under its MIT licence, and splits a file into
+blocks by its extension.
+
+| the file | its blocks |
+|---|---|
+| `.go`, `.js`, `.ts`, `.tsx` | each comment in place, its markers blanked, running line comments joined |
+| `.txt` | the whole text as prose |
+| any other | markdown: each front matter string, then goldmark's HTML block by block |
+
+A markdown block holds its text with inline code masked, and stands in the
+source by its offset, else by the runs of its text read verbatim. A paragraph
+splits into its paragraphs and sentences, and a list item, a heading or a cell
+into its sentences alone. A rule reads a block whose scope holds every section
+it names, and a sentence block only where it names the sentence.
+
+A match stands at its source offset. Where neither offset nor run places it,
+Lint searches it from the block's first run, past the copies before it and any
+copy pressed against inline markup.
+
+# The token kinds
+
+`src/rules/kinds.go` and `src/rules/sequence.go` port Vale's kinds over
+regexp2, so a lookbehind compiles.
+
+| the kind | what it answers |
+|---|---|
+| existence | each match of its tokens, past its exceptions |
+| substitution | each swap's match with its offer filled from the match |
+| occurrence | its first match where the count passes its max or falls short of its min |
+| sequence | each run of tagged words, past a match opening inside an exception |
+
+A sequence reads sentences alone, tagged by `github.com/jdkato/prose/v3`.
+
+# A finding carries its fix
+
+A finding holds `Action` where its rule names one, in Vale's shape: `Name`,
+and `Params` with each offer. A substitution under `action: replace` fills
+`Params` from its swap, and a finding of any other rule leaves `Action` out.
