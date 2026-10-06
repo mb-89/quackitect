@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: clear-hands-back-the-leaf
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 1e318d444c0e3d69
         size: 1525
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: 97b962fdbb1c4a37883364834fafbcbc0135707b
+    hash_after: 97b962fdbb1c4a37883364834fafbcbc0135707b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 91f892b93ab10be4
+        size: 4083
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -252,26 +265,43 @@ The dry probe `src/scripts/probe-clear.js` goes on past the clear: it pulls `rea
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_clear_test.go
+- src/modules/hooks/clear_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each of the four Go tests fails on its own assertion:
+
+- the read's pass hands `handover` again
+- the second handover answers refused, and tells the box to end the turn
+- a plan working on `handover` holds the pull at wait
+- the Stop that answers the clear leaves the `clear` hold standing
+
+The extended dry probe reproduces the live loop through the real plugin and door. After the clear the bare pull answers the clear again, and its pass meets a refusal. That matches the three boxes. The probe's own unit cases stand in `test/level0/probe-clear.test.js` and pass.
+
+What surprises me: the port that retired the bridge server left out the step that hands the read after the clear.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line on the leaf, the refusal and the clear's tickets meets a failing Go test
+- the probe line meets the probe run, which fails
+- the pull tests run over a real origin and clone in a temp folder
+- the hooks test runs over a temp tree and the hold door
 
 # gate
 

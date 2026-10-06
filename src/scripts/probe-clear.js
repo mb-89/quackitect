@@ -1,7 +1,7 @@
 // The dry probe's clear: a session past a low handover key takes the handover
-// and the clear off the real pull, ends its turn, and the harness reads whether
-// the conversation clears and the resume prompt opens the next one.
-// [[spec/tickets/the-clear-continues-the-session]]
+// and the clear off the real pull, ends its turn, and the conversation clears.
+// The next one pulls the read, takes its leaf in the same answer, commits, and
+// ends its turn with no second clear. [[spec/tickets/the-clear-hands-back-the-leaf]]
 
 import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
 import { RESUME } from "../bridge/handover.js";
@@ -19,6 +19,36 @@ const HANDOVER_TEXT = "# Handover\n\nThe dry probe stands nothing in hand, and t
 const ANSWER = "The handover stands, and the clear ends this turn.";
 // The ticket the probe's own work branch carries, so the pull reads a group still open whatever the clone stands on. [[spec/tickets/the-clear-runs-live-remote]]
 const GROUP = "dry-probe-clears";
+// The leaf the probe's group carries across the clear, and the words each pull past the clear answers. [[spec/tickets/the-clear-hands-back-the-leaf]]
+const LEAF = "dry-probe-leaf";
+const LEAF_TEXT = `---
+kind: [[ticket]]
+state: open
+steps:
+  - name: do
+    does: makes the change
+    evidence:
+      - name: says
+        form: text
+        says: what changes
+process: [[spec/processes/trivial]]
+group: ${GROUP}
+---
+
+# Ask
+
+The leaf the dry probe carries across the clear.
+
+# do
+
+## says
+
+<!-- what changes -->
+
+# Discussion
+`;
+const READ_HELD = "read-handover stands in your hand.";
+const LEAF_HANDED = `work  ${LEAF} at do`;
 
 // The turn's two ends, in the order the live host names: the Stop, then the turn's completion. [[spec/tickets/the-clear-runs-live-remote]]
 export const ENDS = ["classic.Stop", "turn.complete"];
@@ -51,7 +81,29 @@ export async function clearRun(it, tree, raise, seen, outer) {
     await raise(event, e, async () => (event === "turn.complete" ? { text: ANSWER } : {}));
   }
   await settled(seen);
-  return { runs, commands: [...seen.commands], prompts: [...seen.prompts] };
+  const commands = [...seen.commands];
+  const prompts = [...seen.prompts];
+  const after = { pulled: pull(), read: pull("--pass"), committed: committed(it, tree) };
+  for (const event of ENDS) {
+    const e = event === "turn.complete" ? { reason: "answer", answer: ANSWER } : {};
+    await raise(event, e, async () => (event === "turn.complete" ? { text: ANSWER } : {}));
+  }
+  after.clears = seen.commands.filter((one) => one === "clear").length;
+  return { runs, commands, prompts, after };
+}
+
+// The work the leaf makes lands as a commit on the box's branch, and origin carries it. [[spec/tickets/the-clear-hands-back-the-leaf]]
+function committed(it, tree) {
+  const commit = it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "--allow-empty", "-m", `${LEAF}: the leaf lands`],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
+  const pushed = it.proc.run(["git", "update-ref", `refs/remotes/origin/work/${GROUP}`, "HEAD"], {
+    cwd: tree,
+    timeoutMs: PULL_WAIT,
+  });
+  const fell = [commit, pushed].find((one) => one.exitCode !== 0);
+  return { exit: fell?.exitCode ?? 0, said: fell ? `${fell.stdout}${fell.stderr}` : "" };
 }
 
 // A verb finds its root off QUACKITECT_ROOT before its folder, and the index hands its own root to every child, so the clone names itself. [[spec/tickets/the-clear-carries-no-local-work]]
@@ -65,6 +117,7 @@ export function grouped(it, tree, env) {
     [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
+  it.disk.write(it.join(tree, "spec", "tickets", `${LEAF}.md`), LEAF_TEXT);
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
     timeoutMs: PULL_WAIT,
@@ -115,7 +168,18 @@ export function clearHeld(rows, seen) {
   }
   const prompt = run.prompts.at(-1) ?? "";
   if (prompt !== RESUME) return { pass: false, evidence: `the next conversation opens on: ${firstLine(prompt) || "no prompt"}` };
-  return { pass: true, evidence: "/clear runs, then the resume prompt opens the next conversation" };
+  return afterHeld(run.after ?? {});
+}
+
+// Past the clear the pull hands the read, the read's pass hands the leaf in the same answer, the commit lands, and the turn's end runs no second clear. [[spec/tickets/the-clear-hands-back-the-leaf]]
+function afterHeld(after) {
+  const pulled = String(after.pulled ?? "");
+  const read = String(after.read ?? "");
+  if (!pulled.includes(READ_HELD)) return { pass: false, evidence: `the pull after the clear answers: ${firstLine(pulled) || "nothing"}` };
+  if (!read.includes(LEAF_HANDED)) return { pass: false, evidence: `the read's pass hands no leaf: ${firstLine(read) || "nothing"}` };
+  if (after.committed?.exit !== 0) return { pass: false, evidence: `the leaf's commit answers ${after.committed?.exit}: ${firstLine(after.committed?.said)}` };
+  if (after.clears !== 1) return { pass: false, evidence: `the turn after the clear runs ${after.clears} clear(s) in all, and one stands` };
+  return { pass: true, evidence: "/clear runs, the resume prompt opens, the read hands the leaf, the commit lands, and no second clear runs" };
 }
 
 const firstLine = (text) => String(text ?? "").trim().split("\n").at(-1).slice(0, SHOWN);
