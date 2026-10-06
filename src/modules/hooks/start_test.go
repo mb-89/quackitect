@@ -24,7 +24,7 @@ func TestStartRefusesADeskSessionWritingWithNoPlugin(t *testing.T) {
 		{"a desk session naming no mode with no plugin", false, false, "", true},
 	}
 	for _, one := range cases {
-		got := StartRefusal(root, root, one.plugin, one.cloud, one.mode)
+		got := StartRefusal(root, one.plugin, one.cloud, one.mode)
 		if !one.refuses {
 			if got != "" {
 				t.Errorf("%s: refuses with %q, want a pass", one.name, got)

@@ -171,22 +171,33 @@ func TestVoiceMeasureScoresAFolderLineForLine(t *testing.T) {
 
 func TestVoiceMeasureExitsOneWhereAnAnswerRunsPastTheCeiling(t *testing.T) {
 	t.Parallel()
-	stdout := jsonOf(t, map[string]any{
-		"docs/a.md": []any{finding("VoiceVale.LongSentence"), finding("VoiceParagraph.Passive"), finding("Schema.Kind")},
-	})
+	const past = ".se/.runtime/measure/a/001-answer.md"
+	const within = ".se/.runtime/measure/b/001-answer.md"
+	three := []any{finding("VoiceVale.LongSentence"), finding("VoiceParagraph.Passive"), finding("Schema.Kind")}
+	stdout := jsonOf(t, map[string]any{past: three, "docs/a.md": three})
 	d, _, _ := doorsOf(map[string]string{
-		"/tree/docs/a.md": ten + "\n",
-		"/tree/docs/b.md": ten + "\n",
-		testBin:           "",
-	}, map[string]string{"docs": stdout}, "2026-09-12T00:00:00Z")
-	d.Ceiling = 100
+		"/tree/logs/a.jsonl": spoke(t, ten+" "+ten+" "+ten, nil),
+		"/tree/logs/b.jsonl": spoke(t, ten+" "+ten+" "+ten, nil),
+		"/tree/docs/a.md":    ten + "\n",
+		testBin:              "",
+	}, map[string]string{".se/.runtime/measure": stdout, "docs": stdout}, "2026-09-12T00:00:00Z")
+	d.Ceiling = 50
 
-	got := run(d, false, "measure", "docs")
+	got := run(d, false, "measure", "--transcripts", "logs")
 	if got.code != 1 {
-		t.Fatalf("measure past the ceiling exits %d, want 1: %+v", got.code, got)
+		t.Fatalf("measure --transcripts past the ceiling exits %d, want 1: %+v", got.code, got)
 	}
-	if !strings.Contains(got.errs, "docs/a.md") || strings.Contains(got.errs, "docs/b.md") {
-		t.Fatalf("measure past the ceiling names %q, want docs/a.md alone", got.errs)
+	if !strings.Contains(got.errs, past) || strings.Contains(got.errs, within) {
+		t.Fatalf("measure past the ceiling names %q, want %s alone", got.errs, past)
+	}
+
+	if folder := run(d, false, "measure", "docs"); folder.code != 0 {
+		t.Fatalf("a plain folder run past the ceiling exits %d, want 0: %+v", folder.code, folder)
+	}
+
+	d.Ceiling = 0
+	if off := run(d, false, "measure", "--transcripts", "logs"); off.code != 0 {
+		t.Fatalf("a ceiling of 0 exits %d, want 0: %+v", off.code, off)
 	}
 }
 

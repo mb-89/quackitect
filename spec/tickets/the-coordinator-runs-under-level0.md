@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -156,6 +156,15 @@ record:
         hash: 77f21a5dc041a8f5
         size: 921
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 700be6a95e040207b6d9c3522c474cc425f0429d
+    hash_after: 700be6a95e040207b6d9c3522c474cc425f0429d
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks/start.go src/modules/hooks/start_test.go src/quack/verb_start.go src/quack/verb_start_test.go src/quack/voice_verb.go src/quack/voice_verb_test.go src/scripts/boot.js test/level0/hooks.test.js src/voice/voice.go src/voice/voice_test.go spec/guidance/coordinator/coordinator.md spec/rationales/coordinator.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, and drops the tree.go row the verb needed none of
+- StartRefusal is pure, the start verb runs over its input reader, boot.js over the fake disk and proc doors, and measure over the doorsOf fake
+- each change points at this ticket or the section it implements
+- the ceiling stands once, as answer.ceiling, and the refusal reason once, in StartRefusal
 
 ## tests-green
 

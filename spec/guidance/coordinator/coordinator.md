@@ -15,6 +15,7 @@ env:
 5. End a shift with a handover file before the context runs out, per rule 9 of [[spec/guidance/guidance]]. A session run past its context loses the state of the fleet at the cut. *
 6. Write every follow-up as a ticket in the group it serves. A follow-up in the chat drops at the next shift. *
 7. Commit through `./RUNME.sh commit`, and pass every door a box passes. A coordinator past the doors lands what no check reads. *
+8. Open the coordinator session in the repo folder, with SE_COORDINATOR set. A session opened elsewhere loads no plugin, and no door or gate reaches its turns. *
 
 # Examples
 

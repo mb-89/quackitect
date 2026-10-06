@@ -34,3 +34,7 @@ Follow-ups typed into the chat dropped at the next shift. A ticket in the group 
 ## 7. The same doors
 
 The retro found the coordinator committing with raw git and flipping phases with sed. A commit past the doors lands what no check reads, and the next box meets the fault.
+
+## 8. The repo folder
+
+The retro found the coordinator writing past the doors and answering past the ceiling, from a session that loaded no level-zero plugin. The plugin loads off the folder a session opens in, so a session opened elsewhere meets no write door, no answer gate and no stop door. The start refusal reaches a session in the repo folder alone, because the boot hook lives in that folder's settings. A session opened anywhere else meets no refusal, so this rule carries that case by itself.
