@@ -388,10 +388,9 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	ran := d.run(clientArgv(client, filepath.Join(box.tree, filepath.FromSlash(pluginFolder))), runOpts{
 		cwd: box.tree,
 		env: map[string]string{
-			"CLAUDE_CODE_REMOTE":                "true",
-			"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1",
-			"CLAUDE_CONFIG_DIR":                 config,
-			"SE_BRIDGE_PORT":                    strconv.Itoa(box.port),
+			"CLAUDE_CODE_REMOTE": "true",
+			"CLAUDE_CONFIG_DIR":  config,
+			"SE_BRIDGE_PORT":     strconv.Itoa(box.port),
 		},
 		timeout: probeWait,
 	})

@@ -280,7 +280,6 @@ function coldRun(root, it, client, say, { temp, tree, port, delta }) {
       cwd: tree,
       env: {
         CLAUDE_CODE_REMOTE: "true",
-        CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1",
         CLAUDE_CONFIG_DIR: config,
         SE_BRIDGE_PORT: String(port),
       },

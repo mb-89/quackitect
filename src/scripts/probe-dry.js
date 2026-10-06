@@ -192,10 +192,12 @@ export function engineOf(register, options = {}) {
   };
 }
 
+// What the dry session's client carries: a cloud box, and no switch for mods, which load by default from client 2.1.287. [[spec/tickets/level0-drops-what-standard-replaces]]
+export const SESSION_ENV = Object.freeze({ CLAUDE_CODE_REMOTE: "true" });
+
 // The session a client runs on a cold box: it starts, the owner's prompt arrives while the start road stands the door, the context reads, the answer opens on the canary, a read and a guarded call run, and the turn stops. [[spec/tickets/level0-runs-on-the-door]]
 async function session(it, tree) {
-  const env = { CLAUDE_CODE_REMOTE: "true", CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" };
-  const { $, seen } = harnessOf(it, tree, env);
+  const { $, seen } = harnessOf(it, tree, { ...SESSION_ENV });
   const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
   const engine = engineOf(loaded.register, {});
   const raise = async (event, e, last = async (said) => ({ passed: said }), origin) => {

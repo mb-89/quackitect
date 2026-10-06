@@ -10,7 +10,18 @@ import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { RESUME } from "../../src/bridge/handover.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
-import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
+import {
+  DRY,
+  engineOf,
+  harnessOf,
+  readsDry,
+  SESSION_ENV,
+} from "../../src/scripts/probe-dry.js";
+
+// Mods load by default from client 2.1.287, so the dry session sets no switch for them. [[spec/tickets/level0-drops-what-standard-replaces]]
+test("the dry session carries a cloud box and no switch for mods", () => {
+  assert.deepEqual({ ...SESSION_ENV }, { CLAUDE_CODE_REMOTE: "true" });
+});
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
 

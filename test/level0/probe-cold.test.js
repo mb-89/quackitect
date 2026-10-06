@@ -310,7 +310,7 @@ test("the runner clones, installs, runs the client, reads the log, and removes t
   const client = proc.ran.find((one) => one.argv[0] === "claude");
   assert.ok(client.argv.includes("--plugin-dir"));
   assert.equal(client.init.env.CLAUDE_CODE_REMOTE, "true");
-  assert.equal(client.init.env.CLAUDE_CODE_ENABLE_FUNCTION_HOOKS, "1");
+  assert.equal(client.init.env.CLAUDE_CODE_ENABLE_FUNCTION_HOOKS, undefined);
   assert.equal(client.init.env.CLAUDE_CONFIG_DIR, "/tmp/se-cold-1/config");
   assert.equal(client.init.env.SE_BRIDGE_PORT, String(coldPort(12345)));
   assert.equal(disk.exists("/tmp/se-cold-1"), false);
