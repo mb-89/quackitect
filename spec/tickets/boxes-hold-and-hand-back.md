@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
@@ -150,6 +150,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: e75098edf437ca37b82cdf1f231e5cf23e2e4d7b
+    hash_after: e75098edf437ca37b82cdf1f231e5cf23e2e4d7b
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -230,38 +242,75 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+holds-beat-with-the-session: a hold beats on beats/<group> at each turn's end, and a session end frees it at once
+takeover-rescues-unpushed-commits: a red cloud commit reaches rescue/<group>, and a takeover merges it in
+cloud-turns-end-without-questions and cloud-boxes-wait-in-turn: a cloud turn ends on a decision, and waits for its helpers inside the turn
+rescue-passes-the-stamp-gate: the push gate lets a rescue push through on any stamp
+ci-skips-rescue-and-beats: the check workflow runs on no rescue or beat push
+clear-keeps-the-hold: the end beat skips a clear, minted off the accept review
+the merge of main: the take reads --over off argv, since the name past a flag now reads empty
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the accept review ran in a helper against the goal, and found the clear ending a live hold; the beat branch carried that very end from this session's own clear
+a docs helper read the SessionEnd matcher off the hooks reference, so the fix rests on the docs and on no recall
+the rescue path this group built carried two red commits off the box, and the branch lost nothing
+each leaf went red first: the workflow contract, the rescue push case and the end beat case each failed on their own assertion before the change
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+19:10 a Bash call opened its description with no ticket, and the door refused it
+19:14 the pull tool answered with no hook, and the verb ran through RUNME.sh in its place
+19:16 a raw git push met GitWritesThroughAVerb
+19:29 a tests-green hand-back carried one checked line for a four-item checklist
+19:31 a helper launched in the foreground, and the door refused it
+19:38 the accept verdict took four tries: a link, a bare name, an existing child, then a fix child the verdict mints itself; a hand-minted draft collided with it
+19:44 a commit of the size golden read red under a loaded check, and went to the rescue branch
+19:50 the sync met a conflict in the work skill and the size golden
+19:53 the merge commit read red: main's nameWord reads no name past a flag, so take --over lost its flag
+19:55 a partial commit inside a merge and a git add were refused
+20:00 the rescue branch stayed on origin after a green commit, since the delete push failed and nothing said why
+20:02 two calls chained a landing behind a gate with a semicolon or a pipe, and met LandingFollowsItsGate
+the plan grace ran out three times between tickets
+owner prompt, line 1: run the work skill, decide every step, never stop at a handover; nothing in this window turned it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+a ticket in the description: the work skill names the Bash description rule beside its first step
+the verdict form: the accept leaf's answer line names the form, a dash, a new child name and the finding, in spec/processes/group.yaml
+the red under load: the index contract case waits on the process's exit through the proc door in test/contract/index.test.js, in place of a five-second loop on the clock
+the take flag: Branch hands every verb its argv, and a verb with a flag before its name reads both off argv, in src/branches/branch.go
+the quiet rescue drop: dropsRescue writes the refused delete to the error stream, in src/quack/commit.go
+the plan grace: a plan call rides each pull, which the pull tool's plan field already carries
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The accept review weighed four points and one held: a clear inside a living session ended its hold, which the beat branch showed. The other three stand by design: a green commit whose push fails waits for the next push, beats firing at turn ends fall back on the tip's age, and a rescue merged by a takeover reaches the work branch red because CI gates the pull request. The red merge was main's fault, and rule eleven of the cloud guidance put its fix on this branch.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact stands in one place: each line points at its file or ticket, and repeats no design
+no number lands past the five-second deadline, which names the case's own constant
+no header lands: the retro writes fields, no file
+the errors carry their times off this window; the owner's one prompt carries its line
+the chapter names the box by role, and no path past the tree's own files
 
 ## cloud
 
