@@ -14,7 +14,7 @@ rationale: [[spec/rationales/testing]]
 5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
 6. Name a test as the claim it makes, and assert every word of that claim.
 7. Share a fixture nobody writes to, and make what a test changes inside the test.
-8. Take the clock and the random source as arguments, so a failing case replays.
+8. Take the clock and the random source as arguments, so a failing case replays. Start no timer in a test, and the `purity` guard names a function reaching the clock in place. [[spec/design_output/model#the-guards-hold-a-baseline]]
 9. Let every test run beside every other. A test needing an order is a red test.
 10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
 11. Test a behavior at the outermost door, the command line `quack ...`. Where it cannot reach an edge, test a Go module without the `io` flag against the fake index in `q/qtest`. Import nothing past `q`, `q/qtest` and the pure standard library. A fixture rides in through `embed`, or the case seeds it. [[spec/design_output/model#the-fake-index]] *
