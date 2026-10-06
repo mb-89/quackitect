@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 5a96fd03098fe0a0d4d3906c834971c9f3c13a3d
+    hash_after: 5a96fd03098fe0a0d4d3906c834971c9f3c13a3d
+    inputs:
+      - name: ask
+        hash: d7ed6f3f3b972aaa
+        size: 523
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,56 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each suite runs its shared cases over a table of doors, the real one and the fake, as test/contract/clock.test.js does.
+
+1. test/contract/session.test.js runs its two cases over the real session door and fakeSession. The real door reads its records off the disk, so each call opens a new door. The fake holds them in memory, so the cases open one fake and hand it back on each call.
+2. test/contract/index.test.js adds one case run both ways: a work tree holding one note, asked for hashes of that note with a head size and of a path standing nowhere. The real index answers off its database, and fakeIndex off the disk, and both answer hash, size and head for the note and nothing for the missing path. The real half runs where the binary is built, as the other real cases do.
+3. The contract suites row of the family table names both suites as running both doors.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- test/contract/session.test.js, its two cases
+- test/contract/index.test.js, one new case
+- spec/design_output/doors.md, the contract suites row
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/session.test.js records survive process adapters and isolate session IDs, over both doors
+- test/contract/session.test.js a crash retains the saved handover and releases the lock, over both doors
+- test/contract/index.test.js the fake and the real index answer the same hashes
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- test/contract/session.test.js
+- test/contract/index.test.js
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- src/doors/session.js, src/doors/fake/session.js, src/doors/fake/index.js, src/index/answers.go and Hashes in src/index/files.go stand opened, and both indexes answer hash, size and head per path, skipping a missing one
+- the callers are the two suites and the table row
+- the first done_when line meets the three cases, the second the row, the third the check
 
 ## tests-red
 
