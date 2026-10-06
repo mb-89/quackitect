@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 45fb4aad2512f1094238a7da8355622995072ad9
+    hash_after: 45fb4aad2512f1094238a7da8355622995072ad9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/imports passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  114.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 53d57e1376be6ada
+        size: 1107
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -355,26 +378,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/placements_test.go src/imports/imports_test.go src/quack/manager_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The audit stands as the family table in spec/design_output/doors.md: each door, its contract suite, and every family of tests reaching a real door with its fate. Three moves land here. The two planted import trees build once a package run, the quack binary builds once a package run and each case copies it into its own folder, and the placements wait on a timer a case swaps, with a stop that joins the spawner before it answers. The five wider moves, the branch verbs, the quack spawns, the quack repositories, the pull and the index and session suites, each stand as a child ticket in this group, and the table links each.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft and the gate points name, plus the quack TestMain removing the shared build folder, and the child tickets
+- every door the change reaches has a fake, or a child ticket moving its family onto one
+- a comment names the approach on each new helper, pointing at this ticket
+- the audit stands once, in the family table, and the children point at it
 
 # accept
 
