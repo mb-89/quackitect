@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: lint-without-vale
 parent: rules-lint-changed-files-first
+record:
+  - step: do
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 16ff5e00ae70874aedfbbc25df4e56245e4a65da
+    hash_after: 84ac381c72cece10f44e0732a6dafec7c64f10f0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   85.8  in all"
+    inputs:
+      - name: ask
+        hash: 8a74a61291a93dcc
+        size: 299
+    def: 1462c12807ab5533
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ CI's check.yml checks out at depth one with no origin/main ref, so the changed d
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/lint_changed_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+CI's checkout at depth one holds no origin/main ref, so a merge base finds nothing there. The changed door in `src/quack/lint_changed.go` now reads the merge base where one stands. Where none stands, it reads the files of HEAD's own commit, and it says so in one line on the error stream. Both roads add the working tree's changes and the new files, and drop a deleted file. `lintHere` wires the door into the lint, so the parent's `--changed` flag reads it. `TestChangedOver` drives both roads over a fake git.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the fallback takes HEAD's own commit, the first road the ask names, and a case drives it
+- the cleanup: none shows, and the door reuses the trunk name from the command module
+- one place: the trunk's name stays in `src/modules/hooks/command/trunk.go`, and the door points at this ticket
 
 # Discussion
 
