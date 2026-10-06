@@ -30,8 +30,6 @@ const (
 	groupRoute   = "group"
 	trivialRoute = "trivial"
 	frontFence   = "---"
-	// The span a claim goes stale past where work.staleAfter says nothing. [[spec/design_output/work#a-stale-group-is-yours]]
-	staleSpan = "12h"
 	// The branch every work branch leaves and lands on. [[spec/design_output/work#trunk-comes-in-first]]
 	trunk = "main"
 )

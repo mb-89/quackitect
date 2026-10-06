@@ -81,7 +81,7 @@ func pcTakingPast(t *testing.T, past pcPast) *tree {
 		ahead = 48 * time.Hour
 	}
 	one.pcClock(ahead)
-	one.d.Config = nil
+	one.d.Config = fixtureConfig
 	return one
 }
 

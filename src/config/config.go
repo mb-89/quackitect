@@ -97,6 +97,11 @@ func Shared(root, key string) (any, bool) {
 	return defaultIn(read(root, Schema), key)
 }
 
+// A key's built-in, the schema's default, read off no other layer, for a reader whose config door answers nothing. [[spec/tickets/stale-span-reads-schema-unset]]
+func Default(root, key string) (any, bool) {
+	return defaultIn(read(root, Schema), key)
+}
+
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
 func Map(root, path, key string) map[string]string {
 	said, found := valueIn(read(root, path), key)

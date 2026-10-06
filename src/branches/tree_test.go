@@ -65,6 +65,17 @@ type tree struct {
 }
 
 // A tree with main carrying the files, pushed to origin, on a cloud box. [[spec/tickets/work-verbs-port-to-go]]
+// The span the fixture's claims go stale past, which the cases' clocks read against. [[spec/tickets/stale-span-reads-schema-unset]]
+const fixtureSpan = "12h"
+
+// The fixture's config door: the stale span, and nothing past it. [[spec/tickets/stale-span-reads-schema-unset]]
+func fixtureConfig(key string) any {
+	if key == staleKey {
+		return fixtureSpan
+	}
+	return nil
+}
+
 func newTree(t *testing.T, files map[string]string) *tree {
 	t.Helper()
 	one := &tree{t: t, root: t.TempDir(), from: t.TempDir()}
@@ -85,12 +96,13 @@ func newTree(t *testing.T, files map[string]string) *tree {
 	one.land("main opens", files)
 	one.git("push", "-q", "-u", "origin", "main")
 	one.d = &Doors{
-		Root:  one.root,
-		Env:   map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_CLOUD": "", "CLAUDECODE": "", "GIT_CONFIG_NOSYSTEM": "1"},
-		Now:   func() time.Time { return testNow },
-		Out:   &one.out,
-		Errs:  &one.errs,
-		Runme: []string{"false"},
+		Root:   one.root,
+		Env:    map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_CLOUD": "", "CLAUDECODE": "", "GIT_CONFIG_NOSYSTEM": "1"},
+		Now:    func() time.Time { return testNow },
+		Out:    &one.out,
+		Errs:   &one.errs,
+		Runme:  []string{"false"},
+		Config: fixtureConfig,
 	}
 	return one
 }

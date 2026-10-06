@@ -5,7 +5,10 @@
 package branches
 
 import (
+	"fmt"
 	"strconv"
+
+	"quackitect/src/config"
 )
 
 // The key naming the span a claim goes stale past. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -19,12 +22,15 @@ func tipAge(one stand, now int64) int64 {
 	return max(0, now-one.When)
 }
 
-// The span a claim goes stale past, the config's or the default. [[spec/design_output/work#a-stale-group-is-yours]]
+// The span a claim goes stale past: the config door's, or the schema default at the method root where the door answers nothing. No span reads no claim as stale. [[spec/design_output/work#a-stale-group-is-yours]] [[spec/tickets/stale-span-reads-schema-unset]]
 func (d *Doors) staleSpan() int64 {
 	if said := spanOf(d.config(staleKey)); said > 0 {
 		return int64(said)
 	}
-	return int64(spanOf(staleSpan))
+	if said, held := config.Default(d.Method, staleKey); held {
+		return int64(spanOf(fmt.Sprint(said)))
+	}
+	return 0
 }
 
 // A claim's age and whether it stands older than the span. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -39,7 +45,8 @@ func (d *Doors) staleClaim(one stand, now int64) claim {
 	if held < 0 {
 		return claim{}
 	}
-	return claim{Age: aged(held), Stale: held > d.staleSpan()}
+	span := d.staleSpan()
+	return claim{Age: aged(held), Stale: span > 0 && held > span}
 }
 
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
