@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/draft
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -175,6 +175,22 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/failures]]
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 65817e9703ba1b2317bbef90d351fe4914677d71
+    hash_after: 65817e9703ba1b2317bbef90d351fe4914677d71
+    inputs:
+      - name: ask
+        hash: 8ad39b0f4c3e5a2b
+        size: 624
+      - name: [[spec/design_output/failures]]
+        hash: 8e785cc94e2e32f9
+        size: 4503
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    skipped: true
+    kept: e9d8483c071e36155534056c8b2d9585613ec702
+    why: its red tests stand as e9d8483c0 landed them, and a later leaf passed since
 ---
 
 # Ask
@@ -209,19 +225,20 @@ Without it, an agent meeting a fault writes free text, and the retro reads no co
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-[[spec/design_output/failures#an-agent-raises-by-verb]] holds the approach. src/quack/verb_failure.go registers one verb, failure, and reads its subverb off the first word. It follows verb_log.go: failureDoors holds the root and the clock, failureHere answers them off index.Root and the wall clock, and failureVerb(doors) answers the twin, so a case hands in a temp root and a fixed now.
+[[spec/design_output/failures#an-agent-raises-by-verb]] holds the approach. src/quack/verb_failure.go registers one verb, failure, and reads its subverb off the first word. failureDoors holds the root and the clock, failureHere answers them off index.Root and the wall clock, and failureVerb(doors) answers the twin, so a case hands in a temp root and a fixed now.
 
-- raise <id> [said...] loads the registry through failure.Load(failure.Dir{Root}), raises the id through failure.Raise, and prints its Lines. It writes the row through sayLine and appendsLine onto the session log, the failure id riding as an extra field. It exits 0 where the id stands registered, and exitFailed where it does not.
-- new <id> --level=<level> --remedy=<line>... --when=<line> builds the node's text and reads it back through failure.NodeOf before it writes. It refuses a node with no remedy, a level off the log ladder, and an id a node already carries, and then writes spec/failures/<id>.md.
-- count reads the session log through logFiles and logLinesOf, keeps the rows of kind failure, and prints one line an id, as `<count> <id>`, the most first, then by id.
+- raise <id> [said...] joins the words into one message, raises the id through failure.Raise over failure.Load(failure.Dir{Root}), and prints its Lines. It feeds level, kind and said off Raised.Row into sayLine, the failure id under extra, and appends the line onto the session log through appendsLine. An id no node carries still prints and logs, and answers exitFailed.
+- new <id> --level=<level> --remedy=<line>... --when=<line> parses each flag through fieldFlag, writes the node through check.Minted in the shape the failure schema names, and reads it back through failure.NodeOf before pull.OSDisk writes it. It refuses an id off the shape, an id a node carries, a level off logmodule.Ladder, no remedy and no when, each with exitUsage.
+- count reads the session file alone, keeps the rows of kind failure.RowKind holding a non-empty failure.IDField, and prints `<count> <id>`, the most first, then by id. A row naming no id counts nowhere, and the rotated files stay out.
+- src/modules/verbs/tree.go names the failure row in Commands, so help and the verb tools name it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- none today: the failure verb is new
-- ./RUNME.sh, which hands the word failure to quack through the register table in src/quack/registry.go
+- src/quack/registry.go register, through init in src/quack/verb_failure.go
+- src/modules/verbs/tree.go Commands, the row help and the verb tools read
 - the agent, which runs failure new, then failure raise, on a fault with no id
 
 ### tests
@@ -230,8 +247,10 @@ Without it, an agent meeting a fault writes free text, and the retro reads no co
 <!-- the form is list -->
 
 - src/quack/verb_failure_test.go TestFailureRaisePrintsTheNodesLinesAndWritesItsRow
+- src/quack/verb_failure_test.go TestFailureRaiseOfAnUnregisteredIdLogsItAtErrorAndFails
 - src/quack/verb_failure_test.go TestFailureNewWritesTheNode
 - src/quack/verb_failure_test.go TestFailureNewRefusesANodeWithNoRemedy
+- src/quack/verb_failure_test.go TestFailureNewRefusesEachShapeOffTheSchema
 - src/quack/verb_failure_test.go TestFailureCountAnswersEachIdWithItsCount
 
 ### answers
@@ -239,7 +258,13 @@ Without it, an agent meeting a fault writes free text, and the retro reads no co
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first draft
+- failure-verb-in-help: the approach names the Commands row in src/modules/verbs/tree.go, and the fix ticket closed it
+- failure-raise-row-off-door: raise feeds level, kind and said off Raised.Row into sayLine, the id under extra, and the fix ticket closed it
+- failure-raise-joins-said: raise joins the words into one message before Raise, and the fix ticket closed it
+- failure-raise-unregistered-case: TestFailureRaiseOfAnUnregisteredIdLogsItAtErrorAndFails decides the row and the exit, and the fix ticket closed it
+- failure-new-shape-once: new writes through check.Minted and parses through fieldFlag, and the fix ticket closed it
+- failure-new-refusals-tested: TestFailureNewRefusesEachShapeOffTheSchema decides each refusal, the note names --when, and the fix ticket closed it
+- failure-count-skips-no-id: count skips a row with no id and reads the session file alone, and the fix ticket closed it
 
 ### size
 
@@ -248,15 +273,16 @@ Without it, an agent meeting a fault writes free text, and the retro reads no co
 
 - src/quack/verb_failure.go
 - src/quack/verb_failure_test.go
+- src/modules/verbs/tree.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened src/quack/verb_log.go (logDoors, logHere, logVerb, sayLine, appendsLine, logFiles, logLinesOf), src/quack/registry.go register, src/quack/verbs.go twin, spec/schemas/failure.schema.yaml, and src/failure, and checked each claim the approach makes against them
-- the callers list names the register table and the agent, since no caller stands today
-- each done_when line maps to a test: raise to TestFailureRaisePrintsTheNodesLinesAndWritesItsRow, new to the two TestFailureNew cases, count to TestFailureCountAnswersEachIdWithItsCount, and the check to ./RUNME.sh check
+- opened src/quack/verb_failure.go, src/quack/verb_mint.go fieldFlag, src/modules/check/export.go Minted and SchemasIn, src/failure/raise.go RowKind, IDField and Row, src/failure/node.go Folder, src/quack/registry.go register and src/modules/verbs/tree.go, and checked each claim there
+- the callers list names register, the Commands row and the agent, and a search over src finds no other caller of failureVerb, failureRaises, failureWrites or failureCounts
+- raise maps to the two TestFailureRaise cases, new to the two TestFailureNew refusal cases and TestFailureNewWritesTheNode, count to TestFailureCountAnswersEachIdWithItsCount, and ./RUNME.sh check decides the last line
 
 ## tests-red
 
