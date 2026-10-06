@@ -326,12 +326,13 @@ func TestCheckReads(t *testing.T) {
 			t.Fatal("the port reads wrong")
 		}
 	})
-	t.Run("level zero going red says the tree is red", func(t *testing.T) {
+	// [[spec/tickets/platform-red-line-tested]]
+	t.Run("level zero going red says the tree is red on the platform it ran on", func(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"probe smoke --working": 1}}
 		doors := fake.doors()
 		var said strings.Builder
 		doors.errs = &said
-		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") {
+		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") || !strings.Contains(said.String(), "on linux") {
 			t.Fatalf("a red dry session answers %d, %q", code, said.String())
 		}
 	})
