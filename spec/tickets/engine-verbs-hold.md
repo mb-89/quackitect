@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/cloud
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -163,6 +163,15 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 609f36d49a566f075343007d278d1ca23812fcf9
+    hash_after: 609f36d49a566f075343007d278d1ca23812fcf9
+    inputs:
+      - name: retro/write
+        hash: 009e1d116c57637b
+        size: 3161
+    def: 4da1ca5da87d5bbc
 ---
 
 # Ask
@@ -330,20 +339,29 @@ role: the chapter names the box and the owner by role, with no address and no bo
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- no host, right or install was refused in this window
+- the patch tool lacked a delete op at 23:16, and a plain rm stood in
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the shell door refused git rm at 23:16, and the commit verb landed the deletion
+- the door refused a hand-back joined by a semicolon at 23:24
+- the server restart after each commit at 23:21 to 23:27, which the tools met as connection refused and level zero is starting
+- the sync at 23:31 took main in with no conflict
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside this group
+- inhand-skips-ticket-names stands in this group, to work before branch done
+- the handover names that ticket, then branch done and the pull request against main with auto-merge on
 
 # Discussion
 
