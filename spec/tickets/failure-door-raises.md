@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,21 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 86b70fdfab986b87580bd22f42bd7e1dcd3431ef
+    hash_after: 86b70fdfab986b87580bd22f42bd7e1dcd3431ef
+    inputs:
+      - name: design/draft
+        hash: 61c9a6b89f8bc59c
+        size: 2456
+      - name: design/tests-red
+        hash: 6cd73660cfdaa4d4
+        size: 1131
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -280,8 +295,16 @@ Each case fails on its own assertion. The Go stubs answer an empty Raised, no li
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+
+- The approach answers the ask: Raise, Lines and Row in src/failure/raise.go follow the design note, Fake and Registry.Node stand in registry.go, and the JS door rides log.say, whose rowOf in .claude/skills/level0/lib/log.js carries the failure field through as an extra.
+- Every done_when line meets a case failing on its own assertion: the three Go cases fail under go test ./src/failure/, and the level0 and contract cases fail under node.
+- Fix in place at implement: ./RUNME.sh test drops a Go path, so the tests-red command ran only the three JS cases and its evidence decides neither go test line. The tests-green command runs go test ./src/failure/ beside the JS cases.
+- Fix in place at implement: the contract case now stands at test/contract/failure.test.js, the name the check wants, but the move stands uncommitted and the draft's tests and size and the tests-red command and red list still name test/contract/failure-door.test.js. Commit the move, and the tests-green command names the new path.
+- Fix in place at implement: no case fixes the row an unregistered id writes, and the design names no level for it. Take the failure-unregistered node's level, error, keep the failure field holding the raised id, and hold both twins to it.
+- Form: Go Raise takes said... and joins it with a space, while the JS raise takes one said, and the contract case reads one string alone.
 
 # implement
 
