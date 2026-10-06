@@ -372,3 +372,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- size-misses-held-and-branch: the size list under design/draft also takes `src/branches/held.go`, where `letGo` closes the take on release, and `src/branches/branch.go`, where `Branch` reads the name through `word(argv, 1)`. The engine owns the draft's evidence, so the two files stand here, and implement reads them beside the list.
