@@ -113,7 +113,6 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 	}
 }
 
-// A door reaching no git and no voice reads neither, and its guards pass a commit. [[spec/tickets/cage-commit-guards-port]]
 // A commit whose trailer names a model meets a refusal at the door, with no Vale on the box. [[spec/tickets/commit-door-refuses-model-trailers]]
 func TestCommitVoiceRefusesAModelTrailerWithNoVale(t *testing.T) {
 	root := t.TempDir()
@@ -127,6 +126,7 @@ func TestCommitVoiceRefusesAModelTrailerWithNoVale(t *testing.T) {
 	}
 }
 
+// A door reaching no git and no voice reads neither, and its guards pass a commit. [[spec/tickets/cage-commit-guards-port]]
 func TestADoorWithNoGitOrVoiceReadsNeither(t *testing.T) {
 	root := t.TempDir()
 	d := &Door{}

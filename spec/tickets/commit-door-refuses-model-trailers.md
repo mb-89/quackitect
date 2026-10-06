@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: e844daf0c0a8d290
         size: 2819
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 86b2f0ce167e37d1ee2b3b4f9d713480f2204b59
+    hash_after: 86b2f0ce167e37d1ee2b3b4f9d713480f2204b59
+    inputs:
+      - name: design/draft
+        hash: e844daf0c0a8d290
+        size: 2819
+      - name: design/tests-red
+        hash: ada1bd682add724a
+        size: 1023
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,11 @@ The door case runs on a temporary folder with no git and no Vale, and the verb c
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- model-trailer-refuses-in-place: the approach leaves out two spots the red tests demand, and implement fixes both in voice.go and commits.go: add ModelTrailer to the refusing set, since TestModelTrailersRefusesATrailerNamingAModel asserts Refuses on the row; and split the !ok test from the d.from.Voice nil test in commitVoice, so the model read runs on a box with no Vale while a message with no model trailer still answers nil for TestADoorWithNoGitOrVoiceReadsNeither
+- attribution-trailer-meets-the-door: the session attribution this box carries asks for a Co-Authored-By trailer naming a model, which this door refuses once it lands; the owner's rule wins, so commits from that point on carry the Claude-Session line alone
 
 # implement
 
