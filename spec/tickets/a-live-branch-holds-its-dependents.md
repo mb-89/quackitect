@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: c90f8177b080c6e429d610b7c7b4f4e4f08cfe29
+    hash_after: c90f8177b080c6e429d610b7c7b4f4e4f08cfe29
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 89a9877eb7823356
+        size: 785
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -330,26 +353,33 @@ the rule stands once, in that chapter, and both twins point at it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull src/branches
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull and the branch verbs read a depends_on name standing neither in this tree nor on main as open while origin/work/<name> stands, because a group still works there and its merge brings the ticket to main. A name standing nowhere still reads as closed. Before this, test-walks-move-onto-fakes would go out while tests-meet-the-doors-once stood open on its branch, and it moves the same tests. The rule stands in spec/design_output/pull#a-live-branch-holds-its-dependents.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft sizes, and the size golden recording the length of pull.md
+git is the one door the change reaches, and the cases drive a real repository as every case beside them does
+both closedHere functions point at the chapter naming the approach
+the rule stands once, in that chapter, and both twins point at it
 
 # accept
 
