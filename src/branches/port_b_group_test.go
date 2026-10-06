@@ -222,9 +222,10 @@ func TestPBCloseDropsABranchTrunkHolds(t *testing.T) {
 	one.branch("one-group", map[string]string{pbAt: pbClosed(pbGroupNote)})
 	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/one-group")
 	one.git("push", "-q", "origin", "main")
-	if code := one.branchSays("close", "one-group"); code != 0 {
+	if code := one.branchSays("close"); code != 0 {
 		t.Fatalf("the close answers %d: %s", code, pbSaid(one))
 	}
+	holds(t, pbSaid(one), "work/one-group is closed.")
 	if one.git("ls-remote", "--heads", "origin", "work/one-group") != "" {
 		t.Fatal("the branch stands on origin")
 	}

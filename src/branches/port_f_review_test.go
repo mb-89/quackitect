@@ -282,6 +282,10 @@ func TestPFAReviewNamingNoBranchRefuses(t *testing.T) {
 		t.Fatalf("the review answers %d", code)
 	}
 	holds(t, one.errs.String(), "branch review needs a name")
+	if code := one.branchSays("review", "none"); code != codeRed {
+		t.Fatalf("a review of nothing answers %d", code)
+	}
+	holds(t, one.errs.String(), "work/none stands nowhere, here or on origin.")
 }
 
 // A report with nothing to fix fits on one line. [[spec/tickets/work-verbs-port-to-go]]
@@ -334,6 +338,12 @@ func TestPFARedSpecRunNamesEachCaseOnce(t *testing.T) {
 	got := whatFailed("✔ one holds\n✖ two breaks (1ms)\n✖ failing tests:\n✖ two breaks (1ms)\nℹ fail 1\n", "")
 	if got != "✖ two breaks (1ms)" {
 		t.Fatalf("the cases read %q", got)
+	}
+	if got := whatFailed("not ok 1 - a\nnot ok 1 - a\nnot ok 2 - b\n", ""); got != "not ok 1 - a\nnot ok 2 - b" {
+		t.Fatalf("the tap cases read %q", got)
+	}
+	if got := whatFailed("one\ntwo\n", "three"); got != "one\ntwo\nthree" {
+		t.Fatalf("the last lines read %q", got)
 	}
 }
 

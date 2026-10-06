@@ -1,28 +1,8 @@
-// The sync: trunk comes in, and a ticket whose front alone conflicts merges.
+// The sync: another branch refuses, and a ticket whose front alone conflicts merges.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
 import "testing"
-
-// A branch carrying every commit of trunk takes nothing, and one behind takes trunk by a merge. [[spec/design_output/work#trunk-comes-in-first]]
-func TestTheSyncTakesTrunkIn(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
-	if code := one.branchSays("sync"); code != 0 {
-		t.Fatalf("the sync answers %d", code)
-	}
-	holds(t, one.out.String(), "work/g already carries every commit on main.")
-	one.git("switch", "-q", "main")
-	one.land("main moves", map[string]string{"other.txt": "x\n"})
-	one.git("push", "-q", "origin", "main")
-	one.git("switch", "-q", "work/g")
-	if code := one.branchSays("sync"); code != 0 {
-		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
-	}
-	holds(t, one.out.String(), "work/g took 1 commit(s) from main.")
-}
 
 // The sync runs on trunk or a work branch alone. [[spec/design_output/work#trunk-comes-in-first]]
 func TestTheSyncRefusesAnyOtherBranch(t *testing.T) {

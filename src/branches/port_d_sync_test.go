@@ -97,6 +97,10 @@ func TestPDSyncOnAWorkBranchTakesMain(t *testing.T) {
 	one := newTree(t, nil)
 	one.branch("g", nil)
 	pdOn(one, "g")
+	if code := one.branchSays("sync"); code != codeOK {
+		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
+	}
+	holds(t, one.out.String(), "work/g already carries every commit on main.")
 	pdMainMoves(one, 2)
 	if code := one.branchSays("sync"); code != codeOK {
 		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
