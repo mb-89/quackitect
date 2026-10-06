@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: fe033274c17d7b49b264283634b44016f893accf
+    hash_after: fe033274c17d7b49b264283634b44016f893accf
+    inputs:
+      - name: ask
+        hash: 37c72798334cdf21
+        size: 480
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,73 @@ Boxes the dispatch fires miss the session list, so a stall or a cost stands unre
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The group ticket's record carries every box, since each box takes its branch through `branch take` whoever fires it. The final record rides on the box's own hold entry, and the fleet reads the record, not the session list.
+
+- The take writes `session` on the claim entry, off `CLAUDE_CODE_REMOTE_SESSION_ID`, where the box carries one. `claimGroup` in `src/branches/take.go` adds the row.
+- `branch done` and `branch release` read `--model`, `--cost` and `--final`. They write each given one as `model`, `cost` and `final` on the entry they close.
+- `front.AfterWith(text, hash, more)` in `src/front/front.go` closes the open take with `hash_after` and the rows past it. `After` calls it with none, so its callers stand unchanged.
+- The ticket schema's record entry admits `session`, `model`, `cost` and `final`.
+- `fleetRows(stood, standing)` in the new `src/branches/fleet.go` stands pure. It answers one row a work branch, with the last hand its record names and that entry's session, model, cost and final line. The fleet verb ticket prints these rows.
+- The work skill's done line and the prompt's rules name the three flags, so every box writes them.
+
+Weighed: the hold entry over a new entry, because `retroOpen` reads the last entry a step names, and a second entry on the retro step reads as unwritten. Assumed: a box knows its model and cost only by its own report, so each flag stays optional and the record writes what the box gives.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/done.go: leaves, which closes the take with the final rows
+- src/branches/done.go: finish, which hands the flags to leaves
+- src/branches/done.go: release, through letGo, which closes the take with the final rows
+- src/branches/take.go: claimGroup, which writes the session
+- src/front/front.go: After, which now calls AfterWith
+- src/branches/group.go: withHashAfter and withEveryTakeClosed, which reach After unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/record_test.go: TestDoneWritesTheModelCostAndFinalLineToTheRecord
+- src/branches/record_test.go: TestReleaseWritesTheFinalLineToTheRecord
+- src/branches/record_test.go: TestTakeWritesTheSessionOnTheClaim
+- src/branches/fleet_test.go: TestFleetHoldsTheBoxesTheDispatchFires
+- src/front/front_test.go: TestAfterWithClosesTheTakeWithTheRowsPastIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/done.go
+- src/branches/take.go
+- src/branches/fleet.go
+- src/branches/record_test.go
+- src/branches/fleet_test.go
+- src/front/front.go
+- src/front/front_test.go
+- spec/schemas/ticket.schema.yaml
+- .claude/skills/work/SKILL.md
+- src/branches/prompt.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `done.go` (finish, leaves, release), `take.go` (claimGroup), `group.go` (heldIn, withHashAfter, entriesOf), `front.go` (After, Entry) and the record schema, and checked each claim there.
+- Callers: every caller of After, leaves, letGo and claimGroup stands in the list.
+- The first done_when line meets TestDoneWritesTheModelCostAndFinalLineToTheRecord, the second meets TestFleetHoldsTheBoxesTheDispatchFires, and the check line meets the command at tests-green.
 
 ## tests-red
 
