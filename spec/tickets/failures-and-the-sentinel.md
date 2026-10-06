@@ -294,3 +294,5 @@ Refusals are free text written at each site. Many name no fix, two point at each
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the-fleet-verb-watches-boxes: `./RUNME.sh cloud fleet` prints a `wake <branch> <why>` line for each idle, stopped or failed box, and exits 1 where one stands. The sentinel takes that over as a watch on a failure node. Until it lands, the verb's lines and exit code carry the wake.
