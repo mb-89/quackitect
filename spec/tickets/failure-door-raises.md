@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,15 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 868c91b89990c351a9bea93c2b4c99f22f24a635
+    hash_after: 868c91b89990c351a9bea93c2b4c99f22f24a635
+    answered:
+      - name: lint
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -315,14 +324,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, with the contract case under test/contract/failure.test.js, the name the check wants for the door
+- the JavaScript door reaches the disk and the log through their doors, and fakeFailure stands as its fake over fakeLog, held to the real door by the contract case
+- each function's comment names the approach and links the design note's section
+- the folder and the note ending stay in node.go for Go and in the door's constants for JavaScript, and the design note owns the line format
 
 ## tests-green
 

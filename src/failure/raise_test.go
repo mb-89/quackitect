@@ -38,3 +38,12 @@ func TestTheRowCarriesTheFailureId(t *testing.T) {
 		t.Fatalf("Row answers %#v, want %#v", got, want)
 	}
 }
+
+func TestAnUnregisteredIdWritesARowAtError(t *testing.T) {
+	t.Parallel()
+	got := Raise(Fake(), "nobody", "it fails").Row(stamp)
+	want := map[string]any{"at": stamp, "level": "error", "kind": "failure", "said": "it fails", "failure": "nobody"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("Row answers %#v, want %#v", got, want)
+	}
+}

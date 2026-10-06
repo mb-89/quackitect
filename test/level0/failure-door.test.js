@@ -32,3 +32,18 @@ test("raise names an unregistered id and prints its message", async () => {
     "failure nobody stands unregistered, so spec/failures names no remedy",
   ]);
 });
+
+test("an unregistered id writes a row at error carrying the id", async () => {
+  const door = fakeFailure();
+  await door.raise("nobody", "it fails");
+  const [row] = door.log.lines();
+  assert.equal(row.level, "error");
+  assert.equal(row.failure, "nobody");
+});
+
+test("raise takes a message of several lines, as the Go door does", async () => {
+  const door = fakeFailure([HELD]);
+  const lines = await door.raise("leaf-held", "a leaf stands", "in your hand");
+  assert.deepEqual(lines.slice(0, 2), ["a leaf stands", "in your hand"]);
+  assert.equal(door.log.lines()[0].said, "a leaf stands in your hand");
+});
