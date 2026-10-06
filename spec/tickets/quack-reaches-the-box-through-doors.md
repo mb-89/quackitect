@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: cf68c955a77a9b594e28ce9bdf4cf42a9b3bd61c
+    hash_after: cf68c955a77a9b594e28ce9bdf4cf42a9b3bd61c
+    inputs:
+      - name: ask
+        hash: 30d90eb0d7ad46ba
+        size: 634
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,66 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The root keeps its reach in a handful of door files, and every verb takes its reach off the hand those build.
+
+1. `src/quack/owns.yaml` declares the root as a door owning `os`, `os/exec`, `net`, `net/http` and `syscall`, with its files: `main.go`, `io.go`, `boxdoors.go`, `checkdoors.go`, `ticket_doors.go` and `writedoor.go`. Several doors may own one name, so the files IO module keeps `os` as well.
+2. Each verb file reaching the box takes the reach off a hand those files build: `boxDoors` for a run, a GET, the environment and the streams, `writeDoor` for a write, and the check and ticket doors for theirs. A read or a write the hands lack joins the hand as one member, in its door file, with its fake beside it.
+3. `os.Args`, `os.Exit` and the process streams stay in `main.go`, which hands them on.
+
+The change lands in commits by verb family, each green: the `retro_*` verbs, the `verb_*` verbs, then the rest. The walk-arounds of `time` and `context` in the root fall to `quack-waits-on-the-clock`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/boxdoors.go realBoxDoors and boxDoors: gains the members the verbs reach for
+src/quack/writedoor.go: the write hand
+src/quack/checkdoors.go and src/quack/ticket_doors.go: their hands
+src/quack/main.go: builds the hands and hands them on
+every verb file `./RUNME.sh doors` lists under src/quack for os, os/exec, net, net/http or syscall, one function each, which the build names once the import leaves
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/owns/tree_test.go TestEveryDoorNamesAPlantedWalk: covers the root's declaration, unchanged
+src/quack/box_doors_test.go: each member the hand gains, against its fake
+src/quack/quack_doors_tree_test.go TestNoRootFileReachesTheBoxPastItsDoors: no file of src/quack outside the root's door files and tests walks around a door owning os, os/exec, net, net/http or syscall
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/owns.yaml
+src/quack/boxdoors.go
+src/quack/writedoor.go
+src/quack/checkdoors.go
+src/quack/ticket_doors.go
+src/quack/main.go
+src/quack/box_doors_test.go
+src/quack/quack_doors_tree_test.go
+every verb file the callers list names
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened `src/quack/boxdoors.go`, the door file list under `src/quack`, and the per-file walk-arounds `./RUNME.sh doors` prints, and each claim stands there
+the callers list names the hands and every verb file the doors verb lists
+the first done_when line falls to TestNoRootFileReachesTheBoxPastItsDoors and `./RUNME.sh doors`, the second to the root's declaration that `./RUNME.sh doors` lists, the third to `./RUNME.sh test src/quack`
 
 ## tests-red
 
