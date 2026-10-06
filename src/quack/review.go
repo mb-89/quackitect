@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/review"
+	"quackitect/src/proc"
 )
 
 // The span the verb gathers in, and the why a verb printing nothing answers. [[spec/tickets/review-spawns-off-the-door]]
@@ -38,6 +39,11 @@ func reviewOver(method string) func(root, branch string) (review.Material, strin
 		_ = run.Run()
 		return gatheredOf(out.String(), errs.String())
 	}
+}
+
+// reviewOver over the process door and the binary a road runs. A stub until the implement step: it gathers nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func reviewRunOver(_ proc.Runner, _ func() (string, error), _ string) func(root, branch string) (review.Material, string) {
+	return func(string, string) (review.Material, string) { return review.Material{}, saidNothing }
 }
 
 // The newest printed line reading as material, or why none does: what the verb said on stderr, else on stdout. [[spec/tickets/review-spawns-off-the-door]]

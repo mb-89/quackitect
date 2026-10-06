@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"os/exec" // level0: OutsideInDoors - this file is the process door
 	"slices"
 	"strings"
@@ -20,6 +21,9 @@ const (
 	pipesClose = time.Second
 )
 
+// The exit code a run answers where a signal ends it, apart from NotStarted. [[spec/tickets/quack-spawns-all-take-the-runner]]
+const Signalled = -2
+
 // The faults a run answers where the halt stands before it, the halt ends it, or it passes its wait. [[spec/design_output/doors#the-process-door]]
 const (
 	haltedBefore = "proc: the halt stands, so the run never starts"
@@ -32,12 +36,19 @@ var namesNoProgram = Said{Err: "proc: a command names no program", Code: NotStar
 
 // What a run takes. Drop names the box's variables a run leaves behind, Env carries the pairs past the box's own, and a Wait past zero ends the run with a fault. [[spec/design_output/doors#the-process-door]]
 type Command struct {
-	Argv  []string
-	Dir   string
-	Drop  []string
-	Env   []string
-	Stdin string
-	Wait  time.Duration
+	Argv    []string
+	Dir     string
+	Drop    []string
+	Env     []string
+	Stdin   string
+	Wait    time.Duration
+	Streams *Streams
+}
+
+// The caller's streams a run reads and writes in place of Stdin and the buffers Said answers. A stub until the implement step: no runner reads them. [[spec/tickets/quack-spawns-all-take-the-runner]]
+type Streams struct {
+	In       io.Reader
+	Out, Err io.Writer
 }
 
 // What a run answers. [[spec/design_output/doors#the-process-door]]

@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 )
 
@@ -171,6 +172,9 @@ func unreadWhy(said []byte, err error) string {
 
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
 func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
+
+// heardIn over the process door. A stub until the implement step: it reads no Vale. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func heardInOver(_ proc.Runner, _, _, _, _ string) valeHeard { return valeHeard{why: noValeWhy} }
 
 // What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
 func heardIn(root, name, text, mode string) valeHeard {

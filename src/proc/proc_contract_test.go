@@ -97,6 +97,8 @@ func fakeSh(one Command) Said {
 		return Said{Out: "out", Err: "err", Code: 3}
 	case "cat":
 		return Said{Out: one.Stdin}
+	case "kill -TERM $$":
+		return Said{Code: Signalled}
 	case "pwd -P":
 		return Said{Out: one.Dir + "\n"}
 	case "printf %s \"$PROC_CONTRACT\"":
@@ -162,6 +164,33 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 		}
 		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
+		}
+	}
+}
+
+// A command carrying streams reads its input off them and writes its output and errors there, and answers both buffers empty. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func TestARunWithStreamsHandsThemItsInputAndOutput(t *testing.T) {
+	t.Parallel()
+	for name, run := range runners() {
+		var out, errs strings.Builder
+		said := run(Command{Argv: []string{"sh", "-c", "cat"}, Streams: &Streams{In: strings.NewReader("in"), Out: &out, Err: &errs}})
+		if said != (Said{}) || out.String() != "in" {
+			t.Errorf("the %s runner answers %+v and writes %q, and wants the input written through", name, said, out.String())
+		}
+		out.Reset()
+		said = run(Command{Argv: []string{"sh", "-c", "printf out; printf err >&2; exit 3"}, Streams: &Streams{Out: &out, Err: &errs}})
+		if said != (Said{Code: 3}) || out.String() != "out" || errs.String() != "err" {
+			t.Errorf("the %s runner answers %+v and writes %q, %q, and wants both streams written through", name, said, out.String(), errs.String())
+		}
+	}
+}
+
+// A run a signal ends answers Signalled, apart from a program that never starts. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func TestARunASignalEndsAnswersSignalled(t *testing.T) {
+	t.Parallel()
+	for name, run := range runners() {
+		if said := run(Command{Argv: []string{"sh", "-c", "kill -TERM $$"}}); said.Code != Signalled {
+			t.Errorf("the %s runner answers %+v, and wants Signalled", name, said)
 		}
 	}
 }

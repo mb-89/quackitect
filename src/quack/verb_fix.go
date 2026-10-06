@@ -21,6 +21,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/proc"
 )
 
 // The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
@@ -131,6 +132,11 @@ func toolHere(root, name string) string {
 func standsHere(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+// toolRuns over the process door and the input it hands through. A stub until the implement step: it runs nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func toolRunsOver(_ proc.Runner, _ io.Reader) fixRunner {
+	return func(string, io.Writer, io.Writer, ...string) int { return exitFailed }
 }
 
 // A tool run with the caller's streams, answering its exit code. [[spec/tickets/the-small-faults-land]]

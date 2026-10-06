@@ -13,8 +13,19 @@ import (
 	"strings"
 
 	"quackitect/src/modules/check"
+	"quackitect/src/proc"
 	"quackitect/src/pull"
 )
+
+// roadVerb over the process door and the binary a road runs. A stub until the implement step: it runs no road. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func roadVerbOver(_ proc.Runner, _ func() (string, error), _ string) func(words ...string) (int, string) {
+	return func(...string) (int, string) { return exitFailed, "roadVerbOver runs no road yet" }
+}
+
+// takesBranch over the process door and the binary a road runs. A stub until the implement step: it takes nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func takesBranchOver(_ proc.Runner, _ func() (string, error)) func(scripts, group string, it *pull.It) int {
+	return func(string, string, *pull.It) int { return exitFailed }
+}
 
 // A verb through the road this binary answers, its two streams as one text. [[spec/tickets/landing-verbs-port-to-go]]
 func roadVerb(root string) func(words ...string) (int, string) {

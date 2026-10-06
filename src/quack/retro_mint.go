@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The folder tickets stand in, the record of a retro's classes, the processes a ticket mints onto, the tree's own command line, and the status a class stands open at. [[spec/guidance/retro/check]]
@@ -69,6 +71,11 @@ type retroMintRecord struct {
 }
 
 func init() { register("retro mint", retroMintVerb(retroRoot, retroMintRunme)) }
+
+// retroMintRunme over the process door. A stub until the implement step: it runs nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func retroMintRunmeOver(_ proc.Runner) func(dir string, argv []string, env map[string]string) retroMintRan {
+	return func(string, []string, map[string]string) retroMintRan { return retroMintRan{code: exitFailed} }
+}
 
 // Runs a program under the root, with ./RUNME.sh read as the root's own, and the env added over the caller's. [[spec/design_output/vehicle#the-work-root-inherits]]
 func retroMintRunme(dir string, argv []string, env map[string]string) retroMintRan {

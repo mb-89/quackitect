@@ -17,6 +17,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks"
+	"quackitect/src/proc"
 )
 
 // The index binary under the root, as BIN in .claude/skills/level0/lib/index.js names it. [[spec/design_output/level0#a-desk-serve-returns]]
@@ -108,6 +109,11 @@ func serveReal() serveDoors {
 		root = "."
 	}
 	return serveDoors{root: filepath.ToSlash(root), run: serveRuns}
+}
+
+// serveRuns over the process door. A stub until the implement step: it runs nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func serveRunsOver(_ proc.Runner) func(argv []string, cwd string) (int, string, error) {
+	return func([]string, string) (int, string, error) { return exitFailed, "", nil }
 }
 
 // Runs a program in a folder, and answers its exit code and what it wrote to its error stream. A signal's end reads as 1, as the JavaScript door answers it. [[spec/design_output/level0#a-desk-serve-returns]]

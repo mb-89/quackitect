@@ -28,6 +28,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/proc"
 	"quackitect/src/tui/frame"
 )
 
@@ -608,6 +609,11 @@ func tuiGoOf(root string) string {
 		}
 	}
 	return "go"
+}
+
+// tuiLaunch over the process door and the input it hands through. A stub until the implement step: it launches nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func tuiLaunchOver(_ proc.Runner, _ io.Reader) func(argv []string, cwd string, out, errs io.Writer) (int, error) {
+	return func([]string, string, io.Writer, io.Writer) (int, error) { return 0, nil }
 }
 
 // Runs the viewer on the caller's terminal: its input, and its output and error streams, which pass straight through where they are files. [[spec/design_output/tui#the-verb-builds-it]]

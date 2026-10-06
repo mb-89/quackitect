@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: f8a2aeaa9f01731c
         size: 860
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 72ea7aacdd39c404cab0836028b13fc1ea315124
+    hash_after: 72ea7aacdd39c404cab0836028b13fc1ea315124
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: ae92722ea762d1ae
+        size: 5304
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -278,26 +291,32 @@ I refuse to buffer the streams through `Said`. A viewer run buffered shows nothi
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/spawns_runner_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go
+- src/quack/spawns_runner_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Ten new cases fail on their own assertions. The two contract cases fail on both runners, since no runner reads Streams yet and the real one answers a signal as NotStarted. The eight quack cases meet stubs that spawn nothing, so each fails on what the fake should have met. The surprise: reviewOver reached os.Executable through selfRoad, so a stub spawning in place would have run the test binary itself, and the Over form takes the binary as an argument.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 and 2 meet the eight cases in spawns_runner_test.go, and done_when 3 and the grep fall to the gate read
+- the one door the tests reach is the process door, and FakeRunner stands beside the real runner
 
 # gate
 
