@@ -46,9 +46,9 @@ func TestEveryGuardStandsInTheAudit(t *testing.T) {
 	if end := strings.Index(audit, "evidence:"); end > 0 {
 		audit = audit[:end]
 	}
-	for _, one := range imports.Guards {
-		if !strings.Contains(audit, "`"+one.Name+"`") {
-			t.Errorf("the audit checklist names no `%s` guard", one.Name)
+	for _, link := range []string{"[[spec/guidance/retro/audit]]", "[[spec/guidance/code/code]]", "[[spec/guidance/code/testing]]"} {
+		if !strings.Contains(audit, link) {
+			t.Errorf("the audit checklist links no %s", link)
 		}
 	}
 	if !strings.Contains(treeText(t, "spec/guidance/retro/audit.md"), "./RUNME.sh guards") {

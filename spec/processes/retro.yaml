@@ -47,8 +47,8 @@ steps:
     checklist:
       - the code the window lands follows [[spec/guidance/code/code]]
       - every change lands with a test that fails before it and passes after, as [[spec/guidance/code/testing]] asks
-      - the code the window lands holds the code and test rules the guards read, which `./RUNME.sh guards` answers per guard: `blackbox`, `fixture`, `ratio`, `script` and `purity`
-      - every test the window lands tests behavior at the outermost door, the command line, and a module port only for an edge it cannot reach, as [[spec/guidance/code/testing]] asks
+      - every guarded rule of the code and testing guidance holds over the window, as [[spec/guidance/retro/audit]] asks
+      - every test the window lands meets its behavior at the command line, as [[spec/guidance/code/testing]] asks
       - every note the window writes holds the shape [[spec/guidance/guidance]] asks
       - the work follows [[spec/guidance/working]], a turn at a time
       - a change reaches every place holding the same thing, each writer, each copy and each name

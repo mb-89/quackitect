@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 6e900c644062034902a8af1337adf28a3534b6aa
+    hash_after: 6e900c644062034902a8af1337adf28a3534b6aa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "    1.9  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: 96c683892ae46d57
+        size: 744
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,33 @@ one place: every guard rule links the model section owning the guards and their 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/guidance_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The code and test rules stand in guidance. spec/guidance/code/code.md gains the purity rule and the no-hand-script rule. spec/guidance/code/testing.md folds the behavior, fixture home, ratio, no-timer, door-once and black-box rules into rules 6, 7, 8, 11 and 15, since the schema caps a note at 15 items. Each guarded rule names its guard and links the model section owning the guards. The audit checklist in spec/processes/retro.yaml links the guarded rules through spec/guidance/retro/audit.md, which answers them off ./RUNME.sh guards, since a checklist line holds four code spans at most. src/imports/guidance_test.go holds each guard in the guidance and each link in the audit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the ask names, and the testing rationale the door-once point added
+no door: the test reads tree files, as the tree test beside it does
+the test file header names the ticket whose approach it holds
+one place: every guarded rule links the model section owning the guards and their markers
 
 # accept
 
