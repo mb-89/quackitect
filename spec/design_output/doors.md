@@ -199,7 +199,7 @@ family carries its fate:
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
 | the quack verbs sleeping, or spawning the binary or go | `src/quack/check_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go`, `src/quack/split_test.go`, `src/quack/waits_test.go` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
-| the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under [[spec/tickets/index-session-suites-run-fakes]] |
+| the index and session suites running the fake beside the real door | `test/contract/index.test.js`, `test/contract/session.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go` | door tests of the index door |
 | the quack verbs over a repository a case | `src/quack/commit_test.go`, `src/quack/codec_test.go`, `src/quack/landing_test.go`, `src/quack/ticket_bless_test.go`, `src/quack/ticket_open_test.go`, `src/quack/ticket_route_test.go`, `src/quack/verb_mint_test.go` | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |

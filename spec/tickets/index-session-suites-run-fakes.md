@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 7aa476c87847d0d7
         size: 750
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 582932b5539db474c761b90602f0dff3e37237a0
+    hash_after: 582932b5539db474c761b90602f0dff3e37237a0
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/doors/fake/session.js, the index suite's head comment and the doors chapter row, each named by the gate
+- the doors the suites reach are the index and the session, and each fake now runs beside its real door
+- the index suite's head comment names the approach: the fake runs beside the real door on every answer the fake gives
+- the refusal text stands in the real door and its fake alike, and the contract case holds the two to it
 
 ## tests-green
 

@@ -1,5 +1,6 @@
 // The index door, against the real binary. It stands where the tree is built,
-// answers a glob out of the rows, and reads as absent where it is not.
+// answers a glob out of the rows, and reads as absent where it is not. The fake
+// runs beside the real door on every answer the fake gives.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import assert from "node:assert/strict";
