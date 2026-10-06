@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,7 +165,30 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 66b0b8c4ab43a71947c710a1734d561895858d39
+    hash_after: 66b0b8c4ab43a71947c710a1734d561895858d39
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 733bb02b6ec002b3
+        size: 854
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: the-fleet-verb-watches-boxes
+reason: done
 ---
 
 # Ask
@@ -333,26 +356,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/routine_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The fleet check now stands as one stored routine. cloud trigger prints the work routine as before, then fleet_check with the id under cloud.fleetRoutine and the prompt it carries. Where no id stands, it prints the prompt to store. cloud route reads a pull request event and names the session of the box that holds its branch, or the coordinator where none holds it. The box itself subscribes to its pull request, as the work skill now says. The person ticket the-fleet-routine-stands carries the commands that store the routine and write its id into tracked config. The config schema declares that key and the fleet's idle span. The two keys stand in the settings catalog, and the schema, the projected config commands and the size golden regenerate off it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list, and the schema takes the two keys the verbs read.
+- cloud route reads the event through readFile and git through the quiet door, and the cases drive both.
+- Each new function carries a link to this ticket.
+- The routine's name, key and prompt stand once in routine.go.
 
 # accept
 
