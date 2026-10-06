@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,10 @@ record:
   - step: gate
     hand: the engine
     stale: design/draft, design/tests-red
+  - step: design/tests-red
+    skipped: true
+    kept: 78dbdd03594d87fcb75c4cac77e28cd5a38b3fb1
+    why: its red tests stand as 78dbdd035 landed them, and a later leaf passed since
 ---
 
 # Ask
