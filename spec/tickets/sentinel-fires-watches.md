@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -191,6 +191,21 @@ record:
     skipped: true
     kept: fc2c608f22299b4a2b46ffd5924e3ac9334c4c4c
     why: its red tests stand as fc2c608f2 landed them, and a later leaf passed since
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-10
+    hash_before: a7db35b2c1a3ed4d70f699e389642dfd4048b52b
+    hash_after: a7db35b2c1a3ed4d70f699e389642dfd4048b52b
+    inputs:
+      - name: design/draft
+        hash: e4d12a074e383f92
+        size: 3512
+      - name: design/tests-red
+        hash: 93953b6e9f5ee92f
+        size: 1038
+      - name: [[spec/design_output/failures]]
+        hash: 8e785cc94e2e32f9
+        size: 4503
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -344,16 +359,9 @@ Each case fails on its own assertion. The stub sentinel fires nothing and runs n
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-pass
-- the approach answers the ask, and each done_when line meets a red case that fails on its own assertion: the event, the quiet span and the reaction in src/failure/sentinel_test.go, After in src/modules/clock/clock_contract_test.go under the contract tag the check runs, and Runner in src/failure/door_contract_test.go
-- implement: TestAQuietSpanFiresOnceAndAMatchingEventArmsItAgain hears an event before the first span passes, so no case shows NewSentinel arming each quiet watch at once; add the stall from the start, a Tick past the span with no event firing once, to sentinel_test.go
-- implement: the real clock runs the After hand on its own goroutine while Hear runs on the caller, so Sentinel holds a mutex over its armed stops, and a hand stopped while it fires checks a generation so a stale fire drops
-- implement: watchOf in src/failure/node.go takes match as any text and never compiles it, so a pattern regexp refuses reaches the sentinel at run time; NodeOf names that fault, a file past the draft size
-- implement: FakeClock.After keeps a one-shot hand that Tick deletes once it calls it, so the hand runs once whatever span later ticks pass
-- implement: TestClockKeepsItsContract waits through time.Sleep on the real clock, against the rule of no sleeps in tests; the real side waits on an After hand closing a channel instead, in the same contract file
-- implement: Shell.Run names what a nonzero exit and a missing RUNME.sh answer, and the sentinel says what it does with an error the Runner answers, since no case decides either
-- the ask says go test ./src/modules/clock/ passes the After contract, and that case stands under the contract build tag, so the plain command runs nothing of it; the check runs go test -tags contract, which decides the line
-- the hooks door wiring stands outside the done_when lines, and the note sentinel-hears-the-hooks carries it to the retro, so the sentinel fires nothing in a live session until that note becomes a ticket
+accept with points
+- sentinel-note-names-the-runner: spec/design_output/failures.md says Sentinel takes the registry, the clock door and a hand, and that the engine runs the reaction, while src/failure/sentinel.go NewSentinel takes a Runner and runs the reaction itself, raising failure-reaction-fails; the note's chapter names the Runner and the sentinel as the hand running the reaction
+- sentinel-callers-list-whole: the draft's callers list names NodeOf alone in node.go, and misses its callers src/failure/registry.go Load, src/failure/check.go and src/quack/verb_failure.go, each reading the new match-pattern fault; the builder confirms each still answers green
 
 # implement
 
