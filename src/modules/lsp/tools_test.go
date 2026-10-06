@@ -219,6 +219,32 @@ func TestAValeRowPublishesUnderItsSource(t *testing.T) {
 	}
 }
 
+// The Go rules draw their rows with no Vale on the box, an open buffer and a closed file alike. [[spec/tickets/go-rules-replace-vale]]
+func TestTheGoRulesDrawTheirRows(t *testing.T) {
+	fake := &fakeTools{says: map[string]string{"biome": "{}"}}
+	server, pushed := toolsOver(t, map[string]string{"spec/a.md": "# A\n\nSome text\n", "spec/b.md": "# B\n\nSome text\n"}, fake)
+	server.from.Tools.Vale = ""
+	server.from.Tools.Rules = func(path, text string) []Finding {
+		if !strings.Contains(text, "Some") {
+			return nil
+		}
+		return []Finding{{Rule: "Sentence", Line: 2, Column: 1, Message: "A rule speaks.", Severity: "warning"}}
+	}
+	server.Handle(opened("file:///tree/spec/a.md", "# A\nSome text\n"))
+	server.Settle()
+	if drawn := drawnOn(*pushed, "file:///tree/spec/a.md"); !holds(drawn, "rules", "Sentence") || holds(drawn, "vale", ValeRuns) {
+		t.Fatalf("the open file draws %+v, and wants the Go rules' row under the source rules", drawn)
+	}
+	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md"); !holds(drawn, "rules", "Sentence") {
+		t.Fatalf("the closed file draws %+v, and wants the Go rules' row off the whole run", drawn)
+	}
+	for _, call := range fake.calls {
+		if strings.HasPrefix(call, "vale ") {
+			t.Fatalf("the runs %q ask vale, and the rules run in Go", fake.calls)
+		}
+	}
+}
+
 func TestABiomeRowPublishesUnderItsSource(t *testing.T) {
 	biome := `{"diagnostics": [{"severity": "error", "category": "lint/style/useConst", "location": {"path": {"file": "src/a.js"}, "start": {"line": 1}}, "description": "Use const."}]}`
 	fake := &fakeTools{says: map[string]string{"vale": "{}", "biome": biome}}

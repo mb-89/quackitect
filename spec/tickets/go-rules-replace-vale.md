@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 87e003b9fd2e4022
         size: 944
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 9aeb0e9b590183ba4a581092e23827a1e4d89667
+    hash_after: 9aeb0e9b590183ba4a581092e23827a1e4d89667
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/rules fails
+    inputs:
+      - name: design/draft
+        hash: e5e357354b7669b9
+        size: 3124
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -250,26 +263,33 @@ A pure Go package src/rules owns every rule. Load takes the texts it reads, the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/rules/rules_test.go src/modules/lsp/tools_test.go src/quack/rules_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/rules/rules_test.go
+- src/modules/lsp/tools_test.go
+- src/quack/rules_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every rule fails its fixture on its own assertion, the lsp case draws no row under the source rules, and the verb answers no JSON. Vale lints front matter for its token rules, and a front matter line above its closing fence reads as a setext heading, so a paragraph rule passes it. Paragraph scope skips list items. An occurrence rule reports its first token. Spans count from 1 and hold both ends.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red case: the per-rule corpus, the scope case, the lsp case, and the verb case; the compare and the removal meet the retro and a grep at accept
+- the lsp case fakes the rules through the Rules field, and the rules tests read the tree texts through the Read argument
 
 # gate
 

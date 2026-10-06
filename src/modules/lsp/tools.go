@@ -44,6 +44,8 @@ type Runner func(dir, input, name string, argv ...string) (string, error)
 // The tools a run takes, where the box holds them, and the ceilings the code faults read. [[spec/tickets/lsp-module-draws-the-tools]]
 type Tools struct {
 	Root     string
+	// The Go rules over one text read as the file at the path, which the wiring hands in. [[spec/tickets/go-rules-replace-vale]]
+	Rules    func(path, text string) []Finding
 	Vale     string
 	Biome    string
 	Config   string
