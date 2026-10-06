@@ -370,3 +370,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A cloud session's attribution asks for a `Co-Authored-By` trailer naming a model, and this door refuses it. The owner's rule wins: a commit message a hand writes here carries the `Claude-Session` line alone. The engine and the commit verb write no trailer, so no code changes for it. For details, see [[spec/tickets/attribution-trailer-meets-the-door]].

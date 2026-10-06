@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: engine-verbs-hold
 parent: commit-door-refuses-model-trailers
+record:
+  - step: do
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 0660144bb2f6aaddc5896a806088947dd7f6ab0d
+    hash_after: 0660144bb2f6aaddc5896a806088947dd7f6ab0d
+    why: commit-door-refuses-model-trailers answers this ask
+reason: answered
 ---
 
 # Ask
@@ -47,26 +54,32 @@ the session attribution this box carries asks for a Co-Authored-By trailer namin
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+go test -C src ./modules/hooks/command/ -run TestModelTrailersPassesASessionLink
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+No code on this branch writes a Co-Authored-By trailer: the engine and the commit verb write each message with none, and the session attribution reaches a commit only where a hand writes the message itself. The owner rule wins over that attribution, so from the door on, a hand-written commit here carries the Claude-Session line alone, and the door test passes that line.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: the decision stands, and no code carries the trailer, which a search of the tree and the recent commits shows.
+The change reveals no cleanup.
+The rule stands once, in ModelTrailers in src/modules/hooks/command/voice.go, which the parent adds.
 
 # Discussion
 
