@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -82,13 +82,14 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
+step: sync
 ---
 
 # Ask
 
 <!-- goal, as text: what these tickets add up to, for the hand that takes them -->
 
-A cloud box carries the leaf it holds across a context clear: the pull after the clear hands that leaf back in the same turn, a second handover with no new commit sends the box back to its leaf, and the handover or `clear` ticket never comes out of the pull as work. The dry probe walks the whole cycle, handover, clear, pull, continue, commit.
+A cloud box carries the leaf it holds across a context clear. The pull after the clear hands that leaf back in the same turn. A second handover with no new commit sends the box back to its leaf. The pull hands out the handover and `clear` tickets as work nowhere. The dry probe walks the whole cycle, handover, clear, pull, continue, commit.
 
 The group carries the name the owner ordered with its article cut, because a branch name holds at most five words.
 
