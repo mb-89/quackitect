@@ -656,3 +656,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's approach says Five cases lean on a refusal the fake holds no road to, and reads Four: the index lock, the commit hook, the open hook and the remote URL. The tests list names the same four, so no case goes missing.
