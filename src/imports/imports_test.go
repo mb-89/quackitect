@@ -120,6 +120,14 @@ func TestAModuleImportsTheFrontWriter(t *testing.T) {
 	}
 }
 
+// The declaration reader the check module takes passes, as the pointer reader does. [[spec/tickets/owns-joins-the-pure-tree]]
+func TestAModuleImportsTheDeclarationReader(t *testing.T) {
+	t.Parallel()
+	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/owns"}, nil); len(said) != 0 {
+		t.Fatalf("src/owns reads as past q: %v", said)
+	}
+}
+
 func TestEveryPureReaderImportsThePureLibraryAlone(t *testing.T) {
 	t.Parallel()
 	owned := Owned(filepath.Join("..", ".."))

@@ -446,3 +446,5 @@ The draft's lists name files the red cases left. Read them as follows:
 The size list also takes `src/quack/verb_doors_test.go` and `src/quack/lsp_doors_test.go`.
 
 The ask's line naming `src/modules/lsp` stands met by `src/quack/lsp_doors_test.go`. `src/quack` alone wires the real check module into the lsp IO module, so a test under `src/modules/lsp` meets a fake check and proves no walk-around.
+
+The draft's callers list also takes `pureTree` in `src/imports/imports.go`, which `pastQ` reads. It names `src/owns`, so `src/modules/check` imports the declaration reader and passes `onlyq`.
