@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 6b7173589739eb008c421c62e8d68bd1fa4f659b
+    hash_after: 6b7173589739eb008c421c62e8d68bd1fa4f659b
+    inputs:
+      - name: ask
+        hash: 646a8dca9a84c1c2
+        size: 888
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,62 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The guard reads the audit, so the family table in `spec/design_output/doors.md` stays the one list of door tests.
+
+1. `src/imports/clock.go` holds `RealWaits(file)`, a pure pass over one parsed test file. It names each call to `time.Sleep`, `exec.Command`, `exec.CommandContext` and `os.StartProcess`, through the import names the file gives `time`, `os/exec` and `os`.
+2. `src/imports/clock_test.go` proves the pass over a planted file, and holds the tree case. The tree case walks every `_test.go` under `src`, reads every code span ending in `_test.go` out of the tables of the doors note, and names each file calling a real wait that no span matches through `path.Match`. The check runs it in its go part, as it runs the serial guard.
+3. The doors note takes the files the survey finds outside the table: the index cases polling a real index join the index door row, and the watch cases join a new row as door tests of the file watch. The fixed sleep in `src/modules/index/call_test.go` waits in a module test, so a new row names it with a child ticket, `caller-wait-meets-no-sleep`.
+4. `spec/guidance/code/testing.md` takes five rules: one door test a door listed in the audit, a fixture built once a package run, a module as read, compute and write over the index, a module holding no state past a named exception, and no wall-clock wait or spawn outside a door test, pointing at the guard.
+5. `spec/rationales/testing.md` argues each new rule, off the lease flake, the cold-box waits and the measured builds.
+
+The guard reads a sleep and a spawn, and leaves `time.After` and a ticker alone. It costs a wait inside a select, which the rule still names.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- the check's go part, which runs every Go test, the new tree case among them
+- spec/design_output/doors.md, whose tables the tree case reads
+- spec/guidance/code/testing.md, read by every hand writing a test
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/imports/clock_test.go TestASleepAndASpawnAreNamedThroughTheirImportNames
+- src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/imports/clock.go
+- src/imports/clock_test.go
+- spec/design_output/doors.md
+- spec/guidance/code/testing.md
+- spec/rationales/testing.md
+- spec/tickets/caller-wait-meets-no-sleep.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each file named stands opened: serial.go and serial_test.go as the shape, the doors note tables, the testing guidance and rationale, and the seven files the survey finds
+- the callers come off the check, which runs every Go test, and off the note the tree case reads
+- each done_when line meets its test or file: the rules and the rationale stand as files, the two cases decide the guard, and the check the last
 
 ## tests-red
 
