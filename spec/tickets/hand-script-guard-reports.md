@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -150,6 +150,12 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/tests-red
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: a4da2cfacbcc6bcc59075aecfc279556ee17eaba
+    hash_after: caaab8a8c686d0d63785cd008310600c4c882ccc
+    why: black-box-tests-guard-reports answers this ask
+reason: answered
 ---
 
 # Ask
