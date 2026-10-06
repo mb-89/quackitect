@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -35,6 +36,15 @@ steps:
           - name: size
             form: list
             says: every file the approach touches, one a line
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "design/tests-red fails back 2 times: src/owns stands on no main and the doors-declare-what-they-own group opens no pull request, so a draft built on it waits past this branch; the draft moves onto the guards in src/imports, which this group landed"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: tests-red
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
@@ -116,8 +126,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: code-is-pure-tests-behave
-step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -141,6 +149,17 @@ record:
       - name: tests
         exit: 1
         said: FAIL
+  - step: design/tests-red
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 09f4c59994632f9e187d61b00b3b2353fe871e63
+    hash_after: 09f4c59994632f9e187d61b00b3b2353fe871e63
+    returns: 2
+    why: src/owns stands on no main and the doors-declare-what-they-own group opens no pull request, so a draft built on it waits past this branch; the draft moves onto the guards in src/imports, which this group landed
+    answered:
+      - name: tests
+        exit: 0
+        said: ok  	quackitect/src/imports	3.915s
+group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
 ---
 
@@ -271,6 +290,16 @@ Weighed: one `random` door module against declaring `crypto/rand` on the four do
 every file the approach names stands opened on origin/work/doors-declare-what-they-own: walkaround.go, owns.go, golang.go, imports.go and every owns.yaml, and each use count comes off git grep there
 the callers come off a git grep for owns.Walks, owns.Read, impure and floor on that branch, each with its enclosing function
 done_when 1 is the Discussion table; done_when 2 and 3 meet the walkaround_test.go cases on planted packages under go test ./src/imports; done_when 4 meets ./RUNME.sh check at tests-green
+
+## person-1
+
+<!-- design/tests-red fails back 2 times: src/owns stands on no main and the doors-declare-what-they-own group opens no pull request, so a draft built on it waits past this branch; the draft moves onto the guards in src/imports, which this group landed -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## tests-red
 
