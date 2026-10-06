@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: d0ee6f1be061baefb9e377cdd14aaae9299e792a
+    hash_after: d0ee6f1be061baefb9e377cdd14aaae9299e792a
+    inputs:
+      - name: ask
+        hash: 2f9d4591c4088399
+        size: 369
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,71 @@ Hands keep pushing such trailers, and each one stands on main for good.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One pure read in the command package decides a model trailer, and both commit roads call it. In src/modules/hooks/command/voice.go, `TrailersOf(text)` returns the lines of the closing trailer paragraph. `WithoutTrailers` keeps its signature and calls `TrailersOf`, so the parse stands once.
+
+A new `ModelTrailers(message) []Row` reads each trailer's value against one pattern, `modelName`. The pattern matches opus, sonnet, haiku, fable, gpt, gemini and a bare claude. A claude followed by a dot reads as a host, so `Claude-Session: https://claude.ai/...` passes. Each match comes back as a Row with Rule `ModelTrailer`, the line as Said, and a message naming the owner's rule.
+
+The hook door: `(*Door).commitVoice` in src/modules/hooks/commits.go reads the message as now, and prepends `command.ModelTrailers(message)` ahead of the Voice nil check. `(*Door).commands` in hooks.go then refuses through `RefusedCommand` with no change.
+
+The verb: `commitVerb` in src/quack/commit.go calls `command.ModelTrailers(message)` after `TicketFault`. A match prints each row to errs and returns `exitUsage` before anything stages.
+
+The owner rules out any trailer naming a model, so the list takes every family name this box meets, fable among them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/hooks/hooks.go (*Door).commands
+src/modules/hooks/commits_test.go TestADoorWithNoGitOrVoiceReadsNeither
+src/quack/commit.go init
+src/quack/commit.go messageFindings
+src/modules/hooks/commits.go (*Door).commitVoice
+src/modules/hooks/command/voice_test.go TestWithoutTrailersDropsTheClosingTrailers
+src/quack/commit_test.go TestCommitVerb
+src/quack/commit_test.go TestCommitVerbDesk
+src/quack/commit_test.go TestCommitVerbMoves
+src/quack/commit_test.go TestCommitVerbGates
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/hooks/command/voice_test.go TestModelTrailersRefusesATrailerNamingAModel
+src/modules/hooks/command/voice_test.go TestModelTrailersPassesASessionLink
+src/modules/hooks/commits_test.go TestCommitVoiceRefusesAModelTrailerWithNoVale
+src/quack/commit_test.go TestCommitVerbRefusesAModelTrailer
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/hooks/command/voice.go
+src/modules/hooks/command/voice_test.go
+src/modules/hooks/commits.go
+src/modules/hooks/commits_test.go
+src/quack/commit.go
+src/quack/commit_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+voice.go WithoutTrailers and the trailer pattern, commits.go commitVoice, hooks.go commands, commit.go commitVerb and messageFindings, landing_test.go fakeLanding stand opened and read.
+A grep for commitVoice, commitVerb, WithoutTrailers and messageFindings over src gives the callers list; ModelTrailers is new, and its two callers stand in it.
+The hooks/command case is TestModelTrailersRefusesATrailerNamingAModel, the quack case is TestCommitVerbRefusesAModelTrailer, and ./RUNME.sh check runs the battery over both.
 
 ## tests-red
 
