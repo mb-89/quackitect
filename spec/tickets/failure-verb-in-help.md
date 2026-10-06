@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: failures-stand-registered
 parent: failure-verbs-raise-and-register
+record:
+  - step: do
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: cb3841be496c0f8758278da0c36ab381adca0cf2
+    hash_after: cb3841be496c0f8758278da0c36ab381adca0cf2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: ask
+        hash: b7a0948bcf1c24f0
+        size: 200
+    def: 9da33ea199bff5a7
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ size leaves out src/modules/verbs/tree.go. The road reaches a registered verb, b
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/verbs/tree_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Commands in src/modules/verbs/tree.go carries a failure row, so help and the verb tools an agent calls name the failure verb the ask hands the agent. tree_test.go asserts the row stands.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the verb joins Commands
+- the cleanup the change reveals is none past the row
+- the verb's doc line stands once, in Commands
 
 # Discussion
 
