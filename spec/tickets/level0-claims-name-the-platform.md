@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: b9c2ed36934e28a6
         size: 581
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 302374d50444627c5371db7eb2cea663f2c7599a
+    hash_after: 5dc70d242f9a09ae310c58d56da1d136f2d741a5
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -285,14 +294,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go vet ./quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go alone, inside the size list
+the change reaches the platform and the streams through checkDoors, whose fake names linux
+the comment over level0Runs links this ticket and level0-runs-on-the-door
+the desk trial name stands once, in deskTrial, and the line reads it there
 
 ## tests-green
 
