@@ -5,7 +5,6 @@ package lsp
 
 import (
 	"encoding/json"
-	"errors"
 	"maps"
 	"regexp"
 	"slices"
@@ -16,22 +15,45 @@ import (
 	"quackitect/src/proc"
 )
 
-// What a fake binary answers: its stdout by the binary's name, and the calls it takes. [[spec/tickets/lsp-module-draws-the-tools]]
+// The fake process door taught vale and biome, and the commands it takes. [[spec/design_output/doors#the-process-door]]
 type fakeTools struct {
-	mu    sync.Mutex
-	says  map[string]string
-	fails map[string]error
-	calls []string
+	proc.FakeRunner
+	mu   sync.Mutex
+	took []proc.Command
 }
 
-func (one *fakeTools) run(dir, input, name string, argv ...string) (string, error) {
-	one.mu.Lock()
-	defer one.mu.Unlock()
-	one.calls = append(one.calls, name+" "+strings.Join(argv, " "))
-	if err := one.fails[name]; err != nil {
-		return "", err
+// The fake whose vale and biome answer their stdout off says, or a fault off fails with no output. [[spec/design_output/doors#the-process-door]]
+func taughtTools(says, fails map[string]string) *fakeTools {
+	fake := &fakeTools{}
+	answers := func(name string) proc.Program {
+		return func(one proc.Command) proc.Said {
+			fake.mu.Lock()
+			defer fake.mu.Unlock()
+			fake.took = append(fake.took, one)
+			if why := fails[name]; why != "" {
+				return proc.Said{Err: why, Code: 1}
+			}
+			return proc.Said{Out: says[name]}
+		}
 	}
-	return one.says[name], nil
+	fake.Programs = map[string]proc.Program{"vale": answers("vale"), "biome": answers("biome")}
+	return fake
+}
+
+// The commands the fake took. [[spec/design_output/doors#the-process-door]]
+func (fake *fakeTools) ran() []proc.Command {
+	fake.mu.Lock()
+	defer fake.mu.Unlock()
+	return slices.Clone(fake.took)
+}
+
+// Each command the fake took, as one line. [[spec/design_output/doors#the-process-door]]
+func (fake *fakeTools) calls() []string {
+	out := []string{}
+	for _, one := range fake.ran() {
+		out = append(out, strings.Join(one.Argv, " "))
+	}
+	return out
 }
 
 // A tree over the texts git tracks, each buffer an editor holds over its file. [[spec/tickets/lsp-module-draws-the-tools]]
@@ -160,7 +182,7 @@ func fakeFolds(tree Tree, path string, line, character int) any {
 // A server over the files named, whose sweep answers nothing, running the fake tools with no quiet span. [[spec/tickets/lsp-module-draws-the-tools]]
 func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server, *[][]byte) {
 	t.Helper()
-	return toolsServer(t, files, &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.run, Check: fakeCheck})
+	return toolsServer(t, files, &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.Run, Check: fakeCheck})
 }
 
 // A server over the files named, whose sweep answers nothing, running the tools handed in. [[spec/tickets/lsp-tools-take-the-runner]]
@@ -217,7 +239,7 @@ func valeSays(file, check, match string) string {
 }
 
 func TestAValeRowPublishesUnderItsSource(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/a.md", "VoiceVale.Sentence", "Some")}}
+	fake := taughtTools(map[string]string{"vale": valeSays("/tree/spec/a.md", "VoiceVale.Sentence", "Some")}, nil)
 	server, pushed := toolsOver(t, map[string]string{"spec/a.md": "# A\n\nSome text\n"}, fake)
 	server.Handle(opened("file:///tree/spec/a.md", "# A\nSome text\n"))
 	server.Settle()
@@ -228,7 +250,7 @@ func TestAValeRowPublishesUnderItsSource(t *testing.T) {
 
 func TestABiomeRowPublishesUnderItsSource(t *testing.T) {
 	biome := `{"diagnostics": [{"severity": "error", "category": "lint/style/useConst", "location": {"path": {"file": "src/a.js"}, "start": {"line": 1}}, "description": "Use const."}]}`
-	fake := &fakeTools{says: map[string]string{"vale": "{}", "biome": biome}}
+	fake := taughtTools(map[string]string{"vale": "{}", "biome": biome}, nil)
 	server, _ := toolsOver(t, map[string]string{"src/a.js": "let a = 0;\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/src/a.js"); !holds(drawn, "biome", "style/useConst") {
 		t.Fatalf("src/a.js draws %+v, and wants the Biome row under the source biome", drawn)
@@ -236,7 +258,7 @@ func TestABiomeRowPublishesUnderItsSource(t *testing.T) {
 }
 
 func TestACodeFaultPublishesUnderTree(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": "{}"}}
+	fake := taughtTools(map[string]string{"vale": "{}"}, nil)
 	server, _ := toolsOver(t, map[string]string{"spec/a.md": "# A\n\n<!-- vale " + "Voice.Sentence = NO -->\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/a.md"); !holds(drawn, "tree", "ExemptionCarriesAReason") {
 		t.Fatalf("spec/a.md draws %+v, and wants the unreasoned marker under the source tree", drawn)
@@ -244,7 +266,7 @@ func TestACodeFaultPublishesUnderTree(t *testing.T) {
 }
 
 func TestAClosedFileDrawsItsRowsAtTheListen(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
+	fake := taughtTools(map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}, nil)
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
 		t.Fatalf("the closed file draws %+v, and wants its Vale row off the whole run", drawn)
@@ -252,62 +274,29 @@ func TestAClosedFileDrawsItsRowsAtTheListen(t *testing.T) {
 }
 
 func TestTheTenseReaderDropsAPastRow(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.PastTense", "read")}}
+	fake := taughtTools(map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.PastTense", "read")}, nil)
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\nWe read it\n"}, fake)
 	bodies := server.SweepTools()
 	if drawn := drawnOn(bodies, "file:///tree/spec/b.md"); holds(drawn, "vale", "PastTense") {
 		t.Fatalf("the file draws %+v, and the tense reader reads the word as no past", drawn)
 	}
-	for _, call := range fake.calls {
+	for _, call := range fake.calls() {
 		if strings.HasPrefix(call, "node ") {
-			t.Fatalf("the runs %q ask node, and the tense reader runs in Go", fake.calls)
+			t.Fatalf("the runs %q ask node, and the tense reader runs in Go", fake.calls())
 		}
-	}
-}
-
-// The fake process door taught vale and biome, each answering an empty report, and the commands it takes. [[spec/tickets/lsp-tools-take-the-runner]]
-func taughtTools() (*proc.FakeRunner, func() []proc.Command) {
-	var (
-		mu  sync.Mutex
-		ran []proc.Command
-	)
-	answers := func(out string) proc.Program {
-		return func(one proc.Command) proc.Said {
-			mu.Lock()
-			defer mu.Unlock()
-			ran = append(ran, one)
-			return proc.Said{Out: out}
-		}
-	}
-	fake := &proc.FakeRunner{Programs: map[string]proc.Program{"vale": answers("{}"), "biome": answers(`{"diagnostics": []}`)}}
-	return fake, func() []proc.Command {
-		mu.Lock()
-		defer mu.Unlock()
-		return slices.Clone(ran)
-	}
-}
-
-// Today's tool runner over the process door, which carries the folder and the input and knows no wait. [[spec/tickets/lsp-tools-take-the-runner]]
-func throughTheDoor(run proc.Runner) Runner {
-	return func(dir, input, name string, argv ...string) (string, error) {
-		said := run(proc.Command{Argv: append([]string{name}, argv...), Dir: dir, Stdin: input})
-		if said.Code != 0 && said.Out == "" {
-			return "", errors.New(said.Err)
-		}
-		return said.Out, nil
 	}
 }
 
 func TestTheToolsRunThroughTheProcessDoorWithTheirWait(t *testing.T) {
-	fake, ran := taughtTools()
+	fake := taughtTools(map[string]string{"vale": "{}", "biome": `{"diagnostics": []}`}, nil)
 	buffer := "# A\nSome text\n"
-	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: throughTheDoor(fake.Run), Check: fakeCheck}
+	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.Run, Check: fakeCheck}
 	server, _ := toolsServer(t, map[string]string{"spec/a.md": "# A\n", "src/a.js": "let a = 0;\n"}, tools)
 	server.Handle(opened("file:///tree/spec/a.md", buffer))
 	server.Settle()
 	server.SweepTools()
 	seen := map[string]bool{}
-	for _, one := range ran() {
+	for _, one := range fake.ran() {
 		seen[one.Argv[0]] = true
 		input := ""
 		if slices.Contains(one.Argv, "--path=/tree/spec/a.md") {
@@ -318,12 +307,12 @@ func TestTheToolsRunThroughTheProcessDoorWithTheirWait(t *testing.T) {
 		}
 	}
 	if !seen["vale"] || !seen["biome"] {
-		t.Fatalf("the door runs %q, and wants vale and biome", ran())
+		t.Fatalf("the door runs %q, and wants vale and biome", fake.ran())
 	}
 }
 
 func TestAValeFaultDrawsValeRuns(t *testing.T) {
-	fake := &fakeTools{fails: map[string]error{"vale": errors.New("E100 the config breaks")}}
+	fake := taughtTools(nil, map[string]string{"vale": "E100 the config breaks"})
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
 		t.Fatalf("the config draws %+v, and wants ValeRuns in Vale's own words", drawn)

@@ -182,7 +182,6 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | index | `src/index` | `src/q/qtest` | `src/index/contract_test.go` |
 | bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
 | a placed process | `src/index/procs.go` | none | `src/index/procs_test.go` |
-| a tool's process | `src/modules/lsp` | none | `src/modules/lsp/door_test.go` |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |
@@ -247,15 +246,16 @@ cold box.
 
 The quack verbs, the branch verbs and the pull's shell each spawn a process in
 place. One door takes a command, its folder, its env and its input, and answers
-its output, its errors and its exit code. The `Runner` in
-`src/modules/lsp/tools.go` runs a tool's process already, so the door takes its
-shape, and the lsp module moves onto it.
+its output, its errors and its exit code. The lsp module's tool runs take it,
+with the halt and the wait they need.
 
 | part | what it holds |
 |---|---|
 | `Runner` in `src/proc` | the door, a function the real one fills with `exec`, outside `src/modules`, since it registers no ports |
-| `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does |
-| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, and a program that never starts |
+| `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it never starts |
+| `Wait` on a command | the span past which a run ends with a fault, and zero sets no limit |
+| `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does, and its own `Halt`, `Ends` and `After` for the halt and the wait |
+| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, a program that never starts, the halt and the wait |
 
 The branch verbs' `rawEnv`, the pull's shell, and every `exec.Command` in
 the quack verbs outside the box and check doors take the `Runner`. A case

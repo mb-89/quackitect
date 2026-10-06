@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 03f947eb682998f0
         size: 905
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 9afd04db1e9541e3b43b00bf289256257f64300f
+    hash_after: 9afd04db1e9541e3b43b00bf289256257f64300f
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -338,14 +347,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list plus src/modules/lsp/lsp_test.go, which the gate named, and leaves Command.Drop to quack-spawns-meet-fake-process, whose red case shares the suite file
+- the one door the change reaches is the process door, and FakeRunner gains the halt, the shared Ends channel and the After timer beside the real Halting runner
+- each changed function points at the process door section of spec/design_output/doors.md, which now names the halt and the wait
+- the halt and the wait stand once, in src/proc/proc.go, and the lsp module reaches them through proc.Runner
 
 ## tests-green
 
