@@ -107,7 +107,11 @@ record:
         hash: 2f27903492d3e8aa
         size: 574
     def: cb8f90bc86fc7d39
-step: children
+  - step: children
+    hand: the engine
+    hash_before: 20746d6d63235e07eeee15f013a4b0736aa5120a
+    hash_after: 20746d6d63235e07eeee15f013a4b0736aa5120a
+step: accept
 ---
 
 # Ask
