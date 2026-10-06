@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 1f913166d8f3f00ffc07abcb36925ec0fb871261
+    hash_after: 2d6e713d7702e49f27d51103401ebc5e04f2e415
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   61.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 3775347d2e198c47
+        size: 483
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verb_lint_test.go src/quack/check_test.go test/level0/cli-read.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check's lint runs in Go alone. The Go lint leaves its findings where `SE_LINT_FOUND` points, which the check's stamp and `check --errors` read, so the JavaScript lint in `src/scripts/cli-read.js` had nothing left to do. It leaves with its cases in `test/level0/cli-read.test.js` and `test/contract/one-reading.test.js`, and `test/contract/lint-twins.test.js` leaves whole, since no second lint stands to compare. `cli-read.js` keeps the version and the walk, which `cli-check.js` and the Go version reader name. The exports only the old lint called in `quack-topic.js` and `findings.js` wait in the note `js-lint-leftovers-stand-dead`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, and the dead exports past them wait in a note
+- every door has a fake: the leave door has `lintFake.leave`
+- the leave door's comment points at this ticket
+- one place: `src/quack/verb_lint.go` owns the check's lint
 
 # accept
 
