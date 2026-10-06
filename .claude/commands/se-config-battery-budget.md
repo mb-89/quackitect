@@ -1,5 +1,5 @@
 ---
-description: "config / battery / budget: sets battery.budget to what you type. The time the whole check takes at most, about a fifth over a clean check on a cloud box of four cores, where every part starts at once and the cores bound the span. Past it, the check prints a warning naming its slowest part and its slowest cases. 0 switches it off."
+description: "config / battery / budget: sets battery.budget to what you type. The time the whole check takes at most. Past it, the check prints a warning naming its slowest part and its slowest cases. 0 switches it off."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
