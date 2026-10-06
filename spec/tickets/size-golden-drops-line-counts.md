@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 3083f7a5dfa2e32db313b919d1cfe5e24c2e6e57
+    hash_after: 3083f7a5dfa2e32db313b919d1cfe5e24c2e6e57
+    inputs:
+      - name: ask
+        hash: 1c3f36d653132a35
+        size: 398
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,63 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The size golden holds rows the Go side alone reports, and every row names a prose or data file with its line count. sizeFaults in src/modules/check/textfaults.go sizes every path it meets, while its JavaScript twin sizeFaults in .claude/skills/level0/lib/size.js sizes code files alone. textFaults gates on sizedFile already, so the lint itself reads no prose file for size; only the twin walk in src/quack/check_twins_test.go goTwins feeds sizeFaults a ticket.
+
+The fix moves the gate into sizeFaults: it answers nothing where sizedFile reads no code path, as the JavaScript twin does. textFaults keeps its own gate, so the lint reads the same rows. A rerun of go test ./src/quack -run TestTwinGoldens -twins then writes src/modules/check/testdata/size.golden.json with both sides empty. A ticket or note edit then moves no golden.
+
+For the test verb: testVerb in src/branches/test.go adds the packages a changed golden's readers stand in. A new pure goldenReaders(changed []string, tests map[string]string) []string names, for each changed path under a testdata folder, the folder's own package and every package whose _test.go text names that folder past src/. testVerb builds the map off d.filesUnder("src") and d.read. twinsAt in src/quack/check_twins_test.go reads filepath.FromSlash("../modules/check/testdata"), so its text names the folder the reader looks for.
+
+The gate meets the ask with less than the title names, since the counted rows stand through the twin walk alone. goldenReaders closes the test line, since today a changed golden maps to no package.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/check/textfaults.go textFaults (calls sizeFaults)
+src/modules/check/export.go SizeFaults (exports sizeFaults)
+src/quack/check_twins_test.go goTwins (calls check.SizeFaults)
+src/quack/check_twins_test.go TestTwinGoldens (reads twinsAt)
+src/branches/branch.go init table row test (runs testVerb)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/check/textfaults_test.go TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds
+src/modules/check/textfaults_test.go TestACodeFilePastTheCeilingStillNamesItsCeiling
+src/branches/test_test.go TestGoldenReadersNameEveryPackageReadingAChangedGolden
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/check/textfaults.go
+src/modules/check/textfaults_test.go
+src/modules/check/testdata/size.golden.json
+src/quack/check_twins_test.go
+src/branches/test.go
+src/branches/test_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened textfaults.go (textFaults, sizeFaults, sizedFile), export.go SizeFaults, testdata/size.golden.json, quack/check_twins_test.go (goTwins, TestTwinGoldens, twinsAt), src/scripts/check-twins.js, .claude/skills/level0/lib/size.js sizeFaults, branches/test.go (testVerb, goPackagesOf, goTestNames), doors.go filesUnder, and port_f_testverb_test.go.
+Callers came from a grep for SizeFaults and sizeFaults( across src, and from the branch verb table for testVerb.
+The first done_when line meets TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds under go test ./src/modules/check/; the second meets TestGoldenReadersNameEveryPackageReadingAChangedGolden plus a run of ./RUNME.sh branch test at tests-green that lists src/quack and src/modules/check; ./RUNME.sh check stands as its own command.
 
 ## tests-red
 
