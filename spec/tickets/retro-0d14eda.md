@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -248,6 +248,20 @@ record:
         hash: 27118cdfa6992352
         size: 53
     def: 683a303033a0f990
+  - step: mint
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: f0f7c8db5dc4aebbedee251e9cd46c241a579217
+    hash_after: 654c856e1a4d6c8ac39605b335493e233f2f5a38
+    answered:
+      - name: minted
+        exit: 0
+        said: 0 ticket(s) mint, and 1 class(es) stand closed already.
+    inputs:
+      - name: report
+        hash: 8e295ba6402c5f31
+        size: 175
+    def: 54f799a221458596
+reason: done
 ---
 
 # Ask
@@ -422,8 +436,9 @@ k12 takes the failure registry with a sentinel: every failure a node with an id,
 ## minted
 
 <!-- retro mint, which refuses a class carrying no status or a promotion carrying no ticket, and mints the rest -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro mint retro-0d14eda
 
 # Discussion
 
