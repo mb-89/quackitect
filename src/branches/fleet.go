@@ -68,7 +68,7 @@ func withTips(rows []boxRow, stood []stand, now int64, pulls map[string]string) 
 	return out
 }
 
-// The pull request numbers by the tip their head names, off ls-remote's rows. [[spec/tickets/the-fleet-verb-watches-boxes]]
+// The pull request numbers by the tip their head names, off origin's pull refs. [[spec/tickets/the-fleet-verb-watches-boxes]]
 func pullsOf(refs []git.Ref) map[string]string {
 	out := map[string]string{}
 	for _, one := range refs {

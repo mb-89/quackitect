@@ -21,7 +21,6 @@ const ANSWER = "The handover stands, and the clear ends this turn.";
 const GROUP = "dry-probe-clears";
 // The leaf the probe's group carries across the clear, and the words each pull past the clear answers. [[spec/tickets/the-clear-hands-back-the-leaf]]
 const LEAF = "dry-probe-leaf";
-// The line a tagged ticket's front matter carries. [[spec/tickets/probe-clone-drops-free-tags]]
 const LEAF_TEXT = `---
 kind: [[ticket]]
 state: open
