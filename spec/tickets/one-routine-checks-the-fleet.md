@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: d1693b39881db6c01e6222e55891281098b8bc5f
+    hash_after: d1693b39881db6c01e6222e55891281098b8bc5f
+    inputs:
+      - name: ask
+        hash: d5fd766e4b279ef6
+        size: 528
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,65 @@ The coordinator types its check again as a chain of one-shot wakes that die at t
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The fleet check stands as one stored routine whose prompt the tree writes once. A pull request event goes to the box its branch's record names.
+
+- `src/branches/routine.go` holds the fleet routine's name `fleet_check` and its prompt `fleetPrompt`. The prompt runs `./RUNME.sh cloud fleet` and acts on each wake line it prints.
+- The routine's id comes from the config key `cloud.fleetRoutine`, since the owner stores the routine on claude.ai and the id follows.
+- `cloud trigger`, through `trigger` in `src/branches/free.go`, prints the work routine as it does now. Under it stands the fleet routine with its name, its id and its prompt. Where no id stands, it says so, and prints the prompt to store.
+- `pullRouteOf(head, rows)` stands pure. It answers the session of the box that holds the head branch off the fleet rows, or nothing where no box holds it.
+- `./RUNME.sh cloud route` reads the event at `GITHUB_EVENT_PATH`, or the path past the verb, and takes `pull_request.head.ref`. It prints the session that holds that branch, or says the coordinator takes it.
+- A person ticket in the group stores the routine on claude.ai with the prompt the verb prints, and writes its id to the config. Done hands it loose to main.
+
+Weighed: the config key over a constant id, since the routine does not stand yet and a constant id would name nothing. Assumed: a box holding a branch is the one its open take names, as the record ticket writes it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/branch.go: Cloud, which gains the route word
+- src/branches/free.go: trigger, which prints the fleet routine
+- src/quack/cloud.go: cloudVerb, which hands every word to Cloud and changes nothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/routine_test.go: TestTriggerNamesTheStoredFleetRoutineAndItsPrompt
+- src/branches/routine_test.go: TestTriggerSaysWhereNoFleetRoutineStands
+- src/branches/routine_test.go: TestAPullRequestEventRoutesToTheBoxThatHoldsItsBranch
+- src/branches/routine_test.go: TestAPullRequestEventOnAFreeBranchRoutesToNoBox
+- src/branches/routine_test.go: TestRouteReadsTheEventFile
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/routine.go
+- src/branches/routine_test.go
+- src/branches/free.go
+- src/branches/branch.go
+- spec/tickets/the-fleet-routine-stands.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `branch.go` (Cloud), `free.go` (trigger), `stands.go` (routineName, routineID) and `doors.go` (config, env, read), and checked each claim there.
+- Callers: Cloud and trigger stand in the list, and `src/quack/cloud.go` reaches them unchanged.
+- The first done_when line meets TestTriggerNamesTheStoredFleetRoutineAndItsPrompt, the second meets TestAPullRequestEventRoutesToTheBoxThatHoldsItsBranch, and the check line meets the command at tests-green.
 
 ## tests-red
 
