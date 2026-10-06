@@ -82,7 +82,17 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
+record:
+  - step: sync
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 8c0f79e4bdb5320a26034a65bb4f7a835cdd0c4a
+    hash_after: ab8db557a2278941081d5fd000033c4072f3914f
+    answered:
+      - name: sync
+        exit: 0
+        said: work/ci-runs-once-a-head already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -98,8 +108,9 @@ never waits behind the fleet's superseded ones.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
