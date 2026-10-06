@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 568546eb4e62e78e5c8b425214588d1f44bada68
+    hash_after: 568546eb4e62e78e5c8b425214588d1f44bada68
+    inputs:
+      - name: ask
+        hash: fdf45284927fd4e5
+        size: 500
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,53 @@ A box asks a person nobody is, stands idle, and waits for a takeover that costs 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new mechanical check, ends-on-a-question, answers true where the box is a cloud box and the last prose paragraph of the answer ends on a question mark. EndsOnQuestion in src/modules/hooks/stop/vote.go reads the paragraphs the way NamesNext does: it skips a table, a heading, the stop line and the holds line, strips a trailing emphasis, code or bracket mark, and reads the last character. A new continue rule, a-cloud-box-decides, at priority 83 in spec/config/stop/level0.yml, runs the check. Its says tells the box to decide the question itself, say what it weighs, and carry on. Priority 83 stands below the owner holds at 85 and 84, so an owner hold still ends the turn, and above the-work-stands-complete at 45, which yields to it anyway. The check reads the answer text, so it joins ReadsText, and the stop call, which carries no text, skips it at claim time. On a desk the check answers false, so the vote stands as it does today. The design note spec/design_output/stop.md takes a row in the mechanical checks table and a section, A cloud box decides.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go Stops.stops, through stop.Decide and stop.Ran
+- src/modules/hooks/stops.go Stops.claims, through stop.ReadsText
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/stop_test.go TestACloudTurnEndingOnAQuestionHearsDecide
+- src/modules/hooks/stop/stop_test.go TestADeskTurnEndingOnAQuestionStopsAsToday
+- src/modules/hooks/stop/stop_test.go TestEndsOnQuestionReadsTheLastProse
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/checks.go
+- src/modules/hooks/stop/vote.go
+- src/modules/hooks/stop/stop_test.go
+- spec/config/stop/level0.yml
+- spec/design_output/stop.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened checks.go, vote.go, rules.go, stops.go and level0.yml, and checked the priorities and the ReadsText skip there
+- the callers are Stops.stops and Stops.claims, the only callers of Decide, Ran and ReadsText outside tests
+- each done_when line meets a named test: the cloud case, the desk case, and the check for the third
 
 ## tests-red
 
