@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 74af97a0fdb11a41
         size: 316
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 31c1db075cb7cc1dd08535902bc19a76c5b539ca
+    hash_after: 31c1db075cb7cc1dd08535902bc19a76c5b539ca
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: a9e49e10896a0dc7
+        size: 1733
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -214,26 +227,31 @@ The done_when line 'go test ./src/branches/ passes a case where fixGroup writes 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The fix group comes back at state draft with no step, which is the stall the ask names. The case reads the real schema and the group process under the tree, and it needs no git, since fixGroup reads those two files alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The done_when line on `go test ./src/branches/` meets TestFixGroupWritesTheGroupOpenAtItsFirstStep, and the check line waits for tests-green.
+The case reaches no door: fixGroup reads two tracked files through readFile, and the dispatch case over a real origin already proves that door.
 
 # gate
 

@@ -16,6 +16,27 @@ import (
 	"quackitect/src/yaml"
 )
 
+// The fix group the dispatch mints stands open at its route's first leaf, so its box finds work at once. [[spec/tickets/dispatch-mints-fix-groups-open]]
+func TestFixGroupWritesTheGroupOpenAtItsFirstStep(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	d := &Doors{Method: root}
+	route, why := d.processAt(groupRoute)
+	if why != "" {
+		t.Fatal(why)
+	}
+	text, why := d.fixGroup("loose-fixes-abc1234", "")
+	if why != "" {
+		t.Fatal(why)
+	}
+	if state, step := fieldOf(text, "state"), fieldOf(text, "step"); state != openState || step == "" || step != firstLeaf(route.Steps, "") {
+		t.Errorf("the fix group reads state %q, step %q", state, step)
+	}
+}
+
 // The write branch this tree's main names, and the top fix group's name. [[spec/tickets/dispatch-verbs-port-to-go]]
 func (one *tree) dpWriteBranch() (string, string) {
 	main := shortWrite(one.git("rev-parse", "origin/main"))
