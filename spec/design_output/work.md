@@ -684,10 +684,10 @@ retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 | field | holds |
 |---|---|
 | `parts` | a time a part, in the order each ends |
-| `total` | the battery's span, start to end, which counts a part running beside the rest once |
+| `total` | the battery's span, start to end, which is its slowest part, since every part starts at once |
 | `slowest` | the slowest cases, each with its file |
 | `files` | a time a test file, the slowest first |
-| `unrun` | the parts a red run leaves unrun |
+| `unrun` | the parts a red run leaves unrun on an older stamp, and nothing on a new one, since every part runs |
 | `red` | each red case, with the error line the runner writes under it |
 | `spawns` | the spawns the tests make, and how many of them are Vale |
 
@@ -695,8 +695,8 @@ The stamp keeps each run's `parts` under `runs`, newest first, up to the count
 `battery.runs` names in `spec/config/level0.json`. It keeps a run of the
 stamp's own `sha` alone, so a median reads one tree and no change of code
 reads as noise. Collect writes each part's median into the retro's report.
-It reads a part over the runs that reach it, because a red run leaves the parts
-past it unrun. The median covers `parts` and their `total` alone. The `slowest`
+It reads a part over the runs that reach it, because an older stamp leaves
+the parts past a red unrun. The median covers `parts` and their `total` alone. The `slowest`
 cases and the `files` stay off the last run.
 
 A first retro reads against nothing, so the effect step writes its battery

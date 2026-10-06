@@ -1,6 +1,6 @@
 // The check verb: the tests, level zero, the Go tests, the doors, the
-// projections, the plugin, the server, then the rules over the tree, each
-// part timed, and the stamp a door reads before a push.
+// projections, the plugin, the server and the rules over the tree, all at
+// once and each timed, and the stamp a door reads before a push.
 // [[spec/design_output/work#the-battery-answers-first]]
 package main
 

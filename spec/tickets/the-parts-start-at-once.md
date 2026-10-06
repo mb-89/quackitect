@@ -117,7 +117,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 698e90a09495faee
         size: 1027
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 56722c4217779acd206cc7d745340d90d8d1d3c8
+    hash_after: 56722c4217779acd206cc7d745340d90d8d1d3c8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/check.go src/quack/check_test.go spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches check.go and its test, and the battery rows of the work design note, which owns the report fields the change alters
+- every door the change reaches has a fake: the clock door through the held clock and ticking, and the parts through fake runs
+- the comment over batteryRun names the approach and links this ticket
+- the red line stands once as the constant redPart, and the report fields stand once in the work design note
 
 ## tests-green
 
