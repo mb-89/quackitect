@@ -99,7 +99,19 @@ record:
         exit: 0
         said: work/loose-fixes-a3b839d already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 31f16efb1b52 · claude-code-remote
+    hash_before: 2df2e00ada528799135319a90123b0db50a865f3
+    hash_after: 2df2e00ada528799135319a90123b0db50a865f3
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: 19b6849b1f151cd5
+step: children
 ---
 
 # Ask
@@ -133,14 +145,22 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/doors-once-takes-main]], trivial
+- [[spec/tickets/the-doors-pr-goes-green]], trivial
+- [[spec/tickets/the-fleet-pr-goes-green]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small: each one reads a single merge on main
+- the children add up to the goal: they are every ticket naming this group
+- no child waits on another: each reads its own merge
+- each child reads nothing from its siblings, so the order stands free
+- the diff holds ticket fronts alone, and stays one review
 
 # children
 
