@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,21 @@ record:
         hash: a1cec3f4220df26e
         size: 77706
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 80ae0b3f4d345254658344bc54691f10478ebdb0
+    hash_after: 80ae0b3f4d345254658344bc54691f10478ebdb0
+    inputs:
+      - name: design/draft
+        hash: c0a79dd2622f6ee7
+        size: 1537
+      - name: design/tests-red
+        hash: 251f6039a646caf2
+        size: 661
+      - name: [[spec/design_output/model]]
+        hash: a1cec3f4220df26e
+        size: 77706
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -302,8 +317,9 @@ Each case fails on its own assertion over the stubs. The new `src/imports` tests
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach answers each done_when line; InPackageTests and Compare stand as stubs and their cases in src/imports fail on their own assertion, verb_guards_test carries the marker with the main-package reason, and model.md#the-guards-hold-a-baseline names the guard, its marker and its baseline. I weigh the src/quack offenders standing in the baseline as the ask intends, since report mode keeps the check green.
 
 # implement
 
