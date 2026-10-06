@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -176,6 +176,25 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: d1406684077fa884832325dc2e6e7b25418dc3d4
+    hash_after: d1406684077fa884832325dc2e6e7b25418dc3d4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 959f88c063abaa29
+        size: 11380
+      - name: [[spec/design_output/doors]]
+        hash: 743d741e7e16080f
+        size: 18226
+      - name: [[spec/tickets/pull-meets-fake-git]]
+        hash: 0ecf0b21dbd1a30f
+        size: 430
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -437,15 +456,15 @@ I refuse moving the verbs' own disk reads onto a `files.FakeDisk` in this move. 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Move 1 filled every Repo operation, so the sixteen contract cases this step wrote now pass. The new case in src/quack/repos_moved_test.go fails on its own assertions: each repository test file still spawns git, and the doors chapter still lists them. It turns green once the verbs take Repo and their row leaves the chapter, as the pull move proved for its own.
+The step went stale when the branch-verbs edit changed the doors chapter. The rerun still fails on its own assertion: each repository test file in src/quack still spawns git, and the doors chapter still lists them. It turns green once the verbs take Repo and their row leaves the chapter.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-done_when one and two meet TestTheQuackRepositoryCasesSpawnNothingAndTheDoorsChapterListsThemNowhere, red now; done_when three is the check
-the doors the tests reach are git and the disk, and FakeRepo and a local tree stand for each
+- done_when one and two meet TestTheQuackRepositoryCasesSpawnNothingAndTheDoorsChapterListsThemNowhere, red now; done_when three is the check
+- the doors the tests reach are git and the disk, and FakeRepo and a local tree stand for each
 
 # gate
 
