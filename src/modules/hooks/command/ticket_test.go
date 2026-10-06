@@ -63,6 +63,20 @@ func TestTicketFaultReadsTheHand(t *testing.T) {
 	}
 }
 
+// A plan naming a ticket holds no todo, so a closed ticket it names meets the door as closed. [[spec/tickets/inhand-skips-ticket-names]]
+func TestAPlanNamingATicketHoldsNoTodo(t *testing.T) {
+	for _, working := range []string{"c", "b"} {
+		tree := seeded{"spec/tickets/c.md": closedTicket, ".se/tickets/b.md": openTicket, ".se/.runtime/plan.json": `{"working":"` + working + `"}`}
+		if todo := InHand(tree).Todo; todo != "" {
+			t.Errorf("a plan naming %s holds the todo %q", working, todo)
+		}
+	}
+	tree := seeded{"spec/tickets/c.md": closedTicket, ".se/.runtime/plan.json": `{"working":"c"}`}
+	if got := TicketFault("c", tree, "how"); got != "c stands closed. how" {
+		t.Errorf("a write naming the closed ticket the plan names meets %q", got)
+	}
+}
+
 func TestTheTicketDoorPassesTheTodoAndTheFreeVerbs(t *testing.T) {
 	tree := seeded{".se/.runtime/plan.json": `{"working":"a-todo"}`}
 	if said := TicketDoor("ls", "a-todo: list", tree); said != "" {
