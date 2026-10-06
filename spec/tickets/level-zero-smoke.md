@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
@@ -201,6 +201,15 @@ record:
     hash_after: f5d2100d3bfbc25f744bd5f5b8b037e5b9f1bb5e
     returns: 1
     why: the hand takes it back
+  - step: split
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: bef6db86579b2d02e15d3e615365c5d261db8b98
+    hash_after: 0f83a536f5f9ceddc38f1120af9647f8fa75f200
+    inputs:
+      - name: ask
+        hash: ee168782689e2bf1
+        size: 576
+    def: cb8f90bc86fc7d39
 reason: done
 ---
 
@@ -228,18 +237,19 @@ A pull request that breaks level zero cannot go green. A fast smoke test with th
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/level0-smoke-runs-in-seconds]] standard
-- [[spec/tickets/probe-at-revision-guards-merges]] standard
-- [[spec/tickets/probe-at-stays-dry]] trivial
-- [[spec/tickets/merge-deny-every-connector]] trivial
-- [[spec/tickets/the-index-outlives-the-check]] standard
 - [[spec/tickets/door-outlives-taskkill-tree]] trivial
+- [[spec/tickets/ending-windows-tree-tested]] trivial
 - [[spec/tickets/level0-claims-name-the-platform]] standard
+- [[spec/tickets/level0-smoke-runs-in-seconds]] standard
+- [[spec/tickets/merge-deny-every-connector]] trivial
 - [[spec/tickets/platform-draft-names-checkdoors]] trivial
 - [[spec/tickets/platform-red-line-tested]] trivial
+- [[spec/tickets/probe-at-revision-guards-merges]] standard
+- [[spec/tickets/probe-at-stays-dry]] trivial
 - [[spec/tickets/runme-road-waits-on-ready]] standard
+- [[spec/tickets/smoke-waits-for-the-door]] trivial
 - [[spec/tickets/the-check-ends-what-it-drops]] standard
-- [[spec/tickets/ending-windows-tree-tested]] trivial
+- [[spec/tickets/the-index-outlives-the-check]] standard
 - [[spec/tickets/vale-call-takes-endswhole]] trivial
 
 ## checked
