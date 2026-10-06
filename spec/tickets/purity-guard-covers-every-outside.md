@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -189,6 +189,15 @@ record:
         hash: eba58ab396d31b46
         size: 663
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: df545e7d26e0116bb92e04cc5b801cd38c086f74
+    hash_after: 466b26ac8b8465a200364879ae14e423f8cb4e28
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
 ---
@@ -386,14 +395,19 @@ accept: the redraft under Discussion answers each done_when line. The kinds tabl
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/imports ./src/quack
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches purity.go, guards.go, the purity baseline, the model row and one marker in verb_guards.go, which the redraft names
+- the guard reads planted text and a reader, so no door needs a fake
+- every new function names model.md#the-guards-hold-a-baseline
+- OutsideKinds stands once, in purity.go, and the model row points at it
 
 ## tests-green
 
