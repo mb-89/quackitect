@@ -28,6 +28,17 @@ func TestEverySectionRegistersItsKeys(t *testing.T) {
 	}
 }
 
+func TestTheFleetKeysStandWithTheirBuiltIns(t *testing.T) {
+	for section, want := range map[string]string{"cloud": "fleet-routine", "fleet": "idle-after"} {
+		c := q.New()
+		Of(section)(c)
+		keys := c.Keys()
+		if len(keys) != 1 || keys[0].Local != want || keys[0].Type != "string" {
+			t.Errorf("%s registers %+v, not the string key %s", section, keys, want)
+		}
+	}
+}
+
 func TestAKeyTakesTheTypeOfItsBuiltIn(t *testing.T) {
 	c := q.New()
 	Of("stop")(c)
