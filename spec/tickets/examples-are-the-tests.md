@@ -95,7 +95,16 @@ record:
         exit: 0
         said: work/examples-are-the-tests already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 2dca9acd8cb4 · claude-code-remote
+    hash_before: a69a0df3cc67fde8eac356ab5bbbb7e32836748a
+    hash_after: a69a0df3cc67fde8eac356ab5bbbb7e32836748a
+    inputs:
+      - name: ask
+        hash: ec95a41be42e2146
+        size: 430
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -120,14 +129,22 @@ The design of examples stands written: one Markdown file a behavior is tutorial,
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/examples-design-input]], trivial
+- [[spec/tickets/examples-design-note]], trivial
+- [[spec/tickets/examples-testing-rules]], trivial
+- [[spec/tickets/examples-implementation-drafts]], trivial
+- [[spec/tickets/restated-table-runs-in-time]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child writes one note or one rule set, small enough to review whole
+- the children add up to the goal: the design input, the design note, the rules, and the implementation drafts; the timing fix keeps the check green under it
+- the design note waits on the design input, and the rules and the drafts wait on the design note, each under depends_on
 
 # children
 
