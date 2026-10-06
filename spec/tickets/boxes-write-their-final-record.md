@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 800b93012edb9c059affe436ec4777c7fc97887d
+    hash_after: 800b93012edb9c059affe436ec4777c7fc97887d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/front passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: f9d34cc63f54d15f
+        size: 973
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -342,26 +365,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/record_test.go src/front/front_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every box now leaves its final record on the group ticket it holds, whoever fires it. The take writes the harness session on the claim. Done and release read --model, --cost and --final, and write each given one on the take they close, through front.AfterWith. The fleet rows read the last hand off each group's record, with its session, model, cost and final line. The branch verb's name word skips a flag, so release --final names no branch. The ticket schema admits the four fields. The fleet case TestFleetHoldsTheBoxesTheDispatchFires passes under go test, and fleet_test.go stays red on the fleet verb's own cases, which the-fleet-verb-watches-boxes owns.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list or on the note under Discussion.
+- The change opens no new door. The take reads the session through d.env, which the cases set.
+- Each new function carries a link to this ticket, where the approach stands.
+- The flags read through flagIn, and the rows through recordIn and entryField, so no reader stands twice.
 
 # accept
 
