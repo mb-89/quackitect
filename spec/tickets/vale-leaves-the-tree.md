@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2ca6d5ec6b7e972b
         size: 1255
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: d216e837464cdd1c26b2401f2a231f4490fb25a7
+    hash_after: 86c58fd54e0504b81eea501d3f300c3c96aa313e
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -368,14 +377,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list and the Discussion name, and departs on these: the JavaScript projection twins and lib/helpers.js, since the JavaScript projection rewrites the same rule files and would put the Tengo back; the size golden and the projected VoiceParagraph rules, which the projection writes; the voice split into answers.go, scores.go, refusals.go and js.go, which the check's file ceiling asked; and the new tests the commit door asks beside each changed file
+every door the change reaches has a fake: the voice verb's Lint door takes a fake in the voice tests, the rules-over door meets fakeProc through teachRules, and the fix verb runs over a seeded rules root
+a comment names the approach: each new file's header and each new case's pointer names vale-leaves-the-tree or the design section it serves
+every fact stands in one place: the replace action has one name, rules.ActionReplace, the voice door reuses lspRules, and the size additions stand once under the Discussion
 
 ## tests-green
 
