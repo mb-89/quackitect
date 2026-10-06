@@ -6,6 +6,7 @@ package review
 import (
 	_ "embed"
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -68,6 +69,17 @@ func TestTheReportAnswersAsTheBridge(t *testing.T) {
 		material.Check, material.Retro = one.Check, one.Retro
 		if said := Report(material, ReadOf(one.E.Deny, one.E.IsError, one.E.Text)); said != one.Report {
 			t.Errorf("%s: the report reads %q, and the bridge reads %q", one.Name, said, one.Report)
+		}
+	}
+}
+
+// The report the tool answers names every unreached file and counts the row one fix. [[spec/tickets/accept-runs-the-orphan-scan]]
+func TestTheReportCountsTheUnreachedRow(t *testing.T) {
+	material := Material{Branch: "work/g", Check: Check{OK: true}, Retro: true, Unreached: []string{"src/lone/lone.go", "src/lone/lone_test.go"}}
+	said := Report(material, Read{})
+	for _, line := range []string{"unreached  src/lone/lone.go\n           src/lone/lone_test.go", "1 thing to fix."} {
+		if !strings.Contains(said, line) {
+			t.Errorf("the report lacks %q:\n%s", line, said)
 		}
 	}
 }

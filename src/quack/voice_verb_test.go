@@ -46,6 +46,16 @@ func voiceFake(root, vale, said string, fault error, ran *[][]string) voiceOutsi
 	}
 }
 
+// [[spec/tickets/the-coordinator-runs-under-level0]]
+func TestVoiceDoorsReadTheAnswerCeiling(t *testing.T) {
+	t.Parallel()
+	root := voiceTree(t, map[string]string{".se/.runtime/config.json": `{"answer": {"ceiling": 42}}`})
+	var ran [][]string
+	if got := voiceDoorsAt(root, voiceFake(root, "", "", nil, &ran)).Ceiling; got != 42 {
+		t.Fatalf("the voice doors hold a ceiling of %d, want 42 off answer.ceiling", got)
+	}
+}
+
 func voiceRuns(one twin, dry bool, argv ...string) (int, string, string) {
 	var out, errs strings.Builder
 	code := one(argv, dry, &out, &errs)

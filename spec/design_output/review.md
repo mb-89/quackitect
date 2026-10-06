@@ -40,6 +40,7 @@ mechanical answers in front of them while they do.
 | the shape of the diff | `git diff --stat main...<ref>` |
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
+| the unreached files | the scan under [[spec/design_output/review#the-unreached-row]] |
 
 The ask and the handback are one file at separate commits. `branch open` cuts the
 branch off trunk's tree, so `git rev-list --reverse main..<ref>` names the
@@ -139,6 +140,34 @@ handback, and `retroOnTicket` reads a filled line under its retro chapter. A
 report with nothing to fix fits on one line:
 
     work/the-config-holds-numbers   nothing to fix, and the merge is a desk's.
+
+## The unreached row
+
+The accept refuses a group that leaves dead code behind. The verb reads git
+at the branch's ref, never the working tree:
+
+| the step | what it reads |
+|---|---|
+| the added files | `git diff --name-only --no-renames --diff-filter=A main...<ref>`, the Go files alone |
+| the module | the `module` line of `git show <ref>:go.mod` |
+| the import path | the module, then the folder |
+| a reach | `git grep -l -F '"<module>/<folder>"' <ref> -- '*.go'` naming a file past the folder |
+
+A folder counts reached where one of these holds:
+
+- a file the branch adds there says `package main`
+- the folder holds tests alone
+- the folder sits under `testdata`
+- a Go file past the folder imports its quoted path, so `src/used` never matches `src/usedfoo`
+
+Every added file of a folder left unreached stands in the `unreached` row, one
+a line, and the row counts one fix:
+
+    unreached  src/lone/lone.go
+               src/lone/lone_test.go
+
+The word is unreached, because [[spec/vocabulary/terms.yml]] gives orphan to a
+branch sharing no history with main.
 
 # The queue takes done branches
 

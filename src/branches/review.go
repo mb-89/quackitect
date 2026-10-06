@@ -43,15 +43,16 @@ type checked struct {
 
 // What a reader needs of a branch, as branch review --json prints it. [[spec/design_output/review#the-questions]]
 type material struct {
-	Branch   string  `json:"branch"`
-	Ref      string  `json:"ref"`
-	Trunk    string  `json:"trunk"`
-	Ask      string  `json:"ask"`
-	Handback string  `json:"handback"`
-	Retro    bool    `json:"retro"`
-	Stat     string  `json:"stat"`
-	Diff     string  `json:"diff"`
-	Check    checked `json:"check"`
+	Branch    string   `json:"branch"`
+	Ref       string   `json:"ref"`
+	Trunk     string   `json:"trunk"`
+	Ask       string   `json:"ask"`
+	Handback  string   `json:"handback"`
+	Retro     bool     `json:"retro"`
+	Stat      string   `json:"stat"`
+	Diff      string   `json:"diff"`
+	Check     checked  `json:"check"`
+	Unreached []string `json:"unreached,omitempty"`
 }
 
 // Gathers what a reader needs of a branch, and prints the report or the JSON. [[spec/design_output/review#what-the-verb-gathers]]
@@ -98,15 +99,16 @@ func (d *Doors) gather(branch, at, trunkRef, first string) material {
 	ticket := ticketAt(strings.TrimPrefix(branch, workBranch))
 	handback := d.show(at, ticket)
 	return material{
-		Branch:   branch,
-		Ref:      at,
-		Trunk:    trunkRef,
-		Ask:      d.show(first, ticket),
-		Handback: handback,
-		Retro:    retroOnTicket(handback),
-		Stat:     strings.TrimSpace(d.patchSince(trunkRef, at, true)),
-		Diff:     capped(strings.TrimSpace(d.patchSince(trunkRef, at, false))),
-		Check:    d.checkOn(branch, at),
+		Branch:    branch,
+		Ref:       at,
+		Trunk:     trunkRef,
+		Ask:       d.show(first, ticket),
+		Handback:  handback,
+		Retro:     retroOnTicket(handback),
+		Stat:      strings.TrimSpace(d.patchSince(trunkRef, at, true)),
+		Diff:      capped(strings.TrimSpace(d.patchSince(trunkRef, at, false))),
+		Check:     d.checkOn(branch, at),
+		Unreached: d.unreached(trunkRef, at),
 	}
 }
 
@@ -183,13 +185,16 @@ func retroOnTicket(text string) bool {
 	return false
 }
 
-// The report a reader reads: nothing to fix, or the rows naming what to. [[spec/design_output/review#what-the-report-looks-like]]
+// The report a reader reads: nothing to fix, or the rows naming what to. [[spec/design_output/review#what-the-report-looks-like]] [[spec/design_output/review#the-unreached-row]]
 func report(said material) string {
 	fix := 0
 	if !said.Check.OK {
 		fix++
 	}
 	if !said.Retro {
+		fix++
+	}
+	if len(said.Unreached) > 0 {
 		fix++
 	}
 	if fix == 0 {
@@ -205,6 +210,9 @@ func report(said material) string {
 		rows = append(rows, [2]string{"retro", "present"})
 	} else {
 		rows = append(rows, [2]string{"retro", "absent from the handback"})
+	}
+	if len(said.Unreached) > 0 {
+		rows = append(rows, [2]string{"unreached", strings.Join(said.Unreached, "\n")})
 	}
 	out := []string{said.Branch, ""}
 	for _, row := range rows {
