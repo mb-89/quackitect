@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -162,6 +162,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 37c560e157b04de6282fa8c777079046180bdfd9
+    hash_after: 37c560e157b04de6282fa8c777079046180bdfd9
+    inputs:
+      - name: retro/write
+        hash: be8bf7cd9d2baa00
+        size: 4133
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -319,20 +329,28 @@ the chapter names the box by role, and no path past the tree's own files
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+a push outside refs/heads: the git proxy answers 403, so the beat stands on a branch, per the handover
+20:00 a branch delete: the rescue drop came back failed, likely the proxy, unchecked
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the trunk guard kept every push on the work branch
+19:50 a conflict at sync in the work skill and the size golden
+19:44 and 19:53 the check read red inside the commit verb, once under load and once on main's take regression
+the stop and tool hooks: GitWritesThroughAVerb, LandingFollowsItsGate, the plan grace
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parked, and no ticket minted outside the group
+the handover names the pull request against main, auto-merge with method MERGE, and its CI
 
 # Discussion
 
