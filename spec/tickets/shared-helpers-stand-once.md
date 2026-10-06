@@ -233,9 +233,9 @@ src/modules/check/checker.go (*Checker).Sweep
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-src/modules/check/twins_test.go TestTheCheckRefusesABodyStandingInAnotherPackage
-src/modules/check/twins_test.go TestABodyRenamedOnlyStillReadsAsACopy
-src/modules/check/twins_test.go TestAShortBodyAndATestFilePass
+src/modules/check/copies_test.go TestTheCheckRefusesABodyStandingInAnotherPackage
+src/modules/check/copies_test.go TestABodyRenamedOnlyStillReadsAsACopy
+src/modules/check/copies_test.go TestAShortBodyAndATestFilePass
 src/yaml/yaml_test.go TestTruthyReadsEachKind
 
 ### answers
@@ -251,7 +251,7 @@ first
 <!-- the form is list -->
 
 src/modules/check/twins.go
-src/modules/check/twins_test.go
+src/modules/check/copies_test.go
 src/modules/check/checker.go
 src/modules/check/testdata/tree.golden.json
 src/yaml/value.go
@@ -300,7 +300,7 @@ The check line is TestTheCheckRefusesABodyStandingInAnotherPackage; `git grep -c
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/yaml/yaml_test.go src/modules/check/twins_test.go
+./RUNME.sh branch test src/yaml/yaml_test.go src/modules/check/copies_test.go
 
 ### red
 
@@ -308,7 +308,7 @@ The check line is TestTheCheckRefusesABodyStandingInAnotherPackage; `git grep -c
 <!-- the form is list -->
 
 src/yaml/yaml_test.go
-src/modules/check/twins_test.go
+src/modules/check/copies_test.go
 
 ### seen
 
@@ -409,3 +409,5 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 The ask's grep reads the name with its case. So `src/yaml` keeps the one `func truthy`, and exports it as `var Truthy = truthy` for every other package.
+
+The rule says copy for a body standing in two packages, because package check says twin for a check and its Go port. The implement step writes src/modules/check/copies.go, `helperCopies(tree)` and the constant `copyFloor`, where the draft names twins.go, helperTwins and twinFloor. The test file stands at src/modules/check/copies_test.go, and the red list names it there.
