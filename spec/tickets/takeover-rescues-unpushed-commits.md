@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c829c29f5c3d9736
         size: 460
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 85a0708c6957481be1ff83ba125704738d2bc8cf
+    hash_after: 85a0708c6957481be1ff83ba125704738d2bc8cf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9514dcba4510cdaf
+        size: 2246
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,32 @@ first
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/commit_test.go src/branches/rescue_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/commit_test.go
+- src/branches/rescue_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The red cloud commit stays on the box: the verb says no push reaches origin, and origin holds no rescue branch. The take reads --over as a group name, as the beat ticket saw. The green push case passes today, because no rescue gets written to drop. It pins the drop once the rescue lands. The planning helper names a fault the tests miss: the pre-push hook in src/scripts/prepush.js refuses an agent push its green stamp leaves out. A rescue push carries a red tip, so the implement step has to route it past that gate on purpose.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing test: the rescue branch on origin for a red cloud commit, and the takeover taking it in; the conflict case and the off-work case back them
+- the tests reach git through a real bare origin and the commit verb through fakeLanding, as the tests beside them do
 
 # gate
 
