@@ -33,6 +33,7 @@ func counted(t *testing.T, db *sql.DB, query string, args ...any) int {
 }
 
 func TestASweepAfterOneChangeRewritesThatFileAloneAndDropsAGoneOne(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	kept := rowidOf(t, db, `SELECT rowid FROM link WHERE from_path = 'spec/one.md'`)
@@ -63,6 +64,7 @@ func TestASweepAfterOneChangeRewritesThatFileAloneAndDropsAGoneOne(t *testing.T)
 }
 
 func TestAChangeMovesThePathsItNamesAlone(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	kept := rowidOf(t, db, `SELECT rowid FROM note WHERE path = 'spec/two.md'`)
@@ -86,6 +88,7 @@ func TestAChangeMovesThePathsItNamesAlone(t *testing.T) {
 
 // A path standing nowhere takes every row under it along, and a link to it reaches nothing again. [[spec/design_output/index#a-change-moves-its-rows]]
 func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	if counted(t, db, `SELECT count(*) FROM link WHERE from_path = 'spec/one.md' AND to_path = 'spec/two.md'`) != 1 {
@@ -117,6 +120,7 @@ func doorOver(t *testing.T, root string, db *sql.DB) *door {
 
 // A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
 func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	made := exec.Command("git", "init", "-q")
 	made.Dir = root
@@ -135,6 +139,7 @@ func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
 }
 
 // A settle that fails keeps what it heard, and says so. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: RunsAlone - it swaps the package's stderr, which every settle beside it writes
 func TestAFailedSettleKeepsThePathsItHeard(t *testing.T) {
 	root := tree(t)
 	db := opened(t, root)
@@ -157,6 +162,7 @@ func TestAFailedSettleKeepsThePathsItHeard(t *testing.T) {
 }
 
 func TestGitsOwnIndexTurnsTheTrackedFlags(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	run := func(argv ...string) {
 		one := exec.Command("git", argv...)

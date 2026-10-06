@@ -9,6 +9,7 @@ import (
 )
 
 func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, "src/stub/.claude-plugin/plugin.json", "{\"name\": \"level0\"}\n")
 	db := opened(t, root)
@@ -33,6 +34,7 @@ func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(
 }
 
 func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	for _, argv := range [][]string{{"init", "-q"}, {"add", "spec/one.md"}} {
 		run := exec.Command("git", argv...)
@@ -55,6 +57,7 @@ func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
 }
 
 func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	named, err := Texts(db, []string{"src/plain.js", "nowhere.md"})
@@ -75,6 +78,7 @@ func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
 
 // The hash reads the text as the engine's hashText does, so a note hashed on either side matches. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Hashes(db, []HashAsk{{Path: "src/plain.js", Size: 10}, {Path: "nowhere.md"}})
@@ -95,6 +99,7 @@ func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
 
 // The hashes hashText in .claude/skills/level0/lib/hash.js answers, which the viewer's stamp reads. [[spec/design_output/tui#the-verb-builds-it]]
 func TestHashTextMatchesJavaScript(t *testing.T) {
+	t.Parallel()
 	for text, want := range map[string]string{
 		"":                 "811c9dc59e3779b9",
 		"abc":              "1a47e90b6898d0cd",

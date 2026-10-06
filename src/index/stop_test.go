@@ -11,6 +11,7 @@ import (
 const stopAskWithin = time.Second
 
 func TestAStopCallAsksMainForTheDoorsStop(t *testing.T) {
+	t.Parallel()
 	exited := make(chan int, 1)
 	go stopsAfter(t.TempDir(), 0, time.Hour, func(code int) { exited <- code })
 	select {
@@ -26,6 +27,7 @@ func TestAStopCallAsksMainForTheDoorsStop(t *testing.T) {
 }
 
 func TestAStopOutlastingItsBoundEndsTheProcess(t *testing.T) {
+	t.Parallel()
 	exited := make(chan int, 1)
 	go stopsAfter(t.TempDir(), 0, 0, func(code int) { exited <- code })
 	select {

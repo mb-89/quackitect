@@ -8,6 +8,7 @@ import (
 )
 
 func TestGrepFindsALineAndItsPath(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Grep(db, GrepAsk{Pattern: "const said"})
@@ -23,6 +24,7 @@ func TestGrepFindsALineAndItsPath(t *testing.T) {
 }
 
 func TestGrepTakesAGlobAndAFolder(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Grep(db, GrepAsk{Pattern: "note", Glob: "*.md"})
@@ -43,6 +45,7 @@ func TestGrepTakesAGlobAndAFolder(t *testing.T) {
 }
 
 func TestGrepReadsCaseAndTheLinesAround(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Grep(db, GrepAsk{Pattern: "THE FIRST NOTE", Insensitive: true, Before: 1})
@@ -61,6 +64,7 @@ func TestGrepReadsCaseAndTheLinesAround(t *testing.T) {
 }
 
 func TestGrepRefusesAPatternNobodyCompiles(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	if _, err := Grep(db, GrepAsk{Pattern: "a(b"}); err == nil {
@@ -69,6 +73,7 @@ func TestGrepRefusesAPatternNobodyCompiles(t *testing.T) {
 }
 
 func TestGlobNamesTheFilesAndSkipsTheRest(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Glob(db, GlobAsk{Pattern: "**/*.md"})
@@ -89,6 +94,7 @@ func TestGlobNamesTheFilesAndSkipsTheRest(t *testing.T) {
 }
 
 func TestGlobTranslatesTheShapes(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct {
 		glob string
 		path string
@@ -111,6 +117,7 @@ func TestGlobTranslatesTheShapes(t *testing.T) {
 }
 
 func TestGrepReadsAMatchAcrossLines(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Grep(db, GrepAsk{Pattern: `first note says.*\n.*`, Multiline: true})
@@ -129,6 +136,7 @@ func TestGrepReadsAMatchAcrossLines(t *testing.T) {
 }
 
 func TestGrepAnswersTheMatchAlone(t *testing.T) {
+	t.Parallel()
 	db := opened(t, tree(t))
 
 	said, err := Grep(db, GrepAsk{Pattern: `\[\[\w+\]\]`, Only: true})

@@ -11,6 +11,7 @@ import (
 )
 
 func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -49,6 +50,7 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 }
 
 func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -84,6 +86,7 @@ func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
 }
 
 func TestTheBusRefusesAPeerWithoutTheToken(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)

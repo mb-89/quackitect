@@ -88,6 +88,7 @@ func listedTools(t *testing.T) map[string]listedTool {
 }
 
 func TestV1ListsEachActionAsATool(t *testing.T) {
+	t.Parallel()
 	add, ok := listedTools(t)["index_t_add"]
 	if !ok || add.Action != "t/add" || add.Description != "adds two terms" || add.Bare || add.InputSchema.Type != "object" {
 		t.Fatalf("the list holds %+v for t/add", add)
@@ -99,6 +100,7 @@ func TestV1ListsEachActionAsATool(t *testing.T) {
 
 // Every tool the list names spells its action as the shared surface does, so the hooks door and the mcp module read it back. [[spec/tickets/tool-surface-moves-into-q]]
 func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
+	t.Parallel()
 	listed := listedTools(t)
 	if len(listed) == 0 {
 		t.Fatal("the list holds no tool, and wants t/add and t/echo")
@@ -112,6 +114,7 @@ func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
 
 // An action carrying its own tool name lists under that name, and still names its action. [[spec/tickets/tools-keep-their-own-names]]
 func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
+	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {
 		q.ActionIn(c, "t/plan", func(in string) []q.Request {
 			return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "a plan writes nothing here"}}
@@ -135,6 +138,7 @@ func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
 
 // Every listed tool carries the plan field, so the plan's answer rides any call. [[spec/tickets/plan-writes-off-go]]
 func TestEveryListedToolCarriesThePlanField(t *testing.T) {
+	t.Parallel()
 	listed := listedTools(t)
 	if len(listed) == 0 {
 		t.Fatal("the list holds no tool, and wants t/add and t/echo")
@@ -148,6 +152,7 @@ func TestEveryListedToolCarriesThePlanField(t *testing.T) {
 
 // The plan tool takes the plan as its input, and carries no plan field of its own. [[spec/tickets/plan-writes-off-go]]
 func TestThePlanToolCarriesNoPlanField(t *testing.T) {
+	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {
 		q.ActionIn(c, "t/plan", func(tool.Plan) []q.Request { return nil }, q.Doc("plans the work"), q.ToolName(tool.PlanTool))
 	})
@@ -171,6 +176,7 @@ func TestThePlanToolCarriesNoPlanField(t *testing.T) {
 }
 
 func TestABareInputRidesAsOneProperty(t *testing.T) {
+	t.Parallel()
 	echo, ok := listedTools(t)["index_t_echo"]
 	if !ok || !echo.Bare || echo.InputSchema.Type != "object" || echo.InputSchema.Properties["input"].Type != "string" {
 		t.Fatalf("the list holds %+v for t/echo", echo)
@@ -179,6 +185,7 @@ func TestABareInputRidesAsOneProperty(t *testing.T) {
 
 // The list /v1/tools generates reads as the golden file, so the hook's case holds the one shape the index answers. [[spec/tickets/tool-list-shape-held-once]]
 func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
+	t.Parallel()
 	var said, held any
 	if err := json.Unmarshal(toolsBody(t), &said); err != nil {
 		t.Fatal(err)

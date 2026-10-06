@@ -20,6 +20,7 @@ import (
 const topicPolls = 100
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -56,6 +57,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 
 // The door answers the settled value of one name, the one a reader beside the old path compares. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	c := q.New()
 	q.OutIn(c, "work/open-tasks", 3, q.Doc("a count the case reads"))
@@ -79,6 +81,7 @@ func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 
 // A name nobody registered answers an error, so a reader beside the old path compares nothing. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -99,6 +102,7 @@ func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
 }
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -121,6 +125,7 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -148,6 +153,7 @@ func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 }
 
 func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 
 	self, _ := os.Executable()
@@ -168,6 +174,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -204,6 +211,7 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -249,6 +257,7 @@ func tickOf(t *testing.T, said answer) int64 {
 }
 
 func TestTheDoorAnswersWhy(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 0)
@@ -272,6 +281,7 @@ func TestTheDoorAnswersWhy(t *testing.T) {
 }
 
 func TestTheWhyVerbAsksTheName(t *testing.T) {
+	t.Parallel()
 	method, params := asked([]string{"why", "t/n"})
 	if method != "why" || string(params) != `{"name":"t/n"}` {
 		t.Fatalf("the verb asks %s with %s", method, params)
@@ -280,6 +290,7 @@ func TestTheWhyVerbAsksTheName(t *testing.T) {
 
 // The engine asks the door for the hash of a note, so the door answers the hashes method. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -304,6 +315,7 @@ func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 
 // Serve builds the scheduler over its store, so a move an IO module commits runs the provider reading it. [[spec/tickets/the-scheduler-runs-providers]]
 func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
+	t.Parallel()
 	type countOf struct {
 		N int `q:"t/n"`
 	}
@@ -339,6 +351,7 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 
 // The manager's step runs on the work loop, and the loop's idle tick runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
 func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
 	var stepped atomic.Int64
@@ -362,6 +375,7 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 
 // The value answer drains through the manager's settle, so a reader reads what the placed processes answer before it. [[spec/tickets/callers-name-drains-readers]]
 func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	catalog := q.New()
 	hand := q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
@@ -386,6 +400,7 @@ func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 
 // The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
 func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 4, q.Doc("a count"))

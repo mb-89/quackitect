@@ -20,6 +20,7 @@ const v1Listen = 2
 const closeWait = 2 * time.Second
 
 func TestAFailedV1StartStopsThePartsItReached(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	var managed, started atomic.Bool
 	manage := func(string, *q.Store, OpRows, Reads, func(func())) (Managed, error) {

@@ -13,6 +13,7 @@ import (
 )
 
 func TestABrokenCatalogRefusesTheStart(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	broken := q.New()
 	q.OutIn(broken, "t/n", 0)

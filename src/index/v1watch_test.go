@@ -94,6 +94,7 @@ func nextEvent(t *testing.T, events <-chan watched) watched {
 }
 
 func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
+	t.Parallel()
 	standing, _ := watchingV1(t)
 	said, events := openWatch(t, standing, "files/spec/one.md")
 	if said.StatusCode != http.StatusOK || !strings.HasPrefix(said.Header.Get("Content-Type"), "text/event-stream") {
@@ -106,6 +107,7 @@ func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
 }
 
 func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
+	t.Parallel()
 	standing, writes := watchingV1(t)
 	_, events := openWatch(t, standing, "files/spec/one.md")
 	first := nextEvent(t, events)
@@ -117,6 +119,7 @@ func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
 }
 
 func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
+	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/watch?names=t/none")
 	if said.StatusCode != http.StatusNotFound || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("the watch answers %d: %s", said.StatusCode, body)
@@ -124,6 +127,7 @@ func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 }
 
 func TestV1WatchSendsNothingWhereTheValueStands(t *testing.T) {
+	t.Parallel()
 	standing, writes := watchingV1(t)
 	_, events := openWatch(t, standing, "files/spec/one.md")
 	nextEvent(t, events)

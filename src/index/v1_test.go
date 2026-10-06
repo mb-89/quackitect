@@ -55,6 +55,7 @@ func getV1(t *testing.T, standing Standing, path string) (*http.Response, []byte
 }
 
 func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
+	t.Parallel()
 	standing := standingV1(t)
 	said, body := getV1(t, standing, "/v1/values/files/spec/one.md")
 	var found struct {
@@ -74,6 +75,7 @@ func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
 }
 
 func TestV1AnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
+	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/values/t/none")
 	if said.StatusCode != http.StatusNotFound || !strings.Contains(said.Header.Get("Content-Type"), "problem+json") || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("/v1 answers %d, %s: %s", said.StatusCode, said.Header.Get("Content-Type"), body)
@@ -81,6 +83,7 @@ func TestV1AnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 }
 
 func TestV1WritesItsOpenAPIDocument(t *testing.T) {
+	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/openapi.json")
 	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "/values/") {
 		t.Fatalf("the document answers %d: %.200s", said.StatusCode, body)
@@ -89,6 +92,7 @@ func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 
 // The value carries its stale mark. [[spec/design_output/model#a-stale-mark]]
 func TestV1ReadsAStaleName(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	q.OutIn(c, "t/n", 0)
 	store := q.NewStore(c)
@@ -104,6 +108,7 @@ func TestV1ReadsAStaleName(t *testing.T) {
 
 // A door fresh from its start holds a derived value at its default until the scheduler settles, so the route settles first. [[spec/tickets/fix-verbs-shadow-yours]]
 func TestV1SettlesBeforeItReads(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	hand := q.OutIn(c, "t/n", 0)
 	store := q.NewStore(c)
@@ -119,6 +124,7 @@ func TestV1SettlesBeforeItReads(t *testing.T) {
 }
 
 func TestV1DrawsItsDocs(t *testing.T) {
+	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/docs")
 	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "openapi") {
 		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
@@ -127,9 +133,9 @@ func TestV1DrawsItsDocs(t *testing.T) {
 
 // V1 answers the base of the door standing over the root. [[spec/tickets/the-quack-cli-gets-generated]]
 func TestV1AnswersTheBaseOfTheStandingDoor(t *testing.T) {
+	t.Parallel()
 	standing := standingV1(t)
-	t.Setenv("QUACKITECT_ROOT", standing.Root)
-	base, err := V1()
+	base, err := V1At(standing.Root)
 	if want := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1); err != nil || base != want {
 		t.Fatalf("V1 answers %q, %v, not %q", base, err, want)
 	}

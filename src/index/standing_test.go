@@ -11,6 +11,7 @@ import (
 )
 
 func TestTheStandingFileNamesTheBusAndItsToken(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	bus, err := StartBus()
 	if err != nil {

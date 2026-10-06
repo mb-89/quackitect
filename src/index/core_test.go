@@ -10,6 +10,7 @@ import (
 )
 
 func TestTheCoreWritesNoInputName(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	read := q.NewStore(c).Snapshot()
 	for _, name := range []string{"files/a.md", "clock/minute", "env/SE_ROLE"} {

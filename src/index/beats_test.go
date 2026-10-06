@@ -10,6 +10,7 @@ import (
 )
 
 func TestABeatAtZeroTakesTheBuiltInSpan(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, config.Tracked, `{"watchdog":{"beat":0,"lease":7}}`)
 	if got := spanOf(root, "watchdog.beat", builtInBeat); got != builtInBeat {

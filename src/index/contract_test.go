@@ -29,5 +29,6 @@ func throughTheDoor(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 }
 
 func TestTheIndexKeepsTheContract(t *testing.T) {
+	t.Parallel()
 	qtest.Suite(t, throughTheDoor)
 }

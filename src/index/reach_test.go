@@ -66,6 +66,7 @@ func standsAt(t *testing.T, root string, said Standing) {
 }
 
 // A spawn that names the binary it runs, and stands the door again where the case hands one. [[spec/design_output/index#a-door-comes-back]]
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func fakeSpawn(t *testing.T, again func(root string)) func() []string {
 	t.Helper()
 	var ran []string
@@ -82,6 +83,7 @@ func fakeSpawn(t *testing.T, again func(root string)) func() []string {
 }
 
 func TestAClientKeepsTheDoorTheTreesIndexStands(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	self, _ := os.Executable()
@@ -94,6 +96,7 @@ func TestAClientKeepsTheDoorTheTreesIndexStands(t *testing.T) {
 }
 
 func TestARebuiltIndexLeavesItsDoorStale(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the old build")
 	stamp := stampOf(bin)
@@ -139,6 +142,7 @@ func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 
 // A serve meets the live door on its build and stands no second one, and a door on another build hears a stop and stands live no more. [[spec/tickets/process-shadow-reads-clean]]
 func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	door, heard := heardDoor(t)
@@ -162,6 +166,7 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 
 // A door leaving drops the standing file while it names that door, and leaves another door's file standing. [[spec/tickets/process-shadow-reads-clean]]
 func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
 	dropsOwn(root, 3)
@@ -176,6 +181,7 @@ func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
 
 // A door stays while the standing file names it, and leaves once the file names another door. [[spec/tickets/process-shadow-reads-clean]]
 func TestADisplacedDoorLeaves(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
 	gone := displaced(root, 2, time.Millisecond)
@@ -193,6 +199,7 @@ func TestADisplacedDoorLeaves(t *testing.T) {
 }
 
 func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	built := filepath.Join(t.TempDir(), "another-index")
 	if err := os.WriteFile(built, []byte("a build elsewhere"), 0o755); err != nil {
@@ -222,6 +229,7 @@ func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 }
 
 func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -239,6 +247,7 @@ func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
 }
 
 func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	vehicle := t.TempDir()
 	self := filepath.Join(vehicle, "logview")

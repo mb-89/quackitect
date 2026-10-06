@@ -9,6 +9,7 @@ import (
 
 // The door's stop closes the watch while its loop adds a folder. [[spec/tickets/a-watch-stops-mid-add]]
 func TestTheIndexWatchStopsWhileFoldersAppear(t *testing.T) {
+	t.Parallel()
 	for round := 0; round < 20; round++ {
 		root := t.TempDir()
 		one := &door{touched: map[string]bool{}, dirty: make(chan struct{}, 1)}

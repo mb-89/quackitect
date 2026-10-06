@@ -89,6 +89,7 @@ func firstKeyed(t *testing.T, standing Standing, name string) keyedEvent {
 
 // A watch over a keyed name of a wired family sends its value, parsed off its file. [[spec/tickets/the-lens-reads-v1]]
 func TestWatchSendsAKeyedName(t *testing.T) {
+	t.Parallel()
 	first := firstKeyed(t, keyedDoor(t), keyedHold)
 	if first.Name != keyedHold || !strings.Contains(string(first.Value), `ticket`) {
 		t.Fatalf("the first event names %s with %s, and wants the hold its file holds", first.Name, first.Value)

@@ -50,6 +50,7 @@ func opened(t *testing.T, root string) *sql.DB {
 }
 
 func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, ".se/.retro/one/input/log/a.jsonl", "{}\n")
 	db := opened(t, root)
@@ -80,6 +81,7 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 
 // A dot folder under the private one stands outside the walk, the change and the watch, and every other folder there stands inside. [[spec/design_output/index#the-rows-the-walk-writes]]
 func TestADotFolderUnderThePrivateFolderStandsOutsideTheWalkAndTheWatch(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, ".se/.log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
 	write(t, root, ".se/notes/kept.md", "A note git ignores, and the walk reads all the same.\n")
@@ -121,6 +123,7 @@ func TestADotFolderUnderThePrivateFolderStandsOutsideTheWalkAndTheWatch(t *testi
 
 // A folder below the root carrying its own .git, a worktree's file or a clone's folder, stands off the walk and the watch whole; the root's own .git stays as it is today. [[spec/design_output/index#the-rows-the-walk-writes]]
 func TestAFolderCarryingItsOwnGitStandsOffTheWalkAndTheWatch(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, ".se/wt/drawing/.git", "gitdir: ../../../.git/worktrees/drawing\n")
 	write(t, root, ".se/wt/drawing/spec/tickets/dup.md", "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA duplicate off a leftover worktree.\n")
@@ -149,6 +152,7 @@ func TestAFolderCarryingItsOwnGitStandsOffTheWalkAndTheWatch(t *testing.T) {
 
 // A hook hands the drive letter lower case and a shell upper case, and both name one tree. [[spec/design_output/index#a-door-comes-back]]
 func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	if rooted(root+string(filepath.Separator)) != rooted(root) {
 		t.Fatal("a trailing separator reads as another tree")
@@ -186,6 +190,7 @@ func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
 }
 
 func TestAWordStandingInAPrivateNoteAloneComesBackFromAFind(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 
@@ -200,6 +205,7 @@ func TestAWordStandingInAPrivateNoteAloneComesBackFromAFind(t *testing.T) {
 
 // [[spec/design_output/index#the-rank-is-bm25]]
 func TestANoteNamingTheWordOutranksOneSayingItInItsBody(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	write(t, root, "spec/said.md", "---\nid: said\n---\n\nquince quince quince quince, a body full of it.\n")
 	write(t, root, "spec/quince.md", "---\nid: quince\n---\n\nA note about something else.\n")
@@ -215,6 +221,7 @@ func TestANoteNamingTheWordOutranksOneSayingItInItsBody(t *testing.T) {
 }
 
 func TestANoteCarriesItsFrontmatter(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 
@@ -228,6 +235,7 @@ func TestANoteCarriesItsFrontmatter(t *testing.T) {
 }
 
 func TestALinkNamesTheNoteItReaches(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 
@@ -243,6 +251,7 @@ func TestALinkNamesTheNoteItReaches(t *testing.T) {
 
 // A ticket names its process with the ending off, and the link reaches the yaml file. [[spec/design_output/index#a-note-and-its-links]]
 func TestAPointerWithTheEndingOffReachesAProcessFile(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, "spec/processes/trivial.yaml", "kind: process\nsteps: []\n")
 	write(t, root, "spec/tickets/one.md", "---\nkind: ticket\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n")
@@ -268,6 +277,7 @@ func TestAPointerWithTheEndingOffReachesAProcessFile(t *testing.T) {
 }
 
 func TestALinkNamingNothingDangles(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 
@@ -281,6 +291,7 @@ func TestALinkNamingNothingDangles(t *testing.T) {
 }
 
 func TestTheSearchFindsAWordInAnyFile(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 
@@ -294,6 +305,7 @@ func TestTheSearchFindsAWordInAnyFile(t *testing.T) {
 }
 
 func TestAnIndexUnderAnotherRootIsDropped(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	at := filepath.Join(t.TempDir(), "index.db")
 
@@ -323,6 +335,7 @@ func TestAnIndexUnderAnotherRootIsDropped(t *testing.T) {
 
 // The sweep writes a row for every line holding text, under the line's own number, across two files of one sweep. [[spec/tickets/the-sweep-prepares-once]]
 func TestTheSweepWritesEveryLineHoldingTextUnderItsNumber(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	write(t, root, "src/a.js", "one\n\n  \nfour\nfive\n")
 	write(t, root, "src/b.js", "\nsecond\n")
@@ -349,6 +362,7 @@ func TestTheSweepWritesEveryLineHoldingTextUnderItsNumber(t *testing.T) {
 
 // The pure driver answers a line search and its ranking. [[spec/design_output/index#the-compiler-it-needs]]
 func TestTheIndexOpensWithoutCgo(t *testing.T) {
+	t.Parallel()
 	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
 	if err != nil {
 		t.Fatal(err)
@@ -370,6 +384,7 @@ func TestTheIndexOpensWithoutCgo(t *testing.T) {
 
 // The journal, the busy timeout and the sync ride the file name as pragmas. [[spec/design_output/index#the-compiler-it-needs]]
 func TestTheIndexOpensWithItsPragmas(t *testing.T) {
+	t.Parallel()
 	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
 	if err != nil {
 		t.Fatal(err)

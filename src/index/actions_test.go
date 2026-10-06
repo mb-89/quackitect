@@ -131,6 +131,7 @@ func postedOf(t *testing.T, body []byte) postedOut {
 }
 
 func TestAnActionAnswersItsResultWithinTheWait(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	close(hold)
 	said, body := postV1(t, standingActions(t, 0, hold), "/v1/actions/t/add", "wait=5", `{"a":2,"b":3}`)
@@ -147,6 +148,7 @@ func TestAnActionAnswersItsResultWithinTheWait(t *testing.T) {
 }
 
 func TestAWaitOfNoneAnswersAcceptedWithTheHandle(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	standing := standingActions(t, 5, hold)
 	said, body := postV1(t, standing, "/v1/actions/t/add", "wait=0", `{"a":2,"b":3}`)
@@ -168,6 +170,7 @@ func TestAWaitOfNoneAnswersAcceptedWithTheHandle(t *testing.T) {
 }
 
 func TestNoPreferReadsTheDefaultWaitOffItsKey(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	close(hold)
 	said, body := postV1(t, standingActions(t, 5, hold), "/v1/actions/t/add", "", `{"a":1,"b":1}`)
@@ -183,6 +186,7 @@ func TestNoPreferReadsTheDefaultWaitOffItsKey(t *testing.T) {
 }
 
 func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	close(hold)
 	_, body := getV1(t, standingActions(t, 0, hold), "/v1/openapi.json")
@@ -214,6 +218,7 @@ func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
 
 // A body the input type refuses reads 400, and a module refusing a request reads 422 with its reason. [[spec/tickets/action-refusals-meet-cases]]
 func TestARefusedPostAnswersItsProblem(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	close(hold)
 	standing := standingActions(t, 0, hold)
@@ -228,6 +233,7 @@ func TestARefusedPostAnswersItsProblem(t *testing.T) {
 
 // A Prefer header holding two preferences applies the wait among them, per RFC 7240. [[spec/design_output/model#a-caller-sets-its-wait]]
 func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
+	t.Parallel()
 	hold := make(chan struct{})
 	close(hold)
 	said, body := postV1(t, standingActions(t, 0, hold), "/v1/actions/t/add", "respond-async, wait=5", `{"a":2,"b":2}`)
@@ -241,6 +247,7 @@ func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
 
 // A door with no manager calls nothing, so /v1 serves no action. [[spec/tickets/actions-answer-over-http]]
 func TestADoorWithNoManagerServesNoAction(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	c := q.New()
 	q.ActionIn(c, "t/add", func(in addIn) []q.Request { return nil }, q.Doc("adds two terms"))
