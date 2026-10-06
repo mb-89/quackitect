@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: read
+step: classify
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -200,6 +200,19 @@ record:
         hash: 5534f0f00dd07c73
         size: 55
     def: 9bedae769f3b2577
+  - step: read
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: ed121e220288a2df71e732e28e9c8c30a9bca458
+    hash_after: ed121e220288a2df71e732e28e9c8c30a9bca458
+    answered:
+      - name: matrix
+        exit: 0
+        said: The report of retro-0d14eda draws 17 column(s), bottom line first, in its retro folder.
+    inputs:
+      - name: chapter
+        hash: d9f11f0c6509207d
+        size: 57
+    def: eebf9c438d0f9b8b
 ---
 
 # Ask
@@ -329,8 +342,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## matrix
 
 <!-- retro matrix, which refuses a chapter standing without its findings -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro matrix retro-0d14eda
 
 # classify
 
