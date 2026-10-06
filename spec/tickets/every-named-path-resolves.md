@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 36f3cb64b0e2abfc
         size: 436
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 6bfcde52863af7a719520ab7a415ce873f93fa3d
+    hash_after: 6bfcde52863af7a719520ab7a415ce873f93fa3d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 22bc942abf02b0f9
+        size: 3924
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -240,26 +253,32 @@ The check line is TestTheCheckRefusesANoteNamingADeletedFile, the branches line 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/named_test.go src/branches/free_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/check/named_test.go
+src/branches/free_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The sweep draws no rule on a note or a comment naming a missing file, and the stale span reads the 12h constant where the settings default holds 30m. The shape case and the open ticket case pass already, and they guard the new rule against false hits. The span case reads the default off the tracked schema, so a change to the default moves no test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The check line meets TestTheCheckRefusesANoteNamingADeletedFile, the branches line meets TestTheStaleSpanReadsTheSettingsDefault, and the check line waits for tests-green.
+The check cases run over the fake index in q/qtest, and the span case reads the doors with no git and no clock.
 
 # gate
 
