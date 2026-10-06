@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: e3b8ae9465e15a2209197dccdd9905cb62b9b006
+    hash_after: e3b8ae9465e15a2209197dccdd9905cb62b9b006
+    inputs:
+      - name: ask
+        hash: 4ed0dfbcf1eb4026
+        size: 528
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,123 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Vale leaves in six moves. Each replaces a Vale road with the Go rules, or drops a road nothing needs.
+
+1. The install and the lists. `src/scripts/install.sh` downloads neither Vale nor vale-ls. The survey, `Wanted` in `src/modules/check/tree.go`, the brief's tool rows, the tools verb and the CI cache keys drop both names.
+2. The editor. The Go lsp draws the rules already. So the Vale extension's offer, the `vale.valeCLI` settings, the check's settings rules over that extension, `valeLevel`, and their twins in `lib/tree.js` and `lib/servers.js` leave. The extension's watch on `.vale.ini` leaves too.
+3. The voice verb. `measure` in `src/voice/voice.go` reads `rulesAt(root)` and `Set.Lint` per file, as `lspRules` does. `valeAt`, `voiceRunsVale` and the JSON parsers leave.
+4. The fix verb. A new `Apply` in `src/rules` rewrites a text by each finding's replace action. `calm` reads the Capitalization rows of the Go rules. `fix` runs both with no binary.
+5. The lsp module. The Vale branch of `src/modules/lsp/tools.go` and `valeBuilt` in `door.go` leave. `ValeRuns` becomes `RulesLoad`, since it names a rules load that fails.
+6. The JavaScript readers. `askFaults` and `pull-chapter.js` read through `src/doors/vale.js`, which asks the rules-over verb. `it.vale`, `voiceOver`, `valeArgvOf`, `configOf`, `findingsOver`, `vale-rows.js`, `lintedBy`, `styles.js` and the check's Vale twin leave. So do the exports the note `js-lint-leftovers-stand-dead` names.
+
+Then `.vale.ini` and `spec/config/editor.vale.ini` leave. The projection writes no Tengo body, since the Go scripts dispatch by name. A case shows a YAML file under `spec/vocabulary` still meets its rules, which the ini's formats block held.
+
+The done_when grep excludes `testdata`. Those goldens snapshot ticket names such as `vale-ls-on-windows`, and run nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/install.sh: the vale and vale-ls installs
+- src/quack/survey.go: the survey list
+- src/modules/check/tree.go: Wanted, the settings rules
+- src/modules/check/install.go: valeLevel
+- src/modules/hooks/brief/brief.go: the tool rows
+- src/quack/setup_verb.go: the editor's extension offer
+- .claude/skills/level0/lib/tree.js, servers.js, tools.js
+- src/quack/command.go: valeAt
+- src/quack/voice_verb.go: voiceRunsVale
+- src/voice/voice.go: measure and the row parsers
+- src/quack/verb_fix.go: fixVerb, calm
+- src/modules/lsp/tools.go: the Vale branch, ValeRuns
+- src/modules/lsp/door.go: valeBuilt
+- src/quack/rules.go and verb_lint.go: ValeRuns
+- src/scripts/cli-doors.js: it.vale
+- src/bridge/findings.js: voiceOver, valeArgvOf, configOf, findingsOver
+- src/scripts/ticket-ask-lint.js: askFaults
+- src/scripts/pull-chapter.js: the chapter lint
+- src/scripts/prepush.js: lintedBy
+- src/scripts/styles.js: assemble
+- src/scripts/check-twins.js and src/quack/check.go: the vale twin
+- src/projection: the Tengo bodies
+- src/extension/lib/lsp.js: the ini watch
+- .github/workflows/check.yml and dispatch.yml: the cache keys
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/rules/apply_test.go TestApply: a replace action rewrites its match, and a finding with no action leaves the text
+- src/voice/voice_test.go: measure reads the Go rules over a seeded root, and runs no binary
+- src/quack/verb_fix_test.go: fix applies the Go rules' swaps and calms a shout, with no Vale
+- src/modules/lsp/tools_test.go: the tools draw the rules, and a failed load names RulesLoad
+- src/rules/load_test.go: a YAML file under spec/vocabulary meets its rules
+- test/level0/ask-lint.test.js: the ask lint reads the rules-over verb
+- test/contract/install.test.js: the install names no Vale
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/install.sh
+- src/quack/survey.go
+- src/modules/check/tree.go
+- src/modules/check/install.go
+- src/modules/hooks/brief/brief.go
+- src/quack/setup_verb.go
+- .vscode/extensions.json
+- .vscode/settings.json
+- .claude/skills/level0/lib/tree.js
+- .claude/skills/level0/lib/servers.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/vale.js
+- src/quack/command.go
+- src/quack/voice_verb.go
+- src/voice/voice.go
+- src/quack/verb_fix.go
+- src/rules/apply.go
+- src/modules/lsp/tools.go
+- src/modules/lsp/door.go
+- src/quack/rules.go
+- src/quack/verb_lint.go
+- src/scripts/cli-doors.js
+- src/bridge/findings.js
+- src/bridge/vale-rows.js
+- src/scripts/ticket-ask-lint.js
+- src/scripts/pull-chapter.js
+- src/scripts/prepush.js
+- src/scripts/styles.js
+- src/scripts/quack-topic.js
+- src/scripts/check-twins.js
+- src/quack/check.go
+- src/projection
+- src/extension/lib/lsp.js
+- .github/workflows/check.yml
+- .github/workflows/dispatch.yml
+- .vale.ini
+- spec/config/editor.vale.ini
+- the tests and goldens naming Vale, under src and test
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened by the survey helper, and each claim was checked there: `src/rules` loads `spec/config/styles`, and reads no ini
+- the callers list names each caller the survey found, by file and function
+- the size list names every file the approach touches, and the tests list holds a case for each move that changes code
 
 ## tests-red
 
