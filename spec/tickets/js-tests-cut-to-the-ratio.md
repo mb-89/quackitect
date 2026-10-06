@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -42,6 +42,12 @@ record:
       - name: check
         exit: 0
         said: "  114.9  in all"
+  - step: do
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: d271b562bc2e0cbd59f73d05c5adc1cc0320aab4
+    hash_after: 097cf6a094d88fbb961324658094eb33d7d74ec1
+reason: became
+successors: [the-dead-bridge-tests-leave]
 ---
 
 # Ask
