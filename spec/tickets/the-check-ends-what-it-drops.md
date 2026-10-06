@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d7c071c1f34ecffe
         size: 596
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: c171785c1e1187b951856bf9a989a4ef382d43b0
+    hash_after: c171785c1e1187b951856bf9a989a4ef382d43b0
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -291,14 +300,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go vet ./quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches ending.go, ending_unix.go, ending_windows.go and the four callers the approach names, landed through ending-windows-tree-tested and vale-call-takes-endswhole
+the change reaches processes through exec.Cmd, which the ending cases drive against the real thing, since the process is the door under test
+endsWhole, whole and the realRun rule link this ticket
+the inherit rule stands once, over realRun
 
 ## tests-green
 
