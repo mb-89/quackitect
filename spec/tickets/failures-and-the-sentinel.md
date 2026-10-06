@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,21 @@ record:
         hash: 88bf6a4f020f44dd
         size: 263
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 82c792e07035c55b12db16d5c686d6315098ac0b
+    hash_after: 82c792e07035c55b12db16d5c686d6315098ac0b
+    inputs:
+      - name: design/draft
+        hash: d608216124531fde
+        size: 2833
+      - name: design/tests-red
+        hash: 08bd99e184844752
+        size: 586
+      - name: [[spec/design_output/failures]]
+        hash: c263fe950a83d49b
+        size: 4620
+    def: dc4904ab364efa10
 depends_on: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register
 ---
 
@@ -305,8 +320,15 @@ The case reads the tree alone, so no door needs a fake.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- pull-callers-name-stillheld: the callers list and the red test's Say(Refused form miss the Errorln refusals in src/pull/pull.go, stillHeld and the refusals at the branch check and the queue bind among them; move each through the door at implement
+- take-moves-stands-refusals: the take refuses through d.offTrunk and d.dirty in src/branches/stands.go, which the size list leaves out, and the red test refuses the git output and conflict notice warns in take.go that the design keeps as a refusal's detail rows
+- mint-refusals-keep-ids: the draft gives the mint one id, yet its refusal text comes from fieldsIn, withRoute, check.Minted, pull.EmptyGroup and pull.ClosedGroup, and the errs form also catches the usage text and the I/O error prints in verb_mint.go
+- pull-ids-test-written: the done_when line where go test ./src/pull/ reads the ids meets no red test, since tests-red wrote TestMovedRefusalsPassTheFailureDoor alone and none of the four tests the draft names; write them at implement against failure.Fake
+- moved-owns-the-files: src/quack/refusals_test.go keeps its own refusalsPast map beside failure.Moved, which tree_test.go reads through DoorFaults; fill Moved, and let the red case read it, so one place names the moved files
+- js-refusals-move: src/scripts/pull.js deskRefused and src/bridge/bash.js deskRefusal keep their refusal text past the door, and the design note defers the twins with no ticket
 
 # implement
 
