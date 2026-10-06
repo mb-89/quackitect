@@ -5,12 +5,6 @@
 // The span a burst of file writes takes to settle, before the sidebar draws the badge again. It stands above burstSettleDelay in src/index/door.go, so the index sweeps the burst before the badge's verb asks it. [[spec/tickets/the-badge-reads-open-tasks]]
 const BURST = 500;
 
-// The editor's timer, with the cancel a later call takes. [[spec/tickets/the-badge-reads-open-tasks]]
-function timer(run, span) {
-  const one = setTimeout(run, span);
-  return { cancel: () => clearTimeout(one) };
-}
-
 // [[spec/tickets/the-badge-reads-open-tasks]]
 function settled(run, span, later) {
   let waiting = null;
@@ -23,4 +17,4 @@ function settled(run, span, later) {
   };
 }
 
-module.exports = { BURST, settled, timer };
+module.exports = { BURST, settled };

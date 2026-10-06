@@ -2,7 +2,6 @@
 // the index's standing file names. It answers nothing where no index stands.
 // [[spec/design_output/extension#the-views-section]]
 
-const { readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
 // A copy of inRun("index.json") out of .claude/skills/level0/lib/folders.js, the file standingPath in src/index/door.go writes, because the extension loads CommonJS and that module is ESM. [[spec/design_output/model#surfaces]]
@@ -14,12 +13,15 @@ const NO_INDEX =
   "no index answers at this tree, and ./RUNME.sh index standing starts one";
 // The seconds a person's press waits on its verb, past which the answer names the handle to read. [[spec/design_output/model#a-caller-sets-its-wait]]
 const ACT_WAIT = 600;
+// The status codes fetch reads as ok, the 2xx span. [[spec/design_output/doors#one-door-per-outside-thing]]
+const OK = 200;
+const REDIRECT = 300;
 
 // [[spec/design_output/extension#the-views-section]]
-function indexDoor(root) {
+function indexDoor(root, doors) {
   const base = () => {
     try {
-      const port = JSON.parse(readFileSync(join(root, ...STANDING), "utf8"))?.v1;
+      const port = JSON.parse(doors.disk.read(join(root, ...STANDING)))?.v1;
       return port ? `http://127.0.0.1:${port}/v1` : "";
     } catch {
       return "";
@@ -29,8 +31,11 @@ function indexDoor(root) {
     const at = base();
     if (!at) return undefined;
     try {
-      const said = await fetch(`${at}${path}`, init);
-      return { ok: said.ok, body: await said.json().catch(() => undefined) };
+      const said = await doors.http.send(`${at}${path}`, init);
+      return {
+        ok: said.status >= OK && said.status < REDIRECT,
+        body: bodyOf(said.text),
+      };
     } catch {
       return undefined;
     }
@@ -47,13 +52,14 @@ function indexDoor(root) {
       const at = base();
       try {
         if (at) {
+          // level0: OutsideInDoors - the http door answers a whole body as text, and a watch reads an event stream that never ends
           const said = await fetch(`${at}/watch?names=${names.join(",")}`, {
             signal: aborts.signal,
           });
           if (said.ok && said.body) await eventsIn(said.body, fn);
         }
       } catch {}
-      if (!aborts.signal.aborted) setTimeout(opens, REOPEN);
+      if (!aborts.signal.aborted) doors.clock.after(REOPEN, opens, { unref: true });
     };
     opens();
     return { stop: () => aborts.abort() };
@@ -87,6 +93,14 @@ function posted(input, wait) {
     },
     body: JSON.stringify(input ?? {}),
   };
+}
+
+function bodyOf(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
 }
 
 function textOf(result) {

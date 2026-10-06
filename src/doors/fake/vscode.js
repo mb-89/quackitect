@@ -3,8 +3,10 @@
 // [[spec/design_output/doors#a-fake-behaves]]
 
 import { createRequire } from "node:module";
+import { join } from "node:path";
 
 const NAME = "vscode";
+const EXTENSION = join(import.meta.dirname, "..", "..", "extension");
 
 // A require from the test's own place, where vscode answers the fake the case hands in. [[spec/design_output/doors#a-fake-behaves]]
 export function editorRequire(fake, from) {
@@ -17,6 +19,10 @@ export function editorRequire(fake, from) {
     };
     answered.fake = true;
     Module._resolveFilename = answered;
+  }
+  // A module an earlier fake loaded holds that fake, so each case loads the extension again over its own. [[spec/guidance/code/testing]]
+  for (const loaded of Object.keys(require.cache)) {
+    if (loaded.startsWith(EXTENSION)) delete require.cache[loaded];
   }
   require.cache[NAME] = { id: NAME, filename: NAME, loaded: true, exports: fake };
   return require;

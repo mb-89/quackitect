@@ -22,17 +22,17 @@ const QUIET = [
 ];
 
 // [[spec/design_output/extension#the-editor-is-a-door]]
-function editorDoor(context) {
+function editorDoor(context, doors) {
   const folder = vscode.workspace.workspaceFolders?.[0];
-  const index = indexDoor(folder?.uri?.fsPath ?? "");
+  const index = indexDoor(folder?.uri?.fsPath ?? "", doors);
   let page = null;
   const bars = new Map();
 
   const uriOf = (path) => vscode.Uri.joinPath(folder.uri, ...String(path).split("/"));
 
   return {
-    ...processDoor(context, folder),
-    ...fileDoor(context, folder, uriOf),
+    ...processDoor(context, folder, doors),
+    ...fileDoor(context, folder, uriOf, doors),
     ...lensDoor(context, folder),
     ...insetDoor(context, folder),
     ...fieldDoor(context, folder),
@@ -58,7 +58,7 @@ function editorDoor(context) {
         return "";
       }
       // [[spec/design_output/lsp#the-client-starts-it-again]]
-      const client = clientOf(node, ask);
+      const client = clientOf(node, ask, doors.clock.wait);
       context.subscriptions.push(client);
       client.start();
       return ask.server.command;
@@ -68,7 +68,8 @@ function editorDoor(context) {
       page = one;
     },
     pid: () => process.ppid,
-    now: () => Date.now(),
+    now: () => doors.clock.ms(),
+    later: (run, span) => doors.clock.after(span, run),
 
     // [[spec/design_output/extension#it-starts-silent]]
     marks(name, on) {

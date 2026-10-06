@@ -5,12 +5,16 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { editorRequire } from "../../src/doors/fake/vscode.js";
+import { http } from "../../src/doors/http.js";
 import { wire } from "../../src/doors/wire.js";
 
 const require = editorRequire({}, import.meta.url);
-const { indexDoor } = require("../../src/extension/editor-index.js");
+const editorIndex = require("../../src/extension/editor-index.js");
+const DOORS = { clock: clock(), disk: disk(), http: http() };
+const indexDoor = (root) => editorIndex.indexDoor(root, DOORS);
 
 function served() {
   const posted = [];
