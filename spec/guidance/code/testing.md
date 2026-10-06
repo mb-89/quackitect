@@ -7,7 +7,7 @@ rationale: [[spec/rationales/testing]]
 
 # Actionables
 
-1. In the JavaScript the migration has yet to remove, reach the outside through a door under `src/doors` alone. The Go IO modules follow rules 11 to 15 instead. A module reading the outside in place takes the box into every test of it. *
+1. In the VS Code extension under `src/extension` and the level-zero hooks under `.claude/skills/level0`, reach the outside through a door under `src/doors` alone. The Go IO modules follow rules 11 to 15 instead. A module reading the outside in place takes the box into every test of it. *
 2. In that JavaScript, write a normal test against a fake from `src/doors/fake`. It touches memory and nothing else. *
 3. In that JavaScript, put a test that drives the real thing in `test/contract`, one per door. A door nobody drives fails on the first box its fake misses. *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
