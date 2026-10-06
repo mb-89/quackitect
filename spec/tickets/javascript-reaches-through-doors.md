@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    1.9  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 8fe21c98e9cf866fdb1b007466669783572eea80
+    hash_after: 8fe21c98e9cf866fdb1b007466669783572eea80
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes
+      - name: check
+        exit: 0
+        said: "  113.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c8f29294cd586466
+        size: 824
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -357,26 +380,33 @@ the clock timers, the outside key and the stacked doors each stand once in spec/
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns/scripts_tree_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The JavaScript under src/extension, src/scripts and src/bridge now reaches time, the network and node modules through the doors. The clock door gained after, wait and ms, and its fake fires each timer as tick passes it. proc and awake stand on the clock. The http door takes a signal, and copilot sends through it under a deadline the clock fires. The probes and the bridge wait pause on the hand clock. The extension builds its doors once at activate, through editor-doors.js, and hands them on. Two lines stay marked: the realpath that finds the doors, and the event stream the http door cannot read. The page bundle and the prototype declare themselves outsides with a new outside key, so their names stay owned inside their files alone, and the doors verb lists each file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the ask names, the doors they stand on, and the doors verb and owns parser a gate point asks for
+every door the change reaches has a fake, and the vscode stand-in drops extension modules an earlier fake bound
+each move points at its section of spec/design_output/doors.md
+the timers, the outside key and the stacked doors each stand once in spec/design_output/doors.md
 
 # accept
 
