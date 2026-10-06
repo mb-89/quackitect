@@ -118,11 +118,20 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: 3f21bd5307b3f35ddb6736ba9be40b0762150d27
+    hash_after: 3f21bd5307b3f35ddb6736ba9be40b0762150d27
+    inputs:
+      - name: ask
+        hash: 664e2b4873cd687b
+        size: 889
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,60 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two waits move off a fixed timer onto readiness.
+
+1. The alarm cases in `src/quack/io_test.go` hand the dog `clock.NewFake(...).Now` in place of `time.Now`. Each case moves the fake clock past the lease term only once the current process commits a pid the case has not yet expired, so the spawn's start time never counts against the lease. The cases still spawn the real test binary over the real bus, so the module case stands as the one door test of a placed process, and asserts two pids and then the alarm as before. The cause: the dog holds a 200 ms lease on the real clock from the spawn, so a loaded box kills the second process before it commits its pid, two faults raise the alarm and stop the restarts, and the case waits out twenty seconds for a second pid that never comes.
+
+2. `starts` in `src/index/door.go` waits on readiness. The spawning caller waits until the standing file stands or its spawned index exits, and refreshes its claim each poll. A caller meeting a claim waits while that claim stays fresh, and takes the claim where it goes stale or leaves without a door. A hang guard on a named span ends a wait where an index neither stands nor exits. `spawns` answers a channel carrying the process's exit. The clock and the pause the wait reads stand in package variables, so the reach cases drive them fake and sleep no real second. Both contract suites then share the one index the first caller spawns, however long its first build takes on a cold box.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/main.go reaches, the one caller of starts
+- src/index/door.go starts, the one caller of claims and spawns
+- src/index/reach_test.go fakeSpawn, TestAStartRunsTheTreesIndexAndNeverTheCaller, TestACallerMeetingAClaimWaitsAndSpawnsNothing, TestAStaleClaimGivesWay
+- src/quack/io_test.go TestASilentIOProcessReadsInTheAlarms and TestASilentModuleProcessRestartsAndRaisesAnAlarm, the two callers of manager.NewDog on the real clock there
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/reach_test.go TestAStartWaitsOnItsIndexPastTheOldSpan
+- src/index/reach_test.go TestAStartEndsWhenItsIndexExits
+- src/index/reach_test.go TestAStartGivesUpOnAHungIndex
+- src/index/reach_test.go TestAWaiterHoldsWhileTheClaimStaysFresh
+- src/quack/io_test.go TestASilentModuleProcessRestartsAndRaisesAnAlarm, rewritten onto the fake clock with the same assertion
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/index/door.go
+- src/index/main.go
+- src/index/reach_test.go
+- src/quack/io_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: door.go starts, claims and spawns, main.go reaches and the start constants, procs.go runs and holds, lease.go Dog, clock.go FakeClock, both io_test cases, both contract suites
+- callers come off a grep of starts, claims, spawns and NewDog under src
+- each done_when line names its test: the io_test case, the module case as the door test, the reach cases for readiness, and the check
 
 ## tests-red
 
