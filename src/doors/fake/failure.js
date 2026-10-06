@@ -2,7 +2,7 @@
 // id a case raises.
 // [[spec/design_output/failures#one-door-raises-a-failure]]
 
-import { raiser } from "../failure.js";
+import { liner, raiser } from "../failure.js";
 import { behaves } from "./behaves.js";
 import { fakeLog } from "./log.js";
 
@@ -16,6 +16,7 @@ export function fakeFailure(nodes = [], log = fakeLog()) {
         ids.push(id);
         return raise(id, ...said);
       },
+      lines: liner((id) => held.get(id)),
       raised: () => [...ids],
       log,
     },

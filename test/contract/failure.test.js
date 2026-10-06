@@ -21,3 +21,12 @@ test("the door reads the real nodes under spec/failures", async () => {
   assert.deepEqual(await real.raise(ID, "it fails"), want);
   assert.deepEqual(await fake.raise(ID, "it fails"), want);
 });
+
+// A caller answering its code at once reads the lines with no wait. [[spec/tickets/the-twins-leave-whole]]
+test("the door answers a raise's lines at once, and the fake answers the same", () => {
+  const real = failure(disk(), fakeLog(fakeClock()));
+  const fake = fakeFailure([{ id: ID, level: "error", remedies: [REMEDY] }]);
+  const want = ["it fails", `failure ${ID} at error`, `remedy: ${REMEDY}`];
+  assert.deepEqual(real.lines(ID, "it fails"), want);
+  assert.deepEqual(fake.lines(ID, "it fails"), want);
+});

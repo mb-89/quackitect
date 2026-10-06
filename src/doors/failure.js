@@ -25,6 +25,11 @@ export function raiser(nodeOf, log) {
   };
 }
 
+// The lines a raise prints, at once and with no row, for a caller answering its code before the log could write. [[spec/tickets/the-twins-leave-whole]]
+export function liner(nodeOf) {
+  return (id, ...lines) => linesOf(nodeOf(id), id, lines.flat().map(String));
+}
+
 // The node one note names, or nothing where it names no level or no remedy. [[spec/design_output/failures#a-failure-is-a-node]]
 function nodeIn(id, text) {
   const said = readNote(text).front.said ?? {};
@@ -50,5 +55,5 @@ export function failure(disk, log, root = ".") {
     );
     return nodes.get(id);
   };
-  return { raise: raiser(nodeOf, log) };
+  return { raise: raiser(nodeOf, log), lines: liner(nodeOf) };
 }
