@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: implement/tests-green
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -178,6 +178,12 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/doors]]
 ---
 
 # Ask
