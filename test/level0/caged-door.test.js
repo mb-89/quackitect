@@ -5,35 +5,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
-import { LOCAL, TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const STUB = "/stub";
 
-// A box whose cage reads new, whose hooks door names its port, and whose every post falls. Another writer appends a row to the session log after each read and each post, as a server writing beside the hook does. [[spec/tickets/a-down-index-refuses-calls]]
+// A box whose hooks door names its port, and whose every post falls. Another writer appends a row to the session log after each read and each post, as a server writing beside the hook does. [[spec/tickets/a-down-index-refuses-calls]]
 const DOOR = {
   [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
 };
-const CAGED = {
-  ...DOOR,
-  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "new" } }),
-};
-
-// The tracked key reads old, and the override layer lays new over it. [[spec/tickets/cage-key-reads-the-layers]]
-const OVERRIDDEN = {
-  ...DOOR,
-  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "old" } }),
-  [`${STUB}/${LOCAL}`]: JSON.stringify({ migration: { cage: "new" } }),
-};
-
-// The tracked key reads old, and no layer moves it. [[spec/tickets/cage-key-reads-the-layers]]
-const UNCAGED = {
-  ...DOOR,
-  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "old" } }),
-};
 const LOG = `${STUB}/.se/.log/session.jsonl`;
 
-function caged(layers = CAGED) {
+function caged(layers = DOOR) {
   const files = fakeDisk({ ...layers, [LOG]: "" });
   const runs = [];
   const logged = [];
@@ -149,25 +131,6 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
   up = false;
   await bash("ls");
   assert.equal(starts(), 2, "a door that answers and falls again starts once more");
-});
-
-// [[spec/tickets/cage-key-reads-the-layers]]
-test("an override layer alone puts the hook on the door road, and the tracked key alone leaves it off", async () => {
-  const call = { tool: "Bash", command: "ls" };
-
-  const laid = caged(OVERRIDDEN);
-  const bare = caged(UNCAGED);
-
-  const over = await laid.hooks["*"](laid.$, call, laid.handed);
-  const off = await bare.hooks["*"](bare.$, call, bare.handed);
-
-  assert.equal(over?.handed, undefined, "the override sends the call to the door");
-  assert.match(
-    String(over?.deny ?? ""),
-    /session\/alarms/,
-    "and the down door refuses it",
-  );
-  assert.equal(off?.deny, undefined, "the tracked key alone refuses nothing");
 });
 
 // [[spec/tickets/a-down-index-refuses-calls]]
@@ -388,42 +351,6 @@ test("under new a prompt the door rewrites goes on to the harness rewritten", as
 
   assert.deepEqual(handed, [rewritten], "the harness reads the rewritten prompt");
   assert.deepEqual(said, { handed: rewritten }, "and its answer stands");
-});
-
-// [[spec/tickets/level0-runs-on-the-door]]
-test("under new a prompt context raised while another event reads the cage still reaches the door", async () => {
-  const box = caged();
-  const posts = [];
-  answering(box, posts);
-  const read = box.$.fs.read;
-  let release;
-  const held = new Promise((done) => {
-    release = done;
-  });
-  let first = true;
-  box.$.fs.read = async (rel) => {
-    if (first) {
-      first = false;
-      await held;
-    }
-    return read(rel);
-  };
-  const passing = (event) => Object.assign(async (e) => ({ handed: e }), { event });
-  const context = Object.assign(async () => ({ blocks: [] }), {
-    event: "prompt.context",
-  });
-
-  const slow = box.hooks["*"](box.$, {}, passing("env.get"));
-  const said = box.hooks["*"](box.$, {}, context);
-  await new Promise((done) => setTimeout(done, 10));
-  release();
-  await slow;
-
-  assert.deepEqual(
-    ((await said)?.blocks ?? []).map((one) => one.name),
-    ["level0-tools", "level0-canary"],
-    "the context takes the door's blocks while the other read stands open",
-  );
 });
 
 // [[spec/tickets/level0-runs-on-the-door]]

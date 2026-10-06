@@ -5,7 +5,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
-import { TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const STUB = "/stub";
@@ -17,11 +16,10 @@ const SPAWN = {
 };
 const BACK = { event: "agent.answered", token: "review-1" };
 
-// A box whose cage reads new, whose hooks door names its port, and whose door answers the spawn and then the report. [[spec/tickets/review-spawns-off-the-door]]
+// A box whose hooks door names its port, and whose door answers the spawn and then the report. [[spec/tickets/review-spawns-off-the-door]]
 function caged() {
   const files = fakeDisk({
     [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
-    [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "new" } }),
     [`${STUB}/.se/.log/session.jsonl`]: "",
   });
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);

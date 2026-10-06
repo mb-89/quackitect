@@ -35,9 +35,6 @@ export type Step = {
   after?: string[];
 };
 
-// The slice key the cage reads, and the value that hands the events to the door. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
-export const CAGE_KEY = "migration.cage";
-export const NEW = "new";
 // The standing file the hooks door writes, which StandingFile in src/modules/hooks/hooks.go owns, spelled again here because this hook imports its own folder alone. [[spec/tickets/a-down-index-refuses-calls]]
 export const HOOKS_FILE = `${RUN}/hooks.json`;
 const DOORED = new Set([
