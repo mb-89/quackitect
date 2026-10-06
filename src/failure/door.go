@@ -47,6 +47,25 @@ func (one Dir) Read(path string) (string, bool) {
 	return string(said), err == nil
 }
 
+// The process door: it runs a ./RUNME.sh verb line. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+type Runner interface {
+	Run(line string) (exit int, err error)
+}
+
+// The shell under a root, running ./RUNME.sh with a line's words. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+type Shell struct{ Root string }
+
+func (one Shell) Run(line string) (int, error) {
+	return 0, nil
+}
+
+// A process door in memory, keeping each line it gets. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+type FakeRunner struct{ Lines []string }
+
+func (one *FakeRunner) Run(line string) (int, error) {
+	return 0, nil
+}
+
 // A folder in memory, keyed by slashed path. [[spec/design_output/failures#the-registry-reads-the-nodes]]
 type FakeDir map[string]string
 

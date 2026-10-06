@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,22 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 5ff1dcd0126d8157306e4f77cbd96093889c4543
+    hash_after: 8a37fccab292e70b5d72becf96e752639639c0ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/failure fails
+    inputs:
+      - name: design/draft
+        hash: d193756acc6de080
+        size: 2942
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +251,35 @@ Assumed: the hooks door handing each post to the sentinel stands outside this as
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/sentinel_test.go src/failure/door_contract_test.go src/modules/clock/clock_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/failure/sentinel_test.go TestAnEventMatchingAWatchFiresItsFailure
+- src/failure/sentinel_test.go TestAQuietSpanFiresOnceAndAMatchingEventArmsItAgain
+- src/failure/sentinel_test.go TestAFiredFailureRunsItsReaction
+- src/failure/door_contract_test.go TestShellAndFakeRunnerAnswerAlike
+- src/modules/clock/clock_contract_test.go TestAfterKeepsItsContract
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The stub sentinel fires nothing and runs nothing, the stub runners run nothing, the fake clock's After never calls its hand, and the real clock's calls it at once, so the hand runs after its stop.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each go test line of the ask meets its case: the event, the quiet span, After's contract and the reaction, and ./RUNME.sh check decides the last
+- the sentinel cases take the fake clock and FakeRunner, and the contract cases hold the real clock and the shell to their fakes
 
 # gate
 

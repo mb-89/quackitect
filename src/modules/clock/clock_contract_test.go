@@ -27,3 +27,45 @@ func TestClockKeepsItsContract(t *testing.T) {
 	t.Run("fake", func(t *testing.T) { clockSuite(t, fake, func() { fake.Tick(time.Millisecond) }) })
 	t.Run("real", func(t *testing.T) { clockSuite(t, New(), func() { time.Sleep(time.Millisecond) }) })
 }
+
+// The hand runs once its span passes, once alone, and never after a stop. Await reads whether the hand ran, the real clock blocking on it and the fake reading it at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func afterSuite(t *testing.T, one Clock, pass func(time.Duration), await func(<-chan time.Time) bool) {
+	ran := make(chan time.Time, 2)
+	one.After(time.Millisecond, func(at time.Time) { ran <- at })
+	pass(time.Millisecond)
+	if !await(ran) {
+		t.Fatal("the hand runs nowhere once its span passes")
+	}
+	pass(time.Millisecond)
+	select {
+	case <-ran:
+		t.Fatal("the hand runs twice")
+	default:
+	}
+	stopped := make(chan time.Time, 1)
+	stop := one.After(time.Hour, func(at time.Time) { stopped <- at })
+	stop()
+	pass(2 * time.Hour)
+	select {
+	case <-stopped:
+		t.Fatal("the hand runs after its stop")
+	default:
+	}
+}
+
+func TestAfterKeepsItsContract(t *testing.T) {
+	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+	t.Run("fake", func(t *testing.T) {
+		afterSuite(t, fake, fake.Tick, func(ran <-chan time.Time) bool {
+			select {
+			case <-ran:
+				return true
+			default:
+				return false
+			}
+		})
+	})
+	t.Run("real", func(t *testing.T) {
+		afterSuite(t, New(), func(time.Duration) {}, func(ran <-chan time.Time) bool { <-ran; return true })
+	})
+}

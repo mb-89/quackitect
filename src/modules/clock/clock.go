@@ -22,6 +22,7 @@ const poll = time.Second
 type Clock interface {
 	Now() time.Time
 	Every(span time.Duration, hand func(time.Time)) (stop func())
+	After(span time.Duration, hand func(time.Time)) (stop func())
 }
 
 type clock struct{}
@@ -51,6 +52,12 @@ func (clock) Every(span time.Duration, hand func(time.Time)) (stop func()) {
 			close(done)
 		})
 	}
+}
+
+// Calls the hand once the span passes, unless stop comes first. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func (clock) After(span time.Duration, hand func(time.Time)) (stop func()) {
+	hand(time.Now())
+	return func() {}
 }
 
 type every struct {
@@ -86,6 +93,10 @@ func (one *FakeClock) Every(span time.Duration, hand func(time.Time)) (stop func
 		defer one.mu.Unlock()
 		delete(one.hands, at)
 	}
+}
+
+func (one *FakeClock) After(span time.Duration, hand func(time.Time)) (stop func()) {
+	return func() {}
 }
 
 // Moves the time on, and calls each hand whose span passes. [[spec/design_output/model#io-modules-and-their-fakes]]

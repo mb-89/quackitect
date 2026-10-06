@@ -43,3 +43,23 @@ func TestDirAndFakeDirAnswerAlike(t *testing.T) {
 		}
 	}
 }
+
+func TestShellAndFakeRunnerAnswerAlike(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "RUNME.sh"), []byte("#!/bin/sh\necho \"$@\" >> ran.txt\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	fake := &FakeRunner{}
+	for name, runner := range map[string]Runner{"shell": Shell{Root: root}, "fake": fake} {
+		if exit, err := runner.Run("branch release"); exit != 0 || err != nil {
+			t.Errorf("%s runs the line to %d, %v", name, exit, err)
+		}
+	}
+	if ran, _ := os.ReadFile(filepath.Join(root, "ran.txt")); string(ran) != "branch release\n" {
+		t.Errorf("the shell runs %q", ran)
+	}
+	if !reflect.DeepEqual(fake.Lines, []string{"branch release"}) {
+		t.Errorf("the fake keeps %q", fake.Lines)
+	}
+}
