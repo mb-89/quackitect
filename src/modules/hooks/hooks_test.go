@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
@@ -293,5 +294,16 @@ func TestAStringResultReachesTheHarnessUnderAResultKey(t *testing.T) {
 	other := doorOver(t, &calls{said: Called{Result: listed, Handle: "h2"}}, &book{})
 	if got := hooks(t, other.door, toolCall(nil)).Effects[0].Result; !reflect.DeepEqual(got, listed) {
 		t.Errorf("the door answers %#v, and wants the list as it stands", got)
+	}
+}
+
+// The sentinel hears each post as its event and its payload, so a watch matches a tool's command. [[spec/tickets/the-hooks-feed-the-sentinel]]
+func TestHookHandsEachPostToHear(t *testing.T) {
+	heard := []failure.Event{}
+	one := doorOver(t, &calls{}, &book{})
+	one.door.from.Hear = func(event failure.Event) { heard = append(heard, event) }
+	hooks(t, one.door, toolCall(map[string]any{"command": "./RUNME.sh branch take"}))
+	if len(heard) != 1 || heard[0].Kind != "tool.call" || !strings.Contains(heard[0].Text, "branch take") {
+		t.Fatalf("the sentinel hears %+v, and wants one tool.call whose text carries the command", heard)
 	}
 }

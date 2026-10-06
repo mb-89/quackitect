@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 63e9e156266d562d
         size: 658
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 7d04e8a322f77acadf6488fe0be57bb67802cbe7
+    hash_after: 7d04e8a322f77acadf6488fe0be57bb67802cbe7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 1052dcc7a5584885
+        size: 1931
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,32 @@ each done_when line meets a test: the door's case hands a post on, the wiring's 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/hooks_test.go src/quack/sentinel_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks_test.go
+- src/quack/sentinel_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both fail on their own assertion: the door hears nothing, and the wiring writes no row. Go reads a missing name as a build fault, so the Hear field and a sentinelOver hearing nothing stand as stubs beside the tests. No node under spec/failures declares a watch yet, so the wiring case brings its own node through the fake folder.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the done_when lines meet the door's case, the wiring's case and the check, and both cases fail today
+the cases reach the clock, the process door and the folder through their fakes: FakeClock, FakeRunner and FakeDir, and the log writer through a hand the case holds
 
 # gate
 
