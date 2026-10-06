@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -154,6 +154,25 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 3770de8c7370cdaba7fa7eb33fd264efc033afcc
+    hash_after: 3770de8c7370cdaba7fa7eb33fd264efc033afcc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 959f88c063abaa29
+        size: 11380
+      - name: [[spec/design_output/doors]]
+        hash: 8f2f939387c0fe86
+        size: 17697
+      - name: [[spec/tickets/pull-meets-fake-git]]
+        hash: 0ecf0b21dbd1a30f
+        size: 430
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -400,7 +419,7 @@ I refuse moving the verbs' own disk reads onto a `files.FakeDisk` in this move. 
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/modules/git/repo_contract_test.go
+./RUNME.sh branch test src/quack/repos_moved_test.go
 
 ### red
 
@@ -408,21 +427,22 @@ I refuse moving the verbs' own disk reads onto a `files.FakeDisk` in this move. 
 <!-- the form is list -->
 
 - src/modules/git/repo_contract_test.go
+- src/quack/repos_moved_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Sixteen contract cases fail on their own assertions on three arms: real git, FakeRepo on a FakeDisk, and FakeRepo over a real folder. The new operations are stubs that answer zero values. The quack case swaps cannot turn red until the verbs take Repo, so implement writes them. A path-limited reset mid-merge keeps the merge only because the verb passes a path, so the reset case pins both forms.
+Move 1 filled every Repo operation, so the sixteen contract cases this step wrote now pass. The new case in src/quack/repos_moved_test.go fails on its own assertions: each repository test file still spawns git, and the doors chapter still lists them. It turns green once the verbs take Repo and their row leaves the chapter, as the pull move proved for its own.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-done_when one meets the contract cases now, and the quack cases at implement once landingRepo builds a FakeRepo; done_when two meets TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit; done_when three is the check
-the doors the tests reach are git and the disk, and FakeRepo and FakeDisk stand for each
+done_when one and two meet TestTheQuackRepositoryCasesSpawnNothingAndTheDoorsChapterListsThemNowhere, red now; done_when three is the check
+the doors the tests reach are git and the disk, and FakeRepo and a local tree stand for each
 
 # gate
 
