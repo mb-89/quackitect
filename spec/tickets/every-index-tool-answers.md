@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 11f88116e7d4509bde1f65d65d65f2d9ed38fc73
+    hash_after: 11f88116e7d4509bde1f65d65d65f2d9ed38fc73
+    inputs:
+      - name: ask
+        hash: 8125ea638545e4ce
+        size: 352
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,76 @@ Boxes call a listed tool, meet no handler or a refused connection, and fall back
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The index lists a tool only where its manager accepts every request the action opens with. Actions stay pure, so `store.Act(name, zero input)` names those requests with no IO.
+
+In src/index/ops.go, `Managed` gains `Accepts func(module, verb string) bool`. A nil Accepts accepts every request, so the current fakes keep their list. The door keeps it beside `one.call`.
+
+In src/index/tools.go, `servesTools` builds the zero input through `store.Input(name, nil)`, reads `store.Act`, and skips an action whose first requests name a verb Accepts refuses. `servesActions` in src/index/actions.go applies the same skip, so the list and the routes agree. One helper, `(*door).answers(name) bool`, holds that read for both.
+
+In src/quack/accepts.go, the switch inside `accepts` moves into `acceptsVerb(module, verb string) bool`. `accepts` calls it before it routes, so the refusal and the list read one table. `manages` in src/quack/main.go sets `Accepts` to `acceptsVerb`, widened by every module the split hands to an IO process (`split.Away`).
+
+A second test in src/quack runs every tool `lists` prints through `acts` over `managesLive`. It names each tool that still answers `no IO module accepts`, so a gap in the real wiring turns red there.
+
+The ask names go test ./src/index/, and src/index imports nothing of package main. So the index case runs over a fake manager and decides the line, and the quack case reads the real wiring beside it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/v1.go (*door).servesV1
+src/index/door.go opensOn
+src/index/ops.go (*door).manages
+src/index/actions_test.go fakeManager
+src/quack/main.go manages
+src/quack/twin_live_test.go managesLive
+src/quack/cli_test.go (manage literal handed to index.ServeManaged)
+src/quack/accepts.go accepts
+src/quack/main.go manages (accepts caller)
+src/quack/twin_live_test.go managesLive (accepts caller)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/index/tools_test.go TestEachListedToolAnswersACallThroughAct
+src/index/tools_test.go TestTheToolListSkipsAnActionNoModuleAccepts
+src/quack/accepts_test.go TestAcceptsVerbReadsTheTableAcceptsRoutes
+src/quack/cli_test.go TestEveryWiredToolAnswersThroughAct
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/index/ops.go
+src/index/door.go
+src/index/tools.go
+src/index/actions.go
+src/index/tools_test.go
+src/quack/accepts.go
+src/quack/accepts_test.go
+src/quack/main.go
+src/quack/cli_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+tools.go servesTools, actions.go servesActions, ops.go Managed and ServeManaged, v1.go servesV1, q/action.go Act and Input, modules/index/manager.go Serving, quack accepts.go accepts, main.go manages, cli.go lists and acts, and twin_live_test.go managesLive stand opened and read.
+A grep for Managed{, servesTools, servesActions and accepts( over src gives the callers list.
+The src/index done_when line is TestEachListedToolAnswersACallThroughAct, which posts each tool /v1/tools lists to /v1/actions, the route `act` posts to; ./RUNME.sh check runs the battery.
 
 ## tests-red
 
