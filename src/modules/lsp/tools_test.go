@@ -6,6 +6,7 @@ package lsp
 import (
 	"encoding/json"
 	"maps"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -299,7 +300,7 @@ func TestTheToolsRunThroughTheProcessDoorWithTheirWait(t *testing.T) {
 	for _, one := range fake.ran() {
 		seen[one.Argv[0]] = true
 		input := ""
-		if slices.Contains(one.Argv, "--path=/tree/spec/a.md") {
+		if slices.Contains(one.Argv, "--path="+filepath.Join("/tree", "spec", "a.md")) {
 			input = buffer
 		}
 		if one.Dir != "/tree" || one.Stdin != input || one.Wait != toolWait {

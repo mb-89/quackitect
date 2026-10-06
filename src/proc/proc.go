@@ -9,6 +9,7 @@ import (
 	"errors"
 	"io"
 	"os/exec" // level0: OutsideInDoors - this file is the process door
+	"runtime"
 	"slices"
 	"strings"
 	"sync"
@@ -102,7 +103,7 @@ func runUnder(life context.Context, one Command) Said {
 		return Said{Out: out.String(), Err: haltEndsRun, Code: NotStarted}
 	case run.Err() != nil:
 		return Said{Out: out.String(), Err: pastItsWait, Code: NotStarted}
-	case exit != nil && exit.ExitCode() < 0:
+	case exit != nil && signalled(runtime.GOOS, exit.ExitCode()):
 		return Said{Out: out.String(), Err: errs.String(), Code: Signalled}
 	case exit != nil:
 		return Said{Out: out.String(), Err: errs.String(), Code: exit.ExitCode()}
@@ -111,6 +112,18 @@ func runUnder(life context.Context, one Command) Said {
 	}
 	return Said{Out: out.String(), Err: errs.String()}
 }
+
+// Whether an exit code reads as a signal's end. Go answers below zero where a signal ends a run on a POSIX box. Windows carries no signals, and the MSYS sh Git for Windows ships ends on one with the signal's number in the high byte and none in the low. [[spec/tickets/the-doors-pr-goes-green]]
+func signalled(goos string, code int) bool {
+	if code < 0 {
+		return true
+	}
+	signal := code >> 8
+	return goos == "windows" && code&0xff == 0 && signal >= 1 && signal <= maxSignal
+}
+
+// The highest signal number MSYS writes into an exit code. [[spec/tickets/the-doors-pr-goes-green]]
+const maxSignal = 64
 
 // The pairs of an environment whose names the drop leaves out. [[spec/design_output/doors#the-process-door]]
 func without(env, drop []string) []string {

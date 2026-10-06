@@ -121,6 +121,28 @@ func fakeSh(one Command) Said {
 	return Said{Err: "sh: the fake holds no answer to " + one.Argv[2], Code: 2}
 }
 
+// The exit codes each box answers, read as a signal's end or as a plain exit, so the Windows reading runs on every box. [[spec/tickets/the-doors-pr-goes-green]]
+func TestAnExitCodeReadsAsASignalWhereTheBoxWritesOne(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		goos string
+		code int
+		want bool
+	}{
+		{"linux", -1, true},
+		{"linux", 3840, false},
+		{"windows", 15 << 8, true},
+		{"windows", 9 << 8, true},
+		{"windows", 3, false},
+		{"windows", 15<<8 | 1, false},
+		{"windows", 0xC000013A, false},
+	} {
+		if said := signalled(one.goos, one.code); said != one.want {
+			t.Errorf("on %s the code %d reads signalled %v, and wants %v", one.goos, one.code, said, one.want)
+		}
+	}
+}
+
 func TestARunAnswersItsOutputItsErrorsAndItsExitCode(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {

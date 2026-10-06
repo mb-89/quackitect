@@ -47,7 +47,7 @@ done_when:
 
 <!-- the tests that cover the change, or the check where it touches no code -->
 
-`go test ./src/branches/ ./src/proc/ ./src/modules/git/ ./src/quack/` and `node --test test/level0/probe-clear.test.js` pass on the box.
+`go test ./src/branches/ ./src/proc/ ./src/modules/git/ ./src/modules/lsp/ ./src/quack/` and `node --test test/level0/probe-clear.test.js` pass on the box.
 
 <!-- the form is command -->
 
@@ -61,7 +61,7 @@ done_when:
 
 <!-- what changes and why, for a reader who was not there -->
 
-Main merges in. Its fleet, route and prompt verbs now reach git and the disk through the doors the group built, and their tests run on the fake tree. Main's unpark of the probe's clone holds over the group's own copy of it. The git door writes MERGE_HEAD as a file in the git folder, because git from 2.45 on refuses `update-ref` on a pseudoref. The process door's folder case reads a file the run leaves by a relative name, because MSYS sh prints its folder in the `/c/...` form on Windows.
+Main merges in. Its fleet, route and prompt verbs now reach git and the disk through the doors the group built, and their tests run on the fake tree. Main's unpark of the probe's clone holds over the group's own copy of it. The git door writes MERGE_HEAD as a file in the git folder, because git from 2.45 on refuses `update-ref` on a pseudoref. The process door's folder case reads a file the run leaves by a relative name, because MSYS sh prints its folder in the `/c/...` form on Windows. The process door reads an exit code with a signal in its high byte and none in its low as Signalled on Windows, since MSYS sh ends on a signal that way and Windows carries none. The Vale-run case builds the path it looks for through `filepath`, as the box writes it.
 
 <!-- the form is text -->
 
