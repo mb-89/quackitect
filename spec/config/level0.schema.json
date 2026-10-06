@@ -144,6 +144,12 @@
           "asks": "name",
           "opens": "spec/tickets/<name>.md"
         },
+        "beatAfter": {
+          "type": "string",
+          "default": "10m",
+          "help": "The age of a box's last beat past which its hold reads dead, shorter than staleAfter.",
+          "unit": "a span, as 90m, 12h or 3d"
+        },
         "failsBeforePerson": {
           "type": "number",
           "default": 2,

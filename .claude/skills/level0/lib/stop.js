@@ -255,7 +255,22 @@ const NEXT =
   /^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)/i;
 
 export function namesNext(text) {
-  const paragraphs = String(text ?? "")
+  return proseOf(text).some((one) =>
+    one
+      .split(/(?<=[.!?])\s+/)
+      .some((sentence) => NEXT.test(sentence.replace(/^[-*]\s+/, "").trim())),
+  );
+}
+
+// An answer ends on a question where its last prose paragraph closes on a question mark. [[spec/design_output/stop#a-cloud-box-decides]]
+export function endsOnQuestion(text) {
+  const last = proseOf(text).at(-1) ?? "";
+  return /\?[*_`"')]*$/.test(last);
+}
+
+// The paragraphs past the tables, the headings, the stop line and the canary. [[spec/design_output/stop#the-chat-is-new]]
+function proseOf(text) {
+  return String(text ?? "")
     .split(/\r?\n\s*\r?\n/)
     .map((one) => one.trim())
     .filter(
@@ -266,11 +281,6 @@ export function namesNext(text) {
         !/^stop:/i.test(one) &&
         !/^level0 holds this session/.test(one),
     );
-  return paragraphs.some((one) =>
-    one
-      .split(/(?<=[.!?])\s+/)
-      .some((sentence) => NEXT.test(sentence.replace(/^[-*]\s+/, "").trim())),
-  );
 }
 
 // [[spec/design_output/stop#what-the-todo-list-says]]
