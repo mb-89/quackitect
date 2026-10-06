@@ -23,12 +23,14 @@ export const START = [
   "if (!existsSync(method)) process.exit(4);",
   "mkdirSync(here + '/.se/.log', { recursive: true });",
   `const out = openSync(here + '/${SERVE}', 'a');`,
-  `const index = method + '/${BIN}';`,
+  // A Windows box builds the index with its suffix, so the road takes the binary that stands. [[spec/tickets/level0-smoke-runs-in-seconds]]
+  `const indexOf = () => [method + '/${BIN}' + '.exe', method + '/${BIN}'].find(existsSync) || method + '/${BIN}';`,
   // A fresh clone carries no index, because git tracks no binary. [[spec/tickets/go-prose-checks-stand-alone]]
-  "const brought = !existsSync(index);",
+  "const brought = !existsSync(indexOf());",
   // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   "const install = () => spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env: Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' }), stdio: ['ignore', out, out] });",
   "if (brought) install();",
+  "const index = indexOf();",
   "if (!existsSync(index)) process.exit(9);",
   `const stood = spawnSync(index, ['standing'], { cwd: here, encoding: 'utf8', timeout: ${STANDING_WAIT}, windowsHide: true });`,
   "if (stood.status !== 0) {",
