@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ed08e844123f91a5
         size: 861
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: c662450b4b8c6acdd20230be9d65b91da5624cab
+    hash_after: 276643172ce4141b8c88e2d96d590568949d6536
+    answered:
+      - name: lint
+        exit: 0
+        said: green
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/doors/index.js alone, which the size names; the reviewer's point on src/index/main.go stands as the note the-index-keeps-its-root
+- the door reaches proc, whose fake records the env, and test/level0/search-door.test.js reads it there
+- a comment over ROOT_VAR names the approach by its ticket
+- the variable's name stands once in the door, as ROOT_VAR, and no JS module held it before
 
 ## tests-green
 
