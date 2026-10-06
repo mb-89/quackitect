@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process_hash: 2b5ab398855a1aba
 group: code-is-pure-tests-behave
 depends_on: [fixture-home-guard-reports]
 step: do
+record:
+  - step: do
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 06d2ea3560215e925a4e21b39b5ae09013c5a90c
+    hash_after: 17f1ce14f0d0f9f1038dbb040a464d9f5b5dcf3a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/imports passes; green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  105.0  in all"
+    inputs:
+      - name: ask
+        hash: 292e43a2bb06f45f
+        size: 521
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ The slow packages pay a fixture per case, and the guard holds new cases alone.
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The tests of src/imports and src/index build each fixture they share once, in a main_test.go, through qtest.Shared builders. A case writing its own tree, index, door or repository carries the FixtureOutsideHome marker with that reason, so the fixture baseline names no case of either package. Every in-package test file there and in src/branches and src/quack names why it stands inside its package. The Discussion holds the times and why the branches and quack fixture cases stay.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the Discussion says why the branches and quack fixture cases stay in the baseline
+- the cleanup the change reveals, the dead helpers of imports_test.go, leaves in the change
+- the case tree file list stands once, in plantTree in src/index/main_test.go
 
 # Discussion
 
