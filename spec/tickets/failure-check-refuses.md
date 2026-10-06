@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,21 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-5
+    hash_before: 3cfe6fbebe40cc66c162824a327f9ddfc87fc2ac
+    hash_after: fc2c608f22299b4a2b46ffd5924e3ac9334c4c4c
+    inputs:
+      - name: design/draft
+        hash: d49d70f3831b853c
+        size: 2429
+      - name: design/tests-red
+        hash: 26d55a6dbde31cfe
+        size: 1101
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -288,8 +303,11 @@ Each case fails on its own assertion. The fault stubs answer no fault, so each f
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-skips-named-red-tests: the red rows on failure-check-refuses read as a path and a test name, so goTestNames in src/quack/check.go meets no path ending _test.go, skips nothing, and ./RUNME.sh check exits 1 on the seven src/failure cases; teach goSkipOf to read a path and a test name, or write the red rows as bare paths, since the verb_failure_test rows of failure-verbs-raise-and-register share the form
+- raise-scan-keys-failure-door: the draft names no rule telling a failure raise from another raise, and src/scripts/probe-dry.js and src/scripts/probe-clear.js call an engine raise with literal event ids such as session.start and tool.call, so a scan matching a bare raise( names each as an unregistered id and TestEveryRaisedIdStandsAsANode stays red; key the JavaScript match to the handle the failure door answers, and add a fixture case holding an engine raise that RaiseFaults leaves alone
 
 # implement
 
