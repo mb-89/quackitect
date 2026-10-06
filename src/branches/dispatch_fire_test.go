@@ -26,6 +26,7 @@ func dfEnv() map[string]string {
 		"ROUTINE_FIRE_URL":   dfFireURL,
 		"ROUTINE_FIRE_TOKEN": "fire-token",
 		"PULL_TOKEN":         "pull-token",
+		"GH_TOKEN":           "",
 		"GITHUB_REPOSITORY":  dfRepo,
 		"GITHUB_API_URL":     dfAPI,
 	}

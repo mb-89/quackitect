@@ -138,6 +138,21 @@ func taggedIn(list []*Held) []*Held {
 	return out
 }
 
+// The tagged tickets a work branch takes first: its group's children alone, so a tag on another group's ticket waits for that group's branch. [[spec/tickets/box-opens-its-pr]]
+func taggedAmong(tagged, children []*Held) []*Held {
+	ours := map[*Held]bool{}
+	for _, one := range children {
+		ours[one] = true
+	}
+	out := []*Held{}
+	for _, one := range tagged {
+		if ours[one] {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
 // The score orders the queue, off the queue module's one decider. [[spec/design_output/pull#the-queue-is-a-score]]
 func (it *It) sorted(list, all []*Held) []*Held {
 	rows := func(from []*Held) []queue.Row {
@@ -229,7 +244,8 @@ func (it *It) handOut(who *Who) int {
 	}
 	var pools [][]*Held
 	if who.Group != "" {
-		pools = append([][]*Held{tagged, it.sorted(heldChildren(all, who.Group), all)}, late...)
+		children := heldChildren(all, who.Group)
+		pools = append([][]*Held{taggedAmong(tagged, children), it.sorted(children, all)}, late...)
 	} else {
 		pools = [][]*Held{tagged, it.sorted(freeIn(all), all), notes}
 		it.cutForGroups(all)

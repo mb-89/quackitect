@@ -160,6 +160,9 @@ type hub struct {
 
 func (d *Doors) hubOf(token, name string) (hub, string) {
 	repo := d.env("GITHUB_REPOSITORY")
+	if repo == "" {
+		repo = originRepo(d.quiet("remote", "get-url", "origin").Out)
+	}
 	var missing []string
 	if token == "" {
 		missing = append(missing, name)
@@ -182,12 +185,29 @@ func (d *Doors) hubOf(token, name string) (hub, string) {
 	}}, ""
 }
 
+// The token a pull request opens on: PULL_TOKEN, else the GH_TOKEN a cloud box holds, so done on a box opens its own. [[spec/tickets/box-opens-its-pr]]
+func (d *Doors) pullToken() string {
+	if token := d.env("PULL_TOKEN"); token != "" {
+		return token
+	}
+	return d.env("GH_TOKEN")
+}
+
+// The owner/name an origin URL names, over https, ssh or a proxy path, or empty where it names none. [[spec/tickets/box-opens-its-pr]]
+func originRepo(url string) string {
+	parts := strings.FieldsFunc(strings.TrimSuffix(strings.TrimSuffix(strings.TrimSpace(url), "/"), ".git"), func(r rune) bool { return r == '/' || r == ':' })
+	if len(parts) < 2 {
+		return ""
+	}
+	return parts[len(parts)-2] + "/" + parts[len(parts)-1]
+}
+
 // The write branch's pull request opens on the owner's token, so the check runs on it, and then takes auto-merge. [[spec/tickets/the-owner-stores-the-token]]
 func (d *Doors) pulled(send Send, write *writeRow, out *pullRow) int {
 	if write == nil || (write.State != "pushed" && write.State != "standing") {
 		return codeOK
 	}
-	gh, why := d.hubOf(d.env("PULL_TOKEN"), "PULL_TOKEN")
+	gh, why := d.hubOf(d.pullToken(), "PULL_TOKEN")
 	if why != "" {
 		out.State, out.Why = "refused", why
 		return codeRed
