@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 2dbc33b2321c853d
         size: 942
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4fa441365ff6314dbaf96110386a12bc309e2aaf
+    hash_after: 35c71ba2cfd395bb23868b72853e558ae69079b6
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -359,14 +368,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list and the gate's spawndoors.go header, and src/proc/proc_contract_test.go closes the commit door's ask for a test beside proc.go
+- the one door the change reaches is the process door, and FakeRunner stands beside proc.Real
+- nodeAcceptOver and voiceRunsValeOver each point at this ticket, and the process door section of spec/design_output/doors.md names the approach
+- the harness names stand once, in harness in src/quack/twins.go, and Command.Drop carries them, so personEnv leaves
 
 ## tests-green
 
