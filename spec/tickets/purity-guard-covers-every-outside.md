@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -177,6 +177,18 @@ record:
         hash: 2f56b2e1a3a40ec9
         size: 5161
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 12f919bcb3a76453d7b7f82476a7a76e7f0df4fc
+    hash_after: 12f919bcb3a76453d7b7f82476a7a76e7f0df4fc
+    inputs:
+      - name: design/draft
+        hash: 2f56b2e1a3a40ec9
+        size: 5161
+      - name: design/tests-red
+        hash: eba58ab396d31b46
+        size: 663
+    def: dc4904ab364efa10
 group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
 ---
@@ -361,8 +373,9 @@ The reach case and the kinds case fail on their assertions over the stub, and th
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the redraft under Discussion answers each done_when line. The kinds table names a door or the gap for all seven. purity_test.go fires on a planted reach of each kind and spares a marked, a pure, an IO module and a test function. The check stays green through the report mode baseline. I weigh direct reaches alone as enough for the owner rule, since a transitive reach would mark every caller of a door and bury the reason line the owner asks for.
 
 # implement
 
