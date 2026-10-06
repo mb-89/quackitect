@@ -10,8 +10,8 @@ const sessionVar = "CLAUDE_CODE_REMOTE_SESSION_ID"
 // The tip, its age and the pull request come off the refs. [[spec/tickets/the-fleet-verb-watches-boxes]]
 type boxRow struct {
 	Branch, Standing, Hand, Session, Model, Cost, Final string
-	Tip, Age, Pull                                     string
-	AgeSeconds                                         int64
+	Tip, Age, Pull                                      string
+	AgeSeconds                                          int64
 }
 
 // The config key naming the span a held box sits idle past, and its default. [[spec/tickets/the-fleet-verb-watches-boxes]]

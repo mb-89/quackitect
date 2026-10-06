@@ -51,6 +51,7 @@ func promptSays(t *testing.T, files map[string]string, argv ...string) (int, str
 }
 
 func TestPromptWritesTheGroupsPromptFromItsRoute(t *testing.T) {
+	t.Parallel()
 	code, out, errs := promptSays(t, map[string]string{
 		"spec/processes/group.yaml": promptRoute,
 		"spec/tickets/g.md":         promptGroup("group"),
@@ -77,6 +78,7 @@ func TestPromptWritesTheGroupsPromptFromItsRoute(t *testing.T) {
 }
 
 func TestPromptRefusesATicketThatStandsNowhere(t *testing.T) {
+	t.Parallel()
 	code, out, errs := promptSays(t, map[string]string{"spec/processes/group.yaml": promptRoute}, "gone")
 	if code != codeRefused || out != "" {
 		t.Fatalf("cloud prompt gone answers %d and prints %q", code, out)
@@ -85,6 +87,7 @@ func TestPromptRefusesATicketThatStandsNowhere(t *testing.T) {
 }
 
 func TestPromptRefusesARouteThatStandsNowhere(t *testing.T) {
+	t.Parallel()
 	code, out, errs := promptSays(t, map[string]string{"spec/tickets/g.md": promptGroup("group")}, "g")
 	if code != codeRefused || out != "" {
 		t.Fatalf("cloud prompt g answers %d and prints %q", code, out)
@@ -93,6 +96,7 @@ func TestPromptRefusesARouteThatStandsNowhere(t *testing.T) {
 }
 
 func TestPromptRefusesATicketNamingNoGroup(t *testing.T) {
+	t.Parallel()
 	code, out, errs := promptSays(t, map[string]string{
 		"spec/processes/standard.yaml": promptRoute,
 		"spec/tickets/g.md":            promptGroup("standard"),
@@ -104,6 +108,7 @@ func TestPromptRefusesATicketNamingNoGroup(t *testing.T) {
 }
 
 func TestPromptRefusesNoName(t *testing.T) {
+	t.Parallel()
 	code, _, errs := promptSays(t, nil)
 	if code != codeRefused {
 		t.Fatalf("cloud prompt answers %d", code)

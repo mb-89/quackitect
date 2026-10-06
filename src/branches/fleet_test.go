@@ -21,10 +21,12 @@ func wakesAre(t *testing.T, rows []boxRow, want ...wake) {
 }
 
 func TestAnIdleBoxRaisesAWake(t *testing.T) {
+	t.Parallel()
 	wakesAre(t, []boxRow{{Branch: "work/a", Standing: held, AgeSeconds: fleetIdle + 60}}, wake{Branch: "work/a", Why: wakeIdle})
 }
 
 func TestAStoppedBoxRaisesAWake(t *testing.T) {
+	t.Parallel()
 	wakesAre(t, []boxRow{
 		{Branch: "work/a", Standing: done},
 		{Branch: "work/b", Standing: done, Pull: "#7"},
@@ -32,6 +34,7 @@ func TestAStoppedBoxRaisesAWake(t *testing.T) {
 }
 
 func TestAFailedBoxRaisesAWake(t *testing.T) {
+	t.Parallel()
 	wakesAre(t, []boxRow{
 		{Branch: "work/a", Standing: todo, Final: "The box stops short: the check stays red."},
 		{Branch: "work/b", Standing: todo},
@@ -39,6 +42,7 @@ func TestAFailedBoxRaisesAWake(t *testing.T) {
 }
 
 func TestABusyBoxRaisesNoWake(t *testing.T) {
+	t.Parallel()
 	wakesAre(t, []boxRow{
 		{Branch: "work/a", Standing: held, AgeSeconds: fleetIdle - 60},
 		{Branch: "work/b", Standing: merged},
@@ -79,6 +83,7 @@ func TestFleetExitsRedOnAWake(t *testing.T) {
 
 // A box the dispatch fires takes its branch, and its take names the hand and the session the fire opened. [[spec/tickets/boxes-write-their-final-record]]
 func TestFleetHoldsTheBoxesTheDispatchFires(t *testing.T) {
+	t.Parallel()
 	fired := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box 9e1f · claude-code-remote"}, {Key: "hash_before", Value: "a1b2c3"}, {Key: "session", Value: "cse_fired"}})
 	stood := []stand{
 		{ref: ref{Branch: "work/fired"}, Name: "fired", Ticket: fired},

@@ -11,5 +11,5 @@ const boxRules = `Rules for this box (the owner is away; decide every step yours
 - No timers and no sleeps in code or tests: wait on events; time only through the clock door.
 - Each door is tested once against the real thing; every other test uses the door's fake; modules stay pure over the index.
 - Commit with ./RUNME.sh commit, push yourself, keep ./RUNME.sh check green, merge main in (never rebase, never force-push, never --no-verify).
-- When the group is done: ./RUNME.sh branch done, open the PR against main and turn on auto-merge with method MERGE. Watch its CI and fix any red until it merges.
+- When the group is done: ./RUNME.sh branch done --model <id> --cost <usd> --final "<your last line>", open the PR against main and turn on auto-merge with method MERGE. Watch its CI and fix any red until it merges.
 - Other boxes work other groups in parallel; on a merge conflict, merge main and resolve.`
