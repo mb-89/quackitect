@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"regexp"
 	"strings"
+
+	"quackitect/src/pull"
 )
 
 // Where the box id, the session, the identity and the holds stand, and the length of a minted box id. [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -137,7 +139,7 @@ func (d *Doors) boxOf() string {
 		stamp = d.Now().UTC().Format(stampLayout)
 	}
 	quoted, _ := json.Marshal(stamp + " " + d.Root)
-	id := hashText(string(quoted))[:boxID]
+	id := pull.HashText(string(quoted))[:boxID]
 	line, _ := json.Marshal(map[string]string{"id": id})
 	_ = d.write(boxFile, string(line)+"\n")
 	return id

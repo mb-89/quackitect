@@ -5,6 +5,8 @@
 package branches
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -73,7 +75,7 @@ func (d *Doors) retroOpen(text string) string {
 		for at := len(record) - 1; at >= 0; at-- {
 			if strings.TrimSpace(asText(record[at].Get("step"))) == path {
 				last := record[at]
-				return truthy(last.Get("skipped")) || (truthy(last.Get("hash_after")) && !truthy(last.Get("returns")))
+				return yaml.Truthy(last.Get("skipped")) || (yaml.Truthy(last.Get("hash_after")) && !yaml.Truthy(last.Get("returns")))
 			}
 		}
 		return false

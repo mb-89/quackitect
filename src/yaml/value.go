@@ -4,6 +4,7 @@
 package yaml
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"strings"
@@ -28,6 +29,32 @@ func truthy(said any) bool {
 		return one != ""
 	}
 	return true
+}
+
+// A loose value as the bridge's String reads it: nothing for nil, a string as it stands, and JSON for the rest. [[spec/tickets/shared-helpers-stand-once]]
+func JSONText(said any) string {
+	switch one := said.(type) {
+	case nil:
+		return ""
+	case string:
+		return one
+	}
+	body, _ := json.Marshal(said)
+	return string(body)
+}
+
+// A field's value as text: nothing for nil, a list or an object as its JSON, and a scalar as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func FieldText(said any) string {
+	switch one := said.(type) {
+	case nil:
+		return ""
+	case string:
+		return one
+	case map[string]any, []any:
+		body, _ := json.Marshal(one)
+		return string(body)
+	}
+	return fmt.Sprint(said)
 }
 
 func AsDoc(said any) *Doc {

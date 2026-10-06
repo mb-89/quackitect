@@ -40,6 +40,9 @@ type Tree struct {
 	parses    map[string]parse
 	ruleKey   string
 	ruleFound []Finding
+	// The bodies standing in two packages, by a hash of every Go text. [[spec/tickets/shared-helpers-stand-once]]
+	copyKey   string
+	copyFound []Finding
 }
 
 // The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]

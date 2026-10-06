@@ -60,7 +60,7 @@ type Hold struct {
 }
 
 // Whether a value of the environment reads as set. [[spec/guidance/cloud/cloud]]
-func truthy(said string) bool {
+func flagOn(said string) bool {
 	said = strings.ToLower(strings.TrimSpace(said))
 	return said != "" && said != "0" && said != "false"
 }
@@ -78,7 +78,7 @@ func AgentOf(env map[string]string) string {
 // Whether the environment says this box runs on the cloud. [[spec/guidance/cloud/cloud]]
 func InCloud(env map[string]string) bool {
 	for _, name := range cloudVars {
-		if truthy(env[name]) {
+		if flagOn(env[name]) {
 			return true
 		}
 	}

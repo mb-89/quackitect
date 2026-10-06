@@ -226,21 +226,6 @@ func entryField(entry *yaml.Doc, key string) string {
 	return strings.TrimSpace(yaml.AsString(entry.Get(key)))
 }
 
-// Whether a record item's field holds a value JavaScript reads as true. [[spec/design_output/work#held-derives-from-the-record]]
-func truthy(said any) bool {
-	switch one := said.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case int:
-		return one != 0
-	case string:
-		return one != ""
-	}
-	return true
-}
-
 // The take standing open: the last record item with hash_before and no hash_after. [[spec/design_output/work#held-derives-from-the-record]]
 type hold struct {
 	Step, Hand, HashBefore string
@@ -250,7 +235,7 @@ type hold struct {
 func heldIn(text string) *hold {
 	var held *yaml.Doc
 	for _, one := range recordIn(text) {
-		if truthy(one.Get("hash_before")) && !truthy(one.Get("hash_after")) {
+		if yaml.Truthy(one.Get("hash_before")) && !yaml.Truthy(one.Get("hash_after")) {
 			held = one
 		}
 	}

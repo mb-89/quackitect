@@ -63,3 +63,15 @@ func TestAShortBodyAndATestFilePass(t *testing.T) {
 		}
 	}
 }
+
+// Two types' methods sharing a body answer for their own receivers, and draw nothing. [[spec/tickets/shared-helpers-stand-once]]
+func TestMethodsSharingABodyPass(t *testing.T) {
+	method := func(pkg string) string {
+		return strings.Replace(counting(pkg, "tally", "items", "word"), "func tally(", "func (one box) tally(", 1) + "\ntype box struct{}\n"
+	}
+	for _, one := range sweepOver(t, map[string]string{"src/a/a.go": method("a"), "src/b/b.go": method("b")}, nil) {
+		if one.Rule == copyRule {
+			t.Fatalf("the sweep answers %+v on two types' methods", one)
+		}
+	}
+}

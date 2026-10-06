@@ -313,3 +313,14 @@ func TestHoldAt(t *testing.T) {
 		t.Fatalf("the hold stands at %s", got)
 	}
 }
+
+// A cloud variable reading false or zero leaves the box on the desk, and one reading on puts it on the cloud. [[spec/tickets/shared-helpers-stand-once]]
+func TestACloudFlagReadsOnOrOff(t *testing.T) {
+	t.Parallel()
+	if InCloud(map[string]string{"SE_CLOUD": " False "}) || InCloud(map[string]string{"SE_CLOUD": "0"}) || !InCloud(map[string]string{"SE_CLOUD": "1"}) {
+		t.Fatal("the cloud flag reads apart from flagOn")
+	}
+	if got := sortedKeys(map[string]bool{"b": true, "a": true}); len(got) != 2 || got[0] != "a" {
+		t.Fatalf("the keys read %v", got)
+	}
+}

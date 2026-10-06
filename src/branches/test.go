@@ -5,6 +5,8 @@
 package branches
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"path"
 	"regexp"
@@ -173,7 +175,7 @@ func (d *Doors) sinceOf(held *holdFile) string {
 	if held != nil && held.Path != "" {
 		if d.exists(held.Path) {
 			for _, one := range recordIn(d.read(held.Path)) {
-				if truthy(one.Get("hash_before")) {
+				if yaml.Truthy(one.Get("hash_before")) {
 					return asText(one.Get("hash_before"))
 				}
 			}

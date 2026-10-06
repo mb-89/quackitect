@@ -95,7 +95,7 @@ func isRed(leaf *Leaf) bool {
 }
 
 func isPass(entry *yaml.Doc) bool {
-	return yaml.AsString(entry.Get("def")) != "" && !truthy(yaml.AsString(entry.Get("stale"))) && !truthy(yaml.AsString(entry.Get("skipped"))) && !entry.Has("returns")
+	return yaml.AsString(entry.Get("def")) != "" && !yaml.Truthy(entry.Get("stale")) && !yaml.Truthy(entry.Get("skipped")) && !entry.Has("returns")
 }
 
 // [[spec/design_output/pull#kept-red-leaves]]

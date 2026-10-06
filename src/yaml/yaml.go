@@ -19,6 +19,26 @@ type Doc struct {
 
 func New() *Doc { return &Doc{at: map[string]any{}} }
 
+// The fence a note's front opens and closes on. [[spec/design_output/schema#what-a-note-reads-as]]
+const frontFence = "---"
+
+// The front a note opens with, or nil where none stands. [[spec/tickets/shared-helpers-stand-once]]
+func FrontOf(text string) *Doc {
+	rows := SplitLines(text)
+	if strings.TrimSpace(rows[0]) != frontFence {
+		return nil
+	}
+	for at := 1; at < len(rows); at++ {
+		if strings.TrimSpace(rows[at]) == frontFence {
+			return AsDoc(Read(strings.Join(rows[1:at], "\n")))
+		}
+	}
+	return nil
+}
+
+// The items of a flow list, for every package that splits one. [[spec/tickets/shared-helpers-stand-once]]
+var FlowItems = flowItems
+
 func (one *Doc) Set(key string, said any) {
 	if one.at == nil {
 		one.at = map[string]any{}

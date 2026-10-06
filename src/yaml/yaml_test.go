@@ -21,6 +21,23 @@ func TestTruthyReadsEachKind(t *testing.T) {
 	}
 }
 
+// The shared readers answer as the copies they replace did: the front, a JSON text and a field text. [[spec/tickets/shared-helpers-stand-once]]
+func TestTheSharedReadersAnswerEachShape(t *testing.T) {
+	t.Parallel()
+	if front := FrontOf("---\r\nstate: open\r\n---\nbody"); front == nil || AsString(front.Get("state")) != "open" {
+		t.Fatalf("the front reads %+v", front)
+	}
+	if FrontOf("no front") != nil || FrontOf("---\nstate: open") != nil {
+		t.Fatal("a note with no closed front reads a front")
+	}
+	if JSONText(nil) != "" || JSONText("x") != "x" || JSONText(2.5) != "2.5" || JSONText([]any{"a"}) != `["a"]` {
+		t.Fatal("JSONText reads a value otherwise than String reads it")
+	}
+	if FieldText(nil) != "" || FieldText(true) != "true" || FieldText(map[string]any{"a": 1.0}) != `{"a":1}` {
+		t.Fatal("FieldText reads a value otherwise than a log row reads it")
+	}
+}
+
 const schemaYaml = `# a comment the reader skips
 kind: handover
 

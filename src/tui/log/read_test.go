@@ -42,3 +42,11 @@ func TestAnOlderLineNamingItsDoorStillReadsItsKind(t *testing.T) {
 		t.Fatalf("a line from before the rename reads door as its kind, and read %+v", r)
 	}
 }
+
+// A null field reads as nothing, and a list as its JSON. [[spec/tickets/shared-helpers-stand-once]]
+func TestARecordReadsEachFieldAsText(t *testing.T) {
+	record := ParseRecord(`{"level":"info","said":null,"text":["a"]}`)
+	if record.Said != "" || record.Text != `["a"]` || record.Level != "info" {
+		t.Fatalf("the record reads %+v", record)
+	}
+}

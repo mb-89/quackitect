@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"quackitect/src/modules/check"
+	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
@@ -220,7 +221,7 @@ func (d *Doors) processAt(name string) (processRoute, string) {
 // The hash over a route's ask and steps, as processHash in lib/schema-route.js writes it: keys sorted, every scalar a string. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func processHash(ask, steps []any) string {
 	said, _ := json.Marshal(map[string]any{"ask": canonicalOf(ask), "steps": canonicalOf(steps)})
-	return hashText(string(said))
+	return pull.HashText(string(said))
 }
 
 // A value as canonicalOf in lib/schema-route.js holds it. Go's encoder sorts a map's keys, as the JavaScript sorts them. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

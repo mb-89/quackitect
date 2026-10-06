@@ -280,3 +280,10 @@ func TestInheritsJoinsAJSONFileKeyByKey(t *testing.T) {
 		t.Errorf("the folder lists %v, and the union holds two", got)
 	}
 }
+
+// The Null mark, a zero and NaN read false in a condition, and a word reads true. [[spec/tickets/shared-helpers-stand-once]]
+func TestAConditionReadsAsJavaScriptReadsIt(t *testing.T) {
+	if holdsTrue(Null{}) || holdsTrue(nil) || holdsTrue(0.0) || holdsTrue(math.NaN()) || holdsTrue("") || !holdsTrue("x") || !holdsTrue(1.0) {
+		t.Fatal("a condition reads otherwise than JavaScript reads it")
+	}
+}

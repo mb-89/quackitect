@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -178,6 +178,15 @@ record:
         hash: d62ea66838360d58
         size: 757
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 4fbca2fdb27f20f235a412fd68b766ac4810cb9a
+    hash_after: 4fbca2fdb27f20f235a412fd68b766ac4810cb9a
+    answered:
+      - name: lint
+        exit: 0
+        said: "   92.3  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -368,14 +377,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list and the files its last size line covers: every Go file the new rule names, folded so the check stays green, plus retroJSTruthy, which now leans on yaml.Truthy for the kinds yaml knows.
+The rule reads the tree through the checker's Go texts, which the tests seed in memory, and every folded caller keeps its package's own doors.
+Each new function and the rule carry a link to spec/tickets/shared-helpers-stand-once.
+Each folded helper stands once: truthy, JSONText, FrontOf, FieldText, QuotedWhole and FlowItems in src/yaml, HashText and JSQuote in src/pull, and the rule over the tree finds no copy left.
 
 ## tests-green
 

@@ -101,8 +101,8 @@ func InHand(tree Tree) Hand {
 		if json.Unmarshal([]byte(text), &held) != nil {
 			continue
 		}
-		ticket := strings.TrimSpace(textOf(held.Ticket))
-		if ticket != "" && !holds(hand.Tickets, ticket) && stillHeld(tree, textOf(held.Path)) {
+		ticket := strings.TrimSpace(yaml.JSONText(held.Ticket))
+		if ticket != "" && !holds(hand.Tickets, ticket) && stillHeld(tree, yaml.JSONText(held.Path)) {
 			hand.Tickets = append(hand.Tickets, ticket)
 		}
 	}
@@ -110,7 +110,7 @@ func InHand(tree Tree) Hand {
 		Working any `json:"working"`
 	}
 	if text, ok := tree.Read(plans); ok && json.Unmarshal([]byte(text), &plan) == nil {
-		hand.Todo = strings.TrimSpace(textOf(plan.Working))
+		hand.Todo = strings.TrimSpace(yaml.JSONText(plan.Working))
 	}
 	return hand
 }
@@ -151,16 +151,4 @@ func stateOf(text string) string {
 		}
 	}
 	return ""
-}
-
-// A JSON value as the bridge's String reads it, and nothing for null. [[spec/tickets/cage-command-rules-port]]
-func textOf(value any) string {
-	switch one := value.(type) {
-	case nil:
-		return ""
-	case string:
-		return one
-	}
-	body, _ := json.Marshal(value)
-	return string(body)
 }

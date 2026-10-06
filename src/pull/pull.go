@@ -405,7 +405,7 @@ func (it *It) takeBack(who *Who, name, path string) int {
 	}
 	var wrote *yaml.Doc
 	for _, entry := range entriesOf(one.Front) {
-		if yaml.AsString(entry.Get("step")) == path && !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if yaml.AsString(entry.Get("step")) == path && !yaml.Truthy(entry.Get("skipped")) {
 			wrote = entry
 		}
 	}
