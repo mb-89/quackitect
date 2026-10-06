@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -228,6 +228,21 @@ record:
     skipped: true
     kept: fc2c608f22299b4a2b46ffd5924e3ac9334c4c4c
     why: its red tests stand as fc2c608f2 landed them, and a later leaf passed since
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-15
+    hash_before: 2ae91bc917e9101fa30b6b2e694c0a2e4c0fe999
+    hash_after: 2ae91bc917e9101fa30b6b2e694c0a2e4c0fe999
+    inputs:
+      - name: design/draft
+        hash: bfbfac32651d6661
+        size: 3121
+      - name: design/tests-red
+        hash: 93953b6e9f5ee92f
+        size: 1038
+      - name: [[spec/design_output/failures]]
+        hash: c263fe950a83d49b
+        size: 4620
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -377,9 +392,7 @@ Each case fails on its own assertion. The stub sentinel fires nothing and runs n
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- sentinel-note-names-the-runner: spec/design_output/failures.md says Sentinel takes the registry, the clock door and a hand, and that the engine runs the reaction, while src/failure/sentinel.go NewSentinel takes a Runner and runs the reaction itself, raising failure-reaction-fails; the note's chapter names the Runner and the sentinel as the hand running the reaction
-- sentinel-callers-list-whole: the draft's callers list names NodeOf alone in node.go, and misses its callers src/failure/registry.go Load, src/failure/check.go and src/quack/verb_failure.go, each reading the new match-pattern fault; the builder confirms each still answers green
+accept
 
 # implement
 
