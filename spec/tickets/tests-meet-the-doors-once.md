@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box b4c8cb96d125 · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/tests-meet-the-doors-once already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: cf0671a1471b15bcbf52a1f25b0b4af04650e84e
+    hash_after: d0a6d0935cc30439058b6d35474c5f000d795048
+    inputs:
+      - name: ask
+        hash: 75adcafc745ca0d5
+        size: 910
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -123,14 +132,24 @@ Done when the lease flake and the two cold-box contract waits run on a fake cloc
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/lease-waits-meet-a-fake-clock]], standard, closed
+- [[spec/tickets/alarm-ticks-await-the-beat]], a gate point, closed
+- [[spec/tickets/hang-guard-under-suite-timer]], a gate point, closed
+- [[spec/tickets/start-fault-names-its-span]], a gate point, closed
+- [[spec/tickets/io-case-red-before-green]], a gate point, closed
+- [[spec/tickets/each-door-meets-one-test]], standard
+- [[spec/tickets/the-testing-rules-name-the-doors]], standard, waits for the audit
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reviews whole: the flake fix, the audit, and the guidance with its guard, and the audit names a child for any refactor past one review
+- the children add up to the goal: the waits, the audit with its fixtures and pure modules, the rules with the guard, and the check measured
+- the guidance child names the audit under depends_on, because the guard reads the audit's list of door tests
 
 # children
 
