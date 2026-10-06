@@ -146,7 +146,10 @@ ifBuilt("the fake and the real index answer the same hashes", () => {
   const it = index(files, proc(), clock(), root, work);
   try {
     const real = it.ask("hashes", { asks });
-    assert.ok(real?.["spec/tickets/a-child.md"]?.hash, "the real index hashes the note");
+    assert.ok(
+      real?.["spec/tickets/a-child.md"]?.hash,
+      "the real index hashes the note",
+    );
     assert.deepEqual(fakeIndex(files, work, join).ask("hashes", { asks }), real);
   } finally {
     it.ask("stop", {});

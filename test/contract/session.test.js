@@ -26,17 +26,17 @@ for (const [name, opens] of Object.entries(DOORS)) {
     const session = opens(root);
     try {
       await session(root).withState("one", (state, save) => {
-      state.said = "retained";
-      save();
-    });
-    await session(root).withState("one", (state) =>
-      assert.equal(state.said, "retained"),
-    );
-    await session(root).withState("two", (state) => assert.deepEqual(state, {}));
-    assert.throws(() => session(root).path("../escape"), /outside/);
-  } finally {
-    files.remove(root);
-  }
+        state.said = "retained";
+        save();
+      });
+      await session(root).withState("one", (state) =>
+        assert.equal(state.said, "retained"),
+      );
+      await session(root).withState("two", (state) => assert.deepEqual(state, {}));
+      assert.throws(() => session(root).path("../escape"), /outside/);
+    } finally {
+      files.remove(root);
+    }
   });
 
   test(`a missing path or session ID is refused, on the ${name} door`, async () => {
@@ -45,43 +45,46 @@ for (const [name, opens] of Object.entries(DOORS)) {
     const session = opens(root);
     try {
       assert.throws(() => session(root).path(""), /Missing file path/);
-      await assert.rejects(session(root).withState("", () => {}), /session ID/);
+      await assert.rejects(
+        session(root).withState("", () => {}),
+        /session ID/,
+      );
     } finally {
       files.remove(root);
     }
   });
 
   test(`a crash retains the saved handover and releases the lock, on the ${name} door`, async () => {
-  const files = disk();
-  const root = files.tempDir("quack-session-");
-  const session = opens(root);
-  try {
-    await assert.rejects(
-      session(root).withState("one", (state, save, claim) => {
-        claim(HANDOVER, "the result");
-        state.said = "the result";
-        save();
-        throw new Error("interrupted");
-      }),
-      /interrupted/,
-    );
-    await session(root).withState("one", (state) =>
-      assert.equal(state.said, "the result"),
-    );
-    await assert.rejects(
-      session(root).withState("two", (_state, _save, claim) =>
-        claim(HANDOVER, "the result"),
-      ),
-      /owns/,
-    );
-    await session(root).withState("one", (_state, _save, _claim, release) =>
-      release(HANDOVER),
-    );
-    await session(root).withState("two", (_state, _save, claim) =>
-      claim(HANDOVER, "another result"),
-    );
-  } finally {
-    files.remove(root);
-  }
+    const files = disk();
+    const root = files.tempDir("quack-session-");
+    const session = opens(root);
+    try {
+      await assert.rejects(
+        session(root).withState("one", (state, save, claim) => {
+          claim(HANDOVER, "the result");
+          state.said = "the result";
+          save();
+          throw new Error("interrupted");
+        }),
+        /interrupted/,
+      );
+      await session(root).withState("one", (state) =>
+        assert.equal(state.said, "the result"),
+      );
+      await assert.rejects(
+        session(root).withState("two", (_state, _save, claim) =>
+          claim(HANDOVER, "the result"),
+        ),
+        /owns/,
+      );
+      await session(root).withState("one", (_state, _save, _claim, release) =>
+        release(HANDOVER),
+      );
+      await session(root).withState("two", (_state, _save, claim) =>
+        claim(HANDOVER, "another result"),
+      );
+    } finally {
+      files.remove(root);
+    }
   });
 }
