@@ -58,7 +58,7 @@ func (it *It) branchTaken(named string) int {
 		return it.Take(named)
 	}
 	if named != "" {
-		return it.deskRefused("the pull takes no branch for "+named, named)
+		return it.deskRefused("the pull takes no branch for " + named)
 	}
 	if it.Ready != nil && it.Ready() {
 		return 0
@@ -67,13 +67,10 @@ func (it *It) branchTaken(named string) int {
 }
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]
-func (it *It) deskRefused(what, name string) int {
-	if name == "" {
-		name = "<name>"
-	}
+// The message alone, since the node desk-works-on-trunk holds the remedy. [[spec/tickets/go-pull-desk-remedy-once]]
+func (it *It) deskRefused(what string) int {
 	it.Refuse(failure.Raise(it.Failures, "desk-works-on-trunk",
-		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what),
-		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name)))
+		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what)))
 	return 2
 }
 

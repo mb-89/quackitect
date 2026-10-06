@@ -188,7 +188,7 @@ func (it *It) Pull(argv []string) int {
 	onTrunk := branch == Trunk
 	// A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !it.Cloud && strings.HasPrefix(branch, WorkBranch) {
-		return it.deskRefused("the pull hands nothing out on "+branch, "")
+		return it.deskRefused("the pull hands nothing out on " + branch)
 	}
 	if !onTrunk && !strings.HasPrefix(branch, WorkBranch) {
 		it.Refuse(failure.Raise(it.Failures, "pull-branch-off-road",
