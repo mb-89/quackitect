@@ -62,11 +62,11 @@ func TestADoorAtReportDrawsAHintInAHeldBufferAlone(t *testing.T) {
 func TestDoorDeclaresNamesADoorNoDeclarationHolds(t *testing.T) {
 	t.Parallel()
 	tree := TreeOver("", Texts{
-		"src/modules/mail/mail.go":     "package mail\n\nimport \"quackitect/src/q\"\n\nvar flag = q.IO()\n",
+		"src/modules/mail/mail.go":      "package mail\n\nimport \"quackitect/src/q\"\n\nvar flag = q.IO()\n",
 		"src/modules/mail/mail_test.go": "package mail\n",
-		"src/doors/post.js":            "export const post = () => ({});\n",
-		"src/tui/paint/door.go":        "package paint\n",
-		"src/modules/plain/plain.go":   "package plain\n\n// q.IO() flags an IO module.\n",
+		"src/doors/post.js":             "export const post = () => ({});\n",
+		"src/tui/paint/door.go":         "package paint\n",
+		"src/modules/plain/plain.go":    "package plain\n\n// q.IO() flags an IO module.\n",
 	})
 	found := ruled(CheckerOver(tree, 0, 0).Sweep(), DoorDeclares)
 	files := []string{}
@@ -91,10 +91,10 @@ func TestDoorDeclaresNamesADeclarationOfNoForm(t *testing.T) {
 func TestADeclaredDoorPasses(t *testing.T) {
 	t.Parallel()
 	tree := TreeOver("", Texts{
-		"src/modules/mail/mail.go":  "package mail\n\nimport \"quackitect/src/q\"\n\nvar flag = q.IO()\n",
+		"src/modules/mail/mail.go":   "package mail\n\nimport \"quackitect/src/q\"\n\nvar flag = q.IO()\n",
 		"src/modules/mail/owns.yaml": "mail:\n  go: [net/smtp]\n",
-		"src/doors/post.js":         "export const post = () => ({});\n",
-		"src/doors/owns.yaml":       "post:\n  js: [fetch]\n  files: [post.js]\n",
+		"src/doors/post.js":          "export const post = () => ({});\n",
+		"src/doors/owns.yaml":        "post:\n  js: [fetch]\n  files: [post.js]\n",
 	})
 	if found := ruled(CheckerOver(tree, 0, 0).Sweep(), DoorDeclares); len(found) != 0 {
 		t.Fatalf("the declared doors read %+v", found)

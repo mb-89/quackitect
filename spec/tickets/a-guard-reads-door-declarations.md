@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,21 @@ record:
         hash: 38bae238e57a16af
         size: 10261
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 86086f797ef7 · claude-code-remote · helper-4
+    hash_before: b4f0752fbb1f1ba72c5f2d3f1e3d08b66713362d
+    hash_after: b4f0752fbb1f1ba72c5f2d3f1e3d08b66713362d
+    inputs:
+      - name: design/draft
+        hash: 71e1166244e6076f
+        size: 2764
+      - name: design/tests-red
+        hash: ecab8a8b14de3f80
+        size: 1458
+      - name: [[spec/design_output/doors]]
+        hash: 38bae238e57a16af
+        size: 10261
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -299,8 +314,13 @@ Every new case fails on its own assertion over the stub, and the old cases stay 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- door-lists-take-whole-packages: ioonly's outside and onlyq's impure must derive from owns.Whole, never owns.Packages, since clock owns time and context by member and two dozen core and module files import them for time.Duration; impure's non-door floor (io/fs, syscall, unsafe, plugin, runtime/cgo, database/sql, log/syslog, io/ioutil) stays refused or a declaration names it, so nothing falls through
+- owns-joins-the-pure-tree: src/modules/check importing quackitect/src/owns falls to onlyq unless pureTree in src/imports/imports.go names src/owns, and the draft's callers list misses pastQ's pureTree
+- doors-only-reads-the-declarations: the Vale rule DoorsOnly keeps its own hand-kept list of node: imports, Date.now, new Date() and Math.random beside the new guard, and the design names no fate for it; derive it, retire it, or say why it stays
+- draft-lists-match-red-tests: the draft's tests list names src/imports/imports_test.go and src/quack/lsp_test.go, while the red cases stand in walkaround_test.go and src/quack/lsp_doors_test.go, and its size list misses src/quack/verb_doors_test.go and lsp_doors_test.go; the done_when line naming src/modules/lsp reads as met by src/quack/lsp_doors_test.go, because only quack wires the real check module into the lsp IO module, and the accept gate takes it so
 
 # implement
 
