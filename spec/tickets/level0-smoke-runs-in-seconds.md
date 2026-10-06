@@ -349,3 +349,9 @@ Every new case fails on its assertion: the check runs probe dry, the verb prints
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This ticket carries the tests-green step of [[spec/tickets/level0-claims-name-the-platform]], which closed `became` onto it. Its change landed, and its cases stand in `src/quack/check_test.go`. The package stays red only on the cases keyed on `probe smoke --working`, which this ticket's implement step turns green. So the tests-green here runs that package with those cases, and the accept here also reads that ask:
+
+- `go test ./src/quack/` passes a case where `level0Runs` on Windows names the desk trial that covers it.
+- the red line names the platform beside the tree going red.
+- `./RUNME.sh check` exits 0.
