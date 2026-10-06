@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: d7cc0fdfde7d1c93583f93d34f18c0ff459c6f1d
+    hash_after: d7cc0fdfde7d1c93583f93d34f18c0ff459c6f1d
+    inputs:
+      - name: ask
+        hash: ba3dbab3893b01c8
+        size: 706
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,54 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+closedHere answers false where a dependency stands neither here nor on main while origin/work/<dep> stands as a branch: a group still at work owns that name, and its merge brings the ticket to main. A dependency standing nowhere at all still reads as met, so a ticket naming a gone ticket waits on nothing. The pull in src/pull/pull_hand.go and its twin in src/branches/route.go both take the rule, each asking git for refs/remotes/origin/work/<dep> through the git door it holds. The second done_when line names go-tests-meet-the-doors, which closed became test-walks-move-onto-fakes, so the successor carries the check: the pull hands no leaf of it while origin/work/tests-meet-the-doors-once stands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/pull/pull_hand.go It.takeable: reads closedHere per dependency
+src/pull/pull_hand.go It.offer: names the open dependencies as the wait
+src/branches/take.go Doors.waitsAt: names what a child waits for
+src/branches/route.go: the route walk reads closedHere per dependency
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/pull/pull_test.go TestPull: a dependency on a live work branch waits
+src/branches/take_test.go TestADependencyOnALiveBranchWaits
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/pull/pull_hand.go
+src/pull/pull_test.go
+src/branches/route.go
+src/branches/take_test.go
+spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened closedHere in both packages, the four callers, cloudPull in src/pull/pull_test.go and the branch fixtures in src/branches/free_test.go, and each claim stands there
+the callers list names every reader of closedHere the search finds
+the first done_when line falls to the pull case, the second to ./RUNME.sh ticket pull over test-walks-move-onto-fakes, the third to ./RUNME.sh check
 
 ## tests-red
 

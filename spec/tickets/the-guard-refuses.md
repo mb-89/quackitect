@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-depends_on: [go-waits-on-events, quack-waits-on-the-clock, quack-reaches-the-box-through-doors, javascript-reaches-through-doors, go-tests-meet-the-doors]
+depends_on: [go-waits-on-events, quack-waits-on-the-clock, quack-reaches-the-box-through-doors, javascript-reaches-through-doors, go-tests-meet-the-doors, test-walks-move-onto-fakes]
 step: design/owner-read
 ---
 
