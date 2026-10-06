@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 28302b6e72396e22
         size: 2965
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: 5d5c4687d2eb621a8a68b9d4c55b962d254a915f
+    hash_after: 5d5c4687d2eb621a8a68b9d4c55b962d254a915f
+    inputs:
+      - name: design/draft
+        hash: 28302b6e72396e22
+        size: 2965
+      - name: design/tests-red
+        hash: 7a20935396b81582
+        size: 787
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -305,8 +317,12 @@ each case goes red for the reason the change answers, as the build shows
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- tests-reach-the-fake-clock: the draft hands each caller's test clock.NewFake, but noModule in src/imports/imports.go refuses src/index, src/modules/lsp, src/modules/hooks, src/modules/index and src/tui/frame, their _test packages among them since ownModule trims _test, an import of src/modules/clock; the fake moves where those tests reach it, q/qtest beside its contract suite, and size names those files
+- watchertest-waits-through-clock: src/watcher/watchertest/watchertest.go:58 time.After is a walk-around in a Go file that is no test, and the callers list leaves it out, so the first done_when line stays unmet without it
+- clock-test-asserts-q-clock: tests-red seen says the build stops on q.Clock undefined, yet the tests compile and fail on the waiterOf assertion, and TestTheRealClockAndTheFakeAreAQClock stands nowhere; once q.Clock lands, a test asserts New() and NewFake both stand as a q.Clock
 
 # implement
 
