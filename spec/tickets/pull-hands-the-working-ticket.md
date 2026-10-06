@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 52abf16de242c557
         size: 1885
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 69bd64b2e1711b581f17b5881e774be0c4545318
+    hash_after: 69bd64b2e1711b581f17b5881e774be0c4545318
+    inputs:
+      - name: design/draft
+        hash: 52abf16de242c557
+        size: 1885
+      - name: design/tests-red
+        hash: f6de9d513d415d65
+        size: 783
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -270,8 +282,10 @@ The pull cases run on the real-git tree the package already proves its door on, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- helpers-keep-the-plan-ticket: in src/pull/pull.go Pull, `wanted = working` on the --as road reads workingTodo. Once workingTodo answers empty for a ticket name, a helper pulling with --as no longer binds to the ticket the plan names and takes the queue head instead, which contradicts the approach line saying the --as road stays bound. Read the raw plan line for `wanted` and `helps`, filter only the todo hold through namesTicket, and add a TestPull case where a plan naming alpha and a pull with --as hands alpha.
 
 # implement
 
