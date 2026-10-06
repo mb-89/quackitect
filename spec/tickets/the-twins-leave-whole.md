@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 613a6eda8e875a5a
         size: 1263
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 5f194e83cad79e9e97c7cedcc57f418d903fe8a6
+    hash_after: 71afd277cfc1236443bb6d7a77bd16a0591a1560
+    answered:
+      - name: lint
+        exit: 0
+        said: green
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -308,14 +317,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size's files, plus the fallout the signature and the moved remedy force: pull.js calls deskRefused, and five desk cases now read the remedy off the node, so their trees hold it
+- the JS refusals reach the failure door over the fake disk and log, and the Go take reads failure.Fake through deskNodes
+- a comment over deskRefused, deskSaid in take.go and DESK_FAILURE names the approach
+- the remedy stands on the node alone, the JS id once as DESK_FAILURE, and the test node once per language: DESK_NODE in work-doors.js, deskNodes in take_failure_test.go
 
 ## tests-green
 
