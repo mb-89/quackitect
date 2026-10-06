@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 59f0b483526f19bf
         size: 698
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 5ab26c929dbbb125f9250341d0db331ad946ef36
+    hash_after: 98dc41f5939f2342f1f7e3b028e5add1870b890d
+    answered:
+      - name: lint
+        exit: 0
+        said: "  110.8  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack alone, which the ask names
+every member the hands gain has a fake, and the disk and the box each keep a contract suite over fake and real
+each door file points at the ticket, and src/quack/owns.yaml names the root door files
+the door files stand once in src/quack/owns.yaml, and each shared real reach stands once in boxdoors.go or boxfiles.go
 
 ## tests-green
 
