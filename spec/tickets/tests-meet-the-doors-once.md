@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box b4c8cb96d125 · claude-code-remote
     hash_before: 2f1b5f46b1ad7759fbd03300e960a9f30cc081f3
+  - step: sync
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: a47eec3f025f60595a652abb07701ac1e0bbb5d9
+    hash_after: a47eec3f025f60595a652abb07701ac1e0bbb5d9
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tests-meet-the-doors-once already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -103,8 +112,9 @@ Done when the lease flake and the two cold-box contract waits run on a fake cloc
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
