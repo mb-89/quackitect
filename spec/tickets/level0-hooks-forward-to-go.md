@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -152,6 +152,19 @@ record:
         hash: 447757a42396b889
         size: 610
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: c8af34dec9e0b80ddfe6872e3de0d7c86dc08115
+    hash_after: c8af34dec9e0b80ddfe6872e3de0d7c86dc08115
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: d5c38a694506234e
+        size: 7730
+    def: 08e16d07b0de477c
 group: javascript-leaves
 ---
 
@@ -370,14 +383,13 @@ Assumed: copilot-hooks-run-in-go and probes-leave-node land first and remove cop
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-All twenty Go tests the draft names fail on their own assertion against stubs. The three JavaScript cases land at implement, beside the forwarder they test.
+The twenty Go cases the redraft names still fail on their own assertion, against the stubs the first red pass left. The redraft changed no test, since the send-back came from the process alone.
 
-- The down word reads the event as JSON on stdin and prints an answer in the door's effect shape, so one mapping reads both.
-- Its guarded refusal rests on the down.go stubs the Copilot sibling ports, so it stays red until that lands.
-- The event list test copies the old cage.js list, which lacks classic.PostToolUse, and the Copilot sibling posts that event. Implement adds it.
-- No design note describes the down word, so these tests define it first.
-- Three standing test files hold new cases, so the check leaves their old cases out until tests-green.
-- gofmt's layout lands on three files an earlier red step left unformatted.
+- Every down word case prints an empty answer, and the start reasons read empty for every code.
+- The two folder cases fail on the git grep, which still finds the lib imports and the /event road.
+- The two pull cases read an empty spawn answer and an empty spec.
+- The same package runs fail Copilot and probe cases, which belong to copilot-hooks-run-in-go and probes-leave-node.
+- The three JavaScript cases land at implement, beside the forwarder they test.
 
 ### checked
 
