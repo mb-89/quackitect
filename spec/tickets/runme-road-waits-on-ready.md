@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 64b0da3c99b2f4a9
         size: 687
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: d52661943b099f0cc8345636086e9ff53210a254
+    hash_after: c33f4f33876b30fc6b53e8103936800e5608cf90
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -288,14 +297,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/doors test/contract/runme-road.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/doors/index.js, src/doors/fake/index.js and the road test, which the size list and the gate name
+the fake index answers ready beside warm
+ready, the fake and the before hook link this ticket
+the road reads the binary through at() in the door, which owns it
 
 ## tests-green
 
