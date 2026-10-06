@@ -44,8 +44,8 @@ const (
 
 // The word the fold answers a turn's end with where the conversation clears, the kind the door answers it as, and the prompt the next conversation opens on. RESUME in src/bridge/handover.js owns the prompt, and the package spells it again. [[spec/tickets/clear-answers-off-the-door]]
 const (
-	ClearWord    = "clear"
-	clearKind    = "clear"
+	ClearWord = "clear"
+	clearKind = "clear"
 	// The prompt the clear resumes on, which the dry probe reads too. [[spec/tickets/probes-leave-node]]
 	ResumePrompt = "Level zero cleared the conversation, because the context passed `" + handoverKey + "`. Run `./RUNME.sh ticket pull`: `read-handover` stands in your hand, and the handover block says where the work stands."
 )

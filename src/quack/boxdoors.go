@@ -38,12 +38,12 @@ type ranResult struct {
 
 // The doors a box verb reaches. [[spec/tickets/box-verbs-port-to-go]]
 type boxDoors struct {
-	root      string
-	env       func(key string) string
-	goos      string
-	pid       int
-	run       func(argv []string, o runOpts) ranResult
-	get       func(url string, wait time.Duration) (string, error)
+	root string
+	env  func(key string) string
+	goos string
+	pid  int
+	run  func(argv []string, o runOpts) ranResult
+	get  func(url string, wait time.Duration) (string, error)
 	// A POST of the body to the address under the bearer token, answering the status and the text. [[spec/tickets/probes-leave-node]]
 	post      func(url, token, body string, wait time.Duration) (int, string, error)
 	now       func() time.Time

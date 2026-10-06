@@ -136,6 +136,22 @@ func PullArgvOf(argv []string) []string {
 	return out
 }
 
+// The pull tool's answer: the text the lead reads, and the prompt of the hand it spawns apart. [[spec/tickets/level0-hooks-forward-to-go]]
+type ToolAnswer struct {
+	Result string `json:"result"`
+	Spawn  string `json:"spawn,omitempty"`
+}
+
+// The tool's answer off the pull's text. [[spec/tickets/level0-hooks-forward-to-go]]
+func ToolAnswerOf(_ string) ToolAnswer {
+	return ToolAnswer{}
+}
+
+// The spec the pull tool registers. [[spec/tickets/level0-hooks-forward-to-go]]
+func PullSpec() map[string]any {
+	return nil
+}
+
 // JSON as JSON.stringify writes it: no space between the parts. [[spec/design_output/pull#the-hand-out]]
 func compactJSON(raw json.RawMessage) string {
 	var out strings.Builder

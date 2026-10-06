@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 447757a42396b889
         size: 610
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 874ad006f6fca0a9863b8e719579f887a2767800
+    hash_after: 874ad006f6fca0a9863b8e719579f887a2767800
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 0a94dea3fed559cf
+        size: 7272
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -323,26 +336,45 @@ Assumed: copilot-hooks-run-in-go, probes-leave-node and session-start-leaves-nod
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/session_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/spawn_test.go
+- src/modules/hooks/probe_test.go
+- src/modules/hooks/session_test.go
+- src/modules/hooks/transcript_test.go
+- src/modules/hooks/hooks_test.go
+- src/quack/hook_down_test.go
+- src/quack/hooks_folder_test.go
+- src/pull/pull_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All twenty Go tests the draft names fail on their own assertion against stubs. The three JavaScript cases land at implement, beside the forwarder they test.
+
+- The down word reads the event as JSON on stdin and prints an answer in the door's effect shape, so one mapping reads both.
+- Its guarded refusal rests on the down.go stubs the Copilot sibling ports, so it stays red until that lands.
+- The event list test copies the old cage.js list, which lacks classic.PostToolUse, and the Copilot sibling posts that event. Implement adds it.
+- No design note describes the down word, so these tests define it first.
+- Three standing test files hold new cases, so the check leaves their old cases out until tests-green.
+- gofmt's layout lands on three files an earlier red step left unformatted.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the two folder cases fail on the two grep lines, the spawn, probe and session cases on the go test line, the dry probe's whole run answers line four, and a live check line five
+- the disk, the post, the process runs and the clock reach the tests as fakes, and the folder cases read the tree through git alone
 
 # gate
 

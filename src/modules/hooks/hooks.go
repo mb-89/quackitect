@@ -213,7 +213,10 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if d.from.Config != nil {
 		settings = d.from.Config(root)
 	}
+	post = picks(post)
 	session := d.sessionFor(post, root)
+	d.writesSession(post, root)
+	d.probes(session, post, root)
 	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}

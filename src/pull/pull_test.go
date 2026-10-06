@@ -6,9 +6,11 @@ package pull
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -243,6 +245,43 @@ func TestPullArgvOf(t *testing.T) {
 	} {
 		if got := strings.Join(PullArgvOf(one.argv), "|"); got != one.want {
 			t.Errorf("%s reads %s, and wants %s", one.name, got, one.want)
+		}
+	}
+}
+
+// A spawn answer as the pull prints it, off test/level0/pull-spawn-hook.test.js. [[spec/tickets/level0-hooks-forward-to-go]]
+const spawnAnswer = "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it."
+
+func TestThePullToolAnswersItsSpawnApart(t *testing.T) {
+	t.Parallel()
+	said := ToolAnswerOf(spawnAnswer)
+	if said.Result != spawnAnswer || said.Spawn != "You are a hand of your own, named helper-2.\n1. Run it." {
+		t.Fatalf("a spawn answer reads %+v, and wants the whole text and the hand's prompt apart", said)
+	}
+	body, _ := json.Marshal(ToolAnswerOf("work\n  a-child at design/draft"))
+	if string(body) != `{"result":"work\n  a-child at design/draft"}` {
+		t.Fatalf("a work answer prints %s, and wants its text alone", body)
+	}
+	if said := ToolAnswerOf("spawn\n  no blank row"); said.Spawn != "" {
+		t.Fatalf("a spawn answer with no prompt reads %+v, and wants no spawn", said)
+	}
+}
+
+func TestThePullSpecTakesTheFourVerdicts(t *testing.T) {
+	t.Parallel()
+	spec := PullSpec()
+	schema, _ := spec["inputSchema"].(map[string]any)
+	properties, _ := schema["properties"].(map[string]any)
+	verdict, _ := properties["verdict"].(map[string]any)
+	if spec["name"] != "pull" || spec["description"] == "" || spec["description"] == nil {
+		t.Fatalf("the spec reads %v, and wants the tool named pull with a description", spec)
+	}
+	if got := verdict["enum"]; !reflect.DeepEqual(got, []string{"pass", "fail", "became", "answered"}) {
+		t.Fatalf("the verdict takes %#v, and wants pass, fail, became and answered", got)
+	}
+	for _, key := range []string{"ticket", "reason", "fields"} {
+		if _, ok := properties[key]; !ok {
+			t.Errorf("the spec's input holds %v, and wants %s", properties, key)
 		}
 	}
 }

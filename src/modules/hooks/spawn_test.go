@@ -6,6 +6,7 @@ package hooks
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -65,6 +66,44 @@ func spawns(t *testing.T, one layerRow) (Answer, map[string]any) {
 // Whether the row's spawn takes the layer of its own kind. [[spec/tickets/spawn-answers-off-the-door]]
 func kinded(one layerRow) bool {
 	return one.Kind != "" && one.Layer == one.Kind
+}
+
+// The prompt a spawn carries, and the tag of the hand of session s1 the session file names, off spawnTagOf in .claude/skills/level0/hooks/start.js. [[spec/tickets/level0-hooks-forward-to-go]]
+const (
+	spawnPrompt = "read the branch"
+	handTag     = "You are the hand of session s1 on this box, so you pull under no --as."
+)
+
+// The prompt the door answers a main agent's spawn under a tree holding the session file of s1 and no layer, or nothing where it passes. [[spec/tickets/level0-hooks-forward-to-go]]
+func taggedPrompt(t *testing.T, e map[string]any) (string, bool) {
+	t.Helper()
+	root := treeOf(t, map[string]string{sessionFile: `{"id":"s1","harness":"claude-code"}`}, "")
+	door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
+	said := hooks(t, door, Post{Event: spawnEvent, Root: root, E: e})
+	for _, effect := range said.Effects {
+		if effect.Kind == eventEffect {
+			event, _ := effect.Result.(map[string]any)
+			return textOf(event, "prompt"), true
+		}
+	}
+	return "", false
+}
+
+func TestASpawnCarriesTheHandsTagOffTheSessionFile(t *testing.T) {
+	got, ok := taggedPrompt(t, map[string]any{"session_id": "s1", "prompt": spawnPrompt, "subagentType": "general-purpose"})
+	if want := handTag + "\n\n" + spawnPrompt; !ok || got != want {
+		t.Fatalf("the spawn's prompt reads %q (an event: %v), and wants the hand's tag ahead of it:\n%s", got, ok, want)
+	}
+}
+
+func TestASpawnTheHookMakesItselfCarriesNoTag(t *testing.T) {
+	if got, _ := taggedPrompt(t, map[string]any{"session_id": "s1", "prompt": spawnPrompt}); !strings.HasPrefix(got, handTag) {
+		t.Fatalf("a main agent's spawn reads %q, and wants the tag, so the case below reads the own spawn apart", got)
+	}
+	got, ok := taggedPrompt(t, map[string]any{"session_id": "s1", "prompt": spawnPrompt, "own": true, "background": true})
+	if ok && strings.Contains(got, handTag) {
+		t.Fatalf("the hook's own spawn reads %q, and wants no tag", got)
+	}
 }
 
 // A spawn naming no kind, or a kind with no layer, answers its event with the prompt wrapped in the helper layer, and a tree holding no rule passes it. [[spec/tickets/spawn-answers-off-the-door]]

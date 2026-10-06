@@ -23,6 +23,8 @@ type hookDoors struct {
 	ask func(post hooks.Post) (hooks.Answer, error)
 	// The session log's one row a Copilot event writes. [[spec/tickets/copilot-hooks-run-in-go]]
 	log func(level, kind, line string, fields map[string]any) error
+	// The run of a program in a folder the down word starts the index with, as serveDoors.run answers it. [[spec/tickets/level0-hooks-forward-to-go]]
+	run func(argv []string, cwd string) (int, string, error)
 }
 
 // The ask reading the standing file under the root and posting there with its bearer token, within the wait. [[spec/tickets/copilot-hooks-run-in-go]]
