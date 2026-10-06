@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 71b107baaebbbb4d
         size: 3908
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-4
+    hash_before: 98e8b9acc6e1fd47bc833fb636eedf5c1ed1f298
+    hash_after: 98e8b9acc6e1fd47bc833fb636eedf5c1ed1f298
+    inputs:
+      - name: design/draft
+        hash: 71b107baaebbbb4d
+        size: 3908
+      - name: design/tests-red
+        hash: 345c545bd2b0dce5
+        size: 996
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -307,8 +319,10 @@ All ten tests fail on their own assertion, and the test file stands alone in the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- boot-span-outlives-start-js: TestTheBootHookWaitsOutTheStartSpan in src/quack/session_start_test.go reads STARTING out of .claude/skills/level0/hooks/start.js, and level0-hooks-forward-to-go deletes start.js with no callers line for this test, so the test reads the start span from wherever the forwarder lands it in Go
 
 # implement
 
