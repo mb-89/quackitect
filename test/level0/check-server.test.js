@@ -42,11 +42,12 @@ test("the delta keeps the blank context line a hunk ends on, and a refused diff 
   const proc = (exitCode) => ({
     run: (args, opts) => {
       asked.push([args, opts.cwd]);
-      return { exitCode, stdout: patch, stderr: "" };
+      return { exitCode, stdout: args[1] === "ls-files" ? "" : patch, stderr: "" };
     },
   });
   assert.equal(check.deltaOf({ proc: proc(0) }, "/tree"), patch);
   assert.deepEqual(asked[0], [["git", "diff", "HEAD", "--binary", "--no-renames"], "/tree"]);
   assert.equal(check.deltaOf({ proc: proc(1) }, "/tree"), "");
 });
+
 

@@ -204,7 +204,7 @@ func holds(drawn []diagnostic, source, code string) bool {
 	return false
 }
 
-// Vale's answer naming one row of the rule on spec/a.md, as its JSON reporter writes it. [[spec/tickets/lsp-module-draws-the-tools]]
+// Vale's answer naming one row of the rule on the case's note, as its JSON reporter writes it. [[spec/tickets/lsp-module-draws-the-tools]]
 func valeSays(file, check, match string) string {
 	return `{"` + file + `": [{"Check": "` + check + `", "Line": 2, "Span": [1, 4], "Match": "` + match + `", "Message": "A rule speaks.", "Severity": "warning"}]}`
 }

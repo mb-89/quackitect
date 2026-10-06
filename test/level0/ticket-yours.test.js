@@ -62,7 +62,7 @@ function asked(files, argv) {
   return { ...ran, json };
 }
 
-// The count src/tui/work/workplaces.go draws behind the tab's name: each name's last place, off the cloud. [[spec/design_output/tui#the-work-tab]]
+// The count the work tab draws behind its name: each name's last place, off the cloud. [[spec/design_output/tui#the-work-tab]]
 function tabCount(files) {
   const answer = answerOf(
     { root: ROOT, method: ROOT, work: ROOT, ...doorsOf(files) },

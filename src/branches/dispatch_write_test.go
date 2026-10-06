@@ -1,6 +1,6 @@
 // The dispatcher's writes over a real origin and its clone: one fix group, one
 // commit on claude/dispatch-<commit>, a worktree that leaves, and no push of
-// main, ported off test/level0/dispatch.test.js.
+// main, ported off the JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
 package branches
 

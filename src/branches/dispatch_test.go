@@ -1,6 +1,6 @@
 // The dispatcher's plan over a real origin and its clone: what stands ready,
-// held, waiting, stuck, loose and left for a person, ported off
-// test/level0/dispatch.test.js.
+// held, waiting, stuck, loose and left for a person, ported off the
+// JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
 package branches
 

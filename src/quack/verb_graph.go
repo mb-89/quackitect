@@ -1,5 +1,5 @@
 // The graph verb: a process or a ticket, drawn as the graph the editor reads,
-// off drawing in src/scripts/mint-verb.js.
+// off the drawing the JavaScript mint verb held.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 package main
 

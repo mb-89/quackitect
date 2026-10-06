@@ -216,8 +216,8 @@ replace and undo. For the rules riding the first answer, see
 
 The server imports its doors and its libs once, so a fix to one reaches no
 running session by itself. So the server notes its own code at the first
-event: every script under the roots `src/bridge/reload.js` names, and every
-module `src/bridge/server.js` imports, at any depth. After every tool run it
+event: every script under the roots it watches, and every
+module it imports, at any depth. After every tool run it
 reads the time and the size of each again, and reads no script whole. A file
 that differs restarts the server through the road the `/restart` request
 takes, and the log names the file. The next event lands on
@@ -235,7 +235,7 @@ that child does what the table says:
 | drive | runs one of each event through `decide`, on a box whose doors stand in memory |
 | answer | exits 0, or exits 1 with the fault on standard error |
 
-`src/bridge/selftest.js` holds the events and the doors. On a clean exit the
+On a clean exit the
 server steps down, as above. On a fault it runs on over the old code, and writes one
 `error` line naming the file, the line and the error. The same fault writes no
 second line, and code unmoved since the fault asks for no second test. An asked
@@ -244,8 +244,6 @@ second line, and code unmoved since the fault asks for no second test. An asked
 The start road of the bridgehead runs the same flag before it starts a server,
 and answers `8` where the test fails. So a broken tree writes one line, and no
 road starts a server that falls on its first event.
-`test/contract/server-loads.test.js` runs the test over this tree, so
-`./RUNME.sh check` refuses a bridge that fails it.
 
 ## A door that throws passes
 
@@ -257,7 +255,7 @@ unread, and the box writes one `warn` line.
 ## A cache follows its file
 
 The box holds a few files it reads once, and each drops where a tool run
-moves the file it stands on. `src/bridge/caches.js` names them:
+moves the file it stands on. The table names them:
 
 | the cache | the files it stands on |
 |---|---|
@@ -303,11 +301,11 @@ serve log as the child's output. A child ending inside the window is a fall.
 Then the old server writes
 one `fatal` line naming the exit and the line the child writes, and exits
 with one. A child standing past the window is the server, and the old one
-exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
+exits clean. `RESPAWN_WAIT` holds the window, and
 `SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
-`restarts` in `src/bridge/server.js` ends the listen and starts the child on
+`restarts` ends the listen and starts the child on
 the next turn of the loop. Node's own close callback waits on every open
 connection, and a running wait holds one for minutes. So the restart waits on
 none, and the old process ends them as it exits.
@@ -448,7 +446,7 @@ session start fills, and the session runs on.
 | `box.projections`, `box.sources` | the write door | nothing, and `freshens` fills them |
 | the warm index | the search tools | a cold index |
 
-`fillsBox` in `src/bridge/server.js` fills the schemas, the survey and the
+`fillsBox` fills the schemas, the survey and the
 specs. `decide` runs it ahead of the door, so the door and the registration
 both read a full box. A session start passes `again`, because the tree moves
 under a box that stands.
@@ -487,7 +485,7 @@ name, and says which one answers.
 | the file | who writes it | does git track it |
 |---|---|---|
 | `.claude/settings.json` | this tree | yes |
-| `.claude/settings.local.json` | the box | no |
+| `settings.local.json` under `.claude` | the box | no |
 | the settings under the home of the box | the box | no |
 
 `SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
@@ -516,7 +514,7 @@ port, and leaves the one its scheme takes by default. `doctor` pads a label to
 one width, so the rows stand in line. The word `warn` opens the printed row,
 and the doctor writes no log line of its own.
 
-The entry at the dead port lives in `.claude/settings.local.json`, which git
+The entry at the dead port lives in `settings.local.json` under `.claude`, which git
 ignores. So a hand on the box it belongs to takes that line out, and this row
 is what shows them the entry.
 
@@ -667,7 +665,7 @@ name `level0`.
 
 The client keeps a cache of the plugin folder under the user's home, one per
 version, off every tree. `claude plugin update` refreshes it. The path to the
-vehicle differs per box, so the shim writes it into `.claude/settings.local.json`,
+vehicle differs per box, so the shim writes it into `settings.local.json` under `.claude`,
 which git ignores.
 
 Every road that runs the vehicle's code inside a plugin of the stub's own fails.
@@ -1186,8 +1184,8 @@ naming none comes back refused, and so does a source that is a target too,
 because that cut writes over what it reads. A target named twice comes back
 refused too, because the second cut writes over the first.
 
-`src/scripts/split-cut.js` owns the ranges and the cut over text, and
-`src/scripts/split-verb.js` writes them. One journal entry under `by: split`
+`src/quack/verb_split.go` owns the ranges and the cut over text, and
+writes them. One journal entry under `by: split`
 holds every target and the rest, so `mcp__level0__undo` takes the whole cut
 back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
 
@@ -1203,8 +1201,8 @@ Hand every rule the path the repo root holds. Vale scopes on it.
 
 | what the client sends | what the door hands on |
 |---|---|
-| `C:\...\quackitect-v5\spec\rationales\a.md` | `spec/rationales/a.md` |
-| `spec/rationales/a.md` | `spec/rationales/a.md` |
+| `C:\...\quackitect-v5\spec\rationales\working.md` | `spec/rationales/working.md` |
+| `spec/rationales/working.md` | `spec/rationales/working.md` |
 
 Keep every folder in that path, so `[spec/rationales/*.md]` and each other
 `.vale.ini` section matches what Vale reads at `--path`.
@@ -1583,7 +1581,7 @@ matcher, so one hook holds both.
 
 Nobody sits beside a cloud box, so an `AskUserQuestion` there meets nobody. `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses it where `cloudHere` holds. The refusal names the question ticket and the push, and points at [[spec/guidance/cloud/cloud]].
 
-- `onToolCall` in `src/bridge/server.js` reads it after the owner's hold and before the grace.
+- `onToolCall` reads it after the owner's hold and before the grace.
 - A helper's call meets it too, since nobody sits beside a helper on a cloud box either.
 - A desk asks as it always does.
 
@@ -1717,7 +1715,7 @@ passes the door on its first write. The tool writes nothing, so it takes the
 wording `check_answer` takes, and the refusal wording stays with the door.
 
 `src/bridge/prose.js` holds the spec and the handler, and exports the `SPECS`
-and `TOOLS` pair `src/bridge/server.js` imports for each bridge module.
+and `TOOLS` pair.
 
 # The question comes first
 

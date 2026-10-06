@@ -1,6 +1,6 @@
 // The mint verb: a new note in the shape its schema names, with the route and
-// its hash copied in off the process a ticket names, off mint in
-// src/scripts/mint-verb.js.
+// its hash copied in off the process a ticket names, off the JavaScript
+// mint verb.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package main
 

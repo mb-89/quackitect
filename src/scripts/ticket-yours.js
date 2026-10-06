@@ -8,7 +8,7 @@ import { ticketsHere } from "./pull-hand.js";
 import { CLOUD_PLACE, compareOutline } from "./pull-outline.js";
 import { answerOf } from "./work-answer.js";
 
-// The rows this box takes: every row the answer places, off the cloud, each name once. src/tui/work/workplaces.go counts the same rows behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+// The rows this box takes: every row the answer places, off the cloud, each name once. The work tab counts the same rows behind its name. [[spec/design_output/tui#the-work-tab]]
 export function queueIn(answer) {
   const rows = new Map();
   for (const one of answer?.branches ?? []) {

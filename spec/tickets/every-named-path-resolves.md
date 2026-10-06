@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: aec90133ee67a7eb
         size: 822
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 443cff5b58d86e0ed9af2a7aa9bbba801b705f9d
+    hash_after: 443cff5b58d86e0ed9af2a7aa9bbba801b705f9d
+    answered:
+      - name: lint
+        exit: 0
+        said: "  113.3  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -314,14 +323,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the rule lands in src/modules/check, and every other file it touches drops a dead path the rule names, which the draft asks this change to fix.
+every door the change reaches has a fake: the rule reads the tree through placesIn, and its cases plant notes over the fake tree.
+a comment names the approach the change implements: named.go opens with the rule and points at this ticket.
+every fact the change adds stands in one place: the row walk moves into rowsSaid in pointer.go, which both rules read, and the dry probe delta reads untracked files in deltaOf alone.
 
 ## tests-green
 

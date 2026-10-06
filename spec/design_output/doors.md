@@ -108,9 +108,7 @@ driving a door through a fake asserts on something.
 The bridgehead is a door: it sits in the agent's path, and it is the outside
 thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
 and in no `src/doors`, because the client loads a hooks module from that
-folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
-straight into `decide`, so a test drives the server with no client, no wire
-and no port. For details, see
+folder alone. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # The folders, and their cost

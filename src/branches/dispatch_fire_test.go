@@ -1,6 +1,6 @@
 // The Action's fire over a fake send door: one routine fire a ready group and
 // a stuck hand-over, up to the cap, and the write branch's pull request on the
-// owner's token, ported off test/level0/dispatch-fire.test.js.
+// owner's token, ported off the JavaScript fire cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
 package branches
 
