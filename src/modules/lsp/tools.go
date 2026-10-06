@@ -23,6 +23,7 @@ const (
 	// The rule a Vale answering a fault draws, so a broken rule stands in the panel. [[spec/design_output/lsp#the-server-runs-the-tools]]
 	ValeRuns  = "ValeRuns"
 	fromVale  = "vale"
+	fromRules = "rules"
 	fromBiome = "biome"
 	fromTree  = "tree"
 )
@@ -96,13 +97,13 @@ func (one *Tools) Sweep(tree Tree) []Finding {
 	}
 	held := one.kept(tree.Buffers())
 	out := []Finding{}
-	for _, said := range one.vale(tree, []string{"."}, nil) {
+	for _, said := range one.prose(tree, []string{"."}, nil) {
 		if said.Rule == ValeRuns || !slices.Contains(held, said.File) {
 			out = append(out, said)
 		}
 	}
 	if len(held) > 0 {
-		out = append(out, one.vale(tree, nil, held)...)
+		out = append(out, one.prose(tree, nil, held)...)
 	}
 	for _, path := range tree.Paths() {
 		out = append(out, one.textFaults(tree, path)...)
@@ -125,7 +126,7 @@ func (one *Tools) Over(tree Tree, paths []string) []Finding {
 		}
 		disk = append(disk, at)
 	}
-	out := one.vale(tree, disk, held)
+	out := one.prose(tree, disk, held)
 	for _, at := range every {
 		out = append(out, one.textFaults(tree, at)...)
 	}
@@ -174,6 +175,32 @@ func (one *Tools) onTheTree(tree Tree, found []Finding) []Finding {
 			continue
 		}
 		out = append(out, said)
+	}
+	return out
+}
+
+// The rule a check id names, its style left off where the style is the voice's own. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func RuleOf(check string) string {
+	return proseKind.ReplaceAllString(check, "")
+}
+
+// The prose rows over the paths named: the Go rules where the wiring hands them in, else Vale. A dot names every path the tree holds. [[spec/tickets/go-rules-replace-vale]]
+func (one *Tools) prose(tree Tree, disk, held []string) []Finding {
+	if one.Rules == nil {
+		return one.vale(tree, disk, held)
+	}
+	out := []Finding{}
+	for _, at := range append(append([]string{}, disk...), held...) {
+		paths := []string{at}
+		if at == "." {
+			paths = one.kept(tree.Paths())
+		}
+		for _, path := range paths {
+			for _, said := range one.Rules(path, tree.Read(path)) {
+				said.File, said.Source = path, fromRules
+				out = append(out, said)
+			}
+		}
 	}
 	return out
 }
@@ -260,7 +287,7 @@ func (one *Tools) valeRowsOf(stdout string) ([]valeHeard, string) {
 		}
 		path := strings.TrimPrefix(one.Check.Relative(one.Root, file), "./")
 		for _, row := range rows {
-			said := Finding{File: path, Rule: proseKind.ReplaceAllString(row.Check, ""), Line: max(row.Line, 1), Column: 1, Message: row.Message, Severity: row.Severity, Source: fromVale}
+			said := Finding{File: path, Rule: RuleOf(row.Check), Line: max(row.Line, 1), Column: 1, Message: row.Message, Severity: row.Severity, Source: fromVale}
 			if len(row.Span) > 0 {
 				said.Column = row.Span[0]
 			}
