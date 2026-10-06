@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 31b422a6b4c97a95
         size: 832
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: f74aaa851345a3ab379891d90cf33233ace99270
+    hash_after: f74aaa851345a3ab379891d90cf33233ace99270
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/branches/prompt.go src/branches/branch.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches prompt.go and branch.go, both on the size list.
+- The verb reads the disk through the standing doors, read, notesIn and processAt, which the cases drive over a temp folder.
+- Each new function carries a link to this ticket, where the approach stands.
+- The route reads through processAt and the box rules stand once in boxRules, so no reader or rule stands twice.
 
 ## tests-green
 

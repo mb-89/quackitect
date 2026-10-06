@@ -86,11 +86,15 @@ func Branch(d *Doors, argv []string) int {
 
 // Runs the cloud verb: the routine's trigger, or the usage. [[spec/design_output/work#the-routine-a-verb-names]]
 func Cloud(d *Doors, argv []string) int {
-	if word(argv, 0) == "trigger" {
+	switch word(argv, 0) {
+	case "trigger":
 		return d.trigger()
+	case "prompt":
+		return d.prompt(word(argv, 1))
 	}
 	d.say("Usage: ./RUNME.sh cloud <verb>\n")
 	d.say("  trigger       the routine that works a branch, and what stands free")
+	d.say("  prompt <group> the prompt a box starts with, off the group and its route")
 	if word(argv, 0) != "" {
 		return codeRefused
 	}
