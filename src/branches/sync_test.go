@@ -8,7 +8,7 @@ import "testing"
 func TestTheSyncRefusesAnyOtherBranch(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
-	one.git("switch", "-q", "-c", "side")
+	one.cut("side", "")
 	if code := one.branchSays("sync"); code != codeRefused {
 		t.Fatalf("the sync answers %d", code)
 	}

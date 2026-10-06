@@ -31,7 +31,6 @@ const (
 
 var (
 	personStep = regexp.MustCompile(`^person(-\d+)?$`)
-	movedPush  = regexp.MustCompile(`\((?:fetch first|non-fast-forward)\)`)
 	pushNoise  = regexp.MustCompile(`^(?:error: failed to push|hint:|To )`)
 )
 
@@ -205,7 +204,7 @@ func (d *Doors) inserted(one note, before string, step *yaml.Doc) (string, strin
 	holder.Set("steps", slices.Insert(slices.Clone(list), at, any(step)))
 	path := strings.Join(append(slices.Clone(parts[:len(parts)-1]), asText(step.Get("name"))), "/")
 	text := one.Text
-	if schema := yaml.AsDoc(yaml.Read(readFile(d.methodAt(ticketSchema)))); schema != nil {
+	if schema := yaml.AsDoc(yaml.Read(d.methodRead(ticketSchema))); schema != nil {
 		text = check.ReRouted(one.Text, schema, yaml.AsList(root.Get("steps")), "")
 	}
 	return withField(withField(text, "step", path), "state", openState), path
@@ -243,15 +242,15 @@ func (d *Doors) landed(one note, changes []string) string {
 		}
 	}
 	ignored := map[string]bool{}
-	for _, row := range strings.Split(d.quiet(append([]string{"check-ignore", "--"}, paths...)...).Out, "\n") {
-		ignored[strings.TrimSpace(row)] = true
+	for _, path := range d.Repo.Ignored(paths) {
+		ignored[path] = true
 	}
 	var kept []string
 	for _, path := range paths {
 		if ignored[path] {
 			continue
 		}
-		if d.exists(path) || d.quiet("ls-files", "--error-unmatch", "--", path).OK {
+		if d.exists(path) || d.Repo.Tracked(path) {
 			kept = append(kept, path)
 		}
 	}
@@ -286,26 +285,20 @@ func (d *Doors) landedAll(one note, changes, theirs []string) string {
 	if one.Private {
 		return ""
 	}
-	d.quiet("add", "-A")
+	_ = d.Repo.AddAll()
 	if len(theirs) > 0 {
-		d.quiet(append([]string{"reset", "-q", "--"}, theirs...)...)
+		_ = d.Repo.Reset(theirs)
 	}
-	ran := Said{Err: d.stagedFault(nil)}
-	if ran.Err == "" {
-		ran = d.quiet("commit", "-m", one.Name+": "+strings.Join(changes, ", "))
+	fault := d.stagedFault(nil)
+	if fault == "" {
+		fault = d.committed(one.Name+": "+strings.Join(changes, ", "), nil)
 	}
-	if ran.OK {
+	if fault == "" {
 		return ""
 	}
-	d.quiet("reset", "-q")
+	_ = d.Repo.Reset(nil)
 	_ = d.write(one.At, stood)
-	switch {
-	case ran.Err != "":
-		return ran.Err
-	case ran.Out != "":
-		return ran.Out
-	}
-	return "the commit answers nothing"
+	return fault
 }
 
 // The files the undo journals name since the hold took the ticket: the ticket's own, and every other ticket's. [[spec/design_output/pull#the-refused-commit]]
@@ -378,9 +371,8 @@ func (d *Doors) pushed(branch string) (bool, []string) {
 	if ok || !moved {
 		return ok, why
 	}
-	d.quiet("fetch", "origin", branch)
-	if !d.quiet("rebase", "origin/"+branch).OK {
-		d.quiet("rebase", "--abort")
+	_ = d.Repo.Fetch(branch)
+	if d.Repo.Rebase("origin/"+branch) != nil {
 		return false, []string{branch + " moves on origin, and one rebase falls short. Push " + branch + ", then pull again."}
 	}
 	ok, _, why = d.tried(branch)
@@ -389,7 +381,7 @@ func (d *Doors) pushed(branch string) (bool, []string) {
 
 // One push, whether origin moved under it, and the push door's own cause. [[spec/design_output/pull#the-rejected-push]]
 func (d *Doors) tried(branch string) (bool, bool, []string) {
-	ran := d.quiet("push", "origin", branch)
+	ran := d.Repo.Push(branch, false)
 	if ran.OK {
 		return true, false, nil
 	}
@@ -402,5 +394,5 @@ func (d *Doors) tried(branch string) (bool, bool, []string) {
 	if len(lines) == 0 {
 		lines = []string{"it names no cause"}
 	}
-	return false, movedPush.MatchString(ran.Err), append([]string{"The push door refuses " + branch + ":"}, lines...)
+	return false, ran.Moved, append([]string{"The push door refuses " + branch + ":"}, lines...)
 }

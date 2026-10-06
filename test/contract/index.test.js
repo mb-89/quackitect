@@ -1,5 +1,6 @@
 // The index door, against the real binary. It stands where the tree is built,
-// answers a glob out of the rows, and reads as absent where it is not.
+// answers a glob out of the rows, and reads as absent where it is not. The fake
+// runs beside the real door on every answer the fake gives.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import assert from "node:assert/strict";
@@ -9,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
+import { fakeIndex } from "../../src/doors/fake/index.js";
 import { index } from "../../src/doors/index.js";
 import { proc } from "../../src/doors/proc.js";
 
@@ -134,6 +136,28 @@ ifBuilt("a ticket's standing reads off its group's branch through the ticket", (
     assert.equal(rows.get("a-child").group, "one-group");
     assert.equal(rows.get("a-child").state, "open");
     assert.equal(rows.get("a-child").step, "do");
+  } finally {
+    it.ask("stop", {});
+  }
+});
+
+// The fake answers the hashes the real index answers, off the disk where the real one reads its database. [[spec/tickets/index-session-suites-run-fakes]]
+ifBuilt("the fake and the real index answer the same hashes", () => {
+  const work = files.tempDir("hashes-");
+  files.makeDir(join(work, "spec", "tickets"));
+  files.write(join(work, "spec", "tickets", "a-child.md"), child(""));
+  const asks = [
+    { path: "spec/tickets/a-child.md", size: 12 },
+    { path: "spec/tickets/nowhere.md", size: 0 },
+  ];
+  const it = index(files, proc(), clock(), root, work);
+  try {
+    const real = it.ask("hashes", { asks });
+    assert.ok(
+      real?.["spec/tickets/a-child.md"]?.hash,
+      "the real index hashes the note",
+    );
+    assert.deepEqual(fakeIndex(files, work, join).ask("hashes", { asks }), real);
   } finally {
     it.ask("stop", {});
   }

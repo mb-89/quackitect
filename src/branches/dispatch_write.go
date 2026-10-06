@@ -1,7 +1,7 @@
 // The dispatcher's writes: a fix group holding the loose agent tickets, and a
 // branch for each ready group on main standing with none. Every write rides one
-// commit on claude/dispatch-<commit>, made in a worktree of its own, so no push
-// names main and the box's checkout moves nowhere.
+// commit on claude/dispatch-<commit>, made off main's tree with no work tree,
+// so no push names main and the box's checkout moves nowhere.
 // [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 package branches
 
@@ -13,13 +13,13 @@ import (
 	"strings"
 
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/yaml"
 )
 
-// The branch prefix the writes ride, the worktree they are made in, and a commit's short name as git prints it. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
+// The branch prefix the writes ride, and a commit's short name as git prints it. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 const (
 	writesPrefix = "claude/dispatch-"
-	writeTree    = runtimeFolder + "/dispatch"
 	writeShort   = 7
 	writeFree    = "free"
 	fixField     = "fix"
@@ -71,14 +71,16 @@ type writeAt struct {
 
 // What stops the writes: a write branch of this main already standing, or an earlier one still unmerged. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 func (d *Doors) writeState() writeAt {
-	main := d.quiet("rev-parse", "origin/"+trunk).Out
+	main := d.rev("origin/" + trunk)
 	if main == "" {
 		return writeAt{State: "blind"}
 	}
 	branch := writesPrefix + shortWrite(main)
-	standing := d.remoteRows("branch", "-r", "--list", "origin/"+writesPrefix+"*")
+	stood, _ := d.Repo.Refs(remoteRefs + writesPrefix)
+	standing := remoteRows(stood)
+	inside, _ := d.Repo.Merged(remoteRefs, "origin/"+trunk)
 	merged := map[string]bool{}
-	for _, one := range d.remoteRows("branch", "-r", "--merged", "origin/"+trunk) {
+	for _, one := range remoteRows(inside) {
 		merged[one] = true
 	}
 	for _, one := range standing {
@@ -95,12 +97,10 @@ func (d *Doors) writeState() writeAt {
 }
 
 // The remote branches a git branch listing names, origin/ cut off. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
-func (d *Doors) remoteRows(args ...string) []string {
+func remoteRows(refs []git.Ref) []string {
 	var out []string
-	for _, row := range strings.Split(d.quiet(args...).Out, "\n") {
-		if row = strings.TrimPrefix(strings.TrimSpace(row), "origin/"); row != "" {
-			out = append(out, row)
-		}
+	for _, one := range refs {
+		out = append(out, strings.TrimPrefix(one.Name, remoteRefs))
 	}
 	return out
 }
@@ -194,7 +194,7 @@ func (d *Doors) fixGroup(name, parent string) (string, string) {
 
 // The ticket schema under the method root, the one kind governing spec/tickets, which the mint reads. [[spec/design_output/schema#mint-writes-a-valid-note]]
 func (d *Doors) schemas() *check.Kinds {
-	files := check.Texts{ticketSchema: readFile(d.methodAt(ticketSchema))}
+	files := check.Texts{ticketSchema: d.methodRead(ticketSchema)}
 	return check.SchemasIn(check.TreeOver(d.Method, files))
 }
 
@@ -206,7 +206,7 @@ type processRoute struct {
 
 // The route a process file holds, as processAt in src/scripts/process.js reads it. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func (d *Doors) processAt(name string) (processRoute, string) {
-	text := readFile(d.methodAt(processFolder + "/" + name + processEnd))
+	text := d.methodRead(processFolder + "/" + name + processEnd)
 	if text == "" {
 		return processRoute{}, processFolder + " holds no " + name + "."
 	}
@@ -243,27 +243,13 @@ func canonicalOf(said any) any {
 	return yaml.AsString(said)
 }
 
-// One commit in a worktree off main, pushed to the write branch, and the worktree gone after. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
+// One commit off main carrying the writes, pushed to the write branch, which touches no work tree. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 func (d *Doors) land(branch string, files map[string]string, main string) string {
-	at := d.at(writeTree)
-	d.quiet("worktree", "remove", "--force", at)
-	if !d.quiet("worktree", "add", "--detach", at, "origin/"+trunk).OK {
-		return "The worktree at " + writeTree + " would not open, so nothing is written."
-	}
-	defer d.quiet("worktree", "remove", "--force", at)
-	for path, text := range files {
-		if err := d.write(writeTree+"/"+path, text); err != nil {
-			return "The writes would not land in the worktree, so nothing is pushed."
-		}
-	}
-	inside := func(args ...string) bool { return d.quiet(append([]string{"-C", at}, args...)...).OK }
-	if !inside("add", "-A") {
-		return "The writes would not stage, so nothing is pushed."
-	}
-	if !inside("commit", "-m", branch+": the dispatch over "+trunk+" at "+shortWrite(main)) {
+	made, err := d.Repo.CommitFiles("origin/"+trunk, files, branch+": the dispatch over "+trunk+" at "+shortWrite(main))
+	if err != nil {
 		return "The writes would not commit, so nothing is pushed."
 	}
-	if !inside("push", "origin", "HEAD:refs/heads/"+branch) {
+	if !d.Repo.PushTo(made, branch).OK {
 		return "The push of " + branch + " came back refused."
 	}
 	return ""
@@ -275,7 +261,7 @@ func (d *Doors) opens(names []string) []string {
 	for _, name := range names {
 		branch := workBranch + name
 		mark := d.markOff(branch)
-		if mark == "" || !d.quiet("push", "origin", mark+":refs/heads/"+branch).OK {
+		if mark == "" || !d.Repo.PushTo(mark, branch).OK {
 			refused = append(refused, branch)
 		}
 	}

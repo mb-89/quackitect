@@ -50,7 +50,7 @@ func (d *Doors) route(path string) int {
 			} `json:"head"`
 		} `json:"pull_request"`
 	}
-	if err := json.Unmarshal([]byte(readFile(at)), &event); err != nil || event.PullRequest.Head.Ref == "" {
+	if err := json.Unmarshal([]byte(d.read(d.inTree(at))), &event); err != nil || event.PullRequest.Head.Ref == "" {
 		d.warn("cloud route reads no pull request event at %q: ./RUNME.sh cloud route <event.json>", at)
 		return codeRefused
 	}

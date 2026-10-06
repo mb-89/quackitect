@@ -1,4 +1,4 @@
-// The test verb over a real clone, ported off test/level0/test-verb.test.js,
+// The test verb over a fake clone, its node and go runs off the fake disk, ported off test/level0/test-verb.test.js,
 // go-modules.test.js and pull-leaves.test.js: named files and folders, the
 // tests a branch changes, the red run over HEAD's text, and the words a run answers.
 // [[spec/tickets/work-verbs-port-to-go]]
@@ -210,8 +210,8 @@ func TestPFARedRunNamesItsCasesAboveTheVerdict(t *testing.T) {
 func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
-	base := one.git("rev-parse", "HEAD")
-	one.git("switch", "-q", "-c", workBranch+"x")
+	base := one.rev("HEAD")
+	one.cut(workBranch+"x", "")
 	one.land("a source", map[string]string{"src/x.js": "x\n"})
 	if code := one.branchSays("test"); code != codeRed {
 		t.Fatalf("the test verb answers %d", code)
@@ -225,7 +225,7 @@ func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
 func TestPFABranchChangingATestRunsIt(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
-	one.git("switch", "-q", "-c", workBranch+"x")
+	one.cut(workBranch+"x", "")
 	one.land("a test", map[string]string{"test/level0/x.test.js": pfNodeTests(3, ""), "src/x.js": "x\n"})
 	if code := one.branchSays("test"); code != 0 {
 		t.Fatalf("the test verb answers %d: %s", code, one.out.String())
@@ -239,7 +239,7 @@ func TestPFABranchChangingATestRunsIt(t *testing.T) {
 func TestPFADeletedTestStaysOutAndAnUntrackedFolderRuns(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{"test/level0/gone.test.js": "require(\"node:test\").test(\"gone\", () => { throw new Error(\"it ran\"); });\n"}).desk()
-	one.sh(one.root, "rm", "test/level0/gone.test.js")
+	one.erase("test/level0/gone.test.js")
 	one.write(map[string]string{"test/level0/fresh/new.test.js": pfNodeTests(1, "")})
 	if code := one.branchSays("test"); code != 0 {
 		t.Fatalf("the test verb answers %d: %s", code, one.out.String())

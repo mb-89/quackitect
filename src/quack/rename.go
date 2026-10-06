@@ -244,7 +244,7 @@ func (d landingDoors) renaming(from, to string) renamed {
 		return renamed{why: err.Error()}
 	}
 	// Every reader of the tree asks git for its file list, so the move reaches git too. [[spec/design_output/index#a-rename-reaches-a-name]]
-	gitRun(d.root, "add", "-A", from, to)
+	_ = d.git.Add([]string{from, to})
 	var wrote []string
 	read, texts, skipped := d.writtenFiles()
 	for _, file := range read {

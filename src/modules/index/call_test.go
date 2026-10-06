@@ -5,10 +5,17 @@ package index
 
 import (
 	"errors"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/config"
+	"quackitect/src/imports"
 	"quackitect/src/q"
 )
 
@@ -87,6 +94,40 @@ func TestAFailingCallAnswersItsReason(t *testing.T) {
 	}
 	if one, _ := b.Get(said.Handle); one.State != Failed {
 		t.Fatalf("%s stands %s", said.Handle, one.State)
+	}
+}
+
+// A wait arms its span through the timer the book holds, so a case reads when it waits. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestAWaitArmsItsSpanThroughTheBooksTimer(t *testing.T) {
+	t.Parallel()
+	b, _, _ := bookOf(t)
+	armed := []time.Duration{}
+	b.after = func(span time.Duration) <-chan time.Time {
+		armed = append(armed, span)
+		return make(chan time.Time)
+	}
+	b.Wait("no-such-handle", patience)
+	if !slices.Equal(armed, []time.Duration{patience}) {
+		t.Fatalf("the wait arms %v through the book's timer", armed)
+	}
+}
+
+// The wait cases sleep on nothing, and the doors chapter lists this file among no test reaching a real door. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestTheWaitCasesSleepOnNothingAndTheDoorsChapterListsThemNowhere(t *testing.T) {
+	t.Parallel()
+	file, err := parser.ParseFile(token.NewFileSet(), "call_test.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if waits := imports.RealWaits(file); len(waits) > 0 {
+		t.Errorf("call_test.go calls %v, where the wait cases run on a signal", waits)
+	}
+	note, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "design_output", "doors.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(note), "`src/modules/index/call_test.go`") {
+		t.Error("spec/design_output/doors.md still lists src/modules/index/call_test.go as a test reaching a real door")
 	}
 }
 

@@ -4,16 +4,14 @@
 package main
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
 
 	"quackitect/src/modules/hooks/review"
+	"quackitect/src/proc"
 )
 
 // The span the verb gathers in, and the why a verb printing nothing answers. [[spec/tickets/review-spawns-off-the-door]]
@@ -26,17 +24,15 @@ var printedLines = regexp.MustCompile(`\r?\n`)
 
 // The branch verb off the method root, run in the work root, and its material or why it gathered none. [[spec/tickets/review-spawns-off-the-door]] [[spec/tickets/work-verbs-port-to-go]]
 func reviewOver(method string) func(root, branch string) (review.Material, string) {
+	return reviewRunOver(proc.Real, os.Executable, method)
+}
+
+// The branch verb off the method root, run in the work root through the process door under the binary the self answers, and its material or why it gathered none. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func reviewRunOver(run proc.Runner, self func() (string, error), method string) func(root, branch string) (review.Material, string) {
 	return func(root, branch string) (review.Material, string) {
-		span, stop := context.WithTimeout(context.Background(), reviewGathering)
-		defer stop()
-		road := append(selfRoad(method), "branch", "review", branch, "--json")
-		run := endsWhole(exec.CommandContext(span, road[0], road[1:]...))
-		run.Dir = root
-		run.Env = append(os.Environ(), "QUACKITECT_ROOT="+method, workRootVar+"="+root)
-		var out, errs bytes.Buffer
-		run.Stdout, run.Stderr = &out, &errs
-		_ = run.Run()
-		return gatheredOf(out.String(), errs.String())
+		road := append(selfRoadOver(self, method), "branch", "review", branch, "--json")
+		said := run(proc.Command{Argv: road, Dir: root, Env: []string{"QUACKITECT_ROOT=" + method, workRootVar + "=" + root}, Wait: reviewGathering})
+		return gatheredOf(said.Out, said.Err)
 	}
 }
 

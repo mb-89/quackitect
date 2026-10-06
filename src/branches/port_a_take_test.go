@@ -1,4 +1,4 @@
-// The take over a real clone, as test/level0/work.test.js drives it through
+// The take over a fake clone, as test/level0/work.test.js drives it through
 // fake doors: the uncommitted check, the parked ticket, the unpushed branch,
 // and the stuck hand-over handed out first.
 // [[spec/tickets/work-verbs-port-to-go]]
@@ -36,7 +36,7 @@ func TestPATakeStopsOnUncommittedWork(t *testing.T) {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
 	holds(t, paSaid(one), "uncommitted changes")
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != trunk {
+	if one.here() != trunk {
 		t.Fatal("the refused take moves the box")
 	}
 }
@@ -51,7 +51,7 @@ func TestPATakeLooksPastATaggedTicket(t *testing.T) {
 	if strings.Contains(paSaid(one), "uncommitted changes") {
 		t.Fatal("the tagged ticket stops the take")
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/one-group" {
+	if one.here() != "work/one-group" {
 		t.Fatal("the take leaves the box off the branch")
 	}
 }
@@ -75,7 +75,7 @@ func TestPAUntaggedChangeStopsTake(t *testing.T) {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
 	holds(t, paSaid(one), "uncommitted changes")
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != trunk {
+	if one.here() != trunk {
 		t.Fatal("the refused take moves the box")
 	}
 }
@@ -87,12 +87,12 @@ func TestPATakeRefusesBoxAhead(t *testing.T) {
 	one.branch("fix-lsp", map[string]string{"a.md": "a\n"})
 	paOn(one, "fix-lsp")
 	one.land("ahead", map[string]string{"b.md": "b\n"})
-	tip := one.git("rev-parse", "HEAD")
+	tip := one.rev("HEAD")
 	if code := one.branchSays("take"); code != codeRefused {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
 	holds(t, paSaid(one), "holds 1 commit(s) origin lacks")
-	if one.git("rev-parse", "HEAD") != tip {
+	if one.rev("HEAD") != tip {
 		t.Fatal("the take resets the commit away")
 	}
 }
@@ -106,26 +106,25 @@ func TestPATakeRefusesPickedBranchAhead(t *testing.T) {
 	for at := range 3 {
 		one.land(fmt.Sprintf("ahead %d", at), map[string]string{fmt.Sprintf("a%d.md", at): "a\n"})
 	}
-	tip := one.git("rev-parse", "HEAD")
-	one.git("switch", "-q", "main")
+	tip := one.rev("HEAD")
+	one.switchTo("main")
 	if code := one.branchSays("take"); code != codeRefused {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
 	holds(t, paSaid(one), "work/one-group holds 3 commit(s) origin lacks")
-	if one.git("rev-parse", "work/one-group") != tip {
+	if one.rev("work/one-group") != tip {
 		t.Fatal("the take resets the commits away")
 	}
 }
 
 // A tree with a closed hand-over on work/landing and a free group on work/one-group. [[spec/tickets/work-verbs-port-to-go]]
-func paHandOver(t *testing.T, landingDate string) *tree {
+func paHandOver(t *testing.T, landingDate time.Time) *tree {
 	t.Helper()
 	one := newTree(t, nil)
-	if landingDate != "" {
-		one.env = []string{"GIT_COMMITTER_DATE=" + landingDate, "GIT_AUTHOR_DATE=" + landingDate}
+	if landingDate.IsZero() {
+		landingDate = testNow
 	}
-	one.branch("landing", map[string]string{ticketAt("landing"): withField(paGroupNote, "state", closedState)})
-	one.env = nil
+	one.branchAt("landing", map[string]string{ticketAt("landing"): withField(paGroupNote, "state", closedState)}, landingDate)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	return one
 }
@@ -135,18 +134,18 @@ func paTrunkMoves(one *tree) {
 	one.t.Helper()
 	one.land("trunk one", map[string]string{"t1.md": "t\n"})
 	one.land("trunk two", map[string]string{"t2.md": "t\n"})
-	one.git("push", "-q", "origin", "main")
+	one.push("main")
 }
 
 // Branch take hands out a stuck hand-over first, prints sync, check and push, and writes no record. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeHandsStuckFirst(t *testing.T) {
 	t.Parallel()
-	one := paHandOver(t, "")
+	one := paHandOver(t, time.Time{})
 	paTrunkMoves(one)
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/landing" {
+	if one.here() != "work/landing" {
 		t.Fatal("the take leaves the box off the stuck branch")
 	}
 	said := paSaid(one)
@@ -155,7 +154,7 @@ func TestPATakeHandsStuckFirst(t *testing.T) {
 	if one.read(ticketAt("landing")) != withField(paGroupNote, "state", closedState) {
 		t.Fatal("the take writes a record on a closed group")
 	}
-	if one.git("show", "origin/work/one-group:"+ticketAt("one-group")) != strings.TrimSpace(paGroupNote) {
+	if one.show("origin/work/one-group", ticketAt("one-group")) != strings.TrimSpace(paGroupNote) {
 		t.Fatal("the free group moves")
 	}
 }
@@ -163,10 +162,10 @@ func TestPATakeHandsStuckFirst(t *testing.T) {
 // Branch take naming a free group passes a stuck hand-over by. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeNamedPassesStuckBy(t *testing.T) {
 	t.Parallel()
-	one := paHandOver(t, "")
+	one := paHandOver(t, time.Time{})
 	paTrunkMoves(one)
 	one.branchSays("take", "one-group")
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") == "work/landing" {
+	if one.here() == "work/landing" {
 		t.Fatal("the take moves onto the stuck branch")
 	}
 	if strings.Contains(paSaid(one), "You are on work/landing") {
@@ -178,8 +177,7 @@ func TestPATakeNamedPassesStuckBy(t *testing.T) {
 func TestPATakeHandsStaleByTheClock(t *testing.T) {
 	t.Parallel()
 	from := time.Date(2026, 1, 2, 0, 0, 0, 0, time.UTC)
-	twoDaysBack := from.Add(-48 * time.Hour).Unix()
-	one := paHandOver(t, fmt.Sprintf("@%d +0000", twoDaysBack))
+	one := paHandOver(t, from.Add(-48*time.Hour))
 	one.d.Now = func() time.Time { return from }
 	one.d.Config = func(key string) any {
 		if key == staleKey {
@@ -190,7 +188,7 @@ func TestPATakeHandsStaleByTheClock(t *testing.T) {
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/landing" {
+	if one.here() != "work/landing" {
 		t.Fatal("the take leaves the box off the stale branch")
 	}
 	holds(t, paSaid(one), "You are on work/landing, whose hand-over stands stale")

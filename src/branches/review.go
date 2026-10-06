@@ -97,16 +97,16 @@ func review(d *Doors, name string, argv []string) int {
 // The group ticket is the handback, and its retro chapter the retro. [[spec/design_output/review#the-questions]]
 func (d *Doors) gather(branch, at, trunkRef, first string) material {
 	ticket := ticketAt(strings.TrimPrefix(branch, workBranch))
-	handback := d.show(at + ":" + ticket)
+	handback := d.show(at, ticket)
 	return material{
 		Branch:    branch,
 		Ref:       at,
 		Trunk:     trunkRef,
-		Ask:       d.show(first + ":" + ticket),
+		Ask:       d.show(first, ticket),
 		Handback:  handback,
 		Retro:     retroOnTicket(handback),
-		Stat:      d.quiet("diff", "--stat", trunkRef+"..."+at).Out,
-		Diff:      capped(d.quiet("diff", trunkRef+"..."+at).Out),
+		Stat:      strings.TrimSpace(d.patchSince(trunkRef, at, true)),
+		Diff:      capped(strings.TrimSpace(d.patchSince(trunkRef, at, false))),
 		Check:     d.checkOn(branch, at),
 		Unreached: d.unreached(trunkRef, at),
 	}
@@ -115,30 +115,39 @@ func (d *Doors) gather(branch, at, trunkRef, first string) material {
 // The ref a name stands at, on origin first, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
 func (d *Doors) refFor(name string) string {
 	for _, one := range []string{"origin/" + name, name} {
-		if d.quiet("rev-parse", "--verify", "--quiet", one).OK {
+		if _, ok := d.Repo.Resolve(one); ok {
 			return one
 		}
 	}
 	return ""
 }
 
-// The first commit a ref carries past trunk. [[spec/design_output/review#what-the-verb-gathers]]
-func (d *Doors) firstCommit(trunkRef, at string) string {
-	for _, row := range strings.Split(d.quiet("rev-list", "--reverse", trunkRef+".."+at).Out, "\n") {
-		if row != "" {
-			return row
-		}
-	}
-	return ""
-}
-
-// What git shows at a ref, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
-func (d *Doors) show(at string) string {
-	said := d.quiet("show", at)
-	if !said.OK {
+// The patch or its stat from where a ref leaves trunk to the ref, as git diff trunk...ref reads it. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) patchSince(trunkRef, at string, stat bool) string {
+	base, ok := d.Repo.MergeBase(trunkRef, at)
+	if !ok {
 		return ""
 	}
-	return said.Out
+	said, _ := d.Repo.Patch(base, at, stat)
+	return said
+}
+
+// The first commit a ref carries past trunk. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) firstCommit(trunkRef, at string) string {
+	commits, _ := d.Repo.Log(trunkRef, at, false)
+	if len(commits) == 0 {
+		return ""
+	}
+	return commits[len(commits)-1].Hash
+}
+
+// A file at a ref, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) show(ref, path string) string {
+	said, ok := d.Repo.Show(ref, path)
+	if !ok {
+		return ""
+	}
+	return strings.TrimSpace(said)
 }
 
 // A diff cut at the cap, with a line saying it runs on. [[spec/design_output/review#what-the-verb-gathers]]
@@ -237,8 +246,7 @@ func (d *Doors) checkOn(branch, at string) checked {
 	rel := reviewFolder + "/" + strings.Join(strings.Split(branch, "/"), "-")
 	where := d.at(rel)
 	d.remove(rel)
-	d.quiet("worktree", "prune")
-	if !d.quiet("worktree", "add", "--detach", where, at).OK {
+	if d.Repo.AddWorktree(rel, at) != nil {
 		return checked{Says: "no worktree opens on " + at}
 	}
 	survey := d.read(toolsFile)
@@ -259,18 +267,17 @@ func (d *Doors) checkOn(branch, at string) checked {
 		if !d.exists(one) {
 			continue
 		}
-		if to := filepath.Join(where, filepath.FromSlash(one)); d.link(one, to) {
+		if to := rel + "/" + one; d.link(one, to) {
 			linked = append(linked, to)
 		}
 	}
 	bin := filepath.Join(where, filepath.FromSlash(binFolder), "se-index"+exe())
 	ran := d.run(where, nil, "", bin, "verb", filepath.Join(where, "src", "scripts"), "check")
 	for _, one := range linked {
-		unlink(one)
+		d.unlink(one)
 	}
-	d.quiet("worktree", "remove", "--force", where)
+	_ = d.Repo.RemoveWorktree(rel)
 	d.remove(rel)
-	d.quiet("worktree", "prune")
 	code := ran.Code
 	if ran.OK {
 		return checked{OK: true, Code: &code}

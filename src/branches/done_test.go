@@ -9,7 +9,7 @@ func TestDoneWantsTheCheckOnHead(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
+	one.cut("work/g", "origin/work/g")
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d", code)
 	}

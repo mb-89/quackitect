@@ -7,6 +7,8 @@ import (
 	"cmp"
 	"slices"
 	"strings"
+
+	"quackitect/src/modules/git"
 )
 
 // The variable the harness names a cloud box's session in, which a pull request event routes to. [[spec/tickets/boxes-write-their-final-record]]
@@ -66,14 +68,12 @@ func withTips(rows []boxRow, stood []stand, now int64, pulls map[string]string) 
 	return out
 }
 
-// The pull request numbers by the tip their head names, off ls-remote's rows. [[spec/tickets/the-fleet-verb-watches-boxes]]
-func pullsOf(said string) map[string]string {
+// The pull request numbers by the tip their head names, off origin's pull refs. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func pullsOf(refs []git.Ref) map[string]string {
 	out := map[string]string{}
-	for _, row := range strings.Split(said, "\n") {
-		sha, name, ok := strings.Cut(strings.TrimSpace(row), "\t")
-		number := strings.TrimSuffix(strings.TrimPrefix(name, "refs/pull/"), "/head")
-		if ok && number != name {
-			out[sha] = "#" + number
+	for _, one := range refs {
+		if number, ok := strings.CutSuffix(strings.TrimPrefix(one.Name, pullRefs), "/head"); ok && !strings.Contains(number, "/") {
+			out[one.Hash] = "#" + number
 		}
 	}
 	return out
@@ -91,7 +91,8 @@ func (d *Doors) idleSpan() int64 {
 func (d *Doors) fleet() int {
 	d.fetch()
 	stood, _ := d.readWork(false)
-	pulls := pullsOf(d.quiet("ls-remote", "origin", "refs/pull/*/head").Out)
+	said, _ := d.Repo.RemoteRefs(pullRefs)
+	pulls := pullsOf(said)
 	rows := withTips(fleetRows(stood, standingAll(stood)), stood, d.nowSeconds(), pulls)
 	for _, one := range rows {
 		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull, one.Model, one.Cost, one.Final), "  "))

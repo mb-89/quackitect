@@ -23,7 +23,7 @@ func TestAMergeStandsAsideForAPullRequest(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/7/head")
+	one.pushAt("origin/work/g", "refs/pull/7/head")
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d", code)
 	}

@@ -54,6 +54,13 @@ runs on the fake.
 
 That test costs what the real thing costs, once for the suite.
 
+The owner ruled that this held over every door, the Go doors among them. A door
+driven from many tests paid the box in each, and a loaded box turned any of them
+red. The lease case went red that way under a parallel run, with nothing wrong
+in the code. The audit in [[spec/design_output/doors#one-contract-test-per-door]]
+listed the door tests and every family still reaching a real door, each with its
+fate, so one list let a program hold the rule.
+
 ## 4. A fake behaves
 
 Fowler draws the line: a fake behaves, and somebody scripts a mock. A mock
@@ -84,6 +91,28 @@ Weigh the doc against the change. A doc costs a paragraph to change, and the
 same design in code costs the code. Write one where the design holds a decision
 somebody else would make differently, and skip it on a one-line fix.
 
+## 7. A fixture builds once
+
+Three quack cases each ran `go build` over the same root, and two import cases
+each planted the same tree. One build a package run, copied where a case wrote
+into it, served every case, and the quack case alone dropped two builds of
+several seconds each.
+
+## 8. No wall-clock wait
+
+The lease flake and the two cold-box waits each slept or polled on the wall
+clock, and each passed on a quiet box. A fake clock or a readiness signal gave
+the same case one answer on every box. A test file calling `time.Sleep` or a
+spawn was a thing a parser read, so `src/imports/clock.go` held the rule, and
+the check named a file doing either outside the audit.
+
+## 10. A module holds no state
+
+State a module held outlived the case that wrote it, so the next case read it.
+The survey found one such state, `namePatterns` in
+`src/modules/check/private.go`, a memo of a pure compile, and the audit named it
+as the exception.
+
 ## 11. The fake index
 
 The owner ruled that every module tested in isolation against a fake index. A
@@ -95,6 +124,10 @@ in for it.
 |---|---|
 | an agent reading one module and the names it read, and nothing past them | a harness, `q/qtest`, standing beside the index |
 | a module test with no disk, no git, no database and no port | a module naming its requests, and leaving the running to the index |
+
+A module that read the index, computed, and wrote the index tested against
+`q/qtest` alone. The `onlyq` and `ioonly` analyzers held every module without
+the `io` flag to that shape, so the rule named what the check enforced.
 
 A door fake in a module test made the module reach past the index. The fake
 index held it to the one peer the design gave it. For the harness, see

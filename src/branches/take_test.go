@@ -22,14 +22,14 @@ func TestTheTakeClaimsAFreeGroup(t *testing.T) {
 	if code := one.branchSays("take"); code != 0 {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/g" {
+	if one.here() != "work/g" {
 		t.Fatal("the take leaves the box off the branch")
 	}
 	held := heldIn(one.read(ticketAt("g")))
 	if held == nil || held.Step != "children" {
 		t.Fatalf("the claim reads %+v", held)
 	}
-	if one.git("rev-parse", "HEAD") != one.git("rev-parse", "origin/work/g") {
+	if one.rev("HEAD") != one.rev("origin/work/g") {
 		t.Fatal("the claim stays off origin")
 	}
 	holds(t, one.out.String(), "Its tickets stand in spec/tickets, and spec/tickets/g.md is the group itself.")
@@ -43,8 +43,8 @@ func TestTheOpenPushesTheBranchAndMarksTrunk(t *testing.T) {
 	if code := one.branchSays("open", "g"); code != 0 {
 		t.Fatalf("the open answers %d: %s", code, one.errs.String())
 	}
-	one.git("fetch", "-q", "origin")
-	if fieldOf(one.git("show", "origin/main:"+ticketAt("g")), cloudMark) != "true" {
+	one.fetch()
+	if fieldOf(one.show("origin/main", ticketAt("g")), cloudMark) != "true" {
 		t.Fatal("trunk carries no marker")
 	}
 	holds(t, one.out.String(), "work/g stands at todo in the cloud, carrying spec/tickets/g.md.")
