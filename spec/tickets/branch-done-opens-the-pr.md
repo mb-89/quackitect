@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: f449b0e5d26675acbc3fe8053ddf7eded18a472a
+    hash_after: 6a5605ca3b27d2f6e3e5266a638c46862dc908e4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    2.1  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: 3b1ac24038e52881
+        size: 903
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -337,26 +360,33 @@ The pull road stands once, in pullOpens in src/branches/dispatch_fire.go, which 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_c_done_test.go src/branches/dispatch_done_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+branch done now opens the work branch pull request against main with auto-merge on, in the same call as its push, and prints its address. A run with no token prints the reason and the work skill line, and still answers green. The dispatch opens the pull request of every done branch carrying a commit main lacks, and reads a standing one without a second post. Both roads run through pullOpens, on the one send door the doors carry. The dispatch cases moved to dispatch_done_test.go, apart from the update cases running-work-takes-main-fixes holds red in dispatch_fire_test.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, plus src/quack/branch_doors_test.go, src/branches/dispatch_done_test.go and src/branches/dispatch_level_test.go for its tests.
+Every request goes through Doors.Send, which the tests fill with the fake hub and branchDoors sets to httpSend.
+Comments on workPull, pullOpens and the done road link this ticket and name the approach.
+The pull road stands once, in pullOpens in src/branches/dispatch_fire.go.
 
 # accept
 
