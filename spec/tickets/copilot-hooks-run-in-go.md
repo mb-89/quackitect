@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -152,6 +152,19 @@ record:
         hash: e1dd042af4ef6bcc
         size: 765
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 584ac002aca12b8a3076e3f33f537ff64e314e2c
+    hash_after: 584ac002aca12b8a3076e3f33f537ff64e314e2c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9bfe92748f776f12
+        size: 5593
+    def: 08e16d07b0de477c
 group: javascript-leaves
 ---
 
@@ -310,7 +323,7 @@ Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking 
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test src/quack/hook_verb_test.go
+./RUNME.sh branch test src/quack/hook_verb_test.go src/quack/setup_verb_test.go src/modules/hooks/copilot_test.go src/modules/hooks/down_test.go src/modules/edits/mutations_test.go
 
 ### red
 
@@ -328,20 +341,14 @@ Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-All seventeen tests the draft names fail on their own assertion, against stubs that return zero values.
-
-- The retry fault comes from a failing log, since a down door never faults: it refuses a guarded call or lets it through.
-- The real door's test runs the ask against a loopback test server, the one way to check the bearer token and the standing file.
-- The test builds the script path from parts, or its own grep would keep it red.
-- No Go port of the down door stood, so down.go ports it fresh.
-- ReplyOf returns a map, so a reply of nothing and an empty object stay apart.
+The cases the first round wrote still fail on their own assertion over the merged tree, against stubs that return zero values. The route change adds no case, since main changed none of the files the approach names. The git hook cases in `hook_verb_test.go` pass beside them, and the verb answers on the file as a whole.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- TestCopilotScriptsLeave and TestCopilotHooksNameNoScript fail on lines one and two, the TestHook cases on line three, and a live check answers line four
+- `TestCopilotScriptsLeave` and `TestCopilotHooksNameNoScript` fail on lines one and two, the hook cases on line three, and a live check answers line four
 - the hooks door, the log and the clock reach the tests as fakes, and the one real door case runs against a loopback test server
 
 # gate
