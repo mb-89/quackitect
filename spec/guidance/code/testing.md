@@ -11,7 +11,7 @@ rationale: [[spec/rationales/testing]]
 2. In that JavaScript, write a normal test against a fake from `src/doors/fake`. It touches memory and nothing else. *
 3. Give each door one door test against the real thing, list it in the door audit, and run every other test on the door's fake. A door driven from many tests waits on the box in each of them, and one nobody drives fails on the first box its fake misses. In the JavaScript the door test stands in `test/contract`. [[spec/design_output/doors#one-contract-test-per-door]] *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
-5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
+5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. For a defect, that failing case is a `./RUNME.sh probe` run or a contract case showing the live fault through the real door, since a fix against a guess lands green while the fault stands. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
 6. Name a test as the claim it makes, and assert every word of that claim. Read the rules on behavior tests in [[spec/guidance/code/examples]].
 7. Build a fixture once a package run and share it where no case writes to it, and copy it into the case where one does. A fixture each case builds pays its build once a case. *
 8. Take the clock and the random source as arguments, and wait on readiness or a fake clock outside a door test, where no process spawns either. A wait on the wall clock passes on a quiet box and fails on a loaded one, and the check names a test doing it outside the audit. *
@@ -29,6 +29,7 @@ rationale: [[spec/rationales/testing]]
 |---|---|---|
 | 4 | a fake disk that reads what it writes | a double answering a scripted string |
 | 5 | a red test before the code | code first, a test after |
+| 5 | a contract case red on the live fault, then the fix | a fix to the code a guess names, green on the fake |
 | 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |
 | 13 | one suite of cases run over `FakeGit` and a real repository | a fake no suite holds to the real thing |
 | 7 | one go build of the binary, copied into each case's folder | a go build in each case |
