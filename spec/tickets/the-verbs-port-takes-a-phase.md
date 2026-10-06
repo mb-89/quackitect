@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: does the work the ask names, and says what came back
@@ -47,6 +47,19 @@ record:
         hash: ad7b41ebfb9eacde
         size: 305
     def: c093c04dc9e56675
+  - step: follow
+    hand: box d8921a909c1fa5 · claude-code-remote
+    hash_before: 1b6ca98b7ad23605e7e3754e6ca42df92872ad3c
+    hash_after: 1b6ca98b7ad23605e7e3754e6ca42df92872ad3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "   79.8  in all"
+    def: 9765995063d5dc32
+reason: done
 ---
 
 # Ask
@@ -79,26 +92,31 @@ A new phase 11, key migration.phase11, decided by the owner on the coordinator r
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/migration/migration_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The owner chose a phase for the verbs port. Phase 11 stands under the key migration.phase11 in spec/config/level0.json and in the phase table of src/modules/migration/migration.go. Its group the-verbs-run-in-go closed through pull request 106. The tree already carries the result, so this step names where it stands and adds nothing.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the result: phase 11 and its key stand where the result names them
+- every fact stands in one place: the phase table holds the phase, and this ticket points at it
 
 # Discussion
 
