@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 9d657bfa5c2a59d2
         size: 739
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 78e3bfa386b47202f5b06458d5fdc0631c1a0426
+    hash_after: e158d2509d9c42e0c86f4ec18ea94d77d6ed1368
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -296,14 +305,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint --changed --strict
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the lint verb, the check's parts, the commit verb and the changed door the ask names. The warnings it clears sit in files the branch changes, which the new changed part reads whole, and the moved pointers follow the one heading that cut.
+- every door has a fake: the lint's changed door has `lintFake.changed` and the git fake in `lint_changed_test.go`, and the commit's lint runs through the landing fake's verb
+- each new comment points at this ticket, which carries the approach
+- one place: `engineWrites` in `src/quack/lint_changed.go` names the folders the engine writes, and the lint and the commit both read it through `handWritten`
 
 ## tests-green
 
