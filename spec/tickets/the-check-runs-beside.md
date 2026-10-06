@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -287,6 +287,30 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 240e9bc07880faf287c78d307d06bb98a738915c
+    hash_after: 240e9bc07880faf287c78d307d06bb98a738915c
+    inputs:
+      - name: retro/write
+        hash: 870e342117f4c54a
+        size: 3173
+      - name: [[spec/tickets/the-parts-start-at-once]]
+        hash: dfee1caff0b0df9a
+        size: 1112
+      - name: [[spec/tickets/the-budget-reads-the-span]]
+        hash: 2a6c87fb96da7541
+        size: 483
+      - name: [[spec/tickets/index-cases-wait-for-it]]
+        hash: 0ac7d2bb2c4c626e
+        size: 408
+      - name: [[spec/tickets/vale-retries-its-timeout]]
+        hash: 6ad91211404d5f27
+        size: 631
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 7c1b55b24304355c
+        size: 3362
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -441,7 +465,7 @@ The worry through the run was whether the review reds came from this group or fr
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- nothing: every tool stood on the box, and the review worktree fetched vale and biome on its own
+- nothing: every tool stood on the box, and the review worktree fetched its own linters
 
 ### met
 
@@ -449,9 +473,9 @@ The worry through the run was whether the review reds came from this group or fr
 <!-- the form is list -->
 
 - 21:5x: a conflict at sync in seven files, since main changed the check and the table rule beside this group
-- the write door refused a git rm and a hand edit of the projected yml, so rules.go took the change and the projection wrote the yml
-- the MCP pull tool lost its hook once, and RUNME.sh ticket pull carried the hand-back
+- the write door refused a git rm and a hand edit of a projected rule, so the projection wrote the rule
 - the stop hook refused a stop while a helper ran, since the box stops with the turn
+- 22:07: a red in the rules part on the box alone, Vale past its cap under load
 
 ### left
 
