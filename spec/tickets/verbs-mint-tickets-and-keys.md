@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -143,6 +143,15 @@ record:
         hash: bdf59bab9d2faa1c
         size: 3478
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 82faf74df1afabf4edfc4ef2aa7ec6025e5b094f
+    hash_after: 82faf74df1afabf4edfc4ef2aa7ec6025e5b094f
+    inputs:
+      - name: ask
+        hash: 9f3104d696453518
+        size: 518
+    def: c01ae0f2ace0cecb
 group: engine-verbs-hold
 ---
 
@@ -179,7 +188,7 @@ Hands clone tickets with sed and edit the tracked config with scripts, and the c
 
 Two verbs each take one flag more.
 
-Mint: a new function askFlags in src/quack/verb_mint.go splits the words before fieldsIn runs. It reads the process the --process word names through pull.ProcessAt, and takes every --<name>=value word whose slug matches a name under the process's ask (gain, breaks, done_when, view, from). A list field such as done_when takes the flag once a line, so --done_when may repeat. The rest of the words go to fieldsIn as today, so a stray field still comes back refused. After withRoute, mintVerb writes fields[askField] off the ask fields through a new pull.AskOf(ask []any, said map[string][]string) in src/pull/process.go. AskOf writes each text field as a paragraph and each list field as '- ' lines, in the order the process names them. retroMintAskOf in src/quack/retro_mint.go then delegates to pull.AskOf, so one function owns the ask's layout. A mint naming both --Ask and an ask field comes back refused with exitUsage, naming the two roads. The --from=handover road keeps its place: HandedOver wraps the composed ask.
+Mint: a new function askFlags in src/quack/verb_mint.go splits the words before fieldsIn runs. It reads the process the --process word names through pull.ProcessAt, and takes every --<name>=value word whose slug matches a name under the process's ask (gain, breaks, done_when, view, from). A list field such as done_when takes the flag once a line, so --done_when may repeat. The rest of the words go to fieldsIn as today, so a stray field still comes back refused. After withRoute, mintVerb writes fields[askField] off the ask fields through a new pull.AskFrom(ask []any, said map[string][]string) in src/pull/process.go. AskFrom writes each text field as a paragraph and each list field as '- ' lines, in the order the process names them. retroMintAskOf in src/quack/retro_mint.go then delegates to pull.AskFrom, so one function owns the ask's layout. A mint naming both --Ask and an ask field comes back refused with exitUsage, naming the two roads. The --from=handover road keeps its place: HandedOver wraps the composed ask.
 
 Config: configVerb in src/quack/verb_config.go reads a --tracked word among the flags it drops today. configWrites takes the layer path as an argument: config.Tracked with --tracked, config.Local otherwise. The write keeps settingAt and orderedAt, so the comment member and key order stand. The printed line and the log row name the layer the write lands in. The usage line under the row list names --tracked beside the local write.
 
@@ -206,7 +215,7 @@ src/modules/config/keys.go actions config/set (runs node run config key value)
 
 src/quack/verb_mint_test.go TestMintVerb/a_ticket_takes_the_gain_the_breaks_and_the_done_when_as_fields
 src/quack/verb_mint_test.go TestMintVerb/a_ticket_naming_the_Ask_and_an_ask_field_comes_back_refused
-src/pull/process_test.go TestAskOfWritesEachFieldInRouteOrder
+src/pull/process_test.go TestAskFromWritesEachFieldInRouteOrder
 src/quack/verb_config_test.go TestConfigWritesTheTrackedLayerWithTracked
 
 ### answers
@@ -237,6 +246,8 @@ src/quack/verb_config_test.go
 Opened verb_mint.go (mintVerb, fieldsIn, withRoute), pull/process.go (ProcessAt, AskRows, HandedOver), retro_mint.go (retroMintAskOf, retroMintOne), verb_config.go (configVerb, configWrites), config/keys.go actions, and spec/processes/standard.yaml's ask names.
 Callers came from a grep for mintVerb, the mint verb word, retroMintAskOf, configWrites and the config verb word across src.
 The mint done_when line meets TestMintVerb's new gain/breaks/done_when case under go test ./src/quack/; the config line meets TestConfigWritesTheTrackedLayerWithTracked under the same command; ./RUNME.sh check stands as its own command.
+The approach adds a --tracked flag to the config verb and no config key, so no default file takes one.
+The ask helper stands as AskFrom in src/pull/process.go, as tests-red wrote it, and the approach names it so.
 
 ## tests-red
 
