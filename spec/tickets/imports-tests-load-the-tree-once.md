@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: code-is-pure-tests-behave
 step: do
+record:
+  - step: do
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 912e3c7e6b20e58a74614959ecfab23654be902d
+    hash_after: 912e3c7e6b20e58a74614959ecfab23654be902d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "  102.1  in all"
+    inputs:
+      - name: ask
+        hash: 9e0484f32b10cee3
+        size: 505
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -48,26 +66,32 @@ Each tree case loads the module again, and each new guard adds a load of its own
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Nothing changes here. On this branch one case alone, TestTheTreeHoldsTheImportRules in src/imports/tree_test.go, loads the tree, so the package loads it once a run, and go test -count=1 ./src/imports takes about five and a half seconds before and after. The tests-meet-the-doors-once branch adds a second tree case and memoizes the load as treeLoad through sync.OnceValues, and carries it to main. The guards this group adds parse the test files on a walk of their own, and take no second load.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask holds on this branch, and the says line names the sibling branch carrying the memoized load
+- the cleanup stands on the sibling branch, so this change carries none
+- the change adds no fact
 
 # Discussion
 
