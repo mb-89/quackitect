@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: classify
+step: check
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -213,6 +213,19 @@ record:
         hash: d9f11f0c6509207d
         size: 57
     def: eebf9c438d0f9b8b
+  - step: classify
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: 358ba95df18330f731f5e78d417ff46e828098e2
+    hash_after: 358ba95df18330f731f5e78d417ff46e828098e2
+    answered:
+      - name: classes
+        exit: 0
+        said: 103 active hour(s), and every finding, note and memory carries a disposition.
+    inputs:
+      - name: read
+        hash: eea9811c13637ae9
+        size: 53
+    def: 9127aa5c2c6b0be8
 ---
 
 # Ask
@@ -353,8 +366,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## classes
 
 <!-- retro classes, which counts each rate and refuses a finding with no disposition -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro classes retro-0d14eda
 
 # check
 
