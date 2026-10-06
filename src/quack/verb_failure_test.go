@@ -99,6 +99,25 @@ func TestFailureNewWritesTheNode(t *testing.T) {
 	}
 }
 
+func TestFailureNewStagesTheNodeItWrites(t *testing.T) {
+	t.Parallel()
+	root, _ := failureOver(t, map[string]string{})
+	var staged []string
+	verb := failureVerb(func() (failureDoors, error) {
+		return failureDoors{root: root, now: func() time.Time { return failureNow }, stage: func(path string) bool {
+			staged = append(staged, path)
+			return true
+		}}, nil
+	})
+	var out, errs bytes.Buffer
+	if code := verb([]string{"failure", "new", "leaf-held", "--level=warn", "--remedy=Pull again.", "--when=A hand pulls while a leaf stands in it."}, false, &out, &errs); code != 0 {
+		t.Fatalf("new answers %d: %s", code, errs.String())
+	}
+	if !reflect.DeepEqual(staged, []string{"spec/failures/leaf-held.md"}) {
+		t.Fatalf("new stages %q", staged)
+	}
+}
+
 func TestFailureNewRefusesANodeWithNoRemedy(t *testing.T) {
 	t.Parallel()
 	root, verb := failureOver(t, map[string]string{})

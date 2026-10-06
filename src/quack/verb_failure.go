@@ -47,12 +47,18 @@ var failureUsage = []string{
 type failureDoors struct {
 	root string
 	now  func() time.Time
+	// Stages a written node in git, so the next commit carries it. Nil stages nothing. [[spec/tickets/failure-new-lands-untracked]]
+	stage func(path string) bool
 }
 
 // The doors over the tree's own root and the wall clock. [[spec/design_output/failures#an-agent-raises-by-verb]]
 func failureHere() (failureDoors, error) {
 	root, err := index.Root()
-	return failureDoors{root: root, now: time.Now}, err
+	stage := func(path string) bool {
+		_, ok := gitIn(root, "add", "--", path)
+		return ok
+	}
+	return failureDoors{root: root, now: time.Now, stage: stage}, err
 }
 
 func init() { register("failure", failureVerb(failureHere)) }
@@ -174,6 +180,9 @@ func failureWrites(d failureDoors, said []string, out, errs io.Writer) int {
 	if err := (pull.OSDisk{Root: d.root}).Write(where, text); err != nil {
 		fmt.Fprintln(errs, err)
 		return exitFailed
+	}
+	if d.stage != nil && !d.stage(where) {
+		fmt.Fprintf(errs, "%s stands, and git stages it nowhere, so commit it by its path\n", where)
 	}
 	fmt.Fprintf(out, "%s stands. Raise it with ./RUNME.sh failure raise %s\n", where, id)
 	return 0
