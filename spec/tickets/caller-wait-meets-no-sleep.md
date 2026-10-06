@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["the-testing-rules-name-the-doors"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 543b3deeb4147393
         size: 1363
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 7627a9e3369bc6592be61172f2bf3801ac7e060e
+    hash_after: 7627a9e3369bc6592be61172f2bf3801ac7e060e
+    inputs:
+      - name: design/draft
+        hash: 543b3deeb4147393
+        size: 1363
+      - name: design/tests-red
+        hash: bd05809591ad6e05
+        size: 753
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,11 @@ Both cases fail on their own assertion: the wait arms nothing through the book t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: Book.Wait arms its span through the book's after field, which NewBook fills with time.After, and the case on a wait with no handle closes the held operations once the wait arms, after WaitCaller reads Open. The first done_when line meets TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations and TestAWaitArmsItsSpanThroughTheBooksTimer, both red on their own assertion. The second line met no red test, since call_test.go calls no time.Sleep and the check passes with the row standing; the gate adds TestTheWaitCasesSleepOnNothingAndTheDoorsChapterListsThemNowhere in src/modules/index/call_test.go, after the guards in src/pull and src/branches, red until the row leaves doors.md. The third line rests on the check at tests-green.
 
 # implement
 

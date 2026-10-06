@@ -5,12 +5,18 @@ package index
 
 import (
 	"errors"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"quackitect/src/config"
+	"quackitect/src/imports"
 	"quackitect/src/q"
 )
 
@@ -143,6 +149,25 @@ func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
 	}
 	if open := b.Open("s2"); len(open) != 1 {
 		t.Fatalf("s2 holds %v open", open)
+	}
+}
+
+// The wait cases sleep on nothing, and the doors chapter lists this file among no test reaching a real door. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestTheWaitCasesSleepOnNothingAndTheDoorsChapterListsThemNowhere(t *testing.T) {
+	t.Parallel()
+	file, err := parser.ParseFile(token.NewFileSet(), "call_test.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if waits := imports.RealWaits(file); len(waits) > 0 {
+		t.Errorf("call_test.go calls %v, where the wait cases run on a signal", waits)
+	}
+	note, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "design_output", "doors.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(note), "`src/modules/index/call_test.go`") {
+		t.Error("spec/design_output/doors.md still lists src/modules/index/call_test.go as a test reaching a real door")
 	}
 }
 
