@@ -65,9 +65,11 @@ var checks = map[string]func(Facts) bool{
 	// A cloud box hands a person's step back as a ticket, so no step there waits on a person. [[spec/tickets/the-stop-reads-the-state]]
 	"step-waits-on-person": func(f Facts) bool { return !f.Cloud && f.PersonStep },
 	"a-person-sits-here":   func(f Facts) bool { return !f.Cloud },
-	"a-report-stands":      func(f Facts) bool { return ReportStands(f.Text) || f.Reported },
-	"never":                func(Facts) bool { return false },
-	planIsEmpty:            PlanEmpty,
+	// A cloud box asks nobody, so a turn ending on a question decides instead. [[spec/design_output/stop#a-cloud-box-decides]]
+	"ends-on-a-question": func(f Facts) bool { return f.Cloud && EndsOnQuestion(f.Text) },
+	"a-report-stands":    func(f Facts) bool { return ReportStands(f.Text) || f.Reported },
+	"never":              func(Facts) bool { return false },
+	planIsEmpty:          PlanEmpty,
 }
 
 // A check's answer, and whether this door holds it. The god binding stands the engine's checks down. [[spec/design_output/stop#the-mechanical-checks]]

@@ -254,6 +254,52 @@ Under yours it carries the answers below, and each is a verb:
 `work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from
 the tip, so nothing writes to a branch nobody holds.
 
+## A hold beats with its session
+
+The tip's age reads a box dead late, and reads a live box that commits
+nothing dead. So a box holding a group beats: `branch beat` pushes a
+parentless commit on the empty tree to the branch `beats/<group>`, by force, with
+the clock door's time and the subject `<hand> beats`. `branch beat --end`
+writes `<hand> ends`. The take writes the first beat, a Stop command hook
+beats at each turn's end, and a SessionEnd command hook ends the hold. Its
+matcher leaves out `clear`, since a clear goes on inside a living box.
+
+| the last beat | the hold reads |
+|---|---|
+| ends, at or past the tip's second | dead at once |
+| beats, younger than `work.beatAfter` | live, whatever the tip's age |
+| none, or older | by the tip's age against `work.staleAfter` |
+
+A beat younger than half of `work.beatAfter` writes nothing, so a beat at
+every turn costs one push a span. The verb answers 0 and prints nothing off a
+branch this box holds, and on a refused push, since a Stop hook answering 2
+holds the turn. The beat stands on a branch, since the cloud's git proxy
+refuses a push outside `refs/heads`. The fetch brings it with every branch,
+and the list reads the refs it brings.
+
+| verb | on a live hold | on a dead hold |
+|---|---|---|
+| `branch take <name>` | refuses, naming the beat's age | takes it over |
+| `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
+| `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
+
+## A red commit reaches a rescue branch
+
+A cloud box dies with its tree, and a commit the check answers red stays on
+the box. So on a cloud box standing on `work/<group>`, the commit verb pushes
+a red commit by force to the branch `rescue/<group>`, and still answers red.
+The work branch stays green, so CI and the pull request read no red commit.
+
+| who | what it does with `rescue/<group>` |
+|---|---|
+| the commit verb, red on a cloud box | pushes HEAD there by force, and names it |
+| the commit verb, green and pushed | deletes it on origin where HEAD carries it |
+| the take, over another box's hold | merges it in, pushes, and deletes it |
+| the take, on a conflict | aborts the merge, leaves it on origin, and names `git merge origin/rescue/<group>` |
+
+A desk, and a branch off `work/`, write no rescue. The push door lets the red
+push through, since CI guards a work branch.
+
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which

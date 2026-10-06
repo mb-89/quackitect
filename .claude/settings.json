@@ -6,7 +6,7 @@
   "env": {
     "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
   },
-  "$hooks": "THE BOOT. A cloud box lacking the plugin manifest installs it as a session starts, for the session after it, and the timeout in seconds matches STARTING, the span the start road allows the same install. See spec/design_output/level0.",
+  "$hooks": "THE BOOT. A cloud box lacking the plugin manifest installs it as a session starts, for the session after it, and the timeout in seconds matches STARTING, the span the start road allows the same install. THE BEAT: a box holding a group beats at each turn's end and ends its hold as the session ends, so a takeover reads the box dead at once. See spec/design_output/level0 and spec/design_output/work.",
   "hooks": {
     "SessionStart": [
       {
@@ -15,6 +15,29 @@
             "type": "command",
             "command": "node $CLAUDE_PROJECT_DIR/src/scripts/boot.js",
             "timeout": 180
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/RUNME.sh branch beat",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "resume|logout|prompt_input_exit|other",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/RUNME.sh branch beat --end",
+            "timeout": 60
           }
         ]
       }

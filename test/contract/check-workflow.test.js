@@ -24,8 +24,11 @@ test("the check runs on a Linux runner and a Windows runner", () => {
   assert.match(text, /key: se-bin-\$\{\{ runner\.os \}\}-/);
 });
 
-// A pull request against main runs the check GitHub's auto-merge waits on. [[spec/tickets/groups-land-through-pull-requests]]
-test("the check runs on a push and on a pull request against main", () => {
+// A pull request against main runs the check GitHub's auto-merge waits on, and a rescue or beat push runs none. [[spec/tickets/groups-land-through-pull-requests]] [[spec/tickets/ci-skips-rescue-and-beats]]
+test("the check runs on a push past rescue and beats, and on a pull request against main", () => {
   const text = disk().read(WORKFLOW);
-  assert.match(text, /^on:\n {2}push:\n {2}pull_request:\n {4}branches: \[main\]$/m);
+  assert.match(
+    text,
+    /^on:\n {2}push:\n {4}branches-ignore: \["rescue\/\*\*", "beats\/\*\*"\]\n {2}pull_request:\n {4}branches: \[main\]$/m,
+  );
 });
