@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: c69d3825b31fdb27b0ea907b43b03383c501f675
+    hash_after: c69d3825b31fdb27b0ea907b43b03383c501f675
+    inputs:
+      - name: ask
+        hash: 7cb116066181fffb
+        size: 407
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,87 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. src/scripts/install.sh gains a boot word, read right after bin is set and before the runtime folder moves.
+2. The boot word exits 0 where neither CLAUDE_CODE_REMOTE nor SE_CLOUD is set.
+3. It exits 0 where the plugin manifest stands, at the path pluginTarget in src/quack/brand.go names.
+4. Otherwise it runs the install under the session skip list plus the caller's SE_INSTALL_SKIP.
+5. It answers 0 whatever that install answers, so a failed install holds no session up.
+6. Its comments name no node, since test/contract/install.test.js refuses that word in install.sh.
+7. The SessionStart hook in .claude/settings.json runs `sh install.sh boot` under the project folder, and keeps its timeout.
+8. The hooks comment in .claude/settings.json names the boot word.
+9. src/scripts/boot.js goes, the only start road importing the hook module and the doors.
+10. src/doors/disk.js and src/doors/proc.js stay, since many scripts and tests still import them.
+11. test/level0/hooks.test.js drops its boot and settings cases, and its other cases stay.
+12. src/quack/session_start_test.go carries those cases in Go and runs the real install.sh in a temporary tree.
+13. spec/design_output/level0.md names the boot word under The boot hook.
+Weighed: a Go boot verb needs a binary a fresh clone lacks, so install.sh holds the boot.
+Weighed: a separate boot script fails the second grep line, so the boot rides install.sh as a word.
+Weighed: the skip list stands in install.sh too, and a Go test pins it to installSkip in probe_cold.go.
+Assumed: the ask's line on keeping boot.js and the doors names today's cause, and binds the change to nothing.
+Assumed: start.js keeps INSTALL_SKIP and STARTING until level0-hooks-forward-to-go moves them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/settings.json: the SessionStart hook
+- .claude/settings.json: the hooks comment
+- test/level0/hooks.test.js: imports boots, INSTALL_SKIP and STARTING
+- spec/design_output/level0.md: The boot hook
+- src/scripts/install.sh: its top level, gains the boot word
+- RUNME.sh: runs install.sh with no word, unchanged
+- src/quack/probe_cold.go: coldTree runs install.sh with no word, and installSkip pins the boot list
+- src/quack/brand.go: pluginTarget names the manifest the boot word reads
+- src/quack/commit.go: coldPath lists install.sh
+- test/contract/install.test.js: refuses node in install.sh
+- .claude/skills/level0/hooks/start.js: INSTALL_SKIP and STARTING stay for the forwarder sibling
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/session_start_test.go: TestNoTrackedFileNamesTheNodeBoot
+- src/quack/session_start_test.go: TestTheSessionStartHookRunsTheInstallBootWord
+- src/quack/session_start_test.go: TestTheBootHookWaitsOutTheStartSpan
+- src/quack/session_start_test.go: TestTheBootRunsNoInstallWhereTheManifestStands
+- src/quack/session_start_test.go: TestTheBootRunsNoInstallOffACloudBox
+- src/quack/session_start_test.go: TestTheBootRunsTheInstallOnACloudBoxLackingTheManifest
+- src/quack/session_start_test.go: TestTheBootRunsTheInstallOnABoxSECloudMarks
+- src/quack/session_start_test.go: TestTheBootAnswersZeroWhereTheInstallFails
+- src/quack/session_start_test.go: TestTheBootSkipsWhatTheColdProbeSkips
+- src/quack/session_start_test.go: TestTheBootReadsTheManifestTheBrandWrites
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/boot.js
+- src/scripts/install.sh
+- .claude/settings.json
+- test/level0/hooks.test.js
+- src/quack/session_start_test.go
+- spec/design_output/level0.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- a helper opened boot.js, settings.json, hooks.test.js, install.sh, start.js, probe_cold.go, commit.go, brand.go and level0.md, and I checked the hook line, installSkip, pluginTarget and the doors' other importers
+- the callers come off a git grep for boot, SessionStart, INSTALL_SKIP, STARTING, install.sh and the door imports
+- TestNoTrackedFileNamesTheNodeBoot decides lines one and two, a live probe cold line three, and a live check line four
 
 ## tests-red
 
