@@ -5,17 +5,19 @@
 package branches
 
 import (
+	"fmt"
 	"slices"
 	"sort"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/front"
 )
 
 // A group reaches the cloud as a branch of its own, pushed off trunk, so no hand runs git for it. [[spec/design_output/work#a-group-is-a-ticket]]
 func openGroup(d *Doors, name string, _ []string) int {
 	if name == "" {
-		d.warn("branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs")
+		d.raises(failure.Raise(d.Failures, "take-open-names-no-group", "branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs"))
 		return codeRefused
 	}
 	if d.offTrunk("open") {
@@ -25,13 +27,13 @@ func openGroup(d *Doors, name string, _ []string) int {
 	text := d.textAt("origin/"+trunk, at)
 	switch {
 	case text == "":
-		d.warn("%s carries no %s, so push the group first.", trunk, at)
+		d.raises(failure.Raise(d.Failures, "take-group-unpushed", fmt.Sprintf("%s carries no %s, so push the group first.", trunk, at)))
 		return codeRefused
 	case !isGroup(text):
-		d.warn("%s names no group process, so a branch carries nothing.", at)
+		d.raises(failure.Raise(d.Failures, "take-names-no-group", at+" names no group process, so a branch carries nothing."))
 		return codeRefused
 	case fieldOf(text, "state") == closedState:
-		d.warn("%s stands closed, and a closed group opens no branch.", at)
+		d.raises(failure.Raise(d.Failures, "take-group-closed", at+" stands closed, and a closed group opens no branch."))
 		return codeRefused
 	}
 	branch := workBranch + name
@@ -45,11 +47,11 @@ func openGroup(d *Doors, name string, _ []string) int {
 	}
 	mark := d.markOff(branch)
 	if mark == "" {
-		d.warn("The commit that opens %s came back refused, so nothing is pushed.", branch)
+		d.raises(failure.Raise(d.Failures, "take-open-commit-refused", "The commit that opens "+branch+" came back refused, so nothing is pushed."))
 		return codeRed
 	}
 	if !d.loud("push", "origin", mark+":refs/heads/"+branch).OK {
-		d.warn("%s", refusedPush(branch))
+		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(branch)))
 		return codeRed
 	}
 	d.say("%s stands at %s in the cloud, carrying %s.", branch, todo, at)
@@ -82,7 +84,7 @@ func deskRefusal(what string) string {
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
 func take(d *Doors, name string, _ []string) int {
 	if !d.cloud() {
-		d.warn("%s", deskRefusal("branch take moves this box onto no branch"))
+		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskRefusal("branch take moves this box onto no branch")))
 		return codeRefused
 	}
 	if d.dirty("") {
@@ -103,8 +105,9 @@ func take(d *Doors, name string, _ []string) int {
 		}
 		past := d.pastHold(holding, read.Stand, read.Standing)
 		if past == "" {
-			d.warn("The take names %s, and this box holds %s, which stands in work.", named, holding.Branch)
-			d.warn("Hand %s back with ./RUNME.sh branch release, or ./RUNME.sh branch done, then take %s.", holding.Branch, named)
+			d.raises(failure.Raise(d.Failures, "take-hand-holds",
+				fmt.Sprintf("The take names %s, and this box holds %s, which stands in work.", named, holding.Branch),
+				fmt.Sprintf("Hand %s back with ./RUNME.sh branch release, or ./RUNME.sh branch done, then take %s.", holding.Branch, named)))
 			return codeRed
 		}
 		d.say("%s stands %s, so its hold drops and the take goes on to %s.", holding.Branch, past, named)
@@ -136,7 +139,7 @@ func take(d *Doors, name string, _ []string) int {
 			}
 		}
 		if len(free) == 0 {
-			d.warn("work/%s stands at no free %s. Run ./RUNME.sh branch list to read where it stands.", name, todo)
+			d.raises(failure.Raise(d.Failures, "take-branch-not-free", fmt.Sprintf("work/%s stands at no free %s. Run ./RUNME.sh branch list to read where it stands.", name, todo)))
 			return codeRed
 		}
 	}
@@ -287,21 +290,20 @@ func (d *Doors) claimGroup(one stand) int {
 	if !committed.OK {
 		d.quiet("reset", "--", at)
 		_ = d.write(at, was)
-		d.warn("The claim on %s would not commit, so the take stands undone.", one.Branch)
-		if committed.Err != "" {
-			d.warn("%s", committed.Err)
-		} else {
-			d.warn("%s", committed.Out)
+		detail := committed.Err
+		if detail == "" {
+			detail = committed.Out
 		}
+		d.raises(failure.Raise(d.Failures, "take-claim-refused", "The claim on "+one.Branch+" would not commit, so the take stands undone.", detail))
 		return codeRed
 	}
 	if !d.loud("push", "origin", one.Branch).OK {
 		d.quiet("reset", "--keep", "origin/"+one.Branch)
-		d.warn("%s", refusedPush(one.Branch))
+		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(one.Branch)))
 		return codeRed
 	}
 	if d.sync() == codeRed {
-		d.warn("Resolve the conflict on %s and commit it, then work the ask below.", one.Branch)
+		d.raises(failure.Raise(d.Failures, "take-sync-conflict", "Resolve the conflict on "+one.Branch+" and commit it, then work the ask below."))
 		d.brief(one.Branch, one.Name, hand, was)
 		return codeRed
 	}

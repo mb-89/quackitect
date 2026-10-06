@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -432,8 +433,7 @@ type change struct {
 func (d *Doors) dirty(branch string) bool {
 	for _, one := range d.standingIn() {
 		if !one.Parked {
-			d.warn("This tree carries uncommitted changes, so no branch may move.")
-			d.warn("Commit them, or stash them, and run this again.")
+			d.raises(failure.Raise(d.Failures, "branch-tree-dirty", "This tree carries uncommitted changes, so no branch may move.", "Commit them, or stash them, and run this again."))
 			return true
 		}
 	}
@@ -457,8 +457,9 @@ func (d *Doors) unpushed(branch string) bool {
 	if !said.OK || said.Out == "" || said.Out == "0" {
 		return false
 	}
-	d.warn("%s holds %s commit(s) origin lacks, so no branch may move.", branch, said.Out)
-	d.warn("Run git push origin %s, and run this again.", branch)
+	d.raises(failure.Raise(d.Failures, "branch-unpushed",
+		branch+" holds "+said.Out+" commit(s) origin lacks, so no branch may move.",
+		"Run git push origin "+branch+", and run this again."))
 	return true
 }
 

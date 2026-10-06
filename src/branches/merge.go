@@ -9,6 +9,8 @@ import (
 	"slices"
 	"sort"
 	"strings"
+
+	"quackitect/src/failure"
 )
 
 // The key the group ticket on trunk carries while its branch stands in the cloud. [[spec/rationales/git-stays-the-archive]]
@@ -54,7 +56,7 @@ func (d *Doors) marksTrunk(name string) bool {
 // Whether the box stands off trunk or on a dirty tree, which every verb committing on trunk refuses. [[spec/tickets/groups-carry-the-cloud-marker]]
 func (d *Doors) offTrunk(what string) bool {
 	if on := d.here(); on != trunk {
-		d.warn("branch %s runs on %s, and this is %s.", what, trunk, on)
+		d.raises(failure.Raise(d.Failures, "branch-off-trunk", "branch "+what+" runs on "+trunk+", and this is "+on+"."))
 		return true
 	}
 	return d.dirty("")
