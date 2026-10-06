@@ -123,6 +123,12 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 5a68abe1b8213189dc9b2d0bdfd4abdaa850de85
+    hash_after: 366b69287c1f89c454b00a6b99517bd102cd0a16
+    returns: 1
+    why: the branch verbs run some twenty-seven git subcommands, pushes, merges and worktrees among them, and FakeGit holds four reads, so the move waits on git-and-process-doors-designed in unfaked-doors-take-fakes
 ---
 
 # Ask
@@ -163,38 +169,46 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Waits on [[spec/tickets/git-and-process-doors-designed]], which names the git door carrying writes and its fake. FakeGit holds Tips, Trunk, Stood and Tracked, and the branch verbs run rev-parse, push, commit, worktree, merge, rebase and more through Doors.run.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- none yet, the design names them
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- none yet, the design names them
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- none yet, the design names them
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- src/branches/doors.go and src/modules/git/git.go stand opened, and the git subcommands come off a grep of d.quiet, d.loud and d.git
+- the callers wait on the design
+- each done_when line waits on the fake the design names
 
 ## tests-red
 
