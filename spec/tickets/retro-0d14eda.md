@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: chapter
+step: read
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -187,6 +187,19 @@ record:
         hash: abbc1492b1d54237
         size: 1547
     def: 9cf43185b299fada
+  - step: chapter
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: f1829c985fc0ecffa79ef89fe61d8ece21f11709
+    hash_after: f1829c985fc0ecffa79ef89fe61d8ece21f11709
+    answered:
+      - name: chapters
+        exit: 0
+        said: c14  2026-10-06T07:00:00.000Z to 2026-10-06T13:00:00.000Z  698 line(s)  the verbs port takes a phase (#110), a Windows-o
+    inputs:
+      - name: backlog
+        hash: 5534f0f00dd07c73
+        size: 55
+    def: 9bedae769f3b2577
 ---
 
 # Ask
@@ -305,8 +318,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## chapters
 
 <!-- retro chapters, which refuses a gap or an overlap between two chapters -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro chapters retro-0d14eda
 
 # read
 
