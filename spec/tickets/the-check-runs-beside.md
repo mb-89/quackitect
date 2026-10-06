@@ -130,7 +130,26 @@ record:
         hash: 2f27903492d3e8aa
         size: 574
     def: 07c43ae7253713ec
-step: accept
+  - step: accept
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 69a3037b7e3d988e27b1cc2114e91887c14d2ec0
+    hash_after: c4868df8b9744946f4dd01b56e7bea2587ff154c
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-check-runs-beside already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 07c43ae7253713ec
+step: retro/notes
 ---
 
 # Ask
@@ -184,8 +203,11 @@ The check's parts block each other no more: every part starts at once, so the ch
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- index-cases-wait-for-it: the check in the review's fresh worktree goes red in the cases reaching the index through RUNME.sh, lint-twins and runme-road. Lint-twins also ran red once on this box after a Go change. With every part starting at once, the tests part can meet an index still restarting on a new binary. Find the cause, make those cases wait for a live index or the check wait out the restart, and prove it on branch review.
+accept
+- every part starts at once after one ready step, and the wall time is that step and the slowest part
+- the design names the one wait, every part on the ready step, and why
+- TestReadyStep and TestBatteryRun prove the order over fake parts and the held clock
+- branch review answers check passes, and the tree check runs inside battery.budget
 
 # retro
 
