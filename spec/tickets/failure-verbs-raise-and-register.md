@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -206,6 +206,15 @@ record:
         hash: 8e785cc94e2e32f9
         size: 4503
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: cf217e37e7e9135448f5004beda2a0064c3a2595
+    hash_after: cf217e37e7e9135448f5004beda2a0064c3a2595
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -355,14 +364,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/quack/verb_failure.go, src/quack/verb_failure_test.go and src/modules/verbs/tree.go, the files the draft names, and no other
+- the verb reaches the disk under its root and the clock through failureDoors, and each case hands in a temp root and a fixed now
+- the header and each subverb function in src/quack/verb_failure.go point at spec/design_output/failures#an-agent-raises-by-verb
+- the row shape stays in Raised.Row in src/failure/raise.go, and the node shape in the failure schema, which the verb reads through check.Minted
 
 ## tests-green
 
