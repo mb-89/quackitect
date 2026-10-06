@@ -108,7 +108,7 @@ A new phase 11, key migration.phase11, decided by the owner on the coordinator r
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The owner chose a phase for the verbs port. Phase 11 stands under the key migration.phase11 in spec/config/level0.json and in the phase table of src/modules/migration/migration.go. Its group the-verbs-run-in-go closed through pull request 106. The tree already carries the result, so this step names where it stands and adds nothing.
+The owner chose a phase for the verbs port. Phase 11 stands under the key migration.phase11 in spec/config/level0.json. It also stands in the phase table of src/modules/migration/migration.go. Its group the-verbs-run-in-go closed through pull request 106. The tree already carries the result, so this step names where it stands and adds nothing.
 
 ## checked
 
