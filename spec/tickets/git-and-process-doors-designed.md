@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,21 @@ record:
         hash: 468995647948509f
         size: 17322
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 9bf1c0b28da0fdb102260dd81067da22a78f79ba
+    hash_after: ea5f38b3905ce70b1ddc906ece851a4a317b5f02
+    inputs:
+      - name: design/draft
+        hash: 2e87095745369753
+        size: 1218
+      - name: design/tests-red
+        hash: 2a9158664f043493
+        size: 860
+      - name: [[spec/design_output/doors]]
+        hash: 468995647948509f
+        size: 17322
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +287,12 @@ A design adds no code, so the red test is the process door contract suite, the h
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- proc-contract-holds-the-folder: Command carries Dir and the door takes a folder, yet src/proc/proc_contract_test.go holds no case running a command in a folder, so a fake ignoring Dir passes
+- proc-empty-argv-never-starts: proc.Real indexes Argv[0] and panics on an empty Argv, where the door answers NotStarted for a program that never starts
+- fake-repo-absorbs-fake-git: the chapter puts FakeRepo beside FakeGit in src/modules/git and names no fate for FakeGit four reads, so the package keeps two git fakes, the drift the ask names
 
 # implement
 
