@@ -86,7 +86,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		pid:     os.Getpid(),
 		run:     realRun(out, errs),
 		get:     realGet,
-		now:     time.Now,
+		now:     wall.Now,
 		disk:    realDisk(),
 		out:     out,
 		errs:    errs,
@@ -112,7 +112,7 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		ctx := context.Background()
 		if o.timeout > 0 {
 			var cancel context.CancelFunc
-			ctx, cancel = context.WithTimeout(ctx, o.timeout)
+			ctx, cancel = wall.WithTimeout(ctx, o.timeout)
 			defer cancel()
 		}
 		child := exec.CommandContext(ctx, argv[0], argv[1:]...)

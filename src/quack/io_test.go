@@ -15,6 +15,7 @@ import (
 	"quackitect/src/index"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The fake silent IO process: it commits a value, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
@@ -196,7 +197,9 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	}
 	defer watcher.Close()
 	rows := make(chan map[string]any, 4)
-	stop, err := watchesIndex(watcher, 100*time.Millisecond, func(row map[string]any) error { rows <- row; return nil })
+	fake := qtest.NewFake(time.Unix(0, 0))
+	term := 100 * time.Millisecond
+	stop, err := watchesIndex(watcher, fake, term, func(row map[string]any) error { rows <- row; return nil })
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,13 +212,19 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	if err := indexSide.Beat("index"); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case row := <-rows:
-		if row["kind"] != "watchdog" || row["part"] != "index" {
-			t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+	giveUp := time.After(5 * time.Second)
+	for {
+		fake.Tick(2 * term)
+		select {
+		case row := <-rows:
+			if row["kind"] != "watchdog" || row["part"] != "index" {
+				t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+			}
+			return
+		case <-giveUp:
+			t.Fatal("the IO process writes no row where the index falls silent")
+		case <-time.After(term):
 		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("the IO process writes no row where the index falls silent")
 	}
 }
 

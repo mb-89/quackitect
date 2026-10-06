@@ -199,7 +199,7 @@ func verbRoad(argv []string, out, errs io.Writer) int {
 		old:   usageDoor(argv, errs),
 		alone: func(argv []string) int { return routes(out, errs, reachV1, argv) },
 		twins: registry,
-		log:   appendsRow(realDisk(), root, time.Now),
+		log:   appendsRow(realDisk(), root, wall.Now),
 		out:   out,
 		errs:  errs,
 	}, argv)

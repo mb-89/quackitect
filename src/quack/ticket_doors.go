@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
@@ -57,7 +56,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 	}
 	rows, _ := configAt(method)
 	it := &pull.It{
-		Disk: pull.OSDisk{Root: work}, Git: pull.GitDoor{Root: work}, Now: time.Now, Out: out, Err: errs,
+		Disk: pull.OSDisk{Root: work}, Git: pull.GitDoor{Root: work}, Now: wall.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),
 		Words: configInt(rows, "names.words"), Fails: configInt(rows, "work.failsBeforePerson"),
 		Refusals: configInt(rows, "work.refusalsBeforeFail"), Splits: configInt(rows, "work.stepsBeforeSplit"),
@@ -121,7 +120,7 @@ const (
 
 // The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as rowOf in lib/log.js shapes it. [[spec/design_output/log#what-one-line-looks-like]]
 func pullLog(work, floor string) func(level, kind, said string, extra map[string]any) {
-	write := appendsRow(realDisk(), work, time.Now)
+	write := appendsRow(realDisk(), work, wall.Now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {

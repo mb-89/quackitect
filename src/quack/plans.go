@@ -8,7 +8,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"path/filepath"
-	"time"
 
 	settingsreader "quackitect/src/config"
 	"quackitect/src/modules/plans"
@@ -37,7 +36,7 @@ func plansOutside(disk diskDoors, root string, store *q.Store) plans.Outside {
 			}
 			return disk.write(path, []byte(text), planFileMode)
 		},
-		Now:    time.Now,
+		Now:    wall.Now,
 		Most:   settingsreader.Count(root, planMostOpenKey),
 		Places: placesOver(disk, root, store),
 	}

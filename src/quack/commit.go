@@ -72,8 +72,8 @@ func landingHere() landingDoors {
 		verb:   roadVerb(box, root),
 		claude: claudeAt(box, root),
 		voice:  func(message string) []heard { return heardOver(box, root, commitName, message).rows },
-		log:    appendsRow(box.disk, root, time.Now),
-		now:    time.Now,
+		log:    appendsRow(box.disk, root, wall.Now),
+		now:    wall.Now,
 		box:    box,
 	}
 }

@@ -31,7 +31,7 @@ func vehicleOutside() vehicleDoors {
 	return vehicleDoors{
 		env:     vehicleEnv(box.environ()),
 		root:    vehicleRootHere(box),
-		now:     time.Now,
+		now:     wall.Now,
 		pid:     box.pid,
 		windows: box.windows(),
 		git:     vehicleGit(box),

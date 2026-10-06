@@ -44,7 +44,7 @@ func searchOutside(root string, reads index.Reads) search.Outside {
 // [[spec/tickets/find-and-wait-in-go]]
 func waitsOutside(root string, store *q.Store) waits.Outside {
 	return waits.Outside{
-		Root: root, Now: time.Now, Pause: time.Sleep,
+		Root: root, Now: wall.Now, Pause: func(span time.Duration) { <-wall.After(span) },
 		Most:     time.Duration(settingsreader.Count(root, waitMostKey)) * time.Second,
 		Quiet:    time.Duration(settingsreader.Count(root, waitQuietKey)) * time.Second,
 		Reported: reportsHeard(store),

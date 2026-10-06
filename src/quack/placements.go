@@ -169,19 +169,9 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string, errs io.Wr
 		waiting <- struct{}{}
 	}
 	part := strings.Join(instances, partJoin)
-	beats := time.NewTicker(moduleBeat)
-	go func() {
-		for {
-			select {
-			case <-quit:
-				return
-			case <-beats.C:
-				_ = peer.Beat(part)
-			}
-		}
-	}()
+	beats := wall.Every(moduleBeat, func(time.Time) { _ = peer.Beat(part) })
 	return func() {
-		beats.Stop()
+		beats()
 		close(quit)
 		halt()
 	}, nil

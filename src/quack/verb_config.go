@@ -28,7 +28,7 @@ const (
 // The log levels below info, which a row of info passes. [[spec/design_output/log#a-setting-writes-a-line]]
 var logsInfo = []string{"", "debug", "info"}
 
-func init() { register("config", configVerb(index.Root, time.Now, realDisk())) }
+func init() { register("config", configVerb(index.Root, wall.Now, realDisk())) }
 
 // config over the root: every row, one key's row, or a write of one key where a value follows it. [[spec/design_output/config#the-verb-names-the-layer]]
 func configVerb(root func() (string, error), now func() time.Time, disk diskDoors) twin {

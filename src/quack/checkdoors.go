@@ -16,7 +16,6 @@ import (
 	"runtime"
 	"slices"
 	"strings"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/tickets"
@@ -46,7 +45,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	self, _ := selfPath()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, now: time.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(realDisk(), root, time.Now), out: out, errs: errs, disk: realDisk()}
+	d := checkDoors{root: root, now: wall.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(realDisk(), root, wall.Now), out: out, errs: errs, disk: realDisk()}
 	d.run = func(argv, env []string, quiet bool) (int, string, error) {
 		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
 		child.Dir, child.Env = root, append(os.Environ(), env...)

@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/edits"
@@ -83,7 +82,7 @@ func writeProse(root, where, text string) []write.Finding {
 // What the edits module reads past its own disk: the ticket door, the write door, the sweep and the mint, over the root. [[spec/tickets/edit-tools-answer-in-go]]
 func editsOutside(root string) edits.Outside {
 	return edits.Outside{
-		Root: root, Now: time.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
+		Root: root, Now: wall.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
 		Ticket: func(name string, files []string) string {
 			for _, one := range files {
 				if one != write.Handover {

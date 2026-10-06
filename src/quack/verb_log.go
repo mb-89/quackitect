@@ -98,7 +98,7 @@ type logDoors struct {
 // The doors over the tree's own root and the wall clock. [[spec/design_output/log#one-verb-reads-the-log]]
 func logHere() (logDoors, error) {
 	root, err := index.Root()
-	return logDoors{root: root, now: time.Now, disk: realDisk()}, err
+	return logDoors{root: root, now: wall.Now, disk: realDisk()}, err
 }
 
 // One row as its line holds it: the keys in the order the line writes them, each key's JSON, and the line. [[spec/design_output/log#what-one-line-looks-like]]

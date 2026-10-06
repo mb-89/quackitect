@@ -337,7 +337,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err
 		},
-		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
+		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), wall.Now()) },
 		// [[spec/tickets/copilot-meets-the-hooks-door]]
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
 		Root:   root, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,

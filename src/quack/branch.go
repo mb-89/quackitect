@@ -8,7 +8,6 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"quackitect/src/branches"
 	"quackitect/src/config"
@@ -38,7 +37,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 	return &branches.Doors{
 		Root:   work,
 		Method: method,
-		Now:    time.Now,
+		Now:    wall.Now,
 		Out:    out,
 		Errs:   errs,
 		Log: func(level, kind, said string, more map[string]any) {
@@ -46,7 +45,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 			for key, value := range more {
 				row[key] = value
 			}
-			_ = appendsRow(box.disk, work, time.Now)(row)
+			_ = appendsRow(box.disk, work, wall.Now)(row)
 		},
 		Config: func(key string) any {
 			said, _ := config.Value(work, key)

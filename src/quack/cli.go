@@ -262,7 +262,7 @@ func follows(errs io.Writer, handle string) (any, error) {
 		if op.Value.Progress.Known > 0 {
 			fmt.Fprintf(errs, "%d of %d done\n", op.Value.Progress.Done, op.Value.Progress.Known)
 		}
-		time.Sleep(followPause)
+		<-wall.After(followPause)
 	}
 }
 

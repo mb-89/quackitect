@@ -56,8 +56,8 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(hand, root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(askIndex) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(hand, root)) },
-		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(hand.disk, root, time.Now)),
-		now:   time.Now,
+		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(hand.disk, root, wall.Now)),
+		now:   wall.Now,
 		disk:  hand.disk,
 	}, nil
 }

@@ -27,7 +27,7 @@ func init() {
 		root: index.Root,
 		vale: func(root string) string { return valeAt(disk, root) },
 		run:  voiceRunsVale(realRun(io.Discard, io.Discard)),
-		now:  time.Now,
+		now:  wall.Now,
 		disk: disk,
 	}))
 }
