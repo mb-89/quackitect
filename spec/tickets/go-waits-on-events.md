@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 7a20935396b81582
         size: 787
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: a4ea5fef73dcd9e9db384ba4ce9f3d7c0b285f83
+    hash_after: e81b4a1544959a1c09ebd5e8033a8305c7aab4ae
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -333,14 +342,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the clock module, the core, `q/qtest`, and each caller the draft names, plus the root that wires them and the tests that build them, every one inside the ask
+the clock door reaches the change, and its one fake now stands in `q/qtest`, where a package that imports no module reaches it, with `qtest.Wall()` held to the same contract suite
+the header of `src/q/clock.go` points at the doors note section on time as a door
+`q.Clock` stands once, in the core, and the clock module and `q/qtest` implement it
 
 ## tests-green
 
