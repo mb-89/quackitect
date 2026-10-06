@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 8ae855272ceabd77a8bfdccab7f6837957115402
+    hash_after: 8ae855272ceabd77a8bfdccab7f6837957115402
+    inputs:
+      - name: ask
+        hash: 21bf3069c0e18f63
+        size: 421
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,55 @@ An orphan holds a pipe, a port or a lock, so the next check hangs or a box runs 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One helper, endsWhole in src/quack/ending.go, readies a command so the end of its context ends the child and every process the child started. On Linux and macOS, ending_unix.go stands the child in a process group of its own and its Cancel kills the whole group. On Windows, ending_windows.go has Cancel run taskkill /T /F over the child's tree. The Vale call in heardIn, gitRead, the review gathering and realRun where a run carries a span and inherits no terminal all take it, since each gives up on a child at a span. A run inheriting the terminal keeps the terminal's group, so a Ctrl-C there still reaches the child. The test proves the end through an event and no timer: the child starts a grandchild holding the child's stdout, and that pipe reads to its end only once every process holding it has ended.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/command.go heardIn, the Vale call
+- src/quack/command.go gitRead
+- src/quack/review.go reviewOver
+- src/quack/boxdoors.go realRun
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/ending_test.go TestAChildTheCheckGivesUpOnEndsWithEveryProcessItStarted
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/ending.go
+- src/quack/ending_unix.go
+- src/quack/ending_windows.go
+- src/quack/ending_test.go
+- src/quack/command.go
+- src/quack/review.go
+- src/quack/boxdoors.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- command.go heardIn and gitRead, review.go reviewOver and boxdoors.go realRun stand opened, each building its child through exec.CommandContext with a span
+- grep finds exec.CommandContext in those four places in src/quack, and lsp and index own their own children outside the check
+- the Vale line meets ending_test, which drives the road the Vale call takes, and the check line its own command
 
 ## tests-red
 
