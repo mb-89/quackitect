@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The disk under the root, by slashed paths relative to it. [[spec/tickets/ticket-verbs-port-to-go]]
@@ -130,6 +132,11 @@ func (one GitDoor) Run(args ...string) Ran {
 	run.Stdout, run.Stderr = &out, &errs
 	err := run.Run()
 	return Ran{OK: err == nil, Out: strings.TrimSpace(out.String()), Err: strings.TrimSpace(errs.String())}
+}
+
+// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program never starts. [[spec/design_output/doors#the-process-door]]
+func ShellOver(run proc.Runner, root string) Shell {
+	return func(string) (string, int, error) { return "", 0, nil }
 }
 
 // A command line through sh under a root: what it printed, its exit code, and why where it starts not. [[spec/design_output/pull#the-commands-answer]]

@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,22 @@ record:
         hash: 0ecf0b21dbd1a30f
         size: 430
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: ccaefa95b637fd1478e2e560e8e884fad8955468
+    hash_after: ccaefa95b637fd1478e2e560e8e884fad8955468
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/git fails
+    inputs:
+      - name: design/draft
+        hash: 8eaac3060915d948
+        size: 12071
+      - name: [[spec/design_output/doors]]
+        hash: ffaadf7c3fe494dd
+        size: 17605
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -365,26 +381,33 @@ I weighed a `FakeRunner` `git` program that reads argv over `FakeRepo`, and I re
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/git/repo_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/repo_contract_test.go
+- src/modules/files/disk_contract_test.go
+- src/pull/shell_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every Repo contract case fails on its own assertion against stub doors that answer zero values. Each case runs a real arm over a bare origin and two clones, and a fake arm over FakeRepo. The disk case fails under go test -tags contract, but branch test passes no build tag, so the verb never runs it. One case passed against a zero stub, so it now asserts its precondition first. The cases also fix choices the draft left open: Log answers newest first, Status reads two letters and a move reads R with its source.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+done_when one meets the Repo suite and the shell case, which fail now, and the pull cases turn onto them at implement; done_when two meets TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit in src/imports/clock_test.go; done_when three is the check
+the doors the tests reach are git, the disk and the process door, and FakeRepo, FakeDisk and FakeRunner stand for each
 
 # gate
 

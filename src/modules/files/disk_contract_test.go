@@ -5,7 +5,10 @@
 // [[spec/design_output/model#the-fake-keeps-a-contract]]
 package files
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func diskSuite(t *testing.T, open func(t *testing.T) Disk) {
 	t.Run("a write reads back", func(t *testing.T) {
@@ -29,6 +32,25 @@ func diskSuite(t *testing.T, open func(t *testing.T) Disk) {
 			t.Fatalf("c.md reads %v, %v after the remove", ok, err)
 		}
 	})
+}
+
+func TestDiskListsEveryFileUnderAFolder(t *testing.T) {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+		for _, path := range []string{"e.md", "ab/d.md", "a/deep/c.md", "a/b.md"} {
+			if err := one.Write(path, "x"); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if said, err := one.List("a"); err != nil || !reflect.DeepEqual(said, []string{"a/b.md", "a/deep/c.md"}) {
+			t.Errorf("the %s disk lists %v, %v under a", name, said, err)
+		}
+		if said, err := one.List(""); err != nil || !reflect.DeepEqual(said, []string{"a/b.md", "a/deep/c.md", "ab/d.md", "e.md"}) {
+			t.Errorf("the %s disk lists %v, %v under its root", name, said, err)
+		}
+		if said, err := one.List("none"); err != nil || len(said) != 0 {
+			t.Errorf("the %s disk lists %v, %v under a folder nothing holds", name, said, err)
+		}
+	}
 }
 
 func TestDiskKeepsItsContract(t *testing.T) {

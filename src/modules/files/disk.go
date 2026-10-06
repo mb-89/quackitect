@@ -34,6 +34,7 @@ type Disk interface {
 	Write(path, text string) error
 	Read(path string) (string, bool, error)
 	Remove(path string) error
+	List(folder string) ([]string, error)
 }
 
 type disk struct{ root string }
@@ -57,6 +58,9 @@ func (one disk) Read(path string) (string, bool, error) {
 	}
 	return string(body), err == nil, err
 }
+
+// Every file under the folder at any depth, by its slashed path from the root, sorted. [[spec/design_output/doors#the-git-door-carries-writes]]
+func (one disk) List(folder string) ([]string, error) { return nil, nil }
 
 func (one disk) Remove(path string) error {
 	if err := os.Remove(one.at(path)); err != nil && !errors.Is(err, fs.ErrNotExist) {
@@ -91,6 +95,9 @@ func (one *FakeDisk) Read(path string) (string, bool, error) {
 	text, ok := one.files[path]
 	return text, ok, nil
 }
+
+// [[spec/design_output/doors#the-git-door-carries-writes]]
+func (one *FakeDisk) List(folder string) ([]string, error) { return nil, nil }
 
 func (one *FakeDisk) Remove(path string) error {
 	one.mu.Lock()
