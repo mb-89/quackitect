@@ -5,6 +5,7 @@ package yaml
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -12,7 +13,21 @@ import (
 var Truthy = truthy
 
 func truthy(said any) bool {
-	return false
+	switch one := said.(type) {
+	case nil:
+		return false
+	case bool:
+		return one
+	case int:
+		return one != 0
+	case int64:
+		return one != 0
+	case float64:
+		return one != 0 && !math.IsNaN(one)
+	case string:
+		return one != ""
+	}
+	return true
 }
 
 func AsDoc(said any) *Doc {

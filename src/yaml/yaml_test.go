@@ -13,7 +13,7 @@ func TestTruthyReadsEachKind(t *testing.T) {
 		want bool
 	}{
 		{nil, false}, {false, false}, {0, false}, {0.0, false}, {int64(0), false}, {math.NaN(), false}, {"", false},
-		{true, true}, {1, true}, {-2.5, true}, {"x", true}, {"false", true}, {[]any{}, true}, {map[string]any{}, true},
+		{true, true}, {1, true}, {int64(-3), true}, {-2.5, true}, {"x", true}, {"false", true}, {[]any{}, true}, {map[string]any{}, true},
 	} {
 		if got := Truthy(one.said); got != one.want {
 			t.Errorf("Truthy(%#v) reads %v, want %v", one.said, got, one.want)

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: engine-verbs-hold
 parent: shared-helpers-stand-once
+record:
+  - step: do
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: c960e15c8eeaf2eeb38904a93c2a3605fecedd09
+    hash_after: c960e15c8eeaf2eeb38904a93c2a3605fecedd09
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "   96.9  in all"
+    inputs:
+      - name: ask
+        hash: 5d053c095046c0cd
+        size: 332
+    def: ff48085f241db4b2
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ src/vehicle/json.go holds a ninth copy, exported as Truthy, with the body voice.
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+CGO_ENABLED=0 go test -count=1 ./src/vehicle/ ./src/yaml/ && echo green
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+src/vehicle held its own exported Truthy, a ninth copy the parent's draft and its grep missed for its capital letter. The copy is gone, and every call in src/vehicle/pure.go reads yaml.Truthy. The parent's yaml body stood as a stub reading every value false, so this change lands it with the fold: it takes the union of the copies, nil, bool, int, int64, float64 with NaN, and string. yaml's TestTruthyReadsEachKind now passes, and the vehicle tests pass over the new call.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: vehicle's Truthy folds into yaml.Truthy, and its callers in pure.go call yaml.
+The cleanup the fold reveals is in the change: the yaml stub had to read truly before vehicle could lean on it, so its body lands here, and the other copies stay the parent's implement step.
+The truthy body stands once in src/yaml/value.go, and vehicle points at it.
 
 # Discussion
 
