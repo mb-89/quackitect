@@ -155,9 +155,9 @@ func TestBatteryRun(t *testing.T) {
 			t.Fatalf("the run answers %d, timed %v, and %v started before the lead part ended", code, times, early)
 		}
 	})
-	t.Run("level zero leads, and no other part does", func(t *testing.T) {
+	t.Run("level zero and the tests lead, and no other part does", func(t *testing.T) {
 		for _, one := range partsOf((&checkFake{}).doors(), nil, false) {
-			if one.lead != (one.name == "level0") {
+			if one.lead != (one.name == "level0" || one.name == "tests") {
 				t.Fatalf("%s leads %v", one.name, one.lead)
 			}
 		}

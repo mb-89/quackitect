@@ -208,7 +208,7 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery: the ready step alone, then the lead parts at once, then every other part at once. Each wave reads every start of its parts, then starts them and waits for all of them, each timed under its name, the ready step among them. A lead part runs a door start inside a bounded window, which a box loaded by the other parts runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, the slowest lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
+// The battery: the ready step alone, then the lead parts at once, then every other part at once. Each wave reads every start of its parts, then starts them and waits for all of them, each timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, the slowest lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
 func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
 	readyCode := ready.run()
@@ -295,7 +295,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		where = []string{"."}
 	}
 	return []part{
-		{name: "tests", run: func() int { return testsRun(d, quiet) }},
+		{name: "tests", run: func() int { return testsRun(d, quiet) }, lead: true},
 		{name: "level0", run: func() int { return level0Runs(d, quiet) }, lead: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
