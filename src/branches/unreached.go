@@ -13,17 +13,6 @@ import (
 // The folder a Go file under test data stands in, which nothing imports. [[spec/design_output/review#the-unreached-row]]
 const testData = "testdata"
 
-// The every-file listing at a ref the scan reads, and the Go texts it reads once it needs them. [[spec/design_output/review#the-unreached-row]]
-type goFiles struct {
-	d     *Doors
-	at    string
-	files []string
-	read  map[string]string
-}
-
-// The statuses a diff names a path the branch adds by: an add, and a move's new path, which git reads as an add without rename detection. [[spec/design_output/review#the-unreached-row]]
-var addsPath = map[string]bool{"A": true, "R": true, "C": true}
-
 var (
 	moduleLine  = regexp.MustCompile(`(?m)^module\s+(\S+)`)
 	packageMain = regexp.MustCompile(`(?m)^package\s+main\s*$`)
@@ -43,7 +32,7 @@ func (d *Doors) unreached(trunkRef, at string) []string {
 	var folders []string
 	for _, change := range changes {
 		one := change.Path
-		if !addsPath[change.Status] || !strings.HasSuffix(one, ".go") {
+		if (change.Status != "A" && change.Status != "R") || !strings.HasSuffix(one, ".go") {
 			continue
 		}
 		folder := path.Dir(one)
@@ -59,14 +48,10 @@ func (d *Doors) unreached(trunkRef, at string) []string {
 	if found == nil {
 		return nil
 	}
-	files, err := d.Repo.Files(at, "")
-	if err != nil {
-		return nil
-	}
-	scan := &goFiles{d: d, at: at, files: files}
+	sources := d.goSources(at)
 	var out []string
 	for _, folder := range folders {
-		if !scan.reached(found[1], folder, byFolder[folder]) {
+		if !d.reached(at, found[1], folder, byFolder[folder], sources) {
 			out = append(out, byFolder[folder]...)
 		}
 	}
@@ -74,59 +59,63 @@ func (d *Doors) unreached(trunkRef, at string) []string {
 }
 
 // Whether a folder the branch adds files to stands reached: a new main, tests alone, test data, or its quoted import path in a Go file past it. [[spec/design_output/review#the-unreached-row]]
-func (s *goFiles) reached(module, folder string, added []string) bool {
+func (d *Doors) reached(at, module, folder string, added []string, sources map[string]string) bool {
 	if slices.Contains(strings.Split(folder, "/"), testData) {
 		return true
 	}
 	for _, one := range added {
-		if packageMain.MatchString(s.d.show(s.at, one)) {
+		if packageMain.MatchString(d.show(at, one)) {
 			return true
 		}
 	}
-	if s.testsAlone(folder) {
+	if d.testsAlone(at, folder) {
 		return true
 	}
 	importPath := module
 	if folder != "." {
 		importPath += "/" + folder
 	}
-	quoted := `"` + importPath + `"`
-	for file, text := range s.texts() {
-		if path.Dir(file) != folder && strings.Contains(text, quoted) {
+	for file, text := range sources {
+		if path.Dir(file) != folder && strings.Contains(text, `"`+importPath+`"`) {
 			return true
 		}
 	}
 	return false
 }
 
+// Every Go file the ref holds, by its path. [[spec/design_output/review#the-unreached-row]]
+func (d *Doors) goSources(at string) map[string]string {
+	files, err := d.Repo.Files(at, "")
+	if err != nil {
+		return nil
+	}
+	var asks []string
+	for _, one := range files {
+		if strings.HasSuffix(one, ".go") {
+			asks = append(asks, at+":"+one)
+		}
+	}
+	read, err := d.Repo.ShowMany(asks)
+	if err != nil {
+		return nil
+	}
+	sources := make(map[string]string, len(read))
+	for ask, text := range read {
+		sources[strings.TrimPrefix(ask, at+":")] = text
+	}
+	return sources
+}
+
 // Whether every Go file the folder holds at the ref is a test. [[spec/design_output/review#the-unreached-row]]
-func (s *goFiles) testsAlone(folder string) bool {
-	for _, one := range s.files {
+func (d *Doors) testsAlone(at, folder string) bool {
+	listed, err := d.Repo.Files(at, folder)
+	if err != nil {
+		return false
+	}
+	for _, one := range listed {
 		if path.Dir(one) == folder && strings.HasSuffix(one, ".go") && !strings.HasSuffix(one, "_test.go") {
 			return false
 		}
 	}
 	return true
-}
-
-// The Go files at the ref, read once through the door, keyed by path. [[spec/design_output/review#the-unreached-row]]
-func (s *goFiles) texts() map[string]string {
-	if s.read != nil {
-		return s.read
-	}
-	s.read = map[string]string{}
-	var asks []string
-	for _, one := range s.files {
-		if strings.HasSuffix(one, ".go") {
-			asks = append(asks, s.at+":"+one)
-		}
-	}
-	said, err := s.d.Repo.ShowMany(asks)
-	if err != nil {
-		return s.read
-	}
-	for ask, text := range said {
-		s.read[strings.TrimPrefix(ask, s.at+":")] = text
-	}
-	return s.read
 }

@@ -64,15 +64,6 @@ Main's fleet, route and prompt code called doors the branch removes. `fleet` rea
 
 Origin's branch carried the same port from another hand, under the-doors-pr-goes-green. The second sync takes origin's side of every hunk, so this merge adds no code past origin's.
 
-A third sync takes main's retro and coordinator work, and resolves two conflicts:
-
-| file | resolution |
-|---|---|
-| `spec/guidance/code/testing.md` | main's rule 5, which names the probe as the failing case of a defect, and the branch's rules 6 to 8, which its examples back |
-| `src/branches/review.go` | the branch's reads through the git door, and main's `Unreached` row |
-
-Main's unreached scan called the runner the branch removes. It reads the added files through `Repo.MergeBase` and `Repo.Diff`, a folder's files through `Repo.Files`, and the import search through one `Repo.ShowMany`. The auto-merged `retro_mint.go` takes back the `errors` import that main's `retroMintKeeps` calls.
-
 ## checked
 
 - the change follows the ask: the branch takes main in, and the check stands green
