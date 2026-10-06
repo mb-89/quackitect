@@ -124,7 +124,23 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
-step: accept
+  - step: accept
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: ac94537fa3f5988d4c491d9362f18ad4b9820d70
+    hash_after: ac94537fa3f5988d4c491d9362f18ad4b9820d70
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-fleet-watches-itself already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 99540b9882270163
+        size: 510
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+step: retro/notes
 ---
 
 # Ask
@@ -182,8 +198,8 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- fleet-rows-print-final-record: cloud fleet prints no model, cost or final line, though each row carries them off the record, so the fleet shows no final record. The row prints the three.
+accept
+- The diff since the last verdict prints each box's model, cost and final line, which answers the one point. Every clause of the ask now stands: the fleet verb with tip, age, pull request and final record, the wake, the routine with its stored prompt waiting on the owner's ticket, the box's own pull request subscription, and the prompt verb.
 
 # retro
 
