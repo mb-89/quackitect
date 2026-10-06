@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 25b5ae1b04509dbe
         size: 930
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 2fd77f4f7ceb8b4baf732fa9f481adf30f71e1bd
+    hash_after: a58a11b6c088a87da84be20a6fdf69ef28a65b59
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -327,14 +336,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: src/rules, the quack seams, the lsp tools, lib/vale.js and src/doors/vale.js, and the Vale tests the move retires; the voice verb, the install, the survey, the configs and the projection leave in the removal step once the-check-lint-runs-in-go lands
+every door the change reaches has a fake: the lsp case fakes the rules through Tools.Rules, the rules-over case fakes the lint function, lintText meets a fake run, and the quack cases meet the real rules over a seeded temp root in place of a fake binary
+a comment names the approach the change implements: every file of src/rules points at spec/design_output/rules or the ticket, and the seams point at the ticket
+every fact the change adds stands in one place: the text model, the kinds and the script contract stand in spec/design_output/rules.md, the rule name off a check stands in lsp.RuleOf, and the loaded rules in rulesAt
 
 ## tests-green
 
