@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 972de3a0dd10e09f
         size: 482
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: e4fef9d9e8e858d518636fb2058aee89debe46cd
+    hash_after: e4fef9d9e8e858d518636fb2058aee89debe46cd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 48ed21662d6469fb
+        size: 2044
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,32 @@ The cause: spawns in src/index/door.go starts se-index serve with no session of 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/detach_test.go
+- src/quack/ending_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their assertion: the stub leaves the door in its starter's group. The quack case runs the test binary as the child that starts a door, under the same group kill the check uses, so the door it starts meets the check's road. syscall carries no Getsid on Linux, so the cases read the process group, which a new session leads as well.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the quack line meets the group-kill case in ending_test, the index line meets detach_test, and the check line waits for tests-green
+- both cases drive real processes as the one test of the detach road, and the reach tests keep their fake spawn
 
 # gate
 
