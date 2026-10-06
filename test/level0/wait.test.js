@@ -4,7 +4,21 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SPECS, WAIT, WAIT_CALL } from "../../src/bridge/wait.js";
+import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
+import { SPECS, WAIT, WAIT_CALL, waits } from "../../src/bridge/wait.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+
+test("the wait pauses on the box's clock, and hears a report once the clock moves", { timeout: 1000 }, async () => {
+  const work = "/tree";
+  const disk = fakeDisk({ [`${work}/${LOCAL}`]: JSON.stringify({ wait: { most: 60, quiet: 1 } }) });
+  const box = { clock: fakeClock(), disk, work, method: work, reports: [] };
+  const said = waits({ agent: "helper-1" }, box);
+  await Promise.resolve();
+  box.reports.push("helper-1");
+  box.clock.tick(1000);
+  assert.deepEqual(await said, { result: { result: "The helper helper-1 reports." } });
+});
 
 test("the spec names the wait and the three signals it takes", () => {
   const [spec] = SPECS();

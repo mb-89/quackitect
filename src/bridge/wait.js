@@ -17,7 +17,7 @@ export const SPECS = () => [waitSpec()];
 export const TOOLS = { [WAIT_CALL]: (e, box) => waits(e, box) };
 
 // [[spec/design_output/level0#the-wait-returns-on-signals]]
-export async function waits(e, box, pause = sleep) {
+export async function waits(e, box, pause = (ms) => box.clock.wait(ms)) {
   const watch = watchOf(e, box);
   const { signals, from } = watch;
   if (!signals.length)
@@ -135,9 +135,6 @@ function said(line) {
   return { result: { result: line } };
 }
 
-function sleep(ms) {
-  return new Promise((done) => setTimeout(done, ms));
-}
 
 function waitSpec() {
   return {
