@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,21 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 57606fe49c78703fde8d4f44fab80ab1336acfa9
+    hash_after: 57606fe49c78703fde8d4f44fab80ab1336acfa9
+    inputs:
+      - name: design/draft
+        hash: 0809f9ab30bc9651
+        size: 1954
+      - name: design/tests-red
+        hash: 3297de04beacbef1
+        size: 657
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +299,10 @@ The door's fake, `FakeDir`, holds every case, and one contract case drives both 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- failure-watch-shape: the schema types watch as a bare object and remedies as a bare array, and the checker reads no nested properties or items, so a node with quiet: thirty or a remedy written as a map passes the check while Load reads Event, Match, Quiet and string remedies; NodeOf should refuse such a node, or the checker should learn items and nested properties
 
 # implement
 
