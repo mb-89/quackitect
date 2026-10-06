@@ -146,6 +146,15 @@ func TestEachListedToolAnswersACallThroughAct(t *testing.T) {
 	}
 }
 
+// The routes serve no action whose request no module accepts, so the route and the list agree. [[spec/tickets/accepts-reads-away-modules]]
+func TestTheRoutesServeNoActionNoModuleAccepts(t *testing.T) {
+	t.Parallel()
+	standing, _ := ghostTools(t)
+	if said, body := postV1(t, standing, "/v1/actions/t/ghost", "wait=5", `{"a":2,"b":3}`); said.StatusCode != http.StatusNotFound {
+		t.Errorf("t/ghost answers %d: %s", said.StatusCode, body)
+	}
+}
+
 // The list leaves out an action whose request no module accepts, and keeps the one a module answers. [[spec/tickets/every-index-tool-answers]]
 func TestTheToolListSkipsAnActionNoModuleAccepts(t *testing.T) {
 	t.Parallel()

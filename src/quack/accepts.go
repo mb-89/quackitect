@@ -17,8 +17,16 @@ import (
 	"quackitect/src/q"
 )
 
-// Whether an IO module answers the verb, off the table accepts routes by. [[spec/tickets/every-index-tool-answers]]
+// Whether an IO module answers the verb, off the table accepts routes by. Every request reaches accepts, and a placed process answers none, so the table needs no widening by the instances it runs. [[spec/tickets/every-index-tool-answers]] [[spec/tickets/accepts-reads-away-modules]]
 func acceptsVerb(module, verb string) bool {
+	switch module {
+	case search.Module, waits.Module, plans.Module, drafts.Module, files.DiskModule, edits.Module:
+		return true
+	case q.StoreModule:
+		return verb == q.StoreLand
+	case verbsmodule.NodeModule:
+		return verb == verbsmodule.NodeRun
+	}
 	return false
 }
 
@@ -32,6 +40,9 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 	plan := plans.Accept(plansOutside(root, store))
 	draft := drafts.Accept(draftsOutside(root, store, draftsLint(root)))
 	return func(asked q.Request) (any, error) {
+		if !acceptsVerb(asked.Module, asked.Verb) {
+			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
+		}
 		// [[spec/tickets/find-and-wait-in-go]]
 		switch asked.Module {
 		case search.Module:
@@ -44,21 +55,18 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 		// [[spec/tickets/prose-tools-answer-in-go]]
 		case drafts.Module:
 			return draft(asked)
-		}
-		if asked.Module == files.DiskModule {
+		case files.DiskModule:
 			return disk(asked)
-		}
 		// [[spec/tickets/edit-tools-answer-in-go]]
-		if asked.Module == edits.Module {
+		case edits.Module:
 			return edit(asked)
+		// [[spec/tickets/ticket-verbs-become-actions]]
+		case verbsmodule.NodeModule:
+			return node(asked)
 		}
 		// [[spec/tickets/config-answers-keys-and-overrides]]
-		if landing, ok := asked.Args.(q.Landing); ok && store != nil && asked.Module == q.StoreModule && asked.Verb == q.StoreLand {
+		if landing, ok := asked.Args.(q.Landing); ok && store != nil {
 			return nil, store.Land(landing.Name, landing.Event)
-		}
-		// [[spec/tickets/ticket-verbs-become-actions]]
-		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {
-			return node(asked)
 		}
 		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 	}

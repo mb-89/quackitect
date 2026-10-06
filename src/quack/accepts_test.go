@@ -3,6 +3,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 
 	"quackitect/src/modules/drafts"
@@ -35,6 +36,24 @@ func TestAcceptsVerbReadsTheTableAcceptsRoutes(t *testing.T) {
 	} {
 		if got := acceptsVerb(one.module, one.verb); got != one.want {
 			t.Errorf("acceptsVerb(%s, %s) reads %v, want %v", one.module, one.verb, got, one.want)
+		}
+	}
+}
+
+// A request acceptsVerb refuses meets the route's refusal, so the list and the route read one table, whatever instance a placed process runs. [[spec/tickets/accepts-reads-away-modules]]
+func TestTheRouteRefusesWhatAcceptsVerbRefuses(t *testing.T) {
+	t.Parallel()
+	route := accepts(t.TempDir(), nil, nil)
+	for _, asked := range []q.Request{
+		{Module: verbsmodule.NodeModule, Verb: "other"},
+		{Module: q.StoreModule, Verb: "other"},
+		{Module: "ghost", Verb: "add"},
+	} {
+		if acceptsVerb(asked.Module, asked.Verb) {
+			t.Errorf("acceptsVerb(%s, %s) reads true", asked.Module, asked.Verb)
+		}
+		if _, err := route(asked); err == nil || !strings.Contains(err.Error(), "no IO module accepts") {
+			t.Errorf("the route answers %s.%s with %v", asked.Module, asked.Verb, err)
 		}
 	}
 }
