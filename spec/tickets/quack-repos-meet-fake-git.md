@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -220,6 +220,25 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 71a55874e6f1fb3b757c622ebbefa07368d10556
+    hash_after: 71a55874e6f1fb3b757c622ebbefa07368d10556
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 959f88c063abaa29
+        size: 11380
+      - name: [[spec/design_output/doors]]
+        hash: 64a2083d276c869a
+        size: 18222
+      - name: [[spec/tickets/pull-meets-fake-git]]
+        hash: 0ecf0b21dbd1a30f
+        size: 430
+    def: 08e16d07b0de477c
 ---
 
 # Ask
