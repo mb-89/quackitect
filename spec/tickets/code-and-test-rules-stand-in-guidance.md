@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: design
     steps:
@@ -118,6 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports, fixture-home-guard-reports, test-ratio-measure-reports, hand-script-guard-reports, purity-guard-covers-every-outside]
+step: design/owner-read
 ---
 
 # Ask
