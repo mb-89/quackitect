@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: f921a3ccf020b7c5
         size: 2014
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: 260bda669171cf2920ea954b9245f4c0db189266
+    hash_after: 260bda669171cf2920ea954b9245f4c0db189266
+    inputs:
+      - name: design/draft
+        hash: f921a3ccf020b7c5
+        size: 2014
+      - name: design/tests-red
+        hash: 41e4c8078b0ef917
+        size: 812
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -271,8 +283,11 @@ Each case fails on its assertion: the verb hands --at to node unresolved and run
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- probe-at-stays-dry: the approach assumes the check runs `probe dry`, and level0Runs in src/quack/check.go now runs `probe smoke --working`, while probeVerb hands dry and smoke alike to the one Go probeDry and the entry picks probeSmoke on the smoke word. Resolve --at on the dry word alone, and refuse `smoke --at` and `--at` beside `--working` with one line, since smokeTree clones --shared and copies the root's built tools, which belong to another revision. A Go case decides each refusal. The four red cases fail on their own assertion at 260bda669, and TestTheSmokeProbeHandsItsRoadToTheEntry stays green beside them.
+- merge-deny-every-connector: the deny names mcp__github__merge_pull_request alone, and this box also carries a second GitHub connector whose merge_pull_request tool sits under its own mcp__<uuid>__ prefix, and gh pr merge through Bash. Deny the merge tool under every GitHub connector the box loads, and leave enable_pr_auto_merge open, since the work skill turns auto-merge on through the connector. Unchecked: whether the client takes a glob in a deny rule.
 
 # implement
 
