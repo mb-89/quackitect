@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"maps"
 	"slices"
-	"strings"
 
 	"quackitect/src/q"
 )
@@ -88,15 +87,7 @@ func leavesOf(value q.Ordered, at string, into map[string]bool) {
 }
 
 // A dotted key as the catalog names it: its first segment the instance, the rest its local name, each segment in kebab case. [[spec/design_output/model#config-comes-off-the-registrations]]
-func KeyOfDotted(dotted string) q.Key {
-	instance, rest, _ := strings.Cut(dotted, ".")
-	segments := strings.Split(rest, ".")
-	for i, one := range segments {
-		segments[i] = q.Kebab(one)
-	}
-	local := strings.Join(segments, "/")
-	return q.Key{Name: instance + "/config/" + local, Instance: instance, Local: local}
-}
+func KeyOfDotted(dotted string) q.Key { return q.KeyOfDotted(dotted) }
 
 // The input of a set: the dotted key and the value, as a person types them. [[spec/tickets/config-answers-keys-and-overrides]]
 type Set struct {
@@ -133,7 +124,7 @@ func actions(c *q.Catalog) q.Writer {
 		}, q.Doc("Write the key into its layer, typed by its declaration."), q.Label("Set a key"), q.Writes()),
 		q.ActionIn(c, "config/override", func(in Override) []q.Request {
 			name := fullNameOf(c, in.Key)
-			return lands(Change{Kind: Overrides, Holder: in.Window, Values: map[string]string{name: literalOfText(in.Value)}})
+			return lands(Change{Kind: Overrides, Holder: in.Window, Values: map[string]string{name: q.LiteralOfText(in.Value)}})
 		}, q.Doc("Hold the value as an override for the window, until another window opens."), q.Label("Override a key"), q.Writes()),
 		q.ActionIn(c, "config/opened", func(in Opened) []q.Request {
 			return lands(Change{Kind: Drops, Holder: in.Window})

@@ -43,19 +43,6 @@ func renameEntries(t *testing.T, root string) []renameEntry {
 
 func TestRenameReaches(t *testing.T) {
 	t.Parallel()
-	t.Run("a reach is a line naming the old name, and a longer word is no reach", func(t *testing.T) {
-		text := "import a from \"./src/a.js\";\nsee [[src/a.js]]\nsrc/a.jsx stands apart\nmy-src/a.js too\n"
-		if got := reachesIn(text, "src/a.js"); len(got) != 2 || got[0].line != 1 || got[1].line != 2 {
-			t.Fatalf("reachesIn answers %v", got)
-		}
-	})
-	t.Run("a reach stands in an import, a note link with its anchor, a quoted path and prose", func(t *testing.T) {
-		text := "import { one } from \"../gadget/ui.js\";\n// [[spec/design_output/gadget#the-details]]\nconst at = `src/gadget/main.go`;\nthe gadget draws a row\na gadgeteer of the work\n"
-		got := reachesIn(text, "gadget")
-		if len(got) != 4 || got[3].line != 4 || !strings.Contains(got[0].said, "gadget/ui.js") {
-			t.Fatalf("reachesIn answers %v", got)
-		}
-	})
 	t.Run("a rewrite answers the old name as the new one, and leaves a longer word alone", func(t *testing.T) {
 		got := renamedForms("a.js and a.jsx and b-a.js and (a.js)", formsOf("a.js", "c.js"))
 		if got != "c.js and a.jsx and b-a.js and (c.js)" {

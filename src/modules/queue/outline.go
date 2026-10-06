@@ -7,8 +7,6 @@ package queue
 import (
 	"sort"
 	"strconv"
-
-	"quackitect/src/ticket"
 )
 
 // The words a todo carries in place of a row's name, and the place of a row a cloud branch holds. [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -223,9 +221,6 @@ func (kids *tree) numberUnder(name, place string, out map[string]string) {
 		kids.numberUnder(kid, place+"."+strconv.Itoa(at+1), out)
 	}
 }
-
-// Two places compare segment by segment as numbers, so -2 stands before 1, and 1.2 before 1.10. [[spec/design_output/pull#the-queue-is-an-outline]]
-func Compare(left, right string) int { return ticket.ComparePlaces(left, right) }
 
 func holds(list []string, name string) bool {
 	return indexOf(list, name) >= 0

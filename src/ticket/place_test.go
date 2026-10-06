@@ -6,7 +6,7 @@ package ticket
 import "testing"
 
 func TestPlacesCompareAsNumbers(t *testing.T) {
-	before := [][2]string{{"-2", "1"}, {"1.2", "1.10"}, {"1", "1.1"}, {"3", "∞"}, {"0", "0.1"}}
+	before := [][2]string{{"-2", "1"}, {"1.2", "1.10"}, {"1", "1.1"}, {"3", "∞"}, {"1.10", "∞"}, {"-2", "∞"}, {"0", "0.1"}}
 	for _, pair := range before {
 		if ComparePlaces(pair[0], pair[1]) >= 0 || ComparePlaces(pair[1], pair[0]) <= 0 {
 			t.Errorf("%s stands before %s", pair[0], pair[1])

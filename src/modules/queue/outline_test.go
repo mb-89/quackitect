@@ -41,10 +41,3 @@ func TestAChildTakesItsGroupsNumber(t *testing.T) {
 		t.Fatalf("the outline reads %v, and wants %v", said, want)
 	}
 }
-
-// The queue's compare is the ticket package's, and the cloud's place stands past every number. [[spec/tickets/ticket-verbs-become-actions]]
-func TestCompareStandsTheCloudLast(t *testing.T) {
-	if Compare("1.10", CloudPlace) >= 0 || Compare(CloudPlace, "-2") <= 0 || Compare(CloudPlace, CloudPlace) != 0 {
-		t.Errorf("the cloud's place %s stands among the numbers", CloudPlace)
-	}
-}

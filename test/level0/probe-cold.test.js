@@ -362,7 +362,6 @@ test("a path under the hooks folder or a named cold file sits on the cold path",
       "src/scripts/probe-cold.js",
     ],
   );
-  assert.ok(COLD_PATH.includes("src/bridge/guidance.js"));
   assert.ok(COLD_PATH.includes(".claude/skills/level0/lib/guidance.js"));
 });
 

@@ -24,11 +24,11 @@ const (
 	TrackedPort = "tracked"
 )
 
-// The two config files and the keys the rules count by, which src/config names for the LSP. src/config reads the disk, so this module spells them again. [[spec/design_output/config#the-resolver-holds-the-layers]]
+// The config files q names, and the keys the rules count by. [[spec/design_output/config#the-resolver-holds-the-layers]]
 const (
-	trackedConfig = "spec/config/level0.json"
-	schemaConfig  = "spec/config/level0.schema.json"
-	localConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
+	trackedConfig = q.TrackedConfig
+	schemaConfig  = q.SchemaConfig
+	localConfig   = q.LocalConfig
 	wordsKey      = "names.words"
 	pointerKey    = "restated.pointer"
 	ruleKey       = "restated.rule"
@@ -78,18 +78,11 @@ func sweepOf(in sweepIn) []Finding {
 // The rules that read the survey on the box, which stands outside what git tracks, so the lint decides them off the box and the sweep leaves them out. [[spec/tickets/sweep-skips-box-rules]]
 var boxRules = []string{"SurveyFindsNode"}
 
-// A count off the layers: the local file beats the variable, the variable beats the tracked file, and the tracked file beats the schema's default, as src/config reads them. [[spec/design_output/config#the-resolver-holds-the-layers]]
+// A count off the layers at rest, in the order q.Settled holds. [[spec/design_output/model#a-keys-layers]]
 func countOf(texts Texts, env map[string]string, key string) int {
-	said, _ := valueAt(texts[schemaConfig], "properties."+strings.ReplaceAll(key, ".", ".properties.")+".default")
-	if held, found := valueAt(texts[trackedConfig], key); found {
-		said = held
-	}
-	if held := strings.TrimSpace(env[envOf(key)]); held != "" {
-		said = held
-	}
-	if held, found := valueAt(texts[localConfig], key); found {
-		said = held
-	}
+	literal, _, _ := q.Settled(key, orderedOf(texts[schemaConfig]), orderedOf(texts[trackedConfig]), orderedOf(texts[localConfig]), env)
+	var said any
+	_ = json.Unmarshal([]byte(literal), &said)
 	switch one := said.(type) {
 	case float64:
 		return int(one)
@@ -101,25 +94,11 @@ func countOf(texts Texts, env map[string]string, key string) int {
 	return 0
 }
 
-// The variable naming a key, as EnvOf in src/config names it. [[spec/design_output/config#the-go-reader]]
-func envOf(key string) string {
-	return "SE_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
-}
-
-// The value a JSON text holds at a dotted key. [[spec/design_output/config#the-go-reader]]
-func valueAt(text, key string) (any, bool) {
-	var here any
-	if json.Unmarshal([]byte(text), &here) != nil {
-		return nil, false
+// A config file's text as q reads it, or the empty value where it holds no JSON. [[spec/design_output/config#the-go-reader]]
+func orderedOf(text string) q.Ordered {
+	out, err := q.JSON.Parse([]byte(text))
+	if err != nil {
+		return q.Ordered{}
 	}
-	for _, part := range strings.Split(key, ".") {
-		step, ok := here.(map[string]any)
-		if !ok {
-			return nil, false
-		}
-		if here, ok = step[part]; !ok {
-			return nil, false
-		}
-	}
-	return here, true
+	return out
 }

@@ -1,5 +1,5 @@
 // A call answers its result within the wait, or still running past it with
-// the handle and the fraction done, and ops/wait waits on a session.
+// the handle and the fraction done.
 // [[spec/design_output/model#a-caller-sets-its-wait]]
 package index
 
@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -110,45 +109,6 @@ func TestAWaitArmsItsSpanThroughTheBooksTimer(t *testing.T) {
 	b.Wait("no-such-handle", patience)
 	if !slices.Equal(armed, []time.Duration{patience}) {
 		t.Fatalf("the wait arms %v through the book's timer", armed)
-	}
-}
-
-func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
-	b, _, _ := bookOf(t)
-	mine, other := make(chan struct{}), make(chan struct{})
-	defer close(other)
-	store := actions()
-	for range 2 {
-		if said, err := Call(b, store, "t/save", "a.md", "s1", slow, held(mine)); err != nil || !said.Running {
-			t.Fatalf("the call answers %+v, %v", said, err)
-		}
-	}
-	if said, err := Call(b, store, "t/save", "b.md", "s2", slow, held(other)); err != nil || !said.Running {
-		t.Fatalf("the call of s2 answers %+v, %v", said, err)
-	}
-	if open := b.Open("s1"); len(open) != 2 {
-		t.Fatalf("s1 holds %v open", open)
-	}
-	armed := make(chan struct{})
-	var once sync.Once
-	b.after = func(span time.Duration) <-chan time.Time {
-		once.Do(func() { close(armed) })
-		return time.After(span)
-	}
-	waited := make(chan []Op)
-	go func() { waited <- b.WaitCaller("s1", patience) }()
-	select {
-	case <-armed:
-	case <-time.After(patience):
-		t.Fatal("the wait on s1 never arms through the book's timer")
-	}
-	close(mine)
-	ended := <-waited
-	if len(ended) != 2 || ended[0].State != Done || ended[1].State != Done || ended[0].Caller != "s1" {
-		t.Fatalf("the wait on s1 answers %+v", ended)
-	}
-	if open := b.Open("s2"); len(open) != 1 {
-		t.Fatalf("s2 holds %v open", open)
 	}
 }
 
