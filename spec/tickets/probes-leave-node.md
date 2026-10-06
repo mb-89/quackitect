@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: 594bb7de87db1f20
         size: 6146
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-6
+    hash_before: d0a7d8a93d2d83ff9a9a93e507e42fe9ae97d1fe
+    hash_after: d0a7d8a93d2d83ff9a9a93e507e42fe9ae97d1fe
+    inputs:
+      - name: design/draft
+        hash: 594bb7de87db1f20
+        size: 6146
+      - name: design/tests-red
+        hash: 4103cfc6fb205414
+        size: 1027
+    def: dc4904ab364efa10
 group: javascript-leaves
 ---
 
@@ -334,8 +346,11 @@ The first round's eight cases still fail on the stubs, and five cases join them 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- probe-verb-drops-script-comments: the approach drops `dryEntry` from `src/quack/probe_verb.go`, but the comment over `atFlag` (`as AT in src/scripts/probe-dry.js reads it`) and the doc line over `probeDry` still name `src/scripts`, so the second done_when grep stays red until the implement hand rewrites both in place
+- cold-comments-name-go-owner: `src/quack/probe_cold.go` says its numbers and the cold prompt stand `as probe-cold.js` and `COLD.prompt in src/scripts/probe-cold.js` name them, and the `coldPath` comment moving from `commit.go` says the script owns `COLD_PATH`; each points at a deleted file once the scripts go, so the implement hand rewrites them to name the Go owner
 
 # implement
 
