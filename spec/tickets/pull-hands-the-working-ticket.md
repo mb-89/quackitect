@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    1.6  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 5a0daa93532ccd53f5ef184ae6ab89bfd81183f3
+    hash_after: 5a0daa93532ccd53f5ef184ae6ab89bfd81183f3
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "  119.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f6de9d513d415d65
+        size: 783
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -326,26 +349,33 @@ The plan read stands once in planWorking, and the ticket test reuses TicketAt.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+CGO_ENABLED=0 go test -count=1 ./src/pull/ -run "^(TestNamesTicket|TestPull)$/^(a_plan_naming|a_helper|a_working_todo)" && echo green
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A pull whose plan names a ticket no longer reads it as a todo, so the box stops stalling on wait. workingTodo in src/pull/pull_holds.go asks namesTicket in src/pull/ticket_at.go, and a name that finds a ticket holds no pull. A todo that is no ticket still holds it. A helper pulling with --as stays bound to the ticket the plan names. The tests line runs this ticket cases alone, because TestPull also holds the cold path case that running-work-takes-main-fixes keeps red until it lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches src/pull/pull.go, pull_holds.go, ticket_at.go and pull_test.go: the draft's size list plus Pull, which the gate's child names.
+The change reaches the disk alone, through the Disk door, and FakeDisk and the cloudPull clone cover it.
+workingTodo and Pull each carry a link to the ticket whose approach they implement.
+The plan read stands once in planWorking, and the ticket test reuses TicketAt.
 
 # accept
 
