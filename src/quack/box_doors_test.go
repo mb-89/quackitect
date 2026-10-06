@@ -275,14 +275,14 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 			}
 			return out
 		},
-		goos: "linux",
-		pid:  7,
-		run:  runner.run,
-		get:  func(string, time.Duration) (string, error) { return "", errors.New("no wire here") },
+		goos:  "linux",
+		pid:   7,
+		run:   runner.run,
+		get:   func(string, time.Duration) (string, error) { return "", errors.New("no wire here") },
 		clock: qtest.NewFake(time.Unix(0, 0)),
-		disk: newFakeDisk(),
-		out:  &out,
-		errs: &errs,
+		disk:  newFakeDisk(),
+		out:   &out,
+		errs:  &errs,
 	}, runner, &out, &errs
 }
 
