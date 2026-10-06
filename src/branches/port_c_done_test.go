@@ -4,6 +4,7 @@
 package branches
 
 import (
+	"reflect"
 	"slices"
 	"sort"
 	"strings"
@@ -374,4 +375,80 @@ func TestPCDoneClosesOnTheBranchAlone(t *testing.T) {
 	}
 	holds(t, one.pcSaid(), "Open the pull request over work/one-group against main, with auto-merge on")
 	pcLacks(one, one.pcSaid(), "branch merge")
+}
+
+// Hands the doors the hub's send door by name, so the case compiles before the field stands and fails on its own line. [[spec/tickets/branch-done-opens-the-pr]]
+func pcSendDoor(t *testing.T, d *Doors, send Send) {
+	t.Helper()
+	field := reflect.ValueOf(d).Elem().FieldByName("Send")
+	if !field.IsValid() || !field.CanSet() || field.Type() != reflect.TypeOf(Send(nil)) {
+		t.Fatal("the doors carry no Send door, so done reaches no hub")
+	}
+	field.Set(reflect.ValueOf(send))
+}
+
+// A finished group, its env carrying the hub's secrets past the names given, and the hub behind its send door. [[spec/tickets/branch-done-opens-the-pr]]
+func pcDoneOnHub(t *testing.T, env map[string]string) (*tree, *dfHub) {
+	t.Helper()
+	one := pcDone(t, map[string]string{
+		ticketAt(pcGroup):   pcAtChildren(),
+		ticketAt("a-child"): pcChild(pcGroup, "closed"),
+	})
+	for key, value := range dfEnv() {
+		one.d.Env[key] = value
+	}
+	for key, value := range env {
+		one.d.Env[key] = value
+	}
+	hub := newHub()
+	pcSendDoor(t, one.d, hub.send)
+	return one, hub
+}
+
+// done opens the branch's pull request against main on PULL_TOKEN, takes auto-merge, and prints its address. [[spec/tickets/branch-done-opens-the-pr]]
+func TestPCDoneOpensThePullRequestWithAutoMergeThroughItsDoor(t *testing.T) {
+	t.Parallel()
+	one, hub := pcDoneOnHub(t, nil)
+	if code := one.branchSays("done"); code != codeOK {
+		t.Fatalf("done answers %d: %s", code, one.pcSaid())
+	}
+	var opened, merges []dfSent
+	for _, said := range hub.sent {
+		if said.Method == "POST" && said.URL == dfAPI+"/repos/"+dfRepo+"/pulls" {
+			opened = append(opened, said)
+		}
+		if said.URL == dfAPI+"/graphql" {
+			merges = append(merges, said)
+		}
+	}
+	if len(opened) != 1 || len(merges) != 1 {
+		t.Fatalf("done opens %d and merges %d: %s", len(opened), len(merges), one.pcSaid())
+	}
+	dpSame(t, opened[0].Headers["Authorization"], "Bearer pull-token")
+	body := dfBody(t, opened[0])
+	dpSame(t, []any{body["head"], body["base"]}, []any{workBranch + pcGroup, trunk})
+	merge := dfBody(t, merges[0])
+	holds(t, merge["query"].(string), "enablePullRequestAutoMerge")
+	dpSame(t, merge["variables"].(map[string]any)["id"], "PR_7")
+	holds(t, one.pcSaid(), "https://github.example/"+dfRepo+"/pull/7")
+	if one.pcTip(pcOrigin) != one.git("rev-parse", "HEAD") {
+		t.Fatal("the branch stays unpushed")
+	}
+}
+
+// done on a run holding no PULL_TOKEN sends nothing, names the reason and the work skill, and still answers green. [[spec/tickets/branch-done-opens-the-pr]]
+func TestPCDoneWithNoTokenNamesTheWorkSkillAndLeaves(t *testing.T) {
+	t.Parallel()
+	one, hub := pcDoneOnHub(t, map[string]string{"PULL_TOKEN": ""})
+	if code := one.branchSays("done"); code != codeOK {
+		t.Fatalf("done answers %d: %s", code, one.pcSaid())
+	}
+	if len(hub.sent) != 0 {
+		t.Fatalf("done reaches the hub at %s", hub.sent[0].URL)
+	}
+	holds(t, one.pcSaid(), "The run holds no PULL_TOKEN.")
+	holds(t, one.pcSaid(), "as the work skill says")
+	if one.pcTip(pcOrigin) != one.git("rev-parse", "HEAD") {
+		t.Fatal("the branch stays unpushed")
+	}
 }

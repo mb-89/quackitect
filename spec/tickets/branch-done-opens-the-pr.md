@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 9c802087afbe9acf
         size: 496
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 193563a7e65c746b7bcce010b2cf11ffe8402924
+    hash_after: 193563a7e65c746b7bcce010b2cf11ffe8402924
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 7c74d3048b683e3c
+        size: 3365
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -231,26 +244,32 @@ The first done_when line meets TestPCDoneOpensThePullRequestWithAutoMergeThrough
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_c_done_test.go src/branches/dispatch_fire_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/branches/port_c_done_test.go
+src/branches/dispatch_fire_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four new cases fail on their own assertions, and every other case of the package passes. The done cases reach the hub through a `Send` field the doors lack today. A helper finds that field by reflection, so the file compiles now. Tests-green swaps the helper for a plain assignment once the field stands. The dispatch case for a standing pull request expects a row naming the branch, which the draft's `Branch` field on the pull row carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each done_when line on `go test ./src/branches/` meets a red case, and the check line waits for tests-green.
+The hub fake `dfHub` stands for the send door in every case, and the done cases run on the real-git tree the package already tests against.
 
 # gate
 
