@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 4536dba06df95bb336522576d63996297978cd66
+    hash_after: 4536dba06df95bb336522576d63996297978cd66
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   76.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 9d657bfa5c2a59d2
+        size: 739
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -326,26 +349,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_test.go src/quack/commit_test.go src/quack/lint_changed_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lint takes `--strict`, under which a warning exits 1, and `--changed`, which reads the files the branch changes past the folders the engine writes. The check runs `lint --changed --strict` as its first part, so a warning in a changed file turns it red in seconds. The commit runs the strict lint over the files its staging reaches, and refuses before the tests and before anything stages. The lint's own strict and changed cases pass under `go test ./src/quack/ -run 'TestLintVerb/(.*strict.*|.*changed.*)'`. They share `TestLintVerb` with one case `the-check-lint-runs-in-go` holds red until its change lands, so the tests line names the files whose tests stand whole. The first strict run refused the warnings this branch carried in the files it changes, and this change clears them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask reaches, and the warnings it clears sit in files the branch changes
+- every door has a fake: the changed door, the lint verb through the landing fake, and the check's verb road
+- each new comment points at this ticket, which carries the approach
+- one place: `engineWrites` in `src/quack/lint_changed.go` names the folders the engine writes, and both the lint and the commit read it
 
 # accept
 
