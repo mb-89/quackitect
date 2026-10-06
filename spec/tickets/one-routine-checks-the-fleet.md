@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: d5fd766e4b279ef6
         size: 528
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 676ca69525637262c763d8f4c10362bb5befc272
+    hash_after: 676ca69525637262c763d8f4c10362bb5befc272
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: ac503a0377c565c7
+        size: 2730
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ Weighed: the config key over a constant id, since the routine does not stand yet
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/routine_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/routine_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases fail on their own assertion. The trigger prints the work routine alone, the route word answers the usage, and the stub routes nothing. The free-branch case passes against the stub, since an empty route is its claim. It stands as the guard that the change routes nothing past a hold.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done_when line meets TestTriggerNamesTheStoredFleetRoutineAndItsPrompt. The second meets TestAPullRequestEventRoutesToTheBoxThatHoldsItsBranch and TestRouteReadsTheEventFile, and the check line meets the command at tests-green.
+- The trigger and route cases reach git and the disk over a temp clone, as the package's other cases do. The config door is a function the case hands in, and the routing cases stand pure.
 
 # gate
 
