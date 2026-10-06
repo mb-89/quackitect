@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -88,6 +88,15 @@ record:
   - step: sync
     hand: box 57a5a484096e · claude-code-remote
     hash_before: 590a6a06f568a18650b52557879cacc6491b7aeb
+  - step: sync
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: ef294dd556428914875cf733e7ff3004a2b0ba4e
+    hash_after: 8316b1b9e5d706ea51dcb87b6523ba48048345cc
+    answered:
+      - name: sync
+        exit: 0
+        said: work/engine-verbs-hold took 2 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -103,8 +112,9 @@ Boxes now clone front matter with sed, open drafts by hand, push branches with n
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
