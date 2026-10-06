@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: green
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 83d4130bca89729496b88001db63f45926321a9e
+    hash_after: 83d4130bca89729496b88001db63f45926321a9e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s); green, src/branches passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: green
+    inputs:
+      - name: design/tests-red
+        hash: 613a6eda8e875a5a
+        size: 1263
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -338,26 +361,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/cloud-desk.test.js test/level0/pull-hand-desk.test.js src/branches/take_failure_test.go src/quack/commit_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every desk refusal now raises the node desk-works-on-trunk with its message alone. The node holds the remedy, and the failure door prints it once. Before, the JS pull, the JS take, the Go take and the commit verb each spelled the remedy in their own text. Two of them printed it twice, once in the text and once off the node. deskRefusal leaves lib/cloud.js, and DeskRefusal leaves trunk.go. The desk cases that read the remedy now hold the node in their trees. The ask's first two lines ride out as the-twins-retire, which closed with copilot taking through Go. The rest of that retirement stands parked as the note the-js-pull-stack-retires.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files past the size are callers or cases the moved remedy forces, and no other file moves
+- the JS refusals reach the failure door over the fake disk and log
+- a comment over each changed function names the approach
+- the remedy stands on the node alone, and each language holds one test node
 
 # accept
 
