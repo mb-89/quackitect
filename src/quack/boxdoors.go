@@ -56,6 +56,7 @@ type boxDoors struct {
 	get       func(url string, wait time.Duration) (string, error)
 	clock     q.Clock
 	disk      diskDoors
+	input     io.Reader
 	out, errs io.Writer
 }
 
@@ -89,6 +90,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		get:     realGet,
 		clock:   wall,
 		disk:    realDisk(),
+		input:   os.Stdin,
 		out:     out,
 		errs:    errs,
 	}

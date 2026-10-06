@@ -18,6 +18,27 @@ func startFake(input string, env map[string]string, manifest bool) startOutside 
 	}
 }
 
+func TestStartReadsItsInputEnvironmentAndDiskOffTheBox(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		name  string
+		env   map[string]string
+		stops bool
+	}{
+		{"a desk box in default mode with no plugin", nil, true},
+		{"a cloud box", map[string]string{"CLAUDE_CODE_REMOTE": "true"}, false},
+	} {
+		box, _, _, _ := fakeBoxDoors(t)
+		box = withEnv(box, one.env)
+		box.input = strings.NewReader(`{"permission_mode":"default"}`)
+		var out strings.Builder
+		startVerb(startOutsideOf(box))([]string{"start"}, false, &out, &out)
+		if stops := strings.Contains(out.String(), `"continue":false`); stops != one.stops {
+			t.Errorf("%s: prints %q, and the stop reads %v, want %v", one.name, out.String(), stops, one.stops)
+		}
+	}
+}
+
 func TestStartRegistersUnderItsWord(t *testing.T) {
 	t.Parallel()
 	if registry["start"] == nil {

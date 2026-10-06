@@ -281,6 +281,7 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 		get:   func(string, time.Duration) (string, error) { return "", errors.New("no wire here") },
 		clock: qtest.NewFake(time.Unix(0, 0)),
 		disk:  newFakeDisk(),
+		input: strings.NewReader(""),
 		out:   &out,
 		errs:  &errs,
 	}, runner, &out, &errs
