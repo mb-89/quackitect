@@ -6,7 +6,7 @@
 
 import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
 import { graphIn, LEAF } from "../../src/scripts/graph.js";
-import { chapterOf } from "../../src/scripts/pull-chapter.js";
+import { chapterOf } from "../../src/scripts/chapter.js";
 import { CHECKED, leafOf } from "../../src/scripts/pull-route.js";
 
 const CHECKLIST = "checklist";

@@ -283,7 +283,7 @@ func TestTestArgv(t *testing.T) {
 	}
 	red := "test/level0/trust.test.js"
 	argv := testArgv(root, []string{red}, testParts[0])
-	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/pull-kept.test.js") {
+	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/chapter.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
 	for _, one := range argv {

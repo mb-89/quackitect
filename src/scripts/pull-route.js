@@ -26,7 +26,6 @@ import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
 import { notesOf, processNameOf } from "./quack-topic.js";
 import { callOf } from "./tool-call.js";
-import { WORK_VERBS } from "./work.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -41,47 +40,11 @@ export const COMMENT = /^\s*<!--.*-->\s*$/;
 export const ANSWERED = /^\s*answered:/;
 export const FENCE = /^\s*(```|~~~)/;
 
-// [[spec/design_output/pull#a-need-is-a-verb]]
-// The branch verbs read the table work answers when a need asks, since work.js imports the pull, and a read at load meets its table unbuilt. [[spec/tickets/branch-list-reads-work-table]]
-export const VERBS = {
-  get branch() {
-    return Object.keys(WORK_VERBS);
-  },
-  get work() {
-    return Object.keys(WORK_VERBS);
-  },
-  ticket: ["pull", "note", "update", "open"],
-  retro: [
-    "notes",
-    // [[spec/design_output/work#an-experiment-decides]]
-    "audit",
-    "collect",
-    "new",
-    "timeline",
-    "chapters",
-    "matrix",
-    // [[spec/tickets/the-retro-finishes-its-asks]]
-    "read",
-    "effect",
-    "classes",
-    "mint",
-  ],
-};
-
 export { QUEUE };
 
 // [[spec/design_output/config#the-engine-controls]]
 export function handsOut(binding) {
   return (String(binding ?? "").trim() || QUEUE) === QUEUE;
-}
-
-// [[spec/design_output/pull#a-need-is-a-verb]]
-export function holdsVerb(need, verbs = VERBS) {
-  const [verb, sub] = String(need ?? "")
-    .trim()
-    .split(/\s+/);
-  if (!verbs[verb]) return false;
-  return !sub || verbs[verb].includes(sub);
 }
 
 export { agentOf, BOX, handOf, holdAt, holdOf, parsed, roleOf };

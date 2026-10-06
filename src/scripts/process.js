@@ -3,9 +3,26 @@
 // ticket note all copy the same thing.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 
-import { processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import {
+  processHash,
+  readYaml,
+  schemasFrom,
+} from "../../.claude/skills/level0/lib/schema.js";
 
 export const PROCESSES = "spec/processes";
+const SCHEMAS = "spec/schemas";
+
+// Every schema the tree ships, by the kind each governs. [[spec/design_output/schema]]
+export function schemasHere(it) {
+  const at = it.join(it.method ?? it.root, ...SCHEMAS.split("/"));
+  if (!it.disk.exists(at)) return new Map();
+  return schemasFrom(
+    it.disk
+      .list(at)
+      .filter((one) => one.kind === "file" && one.name.endsWith(".yaml"))
+      .map((one) => ({ text: it.disk.read(it.join(at, one.name)) })),
+  );
+}
 export const END = ".yaml";
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
