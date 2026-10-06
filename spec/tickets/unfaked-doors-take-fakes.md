@@ -240,3 +240,10 @@ Done when a design output names the git door and the process door with their fak
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The check time, as `./RUNME.sh check` prints it in all:
+
+| when | seconds |
+|---|---|
+| before the group | 122.7 |
+| after quack-waits-poll-on-a-fake-clock closes | 100.6 |
