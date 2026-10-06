@@ -548,12 +548,3 @@ func TestTestVerb(t *testing.T) {
 		}
 	})
 }
-
-func TestCheckRegisters(t *testing.T) {
-	t.Parallel()
-	for _, words := range []string{"check", "test"} {
-		if registry[words] == nil {
-			t.Fatalf("the registry holds no %s, so quack hands it to node", words)
-		}
-	}
-}

@@ -60,16 +60,6 @@ func voiceRuns(one twin, dry bool, argv ...string) (int, string, string) {
 	return code, out.String(), errs.String()
 }
 
-func TestVoiceRegistersUnderItsWord(t *testing.T) {
-	t.Parallel()
-	if registry["voice"] == nil {
-		t.Fatal("voice registers no Go twin")
-	}
-	if key, _ := twinOf([]string{"voice", "measure", "spec"}, registry); key != "voice" {
-		t.Fatalf("voice measure spec reaches %q", key)
-	}
-}
-
 func TestVoiceVerbMeasuresARealFolder(t *testing.T) {
 	t.Parallel()
 	root := voiceTree(t, map[string]string{

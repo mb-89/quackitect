@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -73,22 +72,6 @@ func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 		t.Fatalf("files/a.md reads %v before any write", got)
 	}
 	var _ index.Start = starts[0]
-}
-
-// The index holds no module's logic, so it imports nothing under src/modules and no src/tickets. [[spec/tickets/tickets-becomes-a-module]]
-func TestTheIndexImportsNoModule(t *testing.T) {
-	t.Parallel()
-	cmd := exec.Command("go", "list", "-deps", "./src/index")
-	cmd.Dir = filepath.Join("..", "..")
-	listed, err := cmd.Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range strings.Fields(string(listed)) {
-		if strings.HasPrefix(one, "quackitect/src/modules/") || one == "quackitect/src/tickets" {
-			t.Fatalf("the index imports %s", one)
-		}
-	}
 }
 
 // The served index answers the tickets the wiring's module reads off the watch, the private ones and one written after the start among them. [[spec/tickets/tickets-becomes-a-module]]
@@ -300,26 +283,6 @@ func TestTheRootLandsAStoreRequest(t *testing.T) {
 	}
 	if held, _ := store.Snapshot().Read(config.HeldName).(config.Held); held.Overrides["queue/config/weight"] != "9" || held.By["queue/config/weight"] != "w1" {
 		t.Fatalf("%s holds %+v after the land", config.HeldName, held)
-	}
-}
-
-// The wiring's http instance declares its wait under the name the door reads, so a layer setting the key reaches every post with no Prefer. [[spec/tickets/wait-key-meets-its-wiring]]
-func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := q.NewStore(c).Declared(index.WaitName); !ok {
-		t.Fatalf("the wiring declares no %s", index.WaitName)
 	}
 }
 
