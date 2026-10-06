@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 3eb63c1c412889c10a4cd30ec30c8376cab301b3
+    hash_after: 3eb63c1c412889c10a4cd30ec30c8376cab301b3
+    inputs:
+      - name: ask
+        hash: f8a2aeaa9f01731c
+        size: 860
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,103 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each of the eight spawns keeps its name and signature as a thin binding over `proc.Real`, and its body moves to an `Over` form taking a `proc.Runner`, as `nodeAccept` and `nodeAcceptOver` stand in `src/quack/twins.go`. A case hands the `Over` form a `FakeRunner`.
+
+The door gains two things, each with a contract case run on both runners.
+
+1. `Streams` on `proc.Command`: an `In` reader and `Out` and `Err` writers. Where a command carries them, the real runner wires them to the run in place of its buffers, and answers `Out` and `Err` empty. The fake reads `In` into the command's `Stdin` before the program runs, writes the program's `Out` and `Err` to the writers after, and answers them empty. So `tuiLaunch`, `toolRuns` and `takesBranch` hand the terminal and the caller's streams straight through, and a case reads what the fake wrote.
+2. `Signalled` beside `NotStarted`: the real runner answers it where a signal ends the run, in place of the `-1` that `exec` reports and `NotStarted` shares. `serveRuns` and `tuiLaunch` read it as exit 1, as their comments say the JavaScript door does, and read `NotStarted` as the fault they answer today.
+
+Each spawn over the door:
+- `toolRuns` becomes `toolRunsOver(run)`, a `fixRunner`: `Streams{In: os.Stdin, Out: out, Err: errs}`, and `NotStarted` prints the fault and answers `exitFailed`
+- `roadVerb(root)` stands as `roadVerbOver(proc.Real, os.Executable, root)`: both writers name one buffer, so the two streams stay one text as `CombinedOutput` keeps them
+- `takesBranch` takes the runner and the binary from `pullHere`: `Streams{Out: it.Out, Err: it.Err}`
+- `retroMintRunme` becomes `retroMintRunmeOver(run)`: `Env` carries the map's pairs in sorted order, and `NotStarted` appends the fault to `errs` and answers `exitFailed`
+- `heardIn` stands as `heardInOver(proc.Real, ...)`: `Stdin` the text, `Wait` `valeSpan`. `unreadWhy` reads `Said.Err` and `Said.Code` in place of an `exec.ExitError`
+- `reviewOver(method)` stands as `reviewRunOver(proc.Real, method)`: `Env` the two pairs, `Wait` `reviewGathering`
+- `serveRuns` becomes `serveRunsOver(run)`, and `tuiLaunch` becomes `tuiLaunchOver(run)` with `Streams{In: os.Stdin, Out: out, Err: errs}`. `serveReal` and `tuiReal` bind `proc.Real`
+
+The header of `src/quack/spawndoors.go` points at the process door section of `spec/design_output/doors.md`, and that section names the quack spawns as moved.
+
+The git reads in `command.go`, `vehicle_verb.go`, `retro_chapters.go`, `verb_lint.go` and `retro_collect.go` belong to the git door. `boxdoors.go` and `checkdoors.go` are the box and check doors the table names. So done_when 1 reads the eight functions, not every `exec.Command` in the folder, and a private note carries the git reads to the retro.
+
+I refuse to buffer the streams through `Said`. A viewer run buffered shows nothing until it ends, which breaks the viewer. The cost of `Streams`: the door holds two shapes of output, and a caller choosing streams reads no `Out`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verb_fix.go init
+- src/quack/verb_fix_test.go TestTheCalmCalmsTheShoutRealValeNames
+- src/quack/commit.go landingHere
+- src/quack/ticket_doors.go pullHere
+- src/quack/ticket_doors.go pullVoice
+- src/quack/command.go heardOver
+- src/quack/retro_mint.go init
+- src/quack/retro_new.go init
+- src/quack/main.go listensHooks
+- src/quack/serve_verb.go serveReal
+- src/quack/tui_verb.go tuiReal
+- src/pull/door.go ShellOver, which reads Signalled past NotStarted
+- src/proc/proc.go runUnder
+- src/proc/proc.go FakeRunner.Run
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go TestARunWithStreamsHandsThemItsInputAndOutput
+- src/proc/proc_contract_test.go TestARunASignalEndsAnswersSignalled
+- src/quack/spawns_runner_test.go TestToolRunsHandsTheStreamsThrough
+- src/quack/spawns_runner_test.go TestARoadVerbAnswersItsStreamsAsOneText
+- src/quack/spawns_runner_test.go TestTheBranchTakeRunsTheRoadOnTheCallersStreams
+- src/quack/spawns_runner_test.go TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv
+- src/quack/spawns_runner_test.go TestValeHeardOverTheDoorReadsTheTextAsTheFile
+- src/quack/spawns_runner_test.go TestAReviewGathersOffTheBranchVerbUnderTheWorkRoot
+- src/quack/spawns_runner_test.go TestServeRunsReadsASignalAsOne
+- src/quack/spawns_runner_test.go TestTheViewerLaunchHandsTheTerminalThrough
+- done_when 1: a grep for exec.Command in the eight functions, which the gate reads, and the spawns_runner_test.go cases
+- done_when 2: TestToolRunsHandsTheStreamsThrough and TestTheViewerLaunchHandsTheTerminalThrough
+- done_when 3: the header of src/quack/spawndoors.go, which the gate reads
+- done_when 4: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/proc/proc.go
+- src/proc/proc_contract_test.go
+- src/quack/verb_fix.go
+- src/quack/spawndoors.go
+- src/quack/ticket_doors.go
+- src/quack/retro_mint.go
+- src/quack/command.go
+- src/quack/review.go
+- src/quack/serve_verb.go
+- src/quack/tui_verb.go
+- src/quack/spawns_runner_test.go
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened all eight functions, their callers by grep, proc.go and its contract suite, and ShellOver, the one reader of NotStarted past the voice verb
+- The callers list names each binding site and each reader of the door's codes
+- Each done_when line names its test or the read the gate makes
 
 ## tests-red
 
