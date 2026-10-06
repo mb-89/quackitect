@@ -29,7 +29,7 @@ import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
-import { heldIn, TICKETS, WORK_BRANCH } from "../engine/group.js";
+import { heldIn, spanOf, TICKETS, WORK_BRANCH } from "../engine/group.js";
 import { configHere } from "./cli-doors.js";
 import { boxIdHere } from "./pull-hand-of.js";
 import { rootsHere } from "./vehicle.js";
@@ -38,6 +38,9 @@ import { staleClaim } from "./work-free.js";
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
 const HEADS = /^refs\/heads\//;
+// A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#a-hold-beats-with-its-session]]
+const BEATS = "refs/beats/";
+const ENDS = " ends";
 const BOX = /\bbox (\S+)/;
 
 export function refsIn(text) {
@@ -100,6 +103,7 @@ export function holds(
   const stamp = stampOf(stampText);
   for (const one of engine && !ciGuards ? refs : []) {
     if (one.remote === `refs/heads/${TRUNK}` || ZEROS.test(String(one.sha ?? ""))) continue;
+    if (String(one.remote ?? "").startsWith(BEATS)) continue;
     const battery = saysGreen(stamp, stamp.sha);
     const covered = stamp.sha === one.sha || checkedThrough(stamp.sha, one.sha);
     if (battery.green && covered) continue;
@@ -187,16 +191,28 @@ export function heldBy(repo) {
   };
 }
 
-// Whether the tip on origin stands older than the span, read the way the list reads a claim. [[spec/tickets/stale-hold-frees-the-branch]]
-export function staleBy(repo, span, now) {
+// Whether the hold on origin stands dead, read the way the list reads a claim: an end at or past the tip, no beat inside its span, and the tip past the stale span. [[spec/design_output/work#a-hold-beats-with-its-session]]
+export function staleBy(repo, span, now, beatSpan = "") {
   return (ref) => {
     const branch = String(ref?.remote ?? "").replace(HEADS, "");
     if (!branch.startsWith(WORK_BRANCH)) return false;
     const said = repo.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
     if (!said.ok) return false;
-    return staleClaim({ when: Number(String(said.out).trim()) }, now, {
-      stale: span,
-    }).stale;
+    const when = Number(String(said.out).trim());
+    const beat = repo.run(
+      ["log", "-1", "--format=%ct %s", `${BEATS}${branch.slice(WORK_BRANCH.length)}`],
+      true,
+    );
+    if (beat.ok) {
+      const line = String(beat.out).trim();
+      const at = Number(line.split(" ")[0]);
+      if (line.endsWith(ENDS) && at >= when) return true;
+      const live = spanOf(beatSpan);
+      if (!line.endsWith(ENDS) && live > 0 && Math.floor(now / 1000) - at < live) {
+        return false;
+      }
+    }
+    return staleClaim({ when }, now, { stale: span }).stale;
   };
 }
 
@@ -240,11 +256,9 @@ export function staleTakes(branch, hand) {
 }
 
 // The span off the config, or the built-in one where the config answers nothing. [[spec/tickets/stale-hold-frees-the-branch]]
-async function spanHere(files, root) {
+async function spanHere(files, root, key = "work.staleAfter") {
   try {
-    return await configHere(files, rootsHere(files, process.env, root)).ask(
-      "work.staleAfter",
-    );
+    return await configHere(files, rootsHere(files, process.env, root)).ask(key);
   } catch {
     return "";
   }
@@ -312,7 +326,12 @@ async function main() {
     heldBy(git(outside, root)),
     boxIdHere({ root, method: root, join, disk: files }),
     agentPushes(process.env),
-    staleBy(git(outside, root), await spanHere(files, root), clock().now().getTime()),
+    staleBy(
+      git(outside, root),
+      await spanHere(files, root),
+      clock().now().getTime(),
+      await spanHere(files, root, "work.beatAfter"),
+    ),
     heldAtTip(git(outside, root)),
     checkedThroughBy(git(outside, root)),
     ciGuardsIn(files, root),
