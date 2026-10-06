@@ -210,6 +210,10 @@ record:
         hash: ee168782689e2bf1
         size: 576
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 72efc4be152ebd940efe9f7024feee7e0c408e76
+    session: cse_01CC7ToBxZqmgbrgbZrD5Jj1
 reason: done
 ---
 
