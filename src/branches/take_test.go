@@ -69,3 +69,16 @@ func TestAnOpenNamingNothingRefuses(t *testing.T) {
 	}
 	holds(t, one.errs.String(), "branch open needs a group")
 }
+
+// A dependency standing as a work branch on origin waits for its merge, and one standing nowhere reads as closed. [[spec/design_output/pull#children-before-their-group]]
+func TestADependencyOnALiveBranchWaits(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, nil)
+	one.branch("other", map[string]string{"notes.txt": "at work\n"})
+	if one.d.closedHere(nil, "other") {
+		t.Fatal("a dependency on the live branch work/other reads as closed")
+	}
+	if !one.d.closedHere(nil, "gone") {
+		t.Fatal("a dependency standing nowhere reads as open")
+	}
+}

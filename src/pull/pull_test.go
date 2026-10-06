@@ -144,6 +144,19 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the hold reads %+v", held)
 		}
 	})
+	t.Run("a dependency standing as a work branch on origin waits, and one standing nowhere reads as met", func(t *testing.T) {
+		for dep, waits := range map[string]bool{"other": true, "gone": false} {
+			it, out, _ := cloudPull(t)
+			_ = it.Disk.Write("spec/tickets/alpha.md", strings.Replace(childTicket, "group: g\n", "group: g\ndepends_on: ["+dep+"]\n", 1))
+			gitIn(t, it.Root, "commit", "-q", "-am", "alpha waits")
+			gitIn(t, it.Root, "push", "-q", "origin", "HEAD:work/other")
+			gitIn(t, it.Root, "fetch", "-q", "origin")
+			it.Pulling([]string{"pull"})
+			if got := strings.Contains(out.String(), "alpha waits for "+dep); got != waits {
+				t.Fatalf("a dependency on %s waits: %v, and wants %v:\n%s", dep, got, waits, out)
+			}
+		}
+	})
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
 		it.Pulling([]string{"pull"})

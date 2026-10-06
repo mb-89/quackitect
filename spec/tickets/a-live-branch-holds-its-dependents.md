@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ba3dbab3893b01c8
         size: 706
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: d7aca686818382d9ce6a6c361b020b685e7d525c
+    hash_after: d7aca686818382d9ce6a6c361b020b685e7d525c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 09c93060e1e21929
+        size: 1706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +241,32 @@ the first done_when line falls to the pull case, the second to ./RUNME.sh ticket
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull src/branches
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/pull/pull_test.go
+src/branches/take_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion. The pull answers wait with no reason for alpha, since closedHere reads the absent dependency other as met and hands alpha out. The branch case reads work/other as closed. The case for a dependency standing nowhere passes today, and pins that the change keeps it met.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the pull case, the second is a checkpoint the hand answers with ./RUNME.sh ticket pull over test-walks-move-onto-fakes, the third falls to ./RUNME.sh check
+both cases drive a real git repository in a temporary folder, as every case beside them in src/pull and src/branches does, and git keeps its contract there
 
 # gate
 
