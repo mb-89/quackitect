@@ -193,7 +193,21 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the hold stands: %+v", held)
 		}
 	})
-	t.Run("a todo in hand holds the pull back", func(t *testing.T) {
+	t.Run("a plan naming a free ticket hands it out", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write(planFile, `{"working":"alpha"}`)
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
+	t.Run("a plan naming the group ticket hands its child", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write(planFile, `{"working":"g"}`)
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
+	t.Run("a working todo that is no ticket still holds the pull", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		_ = it.Disk.Write(planFile, `{"working":"mend the lint"}`)
 		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.Contains(out.String(), "the todo mend the lint stands in hand, so the pull hands nothing else out.") {

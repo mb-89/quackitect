@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 19065eb63385a8de
         size: 410
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: d5925a0507c50e0c1d2aaaa7e144ae117b1f413c
+    hash_after: d5925a0507c50e0c1d2aaaa7e144ae117b1f413c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 52abf16de242c557
+        size: 1885
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,32 @@ The free-ticket case is TestPull/a_plan_naming_a_free_ticket_hands_it_out, the t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/pull_test.go src/pull/ticket_at_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/pull/pull_test.go
+src/pull/ticket_at_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+A plan naming alpha or the group g answers wait with the todo in hand, which is the stall this box met at its first pull. The case of a todo that names no ticket passes already, and it keeps its guard under the name the ask gives it. A stub namesTicket answering false lets the read compile.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The first done_when line meets TestPull/a_plan_naming_a_free_ticket_hands_it_out, the second meets TestPull/a_working_todo_that_is_no_ticket_still_holds_the_pull, and the check line waits for tests-green.
+The pull cases run on the real-git tree the package already proves its door on, and the name case runs on FakeDisk.
 
 # gate
 
