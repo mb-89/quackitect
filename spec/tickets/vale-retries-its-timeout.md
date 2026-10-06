@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-check-runs-beside
 steps:
   - name: do
@@ -27,6 +27,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 20fc25d8293ed8079d406ef75e73e1e3b9cc5c8c
+    hash_after: c37e0c34ae798a3773ec6e2c7e13f8d3552331da
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "   61.5  in all"
+    inputs:
+      - name: ask
+        hash: 6ad91211404d5f27
+        size: 631
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ The rules part runs Vale beside every other part, and a script rule under that l
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/tools_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lint runs Vale again when Vale names its own timeout, E201, up to valeTries runs. With every part of the check at once, a script rule passed the cap of Vale on a sound tree, and the rules part read no file and went red.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the Vale run in the lint module goes again on E201
+- the change reveals no cleanup past it
+- the code and the count stand once, at the top of tools.go, and the ticket carries the reason
 
 # Discussion
 
