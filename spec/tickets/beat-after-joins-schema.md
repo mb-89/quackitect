@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: boxes-hold-and-hand-back
 parent: holds-beat-with-the-session
+record:
+  - step: do
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 7319b4bac4d6af834f4125b79e48453eb7fe87ac
+    hash_after: 4407c78e5b00df7d551b7e814bbdc87626fa46a0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/settings passes
+      - name: check
+        exit: 0
+        said: "  116.7  in all"
+    inputs:
+      - name: ask
+        hash: fa4644d0ca86e9d3
+        size: 319
+    def: 493538c21ebdc181
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,33 @@ work.beatAfter takes a row in spec/config/level0.schema.json beside staleAfter, 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/settings/settings_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The key work.beatAfter joins the settings declarations at 10m, under work.staleAfter, so the generated schema, its command file and the size golden follow. A test holds the beat span shorter than the stale span. The parent ticket says under Discussion that the beat verb reads the span off this key alone, and the last beat off refs/beats.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the settings declaration, its test, and the files the generators write from it
+- the key reads through the config door, so no new door stands
+- the test names the approach in its comment
+- the span stands in the declaration alone, and the parent points at the key
 
 # Discussion
 
