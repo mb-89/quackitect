@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: b985281ed9d9ebbe5cb9877074dea41e3643967f
+    hash_after: b985281ed9d9ebbe5cb9877074dea41e3643967f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.9  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: 0fd6e826035c23a2
+        size: 1008
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ every fact stands in one place: the section in work.md owns the design, and both
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/rescue_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A red commit a cloud box makes on work/<group> now reaches origin on rescue/<group>, pushed by force, and the work branch on origin stays on its green tip. A green push carrying that commit drops the rescue. A takeover through branch take --over merges the rescue the old box left into the branch it now holds, pushes it, and drops the rescue; a conflict aborts the merge, leaves the rescue standing, and names the merge command. The design stands in spec/design_output/work.md, section a red commit reaches a rescue branch. Two children make the rescue push pass the stamp gate and keep CI off rescue and beat branches.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: commit.go, rescue.go and take.go carry the code, work.md the design, and the size golden moves with that note
+every door the change reaches has a fake: git runs against a temp origin as in every other case of both packages, and the clock through pcClock
+a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-a-rescue-branch
+every fact stands in one place: work.md owns the design, and both packages point at it
 
 # accept
 
