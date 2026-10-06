@@ -92,6 +92,10 @@ record:
   - step: sync
     hand: box 34eba3f85616 · claude-code-remote
     hash_before: 3e92d5bac4bc2165f0d7b54cd8368c7b732cac3f
+    hash_after: 3fe011a30b76c7732051d886ac686ece21f8b1c0
+    model: unstated
+    cost: 0
+    final: "dead-tests-and-code-leave: every child closed, the check green, the retro written"
   - step: sync
     hand: box 34eba3f85616 · claude-code-remote
     hash_before: 12d4c5d6afc7f0a33f7d7ef8273a8204888c025b
@@ -163,7 +167,6 @@ record:
         hash: 7c1b55b24304355c
         size: 3362
     def: 4da1ca5da87d5bbc
-cloud: true
 reason: done
 ---
 
