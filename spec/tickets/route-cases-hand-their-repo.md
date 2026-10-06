@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: unfaked-doors-take-fakes
 parent: quack-repos-meet-fake-git
+record:
+  - step: do
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 92f951a273bb8ebe55c4266e33513855ed2d03af
+    hash_after: d614d5cb2852f326f5cdc4fdb095c789d30672f5
+    why: quack-repos-meet-fake-git answers this ask
+reason: answered
 ---
 
 # Ask
