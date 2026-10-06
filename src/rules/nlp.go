@@ -92,7 +92,7 @@ func (b block) place(text string, found hit) (int, int, bool) {
 	return 0, 0, false
 }
 
-// The copies of a match in a text a search would take. [[spec/design_output/rules#the-text-model]]
+// The copies of a match in a text a search takes. [[spec/design_output/rules#the-text-model]]
 func countBounded(text, match string) int {
 	count := 0
 	for at := 0; match != "" && at <= len(text); {

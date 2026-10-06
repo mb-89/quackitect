@@ -124,7 +124,7 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("commit says %q", errs)
 		}
 	})
-	t.Run("the tests run before the staging, and the check after the commit", func(t *testing.T) {
+	t.Run("the rules and the tests run before the staging, and the check after the commit", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		lays(t, root, "src/a.go", "package a\n")
 		d, _, _ := fakeLanding(root)
@@ -136,7 +136,7 @@ func TestCommitVerb(t *testing.T) {
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 {
 			t.Fatalf("commit answers %d, %q", code, errs)
 		}
-		want := []string{"test staged= head=a-ticket: the tree opens", "check staged= head=" + opens}
+		want := []string{"lint staged= head=a-ticket: the tree opens", "test staged= head=a-ticket: the tree opens", "check staged= head=" + opens}
 		if strings.Join(seen, "|") != strings.Join(want, "|") {
 			t.Fatalf("the verbs ran as %v, and want %v", seen, want)
 		}
@@ -322,7 +322,7 @@ func TestCommitVerbGates(t *testing.T) {
 		if code != 0 || headSubject(t, root) != opens || !heard.reached("probe cold") {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
-		if heard.ran[0][0] != "test" || !strings.Contains(out, "The cold probe passes on the staged change to src/quack/a.go.") {
+		if heard.ran[1][0] != "test" || !strings.Contains(out, "The cold probe passes on the staged change to src/quack/a.go.") {
 			t.Fatalf("commit ran %v and said %q", heard.ran, out)
 		}
 	})

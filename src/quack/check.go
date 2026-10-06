@@ -238,6 +238,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		where = []string{"."}
 	}
 	return []part{
+		{name: "changed", run: func() int { return d.verb([]string{"lint", "--changed", "--strict"}, quiet) }},
 		{name: "tests", run: func() int { return testsRun(d, quiet) }},
 		{name: "level0", run: func() int { return level0Runs(d, quiet) }, beside: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},

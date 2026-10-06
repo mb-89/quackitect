@@ -72,7 +72,7 @@ func masked(said []byte, mask byte) {
 	}
 }
 
-// The source with info strings, link labels and list numbers masked, so a match never lands on them. [[spec/design_output/rules#the-text-model]]
+// The source with info strings, link labels and list numbers masked, so a match lands past them. [[spec/design_output/rules#the-text-model]]
 func prepMarkdown(content []byte) {
 	for _, at := range reExInfo.FindAllIndex(content, -1) {
 		ticks := at[0]
@@ -268,7 +268,7 @@ func (w *walker) isNestedList() bool {
 	if w.lastTag() != "li" || size <= nestedDepth {
 		return false
 	}
-	up1, up2 := w.tagHistory[size-2], w.tagHistory[size-3]
+	up1, up2 := w.tagHistory[size-2], w.tagHistory[size-nestedDepth]
 	return (up1 == "ol" || up1 == "ul") && up2 == "li"
 }
 

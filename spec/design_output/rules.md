@@ -24,8 +24,8 @@ underscore reads none.
 # A marker quiets a rule
 
 `quietOf` in `src/rules/exempt.go` reads the markers off the raw text, past
-fenced blocks and code spans, and Lint drops each finding a region covers at
-its line and column.
+code blocks and code spans. Lint drops each finding a region covers at its
+line and column.
 
 | the marker | what it quiets |
 |---|---|
@@ -51,7 +51,7 @@ contract.
 
 A message names `%s` where the match goes, and the rule's own message stands
 where the match names none. Lint places a match at the line of its begin,
-with a span counted in runes from 1 and holding both ends.
+with a span counted in runes from one, holding both ends.
 
 | the file | the styles its makers serve |
 |---|---|
@@ -79,24 +79,24 @@ blocks by its extension.
 
 | the file | its blocks |
 |---|---|
-| `.go`, `.js`, `.ts`, `.tsx` | each comment in place, its markers blanked, running line comments joined |
+| `.go`, `.js`, `.ts`, `.tsx` | each comment in place, its markers blanked, a run of line comments read as one |
 | `.txt` | the whole text as prose |
-| any other | markdown: each front matter string, then goldmark's HTML block by block |
+| any other | markdown: each front matter string, then the markdown parser's HTML block by block |
 
-A markdown block holds its text with inline code masked, and stands in the
-source by its offset, else by the runs of its text read verbatim. A paragraph
+A markdown block holds its text under a mask over inline code. It stands in
+the source by its offset, else by the runs of its text read verbatim. A paragraph
 splits into its paragraphs and sentences, and a list item, a heading or a cell
 into its sentences alone. A rule reads a block whose scope holds every section
 it names, and a sentence block only where it names the sentence.
 
 A match stands at its source offset. Where neither offset nor run places it,
-Lint searches it from the block's first run, past the copies before it and any
-copy pressed against inline markup.
+Lint searches it from the block's first run. The search passes the copies
+before it and any copy pressed against inline markup.
 
 # The token kinds
 
 `src/rules/kinds.go` and `src/rules/sequence.go` port Vale's kinds over
-regexp2, so a lookbehind compiles.
+regexp2, so a pattern looking behind its match compiles.
 
 | the kind | what it answers |
 |---|---|

@@ -12,6 +12,37 @@ import (
 	"quackitect/src/modules/hooks/command"
 )
 
+// The folders the engine writes, where a hand fixes no warning. [[spec/tickets/rules-lint-changed-files-first]]
+var engineWrites = []string{"spec/tickets/", "spec/retros/", ".se/"}
+
+// The paths a hand writes, past every folder the engine writes. [[spec/tickets/rules-lint-changed-files-first]]
+func handWritten(paths []string) []string {
+	out := []string{}
+	for _, one := range paths {
+		if !slices.ContainsFunc(engineWrites, func(folder string) bool { return strings.HasPrefix(one, folder) }) {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
+// The files the staging adds and the ones staged already, read through a dry run so nothing stages, past every deletion. [[spec/tickets/rules-lint-changed-files-first]]
+func stagesTo(root string, addArgs, only []string) []string {
+	var paths []string
+	for _, line := range strings.Split(gitRun(root, append([]string{addArgs[0], "--dry-run"}, addArgs[1:]...)...).out, "\n") {
+		if at, ok := strings.CutPrefix(line, "add '"); ok {
+			paths = append(paths, strings.TrimSuffix(at, "'"))
+		}
+	}
+	for _, line := range strings.Split(gitRun(root, append([]string{"diff", "--cached", "--name-only", "--diff-filter=d"}, only...)...).out, "\n") {
+		if line != "" {
+			paths = append(paths, line)
+		}
+	}
+	slices.Sort(paths)
+	return slices.Compact(paths)
+}
+
 // A git run: what it prints, and whether it exits 0. [[spec/tickets/changed-lint-without-merge-base]]
 type gitAnswers func(args ...string) (string, bool)
 

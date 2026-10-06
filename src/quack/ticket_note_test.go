@@ -155,6 +155,10 @@ func TestTicketNote(t *testing.T) {
 			t.Fatalf("the note holds:\n%s", text)
 		}
 	})
+}
+
+// The note verb's guards: the name and the line it takes, the cap, the rules, a private name and the dry run. [[spec/tickets/rules-lint-changed-files-first]]
+func TestTicketNoteGuards(t *testing.T) {
 	t.Run("note takes a name and a line", func(t *testing.T) {
 		root := noteCaseTree(t)
 		for _, argv := range [][]string{{"ticket", "note"}, {"ticket", "note", "slow-lint"}, {"ticket", "note", "slow-lint", "--todo", "--talk"}} {

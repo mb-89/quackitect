@@ -88,6 +88,11 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 			return exitFailed
 		}
 		where := whereOf(argv[1:])
+		// The changed files stand in place of the paths named, and a warning refuses under --strict, as the commit and the check read it. [[spec/tickets/rules-lint-changed-files-first]]
+		if slices.Contains(argv[1:], "--changed") {
+			where = handWritten(d.changed())
+		}
+		strict := slices.Contains(argv[1:], "--strict")
 		began := d.now()
 		found, fault := lintReading(d, where)
 		if fault != "" {
@@ -107,7 +112,7 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 		})
 		refused := 0
 		for _, one := range found {
-			if one.Severity != check.SeverityWarning {
+			if strict || one.Severity != check.SeverityWarning {
 				refused++
 			}
 		}

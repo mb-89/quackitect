@@ -80,7 +80,7 @@ func mintVerb(rootOf func() (string, error)) twin {
 			fields[askField] = pull.HandedOver(yaml.AsString(fields[askField]))
 		}
 		name := strings.TrimSuffix(path.Base(where), ".md")
-		// A ticket on a closed group's branch stands free. [[spec/design_output/pull#a-closed-group-takes-no-child]]
+		// A ticket on a closed group's branch stands free. [[spec/design_output/pull#a-closed-group-stays-shut]]
 		freed := ""
 		if kind == ticketKind {
 			branch, _ := gitIn(work, "rev-parse", "--abbrev-ref", "HEAD")

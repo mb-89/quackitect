@@ -224,12 +224,6 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-	if code, said := d.verb("test"); code != 0 {
-		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
-		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
-		return exitFailed
-	}
 	// The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
 	moved := movedFrom(d.root, paths)
 	named := append(slices.Clone(paths), moved...)
@@ -247,6 +241,20 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	addArgs := []string{"add", "-A"}
 	if len(adds) > 0 {
 		addArgs = append(append(addArgs, "--"), adds...)
+	}
+	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
+	if reach := handWritten(stagesTo(d.root, addArgs, only)); len(reach) > 0 {
+		if code, said := d.verb(append([]string{"lint", "--strict"}, reach...)...); code != 0 {
+			fmt.Fprintln(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:")
+			fmt.Fprintln(errs, orNothing(said, "the lint answers nothing"))
+			return exitFailed
+		}
+	}
+	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+	if code, said := d.verb("test"); code != 0 {
+		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
+		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
+		return exitFailed
 	}
 	if staged := gitRun(d.root, addArgs...); !staged.ok {
 		fmt.Fprintln(errs, "The staging comes back refused, so the commit stands undone:")

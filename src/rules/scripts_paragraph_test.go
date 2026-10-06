@@ -50,7 +50,7 @@ func paraBranchesMeetVale(t *testing.T, branches []paraBranch) {
 	}
 }
 
-// A schema missing a number a rule reads stops the maker, so no rule runs on a cap it never read. [[spec/design_output/projection#the-second-target]]
+// A schema missing a number a rule reads stops the maker, so every rule runs on a cap it reads. [[spec/design_output/projection#the-second-target]]
 func TestAParagraphRuleRefusesASchemaWithoutItsNumber(t *testing.T) {
 	t.Parallel()
 	empty := func(string) string { return "" }
