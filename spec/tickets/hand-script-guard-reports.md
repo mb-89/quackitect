@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 0fce39be9f102ff2
         size: 839
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 929ee5b96ebea85b7e279655aeee472372dae410
+    hash_after: 929ee5b96ebea85b7e279655aeee472372dae410
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: ac52c0305a416ff9
+        size: 1806
+      - name: [[spec/design_output/model]]
+        hash: a1cec3f4220df26e
+        size: 77706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -230,26 +246,32 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `src/imports/script_test.go`
+- `src/quack/retro_classes_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The retro classes case extends the standing one, so it builds no new fixture. A collected script keeps its whole file name, `script:a-loop.sh`, since two scripts may share a stem.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the guard in the script cases, the classify refusal in the retro classes case
+- the guard cases read a map, and the retro case keeps the temp folder it stood on before
 
 # gate
 
