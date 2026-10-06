@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 3b1ac24038e52881
         size: 903
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 29576cea75c8c9bd40373c1b8f9655144d2f5cc2
+    hash_after: 29576cea75c8c9bd40373c1b8f9655144d2f5cc2
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -307,14 +316,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, src/quack/branch_doors_test.go for the new door, and src/branches/dispatch_level_test.go for the child dispatch-skips-merged-done-branches.
+Every request goes through Doors.Send, which the tests fill with the fake hub, and branchDoors sets to httpSend.
+Comments on workPull, pullOpens and the done road link this ticket and name the approach.
+The pull road stands once, in pullOpens in src/branches/dispatch_fire.go, which done, the dispatch and the write branch call.
 
 ## tests-green
 
