@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,22 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: b5dcb3fa44ac27e3162bc391c8bd226042df7a72
+    hash_after: b5dcb3fa44ac27e3162bc391c8bd226042df7a72
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 61c9a6b89f8bc59c
+        size: 2456
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +242,36 @@ Without it, a refusal names no fix, and the retro counts no failure by id.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/raise_test.go test/level0/failure-door.test.js test/contract/failure-door.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/failure/raise_test.go TestRaiseAnswersTheMessageTheIdAtItsLevelAndEachRemedy
+- src/failure/raise_test.go TestRaiseNamesAnUnregisteredId
+- src/failure/raise_test.go TestTheRowCarriesTheFailureId
+- test/level0/failure-door.test.js raise prints the message, the id at its level and each remedy off the fake, and logs a row carrying the id
+- test/level0/failure-door.test.js raise names an unregistered id and prints its message
+- test/contract/failure-door.test.js the door reads the real nodes under spec/failures
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The Go stubs answer an empty Raised, no lines and no row. The JavaScript stubs answer no lines and no raised id.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the Go cases decide the two go test lines, the level0 and contract cases decide the JavaScript line, and ./RUNME.sh check decides the last
+- the Go cases take the Fake registry, the JavaScript case takes fakeFailure over fakeLog, and the contract case holds the real door on the disk door to the fake
 
 # gate
 
