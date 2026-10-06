@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c7dec0a36dda · claude-code-remote
+    hash_before: 605714f61412ba2f042bf0db215d62b5c0e3d8b6
+    hash_after: 605714f61412ba2f042bf0db215d62b5c0e3d8b6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "    1.9  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+    inputs:
+      - name: design/tests-red
+        hash: 6b15b62b0ab55396
+        size: 784
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -328,26 +351,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/serial_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every top-level test of src/pull now calls t.Parallel first, so the guard in src/imports/serial_test.go passes and leaves the red list. While it stood red, the check passed -skip to go test, and Go caches no result of a run carrying -skip, so every package reran on every check. With the red list empty, a warm check answers the go part from the cache. The race detector and shuffled repeats, CGO_ENABLED=1 go test -race -tags contract -count=3 -shuffle=on ./src/pull, answer ok, and the command for all four packages stands under Discussion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: src/pull/*_test.go stands in the Discussion size
+- every door the change reaches has a fake: t.Parallel reaches no door
+- a comment names the approach: the header of src/imports/serial.go names the rule the guard holds
+- one place: the guard owns the list of slow packages, and the tests repeat none of it
 
 # accept
 
