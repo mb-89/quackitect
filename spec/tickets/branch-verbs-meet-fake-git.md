@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -206,6 +206,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-12
+    hash_before: b8da668c9f52b92e504aef5191774171570a009f
+    hash_after: b8da668c9f52b92e504aef5191774171570a009f
+    inputs:
+      - name: design/draft
+        hash: 633272e4648e13cc
+        size: 8721
+      - name: design/tests-red
+        hash: 8a0ced81fe1fc8ae
+        size: 922
+      - name: [[spec/design_output/doors]]
+        hash: cc0e07111bce8fc0
+        size: 18378
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -438,8 +453,8 @@ the doors the tests reach are git, the disk and the process door, and FakeRepo, 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- branch-vale-case-runs-fake: TestDispatchWritesAFixAskTheVoiceRulesPass in src/branches/dispatch_write_test.go spawns vale through proc.Real, so one case in a file done_when one names runs a real process, and the guard in doors_test.go misses it because imports.RealWaits sees no proc.Real call; the case either moves to a door test of vale with a row in the doors chapter's family table, or the audit learns proc.Real
+accept
+The change in 93e1f290a answers the point the last gate raised and leaves the approach whole: the vale case leaves dispatch_write_test.go for src/branches/dispatch_vale_test.go, the doors chapter's family table names that file as a door test of vale, imports.RealWaits learns proc.Real, and the guard in doors_test.go leaves out valeDoorTest alone, so it still reads every other branch test file for a spawn and for a row in the chapter. done_when one meets TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere and TestATakeAndADispatchRunOnTheFakesAndSpawnNoGit, done_when two meets the chapter half of the same guard, and done_when three meets the check; both guard cases and src/imports pass on this tree.
 
 # implement
 
