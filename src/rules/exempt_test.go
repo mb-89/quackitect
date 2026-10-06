@@ -1,5 +1,5 @@
 // A marker in an HTML comment quiets a rule over the stretch it opens, as
-// Vale 3.20.0 reads it. [[spec/design_output/rules#a-marker-quiets-a-rule]]
+// Vale reads it. [[spec/design_output/rules#a-marker-quiets-a-rule]]
 package rules
 
 import "testing"

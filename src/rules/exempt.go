@@ -1,5 +1,5 @@
 // The markers that quiet a rule over a stretch of a file, read off the raw
-// text past code, as Vale 3.20.0 reads them under its MIT licence.
+// text past code, ported off Vale under its MIT licence.
 // [[spec/design_output/rules#a-marker-quiets-a-rule]]
 package rules
 
