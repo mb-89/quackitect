@@ -106,6 +106,9 @@ record:
         hash: 75adcafc745ca0d5
         size: 910
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 1b552b1b3f1d397540cbf160590eb6d7b02b16e4
 ---
 
 # Ask
