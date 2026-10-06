@@ -900,6 +900,14 @@ stands pure in `src/imports`, and takes parsed files or a file list.
 | the guard | what it names | the marker sparing a line |
 |---|---|---|
 | `blackbox` | a Go test file whose package clause lacks `_test` | `level0: InPackageTest - <why>` on the clause or in the file's doc |
+| `fixture` | a top-level Go test reaching a fixture build outside the home, through its own body or a helper of its package | `level0: FixtureOutsideHome - <why>` on the call's line or in the test's doc |
+
+A fixture build is a call to `TempDir`, `MkdirTemp`, `exec.Command`,
+`exec.CommandContext`, or an index start: `index.Run`, `index.Serve` or
+`index.StartBus`. The home is a package's `main_test.go`, whose `TestMain`
+builds once, and `src/q/qtest`. A shared builder there takes
+`qtest.Shared`, which builds on the first call and answers the same build after.
+A test reads a shared build and writes none of it.
 
 Each guard keeps a baseline, `src/imports/baseline/<guard>.txt`, one offender
 a line. The baseline holds the offenders standing on the guard's first commit.

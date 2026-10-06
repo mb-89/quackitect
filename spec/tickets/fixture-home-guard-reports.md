@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 15191e058697f4c2e6c5766ac3fb3146a6c6bd63
+    hash_after: 15191e058697f4c2e6c5766ac3fb3146a6c6bd63
+    inputs:
+      - name: ask
+        hash: b6103e9aaeda61bd
+        size: 1030
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -162,38 +171,55 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/model#the-guards-hold-a-baseline]]. A pure function, `FixtureBuilds`, in `src/imports/fixture.go` names each top-level test reaching a fixture build outside the home, as a path and a test name. It walks the calls of the test and of the helpers its package declares, as `SerialTests` walks them. A guard entry `fixture` in `src/imports/guards.go` runs it over the tracked test files. `src/q/qtest/shared.go` holds `Shared`, a generic builder over `sync.OnceValue`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/imports/guards.go` `Guards`, which gains the entry
+- the guards verb in `src/quack/verb_guards.go`, which runs every entry
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/imports/fixture_test.go` `TestATestBuildingAFixtureOutsideTheHomeIsNamed`
+- `src/imports/fixture_test.go` `TestTheHomeAndAMarkedCallAreSpared`
+- `src/q/qtest/shared_test.go` `TestASharedBuildAnswersTheFirstBuild`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/imports/fixture.go`
+- `src/imports/fixture_test.go`
+- `src/imports/guards.go`
+- `src/imports/baseline/fixture.txt`
+- `src/q/qtest/shared.go`
+- `src/q/qtest/shared_test.go`
+- `spec/design_output/model.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `SerialTests`, the guards registry and `src/q/qtest` stand opened, and the walk copies the serial guard
+- the guards registry is the one caller, and the verb runs whatever it holds
+- each done_when line meets a case the tests line names
 
 ## tests-red
 
