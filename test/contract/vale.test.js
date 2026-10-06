@@ -414,6 +414,40 @@ ifVale(
   ),
 );
 
+// A comment line past the code passes where it points, suppresses or directs, as rules 1, 3 and 4 of the code guidance say. [[spec/tickets/comment-rules-meet-the-lint]]
+ifVale(
+  "a comment past the code passes with a pointer, a suppression or a directive, and warns bare",
+  proves(
+    {
+      pointed: at(
+        "export const one = 1;\n// The one the door reads. [[spec/tickets/a-thing]]\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+      suppressed: at(
+        "export const one = 1;\n// level0: CodeComment - a fixture\n// nolint: a fixture\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+      bare: at(
+        "export const one = 1;\n// The one the door reads.\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+    },
+    (said) => {
+      for (const key of ["pointed", "suppressed"]) {
+        assert.deepEqual(
+          said.rules(key).filter((one) => one === "CodeComment"),
+          [],
+          `${key} passes`,
+        );
+      }
+      assert.deepEqual(
+        said.rules("bare").filter((one) => one === "CodeComment"),
+        ["CodeComment"],
+      );
+    },
+  ),
+);
+
 // A number word counts a thing whatever word follows it. The fixture is the header ephemeral.js carried. [[spec/tickets/each-fact-keeps-one-owner]]
 ifVale(
   "a header naming a number word refuses, over the header ephemeral.js carried",
