@@ -108,6 +108,22 @@ record:
     hand: the engine
     hash_before: d6d1f31348d0c455c105ea5c586d4ce2a3483b46
     hash_after: d6d1f31348d0c455c105ea5c586d4ce2a3483b46
+  - step: accept
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 886922f5354053e542161ccb7b41f4425ee2c4d2
+    hash_after: 886922f5354053e542161ccb7b41f4425ee2c4d2
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-fleet-watches-itself already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 99540b9882270163
+        size: 510
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 step: accept
 ---
 
@@ -164,8 +180,10 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- fleet-rows-print-final-record: cloud fleet prints no model, cost or final line, though each row carries them off the record, so the fleet shows no final record. The row prints the three.
 
 # retro
 
