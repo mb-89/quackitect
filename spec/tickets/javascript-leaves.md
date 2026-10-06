@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box fb4ccb7cacc7 · claude-code-remote
     hash_before: 4c7ae3ab4e354f3746aad3727782ad93debc07a8
+  - step: sync
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-4
+    hash_before: 14bf2c00d19e67327ea730cb9fd867926aa657b2
+    hash_after: b87c4c0f69041591032102183302d4014b9b6f7e
+    answered:
+      - name: sync
+        exit: 0
+        said: work/javascript-leaves took 2 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -106,8 +115,9 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
