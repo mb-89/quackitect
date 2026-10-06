@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: boxes-hold-and-hand-back
 parent: holds-beat-with-the-session
+record:
+  - step: do
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: cdd49b15af4987f64558259353a031a63af7c9ed
+    hash_after: 5059682d8ff95e8694d7430c3f8a9f0e234c9bd5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: ask
+        hash: ad6fae52fdcd1af9
+        size: 264
+    def: 493538c21ebdc181
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,33 @@ the approach reads an ended beat dead where it stands newer than the tip, and da
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/beat_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Git dates carry seconds alone, so both readers of a hold, the Go take and list and the push door, read an ended beat dead at or after the tip. A case stamps the end in the tip own second and takes the hold over.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change adds one case to the beat tests
+- the case drives a real repository as the package tests do
+- the case names the tie in its comment
+- the compare stands once in each reader, and the design table names the rule
 
 # Discussion
 
