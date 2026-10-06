@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 8125ea638545e4ce
         size: 352
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 7e5d8ebd587987a1922a97f6cf3d4dbbed3554d6
+    hash_after: 7e5d8ebd587987a1922a97f6cf3d4dbbed3554d6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 46b55e4baeebd9a9
+        size: 2934
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -239,26 +252,32 @@ The src/index done_when line is TestEachListedToolAnswersACallThroughAct, which 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/tools_test.go src/quack/accepts_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/index/tools_test.go
+src/quack/accepts_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The list names t/ghost beside t/add, and a call to t/ghost answers 422 with no IO module accepts, the fault the ask names. The table read answers false for every module today, since its body waits for tests-green. The draft named a fourth case calling every real tool through act. That case runs real verbs on an empty input, so tests-green reads the real catalog against acceptsVerb in its place, a pure read with no call.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The done_when line on `go test ./src/index/` meets TestEachListedToolAnswersACallThroughAct and TestTheToolListSkipsAnActionNoModuleAccepts, and the check line waits for tests-green.
+The index cases run over the fake manager, and the quack case reads a pure table, so no case reaches a door past the index the package already serves.
 
 # gate
 

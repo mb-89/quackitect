@@ -17,6 +17,11 @@ import (
 	"quackitect/src/q"
 )
 
+// Whether an IO module answers the verb, off the table accepts routes by. [[spec/tickets/every-index-tool-answers]]
+func acceptsVerb(module, verb string) bool {
+	return false
+}
+
 // The IO modules that answer a request an action lists: disk over the root, the edits, search, waits, plans and drafts modules, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
 func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
