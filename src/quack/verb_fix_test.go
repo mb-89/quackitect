@@ -54,6 +54,7 @@ func fixRoot(t *testing.T) string {
 
 // The fix verb's Vale walk parks the types the engine lays inside the plugin, as the lint's walk does. [[spec/tickets/level0-hooks-move-to-typescript]]
 func TestFixParksTheLaidTypes(t *testing.T) {
+	t.Parallel()
 	if !strings.Contains(valeParked, ".claude/skills/level0/.claude-plugin/types,") {
 		t.Fatalf("the fix verb's walk reads %s, and parks no laid types", valeParked)
 	}

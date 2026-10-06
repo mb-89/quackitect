@@ -211,6 +211,7 @@ func valeSays(file, check, match string) string {
 
 // The engine lays its declarations inside the plugin, and no rule reads them, as no rule reads the root's. [[spec/tickets/level0-hooks-move-to-typescript]]
 func TestTheLaidTypesStandParked(t *testing.T) {
+	t.Parallel()
 	tools := &Tools{Root: "/tree", Check: fakeCheck}
 	for path, want := range map[string]bool{
 		".claude/types/api.d.ts": true,
