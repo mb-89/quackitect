@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 0fb6a36aa6ae5522d277cf7b9195774060e66a44
+    hash_after: 0fb6a36aa6ae5522d277cf7b9195774060e66a44
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    2.5  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: 31b422a6b4c97a95
+        size: 832
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/prompt_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new verb, ./RUNME.sh cloud prompt <group>, prints the prompt a box starts with. It reads the group ticket and the route its process names, through processAt. It lists the group's open children in name order, and closes on the box rules. It refuses with no name, with a ticket that stands nowhere, with a ticket on no group route, and with a route that stands nowhere. The coordinator spawns a box with this output in place of a prompt typed again, so no box starts with a rule missing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches prompt.go and branch.go, both on the size list.
+- The verb reads the disk through read, notesIn and processAt, which the cases drive over a temp folder.
+- Each new function carries a link to this ticket, where the approach stands.
+- The box rules stand once in boxRules, and the route reads through processAt.
 
 # accept
 
