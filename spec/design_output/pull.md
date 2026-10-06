@@ -122,6 +122,19 @@ hand-back still lands, so a leaf in hand closes where it stands.
 A box staying past the close works tickets nobody expects on that branch, and
 they merge unread. For the run behind this, see [[spec/rationales/pull]].
 
+## A closed group takes no child
+
+A ticket naming a closed group under `group` reaches no hand. So the mint, the
+open and `ticket set` refuse it, and name the two roads out:
+
+| the road | what the hand does |
+|---|---|
+| standalone | mints the ticket with no group |
+| reopen | the hand that passed the group's last leaf takes it back with `ticket pull <group> --back <leaf>` |
+
+A ticket minted on a closed group's own branch joins no group, and stands
+free. For the run behind this, see [[spec/rationales/pull]].
+
 ## Children before their group
 
 `childrenOf` walks `group` up the chain, so a group inside a group runs on the

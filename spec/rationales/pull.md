@@ -15,3 +15,14 @@ Nothing stopped the box. The pull read a closed group as any other, and the
 group field took a write from any hand. So the pull now answers `done` on a
 closed group, and the box goes back to trunk. For the rule, see
 [[spec/design_output/pull#a-closed-group-hands-nothing]].
+
+That answer left a gap. A hand later minted `lint-twins-reads-a-standing-finding`
+under the closed group `the-verbs-run-in-go`, and no pull reached it. The
+closed branch answered `done`. A bare pull on trunk took groups alone, and a
+named pull waited behind the queue. A hand finished the child on a branch of
+its own.
+
+Two fixes stood open. The pull could hand such a child out as a free ticket,
+but a free ticket on trunk reaches a desk alone, so a cloud box still met the
+gap. The mint refuses the child instead, and the stray ticket never stands. For
+the rule, see [[spec/design_output/pull#a-closed-group-takes-no-child]].

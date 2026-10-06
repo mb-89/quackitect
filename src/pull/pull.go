@@ -271,22 +271,12 @@ func (it *It) Pull(argv []string) int {
 	if !it.fetched(branch) {
 		return 1
 	}
-	if group != "" && it.closedGroup(group) {
+	if group != "" && GroupClosed(it.Disk, group) {
 		it.Say(Done, fmt.Sprintf("%s stands closed, so work/%s takes no more work.", group, group),
 			fmt.Sprintf("Call %s, then %s from %s.", CallOf("branch", "done"), CallOf("ticket", "pull"), Trunk))
 		return 0
 	}
 	return it.handOut(who)
-}
-
-// [[spec/design_output/pull#a-closed-group-hands-nothing]]
-func (it *It) closedGroup(group string) bool {
-	for _, one := range TicketsHere(it.Disk) {
-		if !one.Private && one.Name == group {
-			return FieldOf(one.Text, "state") == Closed
-		}
-	}
-	return false
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

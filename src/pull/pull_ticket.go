@@ -152,6 +152,9 @@ func (it *It) OpensDraft(at string) (string, string) {
 	if alone := EmptyGroup(it.Disk, text, called); alone != "" {
 		return "", alone
 	}
+	if shut := ClosedGroup(it.Disk, text); shut != "" {
+		return "", shut
+	}
 	refused, warned := it.askFaults(at, text)
 	if len(refused) > 0 {
 		return "", askRefusal(at, refused)

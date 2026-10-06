@@ -9,7 +9,7 @@ const ENTRY = "  - ";
 const FIELD = "    ";
 const NESTED = "      - ";
 const DEEPER = "        ";
-const MARKS = "\"'[{&*!|>%@`#";
+const MARKS = "\"'[]{},&*!|>%@`# \t";
 const LINK = /^\[\[[^[\]]*\]\]$/;
 
 export function fakeFront() {

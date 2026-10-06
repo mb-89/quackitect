@@ -62,6 +62,9 @@ Some ask that says what it wants.
 <!-- what anybody adds, at any time, on this ticket -->
 `
 
+// A group that stands closed, which takes no new child. [[spec/design_output/pull#a-closed-group-hands-nothing]]
+const closedGroupTicket = "---\nkind: [[ticket]]\nstate: closed\nprocess: [[spec/processes/group]]\n---\n"
+
 // A tree holding the schemas this tree holds and one small process, on the branch named. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func mintTree(t *testing.T, branch string) string {
 	t.Helper()
@@ -168,6 +171,36 @@ func TestMintVerb(t *testing.T) {
 		}
 		if _, stands := readsBack(t, method, "spec/tickets/fresh.md"); stands {
 			t.Fatal("the method root takes the note")
+		}
+	})
+	t.Run("a ticket naming a closed group comes back refused, with the roads out", func(t *testing.T) {
+		root := mintTree(t, "")
+		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small", "--group=shut")
+		if code != 2 {
+			t.Fatalf("the mint answers %d: %s, and wants 2", code, said)
+		}
+		for _, line := range []string{"shut stands closed, so it takes no new child.", "Mint the ticket with no group, or reopen shut", "--back"} {
+			if !strings.Contains(said, line) {
+				t.Errorf("the mint says %q, and wants %q", said, line)
+			}
+		}
+		if _, stands := readsBack(t, root, "spec/tickets/fresh.md"); stands {
+			t.Fatal("a refused mint writes spec/tickets/fresh.md")
+		}
+	})
+	t.Run("a ticket on a closed group's branch joins no group, and stands free", func(t *testing.T) {
+		root := mintTree(t, "work/shut")
+		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small")
+		if code != 0 {
+			t.Fatalf("the mint answers %d: %s", code, said)
+		}
+		if got, _ := readsBack(t, root, "spec/tickets/fresh.md"); strings.Contains(got, "group:") {
+			t.Fatalf("the ticket joins the closed group:\n%s", got)
+		}
+		if line := "shut stands closed, so spec/tickets/fresh.md joins no group and stands free."; !strings.Contains(said, line) {
+			t.Errorf("the mint says %q, and wants %q", said, line)
 		}
 	})
 	refusals := []struct {
