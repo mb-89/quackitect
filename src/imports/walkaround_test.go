@@ -63,3 +63,26 @@ func TestAModulesListComesOffTheDeclarations(t *testing.T) {
 	t.Parallel()
 	analysistest.Run(t, plantOf(t, mailed), OnlyQ, "quackitect/src/modules/letters")
 }
+
+var timed = map[string]string{
+	"q/q.go":                 "package q\n\nfunc IO() int { return 0 }\n",
+	"doors/clock/owns.yaml":  "clock:\n  go: [time.Sleep, time.Now]\n",
+	"q/wait/wait.go":         "package wait\n\nimport \"time\"\n\nvar _ time.Duration\n",
+	"modules/later/later.go": "package later\n\nimport \"time\"\n\nvar _ time.Duration\n",
+	"modules/raw/raw.go":     "package raw\n\nimport \"syscall\" // want `quackitect/src/modules/raw imports syscall`\n\nvar _ = syscall.Getpid\n",
+}
+
+func TestTheCoreImportingAPackageADoorOwnsByMemberIsNamedByNone(t *testing.T) {
+	t.Parallel()
+	analysistest.Run(t, plantOf(t, timed), IOOnly, "quackitect/src/q/wait")
+}
+
+func TestAModuleImportingAPackageADoorOwnsByMemberIsNamedByNone(t *testing.T) {
+	t.Parallel()
+	analysistest.Run(t, plantOf(t, timed), OnlyQ, "quackitect/src/modules/later")
+}
+
+func TestAModuleImportingTheFloorIsNamedWithNoDeclaration(t *testing.T) {
+	t.Parallel()
+	analysistest.Run(t, plantOf(t, timed), OnlyQ, "quackitect/src/modules/raw")
+}
