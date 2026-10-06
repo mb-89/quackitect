@@ -364,4 +364,5 @@ pass with findings
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-- beat-after-joins-schema: `work.beatAfter` stands in `spec/config/level0.schema.json` beside `staleAfter`. The verb reads the span off that key alone, and reads the last beat off `refs/beats/<group>`, the ref the fetch brings. No runtime file holds the span or the beat.
+- beat-after-joins-schema: `work.beatAfter` stands in `spec/config/level0.schema.json` beside `staleAfter`. The verb reads the span off that key alone, and reads the last beat off `origin/beats/<group>`, the branch the fetch brings. No runtime file holds the span or the beat.
+- beats-pass-the-push-gate: the cloud's git proxy answers 403 to a push of `refs/beats/<group>`, so the beat stands on the branch `beats/<group>`. For details, see [[spec/design_output/work#a-hold-beats-with-its-session]].
