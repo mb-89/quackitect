@@ -152,3 +152,14 @@ test("a name no definition carries answers that nothing defines it", () => {
     "Nothing in the index defines walks.",
   );
 });
+
+// A child of the index inherits QUACKITECT_ROOT, which the binary reads before its working folder, so the door names its own root. [[spec/tickets/index-survives-a-long-call]]
+test("the door hands the index its work root, so an inherited root names no other index", () => {
+  const outside = fakeProc({ [BIN_AT]: { stdout: "{}" } });
+  const door = index(fakeDisk({ [BIN_AT]: "" }), outside, fakeClock(), "/tree", "/work");
+
+  door.ask("glob", { pattern: "*" });
+
+  assert.equal(outside.ran[0].init.cwd, "/work");
+  assert.equal(outside.ran[0].init.env?.QUACKITECT_ROOT, "/work");
+});

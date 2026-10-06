@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 707753c399639aa5
         size: 709
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: b7cced14437eb849a728989a9917f95fe6a0b04a
+    hash_after: b7cced14437eb849a728989a9917f95fe6a0b04a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: abce73f782ebab81
+        size: 2173
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -218,26 +231,32 @@ each done_when line meets its test: the contract case decides the index left run
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/search-door.test.js test/contract/index.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/search-door.test.js
+- test/contract/index.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both fail on their own assertion. The contract case finds no standing file in its work folder, since the door's call went to the index the inherited root names. The unit case finds the door hands no QUACKITECT_ROOT. A surprise: the contract case under the old door stops the other folder's index, the very drop the tool call met, so the case stops nothing real.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the contract case, which fails today, and the unit case beside it; the second line is a checkpoint the tests-green hand-back answers through the pull tool call
+the fake proc stands for the process door in the unit case, and the contract case alone reaches the real binary
 
 # gate
 
