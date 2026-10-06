@@ -110,6 +110,10 @@ record:
         hash: 94aff2f3cc1fa455
         size: 623
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: box 19cb641dbdcb · claude-code-remote
+    hash_before: bb9fa5b20e89f9463d86b47dc04cb2092640458a
+    session: cse_01D5wBTxJEqTT1F3hCvb8jFt
 ---
 
 # Ask
