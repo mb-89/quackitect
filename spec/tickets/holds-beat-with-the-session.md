@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 23739db1144f9d48
         size: 2896
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3341fdcd540f · claude-code-remote · helper-4
+    hash_before: 6fdf86d60d056a43c143c1a1933f10d35ed3c775
+    hash_after: 6fdf86d60d056a43c143c1a1933f10d35ed3c775
+    inputs:
+      - name: design/draft
+        hash: 23739db1144f9d48
+        size: 2896
+      - name: design/tests-red
+        hash: c21254153cb4aa35
+        size: 872
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,13 @@ The take reads --over as the group name, and finds no work/--over. A take withou
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- beats-pass-the-push-gate: src/scripts/prepush.js refuses an agent push of refs/beats/<group>, since no green stamp reaches a parentless commit, and its staleBy reads tip age alone, so the door refuses the take --over claim on an ended hold whose tip stands fresh. The size leaves prepush.js and its test out, and the Go tests reach no hook, so they pass while a real box fails. Skip refs/beats/* in the stamp loop, and read the beat in staleBy.
+- ended-beat-ties-the-tip: the approach reads an ended beat dead where it stands newer than the tip, and dates carry seconds alone. TestAnEndedHoldMovesUnderTakeOverAtOnce stamps the beat in the same second as the tip, so a strict compare flakes. Read an ended beat dead at or after the tip.
+- beat-hook-stays-quiet: the Stop hook runs on every turn end, on a desk and on main too. branch beat answers 0 and writes nothing off a work branch this box holds, and answers 0 on a refused push, since a Stop hook exit of 2 blocks the turn end. Add a test deciding both.
+- beat-after-joins-schema: work.beatAfter takes a row in spec/config/level0.schema.json beside staleAfter, which the size leaves out. The approach also reads the span off .se/.runtime/beat.json, which clashes with the config key. Read the span off work.beatAfter, and keep the last beat off origin's ref or name the runtime file as a cache alone.
 
 # implement
 
