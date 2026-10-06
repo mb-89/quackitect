@@ -16,7 +16,7 @@ rationale: [[spec/rationales/testing]]
 7. Share a fixture nobody writes to, and make what a test changes inside the test.
 8. Take the clock and the random source as arguments, so a failing case replays.
 9. Let every test run beside every other. A test needing an order is a red test.
-10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
+10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change. Read the rules on behavior tests in [[spec/guidance/code/examples]].
 11. Test a Go module without the `io` flag against the fake index in `q/qtest`, and against nothing else. Import nothing past `q`, `q/qtest` and the pure standard library. A fixture rides in through `embed`, or the case seeds it. [[spec/design_output/model#the-fake-index]] *
 12. Test an IO module against `q/qtest` and the fake of its outside world. A fake disk, git, process or clock stands local. [[spec/design_output/model#its-file-carries-its-fake]]
 13. Every fake stands for a contract. Each contract has one suite of cases, written once, that runs against both the fake and the real thing. The check refuses a fake with no suite beside it. [[spec/design_output/model#the-fake-keeps-a-contract]] *

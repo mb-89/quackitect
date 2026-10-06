@@ -130,6 +130,7 @@
     "standard:design/owner-read": [],
     "standard:design/tests-red": [
       "spec/guidance/code/code",
+      "spec/guidance/code/examples",
       "spec/guidance/code/testing"
     ],
     "standard:gate": [
@@ -137,15 +138,18 @@
     ],
     "standard:implement/change": [
       "spec/guidance/code/code",
+      "spec/guidance/code/examples",
       "spec/guidance/code/testing"
     ],
     "standard:implement/tests-green": [
       "spec/guidance/code/code",
+      "spec/guidance/code/examples",
       "spec/guidance/code/testing"
     ],
     "standard:view": [],
     "trivial:do": [
       "spec/guidance/code/code",
+      "spec/guidance/code/examples",
       "spec/guidance/code/testing"
     ]
   }
