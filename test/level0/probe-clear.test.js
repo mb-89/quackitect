@@ -94,18 +94,20 @@ test("the probe mints its group, stands on its work branch, and points origin's 
   assert.ok(lines.some((one) => /^git update-ref refs\/remotes\/origin\/work\/\S+ HEAD$/.test(one)), lines.join("\n"));
 });
 
-// A tagged ticket stands first in every pull, so a point the tree holds open would reach the probe ahead of its leaf. [[spec/tickets/probe-clone-drops-free-tags]]
-test("the probe's clone leaves no ticket tagged but its own leaf", () => {
-  const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
+// A clone of a box's branch carries the tickets that box parks, and a parked ticket goes out ahead of the probe's leaf. [[spec/tickets/prompt-flags-follow-prompt-verb]]
+test("the probe drops every park in its clone, and commits that before origin's branch points at its tip", () => {
+  const git = (argv) => (argv[1] === "grep" ? { exitCode: 0, stdout: "spec/tickets/parked.md\n" } : { exitCode: 0 });
+  const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git });
   const disk = fakeDisk();
-  disk.makeDir("/t/spec/tickets");
-  disk.write("/t/spec/tickets/a-point.md", "---\nstate: open\ntodo: true\n---\n\n# Ask\n");
-  disk.write("/t/spec/tickets/a-plain-one.md", "---\nstate: open\n---\n\n# Ask\n");
+  disk.write("/t/spec/tickets/parked.md", "---\nkind: [[ticket]]\nstate: open\ntodo: true\nstep: do\n---\n");
   const it = { proc, disk, join: (...parts) => parts.join("/") };
 
-  grouped(it, "/t", {});
-  assert.match(String(disk.read("/t/spec/tickets/a-point.md")), /^todo: false$/m);
-  assert.equal(String(disk.read("/t/spec/tickets/a-plain-one.md")), "---\nstate: open\n---\n\n# Ask\n");
+  assert.equal(grouped(it, "/t", {}), null);
+  assert.equal(disk.read("/t/spec/tickets/parked.md"), "---\nkind: [[ticket]]\nstate: open\nstep: do\n---\n");
+  const lines = proc.ran.map((one) => one.argv.join(" "));
+  const committed = lines.findIndex((one) => /commit -q -m .* -- spec\/tickets\/parked\.md$/.test(one));
+  const pointed = lines.findIndex((one) => /^git update-ref /.test(one));
+  assert.ok(committed >= 0 && committed < pointed, lines.join("\n"));
 });
 
 // A verb reads QUACKITECT_ROOT before its folder, so a probe under the index still writes in its clone. [[spec/tickets/the-clear-carries-no-local-work]]

@@ -22,7 +22,6 @@ const GROUP = "dry-probe-clears";
 // The leaf the probe's group carries across the clear, and the words each pull past the clear answers. [[spec/tickets/the-clear-hands-back-the-leaf]]
 const LEAF = "dry-probe-leaf";
 // The line a tagged ticket's front matter carries. [[spec/tickets/probe-clone-drops-free-tags]]
-const TAGGED = /^todo: true$/m;
 const LEAF_TEXT = `---
 kind: [[ticket]]
 state: open
@@ -120,7 +119,7 @@ export function grouped(it, tree, env) {
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
   it.disk.write(it.join(tree, "spec", "tickets", `${LEAF}.md`), LEAF_TEXT);
-  untagged(it, it.join(tree, "spec", "tickets"));
+  unparked(it, tree);
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
     timeoutMs: PULL_WAIT,
@@ -139,14 +138,19 @@ export function grouped(it, tree, env) {
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
 }
 
-// A tagged ticket stands first in every pull, so the clone stands for a fresh box only once no ticket of the tree carries the tag. [[spec/tickets/probe-clone-drops-free-tags]]
-function untagged(it, folder) {
-  for (const one of it.disk.list(folder)) {
-    if (one.kind !== "file" || one.name === `${LEAF}.md`) continue;
-    const at = it.join(folder, one.name);
-    const text = String(it.disk.read(at));
-    if (TAGGED.test(text)) it.disk.write(at, text.replace(TAGGED, "todo: false"));
+// The clone carries the tickets its source box parks, and a parked ticket goes out ahead of the probe's leaf, so the clone drops every park. [[spec/tickets/prompt-flags-follow-prompt-verb]]
+function unparked(it, tree) {
+  const parked = it.proc.run(["git", "grep", "-l", "^todo: true$", "--", "spec/tickets"], { cwd: tree, timeoutMs: PULL_WAIT });
+  const files = String(parked.stdout ?? "").split("\n").filter(Boolean);
+  for (const file of files) {
+    const at = it.join(tree, file);
+    it.disk.write(at, it.disk.read(at).replace(/^todo: true\r?\n/m, ""));
   }
+  if (files.length === 0) return;
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-m", "the probe unparks its clone", "--", ...files],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
 }
 
 function keyed(it, tree) {
