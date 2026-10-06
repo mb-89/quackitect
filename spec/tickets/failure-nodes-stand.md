@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -174,6 +174,29 @@ record:
         exit: 0
         said: "    2.3  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: a031d073a9645ffb0eb668cac7d24fa9c834c739
+    hash_after: a031d073a9645ffb0eb668cac7d24fa9c834c739
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/failure passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 3297de04beacbef1
+        size: 657
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -343,26 +366,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/registry_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Load reads every .md file under spec/failures through the Reader door, reads each one through NodeOf, and keys each node with no fault by the id its file name carries. Fake keys the nodes a case hands in by their ids. registry_test.go turns green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/failure/registry.go alone, the file the ask names
+- Load reads through the Reader door, and FakeDir stands as its fake under door_contract_test.go
+- the comment on Load names the approach: NodeOf reads each node, and Load keeps the ones with no fault
+- the folder and the note ending stay in node.go's constants, and registry.go reads them from there
 
 # accept
 
