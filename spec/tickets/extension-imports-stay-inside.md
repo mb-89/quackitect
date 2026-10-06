@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 361ec5fd7b1a85f05fb5a7898288e111a05b9103
+    hash_after: 361ec5fd7b1a85f05fb5a7898288e111a05b9103
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 19 test(s) pass in 3 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 9df8337c88a371ff
+        size: 656
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ each copied name points at its Go owner: serveIndexBin, StandingFile, standingPa
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/vehicle_settle_test.go test/level0/logbook.test.js test/level0/work-strings.test.js test/level0/lsp.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The VS Code extension no longer loads files of the tree at runtime. The hook button runs the index binary through execFile: se-index standing starts the hooks door where none answers, and se-index stop stops it. The light follows the hooks door standing file in place of serve.log, which no Go writes. The method root comes off a new settle word of the Go vehicle verb, which runs vehicle.Settles and prints the method. The logbook keeps the level filter alone, since the Go log verb shapes the row. Every comment naming an owner outside the folder now names the Go owner, so the doors, src/bridge/vehicle.js and lib/log.js lose the extension as a caller.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size field names, plus the two tests the commit door and the watch case ask for
+the extension process door is editor-process.js itself, and the settle word runs over the fakes its Go cases hold
+the two changed modules point at spec/tickets/extension-imports-stay-inside
+each copied name points at its Go owner
 
 # accept
 
