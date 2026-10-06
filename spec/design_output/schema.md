@@ -392,9 +392,8 @@ kind settles.
 
 | the reader | how it skips |
 |---|---|
-| Vale, over the tree | `--glob=!{...,**/_*}` |
-| Vale, over one file | the last section of `.vale.ini` |
-| the language server | that same section |
+| the Go rules | the last row of `sections` in `src/rules/scope.go`, which bases the path on no style |
+| the language server | that same row |
 | the write door | `isDraft` before the code door and the prose door |
 | the rules over two files | `tree.paths()` drops one |
 | the standing layer | `readFolder` drops one |

@@ -44,12 +44,12 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the lsp IO module reads the box through its own `door.go` |
 
 A root stands off the rule, because it builds the hand every module past it
-reads. `.vale.ini` names each one in a section, beside the doors and their
-fakes. Each rule takes its own switch, because a file standing off one wants
+reads. `sections` in `src/rules/scope.go` names each one in a row, beside the
+doors and their fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`test/contract/outside-in-doors.test.js` drives Vale over the name of each
-file, so a section a hand writes meets its case.
+`test/contract/outside-in-doors.test.js` drives the tree's rules over the name
+of each file, so a row a hand writes meets its case.
 
 # A raw run keeps bytes
 

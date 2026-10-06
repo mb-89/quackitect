@@ -1199,15 +1199,16 @@ cut. `src/bridge/code.js` owns the refusal.
 
 ## The path a rule reads
 
-Hand every rule the path the repo root holds. Vale scopes on it.
+Hand every rule the path the repo root holds. The Go rules scope on it.
 
 | what the client sends | what the door hands on |
 |---|---|
 | `C:\...\quackitect-v5\spec\rationales\a.md` | `spec/rationales/a.md` |
 | `spec/rationales/a.md` | `spec/rationales/a.md` |
 
-Keep every folder in that path, so `[spec/rationales/*.md]` and each other
-`.vale.ini` section matches what Vale reads at `--path`.
+Keep every folder in that path, so `**/spec/rationales/*.md` and each other
+row of `sections` in `src/rules/scope.go` matches what `rules-over` reads at
+`--path`.
 
 Ask git for the root once a session, through `git rev-parse --show-toplevel`,
 and take it off the front with `relativeTo`. Leave the path whole where the box
@@ -1613,8 +1614,9 @@ copy honest. A copy nobody can edit needs no guard.
 
 # The gate reads the answer
 
-The turn's end runs the answer through Vale under the `*answer.md` section of
-`.vale.ini`, and the score of what comes back cuts into bands. The reply
+The turn's end runs the answer through the Go rules under the `*answer.md` row
+of `sections` in `src/rules/scope.go`. The score of what comes back cuts into
+bands. The reply
 already stands on screen when `turn.complete` fires, so that gate refuses
 nothing. It re-prompts, it carries a line into the next prompt, or it does
 nothing at all. The stop door reads the same answer before the turn ends,
@@ -1824,9 +1826,9 @@ For details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 # A broken rule says so
 
-Vale answers a broken rule file with an `E201`. It writes that to standard
-error and leaves standard output empty, so a reader parsing JSON alone finds no
-breach. So one broken rule turns every rule in the tree off, and the tree
+A broken rule file stops the load. `rules-over` writes the fault to standard
+error, leaves standard output empty, and exits non-zero. A reader parsing JSON
+alone then finds no breach. So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
 `faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
@@ -1836,17 +1838,18 @@ The write door reads a lint that runs nowhere the same way, whatever the fault:
 |---|---|
 | a broken rule, an answer other than JSON, a spawn that falls, a timeout | refuses a prose write, names the fault, and writes it to the log at `warn` |
 | the same fault over a write outside prose | lets it land, so the hand mending a rule file writes it |
-| no Vale on the box | lets the write land, and says so in the log once |
+| no tree binary on the box | lets the write land, and says so in the log once |
 
 # Where a rule lives
 
 | folder | holder |
 |---|---|
-| `spec/config/styles` | Vale reads its style folders, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles` | the Go rules read its rule files, and `sections` in `src/rules/scope.go` says which style reaches which path |
 | `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/tui#colours]] says |
 | `spec/config/biome.json` | Biome reads it |
 
-The comments in `.vale.ini` say why each section stands.
+For how a rule reaches a path, see
+[[spec/design_output/rules#a-rule-reads-its-paths]].
 
 The prose rules stay away from a rule file, because such a file lists the
 words they refuse.
