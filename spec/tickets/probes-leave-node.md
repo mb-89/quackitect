@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -152,6 +152,19 @@ record:
         hash: ac3cdcab2c35b53e
         size: 459
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: a1384b230a8b6d8942c83ff28be59403eed8f73b
+    hash_after: a1384b230a8b6d8942c83ff28be59403eed8f73b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 594bb7de87db1f20
+        size: 6146
+    def: 08e16d07b0de477c
 group: javascript-leaves
 ---
 
@@ -290,7 +303,7 @@ Assumed: `level0-hooks-forward-to-go` cuts the plugin to a forwarder, so the doo
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test src/quack/probe_dry_test.go
+./RUNME.sh branch test src/quack/probe_dry_test.go
 
 ### red
 
@@ -298,26 +311,21 @@ Assumed: `level0-hooks-forward-to-go` cuts the plugin to a forwarder, so the doo
 <!-- the form is list -->
 
 - src/quack/probe_dry_test.go
-- src/quack/probe_cold_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Eight dry probe cases and the cold path case naming no script fail on their own assertion. The two cold path cases for standing behaviour pass, since coldIn already stands in commit.go.
-
-The tests fix the post door's signature and the shape of the session record, which the draft leaves open. The tools check reads the index's tool listing, where the JavaScript probe counted the plugin's tools in process.
-
-The stub holds no probeDry yet, because probe_verb.go still holds the one handing off to Node. The resume prompt now takes one exported name, and the clear case in stops_test.go asserts it.
+The first round's eight cases still fail on the stubs, and five cases join them for what main gave the probe scripts. The smoke case stands the clone off the root's built tools. The revision case reads the checkout between the clone and the install. The held temp tree and the unpark cases each run over a door the case hands in. A surprise: `coldBox` carries no revision, though the JavaScript `coldTree` takes one, so the field lands here to let the revision case compile.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- lines one and two stand as checkpoints at implement, the door case decides line three before a live probe dry, and a live check decides line four
-- the process runs, the post, the disk and the clock each reach the tests through a fake door
+- `git ls-files` and the `src/scripts` grep stand as checkpoints the implement hand answers, `TestTheDryProbeStandsTheDoorAndPostsEveryEventToIt` fails for the live `probe dry` line, and the smoke and revision cases fail for the check line, which runs the smoke
+- the cases reach the process, post and disk doors through `fakeBoxDoors`, a temp folder and a remove door the case hands in, so no case reaches a real process
 
 # gate
 

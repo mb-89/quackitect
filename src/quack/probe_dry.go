@@ -43,3 +43,15 @@ func readsDry(rows []probeRow, seen drySeen) []coldCheck { return nil }
 
 // The working change as a patch, untrimmed, a stub reading none. [[spec/tickets/probes-leave-node]]
 func workingDelta(d boxDoors) string { return "" }
+
+// Reads every dry check but the clear, a stub reading none. [[spec/tickets/probes-leave-node]]
+func readsSmoke(rows []probeRow, seen drySeen) []coldCheck { return nil }
+
+// Stands the smoke's shared clone with the root's built tools, a stub standing nothing. [[spec/tickets/probes-leave-node]]
+func smokeTree(d boxDoors, say func(string), box coldBox) bool { return false }
+
+// Removes the probe's temp tree and names it where it stays, a stub removing nothing. [[spec/tickets/probes-leave-node]]
+func leaves(remove func(string) error, temp string, say func(string)) {}
+
+// Drops every park the clone carries and commits that, a stub dropping none. [[spec/tickets/probes-leave-node]]
+func unparked(d boxDoors, tree string) {}

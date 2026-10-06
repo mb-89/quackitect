@@ -324,7 +324,7 @@ func coldLines(checks []coldCheck) []string {
 type coldBox struct {
 	temp, tree string
 	port       int
-	delta      string
+	delta, at  string
 }
 
 // Clones the commit into a fresh folder, runs the client there, and removes the folder, stopping the index the run started. A delta is the staged change as a patch, so the clone runs the commit about to land. [[spec/design_output/level0#the-cold-probe]]

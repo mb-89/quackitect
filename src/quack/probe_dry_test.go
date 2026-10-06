@@ -352,3 +352,115 @@ func TestTheWorkingDeltaReadsTheDiffUntrimmed(t *testing.T) {
 		t.Errorf("a refused diff reads %q", got)
 	}
 }
+
+func TestTheSmokeStandsTheCloneWithTheRootsBuiltToolsAndInstallsNothing(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := fakeBoxDoors(t)
+	bin := filepath.Join(d.root, filepath.FromSlash(runFolder), "bin")
+	for _, one := range []string{"se-index", "se-index.old"} {
+		if err := os.MkdirAll(bin, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(bin, one), []byte(one), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	temp := t.TempDir()
+	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 7001}
+	if !smokeTree(d, func(string) {}, box) {
+		t.Fatalf("the smoke stands no tree: %v", ranWords(runner))
+	}
+	if len(runner.ran) == 0 || !slices.Equal(runner.ran[0], []string{"git", "clone", "--quiet", "--shared", d.root, box.tree}) {
+		t.Errorf("the smoke clones with %v", ranWords(runner))
+	}
+	for _, one := range ranWords(runner) {
+		if strings.HasPrefix(one, "sh ") {
+			t.Errorf("the smoke installs: %s", one)
+		}
+	}
+	copied := filepath.Join(box.tree, filepath.FromSlash(runFolder), "bin")
+	if text, err := os.ReadFile(filepath.Join(copied, "se-index")); err != nil || string(text) != "se-index" {
+		t.Errorf("the clone's index reads %q, %v", text, err)
+	}
+	if _, err := os.Stat(filepath.Join(copied, "se-index.old")); err == nil {
+		t.Error("the clone carries the build an update keeps behind")
+	}
+	pointer, _ := os.ReadFile(filepath.Join(box.tree, filepath.FromSlash(vehiclePointer)))
+	if !strings.Contains(string(pointer), jsonString(box.tree)) || !strings.Contains(string(pointer), `"port":7001`) {
+		t.Errorf("the pointer reads %q", pointer)
+	}
+}
+
+func TestTheSmokeReadsEveryCheckButTheClear(t *testing.T) {
+	t.Parallel()
+	seen := dryWhole()
+	seen.cleared = nil
+	checks := readsSmoke(coldWhole(), seen)
+	if len(checks) != len(dryChecks)-1 {
+		t.Fatalf("the smoke reads %d check(s): %+v", len(checks), checks)
+	}
+	for _, one := range checks {
+		if one.check == "clear" || !one.pass {
+			t.Errorf("the smoke reads %s as %+v", one.check, one)
+		}
+	}
+}
+
+func TestTheColdTreeChecksTheCloneOutAtTheRevisionItNames(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := fakeBoxDoors(t)
+	temp := t.TempDir()
+	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 7002, at: "abc123"}
+	coldTree(d, func(string) {}, box)
+	ran := ranWords(runner)
+	checked := slices.Index(ran, "git checkout --quiet --detach abc123")
+	installed := slices.IndexFunc(ran, func(one string) bool { return strings.HasPrefix(one, "sh ") })
+	if checked < 1 || installed < checked || runner.opts[checked].cwd != box.tree {
+		t.Errorf("the checkout runs at %d of %v", checked, ran)
+	}
+	plain, runs, _, _ := fakeBoxDoors(t)
+	box.at = ""
+	coldTree(plain, func(string) {}, box)
+	for _, one := range ranWords(runs) {
+		if strings.HasPrefix(one, "git checkout") {
+			t.Errorf("a box naming no revision runs %s", one)
+		}
+	}
+}
+
+func TestATempTreeTheBoxStillHoldsStaysNamedAndTheVerdictStands(t *testing.T) {
+	t.Parallel()
+	var said []string
+	leaves(func(string) error { return fmt.Errorf("EBUSY") }, "/tmp/se-dry-1", func(line string) { said = append(said, line) })
+	if len(said) != 1 || said[0] != "the temp tree stays at /tmp/se-dry-1: EBUSY" {
+		t.Errorf("a held temp tree says %q", said)
+	}
+	said = nil
+	removed := ""
+	leaves(func(at string) error { removed = at; return nil }, "/tmp/se-dry-2", func(line string) { said = append(said, line) })
+	if removed != "/tmp/se-dry-2" || len(said) != 0 {
+		t.Errorf("a free temp tree removes %q and says %q", removed, said)
+	}
+}
+
+func TestTheProbeDropsEveryParkInItsCloneAndCommitsIt(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := fakeBoxDoors(t)
+	tree := t.TempDir()
+	parked := filepath.Join(tree, "spec", "tickets", "a.md")
+	if err := os.MkdirAll(filepath.Dir(parked), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(parked, []byte("---\ntodo: true\nstate: open\n---\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runner.answers["git grep"] = ranResult{stdout: "spec/tickets/a.md\n"}
+	unparked(d, tree)
+	if text, _ := os.ReadFile(parked); string(text) != "---\nstate: open\n---\n" {
+		t.Errorf("the parked ticket reads %q", text)
+	}
+	committed := slices.IndexFunc(runner.ran, func(one []string) bool { return slices.Contains(one, "commit") })
+	if committed < 0 || runner.opts[committed].cwd != tree || !slices.Equal(runner.ran[committed][len(runner.ran[committed])-2:], []string{"--", "spec/tickets/a.md"}) {
+		t.Errorf("the unpark commits with %v", ranWords(runner))
+	}
+}
