@@ -128,13 +128,26 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: collect
+step: effect
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
     hash_before: 4efd1fe6fe4d5150ac8fea8d26410c2ac2ac2487
     hash_after: 4efd1fe6fe4d5150ac8fea8d26410c2ac2ac2487
     def: 469f394c7eccd7de
+  - step: collect
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: e4c8a61f2a223a91aeec51c3ba00c9b906c4c969
+    hash_after: e4c8a61f2a223a91aeec51c3ba00c9b906c4c969
+    answered:
+      - name: run
+        exit: 0
+        said: .se/.retro/retro-0d14eda/input holds a whole run already, and this one changes nothing.
+    inputs:
+      - name: feedback
+        hash: ad7d848022d200b6
+        size: 605
+    def: 6cbd13ac719e276f
 ---
 
 # Ask
@@ -180,8 +193,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## run
 
 <!-- retro collect, which leaves the private folder holding .runtime, .retro and .se/scripts alone -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro collect retro-0d14eda
 
 # effect
 
