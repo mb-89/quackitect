@@ -58,11 +58,12 @@ type refusedRow struct {
 	Why    string `json:"why"`
 }
 
-// The write branch's pull request: none, standing, opened or refused. [[spec/tickets/the-owner-stores-the-token]]
+// A branch's pull request: none, standing, opened or refused. [[spec/tickets/the-owner-stores-the-token]]
 type pullRow struct {
-	State string `json:"state"`
-	URL   string `json:"url"`
-	Why   string `json:"why"`
+	Branch string `json:"branch,omitempty"`
+	State  string `json:"state"`
+	URL    string `json:"url"`
+	Why    string `json:"why"`
 }
 
 // What the fire did. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
@@ -73,18 +74,27 @@ type fireRow struct {
 	Wait    string       `json:"wait"`
 	Why     string       `json:"why"`
 	Pull    pullRow      `json:"pull"`
+	// The pull request of each done branch. [[spec/tickets/branch-done-opens-the-pr]]
+	Hands []pullRow `json:"hands,omitempty"`
 }
 
 // [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
-func (d *Doors) fire(send Send, plan *dispatchPlan) int {
+func (d *Doors) fire(plan *dispatchPlan) int {
 	out := &fireRow{Fired: []firedRow{}, Refused: []refusedRow{}, Left: []string{}, Pull: pullRow{State: "none"}}
 	plan.Fire = out
-	fired := d.fires(send, branchesOf(plan), out)
-	pulled := d.pulled(send, plan.Write, &out.Pull)
-	if fired != codeOK || pulled != codeOK {
-		return codeRed
+	code := codeOK
+	if d.fires(d.Send, branchesOf(plan), out) != codeOK || d.pulled(plan.Write, &out.Pull) != codeOK {
+		code = codeRed
 	}
-	return codeOK
+	// A done branch holding no pull request gets one, so no pushed branch stands without. [[spec/tickets/branch-done-opens-the-pr]]
+	for _, branch := range plan.Done {
+		row := pullRow{Branch: branch, State: "none"}
+		if d.workPull(branch, &row) != codeOK {
+			code = codeRed
+		}
+		out.Hands = append(out.Hands, row)
+	}
+	return code
 }
 
 // The ready groups first, then the stuck hand-overs, one branch each. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
@@ -203,9 +213,24 @@ func originRepo(url string) string {
 }
 
 // The write branch's pull request opens on the owner's token, so the check runs on it, and then takes auto-merge. [[spec/tickets/the-owner-stores-the-token]]
-func (d *Doors) pulled(send Send, write *writeRow, out *pullRow) int {
+func (d *Doors) pulled(write *writeRow, out *pullRow) int {
 	if write == nil || (write.State != "pushed" && write.State != "standing") {
 		return codeOK
+	}
+	return d.pullOpens(write.Branch, write.Branch+": the dispatch's writes", "The dispatch's fix bundles, parent closes and cloud markers, per the dispatch workflow.", out)
+}
+
+// A work branch's pull request, which done and the dispatch both open. [[spec/tickets/branch-done-opens-the-pr]]
+func (d *Doors) workPull(branch string, out *pullRow) int {
+	return d.pullOpens(branch, branch+": the group's work", "The group's work, per the work skill.", out)
+}
+
+// Opens the branch's pull request against main, or reads the one standing, and takes auto-merge on a new one. [[spec/tickets/branch-done-opens-the-pr]]
+func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+	send := d.Send
+	if send == nil {
+		out.State, out.Why = "refused", "The run holds no send door."
+		return codeRed
 	}
 	gh, why := d.hubOf(d.pullToken(), "PULL_TOKEN")
 	if why != "" {
@@ -213,7 +238,7 @@ func (d *Doors) pulled(send Send, write *writeRow, out *pullRow) int {
 		return codeRed
 	}
 	owner, _, _ := strings.Cut(gh.Repo, "/")
-	listed := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls?state=open&head="+owner+":"+write.Branch, Request{Method: "GET", Headers: gh.Headers})
+	listed := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls?state=open&head="+owner+":"+branch, Request{Method: "GET", Headers: gh.Headers})
 	if !okOf(listed) {
 		return refusedPull(out, "The pull request list", listed)
 	}
@@ -227,16 +252,16 @@ func (d *Doors) pulled(send Send, write *writeRow, out *pullRow) int {
 		pulls = nil
 	}
 	for _, one := range pulls {
-		if one.Head.Ref == write.Branch {
+		if one.Head.Ref == branch {
 			out.State, out.URL = "standing", one.URL
 			return codeOK
 		}
 	}
 	made := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]string{
-		"title": write.Branch + ": the dispatch's writes",
-		"head":  write.Branch,
+		"title": title,
+		"head":  branch,
 		"base":  trunk,
-		"body":  "The dispatch's fix bundles, parent closes and cloud markers, per the dispatch workflow.",
+		"body":  body,
 	})})
 	if !okOf(made) {
 		return refusedPull(out, "The pull request", made)
@@ -337,6 +362,16 @@ func fireLines(out *fireRow) []string {
 	lines = append(lines, pull)
 	if out.Pull.Why != "" {
 		lines = append(lines, "  "+out.Pull.Why)
+	}
+	for _, one := range out.Hands {
+		line := "  " + one.Branch + ": " + one.State
+		if one.URL != "" {
+			line += ", " + one.URL
+		}
+		lines = append(lines, line)
+		if one.Why != "" {
+			lines = append(lines, "    "+one.Why)
+		}
 	}
 	return lines
 }

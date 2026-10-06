@@ -164,7 +164,7 @@ func dfFired(hub *dfHub, plan *dispatchPlan, env map[string]string) int {
 	for key, value := range env {
 		said[key] = value
 	}
-	return (&Doors{Env: said}).fire(hub.send, plan)
+	return (&Doors{Env: said, Send: hub.send}).fire(plan)
 }
 
 func dfBody(t *testing.T, one dfSent) map[string]any {

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"slices"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -67,6 +68,8 @@ type dispatchPlan struct {
 	Person  []personRow `json:"person"`
 	Write   *writeRow   `json:"write,omitempty"`
 	Fire    *fireRow    `json:"fire,omitempty"`
+	// The work branches at done that carry a commit main lacks, whose pull request the fire opens. [[spec/tickets/dispatch-skips-merged-done-branches]]
+	Done []string `json:"done,omitempty"`
 }
 
 // The parts of the plan, in the order the dry run prints them. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
@@ -120,6 +123,9 @@ func (d *Doors) planned() (*dispatchPlan, workRead) {
 		case done:
 			if why := d.stuckIn(one, now); why != "" {
 				plan.Stuck = append(plan.Stuck, stuckRow{Group: one.Name, Why: why})
+			}
+			if d.aheadOfTrunk(one.Branch) {
+				plan.Done = append(plan.Done, one.Branch)
 			}
 		}
 	}
@@ -210,8 +216,17 @@ func personOf(loose []ticketFile) []personRow {
 	return out
 }
 
-// Runs the dispatch: the plan, the writes past a dry run, the fire where asked, then the plan printed or as JSON. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+// A branch on origin carrying a commit main lacks. The hub refuses a pull request over a branch level with main. [[spec/tickets/dispatch-skips-merged-done-branches]]
+func (d *Doors) aheadOfTrunk(branch string) bool {
+	count, _ := strconv.Atoi(d.quiet("rev-list", "--count", "origin/"+trunk+"..origin/"+branch).Out)
+	return count > 0
+}
+
+// Runs the dispatch: the plan, the writes past a dry run, the fire where asked, then the plan printed or as JSON. The send it takes becomes the doors' one send door. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]] [[spec/tickets/one-send-door]]
 func Dispatch(d *Doors, send Send, argv []string) int {
+	if send != nil {
+		d.Send = send
+	}
 	// The plan reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
 	d.fetch()
 	plan, read := d.planned()
@@ -222,7 +237,7 @@ func Dispatch(d *Doors, send Send, argv []string) int {
 	}
 	// The Action fires after the writes, so the plan it prints carries both. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
 	if !dry && slices.Contains(argv, "--fire") {
-		if fired := d.fire(send, plan); code == codeOK {
+		if fired := d.fire(plan); code == codeOK {
 			code = fired
 		}
 	}

@@ -180,6 +180,13 @@ func (d *Doors) leaves(branch, at, says string, moved []string) int {
 		}
 		d.say("%s stands %s, and hands %s to %s.", name, closedState, strings.Join(moved, ", "), parent)
 	}
+	// The pull request opens in the same call, and a run with no token leaves it to the dispatch and the work skill. [[spec/tickets/branch-done-opens-the-pr]]
+	row := pullRow{Branch: branch}
+	if d.workPull(branch, &row) == codeOK {
+		d.say("The pull request over %s against %s stands %s, with auto-merge on: %s", branch, trunk, row.State, row.URL)
+		return codeOK
+	}
+	d.say("%s", row.Why)
 	d.say("Open the pull request over %s against %s, with auto-merge on, as the work skill says.", branch, trunk)
 	return codeOK
 }
