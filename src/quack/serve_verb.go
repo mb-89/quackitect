@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -111,25 +110,22 @@ func serveReal() serveDoors {
 	return serveDoors{root: filepath.ToSlash(root), run: serveRuns}
 }
 
-// serveRuns over the process door. A stub until the implement step: it runs nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func serveRunsOver(_ proc.Runner) func(argv []string, cwd string) (int, string, error) {
-	return func([]string, string) (int, string, error) { return exitFailed, "", nil }
+// Runs a program in a folder over the real process door. [[spec/design_output/level0#a-desk-serve-returns]]
+func serveRuns(argv []string, cwd string) (int, string, error) {
+	return serveRunsOver(proc.Real)(argv, cwd)
 }
 
-// Runs a program in a folder, and answers its exit code and what it wrote to its error stream. A signal's end reads as 1, as the JavaScript door answers it. [[spec/design_output/level0#a-desk-serve-returns]]
-func serveRuns(argv []string, cwd string) (int, string, error) {
-	cmd := exec.Command(argv[0], argv[1:]...)
-	cmd.Dir = cwd
-	var stderr strings.Builder
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		code := exit.ExitCode()
-		if code < 0 {
-			code = 1
+// Runs a program in a folder through the process door, its output read by nothing, and answers its exit code and what it wrote to its error stream. A signal's end reads as 1, as the JavaScript door answers it. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func serveRunsOver(run proc.Runner) func(argv []string, cwd string) (int, string, error) {
+	return func(argv []string, cwd string) (int, string, error) {
+		var stderr strings.Builder
+		said := run(proc.Command{Argv: argv, Dir: cwd, Streams: &proc.Streams{Err: &stderr}})
+		switch said.Code {
+		case proc.Signalled:
+			return 1, stderr.String(), nil
+		case proc.NotStarted:
+			return 0, stderr.String(), errors.New(said.Err)
 		}
-		return code, stderr.String(), nil
+		return said.Code, stderr.String(), nil
 	}
-	return 0, stderr.String(), err
 }

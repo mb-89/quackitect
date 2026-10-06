@@ -87,8 +87,11 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 }
 
 // The road a verb runs another verb by: this binary's verb road over the scripts folder, as RUNME.sh hands it past the install, or RUNME.sh where the binary names no path. [[spec/tickets/the-verbs-need-no-wrapper]]
-func selfRoad(method string) []string {
-	if self, err := os.Executable(); err == nil {
+func selfRoad(method string) []string { return selfRoadOver(os.Executable, method) }
+
+// The verb road off the binary the self answers, or RUNME.sh where it names none. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func selfRoadOver(binary func() (string, error), method string) []string {
+	if self, err := binary(); err == nil {
 		return []string{self, "verb", filepath.Join(method, "src", "scripts")}
 	}
 	return []string{"sh", filepath.Join(method, "RUNME.sh")}

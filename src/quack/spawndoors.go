@@ -1,11 +1,10 @@
-// The spawns the landing and ticket verbs reach past git: the verb road, claude
-// on the PATH, and the branch take, each waiting on the process door's
-// follow-up. [[spec/tickets/quack-spawns-all-take-the-runner]]
+// The spawns the landing and ticket verbs reach past git: the verb road and the
+// branch take through the process door, and claude on the PATH.
+// [[spec/design_output/doors#the-process-door]]
 package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -17,34 +16,24 @@ import (
 	"quackitect/src/pull"
 )
 
-// roadVerb over the process door and the binary a road runs. A stub until the implement step: it runs no road. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func roadVerbOver(_ proc.Runner, _ func() (string, error), _ string) func(words ...string) (int, string) {
-	return func(...string) (int, string) { return exitFailed, "roadVerbOver runs no road yet" }
-}
-
-// takesBranch over the process door and the binary a road runs. A stub until the implement step: it takes nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func takesBranchOver(_ proc.Runner, _ func() (string, error)) func(scripts, group string, it *pull.It) int {
-	return func(string, string, *pull.It) int { return exitFailed }
-}
-
-// A verb through the road this binary answers, its two streams as one text. [[spec/tickets/landing-verbs-port-to-go]]
+// A verb through the road this binary answers, over the real process door. [[spec/tickets/landing-verbs-port-to-go]]
 func roadVerb(root string) func(words ...string) (int, string) {
+	return roadVerbOver(proc.Real, os.Executable, root)
+}
+
+// A verb through the road the binary answers, run through the process door with both streams on one buffer, so they answer as one text. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func roadVerbOver(run proc.Runner, self func() (string, error), root string) func(words ...string) (int, string) {
 	return func(words ...string) (int, string) {
-		self, err := os.Executable()
+		binary, err := self()
 		if err != nil {
 			return exitFailed, err.Error()
 		}
-		run := exec.Command(self, append([]string{"verb", filepath.Join(root, "src", "scripts")}, words...)...)
-		run.Dir = root
-		said, err := run.CombinedOutput()
-		if err != nil {
-			var exited *exec.ExitError
-			if errors.As(err, &exited) {
-				return exited.ExitCode(), strings.TrimSpace(string(said))
-			}
-			return exitFailed, strings.TrimSpace(string(said) + "\n" + err.Error())
+		var both strings.Builder
+		said := run(proc.Command{Argv: append([]string{binary, "verb", filepath.Join(root, "src", "scripts")}, words...), Dir: root, Streams: &proc.Streams{Out: &both, Err: &both}})
+		if said.Code < 0 {
+			return exitFailed, strings.TrimSpace(both.String() + "\n" + said.Err)
 		}
-		return 0, strings.TrimSpace(string(said))
+		return said.Code, strings.TrimSpace(both.String())
 	}
 }
 
@@ -64,27 +53,31 @@ func claudeAt(root string) string {
 
 // The branch take a cloud box runs on trunk, through the verb road, so the branch verbs answer it wherever they stand, and the index it serves. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func takesBranch(scripts, group string, it *pull.It) int {
-	self, err := os.Executable()
-	if err != nil {
-		fmt.Fprintln(it.Err, err)
-		return exitFailed
-	}
-	args := []string{"verb", scripts, "branch", "take"}
-	if group != "" {
-		args = append(args, group)
-	}
-	run := exec.Command(self, args...)
-	run.Dir, run.Stdout, run.Stderr = it.Root, it.Out, it.Err
-	code := 0
-	if err := run.Run(); err != nil {
-		code = exitFailed
-		if exit, ok := err.(*exec.ExitError); ok {
-			code = exit.ExitCode()
+	return takesBranchOver(proc.Real, os.Executable)(scripts, group, it)
+}
+
+// The branch take through the process door on the caller's streams, and the index it serves on a cloud box. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func takesBranchOver(run proc.Runner, self func() (string, error)) func(scripts, group string, it *pull.It) int {
+	return func(scripts, group string, it *pull.It) int {
+		binary, err := self()
+		if err != nil {
+			fmt.Fprintln(it.Err, err)
+			return exitFailed
 		}
-	}
-	if code != 0 || !it.Cloud {
+		argv := []string{binary, "verb", scripts, "branch", "take"}
+		if group != "" {
+			argv = append(argv, group)
+		}
+		said := run(proc.Command{Argv: argv, Dir: it.Root, Streams: &proc.Streams{Out: it.Out, Err: it.Err}})
+		code := said.Code
+		if code < 0 {
+			fmt.Fprintln(it.Err, said.Err)
+			code = exitFailed
+		}
+		if code != 0 || !it.Cloud {
+			return code
+		}
+		fmt.Fprintln(it.Out, servesHere(it.Root))
 		return code
 	}
-	fmt.Fprintln(it.Out, servesHere(it.Root))
-	return code
 }

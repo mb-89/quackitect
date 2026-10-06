@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -134,23 +133,21 @@ func standsHere(path string) bool {
 	return err == nil
 }
 
-// toolRuns over the process door and the input it hands through. A stub until the implement step: it runs nothing. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func toolRunsOver(_ proc.Runner, _ io.Reader) fixRunner {
-	return func(string, io.Writer, io.Writer, ...string) int { return exitFailed }
+// A tool run over the real process door, on the terminal's input. [[spec/tickets/the-small-faults-land]]
+func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
+	return toolRunsOver(proc.Real, os.Stdin)(dir, out, errs, argv...)
 }
 
-// A tool run with the caller's streams, answering its exit code. [[spec/tickets/the-small-faults-land]]
-func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
-	one := exec.Command(argv[0], argv[1:]...)
-	one.Dir, one.Stdin, one.Stdout, one.Stderr = dir, os.Stdin, out, errs
-	if err := one.Run(); err != nil {
-		if exit, ok := err.(*exec.ExitError); ok {
-			return exit.ExitCode()
+// A tool run through the process door with the caller's streams and the input it hands through, answering its exit code, and exitFailed with the fault where it never starts or a signal ends it. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func toolRunsOver(run proc.Runner, in io.Reader) fixRunner {
+	return func(dir string, out, errs io.Writer, argv ...string) int {
+		said := run(proc.Command{Argv: argv, Dir: dir, Streams: &proc.Streams{In: in, Out: out, Err: errs}})
+		if said.Code < 0 {
+			fmt.Fprintln(errs, said.Err)
+			return exitFailed
 		}
-		fmt.Fprintln(errs, err)
-		return exitFailed
+		return said.Code
 	}
-	return 0
 }
 
 // One row of Vale's JSON the calm reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]

@@ -182,6 +182,9 @@ func TestARunWithStreamsHandsThemItsInputAndOutput(t *testing.T) {
 		if said != (Said{Code: 3}) || out.String() != "out" || errs.String() != "err" {
 			t.Errorf("the %s runner answers %+v and writes %q, %q, and wants both streams written through", name, said, out.String(), errs.String())
 		}
+		if said := run(Command{Argv: []string{"/proc/contract/none"}, Streams: &Streams{Out: &out, Err: &errs}}); said.Code != NotStarted || said.Err == "" {
+			t.Errorf("the %s runner answers %+v, and wants a streamed program that never starts read as NotStarted with its fault", name, said)
+		}
 	}
 }
 

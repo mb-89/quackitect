@@ -45,7 +45,7 @@ type Command struct {
 	Streams *Streams
 }
 
-// The caller's streams a run reads and writes in place of Stdin and the buffers Said answers. A stub until the implement step: no runner reads them. [[spec/tickets/quack-spawns-all-take-the-runner]]
+// The caller's streams a run reads and writes in place of Stdin and the buffers Said answers, a nil one reading or writing nothing. [[spec/design_output/doors#the-process-door]]
 type Streams struct {
 	In       io.Reader
 	Out, Err io.Writer
@@ -89,9 +89,11 @@ func runUnder(life context.Context, one Command) Said {
 	cmd.WaitDelay = pipesClose
 	cmd.Dir = one.Dir
 	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
-	cmd.Stdin = strings.NewReader(one.Stdin)
 	var out, errs bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errs
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = strings.NewReader(one.Stdin), &out, &errs
+	if through := one.Streams; through != nil {
+		cmd.Stdin, cmd.Stdout, cmd.Stderr = through.In, through.Out, through.Err
+	}
 	err := cmd.Run()
 	var exit *exec.ExitError
 	errors.As(err, &exit)
@@ -100,6 +102,8 @@ func runUnder(life context.Context, one Command) Said {
 		return Said{Out: out.String(), Err: haltEndsRun, Code: NotStarted}
 	case run.Err() != nil:
 		return Said{Out: out.String(), Err: pastItsWait, Code: NotStarted}
+	case exit != nil && exit.ExitCode() < 0:
+		return Said{Out: out.String(), Err: errs.String(), Code: Signalled}
 	case exit != nil:
 		return Said{Out: out.String(), Err: errs.String(), Code: exit.ExitCode()}
 	case err != nil:
@@ -175,10 +179,31 @@ func (fake *FakeRunner) Run(one Command) Said {
 	if fake.halted() {
 		return Said{Err: haltedBefore, Code: NotStarted}
 	}
+	if one.Streams != nil {
+		one, program = throughStreams(one, program)
+	}
 	if one.Wait <= 0 {
 		return fake.unlessHalted(program(one))
 	}
 	return fake.within(program, one)
+}
+
+// The command with its input read off the streams, and the program writing its output and errors to them, answering both buffers empty as the real runner does. [[spec/design_output/doors#the-process-door]]
+func throughStreams(one Command, program Program) (Command, Program) {
+	through := one.Streams
+	if through.In != nil {
+		read, _ := io.ReadAll(through.In)
+		one.Stdin = string(read)
+	}
+	return one, func(asked Command) Said {
+		said := program(asked)
+		for _, pair := range [][2]any{{through.Out, said.Out}, {through.Err, said.Err}} {
+			if to, ok := pair[0].(io.Writer); ok && to != nil {
+				_, _ = io.WriteString(to, pair[1].(string))
+			}
+		}
+		return Said{Code: said.Code}
+	}
 }
 
 // The program's answer, or the fault its wait answers through After, which leaves Ends open for every other run. [[spec/design_output/doors#the-process-door]]

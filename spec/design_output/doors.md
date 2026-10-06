@@ -254,14 +254,16 @@ with the halt and the wait they need.
 | `Runner` in `src/proc` | the door, a function the real one fills with `exec`, outside `src/modules`, since it registers no ports |
 | `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it never starts |
 | `Wait` on a command | the span past which a run ends with a fault, and zero sets no limit |
+| `Streams` on a command | the caller's input and output streams, which a run reads and writes in place of `Stdin` and the buffers, so a viewer or a tool hands the terminal straight through |
+| `Signalled` | the code a run a signal ends answers, apart from `NotStarted` |
 | `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does, and its own `Halt`, `Ends` and `After` for the halt and the wait |
-| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, a program that never starts, the halt and the wait |
+| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, the streams, a signal's end, a program that never starts, the halt and the wait |
 
-The branch verbs' `rawEnv`, the pull's shell, the node module's child road and
-the voice verb's Vale take the `Runner`. Every other `exec.Command` in the
-quack verbs outside the box and check doors waits under
-[[spec/tickets/quack-spawns-all-take-the-runner]]. A case teaching the fake
-quack binary hands it a handler that answers the child road.
+The branch verbs' `rawEnv`, the pull's shell, and every spawn in the quack
+verbs outside the box and check doors take the `Runner`. Each quack spawn
+keeps its name as a binding over `Real`, beside an `Over` form a case hands a
+`FakeRunner`. A case teaching the fake quack binary hands it a handler that
+answers the child road.
 
 ## The moves
 
