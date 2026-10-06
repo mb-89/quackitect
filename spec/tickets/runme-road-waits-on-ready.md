@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 4db3bc82c38588d5
         size: 401
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 97372e9c2fdb9429fcd97c00ae3e8e9e96096885
+    hash_after: 97372e9c2fdb9429fcd97c00ae3e8e9e96096885
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: b8bcc39ac74d8475
+        size: 1578
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -216,26 +229,32 @@ The index door gains ready(): it runs se-index standing with no timeout, which r
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/index.test.js
+- test/contract/runme-road.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The three cases fail on their assertions once a stub ready stands on the door: the stub answers no door, and the road names its timer and no ready wait. The case over the road reads its own source, and spells the timer words in pieces, so the pattern never matches itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the runme-road line meets the case reading the file for the ready wait and no timer, and the check line waits for tests-green
+- the ready call meets its one contract case against the real binary and the no-binary box, and the fake index gains ready beside warm in the change
 
 # gate
 

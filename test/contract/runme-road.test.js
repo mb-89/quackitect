@@ -3,8 +3,10 @@
 // [[spec/tickets/runme-hands-verbs-to-quack]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { proc } from "../../src/doors/proc.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -16,6 +18,13 @@ const runs = (...argv) =>
     cwd: ROOT,
     timeoutMs: RUN_TIMEOUT_MS,
   });
+
+// The road waits on the index's ready event, and a timer guesses at nothing. [[spec/tickets/runme-road-waits-on-ready]]
+test("the road waits on the index's ready event, and names no timer", () => {
+  const text = readFileSync(fileURLToPath(import.meta.url), "utf8");
+  assert.match(text, /\.ready\(\)/, "the file waits on the ready event");
+  assert.doesNotMatch(text, new RegExp(["time", "outMs|set", "Timeout|_MS\\b"].join("")), "the file names no timer");
+});
 
 test("./RUNME.sh hands get to quack, which reads the verbs slice off the index", () => {
   const said = runs("get", "migration/config/verbs");

@@ -65,6 +65,8 @@ export function index(disk, proc, clock, method, work = method) {
       const ran = run(["find", words], ASKING);
       return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "find");
     },
+    // [[spec/tickets/runme-road-waits-on-ready]]
+    ready: () => ({ ready: false, dead: "" }),
     // [[spec/design_output/index#a-dead-index-speaks]]
     warm: () => {
       const now = clock.now().getTime();
