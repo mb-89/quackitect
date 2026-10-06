@@ -168,7 +168,7 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 	return out, ""
 }
 
-// A fix group minted off the group route, marked fix and filed under its parent. The ask is this file's constant, and the check on the write branch's pull request lints every ticket it lands. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+// A fix group minted off the group route, marked fix, filed under its parent, and open at the route's first step, so its box pulls with no hand running ticket open. The ask is this file's constant, and the check on the write branch's pull request lints every ticket it lands. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
 func (d *Doors) fixGroup(name, parent string) (string, string) {
 	path := ticketAt(name)
 	route, why := d.processAt(groupRoute)
@@ -185,6 +185,7 @@ func (d *Doors) fixGroup(name, parent string) (string, string) {
 	if why != "" {
 		return "", why
 	}
+	text = withField(withField(text, "step", firstLeaf(route.Steps, "")), "state", openState)
 	text = withField(text, fixField, "true")
 	if parent != "" {
 		text = withField(text, groupField, parent)

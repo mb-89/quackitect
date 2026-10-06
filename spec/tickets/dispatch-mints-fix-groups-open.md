@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 8532ce005e537ef8
         size: 652
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: b5d743bbaaec42e0574c8b5f979b07b5477f57d9
+    hash_after: b5d743bbaaec42e0574c8b5f979b07b5477f57d9
+    answered:
+      - name: lint
+        exit: 0
+        said: "  118.0  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -285,14 +294,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: it changes fixGroup in src/branches/dispatch_write.go alone, the file whose test the ask names.
+every door the change reaches has a fake: fixGroup reads the route through Doors.processAt, and the case drives it over the tree root with no network.
+a comment names the approach the change implements: the comment above fixGroup says the group lands open at its route first step, so its box pulls with no hand running ticket open.
+every fact the change adds stands in one place: the change calls firstLeaf and openState from src/branches/group.go, the same pair escalate.go writes.
 
 ## tests-green
 
