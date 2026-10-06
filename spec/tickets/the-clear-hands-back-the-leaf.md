@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: clear-hands-back-the-leaf
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 91f892b93ab10be4
         size: 4083
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 156418b839c4 · claude-code-remote · helper-4
+    hash_before: f4d6dfb870ab5fa65f701d8fa653f655635c388e
+    hash_after: f4d6dfb870ab5fa65f701d8fa653f655635c388e
+    inputs:
+      - name: design/draft
+        hash: 91f892b93ab10be4
+        size: 4083
+      - name: design/tests-red
+        hash: 289f5119dfb23cd8
+        size: 1088
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -310,8 +322,10 @@ What surprises me: the port that retired the bridge server left out the step tha
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- clear-names-the-probe-test: the draft's tests and size lists name test/level0/probe-dry.test.js for the probe's clear cases, and the cases stand in test/level0/probe-clear.test.js, which size leaves out; the builder names that file in place
 
 # implement
 
