@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 6b0799eedfea0d016277c90cfc8fabc7b48fd987
+    hash_after: 6b0799eedfea0d016277c90cfc8fabc7b48fd987
+    inputs:
+      - name: ask
+        hash: f04f51723a777a9d
+        size: 516
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,90 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The `Clock` interface moves from `src/modules/clock` into the core as `q.Clock`, since a module, a door, the index and a renderer import no other module. It names the time types alone, which no door owns whole, so the core stays pure.
+
+`q.Clock` grows the members the callers reach for:
+
+| member | answers | the fake |
+|---|---|---|
+| `Now` | the time now | the time it stands at |
+| `Every` | a hand on each span | fires on `Tick` |
+| `After` | a channel closing past a span | closes on `Tick` past the span |
+| `AfterFunc` | a hand run once past a span, and its stop | runs on `Tick` past the span |
+| `WithTimeout` | a context ending past a span | ends on `Tick` past the span |
+
+The real clock in `src/modules/clock` stays the one file calling `time`. One contract suite runs every member against the real clock and the fake.
+
+Each caller takes a `q.Clock` as an argument or a field, and the root `src/quack` hands it `clock.New()`. A test hands it `clock.NewFake`, and moves it with `Tick`. A poll waiting on a thing that fires an event takes the event in place of the clock: a process exit, a watcher event, a ready signal. A `time.Sleep` between two tries becomes `<-clock.After(span)`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/engine/swap/swap.go Watches
+src/index/beats.go beats
+src/index/door.go awaits
+src/index/door.go claims
+src/index/door.go guards
+src/index/door.go starts
+src/index/door.go sweeps
+src/index/main.go displaced
+src/index/procs.go Settle
+src/index/procs.go runs
+src/index/procs.go spawns
+src/index/stop.go stopsAfter
+src/modules/hooks/hooks.go now
+src/modules/index/call.go Wait
+src/modules/index/call.go WaitCaller
+src/modules/lsp/door.go runsIn
+src/modules/lsp/lsp.go serves
+src/modules/lsp/runs.go schedule
+src/tui/frame/door.go TellPort
+src/quack/modules.go and src/quack/main.go: the root that builds the clock and hands it on
+every caller of the functions above that gains a clock argument, which the build names
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/clock/clock_contract_test.go: After, AfterFunc and WithTimeout against the real clock and the fake
+src/modules/clock/clock_test.go TestTheFakeFiresAfterOnTick
+src/modules/clock/clock_test.go TestTheFakeEndsAContextOnTick
+src/modules/clock/clock_test.go TestAStoppedAfterFuncNeverRuns
+src/q/clock_test.go TestTheRealClockAndTheFakeAreAQClock
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/clock.go
+src/q/clock_test.go
+src/modules/clock/clock.go
+src/modules/clock/clock_test.go
+src/modules/clock/clock_contract_test.go
+every file the callers list names
+the tests of those files, which hand in the fake
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened `src/modules/clock/clock.go`, `src/imports/imports.go` seesModules, `src/index/main.go` and `src/engine/swap/swap.go`, and each claim stands there
+the callers list comes off every walk-around `./RUNME.sh doors` names outside `src/quack`, one function a line
+the first done_when line falls to `./RUNME.sh doors`, the second to `./RUNME.sh test` over each package the callers list names
 
 ## tests-red
 
