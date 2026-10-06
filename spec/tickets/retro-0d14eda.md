@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: report
+step: mint
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -239,6 +239,15 @@ record:
         hash: e3e035de80fffcce
         size: 55
     def: 6c780917f5f28b35
+  - step: report
+    hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
+    hash_before: de53815dc01b9bd34be950b17c16687b5d7d3a49
+    hash_after: de53815dc01b9bd34be950b17c16687b5d7d3a49
+    inputs:
+      - name: check
+        hash: 27118cdfa6992352
+        size: 53
+    def: 683a303033a0f990
 ---
 
 # Ask
@@ -401,8 +410,10 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## verdict
 
 <!-- pass once the report reads right, or fail with what the check changes, one a line -->
-
 <!-- the form is verdict -->
+
+pass: the report reads right
+k12 takes the failure registry with a sentinel: every failure a node with an id, a level, remedies and an optional reaction and watch
 
 # mint
 
