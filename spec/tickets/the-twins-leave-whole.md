@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: fdfab33193f6869586a7571b3e20e419a0ab8fb3
+    hash_after: fdfab33193f6869586a7571b3e20e419a0ab8fb3
+    inputs:
+      - name: ask
+        hash: b7f931327270cefd
+        size: 821
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,60 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The approach departs from the ask's first two done_when lines, and keeps its aim. The twins do not run under tests alone: copilot.js reaches work.js through .claude/skills/level0/lib/copilot-dispatch.js, and pull.js and pull-hand.js stand as hubs that ephemeral-pull.js, pull-escalate.js, work-answer.js and ticket.js import, the last behind the Go fill verb. Their retirement is a migration of its own across these modules, past this branch's edge. The defect the note names stands smaller: four desk refusals print their remedy past the failure door, and two print it twice. The fix: each raises desk-works-on-trunk with the said line alone, and the node's remedy prints once. In Go, take in src/branches/take.go raises a said line with no remedy, and commit in src/quack/commit.go raises through the failure door in place of printing command.DeskRefusal. In JS, take in src/scripts/work.js and deskRefused in src/scripts/pull-hand.js raise through failure(it.disk, it.log, it.root) with deskSaid, as deskGuard in src/bridge/bash.js already does, and answer their code once the raise resolves. Then deskRefusal leaves lib/cloud.js, DeskRefusal leaves src/modules/hooks/command/trunk.go, and deskRefusal leaves take.go. deskSaid, DeskSaid and the node stay.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js: take, which printed deskRefusal
+- src/scripts/pull-hand.js: deskRefused, which handOut and pull in src/scripts/pull.js call
+- test/level0/cloud-desk.test.js: the deskRefusal cases
+- src/branches/take.go: take, which raised deskRefusal's two lines
+- src/quack/commit.go: the desk guard of the commit verb, which printed command.DeskRefusal
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/cloud-desk.test.js: a desk pull raises desk-works-on-trunk through the failure door, and its remedy prints once
+- src/branches/take_failure_test.go: TestDeskTakePrintsTheRemedyOnce
+- src/quack/commit_test.go: TestDeskCommitRaisesThroughTheDoor
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib/cloud.js
+- test/level0/cloud-desk.test.js
+- src/scripts/pull-hand.js
+- src/scripts/work.js
+- src/branches/take.go
+- src/branches/take_failure_test.go
+- src/modules/hooks/command/trunk.go
+- src/quack/commit.go
+- src/quack/commit_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every name stands opened: deskSaid and deskRefusal in lib/cloud.js, deskRefused and handOut in pull-hand.js, pull in pull.js, take in work.js and take.go, DeskSaid and DeskRefusal in trunk.go, the commit guard in commit.go, deskGuard in bash.js, and failure in src/doors/failure.js
+the callers list names every caller a grep for deskRefusal, DeskRefusal and deskRefused finds
+the two done_when lines the approach keeps meet a test: deskRefusal gone from lib/cloud.js and its test, decided by the cloud-desk case, and the check; the two it departs from stand answered in the approach
 
 ## tests-red
 
