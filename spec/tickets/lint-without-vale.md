@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box 09cf21ad3c5d · claude-code-remote
     hash_before: ae3d32de0c6708f2066851db7130eb500e8ddda1
+  - step: sync
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 5ddff27b13dabc94c35c8e10d0ea52e1c721fbba
+    hash_after: 82f365f04883b53dd31f5333a0f18ea75551c4ef
+    answered:
+      - name: sync
+        exit: 0
+        said: work/lint-without-vale already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -107,8 +116,9 @@ The tree lints its prose and its code with its own Go rules, at commit and mint 
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
