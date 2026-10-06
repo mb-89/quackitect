@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 30d90eb0d7ad46ba
         size: 634
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 56c883b9474b3423f60534fcdc9a671a137af690
+    hash_after: 56c883b9474b3423f60534fcdc9a671a137af690
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: cd77d5b1da5f1daf
+        size: 2552
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -234,26 +247,32 @@ the first done_when line falls to TestNoRootFileReachesTheBoxPastItsDoors and `.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/quack_tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case names each import of a box package in a file of the root, past a marked line, the same walk-arounds `./RUNME.sh doors` lists there. It stands under `src/owns` beside the script case, not under `src/quack` as the draft says, because `doorsOf` already reads the tree there. Each member a hand gains takes its own case in `src/quack/box_doors_test.go` as the change writes it, red first.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the case names its claim and asserts it per walk-around, naming the file, line and doors
+the case reads the tree and writes nothing
+the case goes red on each import the change removes, as the run shows
 
 # gate
 
