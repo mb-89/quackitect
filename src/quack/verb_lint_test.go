@@ -25,6 +25,7 @@ func lintRow(file, rule, severity string) check.Finding {
 type lintFake struct {
 	tools, swept, box []check.Finding
 	sweepFault        error
+	changed           []string
 	asked             [][]string
 	rows              []map[string]any
 }
@@ -48,8 +49,9 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 				fake.asked = append(fake.asked, where)
 				return fake.tools
 			},
-			sweep: func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
-			box:   func() []check.Finding { return fake.box },
+			sweep:   func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
+			box:     func() []check.Finding { return fake.box },
+			changed: func() []string { return fake.changed },
 			log: func(row map[string]any) error {
 				fake.rows = append(fake.rows, row)
 				return nil
@@ -99,6 +101,28 @@ func TestLintVerb(t *testing.T) {
 		}
 		if row := fake.rows[0]; row["level"] != "warn" || row["said"] != "3 line(s) break a rule" || row["detail"] != "a.md:2 Sentence, b.md:2 Passive, c.md:2 Passive" {
 			t.Fatalf("lint logs %v, and wants the warn row naming the first rows", row)
+		}
+	})
+	// The commit and the check read a warning as a refusal. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("a warning under --strict exits 1 and names no warning note", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)}}
+		code, out, _ := runsTwin(fake.verb(t, nil), "lint", "--strict")
+		if code != exitFailed || strings.Contains(out, "stand at warning") || !strings.HasSuffix(out, "a.md:2:3: Sentence: Sentence says\n") {
+			t.Fatalf("lint --strict answers %d, %q, and wants 1 ending on the finding", code, out)
+		}
+	})
+	// The engine writes the tickets and the retros, so a hand fixes no warning there. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("--changed reads the changed files past the tickets, the retros and the private folder", func(t *testing.T) {
+		fake := &lintFake{changed: []string{"spec/a.md", "spec/tickets/t.md", "spec/retros/r.md", ".se/tickets/n.md"}}
+		code, out, _ := runsTwin(fake.verb(t, map[string]string{"spec/a.md": "a\n", "spec/tickets/t.md": "t\n", "spec/retros/r.md": "r\n", ".se/tickets/n.md": "n\n"}), "lint", "--changed")
+		if code != 0 || len(fake.asked) != 1 || strings.Join(fake.asked[0], " ") != "spec/a.md" {
+			t.Fatalf("lint --changed answers %d, %q, asks the tools over %v, and wants spec/a.md alone", code, out, fake.asked)
+		}
+	})
+	t.Run("--changed over no changed file passes and asks no tool", func(t *testing.T) {
+		fake := &lintFake{}
+		if code, out, _ := runsTwin(fake.verb(t, nil), "lint", "--changed", "--strict"); code != 0 || len(fake.asked) != 0 || out != "The rules pass.\n" {
+			t.Fatalf("lint --changed answers %d, %q, asks %v", code, out, fake.asked)
 		}
 	})
 	t.Run("a finding at error exits 1 and names no warning note", func(t *testing.T) {

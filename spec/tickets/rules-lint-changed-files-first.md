@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ba4e2087a8e0b8a1
         size: 494
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 93ea938056f9cdc02c0009e8cc9deced9dc2c789
+    hash_after: 93ea938056f9cdc02c0009e8cc9deced9dc2c789
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9bf1118afce8b735
+        size: 1640
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -221,26 +234,33 @@ The lint verb takes --strict, under which a warning exits 1 as an error does, an
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_test.go src/quack/verb_lint_test.go src/quack/commit_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
+- src/quack/verb_lint_test.go
+- src/quack/commit_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The check runs no changed part, a warning under the strict flag exits 0, the changed flag reads the whole tree, and the commit runs the tests before any rule. The cold probe case asserts that the tests run first, so it moves with the change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the commit case, the strict and changed lint cases, and the check part
+- every door the cases reach has its fake: the landing fake for the verbs, and the lint fake gains the changed door
 
 # gate
 

@@ -39,8 +39,10 @@ type lintDoors struct {
 	tools func(where []string) []check.Finding
 	sweep func() ([]check.Finding, error)
 	box   func() []check.Finding
-	log   func(row map[string]any) error
-	now   func() time.Time
+	// The files the branch changes since it left trunk, and the ones it changes in the working tree. [[spec/tickets/rules-lint-changed-files-first]]
+	changed func() []string
+	log     func(row map[string]any) error
+	now     func() time.Time
 }
 
 func init() { register("lint", lintVerb(lintHere)) }
