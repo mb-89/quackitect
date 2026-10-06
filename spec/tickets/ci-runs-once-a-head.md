@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d040db23b249 · claude-code-remote
@@ -131,6 +131,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: a5044e4d3bbd6a797a9ec6be4d723146ae1d2a05
+    hash_after: a5044e4d3bbd6a797a9ec6be4d723146ae1d2a05
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -203,38 +215,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-runs-once-a-head: the check runs on a push to main and on a pull request against main, with a concurrency group per pull request that cancels and a group per run on main
+- the contract test pins the triggers, the groups and the job name
+- work.md carries the reason under the check runs once a head
+- the group's tickets reached main through their own pull request, #119
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the contract test named the old trigger at once, so the workflow and its test moved together
+- the size golden named its own fix, the -twins flag, in its failure line
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 20:21 the mint refused the group before a child named it, and the door refused every call naming the group before its file stood
+- 20:22 the door refused cloud: true on the group, and no verb named in the ask writes it
+- 20:25 branch open refused to run off a detached head, then needed the group on origin main, so the tickets took their own pull request and its queued CI
+- 20:47 branch open tried to push its cloud marker to main, the push came back refused, and branch take then handed out another group's done branch
+- 20:55 the first commit's check went red on the size golden, so the commit landed on a rescue branch, which stays on origin
+- 21:00 the hand-back of do ran past a 115 second cap, and its tests field refused a node command where it wants branch test
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the cloud guidance names the order a box mints a group in: child first, then the group, then the mark
+- branch open on a cloud box writes its cloud marker on the work branch, so it needs no push to main
+- branch take on a cloud box hands the branch its own group names before a stuck hand-over
+- the do step of the trivial process names branch test in its tests field's line
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask was small, and the route around it was large: two pull requests and two CI queues for one workflow change. The choice the run weighed was the concurrency key on main. A group per ref drops a queued run when a third push joins, so the change takes a group per run there, and main never gives way.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands once: the reason lives in work.md, and the workflow and the test link it
+- the change adds no number
+- the workflow header says what the file is for, and counts nothing
+- the chapter carries the run's errors with their times, and the opening prompt stands as the only owner prompt
+- the chapter names roles alone, and no box path
 
 ## cloud
 
