@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -196,6 +196,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/tests-red
+    skipped: true
+    kept: 77cdcc06f46792b90c4b27f619c16b411effc12b
+    why: its red tests stand as 77cdcc06f landed them, and a later leaf passed since
 ---
 
 # Ask
