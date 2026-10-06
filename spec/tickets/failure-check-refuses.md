@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -215,6 +215,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: a408369fbdf492d8d017bd4fcae51c6c5ee10328
+    hash_after: a408369fbdf492d8d017bd4fcae51c6c5ee10328
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/failure passes
+      - name: check
+        exit: 0
+        said: "    1.5  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines"
+    inputs:
+      - name: design/tests-red
+        hash: 26d55a6dbde31cfe
+        size: 1101
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -387,26 +410,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/check_test.go src/failure/tree_test.go src/failure/door_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check now holds the failure registry. Three tree cases under src/failure read the tree: every node names a remedy, every id a Raise or a raise names stands as a node, and every moved file holds no refusal past the door. The package door gains Walk, which lists the files under a folder, and its fake answers alike. Moved stands empty until the refusal move fills it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the five files the draft names, and no other
+- the one door the change reaches is the package door, whose Walk FakeDir answers, held alike by TestDirAndFakeDirAnswerAlike
+- each fault function in src/failure/check.go points at spec/design_output/failures#the-check-holds-the-registry
+- Moved stands in src/failure/check.go alone
 
 # accept
 
