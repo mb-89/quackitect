@@ -42,7 +42,8 @@ type checkFake struct {
 
 func (one *checkFake) doors() checkDoors {
 	return checkDoors{
-		root: "/tree",
+		root:     "/tree",
+		platform: "linux",
 		verb: func(words []string, _ bool) int {
 			one.verbs = append(one.verbs, words)
 			return one.codes[strings.Join(words, " ")]
@@ -97,7 +98,7 @@ func TestCheckParts(t *testing.T) {
 		for _, name := range []string{"level0", "doors", "projections", "rules"} {
 			partNamed(parts, name).run()
 		}
-		want := [][]string{{"probe", "dry", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
+		want := [][]string{{"probe", "smoke", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
 		if !reflect.DeepEqual(fake.verbs, want) {
 			t.Fatalf("the verbs read %v, and want %v", fake.verbs, want)
 		}
@@ -109,14 +110,15 @@ func TestCheckParts(t *testing.T) {
 			t.Fatalf("the rules ran %v", fake.verbs)
 		}
 	})
-	t.Run("a Windows box runs no dry session, and says so", func(t *testing.T) {
-		fake := &checkFake{}
-		doors := fake.doors()
-		doors.windows = true
-		var said strings.Builder
-		doors.out = &said
-		if code := partNamed(partsOf(doors, nil, false), "level0").run(); code != 0 || len(fake.verbs) != 0 || !strings.Contains(said.String(), "Windows") {
-			t.Fatalf("the level0 part answers %d, ran %v, and says %q", code, fake.verbs, said.String())
+	// [[spec/tickets/level0-smoke-runs-in-seconds]]
+	t.Run("level zero runs the smoke on the working tree, on Windows as on Linux", func(t *testing.T) {
+		for _, platform := range []string{"linux", "windows"} {
+			fake := &checkFake{}
+			doors := fake.doors()
+			doors.platform = platform
+			if code := partNamed(partsOf(doors, nil, false), "level0").run(); code != 0 || !reflect.DeepEqual(fake.verbs, [][]string{{"probe", "smoke", "--working"}}) {
+				t.Fatalf("on %s the level0 part answers %d and runs %v", platform, code, fake.verbs)
+			}
 		}
 	})
 	t.Run("the plugin part validates the plugin, and passes where claude stands nowhere", func(t *testing.T) {
@@ -275,7 +277,9 @@ func TestGoGate(t *testing.T) {
 			t.Fatalf("the gate ran %v, and wants %v", fake.runs, want)
 		}
 		red := &checkFake{codes: map[string]int{"go": 1}}
-		if code := goGate(red.doors(), false, nil); code != 1 || len(red.runs) != 1 {
+		redDoors := red.doors()
+		redDoors.root = t.TempDir()
+		if code := goGate(redDoors, false, nil); code != 1 || len(red.runs) != 1 {
 			t.Fatalf("a red test answers %d after %v", code, red.runs)
 		}
 		gone := &checkFake{gone: map[string]bool{"go": true}}
@@ -287,7 +291,7 @@ func TestGoGate(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"go": 1}, said: map[string]string{"go": "=== RUN   TestA\n    --- FAIL: TestA (0.00s)\nok  \tquackitect/src/two\n--- FAIL: TestB (0.01s)\n"}}
 		doors := fake.doors()
 		var errs, out strings.Builder
-		doors.errs, doors.out = &errs, &out
+		doors.errs, doors.out, doors.root = &errs, &out, t.TempDir()
 		if code := goGate(doors, true, nil); code != 1 {
 			t.Fatalf("a red quiet run answers %d", code)
 		}
@@ -327,6 +331,51 @@ func TestTestArgv(t *testing.T) {
 	}
 }
 
+// A red check ends by naming each red case with its file, and its line where the run names one. [[spec/tickets/ci-reds-name-their-cases]]
+func TestCheckEndsOnTheRedCases(t *testing.T) {
+	t.Parallel()
+	ends := func(t *testing.T, run func(doors *checkDoors, argv []string) (int, string)) []string {
+		t.Helper()
+		var said strings.Builder
+		doors := (&checkFake{}).doors()
+		doors.root, doors.out = t.TempDir(), &said
+		doors.run = func(argv, _ []string, _ bool) (int, string, error) {
+			code, out := run(&doors, argv)
+			return code, out, nil
+		}
+		if code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, &said, io.Discard); code != 1 {
+			t.Fatalf("a red run answers %d: %q", code, said.String())
+		}
+		rows := strings.Split(strings.TrimRight(said.String(), "\n"), "\n")
+		return rows[max(0, len(rows)-2):]
+	}
+	t.Run("a red runner case ends the log with its file and line", func(t *testing.T) {
+		rows := ends(t, func(doors *checkDoors, argv []string) (int, string) {
+			if argv[0] != "node" || !slices.Contains(argv, testParts[0].glob) {
+				return 0, ""
+			}
+			row := caseLine(map[string]any{"file": "test/level0/a.test.js", "name": "a case", "nesting": 0, "ms": 3, "ok": false, "said": "it broke", "line": 12})
+			_ = os.MkdirAll(filepath.Dir(doors.at(testParts[0].times)), 0o755)
+			_ = os.WriteFile(doors.at(testParts[0].times), []byte(row+"\n"), 0o644)
+			return 1, ""
+		})
+		if want := []string{"The red cases:", "  test/level0/a.test.js:12: a case: it broke"}; !reflect.DeepEqual(rows, want) {
+			t.Fatalf("the log ends %q, and wants %q", rows, want)
+		}
+	})
+	t.Run("a red Go test ends the log with its file under its package and its line", func(t *testing.T) {
+		rows := ends(t, func(_ *checkDoors, argv []string) (int, string) {
+			if argv[0] != "go" {
+				return 0, ""
+			}
+			return 1, "--- FAIL: TestA (0.00s)\n    --- FAIL: TestA/inner (0.00s)\n        a_test.go:7: one is two\nFAIL\nFAIL\tquackitect/src/one\t0.01s\nFAIL\n"
+		})
+		if want := []string{"The red cases:", "  src/one/a_test.go:7: TestA/inner: one is two"}; !reflect.DeepEqual(rows, want) {
+			t.Fatalf("the log ends %q, and wants %q", rows, want)
+		}
+	})
+}
+
 func TestCheckErrors(t *testing.T) {
 	t.Parallel()
 	lines := caseLine(map[string]any{"file": "test/a.test.js", "name": "a case", "ok": false, "said": "it broke"})
@@ -352,13 +401,33 @@ func TestCheckReads(t *testing.T) {
 			t.Fatal("the port reads wrong")
 		}
 	})
-	t.Run("level zero going red says the tree is red", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"probe dry --working": 1}}
+	// [[spec/tickets/platform-red-line-tested]]
+	t.Run("level zero going red says the tree is red on the platform it ran on", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"probe smoke --working": 1}}
 		doors := fake.doors()
 		var said strings.Builder
 		doors.errs = &said
-		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") {
+		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") || !strings.Contains(said.String(), "on linux") {
 			t.Fatalf("a red dry session answers %d, %q", code, said.String())
+		}
+	})
+	// [[spec/tickets/level0-claims-name-the-platform]]
+	t.Run("a green level zero names the platform it ran on", func(t *testing.T) {
+		doors := (&checkFake{}).doors()
+		var said strings.Builder
+		doors.out = &said
+		if code := level0Runs(doors, false); code != 0 || !strings.Contains(said.String(), "on linux") {
+			t.Fatalf("a green run on linux answers %d, %q", code, said.String())
+		}
+	})
+	t.Run("a Windows box names the desk trial covering it", func(t *testing.T) {
+		doors := (&checkFake{}).doors()
+		doors.platform = "windows"
+		var said strings.Builder
+		doors.out = &said
+		level0Runs(doors, false)
+		if !strings.Contains(said.String(), "on windows") || !strings.Contains(said.String(), deskTrial) {
+			t.Fatalf("a Windows box says %q", said.String())
 		}
 	})
 }

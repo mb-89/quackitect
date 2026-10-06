@@ -15,7 +15,7 @@ import type {
   StarNext,
   StreamNext,
 } from "claude-code";
-import { BIN } from "../lib/index.js";
+import { binaryOf, windowsOf } from "../lib/index-tools.js";
 import { SESSION } from "../lib/log.js";
 import {
   type Answer,
@@ -344,10 +344,10 @@ function starts($: EngineInterface): Promise<void> {
   return road;
 }
 
-// A verb of the index binary the method root carries, run in the work root, so Go answers what the hook hands it. [[spec/tickets/level0-hooks-hold-no-rule]]
+// A verb of the index binary the method root carries, run in the work root, so Go answers what the hook hands it. A Windows box builds the binary with its suffix. [[spec/tickets/level0-hooks-hold-no-rule]] [[spec/tickets/level0-smoke-runs-in-seconds]]
 function verb(...words: string[]): string[] {
   const at = method || root || ".";
-  return [`${at}/${BIN}`, "verb", `${at}/src/scripts`, ...words];
+  return [binaryOf(at, windowsOf(at)), "verb", `${at}/src/scripts`, ...words];
 }
 
 // Go owns the road: the cloud guard, the standing and the row it prints. A desk prints nothing, and a binary standing nowhere or an answer carrying no row writes the one fall row. [[spec/tickets/level0-hooks-hold-no-rule]]

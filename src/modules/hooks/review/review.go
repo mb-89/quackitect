@@ -27,13 +27,14 @@ var fencedAnswer = regexp.MustCompile("```(?:json)?\\s*([\\s\\S]*?)```")
 
 // What the branch verb gathers for a reader, as `branch review --json` prints it. [[spec/design_output/review#the-tool-the-session-calls]]
 type Material struct {
-	Branch   string `json:"branch"`
-	Ask      string `json:"ask"`
-	Handback string `json:"handback"`
-	Stat     string `json:"stat"`
-	Diff     string `json:"diff"`
-	Check    Check  `json:"check"`
-	Retro    bool   `json:"retro"`
+	Branch    string   `json:"branch"`
+	Ask       string   `json:"ask"`
+	Handback  string   `json:"handback"`
+	Stat      string   `json:"stat"`
+	Diff      string   `json:"diff"`
+	Check     Check    `json:"check"`
+	Retro     bool     `json:"retro"`
+	Unreached []string `json:"unreached,omitempty"`
 }
 
 // The check on the branch: whether it passes, its exit code where one stands, and what it says. [[spec/design_output/review#what-the-report-looks-like]]
@@ -223,13 +224,16 @@ func ReadOf(deny string, failed bool, text string) Read {
 	return ReaderSays(text)
 }
 
-// The report the session reads: one line where nothing waits, or a row a finding and the count to fix. [[spec/design_output/review#what-the-report-looks-like]]
+// The report the session reads: one line where nothing waits, or a row a finding and the count to fix. [[spec/design_output/review#what-the-report-looks-like]] [[spec/design_output/review#the-unreached-row]]
 func Report(material Material, read Read) string {
 	fix := read.Fix
 	if !material.Check.OK {
 		fix++
 	}
 	if !material.Retro {
+		fix++
+	}
+	if len(material.Unreached) > 0 {
 		fix++
 	}
 	unread := strings.TrimSpace(read.Unread)
@@ -244,7 +248,7 @@ func Report(material Material, read Read) string {
 		retro = "absent from the handback"
 	}
 	out := []string{material.Branch, ""}
-	for _, row := range [][2]string{{"check", check}, {"retro", retro}, {"ask", read.Ask}, {"tests", read.Tests}, {"beyond", read.Beyond}, {"reader", unread}} {
+	for _, row := range [][2]string{{"check", check}, {"retro", retro}, {"unreached", strings.Join(material.Unreached, "\n")}, {"ask", read.Ask}, {"tests", read.Tests}, {"beyond", read.Beyond}, {"reader", unread}} {
 		if strings.TrimSpace(row[1]) == "" {
 			continue
 		}

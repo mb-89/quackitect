@@ -11,6 +11,7 @@ import { processHash } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
 import { pulling } from "../../src/scripts/work.js";
 import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
@@ -162,6 +163,8 @@ const onBranch = (extra = {}) => ({
   "git status --porcelain": { stdout: "" },
   node: { exitCode: 0, stdout: "" },
   sh: { exitCode: 0, stdout: "" },
+  // A cloud take stands the index through its own standing verb. [[spec/tickets/level0-hooks-hold-no-rule]]
+  [startOf(WORK)[0]]: { exitCode: 0, stdout: "" },
   ...extra,
 });
 

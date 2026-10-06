@@ -14,7 +14,7 @@ const retroUsage = `Usage: ./RUNME.sh retro <verb>
   new              mints a retro off its route, opens it, and hands out its first leaf
   timeline <retro> the hours holding work, per source, with the idle stretches between
   chapters <retro> checks the cuts, and hands every chapter its lines
-  read <retro> <chapter>  every owner prompt, fault and command of the chapter, with its file and line
+  read <retro> <chapter>  every owner prompt, fault, refusal and command of the chapter, with its file and line
   matrix <retro>   draws the report: the class fixes first, then the matrix
   effect <retro>   counts the last retro's class patterns over this input
   classes <retro>  counts each class's rate, and refuses a finding with no disposition

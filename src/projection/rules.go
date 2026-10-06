@@ -61,18 +61,18 @@ var tableWords = []string{
 	"",
 }
 
-// The longest run of words two places share. [[spec/design_output/lsp#a-second-copy-draws]]
+// Whether two places share a run of words that long, found by a lookup of runs so a long table stays inside Vale's budget. [[spec/design_output/lsp#a-second-copy-draws]]
 var tableRun = []string{
-	"run := func(a, b) {",
-	"  most := 0",
-	"  for i := 0; i < len(a); i++ {",
-	"    for j := 0; j < len(b); j++ {",
-	"      n := 0",
-	"      for i+n < len(a) && j+n < len(b) && a[i+n] == b[j+n] { n = n + 1 }",
-	"      if n > most { most = n }",
-	"    }",
+	"runsOf := func(words, most) {",
+	"  seen := {}",
+	"  for j := 0; j+most <= len(words); j++ { seen[text.join(words[j:j+most], \" \")] = true }",
+	"  return seen",
+	"}",
+	"shares := func(words, seen, most) {",
+	"  for i := 0; i+most <= len(words); i++ {",
+	"    if seen[text.join(words[i:i+most], \" \")] { return true }",
 	"  }",
-	"  return most",
+	"  return false",
 	"}",
 	"",
 }
@@ -106,7 +106,7 @@ func tableWalk(most string) []string {
 		"  for at < len(lines) && text.has_prefix(text.trim_space(lines[at].said), \"|\") {",
 		"    for cell in text.split(text.trim_space(lines[at].said), \"|\") {",
 		"      one := text.trim_space(cell)",
-		"      if len(one) > 0 && !text.re_match(`^[-: ]+$`, one) { cells = append(cells, wordsOf(one)) }",
+		"      if len(one) > 0 && !text.re_match(`^[-: ]+$`, one) { cells = append(cells, runsOf(wordsOf(one), " + most + ")) }",
 		"    }",
 		"    at = at + 1",
 		"  }",
@@ -128,7 +128,7 @@ func tableWalk(most string) []string {
 		"  for row in near {",
 		"    mine := wordsOf(row.said)",
 		"    for cell in cells {",
-		"      if run(mine, cell) >= " + most + " {",
+		"      if shares(mine, cell, " + most + ") {",
 		"        matches = append(matches, {",
 		"          begin: row.begin,",
 		"          end: row.end,",

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: the-fleet-watches-itself
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: abf770376e18cfc644da41560f97b17f44041c57
+    hash_after: abf770376e18cfc644da41560f97b17f44041c57
+    inputs:
+      - name: ask
+        hash: 7d33ff4dc7616eba
+        size: 501
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 8721572abbbdb1ce50cfb6dfc7d16be36877005a
+    hash_after: 8721572abbbdb1ce50cfb6dfc7d16be36877005a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 02f7a5a3a638d3f9
+        size: 2318
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 877282628a5f86de2c6db79c3d3477e18ad04c74
+    hash_after: 877282628a5f86de2c6db79c3d3477e18ad04c74
+    inputs:
+      - name: design/draft
+        hash: 02f7a5a3a638d3f9
+        size: 2318
+      - name: design/tests-red
+        hash: 31b422a6b4c97a95
+        size: 832
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: f74aaa851345a3ab379891d90cf33233ace99270
+    hash_after: f74aaa851345a3ab379891d90cf33233ace99270
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 0fb6a36aa6ae5522d277cf7b9195774060e66a44
+    hash_after: 0fb6a36aa6ae5522d277cf7b9195774060e66a44
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    2.5  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: 31b422a6b4c97a95
+        size: 832
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,61 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb `./RUNME.sh cloud prompt <group>` prints the prompt a box starts with, off the group ticket and its route.
+
+- `promptOf(group, steps, children)` in `src/branches/prompt.go` stands pure: it joins the opening line `run the work skill`, the group's name, its children, the route's steps in order, and the box rules.
+- The box rules stand once, as the constant `boxRules` in `prompt.go`, in the order a box meets them: take, pull, commit and push, done, the pull request.
+- The verb reads `spec/tickets/<group>.md` off the work root. It refuses, code 2, where the ticket stands nowhere, or where its `process` names no group route.
+- It reads `spec/processes/<route>.yaml` off the method root, and refuses where that file stands nowhere. The route's top-level step names give the order the prompt prints.
+- The children are the tickets under `spec/tickets` whose `group` names the group, in name order.
+- `Cloud` in `src/branches/branch.go` runs `prompt` beside `trigger`, and its usage names it.
+
+Weighed: the disk read over a read off `origin/main`, since the coordinator runs on a desk standing on main. Assumed: the route is the process file the ticket links, so a renamed or missing process refuses before a box starts.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/branch.go: Cloud, which gains the prompt word
+- src/quack/cloud.go: cloudVerb, which hands every word to Cloud and changes nothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/prompt_test.go: TestPromptWritesTheGroupsPromptFromItsRoute
+- src/branches/prompt_test.go: TestPromptRefusesATicketThatStandsNowhere
+- src/branches/prompt_test.go: TestPromptRefusesARouteThatStandsNowhere
+- src/branches/prompt_test.go: TestPromptRefusesATicketNamingNoGroup
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/prompt.go
+- src/branches/prompt_test.go
+- src/branches/branch.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `src/branches/branch.go` (Cloud, the table), `src/branches/group.go` (routeOf, isGroup), `src/branches/doors.go` (read, names, methodAt) and `src/branches/guidance.go` (processFolder), and checked each claim there.
+- Callers: Cloud is the one entry, and `src/quack/cloud.go` cloudVerb reaches it unchanged.
+- The first done_when line meets TestPromptWritesTheGroupsPromptFromItsRoute, the second meets the two refusal tests, and the check line meets `./RUNME.sh check`.
 
 ## tests-red
 
@@ -189,26 +282,31 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/prompt_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/prompt_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the cloud verb answers its usage, code 2, for the prompt word. The box rules constant stands in `src/branches/prompt.go` already, so the file builds and the first case reads it. The package tests run over a temp folder through the disk doors, as every case in the package does, so the prompt cases need no git.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done_when line meets TestPromptWritesTheGroupsPromptFromItsRoute, and the second meets TestPromptRefusesATicketThatStandsNowhere and TestPromptRefusesARouteThatStandsNowhere. The check line meets the command at tests-green.
+- The disk is the one door these cases reach, and they reach it over a temp folder, as the package's other cases do.
 
 # gate
 
@@ -217,8 +315,12 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach names the children as every ticket whose group names the group, and TestPromptWritesTheGroupsPromptFromItsRoute leaves the closed child c-shut out: the builder reads open children alone.
+- The route read reuses processAt in src/branches/dispatch_write.go, whose refusal `spec/processes holds no <name>.` is the line TestPromptRefusesARouteThatStandsNowhere holds, in place of a second reader of spec/processes.
+- The tests list misses TestPromptRefusesNoName, which stands in src/branches/prompt_test.go and wants `cloud prompt needs a group`: the builder answers it, and the Cloud usage row names prompt beside trigger.
 
 # implement
 
@@ -229,14 +331,19 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/branches/prompt.go src/branches/branch.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches prompt.go and branch.go, both on the size list.
+- The verb reads the disk through the standing doors, read, notesIn and processAt, which the cases drive over a temp folder.
+- Each new function carries a link to this ticket, where the approach stands.
+- The route reads through processAt and the box rules stand once in boxRules, so no reader or rule stands twice.
 
 ## tests-green
 
@@ -245,26 +352,33 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/prompt_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new verb, ./RUNME.sh cloud prompt <group>, prints the prompt a box starts with. It reads the group ticket and the route its process names, through processAt. It lists the group's open children in name order, and closes on the box rules. It refuses with no name, with a ticket that stands nowhere, with a ticket on no group route, and with a route that stands nowhere. The coordinator spawns a box with this output in place of a prompt typed again, so no box starts with a rule missing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches prompt.go and branch.go, both on the size list.
+- The verb reads the disk through read, notesIn and processAt, which the cases drive over a temp folder.
+- Each new function carries a link to this ticket, where the approach stands.
+- The box rules stand once in boxRules, and the route reads through processAt.
 
 # accept
 

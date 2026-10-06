@@ -201,6 +201,10 @@ frontmatter:
                   type: array
                   description: the words a choice takes
 
+                home:
+                  type: boolean
+                  description: a list whose every line names a path, a link or a ticket that stands
+
     process:
       x-link: true
       # [[spec/design_output/schema#a-finding-names-the-section]]
@@ -238,6 +242,22 @@ frontmatter:
           hash_after:
             type: string
             description: the branch tip when the hand puts the step down
+
+          session:
+            type: string
+            description: the session the harness names the box in, per [[spec/tickets/boxes-write-their-final-record]]
+
+          model:
+            type: string
+            description: the model the box runs, as its hand-back names it
+
+          cost:
+            type: number
+            description: the dollars the box spends, as its hand-back names them
+
+          final:
+            type: string
+            description: the last line the box says as it hands the branch back
 
           returns:
             type: integer

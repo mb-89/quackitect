@@ -5,6 +5,7 @@ package stop
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -16,6 +17,46 @@ const (
 	lowStop    = 45
 	mostInARow = 2
 )
+
+// The rules a turn ending on a question meets, as spec/config/stop/level0.yml writes them. The module reads no disk, so src/quack binds the file itself. [[spec/tickets/cloud-turns-end-without-questions]]
+const questionText = `- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+
+- id: a-cloud-box-decides
+  side: continue
+  priority: 83
+  decides: mechanical
+  runs: ends-on-a-question
+  says: A cloud box asks nobody, so decide the question yourself, say what you weigh and what you assume, and carry on.
+
+- id: the-last-line-names-no-stop
+  side: continue
+  priority: 50
+  decides: mechanical
+  runs: no-stop-line
+
+- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  yields: true
+  runs: the-plan-is-empty
+  asks: Does the work stand complete?
+`
+
+func questionRules(t *testing.T) []Rule {
+	t.Helper()
+	rules, broken := Pool([]File{{Name: "level0.yml", Text: questionText}})
+	if len(broken) > 0 {
+		t.Fatalf("the tree's rules read broken: %v", broken)
+	}
+	return rules
+}
+
+const endsAsking = "I weigh the cheap road against the safe one.\n\nShould I take the cheap one?\n\nstop: the-work-stands-complete"
 
 const ruleText = `# A comment above the rules.
 
@@ -142,5 +183,52 @@ func TestEachCheckReadsItsFacts(t *testing.T) {
 	want := `The line claims done, and its check the-plan-is-empty answers false: the plan still holds "Push", "a-ticket". Name each under done in mcp__level0__plan, then claim again.`
 	if got := ClaimFalls(Facts{Claimed: "done", Rules: rules, Planned: []string{"Push", ""}, Working: "a-ticket"}); got != want {
 		t.Errorf("the claim falls saying %q, want %q", got, want)
+	}
+}
+
+// A cloud turn ending on a question meets a refusal that says decide, and an owner's hold still ends it. [[spec/tickets/cloud-turns-end-without-questions]]
+func TestACloudTurnEndingOnAQuestionHearsDecide(t *testing.T) {
+	rules := questionRules(t)
+	facts := Facts{Cloud: true, Text: endsAsking, Rules: rules, Claimed: "the-work-stands-complete"}
+	said := Decide(rules, facts.Claimed, func(name string) (bool, bool) { return Ran(name, facts) })
+	if said.Ends || said.Go == nil || said.Go.ID != "a-cloud-box-decides" || !strings.Contains(said.Go.Says, "decide") {
+		t.Fatalf("a cloud turn ending on a question reads %+v, want it held by a-cloud-box-decides saying decide", said)
+	}
+	facts.Hold = StopHold
+	if said := Decide(rules, "", func(name string) (bool, bool) { return Ran(name, facts) }); !said.Ends {
+		t.Fatalf("a cloud turn the owner holds at stop reads %+v, want it ended", said)
+	}
+}
+
+// A desk turn ending on the same question stops as it does today. [[spec/tickets/cloud-turns-end-without-questions]]
+func TestADeskTurnEndingOnAQuestionStopsAsToday(t *testing.T) {
+	rules := questionRules(t)
+	facts := Facts{Text: endsAsking, Rules: rules, Claimed: "the-work-stands-complete"}
+	said := Decide(rules, facts.Claimed, func(name string) (bool, bool) { return Ran(name, facts) })
+	if !said.Ends || said.Go != nil {
+		t.Fatalf("a desk turn ending on a question reads %+v, want it ended with no continue firing", said)
+	}
+}
+
+// The check reads the last prose paragraph alone, past the tables, the headings and the stop line. [[spec/tickets/cloud-turns-end-without-questions]]
+func TestEndsOnQuestionReadsTheLastProse(t *testing.T) {
+	for _, one := range []struct {
+		text string
+		want bool
+	}{
+		{endsAsking, true},
+		{"Shall I merge it?\n\n| 1 | the merge |", true},
+		{"**Which road do you want?**", true},
+		{"- the cheap road\n- shall I take it?", true},
+		{"Which road? I take the cheap one.", false},
+		{"The work stands complete.\n\nstop: the-work-stands-complete", false},
+		{"", false},
+	} {
+		if got, known := Ran("ends-on-a-question", Facts{Cloud: true, Text: one.text}); !known || got != one.want {
+			t.Errorf("ends-on-a-question over %q reads %v, known %v, want %v", one.text, got, known, one.want)
+		}
+	}
+	if got, _ := Ran("ends-on-a-question", Facts{Text: endsAsking}); got {
+		t.Error("ends-on-a-question reads true on a desk, want false")
 	}
 }

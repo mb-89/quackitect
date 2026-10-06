@@ -25,7 +25,7 @@ import { schemasHere, updated } from "./ticket.js";
 
 const ASK = "ask";
 const DIFF = "diff";
-const LINK = /\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/g;
+export const LINK = /\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/g;
 const NOTE_END = ".md";
 const COMMENT = /^\s*<!--.*-->\s*$/;
 
