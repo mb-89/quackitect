@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 64057603b30e5b21
         size: 2892
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b4c8cb96d125 · claude-code-remote · helper-4
+    hash_before: 40a625a680675a5d4988c0b6b3a6a6d1576e47f1
+    hash_after: 40a625a680675a5d4988c0b6b3a6a6d1576e47f1
+    inputs:
+      - name: design/draft
+        hash: 64057603b30e5b21
+        size: 2892
+      - name: design/tests-red
+        hash: ccf1c54a62d97aec
+        size: 961
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -281,8 +293,13 @@ The four cases fail on their own assertion within a third of a second, because t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- alarm-ticks-await-the-beat: the module case ticks past the term only after the pid lands. The beat lands after the pid commit, so it can renew the lease past one tick. Tick on each poll while the current pid stands unexpired.
+- hang-guard-under-suite-timer: startHang stands at five minutes, the same span as RUN_TIMEOUT_MS in both contract suites. Set the guard under the suite timer, so the start names the hang first.
+- start-fault-names-its-span: starts still says thirty seconds. The rewrite names the hang guard or the index exit instead.
+- io-case-red-before-green: no red test decides the io_test line before implement. The rewritten case under implement decides it, and the check confirms it.
 
 # implement
 
