@@ -34,6 +34,8 @@ import (
 	run "os/exec"
 	"testing"
 	"time"
+
+	"quackitect/src/proc"
 )
 
 func TestWaits(t *testing.T) {
@@ -41,6 +43,7 @@ func TestWaits(t *testing.T) {
 	_ = run.Command("go")
 	_ = run.CommandContext(nil, "go")
 	_, _ = os.StartProcess("go", nil, nil)
+	_ = proc.Real(proc.Command{Argv: []string{"go"}})
 	_ = time.After(time.Second)
 }
 `
@@ -51,7 +54,7 @@ func TestASleepAndASpawnAreNamedThroughTheirImportNames(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess"}
+	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess", "proc.Real"}
 	if said := RealWaits(file); !slices.Equal(said, want) {
 		t.Fatalf("the real waits read %v, where %v stand", said, want)
 	}
@@ -73,7 +76,7 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 		"c/outside_test.go": parsed(plantedWaits),
 		"c/quiet_test.go":   parsed(plantedQuiet),
 	}
-	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess"}
+	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess, proc.Real"}
 	if said := UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
 		t.Fatalf("the guard names %v, where %v stands", said, want)
 	}

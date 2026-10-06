@@ -15,9 +15,10 @@ import (
 
 // The calls that wait on the box, by the path of the package each stands in. [[spec/guidance/code/testing]]
 var realWaits = map[string][]string{
-	"time":    {"Sleep"},
-	"os/exec": {"Command", "CommandContext"},
-	"os":      {"StartProcess"},
+	"time":                {"Sleep"},
+	"os/exec":             {"Command", "CommandContext"},
+	"os":                  {"StartProcess"},
+	"quackitect/src/proc": {"Real"},
 }
 
 // A code span in the door audit naming a Go test file, or a glob of them. [[spec/design_output/doors#one-contract-test-per-door]]

@@ -205,6 +205,7 @@ family carries its fate:
 | the quack verbs over a repository a case | `src/quack/commit_test.go`, `src/quack/codec_test.go`, `src/quack/landing_test.go`, `src/quack/ticket_bless_test.go`, `src/quack/ticket_open_test.go`, `src/quack/ticket_route_test.go`, `src/quack/verb_mint_test.go` | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
 | a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
+| the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
 | a wait on a session sleeping in a module test | `src/modules/index/call_test.go` | waits on a signal, under [[spec/tickets/caller-wait-meets-no-sleep]] |
 
 The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
