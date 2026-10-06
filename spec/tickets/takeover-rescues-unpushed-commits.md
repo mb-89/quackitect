@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: a34e43973d3753d844a3970a3ecf044fb92faf28
+    hash_after: a34e43973d3753d844a3970a3ecf044fb92faf28
+    inputs:
+      - name: ask
+        hash: c829c29f5c3d9736
+        size: 460
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,56 @@ A hand archives or replaces a box while its commits stand on its disk alone, and
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+In src/quack/commit.go landingDoors.lands, a red check on a cloud box standing on work/<group> pushes HEAD by force to rescue/<group> on origin. Force fits, since the rescue branch belongs to the box writing it. The verb still answers red. It says the commit stands on origin under rescue/<group> and nowhere on the work branch, so CI and the PR never read a red commit. A desk, and a branch off work/, write no rescue. A green push on work/<group> deletes rescue/<group> on origin where HEAD carries it. In src/branches, the take over a held branch, through claimGroup after the takeover record and its push, reads origin/rescue/<group>. Where the work branch lacks it, the take merges it in with git merge --no-edit, pushes the work branch, and deletes rescue/<group> on origin. A merge that conflicts aborts, leaves the rescue branch standing, and says so with the command to take it in by hand. The fetch with --prune already brings rescue/* in, as a branch under refs/heads.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/commit.go commitVerb, through landingDoors.lands
+- src/branches/take.go take, through Doors.claimGroup
+- src/branches/take.go Doors.claimGroup, the takeover road a stale or ended hold takes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/commit_test.go TestCommitVerbRescue: a red cloud commit on a work branch lands on rescue/<group> on origin, and the work branch on origin moves nowhere
+- src/quack/commit_test.go TestCommitVerbRescue: a red desk commit writes no rescue branch
+- src/branches/rescue_test.go TestTakeOverTakesInTheRescueBranch
+- src/branches/rescue_test.go TestTakeOverLeavesAConflictingRescueStanding
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/commit.go
+- src/quack/commit_test.go
+- src/branches/take.go
+- src/branches/rescue.go
+- src/branches/rescue_test.go
+- spec/design_output/work.md, a section A red commit reaches a rescue branch
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened src/quack/commit.go lands and its tests, and take.go take and claimGroup, and checked there that the red check returns before any push and that the takeover runs through claimGroup
+- the callers are commitVerb for lands, and take for claimGroup
+- the quack case decides the first done_when line, the branches case the second, and the check on the commit the third
 
 ## tests-red
 
