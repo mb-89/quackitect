@@ -34,7 +34,7 @@ hands it the first leaf of its group. The block under that line shows it:
 |---|---|
 | `title` | the behavior the example shows, as a claim |
 | `keywords` | the words a title search and a content search meet |
-| `interface` | each verb, tab or door-facing feature the example shows, by the name the catalog gives it |
+| `interface` | each verb or door-facing feature the example shows by the name the action catalog gives it, and each tab by the word `./RUNME.sh tui` takes |
 | `edge` | the edge a developer case shows, and only there |
 | the prose | the behavior each step shows, stated before its block |
 | a shell block | `./RUNME.sh` calls alone, one a line |
@@ -96,7 +96,7 @@ lines. A driver runs the steps.
 | driver | started by | where it runs | its doors |
 |---|---|---|---|
 | interactive | the Run action, or `./RUNME.sh example run <path>` | a scratch clone of the tree, in a process and a terminal of its own | the real ones |
-| the tests | the check, through one Go harness | a fixture tree in memory | every door faked: git, the clock, the process, the model |
+| the tests | the check, through one Go harness | a fixture tree on the fake disk | every door faked: git, the clock, the process, the model |
 
 The interactive driver clones the tree with `git clone --local` into
 `.se/.runtime/examples/<name>`, and runs there, so the user's tree stays as it
@@ -104,8 +104,9 @@ stands. It prints each step's prose, its call and the output. It prints the
 verdict of each expect line, and keeps the clone for the user to read. The next run of the same
 example clears the clone first.
 
-The harness builds the fixture tree once per package, in the fixture home
-[[spec/guidance/code/testing]] names. Each example runs over its own copy of
+The harness builds the fixture tree once, in the `TestMain` of its package, on
+the fake disk [[spec/design_output/model#io-modules-and-their-fakes]] names.
+Each example runs over its own copy of
 that tree, so every example runs beside every other. The harness dispatches each
 `./RUNME.sh` line in process, through the action catalog the command line
 reaches. A line naming anything past `./RUNME.sh` refuses at the schema, so
@@ -172,7 +173,8 @@ it. For the audit, see [[spec/guidance/retro/audit]].
 |---|---|
 | a door | the harness runs over the door's fake, and the door's one contract test holds the fake to the real thing |
 | the model | runs as a process the fake process table answers, so no test reaches a model |
-| a fixture | the tree the harness builds once, in the fixture home, which no example writes to |
+| a fixture | the tree the harness builds once in its `TestMain`, which no example writes to |
 | the test ratio | an example is a spec file and counts as no test line, while the harness counts as test code of its package. A test leaving for an example lowers the ratio |
 
-For the ratio's measure, see [[spec/guidance/code/testing]].
+The code-is-pure group owns the measure of the ratio, which counts test lines
+against code lines per module.

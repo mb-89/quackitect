@@ -20,7 +20,7 @@ developer chapters, and the tutorial stayed free of it.
 ## 3. One behavior, one assertion
 
 Two assertions of one behavior drifted: a change updated one and left the
-other, and the battery paid for both. The ratio rule in
-[[spec/guidance/code/testing]] counted every line of the second copy. So the
+other, and the battery paid for both. The owner asked for test code at or
+under the code it tests, and every line of the second copy counted against it. So the
 suite came down to the examples, the developer cases and one contract test per
 door, and a test repeating an example left.
