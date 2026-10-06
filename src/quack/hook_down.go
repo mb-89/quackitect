@@ -4,6 +4,11 @@
 // [[spec/tickets/level0-hooks-forward-to-go]]
 package main
 
+import "time"
+
+// The span the start road allows an install on a fresh clone, which the boot hook's timeout waits out. [[spec/design_output/level0#the-boot-hook]]
+const startSpan = 180 * time.Second
+
 // The name of the block a prompt context carries while level zero stands down. [[spec/tickets/level0-hooks-forward-to-go]]
 const cageBlock = "level0-cage"
 

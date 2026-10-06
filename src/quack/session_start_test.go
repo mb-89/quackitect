@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -153,15 +152,7 @@ func TestTheSessionStartHookRunsTheInstallBootWord(t *testing.T) {
 
 func TestTheBootHookWaitsOutTheStartSpan(t *testing.T) {
 	t.Parallel()
-	body, err := os.ReadFile(filepath.Join(treeRoot, ".claude", "skills", "level0", "hooks", "start.js"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	found := regexp.MustCompile(`export const STARTING = ([0-9_]+);`).FindStringSubmatch(string(body))
-	if found == nil {
-		t.Fatal("start.js names no STARTING span")
-	}
-	starting, _ := strconv.Atoi(strings.ReplaceAll(found[1], "_", ""))
+	starting := int(startSpan.Milliseconds())
 	var spans []int
 	for _, one := range bootHooks(t) {
 		if bootHookLine.MatchString(one.Command) {
