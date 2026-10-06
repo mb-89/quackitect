@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -230,6 +230,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: f81829ea0d48afb7580886df80dd915d700e478b
+    hash_after: f81829ea0d48afb7580886df80dd915d700e478b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/modules/git passes; green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "  109.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8a0ced81fe1fc8ae
+        size: 922
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -495,26 +518,33 @@ The change in 93e1f290a answers the point the last gate raised and leaves the ap
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/doors_test.go src/modules/git/repo_contract_test.go src/modules/files/disk_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The branch verbs in src/branches reach git, processes and the disk through Repo, Runner and Disk, so their cases run on FakeRepo, FakeRunner and FakeDisk in memory. Before, each case built a bare origin and a clone through real git, which turned red on a loaded box and cost the battery real seconds. Repo gains the operations the verbs run, and each one holds to real git through the contract suite in src/modules/git/repo_contract_test.go. The doors chapter drops the branch verbs from its family table and names their fakes in the door table. A guard in src/branches/doors_test.go fails once a branch test file spawns or sleeps, or the chapter lists one. The one vale case stands apart in dispatch_vale_test.go, as the child branch-vale-case-runs-fake records.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, plus the operations Repo needed and the vale door test file the child adds
+- every door the change reaches has a fake: FakeRepo, FakeRunner and FakeDisk, each held to the real thing by its contract suite
+- each changed door file points at the git door section of spec/design_output/doors.md
+- the git operations stand once, in src/modules/git/repo.go, and the doors chapter names them in its operations table
 
 # accept
 
