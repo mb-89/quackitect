@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-// The files the layers stand in, and the layer a key no file sets reads. .claude/skills/level0/lib/folders.js owns the local name. [[spec/design_output/config#the-layers]]
+// The files the layers stand in, and the layer a key no file sets reads. [[spec/design_output/config#the-layers]]
 const (
 	TrackedConfig = "spec/config/level0.json"
-	LocalConfig   = ".se/.runtime/config.json"
+	LocalConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
 	SchemaConfig  = "spec/config/level0.schema.json"
 	BuiltInLayer  = "built-in"
 )

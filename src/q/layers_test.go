@@ -70,3 +70,12 @@ func TestADottedKeyRoundTrips(t *testing.T) {
 		t.Fatalf("watchdog.backoffFirst names %q and reads back %q", key.Name, key.Dotted())
 	}
 }
+
+func TestASharedKeyTakesNothingOffTheLocalFile(t *testing.T) {
+	key := KeyOfDotted("migration.opentasks")
+	key.Shared = true
+	local := parsed(t, `{"migration": {"opentasks": "old"}}`)
+	if value, layer, ok := AtRest(key, Ordered{}, local, nil); ok {
+		t.Fatalf("a shared key no tracked file sets reads %s off %s", value, layer)
+	}
+}
