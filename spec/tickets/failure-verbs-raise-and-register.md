@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,22 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 2c4a0b4d465524ff498603b5c4fcd0997343443b
+    hash_after: 2c4a0b4d465524ff498603b5c4fcd0997343443b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: d0546c92d5536e9c
+        size: 2418
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +241,34 @@ Without it, an agent meeting a fault writes free text, and the retro reads no co
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_failure_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_failure_test.go TestFailureRaisePrintsTheNodesLinesAndWritesItsRow
+- src/quack/verb_failure_test.go TestFailureNewWritesTheNode
+- src/quack/verb_failure_test.go TestFailureNewRefusesANodeWithNoRemedy
+- src/quack/verb_failure_test.go TestFailureCountAnswersEachIdWithItsCount
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The stub verb answers exitFailed and prints nothing, so raise, new and count each miss the exit and the text the case names, and the refusal misses exitUsage and its line.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each go test line of the ask meets its case: raise, new and its refusal, and count, and ./RUNME.sh check decides the last
+- each case reaches the disk under a temp root and the clock through failureDoors, as the log verb's cases do
 
 # gate
 
