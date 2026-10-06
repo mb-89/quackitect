@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,21 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-6
+    hash_before: 23fa5b8d8a656a731a86b241a137eefd3bdb3be4
+    hash_after: 5ff1dcd0126d8157306e4f77cbd96093889c4543
+    inputs:
+      - name: design/draft
+        hash: d0546c92d5536e9c
+        size: 2418
+      - name: design/tests-red
+        hash: 797be04a68e55ea3
+        size: 832
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -277,8 +292,16 @@ Each case fails on its own assertion. The stub verb answers exitFailed and print
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- failure-verb-in-help: size leaves out src/modules/verbs/tree.go. The road reaches a registered verb, but Commands holds no failure row, so help and the verb tools an agent calls never name the verb the ask hands the agent.
+- failure-raise-row-off-door: the draft shapes the row through sayLine by hand, beside Raised.Row in src/failure/raise.go, which the design note names as the row owner. Feed the level, said and failure.IDField off Raised into sayLine, the id under extra, so one place owns the row.
+- failure-raise-joins-said: raise <id> [said...] hands each word to failure.Raise as its own Said entry, so an unquoted message prints one word a line through Lines while Row joins them. Join the words into one message before Raise.
+- failure-raise-unregistered-case: the draft exits exitFailed on an unregistered id but says nothing of the row it writes, and no case decides it. The design note says the message still prints and the id stands named unregistered.
+- failure-new-shape-once: failure new builds the node text by hand, beside verb_mint.go, which writes a note in the shape its schema names and parses --field=value through fieldFlag. Reuse that writer or fieldFlag, and quote each remedy, so a colon in a remedy leaves the YAML NodeOf reads back whole.
+- failure-new-refusals-tested: no case decides the refusal of a level off the ladder, of an id a node already carries, or of an id holding a slash, which writes outside spec/failures. NodeOf checks no level, so the verb holds that check. A missing --when, which the schema requires as the When section, takes no refusal in the draft, and the design note row for failure new names no --when.
+- failure-count-skips-no-id: count keys each row by jsText of its failure field, so a failure row with no id counts under undefined. Skip it. logFiles also reads the rotated files, wider than the session log the ask names, so name that scope.
 
 # implement
 
