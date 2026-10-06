@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 15db91747755d405
         size: 842
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 7374946aa91a11945b59ed1c14810e793aaee89f
+    hash_after: 896637b3c17d161b2bd62df79376fd7a53b07c8c
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -353,14 +362,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, with branch.go for selfRoadOver, vale_why_test.go for the unreadWhy cases, and the contract row the commit door asked for
+- the one door the change reaches is the process door, and FakeRunner holds Streams and Signalled as the contract suite proves
+- each Over form points at this ticket, and the process door section of the doors chapter names the approach
+- Streams and Signalled stand once, in proc.go, and the doors chapter points at them
 
 ## tests-green
 
