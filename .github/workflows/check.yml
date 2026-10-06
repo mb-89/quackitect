@@ -2,12 +2,18 @@
 # A session says the check passes; this says whether it does.
 name: check
 # A pull request against main runs the check GitHub's auto-merge waits on. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
-# A rescue push carries red work and a beat push carries no code, so neither runs it. [[spec/tickets/ci-skips-rescue-and-beats]]
+# A branch takes its check through its pull request, so a push runs it on main alone, and a rescue or beat push runs nothing. [[spec/design_output/work#the-check-runs-once-a-head]]
 on:
   push:
-    branches-ignore: ["rescue/**", "beats/**"]
+    branches: [main]
   pull_request:
     branches: [main]
+
+# A newer head on a pull request cancels the run it supersedes. Each run on main
+# stands in a group of its own, so no run there gives way, queued or running.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('check-pr-{0}', github.event.pull_request.number) || format('check-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
