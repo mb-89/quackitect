@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 6265b0d86105ce987dc0cfbe8ff758c6a4166720
+    hash_after: b6581ad8ca70dd01a36e5d503b7293547fb714ca
+    inputs:
+      - name: ask
+        hash: ba4e2087a8e0b8a1
+        size: 494
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,57 @@ A finding stands unseen until a check of one to four minutes, or a warning lands
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The lint verb takes --strict, under which a warning exits 1 as an error does, and --changed, which reads the files changed since the merge base with origin/main and the working tree, past spec/tickets, spec/retros and .se, whose files the engine writes. The check gains a part changed running lint --changed --strict, so a warning in a file the branch changes turns the check red. The commit verb reads the files its staging reaches through git add --dry-run before the tests, runs lint --strict over them, and refuses before anything stages where the rules refuse. The mint stays as it stands: ticket open already reads the ask's form.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf
+- src/quack/commit.go lands
+- src/quack/verb_lint.go lintVerb, lintHere
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/commit_test.go TestCommitVerbGates: a staged file the rules refuse stops the commit before the tests and the check
+- src/quack/verb_lint_test.go TestLintVerb: a warning under --strict exits 1
+- src/quack/verb_lint_test.go TestLintVerb: --changed reads the changed files past the tickets
+- src/quack/check_test.go: the check runs lint --changed --strict as a part
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_lint.go
+- src/quack/verb_lint_test.go
+- src/quack/commit.go
+- src/quack/commit_test.go
+- src/quack/check.go
+- src/quack/check_test.go
+- spec/design_output/lsp.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened: verb_lint.go, commit.go lands, check.go partsOf
+- the callers list names partsOf, lands and lintHere
+- each done_when line meets a test: the commit case, the strict and changed lint cases, and the check
 
 ## tests-red
 
