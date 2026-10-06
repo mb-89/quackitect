@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: implement/tests-green
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -190,6 +190,12 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/model]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/model]]
 ---
 
 # Ask
