@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4b754ecca83dbb5cbe8394f8f4af34ef7ada2ca2
+    hash_after: 2b448d9dd7204cc622717561bc04ca2e8dc33819
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "  110.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 03f947eb682998f0
+        size: 905
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -368,26 +391,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/tools_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lsp module drops its own Runner and runs Vale and Biome through the one process door in src/proc. The door gains a halt and a wait: Halting answers a real runner whose halt ends every run in flight, a Command's Wait ends a run past its span with a fault, and FakeRunner holds the same through Halt, Ends and After. The halt case left src/modules/lsp/door_test.go for the process contract suite, which runs it on both runners. Before, the tree carried two process doors, and the lsp fake answered no contract. The three halt and wait cases pass. The suite file still holds the red Drop case of quack-spawns-meet-fake-process, which that ticket closes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list and lsp_test.go, which the gate named
+- the process door is the one door, and FakeRunner stands beside the real runner in every case
+- each changed function points at the process door section of the doors chapter
+- the halt and the wait stand once, in src/proc/proc.go
 
 # accept
 
