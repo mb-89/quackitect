@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
 depends_on: [tests-meet-the-doors-once]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 6cc2739de0713d9bf86ead9952ddff6ca0f08ced
+    hash_after: 6cc2739de0713d9bf86ead9952ddff6ca0f08ced
+    inputs:
+      - name: ask
+        hash: c2cd0430e723236e
+        size: 495
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,67 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two parts, in this order.
+
+First, a door names its contract tests. `owns.yaml` takes a `contract` key: paths from the root, under `test/contract/` or ending in `_contract_test.go`, which the parse in `src/owns/owns.go` checks exist. `Door.Holds` answers true for them, so a contract test uses the names its own door owns, and still walks around every other door. A contract test standing in its door's folder needs no key, since the folder already holds it.
+
+Second, after `tests-meet-the-doors-once` merges into main and `./RUNME.sh branch sync` takes it in, every walk-around `./RUNME.sh doors` still lists in a test file moves onto its door's fake. A Go module test takes `q/qtest` and the fake beside the door. A JavaScript test takes `src/doors/fake`. A wait on the wall becomes a wait on the fake clock or on readiness. A helper that builds a real fixture for a contract, such as `src/watcher/watchertest`, keeps the marker with its reason, and the guard lists it.
+
+The second part waits on the other group, because its audit moves most of these tests, and two hands moving one test collide at the merge.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/owns/owns.go Read: parses the new key
+src/owns/owns.go Door.Holds: answers for a contract path
+src/owns/owns.go claims: reads Holds per door, unchanged
+src/modules/check/doors.go heldByOne: reads Holds, unchanged
+src/quack/verb_doors.go doorsVerb: lists a door's contract tests
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/owns/owns_test.go TestAContractTestUsesItsOwnDoorsNames
+src/owns/owns_test.go TestAContractTestWalksAroundAnotherDoor
+src/owns/owns_test.go TestAContractPathStandingNowhereIsAFault
+src/owns/tree_test.go TestEveryContractTestNamesItsDoor
+src/quack/verb_doors_test.go TestTheDoorsVerbListsTheContractTests
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/owns/owns.go
+src/owns/owns_test.go
+src/owns/tree_test.go
+src/quack/verb_doors.go
+src/quack/verb_doors_test.go
+owns.yaml beside each door with a contract test outside its folder
+every test file `./RUNME.sh doors` lists after the sync
+spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened `src/owns/owns.go` Read, Holds, claims and Walks, and `src/modules/check/doors.go` heldByOne, and each claim stands there
+the callers list names every reader of Holds the search finds
+the first done_when line falls to `./RUNME.sh doors`, the second to TestEveryContractTestNamesItsDoor and the doors verb test, the third to `./RUNME.sh check`
 
 ## tests-red
 
