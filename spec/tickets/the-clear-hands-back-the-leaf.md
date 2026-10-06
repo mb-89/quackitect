@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 156418b839c4 · claude-code-remote
+    hash_before: 6ed461dbad23a0ffb1d8bc66601899cdd97327f2
+    hash_after: 6ed461dbad23a0ffb1d8bc66601899cdd97327f2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 23 test(s) pass in 2 file(s); green, src/modules/hooks passes; green, src/pull passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: design/tests-red
+        hash: 289f5119dfb23cd8
+        size: 1088
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -366,26 +389,42 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+After a context clear a cloud box now takes its next leaf in the same turn. Before, it looped on the clear for an hour or more.
+
+The cause: the bridge server left, and with it the step that put `read-handover` in the clear hold and dropped the due mark. The Go door answered the clear at the Stop, and left `clear` in hand. So the resumed box pulled `clear` again, ended its turn, and the Stop cleared again.
+
+- the hooks door: the Stop that answers the clear writes `read-handover` in the clear hold and drops `due.json`
+- the read pass: it drops `due.json` itself, so the hand-out after it hands a leaf in the same answer
+- a second handover with no new commit: the pull refuses it, runs no clear, and hands the leaf with continue in this turn
+- the plan: a plan naming the clear tickets holds no pull back
+
+The dry probe now walks past the clear: the read, the leaf in its answer, a commit, and a turn end with no second clear.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, plus `test/level0/probe-clear.test.js`, which the Discussion names in place
+- the pull tests run over a temp origin and clone, the hooks tests over a temp tree, and the probe over its own clone
+- each new function points at this ticket, which carries the approach
+- the read ticket name stands once in each package
 
 # accept
 
