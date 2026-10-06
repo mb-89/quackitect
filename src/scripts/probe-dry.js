@@ -89,6 +89,7 @@ export function harnessOf(it, tree, env) {
             env: { ...env, ...(init.env ?? {}) },
           }),
           init.timeoutMs ?? EVENT_WAIT,
+          it.clock,
         ),
     },
     http: {
@@ -124,12 +125,7 @@ export function harnessOf(it, tree, env) {
         return {};
       },
     },
-    clock: {
-      after: (ms, fn) => {
-        const timer = setTimeout(fn, ms);
-        return { cancel: () => clearTimeout(timer) };
-      },
-    },
+    clock: { after: (ms, fn) => it.clock.after(ms, fn) },
   };
   return { $, seen };
 }
@@ -142,12 +138,12 @@ function eventOf(body) {
   }
 }
 
-function bounded(promise, ms) {
+function bounded(promise, ms, time) {
   let timer;
   const cut = new Promise((_, fail) => {
-    timer = setTimeout(() => fail(new Error(`no answer in ${ms}ms`)), ms);
+    timer = time.after(ms, () => fail(new Error(`no answer in ${ms}ms`)));
   });
-  return Promise.race([promise, cut]).finally(() => clearTimeout(timer));
+  return Promise.race([promise, cut]).finally(() => timer.cancel());
 }
 
 // The engine the client runs: each registration wraps the ones after it, a filter names the fields an event must carry, and the client's own answer stands last. [[spec/tickets/level0-runs-on-the-door]]
@@ -183,7 +179,7 @@ async function session(it, tree) {
     const holds = event === TURN_END ? 0 : 1;
     seen.depth += holds;
     try {
-      return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
+      return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT, it.clock);
     } finally {
       seen.depth -= holds;
     }

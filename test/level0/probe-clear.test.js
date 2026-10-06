@@ -7,7 +7,8 @@ import { test } from "node:test";
 import { RESUME } from "../../src/bridge/handover.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { clearHeld, ENDS, grouped } from "../../src/scripts/probe-clear.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { clearHeld, ENDS, grouped, settled } from "../../src/scripts/probe-clear.js";
 
 const FELL = { kind: "hook", said: "the clear the handover asks for fails", detail: "refused" };
 // What the cycle past the clear leaves: the read in hand, the leaf in the read's answer, the commit, and the one clear. [[spec/tickets/the-clear-hands-back-the-leaf]]
@@ -31,6 +32,21 @@ function run(over = {}) {
 }
 
 // [[spec/tickets/the-clear-runs-live-remote]]
+test("the settle ends once a prompt lands, on the hand's clock", { timeout: 1000 }, async () => {
+  const time = fakeClock();
+  const seen = { prompts: [] };
+  let ended = false;
+  const settling = settled({ clock: time }, seen).then(() => {
+    ended = true;
+  });
+  time.tick(50);
+  await Promise.resolve();
+  assert.equal(ended, false, "no prompt, so the settle waits on");
+  seen.prompts.push("resume");
+  time.tick(50);
+  await settling;
+});
+
 test("the probe raises the Stop before the turn's completion, the order the live host names", () => {
   assert.deepEqual(ENDS, ["classic.Stop", "turn.complete"]);
 });
