@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: audit
+step: backlog
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -161,6 +161,19 @@ record:
         hash: f3cc2717aa4cc2f3
         size: 47
     def: 0a500fbc7d589467
+  - step: audit
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: 74297b9ac84a48b20a752026e24707c17e238e7e
+    hash_after: ae4463a2281eb5b8113dc79dad11b942ee6d17b4
+    answered:
+      - name: trials
+        exit: 0
+        said: Every experiment stands decided, so the retro closes.
+    inputs:
+      - name: effect
+        hash: 0d0ba34c12e954be
+        size: 49
+    def: f993cc8b0a8c580c
 ---
 
 # Ask
@@ -228,20 +241,38 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## audits
 
 <!-- every audit findings file this step writes, one a line -->
-
 <!-- the form is list -->
+
+- `findings/audit-code.md`
+- `findings/audit-conduct.md`
+- `findings/audit-engine.md`
 
 ## trials
 
 <!-- retro audit, which answers 0 once every experiment stands decided -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro audit
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the code: broken, prose comments and ticket pointers past code.md rules 1, 3 and 4, and 17 function bodies copied across packages
+- the tests: held, every code route carries a red test first, though 25 fixed sleeps land in tests
+- the notes: held, every guidance note links its rationale and keeps its shape
+- the turn: broken for the coordinator, which ran outside the plugin, and untested for the boxes, whose transcripts are gone
+- one place: broken, 29 note lines name 18 deleted paths, and one key carries two built-in defaults
+- the running system: broken, a hooks change merges that no running level zero has run, and boxes keep old rules after a fix
+- the claims: broken, the level-zero run skips Windows and claims rest on no read in four chapters
+- the verbs: broken, the coordinator commits with raw git and flips phases with sed
+- the owner's place: broken, the coordinator cuts its own work branches and 11 PRs come from other branches
+- the counts: broken, a design note counts its own table, and tickets stand exempt from the count rules
+- the experiments: held, the audit verb answers every one decided
+- the refusals: broken, two pull refusals point at each other and the coordinator retries one blind
+- the battery: untested, no earlier retro's battery stands on this box, so effect writes a baseline
+- the voice: broken, 197 of 198 coordinator answers score past the ceiling
 
 # backlog
 
