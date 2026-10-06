@@ -206,14 +206,19 @@ func codeIn(one *hunks) bool {
 	return false
 }
 
-// Whether the lines added read as the lines taken away once each run of spacing reads as one space, as a formatter's alignment leaves them. [[spec/tickets/go-rules-exemption-marker]]
+// Whether in each hunk the lines added read as the lines taken away once each run of spacing reads as one space, as a formatter's alignment leaves them. [[spec/tickets/go-rules-exemption-marker]]
 func layoutAlone(one *hunks) bool {
-	if len(one.added) == 0 || len(one.added) != len(one.removed) {
+	if len(one.blocks) == 0 {
 		return false
 	}
-	for index, line := range one.added {
-		if strings.Join(strings.Fields(line), " ") != strings.Join(strings.Fields(one.removed[index]), " ") {
+	for _, hunk := range one.blocks {
+		if len(hunk.added) == 0 || len(hunk.added) != len(hunk.removed) {
 			return false
+		}
+		for index, line := range hunk.added {
+			if strings.Join(strings.Fields(line), " ") != strings.Join(strings.Fields(hunk.removed[index]), " ") {
+				return false
+			}
 		}
 	}
 	return true

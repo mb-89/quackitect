@@ -54,6 +54,10 @@ func TestALayoutChangeAloneChangesNoCode(t *testing.T) {
 	if got := UntestedIn(spaced, nil, false, nil); len(got) != 1 {
 		t.Fatalf("a change past spacing reads as tested")
 	}
+	reordered := "diff --git a/src/a.go b/src/a.go\n@@ -2 +1,0 @@\n-\treturn x\n@@ -3,0 +3 @@\n+\treturn x"
+	if got := UntestedIn(reordered, nil, false, nil); len(got) != 1 {
+		t.Fatalf("a line moved between hunks reads as layout")
+	}
 }
 
 func TestHeldTestsReadTheHeldTicketsCommandLines(t *testing.T) {

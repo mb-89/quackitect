@@ -374,3 +374,23 @@ test("a function moved whole asks no test, and a statement moved inside a body s
   ].join("\n");
   assert.deepEqual(untestedIn(reordered), ["src/bridge/one.js"]);
 });
+
+test("a change of spacing alone asks no test, and a change past spacing still asks", () => {
+  const aligned = [
+    "diff --git a/src/a.go b/src/a.go",
+    "@@ -1,2 +1,2 @@",
+    "-\tRoot     string",
+    "-\tVale  string",
+    "+\tRoot string",
+    "+\tVale string",
+  ].join("\n");
+  assert.deepEqual(untestedIn(aligned), []);
+
+  const changed = [
+    "diff --git a/src/a.go b/src/a.go",
+    "@@ -1 +1 @@",
+    "-\tx := a+b",
+    "+\tx := a + c",
+  ].join("\n");
+  assert.deepEqual(untestedIn(changed), ["src/a.go"]);
+});
