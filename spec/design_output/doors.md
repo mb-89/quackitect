@@ -214,6 +214,70 @@ The one state a module holds is `namePatterns` in
 `src/modules/check/private.go`, a memo of a pure compile, and it stands as the
 named exception.
 
+# The git door carries writes
+
+`FakeGit` holds four reads. The branch verbs, the quack verbs and the pull run
+git's whole command line, writes among it, so a test of them spawns git. One
+door carrying the writes, with a fake and one contract suite, moves those cases
+into memory. [[spec/tickets/unfaked-doors-take-fakes]]
+
+| part | what it holds |
+|---|---|
+| `Repo` in `src/modules/git` | the typed operations below, each one git command line in the real door |
+| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, and the work tree on a `FakeDisk` |
+| an origin | a second `FakeRepo`, which push and fetch move commits and refs between |
+| `src/modules/git/repo_contract_test.go` | each case run against `FakeRepo` and a real repository under a temporary folder, the one door test of git's writes |
+
+The operations the three packages run:
+
+| kind | operations |
+|---|---|
+| reads | the head and its branch, a ref resolved, a file at a ref, the files at a ref, the paths two refs differ in, the commits one ref stands ahead and behind, the merge base, the work tree's status, the log over a range, the refs under a prefix, a config key |
+| writes to the work tree | add, reset of paths or to a ref, commit, switch with or without a new branch, a worktree added and removed |
+| writes across refs | merge, naming the paths that conflict, rebase onto a ref, update of a ref, push with a lease, fetch with prune |
+
+The fake merges three ways a path at a time. A path both sides change
+differently conflicts whole, where git merges hunks apart. A case needing a
+merge of lines stays a door test, and the contract suite holds one case proving
+the two agree on a path one side alone changes.
+
+The probe's clone and apply stay on the real door, because the probe measures a
+cold box.
+
+## The process door
+
+The quack verbs, the branch verbs and the pull's shell each spawn a process in
+place. One door takes a command, its folder, its env and its input, and answers
+its output, its errors and its exit code. The `Runner` in
+`src/modules/lsp/tools.go` runs a tool's process already, so the door takes its
+shape, and the lsp module moves onto it.
+
+| part | what it holds |
+|---|---|
+| `Runner` in `src/modules/proc` | the door, a function the real one fills with `exec` |
+| `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does |
+| `src/modules/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, and env |
+
+The branch verbs' `rawEnv`, the pull's `OSShell`, and every `exec.Command` in
+the quack verbs outside the box and check doors take the `Runner`. A case
+teaching the fake `go` or the quack binary hands it a handler that runs the
+verb's main in process.
+
+## The moves
+
+Each move narrows its row in the family table, and the real-wait guard holds
+the narrowing.
+
+| order | ticket | the door it takes |
+|---|---|---|
+| 1 | [[spec/tickets/pull-meets-fake-git]] | `Repo`, and the `Runner` for the shell |
+| 2 | [[spec/tickets/quack-repos-meet-fake-git]] | `Repo` |
+| 3 | [[spec/tickets/quack-spawns-meet-fake-process]] | the `Runner` |
+| 4 | [[spec/tickets/branch-verbs-meet-fake-git]] | `Repo`, the `Runner`, and the `FakeDisk` the repository's work tree stands on |
+
+The pull goes first, because its git already stands behind one `Run`. The
+branch verbs go last, because their disk moves with their git.
+
 # A rule test spawns once
 
 A rule asserted against a stub is a rule nobody runs, so a case proving a
