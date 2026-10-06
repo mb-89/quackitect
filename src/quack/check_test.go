@@ -98,7 +98,7 @@ func TestCheckParts(t *testing.T) {
 		for _, name := range []string{"level0", "doors", "projections", "rules"} {
 			partNamed(parts, name).run()
 		}
-		want := [][]string{{"probe", "dry", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
+		want := [][]string{{"probe", "smoke", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
 		if !reflect.DeepEqual(fake.verbs, want) {
 			t.Fatalf("the verbs read %v, and want %v", fake.verbs, want)
 		}

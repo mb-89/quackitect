@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: ef85745769ce3f78
         size: 2897
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: f0f07839366522944a2ec9983b26db67027071d8
+    hash_after: f0f07839366522944a2ec9983b26db67027071d8
+    inputs:
+      - name: design/draft
+        hash: ef85745769ce3f78
+        size: 2897
+      - name: design/tests-red
+        hash: 54045218f4145c0f
+        size: 966
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -277,8 +289,20 @@ Every new case fails on its assertion: the check runs probe dry, the verb prints
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask. A smoke over a shared clone of the working tree, holding the root's built tools and the clear road held off, runs level zero with the model faked in seconds. level0Runs hands `probe smoke --working` on every platform, so the Windows runner of the check matrix runs it too.
+
+A test decides every done_when line:
+- the level0Runs line: check_test.go 'level zero runs the smoke on the working tree, on Windows as on Linux', red
+- the workflow line: check-workflow.test.js already holds `os: [ubuntu-latest, windows-latest]` in check.yml, so it stands green with no change
+- the check line: its own command, at tests-green
+
+Fixed within the gate's diff: the case 'a part another verb owns runs that verb through the road' still wanted `probe dry --working`, so it now wants `probe smoke --working` and stands red with the rest of check_test.go.
+
+Weighed: the ask says no clone, and the draft takes `git clone --shared` with the working change applied. That clone takes no copy and no install, which matches the owner's words: the tree as it stands, not a cold clone. The Windows case 'names the desk trial covering it' and the new smoke case can both hold: on Windows, level0Runs runs the smoke and names deskTrial for the live client. The implement step keeps both, as the handover says.
 
 # implement
 
