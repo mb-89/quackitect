@@ -86,7 +86,16 @@ record:
   - step: sync
     hand: box 238560a34a48 · claude-code-remote
     hash_before: 981a99851912e128768b07ed4757be9ee64dec44
-step: sync
+  - step: sync
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 4380533f528f83e410b805e56310c66fff29cef3
+    hash_after: 4380533f528f83e410b805e56310c66fff29cef3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-fleet-watches-itself already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -102,8 +111,9 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
