@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: gate
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,9 @@ record:
         hash: 61ac69020f637f41
         size: 76243
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/model]]
 ---
 
 # Ask
