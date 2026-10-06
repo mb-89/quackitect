@@ -272,13 +272,9 @@ func textSetting(root, key string) string {
 
 // What a git read prints under the root, or nothing where it fails. [[spec/tickets/cage-command-rules-port]]
 func gitRead(root string, args ...string) string {
-	span, stop := context.WithTimeout(context.Background(), gitReadSpan)
-	defer stop()
-	run := exec.CommandContext(span, "git", args...)
-	run.Dir = root
-	said, err := run.Output()
-	if err != nil {
+	said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root, Wait: gitReadSpan})
+	if said.Code != 0 {
 		return ""
 	}
-	return strings.TrimSpace(string(said))
+	return strings.TrimSpace(said.Out)
 }
