@@ -187,6 +187,28 @@
         }
       }
     },
+    "cloud": {
+      "type": "object",
+      "properties": {
+        "fleetRoutine": {
+          "type": "string",
+          "default": "",
+          "help": "The id of the stored routine that checks the fleet, which ./RUNME.sh cloud trigger names.",
+          "unit": "a routine id, opening on trig_"
+        }
+      }
+    },
+    "fleet": {
+      "type": "object",
+      "properties": {
+        "idleAfter": {
+          "type": "string",
+          "default": "30m",
+          "help": "The age of a held box's tip past which ./RUNME.sh cloud fleet raises an idle wake.",
+          "unit": "a span, as 90m, 12h or 3d"
+        }
+      }
+    },
     "engine": {
       "type": "object",
       "properties": {

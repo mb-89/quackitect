@@ -140,11 +140,12 @@ func (d *Doors) trigger() int {
 	d.say("    action=run  trigger_id=%s\n", routineID)
 	if len(free) == 0 {
 		d.say("No branch stands free, so a box fired now takes nothing.")
-		return codeOK
+	} else {
+		d.say("These branches stand free, and a box takes one each:")
+		for _, one := range free {
+			d.say("  %s", one.Branch)
+		}
 	}
-	d.say("These branches stand free, and a box takes one each:")
-	for _, one := range free {
-		d.say("  %s", one.Branch)
-	}
+	d.fleetRoutine()
 	return codeOK
 }

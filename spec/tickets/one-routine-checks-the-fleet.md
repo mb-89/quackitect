@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 733bb02b6ec002b3
         size: 854
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 3e231e3232f5344d5d2df4c4d48929ebb7acdd9f
+    hash_after: 286b8d30377d81428c7632ec1e369b656e984491
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 depends_on: the-fleet-verb-watches-boxes
 ---
 
@@ -303,14 +312,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/branches/routine.go src/branches/free.go src/branches/branch.go spec/config/level0.schema.json spec/tickets/the-fleet-routine-stands.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches routine.go, free.go, branch.go and the person ticket, all on the size list. It also declares cloud.fleetRoutine and fleet.idleAfter in the config schema, since the person ticket writes the id into tracked config.
+- cloud route reads the event file through readFile and git through the quiet door, and the cases drive both over a temp clone.
+- Each new function carries a link to this ticket.
+- The routine's name, key and prompt stand once in routine.go, and the route reads the fleet rows through fleetRows.
 
 ## tests-green
 
