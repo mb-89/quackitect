@@ -154,6 +154,19 @@ details, see [[spec/design_output/work#a-box-leaves]]. A child
 reopening past the `children` step sends the group's last leaf back there,
 which leaves the group open the same way.
 
+## A live branch holds its dependents
+
+A `depends_on` name reads the first place it stands:
+
+| where the name stands | the dependency reads |
+|---|---|
+| a ticket here | its own state |
+| a ticket on `main` | that ticket's state |
+| only as `origin/work/<name>` | open, since a group still works there, and its merge brings the ticket to `main` |
+| nowhere | closed, so a ticket naming a gone ticket waits on nothing |
+
+The pull and the branch verbs read it the same way.
+
 ## A condition skips a leaf
 
 `when` reads `cloud` or `desk`, off the doors the command line hands in off

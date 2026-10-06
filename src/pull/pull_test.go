@@ -155,6 +155,9 @@ func TestPull(t *testing.T) {
 			if got := strings.Contains(out.String(), "alpha waits for "+dep); got != waits {
 				t.Fatalf("a dependency on %s waits: %v, and wants %v:\n%s", dep, got, waits, out)
 			}
+			if held := it.HoldOf("box cafecafecafe · claude-code-remote"); (held == nil) != waits {
+				t.Fatalf("a dependency on %s leaves the hold %+v", dep, held)
+			}
 		}
 	})
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {

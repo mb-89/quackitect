@@ -81,4 +81,8 @@ func TestADependencyOnALiveBranchWaits(t *testing.T) {
 	if !one.d.closedHere(nil, "gone") {
 		t.Fatal("a dependency standing nowhere reads as open")
 	}
+	kid := named{Name: "kid", Text: withField(childNote, "depends_on", "[other]")}
+	if said := one.d.waitsAt(kid, nil); said != "kid waits for other to close" {
+		t.Fatalf("the child waiting on work/other reads %q", said)
+	}
 }
