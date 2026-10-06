@@ -143,7 +143,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box 31f16efb1b52 · claude-code-remote
+    hash_before: c5796dbde90afad2549ab48399b6cce4dff06f49
+    hash_after: c5796dbde90afad2549ab48399b6cce4dff06f49
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
+step: retro/cloud
 ---
 
 # Ask
@@ -227,38 +239,57 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- doors-once-takes-main closes: PR 116 merged its branch into main
+- the-doors-pr-goes-green closes on the same merge, with src/proc green on the box
+- the-fleet-pr-goes-green closes: PR 113 merged the fleet branch into main
+- the group syncs main, and the check exits 0
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- each child asked for a merge that already stood on main, so a read of origin answered it with no code
+- the earlier fix groups history showed the road from draft through open to the retro
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- no owner prompt turned this run, since a schedule fired it
+- 23:24 UTC: the MCP ticket pull door refused its connection on the first hand-back, and the shell verb carried it
+- 23:24 UTC: a prior hand wrote the command fields of doors-once-takes-main as prose, and the hand-back refused twice before they held one bare command
+- 23:28 UTC: the group stood draft after its children closed, and branch done asked for a retro the pull would not hand out until the open verb ran
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the work skill names the open verb for a group standing draft: `.claude/skills/work/SKILL.md`
+- the write door refuses prose in a command field at the write, not the hand-back: [[spec/design_output/level0]]
+- the MCP door failure goes to the next box that meets it, under the cloud guidance: [[spec/guidance/cloud/cloud]]
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The dispatch named work/examples-run-as-tests, and the take handed this fix group because that group waits on an owner read. Every child was stale: the merges it asked for had landed before this box took the branch.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: the retro points at the merges and the skill, and copies neither
+- the change adds no number
+- the change writes no file header
+- the chapter carries each error with its time, and says no owner prompt turned the run
+- the chapter names the box and the agent by role, with no name, address or box path
 
 ## cloud
 
