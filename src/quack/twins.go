@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -160,8 +159,13 @@ func branchQueue(v1 func() (string, error)) twin {
 	}
 }
 
-// The node module: answers a registered verb's words, in process or as a person's child road under the root, and refuses a word nothing registers. [[spec/tickets/program-of-drops-node]]
+// The node module over the real process door and this binary. [[spec/tickets/program-of-drops-node]]
 func nodeAccept(root string) func(q.Request) (any, error) {
+	return nodeAcceptOver(proc.Real, os.Executable, root)
+}
+
+// The node module: answers a registered verb's words, in process or as a person's child road under the root through the process door, and refuses a word nothing registers. [[spec/tickets/quack-spawns-meet-fake-process]]
+func nodeAcceptOver(run proc.Runner, self func() (string, error), root string) func(q.Request) (any, error) {
 	scripts := filepath.Join(root, "src", "scripts")
 	return func(asked q.Request) (any, error) {
 		words, person := asked.Args, false
@@ -184,54 +188,28 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 			return goAnswer(args, one)
 		}
 		// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
-		self, err := selfPath()
+		binary, err := self()
 		if err != nil {
 			return nil, err
 		}
-		run := exec.Command(self, append([]string{"verb", scripts}, args...)...)
-		run.Dir = root
-		if person {
-			run.Env = personEnv(os.Environ(), root)
+		said := run(proc.Command{
+			Argv: append([]string{binary, "verb", scripts}, args...),
+			Dir:  root,
+			Drop: harness,
+			Env:  []string{workRoot + "=" + root},
+		})
+		if said.Code != 0 {
+			return nil, fmt.Errorf("%s answers exit %d: %s", strings.Join(args, " "), said.Code, strings.TrimRight(said.Out+said.Err, "\n"))
 		}
-		said, err := run.CombinedOutput()
-		text := strings.TrimRight(string(said), "\n")
-		if err != nil {
-			return nil, fmt.Errorf("%s answers %v: %s", strings.Join(args, " "), err, text)
-		}
-		return text, nil
+		return strings.TrimRight(said.Out, "\n"), nil
 	}
 }
-
-// The node module over the process door and the binary a child road runs. A stub until the implement step: a person's call answers a fault and spawns nothing. [[spec/tickets/quack-spawns-meet-fake-process]]
-func nodeAcceptOver(_ proc.Runner, _ func() (string, error), root string) func(q.Request) (any, error) {
-	inProcess := nodeAccept(root)
-	return func(asked q.Request) (any, error) {
-		if marked, ok := asked.Args.(map[string]any); ok && marked[verbsmodule.PersonField] == true {
-			return nil, fmt.Errorf("nodeAcceptOver runs no child road yet")
-		}
-		return inProcess(asked)
-	}
-}
-
-// The binary a child road runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
-var selfPath = os.Executable
 
 // The variables a harness sets, which HARNESS in src/extension/lib/lens.js owns, and the root a person's run names, which WORK_ROOT there owns. [[spec/design_output/pull#the-hand-rule]]
 var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}
 
 const workRoot = "SE_WORK_ROOT"
 
-// The environment a person's run takes: the harness variables left behind, and the root named. [[spec/tickets/the-lens-calls-actions]]
-func personEnv(env []string, root string) []string {
-	out := make([]string, 0, len(env)+1)
-	for _, one := range env {
-		name, _, _ := strings.Cut(one, "=")
-		if !slices.Contains(harness, name) && name != workRoot {
-			out = append(out, one)
-		}
-	}
-	return append(out, workRoot+"="+root)
-}
 
 // The words a request carries, as a list of strings or as the list JSON decodes. [[spec/tickets/ticket-verbs-become-actions]]
 func wordsOf(args any) ([]string, error) {

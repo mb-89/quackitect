@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"os/exec" // level0: OutsideInDoors - this file is the process door
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -76,7 +77,7 @@ func runUnder(life context.Context, one Command) Said {
 	cmd := exec.CommandContext(run, one.Argv[0], one.Argv[1:]...)
 	cmd.WaitDelay = pipesClose
 	cmd.Dir = one.Dir
-	cmd.Env = append(cmd.Environ(), one.Env...)
+	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
 	cmd.Stdin = strings.NewReader(one.Stdin)
 	var out, errs bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &errs
@@ -94,6 +95,21 @@ func runUnder(life context.Context, one Command) Said {
 		return Said{Err: err.Error(), Code: NotStarted}
 	}
 	return Said{Out: out.String(), Err: errs.String()}
+}
+
+// The pairs of an environment whose names the drop leaves out. [[spec/design_output/doors#the-process-door]]
+func without(env, drop []string) []string {
+	if len(drop) == 0 {
+		return env
+	}
+	kept := make([]string, 0, len(env))
+	for _, pair := range env {
+		name, _, _ := strings.Cut(pair, "=")
+		if !slices.Contains(drop, name) {
+			kept = append(kept, pair)
+		}
+	}
+	return kept
 }
 
 // A program the fake runs: the command in, the answer out. [[spec/design_output/doors#the-process-door]]

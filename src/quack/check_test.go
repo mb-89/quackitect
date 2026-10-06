@@ -167,9 +167,10 @@ func TestBatteryRun(t *testing.T) {
 		var held sync.Mutex
 		order := []string{}
 		say := func(one string) { held.Lock(); order = append(order, one); held.Unlock() }
-		release := make(chan struct{})
+		release, started := make(chan struct{}), make(chan struct{})
 		beside := part{name: "level0", beside: true, run: func() int {
 			say("level0 starts")
+			close(started)
 			<-release
 			say("level0 ends")
 			return 1
@@ -177,9 +178,7 @@ func TestBatteryRun(t *testing.T) {
 		plain := func(name string) part {
 			return part{name: name, run: func() int {
 				if name == "go" {
-					for !slices.Contains(func() []string { held.Lock(); defer held.Unlock(); return slices.Clone(order) }(), "level0 starts") {
-						time.Sleep(time.Millisecond)
-					}
+					<-started
 				}
 				say(name)
 				if name == "rules" {

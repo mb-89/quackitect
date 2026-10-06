@@ -1,6 +1,6 @@
 // The spawns the landing and ticket verbs reach past git: the verb road, claude
 // on the PATH, and the branch take, each waiting on the process door's
-// follow-up. [[spec/tickets/quack-spawns-meet-fake-process]]
+// follow-up. [[spec/tickets/quack-spawns-all-take-the-runner]]
 package main
 
 import (

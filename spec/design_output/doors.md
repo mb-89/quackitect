@@ -194,14 +194,15 @@ family carries its fate:
 
 | family | files | fate |
 |---|---|---|
-| the placements over real processes | `src/index/placements_test.go`, `src/quack/placements_test.go`, `src/quack/io_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
+| the placements over real processes | `src/index/placements_test.go`, `src/quack/placements_test.go`, `src/quack/io_test.go`, `src/quack/split_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
 | the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
-| the quack verbs sleeping, or spawning the binary or go | `src/quack/check_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go`, `src/quack/split_test.go`, `src/quack/waits_test.go` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
+| the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
+| the quack waits polling on the wall clock | `src/quack/waits_test.go` | moves onto a fake clock, under [[spec/tickets/quack-waits-poll-on-a-fake-clock]] |
 | the index and session suites running the fake beside the real door | `test/contract/index.test.js`, `test/contract/session.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
-| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go` | door tests of the index door |
+| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
 | a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
 | the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
@@ -257,10 +258,11 @@ with the halt and the wait they need.
 | `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does, and its own `Halt`, `Ends` and `After` for the halt and the wait |
 | `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, a program that never starts, the halt and the wait |
 
-The branch verbs' `rawEnv`, the pull's shell, and every `exec.Command` in
-the quack verbs outside the box and check doors take the `Runner`. A case
-teaching the fake `go` or the quack binary hands it a handler that runs the
-verb's main in process.
+The branch verbs' `rawEnv`, the pull's shell, the node module's child road and
+the voice verb's Vale take the `Runner`. Every other `exec.Command` in the
+quack verbs outside the box and check doors waits under
+[[spec/tickets/quack-spawns-all-take-the-runner]]. A case teaching the fake
+quack binary hands it a handler that answers the child road.
 
 ## The moves
 
