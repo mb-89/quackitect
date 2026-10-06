@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/failures-and-the-sentinel.md:298:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: bd6a7361982716236111bc6a6118dc39a44c2569
+    hash_after: bd6a7361982716236111bc6a6118dc39a44c2569
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.6  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: 6e6c55ed28e894ff
+        size: 1007
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -338,26 +361,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/fleet_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new verb, ./RUNME.sh cloud fleet, prints one row a work branch: its standing, tip, the tip's age, the hand and session its record names, and its pull request. The pull requests come off one git ls-remote of refs/pull/*/head, so no token is needed. A held box idle past fleet.idleAfter, a done box with no pull request, and a freed box with a final line each print a wake line, and the verb exits 1 where one stands. A watch that runs it wakes the coordinator at once. A pull ref outlives its pull request, so a done branch whose pull request closed unmerged reads as carrying one and raises no wake. The sentinel ticket's Discussion names the watch it takes over.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file touched stands on the size list. withTips takes the gate's added arguments, so fleetRows and its callers stand unchanged.
+- The verb reaches git through the quiet door, and the cases drive it over a temp clone with a bare origin.
+- Each new function carries a link to this ticket.
+- The span reads through spanOf and the age through aged, so no reader stands twice.
 
 # accept
 
