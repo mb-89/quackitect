@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: d0ce30ea438baf8af039b5a4c32b736d7c03d16c
+    hash_after: 9ed48d7dacecb407a7947917498b7e235226c7af
+    inputs:
+      - name: ask
+        hash: acdc248052365f28
+        size: 635
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,83 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two declarations, and the rest moves onto the doors.
+
+| where | what it reaches | the change |
+|---|---|---|
+| `src/extension/drawing/route.mjs` | the page's timers and time, inside a bundle of the webview sources | `src/extension/drawing/owns.yaml` declares the page as its own outside, owning those names, with `route.mjs` as its file. The bundle runs in the editor's page, where no node door reaches, and nobody edits it by hand |
+| `prototype/trace-view` | timers and `node:child_process` | `prototype/trace-view/owns.yaml` declares the prototype as its own outside, since it runs alone and ships nowhere |
+| `src/doors/awake.js`, `src/doors/proc.js` | timers | each takes the clock door, as a door standing on another does |
+| `src/bridge/wait.js`, `src/scripts/probe-clear.js`, `src/scripts/probe-dry.js` | timers | each takes the clock door off the hand its root builds |
+| `src/scripts/copilot.js` | `fetch` | takes the http door |
+| `src/extension/editor.js`, `src/extension/lib/lsp.js`, `src/extension/lib/settle.js` | timers and time | each takes the clock door off the hand the extension's activation builds |
+| `src/extension/editor-files.js`, `src/extension/editor-index.js`, `src/extension/editor-process.js` | `node:fs`, `fetch`, `node:http` | each takes the disk, http or wire door off that same hand |
+
+The extension's activation stands as a root, as the command line does, and builds every door once. The assumption: the packaged extension reaches `src/doors`, as `src/scripts` does today. Where it does not, the bundle step carries the doors in.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/doors/awake.js and src/doors/proc.js: every caller building them, which the root names
+src/bridge/wait.js wait
+src/scripts/probe-clear.js, src/scripts/probe-dry.js, src/scripts/copilot.js: their mains
+src/extension/editor.js activate: the root that builds the hand
+src/extension/lib/settle.js, src/extension/lib/lsp.js, src/extension/editor-files.js, src/extension/editor-index.js, src/extension/editor-process.js: every caller in the extension
+src/owns: reads the two new declarations, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/contract/awake.test.js and test/contract/proc.test.js: the door built over the real clock
+test/level0/settle.test.js: settles on the fake clock with no wall wait
+test/level0/lsp.test.js: the lsp client times out on the fake clock
+test/level0/editor-doors.test.js: the activation builds every door once and hands it on
+test/level0/probe-dry.test.js and test/level0/probe-clear.test.js: the probe waits on the fake clock
+test/level0/copilot.test.js: copilot fetches through the fake http door
+src/owns/tree_test.go TestEveryDoorNamesAPlantedWalk: covers the two new declarations, unchanged
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/extension/drawing/owns.yaml
+prototype/trace-view/owns.yaml
+src/doors/awake.js
+src/doors/proc.js
+src/bridge/wait.js
+src/scripts/probe-clear.js
+src/scripts/probe-dry.js
+src/scripts/copilot.js
+src/extension/editor.js
+src/extension/editor-files.js
+src/extension/editor-index.js
+src/extension/editor-process.js
+src/extension/lib/lsp.js
+src/extension/lib/settle.js
+the tests the tests list names
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened `src/scripts/bundle.js`, the head of `route.mjs`, `src/doors/owns.yaml` and the walk list in `src/modules/check/textfaults.go`, and each claim stands there
+the callers list names each file `./RUNME.sh doors` lists in production JavaScript, and the root building each hand
+the first done_when line falls to `./RUNME.sh doors`, the second to the two declarations it lists, the third to `./RUNME.sh test` over the tests list
 
 ## tests-red
 
