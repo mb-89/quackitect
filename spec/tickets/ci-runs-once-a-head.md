@@ -146,12 +146,15 @@ record:
   - step: retro/cloud
     hand: box d040db23b249 · claude-code-remote
     hash_before: c1ccf97a8db4a744644e83f7d68ef8382b224e9b
-    hash_after: c1ccf97a8db4a744644e83f7d68ef8382b224e9b
+    hash_after: c57512058de879b7f547208b0d0fc2ef921d848c
     inputs:
       - name: retro/write
         hash: 981425f204e93893
         size: 2434
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: "The check runs once a head: on a pull request or on main."
 reason: done
 ---
 
