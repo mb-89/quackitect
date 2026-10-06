@@ -105,6 +105,32 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 	}
 }
 
+// The stop answers once the spawner returns, so no spawn lands past it. The timer holds the spawner until the stop begins. [[spec/tickets/stop-join-test-stands-red]]
+func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	placements := NewPlacements(bus, store, []Placed{placed})
+	placements.Timer(func(time.Duration) <-chan time.Time {
+		<-placements.quit
+		return make(chan time.Time)
+	})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	stop()
+	select {
+	case <-placements.spawned:
+	default:
+		t.Fatal("the stop answers while the spawner still runs")
+	}
+}
+
 func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
 	bus, err := StartBus()
 	if err != nil {
