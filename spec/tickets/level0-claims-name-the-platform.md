@@ -347,3 +347,7 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 The draft's callers list also takes `src/quack/checkdoors.go` `checkDoorsOf`, which fills `platform` from `runtime.GOOS`. It also takes `src/quack/check_test.go` `TestCheckParts`, whose Windows case sets `platform`. The size list also takes `src/quack/checkdoors.go`. [[spec/tickets/platform-draft-names-checkdoors]]
+
+The platform cases in `src/quack/check_test.go` cover the change to `level0Runs`. The red case takes the platform through [[spec/tickets/platform-red-line-tested]]. It keys on `probe smoke --working`, so it goes green at the implement step of [[spec/tickets/level0-smoke-runs-in-seconds]].
+
+    grep -n "platform it ran on\|desk trial" src/quack/check_test.go
