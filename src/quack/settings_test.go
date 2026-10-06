@@ -7,13 +7,21 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 )
 
-// The tool a session merges a pull request with, which the settings deny. [[spec/tickets/probe-at-revision-guards-merges]]
-const mergeTool = "mcp__github__merge_pull_request"
+// The roads a session merges a pull request by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]]
+var (
+	mergeRoads = []string{
+		"mcp__github__merge_pull_request",
+		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
+		"Bash(gh pr merge:*)",
+	}
+	autoMerge = "enable_pr_auto_merge"
+)
 
-func TestTheSettingsDenyTheMergeTool(t *testing.T) {
+func TestTheSettingsDenyTheMergeToolUnderEveryConnectorAndLeaveAutoMergeOpen(t *testing.T) {
 	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(settingsFile)))
 	if err != nil {
@@ -27,7 +35,14 @@ func TestTheSettingsDenyTheMergeTool(t *testing.T) {
 	if err := json.Unmarshal(text, &read); err != nil {
 		t.Fatal(err)
 	}
-	if !slices.Contains(read.Permissions.Deny, mergeTool) {
-		t.Errorf("the settings deny %v, and no %s", read.Permissions.Deny, mergeTool)
+	for _, road := range mergeRoads {
+		if !slices.Contains(read.Permissions.Deny, road) {
+			t.Errorf("the settings deny %v, and no %s", read.Permissions.Deny, road)
+		}
+	}
+	for _, one := range read.Permissions.Deny {
+		if strings.Contains(one, autoMerge) {
+			t.Errorf("the settings deny %s, which the work skill turns auto-merge on with", one)
+		}
 	}
 }
