@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"quackitect/src/failure"
+	"quackitect/src/modules/clock"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
@@ -305,5 +306,19 @@ func TestHookHandsEachPostToHear(t *testing.T) {
 	hooks(t, one.door, toolCall(map[string]any{"command": "./RUNME.sh branch take"}))
 	if len(heard) != 1 || heard[0].Kind != "tool.call" || !strings.Contains(heard[0].Text, "branch take") {
 		t.Fatalf("the sentinel hears %+v, and wants one tool.call whose text carries the command", heard)
+	}
+}
+
+// A post a watch matches fires its failure, and the row lands through the say the sentinel holds. [[spec/tickets/hooks-test-reads-fired-row]]
+func TestHookPostFiresTheWatchedRow(t *testing.T) {
+	rows := []map[string]any{}
+	say := func(row map[string]any) { rows = append(rows, row) }
+	dir := failure.FakeDir{failure.Folder + "/take-watched.md": "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run the take again.\"]\nwatch:\n  event: tool.call\n  match: \"branch take\"\n---\n\n# When\n\nA box takes a branch.\n"}
+	sentinel := failure.NewSentinel(failure.Load(dir), clock.NewFake(time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)), func(raised failure.Raised) { say(raised.Row("")) }, &failure.FakeRunner{})
+	one := doorOver(t, &calls{}, &book{})
+	one.door.from.Hear = sentinel.Hear
+	hooks(t, one.door, toolCall(map[string]any{"command": "./RUNME.sh branch take"}))
+	if len(rows) != 1 || rows[0][failure.IDField] != "take-watched" {
+		t.Fatalf("the post writes %+v, and wants one row of take-watched", rows)
 	}
 }
