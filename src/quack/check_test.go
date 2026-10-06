@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -29,8 +30,41 @@ func ticking(step time.Duration) func() time.Time {
 	}
 }
 
-// Doors over fakes, recording each verb and each process the parts reach. [[spec/guidance/code/testing]]
+// A clock standing still until the case moves it, telling the case of each read. [[spec/guidance/code/testing]]
+type heldClock struct {
+	held  sync.Mutex
+	at    time.Time
+	count int
+	reads chan struct{}
+}
+
+func newHeldClock(most int) *heldClock {
+	return &heldClock{at: time.Date(2026, 9, 20, 10, 0, 0, 0, time.UTC), reads: make(chan struct{}, most)}
+}
+
+func (c *heldClock) now() time.Time {
+	c.held.Lock()
+	defer c.held.Unlock()
+	c.count++
+	c.reads <- struct{}{}
+	return c.at
+}
+
+func (c *heldClock) move(by time.Duration) {
+	c.held.Lock()
+	defer c.held.Unlock()
+	c.at = c.at.Add(by)
+}
+
+func (c *heldClock) read() int {
+	c.held.Lock()
+	defer c.held.Unlock()
+	return c.count
+}
+
+// Doors over fakes, recording each verb and each process the parts reach. The parts run together, so a lock holds the records. [[spec/guidance/code/testing]]
 type checkFake struct {
+	held  sync.Mutex
 	verbs [][]string
 	runs  [][]string
 	envs  [][]string
@@ -44,10 +78,14 @@ func (one *checkFake) doors() checkDoors {
 	return checkDoors{
 		root: "/tree",
 		verb: func(words []string, _ bool) int {
+			one.held.Lock()
+			defer one.held.Unlock()
 			one.verbs = append(one.verbs, words)
 			return one.codes[strings.Join(words, " ")]
 		},
 		run: func(argv, env []string, _ bool) (int, string, error) {
+			one.held.Lock()
+			defer one.held.Unlock()
 			one.runs = append(one.runs, argv)
 			one.envs = append(one.envs, env)
 			if one.gone[argv[0]] {
@@ -59,7 +97,12 @@ func (one *checkFake) doors() checkDoors {
 		now:    ticking(time.Millisecond),
 		config: func(string) float64 { return 0 },
 		git:    func(...string) string { return "" },
-		log:    func(row map[string]any) error { one.rows = append(one.rows, row); return nil },
+		log: func(row map[string]any) error {
+			one.held.Lock()
+			defer one.held.Unlock()
+			one.rows = append(one.rows, row)
+			return nil
+		},
 		out:    io.Discard,
 		errs:   io.Discard,
 	}
@@ -76,7 +119,7 @@ func partNamed(parts []part, name string) part {
 
 func TestCheckParts(t *testing.T) {
 	t.Parallel()
-	t.Run("the parts run in order, and level zero runs beside the parts after the tests", func(t *testing.T) {
+	t.Run("the battery holds its eight parts", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
 		names := []string{}
@@ -86,9 +129,6 @@ func TestCheckParts(t *testing.T) {
 		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
-		}
-		if !partNamed(parts, "level0").beside || partNamed(parts, "go").beside {
-			t.Fatal("level zero alone runs beside")
 		}
 	})
 	t.Run("a part another verb owns runs that verb through the road", func(t *testing.T) {
@@ -148,57 +188,77 @@ func TestCheckParts(t *testing.T) {
 
 func TestBatteryRun(t *testing.T) {
 	t.Parallel()
-	step := func(name string, code int, ran *[]string) part {
-		return part{name: name, run: func() int { *ran = append(*ran, name); return code }}
-	}
-	t.Run("the battery runs its parts in order, times each, and stops at the first red", func(t *testing.T) {
-		ran := []string{}
-		code, times, unrun, total := batteryRun([]part{step("tests", 0, &ran), step("rules", 0, &ran)}, ticking(100*time.Millisecond))
-		if code != 0 || len(unrun) != 0 || times["tests"] != 100 || times["rules"] != 100 || total != 500 {
-			t.Fatalf("the green run reads %d, %v, %v, %v", code, times, unrun, total)
-		}
-		ran = []string{}
-		code, times, unrun, _ = batteryRun([]part{step("tests", 0, &ran), step("go", 1, &ran), step("rules", 0, &ran)}, ticking(time.Millisecond))
-		if code != 1 || !reflect.DeepEqual(ran, []string{"tests", "go"}) || !reflect.DeepEqual(unrun, []string{"rules"}) || len(times) != 2 {
-			t.Fatalf("the red run reads %d, ran %v, unrun %v, timed %v", code, ran, unrun, times)
-		}
-	})
-	t.Run("a part beside the run starts in its place, the run goes on, and its red holds the answer", func(t *testing.T) {
+	t.Run("every part starts before any part ends, and the span reads as the slowest part", func(t *testing.T) {
+		clock := newHeldClock(16)
+		names := []string{"tests", "go", "rules"}
+		started := make(chan string, len(names))
+		release := map[string]chan struct{}{}
 		var held sync.Mutex
-		order := []string{}
-		say := func(one string) { held.Lock(); order = append(order, one); held.Unlock() }
-		release := make(chan struct{})
-		beside := part{name: "level0", beside: true, run: func() int {
-			say("level0 starts")
-			<-release
-			say("level0 ends")
-			return 1
-		}}
-		plain := func(name string) part {
-			return part{name: name, run: func() int {
-				if name == "go" {
-					for !slices.Contains(func() []string { held.Lock(); defer held.Unlock(); return slices.Clone(order) }(), "level0 starts") {
-						time.Sleep(time.Millisecond)
-					}
+		early := []string{}
+		parts := []part{}
+		for _, name := range names {
+			release[name] = make(chan struct{})
+			parts = append(parts, part{name: name, run: func() int {
+				held.Lock()
+				if clock.read() < 1+len(names) || len(early) > 0 {
+					early = append(early, name)
 				}
-				say(name)
-				if name == "rules" {
-					close(release)
+				waits := len(early) == 0
+				held.Unlock()
+				started <- name
+				if waits {
+					<-release[name]
 				}
 				return 0
+			}})
+		}
+		type answer struct {
+			times map[string]float64
+			total float64
+		}
+		answered := make(chan answer, 1)
+		go func() {
+			_, times, _, total := batteryRun(parts, clock.now)
+			answered <- answer{times, total}
+		}()
+		for range names {
+			<-started
+		}
+		held.Lock()
+		ran := slices.Clone(early)
+		held.Unlock()
+		if len(ran) > 0 {
+			<-answered
+			t.Fatalf("%v ran before the battery started every part", ran)
+		}
+		for range 1 + len(names) {
+			<-clock.reads
+		}
+		for _, name := range names {
+			clock.move(10 * time.Second)
+			close(release[name])
+			<-clock.reads
+		}
+		got := <-answered
+		if want := map[string]float64{"tests": 10000, "go": 20000, "rules": 30000}; !reflect.DeepEqual(got.times, want) || got.total != 30000 {
+			t.Fatalf("the run timed %v over %v, and wants %v over the slowest part's 30000", got.times, got.total, want)
+		}
+	})
+	t.Run("a red part names itself, and every part beside it runs and reports its time", func(t *testing.T) {
+		var held sync.Mutex
+		ran := []string{}
+		step := func(name string, code int) part {
+			return part{name: name, run: func() int {
+				held.Lock()
+				defer held.Unlock()
+				ran = append(ran, name)
+				return code
 			}}
 		}
-		code, times, unrun, _ := batteryRun([]part{plain("tests"), beside, plain("go"), plain("rules")}, ticking(time.Millisecond))
-		if !reflect.DeepEqual(order, []string{"tests", "level0 starts", "go", "rules", "level0 ends"}) {
-			t.Fatalf("the order reads %v", order)
-		}
-		if code != 1 || len(times) != 4 || len(unrun) != 0 {
-			t.Fatalf("the run reads %d, %v, %v", code, times, unrun)
-		}
-		ran := []string{}
-		_, _, early, _ := batteryRun([]part{step("tests", 1, &ran), {name: "level0", beside: true, run: func() int { return 0 }}, step("go", 0, &ran)}, ticking(time.Millisecond))
-		if !reflect.DeepEqual(early, []string{"level0", "go"}) {
-			t.Fatalf("a red before the beside part leaves %v unrun", early)
+		code, times, red, _ := batteryRun([]part{step("tests", 0), step("go", 1), step("rules", 2)}, ticking(time.Millisecond))
+		slices.Sort(ran)
+		if code != 1 || !reflect.DeepEqual(red, []string{"go", "rules"}) || !reflect.DeepEqual(ran, []string{"go", "rules", "tests"}) || len(times) != 3 {
+			t.Fatalf("the red run answers %d, names %v red, ran %v, timed %v", code, red, ran, times)
 		}
 	})
 }
@@ -364,6 +424,21 @@ func TestCheckVerb(t *testing.T) {
 		}
 		if stamp := doors.text(stampFile); !strings.Contains(stamp, `"sha": "abc"`) || !strings.Contains(stamp, `"ok": true`) || !strings.Contains(stamp, `"spawns": {`) {
 			t.Fatalf("the stamp reads %s", stamp)
+		}
+	})
+	t.Run("a red part names itself on the error stream, and the parts beside it still report", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"doors": 1}}
+		var said, erred strings.Builder
+		doors := fake.doors()
+		doors.root, doors.out, doors.errs = t.TempDir(), &said, &erred
+		code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, &said, &erred)
+		if code != 1 || !strings.Contains(erred.String(), "doors answers red") {
+			t.Fatalf("the run answers %d, and its error stream reads %q", code, erred.String())
+		}
+		for _, name := range []string{"tests", "level0", "go", "projections", "plugin", "server", "rules"} {
+			if !regexp.MustCompile(`(?m)^\s*[0-9.]+  ` + name + `$`).MatchString(said.String()) {
+				t.Errorf("the table names no time for %s:\n%s", name, said.String())
+			}
 		}
 	})
 	t.Run("a run past its budget warns in the log, naming its time", func(t *testing.T) {

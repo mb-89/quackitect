@@ -117,7 +117,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 2f27903492d3e8aa
         size: 574
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 0dc618a397db47b8f1b90f5a05dc78fd4a3ff6a0
+    hash_after: 0dc618a397db47b8f1b90f5a05dc78fd4a3ff6a0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: e752f098fe7ee9d0
+        size: 2092
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ The report keeps its `unrun` field empty, because old stamps carry it and the re
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each of the three cases fails on its own assertion against the serial battery. The overlap case meets the serial run through its guard: a fake part reads the held clock when it starts, and finds fewer reads than one a part plus the battery own. The part then returns without waiting, so the serial run fails fast and hangs on no barrier. The guard asks the battery to read every part start before it runs any part, which the implement step takes. The surprise: the check fake appended to its records with no lock, so it raced once the parts run together, and it takes a lock now.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing test: the overlap case, the red-part case in TestBatteryRun, and the error-stream case in TestCheckVerb; the check line waits for tests-green
+- every door the tests reach has a fake: the held clock stands for the clock door, and the check fake for the verb, process, health, git and log doors
 
 # gate
 
