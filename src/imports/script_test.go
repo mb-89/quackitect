@@ -33,7 +33,7 @@ func TestATrackedScriptOutsideTheEngineIsNamed(t *testing.T) {
 func TestTheEngineAndAMarkedScriptAreSpared(t *testing.T) {
 	t.Parallel()
 	said := scriptsOver(map[string]string{
-		"RUNME.sh":              "#!/bin/sh\n",
+		"RUNME.sh":               "#!/bin/sh\n",
 		"src/scripts/install.sh": "#!/bin/sh\n",
 		".claude/skills/x/y.py":  "print(1)\n",
 		"tools/keep.sh":          "#!/bin/sh\n# level0: HandScript - the runner calls it by path\n",
