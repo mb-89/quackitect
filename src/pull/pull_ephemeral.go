@@ -81,13 +81,33 @@ func (it *It) ephemeralPull(who *Who, verdict string) int {
 			it.Say(Refused, fault, "", "Fix it, and "+writeTicket+" stays in hand.")
 			return 1
 		}
+		if tip := it.handedOverAt(); tip != "" {
+			return it.backToLeaf(who, tip)
+		}
 		it.marksHandoverTip()
 		return it.handsEphemeral(who.Hand, clearTicket, writeTicket+" closes, and "+Handover+" stands.")
 	case clearTicket:
 		it.Say(Refused, asksOf(clearTicket)...)
 		return 1
+	case readTicket:
+		// The clear has run, so the mark it answered drops, and the hand-out after the read hands a leaf. [[spec/tickets/the-clear-hands-back-the-leaf]]
+		it.remove(due)
 	}
 	return it.onward(who, []string{held.Ticket + " closes."})
+}
+
+// A second handover with no commit since the last one hands the leaf back in place of a clear, so the box works on in this turn. The due mark stands, and the hand-out after the next commit hands over. [[spec/tickets/the-clear-hands-back-the-leaf]]
+func (it *It) backToLeaf(who *Who, tip string) int {
+	who.PastDue = true
+	return it.onward(who, []string{
+		fmt.Sprintf("No commit has landed since the last handover (%s), so the pull refuses this handover, and no clear runs.", tip),
+		"Continue the leaf below in this turn, and land a commit before the next handover.",
+	})
+}
+
+// The ticket names the clear runs on, which a plan names as no todo. [[spec/tickets/the-clear-hands-back-the-leaf]]
+func ephemeralName(name string) bool {
+	return name == writeTicket || name == clearTicket || name == readTicket
 }
 
 // What keeps the handover ticket in hand: no file, an empty one, or one naming the retro folder. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
@@ -102,7 +122,7 @@ func (it *It) handoverFault() string {
 	return ""
 }
 
-// A cloud box's handover refuses work that lives on the box alone, and a context that ends with nothing landed since the last handover. [[spec/tickets/the-clear-carries-no-local-work]]
+// A cloud box's handover refuses work that lives on the box alone. [[spec/tickets/the-clear-carries-no-local-work]]
 func (it *It) localWorkFault() string {
 	if !it.Cloud {
 		return ""
@@ -130,6 +150,14 @@ func (it *It) localWorkFault() string {
 		}
 		return said + ". " + fmt.Sprintf("Commit and push %s first. A red push to a work branch lands, and a clear keeps nothing that lives on this box alone.", branch)
 	}
+	return ""
+}
+
+// The short tip a cloud box last handed over at, where no commit has landed since, so a clear loops. [[spec/tickets/the-clear-carries-no-local-work]] [[spec/tickets/the-clear-hands-back-the-leaf]]
+func (it *It) handedOverAt() string {
+	if !it.Cloud {
+		return ""
+	}
 	tip := strings.TrimSpace(it.Git.Run("rev-parse", "HEAD").Out)
 	var last struct {
 		Tip string `json:"tip"`
@@ -138,8 +166,7 @@ func (it *It) localWorkFault() string {
 		_ = json.Unmarshal([]byte(text), &last)
 	}
 	if tip != "" && last.Tip == tip {
-		return fmt.Sprintf("No commit has landed since the last handover (%s), so a whole context passed with nothing pushed, and a clear would loop. ", tip[:min(shortTip, len(tip))]) +
-			"Say in the chat what blocks you, and end the turn. The coordinator reads the session."
+		return tip[:min(shortTip, len(tip))]
 	}
 	return ""
 }
