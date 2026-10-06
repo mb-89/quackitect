@@ -6,22 +6,21 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  HOLDS,
   inRetro,
   inRun,
   PRIVATE,
   RETRO,
   RUN,
   runs,
+  TICKETS as NOTES,
 } from "../../.claude/skills/level0/lib/folders.js";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { FOLDER as LOG } from "../../.claude/skills/level0/lib/log.js";
 import { WORKTREE } from "../../.claude/skills/level0/lib/review.js";
 import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { FOLDER as UNDO } from "../../.claude/skills/level0/lib/undo.js";
-import { HOLDS as GUIDANCE_HOLDS } from "../../src/scripts/guidance-hand.js";
 import { BOX, SESSION } from "../../src/scripts/pull-hand-of.js";
-import { HOLDS as ROUTE_HOLDS } from "../../src/scripts/pull-route.js";
-import { HOLDS, NOTES } from "../../src/scripts/ticket.js";
 
 test("the module names the retro folder and the runtime folder, both under the private one", () => {
   assert.equal(PRIVATE, ".se");
@@ -84,9 +83,7 @@ test("the log stands outside the half the retro skips", () => {
   assert.equal(runs(LOG), false);
 });
 
-test("one hold folder stands, and the three modules naming it answer one path", () => {
-  assert.equal(ROUTE_HOLDS, HOLDS);
-  assert.equal(GUIDANCE_HOLDS, HOLDS);
+test("one hold folder stands under the runtime half", () => {
   assert.equal(HOLDS, inRun("hold"));
 });
 

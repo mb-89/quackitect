@@ -3,10 +3,47 @@
 package queue
 
 import (
+	"encoding/json"
 	"testing"
 
+	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 	"quackitect/src/ticket"
 )
+
+// The ports a case feeds, as the wiring binds them. [[spec/design_output/model#the-fake-index]]
+func fed(c *q.Catalog) q.Writer {
+	hand := q.Join(
+		q.OutIn(c, RowsPort, []ticket.Ticket{}, q.Doc("the tickets, as the case seeds them")),
+		q.OutIn(c, PlanPort, q.Content{}, q.Doc("the plan file, as the case seeds it")),
+		q.OutIn(c, CloudPort, []string{}, q.Doc("the tickets the cloud holds, as the case seeds them")),
+		q.OutIn(c, StoodPort, map[string]int64{}, q.Doc("the second each path came in, as the case seeds it")),
+		q.OutIn(c, MinutePort, int64(0), q.Doc("the minute, as the case seeds it")),
+		q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values, as the case seeds them")),
+	)
+	Places(c)
+	return hand
+}
+
+// The places the module answers over what the case seeds. [[spec/design_output/model#the-fake-index]]
+func placesOver(t *testing.T, seeds map[string]any) map[string]string {
+	t.Helper()
+	var hand q.Writer
+	index := qtest.New(t, func(c *q.Catalog) { hand = fed(c) })
+	index.SeedAs(hand, seeds)
+	said, _ := index.Run(PlacesPort).(map[string]string)
+	return said
+}
+
+// The plan file a case seeds. [[spec/design_output/stop#the-plan]]
+func planText(t *testing.T, plan map[string]any) q.Content {
+	t.Helper()
+	text, err := json.Marshal(plan)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return q.Content{Hash: "plan", Text: string(text)}
+}
 
 func TestACloudRowStandsAtInfinity(t *testing.T) {
 	said := placesOver(t, map[string]any{

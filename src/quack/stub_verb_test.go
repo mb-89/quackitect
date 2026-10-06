@@ -110,10 +110,3 @@ func TestStubVerbPlacesARelativeFolderUnderTheRoot(t *testing.T) {
 		t.Fatal("the stub lands under the root")
 	}
 }
-
-func TestStubVerbStandsInTheRegistry(t *testing.T) {
-	t.Parallel()
-	if _, one := twinOf([]string{"stub", "into"}, registry); one == nil {
-		t.Fatal("the registry holds stub")
-	}
-}

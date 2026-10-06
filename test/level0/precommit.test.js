@@ -224,6 +224,25 @@ test("a test any hold's ticket carries answers the change at the hook", async ()
   assert.equal((await holds(box(), code)).code, 1, "no hold carries nothing");
 });
 
+// A hold outlives the ticket it names, and a ticket standing nowhere carries no test. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a hold whose ticket stands nowhere carries no test, so the change refuses", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "",
+  ].join("\n");
+  const here = box({
+    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
+      ticket: "gone",
+      path: "spec/tickets/gone.md",
+    }),
+  });
+
+  assert.equal((await holds(here, code)).code, 1);
+});
+
 // A marker the delta adds refuses the commit, whichever road makes it. [[spec/design_output/work#no-commit-carries-a-marker]]
 test("a delta adding a conflict marker answers one, and names the file and line", async () => {
   const marked = [

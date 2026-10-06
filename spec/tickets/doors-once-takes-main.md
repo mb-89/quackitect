@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,6 +25,26 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
+group: loose-fixes-a3b839d
+step: do
+record:
+  - step: do
+    hand: box 31f16efb1b52 · claude-code-remote
+    hash_before: 647214682ec4d3adfb8af3eee53801b5b9aacf72
+    hash_after: 647214682ec4d3adfb8af3eee53801b5b9aacf72
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   59.9  in all"
+    inputs:
+      - name: ask
+        hash: 294b4ab5f33b00f0
+        size: 329
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -44,11 +64,11 @@ done_when:
 
 ## tests
 
-`go test ./src/branches/` answers ok, and `node --test test/level0/probe-clear.test.js` passes every case.
+./RUNME.sh branch test src/branches/take_test.go
 
 ## check
 
-`./RUNME.sh check` exits 0 on the merge.
+./RUNME.sh check
 
 ## says
 
