@@ -19,6 +19,7 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 	if len(loaded) == 0 {
 		t.Fatal("the load answers no package")
 	}
+	owned := Owned("../..")
 	for _, one := range loaded {
 		if strings.HasSuffix(one.PkgPath, ".test") {
 			continue
@@ -27,10 +28,10 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for path := range one.Imports {
 			imported = append(imported, path)
 		}
-		for _, fault := range FaultsIn(one.PkgPath, imported, CarriesIO(one.Syntax)) {
+		for _, fault := range FaultsIn(one.PkgPath, imported, owned, CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
-		for _, fault := range RendererFaults(one.PkgPath, one.Fset, one.Syntax) {
+		for _, fault := range RendererFaults(one.PkgPath, one.Fset, one.Syntax, owned) {
 			t.Error(fault)
 		}
 		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
@@ -41,10 +42,10 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 
 func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
 	t.Parallel()
-	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
+	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}, nil); len(said) != 0 {
 		t.Fatalf("src/modulesx reads as a module: %v", said)
 	}
-	if said := Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}); len(said) != 0 {
+	if said := Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}, nil); len(said) != 0 {
 		t.Fatalf("the q core reads as a door: %v", said)
 	}
 }

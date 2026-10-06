@@ -874,8 +874,13 @@ check runs it on Linux and Windows, and reads a package's flag off its
 
 | the analyzer | what it refuses |
 |---|---|
-| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
-| `ioonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in the core, `src/q`, or a renderer |
+| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library. A package a door owns whole reads as impure, and so does the floor the analyzer lists for what no door owns, such as `io/fs` and `unsafe`. So `src/config`, `src/index` and a call to `time.Now` stay out |
+| `ioonly` | an import of a package a door owns whole, and a call to `time.Now`, in the core, `src/q`, or a renderer |
+
+The analyzers read each list off the `owns.yaml` declarations under the module's
+root, through `owns.Whole`. A door owning a package by a member, as the clock
+owns `time.Sleep`, leaves the package open to an import, so `time.Duration`
+stays pure. For details, see [[spec/design_output/doors#a-door-declares-what-it-owns]].
 | `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
 | `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
 
