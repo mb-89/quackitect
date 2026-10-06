@@ -162,6 +162,13 @@ func commitVerb(d landingDoors) twin {
 			fmt.Fprintln(errs, fault)
 			return exitUsage
 		}
+		// A trailer naming a model stops the commit before anything stages. [[spec/tickets/commit-door-refuses-model-trailers]]
+		if rows := command.ModelTrailers(message); len(rows) > 0 {
+			for _, one := range rows {
+				fmt.Fprintf(errs, "%s: %s\n", one.Said, one.Message)
+			}
+			return exitUsage
+		}
 		refused, form := messageFindings(d, message)
 		if len(refused) > 0 {
 			fmt.Fprintln(errs, "The voice rules refuse this message. Write it again.")
