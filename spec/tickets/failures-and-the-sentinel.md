@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -180,6 +180,15 @@ record:
         hash: 78b48d5ee9b48235
         size: 4931
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 63a8fdf9565ba4e4aa6af92748ffe1ad2433fe6f
+    hash_after: 63a8fdf9565ba4e4aa6af92748ffe1ad2433fe6f
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 depends_on: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register
 ---
 
@@ -351,14 +360,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus src/branches/stands.go and merge.go, which the take reaches through its guards, and src/quack/branch.go, which wires the take's registry
+- every door the change reaches has a fake: the pull and the take read failure.Fake in their cases, and failure.Dir has FakeDir
+- each file the change touches carries a header line and a link to spec/design_output/failures#the-refusals-move-onto-nodes
+- every fact stands in one place: remedies stand on their nodes under spec/failures, the moved places stand in failure.Moved alone
 
 ## tests-green
 
