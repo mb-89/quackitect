@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
@@ -243,6 +243,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: a30f8e4fd0b973e1869b7c28041b769a9efbb077
+    hash_after: a30f8e4fd0b973e1869b7c28041b769a9efbb077
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 reason: done
 ---
 
@@ -329,69 +341,57 @@ accept
 <!-- what was done, one line a ticket or a thing -->
 <!-- the form is list -->
 
-- [[spec/tickets/level0-smoke-runs-in-seconds]]: probe smoke runs level zero over the working tree with the model faked, inside the check, on the Linux and Windows runners
-- [[spec/tickets/probe-at-revision-guards-merges]] and [[spec/tickets/probe-at-stays-dry]]: probe dry takes --at a revision and stays dry
-- [[spec/tickets/merge-deny-every-connector]]: the settings deny the merge tool under every GitHub connector, so auto-merge is the one road to main
-- [[spec/tickets/runme-road-waits-on-ready]]: the road test waits on the index ready event
-- [[spec/tickets/the-check-ends-what-it-drops]], [[spec/tickets/ending-windows-tree-tested]] and [[spec/tickets/vale-call-takes-endswhole]]: a child the check gives up on ends with its whole tree
-- [[spec/tickets/the-index-outlives-the-check]] and [[spec/tickets/door-outlives-taskkill-tree]]: the index door stands apart from the process that starts it
-- [[spec/tickets/level0-claims-name-the-platform]], [[spec/tickets/platform-draft-names-checkdoors]] and [[spec/tickets/platform-red-line-tested]]: every level-zero line names its platform
+- smoke-waits-for-the-door: the stop answer names the door's pid, and the stop client waits on it on Windows
+- the merge of main keeps main's unparked and drops the branch's untodo, since both fixed one fault
+- level-zero-smoke: the accept leaf passes on the reopened group
 
 ### well
 
 <!-- what went well, and what made it go well -->
 <!-- the form is list -->
 
-- the handover named the ticket, the leaf and the exact test command, so the box after the clear lost no turn finding its place
-- a pipe held open by child and grandchild proves the tree kill with no timer, which kept the owner rule on tests whole
-- trivial children minted at the gate kept each change small enough to read whole
+- the handover named the fix commit and the next verbs, so the box picked up in a few calls after the clear
+- the branch test takes named files, which gave a road past a moved base
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- the owner prompt of the opening turn asked for the smoke, the ready wait and the ended child, and set the rules on timers and doors
-- 19:06 the hand-back met no index after the check, and the CLI waited minutes on the restart, the fault this group fixes
-- earlier in the run, three waits failed on the index restarting, for minutes each
-- 19:08 the agent ended its turn claiming a helper still ran, and the stop refused it, since a cloud box stops its helpers when the turn ends
-- 19:11 the agent ran git push in place of the push verb, and GitWritesThroughAVerb refused it
-- 19:12 the agent ran past the plan grace, and the engine refused a call until the plan stood
-- 19:13 the agent handed accept back with --pass beside a verdict field, and the pull refused it
-- 19:15 the agent wrote a scratch file through a shell heredoc, and ShellWritesNothing refused it
-- the door start in src/index/door.go waits on the door with a sleep loop, against the owner rule, and it stood on main before this group
+- 20:04 UTC: level zero cleared the conversation past its handover mark, and its prompt opened the window
+- 20:05 UTC: the pull on main handed a cloud box the desk ticket desk-probe-reply-trial, which only a desk runs
+- 20:06 UTC: the fail on that ticket landed a commit on main that the push door refuses, so it stays local
+- 20:10 UTC: branch take met a conflict in the probe clear script and its test, from two fixes of one fault
+- 20:12 UTC: the index dropped mid hand-back, and the pull answered connection refused
+- 20:14 UTC: the merge commit named the ticket, so the branch test measured from it and found no test
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 <!-- the form is list -->
 
-- the index drop: src/index/detach.go lands with this group, and the next box after a check proves it
-- the turn end on a cloud box: .claude/skills/work/SKILL.md says to wait inside the turn on a background command
-- the push: .claude/skills/work/SKILL.md names ./RUNME.sh push at each push step
-- the accept hand-back: the pull verb prints the accept line with --fields alone, and no --pass
-- the heredoc: the agent passes JSON inline to the pull tool, which the work skill names
-- the sleep loop: a backlog ticket has the door start wait on the door ready event, in src/index/door.go
-- the became that skips an accept: a backlog ticket from the note became-skips-the-accept
-- the commit door over tests-red: a backlog ticket from the note implement-reads-the-red-tests
+- the pull: hand a cloud box no ticket whose ask names a desk alone, in spec/design_output/pull
+- the fail verb: land no commit on main from a cloud box, in spec/design_output/pull
+- the branch test: measure from the ticket's first commit on the branch, in src/branches/test.go
+- the dispatch: read the tickets two live groups touch before both start, in the dispatch skill
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The box weighed minting the sleep-loop fix into this group and kept it out, because the loop predates the group and the cloud rule stops work at the branch edge. It assumed a note marked became rides the retro into the backlog.
+The Windows claim rests on a vet of the Windows build and the logic of the process handle, and the CI run on the pull request proves it or not. Two boxes fixed one fault in the probe clear script at once, so the merge chose the copy main already carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each fact points at the ticket that owns it
-- the retro adds no number past the times the run carries
-- the retro writes no file header
-- the badly list carries the owner prompt and each error with its time
-- the chapter names the agent, the box and the owner by role, and no path of the box
+the change adds the pid in one place, the stop answer, and the client reads it there
+the change adds no number
+the new files carry headers saying what they are for, and count nothing
+the chapter carries the clear prompt and each error of the run with its time
+the chapter names roles alone, and no box name, address or path
 
 ## cloud
 
