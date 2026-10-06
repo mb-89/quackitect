@@ -95,7 +95,19 @@ record:
         exit: 0
         said: work/the-check-runs-beside already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 38024a806da0856b1b6e0113b853d0819326d365
+    hash_after: 38024a806da0856b1b6e0113b853d0819326d365
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -124,14 +136,19 @@ The check's parts block each other no more: every part starts at once, so the ch
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-parts-start-at-once]], standard
+- [[spec/tickets/the-budget-reads-the-span]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the-parts-start-at-once carries the overlap and its fake-clock test in one diff, and the-budget-reads-the-span carries one config number, so each reviews whole
+- the first child carries every part starting at once, the red part naming itself and the overlap test; the second carries the budget, so the goal stands inside the two
+- the-budget-reads-the-span names the-parts-start-at-once under depends_on, since it sizes the budget to the span the first child sets
 
 # children
 
