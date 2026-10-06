@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -29,6 +29,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: a-guard-reads-door-declarations
+record:
+  - step: do
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 9642d5f077559c6c400d4fbbac4d2e2c8721f148
+    hash_after: dc319cc3eab2c5ca396216c029192f4019f880b4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/owns passes; green, src/imports passes
+      - name: check
+        exit: 0
+        said: "   89.3  in all"
+    inputs:
+      - name: ask
+        hash: abe3f8c53a9703eb
+        size: 431
+    def: ce98b9e976552e83
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ the draft's tests list names src/imports/imports_test.go and src/quack/lsp_test.
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack src/owns src/imports
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The guard ticket's draft named test files the red cases left, and its size list missed two files. Its Discussion now maps each named case to the file it stands in, adds the two files to the size, and says why `src/quack/lsp_doors_test.go` meets the line naming `src/modules/lsp`: only `src/quack` wires the real check module into the lsp IO module.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change departs from the ask in one place: it writes under Discussion, since a hand writes nothing under another leaf, and the draft keeps its record
+the cleanup: none further; the named test packages stand green
+one place: the mapping stands once, in the guard ticket's Discussion
 
 # Discussion
 
