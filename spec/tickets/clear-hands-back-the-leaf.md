@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: children
+step: accept
 record:
   - step: sync
     hand: box 156418b839c4 · claude-code-remote
@@ -105,6 +105,10 @@ record:
         hash: 2ef6b9dde7e8eb45
         size: 457
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 5ccc94ce8a2a75a751e47e29c544a97fa61fe24d
+    hash_after: 5ccc94ce8a2a75a751e47e29c544a97fa61fe24d
 ---
 
 # Ask
