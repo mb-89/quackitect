@@ -9,6 +9,7 @@ import "testing"
 func TestPDADeskTakeRefusesAndNamesMain(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("one-group"): pdGroupNote}).desk()
+	one.d.Failures = deskNodes()
 	one.branch("one-group", nil)
 	was := one.git("rev-parse", "HEAD")
 	if code := one.branchSays("take", "one-group"); code != codeRefused {
