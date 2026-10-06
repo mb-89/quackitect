@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: abf770376e18cfc644da41560f97b17f44041c57
+    hash_after: abf770376e18cfc644da41560f97b17f44041c57
+    inputs:
+      - name: ask
+        hash: 7d33ff4dc7616eba
+        size: 501
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,61 @@ The coordinator types the prompt again at each spawn, and a typed prompt drops a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb `./RUNME.sh cloud prompt <group>` prints the prompt a box starts with, off the group ticket and its route.
+
+- `promptOf(group, steps, children)` in `src/branches/prompt.go` stands pure: it joins the opening line `run the work skill`, the group's name, its children, the route's steps in order, and the box rules.
+- The box rules stand once, as the constant `boxRules` in `prompt.go`, in the order a box meets them: take, pull, commit and push, done, the pull request.
+- The verb reads `spec/tickets/<group>.md` off the work root. It refuses, code 2, where the ticket stands nowhere, or where its `process` names no group route.
+- It reads `spec/processes/<route>.yaml` off the method root, and refuses where that file stands nowhere. The route's top-level step names give the order the prompt prints.
+- The children are the tickets under `spec/tickets` whose `group` names the group, in name order.
+- `Cloud` in `src/branches/branch.go` runs `prompt` beside `trigger`, and its usage names it.
+
+Weighed: the disk read over a read off `origin/main`, since the coordinator runs on a desk standing on main. Assumed: the route is the process file the ticket links, so a renamed or missing process refuses before a box starts.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/branch.go: Cloud, which gains the prompt word
+- src/quack/cloud.go: cloudVerb, which hands every word to Cloud and changes nothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/prompt_test.go: TestPromptWritesTheGroupsPromptFromItsRoute
+- src/branches/prompt_test.go: TestPromptRefusesATicketThatStandsNowhere
+- src/branches/prompt_test.go: TestPromptRefusesARouteThatStandsNowhere
+- src/branches/prompt_test.go: TestPromptRefusesATicketNamingNoGroup
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/prompt.go
+- src/branches/prompt_test.go
+- src/branches/branch.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `src/branches/branch.go` (Cloud, the table), `src/branches/group.go` (routeOf, isGroup), `src/branches/doors.go` (read, names, methodAt) and `src/branches/guidance.go` (processFolder), and checked each claim there.
+- Callers: Cloud is the one entry, and `src/quack/cloud.go` cloudVerb reaches it unchanged.
+- The first done_when line meets TestPromptWritesTheGroupsPromptFromItsRoute, the second meets the two refusal tests, and the check line meets `./RUNME.sh check`.
 
 ## tests-red
 
