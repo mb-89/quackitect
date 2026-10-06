@@ -117,7 +117,11 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/owner-read
+step: design/draft
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
