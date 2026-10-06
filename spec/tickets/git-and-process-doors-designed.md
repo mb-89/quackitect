@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -214,6 +214,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 287bd8367b7073b173d2b11ce5dccf4b748076a5
+    hash_after: 287bd8367b7073b173d2b11ce5dccf4b748076a5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/proc passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 2a9158664f043493
+        size: 860
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -373,26 +396,33 @@ the answer to an empty argv stands once, in namesNoProgram, and both runners ret
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/proc/proc_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The process door now runs on both sides. FakeRunner.Run answers from its Programs table, and NotStarted with an error on an empty argv or an untaught program. Real answers that same NotStarted on an empty argv where it once panicked. The contract suite, red since tests-red, runs every case on both runners and stands green, so it leaves the red list.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/proc alone, the process door the ask names
+the one door the change reaches is the process door, and FakeRunner stands beside Real with its contract suite
+the header of src/proc/proc.go and each type point at the process door section of spec/design_output/doors, which names the approach
+the answer to an empty argv stands once, in namesNoProgram, and both runners return it
 
 # accept
 
