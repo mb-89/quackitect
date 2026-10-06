@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 7f13a4b6bdd9ca88
         size: 6809
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 2beb0f59e569e3ff53d63252c993e07b5ecb176c
+    hash_after: 2beb0f59e569e3ff53d63252c993e07b5ecb176c
+    inputs:
+      - name: design/draft
+        hash: 7f13a4b6bdd9ca88
+        size: 6809
+      - name: design/tests-red
+        hash: 2dbc33b2321c853d
+        size: 942
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -329,8 +341,14 @@ the one door the tests reach is the process door, and FakeRunner stands beside t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: nodeAcceptOver and voiceRunsValeOver over proc.Runner, Command.Drop, and the family row re-filed by what each file waits on. The red cases fail on their own assertions, as the run shows
+- spawndoors.go: quack-repos-meet-fake-git moved roadVerb, claudeAt and takesBranch there and links this ticket as their owner. No quack case reaches the three, so they join the follow-up for spawns no case reaches, which already names roadVerb and takesBranch. Implement repoints the spawndoors.go header at that follow-up and adds the file to size. claudeAt calls exec.LookPath and spawns nothing
+- Drop: tests-red pins one meaning, where Drop strips the box's variables and a pair in Env stands past the drop. Implement follows tests-red, and leaves out the draft's line on FakeRunner stripping Env. The fake already passes the Drop contract, and the real runner alone fails it
+- tests: the person's case stands as the TestVerbRegistry subtest aPersonRunDropsTheHarnessAndNamesItsRoot, since the registry map is unguarded, and not as a top-level TestAPersonRunDropsTheHarnessAndNamesItsRoot. Implement deletes TestAPersonRunCarriesNoHarness and childSays, which still spawn a shell script
+- the Halting, Command.Wait and fake halt landed by lsp-tools-take-the-runner leave this approach unchanged
 
 # implement
 
