@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    2.6  test/contract/index.test.js a stopped index leaves no se-index process past the case"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: aee280c2fb7c1d3a26cf15a92c7bbb76ed98e214
+    hash_after: aee280c2fb7c1d3a26cf15a92c7bbb76ed98e214
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks/stop passes
+      - name: check
+        exit: 0
+        said: "  115.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 1f088f57a6ca77e2
+        size: 699
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/stop/stop_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud box asks nobody, so the stop vote now holds a cloud turn whose last prose paragraph ends on a question mark. The rule a-cloud-box-decides runs the check ends-on-a-question at priority 83 and says decide. A desk reads the check as false and stops as before, and the owner holds still end the turn.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the stop module, its rule file, its design note and the JS stop door the contract test pairs with it
+- the check reads the facts alone, so no door joins
+- each new function points at the design section a-cloud-box-decides
+- the rule text stands in the rule file alone, and the design table names the check once
 
 # accept
 
