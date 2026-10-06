@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -167,6 +167,12 @@ record:
       - name: lint
         exit: 0
         said: "    1.9  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 581a3beb9d7de2c4c71e0bc18cb6a20d1357cbac
+    hash_after: e64314c60b75ffd05ac889b8a3a7fba2291e1bf0
+reason: became
+successors: [test-walks-move-onto-fakes]
 ---
 
 # Ask
