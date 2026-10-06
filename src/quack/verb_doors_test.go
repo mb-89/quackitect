@@ -111,6 +111,14 @@ func TestDoorsListsADeclarationStandingAsItsOwnOutside(t *testing.T) {
 	}
 }
 
+func TestDoorsListsTheContractTestOfTheRootDoor(t *testing.T) {
+	t.Parallel()
+	_, out, _ := doorsRan(treeRoot)
+	if want := "src/quack/box_doors_contract_test.go keeps the contract of quack\n"; !strings.Contains(out, want) {
+		t.Fatalf("doors over the tree prints %q, and wants %q", out, want)
+	}
+}
+
 func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
