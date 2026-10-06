@@ -33,6 +33,14 @@ export const DRY = {
   checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
 };
 
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+export const SMOKE = { checks: DRY.checks };
+
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+export function smokeTree() {
+  return false;
+}
+
 // The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
 export const WORKING = "--working";
 

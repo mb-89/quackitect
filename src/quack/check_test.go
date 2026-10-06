@@ -110,14 +110,15 @@ func TestCheckParts(t *testing.T) {
 			t.Fatalf("the rules ran %v", fake.verbs)
 		}
 	})
-	t.Run("a Windows box runs no dry session, and says so", func(t *testing.T) {
-		fake := &checkFake{}
-		doors := fake.doors()
-		doors.platform = "windows"
-		var said strings.Builder
-		doors.out = &said
-		if code := partNamed(partsOf(doors, nil, false), "level0").run(); code != 0 || len(fake.verbs) != 0 || !strings.Contains(said.String(), "Windows") {
-			t.Fatalf("the level0 part answers %d, ran %v, and says %q", code, fake.verbs, said.String())
+	// [[spec/tickets/level0-smoke-runs-in-seconds]]
+	t.Run("level zero runs the smoke on the working tree, on Windows as on Linux", func(t *testing.T) {
+		for _, platform := range []string{"linux", "windows"} {
+			fake := &checkFake{}
+			doors := fake.doors()
+			doors.platform = platform
+			if code := partNamed(partsOf(doors, nil, false), "level0").run(); code != 0 || !reflect.DeepEqual(fake.verbs, [][]string{{"probe", "smoke", "--working"}}) {
+				t.Fatalf("on %s the level0 part answers %d and runs %v", platform, code, fake.verbs)
+			}
 		}
 	})
 	t.Run("the plugin part validates the plugin, and passes where claude stands nowhere", func(t *testing.T) {
@@ -326,7 +327,7 @@ func TestCheckReads(t *testing.T) {
 		}
 	})
 	t.Run("level zero going red says the tree is red", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"probe dry --working": 1}}
+		fake := &checkFake{codes: map[string]int{"probe smoke --working": 1}}
 		doors := fake.doors()
 		var said strings.Builder
 		doors.errs = &said

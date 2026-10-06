@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 1ba74feccc7fa8db
         size: 625
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 4b27f26c88d9ad96131a7f74219e9cdab3327b98
+    hash_after: 4b27f26c88d9ad96131a7f74219e9cdab3327b98
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: ef85745769ce3f78
+        size: 2897
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +241,34 @@ A smoke road joins the dry probe: probeSmoke in src/scripts/probe-dry.js stands 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
+- src/quack/probe_verb_test.go
+- test/level0/probe-dry.test.js
+- test/level0/start-constants.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its assertion: the check runs probe dry, the verb prints its usage for smoke, the stubbed smoke tree stands nothing, the stubbed check list still holds the clear, and the start road names no .exe. The red-going case of the check now keys on the smoke, so it stands red with them. A scratch run earlier showed the smoke over a shared clone answering every check but the clear in six seconds, where the dry probe takes forty.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the level0Runs line meets the check_test case over both platforms, the workflow line meets check-workflow.test.js as it stands, and the check line waits for tests-green
+- the smoke tree case runs over fakeDisk and fakeProc, and the check and verb cases over their fakes, so no case reaches a disk, a process or a box
 
 # gate
 
