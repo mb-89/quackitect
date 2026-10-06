@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -206,6 +206,15 @@ record:
         hash: 8e785cc94e2e32f9
         size: 4503
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: f9fe32006c02350165c0cbc3ede8f93881688e33
+    hash_after: f9fe32006c02350165c0cbc3ede8f93881688e33
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -357,14 +366,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/failure/check.go, check_test.go, tree_test.go, door.go and door_contract_test.go, the files the draft names, and no other
+- the one door the change reaches is the package's door, whose Walk FakeDir answers, and TestDirAndFakeDirAnswerAlike holds the two alike
+- the header and each fault function in src/failure/check.go point at spec/design_output/failures#the-check-holds-the-registry
+- Moved stands in src/failure/check.go alone, and the design note points at it by name
 
 ## tests-green
 
