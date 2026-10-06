@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 53d57e1376be6ada
         size: 1107
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 6a323cd8e5c5ec9eaf16dd787900689387c5612a
+    hash_after: 5c8f6d26c47054b4c0023e82896d5a2781b93f4e
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -325,14 +334,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names and the gate's points, plus split_test.go, whose TestMain removes the shared build folder, and the five child tickets the table names
+- every door the change reaches has a fake: the quack build reaches go once a run as a door test of the build, the placements run on the fake timer, and the deferred families each name a child moving them onto a fake
+- a comment names the approach on each new var and helper, pointing at this ticket
+- the audit stands once in the family table of spec/design_output/doors.md, and the children point at it
 
 ## tests-green
 
