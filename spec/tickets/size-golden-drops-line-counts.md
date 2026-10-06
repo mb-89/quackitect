@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -152,6 +152,19 @@ record:
         hash: 1c3f36d653132a35
         size: 398
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: bd0ecfd6de5b0d3806e064692f8182db0858511d
+    hash_after: bd0ecfd6de5b0d3806e064692f8182db0858511d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 214d2c12ba7a3ba4
+        size: 3636
+    def: 08e16d07b0de477c
 group: engine-verbs-hold
 ---
 
