@@ -31,6 +31,17 @@ func TestAModulePastOneToOneIsNamedWithBothCounts(t *testing.T) {
 	}
 }
 
+func TestABlankLineCountsNowhere(t *testing.T) {
+	t.Parallel()
+	said := ratioOver(map[string]string{
+		"c/c.go":      "package c\n",
+		"c/c_test.go": "package c_test\n\n\n   \n",
+	})
+	if len(said) != 0 {
+		t.Fatalf("one test line against one code line answers %q", said)
+	}
+}
+
 func TestAJavaScriptTestBelongsToTheFolderItImports(t *testing.T) {
 	t.Parallel()
 	said := ratioOver(map[string]string{

@@ -62,6 +62,14 @@ func TestMarkedCall(t *testing.T) {
 func TestMarkedDoc(t *testing.T) { _ = t.TempDir() }
 `
 
+func TestAnIndexStartOutsideTheHomeIsNamed(t *testing.T) {
+	t.Parallel()
+	fset, files := parsed(t, map[string]string{"p/c_test.go": "package p_test\n\nimport \"testing\"\n\nfunc TestStarts(t *testing.T) { index.Serve() }\n\nfunc TestShared(t *testing.T) { qtest.Shared(nil) }\n"})
+	if said := imports.FixtureBuilds(fset, files); !slices.Equal(said, []string{"p/c_test.go TestStarts"}) {
+		t.Fatalf("the guard names %v, not the index start alone", said)
+	}
+}
+
 func TestTheHomeAndAMarkedCallAreSpared(t *testing.T) {
 	t.Parallel()
 	fset, files := parsed(t, map[string]string{

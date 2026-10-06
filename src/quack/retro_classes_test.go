@@ -82,6 +82,9 @@ func TestRetroClassesHoldEveryNoteAndMemoryAndTheReportListsThemWithTheChecklist
 	if code != 1 || !strings.Contains(errs, "note:a-parked-thought carries no disposition") || !strings.Contains(errs, "memory:a-rule carries no disposition") || !strings.Contains(errs, "script:a-loop.sh carries no disposition") {
 		t.Fatalf("an undisposed note and memory answer %d, %q", code, errs)
 	}
+	if strings.Contains(errs, "script:a-loop\n") || strings.Contains(errs, "script:a-loop ") {
+		t.Fatalf("a script loses its ending in its id: %q", errs)
+	}
 	if strings.Contains(errs, "memory:MEMORY") {
 		t.Fatalf("the memory index asks a disposition: %q", errs)
 	}

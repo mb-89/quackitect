@@ -25,6 +25,17 @@ func TestACompareKeysOnTheTextBeforeATab(t *testing.T) {
 	}
 }
 
+func TestTheGuardsListEveryGuardTheModelNames(t *testing.T) {
+	t.Parallel()
+	names := []string{}
+	for _, one := range imports.Guards {
+		names = append(names, one.Name)
+	}
+	if want := []string{"blackbox", "fixture", "ratio", "script"}; !slices.Equal(names, want) {
+		t.Fatalf("the guards read %v, not %v", names, want)
+	}
+}
+
 func TestTheBlackboxGuardNamesTrackedInPackageTests(t *testing.T) {
 	t.Parallel()
 	texts := map[string]string{"x/x_test.go": "package x\n", "y/y_test.go": "package y_test\n", "x/x.go": "package x\n"}

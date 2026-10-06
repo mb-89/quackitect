@@ -20,3 +20,11 @@ func TestASharedBuildAnswersTheFirstBuild(t *testing.T) {
 		t.Fatalf("two calls answer %p and %p over %d builds, not one build", first, second, builds)
 	}
 }
+
+func TestTwoSharedBuildersBuildApart(t *testing.T) {
+	t.Parallel()
+	one, two := qtest.Shared(func() int { return 1 }), qtest.Shared(func() int { return 2 })
+	if one() != 1 || two() != 2 {
+		t.Fatalf("two builders answer %d and %d, not 1 and 2", one(), two())
+	}
+}
