@@ -113,7 +113,23 @@ record:
     hand: the engine
     hash_before: 365015cdc1e3ee7b66a322a64fee291a7ecf37e4
     hash_after: 365015cdc1e3ee7b66a322a64fee291a7ecf37e4
-step: accept
+  - step: accept
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: ac722d59c976c495f8113d919f861e6baff0f947
+    hash_after: 33d00afa7e8199fa9f94116e598276045df8e93a
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/retro-and-coordinator already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 901e8175f30a8f12
+        size: 458
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+step: retro/notes
 ---
 
 # Ask
@@ -174,8 +190,10 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the live check of the start refusal stands open as the person trial start-refusal-stops-trial, loose on main, since no box holds a client key
 
 # retro
 
