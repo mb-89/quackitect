@@ -95,7 +95,7 @@ func TestFleetExitsRedOnAWake(t *testing.T) {
 
 func TestPullsReadEachPullHeadByItsTip(t *testing.T) {
 	t.Parallel()
-	said := pullsOf([]git.Ref{{Name: "refs/pull/7/head", Hash: "a1b2"}, {Name: "refs/heads/main", Hash: "c3d4"}})
+	said := pullsOf([]git.Ref{{Name: "refs/pull/7/head", Hash: "a1b2"}, {Name: "refs/pull/7/merge", Hash: "c3d4"}})
 	if len(said) != 1 || said["a1b2"] != "#7" {
 		t.Fatalf("the pulls read %v", said)
 	}

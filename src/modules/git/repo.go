@@ -8,7 +8,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -514,9 +516,24 @@ func (one *door) SoftReset(ref string) error {
 	return err
 }
 
+// A ref set to a commit. Git from 2.45 on refuses update-ref on MERGE_HEAD as a pseudoref, so the door writes its file in the git folder, as git merge does. [[spec/tickets/the-doors-pr-goes-green]]
 func (one *door) UpdateRef(name, hash string) error {
-	_, err := one.must("update-ref", name, hash)
-	return err
+	if name != mergeHead {
+		_, err := one.must("update-ref", name, hash)
+		return err
+	}
+	full, ok := one.word("rev-parse", "--verify", "--quiet", hash+"^{commit}")
+	if !ok {
+		return fmt.Errorf("%s names no commit", hash)
+	}
+	at, ok := one.word("rev-parse", "--git-path", mergeHead)
+	if !ok {
+		return errors.New("git names no path for " + mergeHead)
+	}
+	if !filepath.IsAbs(at) {
+		at = filepath.Join(one.root, at)
+	}
+	return os.WriteFile(at, []byte(full+"\n"), 0o644)
 }
 
 func (one *door) History(path string) ([]Commit, error) {

@@ -60,13 +60,15 @@ The sync of main into the branch resolves four conflicts:
 | `src/quack/io_test.go` | the branch's `silentRun`, which reads the mark the merged fake commits |
 | `src/scripts/probe-clear.js` and its test | main's `unparked`, which holds the trunk's reading of `todo: true` |
 
-Main's fleet, route and prompt code called doors the branch removes. `fleet` reads pull heads through `Repo.RemoteRefs`. `readFile` returns to `doors.go` for the event file at a whole path. The fleet, record and prompt cases run on the fake git and the fake disk.
+Main's fleet, route and prompt code called doors the branch removes. `fleet` reads pull heads through `Repo.RemoteRefs`, and the fleet, record and prompt cases run on the fake git and the fake disk.
+
+Origin's branch carried the same port from another hand, under the-doors-pr-goes-green. The second sync takes origin's side of every hunk, so this merge adds no code past origin's.
 
 ## checked
 
 - the change follows the ask: the branch takes main in, and the check stands green
 - the cleanup the merge reveals is in the change: the unused `TAGGED` and its comment leave
-- every fact stands in one place: `readFile` stands in `doors.go` alone
+- every fact stands in one place: the port keeps origin's `pullRefs`, and adds no second door
 
 # Discussion
 

@@ -19,6 +19,12 @@ const (
 	shortWait  = 100 * time.Millisecond
 )
 
+// The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk and not in the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
+const (
+	hereLine = ": > here"
+	hereFile = "here"
+)
+
 // A runner and the halt that ends its runs. [[spec/tickets/lsp-tools-take-the-runner]]
 type halting struct {
 	run  Runner
@@ -99,8 +105,11 @@ func fakeSh(one Command) Said {
 		return Said{Out: one.Stdin}
 	case "kill -TERM $$":
 		return Said{Code: Signalled}
-	case "pwd -P":
-		return Said{Out: one.Dir + "\n"}
+	case hereLine:
+		if err := os.WriteFile(filepath.Join(one.Dir, hereFile), nil, 0o644); err != nil {
+			return Said{Err: err.Error(), Code: 1}
+		}
+		return Said{}
 	case "printf %s \"$PROC_CONTRACT\"":
 		for _, pair := range one.Env {
 			if value, ok := strings.CutPrefix(pair, "PROC_CONTRACT="); ok {
@@ -133,13 +142,13 @@ func TestARunReadsItsInput(t *testing.T) {
 
 func TestARunStandsInItsFolder(t *testing.T) {
 	t.Parallel()
-	folder, err := filepath.EvalSymlinks(t.TempDir())
-	if err != nil {
-		t.Fatal(err)
-	}
 	for name, run := range runners() {
-		if said := run(Command{Argv: []string{"sh", "-c", "pwd -P"}, Dir: folder}); said.Out != folder+"\n" || said.Code != 0 {
+		folder := t.TempDir()
+		if said := run(Command{Argv: []string{"sh", "-c", hereLine}, Dir: folder}); said.Code != 0 {
 			t.Errorf("the %s runner answers %+v", name, said)
+		}
+		if _, err := os.Stat(filepath.Join(folder, hereFile)); err != nil {
+			t.Errorf("the %s runner leaves no %s in its folder: %v", name, hereFile, err)
 		}
 	}
 }

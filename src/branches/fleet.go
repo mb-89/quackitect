@@ -68,12 +68,11 @@ func withTips(rows []boxRow, stood []stand, now int64, pulls map[string]string) 
 	return out
 }
 
-// The pull request numbers by the tip their head names, off ls-remote's rows. [[spec/tickets/the-fleet-verb-watches-boxes]]
+// The pull request numbers by the tip their head names, off origin's pull refs. [[spec/tickets/the-fleet-verb-watches-boxes]]
 func pullsOf(refs []git.Ref) map[string]string {
 	out := map[string]string{}
 	for _, one := range refs {
-		number, ok := strings.CutSuffix(strings.TrimPrefix(one.Name, "refs/pull/"), "/head")
-		if ok && number != one.Name {
+		if number, ok := strings.CutSuffix(strings.TrimPrefix(one.Name, pullRefs), "/head"); ok && !strings.Contains(number, "/") {
 			out[one.Hash] = "#" + number
 		}
 	}
@@ -92,8 +91,8 @@ func (d *Doors) idleSpan() int64 {
 func (d *Doors) fleet() int {
 	d.fetch()
 	stood, _ := d.readWork(false)
-	refs, _ := d.Repo.RemoteRefs("refs/pull/")
-	pulls := pullsOf(refs)
+	said, _ := d.Repo.RemoteRefs(pullRefs)
+	pulls := pullsOf(said)
 	rows := withTips(fleetRows(stood, standingAll(stood)), stood, d.nowSeconds(), pulls)
 	for _, one := range rows {
 		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull, one.Model, one.Cost, one.Final), "  "))

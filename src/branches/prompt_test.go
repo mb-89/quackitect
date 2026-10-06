@@ -29,7 +29,7 @@ func promptChild(state string) string {
 	return "---\nkind: [[ticket]]\nstate: " + state + "\nprocess: [[spec/processes/standard]]\ngroup: g\n---\n\n# Ask\n\nBuild it.\n"
 }
 
-// Doors over a folder holding the files, and the prompt verb's code, output and errors. [[spec/tickets/a-verb-writes-box-prompts]]
+// Doors over a fake disk holding the files, and the prompt verb's code, output and errors. [[spec/tickets/a-verb-writes-box-prompts]]
 func promptSays(t *testing.T, files map[string]string, argv ...string) (int, string, string) {
 	t.Helper()
 	disk := newFakeDisk()
