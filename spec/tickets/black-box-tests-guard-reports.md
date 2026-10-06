@@ -224,6 +224,12 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 9b371e829a47327956c90d72bc3bcb11e0ea1e7d
+    hash_after: 9b371e829a47327956c90d72bc3bcb11e0ea1e7d
+    returns: 1
+    why: "the hand-back met refused 5 times: tests under implement/tests-green expects green, and ./RUNME.sh branch test answers assertion, a test of src/imports fails"
 ---
 
 # Ask
