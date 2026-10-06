@@ -133,7 +133,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box 2dca9acd8cb4 · claude-code-remote
+    hash_before: 1e2f22c9aea12b072580b036be01b7c7799a82bd
+    hash_after: 1e2f22c9aea12b072580b036be01b7c7799a82bd
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+step: retro/cloud
 ---
 
 # Ask
@@ -208,38 +220,64 @@ accept: the design input holds the seven points with pylib and the pyqtgraph exp
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- examples-design-input: the owner's points on examples stand as design input, with pylib and the pyqtgraph explorer
+- examples-design-note: spec/design_output/examples.md holds the format, the places, the suite, the runner, the Tutorial tab, the search, the editor road and the checks
+- examples-testing-rules: spec/guidance/code/examples.md holds the rules, testing.md points there, and the audit guidance and the retro checklist carry the counts
+- examples-implementation-drafts: the group examples-run-as-tests stands as a draft with its children
+- restated-table-runs-in-time: the RestatedTable rule runs in linear time, with a contract case
+- examples-design-meets-review: the review's points on the design input and the design note
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the sibling branch showed the road for a group a cloud box mints, a commit on its own work branch then a take
+- an independent reviewer read the diff and found what the author's own gate missed
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 18:45 the mint refused the group before a child named it, and branch open refused off main, and a push to main refused from a cloud box
+- 19:00 the vocabulary rule read stale terms until ./RUNME.sh project ran
+- 19:03 the design input pointed at a design note not yet written, and the check went red
+- 19:20 mint_note wrote the Scope alone and dropped every other chapter, for the design input and the design note both
+- 19:30 to 20:00 the check went red three times on a Vale script timeout under load
+- 19:50 testing.md stood at the guidance cap, so the rules took a note of their own
+- 20:26 the author passed the group accept on a grep, before the reviewer reported, and missed the dropped chapters
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the work skill names the road for a group a cloud box mints: commit on work/<group>, push, then branch take, in .claude/skills/work/SKILL.md
+- the commit verb runs the projection where spec/vocabulary changes, in src/quack
+- mint_note writes every chapter its fields name, or refuses the ones it drops, in the mint module
+- the RestatedTable fix holds the timeout, and the check runs Vale in batches, in src/modules/lsp/tools.go
+- the accept gate waits on the review a hand starts, in spec/guidance/working.md
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The design sits on decisions the owner left open: the expect lines as shell comments, the ./RUNME.sh-only rule for steps, and the filter pane and F5 for the tab. Each one keeps a single file readable on GitHub, runnable in Runme and fakeable in the harness. The cap on testing.md was a real constraint, and the separate note tagged testing reaches the same readers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the notes point at the doors, the fakes and the ratio's owner
+- the run adds no number past the run length the schema names
+- the headers say what each file is for
+- the badly list carries each error with its time, and the run had no owner prompt past the first
+- the chapter names roles alone
 
 ## cloud
 
