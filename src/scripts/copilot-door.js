@@ -13,6 +13,17 @@ import { callsOf, postedAs } from "../../.claude/skills/level0/lib/copilot.js";
 
 // Copilot calls none of the reads the plugin serves, so every tool call is guarded while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]
 const SERVED_READS = [];
+// The statuses a fetch reads as ok. [[spec/tickets/copilot-answers-off-the-door]]
+const OK_FROM = 200;
+const OK_PAST = 300;
+
+// The fetch answers takes, sent through the http door under the hook's deadline. [[spec/tickets/copilot-answers-off-the-door]]
+export function fetchThrough(web, signal) {
+  return async (url, init) => {
+    const said = await web.send(url, { ...init, signal });
+    return { ok: said.status >= OK_FROM && said.status < OK_PAST, status: said.status, text: said.text };
+  };
+}
 
 // The result a Copilot event answers: the first deny or block a call meets, else the afters joined as context. A door that answers nothing refuses a guarded call and passes the rest. [[spec/tickets/copilot-answers-off-the-door]]
 export async function answers(event, it) {

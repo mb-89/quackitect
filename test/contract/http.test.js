@@ -61,6 +61,20 @@ test("the real door sends the method, headers and body, and answers the status, 
   }
 });
 
+// A caller with a deadline hands its signal in, and the door gives up where it fires. [[spec/design_output/doors#one-door-per-outside-thing]]
+test("the real door gives up a send whose signal aborts", { timeout: 2000 }, async () => {
+  const { url, server } = await served(() => {});
+  try {
+    const stop = new AbortController();
+    const said = http().send(url, { signal: stop.signal });
+    stop.abort();
+    await assert.rejects(said, { name: "AbortError" });
+  } finally {
+    server.closeAllConnections();
+    server.close();
+  }
+});
+
 test("the fake answers what the real door answers", async () => {
   const { url, server } = await served((res) => {
     res.writeHead(200);

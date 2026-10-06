@@ -10,10 +10,27 @@ import {
   failureOf,
   replyOf,
 } from "../../.claude/skills/level0/lib/copilot.js";
-import { answers } from "../../src/scripts/copilot-door.js";
+import { answers, fetchThrough } from "../../src/scripts/copilot-door.js";
+import { fakeHttp } from "../../src/doors/fake/http.js";
 
 const STANDING = ".se/.runtime/hooks.json";
 const HOOK = "http://127.0.0.1:7001/hook";
+
+// The hook reaches the door through the http door, and reads ok off the status. [[spec/tickets/copilot-answers-off-the-door]]
+test("the hook's fetch sends through the http door, and a status past 2xx reads as no ok", async () => {
+  const web = fakeHttp({
+    [`POST ${HOOK}`]: () => ({ status: 200, text: "{}" }),
+    "POST http://127.0.0.1:7001/down": () => ({ status: 503, text: "down" }),
+  });
+  const fetch = fetchThrough(web, new AbortController().signal);
+  assert.deepEqual(await fetch(HOOK, { method: "POST", body: "{}" }), { ok: true, status: 200, text: "{}" });
+  assert.deepEqual(await fetch("http://127.0.0.1:7001/down", { method: "POST" }), {
+    ok: false,
+    status: 503,
+    text: "down",
+  });
+  assert.equal(web.sent[0].body, "{}");
+});
 
 // A box whose standing file names the door, and whose door answers the effects the case hands it, or falls. [[spec/tickets/copilot-answers-off-the-door]]
 function doored(effects, files = {}) {
