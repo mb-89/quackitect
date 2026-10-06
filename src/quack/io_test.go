@@ -8,16 +8,70 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/clock"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
 
-// The fake silent IO process: it commits a value, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
+// The lease a silent fake holds, the dog over it, and the poll and the cap of the wait on its real process, which both alarm cases share. [[spec/tickets/lease-waits-meet-a-fake-clock]]
+const (
+	silentTerm = 200 * time.Millisecond
+	silentPoll = 20 * time.Millisecond
+	silentCap  = 20 * time.Second
+)
+
+var silentDog = manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute}
+
+// Places one silent fake process under a dog on a fake clock, and polls until held answers true. The clock moves past the lease on each poll while the pid the fake last committed stands unexpired, so a slow spawn counts against no lease, and a beat landing late meets the next tick. The process and the bus stay real, so this is the door test of a placed process. [[spec/tickets/lease-waits-meet-a-fake-clock]]
+func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot, pids int) bool) {
+	t.Helper()
+	c := q.New()
+	as := manager.Registers(c)
+	hand := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	at := clock.NewFake(time.Now())
+	dog := manager.NewDog(at.Now, store, as, silentDog)
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := index.Placed{Name: part, Command: []string{os.Args[0], "-test.run=^" + fake + "$", "--", part}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: dog, Term: silentTerm}
+	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	pids, expired := map[any]bool{}, map[any]bool{}
+	for end := time.Now().Add(silentCap); time.Now().Before(end); time.Sleep(silentPoll) {
+		snap := store.Snapshot()
+		pid := snap.Read("fake/pid")
+		if pid != 0 {
+			pids[pid] = true
+		}
+		if held(snap, len(pids)) {
+			return
+		}
+		if pid != 0 && !expired[pid] {
+			at.Tick(silentTerm + time.Millisecond)
+			if slices.Contains(dog.Check(), part) {
+				expired[pid] = true
+			}
+		}
+	}
+	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants %s", len(pids), store.Snapshot().Read(manager.AlarmsName), wants)
+}
+
+// The fake silent IO process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
 func TestFakeSilentIO(t *testing.T) {
 	t.Parallel()
 	if os.Getenv(index.BusEnv) == "" {
@@ -27,7 +81,7 @@ func TestFakeSilentIO(t *testing.T) {
 	if err != nil {
 		os.Exit(3)
 	}
-	if err := peer.Commit("fake", map[string]any{"fake/out": 7}); err != nil {
+	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid()}); err != nil {
 		os.Exit(4)
 	}
 	_ = peer.Beat(flag.Arg(0))
@@ -38,32 +92,10 @@ func TestFakeSilentIO(t *testing.T) {
 
 func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 	t.Parallel()
-	c := q.New()
-	as := manager.Registers(c)
-	fake := q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value"))
-	if faults := c.Check(); len(faults) > 0 {
-		t.Fatalf("the catalog refuses: %v", faults)
-	}
-	store := q.NewStore(c)
-	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
-	bus, err := index.StartBus()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer bus.Close()
-	placed := index.Placed{Name: ioPart, Command: []string{os.Args[0], "-test.run=^TestFakeSilentIO$", "--", ioPart}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
-	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	for end := time.Now().Add(10 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
-		dog.Check()
-		if alarms, _ := store.Snapshot().Read(manager.AlarmsName).([]manager.Alarm); len(alarms) == 1 && alarms[0].Part == ioPart {
-			return
-		}
-	}
-	t.Fatalf("session/alarms reads %v, and wants the silent IO process", store.Snapshot().Read(manager.AlarmsName))
+	silentRun(t, ioPart, "TestFakeSilentIO", "the silent IO process", func(snap q.Snapshot, _ int) bool {
+		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
+		return len(alarms) == 1 && alarms[0].Part == ioPart
+	})
 }
 
 // The fake silent module process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
@@ -87,37 +119,10 @@ func TestFakeSilentModule(t *testing.T) {
 
 func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 	t.Parallel()
-	c := q.New()
-	as := manager.Registers(c)
-	fake := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
-	if faults := c.Check(); len(faults) > 0 {
-		t.Fatalf("the catalog refuses: %v", faults)
-	}
-	store := q.NewStore(c)
-	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
-	bus, err := index.StartBus()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer bus.Close()
-	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
-	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	pids := map[any]bool{}
-	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
-		dog.Check()
-		snap := store.Snapshot()
-		if pid := snap.Read("fake/pid"); pid != 0 {
-			pids[pid] = true
-		}
-		if alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm); len(pids) > 1 && len(alarms) == 1 && alarms[0].Part == "fake" {
-			return
-		}
-	}
-	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants a restart, then the alarm", len(pids), store.Snapshot().Read(manager.AlarmsName))
+	silentRun(t, "fake", "TestFakeSilentModule", "a restart, then the alarm", func(snap q.Snapshot, pids int) bool {
+		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
+		return pids > 1 && len(alarms) == 1 && alarms[0].Part == "fake"
+	})
 }
 
 type readsAll struct {
