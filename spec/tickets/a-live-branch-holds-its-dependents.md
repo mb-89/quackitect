@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 89a9877eb7823356
         size: 785
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 0ea36ee95e28abf0f77bfa0504d9fcfeabe5f238
+    hash_after: 0616181c9a8522419cc6c651cb86abed8c8cbf04
+    answered:
+      - name: lint
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -300,14 +309,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft sizes, and src/modules/check/testdata/size.golden.json, which records the length of pull.md
+git is the one door the change reaches, through the git door each package already holds, and the cases drive a real repository as every case beside them does
+both closedHere functions point at spec/design_output/pull#a-live-branch-holds-its-dependents
+the rule stands once, in that chapter, and both twins point at it
 
 ## tests-green
 
