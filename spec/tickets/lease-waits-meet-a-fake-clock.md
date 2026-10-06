@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/index/door.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 613. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: e705150d339e45b6757cdaa7eab029182ff57696
+    hash_after: e705150d339e45b6757cdaa7eab029182ff57696
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 2 file(s); green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   90.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: ccf1c54a62d97aec
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,37 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index src/quack test/contract/lint-twins.test.js test/contract/runme-road.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two waits leave a fixed timer.
+
+The alarm cases in `src/quack/io_test.go` run the dog on a fake clock. The clock moves past the lease on each poll while the live pid stands unexpired, so a slow spawn counts against no lease. The process and the bus stay real, so the module case is the door test of a placed process.
+
+`starts` in `src/index/door.go` waits on readiness. The claim holder waits until the door stands or its index exits, and renews the claim. A caller meeting a fresh claim waits on it. A hang guard under the suites' own timer names an index that neither stands nor exits. Both contract suites share the one index the claim spawns, however long its first build takes. The door note under spec/design_output/index#a-door-comes-back carries the table.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the door note
+- the doors the change reaches stand faked in the cases: the spawn, the start clock and the dog's clock
+- each changed function points at the door note or at this ticket
+- the start's wait stands described once, in the door note
 
 # accept
 
