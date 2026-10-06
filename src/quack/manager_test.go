@@ -163,23 +163,19 @@ func stopped(t *testing.T, bin, root string) {
 	}
 }
 
-// The root built into a folder, as the install builds it, copied off the one build this run takes. [[spec/design_output/model#the-wiring-file]]
+// The root built into a folder, as the install builds it, linked off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
 	built, err := quackBinary()
 	if err != nil {
 		t.Fatalf("the root does not build: %v", err)
 	}
-	text, err := os.ReadFile(built)
-	if err != nil {
-		t.Fatal(err)
-	}
 	bin := binaryIn(folder, "quack")
 	if err := os.MkdirAll(folder, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(bin, text, 0o755); err != nil {
-		t.Fatal(err)
+	if err := os.Link(built, bin); err != nil {
+		t.Fatalf("the build does not link into %s: %v", folder, err)
 	}
 	return bin
 }
