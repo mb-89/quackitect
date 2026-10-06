@@ -122,7 +122,7 @@ func starts(root string) error {
 	}
 	if claims(startingPath(root)) {
 		defer os.Remove(startingPath(root))
-		if err := spawns(bin, root); err != nil {
+		if _, err := spawns(bin, root); err != nil {
 			return err
 		}
 	}
@@ -131,7 +131,7 @@ func starts(root string) error {
 		if _, err := standingOf(root); err == nil {
 			return nil
 		}
-		time.Sleep(startPollPause)
+		startPause()
 	}
 	return errorOf("the door took longer than thirty seconds to stand")
 }
@@ -143,7 +143,7 @@ func startingPath(root string) string {
 
 // The first caller claims the start, and a caller meeting a fresh claim waits on the index that claim spawns, so callers racing a start spawn one index. A claim older than the start wait stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
 func claims(marker string) bool {
-	if said, err := os.Stat(marker); err == nil && time.Since(said.ModTime()) > startPolls*startPollPause {
+	if said, err := os.Stat(marker); err == nil && startNow().Sub(said.ModTime()) > startPolls*startPollPause {
 		os.Remove(marker)
 	}
 	os.MkdirAll(filepath.Dir(marker), 0o755)
@@ -155,17 +155,24 @@ func claims(marker string) bool {
 	return true
 }
 
-// Runs the binary with serve over the root, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]
-var spawns = func(bin, root string) error {
+// The clock and the pause a start's wait reads, which a case drives fake so it sleeps no real second. [[spec/design_output/index#a-door-comes-back]]
+var (
+	startNow   = time.Now
+	startPause = func() { time.Sleep(startPollPause) }
+)
+
+// Runs the binary with serve over the root, and answers its exit, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]
+var spawns = func(bin, root string) (<-chan error, error) {
 	one := exec.Command(bin, "serve")
 	one.Dir = root
 	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
 	one.Stdout, one.Stderr = nil, nil
 	if err := one.Start(); err != nil {
-		return err
+		return nil, err
 	}
-	go one.Wait()
-	return nil
+	exited := make(chan error, 1)
+	go func() { exited <- one.Wait() }()
+	return exited, nil
 }
 
 // The paths git tracks under the root. A root git holds nowhere tracks every file the walk reads, the way a reader of a bare folder reads it whole. [[spec/design_output/index#the-rows-the-walk-writes]]

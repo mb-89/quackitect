@@ -5,11 +5,13 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -70,12 +72,12 @@ func fakeSpawn(t *testing.T, again func(root string)) func() []string {
 	t.Helper()
 	var ran []string
 	was := spawns
-	spawns = func(bin, root string) error {
+	spawns = func(bin, root string) (<-chan error, error) {
 		ran = append(ran, bin)
 		if again != nil {
 			again(root)
 		}
-		return nil
+		return nil, nil
 	}
 	t.Cleanup(func() { spawns = was })
 	return func() []string { return ran }
@@ -330,5 +332,106 @@ func TestAStaleClaimGivesWay(t *testing.T) {
 	}
 	if _, err := os.Stat(startingPath(root)); err == nil {
 		t.Fatal("the claim outlives the start it guards")
+	}
+}
+
+// A start's clock standing still until each pause moves it on, so a case waits minutes and sleeps none. Each pause runs the hand the case gives, with the time waited so far. [[spec/design_output/index#a-door-comes-back]]
+func fakeStartClock(t *testing.T, each func(waited time.Duration)) func() time.Duration {
+	t.Helper()
+	from := time.Now()
+	at := from
+	wasNow, wasPause := startNow, startPause
+	startNow = func() time.Time { return at }
+	startPause = func() {
+		at = at.Add(startPollPause)
+		if each != nil {
+			each(at.Sub(from))
+		}
+	}
+	t.Cleanup(func() { startNow, startPause = wasNow, wasPause })
+	return func() time.Duration { return at.Sub(from) }
+}
+
+// A spawn whose index answers the exit the case hands, and stands no door. [[spec/design_output/index#a-door-comes-back]]
+func exitingSpawn(t *testing.T, exits error) {
+	t.Helper()
+	was := spawns
+	spawns = func(bin, root string) (<-chan error, error) {
+		exited := make(chan error, 1)
+		if exits != nil {
+			exited <- exits
+		}
+		return exited, nil
+	}
+	t.Cleanup(func() { spawns = was })
+}
+
+// An index whose first build runs past the old thirty seconds still stands its door, and the start waits on it. [[spec/design_output/index#a-door-comes-back]]
+func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	ran := fakeSpawn(t, nil)
+	fakeStartClock(t, func(waited time.Duration) {
+		if waited == 2*startPolls*startPollPause {
+			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
+		}
+	})
+	if err := starts(root); err != nil {
+		t.Fatalf("a start gives up on an index still coming up: %v", err)
+	}
+	if got := ran(); len(got) != 1 {
+		t.Fatalf("a start spawns %q, and wants one index", got)
+	}
+}
+
+// An index that exits before its door stands ends the wait at once, naming the exit. [[spec/design_output/index#a-door-comes-back]]
+func TestAStartEndsWhenItsIndexExits(t *testing.T) {
+	root := t.TempDir()
+	builtIndex(t, root, "the index build")
+	exitingSpawn(t, errors.New("exit status 2"))
+	waited := fakeStartClock(t, nil)
+	err := starts(root)
+	if err == nil || !strings.Contains(err.Error(), "exit status 2") {
+		t.Fatalf("a start answers %v, and wants the index's exit", err)
+	}
+	if waited() > startPollPause {
+		t.Fatalf("a start waits %v on an index that exits, and wants one pause at most", waited())
+	}
+}
+
+// An index that neither stands nor exits meets the hang guard, and the start names it hung. [[spec/design_output/index#a-door-comes-back]]
+func TestAStartGivesUpOnAHungIndex(t *testing.T) {
+	root := t.TempDir()
+	builtIndex(t, root, "the index build")
+	exitingSpawn(t, nil)
+	waited := fakeStartClock(t, nil)
+	if err := starts(root); err == nil {
+		t.Fatal("a start answers no fault over a hung index")
+	}
+	if waited() < startHang {
+		t.Fatalf("a start gives up after %v, and wants the hang guard of %v", waited(), startHang)
+	}
+}
+
+// A caller meeting a claim its holder keeps fresh waits past the old thirty seconds, spawns nothing, and reads the door that index stands. [[spec/design_output/index#a-door-comes-back]]
+func TestAWaiterHoldsWhileTheClaimStaysFresh(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	ran := fakeSpawn(t, nil)
+	if !claims(startingPath(root)) {
+		t.Fatal("the first caller claims no start")
+	}
+	fakeStartClock(t, func(waited time.Duration) {
+		now := startNow()
+		_ = os.Chtimes(startingPath(root), now, now)
+		if waited == 2*startPolls*startPollPause {
+			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
+		}
+	})
+	if err := starts(root); err != nil {
+		t.Fatalf("a caller gives up on a claim its holder keeps fresh: %v", err)
+	}
+	if got := ran(); len(got) != 0 {
+		t.Fatalf("a caller meeting a fresh claim spawns %q", got)
 	}
 }

@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 664e2b4873cd687b
         size: 889
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: f9052ea47d5b092e7132e8d1f4b041e8d4d4e027
+    hash_after: f9052ea47d5b092e7132e8d1f4b041e8d4d4e027
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 64057603b30e5b21
+        size: 2892
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,31 @@ Two waits move off a fixed timer onto readiness.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/reach_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/reach_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four cases fail on their own assertion within a third of a second, because the fake start clock moves on at each pause and no case sleeps. Each names the fixed thirty seconds: an index still coming up, an index that exits, a hung index and a fresh claim all end at the same span. The seams land with the tests, as a refactor the standing cases pass over: the clock and the pause a start reads, and a spawn answering its exit. The io_test change is test-only and lands under implement, because the fake clock makes it pass at once.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a test: the readiness lines meet the four reach cases, the alarm lines meet the rewritten io_test cases under implement, and the check decides the last
+- the doors these cases reach stand faked: the spawn, the clock and the pause; the disk is a temporary folder the case owns
 
 # gate
 
