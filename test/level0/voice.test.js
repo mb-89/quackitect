@@ -59,6 +59,26 @@ test("an exemption naming a reason passes, and one naming none is refused", () =
   assert.equal(found[0].line, 1);
 });
 
+test("the lint asks the tree's rules-over verb with the path, and reads its rows", async () => {
+  const asked = [];
+  const said = await lintText("It holds; it stands.\n", "spec/a.md", {
+    bin: ["se-index", "verb", "src/scripts"],
+    cwd: "/tree",
+    run: async (argv, init) => {
+      asked.push({ argv, init });
+      return {
+        exitCode: 0,
+        stdout: JSON.stringify({ "spec/a.md": [{ Check: "VoiceParagraph.Characters", Line: 1, Span: [8, 8], Match: ";", Message: "No semicolon.", Severity: "warning" }] }),
+      };
+    },
+  });
+  assert.deepEqual(asked[0].argv, ["se-index", "verb", "src/scripts", "rules-over", "--path=spec/a.md"]);
+  assert.equal(asked[0].init.stdin, "It holds; it stands.\n");
+  assert.equal(said.ran, true);
+  assert.equal(said.found[0].rule, "Characters");
+  assert.equal(said.found[0].column, 8);
+});
+
 test("a linter that cannot run degrades the call", async () => {
   const said = await lintText("anything", "notes.md", {
     run: async () => {

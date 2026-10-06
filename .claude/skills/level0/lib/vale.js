@@ -23,16 +23,11 @@ const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 const PROSE_STYLE = /^Voice(Vale|Paragraph)\./;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
+// The tree's rules over a text, through the rules-over verb the command prefix in bin reaches. [[spec/tickets/go-rules-replace-vale]]
 export async function lintText(text, where, options = {}) {
-  const { run, bin, cwd, config } = options;
-  if (!bin) return { ran: false, why: "no vale stands here", found: [] };
-  const argv = [
-    bin,
-    `--config=${config || CONFIG}`,
-    `--path=${where || "stdin.md"}`,
-    "--output=JSON",
-    "--no-exit",
-  ];
+  const { run, bin, cwd } = options;
+  if (!bin || (Array.isArray(bin) && !bin.length)) return { ran: false, why: "no rules stand here", found: [] };
+  const argv = [...[].concat(bin), "rules-over", `--path=${where || "stdin.md"}`];
 
   let said;
   try {
@@ -43,7 +38,7 @@ export async function lintText(text, where, options = {}) {
   if (said?.exitCode !== 0 && !said?.stdout) {
     return {
       ran: false,
-      why: (said?.stderr || "vale answered nothing").trim(),
+      why: (said?.stderr || "the rules answered nothing").trim(),
       found: [],
     };
   }

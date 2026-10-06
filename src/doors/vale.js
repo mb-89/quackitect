@@ -1,25 +1,17 @@
-// Vale. The one place this tree runs the voice rules over a text. A box with
-// no Vale reads no rule, and says so. The roots hand it the styles they hold
-// together, assembled into the work root.
-// [[spec/design_output/level0#the-write-door]]
+// The prose rules: the one place this tree runs them over a text, through the
+// rules-over verb of the tree's own binary. A box with no binary reads no rule,
+// and says so.
+// [[spec/tickets/go-rules-replace-vale]]
 
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
-import { assemble } from "../scripts/styles.js";
-import { readTools, whereIs } from "../engine/tools.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 
 export function vale(disk, proc, method, work = method) {
-  const found = whereIs(disk, method, "vale", readTools(disk, method));
-  const bin = disk.exists(found) ? found : "";
-  const pair = { method, work, itself: method === work };
-  // The assembly answers the config standing now, so an edit to a rule reads on this lint. [[spec/design_output/vehicle#the-styles-assemble-once]]
-  const runs = async (text, where) => {
-    const root = pair.itself ? method : work;
-    const said = assemble(disk, pair);
-    const run = async (argv, init) => proc.run(argv, { ...init, cwd: root });
-    return lintText(text, where, { bin, run, cwd: root, config: said.config });
-  };
+  const binary = `${method}/${BIN}`;
+  const bin = disk.exists(binary) ? [binary, "verb", `${method}/src/scripts`] : [];
+  const run = async (argv, init) => proc.run(argv, { ...init, cwd: work });
   return {
-    stands: () => Boolean(bin),
-    lint: (text, where) => runs(text, where),
+    stands: () => bin.length > 0,
+    lint: (text, where) => lintText(text, where, { bin, run, cwd: work }),
   };
 }

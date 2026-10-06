@@ -401,3 +401,10 @@ accept with points
 - A rename of `VoiceVale` moves every check id and every standing marker, and changes no behaviour.
 - The narrowed grep meets the binary, its language server, its Go module and its config: what leaves the box.
 - `Tools.Vale` and `ValeRuns` in `src/modules/lsp` read the binary path, so the narrowed grep meets them, and they leave with the door.
+
+## A project carries no rules of its own
+
+The Go rules serve the styles this tree holds, scoped by the Go table, and a work root's own style folder adds no rule. The approach already retires `.vale.ini` and the assembly that joined a project's styles to the method's, so `test/contract/one-config.test.js` leaves with `vale-paths.test.js`.
+
+- The cost: a project carrying its own rule meets none of it. No project this tree drives carries one.
+- The road back: a ticket teaching `Load` a work root's token rules, where a project asks for one.

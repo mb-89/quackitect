@@ -54,7 +54,7 @@ test("a box with no binary reads no rule, and says so", async () => {
   assert.equal(door.stands(), false);
   assert.deepEqual(await door.lint("A line.\n", NOTE), {
     ran: false,
-    why: "no vale stands here",
+    why: "no rules stand here",
     found: [],
   });
 });
