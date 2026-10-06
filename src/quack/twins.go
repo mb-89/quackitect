@@ -210,7 +210,6 @@ var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}
 
 const workRoot = "SE_WORK_ROOT"
 
-
 // The words a request carries, as a list of strings or as the list JSON decodes. [[spec/tickets/ticket-verbs-become-actions]]
 func wordsOf(args any) ([]string, error) {
 	switch held := args.(type) {
