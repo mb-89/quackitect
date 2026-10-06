@@ -153,6 +153,7 @@ func TestTheSchemaWriteFormHoldsItsArgs(t *testing.T) {
 
 // A shared key carries the mark a reader past the catalog reads, and a key of one box carries none. [[spec/design_output/config#the-go-reader]]
 func TestASharedKeyCarriesItsMark(t *testing.T) {
+	t.Parallel()
 	shared, _ := q.JSON.Serialize(keyEntry(q.Key{Type: "string", Default: `"new"`, Shared: true}))
 	if !strings.Contains(string(shared), `"shared": true`) {
 		t.Fatalf("a shared key's entry reads %s, with no shared mark", shared)
