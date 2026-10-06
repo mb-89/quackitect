@@ -16,6 +16,17 @@ run="$root/.se/.runtime"
 home_run="${HOME:-}/.se/.runtime"
 bin="$run/bin"
 
+# The boot word the SessionStart hook runs. A cloud box lacking the plugin
+# manifest installs under the session skip list, which installSkip in
+# src/quack/probe_cold.go pins, and a failed install holds no session up.
+# [[spec/design_output/level0#the-boot-hook]]
+if [ "${1:-}" = boot ]; then
+  [ -n "${CLAUDE_CODE_REMOTE:-}" ] || [ -n "${SE_CLOUD:-}" ] || exit 0
+  [ -f "$root/.claude/skills/level0/.claude-plugin/plugin.json" ] && exit 0
+  SE_INSTALL_SKIP="editor-link editor-extensions editor-client go ${SE_INSTALL_SKIP:-}" sh "$0" || true
+  exit 0
+fi
+
 # The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned
 # by folders.js and spelled again here because a shell script imports nothing. A
 # box carrying the old places hands them to the index walk, so this moves them.

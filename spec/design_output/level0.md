@@ -968,11 +968,11 @@ the language server. Those stay wants, and every rule holds without them.
 
 ## The boot hook
 
-A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
-through node. On a cloud box lacking the plugin manifest, it runs
+A `SessionStart` hook in `.claude/settings.json` runs the boot word of
+`src/scripts/install.sh` through sh. On a cloud box lacking the plugin manifest, it runs
 `src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
 off a cloud box, it runs nothing. A failed install holds no session up. The
-hook's `timeout` waits out `STARTING`, the span the start road allows the same
+hook's `timeout` waits out `startSpan` in `src/quack/hook_down.go`, the span the start road allows the same
 install, so the client cuts no install short before the manifest lands.
 
 Where the manifest stands the plugin loads. The start road of
