@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 89c897856f88b3a49063813d2ed3a22dd8eea35f
+    hash_after: 89c897856f88b3a49063813d2ed3a22dd8eea35f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 2 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   86.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 54045218f4145c0f
+        size: 966
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -343,26 +366,33 @@ the tools folder comes from inRun in folders.js, the pointer from POINTER in veh
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_test.go test/level0/start-constants.test.js test/contract/check-workflow.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Level zero now runs as a smoke over the tree as it stands, on Linux and Windows both, so a pull request that breaks it turns the check red. The smoke clones the working tree with git clone --shared, applies the working change, and copies the root built tools except a kept old build. So the start road finds the index and installs nothing. The session runs with the model faked and the clear road held off, and the smoke reads every dry check but the clear. A real run over this tree passes all seven checks in about eleven seconds, where the dry probe takes minutes. level0Runs runs probe smoke --working on every platform and names the platform. A Windows box also names the desk trial for the live client. The start road takes se-index.exe where a Windows box built it. The dry probe stays as a verb for the cold road. probe_verb_test.go and probe-dry.test.js also hold red cases of probe-at-revision-guards-merges, so the tests field leaves them out. Their smoke cases pass by name: TestTheSmokeProbeHandsItsRoadToTheEntry, and node --test --test-name-pattern=smoke test/level0/probe-dry.test.js.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, plus the export of takesDelta in probe-cold.js
+the smoke reaches the disk and processes through it.disk and it.proc, whose fakes its cases run over
+level0Runs, probeVerb, smokeTree, probeSmoke and the start road carry comments linking this ticket
+the tools folder comes from inRun, the pointer from POINTER, the desk trial from deskTrial
 
 # accept
 
