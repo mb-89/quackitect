@@ -63,11 +63,13 @@ type part struct {
 	run  func() int
 }
 
-// What the check reaches: the root, a verb through quack's own road, a process, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, a verb through quack's own road and the same at low priority, a process and the same at low priority, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
 	verb      func(words []string, quiet bool) int
+	calmVerb  func(words []string, quiet bool) int
 	run       func(argv, env []string, quiet bool) (int, string, error)
+	calm      func(argv, env []string, quiet bool) (int, string, error)
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
 	windows   bool
@@ -251,13 +253,13 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 }
 
-// Level zero runs on a fresh box, or the check is red. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
+// Level zero runs on a fresh box, or the check is red. The dry session times nothing against the wall, so it runs at low priority and yields the cores to the parts that do. [[spec/tickets/the-parts-start-at-once]] The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
 func level0Runs(d checkDoors, quiet bool) int {
 	if d.windows {
 		fmt.Fprintln(d.out, "The start road stands a cloud box alone, so this Windows box runs no dry session.")
 		return 0
 	}
-	code := d.verb([]string{"probe", "dry", workingFlag}, quiet)
+	code := d.calmVerb([]string{"probe", "dry", workingFlag}, quiet)
 	if code != 0 {
 		fmt.Fprintln(d.errs, "Level zero does not run whole on a fresh box, so this tree is red.")
 	}

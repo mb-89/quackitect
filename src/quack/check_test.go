@@ -75,7 +75,7 @@ type checkFake struct {
 }
 
 func (one *checkFake) doors() checkDoors {
-	return checkDoors{
+	d := checkDoors{
 		root: "/tree",
 		verb: func(words []string, _ bool) int {
 			one.held.Lock()
@@ -103,9 +103,11 @@ func (one *checkFake) doors() checkDoors {
 			one.rows = append(one.rows, row)
 			return nil
 		},
-		out:    io.Discard,
-		errs:   io.Discard,
+		out:  io.Discard,
+		errs: io.Discard,
 	}
+	d.calm, d.calmVerb = d.run, d.verb
+	return d
 }
 
 func partNamed(parts []part, name string) part {
