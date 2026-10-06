@@ -28,6 +28,20 @@ process_hash: 2b5ab398855a1aba
 group: code-is-pure-tests-behave
 depends_on: [test-ratio-measure-reports]
 step: do
+record:
+  - step: do
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 5d9d90f2ee4f9b4b6f315c04a6c91ed454a2a10f
+    hash_after: 9b985a982d60ab29f02af2697305838120b1d4c9
+    returns: 1
+    why: the box refuses the delete of the test files the Discussion lists, as a destructive action, so the cut waits on the owner's word
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "  114.9  in all"
 ---
 
 # Ask
@@ -51,26 +65,32 @@ The ratio guard holds the JavaScript at a ratio far past one to one, and the bat
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/battery-reporter.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The battery delta script and its test leave, since no caller reaches the delta and Go holds the median. TestTestArgv names battery-reporter.test.js in its place. The Discussion lists the further test files a survey verified as twins or tests of dead bridge code. The box refuses their delete, so that cut waits on the owner.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask in part: the battery cut lands, and the Discussion says why the rest waits
+the cleanup: the dead bridge modules leave with their tests once the delete stands allowed
+one place: the Discussion holds the cut list, and the handover points at it
 
 # Discussion
 
