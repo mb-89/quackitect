@@ -243,6 +243,10 @@ The clock owns time. Code waits on the event a duration stands for: a channel,
 a ready signal, a watcher event, a process exit, an index sweep. A test moves
 the fake clock with `Tick`, or waits on that event.
 
+The JavaScript clock answers `after`, with the `cancel` it takes back, `wait`
+and `ms`, and its fake fires each timer as `tick` passes it. A timer naming
+`unref` lets the process end while it waits.
+
 Go shares `time` and `context`, so the clock owns their members reading or
 waiting on the time now. `time.Duration` and `time.Date` stay free to every
 file.
