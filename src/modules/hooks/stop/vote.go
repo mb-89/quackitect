@@ -40,6 +40,9 @@ var (
 	next       = regexp.MustCompile(`(?i)^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)`)
 )
 
+// The marks a sentence's emphasis or quote closes on, past its own end. [[spec/design_output/stop#a-cloud-box-decides]]
+const emphasisMarks = "*_`\"')"
+
 // What the vote answers: whether the turn ends, the stop and the continue that won their sides, whether the stop yields, whether the hook stands off, whether the cap let go, and the holds in a row the tooth read. [[spec/design_output/stop#the-vote]]
 type Decision struct {
 	Ends    bool
@@ -188,6 +191,19 @@ func NamesNext(text string) bool {
 		}
 	}
 	return false
+}
+
+// An answer ends on a question where its last prose paragraph, past the tables, the headings and the stop line, closes on a question mark. [[spec/design_output/stop#a-cloud-box-decides]]
+func EndsOnQuestion(text string) bool {
+	last := ""
+	for _, raw := range paragraphs.Split(text, -1) {
+		one := strings.TrimSpace(raw)
+		if one == "" || strings.HasPrefix(one, "|") || strings.HasPrefix(one, "#") || stopOpens.MatchString(one) || holdsOpens.MatchString(one) {
+			continue
+		}
+		last = one
+	}
+	return strings.HasSuffix(strings.TrimRight(last, emphasisMarks), "?")
 }
 
 // A paragraph cut at each run of space that follows a full stop, a question or a cry, as the split behind namesNext does. [[spec/design_output/stop#the-chat-is-new]]
