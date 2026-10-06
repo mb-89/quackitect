@@ -8,6 +8,8 @@ package pull
 import (
 	"io"
 	"time"
+
+	"quackitect/src/failure"
 )
 
 // One git call as the JS git door answers it: whether it ran clean, and its streams trimmed. [[spec/design_output/doors#a-door-standing-on-another]]
@@ -69,6 +71,8 @@ type It struct {
 	Ready func() bool
 	// The process a ticket's ask stands in, read by the schema checks a hand-back runs. [[spec/design_output/pull#the-answers]]
 	Schemas Schemas
+	// The failure nodes each refusal raises through. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+	Failures failure.Registry
 }
 
 // The stamp a clock writes, as toISOString writes it. [[spec/design_output/pull#the-hand-and-the-hold]]

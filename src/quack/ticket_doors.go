@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks/brief"
@@ -64,10 +65,11 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 		PersonSigns: configWord(rows, "work.personSigns") == "true",
 		Weights:     pull.Weights{Block: configNumber(rows, "queue.block"), Day: configNumber(rows, "queue.day"), Fail: configNumber(rows, "queue.fail")},
 		Binding:     configWord(rows, "engine.binding"), CapBytes: configInt(rows, "pull.cap"), CapMargin: configInt(rows, "pull.margin"),
-		Log:     pullLog(work, configWord(rows, "log.level")),
-		Rules:   brief.RulesOf,
-		Shell:   pull.OSShell(work),
-		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
+		Log:      pullLog(work, configWord(rows, "log.level")),
+		Rules:    brief.RulesOf,
+		Shell:    pull.OSShell(work),
+		Schemas:  func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
+		Failures: failure.Load(failure.Dir{Root: method}),
 	}
 	it.Notes = func(key string) []string {
 		said, err := guidanceRows(method, env)

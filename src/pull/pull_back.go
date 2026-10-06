@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/check"
 	"quackitect/src/yaml"
 )
@@ -15,11 +16,11 @@ import (
 func (it *It) handBack(who *Who, name string, said verdict) int {
 	held := who.Held
 	if held == nil {
-		it.Say(Refused, fmt.Sprintf("nothing stands in your hand. Call %s to take a leaf.", CallOf("ticket", "pull")))
+		it.Refuse(failure.Raise(it.Failures, "pull-hand-empty", fmt.Sprintf("nothing stands in your hand. Call %s to take a leaf.", CallOf("ticket", "pull"))))
 		return 1
 	}
 	if name != "" && name != held.Ticket {
-		it.Say(Refused, fmt.Sprintf("%s stands in your hand, and %s is another ticket.", held.Ticket, name))
+		it.Refuse(failure.Raise(it.Failures, "pull-hand-other-ticket", fmt.Sprintf("%s stands in your hand, and %s is another ticket.", held.Ticket, name)))
 		return 1
 	}
 	if !strings.HasPrefix(held.Path, Notes) && !it.fetched(who.Branch) {
@@ -27,7 +28,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	}
 	text, ok := it.Disk.Read(held.Path)
 	if !ok {
-		it.Say(Refused, held.Path+" stands nowhere, so nothing hands back.")
+		it.Refuse(failure.Raise(it.Failures, "pull-hold-path-gone", held.Path+" stands nowhere, so nothing hands back."))
 		it.dropHold(who.Hand)
 		return 1
 	}
@@ -37,7 +38,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 		if yaml.AsString(entry.Get("step")) == held.Step && !truthy(yaml.AsString(entry.Get("skipped"))) && yaml.AsString(entry.Get("hash_after")) != "" && yaml.AsString(entry.Get("hash_before")) == held.Hash {
 			ok, why := it.sentOut(one, who.Branch)
 			if !ok {
-				it.Say(Refused, append([]string{fmt.Sprintf("%s at %s answered, and the record holds this hand-back already. Its push reaches no origin.", held.Ticket, held.Step)}, why...)...)
+				it.Refuse(failure.Raise(it.Failures, "pull-push-refused", append([]string{fmt.Sprintf("%s at %s answered, and the record holds this hand-back already. Its push reaches no origin.", held.Ticket, held.Step)}, why...)...))
 				return 1
 			}
 			return it.onward(who, append([]string{fmt.Sprintf("%s at %s answered already, and the record holds it.", held.Ticket, held.Step)}, why...))
@@ -55,17 +56,17 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 		if shown == "" {
 			shown = "no step"
 		}
-		it.Say(Refused, fmt.Sprintf("%s stands at %s now, and the hold names %s.", held.Ticket, shown, held.Step), "The take is stale, so the hold drops. Pull again.")
+		it.Refuse(failure.Raise(it.Failures, "pull-hold-stale", fmt.Sprintf("%s stands at %s now, and the hold names %s.", held.Ticket, shown, held.Step), "The take is stale, so the hold drops. Pull again."))
 		return 1
 	}
 	if held.Hash != "" && !it.Git.Run("merge-base", "--is-ancestor", held.Hash, "HEAD").OK {
 		it.dropHold(who.Hand)
-		it.Say(Refused, fmt.Sprintf("the take hash %s trails %s, so the hold drops. Pull again.", held.Hash[:min(shortSha, len(held.Hash))], who.Branch))
+		it.Refuse(failure.Raise(it.Failures, "pull-hold-stale", fmt.Sprintf("the take hash %s trails %s, so the hold drops. Pull again.", held.Hash[:min(shortSha, len(held.Hash))], who.Branch)))
 		return 1
 	}
 	leaf := LeafOf(one.Front, held.Step)
 	if leaf == nil {
-		it.Say(Refused, fmt.Sprintf("%s names no leaf of %s.", held.Step, held.Ticket))
+		it.Refuse(failure.Raise(it.Failures, "pull-leaf-unknown", fmt.Sprintf("%s names no leaf of %s.", held.Step, held.Ticket)))
 		return 1
 	}
 	verdictField := leaf.holdsForm("verdict")
@@ -82,7 +83,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	if payload != "" {
 		put, why := withPayload(one.Text, held.Step, payload)
 		if why != "" {
-			it.Say(Refused, why)
+			it.Refuse(failure.Raise(it.Failures, "pull-fields-refused", why))
 			return 1
 		}
 		one.Stood, one.Payload = one.Text, payload
@@ -90,7 +91,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 		one.Front = FrontOf(one.Text)
 	}
 	if verdictField != nil && said.said != "" {
-		it.Say(Refused, fmt.Sprintf("%s holds the verdict field %s, so the field decides and the flag stays off.", leaf.Path, fieldWord(verdictField, "name")))
+		it.Refuse(failure.Raise(it.Failures, "pull-verdict-field-decides", fmt.Sprintf("%s holds the verdict field %s, so the field decides and the flag stays off.", leaf.Path, fieldWord(verdictField, "name"))))
 		return 1
 	}
 	// [[spec/design_output/pull#the-checks]]
@@ -158,7 +159,7 @@ func (it *It) refused(who *Who, one *Held, leaf *Leaf, held Hold, faults []strin
 		if one.Stood != "" {
 			one.Text = one.Stood
 		}
-		it.Say(Refused, append(append([]string{}, faults...), "", fmt.Sprintf("%d refusals in a row, so %s goes back.", count, leaf.Path))...)
+		it.Refuse(failure.Raise(it.Failures, "pull-refusals-in-a-row", append(append([]string{}, faults...), "", fmt.Sprintf("%d refusals in a row, so %s goes back.", count, leaf.Path))...))
 		return it.failed(who, one, leaf, held, fmt.Sprintf("the hand-back met refused %d times: %s", count, faults[0]), nil)
 	}
 	held.Refused = count
@@ -166,7 +167,7 @@ func (it *It) refused(who *Who, one *Held, leaf *Leaf, held Hold, faults []strin
 		held.Payload = one.Payload
 	}
 	it.writeHold(who.Hand, held)
-	it.Say(Refused, append(append([]string{}, faults...), "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))...)
+	it.Refuse(failure.Raise(it.Failures, "pull-evidence-refused", append(append([]string{}, faults...), "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))...))
 	return 1
 }
 

@@ -6,6 +6,8 @@ package pull
 import (
 	"fmt"
 	"strings"
+
+	"quackitect/src/failure"
 )
 
 // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
@@ -69,9 +71,9 @@ func (it *It) deskRefused(what, name string) int {
 	if name == "" {
 		name = "<name>"
 	}
-	it.Say(Refused,
+	it.Refuse(failure.Raise(it.Failures, "desk-works-on-trunk",
 		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what),
-		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name))
+		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name)))
 	return 2
 }
 
