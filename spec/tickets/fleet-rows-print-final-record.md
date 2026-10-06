@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-fleet-watches-itself
 parent: the-fleet-watches-itself
+record:
+  - step: do
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 88f3663409e021c7925a5f575e10045e221a1410
+    hash_after: 88f3663409e021c7925a5f575e10045e221a1410
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    4.0  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+    inputs:
+      - name: ask
+        hash: 92d99af5e052eaf1
+        size: 155
+    def: 9c36b7ae9dac47ce
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ cloud fleet prints no model, cost or final line, though each row carries them of
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/fleet_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+cloud fleet now prints each box's model, cost and final line after its pull request, off the record entry its last hand wrote, so the fleet shows the final record the ask names. The final line stands last, since it holds spaces. TestFleetPrintsTheFinalRecord covers it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change follows the accept point: the row prints the three it already carries.
+- No cleanup follows from one printed row.
+- The fields stand once on boxRow, and the row reads them there.
 
 # Discussion
 

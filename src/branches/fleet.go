@@ -94,7 +94,7 @@ func (d *Doors) fleet() int {
 	pulls := pullsOf(d.quiet("ls-remote", "origin", "refs/pull/*/head").Out)
 	rows := withTips(fleetRows(stood, standingAll(stood)), stood, d.nowSeconds(), pulls)
 	for _, one := range rows {
-		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull), "  "))
+		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull, one.Model, one.Cost, one.Final), "  "))
 	}
 	wakes := wakesOf(rows, d.idleSpan())
 	for _, one := range wakes {

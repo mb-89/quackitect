@@ -72,6 +72,16 @@ func TestFleetListsEachBranchWithTipAgeHolderAndPullRequest(t *testing.T) {
 	}
 }
 
+func TestFleetPrintsTheFinalRecord(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, nil)
+	one.branch("g", map[string]string{ticketAt("g"): withEntry(groupNote, front.Ordered{{Key: "step", Value: "retro"}, {Key: "hand", Value: "box 9e1f"}, {Key: "hash_before", Value: "a1b2c3"}, {Key: "hash_after", Value: "d4e5f6"}, {Key: "model", Value: "claude-test"}, {Key: "cost", Value: "1.25"}, {Key: "final", Value: "The group lands."}})})
+	one.cloudSays("fleet")
+	for _, said := range []string{"claude-test", "1.25", "The group lands."} {
+		holds(t, one.out.String(), said)
+	}
+}
+
 func TestFleetExitsRedOnAWake(t *testing.T) {
 	t.Parallel()
 	one := fleetTree(t, "2026-01-02T02:00:05Z")
