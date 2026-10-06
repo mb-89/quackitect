@@ -83,7 +83,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: tests-meet-the-doors-once
-step: children
+step: accept
 record:
   - step: sync
     hand: box e97c7a20bbd2 · claude-code-remote
@@ -103,6 +103,10 @@ record:
         hash: 5495474fd0152fe7
         size: 964
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 4b3376d5271c8019316b8f2e39eaea1e664df9ed
+    hash_after: 4b3376d5271c8019316b8f2e39eaea1e664df9ed
 ---
 
 # Ask
