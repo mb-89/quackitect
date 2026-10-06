@@ -37,6 +37,7 @@ type Disk interface {
 	Read(path string) (string, bool, error)
 	Remove(path string) error
 	List(folder string) ([]string, error)
+	Link(path, to string) error
 }
 
 type disk struct{ root string }
@@ -85,6 +86,9 @@ func (one disk) Remove(path string) error {
 	}
 	return nil
 }
+
+// The path to standing as an alias of path, a file or a folder, so a read under to reads path: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one disk) Link(path, to string) error { return nil }
 
 // A disk in memory, keyed by the forward-slash path, which tells its listeners each change. [[spec/design_output/model#io-modules-and-their-fakes]]
 type FakeDisk struct {
@@ -140,6 +144,9 @@ func (one *FakeDisk) Remove(path string) error {
 	}
 	return nil
 }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeDisk) Link(path, to string) error { return nil }
 
 // [[spec/design_output/model#io-modules-and-their-fakes]]
 func (one *FakeDisk) Listen(hand func(path, text string, gone bool)) {

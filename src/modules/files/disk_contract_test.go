@@ -59,6 +59,45 @@ func TestDiskListsEveryFileUnderAFolder(t *testing.T) {
 	}
 }
 
+// A link reads what it names, file or folder, and its removal leaves that standing, as the review verb's worktree links. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestDiskLinksAPathAndTheUnlinkLeavesItsTarget(t *testing.T) {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+		for path, text := range map[string]string{"lib/x.txt": "held", "a.md": "said"} {
+			if err := one.Write(path, text); err != nil {
+				t.Fatal(err)
+			}
+		}
+		for path, to := range map[string]string{"lib": "work/deep/lib", "a.md": "work/a.md"} {
+			if err := one.Link(path, to); err != nil {
+				t.Errorf("the %s disk links %s at %s with %v", name, path, to, err)
+			}
+		}
+		if text, ok, err := one.Read("work/deep/lib/x.txt"); err != nil || !ok || text != "held" {
+			t.Errorf("the %s disk reads %q, %v, %v through the folder link", name, text, ok, err)
+		}
+		if err := one.Write("a.md", "next"); err != nil {
+			t.Fatal(err)
+		}
+		if text, ok, err := one.Read("work/a.md"); err != nil || !ok || text != "next" {
+			t.Errorf("the %s disk reads %q, %v, %v through the file link once its target moves", name, text, ok, err)
+		}
+		for _, to := range []string{"work/deep/lib", "work/a.md"} {
+			if err := one.Remove(to); err != nil {
+				t.Errorf("the %s disk removes the link %s with %v", name, to, err)
+			}
+		}
+		if text, ok, err := one.Read("lib/x.txt"); err != nil || !ok || text != "held" {
+			t.Errorf("the %s disk reads lib/x.txt as %q, %v, %v once its link leaves", name, text, ok, err)
+		}
+		if text, ok, err := one.Read("a.md"); err != nil || !ok || text != "next" {
+			t.Errorf("the %s disk reads a.md as %q, %v, %v once its link leaves", name, text, ok, err)
+		}
+		if _, ok, err := one.Read("work/a.md"); err != nil || ok {
+			t.Errorf("the %s disk reads the removed link work/a.md as %v, %v", name, ok, err)
+		}
+	}
+}
+
 func TestDiskKeepsItsContract(t *testing.T) {
 	t.Run("fake", func(t *testing.T) { diskSuite(t, func(*testing.T) Disk { return NewFakeDisk() }) })
 	t.Run("real", func(t *testing.T) { diskSuite(t, func(t *testing.T) Disk { return NewDisk(t.TempDir()) }) })

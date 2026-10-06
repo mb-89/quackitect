@@ -1166,3 +1166,112 @@ func TestRepoHistoryListsTheCommitsTouchingAPathNewestFirst(t *testing.T) {
 		}
 	}
 }
+
+// The commit a branch opens on, off trunk's tree, as take.go's markOff cuts it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestRepoCommitsATreeOntoAParentAndMovesNoRef(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("README.md", "next\n")
+		next := w.here.commit("next")
+		hash, err := w.here.CommitTree("HEAD", w.seed, "opens")
+		if err != nil || len(hash) != hashLength || hash == next {
+			t.Errorf("the %s repo's commit of a tree answers %q, %v", w.name, hash, err)
+		}
+		if head, ok := w.here.Resolve("HEAD"); !ok || head != next {
+			t.Errorf("the %s repo's HEAD moves to %q, %v, and stood at %q", w.name, head, ok, next)
+		}
+		if said, ok := w.here.Show(hash, "README.md"); !ok || said != "next\n" {
+			t.Errorf("the %s repo's new commit holds README.md as %q, %v", w.name, said, ok)
+		}
+		if parent, ok := w.here.Resolve(hash + "^"); !ok || parent != w.seed {
+			t.Errorf("the %s repo's new commit stands on %q, %v, and wants the seed %q", w.name, parent, ok, w.seed)
+		}
+		if said, err := w.here.Log(w.seed, hash, false); err != nil || !reflect.DeepEqual(said, []Commit{{Hash: hash, Subject: "opens"}}) {
+			t.Errorf("the %s repo logs %+v, %v past the seed to the new commit", w.name, said, err)
+		}
+	}
+}
+
+// A trunk carrying a branch's commit by its patch, as merge.go's mergeCloud counts what stays to take. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestRepoNamesTheCommitsATrunkCarriesByPatch(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.there.write("a.txt", "a\n")
+		w.there.commit("a")
+		w.there.write("b.txt", "b\n")
+		b := w.there.commit("b")
+		w.there.push("main")
+		w.at(2000)
+		w.here.write("a.txt", "a\n")
+		w.here.commit("a again")
+		w.here.fetch("main")
+		if said, err := w.here.Cherry("HEAD", "origin/main"); err != nil || !reflect.DeepEqual(said, []string{b}) {
+			t.Errorf("the %s repo names %v, %v as the commits HEAD lacks by patch, and wants [%s]", w.name, said, err, b)
+		}
+		if said, err := w.here.Cherry("origin/main", "origin/main"); err != nil || len(said) != 0 {
+			t.Errorf("the %s repo names %v, %v as the commits a ref lacks of itself", w.name, said, err)
+		}
+	}
+}
+
+// The refs origin holds past its branches, as merge.go's pullCarrying reads the pull requests' heads. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestRepoListsTheRefsOriginHoldsUnderAPrefix(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("c.txt", "c\n")
+		next := w.here.commit("c1")
+		w.here.cut("work/a")
+		w.here.push("work/a")
+		for name, hash := range map[string]string{"refs/pull/7/head": next, "refs/pull/3/head": w.seed} {
+			if err := w.origin.UpdateRef(name, hash); err != nil {
+				t.Fatalf("the %s origin's update of %s answers %v", w.name, name, err)
+			}
+		}
+		want := []Ref{{Name: "refs/pull/3/head", Hash: w.seed}, {Name: "refs/pull/7/head", Hash: next}}
+		if said, err := w.here.RemoteRefs("refs/pull/"); err != nil || !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo lists %+v, %v on origin under refs/pull/, and wants %+v", w.name, said, err, want)
+		}
+		if said, err := w.here.RemoteRefs("refs/heads/work/"); err != nil || !reflect.DeepEqual(said, []Ref{{Name: "refs/heads/work/a", Hash: next}}) {
+			t.Errorf("the %s repo lists %+v, %v on origin under refs/heads/work/", w.name, said, err)
+		}
+	}
+}
+
+// A parked note's path put back as HEAD holds it, as take.go's onBranch clears the way to a switch. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestRepoRestoresAPathFromHead(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("README.md", "changed\n")
+		w.here.write("loose.txt", "loose\n")
+		if err := w.here.Restore("README.md"); err != nil {
+			t.Errorf("the %s repo's restore answers %v", w.name, err)
+		}
+		if said, ok := w.here.read("README.md"); !ok || said != seedText {
+			t.Errorf("the %s repo's work tree holds README.md as %q, %v after the restore", w.name, said, ok)
+		}
+		if said, want := status(t, w.here, true), []Change{{Status: "??", Path: "loose.txt"}}; !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo stands at %+v after the restore, and wants %+v", w.name, said, want)
+		}
+		if err := w.here.Restore("missing.md"); err == nil {
+			t.Errorf("the %s repo restores a path HEAD never held", w.name)
+		}
+	}
+}
+
+// The listing's tickets at every ref in one ask, as doors.go's batch reads them. [[spec/tickets/branch-verbs-meet-fake-git]]
+func TestRepoReadsManyFilesAtRefsInOneAsk(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("README.md", "next\n")
+		w.here.write("notes/a.md", "a\n")
+		w.here.commit("next")
+		asks := []string{w.seed + ":README.md", "HEAD:README.md", "HEAD:notes/a.md", "HEAD:missing.md", "no-such-ref:README.md"}
+		want := map[string]string{w.seed + ":README.md": seedText, "HEAD:README.md": "next\n", "HEAD:notes/a.md": "a\n"}
+		if said, err := w.here.ShowMany(asks); err != nil || !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo reads %v, %v, and wants %v", w.name, said, err, want)
+		}
+		if said, err := w.here.ShowMany(nil); err != nil || len(said) != 0 {
+			t.Errorf("the %s repo reads %v, %v off no ask", w.name, said, err)
+		}
+	}
+}

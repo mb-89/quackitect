@@ -83,6 +83,11 @@ type Repo interface {
 	History(path string) ([]Commit, error)
 	Switch(name string, create bool) error
 	Merge(ref string) ([]string, error)
+	CommitTree(of, parent, message string) (string, error)
+	Cherry(upstream, head string) ([]string, error)
+	RemoteRefs(prefix string) ([]Ref, error)
+	Restore(path string) error
+	ShowMany(asks []string) (map[string]string, error)
 }
 
 // The refs a branch and its tracking copy stand under, and the remote every push and fetch names. [[spec/design_output/doors#the-git-door-carries-writes]]
@@ -514,6 +519,21 @@ func (one *door) Merge(ref string) ([]string, error) {
 	conflicts, _ := one.Unmerged()
 	return conflicts, err
 }
+
+// A commit holding the tree of one ref onto a parent, moving no ref: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *door) CommitTree(of, parent, message string) (string, error) { return "", nil }
+
+// The commits head holds whose patch upstream lacks: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *door) Cherry(upstream, head string) ([]string, error) { return nil, nil }
+
+// The refs origin holds under a prefix with their commits: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *door) RemoteRefs(prefix string) ([]Ref, error) { return nil, nil }
+
+// A path restored from HEAD in the index and the work tree: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *door) Restore(path string) error { return nil }
+
+// Many files at refs in one ask, each ask a ref and a path joined by a colon: a stub until branch-verbs-meet-fake-git lands it. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *door) ShowMany(asks []string) (map[string]string, error) { return nil, nil }
 
 // The rows of an answer, the empty ones dropped. [[spec/design_output/doors#the-git-door-carries-writes]]
 func rowsIn(said string) []string {
@@ -1864,6 +1884,21 @@ func (one *FakeRepo) Merge(ref string) ([]string, error) {
 	one.merging = theirs
 	return conflicts, errors.New("Automatic merge failed; fix conflicts and then commit the result")
 }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeRepo) CommitTree(of, parent, message string) (string, error) { return "", nil }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeRepo) Cherry(upstream, head string) ([]string, error) { return nil, nil }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeRepo) RemoteRefs(prefix string) ([]Ref, error) { return nil, nil }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeRepo) Restore(path string) error { return nil }
+
+// [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *FakeRepo) ShowMany(asks []string) (map[string]string, error) { return nil, nil }
 
 func endsLine(text string) string {
 	if text != "" && !strings.HasSuffix(text, "\n") {

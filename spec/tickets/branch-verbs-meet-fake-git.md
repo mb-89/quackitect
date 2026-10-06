@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -138,6 +138,22 @@ record:
         hash: de20b0a5f70293da
         size: 575
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 2fd1cd2681bf683029393a04ba6bad006741f98e
+    hash_after: 2fd1cd2681bf683029393a04ba6bad006741f98e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 633272e4648e13cc
+        size: 8721
+      - name: [[spec/design_output/doors]]
+        hash: 8f2f939387c0fe86
+        size: 17697
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -333,26 +349,33 @@ Assumption: the done_when line naming FakeGit reads as FakeRepo, since the chapt
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/doors_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/repo_contract_test.go
+- src/modules/files/disk_contract_test.go
+- src/branches/doors_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The five new Repo cases fail on all three arms against stubs, and the disk link case fails under the contract tag. The guard in src/branches/doors_test.go fails while three test files call exec and the doors chapter lists them. The other branch test files reach git through the shared tree fixture, which the guard cannot see, so implement moves that fixture too. RemoteHeads answers names alone, so the hand-back of a pull ref needs RemoteRefs with hashes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+done_when one and two meet TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere, red now; done_when three is the check
+the doors the tests reach are git, the disk and the process door, and FakeRepo, FakeDisk and FakeRunner stand for each
 
 # gate
 
