@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -186,7 +186,30 @@ record:
         exit: 0
         said: "   89.8  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 122a203e1f2172a395b40e89e0a925ec61b53edd
+    hash_after: 122a203e1f2172a395b40e89e0a925ec61b53edd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   92.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6d000a52f89ddc69
+        size: 817
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: engine-verbs-hold
+reason: done
 ---
 
 # Ask
@@ -354,26 +377,33 @@ The code gate stands once in sizedFile, and the golden folder's name once in gol
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/textfaults_test.go src/branches/test_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A ticket or note edit no longer moves a golden. sizeFaults in src/modules/check/textfaults.go draws no size row for a prose or data file, as the JavaScript size rule reads code alone, so the size golden stands empty on both sides. The test verb now runs every package that reads a changed golden: goldenReaders in src/branches/test.go names the golden folder own package and every package whose test text names that folder, and the readers write their paths with slashes so the text names it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list: textfaults.go, size.golden.json, check_twins_test.go through its child, and branches test.go; the readers' paths in src/tui/log landed with golden-readers-read-joined-paths.
+The test verb reads the tree through the Doors read and filesUnder it already owns, and goldenReaders reads a map the tests seed.
+sizeFaults and goldenReaders each carry a link to spec/tickets/size-golden-drops-line-counts.
+The code gate stands once in sizedFile, and the golden folder's name once in goldenFolder.
 
 # accept
 
