@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -122,6 +122,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: eb99382434f10c05f844f1771bf896b50cf60668
+    hash_after: eb99382434f10c05f844f1771bf896b50cf60668
+    inputs:
+      - name: ask
+        hash: da7b88681a0c5ede
+        size: 487
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -153,38 +162,62 @@ The coordinator writes past the doors and answers past the ceiling, and nothing 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The start road today is startsOnce in .claude/skills/level0/hooks/level0.js, inside the plugin. A session that loads no plugin never reaches it or the Go door. The one road such a session meets is the SessionStart command hook, src/scripts/boot.js, which runs for every session opened in the repo folder. A new pure function, StartRefusal in src/modules/hooks/start.go, takes the cwd, the root, the plugin standing (manifest present and CLAUDE_CODE_ENABLE_FUNCTION_HOOKS set), the cloud flag and the permission mode. It answers a refusal naming the repo folder and ./RUNME.sh where a desk session that writes (any mode but plan) loads no plugin, and nothing otherwise. A cloud box passes, since its first session installs the plugin for the next. A new Go verb, start, reads the hook input on stdin and prints continue false with that reason. boots calls it off a cloud box. Coordinator rule 8 says to open the session in the repo folder. measure exits 1 and names each file whose score passes Doors.Ceiling. voiceDoorsAt fills Ceiling from answer.ceiling through settingsreader.Count, and a ceiling of 0 holds the check off. Unchecked: whether SessionStart input carries permission_mode.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/boot.js main (process.exit(boots(...)))
+test/level0/hooks.test.js booting and the boots cases
+src/voice/voice.go Run (calls measure)
+src/quack/voice_verb.go voiceVerb (calls voice.Run and voiceDoorsAt)
+src/quack/voice_verb_test.go TestVoiceVerbMeasuresARealFolder and the other voiceVerb cases
+src/quack/voice_verb.go init (register voice)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/hooks/start_test.go TestStartRefusesADeskSessionWritingWithNoPlugin
+src/voice/voice_test.go TestVoiceMeasureExitsOneWhereAnAnswerRunsPastTheCeiling
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/hooks/start.go
+src/modules/hooks/start_test.go
+src/quack/verb_start.go
+src/modules/verbs/tree.go
+src/scripts/boot.js
+test/level0/hooks.test.js
+src/voice/voice.go
+src/voice/voice_test.go
+src/quack/voice_verb.go
+spec/guidance/coordinator/coordinator.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened stops.go stepStops, brief.go stepBrief, hooks.go Hook and refuses, level0.js seen, opens and startsOnce, cage.js DOORED, boot.js boots, .claude/settings.json SessionStart, voice.go Run and measure, voice_verb.go voiceVerb and voiceDoorsAt, config.go Count, settings.go answer.ceiling default 15, drafts.go answerCeilingKey. Each claim was checked there: the Go door handles session.start in its folds alone and refuses nothing at the start, and measure returns 0 whatever the score.
+The callers come from a grep of boots(, voiceVerb(, voiceDoorsAt, voice.Run and the measure case. No JS script reads the voice measure exit code.
+The hooks done_when line meets TestStartRefusesADeskSessionWritingWithNoPlugin, a pure case with t.Parallel and no sleep. The voice line meets TestVoiceMeasureExitsOneWhereAnAnswerRunsPastTheCeiling over the doorsOf fake. ./RUNME.sh check covers the rest. The existing voice tests leave Ceiling at 0, so they keep exit 0.
+The approach adds no config key: measure reads answer.ceiling, which stands in its default file already.
 
 ## tests-red
 

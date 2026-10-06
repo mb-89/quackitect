@@ -83,7 +83,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: ebc3dea8a0866605
+process_hash: d9f9539fef3ec913
 record:
   - step: sync
     hand: box 89388e314a84 · claude-code-remote

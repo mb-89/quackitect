@@ -17,7 +17,7 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
+    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on", "each child names what it reads from its siblings, and the children land in that order", "a group whose diff grows past one review splits into a group of its own before it grows further"]
     evidence:
       - name: children
         form: list
@@ -82,7 +82,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: ebc3dea8a0866605
+process_hash: d9f9539fef3ec913
 record:
   - step: sync
     hand: box 8c9d6ebe7819 · claude-code-remote
