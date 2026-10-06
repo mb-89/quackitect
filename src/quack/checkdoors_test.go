@@ -30,7 +30,7 @@ func TestFakeGoRedProcess(t *testing.T) {
 func TestLoudRunKeepsAGoRedForTheReport(t *testing.T) {
 	t.Parallel()
 	var out, errs strings.Builder
-	real := runsUnder(t.TempDir(), map[string]string{}, &out, &errs, false)
+	real := runsUnder(t.TempDir(), map[string]string{}, &out, &errs)
 	doors := (&checkFake{}).doors()
 	doors.root = t.TempDir()
 	doors.run = func(argv, env []string, quiet bool) (int, string, error) {

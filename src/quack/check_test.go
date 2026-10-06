@@ -6,6 +6,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -62,10 +63,11 @@ func (one *checkFake) doors() checkDoors {
 			}
 			return one.codes[argv[0]], one.said[argv[0]], nil
 		},
-		get:    func(string) ([]byte, error) { return []byte(`{"ok":true}`), nil },
-		now:    ticking(time.Millisecond),
-		config: func(string) float64 { return 0 },
-		git:    func(...string) string { return "" },
+		get:     func(string) ([]byte, error) { return []byte(`{"ok":true}`), nil },
+		indexUp: func() bool { return true },
+		now:     ticking(time.Millisecond),
+		config:  func(string) float64 { return 0 },
+		git:     func(...string) string { return "" },
 		log: func(row map[string]any) error {
 			one.held.Lock()
 			defer one.held.Unlock()
@@ -75,7 +77,6 @@ func (one *checkFake) doors() checkDoors {
 		out:  io.Discard,
 		errs: io.Discard,
 	}
-	d.calm, d.calmVerb = d.run, d.verb
 	return d
 }
 
@@ -428,6 +429,31 @@ func TestCheckVerb(t *testing.T) {
 		code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check", "--errors"}, false, &said, io.Discard)
 		if code != 0 || strings.TrimSpace(said.String()) != noErrors {
 			t.Fatalf("the run answers %d, %q", code, said.String())
+		}
+	})
+	// [[spec/tickets/the-check-runs-beside]]
+	t.Run("a run that stood the index up stops it last, and a door standing before the run stays", func(t *testing.T) {
+		for _, before := range []bool{false, true} {
+			fake := &checkFake{}
+			doors := fake.doors()
+			doors.root, doors.self = t.TempDir(), "quack"
+			asked := 0
+			doors.indexUp = func() bool {
+				asked++
+				return before || asked > 1
+			}
+			checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, io.Discard, io.Discard)
+			stopped := slices.ContainsFunc(fake.runs, func(argv []string) bool { return reflect.DeepEqual(argv, []string{"quack", "stop"}) })
+			if stopped == before || (stopped && !reflect.DeepEqual(fake.runs[len(fake.runs)-1], []string{"quack", "stop"})) {
+				t.Fatalf("with a door standing before the run %v, the run ran %v", before, fake.runs)
+			}
+		}
+	})
+	t.Run("the standing file names a door where its process lives", func(t *testing.T) {
+		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, os.Getpid()): true} {
+			if indexStands(text) != want {
+				t.Fatalf("%q reads a door %v", text, !want)
+			}
 		}
 	})
 	t.Run("the stamp counts the warnings the lint leaves", func(t *testing.T) {

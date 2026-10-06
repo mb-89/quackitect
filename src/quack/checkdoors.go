@@ -27,8 +27,6 @@ const (
 	surveyFile    = runtimeDir + "/tools.json"
 	publicTickets = "spec/tickets"
 	goFormatter   = "gofmt"
-	niceProgram   = "nice"
-	calmBy        = "10"
 )
 
 // The tree a verb road names: the folder over src/scripts in quack verb <scripts>, else the root the index reads. A review runs the check in a worktree under the method root's variable, and the road names the worktree. [[spec/tickets/check-reads-the-road-root]]
@@ -49,10 +47,8 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
 	d := checkDoors{root: root, self: self, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
-	d.run = runsUnder(root, survey, out, errs, false)
-	d.calm = runsUnder(root, survey, out, errs, d.platform != "windows")
+	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
-	d.calmVerb = verbOver(d.calm, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
 		if err != nil {
@@ -69,6 +65,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		}
 		return said
 	}
+	d.indexUp = func() bool { return indexStands(d.text(indexFile)) }
 	d.git = func(args ...string) string {
 		said, _ := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
 		return strings.TrimSpace(string(said))
@@ -77,13 +74,9 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 }
 
 // A process under the root. A quiet run keeps both streams, and a loud one prints them and keeps the standard output too, so a red Go run names its cases. [[spec/tickets/ci-reds-name-their-cases]]
-func runsUnder(root string, survey map[string]string, out, errs io.Writer, calm bool) func(argv, env []string, quiet bool) (int, string, error) {
+func runsUnder(root string, survey map[string]string, out, errs io.Writer) func(argv, env []string, quiet bool) (int, string, error) {
 	return func(argv, env []string, quiet bool) (int, string, error) {
-		name, args := toolOf(survey, argv[0]), argv[1:]
-		if nice, err := exec.LookPath(niceProgram); calm && err == nil {
-			name, args = nice, append([]string{"-n", calmBy, name}, args...)
-		}
-		child := exec.Command(name, args...)
+		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
 		child.Dir, child.Env = root, append(os.Environ(), env...)
 		var said bytes.Buffer
 		child.Stdout, child.Stderr = io.MultiWriter(out, &said), errs
@@ -126,6 +119,14 @@ func toolOf(survey map[string]string, name string) string {
 		}
 	}
 	return name
+}
+
+// Whether the index's standing file names a process alive, so a door stands over the root. [[spec/tickets/the-check-runs-beside]]
+func indexStands(text string) bool {
+	var said struct {
+		Pid int `json:"pid"`
+	}
+	return json.Unmarshal([]byte(text), &said) == nil && said.Pid > 0 && alive(said.Pid)
 }
 
 // The tests the open tickets list as red, off the tracked tickets alone. [[spec/design_output/pull#the-gate]]

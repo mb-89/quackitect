@@ -28,6 +28,7 @@ const (
 	lintFile    = runtimeDir + "/lint-found.json"
 	goRedFile   = runtimeDir + "/go-red.json"
 	pointerFile = runtimeDir + "/vehicle.json"
+	indexFile   = runtimeDir + "/index.json"
 	reporter    = "src/scripts/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
 	installer   = "src/scripts/install.sh"
@@ -65,14 +66,13 @@ type part struct {
 	run  func() int
 }
 
-// What the check reaches: the root, a verb through quack's own road and the same at low priority, a process and the same at low priority, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
 	self      string
 	verb      func(words []string, quiet bool) int
-	calmVerb  func(words []string, quiet bool) int
 	run       func(argv, env []string, quiet bool) (int, string, error)
-	calm      func(argv, env []string, quiet bool) (int, string, error)
+	indexUp   func() bool
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
 	platform  string
@@ -129,7 +129,11 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		}
 		_ = os.Remove(d.at(lintFile))
 		_ = os.Remove(d.at(goRedFile))
+		owned := !d.indexUp()
 		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
+		if owned {
+			stopsOwnIndex(d)
+		}
 		for _, name := range red {
 			fmt.Fprintf(d.errs, redPart, name)
 		}
@@ -261,6 +265,16 @@ func readyOf(d checkDoors, quiet bool) part {
 	}}
 }
 
+// The index door the run stood up stops once every part ends, through the process door, so the run leaves no process behind it. A door standing before the run is the desk's own, and stays. [[spec/tickets/the-check-runs-beside]]
+func stopsOwnIndex(d checkDoors) {
+	if !d.indexUp() {
+		return
+	}
+	if code, said, err := d.run([]string{d.self, "stop"}, nil, true); err != nil || code != 0 {
+		fmt.Fprintf(d.errs, "The index the check stood up answers %d to its stop, so its processes stand on. %v %s\n", code, err, strings.TrimSpace(said))
+	}
+}
+
 // The battery's parts, which all start at once once the ready step ends. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
 func partsOf(d checkDoors, words []string, quiet bool) []part {
 	where := []string{}
@@ -287,9 +301,9 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 // The trial that runs the live client on the owner's Windows desk, which no box reaches. [[spec/tickets/level0-claims-name-the-platform]]
 const deskTrial = "spec/tickets/desk-probe-reply-trial"
 
-// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]] The smoke times nothing against the wall, so it runs at low priority and yields the cores to the parts that do. [[spec/tickets/the-parts-start-at-once]]
+// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]] The smoke's door start waits a bounded window, so it runs at the priority the parts beside it take. [[spec/tickets/the-check-runs-beside]]
 func level0Runs(d checkDoors, quiet bool) int {
-	code := d.calmVerb([]string{"probe", "smoke", workingFlag}, quiet)
+	code := d.verb([]string{"probe", "smoke", workingFlag}, quiet)
 	if code != 0 {
 		fmt.Fprintf(d.errs, "Level zero does not run whole on %s, so this tree is red.\n", d.platform)
 		return code
