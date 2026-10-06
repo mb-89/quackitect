@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -230,6 +230,29 @@ record:
     hash_after: 9b371e829a47327956c90d72bc3bcb11e0ea1e7d
     returns: 1
     why: "the hand-back met refused 5 times: tests under implement/tests-green expects green, and ./RUNME.sh branch test answers assertion, a test of src/imports fails"
+  - step: implement/tests-green
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 06c3e90c4036d2042f0b0e931b3377eebaec11f3
+    hash_after: 43b9c3dadd8271dc57c5d06e91dd5c1c84a2208c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 88 test(s) pass in 5 file(s); green, src/branches passes; green, src/front passes; green, src/imports passes; gre
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: 251f6039a646caf2
+        size: 661
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -400,26 +423,33 @@ go vet ./src/imports ./src/quack ./src/modules/check
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A guard in src/imports names every Go test file standing inside the package it tests, short of one whose clause or doc carries the InPackageTest marker. The guards verb runs every guard over the tracked tree against its baseline, prints the offenders per package, and answers 0 in report mode; the check runs it as its part guards. The baseline holds the offenders of today, so the check stays green while go-tests-go-black-box cuts them. The file ceiling reads code files alone, as the owner said. The fixture, ratio and script guards landed beside it, since the branch test reads every red file of src/imports.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft files, plus textfaults.go and the size golden, where the check stood red, and the three sibling guards the branch test reads
+- the guard and the verb read through a reader the test plants, so no door needs a fake
+- every new function names model.md#the-guards-hold-a-baseline
+- the baseline folder stands once, in guards.go, and the model points at it
 
 # accept
 
