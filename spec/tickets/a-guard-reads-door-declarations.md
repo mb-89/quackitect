@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,15 @@ record:
         hash: 38bae238e57a16af
         size: 10261
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: c3b8044cffbca49e358d25437f8ce05244be6bc5
+    hash_after: c3b8044cffbca49e358d25437f8ce05244be6bc5
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -331,14 +340,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/owns`, the declarations beside each door, `src/imports`, `src/modules/check` and the doors verb, every one inside the ask
+the change reaches no door, it reads their declarations, so no fake joins
+the header of `src/imports/walkaround.go` points at the design section on what a door declares
+the owned names stand once, in the `owns.yaml` beside each door, and the analyzer and the check read them there
 
 ## tests-green
 
