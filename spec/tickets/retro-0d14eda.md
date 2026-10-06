@@ -128,15 +128,20 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: feedback
+step: collect
+record:
+  - step: feedback
+    hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
+    hash_before: 4efd1fe6fe4d5150ac8fea8d26410c2ac2ac2487
+    hash_after: 4efd1fe6fe4d5150ac8fea8d26410c2ac2ac2487
+    def: 469f394c7eccd7de
 ---
 
 # Ask
 
 <!-- why, as text: what calls for it, as notes standing open, an iteration ending, or the owner asking -->
 
-
-The owner asks for a retro over the fleet's week of independent cloud-box work, from Sep 29 to Oct 6 2026: what goes well, what goes badly, what to improve and what to learn from.
+The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 to Oct 6 2026. It asks what goes well, what goes badly, what to improve and what to learn.
 
 # feedback
 
@@ -145,8 +150,28 @@ The owner asks for a retro over the fleet's week of independent cloud-box work, 
 ## notes
 
 <!-- every private note this step writes, one a line -->
-
 <!-- the form is list -->
+
+- `a-box-reads-each-chapter`
+- `a-stuck-box-gets-killed`
+- `decided-steps-need-no-person`
+- `doors-test-once-modules-pure`
+- `green-needs-no-agent`
+- `io-modules-declare-their-own`
+- `level-zero-never-breaks`
+- `merging-runs-without-a-hand`
+- `nothing-red-reaches-main`
+- `only-main-takes-the-gate`
+- `stale-holds-stop-mechanically`
+- `tests-wait-for-events`
+- `the-check-stays-near-ninety`
+- `the-fleet-works-a-week`
+- `the-handover-only-clears`
+- `the-owner-asks-how-far`
+- `the-verbs-port-fans-out`
+- `the-week-spends-its-tokens`
+- `three-boxes-open-no-pr`
+- `unpushed-commits-get-discarded`
 
 # collect
 
