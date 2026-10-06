@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
 state: closed
+reason: done
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -81,11 +83,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 5d4a884bfb2491ff
-group: the-verbs-run-in-go
-enabled_by: migration.phase11
-depends_on: ["quack-holds-a-verb-registry", "work-verbs-run-in-go"]
-step: retro/cloud
+process_hash: ebc3dea8a0866605
 record:
   - step: sync
     hand: box 89388e314a84 · claude-code-remote
@@ -169,7 +167,9 @@ record:
         hash: 040d8ee98c79cd9f
         size: 1968
     def: 4da1ca5da87d5bbc
-reason: done
+group: the-verbs-run-in-go
+depends_on: ["quack-holds-a-verb-registry", "work-verbs-run-in-go"]
+enabled_by: migration.phase11
 ---
 
 # Ask

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/design_output/pull.md:470:179: Vocabulary: backticked stands outside the words this tree writes. Write a core word,"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: b3ecdc79009c3c1e32c7f45ed1e608725b407794
+    hash_after: b3ecdc79009c3c1e32c7f45ed1e608725b407794
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "    1.6  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: design/tests-red
+        hash: f823972b459c1de0
+        size: 501
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -322,26 +345,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/pull_home_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hand-back now refuses an improve line that names no home. A list field marked home: true takes each line only where it names a link resolving in the tree, a ticket in backticks standing under the tickets folder, or a backticked path whose file or parent folder stands, and a span holding a space counts as none. The retro write in spec/processes/group.yaml marks its improve field so, the ticket schema admits the key, and the JavaScript hand-back, the road a default box runs, carries the same check as the Go one. The route hash moved, so ticket update rewrote the open tickets on the group route.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, the JS twin the gate named, the tickets ticket update rewrites, and the size golden that reads pull.md at its new length
+- the Go test reads through FakeDisk, and the JS cases through the fake doors of test/level0
+- the home check points at the forms table of spec/design_output/pull
+- the three homes stand once, in the says line of the improve field
 
 # accept
 
