@@ -100,7 +100,16 @@ record:
         exit: 0
         said: work/retro-and-coordinator already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: f32161270b84929a8e96b314a6f770e3bc41c5e6
+    hash_after: f32161270b84929a8e96b314a6f770e3bc41c5e6
+    inputs:
+      - name: ask
+        hash: 901e8175f30a8f12
+        size: 458
+    def: 19b6849b1f151cd5
+step: children
 ---
 
 # Ask
@@ -129,14 +138,28 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-defect-reproduces-before-fixing]], trivial
+- [[spec/tickets/accept-runs-the-orphan-scan]], standard
+- [[spec/tickets/ci-reds-name-their-cases]], standard
+- [[spec/tickets/improve-lines-name-their-home]], standard
+- [[spec/tickets/retro-audit-reads-the-decision]], standard
+- [[spec/tickets/retro-read-reads-every-record]], standard
+- [[spec/tickets/splits-name-what-siblings-read]], trivial
+- [[spec/tickets/the-coordinator-guidance-stands]], trivial
+- [[spec/tickets/the-coordinator-runs-under-level0]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child holds one rule or one verb change, small enough to review whole
+- the children cover each line of the goal: the retro reads, the trial decisions, the improve homes, the coordinator note and doors, and the four rules on the way
+- no child waits on another, so none names depends_on
+- the children read nothing from each other, and the coordinator note lands before the start road child that adds rule 8 to it
+- the diff stays one review, so the group keeps one level
 
 # children
 
