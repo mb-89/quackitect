@@ -86,7 +86,16 @@ record:
   - step: sync
     hand: box c46fdbdc0cdf · claude-code-remote
     hash_before: b2be4014364b17f1497d96690275297014d59208
-step: sync
+  - step: sync
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 6a385c47acc0137fb626f993d2238e8ba2bbc9b4
+    hash_after: 6a385c47acc0137fb626f993d2238e8ba2bbc9b4
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-check-runs-beside already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -104,8 +113,9 @@ The check's parts block each other no more: every part starts at once, so the ch
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
