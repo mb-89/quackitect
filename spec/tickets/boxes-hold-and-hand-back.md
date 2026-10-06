@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
@@ -113,6 +113,22 @@ record:
     hand: box 3341fdcd540f · claude-code-remote
     hash_before: edc2f2c7047e6b9486cbd16e9b8ec4bb269c31e1
     hash_after: edc2f2c7047e6b9486cbd16e9b8ec4bb269c31e1
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/boxes-hold-and-hand-back already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1d203dacf8882c98
+        size: 453
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 39dd9ce2f8f08fca320310fa44fa406f0ea043c4
+    hash_after: 158b992d38ec359ca152fe3e770a2b6d07c59c7b
     answered:
       - name: sync/sync
         exit: 0
@@ -183,8 +199,7 @@ no child waits on another now: every child stands closed, and the rescue childre
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- clear-keeps-the-hold: SessionEnd fires on a clear, so a live box writes an end beat and frees its branch
+accept
 
 # retro
 
