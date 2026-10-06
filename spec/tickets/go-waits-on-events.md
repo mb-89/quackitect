@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: f04f51723a777a9d
         size: 516
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: ccf2c0092b55f8d1dc37170ac044ba160e480968
+    hash_after: ccf2c0092b55f8d1dc37170ac044ba160e480968
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/clock fails
+    inputs:
+      - name: design/draft
+        hash: 28302b6e72396e22
+        size: 2965
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -257,26 +270,33 @@ the first done_when line falls to `./RUNME.sh doors`, the second to `./RUNME.sh 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/clock
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/clock/clock_test.go
+src/modules/clock/clock_contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The build stops on `q.Clock` undefined, and the contract build on `After` missing from `Clock`. Those are the two pieces the change adds. The case that the real clock and the fake stand as a `q.Clock` sits in the clock's own test, not under `src/q`, because a core test imports no module.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each case names its claim and asserts it: After fires once its span passes and not before, the context ends on its deadline, a stopped hand never runs, and both clocks stand as `q.Clock`
+each case builds its own fake, and the shared start time is a value nobody writes
+each case goes red for the reason the change answers, as the build shows
 
 # gate
 

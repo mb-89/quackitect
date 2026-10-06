@@ -3,11 +3,72 @@
 package clock
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"quackitect/src/q"
 )
+
+var standsAt = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+
+func TestTheRealClockAndTheFakeAreAQClock(t *testing.T) {
+	t.Parallel()
+	for name, one := range map[string]q.Clock{"real": New(), "fake": NewFake(standsAt)} {
+		if one == nil {
+			t.Errorf("the %s clock reads as no q.Clock", name)
+		}
+	}
+}
+
+func TestTheFakeFiresAfterOnTick(t *testing.T) {
+	t.Parallel()
+	fake := NewFake(standsAt)
+	fired := fake.After(time.Second)
+	fake.Tick(time.Second - time.Millisecond)
+	select {
+	case <-fired:
+		t.Fatal("After fires before its span passes")
+	default:
+	}
+	fake.Tick(time.Millisecond)
+	select {
+	case <-fired:
+	default:
+		t.Fatal("After stands unfired once its span passes")
+	}
+}
+
+func TestTheFakeEndsAContextOnTick(t *testing.T) {
+	t.Parallel()
+	fake := NewFake(standsAt)
+	bounded, cancel := fake.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	fake.Tick(time.Second)
+	select {
+	case <-bounded.Done():
+		if !errors.Is(bounded.Err(), context.DeadlineExceeded) {
+			t.Fatalf("the context ends on %v, and wants its deadline", bounded.Err())
+		}
+	default:
+		t.Fatal("the context stands open once its span passes")
+	}
+}
+
+func TestAStoppedAfterFuncNeverRuns(t *testing.T) {
+	t.Parallel()
+	fake := NewFake(standsAt)
+	ran := false
+	stop := fake.AfterFunc(time.Second, func() { ran = true })
+	if !stop() {
+		t.Fatal("stop reports the hand gone before its span")
+	}
+	fake.Tick(2 * time.Second)
+	if ran {
+		t.Fatal("a stopped hand runs")
+	}
+}
 
 func TestTheMinuteMovesOnTick(t *testing.T) {
 	c := q.New()

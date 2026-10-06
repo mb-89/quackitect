@@ -22,8 +22,33 @@ func clockSuite(t *testing.T, one Clock, pass func()) {
 	}
 }
 
+func afterSuite(t *testing.T, one Clock, pass func()) {
+	fired := one.After(time.Millisecond)
+	ran := make(chan struct{})
+	one.AfterFunc(time.Millisecond, func() { close(ran) })
+	pass()
+	for name, each := range map[string]<-chan struct{}{"After": drained(fired), "AfterFunc": ran} {
+		select {
+		case <-each:
+		case <-time.After(time.Second):
+			t.Fatalf("%s stands unfired past its span", name)
+		}
+	}
+}
+
+func drained(fired <-chan time.Time) <-chan struct{} {
+	out := make(chan struct{})
+	go func() {
+		<-fired
+		close(out)
+	}()
+	return out
+}
+
 func TestClockKeepsItsContract(t *testing.T) {
 	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
 	t.Run("fake", func(t *testing.T) { clockSuite(t, fake, func() { fake.Tick(time.Millisecond) }) })
 	t.Run("real", func(t *testing.T) { clockSuite(t, New(), func() { time.Sleep(time.Millisecond) }) })
+	t.Run("fake waits", func(t *testing.T) { afterSuite(t, fake, func() { fake.Tick(time.Millisecond) }) })
+	t.Run("real waits", func(t *testing.T) { afterSuite(t, New(), func() {}) })
 }
