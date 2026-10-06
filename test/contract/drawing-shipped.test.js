@@ -20,7 +20,9 @@ test("git tracks the drawing the inset loads, off the extension's own folder", (
   const tracked = said.stdout.split(/\r?\n/).filter(Boolean);
   const script = basename(OUT);
   const style = script.replace(/\.mjs$/, ".css");
-  assert.deepEqual(tracked.sort(), [`${folder}/${script}`, `${folder}/${style}`].sort());
+  // The page's declaration stands beside the bundle it names. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+  const declared = `${folder}/owns.yaml`;
+  assert.deepEqual(tracked.sort(), [`${folder}/${script}`, `${folder}/${style}`, declared].sort());
   assert.match(folder, /^src\/extension\//, "the drawing stands inside the extension");
   const inset = files.read(join(root, "src", "extension", "editor-inset.js"));
   assert.match(inset, new RegExp(`"${script.replace(".", "\\.")}"`), "the inset names the script");
