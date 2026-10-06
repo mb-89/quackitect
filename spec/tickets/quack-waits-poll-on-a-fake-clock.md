@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 parent: quack-spawns-meet-fake-process
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: f28dd0498cc38dea
         size: 514
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: d748d197c41139e2874accadde3b5e3e81d11aaf
+    hash_after: 330301649fdf29ec0dd169c5097d7bd007d1f7cd
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches waits_test.go alone, and doors.md lost its row at tests-red
+- the cases reach no door: the manager runs in memory over savedTable
+- savedTable and ended point at this ticket, and the draft names the approach
+- the saves a case holds stand once, as savesHeld
 
 ## tests-green
 
