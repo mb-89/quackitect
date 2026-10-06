@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  118.0  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 6082bfb1bc7885496bce20e9ed5a412a7b160034
+    hash_after: 6082bfb1bc7885496bce20e9ed5a412a7b160034
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 8532ce005e537ef8
+        size: 652
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -315,26 +338,33 @@ every fact the change adds stands in one place: the change calls firstLeaf and o
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch now writes each fix group open at its route first step. Before, fixGroup minted the group as a draft, and leftForPerson kept that draft for a person, so the group box found nothing to pull. fixGroup in src/branches/dispatch_write.go now sets state and step with openState and firstLeaf, the same pair escalate.go writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: it changes fixGroup alone.
+every door the change reaches has a fake: the case drives fixGroup over the tree root through Doors, with no network.
+a comment names the approach the change implements: the comment above fixGroup names the open first step.
+every fact the change adds stands in one place: the change calls openState and firstLeaf from group.go.
 
 # accept
 
