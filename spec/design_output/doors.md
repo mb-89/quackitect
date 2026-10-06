@@ -225,7 +225,7 @@ into memory. [[spec/tickets/unfaked-doors-take-fakes]]
 | part | what it holds |
 |---|---|
 | `Repo` in `src/modules/git` | the typed operations below, each one git command line in the real door |
-| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, and the work tree on a `FakeDisk` |
+| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, and the work tree on a `FakeDisk`, and the four reads of `Git` answered off them, so `FakeGit` leaves once its cases move |
 | an origin | a second `FakeRepo`, which push and fetch move commits and refs between |
 | `src/modules/git/repo_contract_test.go` | each case run against `FakeRepo` and a real repository under a temporary folder, the one door test of git's writes |
 
