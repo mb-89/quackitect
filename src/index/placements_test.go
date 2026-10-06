@@ -287,4 +287,3 @@ func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
 		}
 	}
 }
-

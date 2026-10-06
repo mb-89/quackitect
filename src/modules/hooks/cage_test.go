@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
-
 )
 
 const cageLogs = "../../../test/replay/cage"
