@@ -1,6 +1,6 @@
-// The check verb in Go: its parts in order, each one's road, the battery run,
-// the server read, the Go gate, the test runner's files and the rows under
-// --errors.
+// The check verb in Go: its parts, each one's road, the server read, the Go
+// gate, the test runner's files and the rows under --errors. The battery's
+// run stands in check_battery_test.go.
 // [[spec/design_output/work#the-battery-answers-first]]
 package main
 
@@ -28,38 +28,6 @@ func ticking(step time.Duration) func() time.Time {
 		at = at.Add(step)
 		return at
 	}
-}
-
-// A clock standing still until the case moves it, telling the case of each read. [[spec/guidance/code/testing]]
-type heldClock struct {
-	held  sync.Mutex
-	at    time.Time
-	count int
-	reads chan struct{}
-}
-
-func newHeldClock(most int) *heldClock {
-	return &heldClock{at: time.Date(2026, 9, 20, 10, 0, 0, 0, time.UTC), reads: make(chan struct{}, most)}
-}
-
-func (c *heldClock) now() time.Time {
-	c.held.Lock()
-	defer c.held.Unlock()
-	c.count++
-	c.reads <- struct{}{}
-	return c.at
-}
-
-func (c *heldClock) move(by time.Duration) {
-	c.held.Lock()
-	defer c.held.Unlock()
-	c.at = c.at.Add(by)
-}
-
-func (c *heldClock) read() int {
-	c.held.Lock()
-	defer c.held.Unlock()
-	return c.count
 }
 
 // Doors over fakes, recording each verb and each process the parts reach. The parts run together, so a lock holds the records. [[spec/guidance/code/testing]]
@@ -184,83 +152,6 @@ func TestCheckParts(t *testing.T) {
 		doors.get = func(string) ([]byte, error) { return nil, errors.New("refused") }
 		if code := partNamed(partsOf(doors, nil, false), "server").run(); code != 0 {
 			t.Fatalf("no server answers %d", code)
-		}
-	})
-}
-
-func TestBatteryRun(t *testing.T) {
-	t.Parallel()
-	t.Run("every part starts before any part ends, and the span reads as the slowest part", func(t *testing.T) {
-		clock := newHeldClock(16)
-		names := []string{"tests", "go", "rules"}
-		started := make(chan string, len(names))
-		release := map[string]chan struct{}{}
-		var held sync.Mutex
-		early := []string{}
-		parts := []part{}
-		for _, name := range names {
-			release[name] = make(chan struct{})
-			parts = append(parts, part{name: name, run: func() int {
-				held.Lock()
-				if clock.read() < 1+len(names) || len(early) > 0 {
-					early = append(early, name)
-				}
-				waits := len(early) == 0
-				held.Unlock()
-				started <- name
-				if waits {
-					<-release[name]
-				}
-				return 0
-			}})
-		}
-		type answer struct {
-			times map[string]float64
-			total float64
-		}
-		answered := make(chan answer, 1)
-		go func() {
-			_, times, _, total := batteryRun(parts, clock.now)
-			answered <- answer{times, total}
-		}()
-		for range names {
-			<-started
-		}
-		held.Lock()
-		ran := slices.Clone(early)
-		held.Unlock()
-		if len(ran) > 0 {
-			<-answered
-			t.Fatalf("%v ran before the battery started every part", ran)
-		}
-		for range 1 + len(names) {
-			<-clock.reads
-		}
-		for _, name := range names {
-			clock.move(10 * time.Second)
-			close(release[name])
-			<-clock.reads
-		}
-		got := <-answered
-		if want := map[string]float64{"tests": 10000, "go": 20000, "rules": 30000}; !reflect.DeepEqual(got.times, want) || got.total != 30000 {
-			t.Fatalf("the run timed %v over %v, and wants %v over the slowest part's 30000", got.times, got.total, want)
-		}
-	})
-	t.Run("a red part names itself, and every part beside it runs and reports its time", func(t *testing.T) {
-		var held sync.Mutex
-		ran := []string{}
-		step := func(name string, code int) part {
-			return part{name: name, run: func() int {
-				held.Lock()
-				defer held.Unlock()
-				ran = append(ran, name)
-				return code
-			}}
-		}
-		code, times, red, _ := batteryRun([]part{step("tests", 0), step("go", 1), step("rules", 2)}, ticking(time.Millisecond))
-		slices.Sort(ran)
-		if code != 1 || !reflect.DeepEqual(red, []string{"go", "rules"}) || !reflect.DeepEqual(ran, []string{"go", "rules", "tests"}) || len(times) != 3 {
-			t.Fatalf("the red run answers %d, names %v red, ran %v, timed %v", code, red, ran, times)
 		}
 	})
 }

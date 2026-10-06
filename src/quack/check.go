@@ -29,6 +29,7 @@ const (
 	pointerFile = runtimeDir + "/vehicle.json"
 	reporter    = "src/scripts/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
+	installer   = "src/scripts/install.sh"
 )
 
 // The flags and variables the parts read: the quiet run, the working change the dry session clones, the tally the process door writes, the list the lint leaves, and Go with no C compiler. [[spec/tickets/the-verbs-need-no-wrapper]] [[spec/tickets/level0-runs-on-the-door]]
@@ -66,6 +67,7 @@ type part struct {
 // What the check reaches: the root, a verb through quack's own road and the same at low priority, a process and the same at low priority, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
+	self      string
 	verb      func(words []string, quiet bool) int
 	calmVerb  func(words []string, quiet bool) int
 	run       func(argv, env []string, quiet bool) (int, string, error)
@@ -125,7 +127,7 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			d.out = io.Discard
 		}
 		_ = os.Remove(d.at(lintFile))
-		code, times, red, total := batteryRun(partsOf(d, words, quiet), d.now)
+		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
 		for _, name := range red {
 			fmt.Fprintf(d.errs, redPart, name)
 		}
@@ -195,9 +197,11 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery all at once: the run reads every part's start, then starts every part and waits for all of them, each timed under its name. It answers the first red code in part order and the red parts by name, so a red part names itself while every part beside it still reports. No part reads another's output, so none waits on another, and the total is the slowest part's span. [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
-func batteryRun(parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
+// The battery: the ready step alone, then every part at once. The run reads every part's start, then starts every part and waits for all of them, each timed under its name, the ready step among them. It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another, and the total is the ready step's span and the slowest part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
+func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
+	readyCode := ready.run()
+	readyTook := float64(now().Sub(from).Milliseconds())
 	starts := make([]time.Time, len(parts))
 	for at := range parts {
 		starts[at] = now()
@@ -214,9 +218,12 @@ func batteryRun(parts []part, now func() time.Time) (int, map[string]float64, []
 		}()
 	}
 	all.Wait()
-	code := 0
-	times := map[string]float64{}
+	code := readyCode
+	times := map[string]float64{ready.name: readyTook}
 	red := []string{}
+	if readyCode != 0 {
+		red = append(red, ready.name)
+	}
 	for at, one := range parts {
 		times[one.name] = took[at]
 		if codes[at] == 0 {
@@ -230,7 +237,25 @@ func batteryRun(parts []part, now func() time.Time) (int, map[string]float64, []
 	return code, times, red, float64(now().Sub(from).Milliseconds())
 }
 
-// The battery's parts, which all start at once. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
+// The step every part waits on: the install, which builds a stale binary and swaps it in, then one ask of the index, which stands a door on the build the disk holds. A part reading the index mid-swap or mid-restart reads a door going down, which halts its tools and fails its operations, so the parts start once both stand. [[spec/tickets/index-cases-wait-for-it]]
+func readyOf(d checkDoors, quiet bool) part {
+	return part{name: "ready", run: func() int {
+		code, said, err := d.run([]string{"sh", installer}, nil, quiet)
+		if err != nil || code != 0 {
+			fmt.Fprintln(d.errs, strings.TrimSpace(said))
+			fmt.Fprintf(d.errs, "The install answers %d, so the parts read the binaries as they stand. %v\n", code, err)
+		}
+		code, said, err = d.run([]string{d.self, "standing"}, nil, true)
+		if err != nil || code != 0 {
+			fmt.Fprintln(d.errs, strings.TrimSpace(said))
+			fmt.Fprintln(d.errs, "The index stands no door here, so every part reading it reads nothing.")
+			return max(code, 1)
+		}
+		return 0
+	}}
+}
+
+// The battery's parts, which all start at once once the ready step ends. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
 func partsOf(d checkDoors, words []string, quiet bool) []part {
 	where := []string{}
 	for _, one := range words {

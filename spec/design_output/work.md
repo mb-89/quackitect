@@ -678,13 +678,25 @@ So `done` stops meaning "the session believes this passes". It comes to mean
 reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
 the Bash door alike, so a warning holds every road off the box.
 
+The ready step runs alone before the parts, and every part waits on it:
+
+| the ready step | why a part waits on it |
+|---|---|
+| the install | a stale binary rebuilds and swaps in, so a part meets no binary mid-swap |
+| one ask of the index | a door stands on the build the disk holds, so a part meets no door going down |
+
+A door going down halts the tools it runs and fails the operations in flight,
+so a part reading it reads nothing. No part reads another part's output, so no
+part waits on another. `readyOf` in `src/quack/check.go` holds the step.
+[[spec/tickets/index-cases-wait-for-it]]
+
 The battery's report rides the stamp under `battery`, and a retro keeps one a
 retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 
 | field | holds |
 |---|---|
-| `parts` | a time a part, in the order each ends |
-| `total` | the battery's span, start to end, which is its slowest part, since every part starts at once |
+| `parts` | a time a part, in the order each ends, the ready step among them |
+| `total` | the battery's span, start to end: the ready step, then the slowest part, since every part starts at once |
 | `slowest` | the slowest cases, each with its file |
 | `files` | a time a test file, the slowest first |
 | `unrun` | the parts a red run leaves unrun on an older stamp, and nothing on a new one, since every part runs |
