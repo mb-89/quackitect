@@ -1,6 +1,6 @@
-// What the command line reads: the version and the walk over a folder. The
-// lint, the index, links, notes and find verbs run in Go.
-// [[spec/tickets/the-check-lint-runs-in-go]]
+// What the command line reads: the version and the walk over a folder. Every
+// other reading runs in Go.
+// [[spec/design_output/tree#the-tree-handed-in]]
 
 import { join } from "node:path";
 import { showOf, walkOver } from "../bridge/findings.js";
