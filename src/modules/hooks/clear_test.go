@@ -79,3 +79,30 @@ func TestAStopOffTheQueueKeepsTheConversation(t *testing.T) {
 		}
 	}
 }
+
+// The Stop that answers the clear puts the read in the clear's place, keeping its hand and its stamp, and drops the due mark, so the pull after the clear hands the next leaf. [[spec/tickets/the-clear-hands-back-the-leaf]]
+func TestTheClearAtTheStopHandsTheReadAndDropsTheDueMark(t *testing.T) {
+	clear, _ := json.Marshal(map[string]any{"ticket": clearTicket, "step": clearTicket, "ephemeral": true, "hand": myHand, "taken": "t0"})
+	root := treeOf(t, map[string]string{clearHold: string(clear), dueMark: `{"tokens":5000,"at":1000}`}, "")
+	door := marksDoor(t)
+
+	answer, err := door.Hook(Post{Event: stopEvent, Root: root, E: map[string]any{"session_id": "s1"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !clears(answer) {
+		t.Fatalf("the Stop with the clear in hand answers %+v, and wants the clear", answer.Effects)
+	}
+	body, ok := (disk{root}).Read(clearHold)
+	var held map[string]any
+	if !ok || json.Unmarshal([]byte(body), &held) != nil {
+		t.Fatalf("the hold after the clear reads %q", body)
+	}
+	if held["ticket"] != readTicket || held["step"] != readTicket || held["ephemeral"] != true || held["hand"] != myHand || held["taken"] != "t0" {
+		t.Fatalf("the hold after the clear reads %v, and wants %s in the clear's hand", held, readTicket)
+	}
+	if _, ok := (disk{root}).Read(dueMark); ok {
+		t.Fatalf("the due mark stands after the clear, so the pull hands the handover again")
+	}
+}

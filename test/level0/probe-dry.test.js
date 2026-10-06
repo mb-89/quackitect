@@ -44,6 +44,12 @@ function whole() {
         runs: [{ words: "handover --pass", exit: 0, said: "Level zero clears the conversation." }],
         commands: ["clear"],
         prompts: [RESUME],
+        after: {
+          pulled: "work\n  read-handover stands in your hand.",
+          read: "work\n  read-handover closes.\nwork  dry-probe-leaf at do, leaf 1 of 1",
+          committed: { exit: 0, said: "" },
+          clears: 1,
+        },
       },
     },
   };
