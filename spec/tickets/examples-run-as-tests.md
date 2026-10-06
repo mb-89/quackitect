@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -85,6 +85,16 @@ steps:
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 cloud: true
+record:
+  - step: sync
+    hand: box 70672ee0ff0d · claude-code-remote
+    hash_before: aeb4732cc631937ac8d7df6f36b7f46c9848751a
+    hash_after: aeb4732cc631937ac8d7df6f36b7f46c9848751a
+    answered:
+      - name: sync
+        exit: 0
+        said: work/examples-run-as-tests already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -100,8 +110,9 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
