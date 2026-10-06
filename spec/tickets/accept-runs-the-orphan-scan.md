@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/branches/unreached.go:2:47: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 94011d3d482c2752c4152e3573cab0913f498360
+    hash_after: 94011d3d482c2752c4152e3573cab0913f498360
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.9  test/contract/runme-road.test.js ./RUNME.sh hands config to its program, which names the verbs slice at its bui"
+    inputs:
+      - name: design/tests-red
+        hash: ff63dfed217d1aaa
+        size: 577
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -322,26 +345,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/unreached_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Accept now names every Go file the group adds that nothing reaches. branch review lists the files the branch adds, and counts a folder reached where it holds a main package, holds tests alone, sits under testdata, or another Go file at the branch ref imports its path. Each file nothing reaches lands on an unreached row, which counts one fix, so the review refuses the group until a hand wires or drops the package. The review_branch tool road carries the same row and count. src/scripts/work-review.js stays as it stands, since no live road runs its review.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the review_branch road the gate named
+- the tests drive git over a real bare origin, and the hooks review test runs over the Material it decodes
+- review.go and unreached.go point at the unreached row section of spec/design_output/review
+- the unreached row stands once, in spec/design_output/review.md
 
 # accept
 

@@ -40,7 +40,7 @@ mechanical answers in front of them while they do.
 | the shape of the diff | `git diff --stat main...<ref>` |
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
-| the unreached files | the scan under [[#the-unreached-row]] |
+| the unreached files | the scan under [[spec/design_output/review#the-unreached-row]] |
 
 The ask and the handback are one file at separate commits. `branch open` cuts the
 branch off trunk's tree, so `git rev-list --reverse main..<ref>` names the
