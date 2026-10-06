@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -191,6 +191,21 @@ record:
     skipped: true
     kept: 46c2cc7a5eafcfc8f8465e3d0c437a02a26221ee
     why: its red tests stand as 46c2cc7a5 landed them, and a later leaf passed since
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-10
+    hash_before: 810867571291e6e05feeaabdcd85039d76417681
+    hash_after: 810867571291e6e05feeaabdcd85039d76417681
+    inputs:
+      - name: design/draft
+        hash: 7b00cac3458f3cfd
+        size: 2784
+      - name: design/tests-red
+        hash: 26d55a6dbde31cfe
+        size: 1101
+      - name: [[spec/design_output/failures]]
+        hash: 8e785cc94e2e32f9
+        size: 4503
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -331,9 +346,7 @@ Each case fails on its own assertion. The fault stubs answer no fault, so each f
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- check-skips-named-red-tests: the red rows on failure-check-refuses read as a path and a test name, so goTestNames in src/quack/check.go meets no path ending _test.go, skips nothing, and ./RUNME.sh check exits 1 on the seven src/failure cases; teach goSkipOf to read a path and a test name, or write the red rows as bare paths, since the verb_failure_test rows of failure-verbs-raise-and-register share the form
-- raise-scan-keys-failure-door: the draft names no rule telling a failure raise from another raise, and src/scripts/probe-dry.js and src/scripts/probe-clear.js call an engine raise with literal event ids such as session.start and tool.call, so a scan matching a bare raise( names each as an unregistered id and TestEveryRaisedIdStandsAsANode stays red; key the JavaScript match to the handle the failure door answers, and add a fixture case holding an engine raise that RaiseFaults leaves alone
+accept
 
 # implement
 
