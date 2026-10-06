@@ -428,3 +428,9 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The first done_when line reads with a pathspec that skips the goldens, and the change step decides it so:
+
+- `git grep -il -e '\.runtime/bin/vale' -e 'vale-ls' -e 'errata-ai' -e '\.vale\.ini' -- src test RUNME.sh .github ':!*testdata*'` answers nothing.
+
+The queue and tree goldens snapshot ticket names such as `vale-ls-on-windows`, and run nothing. The door holds the ask, so the line stands here. For details, see [[spec/tickets/done-when-grep-meets-testdata]].
