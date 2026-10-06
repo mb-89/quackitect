@@ -84,3 +84,25 @@ func TestRetroReadMarksAFaultAsTheTimelineCountsItAndALineOfNoJSONEarnsNone(t *t
 		t.Fatalf("a blank prompt earns %v", got)
 	}
 }
+
+// retro read counts a prompt the owner queues mid-turn and lists a refusal that carries no error mark; the queue's own line and a task's queued line earn none. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	retroReadingLay(t, root, retroReadingName, map[string]string{
+		"input/transcripts/one/a.jsonl": fmt.Sprintf(`{"type":"queue-operation","operation":"enqueue","timestamp":%q,"content":"stop and land it"}`, retroReaderWhen) + "\n" +
+			fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"stop and land it","origin":{"kind":"human"}}}`, retroReaderWhen) + "\n" +
+			fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"a task ends","origin":{"kind":"task-notification"}}}`, retroReaderWhen) + "\n" +
+			retroReaderSaid("user", `[{"type":"tool_result","content":"refused\n  the leaf holds no hand"}]`) + "\n" +
+			retroReaderSaid("user", `[{"type":"tool_result","content":"the leaf passes"}]`),
+		"chapters/c1.json": `{"id":"c1","lines":{"transcripts/one/a.jsonl":[[1,5]]}}`,
+	})
+
+	code, out, errs := retroReadingRun(retroReadVerb, root, "retro", "read", retroReadingName, "c1")
+
+	want := "transcripts/one/a.jsonl:2  prompt  stop and land it\n" +
+		"transcripts/one/a.jsonl:4  refusal  the leaf holds no hand\n"
+	if code != 0 || out != want {
+		t.Fatalf("read answers %d, %q, %q, want %q", code, out, errs, want)
+	}
+}

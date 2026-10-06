@@ -380,3 +380,18 @@ func TestRetroMintMintsEveryPromotionAfterTheClasses(t *testing.T) {
 		t.Fatalf("the second run prints %q", again)
 	}
 }
+
+// The mint keeps the retro's classes, rates and collect time in the tracked folder, where the next box's effect finds them. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroMintKeepsTheClassesInTheTrackedFolder(t *testing.T) {
+	t.Parallel()
+	root, fake := retroMintTree(t, []map[string]any{retroMintFixedClass()}, nil)
+	retroMintWrite(t, root, ".se/.retro/"+retroMintName+"/rates.json", `{"hours":1,"classes":{}}`)
+
+	code, _, errs := retroMintRuns(root, fake)
+
+	kept := "spec/retros/" + retroMintName + "/"
+	if code != 0 || retroMintReadFile(t, root, kept+"classes.json") != retroMintReadFile(t, root, retroMintClasses) ||
+		retroMintReadFile(t, root, kept+"rates.json") != `{"hours":1,"classes":{}}` {
+		t.Fatalf("retro mint answers %d, %q, and the tracked folder reads %q", code, errs, retroMintReadFile(t, root, kept+"classes.json"))
+	}
+}

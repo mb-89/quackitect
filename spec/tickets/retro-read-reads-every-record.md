@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: bac3852e47980fa2
         size: 485
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: 5598aa566d687ac369010442f37d21dfbd55fcd9
+    hash_after: 5598aa566d687ac369010442f37d21dfbd55fcd9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 70a72d6b73857176
+        size: 2158
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,33 @@ the first done_when line meets TestRetroReadCountsAQueuedOwnerPromptAndListsAQui
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_read_test.go src/quack/retro_effect_test.go src/quack/retro_mint_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/retro_read_test.go
+src/quack/retro_effect_test.go
+src/quack/retro_mint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Read prints nothing for a queued prompt and a quiet refusal, since it reads typed prompts and error-marked results alone. Effect finds no earlier retro where only the tracked folder holds one. Mint leaves the tracked folder empty. The second retro's input moves into one shared variable, so the standing effect case and the new one read the same lines.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal, the second TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder, both red on their assertion
+the tests reach temp folders the cases seed, and the mint test reaches git through retroMintFake
 
 # gate
 
