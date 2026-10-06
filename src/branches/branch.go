@@ -4,7 +4,10 @@
 // [[spec/design_output/work#the-round-trip]]
 package branches
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // The exit codes a verb answers: done, red, and a call the verb refuses. [[spec/design_output/work#the-round-trip]]
 const (
@@ -60,7 +63,7 @@ func verbNames() []string {
 
 // Runs the branch verb its first word names, or prints the usage. [[spec/design_output/work#the-round-trip]]
 func Branch(d *Doors, argv []string) int {
-	what, name := word(argv, 0), word(argv, 1)
+	what, name := word(argv, 0), nameWord(argv)
 	for _, one := range table {
 		if one.Name != what {
 			continue
@@ -83,11 +86,21 @@ func Branch(d *Doors, argv []string) int {
 
 // Runs the cloud verb: the routine's trigger, or the usage. [[spec/design_output/work#the-routine-a-verb-names]]
 func Cloud(d *Doors, argv []string) int {
-	if word(argv, 0) == "trigger" {
+	switch word(argv, 0) {
+	case "trigger":
 		return d.trigger()
+	case "prompt":
+		return d.prompt(word(argv, 1))
+	case "fleet":
+		return d.fleet()
+	case "route":
+		return d.route(word(argv, 1))
 	}
 	d.say("Usage: ./RUNME.sh cloud <verb>\n")
 	d.say("  trigger       the routine that works a branch, and what stands free")
+	d.say("  prompt <group> the prompt a box starts with, off the group and its route")
+	d.say("  fleet         each box with its tip, age, holder and pull request, and a wake for each that stalls")
+	d.say("  route [event] the session that holds the branch a pull request event names")
 	if word(argv, 0) != "" {
 		return codeRefused
 	}
@@ -98,6 +111,14 @@ func Cloud(d *Doors, argv []string) int {
 func word(argv []string, at int) string {
 	if at < len(argv) {
 		return argv[at]
+	}
+	return ""
+}
+
+// The name past the verb, or nothing where a flag stands there. [[spec/tickets/boxes-write-their-final-record]]
+func nameWord(argv []string) string {
+	if said := word(argv, 1); !strings.HasPrefix(said, "--") {
+		return said
 	}
 	return ""
 }
