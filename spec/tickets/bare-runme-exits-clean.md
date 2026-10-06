@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 109d1abe6f2ad25a
         size: 1605
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: c20c7e8c4810998b23b12d8cf3b0cf3dee63da60
+    hash_after: c20c7e8c4810998b23b12d8cf3b0cf3dee63da60
+    inputs:
+      - name: design/draft
+        hash: 109d1abe6f2ad25a
+        size: 1605
+      - name: design/tests-red
+        hash: da25498fea11bdac
+        size: 688
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -261,8 +273,12 @@ The test drives the real script once, and its install and binary are fakes in a 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: a bare call on a cloud box becomes `set -- help` and reaches the binary, which exits 0, and the desk road stands unchanged; the install still runs first, so the doctor and lspProbe hints naming a bare ./RUNME.sh hold on both roads
+- TestABareRunmeOnACloudBoxPrintsTheVerbs decides the test line and fails here on its own assertion under both cloud variables (exit 1 and the editor note); TestABareRunmeOnADeskWithNoEditorNamesIt passes and guards the desk road; the check line waits for tests-green
+- fix in place at implement: the approach reads a cloud variable as set where it stands non-empty, while cloudVariables in src/quack/command.go reads empty, 0 and false as a desk; match that rule in RUNME.sh, and add a desk case under SE_CLOUD=false to runme_test.go
 
 # implement
 
