@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 2f9d4591c4088399
         size: 369
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: ffcf4e7a50357fd22882765b522cfc2f12ab9969
+    hash_after: ffcf4e7a50357fd22882765b522cfc2f12ab9969
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks/command fails
+    inputs:
+      - name: design/draft
+        hash: e844daf0c0a8d290
+        size: 2819
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,33 @@ The hooks/command case is TestModelTrailersRefusesATrailerNamingAModel, the quac
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/command/voice_test.go src/modules/hooks/commits_test.go src/quack/commit_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/hooks/command/voice_test.go
+src/modules/hooks/commits_test.go
+src/quack/commit_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The three refusal cases fail on their assertions: the read answers no row, the door lets the message through, and the verb lands the commit. The session link case passes already, and it guards the read against a host name. A stub `ModelTrailers` with an empty body lets the tests compile, and tests-green fills it. The trailers carry no mail address, since the private door holds an address in a tracked file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The hook line meets TestModelTrailersRefusesATrailerNamingAModel and TestCommitVoiceRefusesAModelTrailerWithNoVale, the verb line meets TestCommitVerbRefusesAModelTrailer, and the check line waits for tests-green.
+The door case runs on a temporary folder with no git and no Vale, and the verb case runs on the landing fakes the package holds.
 
 # gate
 

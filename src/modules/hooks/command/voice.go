@@ -54,6 +54,11 @@ func WithoutTrailers(text string) string {
 	return strings.Join(paragraphs[:len(paragraphs)-1], "\n\n")
 }
 
+// The trailers of a message that name a model, each as a refusing row. [[spec/tickets/commit-door-refuses-model-trailers]]
+func ModelTrailers(message string) []Row {
+	return nil
+}
+
 // Whether a rule refuses at a door, by the name past its last dot. [[spec/design_output/level0#the-panel-holds-a-warning]]
 func Refuses(rule string) bool {
 	return refusing[rule[strings.LastIndex(rule, ".")+1:]]

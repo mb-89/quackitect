@@ -287,6 +287,19 @@ func TestCommitVerbMoves(t *testing.T) {
 	})
 }
 
+// The commit verb refuses a message whose trailer names a model, before anything runs or lands. [[spec/tickets/commit-door-refuses-model-trailers]]
+func TestCommitVerbRefusesAModelTrailer(t *testing.T) {
+	t.Parallel()
+	root, _ := landingRepo(t)
+	lays(t, root, "src/a.go", "package a\n")
+	d, heard, _ := fakeLanding(root)
+	line := "Co-Authored-By: Claude Opus 5.5"
+	code, _, errs := runsTwin(commitVerb(d), "commit", opens+"\n\n"+line)
+	if code != exitUsage || headSubject(t, root) == opens || len(heard.ran) != 0 || !strings.Contains(errs, line) {
+		t.Fatalf("commit answers %d, %q, HEAD %q, ran %v", code, errs, headSubject(t, root), heard.ran)
+	}
+}
+
 // The commit verb at its gates: the cold probe, the paths it names, and the conflict markers. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerbGates(t *testing.T) {
 	t.Parallel()
