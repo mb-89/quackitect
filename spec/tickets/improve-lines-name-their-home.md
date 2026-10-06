@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: 0a50b997caaabb4d087f9e66f1724c4388274c0c
+    hash_after: 0a50b997caaabb4d087f9e66f1724c4388274c0c
+    inputs:
+      - name: ask
+        hash: 40c833ee214a778b
+        size: 341
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,54 @@ Half the improve lines name no home, and the retros ask one fix three times whil
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A list field takes a new evidence key, `home: true`, which the hand-back reads. `formFault` in `src/pull/pull_chapter.go` passes a list's rows to a new `homeFaults`. Where the field carries the key, it refuses each line that names no home. A home is a link resolving in the tree, a ticket in backticks standing under the tickets folder, or a backticked path whose file or folder stands. The `improve` field of the retro write in `spec/processes/group.yaml` takes the key, and its says line names the three homes. `spec/schemas/ticket.schema.yaml` admits the key on an evidence item. `spec/design_output/pull.md` gains the row under the fields and their forms. The process hash moves, so `./RUNME.sh ticket update` rewrites the tickets the route test pins, and the open group tickets read the new route on their next pull.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/pull/pull_back.go, the hand-back, through formFaults
+src/pull/pull_chapter.go formFaults, which calls formFault
+src/pull/pull_chapter.go formFault, which calls homeFaults and namesHome
+src/branches/dispatch_write_test.go TestDispatchHashesARouteAsTheJavaScriptDoes, which pins the group route's hash
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/pull/pull_home_test.go TestImproveLinesNameTheirHome
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/pull/pull_chapter.go
+src/pull/pull_home_test.go
+spec/schemas/ticket.schema.yaml
+spec/processes/group.yaml
+spec/design_output/pull.md
+spec/tickets/dispatch-verbs-run-in-go.md, through ticket update
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+pull_chapter.go formFault and inherited, pull_stale.go linkIn, the schema's evidence item and group.yaml's improve field stand opened
+the callers come from a grep of formFault and formFaults over src, and of the group route's hash over the tests
+the one done_when line meets TestImproveLinesNameTheirHome
 
 ## tests-red
 
