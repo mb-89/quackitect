@@ -1,6 +1,25 @@
 package yaml
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
+
+// Nil, false, a zero, NaN and the empty string read false, and every other value reads true. [[spec/tickets/shared-helpers-stand-once]]
+func TestTruthyReadsEachKind(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		said any
+		want bool
+	}{
+		{nil, false}, {false, false}, {0, false}, {0.0, false}, {int64(0), false}, {math.NaN(), false}, {"", false},
+		{true, true}, {1, true}, {-2.5, true}, {"x", true}, {"false", true}, {[]any{}, true}, {map[string]any{}, true},
+	} {
+		if got := Truthy(one.said); got != one.want {
+			t.Errorf("Truthy(%#v) reads %v, want %v", one.said, got, one.want)
+		}
+	}
+}
 
 const schemaYaml = `# a comment the reader skips
 kind: handover

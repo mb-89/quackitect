@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: abb7dfca8a237c09
         size: 371
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 1280a1dd1da6af2fd62c7428989b51e97598e10f
+    hash_after: 1280a1dd1da6af2fd62c7428989b51e97598e10f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/yaml fails
+    inputs:
+      - name: design/draft
+        hash: 3041511ebe33f68f
+        size: 5066
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -273,26 +286,32 @@ The check line is TestTheCheckRefusesABodyStandingInAnotherPackage; `git grep -c
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/yaml/yaml_test.go src/modules/check/twins_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/yaml/yaml_test.go
+src/modules/check/twins_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The sweep draws no rule on a body standing in two packages, renamed or not, and the stub truthy reads every value false. The short body and test file case passes already, and it guards the rule against false hits. The grep line waits for tests-green, since the eight copies still stand.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The check line meets TestTheCheckRefusesABodyStandingInAnotherPackage, the grep and check line wait for tests-green, and TestTruthyReadsEachKind decides the shared helper.
+The check cases run over the fake index in q/qtest, and the yaml case reads pure values, so no case reaches a door.
 
 # gate
 

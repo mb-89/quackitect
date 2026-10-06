@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+// Whether a loose value reads as true, as JavaScript reads one, for every package. [[spec/tickets/shared-helpers-stand-once]]
+var Truthy = truthy
+
+func truthy(said any) bool {
+	return false
+}
+
 func AsDoc(said any) *Doc {
 	if one, held := said.(*Doc); held {
 		return one
