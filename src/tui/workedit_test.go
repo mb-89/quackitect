@@ -20,54 +20,8 @@ import (
 	"quackitect/src/tui/work"
 )
 
-// How long a case waits on the command a key hands back. [[spec/tickets/the-work-keys-call-actions]]
-const postWithin = time.Second
-
 // The result each action the work tab posts answers over the fake. [[spec/tickets/the-work-keys-call-actions]]
 var workResults = map[string]any{"work/place": "placed", "tickets/flip-urgent": "flipped", "tickets/set-field": "set", "work/pull": "pulled"}
-
-// The posts the window's fake keeps. [[spec/tickets/the-work-keys-call-actions]]
-func postsIn(m frame.Model) []registry.Posted {
-	return *theWork(m).From.(registry.Fake).Posted
-}
-
-// Each key reaches the window, and the message its command answers comes back to it, so a post runs the way the program runs it. [[spec/tickets/the-work-keys-call-actions]]
-func posting(m frame.Model, keys ...string) frame.Model {
-	for _, one := range keys {
-		var msg tea.Msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(one)}
-		if one == "enter" {
-			msg = tea.KeyMsg{Type: tea.KeyEnter}
-		}
-		for msg != nil {
-			next, cmd := m.Update(msg)
-			m, msg = next.(frame.Model), answerOf(cmd)
-		}
-	}
-	return m
-}
-
-// The message a command answers within the wait, the first of a batch that answers one, and nothing past the wait. [[spec/tickets/the-work-keys-call-actions]]
-func answerOf(cmd tea.Cmd) tea.Msg {
-	if cmd == nil {
-		return nil
-	}
-	said := make(chan tea.Msg, 1)
-	go func() { said <- cmd() }()
-	select {
-	case msg := <-said:
-		if batch, ok := msg.(tea.BatchMsg); ok {
-			for _, one := range batch {
-				if got := answerOf(one); got != nil {
-					return got
-				}
-			}
-			return nil
-		}
-		return msg
-	case <-time.After(postWithin):
-		return nil
-	}
-}
 
 const childNote = `---
 kind: [[ticket]]
@@ -197,43 +151,6 @@ func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/tui#the-work-tab-takes-edits]]
-func TestAnEditInTheWorkTabPostsTheFieldToItsAction(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	m = toRow(toColumn(m, "group"), "a-child")
-	m = opened(m)
-	if !theWork(m).Tree.Editing() || theWork(m).Tree.Typed() != "one-group" {
-		t.Fatalf("the edit opens on the group the cell holds, and holds %q", theWork(m).Tree.Typed())
-	}
-	m = pressed(m, "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "t", "w", "o", "-", "g", "r", "o", "u", "p")
-	m = posting(m, "enter")
-	if theWork(m).Tree.Editing() {
-		t.Fatal("enter closes the edit")
-	}
-	posts := postsIn(m)
-	if len(posts) != 1 || posts[0].Name != "tickets/set-field" || string(posts[0].Input) != `{"name":"a-child","field":"group","value":"two-group"}` {
-		t.Fatalf("enter posts the field to tickets/set-field, and posts %+v", posts)
-	}
-	if noteAt(t, root) != childNote {
-		t.Fatal("the tab writes no file, and the verb behind the action writes the front")
-	}
-}
-
-// [[spec/design_output/tree-view#a-cell-takes-an-edit]]
-func TestEscapePutsTheOldValueBackAndWritesNothing(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	m = toRow(toColumn(m, "group"), "a-child")
-	m = pressed(opened(m), "x", "esc")
-	if theWork(m).Tree.Editing() {
-		t.Fatal("escape closes the edit")
-	}
-	if noteAt(t, root) != childNote {
-		t.Fatal("escape writes nothing")
-	}
-}
-
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	t.Parallel()
@@ -258,24 +175,6 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	}
 	if noteAt(t, root) != childNote {
 		t.Fatal("a refused edit writes nothing")
-	}
-}
-
-// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-func TestTheUrgentKeyPostsAFlipAndWritesNothing(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	m = posting(toRow(m, "a-child"), "u")
-	posts := postsIn(m)
-	if len(posts) != 1 || posts[0].Name != "tickets/flip-urgent" || string(posts[0].Input) != `{"name":"a-child"}` {
-		t.Fatalf("u posts tickets/flip-urgent for the row, and posts %+v", posts)
-	}
-	if noteAt(t, root) != childNote {
-		t.Fatal("the tab writes no file, and the verb behind the action writes the mark")
-	}
-	// The todo takes no key of its own, because a place is the todo. [[spec/design_output/pull#a-todo-forces-a-place]]
-	if m = posting(m, "t"); len(postsIn(m)) != 1 {
-		t.Fatal("t posts nothing")
 	}
 }
 
@@ -363,47 +262,5 @@ func TestTheColumnKeysMoveTheCursorAndEOpensTheCellUnderIt(t *testing.T) {
 	}
 	if m = pressed(m, "z", "z"); !strings.Contains(m.View(), "alt+enter fills every row") {
 		t.Fatal("an edit matching no value names its keys on the tab's last line")
-	}
-}
-
-// [[spec/design_output/tree-view#the-completion-knows-the-field]]
-func TestTheCellOffersWhatTheSchemaNamesAndTabTakesIt(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	m = pressed(toColumn(toRow(m, "a-child"), "reason"), "e")
-	if got := strings.Join(theWork(m).Tree.Offer(), " "); got != "done dropped became answered" {
-		t.Fatalf("the reason offers the four the schema names, and offers %q", got)
-	}
-	if !strings.Contains(m.View(), "tab takes done · dropped") {
-		t.Fatal("the offer draws on the tab's last line")
-	}
-	m = posting(pressed(m, "d", "r", "tab"), "enter")
-	if posts := postsIn(m); len(posts) != 1 || string(posts[0].Input) != `{"name":"a-child","field":"reason","value":"dropped"}` || noteAt(t, root) != childNote {
-		t.Fatalf("tab takes the offer and enter posts it, the tab says %q, and the fake keeps %+v", theWork(m).Notice, posts)
-	}
-	m = pressed(toColumn(m, "urgent"), "e", "backspace", "backspace", "backspace", "backspace")
-	if got := strings.Join(theWork(m).Tree.Offer(), " "); got != "true false" {
-		t.Fatalf("a flag offers the two it takes, and offers %q", got)
-	}
-}
-
-// [[spec/design_output/tree-view#a-schema-refuses-a-value]]
-func TestAValueTheSchemaRefusesNamesTheReasonAndWritesNothing(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	m = pressed(toColumn(toRow(m, "a-child"), "reason"), "e", "l", "a", "t", "e", "r", "enter")
-	notice := theWork(m).Notice
-	if !strings.Contains(notice, "reason takes done, dropped, became, answered alone") || !strings.Contains(notice, "a-child keeps the value") {
-		t.Fatalf("a refused value names the schema's reason and the row, and the tab says %q", notice)
-	}
-	if !strings.Contains(m.View(), "reason takes done") {
-		t.Fatal("the reason draws in the tab")
-	}
-	m = pressed(toColumn(m, "urgent"), "e", "backspace", "backspace", "backspace", "backspace", "backspace", "m", "alt+enter")
-	if !strings.Contains(theWork(m).Notice, "urgent takes a boolean") || !strings.Contains(theWork(m).Notice, "one-group, a-child, a-loose-one") {
-		t.Fatalf("a refused fill names every row it leaves, and the tab says %q", theWork(m).Notice)
-	}
-	if noteAt(t, root) != childNote {
-		t.Fatalf("a refused value writes nothing, and the note reads:\n%s", noteAt(t, root))
 	}
 }

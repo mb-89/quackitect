@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
 
+	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/proc"
 	"quackitect/src/q"
 )
@@ -84,13 +87,6 @@ func TestVerbRegistry(t *testing.T) {
 			t.Fatalf("a road that never starts answers %v, and wants the fault %q", err, want)
 		}
 	})
-	t.Run("the twins register through the registry", func(t *testing.T) {
-		for _, words := range []string{"ticket yours", "retro notes", "branch list --queue"} {
-			if registry[words] == nil {
-				t.Fatalf("the registry holds no %s", words)
-			}
-		}
-	})
 	t.Run("the shared files name no registered verb", func(t *testing.T) {
 		for _, shared := range []string{"verbs.go", "registry.go"} {
 			text, err := os.ReadFile(shared)
@@ -116,4 +112,82 @@ func TestVerbRegistry(t *testing.T) {
 		}()
 		register("registry probe", twinSaying("", &[]bool{}))
 	})
+}
+
+// The topics whose every verb registers a twin under its two words, where the other topics register whole. [[spec/tickets/quack-registers-each-verb]]
+var ownTwins = map[string]bool{"ticket": true, "retro": true}
+
+// A verb's words, and the key of the twin they reach. [[spec/tickets/quack-registers-each-verb]]
+type spelled struct {
+	argv []string
+	key  string
+}
+
+// Every verb the lists name, each topic's verbs among them, and the spellings no list names, by the twin each reaches. [[spec/tickets/quack-registers-each-verb]]
+func everyVerb() []spelled {
+	var out []spelled
+	for _, one := range verbsmodule.Commands {
+		out = append(out, spelled{[]string{one.Name}, one.Name})
+	}
+	for topic, list := range topics {
+		for _, one := range list {
+			key := topic
+			if ownTwins[topic] {
+				key = topic + " " + one.Name
+			}
+			out = append(out, spelled{[]string{topic, one.Name}, key})
+		}
+	}
+	return append(out,
+		spelled{[]string{"ticket", "new"}, "ticket new"},
+		spelled{[]string{"branch", "list", "--queue"}, "branch list --queue"},
+		spelled{[]string{"voice", "measure"}, "voice"},
+		spelled{[]string{"start"}, "start"},
+	)
+}
+
+func TestEveryVerbResolvesToARegisteredAnswer(t *testing.T) {
+	t.Parallel()
+	for _, one := range everyVerb() {
+		argv := append(one.argv, "a-word")
+		if key, found := twinOf(argv, registry); found == nil || key != one.key {
+			t.Errorf("%v reaches the twin %q, and wants %q", one.argv, key, one.key)
+		}
+		if road := roadOf(modeNew, argv, registry); road != toQuack {
+			t.Errorf("%v takes the road %v under new, and wants quack", one.argv, road)
+		}
+	}
+}
+
+var registers = regexp.MustCompile(`register(?:Box)?\("([^"]+)"`)
+
+// Every twin registers from one file, and twins.go alone holds more than one. [[spec/tickets/quack-registers-each-verb]]
+func TestEveryVerbRegistersFromAFileOfItsOwn(t *testing.T) {
+	t.Parallel()
+	files, err := filepath.Glob("*.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	holders := map[string][]string{}
+	for _, file := range files {
+		if strings.HasSuffix(file, "_test.go") {
+			continue
+		}
+		text, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := registers.FindAllStringSubmatch(string(text), -1)
+		if len(found) > 1 && file != "twins.go" {
+			t.Errorf("%s registers %d twins, and a verb registers from a file of its own", file, len(found))
+		}
+		for _, hit := range found {
+			holders[hit[1]] = append(holders[hit[1]], file)
+		}
+	}
+	for _, one := range everyVerb() {
+		if said := holders[one.key]; len(said) != 1 {
+			t.Errorf("%s registers from %v, and wants one file", one.key, said)
+		}
+	}
 }

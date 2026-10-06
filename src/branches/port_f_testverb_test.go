@@ -147,10 +147,10 @@ func TestPFGoSaysItsWord(t *testing.T) {
 	if got := goSays(Said{OK: true}, "src/tui"); got != "green, src/tui passes" {
 		t.Fatalf("a green run reads %q", got)
 	}
-	if got := goSays(Said{Code: 1, Out: "--- FAIL: TestOne\nFAIL\n"}, "src/tui"); !strings.HasPrefix(got, "assertion, a test of src/tui fails") {
+	if got := goSays(Said{Code: 1, Out: "--- FAIL: TestOne\nFAIL\n"}, "src/tui"); got != "assertion, a test of src/tui fails" {
 		t.Fatalf("a failing run reads %q", got)
 	}
-	if got := goSays(Said{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"}, "src/tui"); !strings.HasPrefix(got, "build, because src/tui builds not: ./work.go") {
+	if got := goSays(Said{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"}, "src/tui"); got != "build, because src/tui builds not: ./work.go:9:2: undefined: nothing" {
 		t.Fatalf("a broken build reads %q", got)
 	}
 }
@@ -175,6 +175,10 @@ func TestPFTestSaysItsVerdict(t *testing.T) {
 		if last := rows[len(rows)-1]; !regexp.MustCompile("^" + strings.TrimPrefix(cases[at][0], "^")).MatchString(last) {
 			t.Fatalf("run %d reads %q", at, last)
 		}
+	}
+	red := testSays(Said{Out: "not ok 1 - it adds\n# tests 1\n# fail 1\nAssertionError\n"}, 1)
+	if red != "  not ok: it adds\nassertion, 1 test(s) fail on their own assertion" {
+		t.Fatalf("a red run reads %q", red)
 	}
 }
 

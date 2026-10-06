@@ -34,18 +34,7 @@ group: engine-verbs-hold
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-## gain
-
-The ticket door binds a write to the tickets a hold names, and reads the plan's working line as a todo only where it names no ticket. The pull reads the line the same way, so the door and the pull agree on what stands in hand.
-
-## breaks
-
-A plan naming a closed ticket keeps that ticket in hand as a todo, so a write naming it passes the door, and the refusal lists the ticket as the working todo.
-
-## done_when
-
-- a hooks command case seeds a plan naming a ticket under spec/tickets, and InHand answers no todo: `cd src && go test ./modules/hooks/command/`
-- `./RUNME.sh check` exits 0
+InHand in src/modules/hooks/command/ticket.go reads the plan's working line as a todo where it names a ticket, so a write naming a closed ticket passes the door. Read the line as a todo only where it names no ticket, as the pull's workingTodo does, with a hooks command case.
 
 # do
 

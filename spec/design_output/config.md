@@ -24,11 +24,13 @@ keeps it.
 |---|---|---|
 | built-in, the schema's `default` | the key's Go declaration | once, at the first ask |
 | `spec/config/level0.json` | the team, tracked in git | once, at the first ask |
-| the environment | whoever launches the box | once, at the first ask |
 | `.se/.runtime/config.json` | `./RUNME.sh config`, per box, git ignores it | on every ask |
+| the environment | whoever launches the box | once, at the first ask |
 
-A later layer beats an earlier one, so the per-box file beats the environment
-and the environment beats the tracked file.
+A later layer beats an earlier one, so the environment beats the per-box file
+and the per-box file beats the tracked file. A shared key reads the tracked
+file alone. [[spec/design_output/model#a-keys-layers]] owns the order, and
+`q.AtRest` holds it for every Go reader.
 
 These things follow:
 
@@ -145,8 +147,7 @@ program in the tree calls it:
 
 | what it answers | what it reads |
 |---|---|
-| `Value(root, key)` | the built-in, then the tracked file, then the variable, then the local file |
-| `Shared(root, key)` | the tracked file, then the built-in, for a key the catalog shares |
+| `Value(root, key)` | the layers at rest through `q.Settled`, with the built-in and the shared mark off the schema |
 | `Map(root, path, key)` | the map a named file holds at a key, off that file alone |
 | `List(root, path, key)` | the list a named file holds at a key, in the file's own order |
 | `EnvOf(key)` | the variable a key reads, as the key upper-cased under `SE_` |

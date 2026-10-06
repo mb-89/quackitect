@@ -478,7 +478,11 @@ test("the schema passes the config this tree ships, and refuses a field of the w
 
 // [[spec/design_output/stop#the-mechanical-checks]]
 test("every mechanical check the stop table names stands in the stop door", () => {
-  const hook = files.read(join(root, "src", "bridge", "stop.js"));
+  const door = join(root, "src", "modules", "hooks", "stop");
+  const hook = namesIn(door, ".go")
+    .filter((name) => !name.endsWith("_test.go"))
+    .map((name) => files.read(join(door, name)))
+    .join("\n");
   const at = join(root, STOP);
   const named = pool(
     namesIn(at, ".yml").map((name) => ({ name, text: files.read(join(at, name)) })),

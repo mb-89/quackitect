@@ -78,16 +78,3 @@ func TestTheCloudVerbPrintsItsUsage(t *testing.T) {
 	}
 	holds(t, one.out.String(), "Usage: ./RUNME.sh cloud <verb>")
 }
-
-// A held claim older than the span reads stale, and a fresh one reads its age alone. [[spec/design_output/work#a-stale-group-is-yours]]
-func TestAClaimGoesStalePastTheSpan(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	now := testNow.Unix()
-	if got := one.d.staleClaim(stand{ref: ref{When: now - 13*hour}}, now); !got.Stale || got.Age != "13h" {
-		t.Fatalf("an old claim reads %+v", got)
-	}
-	if got := one.d.staleClaim(stand{ref: ref{When: now - hour}}, now); got.Stale {
-		t.Fatalf("a fresh claim reads %+v", got)
-	}
-}

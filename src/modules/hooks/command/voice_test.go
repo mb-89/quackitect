@@ -8,13 +8,10 @@ import (
 	"testing"
 )
 
-func TestTheVoiceSplitsRefusalsFromForm(t *testing.T) {
+func TestTheVoiceKeepsTheRefusals(t *testing.T) {
 	found := []Row{{Rule: "level0.Private"}, {Rule: "level0.Hedge"}, {Rule: "VoiceRulesRan"}, {Rule: "PrivateLike"}}
 	if got, want := RefusesIn(found), []Row{found[0], found[2]}; !reflect.DeepEqual(got, want) {
 		t.Errorf("RefusesIn keeps %+v, want %+v", got, want)
-	}
-	if got, want := FormIn(found), []Row{found[1], found[3]}; !reflect.DeepEqual(got, want) {
-		t.Errorf("FormIn keeps %+v, want %+v", got, want)
 	}
 }
 

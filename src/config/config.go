@@ -9,18 +9,16 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/src/q"
 )
 
-// The two files the layers stand in, the local one owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-layers]]
+// The two files the layers stand in, the schema whose default answers a key no file sets, and that layer's name. q owns them. [[spec/design_output/config#the-layers]]
 const (
-	Tracked = "spec/config/level0.json"
-	Local   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
-)
-
-// The schema the declarations write, whose default answers a key no file sets, under the layer BuiltIn. [[spec/tickets/the-config-schema-gets-generated]]
-const (
-	Schema  = "spec/config/level0.schema.json"
-	BuiltIn = "built-in"
+	Tracked = q.TrackedConfig
+	Local   = q.LocalConfig
+	Schema  = q.SchemaConfig
+	BuiltIn = q.BuiltInLayer
 )
 
 // The modes the local layer's folder and file take, and the indent its JSON writes. [[spec/tickets/cage-hold-drops-port]]
@@ -59,12 +57,9 @@ func Drop(root, key, value string) error {
 }
 
 // [[spec/design_output/config#the-go-reader]]
-func EnvOf(key string) string {
-	said := strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
-	return "SE_" + said
-}
+func EnvOf(key string) string { return q.EnvOf(key) }
 
-// The local file beats the environment, and the environment beats the tracked one. [[spec/design_output/config#the-resolver-holds-the-layers]]
+// The value a key resolves to at rest, in the order q.AtRest holds. [[spec/design_output/model#a-keys-layers]]
 func Value(root, key string) (any, bool) {
 	out, _, held := Where(root, key)
 	return out, held
@@ -72,29 +67,16 @@ func Value(root, key string) (any, bool) {
 
 // The value and the layer answering it: a file's path, or the variable's name. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func Where(root, key string) (any, string, bool) {
+	env := map[string]string{EnvOf(key): envOf(EnvOf(key))}
+	literal, layer, held := q.Settled(key, ordered(root, Schema), ordered(root, Tracked), ordered(root, Local), env)
+	if !held {
+		return nil, "", false
+	}
 	var out any
-	layer := ""
-	if said, found := defaultIn(read(root, Schema), key); found {
-		out, layer = said, BuiltIn
+	if err := json.Unmarshal([]byte(literal), &out); err != nil {
+		return nil, "", false
 	}
-	if said, found := valueIn(read(root, Tracked), key); found {
-		out, layer = said, Tracked
-	}
-	if said := strings.TrimSpace(envOf(EnvOf(key))); said != "" {
-		out, layer = said, EnvOf(key)
-	}
-	if said, found := valueIn(read(root, Local), key); found {
-		out, layer = said, Local
-	}
-	return out, layer, layer != ""
-}
-
-// A shared key's value: the default file's, and its built-in where the file sets none, since no box sets a shared key for itself. [[spec/tickets/the-config-schema-gets-generated]]
-func Shared(root, key string) (any, bool) {
-	if said, found := valueIn(read(root, Tracked), key); found {
-		return said, true
-	}
-	return defaultIn(read(root, Schema), key)
+	return out, layer, true
 }
 
 // A key's built-in, the schema's default, read off no other layer, for a reader whose config door answers nothing. [[spec/tickets/stale-span-reads-schema-unset]]
@@ -170,6 +152,19 @@ func read(root, path string) map[string]any {
 		return nil
 	}
 	return said
+}
+
+// A layer file as q reads it, or the empty value where it stands nowhere or holds no JSON. [[spec/design_output/config#the-go-reader]]
+func ordered(root, path string) q.Ordered {
+	body, err := readFile(filepath.Join(root, filepath.FromSlash(path)))
+	if err != nil {
+		return q.Ordered{}
+	}
+	out, err := q.JSON.Parse(body)
+	if err != nil {
+		return q.Ordered{}
+	}
+	return out
 }
 
 // The default a schema names for a dotted key, under each segment's properties. [[spec/tickets/the-config-schema-gets-generated]]

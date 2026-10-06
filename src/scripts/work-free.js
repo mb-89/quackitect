@@ -5,8 +5,16 @@
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { aged, parentsIn, spanOf } from "../engine/group.js";
-import { DONE, MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
-import { readWork, trunkOf } from "./work-stands.js";
+import {
+  DONE,
+  MS,
+  ROUTINE,
+  readWork,
+  standingAll,
+  TODO,
+  trunkOf,
+  waitsOf,
+} from "./work-stands.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {

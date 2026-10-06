@@ -224,9 +224,10 @@ func TestPBCloseDropsABranchTrunkHolds(t *testing.T) {
 	one.branch("one-group", map[string]string{pbAt: pbClosed(pbGroupNote)})
 	one.mergeIn("origin/work/one-group", "")
 	one.push("main")
-	if code := one.branchSays("close", "one-group"); code != 0 {
+	if code := one.branchSays("close"); code != 0 {
 		t.Fatalf("the close answers %d: %s", code, pbSaid(one))
 	}
+	holds(t, pbSaid(one), "work/one-group is closed.")
 	if one.originHas("work/one-group") {
 		t.Fatal("the branch stands on origin")
 	}

@@ -4,53 +4,57 @@
 package check
 
 import (
-	_ "embed"
-	"encoding/json"
 	"strings"
 	"testing"
 )
 
-// The size golden, riding in through embed as a module test takes a fixture. [[spec/guidance/code/testing]]
-//
-//go:embed testdata/size.golden.json
-var sizeGolden []byte
-
-// The size ceilings the cases read: the function ceiling and the file ceiling. [[spec/tickets/size-golden-drops-line-counts]]
+// The ceilings the size cases hold a file and a function to. [[spec/design_output/level0#the-size-ceiling]]
 const (
-	caseFunction = 50
-	caseFile     = 600
+	caseFileCeiling     = 10
+	caseFunctionCeiling = 4
 )
 
-// A prose file past the ceiling grows a line and draws no size row, and the size golden names no file the size rule leaves out. [[spec/tickets/size-golden-drops-line-counts]]
-func TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds(t *testing.T) {
-	t.Parallel()
-	text := strings.Repeat("a line\n", caseFile+1)
-	for _, path := range []string{"spec/a.md", "spec/config/a.json", "spec/a.yml"} {
-		if rows := sizeFaults(path, text+"one more\n", caseFunction, caseFile); len(rows) != 0 {
-			t.Errorf("%s draws %+v", path, rows)
+// A text of the given count of plain lines. [[spec/design_output/level0#the-size-ceiling]]
+func linesOf(count int) string {
+	return strings.Repeat("x\n", count-1) + "x"
+}
+
+// The rules of the named kind the text rules answer for one file under the case ceilings. [[spec/design_output/level0#the-size-ceiling]]
+func sizeFound(path, text, rule string) []Finding {
+	tree := TreeOver("/tree", Texts{path: text})
+	out := []Finding{}
+	for _, one := range textFaults(tree, path, caseFunctionCeiling, caseFileCeiling, "") {
+		if one.Rule == rule {
+			out = append(out, one)
 		}
 	}
-	var golden map[string][]struct {
-		File string `json:"file"`
-	}
-	if err := json.Unmarshal(sizeGolden, &golden); err != nil {
-		t.Fatal(err)
-	}
-	for side, rows := range golden {
-		for _, row := range rows {
-			if !sizedFile.MatchString(row.File) {
-				t.Errorf("the %s side of the size golden names %s, which the size rule leaves out", side, row.File)
-			}
-		}
+	return out
+}
+
+func TestACodeFileOneLinePastTheCeilingMeetsFileCeilingAtItsFirstLine(t *testing.T) {
+	said := sizeFound("src/a.go", linesOf(caseFileCeiling+1), FileCeiling)
+	if len(said) != 1 || said[0].Line != 1 || said[0].File != "src/a.go" {
+		t.Fatalf("the file past the ceiling meets %v, and wants one FileCeiling at line 1", said)
 	}
 }
 
-// A code file past the ceiling still names its ceiling. [[spec/tickets/size-golden-drops-line-counts]]
-func TestACodeFilePastTheCeilingStillNamesItsCeiling(t *testing.T) {
-	t.Parallel()
-	rows := sizeFaults("src/a.go", strings.Repeat("x := 1\n", caseFile+1), caseFunction, caseFile)
-	if len(rows) != 1 || rows[0].Rule != FileCeiling {
-		t.Errorf("src/a.go draws %+v", rows)
+func TestACodeFileAtTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("src/a.go", linesOf(caseFileCeiling), FileCeiling); len(said) != 0 {
+		t.Fatalf("the file at the ceiling meets %v, and wants nothing", said)
+	}
+}
+
+func TestAProseFilePastTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("spec/a.md", linesOf(caseFileCeiling+1), FileCeiling); len(said) != 0 {
+		t.Fatalf("the prose file meets %v, and the ceiling covers code files alone", said)
+	}
+}
+
+func TestAFunctionPastItsCeilingMeetsFunctionCeilingAtItsOpeningLine(t *testing.T) {
+	text := "package a\n\nfunc long() {\n" + linesOf(caseFunctionCeiling) + "\n}\n"
+	said := sizeFound("src/a.go", text, FunctionCeiling)
+	if len(said) != 1 || said[0].Line != 3 {
+		t.Fatalf("the long function meets %v, and wants one FunctionCeiling at line 3", said)
 	}
 }
 

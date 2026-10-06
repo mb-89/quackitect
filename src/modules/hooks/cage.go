@@ -1,13 +1,9 @@
-// The cage's replay: a session log recorded at debug drives the door, one
-// hook row a post, and each decision the door reads apart from the bridge's
-// becomes one shadow row.
+// The cage's shadow: a live post carrying the old path's answer, which the
+// door decides apart, becomes one shadow row.
 // [[spec/tickets/cage-rules-replay-session-logs]]
 package hooks
 
 import (
-	"quackitect/src/yaml"
-
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -15,6 +11,7 @@ import (
 	"strings"
 
 	"quackitect/src/q/tool"
+	"quackitect/src/yaml"
 )
 
 // The decision words both sides read as. [[spec/tickets/cage-rules-replay-session-logs]]
@@ -27,7 +24,6 @@ const (
 
 // The row kinds the replay and the lease read write, the slice the replay names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and the shadow row stands in [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]].
 const (
-	hookKind     = "hook"
 	shadowKind   = "shadow"
 	blockKind    = "block"
 	rowsKind     = "rows"
@@ -38,16 +34,7 @@ const (
 	stampLayout  = "2006-01-02T15:04:05.000Z07:00"
 )
 
-// One hook row that a box writes at debug, as src/doors/log.js event writes it. [[spec/tickets/cage-rules-replay-session-logs]]
-type loggedRow struct {
-	At     string `json:"at"`
-	Kind   string `json:"kind"`
-	Event  string `json:"event"`
-	Answer string `json:"answer"`
-	Text   string `json:"text"`
-}
-
-// One hook row the door and the bridge decide apart. [[spec/tickets/cage-rules-replay-session-logs]]
+// One post the door and the old path decide apart. [[spec/tickets/cage-rules-replay-session-logs]]
 type Apart struct {
 	Line  int    `json:"line"`
 	Stamp string `json:"stamp"`
@@ -55,38 +42,6 @@ type Apart struct {
 	Tool  string `json:"tool,omitempty"`
 	Old   string `json:"old"`
 	New   string `json:"new"`
-}
-
-// One recorded post, and the line of the log it stands on. [[spec/tickets/cage-rules-replay-session-logs]]
-type Recorded struct {
-	Line  int
-	Stamp string
-	Post  Post
-}
-
-// Every hook row of a debug session log, as the post the bridge read and its answer under Old. A row of another kind, or no row at all, reads as no post. [[spec/tickets/cage-rules-replay-session-logs]]
-func PostsOf(text string) ([]Recorded, error) {
-	var out []Recorded
-	lines := bufio.NewScanner(strings.NewReader(text))
-	lines.Buffer(nil, bodyCap)
-	for at := 1; lines.Scan(); at++ {
-		var row loggedRow
-		if json.Unmarshal(lines.Bytes(), &row) != nil || row.Kind != hookKind {
-			continue
-		}
-		var said struct {
-			E map[string]any `json:"e"`
-		}
-		if err := json.Unmarshal([]byte(row.Text), &said); err != nil {
-			return nil, fmt.Errorf("line %d of the log carries no event: %w", at, err)
-		}
-		var old any
-		if err := json.Unmarshal([]byte(row.Answer), &old); err != nil {
-			return nil, fmt.Errorf("line %d of the log carries no answer: %w", at, err)
-		}
-		out = append(out, Recorded{Line: at, Stamp: row.At, Post: Post{Event: row.Event, E: said.E, Old: old}})
-	}
-	return out, lines.Err()
 }
 
 // The bridge's answer to an event as one decision word, the way the bridge's letsThrough read it. A block outside the Stop reaches the harness as the call's result, and so refuses it. [[spec/tickets/cage-tool-block-reads-refuse]]
@@ -123,33 +78,6 @@ func NewDecisionOf(post Post, said Answer) string {
 		}
 	}
 	return PassWord
-}
-
-// Drives every hook row through the door in log order, and hands each decision read apart to say as a shadow row. [[spec/tickets/cage-rules-replay-session-logs]]
-func (d *Door) ReplayLog(text string, say func(row map[string]any) error) ([]Apart, error) {
-	posts, err := PostsOf(text)
-	if err != nil {
-		return nil, err
-	}
-	var out []Apart
-	for _, one := range posts {
-		live := one.Post
-		live.Old = nil
-		said, err := d.Hook(live)
-		if err != nil {
-			return nil, fmt.Errorf("line %d of the log: %w", one.Line, err)
-		}
-		old, now := OldDecisionOf(one.Post.Event, one.Post.Old), NewDecisionOf(one.Post, said)
-		if old == now {
-			continue
-		}
-		apart := Apart{Line: one.Line, Stamp: one.Stamp, Event: one.Post.Event, Tool: textOf(one.Post.E, "tool"), Old: old, New: now}
-		if err := say(d.ShadowRowOf(apart)); err != nil {
-			return nil, err
-		}
-		out = append(out, apart)
-	}
-	return out, nil
 }
 
 // A live post carrying the old path's answer, which the door decides apart, hands its shadow row to Shadow. A failing write leaves the answer standing, since the shadow disturbs no hook. [[spec/tickets/copilot-meets-the-hooks-door]]
