@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,22 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: b8c66b43cb0949f5ebc40232b6da7343252b82a8
+    hash_after: b8c66b43cb0949f5ebc40232b6da7343252b82a8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/failure fails
+    inputs:
+      - name: design/draft
+        hash: 0809f9ab30bc9651
+        size: 1954
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -234,26 +250,32 @@ Each done_when line names its case, and the check decides the last.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/failure/registry_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/failure/registry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The Load and fake cases fail on their assertion, since the stubs answer an empty registry.
+The schema case passes already, because the schema lands in this diff and the checker refuses a required field standing empty. The surprise: the checker names the rule `Schema.remedies`, with its kind's prefix.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The Load and fake lines meet a red case, the schema line meets a case the schema holds, and the check decides the last.
+The door's fake, `FakeDir`, holds every case, and one contract case drives both the folder and the fake.
 
 # gate
 
