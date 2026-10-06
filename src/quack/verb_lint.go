@@ -60,8 +60,11 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
-		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
-		now:   time.Now,
+		changed: func() []string {
+			return changedOver(gitAt(root), func(line string) { fmt.Fprintln(os.Stderr, line) })
+		},
+		log: keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
+		now: time.Now,
 	}, nil
 }
 
