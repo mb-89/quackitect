@@ -26,8 +26,7 @@ const liveWait = 20 * time.Second
 func managesLive(as q.Writer) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, reads index.Reads, steps func(func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
-			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps, Now: time.Now,
-			Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps, Clock: stillClock(),
 			Accept: accepts(root, store, reads),
 		})
 		if err != nil {
@@ -55,7 +54,7 @@ func TestATwinReadsTheIndexBesideTheActionCallingIt(t *testing.T) {
 	seeds := func(_ string, commit index.Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"work/yours": yoursRows})
 	}
-	stop, _, err := index.ServeManaged(root, filepath.Join(t.TempDir(), "index.db"), c, managesLive(as), seeds)
+	stop, _, err := index.ServeManaged(wall, root, filepath.Join(t.TempDir(), "index.db"), c, managesLive(as), seeds)
 	if err != nil {
 		t.Fatal(err)
 	}

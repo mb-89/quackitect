@@ -7,13 +7,15 @@ package swap
 import (
 	"io/fs"
 	"time"
+
+	"quackitect/src/q"
 )
 
 // How often a server looks at the path it runs from. [[spec/design_output/lsp]]
 const look = 5 * time.Second
 
 // Watches calls gone once another file stands at the path this binary starts from. [[spec/design_output/lsp]]
-func Watches(gone func()) {
+func Watches(clock q.Clock, gone func()) {
 	path, err := executableOf()
 	if err != nil {
 		return
@@ -22,8 +24,21 @@ func Watches(gone func()) {
 	if err != nil {
 		return
 	}
+	watchesAt(clock, path, first, gone)
+}
+
+// Looks at the path each span, and calls gone once another file stands there. [[spec/tickets/go-waits-on-events]]
+func watchesAt(clock q.Clock, path string, first fs.FileInfo, gone func()) {
+	looks := make(chan struct{}, 1)
+	stop := clock.Every(look, func(time.Time) {
+		select {
+		case looks <- struct{}{}:
+		default:
+		}
+	})
 	go func() {
-		for range time.Tick(look) {
+		defer stop()
+		for range looks {
 			if Swapped(first, path) {
 				gone()
 				return

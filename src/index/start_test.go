@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 func TestABrokenCatalogRefusesTheStart(t *testing.T) {
@@ -17,7 +18,7 @@ func TestABrokenCatalogRefusesTheStart(t *testing.T) {
 	broken := q.New()
 	q.OutIn(broken, "t/n", 0)
 	q.OutIn(broken, "t/n", 0)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), broken)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), broken)
 	if err == nil {
 		stop()
 		t.Fatal("the door stands on a catalog naming t/n twice")

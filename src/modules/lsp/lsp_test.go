@@ -34,7 +34,7 @@ func serverOver(t *testing.T) (*Server, *q.Store) {
 		}
 		return []Finding{}
 	}
-	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep}), store
+	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep, Clock: qtest.Wall()}), store
 }
 
 // A store over the module and the inputs its texts read, as a case seeds them. [[spec/tickets/lsp-module-draws-the-tools]]

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // A build of the tree's index, which no case runs, so its stamp stands apart from the test binary's. [[spec/design_output/index#a-door-comes-back]]
@@ -109,7 +110,7 @@ func TestAStartRunsTheTreesIndexAndNeverTheCaller(t *testing.T) {
 	ran := fakeSpawn(t, func(root string) {
 		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 	})
-	if err := starts(root); err != nil {
+	if err := starts(qtest.Wall(), root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 1 || got[0] != bin {
@@ -126,7 +127,7 @@ func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 	standsAt(t, root, live)
 	ran := fakeSpawn(t, func(root string) { standsAt(t, root, live) })
 
-	if _, err := reaches(root, []string{"standing"}); err != nil {
+	if _, err := reaches(qtest.Wall(), root, []string{"standing"}); err != nil {
 		t.Fatal(err)
 	}
 	if got := heard(); len(got) != 1 || got[0] != "standing" {
@@ -178,7 +179,7 @@ func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
 func TestADisplacedDoorLeaves(t *testing.T) {
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
-	gone := displaced(root, 2, time.Millisecond)
+	gone := displaced(qtest.Wall(), root, 2, time.Millisecond)
 	select {
 	case <-gone:
 		t.Fatal("a door the standing file names leaves")
@@ -213,7 +214,7 @@ func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
 func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 	root := t.TempDir()
 	ran := fakeSpawn(t, nil)
-	if err := starts(root); err == nil {
+	if err := starts(qtest.Wall(), root); err == nil {
 		t.Fatal("a start with no index built answers no fault")
 	}
 	if got := ran(); len(got) != 0 {
@@ -223,7 +224,7 @@ func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 
 func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -277,7 +278,7 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	standsAt(t, root, busy)
 	ran := fakeSpawn(t, func(root string) { standsAt(t, root, busy) })
 
-	if _, err := reaches(root, []string{"standing"}); err == nil {
+	if _, err := reaches(qtest.Wall(), root, []string{"standing"}); err == nil {
 		t.Fatal("a client answers no fault, where the door answers late")
 	}
 	if got := ran(); len(got) != 0 {
@@ -293,14 +294,14 @@ func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	ran := fakeSpawn(t, nil)
-	if !claims(startingPath(root)) {
+	if !claims(qtest.Wall(), startingPath(root)) {
 		t.Fatal("the first caller claims no start")
 	}
 	go func() {
 		time.Sleep(3 * startPollPause)
 		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 	}()
-	if err := starts(root); err != nil {
+	if err := starts(qtest.Wall(), root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 0 {
@@ -312,7 +313,7 @@ func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 func TestAStaleClaimGivesWay(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	if !claims(startingPath(root)) {
+	if !claims(qtest.Wall(), startingPath(root)) {
 		t.Fatal("the first caller claims no start")
 	}
 	long := time.Now().Add(-2 * startPolls * startPollPause)
@@ -322,7 +323,7 @@ func TestAStaleClaimGivesWay(t *testing.T) {
 	ran := fakeSpawn(t, func(root string) {
 		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 	})
-	if err := starts(root); err != nil {
+	if err := starts(qtest.Wall(), root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 1 {

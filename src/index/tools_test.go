@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
 )
 
@@ -56,7 +57,7 @@ func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
 	}, q.Doc("echoes its input"))
 	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
+	_, stop, _, err := opens(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
 	if err != nil {
 		t.Fatal(err)
 	}

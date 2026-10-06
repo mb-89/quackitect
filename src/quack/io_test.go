@@ -52,7 +52,7 @@ func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 	}
 	defer bus.Close()
 	placed := index.Placed{Name: ioPart, Command: []string{os.Args[0], "-test.run=^TestFakeSilentIO$", "--", ioPart}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
-	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	stop, err := index.NewPlacements(wall, bus, store, []index.Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +101,7 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 	}
 	defer bus.Close()
 	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
-	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	stop, err := index.NewPlacements(wall, bus, store, []index.Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}

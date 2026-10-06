@@ -1,16 +1,19 @@
 //go:build contract
 
-// The contract of the clock: Now moves forward and Minute counts it, on the
-// fake and on the real clock.
+// The contract of the clock: Now moves forward and Minute counts it, and each
+// wait fires past its span, on the fake, the real clock and the test wall.
 // [[spec/design_output/model#the-fake-keeps-a-contract]]
 package clock
 
 import (
 	"testing"
 	"time"
+
+	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-func clockSuite(t *testing.T, one Clock, pass func()) {
+func clockSuite(t *testing.T, one q.Clock, pass func()) {
 	before := one.Now()
 	pass()
 	after := one.Now()
@@ -22,7 +25,7 @@ func clockSuite(t *testing.T, one Clock, pass func()) {
 	}
 }
 
-func afterSuite(t *testing.T, one Clock, pass func()) {
+func afterSuite(t *testing.T, one q.Clock, pass func()) {
 	waits := waiterOf(t, one)
 	fired := waits.After(time.Millisecond)
 	ran := make(chan struct{})
@@ -52,4 +55,6 @@ func TestClockKeepsItsContract(t *testing.T) {
 	t.Run("real", func(t *testing.T) { clockSuite(t, New(), func() { time.Sleep(time.Millisecond) }) })
 	t.Run("fake waits", func(t *testing.T) { afterSuite(t, fake, func() { fake.Tick(time.Millisecond) }) })
 	t.Run("real waits", func(t *testing.T) { afterSuite(t, New(), func() {}) })
+	t.Run("wall", func(t *testing.T) { clockSuite(t, qtest.Wall(), func() { time.Sleep(time.Millisecond) }) })
+	t.Run("wall waits", func(t *testing.T) { afterSuite(t, qtest.Wall(), func() {}) })
 }

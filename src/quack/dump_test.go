@@ -33,7 +33,7 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
+	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	said, err := index.Ask("dump", "files/")
+	said, err := askIndex("dump", "files/")
 	if err != nil {
 		t.Fatal(err)
 	}

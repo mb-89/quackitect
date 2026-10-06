@@ -16,7 +16,7 @@ import (
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket place", ticketPlace(index.Root, index.V1)) }
+func init() { register("ticket place", ticketPlace(index.Root, reachV1)) }
 
 // The value the index answers every row under, which the work module wires as work. [[spec/tickets/open-tasks-come-from-work]]
 const placeRows = "work/" + work.RowsPort

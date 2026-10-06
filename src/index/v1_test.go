@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 func standingV1(t *testing.T) Standing {
@@ -25,7 +26,7 @@ func standingV1(t *testing.T) Standing {
 	file := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +130,7 @@ func TestV1DrawsItsDocs(t *testing.T) {
 func TestV1AnswersTheBaseOfTheStandingDoor(t *testing.T) {
 	standing := standingV1(t)
 	t.Setenv("QUACKITECT_ROOT", standing.Root)
-	base, err := V1()
+	base, err := V1(qtest.Wall())
 	if want := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1); err != nil || base != want {
 		t.Fatalf("V1 answers %q, %v, not %q", base, err, want)
 	}

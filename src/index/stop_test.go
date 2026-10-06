@@ -5,6 +5,8 @@ package index
 import (
 	"testing"
 	"time"
+
+	"quackitect/src/q/qtest"
 )
 
 // The span a case waits for a stop call's ask to reach main. [[spec/tickets/the-index-stops-its-tools]]
@@ -12,7 +14,7 @@ const stopAskWithin = time.Second
 
 func TestAStopCallAsksMainForTheDoorsStop(t *testing.T) {
 	exited := make(chan int, 1)
-	go stopsAfter(t.TempDir(), 0, time.Hour, func(code int) { exited <- code })
+	go stopsAfter(qtest.NewFake(time.Time{}), t.TempDir(), 0, time.Hour, func(code int) { exited <- code })
 	select {
 	case <-stopAsked:
 	case <-time.After(stopAskWithin):
@@ -27,7 +29,7 @@ func TestAStopCallAsksMainForTheDoorsStop(t *testing.T) {
 
 func TestAStopOutlastingItsBoundEndsTheProcess(t *testing.T) {
 	exited := make(chan int, 1)
-	go stopsAfter(t.TempDir(), 0, 0, func(code int) { exited <- code })
+	go stopsAfter(qtest.NewFake(time.Time{}), t.TempDir(), 0, 0, func(code int) { exited <- code })
 	select {
 	case code := <-exited:
 		if code != 0 {

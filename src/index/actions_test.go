@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The input of the fake action t/add. [[spec/tickets/actions-answer-over-http]]
@@ -86,7 +87,7 @@ func standingActions(t *testing.T, wait int, hold <-chan struct{}) Standing {
 		}
 		return addOut{Sum: in.A + in.B}, nil
 	}
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
+	_, stop, _, err := opens(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +245,7 @@ func TestADoorWithNoManagerServesNoAction(t *testing.T) {
 	root := tree(t)
 	c := q.New()
 	q.ActionIn(c, "t/add", func(in addIn) []q.Request { return nil }, q.Doc("adds two terms"))
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c)
 	if err != nil {
 		t.Fatal(err)
 	}

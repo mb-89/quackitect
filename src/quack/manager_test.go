@@ -14,11 +14,30 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
+
+// The real time and its waits, with a beat that stands still, so a case's manager renews nothing on its own. [[spec/tickets/go-waits-on-events]]
+type stillBeat struct{ q.Clock }
+
+func (stillBeat) Every(time.Duration, func(time.Time)) func() { return func() {} }
+
+func stillClock() q.Clock { return stillBeat{clock.New()} }
+
+// A still beat keeping each span the manager asks of it. [[spec/tickets/go-waits-on-events]]
+type beatsOf struct {
+	q.Clock
+	spans *[]time.Duration
+}
+
+func (one beatsOf) Every(span time.Duration, hand func(time.Time)) func() {
+	*one.spans = append(*one.spans, span)
+	return one.Clock.Every(span, hand)
+}
 
 // An override on watchdog/beat re-arms the manager's tick at its span, and one on watchdog/lease holds the index's lease at its term, through the config module's layers. [[spec/design_output/model#a-lease]]
 func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
@@ -34,11 +53,7 @@ func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
 	stop, err := manager.Start(manager.Outside{
 		Root: t.TempDir(), Store: ix.Store(), As: as, Rows: opRows{heldTable{}},
 		Steps: func(hand func()) { steps = append(steps, hand) },
-		Now:   time.Now,
-		Every: func(span time.Duration, _ func(time.Time)) func() {
-			spans = append(spans, span)
-			return func() {}
-		},
+		Clock: beatsOf{Clock: stillClock(), spans: &spans},
 	})
 	if err != nil {
 		t.Fatal(err)

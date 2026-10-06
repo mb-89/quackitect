@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 func TestTheStandingFileNamesTheBusAndItsToken(t *testing.T) {
@@ -20,7 +21,7 @@ func TestTheStandingFileNamesTheBusAndItsToken(t *testing.T) {
 	manage := func(string, *q.Store, OpRows, Reads, func(func())) (Managed, error) {
 		return Managed{Stop: func() {}, Bus: bus}, nil
 	}
-	stop, _, err := ServeManaged(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
+	stop, _, err := ServeManaged(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
 	if err != nil {
 		t.Fatal(err)
 	}

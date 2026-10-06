@@ -210,7 +210,7 @@ func verbRoad(argv []string) int {
 	return verbs(verbDoors{
 		mode:  modeOf(root),
 		old:   usageDoor(argv, os.Stderr),
-		alone: func(argv []string) int { return routes(os.Stdout, os.Stderr, index.V1, argv) },
+		alone: func(argv []string) int { return routes(os.Stdout, os.Stderr, reachV1, argv) },
 		twins: registry,
 		log:   appendsRow(root, time.Now),
 		out:   os.Stdout,

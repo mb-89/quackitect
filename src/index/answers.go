@@ -95,7 +95,7 @@ func (one *door) answers(said call) (any, error) {
 		}
 		return map[string]int{"files": count}, err
 	case "stop":
-		go stopsSoon(one.root)
+		go stopsSoon(one.clock, one.root)
 		return map[string]string{"stopping": one.root}, nil
 	case "standing":
 		var files int

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The fake IO process: it commits its pid and a value, and runs until a kill. It runs only where a placed process spawns it. [[spec/design_output/model#a-process-ends]]
@@ -81,7 +82,7 @@ func placedFake(t *testing.T, restart time.Duration) (*q.Store, func()) {
 		t.Fatal(err)
 	}
 	store, hand := fakeStore(t)
-	placed := Placed{Name: "io", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$"}, Instances: map[string]q.Writer{"fake": hand}, Restart: restart}
+	placed := Placed{Name: "io", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$"}, Instances: map[string]q.Writer{"fake": hand}, Restart: restart, clock: qtest.Wall()}
 	stop, err := placed.Start(bus, store)
 	if err != nil {
 		bus.Close()
@@ -130,7 +131,7 @@ func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
 	store, hand := fakeStore(t)
 	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
 	other := Placed{Name: "other", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "other"}, Instances: map[string]q.Writer{"other": hand}, Restart: time.Hour}
-	stop, err := NewPlacements(bus, store, []Placed{fake, other}).Start()
+	stop, err := NewPlacements(qtest.Wall(), bus, store, []Placed{fake, other}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +155,7 @@ func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
 	defer bus.Close()
 	store, hand := fakeStore(t)
 	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
-	placements := NewPlacements(bus, store, []Placed{fake})
+	placements := NewPlacements(qtest.Wall(), bus, store, []Placed{fake})
 	stop, err := placements.Start()
 	if err != nil {
 		t.Fatal(err)
@@ -175,7 +176,7 @@ func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
 func TestASettleWaitsOnNoProcessStandingDown(t *testing.T) {
 	store, source, bus, placed := doublerPlaced(t)
 	placed.Command = []string{os.Args[0], "-test.run=^$"}
-	placements := NewPlacements(bus, store, []Placed{placed})
+	placements := NewPlacements(qtest.Wall(), bus, store, []Placed{placed})
 	stop, err := placements.Start()
 	if err != nil {
 		t.Fatal(err)
@@ -226,7 +227,7 @@ func TestAPlacedProcessHoldsItsLeaseAndStaysDownWhereTheDogRefusesARestart(t *te
 	defer bus.Close()
 	store, hand := fakeStore(t)
 	dog := &refusingDog{}
-	placed := Placed{Name: "io", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$"}, Instances: map[string]q.Writer{"fake": hand}, Restart: 10 * time.Millisecond, Watch: dog, Term: time.Hour}
+	placed := Placed{Name: "io", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$"}, Instances: map[string]q.Writer{"fake": hand}, Restart: 10 * time.Millisecond, Watch: dog, Term: time.Hour, clock: qtest.Wall()}
 	stop, err := placed.Start(bus, store)
 	if err != nil {
 		t.Fatal(err)

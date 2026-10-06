@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"quackitect/src/modules/drafts"
 	manager "quackitect/src/modules/index"
@@ -88,8 +87,7 @@ func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
 			out.Bands = func() drafts.Bands { return table.Bands }
 			served, err := manager.Serving(manager.Outside{
 				Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-				Steps: func(func()) {}, Now: time.Now,
-				Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+				Steps: func(func()) {}, Clock: stillClock(),
 				Accept: drafts.Accept(out),
 			})
 			if err != nil {

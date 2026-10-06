@@ -14,6 +14,7 @@ import (
 
 	"quackitect/src/config"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The polls a case waits through for a value the scheduler commits. [[spec/tickets/the-scheduler-runs-providers]]
@@ -21,7 +22,7 @@ const topicPolls = 100
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
-	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, listen, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +60,7 @@ func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 	root := tree(t)
 	c := q.New()
 	q.OutIn(c, "work/open-tasks", 3, q.Doc("a count the case reads"))
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +81,7 @@ func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 // A name nobody registered answers an error, so a reader beside the old path compares nothing. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +123,7 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +170,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +206,7 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -252,7 +253,7 @@ func TestTheDoorAnswersWhy(t *testing.T) {
 	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 0)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), catalog)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,7 +282,7 @@ func TestTheWhyVerbAsksTheName(t *testing.T) {
 // The engine asks the door for the hash of a note, so the door answers the hashes method. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -314,7 +315,7 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 	moves := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"t/n": 3})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog, moves)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), catalog, moves)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +347,7 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 		steps(func() { stepped.Add(1) })
 		return Managed{Stop: func() {}}, nil
 	}
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
+	_, stop, _, err := opens(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -373,7 +374,7 @@ func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 		}
 		return Managed{Stop: func() {}, Settle: settle}, nil
 	}
-	one, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), catalog, manage)
+	one, stop, _, err := opens(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), catalog, manage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -389,7 +390,7 @@ func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
 	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), catalog)
 	if err != nil {
 		t.Fatal(err)
 	}

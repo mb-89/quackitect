@@ -54,7 +54,7 @@ func lintHere() (lintDoors, error) {
 	return lintDoors{
 		root:  root,
 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
-		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
+		sweep: func() ([]check.Finding, error) { return sweepRows(askIndex) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
 		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
 		now:   time.Now,
@@ -231,7 +231,7 @@ func lintRows(found []check.Finding, refused int) []string {
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func toolsOver(root string, where []string) []check.Finding {
 	tree := lintTree(root)
-	tools := lsp.ToolsAt(root, lspChecks(root))
+	tools := lsp.ToolsAt(wall, root, lspChecks(root))
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {

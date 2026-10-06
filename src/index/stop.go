@@ -6,6 +6,8 @@ package index
 import (
 	"sync"
 	"time"
+
+	"quackitect/src/q"
 )
 
 // The grace a stop call's answer takes to leave, and the longest the door's own stop runs before the process ends without it. [[spec/tickets/the-index-stops-its-tools]]
@@ -21,15 +23,15 @@ var (
 )
 
 // [[spec/design_output/index#a-door-comes-back]]
-func stopsSoon(root string) {
-	stopsAfter(root, stopGraceDelay, stopBound, exits)
+func stopsSoon(clock q.Clock, root string) {
+	stopsAfter(clock, root, stopGraceDelay, stopBound, exits)
 }
 
 // Asks main for the stop after the grace, and ends the process itself where the stop outlasts the bound. [[spec/tickets/the-index-stops-its-tools]]
-func stopsAfter(root string, grace, bound time.Duration, exit func(int)) {
-	time.Sleep(grace)
+func stopsAfter(clock q.Clock, root string, grace, bound time.Duration, exit func(int)) {
+	<-clock.After(grace)
 	stopAsk.Do(func() { close(stopAsked) })
-	time.Sleep(bound)
+	<-clock.After(bound)
 	dropsOwn(root, pidOf())
 	exit(0)
 }

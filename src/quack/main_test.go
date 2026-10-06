@@ -200,7 +200,7 @@ func TestTheServedIndexAnswersItsTickets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
+	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -219,7 +219,7 @@ func awaits(t *testing.T, want map[string]string) {
 	t.Helper()
 	var said any
 	for range ticketPolls {
-		read, err := index.Ask("tickets")
+		read, err := askIndex("tickets")
 		if err != nil {
 			t.Fatal(err)
 		}

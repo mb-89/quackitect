@@ -20,7 +20,7 @@ func throughTheDoor(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 		q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
 	)
 	register(c)
-	one, stop, _, err := opens(t.TempDir(), filepath.Join(t.TempDir(), "index.db"), c, nil)
+	one, stop, _, err := opens(qtest.Wall(), t.TempDir(), filepath.Join(t.TempDir(), "index.db"), c, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

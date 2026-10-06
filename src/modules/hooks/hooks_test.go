@@ -73,7 +73,7 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 	})
 	door := New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
-		Call: c.call, Ops: b.of, Now: func() time.Time { return fixed },
+		Call: c.call, Ops: b.of, Clock: qtest.NewFake(fixed),
 		Root:   treeOf(t, commandTableOf(t).Tree, ""),
 		Config: func(string) Settings { return Settings{Words: nameWords} },
 	})

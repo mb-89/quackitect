@@ -6,6 +6,7 @@ package main
 import (
 	"testing"
 
+	"quackitect/src/modules/clock"
 	"quackitect/src/tui/frame"
 )
 
@@ -19,7 +20,7 @@ func TestTheDoorTakesATabAndHandsItToTheWindow(t *testing.T) {
 	}
 	defer func() { _ = door.Close() }()
 
-	if !frame.TellPort(testPort, "work") {
+	if !frame.TellPort(clock.New(), testPort, "work") {
 		t.Fatal("a caller hands the door a tab, and the door takes it")
 	}
 	msg := <-took
@@ -45,7 +46,7 @@ func TestAPortAlreadyHeldOpensNoSecondDoor(t *testing.T) {
 
 func TestACallToAPortNobodyHoldsAnswersFalse(t *testing.T) {
 	t.Parallel()
-	if frame.TellPort(testPort+2, "log") {
+	if frame.TellPort(clock.New(), testPort+2, "log") {
 		t.Fatal("a port nobody holds takes no tab, so the launch opens a window of its own")
 	}
 }

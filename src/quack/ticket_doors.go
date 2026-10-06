@@ -214,7 +214,7 @@ const hooksDoor = index.Runtime + "/hooks.json"
 // The index this box serves, started where none answers, and the port it stands at. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func servesHere(root string) string {
 	was, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))
-	if _, err := index.V1(); err != nil {
+	if _, err := reachV1(); err != nil {
 		return "No index answers, and the start fails: " + err.Error()
 	}
 	door, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))

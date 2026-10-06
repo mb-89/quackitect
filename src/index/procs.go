@@ -29,6 +29,8 @@ type Placed struct {
 	Term  time.Duration
 	// Where the placements hear that an instance answers, up by a commit or down by an exit. A nil hears nothing. [[spec/tickets/the-split-deployment-takes-over]]
 	answered func(instance string, up bool)
+	// The placements' clock, which the wait before a restart runs on. [[spec/tickets/go-waits-on-events]]
+	clock q.Clock
 }
 
 // What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
@@ -44,6 +46,7 @@ var errSilent = errors.New("the lease expires with no beat")
 
 // Every placed process the index runs over one bus. [[spec/design_output/model#the-placements]]
 type Placements struct {
+	clock   q.Clock
 	bus     *Bus
 	store   *q.Store
 	placed  []Placed
@@ -75,13 +78,13 @@ func (p *Placements) Settle(wait time.Duration) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	spent := false
-	timer := time.AfterFunc(wait, func() {
+	stop := p.clock.AfterFunc(wait, func() {
 		p.mu.Lock()
 		spent = true
 		p.idle.Broadcast()
 		p.mu.Unlock()
 	})
-	defer timer.Stop()
+	defer stop()
 	for len(p.pending) > 0 && !p.stopped && !spent {
 		p.idle.Wait()
 	}
@@ -119,12 +122,12 @@ func (p *Placements) Gap(span time.Duration) *Placements {
 const spawnGap = 20 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
-func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, gap: spawnGap, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
+func NewPlacements(clock q.Clock, bus *Bus, store *q.Store, placed []Placed) *Placements {
+	p := &Placements{clock: clock, bus: bus, store: store, gap: spawnGap, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {
-		one.answered = p.answered
+		one.answered, one.clock = p.answered, clock
 		for instance := range one.Instances {
 			p.pending[instance] = true
 		}
@@ -189,7 +192,7 @@ func (p *Placements) spawns() {
 		select {
 		case <-p.quit:
 			return
-		case <-time.After(wait):
+		case <-p.clock.After(wait):
 		}
 		p.mu.Lock()
 		if p.stopped {
@@ -405,7 +408,7 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}
 		select {
 		case <-stopping:
 			return
-		case <-time.After(wait):
+		case <-p.clock.After(wait):
 		}
 	}
 }

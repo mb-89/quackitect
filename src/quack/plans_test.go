@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/modules/hooks"
 	manager "quackitect/src/modules/index"
@@ -51,8 +50,7 @@ func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 	store := q.NewStore(c)
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+		Steps: func(func()) {}, Clock: stillClock(),
 		Accept: accepts(root, store, nil),
 	})
 	if err != nil {

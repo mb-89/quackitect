@@ -14,7 +14,6 @@ import (
 	"slices"
 	"strings"
 
-	"quackitect/src/index"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/q"
@@ -41,7 +40,7 @@ const (
 	noQueue         = "No ticket stands in the queue."
 )
 
-func init() { register("ticket yours", ticketYours(index.V1)) }
+func init() { register("ticket yours", ticketYours(reachV1)) }
 
 // ticket yours off work/yours over the base v1 answers, one JSON object as ticket-yours.js prints it. [[spec/tickets/ticket-verbs-become-actions]]
 func ticketYours(v1 func() (string, error)) twin {
@@ -95,7 +94,7 @@ func printsLine(out, errs io.Writer, value any) int {
 	return 0
 }
 
-func init() { register("retro notes", retroNotes(index.V1)) }
+func init() { register("retro notes", retroNotes(reachV1)) }
 
 // retro notes off tickets/all over the base v1 answers: every note under .se/tickets standing open. [[spec/tickets/retro-verbs-become-actions]]
 func retroNotes(v1 func() (string, error)) twin {
@@ -131,7 +130,7 @@ func retroNotes(v1 func() (string, error)) twin {
 	}
 }
 
-func init() { register("branch list --queue", branchQueue(index.V1)) }
+func init() { register("branch list --queue", branchQueue(reachV1)) }
 
 // branch list --queue off work/yours over the base v1 answers: each placed row off the cloud, place then name then step. [[spec/tickets/work-verbs-become-actions]]
 func branchQueue(v1 func() (string, error)) twin {

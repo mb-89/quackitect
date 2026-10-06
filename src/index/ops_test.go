@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 func TestTheOpRowsOutliveTheDoor(t *testing.T) {
@@ -24,7 +25,7 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	}
 	db.Close()
 
-	stop, _, err := Serve(root, at, q.New())
+	stop, _, err := Serve(qtest.Wall(), root, at, q.New())
 	if err != nil {
 		t.Fatal(err)
 	}

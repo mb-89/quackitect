@@ -252,7 +252,7 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 		bus.Close()
 		return index.Managed{}, err
 	}
-	placements := index.NewPlacements(bus, store, placed)
+	placements := index.NewPlacements(wall, bus, store, placed)
 	stop, err := placements.Start()
 	if err != nil {
 		beating.Close()

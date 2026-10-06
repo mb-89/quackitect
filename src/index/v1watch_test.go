@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // How long a case waits on the next event before it reads the stream as silent. [[spec/design_output/model#surfaces]]
@@ -36,7 +37,7 @@ func watchingV1(t *testing.T) (Standing, func(text string)) {
 		later = commit
 		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}

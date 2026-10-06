@@ -63,6 +63,7 @@ func (h *heldRows) body(id string) []byte {
 
 // A work loop the case steps by hand, and a time that moves where the case moves it. [[spec/design_output/model#a-lease]]
 type loop struct {
+	q.Clock
 	now   time.Time
 	hands []func()
 	ticks []func(time.Time)
@@ -73,13 +74,16 @@ func (l *loop) outside(t *testing.T, s *q.Store, as q.Writer, rows Rows) Outside
 	return Outside{
 		Root: t.TempDir(), Store: s, As: as, Rows: rows,
 		Steps: func(hand func()) { l.hands = append(l.hands, hand) },
-		Now:   func() time.Time { return l.now },
-		Every: func(span time.Duration, hand func(time.Time)) func() {
-			l.ticks = append(l.ticks, hand)
-			l.spans = append(l.spans, span)
-			return func() {}
-		},
+		Clock: l,
 	}
+}
+
+func (l *loop) Now() time.Time { return l.now }
+
+func (l *loop) Every(span time.Duration, hand func(time.Time)) func() {
+	l.ticks = append(l.ticks, hand)
+	l.spans = append(l.spans, span)
+	return func() {}
 }
 
 func (l *loop) step(t *testing.T) {
@@ -131,7 +135,7 @@ func manager(t *testing.T) (*q.Store, *loop, Outside, *heldRows) {
 	c := q.New()
 	as := Registers(c)
 	s := q.NewStore(c)
-	l := &loop{now: time.Unix(1000, 0).UTC()}
+	l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 	rows := rowsOf(map[string]string{"1": `{"id":"1","action":"t/read","caller":"s1","state":"running","writes":false}`})
 	return s, l, l.outside(t, s, as, rows), rows
 }
@@ -156,7 +160,7 @@ func TestTheManagerRunsOverTheFakeIndex(t *testing.T) {
 	if store == nil {
 		t.Fatal("the fake index hands the manager no store")
 	}
-	l := &loop{now: time.Unix(1000, 0).UTC()}
+	l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 	starts(t, l.outside(t, store, as, rowsOf(map[string]string{})))
 	l.step(t)
 	if health := fields(t, ix.Read("index/health")); health["part"] != "index" {
@@ -198,7 +202,7 @@ func TestALeaseAtZeroTakesTheBuiltInTerm(t *testing.T) {
 		resolved = q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the values each key resolves, as the case seeds them"))
 		as = Registers(c)
 	})
-	l := &loop{now: time.Unix(1000, 0).UTC()}
+	l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
 	ix.SeedAs(resolved, map[string]any{q.ResolvedName: q.Resolved{LeaseKey: "0", BeatKey: "3"}})
 	ix.Run(LeaseKey)
@@ -265,7 +269,7 @@ func catalogued(t *testing.T) *qtest.Index {
 		q.CfgIn(c, "depth", 3, q.Doc("how deep the ask reads"))
 		q.OutIn(c, "t/badge", 0, q.Doc("a count a renderer badges"), q.Label("Tickets"), q.Looks(q.Count))
 	})
-	l := &loop{now: time.Unix(1000, 0).UTC()}
+	l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
 	l.step(t)
 	return ix
@@ -369,7 +373,7 @@ func TestIndexDocsNameEachNameActionAndKeyWithItsDoc(t *testing.T) {
 func TestIndexNamesNestsNoListOfItself(t *testing.T) {
 	var as q.Writer
 	ix := qtest.New(t, func(c *q.Catalog) { as = Registers(c) })
-	l := &loop{now: time.Unix(1000, 0).UTC()}
+	l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
 	l.step(t)
 	l.step(t)
@@ -387,7 +391,7 @@ func TestServesCallsAnActionThroughItsAccept(t *testing.T) {
 		q.ActionIn(c, "t/read", func(path string) []q.Request {
 			return []q.Request{{Module: "disk", Verb: "read", Args: path, NoUndo: "a read"}}
 		}, q.Deadline(time.Minute))
-		l := &loop{now: time.Unix(1000, 0).UTC()}
+		l := &loop{Clock: qtest.Wall(), now: time.Unix(1000, 0).UTC()}
 		from := l.outside(t, q.NewStore(c), as, rowsOf(map[string]string{}))
 		from.Accept = accept
 		stop, call, err := Serves(from)

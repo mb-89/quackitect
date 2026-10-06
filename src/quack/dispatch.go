@@ -16,7 +16,7 @@ import (
 // How long one request of the fire waits for its reply. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
 const sendTimeout = time.Minute
 
-func init() { register("dispatch", dispatchVerb(index.Root, index.V1, httpSend)) }
+func init() { register("dispatch", dispatchVerb(index.Root, reachV1, httpSend)) }
 
 // dispatch off the branch doors and the send door, every word past the verb handed to the package. [[spec/tickets/dispatch-verbs-port-to-go]]
 func dispatchVerb(root func() (string, error), v1 func() (string, error), send branches.Send) twin {

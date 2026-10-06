@@ -66,8 +66,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 	store := q.NewStore(c)
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+		Steps: func(func()) {}, Clock: stillClock(),
 		Accept: accepts(root, store, nil),
 	})
 	if err != nil {
@@ -76,7 +75,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 	t.Cleanup(served.Stop)
 	hook := hookedOf(w, hands, hooksModule)
 	door := hooks.New(hooks.Outside{
-		Store: store, As: hook.as, Bound: hook.bound, Now: time.Now, Root: root,
+		Store: store, As: hook.as, Bound: hook.bound, Clock: wall, Root: root,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err

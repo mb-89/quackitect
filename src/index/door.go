@@ -99,6 +99,8 @@ type door struct {
 	steps []func()
 	// The manager's call, which /v1 hands each action it serves. [[spec/tickets/actions-answer-over-http]]
 	call Call
+	// The time the door reads and waits on, which the root hands in. [[spec/tickets/go-waits-on-events]]
+	clock q.Clock
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -111,7 +113,7 @@ func standingPath(root string) string {
 }
 
 // The command line asks for a door, and this spawns the tree's index where none stands, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
-func starts(root string) error {
+func starts(clock q.Clock, root string) error {
 	self, err := executableOf()
 	if err != nil {
 		return err
@@ -120,7 +122,7 @@ func starts(root string) error {
 	if _, err := statOf(bin); err != nil {
 		return fmt.Errorf("no index binary stands at %s, and ./RUNME.sh builds one: %w", bin, err)
 	}
-	if claims(startingPath(root)) {
+	if claims(clock, startingPath(root)) {
 		defer os.Remove(startingPath(root))
 		if err := spawns(bin, root); err != nil {
 			return err
@@ -131,7 +133,7 @@ func starts(root string) error {
 		if _, err := standingOf(root); err == nil {
 			return nil
 		}
-		time.Sleep(startPollPause)
+		<-clock.After(startPollPause)
 	}
 	return errorOf("the door took longer than thirty seconds to stand")
 }
@@ -142,8 +144,8 @@ func startingPath(root string) string {
 }
 
 // The first caller claims the start, and a caller meeting a fresh claim waits on the index that claim spawns, so callers racing a start spawn one index. A claim older than the start wait stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
-func claims(marker string) bool {
-	if said, err := os.Stat(marker); err == nil && time.Since(said.ModTime()) > startPolls*startPollPause {
+func claims(clock q.Clock, marker string) bool {
+	if said, err := os.Stat(marker); err == nil && clock.Now().Sub(said.ModTime()) > startPolls*startPollPause {
 		os.Remove(marker)
 	}
 	os.MkdirAll(filepath.Dir(marker), 0o755)
@@ -192,17 +194,17 @@ type Commit func(as q.Writer, values map[string]any) error
 type Start func(root string, commit Commit) (stop func(), err error)
 
 // The door with no manager, as a case of the door alone runs it. [[spec/design_output/model#the-index-manager]]
-func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
-	return ServeManaged(root, at, catalog, nil, starts...)
+func Serve(clock q.Clock, root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
+	return ServeManaged(clock, root, at, catalog, nil, starts...)
 }
 
 // Answers the door beside its stop, so a case reads the steps the work loop runs. [[spec/design_output/model#a-lease]]
-func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
-	return opensOn(net.Listen, root, at, catalog, manage, starts...)
+func opens(clock q.Clock, root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
+	return opensOn(clock, net.Listen, root, at, catalog, manage, starts...)
 }
 
 // The door's start over the listen it takes, so a case fails a port. [[spec/design_output/index#the-door-owns-the-database]]
-func opensOn(listens func(network, address string) (net.Listener, error), root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
+func opensOn(clock q.Clock, listens func(network, address string) (net.Listener, error), root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
 	beat := spanOf(root, "watchdog.beat", builtInBeat)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(); len(faults) > 0 {
@@ -230,7 +232,7 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 		return failed(err)
 	}
 
-	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), commit: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
+	one := &door{clock: clock, db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), commit: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store = q.NewStore(catalog)
 	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
@@ -379,7 +381,7 @@ func (one *door) Touched(rel string) {
 
 func (one *door) sweeps() {
 	for range one.dirty {
-		time.Sleep(burstSettleDelay)
+		<-one.clock.After(burstSettleDelay)
 		one.guard.Lock()
 		for _, hand := range one.steps {
 			hand()
@@ -445,7 +447,8 @@ func (one *door) walks() (int, int, error) {
 
 // The sweep on a clock, which catches a change the watch misses. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) guards() {
-	for range time.Tick(sweepEvery) {
+	looks, _ := ticks(one.clock, sweepEvery)
+	for range looks {
 		one.guard.Lock()
 		if _, moved, err := one.walks(); err == nil && moved > 0 {
 			one.moved()
@@ -493,7 +496,7 @@ func (one *door) awaits(w http.ResponseWriter, r *http.Request, said call) {
 	if len(said.Params) > 0 {
 		json.Unmarshal(said.Params, &asked)
 	}
-	patience := time.After(changesWait)
+	patience := one.clock.After(changesWait)
 	for {
 		tick, wake := one.standingAt()
 		if tick > asked.Since {

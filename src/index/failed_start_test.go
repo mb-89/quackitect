@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The door listens for the old API first and for /v1 second. [[spec/design_output/model#surfaces]]
@@ -42,7 +43,7 @@ func TestAFailedV1StartStopsThePartsItReached(t *testing.T) {
 		old = &closeTold{Listener: listener}
 		return old, nil
 	}
-	_, _, _, err := opensOn(listen, root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage, start)
+	_, _, _, err := opensOn(qtest.Wall(), listen, root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage, start)
 	if err == nil {
 		t.Fatal("the start answers no error past a failed /v1 listen")
 	}

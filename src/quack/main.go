@@ -79,7 +79,7 @@ func dumps(prefix string) error {
 	if err != nil {
 		return err
 	}
-	said, err := index.Ask("dump", prefix)
+	said, err := askIndex("dump", prefix)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func main() {
 	}
 	// [[spec/tickets/the-lsp-server-leaves]]
 	if len(os.Args) == 2 && os.Args[1] == "sweep" {
-		if err := sweeps(os.Stdout, index.Ask); err != nil {
+		if err := sweeps(os.Stdout, askIndex); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -178,7 +178,7 @@ func main() {
 		return
 	}
 	if len(os.Args) > 1 && cliVerbs[os.Args[1]] {
-		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
+		os.Exit(routes(os.Stdout, os.Stderr, reachV1, os.Args[1:]))
 	}
 	as := manager.Registers(q.Main)
 	doors, err := wired()
@@ -189,7 +189,7 @@ func main() {
 	// The config module loads always, after the wiring, so it resolves every key the wiring declares. [[spec/design_output/model#the-config-module]]
 	config.Registers(q.Main)
 	// The IO process runs the IO starts, so the index runs none. [[spec/tickets/the-split-deployment-takes-over]]
-	index.Main(manages(as, doors))
+	index.Main(wall, manages(as, doors))
 }
 
 // The module type the wiring loads as hooks, whose door the manager's start opens. [[spec/tickets/the-hooks-door-lands]]
@@ -231,12 +231,20 @@ func hookedOf(w q.Wiring, hands map[string]q.Writer, module string) hooked {
 	return hooked{}
 }
 
+// The real clock the root hands every caller that reads the time or waits on it. [[spec/tickets/go-waits-on-events]]
+var wall = clock.New()
+
+// The base of /v1, and an ask of the index, over the real clock. [[spec/tickets/go-waits-on-events]]
+func reachV1() (string, error) { return index.V1(wall) }
+
+func askIndex(argv ...string) (any, error) { return index.Ask(wall, argv...) }
+
 // The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept, and the hooks door beside it where the wiring loads one. [[spec/design_output/model#the-index-manager]]
 func manages(as q.Writer, open doors) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, reads index.Reads, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store, reads),
+			Clock: wall, Accept: accepts(root, store, reads),
 		})
 		if err != nil {
 			return index.Managed{}, err
@@ -322,7 +330,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 	door := hooks.New(hooks.Outside{
 		Index:  asks,
 		Health: healthOf(store),
-		Store:  store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
+		Store:  store, As: hook.as, Bound: hook.bound, Clock: wall,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err

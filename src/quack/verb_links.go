@@ -3,13 +3,9 @@
 // [[spec/tickets/read-verbs-port-to-go]]
 package main
 
-import (
-	"io"
+import "io"
 
-	"quackitect/src/index"
-)
-
-func init() { register("links", linksVerb(index.Ask)) }
+func init() { register("links", linksVerb(askIndex)) }
 
 // links off the ask: the links reaching the target named, and the dangling ones where no target comes. [[spec/tickets/read-verbs-port-to-go]]
 func linksVerb(ask asker) twin {

@@ -16,7 +16,7 @@ import (
 	"quackitect/src/index"
 )
 
-func init() { register("branch", branchVerb(index.Root, index.V1)) }
+func init() { register("branch", branchVerb(index.Root, reachV1)) }
 
 // branch off the doors over the root and the index, every word past the verb handed to the package. [[spec/tickets/work-verbs-port-to-go]]
 func branchVerb(root func() (string, error), v1 func() (string, error)) twin {

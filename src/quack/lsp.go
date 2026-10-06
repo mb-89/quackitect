@@ -44,7 +44,7 @@ func lspVerb() error {
 	if err != nil {
 		return err
 	}
-	return lsps(root, func() error { _, err := index.V1(); return err }, os.Stdin, os.Stdout)
+	return lsps(root, func() error { _, err := reachV1(); return err }, os.Stdin, os.Stdout)
 }
 
 // Sends the token line, copies the input to the connection until it ends and half-closes, then copies the connection to the output until the IO module ends it. [[spec/design_output/model#the-editor-starts-quack-lsp]]
@@ -68,7 +68,7 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 		Root: root, Store: store, As: one.as, Bound: one.bound,
 		Sweep: func() any { return store.Snapshot().Read(sweepName) },
 		// [[spec/tickets/lsp-module-draws-the-tools]]
-		Tools: lsp.ToolsAt(root, lspChecks(root)), Quiet: -1,
+		Tools: lsp.ToolsAt(wall, root, lspChecks(root)), Quiet: -1, Clock: wall,
 		// [[spec/tickets/lsp-module-serves-the-features]]
 		Check: lspChecks(root),
 		Files: func() map[string]string {

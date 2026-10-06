@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"quackitect/src/q/qtest"
 )
 
 // What a fake binary answers: its stdout by the binary's name, and the calls it takes. [[spec/tickets/lsp-module-draws-the-tools]]
@@ -163,7 +165,7 @@ func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server,
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
-		Tools: tools, Files: func() map[string]string { return files },
+		Tools: tools, Files: func() map[string]string { return files }, Clock: qtest.Wall(),
 	})
 	var (
 		mu     sync.Mutex

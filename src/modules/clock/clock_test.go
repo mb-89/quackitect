@@ -35,6 +35,16 @@ func TestTheRealClockAndTheFakeWait(t *testing.T) {
 	waiterOf(t, NewFake(standsAt))
 }
 
+// [[spec/tickets/clock-test-asserts-q-clock]]
+func TestTheRealClockAndTheFakeAreAQClock(t *testing.T) {
+	t.Parallel()
+	for name, one := range map[string]any{"real": New(), "fake": NewFake(standsAt)} {
+		if _, ok := one.(q.Clock); !ok {
+			t.Fatalf("the %s clock %T stands as no q.Clock", name, one)
+		}
+	}
+}
+
 func TestTheFakeFiresAfterOnTick(t *testing.T) {
 	t.Parallel()
 	fake := NewFake(standsAt)

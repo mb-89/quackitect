@@ -43,7 +43,7 @@ func doorsServer(t *testing.T, files map[string]string) (*lsp.Server, func() [][
 	server := lsp.New(lsp.Outside{
 		Root: "/tree", Store: qtest.Over(t, c, as).Store(), As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []lsp.Finding{} }, Tools: tools, Check: checks,
-		Files: func() map[string]string { return files },
+		Files: func() map[string]string { return files }, Clock: wall,
 	})
 	var (
 		mu     sync.Mutex

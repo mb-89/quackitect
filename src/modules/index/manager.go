@@ -46,8 +46,7 @@ type Outside struct {
 	As    q.Writer
 	Rows  Rows
 	Steps func(hand func())
-	Now   func() time.Time
-	Every func(span time.Duration, hand func(time.Time)) (stop func())
+	Clock q.Clock
 	// The IO modules' side, which answers each request an action lists. A nil refuses every request. [[spec/tickets/actions-answer-over-http]]
 	Accept func(q.Request) (any, error)
 }
@@ -123,11 +122,11 @@ func Serving(from Outside) (Served, error) {
 
 // Opens the book over the rows and fails what a restart leaves in flight, holds the index's lease, hands the work loop its step, and ticks at the beat. [[spec/design_output/model#the-index-manager]]
 func begins(from Outside) (*managed, error) {
-	book, err := NewBook(from.Now, rowsKeep{from.Rows}, bookSettingsOf(from.Root))
+	book, err := NewBook(from.Clock, rowsKeep{from.Rows}, bookSettingsOf(from.Root))
 	if err != nil {
 		return nil, err
 	}
-	one := &managed{from: from, book: book, dog: NewDog(from.Now, from.Store, from.As, dogSettingsOf(from.Root))}
+	one := &managed{from: from, book: book, dog: NewDog(from.Clock.Now, from.Store, from.As, dogSettingsOf(from.Root))}
 	book.OnMove(func(moved Op) { one.commits(map[string]any{Name(moved.ID): moved}) })
 	if err := book.Restart(); err != nil {
 		return nil, err
@@ -140,7 +139,7 @@ func begins(from Outside) (*managed, error) {
 	one.dog.Hold(leasePart, one.term)
 	from.Steps(one.renews)
 	one.beat = spanIn(read.Read(BeatKey), builtInBeat)
-	one.tick = from.Every(one.beat, one.ticks)
+	one.tick = from.Clock.Every(one.beat, one.ticks)
 	from.Store.OnCommit(one.hears)
 	return one, nil
 }
@@ -171,7 +170,7 @@ func (one *managed) hears(values map[string]any) {
 	}
 	if span := spanIn(beat, builtInBeat); beats && span != one.beat {
 		one.tick()
-		one.beat, one.tick = span, one.from.Every(span, one.ticks)
+		one.beat, one.tick = span, one.from.Clock.Every(span, one.ticks)
 	}
 }
 

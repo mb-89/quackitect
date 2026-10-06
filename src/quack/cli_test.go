@@ -58,15 +58,14 @@ func standingTree(t *testing.T) string {
 	}, q.Doc("sleeps past the wait"))
 	manage := func(root string, store *q.Store, rows index.OpRows, _ index.Reads, steps func(hand func())) (index.Managed, error) {
 		stop, call, err := manager.Serves(manager.Outside{
-			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps, Now: time.Now, Accept: fakeAccept,
-			Every: func(time.Duration, func(time.Time)) func() { return func() {} },
+			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps, Clock: stillClock(), Accept: fakeAccept,
 		})
 		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, err
 	}
-	stop, _, err := index.ServeManaged(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
+	stop, _, err := index.ServeManaged(wall, root, filepath.Join(t.TempDir(), "index.db"), c, manage)
 	if err != nil {
 		t.Fatal(err)
 	}

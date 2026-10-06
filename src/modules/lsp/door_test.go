@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"quackitect/src/q/qtest"
 )
 
 // The variable that makes this test binary a tool waiting until it is killed, the span a case lets it start, and the span a halt ends it within. [[spec/tickets/the-index-stops-its-tools]]
@@ -24,7 +26,7 @@ func TestAToolThatWaits(t *testing.T) {
 
 func TestAHaltEndsARunningTool(t *testing.T) {
 	t.Setenv(toolWaitsEnv, "1")
-	run, halt := runsUntilHalt()
+	run, halt := runsUntilHalt(qtest.Wall())
 	done := make(chan struct{})
 	go func() {
 		run(t.TempDir(), "", os.Args[0], "-test.run=^TestAToolThatWaits$")

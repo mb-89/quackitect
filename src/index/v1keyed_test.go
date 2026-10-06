@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The name a case watches: a hold file, under the family an instance wires. [[spec/tickets/the-lens-reads-v1]]
@@ -43,7 +44,7 @@ func keyedDoor(t *testing.T) Standing {
 	file := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"files/.se/.runtime/hold/box.json": q.Content{Hash: "box", Text: `{"ticket": "x"}`}})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
+	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}

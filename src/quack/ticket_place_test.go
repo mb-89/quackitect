@@ -28,7 +28,7 @@ func rowsIndex(t *testing.T, rows []work.Row) func() (string, error) {
 	seeds := func(_ string, commit index.Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{placeRows: rows})
 	}
-	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
+	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
 	if err != nil {
 		t.Fatal(err)
 	}

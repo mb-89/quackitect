@@ -628,5 +628,5 @@ func tuiLaunch(argv []string, cwd string, out, errs io.Writer) (int, error) {
 
 // The tell to whatever window stands on a port, which answers whether it took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]
 func tuiTellAt(port int) func(tab string) bool {
-	return func(tab string) bool { return frame.TellPort(port, tab) }
+	return func(tab string) bool { return frame.TellPort(wall, port, tab) }
 }
