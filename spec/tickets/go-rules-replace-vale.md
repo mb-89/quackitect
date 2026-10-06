@@ -387,3 +387,17 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+## The grep narrows to Vale the tool
+
+`go-rules-rename-voicevale` decides the done_when grep, and the style keeps its name. Accept reads these lines in place of the two the ask names:
+
+| the ask's line | accept reads |
+|---|---|
+| `git grep -il vale -- src test RUNME.sh .github` answers nothing past history notes | `git grep -il -e '\.runtime/bin/vale' -e 'vale-ls' -e 'errata-ai' -e '\.vale\.ini' -- src test RUNME.sh .github` answers nothing |
+| `go test ./src/modules/rules/` | `go test ./src/rules/` |
+
+- The marker keeps Vale's spelling, per [[spec/design_output/rules#a-marker-quiets-a-rule]], and the tests carry it, so the bare grep never answers nothing.
+- A rename of `VoiceVale` moves every check id and every standing marker, and changes no behaviour.
+- The narrowed grep meets the binary, its language server, its Go module and its config: what leaves the box.
+- `Tools.Vale` and `ValeRuns` in `src/modules/lsp` read the binary path, so the narrowed grep meets them, and they leave with the door.
