@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -215,6 +215,15 @@ record:
         hash: ede6066f3673d0de
         size: 77789
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 4b24d6cc34660f82b2637b58463939f734979b2b
+    hash_after: 4b24d6cc34660f82b2637b58463939f734979b2b
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
