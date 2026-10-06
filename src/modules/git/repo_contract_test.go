@@ -38,18 +38,23 @@ type side struct {
 	cut    func(branch string)
 }
 
-// An origin, two clones of it on main, the seed commit both hold, and the clock commits read. [[spec/design_output/doors#the-git-door-carries-writes]]
+// An origin, two clones of it on main, the seed commit both hold, the clock commits read, and a lone repository on main holding no commit and no origin, its identity set on ask. [[spec/design_output/doors#the-git-door-carries-writes]]
 type world struct {
 	name        string
 	origin      Repo
 	here, there side
 	seed        string
 	at          func(second int64)
+	lone        func(identity bool) side
 }
 
 func worlds(t *testing.T) []world {
 	t.Helper()
-	return []world{realWorld(t), fakeWorld(t)}
+	return []world{
+		realWorld(t),
+		fakeWorld(t, "fake", func() files.Disk { return files.NewFakeDisk() }),
+		fakeWorld(t, "fake over a folder", func() files.Disk { return files.NewDisk(t.TempDir()) }),
+	}
 }
 
 func realWorld(t *testing.T) world {
@@ -69,9 +74,7 @@ func realWorld(t *testing.T) world {
 		}
 		return strings.TrimSpace(said.Out)
 	}
-	clone := func(root string) side {
-		raw(root, "config", "user.name", hand)
-		raw(root, "config", "user.email", handMail)
+	open := func(root string) side {
 		at := func(path string) string { return filepath.Join(root, filepath.FromSlash(path)) }
 		return side{
 			Repo: NewRepo(root, run),
@@ -102,6 +105,11 @@ func realWorld(t *testing.T) world {
 			cut:   func(branch string) { raw(root, "branch", branch) },
 		}
 	}
+	clone := func(root string) side {
+		raw(root, "config", "user.name", hand)
+		raw(root, "config", "user.email", handMail)
+		return open(root)
+	}
 	origin, here, there := t.TempDir(), t.TempDir(), t.TempDir()
 	raw(origin, "init", "--quiet", "--bare", "--initial-branch=main")
 	raw(here, "init", "--quiet", "--initial-branch=main")
@@ -112,19 +120,25 @@ func realWorld(t *testing.T) world {
 	raw(here, "push", "--quiet", "-u", "origin", "main")
 	raw(there, "clone", "--quiet", origin, ".")
 	w.there = clone(there)
+	w.lone = func(identity bool) side {
+		root := t.TempDir()
+		raw(root, "init", "--quiet", "--initial-branch=main")
+		raw(root, "config", "user.useConfigOnly", "true")
+		if identity {
+			return clone(root)
+		}
+		return open(root)
+	}
 	return w
 }
 
-func fakeWorld(t *testing.T) world {
+func fakeWorld(t *testing.T, name string, disk func() files.Disk) world {
 	t.Helper()
 	var clock atomic.Int64
 	clock.Store(seedSecond)
-	origin := NewFakeRepo(files.NewFakeDisk(), func() time.Time { return time.Unix(clock.Load(), 0) })
-	clone := func() side {
-		tree := files.NewFakeDisk()
-		repo := origin.Clone(tree)
-		repo.Set("user.name", hand)
-		repo.Set("user.email", handMail)
+	now := func() time.Time { return time.Unix(clock.Load(), 0) }
+	origin := NewFakeRepo(disk(), now)
+	open := func(repo *FakeRepo, tree files.Disk) side {
 		return side{
 			Repo: repo,
 			write: func(path, text string) {
@@ -168,7 +182,24 @@ func fakeWorld(t *testing.T) world {
 			},
 		}
 	}
-	w := world{name: "fake", origin: origin, here: clone(), at: clock.Store}
+	clone := func() side {
+		tree := disk()
+		repo := origin.Clone(tree)
+		repo.Set("user.name", hand)
+		repo.Set("user.email", handMail)
+		return open(repo, tree)
+	}
+	w := world{name: name, origin: origin, here: clone(), at: clock.Store}
+	w.lone = func(identity bool) side {
+		tree := disk()
+		repo := NewFakeRepo(tree, now)
+		repo.Set("user.useConfigOnly", "true")
+		if identity {
+			repo.Set("user.name", hand)
+			repo.Set("user.email", handMail)
+		}
+		return open(repo, tree)
+	}
 	w.here.write("README.md", seedText)
 	w.seed = w.here.commit("seed")
 	if pushed := w.here.Push("main", true); pushed.Err != "" {
@@ -776,6 +807,363 @@ func TestRepoRefsListsTheTrackingRefsUnderAPrefixWithTheirCommits(t *testing.T) 
 		want := []Ref{{Name: "refs/remotes/origin/work/a", Hash: w.seed}, {Name: "refs/remotes/origin/work/b", Hash: next}}
 		if said, err := w.here.Refs("refs/remotes/origin/work/"); err != nil || !reflect.DeepEqual(said, want) {
 			t.Errorf("the %s repo lists %+v, %v, and wants %+v", w.name, said, err, want)
+		}
+	}
+}
+
+// A merge of side into main, both changing README.md: the commit main holds, the commit side holds, and what the merge answers. [[spec/design_output/doors#the-git-door-carries-writes]]
+func merging(t *testing.T, w world) (ours, theirs string, conflicts []string, err error) {
+	t.Helper()
+	if err := w.here.Switch("side", true); err != nil {
+		t.Errorf("the %s repo's switch to a new side answers %v", w.name, err)
+	}
+	w.here.write("README.md", "side\n")
+	theirs = w.here.commit("side")
+	if err := w.here.Switch("main", false); err != nil {
+		t.Errorf("the %s repo's switch to main answers %v", w.name, err)
+	}
+	w.here.write("README.md", "main\n")
+	ours = w.here.commit("main")
+	conflicts, err = w.here.Merge("side")
+	return ours, theirs, conflicts, err
+}
+
+func TestRepoStagedNamesTheIndexChangesAgainstHeadAndReadsAStagedMoveAsAMove(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("keep.txt", "a line nobody else holds\n")
+		w.here.write("gone.txt", "gone\n")
+		w.here.commit("base")
+		w.here.remove("keep.txt")
+		w.here.write("moved.txt", "a line nobody else holds\n")
+		w.here.remove("gone.txt")
+		w.here.write("README.md", "changed\n")
+		w.here.write("new.txt", "new\n")
+		if err := w.here.AddAll(); err != nil {
+			t.Errorf("the %s repo's add of everything answers %v", w.name, err)
+		}
+		w.here.write("loose.txt", "loose\n")
+		want := []Change{{Status: "M", Path: "README.md"}, {Status: "D", Path: "gone.txt"}, {Status: "R", Path: "moved.txt", From: "keep.txt"}, {Status: "A", Path: "new.txt"}}
+		if said, err := w.here.Staged(nil); err != nil || !reflect.DeepEqual(byPath(said), want) {
+			t.Errorf("the %s repo stages %+v, %v, and wants %+v", w.name, said, err, want)
+		}
+		only := []Change{{Status: "M", Path: "README.md"}, {Status: "A", Path: "new.txt"}}
+		if said, err := w.here.Staged([]string{"README.md", "new.txt"}); err != nil || !reflect.DeepEqual(byPath(said), only) {
+			t.Errorf("the %s repo stages %+v, %v under the paths named, and wants %+v", w.name, said, err, only)
+		}
+	}
+}
+
+func TestRepoAddOfARemovedPathStagesItsDeletionAndAMovedFolderStagesBothSides(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("dir/a.txt", "a\n")
+		w.here.write("dir/b.txt", "b\n")
+		w.here.commit("dir")
+		w.here.remove("README.md")
+		w.here.remove("dir/a.txt")
+		w.here.remove("dir/b.txt")
+		w.here.write("moved/a.txt", "a\n")
+		w.here.write("moved/b.txt", "b\n")
+		if err := w.here.Add([]string{"README.md"}); err != nil {
+			t.Errorf("the %s repo's add of a removed path answers %v", w.name, err)
+		}
+		if err := w.here.Add([]string{"dir", "moved"}); err != nil {
+			t.Errorf("the %s repo's add of a moved folder answers %v", w.name, err)
+		}
+		for path, want := range map[string]bool{"README.md": false, "dir/a.txt": false, "dir/b.txt": false, "moved/a.txt": true, "moved/b.txt": true} {
+			if said := w.here.Tracked(path); said != want {
+				t.Errorf("the %s repo answers %v on whether its index holds %s after the add", w.name, said, path)
+			}
+		}
+		if _, err := w.here.Commit("moves", nil); err != nil {
+			t.Errorf("the %s repo's commit answers %v", w.name, err)
+		}
+		for _, path := range []string{"README.md", "dir/a.txt"} {
+			if said, ok := w.here.Show("HEAD", path); ok {
+				t.Errorf("the %s repo's commit holds %s as %q", w.name, path, said)
+			}
+		}
+		if said, ok := w.here.Show("HEAD", "moved/a.txt"); !ok || said != "a\n" {
+			t.Errorf("the %s repo's commit holds moved/a.txt as %q, %v", w.name, said, ok)
+		}
+	}
+}
+
+func TestRepoAddOfAPathStandingNowhereRefusesAndNamesThePath(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("a.txt", "a\n")
+		if err := w.here.Add([]string{"a.txt", "nowhere.txt"}); err == nil || !strings.Contains(err.Error(), "nowhere.txt") {
+			t.Errorf("the %s repo's add of a path standing nowhere answers %v", w.name, err)
+		}
+	}
+}
+
+func TestRepoTrackedAnswersTrueForAFolderHoldingATrackedPath(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("dir/deep/a.txt", "a\n")
+		w.here.commit("dir")
+		w.here.write("loose/b.txt", "b\n")
+		for path, want := range map[string]bool{"dir": true, "dir/deep": true, "loose": false, "nowhere": false} {
+			if said := w.here.Tracked(path); said != want {
+				t.Errorf("the %s repo answers %v on whether its index holds the folder %s", w.name, said, path)
+			}
+		}
+	}
+}
+
+func TestRepoResolvesAParentByItsSuffixAndNoSecondParentOnAPlainCommit(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("c.txt", "1\n")
+		next := w.here.commit("c1")
+		for _, ref := range []string{"HEAD~1", "HEAD^", "HEAD^1", next + "~1"} {
+			if said, ok := w.here.Resolve(ref); !ok || said != w.seed {
+				t.Errorf("the %s repo resolves %s to %q, %v, and the seed stands at %q", w.name, ref, said, ok, w.seed)
+			}
+		}
+		if said, ok := w.here.Resolve("HEAD^2"); ok || said != "" {
+			t.Errorf("the %s repo resolves a plain commit's second parent to %q, %v", w.name, said, ok)
+		}
+	}
+}
+
+func TestRepoSwitchMovesHeadAndTheWorkTreeAndCutsABranchOnAsk(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		if err := w.here.Switch("side", true); err != nil {
+			t.Errorf("the %s repo's switch to a new side answers %v", w.name, err)
+		}
+		if head, err := w.here.Head(); err != nil || head != "side" {
+			t.Errorf("the %s repo's head stands on %q, %v after the switch to a new side", w.name, head, err)
+		}
+		w.here.write("side.txt", "side\n")
+		w.here.commit("side")
+		if err := w.here.Switch("main", false); err != nil {
+			t.Errorf("the %s repo's switch to main answers %v", w.name, err)
+		}
+		if head, err := w.here.Head(); err != nil || head != "main" {
+			t.Errorf("the %s repo's head stands on %q, %v after the switch to main", w.name, head, err)
+		}
+		if said, ok := w.here.read("side.txt"); ok {
+			t.Errorf("the %s repo's work tree on main holds side.txt as %q", w.name, said)
+		}
+		if err := w.here.Switch("side", false); err != nil {
+			t.Errorf("the %s repo's switch back to side answers %v", w.name, err)
+		}
+		if said, ok := w.here.read("side.txt"); !ok || said != "side\n" {
+			t.Errorf("the %s repo's work tree on side holds side.txt as %q, %v", w.name, said, ok)
+		}
+		if err := w.here.Switch("no-such-branch", false); err == nil {
+			t.Errorf("the %s repo switches to a branch standing nowhere", w.name)
+		}
+		if err := w.here.Switch("main", true); err == nil {
+			t.Errorf("the %s repo cuts a branch standing already", w.name)
+		}
+	}
+}
+
+func TestRepoMergeOfAPathOneSideAloneChangesLandsClean(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		if err := w.here.Switch("side", true); err != nil {
+			t.Errorf("the %s repo's switch to a new side answers %v", w.name, err)
+		}
+		w.here.write("README.md", "side\n")
+		theirs := w.here.commit("side")
+		if err := w.here.Switch("main", false); err != nil {
+			t.Errorf("the %s repo's switch to main answers %v", w.name, err)
+		}
+		w.here.write("b.txt", "b\n")
+		ours := w.here.commit("main")
+		if said, err := w.here.Merge("side"); err != nil || len(said) != 0 {
+			t.Errorf("the %s repo's merge answers %v, %v", w.name, said, err)
+		}
+		for path, want := range map[string]string{"README.md": "side\n", "b.txt": "b\n"} {
+			if said, ok := w.here.read(path); !ok || said != want {
+				t.Errorf("the %s repo's work tree holds %s as %q, %v after the merge", w.name, path, said, ok)
+			}
+		}
+		for ref, want := range map[string]string{"HEAD^1": ours, "HEAD^2": theirs} {
+			if said, ok := w.here.Resolve(ref); !ok || said != want {
+				t.Errorf("the %s repo's merge commit holds %s at %q, %v, and wants %q", w.name, ref, said, ok, want)
+			}
+		}
+		if said, err := w.here.Unmerged(); err != nil || len(said) != 0 {
+			t.Errorf("the %s repo names %v, %v unmerged after a clean merge", w.name, said, err)
+		}
+	}
+}
+
+func TestRepoMergeThatConflictsNamesThePathLeavesItUnmergedAndMarksTheWorkTree(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		_, _, conflicts, err := merging(t, w)
+		if err == nil || !reflect.DeepEqual(conflicts, []string{"README.md"}) {
+			t.Errorf("the %s repo's merge answers %v, %v, and wants a conflict on README.md", w.name, conflicts, err)
+		}
+		if said, err := w.here.Unmerged(); err != nil || !reflect.DeepEqual(said, []string{"README.md"}) {
+			t.Errorf("the %s repo names %v, %v unmerged", w.name, said, err)
+		}
+		said, _ := w.here.read("README.md")
+		for _, mark := range []string{"<<<<<<<", "main\n", "=======", "side\n", ">>>>>>>"} {
+			if !strings.Contains(said, mark) {
+				t.Errorf("the %s repo's work tree holds README.md as %q, with no %q", w.name, said, mark)
+			}
+		}
+	}
+}
+
+func TestRepoResetOfPathsMidMergeLeavesTheMergeStanding(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		_, theirs, _, _ := merging(t, w)
+		w.here.write("README.md", "merged\n")
+		for _, paths := range [][]string{{"README.md"}, {"."}} {
+			if err := w.here.Add([]string{"README.md"}); err != nil {
+				t.Errorf("the %s repo's add answers %v", w.name, err)
+			}
+			if err := w.here.Reset(paths); err != nil {
+				t.Errorf("the %s repo's reset of %v answers %v", w.name, paths, err)
+			}
+			if said, ok := w.here.Resolve("MERGE_HEAD"); !ok || said != theirs {
+				t.Errorf("the %s repo holds MERGE_HEAD at %q, %v after the reset of %v, and the side stands at %q", w.name, said, ok, paths, theirs)
+			}
+		}
+	}
+}
+
+func TestRepoCommitMidMergeConcludesItWithTwoParents(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		ours, theirs, _, _ := merging(t, w)
+		w.here.write("README.md", "merged\n")
+		if err := w.here.Add([]string{"README.md"}); err != nil {
+			t.Errorf("the %s repo's add answers %v", w.name, err)
+		}
+		if _, err := w.here.Commit("merged", nil); err != nil {
+			t.Errorf("the %s repo's commit mid-merge answers %v", w.name, err)
+		}
+		for ref, want := range map[string]string{"HEAD^1": ours, "HEAD^2": theirs} {
+			if said, ok := w.here.Resolve(ref); !ok || said != want {
+				t.Errorf("the %s repo's commit holds %s at %q, %v, and wants %q", w.name, ref, said, ok, want)
+			}
+		}
+		if said, ok := w.here.Resolve("MERGE_HEAD"); ok {
+			t.Errorf("the %s repo still holds MERGE_HEAD at %q after the commit", w.name, said)
+		}
+		if said, ok := w.here.Show("HEAD", "README.md"); !ok || said != "merged\n" {
+			t.Errorf("the %s repo's merge commit holds README.md as %q, %v", w.name, said, ok)
+		}
+	}
+}
+
+func TestRepoSoftResetMovesHeadBackAndKeepsTheChangeStaged(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("a.txt", "a\n")
+		w.here.commit("a")
+		if err := w.here.SoftReset("HEAD~1"); err != nil {
+			t.Errorf("the %s repo's soft reset answers %v", w.name, err)
+		}
+		if said, ok := w.here.Resolve("HEAD"); !ok || said != w.seed {
+			t.Errorf("the %s repo's HEAD stands at %q, %v after the soft reset, and the seed stands at %q", w.name, said, ok, w.seed)
+		}
+		if said, want := status(t, w.here, false), []Change{{Status: "A ", Path: "a.txt"}}; !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo stands at %+v after the soft reset, and wants %+v", w.name, said, want)
+		}
+		if said, ok := w.here.read("a.txt"); !ok || said != "a\n" {
+			t.Errorf("the %s repo's work tree holds a.txt as %q, %v", w.name, said, ok)
+		}
+	}
+}
+
+func TestRepoUpdateRefOfMergeHeadOpensTheMergeAgain(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		ours, theirs, _, _ := merging(t, w)
+		w.here.write("README.md", "merged\n")
+		if err := w.here.Add([]string{"README.md"}); err != nil {
+			t.Errorf("the %s repo's add answers %v", w.name, err)
+		}
+		if _, err := w.here.Commit("merged", nil); err != nil {
+			t.Errorf("the %s repo's commit mid-merge answers %v", w.name, err)
+		}
+		if err := w.here.SoftReset("HEAD~1"); err != nil {
+			t.Errorf("the %s repo's soft reset answers %v", w.name, err)
+		}
+		if err := w.here.UpdateRef("MERGE_HEAD", theirs); err != nil {
+			t.Errorf("the %s repo's update of MERGE_HEAD answers %v", w.name, err)
+		}
+		if said, ok := w.here.Resolve("MERGE_HEAD"); !ok || said != theirs {
+			t.Errorf("the %s repo holds MERGE_HEAD at %q, %v, and the side stands at %q", w.name, said, ok, theirs)
+		}
+		if _, err := w.here.Commit("merged again", nil); err != nil {
+			t.Errorf("the %s repo's commit of the merge opened again answers %v", w.name, err)
+		}
+		for ref, want := range map[string]string{"HEAD^1": ours, "HEAD^2": theirs} {
+			if said, ok := w.here.Resolve(ref); !ok || said != want {
+				t.Errorf("the %s repo's commit holds %s at %q, %v, and wants %q", w.name, ref, said, ok, want)
+			}
+		}
+	}
+}
+
+func TestRepoCommitWhereNoIdentityStandsRefusesAndLeavesTheIndex(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		lone := w.lone(false)
+		lone.write("a.txt", "a\n")
+		if err := lone.Add([]string{"a.txt"}); err != nil {
+			t.Errorf("the %s repo's add answers %v", w.name, err)
+		}
+		if hash, err := lone.Commit("no hand", nil); err == nil {
+			t.Errorf("the %s repo commits with no identity as %q", w.name, hash)
+		}
+		if said, want := status(t, lone, false), []Change{{Status: "A ", Path: "a.txt"}}; !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo stands at %+v after the refused commit, and wants %+v", w.name, said, want)
+		}
+	}
+}
+
+func TestRepoPushWithNoOriginRefusesAndSaysWhy(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		lone := w.lone(true)
+		lone.write("a.txt", "a\n")
+		lone.commit("a")
+		if pushed := lone.Push("main", false); pushed.OK || !strings.Contains(pushed.Err, "origin") {
+			t.Errorf("the %s repo's push with no origin answers %+v", w.name, pushed)
+		}
+	}
+}
+
+func TestRepoHeadBeforeTheFirstCommitAnswersAFault(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		if head, err := w.lone(true).Head(); err == nil {
+			t.Errorf("the %s repo names %q before its first commit", w.name, head)
+		}
+	}
+}
+
+func TestRepoHistoryListsTheCommitsTouchingAPathNewestFirst(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		w.here.write("a.txt", "1\n")
+		first := w.here.commit("a1")
+		w.here.write("b.txt", "b\n")
+		w.here.commit("b1")
+		w.here.write("a.txt", "2\n")
+		second := w.here.commit("a2")
+		want := []Commit{{Hash: second, Subject: "a2"}, {Hash: first, Subject: "a1"}}
+		if said, err := w.here.History("a.txt"); err != nil || !reflect.DeepEqual(said, want) {
+			t.Errorf("the %s repo's history of a.txt answers %+v, %v, and wants %+v", w.name, said, err, want)
+		}
+		if said, err := w.here.History("missing.txt"); err != nil || len(said) != 0 {
+			t.Errorf("the %s repo's history of a path no commit touches answers %+v, %v", w.name, said, err)
 		}
 	}
 }

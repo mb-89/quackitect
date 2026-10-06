@@ -1,6 +1,6 @@
 // The git door that carries writes: the typed operations the pull runs, each one
 // git command line in the real door over a process runner, and FakeRepo beside
-// it on a FakeDisk work tree. [[spec/design_output/doors#the-git-door-carries-writes]]
+// it on a work tree any Disk holds. [[spec/design_output/doors#the-git-door-carries-writes]]
 package git
 
 import (
@@ -68,6 +68,12 @@ type Repo interface {
 	StagedAdds(only []string) ([]Line, error)
 	Rebase(onto string) error
 	Refs(prefix string) ([]Ref, error)
+	Staged(only []string) ([]Change, error)
+	SoftReset(ref string) error
+	UpdateRef(name, hash string) error
+	History(path string) ([]Commit, error)
+	Switch(name string, create bool) error
+	Merge(ref string) ([]string, error)
 }
 
 type door struct {
@@ -106,21 +112,27 @@ func (one *door) Unmerged() ([]string, error)                { return nil, nil }
 func (one *door) StagedAdds([]string) ([]Line, error)        { return nil, nil }
 func (one *door) Rebase(string) error                        { return nil }
 func (one *door) Refs(string) ([]Ref, error)                 { return nil, nil }
+func (one *door) Staged([]string) ([]Change, error)          { return nil, nil }
+func (one *door) SoftReset(string) error                     { return nil }
+func (one *door) UpdateRef(string, string) error             { return nil }
+func (one *door) History(string) ([]Commit, error)           { return nil, nil }
+func (one *door) Switch(string, bool) error                  { return nil }
+func (one *door) Merge(string) ([]string, error)             { return nil, nil }
 
-// A repository in memory: commits keyed by the hash of their content, the refs, HEAD, the index, a config, an origin, and the work tree on a FakeDisk. [[spec/design_output/doors#the-git-door-carries-writes]]
+// A repository in memory: commits keyed by the hash of their content, the refs, HEAD, the index, a config, an origin, and the work tree on a Disk, a FakeDisk or a real folder. [[spec/design_output/doors#the-git-door-carries-writes]]
 type FakeRepo struct {
-	tree   *files.FakeDisk
+	tree   files.Disk
 	now    func() time.Time
 	origin *FakeRepo
 }
 
 // [[spec/design_output/doors#the-git-door-carries-writes]]
-func NewFakeRepo(tree *files.FakeDisk, now func() time.Time) *FakeRepo {
+func NewFakeRepo(tree files.Disk, now func() time.Time) *FakeRepo {
 	return &FakeRepo{tree: tree, now: now}
 }
 
 // A clone of this repository on a work tree of its own, with this one as its origin and origin's head checked out. [[spec/design_output/doors#the-git-door-carries-writes]]
-func (one *FakeRepo) Clone(tree *files.FakeDisk) *FakeRepo {
+func (one *FakeRepo) Clone(tree files.Disk) *FakeRepo {
 	return &FakeRepo{tree: tree, now: one.now, origin: one}
 }
 
@@ -155,3 +167,9 @@ func (one *FakeRepo) Unmerged() ([]string, error)                { return nil, n
 func (one *FakeRepo) StagedAdds([]string) ([]Line, error)        { return nil, nil }
 func (one *FakeRepo) Rebase(string) error                        { return nil }
 func (one *FakeRepo) Refs(string) ([]Ref, error)                 { return nil, nil }
+func (one *FakeRepo) Staged([]string) ([]Change, error)          { return nil, nil }
+func (one *FakeRepo) SoftReset(string) error                     { return nil }
+func (one *FakeRepo) UpdateRef(string, string) error             { return nil }
+func (one *FakeRepo) History(string) ([]Commit, error)           { return nil, nil }
+func (one *FakeRepo) Switch(string, bool) error                  { return nil }
+func (one *FakeRepo) Merge(string) ([]string, error)             { return nil, nil }
