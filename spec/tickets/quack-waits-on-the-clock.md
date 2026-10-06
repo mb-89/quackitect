@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,20 @@ record:
         hash: c1f5561bef3f8127
         size: 367
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: b10e5c67cd94cab42b1fc00ae125b099bd139441
+    hash_after: b10e5c67cd94cab42b1fc00ae125b099bd139441
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: 3157324235f0a831
+        size: 2043
+    def: 08e16d07b0de477c
+depends_on: [go-waits-on-events]
 ---
 
 # Ask
@@ -232,26 +246,32 @@ the first done_when line falls to TestNoRootFileReadsTheClockPastItsHand and `./
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/quack_clock_tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case names each read of the time and each wait in a production file of the root, matching what `./RUNME.sh doors` lists there for the clock. The `box_doors_test.go` case on a stamped time follows once `q.Clock` lands from `go-waits-on-events`, which this ticket now names under depends_on.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the case names its claim and asserts it per walk-around, naming the file, line and name
+the case reads the tree and writes nothing
+the case goes red on each read the change moves onto the hand, as the run shows
 
 # gate
 
