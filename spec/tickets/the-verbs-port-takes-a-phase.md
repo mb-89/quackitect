@@ -33,7 +33,20 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/person]]
 process_hash: 781b200dbb69dec3
-step: do
+step: follow
+record:
+  - step: do
+    hand: box d8921a909c1fa5 · claude-code-remote
+    hash_before: d3e2821000a6b044431bcd96aa07620ae00fbf5a
+    hash_after: d3e2821000a6b044431bcd96aa07620ae00fbf5a
+    inputs:
+      - name: ask
+        hash: a9f73d8a03b7f98b
+        size: 822
+      - name: [[spec/tickets/the-verbs-leave-node]]
+        hash: ad7b41ebfb9eacde
+        size: 305
+    def: c093c04dc9e56675
 ---
 
 # Ask
@@ -55,8 +68,9 @@ The commands, in order:
 ## result
 
 <!-- what came back, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+A new phase 11, key migration.phase11, decided by the owner on the coordinator report.
 
 # follow
 
