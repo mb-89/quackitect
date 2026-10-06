@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 48ed21662d6469fb
         size: 2044
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: c4430eac27561b8e67b79cf452e78d1eaf5a340e
+    hash_after: c4430eac27561b8e67b79cf452e78d1eaf5a340e
+    inputs:
+      - name: design/draft
+        hash: 48ed21662d6469fb
+        size: 2044
+      - name: design/tests-red
+        hash: 8a9506635862836c
+        size: 722
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -264,8 +276,10 @@ Both cases fail on their assertion: the stub leaves the door in its starter's gr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- door-outlives-taskkill-tree: ending_windows.go ends a child with taskkill /T /F, which walks the parent-child tree by parent pid; a new process group with no console leaves the door in that tree while the quack verb that spawned it still runs, so on Windows the check's kill still ends the door. The Windows half wants a road that breaks the parent link, such as a short-lived starter that spawns the door and exits, and a windows-tagged case, since both red tests stand under !windows.
 
 # implement
 
