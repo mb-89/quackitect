@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: b8bcc39ac74d8475
         size: 1578
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: e9878292e920630d4b8247ab7aebb224b72c4b4a
+    hash_after: e9878292e920630d4b8247ab7aebb224b72c4b4a
+    inputs:
+      - name: design/draft
+        hash: b8bcc39ac74d8475
+        size: 1578
+      - name: design/tests-red
+        hash: 64b0da3c99b2f4a9
+        size: 687
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,9 @@ The three cases fail on their assertions once a stub ready stands on the door: t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
