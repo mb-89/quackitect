@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 283a836c5dc3b6225a9a5bf6d044eb1e3c1c50b9
+    hash_after: 283a836c5dc3b6225a9a5bf6d044eb1e3c1c50b9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes; green, src/imports passes; green, src/modules/check passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  115.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: ecab8a8b14de3f80
+        size: 1458
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -361,26 +384,33 @@ the owned names stand once, in the `owns.yaml` beside each door, and the analyze
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns src/imports src/modules/check src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every door now carries an `owns.yaml` naming the Go packages and members, and the JS names, it owns. `src/owns` reads those declarations. The `walkaround` analyzer in `src/imports` and the `WalksAroundADoor` rule in `src/modules/check` name an owned name used outside its door. `DoorDeclares` names a door with no declaration. The import rules take their lists off the declarations in place of hand-kept ones, so a new door adds its file and nothing else. Every door stands at report, so the check lists the walk-arounds and stays green while they remain.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/owns`, the declarations, `src/imports`, `src/modules/check` and the doors verb, every one inside the ask
+the change reaches no door, it reads their declarations, so no fake joins
+the header of `src/imports/walkaround.go` points at the design section on what a door declares
+the owned names stand once, in the `owns.yaml` beside each door
 
 # accept
 
