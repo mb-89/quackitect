@@ -36,6 +36,9 @@ func TestTheBlackboxGuardNamesTrackedInPackageTests(t *testing.T) {
 		if said := one.Names([]string{"x/x.go", "x/x_test.go", "y/y_test.go"}, read); !slices.Equal(said, []string{"x/x_test.go"}) {
 			t.Fatalf("the blackbox guard names %v over the tracked files", said)
 		}
+		if one.PackageOf == nil || one.PackageOf("x/y/y_test.go") != "x/y" {
+			t.Fatal("the blackbox guard counts an offender by no folder")
+		}
 		if imports.BaselineOf(one.Name) != "src/imports/baseline/blackbox.txt" {
 			t.Fatalf("the blackbox baseline stands at %q", imports.BaselineOf(one.Name))
 		}

@@ -83,7 +83,7 @@ func TestCheckParts(t *testing.T) {
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules"}
+		want := []string{"tests", "level0", "go", "doors", "guards", "projections", "plugin", "server", "rules"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
