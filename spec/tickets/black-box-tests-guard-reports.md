@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 8d8e9a9fb091558f46ca6ca06a389bfd259acaf6
+    hash_after: 8d8e9a9fb091558f46ca6ca06a389bfd259acaf6
+    inputs:
+      - name: ask
+        hash: 47799efb83a652b4
+        size: 831
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -162,38 +171,59 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/model#the-guards-hold-a-baseline]]. A pure function, `InPackageTests`, in `src/imports/blackbox.go` names each Go test file whose package clause lacks `_test` and carries no marker. A pure `Compare` in `src/imports/guards.go` reads a baseline against what a guard names. The verb `guards` in `src/quack/verb_guards.go` walks the tracked test files, parses each, and prints the compare. The check runs the verb as its part `guards`, after `doors`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/check.go` `partsOf`, which gains the part
+- `src/modules/verbs/tree.go`, the verb list, which gains the verb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/imports/blackbox_test.go` `TestAnInPackageTestFileIsNamed`
+- `src/imports/blackbox_test.go` `TestAMarkedOrBlackBoxFileIsSpared`
+- `src/imports/guards_test.go` `TestACompareNamesNewOffendersAndStaleLines`
+- `src/quack/verb_guards_test.go` `TestTheGuardsReportAnswersZeroAndNamesEachOffender`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/imports/blackbox.go`
+- `src/imports/blackbox_test.go`
+- `src/imports/guards.go`
+- `src/imports/guards_test.go`
+- `src/imports/baseline/blackbox.txt`
+- `src/quack/verb_guards.go`
+- `src/quack/verb_guards_test.go`
+- `src/quack/check.go`
+- `src/modules/verbs/tree.go`
+- `spec/design_output/model.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `partsOf`, the doors verb, the serial guard and the walk-around guard stand opened, and the verb copies their shape
+- the two callers stand listed, and nothing else calls the new functions
+- each done_when line meets a test the tests line names
 
 ## tests-red
 

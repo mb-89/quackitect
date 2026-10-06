@@ -891,6 +891,33 @@ the Go code, and the Vale rules keep the JavaScript that stays. The code holds
 `nodoor` and `noname` today, and [[spec/tickets/analyzers-read-the-io-flag]]
 replaces them.
 
+## The guards hold a baseline
+
+A guard reads the tree's source and names each offender of one rule of
+[[spec/guidance/code/testing]] or [[spec/guidance/code/code]]. Its function
+stands pure in `src/imports`, and takes parsed files or a file list.
+
+| the guard | what it names | the marker sparing a line |
+|---|---|---|
+| `blackbox` | a Go test file whose package clause lacks `_test` | `level0: InPackageTest - <why>` on the clause or in the file's doc |
+
+Each guard keeps a baseline, `src/imports/baseline/<guard>.txt`, one offender
+a line. The baseline holds the offenders standing on the guard's first commit.
+
+`./RUNME.sh guards` runs every guard over the tracked tree and reads each
+baseline. It prints each offender standing outside the baseline, and each
+baseline line the guard no longer names. The check runs it as its part
+`guards`.
+
+| the mode | a new offender | a stale baseline line |
+|---|---|---|
+| report | printed, and the verb answers 0 | printed, and the verb answers 0 |
+| refuse | printed, and the verb answers 1 | printed, and the verb answers 1 |
+
+`./RUNME.sh guards --update` writes each baseline again. In report mode it
+writes what the guard names. In refuse mode it drops the stale lines alone, so a
+baseline only shrinks, and a new offender takes a marker with its reason.
+
 # Operations
 
 Operations: the record every call takes, the wait a caller sets, the states,
