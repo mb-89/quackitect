@@ -86,7 +86,16 @@ record:
   - step: sync
     hand: box 2dca9acd8cb4 · claude-code-remote
     hash_before: 10bb4e6ec233a0ffdfe8fb73c1040abf7c2e51cf
-step: sync
+  - step: sync
+    hand: box 2dca9acd8cb4 · claude-code-remote
+    hash_before: b0e9a317a0d81bd8c968b1216b21b4a620e3e0d4
+    hash_after: b0e9a317a0d81bd8c968b1216b21b4a620e3e0d4
+    answered:
+      - name: sync
+        exit: 0
+        said: work/examples-are-the-tests already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -100,8 +109,9 @@ The design of examples stands written: one Markdown file a behavior is tutorial,
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
