@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: da6b82b36b3b0ae9a060f36b88ec16f15d80ad71
+    hash_after: da6b82b36b3b0ae9a060f36b88ec16f15d80ad71
+    inputs:
+      - name: ask
+        hash: f75794b80ce4ceff
+        size: 330
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,54 @@ Each port group looks for orphans by hand with a script it throws away, or misse
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The accept step of `spec/processes/group.yaml` reads `./RUNME.sh branch review <name>`, per `spec/guidance/review/reviewing.md`. `gather` in `src/branches/review.go` gains `Unreached`, filled by a new `(*Doors).unreached` in `src/branches/unreached.go`. It lists the Go files `git diff --name-only --no-renames --diff-filter=A <trunk>...<ref>` adds, takes the module off `go.mod`, and per folder counts it reached where a new file says `package main`, the folder holds tests alone or sits under `testdata`, or `git grep` finds the folder's import path in a Go file past the folder. `report` adds an `unreached` row naming each file, and counts it one fix, so the review refuses the group until a hand wires or drops the package. The word is unreached, since `spec/vocabulary/terms.yml` gives orphan to a branch sharing no history with main. `spec/design_output/review.md` gains the row and the count.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/branches/review.go gather
+src/branches/review.go report
+src/branches/review.go review
+src/branches/branch.go init, the review row of the verb table
+src/quack/review.go gatheredOf, which decodes the material and ignores the new key
+src/bridge/review.js reviewsBranch
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/branches/unreached_test.go TestTheReviewNamesAPackageNothingImports
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/branches/unreached.go
+src/branches/unreached_test.go
+src/branches/review.go
+spec/design_output/review.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+review.go gather, report and material, group.yaml accept and reviewing.md rule 10 stand opened, and terms.yml defines orphan
+the callers come from a grep of gather, report and material over src
+the one done_when line meets TestTheReviewNamesAPackageNothingImports
 
 ## tests-red
 
