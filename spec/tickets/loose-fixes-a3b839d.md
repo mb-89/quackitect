@@ -17,7 +17,7 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
+    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on", "each child names what it reads from its siblings, and the children land in that order", "a group whose diff grows past one review splits into a group of its own before it grows further"]
     evidence:
       - name: children
         form: list
@@ -62,7 +62,8 @@ steps:
             says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
-            says: how each bad line stops happening, named by its home
+            home: true
+            says: how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks
           - name: thoughts
             form: text
             says: what the thoughts say that the actions do not, off the transcript
@@ -81,15 +82,23 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 5d4a884bfb2491ff
+process_hash: d9f9539fef3ec913
+fix: true
 cloud: true
 ---
 
 # Ask
 
-Examples run as the behavior tests and read as the tutorial, as [[spec/design_output/examples]] designs them. A schema and one parser read an example into steps. A Go harness runs every example inside the check over faked doors, and a verb runs one detached against the real system in a scratch clone.
+The loose agent tickets on main land in this fix group, per [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]].
 
-A Tutorial tab explores them with a two-mode search. The coverage checks report the gaps, and the retro counts them. The first chapters stand, and the tests they make redundant leave. Each guard lands in report mode, and turns to refuse once the tree meets it.
+A fix group closes every ticket it holds. Work a person alone can do leaves it on the person route, loose on main.
+
+- every ticket naming this group closes through the command it names
+- `./RUNME.sh check` exits 0
+
+The view: none.
+
+The source: none.
 
 # sync
 
@@ -165,7 +174,7 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
+<!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
 
 <!-- the form is list -->
 
