@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-depends_on: [tests-meet-the-doors-once]
+depends_on: [tests-meet-the-doors-once, a-live-branch-holds-its-dependents]
 step: implement/change
 record:
   - step: design/owner-read
