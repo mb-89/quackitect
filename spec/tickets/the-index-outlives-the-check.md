@@ -338,3 +338,5 @@ Both cases fail on their assertion: the stub leaves the door in its starter's gr
 <!-- what anybody adds, at any time, on this ticket -->
 
 This ticket carries the test run of [[spec/tickets/ending-windows-tree-tested]], which closed `became` onto it. Its change landed: `endsWhole` ends the child's tree through `ending_unix.go` and `ending_windows.go`, and `ending_windows_test.go` proves the Windows road on the `windows-latest` runner. Its unix case shares `src/quack/ending_test.go` with this ticket's red case, so the tests-green here runs both.
+
+This ticket also carries the tests-green step of [[spec/tickets/the-check-ends-what-it-drops]], which closed `became` onto it for the same file. That ask reads: `go test ./src/quack/` passes a case where a child the Vale call gives up on, and a process it starts, both stand ended once the call returns.
