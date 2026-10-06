@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: f6de9d513d415d65
         size: 783
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 652294ed547ae8be41197a23e85767752ecb7bf0
+    hash_after: 652294ed547ae8be41197a23e85767752ecb7bf0
+    answered:
+      - name: lint
+        exit: 0
+        said: "    1.6  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -296,14 +305,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches src/pull/pull.go, pull_holds.go, ticket_at.go and pull_test.go: the draft's size list plus Pull, which the gate's child names.
+The change reaches the disk alone, through the Disk door, and FakeDisk and the cloudPull clone cover it.
+workingTodo and Pull each carry a link to the ticket whose approach they implement.
+The plan read stands once in planWorking, and the ticket test reuses TicketAt.
 
 ## tests-green
 
