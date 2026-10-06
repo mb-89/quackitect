@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -101,6 +101,15 @@ record:
         exit: 0
         said: work/dead-tests-and-code-leave already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 34eba3f85616 · claude-code-remote
+    hash_before: e86f1d4f5ccbff7c139c8b58d3bf9a1bde25da07
+    hash_after: e86f1d4f5ccbff7c139c8b58d3bf9a1bde25da07
+    inputs:
+      - name: ask
+        hash: 0c167c1dcc40d01c
+        size: 477
+    def: 19b6849b1f151cd5
 cloud: true
 ---
 
@@ -132,14 +141,26 @@ The check spends its time on code nothing loads and on comparisons whose migrati
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/dead-go-goldens-leave]], trivial
+- [[spec/tickets/dead-js-tests-leave]], trivial
+- [[spec/tickets/js-take-path-leaves]], trivial
+- [[spec/tickets/one-config-reader-decides]], trivial
+- [[spec/tickets/branches-fixtures-copy-a-template]], trivial
+- [[spec/tickets/restated-tests-merge]], trivial
+- [[spec/tickets/tests-guidance-note-lands]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child landed as its own few commits, small enough to review whole
+- the children add up to the goal: dead tests and code leave, restated tests merge, one config reader decides, and the rules keep it so
+- no child waits on another now, since every child stands closed
+- the guidance child read the audit draft and the examples note, and landed last
+- the diff stays one group, since the goal is one cut and no child grew past its own review
 
 # children
 
