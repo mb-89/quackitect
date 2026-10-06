@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,7 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
-group: javascript-leaves
-step: gate
+process_hash: c671f20a6ae2a4a6
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +143,7 @@ record:
         hash: 0a94dea3fed559cf
         size: 7272
     def: 08e16d07b0de477c
+group: javascript-leaves
 ---
 
 # Ask
