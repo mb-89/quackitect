@@ -4,6 +4,8 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"time"
 
 	"quackitect/src/failure"
@@ -16,6 +18,12 @@ type sentinelClock interface {
 }
 
 // The hand the hooks door hears each post through, over a sentinel on the registry the reader holds. [[spec/tickets/the-hooks-feed-the-sentinel]]
-func sentinelOver(from failure.Reader, clock sentinelClock, run failure.Runner, say func(row map[string]any) error) func(failure.Event) {
-	return func(failure.Event) {}
+func sentinelOver(from failure.Reader, clock sentinelClock, run failure.Runner, say func(row map[string]any) error, errs io.Writer) func(failure.Event) {
+	// The fire hand answers nothing, so a row the log refuses prints here, and a lost row shows. [[spec/tickets/sentinel-say-error-lands]]
+	fire := func(raised failure.Raised) {
+		if err := say(raised.Row(clock.Now().UTC().Format(logStamp))); err != nil {
+			fmt.Fprintf(errs, "the sentinel lost the row of %s: %v\n", raised.ID, err)
+		}
+	}
+	return failure.NewSentinel(failure.Load(from), clock, fire, run).Hear
 }
