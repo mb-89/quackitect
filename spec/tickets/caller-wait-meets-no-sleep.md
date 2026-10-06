@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["the-testing-rules-name-the-doors"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 0d0d629cd5092214d5ba69528a8b9e5412fe2250
+    hash_after: 0d0d629cd5092214d5ba69528a8b9e5412fe2250
+    inputs:
+      - name: ask
+        hash: 519f80ce0658be38
+        size: 556
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,52 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Book.Wait reads the wall clock through time.After, against rule 8 of the testing guidance. The book takes its timer as a field, after, which NewBook fills with time.After, and Wait arms its span through it. The case on a wait with no handle hands in an after that signals the first time a wait arms. WaitCaller reads the open operations before its first Wait, so the case closes the gate on that signal, and calls no time.Sleep. Its row leaves the family table.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/index/call.go Call, through b.Wait
+- src/modules/index/call.go WaitCaller, through b.Wait
+- src/modules/index/ops.go NewBook, which fills the field
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/index/call_test.go TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations, on the signal
+- src/modules/index/call_test.go TestAWaitArmsItsSpanThroughTheBooksTimer
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/index/ops.go
+- src/modules/index/call.go
+- src/modules/index/call_test.go
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Book, NewBook, Wait, WaitCaller, bookOf and the case stand opened, and WaitCaller reads Open before its first Wait
+- the callers come off a grep of .Wait( under src, where hooks and mcp call tool.Wait, another function
+- the first done_when line meets both cases and the real-wait guard, the second the guard over the narrowed row, the third the check
 
 ## tests-red
 
