@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -143,6 +143,15 @@ record:
         hash: 0a94dea3fed559cf
         size: 7272
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: f324afeb35937d52f8be51e7cc46045203b27041
+    hash_after: f324afeb35937d52f8be51e7cc46045203b27041
+    inputs:
+      - name: ask
+        hash: 447757a42396b889
+        size: 610
+    def: c01ae0f2ace0cecb
 group: javascript-leaves
 ---
 
@@ -202,7 +211,7 @@ none
 17. The stub bridgehead drops its /event probe and always runs the standing, which starts a door where none answers.
 Weighed: raw transcript rows break the body cap, so the forwarder keeps the field cut, and Go keeps the selection.
 Weighed: a box with neither binary nor sh runs uncaged and says so, against a second copy of the guard in JavaScript.
-Assumed: copilot-hooks-run-in-go, probes-leave-node and session-start-leaves-node land first and remove the scripts importing cage.js.
+Assumed: copilot-hooks-run-in-go and probes-leave-node land first and remove copilot-door.js, probe-dry.js and copilot.test.js, the scripts still importing cage.js.
 
 ### callers
 
@@ -222,8 +231,9 @@ Assumed: copilot-hooks-run-in-go, probes-leave-node and session-start-leaves-nod
 - .claude/skills/level0/hooks/pull-tool.js: register
 - src/stub/.claude/skills/level0/hooks/bridgehead.js: starts
 - src/scripts/serve.js: startOf and servesHere
-- src/scripts/boot.js, probe-cold.js, probe-dry.js, copilot-door.js: import the hook files, and leave first under their own children
-- test/level0: hooks, cage, caged-door, door-spawn, door-clear, read-tools, hand, level1, bridgehead, serve and vale-rows tests
+- src/scripts/copilot-door.js and probe-dry.js: import cage.js, and leave first under their own children
+- test/level0/copilot.test.js: imports refusedText from cage.js, and leaves under copilot-hooks-run-in-go
+- test/level0: hooks, cage, caged-door, door-spawn, door-clear, read-tools, hand, level1, bridgehead, serve, clear, shape, start, start-constants, transcript and vale-rows tests
 - test/contract/tree.test.js: the session file copy case
 
 ### tests
@@ -260,7 +270,7 @@ Assumed: copilot-hooks-run-in-go, probes-leave-node and session-start-leaves-nod
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- first: no review has read this draft, and the send-back came from the process change, which adds the config key line to the checklist
 
 ### size
 
@@ -325,9 +335,10 @@ Assumed: copilot-hooks-run-in-go, probes-leave-node and session-start-leaves-nod
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- a helper opened every hook file, the stub bridgehead and the Go door files, and I checked the /event road, the lib imports and the cage key in migration.go
-- the callers come off a git grep on each hook file, each lib import, the session file, Pulling and /event, across src, test and .claude
-- the two hooks_folder_test.go cases decide the grep lines, the spawn, probe and session cases the go test line, the dry probe's whole run and a live run line four, and a live check line five
+- I reopened the hook files, migration.go, hook_down.go and the Go door files on this commit, and checked the lib imports, the /event road, the cage key and configOf there
+- the callers come off a git grep on each hook file, each lib import, the session file, Pulling and /event, rerun after the sync, which moved boot.js out and copilot.test.js in
+- the two hooks_folder_test.go cases decide the grep lines, the spawn, probe and session cases the go test line, the dry probe's whole run line four, and a live check line five
+- the approach adds no config key: it drops the cage key read from level0.js, and the down word and --spec ride the verb's arguments
 
 ## tests-red
 
