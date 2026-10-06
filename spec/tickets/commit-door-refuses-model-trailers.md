@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ada1bd682add724a
         size: 1023
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 7307b48f86ceff9a82e784a0ff7d95ac42b06b1b
+    hash_after: 7307b48f86ceff9a82e784a0ff7d95ac42b06b1b
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.4  test/contract/one-reading.test.js the lint reads each row of the sweep once"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the door landed in commit 080c3e8b7 under model-trailer-refuses-in-place, over src/modules/hooks and src/quack/commit.go with their tests, and this step adds no file.
+every door the change reaches has a fake: TestCommitVerbRefusesAModelTrailer drives ./RUNME.sh commit over a fake root in src/quack, and TestModelTrailersRefusesATrailerNamingAModel reads a message in memory.
+a comment names the approach the change implements: voice.go points at spec/design_output/bash#a-commit-message-meets-voice beside the trailer pattern.
+every fact the change adds stands in one place: ModelTrailers in voice.go owns the pattern, and src/quack/commit.go and src/modules/hooks/commits.go call it.
 
 ## tests-green
 
