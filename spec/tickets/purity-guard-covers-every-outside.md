@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 713ee8631d99f8135d7445fd16fed311674562df
+    hash_after: 713ee8631d99f8135d7445fd16fed311674562df
+    inputs:
+      - name: ask
+        hash: 3856e19de93035cd
+        size: 649
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,94 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The change builds on `src/owns` and the `owns.yaml` declarations of the doors-declare-what-they-own group, and adds only the gaps the Discussion table names. Assumption: that group merges into `main` before tests-red, and tests-red opens on `./RUNME.sh branch sync`; the tests name `src/owns` and build on no branch without it.
+
+1. Declare what a door already reaches, each at `report`, so the check stays green and `./RUNME.sh doors` lists the walk-arounds for the migration tickets:
+   - files: `src/modules/files/owns.yaml` owns `path/filepath.Abs`, `EvalSymlinks`, `Glob`, `Walk` and `WalkDir`.
+   - network: `src/index` and `src/tui/registry` own `net/http/httptest`.
+   - random numbers: `src/index`, `src/modules/hooks`, `src/modules/lsp` and `src/modules/mcp` own `crypto/rand`, the token each reads.
+   - the index: `src/index` owns `database/sql`, and `src/quack` and `src/tui` own the reach members `quackitect/src/index.Ask`, `Open`, `Dial`, `StartBus`, `Serve`, `ServeManaged` and `Main`, which the member form of a `go` name already holds.
+2. Add a `run` key to a declaration: the programs a door runs. `src/modules/git` declares `run: [git]`; `src/branches`, `src/pull`, `src/quack` and `src/index` declare it at `report`. `goWalks` reads a run in argv form: a run name opening a `[]string` literal, or a call argument with another argument after it. A comparison, a map key and a struct field naming `git` run nothing, and walk nowhere.
+3. Add `owns.Unheld`, the Go names reaching the outside that no door may own: `math/rand`, `math/rand/v2`, `io/ioutil`, `crypto/tls`, `net/rpc`, `net/smtp`, `os/user`, `log/syslog`, `plugin`. `Walks` names every use of one as a walk-around of no door, never at report, so an unmarked use refuses at once; no Go file imports one today. The `level0: OutsideInDoors - <why>` marker passes it. `floor` in `src/imports/imports.go` becomes `owns.Unheld` plus the names onlyq refuses a module beyond the outside (`io/fs`, `unsafe`, `runtime/cgo`), so the list stands once.
+4. `owns.Kinds` maps each of the seven kinds onto its Go names, and a tree test holds every name declared by a door or held in `Unheld`, so a kind gaining a name meets the guard.
+5. `spec/design_output/doors.md#a-door-declares-what-it-owns` gains the `run` row and the `Unheld` paragraph.
+
+The JavaScript side stays out: the javascript-leaves group deletes it, and `DoorsOnly` holds it until then.
+
+Weighed: one `random` door module against declaring `crypto/rand` on the four doors reading a token. Four doors each need a token once at start, and a door module costs a fake and a contract test for one call; the declarations cost four lines. The strongest objection: `Unheld` refusing at once breaks a hand importing `math/rand` tomorrow. Answer: that is the ask, and the marker names its way through.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/imports/walkaround.go WalkFaults, through owns.Walks
+- src/modules/check/doors.go walkFaults, through owns.Walks
+- src/modules/check/doors.go doorsOf, through owns.Read
+- src/quack/verb_doors.go walksOver, through owns.Read and owns.Walks
+- src/imports/imports.go Doors, through owns.Read
+- src/imports/imports.go pastQ, through impure and floor
+- src/imports/imports_test.go TestEveryPureReaderImportsThePureLibraryAlone, through impure
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/imports/walkaround_test.go TestARandomReadNoDoorOwnsIsNamed
+- src/imports/walkaround_test.go TestAMarkedRandomReadIsNamedByNone
+- src/imports/walkaround_test.go TestATokenReadOutsideItsDoorsIsNamed
+- src/imports/walkaround_test.go TestAFilepathWalkOutsideTheFilesDoorIsNamed
+- src/imports/walkaround_test.go TestAnIoutilReadIsNamed
+- src/imports/walkaround_test.go TestAnHttptestServerOutsideTheNetworkDoorsIsNamed
+- src/imports/walkaround_test.go TestAGitRunOutsideTheGitDoorIsNamed
+- src/imports/walkaround_test.go TestAGitWordThatRunsNothingIsNamedByNone
+- src/imports/walkaround_test.go TestAnIndexAskOutsideTheIndexDoorIsNamed
+- src/imports/walkaround_test.go TestASQLOpenOutsideTheIndexIsNamed
+- src/owns/owns_test.go TestARunKeyReadsAsTheProgramsADoorRuns
+- src/owns/tree_test.go TestEveryOutsideKindNamesADoorOrUnheld
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/owns/owns.go
+- src/owns/golang.go
+- src/owns/owns_test.go
+- src/owns/tree_test.go
+- src/imports/imports.go
+- src/imports/walkaround_test.go
+- src/modules/files/owns.yaml
+- src/modules/git/owns.yaml
+- src/modules/hooks/owns.yaml
+- src/modules/lsp/owns.yaml
+- src/modules/mcp/owns.yaml
+- src/index/owns.yaml
+- src/tui/registry/owns.yaml
+- src/tui/owns.yaml
+- src/quack/owns.yaml
+- src/pull/owns.yaml
+- src/branches/owns.yaml
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file the approach names stands opened on origin/work/doors-declare-what-they-own: walkaround.go, owns.go, golang.go, imports.go and every owns.yaml, and each use count comes off git grep there
+the callers come off a git grep for owns.Walks, owns.Read, impure and floor on that branch, each with its enclosing function
+done_when 1 is the Discussion table; done_when 2 and 3 meet the walkaround_test.go cases on planted packages under go test ./src/imports; done_when 4 meets ./RUNME.sh check at tests-green
 
 ## tests-red
 
@@ -303,3 +368,15 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The seven outside kinds, read off the Go declarations of `origin/work/doors-declare-what-they-own`. The `owns.yaml` declarations and `src/owns` stand on that branch alone, and none of them stands on `origin/main` yet.
+
+| kind | door | guard case | gap |
+|---|---|---|---|
+| files | `src/modules/files`, and every door owning `os` | the walk-around of `os` | `path/filepath.Abs`, `EvalSymlinks`, `Glob`, `Walk` and `WalkDir` read the disk, and `io/ioutil` reads and writes it, with no door owning them |
+| processes | `src/modules/git`, `src/vehicle`, `src/pull`, `src/quack`, `src/index` own `os/exec`, and `src/index` owns `os/signal` and `syscall` | the walk-around of `os/exec` | `plugin` loads code, with no door owning it |
+| network | `src/modules/hooks`, `src/modules/mcp`, `src/modules/lsp`, `src/index`, `src/tui/frame`, `src/tui/registry` own `net` and `net/http` | the walk-around of `net/http` | `net/http/httptest` opens a port, and `crypto/tls`, `net/rpc` and `net/smtp` dial out, with no door owning them |
+| clock | `src/modules/clock` owns the `time` and `context` members reading the time now | `TestAWalkAroundTheClockIsNamed` | none |
+| random numbers | none | none | `crypto/rand`, read for a token in `src/index`, `src/modules/hooks`, `src/modules/lsp` and `src/modules/mcp`, and `math/rand` and `math/rand/v2` |
+| git | none of its own: every door owning `os/exec` runs it | none | a run of `git` outside `src/modules/git` passes, from `src/branches`, `src/pull`, `src/quack` and `src/index` |
+| the index | `src/index` owns its packages whole | none | `database/sql` and the reach functions of `src/index` (`Ask`, `Open`, `Dial`, `StartBus`, `Serve`, `ServeManaged`, `Main`) stand owned by no door |
