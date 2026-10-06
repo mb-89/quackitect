@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/draft
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -175,6 +175,22 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/failures]]
+  - step: design/draft
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 19c100ba5939cfa2c62325358ad2e48b7a06980b
+    hash_after: 19c100ba5939cfa2c62325358ad2e48b7a06980b
+    inputs:
+      - name: ask
+        hash: 91948bcaf972bb1f
+        size: 615
+      - name: [[spec/design_output/failures]]
+        hash: 8e785cc94e2e32f9
+        size: 4503
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    skipped: true
+    kept: 46c2cc7a5eafcfc8f8465e3d0c437a02a26221ee
+    why: its red tests stand as 46c2cc7a5 landed them, and a later leaf passed since
 ---
 
 # Ask
@@ -211,7 +227,7 @@ Without it, a node loses its remedy, or a site raises an id nobody registers, an
 
 [[spec/design_output/failures#the-check-holds-the-registry]] holds the approach. The tree cases follow src/imports/tree_test.go: pure fault functions, and one case a rule that reads the tree under ../.. through the package's door.
 
-src/failure/check.go adds three fault functions. NodeFaults(reader) answers each fault NodeOf names over every node under spec/failures. RaiseFaults(registry, files) reads each source text it is handed for a literal id inside a Go Raise call or a JavaScript raise call, and answers each id the registry lacks. DoorFaults(moved, files) answers each moved file whose text still holds the refusal call it held before the move.
+src/failure/check.go adds three fault functions. NodeFaults(reader) answers each fault NodeOf names over every node under spec/failures. RaiseFaults(registry, files) reads each source text it is handed for a literal id inside a Go Raise call, or a JavaScript raise call on a handle whose name carries failure, and answers each id the registry lacks. An engine raise with an event id reads as no failure. DoorFaults(moved, files) answers each moved file whose text still holds the refusal call it held before the move.
 
 Moved maps a file to that refusal call, and stands empty until the refusal move fills it.
 
@@ -244,7 +260,8 @@ The door gains Walk(folder), which lists every file under a folder by slashed pa
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first draft
+- check-skips-named-red-tests: closed, and the red rows read as a path and a test name, which the check now skips
+- raise-scan-keys-failure-door: closed, and the JavaScript match keys on a handle whose name carries failure, with a fixture holding engine raises that RaiseFaults leaves alone
 
 ### size
 
@@ -262,7 +279,7 @@ The door gains Walk(folder), which lists every file under a folder by slashed pa
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened src/failure/node.go, registry.go, door.go, raise.go, src/doors/failure.js and src/imports/tree_test.go, and checked each claim the approach makes against them
+- opened src/failure/check.go, node.go, registry.go, door.go, raise.go and src/doors/failure.js, and checked each claim the approach makes against them
 - the callers list names the check and the refusal move, since no caller stands today
 - each done_when line maps to a tree case: the remedy line to TestEveryNodeNamesARemedy, the raised id line to TestEveryRaisedIdStandsAsANode, the moved files line to TestTheMovedFilesWriteNoRefusalPastTheDoor, and the check to ./RUNME.sh check
 
