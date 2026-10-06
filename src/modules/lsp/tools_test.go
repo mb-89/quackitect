@@ -19,6 +19,7 @@ type fakeTools struct {
 	mu    sync.Mutex
 	says  map[string]string
 	fails map[string]error
+	first map[string][]error
 	calls []string
 }
 
@@ -26,6 +27,10 @@ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, erro
 	one.mu.Lock()
 	defer one.mu.Unlock()
 	one.calls = append(one.calls, name+" "+strings.Join(argv, " "))
+	if ahead := one.first[name]; len(ahead) > 0 {
+		one.first[name] = ahead[1:]
+		return "", ahead[0]
+	}
 	if err := one.fails[name]; err != nil {
 		return "", err
 	}
@@ -263,5 +268,36 @@ func TestAValeFaultDrawsValeRuns(t *testing.T) {
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
 		t.Fatalf("the config draws %+v, and wants ValeRuns in Vale's own words", drawn)
+	}
+}
+
+func TestValeGoesAgainOnItsOwnTimeout(t *testing.T) {
+	timedOut := errors.New(`exit status 2: {"Code": "E201", "Text": "VoiceParagraph.Vocabulary: did not finish within 2s"}`)
+	fake := &fakeTools{first: map[string][]error{"vale": {timedOut}}, says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
+	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
+	bodies := server.SweepTools()
+	if drawn := drawnOn(bodies, "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
+		t.Fatalf("the file draws %+v, and wants its row off the second run", drawn)
+	}
+	if drawn := drawnOn(bodies, "file:///tree/.vale.ini"); holds(drawn, "vale", "ValeRuns") {
+		t.Fatalf("the config draws %+v after a timeout the second run clears", drawn)
+	}
+}
+
+func TestValeTimingOutEveryRunDrawsValeRuns(t *testing.T) {
+	timedOut := errors.New(`exit status 2: {"Code": "E201", "Text": "did not finish within 2s"}`)
+	fake := &fakeTools{fails: map[string]error{"vale": timedOut}}
+	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
+	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
+		t.Fatalf("the config draws %+v, and wants ValeRuns once every run times out", drawn)
+	}
+	runs := 0
+	for _, call := range fake.calls {
+		if strings.HasPrefix(call, "vale ") {
+			runs++
+		}
+	}
+	if runs != valeTries {
+		t.Fatalf("vale ran %d times, and the sweep spends %d on a timeout", runs, valeTries)
 	}
 }
