@@ -77,6 +77,15 @@ func TestARunReadsTheEnvPastTheBoxs(t *testing.T) {
 	}
 }
 
+func TestACommandNamingNoProgramAnswersNotStarted(t *testing.T) {
+	t.Parallel()
+	for name, run := range runners() {
+		if said := run(Command{}); said.Code != NotStarted || said.Err == "" {
+			t.Errorf("the %s runner answers %+v", name, said)
+		}
+	}
+}
+
 func TestAProgramNobodyTaughtNeverStarts(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {

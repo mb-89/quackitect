@@ -13,6 +13,9 @@ import (
 // The exit code a run answers where its program never starts. [[spec/design_output/doors#the-process-door]]
 const NotStarted = -1
 
+// What either runner answers a command naming no program. [[spec/design_output/doors#the-process-door]]
+var namesNoProgram = Said{Err: "proc: a command names no program", Code: NotStarted}
+
 // What a run takes. Env carries the pairs past the box's own. [[spec/design_output/doors#the-process-door]]
 type Command struct {
 	Argv  []string
@@ -33,6 +36,9 @@ type Runner func(Command) Said
 
 // The real runner, through exec. [[spec/design_output/doors#the-process-door]]
 func Real(one Command) Said {
+	if len(one.Argv) == 0 {
+		return namesNoProgram
+	}
 	cmd := exec.Command(one.Argv[0], one.Argv[1:]...)
 	cmd.Dir = one.Dir
 	cmd.Env = append(cmd.Environ(), one.Env...)
@@ -61,7 +67,7 @@ type FakeRunner struct {
 // [[spec/design_output/doors#the-process-door]]
 func (fake *FakeRunner) Run(one Command) Said {
 	if len(one.Argv) == 0 {
-		return Said{Err: "proc: a command names no program", Code: NotStarted}
+		return namesNoProgram
 	}
 	program, ok := fake.Programs[one.Argv[0]]
 	if !ok {
