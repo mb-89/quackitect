@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 320ccc21b73ed9c1728ecaa1e7c5aae01d93ea96
+    hash_after: 320ccc21b73ed9c1728ecaa1e7c5aae01d93ea96
+    inputs:
+      - name: ask
+        hash: 780972e44202b6f6
+        size: 888
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -167,38 +176,81 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each decision left in the hooks moves to one Go owner, and the hook keeps the plumbing.
+
+- The guard while the door stands down: a cage verb on the index binary reads the event and its input as JSON on stdin, and prints a deny with the refusal text where the call stays guarded. Guarded, recovers, wordsOf, commits, pushesWork, killsRuntime and refusedText move from cage.ts to src/modules/hooks/guard.go. The hook runs the verb through $.process.run on a tool.call while no door answers, since the binary stands while the server is down. A verb that answers nothing passes the call, and the fall line the session already meets says the cage stands down.
+- The step: the door answers each post with a step beside its effects, built by StepOf in src/modules/hooks/step.go, so stepOf leaves cage.ts and the hook reads answer.step. A back post says so in the post, and the door asks back on the first post alone.
+- The merge: the hook posts what next(e) answered and the adds to POST /merge on the door, and Merged in step.go answers the merged value. merged leaves shape.ts.
+- The doored events: Standing in listen.go names them under events, and the hook reads the list off the standing file. With no standing file, the start road runs once and a tool.call meets the cage verb.
+- The old door trim leaves: textsOf, rowOf, beforeIn, trimmed, before and readsRaw go, because every door now trims the raw rows (fold.go).
+- The Copilot door reads the same Go pieces: answer.step and the cage verb.
+- The stub bridgehead keeps its vehicle roads, since no binary stands before its clone, and the design note says so.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/level0.ts seen, door, doorAsk, doorSpawns, promptOf, trimmed, before, readsRaw
+- .claude/skills/level0/hooks/cage.ts doors, stepOf, guarded, recovers, wordsOf, refusedText, postOf
+- .claude/skills/level0/hooks/shape.ts merged
+- .claude/skills/level0/hooks/transcript.ts textsOf, rowOf, beforeIn
+- src/scripts/copilot-door.js answers
+- src/modules/hooks/listen.go Listen and serves
+- src/modules/hooks/hooks.go Door.Hook, Post and Answer
+- test/level0/cage.test.js, shape.test.js, transcript.test.js, caged-door.test.js, door-clear.test.js, door-spawn.test.js, hooks.test.js, copilot.test.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_cage_test.go TestCageVerb
+- src/modules/hooks/guard_test.go TestGuarded and TestRecovers, ported from test/level0/cage.test.js
+- src/modules/hooks/step_test.go TestStepOf and TestMerged, ported from test/level0/cage.test.js and shape.test.js
+- src/modules/hooks/listen_test.go TestStandingNamesEvents
+- test/level0/caged-door.test.js the hook asks the cage verb while the door stands down, and reads the step the door answers
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
+- the gate of level0-hooks-move-to-typescript hands this ticket the stub bridgehead rules, and they stay in the stub because no binary stands before its clone
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/level0.ts
+- .claude/skills/level0/hooks/cage.ts
+- .claude/skills/level0/hooks/shape.ts
+- .claude/skills/level0/hooks/transcript.ts
+- src/scripts/copilot-door.js
+- src/modules/hooks/guard.go
+- src/modules/hooks/guard_test.go
+- src/modules/hooks/step.go
+- src/modules/hooks/step_test.go
+- src/modules/hooks/listen.go
+- src/modules/hooks/hooks.go
+- src/quack/verb_cage.go
+- src/quack/verb_cage_test.go
+- the hook tests under test/level0 named in callers
+- spec/design_output/level0.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+cage.ts, shape.ts, transcript.ts, level0.ts, copilot-door.js, listen.go and Door.Hook in hooks.go stand opened, and each named function stands there
+the callers list names every importer of the hook files, from a search over src, test and the plugin
+the first done_when line meets the Go tests above, the second the caged-door case, and the third ./RUNME.sh check
+the approach adds no config key
 
 ## tests-red
 
