@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: fb5e4eeffc38f2e329d3bbff1d61e517640f319f
+    hash_after: fb5e4eeffc38f2e329d3bbff1d61e517640f319f
+    inputs:
+      - name: ask
+        hash: 015d35ecc32e1941
+        size: 508
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,59 @@ A hand writes a probe loop over merges each time main goes red, and a hand merge
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two parts. The probe at a revision: the Go probe verb reads --at <rev> on the dry road, resolves it with git rev-parse --verify <rev>^{commit} through its process door, refuses a revision git cannot resolve with one line and no node, and hands the entry --at <sha>. probeDry in src/scripts/probe-dry.js reads --at and hands it to coldTree in src/scripts/probe-cold.js, which checks the clone out at that commit before the install, and takes no working change beside it, since the two name different trees. One call then runs level zero at any merge on main. The guard on merges: .claude/settings.json denies mcp__github__merge_pull_request, so no session merges by hand and auto-merge stays the one road to main, and a Go case reads that deny off the tracked file, as config_test reads spec/wiring.yaml.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/probe_verb.go probeVerb and probeDry
+- src/quack/check.go level0Runs (hands no --at, unchanged)
+- src/scripts/probe-dry.js probeDry and the verbMain entry
+- src/scripts/probe-cold.js coldTree, called by probeDry and coldRun
+- .claude/settings.json, read by the client
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/probe_verb_test.go TestTheDryProbeRunsAtARevision
+- src/quack/probe_verb_test.go TestTheDryProbeRefusesARevisionGitCannotResolve
+- src/quack/settings_test.go TestTheSettingsDenyTheMergeTool
+- test/level0/probe-dry.test.js the cold tree checks the clone out at the revision it names
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/probe_verb.go
+- src/quack/probe_verb_test.go
+- src/quack/settings_test.go
+- src/scripts/probe-dry.js
+- src/scripts/probe-cold.js
+- test/level0/probe-dry.test.js
+- .claude/settings.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- probe_verb.go probeDry, probe-dry.js probeDry and entry, probe-cold.js coldTree and takesDelta, and .claude/settings.json stand opened
+- grep finds coldTree called by probeDry and coldRun, and probeDry by probeVerb alone in Go
+- the --at line meets the two probe_verb cases, the deny line meets settings_test, and the check line its own command
 
 ## tests-red
 
