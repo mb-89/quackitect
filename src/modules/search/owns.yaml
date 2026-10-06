@@ -1,0 +1,4 @@
+# The search IO module: the files a search reads.
+search:
+  go: [os]
+  report: true

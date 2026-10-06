@@ -79,6 +79,14 @@ func TestDoorDeclaresNamesADoorNoDeclarationHolds(t *testing.T) {
 	}
 }
 
+func TestAFlagInsideAStringNamesNoDoor(t *testing.T) {
+	t.Parallel()
+	tree := TreeOver("", Texts{"src/modules/check/doors.go": "package check\n\nconst flag = \"q.IO()\"\n"})
+	if found := ruled(CheckerOver(tree, 0, 0).Sweep(), DoorDeclares); len(found) != 0 {
+		t.Fatalf("a flag spelled in a string reads %+v", found)
+	}
+}
+
 func TestDoorDeclaresNamesADeclarationOfNoForm(t *testing.T) {
 	t.Parallel()
 	tree := TreeOver("", Texts{clockAt: "clock:\n  owner: me\n"})

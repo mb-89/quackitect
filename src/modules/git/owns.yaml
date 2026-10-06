@@ -1,0 +1,4 @@
+# The git IO module: the repository, through the git program.
+git:
+  go: [os, os/exec]
+  report: true

@@ -67,6 +67,19 @@ func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	}
 }
 
+func TestDoorsListsAScriptWalkingAroundADoor(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/doors/clock.js", "export const clock = () => ({ now: () => Date.now() });\n")
+	seedFile(t, root, "src/doors/owns.yaml", "clock:\n  js: [Date.now]\n  files: [clock.js]\n  report: true\n")
+	seedFile(t, root, "test/contract/clock.test.js", "")
+	seedFile(t, root, "src/scripts/wait.js", "export const at = () => Date.now();\n")
+	code, out, _ := doorsRan(root)
+	if code != 0 || !strings.Contains(out, "src/scripts/wait.js:1:25: Date.now walks around clock\n") || strings.Contains(out, "src/doors/clock.js:") {
+		t.Fatalf("doors answers %d and %q, and wants the script's walk-around alone", code, out)
+	}
+}
+
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

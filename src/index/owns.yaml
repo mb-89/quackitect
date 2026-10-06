@@ -1,0 +1,6 @@
+# The index's door: the disk, the processes, the signals and the socket the
+# index serves on.
+index:
+  go: [os, os/exec, os/signal, net, net/http, syscall]
+  files: [door.go]
+  report: true

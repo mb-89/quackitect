@@ -8,7 +8,7 @@ refines:
 
 The target architecture, whole. It covers the index and its modules, the IO
 modules, operations, watchdogs, the inner protocol, the processes, the surfaces,
-the views and the hook protocol. The old system calls an IO module a door. Each
+the views and the hook protocol. An IO module is a door written in Go. Each
 part stands in a chapter of its own, and the rules stand in
 [[spec/design_input/the-index-holds-the-model]]. The order of the migration
 stands in [[spec/design_input/the-migration-runs-in-slices]].
@@ -764,7 +764,9 @@ An IO module registers its in-ports, out-ports and config by local name, like
 every other module. For the contract, see
 [[spec/design_input/the-index-holds-the-model#every-part-is-a-module]]. Its
 registration carries `q.IO()`. It is one file in a topic package under
-`src/modules/<topic>` beside the others, and no separate tree holds it.
+`src/modules/<topic>` beside the others, and no separate tree holds it. An IO
+module is a door, so its folder carries the `owns.yaml` naming what it owns.
+For details, see [[spec/design_output/doors#a-door-declares-what-it-owns]].
 
 | what it does | such as |
 |---|---|
@@ -876,13 +878,14 @@ check runs it on Linux and Windows, and reads a package's flag off its
 |---|---|
 | `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library. A package a door owns whole reads as impure, and so does the floor the analyzer lists for what no door owns, such as `io/fs` and `unsafe`. So `src/config`, `src/index` and a call to `time.Now` stay out |
 | `ioonly` | an import of a package a door owns whole, and a call to `time.Now`, in the core, `src/q`, or a renderer |
+| `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
+| `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
+| `walkaround` | a use of a name a door owns, in a file outside every door owning it |
 
 The analyzers read each list off the `owns.yaml` declarations under the module's
 root, through `owns.Whole`. A door owning a package by a member, as the clock
 owns `time.Sleep`, leaves the package open to an import, so `time.Duration`
 stays pure. For details, see [[spec/design_output/doors#a-door-declares-what-it-owns]].
-| `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
-| `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
 
 An IO module imports what its IO needs, and reaches another module through the
 index alone, which `nomodule` holds. `nomodule` checks imports between packages

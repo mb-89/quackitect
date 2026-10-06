@@ -1,0 +1,5 @@
+# The window's door: the terminal and the files it reads.
+tui:
+  go: [os]
+  files: [door.go]
+  report: true

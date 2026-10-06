@@ -1,0 +1,4 @@
+# The edits IO module: the files an edit writes.
+edits:
+  go: [os]
+  report: true

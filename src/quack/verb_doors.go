@@ -1,24 +1,34 @@
-// The doors verb: every door, and the contract test that holds it.
+// The doors verb: every door, the contract test that holds it, and every
+// walk-around of a door with every line marked past one.
 // [[spec/guidance/code/testing]]
 package main
 
 import (
 	"fmt"
 	"io"
+	"io/fs"
+	"os" // level0: OutsideInDoors - the verb reads the tree it lists, as the lint's walk reads it
+	"path"
+	"path/filepath"
 	"strings"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
+	"quackitect/src/owns"
 )
 
 // Where the doors and their contract tests stand, as DOORS and CONTRACT in src/scripts/cli-doors.js name them. [[spec/design_output/doors#one-contract-test-per-door]]
 const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"
+	walkLine       = "%s:%d:%d: %s walks around %s\n"
+	markedWalk     = "%s:%d:%d: %s stands marked: %s\n"
+	walksRefused   = "A walk-around reaches past its door. Reach it through the door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"
 )
 
 func init() { register("doors", doorsVerb(index.Root)) }
 
-// doors over the root: each door under src/doors with no contract test named, or the count where each holds one. [[spec/design_output/doors#one-contract-test-per-door]]
+// doors over the root: each door under src/doors with no contract test named, each walk-around and marked line, or the count where nothing stands. [[spec/design_output/doors#one-contract-test-per-door]]
 func doorsVerb(root func() (string, error)) twin {
 	return func(_ []string, _ bool, out, errs io.Writer) int {
 		at, err := root()
@@ -26,6 +36,7 @@ func doorsVerb(root func() (string, error)) twin {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
+		refused := walksOver(at, out, errs)
 		disk := rootDisk{at}
 		held := map[string]bool{}
 		for _, name := range disk.Names(contractFolder) {
@@ -47,9 +58,66 @@ func doorsVerb(root func() (string, error)) twin {
 		}
 		if missing > 0 {
 			fmt.Fprintln(errs, "A door with no contract test lets its fake drift. Write one.")
+		}
+		if refused > 0 {
+			fmt.Fprintln(errs, walksRefused)
+		}
+		if missing > 0 || refused > 0 {
 			return exitFailed
 		}
 		fmt.Fprintf(out, "%d doors, and a contract test holds each one.\n", doors)
 		return 0
 	}
+}
+
+// Every walk-around and marked line of the files the lint's walk reaches: a door at report's walk-around and a marked line to out, a refusing door's to errs, and the count refused. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func walksOver(root string, out, errs io.Writer) int {
+	declared, files := map[string]string{}, []string{}
+	_ = filepath.WalkDir(root, func(at string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		rel, err := filepath.Rel(root, at)
+		if err != nil || rel == "." {
+			return nil
+		}
+		rel = filepath.ToSlash(rel)
+		if !check.Walked(rel) {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		switch {
+		case entry.IsDir():
+		case owns.Declares(rel):
+			if text, err := os.ReadFile(at); err == nil {
+				declared[rel] = string(text)
+			}
+		case path.Ext(rel) == ".go" || path.Ext(rel) == ".js" || path.Ext(rel) == ".mjs":
+			files = append(files, rel)
+		}
+		return nil
+	})
+	disk := rootDisk{root}
+	doors, _ := owns.Read(declared, disk.Exists)
+	if len(doors) == 0 {
+		return 0
+	}
+	refused := 0
+	for _, rel := range files {
+		text, _ := disk.Read(rel)
+		for _, one := range owns.Walks(rel, text, doors) {
+			switch {
+			case one.Marked:
+				fmt.Fprintf(out, markedWalk, rel, one.Line, one.Column, one.Name, one.Reason)
+			case one.Report:
+				fmt.Fprintf(out, walkLine, rel, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+			default:
+				refused++
+				fmt.Fprintf(errs, walkLine, rel, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+			}
+		}
+	}
+	return refused
 }

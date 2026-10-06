@@ -73,6 +73,7 @@ func textFaults(tree *Tree, path string, function, file int, source string) []Fi
 	if sized {
 		out = append(out, sizeFaults(path, text, function, file)...)
 		out = append(out, magicIn(path, text)...)
+		out = append(out, walkFaults(tree, slashed(path))...)
 	}
 	for i := range out {
 		out[i].Source = source

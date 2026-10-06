@@ -4,6 +4,7 @@
 package imports
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -19,7 +20,11 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 	if len(loaded) == 0 {
 		t.Fatal("the load answers no package")
 	}
-	owned := Owned("../..")
+	root, err := filepath.Abs("../..")
+	if err != nil {
+		t.Fatal(err)
+	}
+	owned := Owned(root)
 	for _, one := range loaded {
 		if strings.HasSuffix(one.PkgPath, ".test") {
 			continue
@@ -36,6 +41,9 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		}
 		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
+		}
+		for _, fault := range WalkFaults(root, one.Fset, one.Syntax) {
+			t.Errorf("%s: %s", one.Fset.Position(fault.at), fault)
 		}
 	}
 }

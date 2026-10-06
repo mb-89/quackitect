@@ -123,7 +123,7 @@ func insideOf(door Door, lang string) string {
 // Whether a line of code, past the comments, calls q.IO(). [[spec/design_output/model#io-modules-are-modules]]
 func callsIO(text string) bool {
 	for _, line := range strings.Split(text, "\n") {
-		if !strings.HasPrefix(strings.TrimSpace(line), "//") && strings.Contains(line, "q.IO()") {
+		if code, _, _ := strings.Cut(line, "//"); strings.Contains(code, "q.IO()") && !strings.Contains(code, "\"q.IO()\"") {
 			return true
 		}
 	}

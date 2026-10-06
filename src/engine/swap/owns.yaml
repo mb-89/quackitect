@@ -1,0 +1,5 @@
+# The swap's door: the binary it swaps on disk.
+swap:
+  go: [os]
+  files: [door.go]
+  report: true

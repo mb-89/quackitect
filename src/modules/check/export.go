@@ -66,6 +66,7 @@ var (
 	Textual                  = textual
 	TreeFaults               = treeFaults
 	UnreasonedIn             = unreasoned
+	Walked                   = walked
 	WordsIn                  = wordsIn
 )
 

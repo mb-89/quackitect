@@ -93,6 +93,7 @@ var Rules = []func(*Tree) []Finding{
 	everyPointerResolves,
 	groupAsksNobody,
 	noConflictMarkers,
+	declaresFaults,
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]

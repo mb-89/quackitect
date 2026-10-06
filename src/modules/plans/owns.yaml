@@ -1,0 +1,3 @@
+# The plans IO module: the plan, which the store writes.
+plans:
+  go: []

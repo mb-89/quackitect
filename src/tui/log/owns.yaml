@@ -1,0 +1,5 @@
+# The log view's door: the log files it reads.
+log:
+  go: [os]
+  files: [door.go]
+  report: true

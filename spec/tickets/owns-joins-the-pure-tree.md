@@ -24,7 +24,6 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba

@@ -1,0 +1,4 @@
+# The files IO module: the disk, and its watcher.
+files:
+  go: [os]
+  report: true

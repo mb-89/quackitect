@@ -1,0 +1,4 @@
+# The hooks IO module: the bridgehead's socket and the files a hook reads.
+hooks:
+  go: [os, net, net/http]
+  report: true

@@ -40,6 +40,8 @@ type Tree struct {
 	parses    map[string]parse
 	ruleKey   string
 	ruleFound []Finding
+	// The declarations and the doors they read as. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+	declared declared
 }
 
 // The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]

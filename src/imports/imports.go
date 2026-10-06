@@ -52,7 +52,7 @@ var (
 )
 
 // The tree's own readers a module takes beside q, each importing the pure standard library alone, the one q rests on among them. [[spec/tickets/tickets-becomes-a-module]]
-var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front"}
+var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front", module + "src/owns"}
 
 // The standard library packages past the pure library that no door owns whole, each with every package below it, per [[spec/design_output/model#the-build-checks-imports]].
 var floor = []string{"io/fs", "io/ioutil", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
@@ -72,10 +72,15 @@ func impure(path string, owned []string) bool {
 
 var declared sync.Map
 
-// The packages the declarations under the root own whole, read once a root. [[spec/design_output/model#the-build-checks-imports]]
+// The packages the declarations under the root own whole. [[spec/design_output/model#the-build-checks-imports]]
 func Owned(root string) []string {
+	return owns.Whole(Doors(root))
+}
+
+// Every door the declarations under the root name, read once a root. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+func Doors(root string) []owns.Door {
 	if held, ok := declared.Load(root); ok {
-		return held.([]string)
+		return held.([]owns.Door)
 	}
 	texts := map[string]string{}
 	_ = filepath.WalkDir(root, func(at string, entry fs.DirEntry, err error) error {
@@ -96,8 +101,8 @@ func Owned(root string) []string {
 		_, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel)))
 		return err == nil
 	})
-	held, _ := declared.LoadOrStore(root, owns.Whole(doors))
-	return held.([]string)
+	held, _ := declared.LoadOrStore(root, doors)
+	return held.([]owns.Door)
 }
 
 // The folder the module stands in, off the first file of the pass and its package path, or empty. [[spec/design_output/model#the-build-checks-imports]]

@@ -1,0 +1,5 @@
+# The index manager: the processes it starts and ends, through the ports quack
+# hands in.
+manager:
+  go: []
+  report: true

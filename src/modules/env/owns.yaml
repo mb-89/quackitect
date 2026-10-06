@@ -1,0 +1,4 @@
+# The env IO module: the process's environment.
+env:
+  go: [os]
+  report: true

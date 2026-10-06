@@ -1,0 +1,4 @@
+# The waits IO module: the files a wait watches.
+waits:
+  go: [os]
+  report: true

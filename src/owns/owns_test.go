@@ -226,6 +226,14 @@ func TestAScriptWalksAroundItsDoors(t *testing.T) {
 	}
 }
 
+func TestAConstructorWithNoParenthesesIsAWalk(t *testing.T) {
+	t.Parallel()
+	text := "const now = new Date;\nconst then = new Date(at);\nconst there = new globalThis.Date();\n"
+	if got := named(Walks("src/scripts/wait.js", text, planted(t))); !slices.Equal(got, []string{"new Date()"}) {
+		t.Fatalf("the walks name %v, and want the bare new Date alone", got)
+	}
+}
+
 func TestAScriptInsideItsDoorIsNoWalk(t *testing.T) {
 	t.Parallel()
 	text := "export const clock = () => ({ now: () => new Date(), at: () => Date.now() });\n"

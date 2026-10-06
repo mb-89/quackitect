@@ -15,7 +15,7 @@ import (
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
-// The packages the planted disk door owns whole.
+// The packages the planted disk door owns whole. [[spec/design_output/model#the-build-checks-imports]]
 var ownedOs = []string{"os"}
 
 var planted = map[string]string{
