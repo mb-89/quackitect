@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -129,6 +129,15 @@ record:
     hash_after: 366b69287c1f89c454b00a6b99517bd102cd0a16
     returns: 1
     why: the branch verbs run some twenty-seven git subcommands, pushes, merges and worktrees among them, and FakeGit holds four reads, so the move waits on git-and-process-doors-designed in unfaked-doors-take-fakes
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-11
+    hash_before: 6ccfbf9698e86cbd9a84d1626c28bb9b41760204
+    hash_after: 6ccfbf9698e86cbd9a84d1626c28bb9b41760204
+    inputs:
+      - name: ask
+        hash: de20b0a5f70293da
+        size: 575
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -171,21 +180,59 @@ none
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-Waits on [[spec/tickets/git-and-process-doors-designed]], which names the git door carrying writes and its fake. FakeGit holds Tips, Trunk, Stood and Tracked, and the branch verbs run rev-parse, push, commit, worktree, merge, rebase and more through Doors.run.
+The branch verbs take the three doors [[spec/design_output/doors#the-git-door-carries-writes]] names, and the tree fixture moves onto their fakes, so every case in src/branches runs in memory.
+
+- Doors in src/branches/doors.go gains Repo (git.Repo), Run (proc.Runner) and Disk (files.Disk). git, quiet, loud and batch call Repo's typed operations in place of an argv. rawEnv, run, raw and verb call Run with a proc.Command. exists, read, write, remove, names, filesUnder, link, unlink and readFile go through Disk. src/quack/branch.go fills the real three: git.NewRepo over the work root, proc.Real, files.NewDisk.
+- Repo and FakeRepo arrive with move 1, pull-meets-fake-git, and moves 2 and 3 grow them. This move adds the operations the branch verbs run that the doors chapter's table lacks, each with a contract case on both sides: a commit off a tree onto a parent that moves no ref (commit-tree in take.go openGroup), the commits a trunk carries by patch (cherry in merge.go), the refs origin holds under a prefix (ls-remote in merge.go), a path restored from HEAD (checkout -- in take.go), and many files at refs in one ask (cat-file --batch in doors.go batch). The chapter's operations table gains those rows.
+- files.Disk gains List, every file under a folder as slash paths, and Link, a path aliased under another. The real disk lists by a walk and links by a symlink, the fake keeps an alias. Both gain contract cases in disk_contract_test.go. The review verb's worktree stands under the work root, so its links stay inside Disk.
+- The tree fixture in tree_test.go builds an origin FakeRepo and a clone FakeRepo over a FakeDisk, and a FakeRunner taught `false` for Runme, plus `go`, `node` and the se-index binary where a case of the test and review verbs needs them, each answering canned output. It teaches the runner no `git`, so a git spawn answers NotStarted and turns the case red. land, branch, write and read call FakeRepo and FakeDisk. Each case's own one.git argv becomes the Repo read it asks: rev-parse a ref resolved, rev-list --count ahead and behind, show a file at a ref, log the log over a range, worktree list the worktrees.
+- The fixture serves every test file in the package, so the move covers the package, past the three files the guard names today. The family table drops the branch verbs row, and the door table's branch verbs row names Repo, the Runner and FakeDisk.
+
+The fake merges a path whole where git merges hunks. A case in merge_test.go or port_d_sync_test.go needing a merge of lines moves into repo_contract_test.go as a door case.
+
+Assumption: the done_when line naming FakeGit reads as FakeRepo, since the chapter retires FakeGit once its cases move. Weighed and refused: a FakeRunner `git` program that reads argv over FakeRepo. It leaves the verbs untouched, but it grows a second git inside the fake, which the chapter's typed Repo exists to avoid. Cost of the route taken: every verb file and every fixture file changes in one move, so implement/change lands the doors first, then the fixture, then the cases a file at a time, green after each. Implement waits on pull-meets-fake-git landing Repo and FakeRepo in code.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- none yet, the design names them
+- src/quack/branch.go branchDoors, which builds Doors for the branch, dispatch and cloud verbs
+- src/branches/doors.go fetch here head quiet loud git batch run raw rawEnv verb exists read write remove names filesUnder link unlink readFile methodAt
+- src/branches/dispatch_write.go land opens processAt remoteRows schemas writeState
+- src/branches/done.go finish leaves ready
+- src/branches/escalate.go escalate inserted journaled landed landedAll pushed takenOf tried
+- src/branches/fix.go addedHere
+- src/branches/free.go stuckIn
+- src/branches/guidance.go alwaysOn guidanceText stepNotes
+- src/branches/hand.go boxIDHere boxOf handOf holdOf
+- src/branches/held.go heldHere letGo
+- src/branches/land.go landedAlone stagedFault
+- src/branches/merge.go checkSays closeVerb conflicted filed installs marks marksTrunk merge mergeCloud movedOnTrunk pullCarrying
+- src/branches/review.go checkOn firstCommit gather refFor show
+- src/branches/route.go closedHere
+- src/branches/stands.go baseOnTrunk branchesIn mergedHere notesIn parkedHere pathsIn readWork refsHere standingIn textAt ticketsOn unpushed
+- src/branches/sync.go frontSettles ownIn settles sync unmerged
+- src/branches/take.go claimGroup markOff onBranch openGroup parkedFiles standsOpen
+- src/branches/test.go changedFiles goTestNames putBack redTest setAside sinceOf testVerb
+- src/branches/unblock.go noteAt unblock
+- src/branches/tree_test.go newTree desk sh git write land branch read, the fixture every test file in the package calls
+- src/modules/files/disk.go Disk, whose implementers disk and FakeDisk gain List and Link
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-- none yet, the design names them
+- src/branches/doors_test.go TestATakeAndADispatchRunOnTheFakesAndSpawnNoGit
+- src/modules/git/repo_contract_test.go TestRepoCommitsATreeOntoAParentAndMovesNoRef
+- src/modules/git/repo_contract_test.go TestRepoNamesTheCommitsATrunkCarriesByPatch
+- src/modules/git/repo_contract_test.go TestRepoListsTheRefsOriginHoldsUnderAPrefix
+- src/modules/git/repo_contract_test.go TestRepoRestoresAPathFromHead
+- src/modules/git/repo_contract_test.go TestRepoReadsManyFilesAtRefsInOneAsk
+- src/modules/files/disk_contract_test.go TestDiskListsEveryFileUnderAFolder
+- src/modules/files/disk_contract_test.go TestDiskLinksAPathAndTheUnlinkLeavesItsTarget
+- src/imports/clock_test.go TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit, standing, decides done_when lines one and two once the family row leaves
 
 ### answers
 
@@ -199,16 +246,85 @@ Waits on [[spec/tickets/git-and-process-doors-designed]], which names the git do
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-- none yet, the design names them
+- src/branches/dispatch_write.go
+- src/branches/done.go
+- src/branches/doors.go
+- src/branches/escalate.go
+- src/branches/fix.go
+- src/branches/free.go
+- src/branches/guidance.go
+- src/branches/hand.go
+- src/branches/held.go
+- src/branches/land.go
+- src/branches/merge.go
+- src/branches/review.go
+- src/branches/route.go
+- src/branches/stands.go
+- src/branches/sync.go
+- src/branches/take.go
+- src/branches/test.go
+- src/branches/unblock.go
+- src/branches/branch_test.go
+- src/branches/dispatch_fire_test.go
+- src/branches/dispatch_test.go
+- src/branches/dispatch_write_test.go
+- src/branches/done_test.go
+- src/branches/doors_test.go
+- src/branches/escalate_test.go
+- src/branches/free_test.go
+- src/branches/guidance_test.go
+- src/branches/held_test.go
+- src/branches/list_test.go
+- src/branches/merge_test.go
+- src/branches/port_a_close_test.go
+- src/branches/port_a_fixtures_test.go
+- src/branches/port_a_leave_test.go
+- src/branches/port_a_rows_test.go
+- src/branches/port_a_take_test.go
+- src/branches/port_a_usage_test.go
+- src/branches/port_b_fixtures_test.go
+- src/branches/port_b_group_test.go
+- src/branches/port_b_take_test.go
+- src/branches/port_b_waits_test.go
+- src/branches/port_c_done_test.go
+- src/branches/port_c_fix_test.go
+- src/branches/port_c_fixtures_test.go
+- src/branches/port_c_held_test.go
+- src/branches/port_d_desk_test.go
+- src/branches/port_d_list_test.go
+- src/branches/port_d_orphan_test.go
+- src/branches/port_d_stands_test.go
+- src/branches/port_d_switch_test.go
+- src/branches/port_d_sync_test.go
+- src/branches/port_e_helpers_test.go
+- src/branches/port_e_marker_test.go
+- src/branches/port_e_open_test.go
+- src/branches/port_f_escalate_test.go
+- src/branches/port_f_guidance_test.go
+- src/branches/port_f_review_test.go
+- src/branches/port_f_testverb_test.go
+- src/branches/port_f_unblock_test.go
+- src/branches/review_test.go
+- src/branches/sync_test.go
+- src/branches/take_test.go
+- src/branches/test_test.go
+- src/branches/tree_test.go
+- src/branches/unblock_test.go
+- src/quack/branch.go
+- src/modules/git/repo.go
+- src/modules/git/repo_contract_test.go
+- src/modules/files/disk.go
+- src/modules/files/disk_contract_test.go
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- src/branches/doors.go and src/modules/git/git.go stand opened, and the git subcommands come off a grep of d.quiet, d.loud and d.git
-- the callers wait on the design
-- each done_when line waits on the fake the design names
+- every file, function and verb the approach names stands opened: doors.go Doors and its methods, tree_test.go newTree, quack/branch.go branchDoors, proc.go Runner and FakeRunner, files/disk.go Disk and FakeDisk, git.go FakeGit, imports/clock.go UnauditedWaits, and the commit-tree, cherry, ls-remote, checkout and cat-file call sites; Repo and FakeRepo stand in the doors chapter alone, so their operations come off its table
+- the callers list comes off a scan of every function in src/branches calling a door method that changes, beside branchDoors in src/quack and the Disk implementers
+- done_when one and two: TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit fails once the family row leaves while a fixture still calls exec, and TestATakeAndADispatchRunOnTheFakesAndSpawnNoGit fails where a verb reaches git through a runner taught no git; done_when three: ./RUNME.sh check
 
 ## tests-red
 
