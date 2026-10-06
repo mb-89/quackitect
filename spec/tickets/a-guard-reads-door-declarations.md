@@ -435,3 +435,14 @@ the owned names stand once, in the `owns.yaml` beside each door
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's lists name files the red cases left. Read them as follows:
+
+| the draft names | the case stands in |
+|---|---|
+| `src/imports/imports_test.go` TestTheListsComeOffTheDeclarations | `src/owns/owns_test.go` TestTheListsComeOffTheDeclarations, and `src/imports/walkaround_test.go` for the analyzers |
+| `src/quack/lsp_test.go` TestAWalkAroundDrawsAsADiagnostic | `src/quack/lsp_doors_test.go` |
+
+The size list also takes `src/quack/verb_doors_test.go` and `src/quack/lsp_doors_test.go`.
+
+The ask's line naming `src/modules/lsp` stands met by `src/quack/lsp_doors_test.go`. `src/quack` alone wires the real check module into the lsp IO module, so a test under `src/modules/lsp` meets a fake check and proves no walk-around.
