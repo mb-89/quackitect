@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 21e2fa1702189c9d4904ed24661a8abc5bba438f
+    hash_after: 21e2fa1702189c9d4904ed24661a8abc5bba438f
+    inputs:
+      - name: ask
+        hash: df5766ae1b46f46d
+        size: 455
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,62 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The extension stops loading files of the tree at runtime, and reaches Go through the index binary alone. (1) editor-process.js: the hook button runs the binary itself through execFile from node:child_process, inside this file, which stands as the extension's process door. A start runs `<method>/.se/.runtime/bin/se-index standing` in the work root, which starts the hooks door detached where none answers and returns, and a non-zero exit reads as the fall. A stop runs `se-index stop` the same way. So procDoor and the import of src/doors/proc.js leave, and the START_WAIT window with them. The watcher follows the hooks door's standing file, which the door writes on each start, in place of serve.log, which no Go writes. (2) settled(): the method root comes off a new word of the Go vehicle verb, `se-index verb . vehicle settle`, run from the extension's home binary with SE_WORK_ROOT set to the work root. The word runs vehicle.Settles, the Go twin of settles in src/bridge/vehicle.js, and prints `method <root>`. So the imports of src/bridge/vehicle.js, src/doors/disk.js and src/doors/clock.js leave. (3) lib/logbook.js: the Go log verb's say already shapes the row (sayLine in src/quack/verb_log.go), so the logbook keeps the level filter alone, over the ladder src/modules/log names, and drops the import of lib/log.js. (4) The comments naming owners outside the folder name the Go owner instead, so the done grep answers nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/editor.js activate, which builds processDoor and hands it to the sidebar's hook button
+- src/extension/lib/sidebar.js and lib/work.js, which call startProcess, stopProcess and adoptsProcess through the editor
+- src/extension/editor.js, which builds logbookOf and calls say
+- src/quack/vehicle_verb.go vehicleTwin, which gains the settle word
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/vehicle_verb_test.go TestVehicleSettleNamesThePointedMethod
+- src/quack/vehicle_verb_test.go TestVehicleSettleMakesABareWorkAProject
+- test/level0/logbook.test.js a line below the level now posts nothing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/extension/editor-process.js
+- src/extension/lib/logbook.js
+- src/extension/editor-index.js
+- src/extension/editor-inset.js
+- src/extension/lib/lens.js
+- src/extension/lib/lsp.js
+- src/extension/lib/values.js
+- src/extension/lib/widgets.js
+- src/extension/lib/work.js
+- src/quack/vehicle_verb.go
+- src/quack/vehicle_verb_test.go
+- test/level0/logbook.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- editor-process.js, logbook.js, src/bridge/vehicle.js settles, src/vehicle/bridge.go Settles, src/quack/vehicle_verb.go, src/quack/serve_verb.go and src/quack/verb_log.go sayLine stand opened, and each claim checked there
+- git grep finds no test of processDoor, and editor.js alone builds it and the logbook
+- each done_when line names its command: the git grep, the logbook test, and the check
 
 ## tests-red
 
