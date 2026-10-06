@@ -62,3 +62,12 @@ func TestTheBlackboxGuardNamesTrackedInPackageTests(t *testing.T) {
 	}
 	t.Fatal("no guard named blackbox stands")
 }
+
+func TestTheTestGuardsRefuseAndThePurityGuardReports(t *testing.T) {
+	t.Parallel()
+	for _, one := range imports.Guards {
+		if want := one.Name != "purity"; one.Refuses != want {
+			t.Errorf("the %s guard refuses %v, not %v", one.Name, one.Refuses, want)
+		}
+	}
+}

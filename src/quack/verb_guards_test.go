@@ -58,3 +58,54 @@ func TestTheGuardsRefuseAnswersOneOverANewOffender(t *testing.T) {
 		t.Fatalf("a refusing guard over a new offender answers %d", code)
 	}
 }
+
+var refusingGuards = map[string]map[string]string{
+	"blackbox": {"a/a_test.go": "package a\n"},
+	"fixture":  {"a/a_test.go": "package a_test\n\nimport \"testing\"\n\nfunc TestBuilds(t *testing.T) { _ = t.TempDir() }\n"},
+	"ratio":    {"a/a.go": "package a\n", "a/a_test.go": "package a_test\n\nfunc one() {}\nfunc two() {}\n"},
+	"script":   {"tools/run": "#!/bin/sh\necho one\n"},
+}
+
+func guardNamed(t *testing.T, name string) imports.Guard {
+	t.Helper()
+	at := slices.IndexFunc(imports.Guards, func(one imports.Guard) bool { return one.Name == name })
+	if at < 0 {
+		t.Fatalf("no guard is named %s", name)
+	}
+	return imports.Guards[at]
+}
+
+func plantedReads(files map[string]string, baseline string) ([]string, func(string) string) {
+	tracked := []string{}
+	for path := range files {
+		tracked = append(tracked, path)
+	}
+	slices.Sort(tracked)
+	return tracked, func(path string) string {
+		if strings.HasPrefix(path, "src/imports/baseline/") {
+			return baseline
+		}
+		return files[path]
+	}
+}
+
+func TestEachTestGuardRefusesItsPlantedOffenderPastTheBaseline(t *testing.T) {
+	t.Parallel()
+	for name, files := range refusingGuards {
+		guard := guardNamed(t, name)
+		tracked, read := plantedReads(files, "")
+		lines, code := guardsSaid([]imports.Guard{guard}, tracked, read)
+		if code != exitFailed || !slices.ContainsFunc(lines, func(line string) bool { return strings.HasPrefix(line, name+": new ") }) {
+			t.Errorf("the %s guard answers %d over %q, not a refusal naming the planted offender", name, code, lines)
+		}
+	}
+}
+
+func TestATestGuardRefusesABaselineLineItNoLongerNames(t *testing.T) {
+	t.Parallel()
+	tracked, read := plantedReads(map[string]string{"docs/a.md": "# a\n"}, "tools/gone\n")
+	lines, code := guardsSaid([]imports.Guard{guardNamed(t, "script")}, tracked, read)
+	if code != exitFailed || !slices.Contains(lines, "script: stale tools/gone") {
+		t.Fatalf("the script guard answers %d over %q, not a refusal naming the stale line", code, lines)
+	}
+}

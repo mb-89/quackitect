@@ -27,10 +27,10 @@ type Verdict struct {
 
 // Every guard the guards verb runs. [[spec/design_output/model#the-guards-hold-a-baseline]]
 var Guards = []Guard{
-	{Name: "blackbox", Names: inPackageTracked, PackageOf: path.Dir},
-	{Name: "fixture", Names: fixturesTracked, PackageOf: fixturePackage},
-	{Name: "ratio", Names: RatioOffenders},
-	{Name: "script", Names: HandScripts},
+	{Name: "blackbox", Refuses: true, Names: inPackageTracked, PackageOf: path.Dir},
+	{Name: "fixture", Refuses: true, Names: fixturesTracked, PackageOf: fixturePackage},
+	{Name: "ratio", Refuses: true, Names: RatioOffenders},
+	{Name: "script", Refuses: true, Names: HandScripts},
 	{Name: "purity", Names: purityTracked, PackageOf: fixturePackage},
 }
 
