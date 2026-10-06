@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 8fdf0e78c29f3b82
         size: 1478
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 5e767b0ac4bd025ea5759be2eb2cfe93f81f7521
+    hash_after: 5e767b0ac4bd025ea5759be2eb2cfe93f81f7521
+    inputs:
+      - name: design/draft
+        hash: 8fdf0e78c29f3b82
+        size: 1478
+      - name: design/tests-red
+        hash: 8cbd15eac786f9db
+        size: 533
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +272,11 @@ the test reaches a temp folder the case seeds, as every retro audit test does, a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- where open trials and silent trials both stand, the verb prints the open-trial message first, byte for byte as it stands, then the silent list
+- successors reads as a list off the front, so an empty list keeps nothing
 
 # implement
 
