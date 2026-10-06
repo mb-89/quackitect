@@ -204,6 +204,11 @@ func empty(value any) bool {
 	return false
 }
 
+// hash_after on the open take, and the rows past it on the same item. [[spec/tickets/boxes-write-their-final-record]]
+func AfterWith(text, hash string, _ Ordered) (string, error) {
+	return After(text, hash)
+}
+
 // hash_after on the last record item standing open, and over the last item's where none stands open. [[spec/tickets/go-writes-the-frontmatter]]
 func After(text, hash string) (string, error) {
 	one, err := split(text)

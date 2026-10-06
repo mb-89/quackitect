@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 37c72798334cdf21
         size: 480
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: c82ba6a7785f60562637604292adecf41d6bea19
+    hash_after: c82ba6a7785f60562637604292adecf41d6bea19
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: cbd2dd886d303b08
+        size: 3072
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,33 @@ Weighed: the hold entry over a new entry, because `retroOpen` reads the last ent
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/record_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/record_test.go
+- src/branches/fleet_test.go
+- src/front/front_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The take writes no session, done writes no model, and the fleet rows stand empty. Release reads `--final` as the branch name and answers `work/--final carries no group`. So the branch verb's name word must skip a flag, and the change takes that in. `AfterWith` and `fleetRows` stand as stubs, so the package builds and the cases reach their assertions.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done_when line meets TestDoneWritesTheModelCostAndFinalLineToTheRecord and TestReleaseWritesTheFinalLineToTheRecord. The second meets TestFleetHoldsTheBoxesTheDispatchFires, and the check line meets the command at tests-green.
+- The record cases reach git and the disk over a temp clone and a bare origin, as the package's other cases do. The fleet case and the front case stand pure.
 
 # gate
 
