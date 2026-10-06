@@ -27,6 +27,6 @@ func TestAShapeScriptRefusesTheBranchesTheCorpusMisses(t *testing.T) {
 	voiceMeets(t, []voiceCase{
 		{check: "VoiceShape.GuidanceEnv", text: "---\nkind: [[guidance]]\nenv: level_zero\n---\n\n# Actionables\n\n1. Run the check.\n", want: []voicePlaced{{3, [2]int{1, 15}, ""}}},
 		{check: "VoiceShape.StopRule", text: "- id: one\n  side: maybe\n  priority: 1\n  decides: x\n  says: y\n- id: two\n  side: stop\n  priority: 1\n  decides: x\n  says: y\n", want: []voicePlaced{{1, [2]int{1, 1}, ""}}},
-		{check: "VoiceShape.MarkedRuleNamesFailure", text: "# Actionables\n\n1. Run `a. b. c.` now. *\n2. Run it. See [[x. y]]. *\n", want: []voicePlaced{{3, [2]int{1, 24}, ""}}},
+		{check: "VoiceShape.MarkedRuleNamesFailure", text: "# Actionables\n\n1. Run `a. b. c.` now. *\n2. Run it. See " + "[" + "[x. y]]. *\n", want: []voicePlaced{{3, [2]int{1, 24}, ""}}},
 	})
 }
