@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
-import { readsText, readsTexts } from "../../src/bridge/findings.js";
+import { PARKED, readsText, readsTexts } from "../../src/bridge/findings.js";
 import {
   CACHE,
   filesUnder,
@@ -135,6 +135,11 @@ test("the walk parks what Vale's glob parks, at any depth", () => {
   assert.equal(parked(".se/tickets/one.md"), true);
   assert.equal(parked("spec/_draft.md"), true);
   assert.equal(parked(".claude/types/api.d.ts"), true);
+  assert.equal(
+    parked(".claude/skills/level0/.claude-plugin/types/claude-code/index.d.ts"),
+    true,
+  );
+  assert.match(PARKED[0], /\.claude\/skills\/level0\/\.claude-plugin\/types/);
   assert.equal(parked(".claude/skills/level0/hooks/cage.ts"), false);
   assert.equal(parked("spec/tickets/one.md"), false);
 });

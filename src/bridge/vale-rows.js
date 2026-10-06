@@ -14,7 +14,11 @@ export const NAMED_MOST = 200;
 export const ARGV_MOST = 20000;
 // The folders Vale's glob parks at any depth, the way PARKED in findings.js names them. [[spec/design_output/tree#the-tree-handed-in]]
 const PARKED = new Set([".se", "node_modules", ".git"]);
-const PARKED_UNDER = [".claude/types", ".claude/worktrees"];
+const PARKED_UNDER = [
+  ".claude/types",
+  ".claude/skills/level0/.claude-plugin/types",
+  ".claude/worktrees",
+];
 const WHOLE = ".";
 
 // Vale's answer over the paths asked, as Vale prints it: the rows kept for each file unchanged, and a run over the rest. [[spec/tickets/the-check-runs-fast-again]]

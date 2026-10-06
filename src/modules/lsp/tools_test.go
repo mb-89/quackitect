@@ -209,6 +209,20 @@ func valeSays(file, check, match string) string {
 	return `{"` + file + `": [{"Check": "` + check + `", "Line": 2, "Span": [1, 4], "Match": "` + match + `", "Message": "A rule speaks.", "Severity": "warning"}]}`
 }
 
+// The engine lays its declarations inside the plugin, and no rule reads them, as no rule reads the root's. [[spec/tickets/level0-hooks-move-to-typescript]]
+func TestTheLaidTypesStandParked(t *testing.T) {
+	tools := &Tools{Root: "/tree", Check: fakeCheck}
+	for path, want := range map[string]bool{
+		".claude/types/api.d.ts": true,
+		".claude/skills/level0/.claude-plugin/types/claude-code/index.d.ts": true,
+		".claude/skills/level0/hooks/cage.ts":                               false,
+	} {
+		if got := tools.parked(path); got != want {
+			t.Errorf("%s reads parked %v, and wants %v", path, got, want)
+		}
+	}
+}
+
 func TestAValeRowPublishesUnderItsSource(t *testing.T) {
 	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/a.md", "VoiceVale.Sentence", "Some")}}
 	server, pushed := toolsOver(t, map[string]string{"spec/a.md": "# A\n\nSome text\n"}, fake)

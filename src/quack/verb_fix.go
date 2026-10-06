@@ -24,7 +24,7 @@ import (
 )
 
 // The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
-const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
+const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/skills/level0/.claude-plugin/types,.claude/worktrees}/**,**/_*}"
 
 // The usage, the rounds Vale fixes at most, Vale's config, biome's config folder, the rule the calm reads and the mode a calmed file keeps. [[spec/tickets/the-small-faults-land]]
 const (

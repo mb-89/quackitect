@@ -17,7 +17,7 @@ import (
 
 // The names the lint spells in src/bridge/findings.js and .claude/skills/level0/lib/code.js, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
-	valeSkips   = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
+	valeSkips   = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/skills/level0/.claude-plugin/types,.claude/worktrees}/**,**/_*}"
 	biomeConfig = "spec/config"
 	pastRule    = "PastTense"
 	// The rule a Vale answering a fault draws, so a broken rule stands in the panel. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -31,7 +31,7 @@ const (
 var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
 // The folders Vale skips, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
-var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
+var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/skills/level0/.claude-plugin/types", ".claude/worktrees"}
 
 var (
 	valeCode  = regexp.MustCompile(`^E\d+$`)
