@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box b4c8cb96d125 · claude-code-remote
@@ -113,6 +113,22 @@ record:
     hand: the engine
     hash_before: ef074f5c59eadd38df3eb854d6f415ae9b650a48
     hash_after: ef074f5c59eadd38df3eb854d6f415ae9b650a48
+  - step: accept
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 1d4f13ef4ca2b1f57c8e0119febf5b75461046d2
+    hash_after: 789d96642677b1a29d55b56ae7b71adf3e4872cd
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/tests-meet-the-doors-once already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 75adcafc745ca0d5
+        size: 910
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -168,8 +184,14 @@ Done when the lease flake and the two cold-box contract waits run on a fake cloc
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the lease flake and the cold-box waits run on a fake clock and on readiness, through lease-waits-meet-a-fake-clock and cold-runner-waits-meet-readiness
+- the doors chapter lists every door with its fake and its one contract suite, and every test still reaching a real door under a family with its fate. TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit names any test outside it
+- the rest moved onto fakes through unfaked-doors-take-fakes and its children, and the fixtures built once a case now build once a run through shared-plant-outlives-each-case and quack-build-links-each-case
+- spec/guidance/code/testing carries the rules, and the guards the check runs hold the mechanical ones
+- the check stands green at 101.2 seconds against 122.7 before, which the Discussion carries
 
 # retro
 
