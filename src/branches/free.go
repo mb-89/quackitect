@@ -35,7 +35,6 @@ type claim struct {
 	Beat  string
 }
 
-
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
 func (d *Doors) nowSeconds() int64 {
 	if d.Now == nil {
