@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 1e82a2043f8aa84c1901b87e36db3ee5a42132c0
+    hash_after: 1e82a2043f8aa84c1901b87e36db3ee5a42132c0
+    inputs:
+      - name: ask
+        hash: cbde1a14dc72bbf9
+        size: 629
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,66 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+All in src/tui/tutorial/tab.go, after [[spec/design_output/examples#the-search]].
+
+1. The tab holds a `content bool` beside `word`; title mode is the zero value.
+2. `kept()` reads one pure function `matches(row, word, content)`: title mode tests the lowered title, content mode the lowered title, each keyword and the body. The tree already drops a chapter holding no kept row, since `Left` draws headings off the kept rows alone.
+3. A new Act in `Keys`, `alt+m`, with `Under: true`, so it works while the filter line takes letters (the `alt+l` pattern in src/tui/log/tab.go). It flips `content` and calls `Move(m, 0)`, so the selection lands on a kept row. `alt+m` stands free across src/tui.
+4. `Left` opens with a dim line naming the mode, `title search` or `content search`, while `word` stands non-empty. The footer cannot carry it: `RenderMarks` reads the marks of `Tabs[0]`, the log.
+5. `Detail` in content mode with a word wraps each line through `draw.Wrap(line, w)` itself and hands each wrapped line as a `Drawn` part, every case-blind match rendered in a `matchStyle` (reverse video) and the rest in the line's own style. The title line takes the same light. Title mode draws as it stands. Cost: a match the wrap splits lights on each half apart; the keywords stay unlit, because `Detail` draws none.
+6. `Narrow` keeps its body: an empty word keeps every row, and `Move(m, 0)` holds `At` where it stands, so clearing brings the tree back with the selection held. Its comment drops the line saying the search ticket owns the modes.
+
+Assumptions: a match is a case-blind substring, as `kept()` reads it today; the mode survives a cleared line, so the next search runs in the mode the user set.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/frame/filterpane.go Model.Narrow, calling Tab.Narrow
+- src/tui/frame/model.go Model.Update, calling Tab.Keys for an Under act
+- src/tui/frame/keys.go Model bands, calling Tab.Keys for the help
+- src/tui/frame/model.go Model.LoadPane, calling Tab.Detail
+- src/tui/frame/model.go Model.View, calling Tab.Left
+- src/tui/tutorial/tab.go Tab.Move and Tab.Left, calling kept
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab_test.go TestTitleModeKeepsTheExamplesWhoseTitleMatches
+- src/tui/tutorial/tab_test.go TestContentModeKeepsTitleKeywordsOrBodyMatches
+- src/tui/tutorial/tab_test.go TestContentModeLightsEveryMatchInTheMainView
+- src/tui/tutorial/tab_test.go TestAltMTurnsTheModeOverUnderTheFilterPane
+- src/tui/tutorial/tab_test.go TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab.go
+- src/tui/tutorial/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened tab.go, frame/filterpane.go, frame/part.go, frame/tabs.go, frame/keys.go, frame/model.go, frame/footer.go, draw/wrap.go and tab_test.go, and checked each claim there
+- the callers list names the frame call sites of Narrow, Keys, Detail and Left, found by grep over src/tui/frame, and the two in-tab callers of kept
+- done_when 1 meets TestTitleModeKeepsTheExamplesWhoseTitleMatches; 2 meets TestContentModeKeepsTitleKeywordsOrBodyMatches and TestContentModeLightsEveryMatchInTheMainView; 3 meets TestAltMTurnsTheModeOverUnderTheFilterPane and TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld; 4 meets those cases and ./RUNME.sh check
+- the approach adds no config key
 
 ## tests-red
 
