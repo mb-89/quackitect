@@ -438,9 +438,12 @@ function canaryHeard(rows) {
   return { pass: true, evidence: `the door hears: ${heard.said}` };
 }
 
+// The paths the hooks door answers: the event, and the merge postOf in .claude/skills/level0/hooks/cage.ts names. [[spec/tickets/level0-hooks-hold-no-rule]]
+const DOOR_PATHS = /\/(hook|merge)$/;
+
 // Nothing posts past the hooks door, and no line or row says level zero answers nothing. [[spec/tickets/level0-runs-on-the-door]]
 function quietRun(rows, seen) {
-  const astray = (seen.posts ?? []).filter((one) => !one.url.endsWith("/hook"));
+  const astray = (seen.posts ?? []).filter((one) => !DOOR_PATHS.test(one.url));
   if (astray.length)
     return {
       pass: false,

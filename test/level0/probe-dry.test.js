@@ -209,6 +209,21 @@ test("a post past the hooks door, or a line saying level zero answers nothing, f
   );
 });
 
+// [[spec/tickets/level0-hooks-hold-no-rule]]
+test("a merge the hook posts to the hooks door passes quiet", () => {
+  const { rows, seen } = whole();
+  assert.deepEqual(
+    failing(rows, {
+      ...seen,
+      posts: [
+        { url: "http://127.0.0.1:6510/hook", event: "prompt.context" },
+        { url: "http://127.0.0.1:6510/merge", event: "" },
+      ],
+    }),
+    [],
+  );
+});
+
 test("a door that never stood, and a canary nobody heard, fail their checks", () => {
   const { rows, seen } = whole();
   assert.deepEqual(failing(rows, { ...seen, door: false }), ["door"]);
