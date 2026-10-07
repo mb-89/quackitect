@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 44f026d026534d58
         size: 1925
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box eabbd46a6a23 · claude-code-remote · helper-4
+    hash_before: cffca6022d4d86c545747e6beb8327e5230023a2
+    hash_after: cffca6022d4d86c545747e6beb8327e5230023a2
+    inputs:
+      - name: design/draft
+        hash: 44f026d026534d58
+        size: 1925
+      - name: design/tests-red
+        hash: d1dd9f88b5c81bd1
+        size: 918
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,10 @@ the start test reaches the root, input, environment and disk through startFake, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- boot-hook-names-desk-road: spec/design_output/level0.md section The boot hook still says that off a cloud box boot.js runs nothing, while src/scripts/boot.js asks hands the hook input to the start verb there; the implement step rewrites that sentence beside the row it already fixes in What the standard road leaves, so the note names both roads in one place and the row points at it
 
 # implement
 
