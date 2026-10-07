@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -315,6 +315,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 5038fb320b2cb20699d1636e1f03b4e812de8252
+    hash_after: 5038fb320b2cb20699d1636e1f03b4e812de8252
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 reason: done
 ---
 
@@ -418,6 +430,7 @@ accept
 - `drafts-name-no-vale` names the Go rules where the drafts named Vale
 - `the-tree-lints-clean` points the stamp at the source the Go rules write
 - the same ticket clears the Go code and the notes of every warning
+- `mains-new-files-lint-clean` clears the warnings in four files main brings in
 - accept passed over every line of the ask
 
 ### well
@@ -428,6 +441,7 @@ accept
 - each conflict read against both sides' commits, so the merges kept both intents
 - four helpers cleared the warnings beside each other, one share each
 - the stamp case pinned the source fault in one line
+- the handover named the four files and the next steps, so the box after the clear went straight to them
 
 ### badly
 
@@ -441,6 +455,10 @@ accept
 - 15:00 a helper rewrote the asks of other groups, and the box dropped those edits
 - 15:10 a new case ran alone, and the check asked for `t.Parallel`
 - 15:25 a trailer naming a model met the owner rule main brought in
+- 15:34 the open read an ask written under subheadings as empty
+- 15:38 two hand-backs met a refused connection while the index restarted
+- 15:40 the tests field took a command printing ok, and wants a verdict starting with green
+- 15:37 `t.Parallel` stands out of reach where `runsVerb` sets the root through the environment
 
 ### improve
 
@@ -451,24 +469,27 @@ accept
 - a write meeting a rebuilding index says so: `a-down-index-refuses-calls`
 - a switch of finding source moves every reader of the source with it: `src/quack/battery.go`
 - a helper prompt names the folders past the branch edge: `spec/guidance/cloud/cloud.md`
+- the open names the form an ask takes when it reads one as empty: `src/quack/verb_ticket.go`
+- the tests field says it wants `./RUNME.sh branch test`: `spec/processes/trivial.yaml`
+- `runsVerb` takes the root as an argument, so its cases run in parallel: `src/quack/verb_split_test.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The gate that held the branch read a source name the switch left behind. A search for every reader of a source name belongs to a switch like this one. The warnings in the Go code and the notes stood real, and clearing them cost four helpers and no design.
+The gate that held the branch read a source name the switch left behind. A search for every reader of a source name belongs to a switch like this one. The warnings in the Go code and the notes stood real, and clearing them cost four helpers and no design. After the clear, each refusal named its fix, and the cost lay in guessing the form a field wants.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every fact stands in one place: each improve line points at its home
-the change adds no number
-the change writes no header
-the chapter carries the errors with their times, and the run met no owner prompt past the handover
-the chapter names the role, and names no box
+- every fact stands in one place: each improve line points at its home
+- the change adds no number
+- the change writes no header
+- the chapter carries the errors with their times, and the run met no owner prompt past the handover
+- the chapter names the role, and names no box
 
 ## cloud
 
