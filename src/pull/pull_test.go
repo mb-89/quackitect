@@ -233,6 +233,23 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the pull answers %d:\n%s", code, errs)
 		}
 	})
+	t.Run("a tool's pull prints both streams as one JSON answer", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		it.Pulling([]string{"pull", "--tool", "{}"})
+		out.Reset()
+		code := it.Pulling([]string{"pull", "--tool", "{}"})
+		var said ToolAnswer
+		if err := json.Unmarshal(out.Bytes(), &said); err != nil || code != 1 || !strings.Contains(said.Result, "alpha stands in your hand at do") || said.Spawn != "" {
+			t.Fatalf("the tool's second pull answers %d, %q, and wants the refusal off the error stream as one JSON answer", code, out)
+		}
+	})
+	t.Run("the spec flag prints the tool's spec as JSON", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		var spec map[string]any
+		if code := it.Pulling([]string{"pull", "--spec"}); code != 0 || json.Unmarshal(out.Bytes(), &spec) != nil || spec["name"] != "pull" {
+			t.Fatalf("the spec answers %d, %q, and wants the spec named pull", code, out)
+		}
+	})
 	t.Run("the tool's input reads as the words a person types", func(t *testing.T) {
 		got := strings.Join(PullArgvOf([]string{"pull", "--tool", `{"ticket":"alpha","verdict":"accept","fields":{"b":"x","a":"y"}}`}), " ")
 		if got != `pull alpha --pass --fields {"b":"x","a":"y"}` {

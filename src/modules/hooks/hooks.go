@@ -159,6 +159,18 @@ type Settings struct {
 	BindingLayer string
 }
 
+// The events the door decides, which the forwarder posts every one of. [[spec/tickets/level0-hooks-forward-to-go]]
+var decided = map[string]bool{
+	startEvent: true, contextEvent: true, promptEvent: true, "classic.MessageDisplay": true, spokeEvent: true,
+	"session.compact": true, "session.end": true, "session.measure": true, "turn.said": true, "turn.complete": true,
+	stopEvent: true, spawnEvent: true, "tool.describe": true, toolEvent: true, answerEvent: true,
+}
+
+// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. [[spec/design_output/stop#the-context-hands-over]]
+func fills(post Post) bool {
+	return post.Event == stopEvent || post.Event == toolEvent && textOf(post.E, "agentId", "agent_id") == ""
+}
+
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
 type Door struct {
 	from Outside
@@ -171,6 +183,8 @@ type Door struct {
 	reviews map[string]review.Material
 	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
 	downSince time.Time
+	// The sessions a marked prompt armed the reply probe in. [[spec/tickets/the-reply-probe-runs]]
+	probing map[string]bool
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -200,11 +214,17 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}, probing: map[string]bool{}}
 }
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
+	if !decided[post.Event] {
+		return Answer{Effects: []Effect{{Kind: passKind}}}, nil
+	}
+	if !fills(post) {
+		post.Fill = nil
+	}
 	root := post.Root
 	if root == "" {
 		root = d.from.Root

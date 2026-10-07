@@ -20,7 +20,7 @@ import (
 
 // The verb's usage, the git events it answers, the key the stale span stands under, and the variables naming an agent's push. [[spec/tickets/git-hooks-run-in-go]]
 const (
-	hookUsage     = "Usage: se-index hook <pre-commit|pre-push|SessionStart|PreToolUse|PostToolUse|Stop>"
+	hookUsage     = "Usage: se-index hook <pre-commit|pre-push|SessionStart|PreToolUse|PostToolUse|Stop|down <event>>"
 	preCommit     = "pre-commit"
 	prePush       = "pre-push"
 	staleAfterKey = "work.staleAfter"
@@ -59,7 +59,7 @@ func hookHere() hookDoors {
 	rows, _ := configAt(root)
 	return hookDoors{
 		root: root, cloud: commandSettings(root).Cloud, env: os.Getenv, stdin: os.Stdin, now: time.Now,
-		copilot: surface, ask: hookAsk(root, copilotWait), log: logsRow(root, configWord(rows, "log.level")),
+		copilot: surface, ask: hookAsk(root, copilotWait), log: logsRow(root, configWord(rows, "log.level")), run: serveRuns,
 	}
 }
 
@@ -170,6 +170,9 @@ func hookVerb(d hookDoors) twin {
 		}
 		if copilotEvents[event] {
 			return copilotHook(d, event, out, errs)
+		}
+		if event == downWord && len(argv) > 2 {
+			return hookDown(d, argv[2], out, errs)
 		}
 		door := hooks.New(hooks.Outside{Root: d.root, Git: gitRead})
 		settings := commandSettings(d.root)

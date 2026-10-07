@@ -189,3 +189,11 @@ func TestTheSessionStartFallSaysNothingToThePerson(t *testing.T) {
 		t.Errorf("a prompt's fall says %q, and wants the fall line naming the fault", prompt.errs)
 	}
 }
+
+func TestTheDownWordNamingNoEventPrintsTheUsage(t *testing.T) {
+	t.Parallel()
+	code, out, errs := runsTwin(hookVerb(hookDoorsOver(t.TempDir(), false, nil, "", time.Now())), "hook", "down")
+	if code != exitFailed || out != "" || !strings.Contains(errs, "down <event>") {
+		t.Fatalf("the down word with no event answers %d, %q, %q, and wants the usage naming the event it takes", code, out, errs)
+	}
+}

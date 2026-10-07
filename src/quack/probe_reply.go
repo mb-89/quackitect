@@ -9,12 +9,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"quackitect/src/modules/hooks"
 )
 
-// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, and the warning PROMPT_WHY in src/bridge/answer.js opens on. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's words, the marker and the event off the door's probe, and the warning PROMPT_WHY in src/bridge/answer.js opens on. [[spec/tickets/the-reply-probe-runs]]
 const (
-	replyMarker = "se-probe-reply"
-	replyEvent  = "probe.reply"
+	replyMarker = hooks.ReplyMarker
+	replyEvent  = hooks.ReplyEvent
 	replySays   = "se-probe-reply writes this line"
 	promptWhy   = "The owner sent a prompt"
 	// The width a field's name pads to, and the characters of its value the verb shows. [[spec/tickets/the-reply-probe-runs]]

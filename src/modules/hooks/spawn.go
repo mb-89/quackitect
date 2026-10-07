@@ -4,8 +4,10 @@
 package hooks
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"quackitect/src/modules/hooks/brief"
 )
@@ -15,16 +17,36 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
 	if post.Event != spawnEvent || root == "" {
 		return Effect{}, false
 	}
+	prompt := textOf(post.E, "prompt")
 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
-	if layer == "" {
+	if layer != "" {
+		prompt = brief.ForHelper(layer, prompt)
+	}
+	if post.E["own"] != true {
+		if tag := spawnTagIn(disk{root}); tag != "" {
+			prompt = tag + "\n\n" + prompt
+		}
+	}
+	if prompt == textOf(post.E, "prompt") {
 		return Effect{}, false
 	}
 	event := make(map[string]any, len(post.E))
 	for key, value := range post.E {
 		event[key] = value
 	}
-	event["prompt"] = brief.ForHelper(layer, textOf(post.E, "prompt"))
+	event["prompt"] = prompt
 	return Effect{Kind: eventKind, Result: event}, true
+}
+
+// The tag of the hand of the session the session file names, or nothing where it names none. [[spec/design_output/pull#a-hand-of-its-own]]
+func spawnTagIn(tree disk) string {
+	var held map[string]any
+	_ = json.Unmarshal([]byte(tree.text(sessionFile)), &held)
+	id := strings.TrimSpace(textOf(held, "id"))
+	if id == "" {
+		return ""
+	}
+	return "You are the hand of session " + id + " on this box, so you pull under no --as."
 }
 
 // The notes under the method root with the post's root over it. [[spec/design_output/vehicle#the-work-root-inherits]]
