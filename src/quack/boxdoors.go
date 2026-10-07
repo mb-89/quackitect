@@ -90,7 +90,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		get:     realGet,
 		clock:   wall,
 		disk:    realDisk(),
-		input:   os.Stdin,
+		input:   stdin,
 		out:     out,
 		errs:    errs,
 	}
@@ -165,6 +165,9 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 
 // The binary this process runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
 var selfPath = os.Executable
+
+// The input this process reads, which a verb reading its event takes. [[spec/tickets/level0-hooks-hold-no-rule]]
+var stdin io.Reader = os.Stdin
 
 // A process stands alive where it takes signal zero. Windows takes no signal, so there a process stands alive while it opens. [[spec/tickets/find-and-wait-in-go]]
 func alive(pid int) bool {
