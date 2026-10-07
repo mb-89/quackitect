@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/check"
 	"quackitect/src/yaml"
 )
@@ -101,7 +102,7 @@ func (it *It) withPersonStep(one *Held, before, asks string, options []string) s
 		}
 	}
 	if it.Splits > 0 && standing >= it.Splits {
-		it.Errorln(fmt.Sprintf("%s carries %d person steps already, so split it: hand back --became <ticket>.", one.Name, standing))
+		it.Refuse(failure.Raise(it.Failures, "pull-person-steps-split", fmt.Sprintf("%s carries %d person steps already, so split it: hand back --became <ticket>.", one.Name, standing)))
 		return ""
 	}
 	by := Person
