@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -262,6 +262,15 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: b7d989ad27290624d6c287b21af18707de5231aa
+    hash_after: b7d989ad27290624d6c287b21af18707de5231aa
+    inputs:
+      - name: retro/write
+        hash: 4625134cbd0d0ff1
+        size: 2010
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -426,25 +435,26 @@ the chapter names the role, and names no box
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- nothing: every tool the run called stood on the box, and the proxy refused no host
+- nothing: every tool stood on the box, and the proxy refused no host
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- 14:20 a conflict at the merge of main, over the check parts, the lsp tools and their test, and a paragraph contract case
-- 14:22 the index rebuilding after the merge held every write until it came back up
+- 14:20 a conflict at the first merge of main
+- 14:22 the index rebuilding after the merge, which held every write
 - 14:35 the commit hook refusing code with no Go test beside it
-- 14:44 the done gate counting warnings over the whole tree, which `the-tree-lints-clean` clears
+- 14:44 the done gate counting the prose of open tickets
+- 15:20 a conflict at the second merge of main, at the accept sync
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- no person step parked, and no ticket minted outside the group
-- the handover asks for the pull request against main with auto-merge on, and this box opens it after the cleanup
+- no person step, and no ticket outside the group
+- the handover asks for the pull request with auto-merge on, which this box opens next
 
 # Discussion
 
