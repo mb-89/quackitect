@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -147,6 +147,18 @@ record:
   - step: split
     hand: the engine
     stale: [[spec/design_output/examples]]
+  - step: split
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: ea1a3d5e94910d0a023cd21d72c725ee80f6a805
+    hash_after: ea1a3d5e94910d0a023cd21d72c725ee80f6a805
+    inputs:
+      - name: ask
+        hash: 4df0b47ac1b5a066
+        size: 563
+      - name: [[spec/design_output/examples]]
+        hash: cbfcdb18dc87799c
+        size: 8264
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -175,25 +187,35 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/example-schema-reads-steps]], standard
-- [[spec/tickets/example-harness-runs-on-fakes]], standard
-- [[spec/tickets/example-run-verb-clones]], standard
 - [[spec/tickets/example-coverage-check-reports]], standard
-- [[spec/tickets/example-tutorial-tab-draws]], standard
-- [[spec/tickets/example-tutorial-search-finds]], standard
 - [[spec/tickets/example-first-chapters-stand]], standard
+- [[spec/tickets/example-harness-runs-on-fakes]], standard
 - [[spec/tickets/example-retro-counts-gaps]], standard
+- [[spec/tickets/example-retro-gaps-shown-name]], trivial
+- [[spec/tickets/example-run-pauses-between-steps]], trivial
+- [[spec/tickets/example-run-verb-clones]], standard
+- [[spec/tickets/example-schema-reads-steps]], standard
+- [[spec/tickets/example-tutorial-search-finds]], standard
+- [[spec/tickets/example-tutorial-tab-draws]], standard
+- [[spec/tickets/harness-copies-stand-apart]], trivial
+- [[spec/tickets/harness-draft-follows-seen]], trivial
+- [[spec/tickets/harness-fakes-the-model]], trivial
+- [[spec/tickets/harness-meets-a-real-example]], trivial
+- [[spec/tickets/io-start-fault-shows]], trivial
+- [[spec/tickets/seed-splits-under-bus-cap]], trivial
+- [[spec/tickets/sweep-reads-tracked-after-restart]], standard
+- [[spec/tickets/tips-carry-branch-changes-alone]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every child is small enough to review whole: each holds one part of the design note, a schema and parser, a harness, a verb, a check, a tab, a search, a chapter set, a retro verb
-- the children add up to the goal: format, harness, run verb, tab, search, coverage, retro and first chapters are each one section of the design note
-- each waiting child names its sibling under depends_on, read off each front
+- every child is small enough to review whole, and each stands closed
+- the children add up to the goal: the eight design children build it, and the rest are fixes the run met inside it
+- each waiting child names its sibling under depends_on
 - each child reads its siblings through depends_on, and the pull lands them in that order
-- the diff stays one group, and a child that grows past one review splits into a group of its own
+- the diff stays one group, and no child grew past one review
 
 # children
 
