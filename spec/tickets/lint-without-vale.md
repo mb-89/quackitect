@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/cloud
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -277,6 +277,15 @@ record:
     hash_after: e73e7d66b102f21c014c332b538c7ad0d506a85e
     returns: 2
     why: the hand takes it back
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 55e9b22b18123e61bb39573a37114849b9878875
+    hash_after: 61165883f8912d1e5552240cd08d7a8c287678d0
+    inputs:
+      - name: retro/write
+        hash: 4625134cbd0d0ff1
+        size: 2010
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -453,6 +462,7 @@ the chapter names the role, and names no box
 - 14:35 the commit hook refusing code with no Go test beside it
 - 14:44 the done gate counting the prose of open tickets
 - 15:20 a conflict at the second merge of main, at the accept sync
+- 15:34 the context clear at handoverAt, and the child mains-new-files-lint-clean opened for the files main brought in
 
 ### left
 
