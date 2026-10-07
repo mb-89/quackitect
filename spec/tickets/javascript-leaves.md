@@ -97,6 +97,10 @@ record:
         exit: 0
         said: work/javascript-leaves took 2 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 4ff7fa868a926591263ea50da20cac17743edd74
+    session: cse_01JvgNjKzrPHbhvu3UPuWaU8
 ---
 
 # Ask
