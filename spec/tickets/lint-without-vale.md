@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -327,6 +327,15 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 8dd2b34ed0d9c93a7d11ba00fcfd6fe6efad4447
+    hash_after: 8dd2b34ed0d9c93a7d11ba00fcfd6fe6efad4447
+    inputs:
+      - name: retro/write
+        hash: 8328e03bfb21675b
+        size: 2916
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -512,7 +521,8 @@ The gate that held the branch read a source name the switch left behind. A searc
 - 14:35 the commit hook refusing code with no Go test beside it
 - 14:44 the done gate counting the prose of open tickets
 - 15:20 a conflict at the second merge of main, at the accept sync
-- 15:34 the context clear at handoverAt, and the child mains-new-files-lint-clean opened for the files main brought in
+- 15:34 the context clear at the handover threshold, and the child `mains-new-files-lint-clean` opened for the files main brings in
+- 15:38 the index refusing two hand-backs while it restarted
 
 ### left
 
