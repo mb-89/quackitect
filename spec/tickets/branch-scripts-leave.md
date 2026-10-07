@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/owner-read
+step: design/draft
 steps:
   - name: design
     steps:
@@ -119,6 +119,10 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["copilot-hooks-run-in-go", "git-hooks-run-in-go", "probes-leave-node", "bridge-library-leaves"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
