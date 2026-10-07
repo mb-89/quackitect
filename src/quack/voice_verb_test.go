@@ -1,7 +1,7 @@
 // The voice verb in Go over a real temp tree and fake rules: the registered
 // words, the measure table, a dry run, and the tree's own rules over a file.
 // [[spec/design_output/projection#the-second-target]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"
@@ -19,7 +19,7 @@ const voiceTen = "one two three four five six seven eight nine ten"
 // A temp tree holding files at slash paths under it. [[spec/design_output/projection#the-second-target]]
 func voiceTree(t *testing.T, files map[string]string) string {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case writes the files of a tree of its own
 	for path, text := range files {
 		at := filepath.Join(root, filepath.FromSlash(path))
 		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {

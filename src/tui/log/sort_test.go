@@ -1,7 +1,7 @@
 // The order a press on a column name puts the rows in, driven through Update
 // the way the terminal drives it. Every model here reads memory and no file.
 
-package log
+package log // level0: InPackageTest - the cases build their rows through row, the helper the in-package detail tests share
 
 import (
 	"strings"

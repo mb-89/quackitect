@@ -2,7 +2,7 @@
 
 // A tree kill over the process that started a door leaves the door answering, which its exit code proves.
 // [[spec/tickets/door-outlives-taskkill-tree]]
-package index
+package index // level0: InPackageTest - the case reads the unexported exitEnds the door's wait reads
 
 import (
 	"bufio"
@@ -45,6 +45,7 @@ func TestAStartersCleanExitLeavesTheDoorStanding(t *testing.T) {
 }
 
 // [[spec/tickets/door-outlives-taskkill-tree]]
+// level0: FixtureOutsideHome - the case spawns its own caller and door, then kills the caller's tree
 func TestADoorOutlivesATreeKillOverWhatStartedIt(t *testing.T) {
 	self := "-test.run=^TestADoorOutlivesATreeKillOverWhatStartedIt$"
 	switch os.Getenv(doorRole) {

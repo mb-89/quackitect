@@ -7,7 +7,7 @@ description: Takes one work branch, works its group to done, and hands it back t
 
 One session works one group. For the rules on the way, see [[spec/guidance/cloud/cloud]].
 
-1. Run `./RUNME.sh branch take`, and read the ask it prints.
+1. Run `./RUNME.sh branch take <group>` where the prompt names a group, and `./RUNME.sh branch take` where it names none. Read the ask it prints.
 2. Work the group as the cloud guidance says, one ticket a pull, through `./RUNME.sh ticket pull`. Decide every step yourself, keep each ticket you mint in the group, and open no GitHub issue. Wait for every helper and retry inside your turn, as rule 10 of the cloud guidance says. [[spec/guidance/cloud/cloud]]
 3. Run `./RUNME.sh branch done --model <id> --cost <usd> --final "<your last line>"` once the pull answers wait. The record carries the three for the fleet and the retro.
 4. Open a pull request from `work/<group>` against `main` through the GitHub connector. Turn auto-merge on, with the merge method `MERGE`. The owner merges nothing by hand.

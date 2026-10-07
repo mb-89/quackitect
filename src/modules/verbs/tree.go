@@ -23,6 +23,7 @@ var Commands = []Verb{
 	{Name: "tools", Doc: "ask this box where every tool stands, and write it down"},
 	{Name: "setup", Doc: "the install's steps that run JavaScript: the editor, the browser, the survey, the Copilot setup and the brand"},
 	{Name: "doors", Doc: "every door, and the contract test that holds it"},
+	{Name: "guards", Doc: "every guard over the tracked tree against its baseline, and --update writes each baseline again"},
 	{Name: "project", Doc: "write every projection again, from the source it names"},
 	{Name: "config", Doc: "every key, its value, and the layer answering it"},
 	{Name: "branch", Doc: "work branches and groups: new, take, sync, done, list, merge, close, test"},

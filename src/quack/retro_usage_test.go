@@ -1,7 +1,7 @@
 // The retro usage prints one line a verb, so each verb's action reads its doc
 // off the line that names it, and exits 0 bare and 2 on an unknown word.
 // [[spec/tickets/retro-usage-names-every-verb]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"regexp"

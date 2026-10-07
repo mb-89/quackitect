@@ -2,7 +2,7 @@
 // ancestor with trunk reaches no sync, so the take passes it over and the list
 // says why, once a shallow clone stands whole.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported baseOnTrunk through the pd helpers
 
 import (
 	"strings"

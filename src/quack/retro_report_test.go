@@ -1,7 +1,7 @@
 // The retro's report off its columns and the later steps' records: the field
 // feedback, the battery and an open check step.
 // [[spec/guidance/retro/classify]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

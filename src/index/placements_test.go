@@ -1,7 +1,7 @@
 // The placements: each process restarts alone and the index stays warm, and
 // the index answers the inputs and publishes a run where a commit moves one.
 // [[spec/design_output/model#the-placements]]
-package index
+package index // level0: InPackageTest - it reaches the fakeStore and until helpers procs_test declares
 
 import (
 	"os"
@@ -70,6 +70,7 @@ func timerAsked(t *testing.T, asks <-chan time.Duration, span time.Duration) {
 
 // New placements wait the default gap between two spawns, and it stays short. [[spec/tickets/the-modules-start-together]]
 func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
+	t.Parallel()
 	if got := NewPlacements(nil, nil, nil).gap; got != spawnGap {
 		t.Fatalf("new placements wait %v between spawns, and want %v", got, spawnGap)
 	}
@@ -79,6 +80,7 @@ func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
 }
 
 func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -105,6 +107,7 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 
 // The stop answers once the spawner returns, so no spawn lands past it. The timer holds the spawner until the stop begins. [[spec/tickets/stop-join-test-stands-red]]
 func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -130,6 +133,7 @@ func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
 }
 
 func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -150,6 +154,7 @@ func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
 }
 
 func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
+	t.Parallel()
 	store, _, stop := placedTwo(t)
 	defer stop()
 	other, first := read(store, "other/pid"), read(store, "fake/pid")
@@ -214,6 +219,7 @@ func runsOf(t *testing.T, peer *Peer) chan struct{} {
 }
 
 func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
 	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
 	if err != nil {
@@ -244,6 +250,7 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 }
 
 func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
 	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
 	if err != nil {
@@ -273,6 +280,7 @@ func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
 
 // A commit answering an earlier run leaves the reader waiting on a run sent while the process computed. [[spec/tickets/mid-run-commit-clears-early]]
 func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
 	placements := NewPlacements(bus, store, []Placed{placed})
 	stop, err := placements.Start()
@@ -332,6 +340,7 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 
 // A settle on a silent process ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
 func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
+	t.Parallel()
 	store, _, bus, placed := doublerPlaced(t)
 	placements := NewPlacements(bus, store, []Placed{placed})
 	stop, err := placements.Start()

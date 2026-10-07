@@ -2,7 +2,7 @@
 // go-modules.test.js and pull-leaves.test.js: named files and folders, the
 // tests a branch changes, the red run over HEAD's text, and the words a run answers.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported test verb parts: asides, goPackagesOf, goSays and testSays
 
 import (
 	"encoding/json"

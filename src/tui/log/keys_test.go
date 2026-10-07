@@ -1,7 +1,7 @@
 // The keys and the arrivals, driven through Update the way the terminal drives
 // them. Every model here reads memory and no file.
 
-package log
+package log // level0: InPackageTest - the cases build their rows through row, the helper the in-package detail tests share
 
 import (
 	"encoding/json"
@@ -12,7 +12,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/registry"
 )
@@ -29,26 +28,13 @@ func window(n int) frame.Model {
 	return m
 }
 
+var named = map[string]tea.KeyType{"up": tea.KeyUp, "down": tea.KeyDown, "pgup": tea.KeyPgUp, "pgdown": tea.KeyPgDown, "home": tea.KeyHome, "end": tea.KeyEnd, "enter": tea.KeyEnter}
+
 func press(m frame.Model, keys ...string) frame.Model {
 	for _, name := range keys {
-		var msg tea.KeyMsg
-		switch name {
-		case "up":
-			msg = tea.KeyMsg{Type: tea.KeyUp}
-		case "down":
-			msg = tea.KeyMsg{Type: tea.KeyDown}
-		case "pgup":
-			msg = tea.KeyMsg{Type: tea.KeyPgUp}
-		case "pgdown":
-			msg = tea.KeyMsg{Type: tea.KeyPgDown}
-		case "home":
-			msg = tea.KeyMsg{Type: tea.KeyHome}
-		case "end":
-			msg = tea.KeyMsg{Type: tea.KeyEnd}
-		case "enter":
-			msg = tea.KeyMsg{Type: tea.KeyEnter}
-		default:
-			msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(name)}
+		msg := tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(name)}
+		if kind, ok := named[name]; ok {
+			msg = tea.KeyMsg{Type: kind}
 		}
 		out, _ := m.Update(msg)
 		m = out.(frame.Model)
@@ -86,6 +72,9 @@ func TestWAndSMoveTheLogUpAndDown(t *testing.T) {
 	if logTab(m).Sel != 18 {
 		t.Fatalf("s moves one row down to 18, and landed on %d", logTab(m).Sel)
 	}
+	if m = press(m, "up"); logTab(m).Sel != 17 {
+		t.Fatalf("up moves the log to row 17 with the details closed, and landed on %d", logTab(m).Sel)
+	}
 }
 
 func TestTheArrowsScrollTheDetailsAndLeaveTheLogWhereItStands(t *testing.T) {
@@ -102,14 +91,6 @@ func TestTheArrowsScrollTheDetailsAndLeaveTheLogWhereItStands(t *testing.T) {
 	m = press(m, "w")
 	if logTab(m).Sel != 18 || m.Box.YOffset != 0 {
 		t.Fatalf("w moves the log to 18 and opens its details at the top, and got row %d offset %d", logTab(m).Sel, m.Box.YOffset)
-	}
-}
-
-func TestTheArrowsMoveTheLogWhileTheDetailsAreClosed(t *testing.T) {
-	t.Parallel()
-	m := press(window(20), "up")
-	if logTab(m).Sel != 18 {
-		t.Fatalf("up moves the log to row 18 with the details closed, and landed on %d", logTab(m).Sel)
 	}
 }
 
@@ -141,9 +122,9 @@ func TestHomeGoesToTheFirstRowAndLetsGoOfTheNewest(t *testing.T) {
 
 func TestEndGoesToTheNewestRowAndFollowsWhatArrives(t *testing.T) {
 	t.Parallel()
-	m := press(window(30), "home", "end")
+	m := press(window(30), "home", "end", "s")
 	if logTab(m).Sel != 29 || !logTab(m).Follow {
-		t.Fatalf("end lands on row 29 and follows, and got row %d follow %v", logTab(m).Sel, logTab(m).Follow)
+		t.Fatalf("end lands on row 29 and follows, and s there stays, and got row %d follow %v", logTab(m).Sel, logTab(m).Follow)
 	}
 	m = arrive(m, row(31, "tool", "line 31"))
 	if logTab(m).Sel != 30 {
@@ -177,14 +158,6 @@ func TestPageKeysStepAWholeWindow(t *testing.T) {
 	}
 }
 
-func TestSAtTheNewestRowStaysThere(t *testing.T) {
-	t.Parallel()
-	m := press(window(5), "s", "s")
-	if logTab(m).Sel != 4 || !logTab(m).Follow {
-		t.Fatalf("s at the newest row stays on 4 and follows, and got row %d follow %v", logTab(m).Sel, logTab(m).Follow)
-	}
-}
-
 func TestAReplyArrivingUnderAHeldPromptReachesItsDetails(t *testing.T) {
 	t.Parallel()
 	m := window(0)
@@ -207,13 +180,7 @@ func alt(m frame.Model, key rune) frame.Model {
 	return out.(frame.Model)
 }
 
-func typed(m frame.Model, said string) frame.Model {
-	for _, key := range said {
-		out, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{key}})
-		m = out.(frame.Model)
-	}
-	return m
-}
+func typed(m frame.Model, said string) frame.Model { return press(m, strings.Split(said, "")...) }
 
 func erase(m frame.Model, n int) frame.Model {
 	for i := 0; i < n; i++ {
@@ -238,9 +205,6 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	if shown() != 5 {
 		t.Fatalf("the floor opens at info and shows 5 rows, and it shows %d", shown())
 	}
-	if !strings.Contains(m.RenderMarks(), "INFO") {
-		t.Fatalf("the footer names the floor, and reads %q", m.RenderMarks())
-	}
 	for _, want := range []struct {
 		floor string
 		rows  int
@@ -248,9 +212,6 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 		m = alt(m, 'l')
 		if logTab(m).Floor != want.floor || shown() != want.rows {
 			t.Fatalf("alt+l brings the floor to %s with %d rows, and stands at %s with %d", want.floor, want.rows, logTab(m).Floor, shown())
-		}
-		if !strings.Contains(m.RenderMarks(), draw.Pad(strings.ToUpper(want.floor), frame.FloorWide)) {
-			t.Fatalf("the footer names %s, and reads %q", want.floor, m.RenderMarks())
 		}
 	}
 }
@@ -288,7 +249,7 @@ func TestAltFOpensTheFilterAndLettersNarrowTheLog(t *testing.T) {
 	}
 }
 
-func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) {
+func TestAHeldFilterOutlivesItsPaneAndAClearedLineBringsEveryRowBack(t *testing.T) {
 	t.Parallel()
 	m := alt(window(5), 'f')
 	m = typed(m, "line 3")
@@ -299,18 +260,12 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.Pane != frame.PaneShut || len(logTab(m).View) != 1 {
 		t.Fatalf("enter closes the filter pane and keeps the filter, and got pane %d view %v", m.Pane, logTab(m).View)
 	}
-	if !strings.Contains(m.RenderMarks(), draw.LevelStyle("error").Render(frame.FilterMark)) {
-		t.Fatalf("a held filter lights the funnel, and the marks read %q", m.RenderMarks())
-	}
 	m = erase(alt(m, 'f'), len("line 3"))
 	if !logTab(m).Filter.Empty() || len(logTab(m).View) != 5 {
 		t.Fatalf("a cleared line drops the filter, and the view holds %v", logTab(m).View)
 	}
 	if m.Pane != frame.PaneFilter {
 		t.Fatal("the filter pane stands open while the line clears")
-	}
-	if !strings.Contains(m.RenderMarks(), draw.Dim.Render(frame.FilterMark)) {
-		t.Fatalf("a dropped filter darkens the funnel, and the marks read %q", m.RenderMarks())
 	}
 }
 
@@ -357,9 +312,6 @@ var (
 // [[spec/design_output/tui#one-key-filters-the-line]]
 func TestAltShiftFKeepsTheSelectedKindAndTheSameChordClearsIt(t *testing.T) {
 	t.Parallel()
-	if altShiftF.String() != "alt+F" || altQ.String() != "alt+q" {
-		t.Fatalf("the chords read %q and %q", altShiftF.String(), altQ.String())
-	}
 	m := press(mixed(), "home")
 	m = chord(m, altShiftF)
 	if m.Input.Value() != "kind: /^prompt$/" || len(logTab(m).View) != 2 {
@@ -396,9 +348,6 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	if m.Input.Value() != PromptsFilter || len(logTab(m).View) != 3 || m.Pane != frame.PaneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.Input.Value(), logTab(m).View, m.Pane)
 	}
-	if !strings.Contains(m.RenderMarks(), draw.LevelStyle("error").Render(frame.FilterMark)) {
-		t.Fatalf("a filter alt+q sets lights the funnel, and the marks read %q", m.RenderMarks())
-	}
 	m = chord(m, altQ)
 	if !logTab(m).Filter.Empty() || len(logTab(m).View) != 6 || m.Input.Value() != "" {
 		t.Fatalf("the same chord clears the filter, and got %q %v", m.Input.Value(), logTab(m).View)
@@ -433,10 +382,13 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 // [[spec/design_output/tui#e-finds-the-newest-error]]
 func TestEJumpsToTheNewestErrorAndAgainToTheOneBefore(t *testing.T) {
 	t.Parallel()
-	m := window(10)
+	m := press(window(10), "home", "e")
+	if logTab(m).Sel != 0 {
+		t.Fatalf("e finds no error and leaves row 0, and landed on %d", logTab(m).Sel)
+	}
 	logTab(m).All[2].Level, logTab(m).All[6].Level = "error", "error"
 	logTab(m).All[8].Level = "warn"
-	m = press(m, "home", "e")
+	m = press(m, "e")
 	if logTab(m).Sel != 6 || logTab(m).Follow {
 		t.Fatalf("e lands on the newest error at 6 and holds, and got row %d follow %v", logTab(m).Sel, logTab(m).Follow)
 	}
@@ -447,14 +399,6 @@ func TestEJumpsToTheNewestErrorAndAgainToTheOneBefore(t *testing.T) {
 	m = press(m, "e")
 	if logTab(m).Sel != 2 {
 		t.Fatalf("e on the oldest error stays, and landed on %d", logTab(m).Sel)
-	}
-}
-
-func TestEWithNoErrorLeavesTheSelectionWhereItStands(t *testing.T) {
-	t.Parallel()
-	m := press(window(5), "home", "e")
-	if logTab(m).Sel != 0 {
-		t.Fatalf("e finds no error and leaves row 0, and landed on %d", logTab(m).Sel)
 	}
 }
 

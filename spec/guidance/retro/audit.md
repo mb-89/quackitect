@@ -14,3 +14,4 @@ rationale: [[spec/rationales/auditing]]
 5. Name a rule nobody follows as a check to build or a rule to cut. A rule that stands unfollowed teaches every reader that the rules are optional. *
 6. Name each feature the window lands with no example, and each test asserting again what an example shows, under stop. A gap nobody counts grows between retros. [[spec/design_output/examples#the-checks]] *
 7. Name each module the window touches past one test line per code line, under stop. Name there too each test over deleted code and each comparison past its switch. A test nobody counts grows with every change, and the battery pays for it. [[spec/guidance/code/tests]] *
+8. Answer a code or test rule a guard holds off `./RUNME.sh guards`, and read the rest off the window's diff. A guard counts what a reader reads past.

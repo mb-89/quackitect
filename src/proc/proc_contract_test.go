@@ -1,11 +1,12 @@
 // The process door's contract: each case runs against the fake and the real
 // runner, which is the one door test of a spawned process.
 // [[spec/design_output/doors#the-process-door]]
-package proc
+package proc // level0: InPackageTest - the contract suite reads the unexported signalled each platform's exit code passes through
 
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -143,21 +144,27 @@ func TestAnExitCodeReadsAsASignalWhereTheBoxWritesOne(t *testing.T) {
 	}
 }
 
-func TestARunAnswersItsOutputItsErrorsAndItsExitCode(t *testing.T) {
+// A run answers its output, its errors and its exit code, reads its input and the env past the box's, answers Signalled where a signal ends it, and NotStarted with its fault where no program starts. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func TestARunAnswersWhatItsProgramSays(t *testing.T) {
 	t.Parallel()
-	for name, run := range runners() {
-		said := run(Command{Argv: []string{"sh", "-c", "printf out; printf err >&2; exit 3"}})
-		if said != (Said{Out: "out", Err: "err", Code: 3}) {
-			t.Errorf("the %s runner answers %+v", name, said)
-		}
-	}
-}
-
-func TestARunReadsItsInput(t *testing.T) {
-	t.Parallel()
-	for name, run := range runners() {
-		if said := run(Command{Argv: []string{"sh", "-c", "cat"}, Stdin: "in"}); said.Out != "in" || said.Code != 0 {
-			t.Errorf("the %s runner answers %+v", name, said)
+	sh := func(line string) []string { return []string{"sh", "-c", line} }
+	for _, one := range []struct {
+		command Command
+		want    Said
+	}{
+		{Command{Argv: sh("printf out; printf err >&2; exit 3")}, Said{Out: "out", Err: "err", Code: 3}},
+		{Command{Argv: sh("cat"), Stdin: "in"}, Said{Out: "in"}},
+		{Command{Argv: sh("printf %s \"$PROC_CONTRACT\""), Env: []string{"PROC_CONTRACT=held"}}, Said{Out: "held"}},
+		{Command{Argv: sh("kill -TERM $$")}, Said{Code: Signalled}},
+		{Command{}, Said{Code: NotStarted}},
+		{Command{Argv: []string{"no-such-program-anywhere"}}, Said{Code: NotStarted}},
+	} {
+		for name, run := range runners() {
+			said := run(one.command)
+			faulted := one.want.Code != NotStarted || said.Err != ""
+			if said.Out != one.want.Out || said.Code != one.want.Code || !faulted || (one.want.Err != "" && said.Err != one.want.Err) {
+				t.Errorf("the %s runner answers %+v to %q, and wants %+v", name, said, one.command.Argv, one.want)
+			}
 		}
 	}
 }
@@ -165,22 +172,12 @@ func TestARunReadsItsInput(t *testing.T) {
 func TestARunStandsInItsFolder(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {
-		folder := t.TempDir()
+		folder := t.TempDir() // level0: FixtureOutsideHome - each run writes a file into a folder of its own
 		if said := run(Command{Argv: []string{"sh", "-c", hereLine}, Dir: folder}); said.Code != 0 {
 			t.Errorf("the %s runner answers %+v", name, said)
 		}
 		if _, err := os.Stat(filepath.Join(folder, hereFile)); err != nil {
 			t.Errorf("the %s runner leaves no %s in its folder: %v", name, hereFile, err)
-		}
-	}
-}
-
-func TestARunReadsTheEnvPastTheBoxs(t *testing.T) {
-	t.Parallel()
-	for name, run := range runners() {
-		said := run(Command{Argv: []string{"sh", "-c", "printf %s \"$PROC_CONTRACT\""}, Env: []string{"PROC_CONTRACT=held"}})
-		if said.Out != "held" {
-			t.Errorf("the %s runner answers %+v", name, said)
 		}
 	}
 }
@@ -196,6 +193,21 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
 		}
+	}
+}
+
+// A run on the caller's terminal stays in the caller's process group, so its reads reach the terminal, and a run reading none stands in a group of its own. [[spec/tickets/the-check-ends-what-it-drops]]
+func TestARunOnTheCallersStreamsStaysInTheCallersGroup(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("a Windows box carries no process groups")
+	}
+	line := []string{"sh", "-c", "echo $(ps -o pgid= -p $$) $(ps -o pgid= -p $PPID)"}
+	var out strings.Builder
+	Real(Command{Argv: line, Streams: &Streams{Out: &out}})
+	own, caller, _ := strings.Cut(strings.TrimSpace(out.String()), " ")
+	alone, theirs, _ := strings.Cut(strings.TrimSpace(Real(Command{Argv: line}).Out), " ")
+	if own != caller || alone == theirs {
+		t.Errorf("a streamed run stands in group %q beside the caller's %q, and a whole run in %q beside %q", own, caller, alone, theirs)
 	}
 }
 
@@ -219,29 +231,10 @@ func TestARunWithStreamsHandsThemItsInputAndOutput(t *testing.T) {
 	}
 }
 
-// A run a signal ends answers Signalled, apart from a program that fails to start. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func TestARunASignalEndsAnswersSignalled(t *testing.T) {
-	t.Parallel()
-	for name, run := range runners() {
-		if said := run(Command{Argv: []string{"sh", "-c", "kill -TERM $$"}}); said.Code != Signalled {
-			t.Errorf("the %s runner answers %+v, and wants Signalled", name, said)
-		}
-	}
-}
-
-func TestACommandNamingNoProgramAnswersNotStarted(t *testing.T) {
-	t.Parallel()
-	for name, run := range runners() {
-		if said := run(Command{}); said.Code != NotStarted || said.Err == "" {
-			t.Errorf("the %s runner answers %+v", name, said)
-		}
-	}
-}
-
 func TestAHaltEndsARunInFlight(t *testing.T) {
 	t.Parallel()
 	for name, one := range haltingRunners(t) {
-		folder := t.TempDir()
+		folder := t.TempDir() // level0: FixtureOutsideHome - each run writes a file into a folder of its own
 		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: folder})
 		if !standsUp(folder) {
 			t.Errorf("the %s runner starts no run within %v", name, endsWithin)
@@ -273,7 +266,7 @@ func TestARunAfterTheHaltNeverStarts(t *testing.T) {
 func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 	t.Parallel()
 	for name, one := range haltingRunners(t) {
-		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait})
+		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait}) // level0: FixtureOutsideHome - each run stands in a folder of its own
 		answer, ended := endsIn(said)
 		if !ended {
 			t.Errorf("the %s runner's run outlasts its wait by %v", name, endsWithin)
@@ -281,15 +274,6 @@ func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 		}
 		if answer.Code == 0 || answer.Err == "" {
 			t.Errorf("the %s runner's run past its wait answers %+v", name, answer)
-		}
-	}
-}
-
-func TestAProgramNobodyTaughtNeverStarts(t *testing.T) {
-	t.Parallel()
-	for name, run := range runners() {
-		if said := run(Command{Argv: []string{"no-such-program-anywhere"}}); said.Code != NotStarted || said.Err == "" {
-			t.Errorf("the %s runner answers %+v", name, said)
 		}
 	}
 }

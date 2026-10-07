@@ -99,7 +99,7 @@ func TestAPressOnTheMarkClosesTheGroupAndOpensItAgain(t *testing.T) {
 		{"name": "a-child", "kind": "ticket", "route": "trivial", "state": "open", "path": "spec/tickets/a-child.md", "queue": "1.1", "group": "one-group"},
 		{"name": "a-loose-one", "kind": "ticket", "route": "trivial", "state": "open", "path": "spec/tickets/a-loose-one.md", "queue": "2"},
 	}
-	tab := New(filepath.Join(t.TempDir(), ".se", ".log", "session.jsonl"))
+	tab := New(filepath.Join(t.TempDir(), ".se", ".log", "session.jsonl")) // level0: FixtureOutsideHome - the tab reads its root off a path of the case's own
 	tab.From = fake
 	m := frame.New(tab.Path, time.UTC, []frame.Tab{tab})
 	m.W, m.H = 120, 24

@@ -1,7 +1,7 @@
 // The battery's run in Go: the ready step alone, then every part at once,
 // timed over a clock the case moves, with no real timer.
 // [[spec/design_output/work#the-battery-answers-first]]
-package main
+package main // level0: InPackageTest - the case drives the unexported batteryRun, part, partsOf and readyOf over the in-package helpers checkFake and ticking
 
 import (
 	"reflect"

@@ -2,7 +2,7 @@
 // and its hash copy in off the process, a ticket a box mints joins the group
 // it works, and an empty group stands refused, as mint-verb.js wrote it.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"
