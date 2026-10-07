@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -151,6 +151,21 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: fc1f01339b6f17fd14e54920d26dd93ddf5b51fb
+    hash_after: fc1f01339b6f17fd14e54920d26dd93ddf5b51fb
+    inputs:
+      - name: design/draft
+        hash: 2c01e3f3b017de14
+        size: 3315
+      - name: design/tests-red
+        hash: 534e9b74e1d3d6d2
+        size: 1118
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -288,8 +303,9 @@ Each new case fails on its own assertion, and the four cases standing before pas
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
