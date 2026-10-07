@@ -4,7 +4,9 @@ package git
 
 import (
 	"errors"
+	"maps"
 	"path"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -234,7 +236,7 @@ func (one *door) treeWith(parent, folder string, files map[string]string) (strin
 		entries[name] = "040000 tree " + hash + "\t" + name
 	}
 	rows := []string{}
-	for _, name := range sortedKeys(entries) {
+	for _, name := range slices.Sorted(maps.Keys(entries)) {
 		rows = append(rows, entries[name])
 	}
 	said := one.run(proc.Command{Argv: []string{"git", "mktree", "-z"}, Dir: one.root, Stdin: strings.Join(rows, "\x00") + "\x00"})
@@ -242,15 +244,6 @@ func (one *door) treeWith(parent, folder string, files map[string]string) (strin
 		return "", errors.New(strings.TrimSpace(said.Err))
 	}
 	return strings.TrimSpace(said.Out), nil
-}
-
-func sortedKeys(set map[string]string) []string {
-	out := make([]string, 0, len(set))
-	for key := range set {
-		out = append(out, key)
-	}
-	sort.Strings(out)
-	return out
 }
 
 // A worktree at a path under the root, detached at a ref, the gone ones pruned first. [[spec/design_output/review#a-worktree-runs-the-check]]

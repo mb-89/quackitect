@@ -7,7 +7,7 @@ rationale: [[spec/rationales/testing]]
 
 # Actionables
 
-1. Reach the outside through a door under `src/doors` alone. This holds in the VS Code extension under `src/extension` and the level-zero hooks under `.claude/skills/level0`. The Go IO modules follow rules 11 to 15 instead. A module reading the outside in place takes the box into every test of it. *
+1. Reach the outside through a door under `src/doors` alone. This holds in the VS Code extension under `src/extension` and the level-zero hooks under `.claude/skills/level0`. The Go IO modules follow rules 11 to 15 instead. A JavaScript module past its door ties each case to the machine it runs on. *
 2. In that JavaScript, write a normal test against a fake from `src/doors/fake`. It touches memory and nothing else. *
 3. Give each door one door test against the real thing, and list it in the door audit. Run every other test on the door's fake. A door driven from many tests waits on the box in each of them. One nobody drives fails on the first box its fake misses. In the JavaScript the door test stands in `test/contract`. [[spec/design_output/doors#one-contract-test-per-door]] *
 4. Write a fake that behaves. A double scripting the answer tests the script. *

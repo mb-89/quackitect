@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: level-zero-becomes-a-typed-mod
+group: level-zero-typed-mod
 depends_on: [level0-hooks-move-to-typescript]
 ---
 
