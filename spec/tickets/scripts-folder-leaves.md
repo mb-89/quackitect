@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 184db4f157325a2e
         size: 428
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7caccc264a208a3ae81c2d6de5b3f947f4c22b3f
+    hash_after: 892a8fe44088564a0f654e613a54dae4f8c5314f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: bf4f437b724149d3
+        size: 9183
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -311,26 +324,35 @@ Assumed: a hand run of drawing-page.test.js outside the check skips where PLAYWR
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/scripts_folder_test.go src/quack/stamp_verb_test.go src/quack/bundle_verb_test.go src/quack/check_browser_test.go src/quack/session_start_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/scripts_folder_test.go
+- src/quack/stamp_verb_test.go
+- src/quack/bundle_verb_test.go
+- src/quack/check_browser_test.go
+- src/quack/session_start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Eleven cases fail on their own assertions. The scripts folder case names the six leaving scripts and the four leaving tests. The stamp and bundle stubs answer 0 and an empty stamp, so every verb case fails on its exit code or its runs. The browser case finds SE_SPAWNS alone on the node runs. The install case finds the index asked for no stamp, since install.sh still calls go-stamp.sh. TestTheInsetLoadsTheDrawingFromInsideTheExtension passes now, and so do the stamp and bundle registry rows, since the stubs register. The install case sits in session_start_test.go, which the door audit lists for real sh runs, so its boot cases leave the check until tests-green. The browser case takes its own file, which keeps check_test.go in the check.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- scripts_folder_test.go decides the first done_when line beside git ls-files as the checkpoint, and probe cold and the check stand as tests-green checkpoints
+- the verb cases run on fakeBoxDoors and its fake runner, the browser case on checkFake, and the install case on a fake index and fake go with no timer
 
 # gate
 
