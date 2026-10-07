@@ -160,7 +160,7 @@ record:
   - step: implement/change
     hand: box b1ba21c2e626 · claude-code-remote
     hash_before: 57aa6966c0710dc081a31610642eaa2daf65edf8
-    hash_after: 813503b5d02db9097d09cdc5bec28e6127b2c0aa
+    hash_after: 01480923122681129aee8f1818a259e937854960
     answered:
       - name: lint
         exit: 0
@@ -378,7 +378,7 @@ go build ./... && go vet ./... && ./RUNME.sh lint
 the change touches no file the ask leaves out: every file stands in the size list, plus src/pull/pull_landed_test.go, which gate point 2 adds
 every door the change reaches has a fake: InCloud takes a get func, so its test hands it a map and reads no environment; LineVerbs is pure; the cage red test globs the disk with no exec; the moved JS tests read the fakes they already used
 a comment names the approach the change implements: each changed line carries a pointer at spec/guidance/cloud/cloud, spec/design_output/bash#the-description-names-verbs or spec/design_output/work#a-desk-works-on-trunk, and the headers lose their off-lib clause per approach line 17
-every fact the change adds stands in one place: CloudVariables and InCloud in command/cloud.go are the one cloud read, and the quack copy is gone; LineVerbs returns slices.Clone(lineVerbs) and spells no second list; fake git's TRUNK points at Trunk in command/trunk.go; the notes point at each Go owner
+every fact the change adds stands in one place: CloudVariables and InCloud in command/cloud.go are the one cloud read, and the quack copy is gone; LineVerbs returns slices.Clone(lineVerbs) and spells no second list; TRUNK in the fake git points at Trunk in command/trunk.go; the notes point at each Go owner
 
 ## tests-green
 
