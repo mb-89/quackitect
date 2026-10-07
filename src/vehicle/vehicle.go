@@ -1,6 +1,5 @@
-// A vehicle, made and placed: the roads src/scripts/vehicle.js walks. The pure
-// half decides, the disk door writes, and a project keeps the identity of
-// whatever drives it.
+// A vehicle, made and placed. The pure half decides, the disk door writes, and
+// a project keeps the identity of whatever drives it.
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]
 package vehicle
 

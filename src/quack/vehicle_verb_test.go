@@ -84,7 +84,7 @@ func vehicleRun(doors vehicleDoors, dry bool, argv ...string) (int, string, stri
 func TestVehicleVerbHereNamesTheRootsAndTheRegister(t *testing.T) {
 	t.Parallel()
 	where, doors := vehicleFixture(t)
-	// Both roots print slashed, the method as methodRootFrom answered it. [[spec/tickets/window-verbs-windows-green]] [[spec/tickets/window-verbs-here-one-spelling]]
+	// Both roots print slashed, the method as MethodRootFrom answers it. [[spec/tickets/window-verbs-windows-green]] [[spec/tickets/window-verbs-here-one-spelling]]
 	method := filepath.ToSlash(doors.root)
 	code, out, _ := vehicleRun(doors, false)
 	want := "method  " + method + "\nwork    " + method + "\nvehicle abc123  (this tree drives itself)\n"

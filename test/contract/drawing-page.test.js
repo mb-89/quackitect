@@ -11,7 +11,7 @@ import { browserFrom } from "../../src/scripts/browser.js";
 import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { ticketDrawn, ticketText } from "../level0/v1-index.js";
-import { aheadOnly } from "../../src/scripts/ticket-route.js";
+import { moved, reachedIn } from "../../src/extension/webview/route/edit.js";
 
 const files = disk();
 const DRIVER = join(WEBVIEW, "node_modules", "playwright-core", "index.mjs");
@@ -153,7 +153,8 @@ test("an edit to a step ahead posts the whole route ticket route takes", {
     said[0].steps.map((one) => one.name),
     ["sync", "design", "tell", "ship"],
   );
-  assert.deepEqual(aheadOnly(FRONT, said[0].steps), { steps: said[0].steps });
+  // The page posts what edit.js answers, which drawing-edit.test.js holds to the route the verb takes. [[spec/tickets/ticket-scripts-leave]]
+  assert.deepEqual(said[0].steps, moved(FRONT.steps, "ship", 1, reachedIn(GRAPH)));
   const gone = await postedAfter(() => node("tell").locator("button.drop").click());
   assert.deepEqual(
     gone[0].steps.map((one) => one.name),

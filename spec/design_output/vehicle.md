@@ -5,7 +5,7 @@ refines: ["[[spec/design_input/a-stub-takes-its-vehicle]]"]
 
 # Scope
 
-`src/scripts/vehicle.js` carries this tooling into another project. This note
+The vehicle verb and `src/vehicle` carry this tooling into another project. This note
 covers the vehicle, the project it drives, and the roots between them. For the
 argument, see [[spec/rationales/vehicle]].
 
@@ -104,7 +104,7 @@ A vehicle carries the whole method and answers for itself. It reaches back to
 its origin for nothing at all. A corporate machine holds the vehicle, and the
 tree behind it stands outside every wall that machine sits inside.
 
-Proven against a real vehicle, in `test/contract/vehicle.test.js`:
+Proven against a real vehicle, in `TestVehicleAProducedVehicleStandsAlone` in `src/vehicle/vehicle_test.go`:
 
 | what stands | what the vehicle answers |
 |---|---|
@@ -281,8 +281,8 @@ vehicle. So it reads both records the plain way:
 - a path in the register holds backslashes as JSON writes them, and the shim turns each into a slash
 
 A shim finding the vehicle sets `SE_WORK_ROOT` to the stub. It then hands
-every argument to the vehicle's `RUNME.sh`, and `rootsHere` in the command
-line takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
+every argument to the vehicle's `RUNME.sh`, and `RootsHere` in `src/vehicle/vehicle.go`
+takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
 the vehicle as method and the stub as work. A shim finding none prints one
 line naming the vehicle, its upstream and the cloned road, and exits one.
 
@@ -318,10 +318,10 @@ settles the stub the way the sidebar's hook button does:
 | the pointer | `.se/.runtime/vehicle.json` in the stub |
 | the plugin's two manifests, the modules the hooks manifest names, and the closure of their imports, read off the source | `.claude/skills/level0` in the stub |
 
-`filesOf` in `src/bridge/vehicle.js` reads that closure at each attach. So a
+`FilesOf` in `src/vehicle/bridge.go` reads that closure at each attach. So a
 hook taking a new import hands the copy that file, and no list of the files
-stands to go stale. `test/level0/vehicle.test.js` drives it over a fake plugin
-folder whose imports run three deep.
+stands to go stale. `TestVehicleAHookTakingANewImportHandsTheCopyThatFile` in
+`src/vehicle/vehicle_test.go` drives it.
 
 So the bridgehead rewrites the plugin folder beside its own. The client loads
 that hook at the next start, because it scans plugins once. The road then

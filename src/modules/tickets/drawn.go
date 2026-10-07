@@ -186,7 +186,7 @@ func graphOf(front *yaml.Doc, walk []entry, sections []note.Section) Graph {
 	return out
 }
 
-// The leaves at or before the pointer, and each one the record names, as reachedOf in src/scripts/ticket-route.js reads them. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The leaves at or before the pointer, and each one the record names, as ReachedOf in src/pull/walk.go reads them. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func reachedOf(front *yaml.Doc, walk []entry) []string {
 	step := strings.TrimSpace(yaml.AsString(front.Get("step")))
 	at := -1

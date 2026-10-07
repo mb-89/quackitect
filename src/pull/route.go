@@ -1,7 +1,6 @@
 // The reads the route, fill and update verbs share: a route a person edits
 // past the pointer, the drift from the version a ticket copied, and a new
-// route that keeps the leaves already reached, off ticket-route.js,
-// ticket-drift.js and updated in ticket.js under src/scripts.
+// route that keeps the leaves already reached.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package pull
 

@@ -1,6 +1,6 @@
 // The route verb: a person edits the steps ahead of the pointer, every leaf
 // the ticket reached stands as it stood, and the verb answers JSON on both
-// roads, off route in src/scripts/ticket.js and routed in ticket-route.js.
+// roads. RouteAheadOnly and RouteOf in src/pull/route.go decide the route.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package main
 
