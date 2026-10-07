@@ -19,7 +19,7 @@ import (
 // The family the drawing stands under, by its local name. [[spec/tickets/the-lens-reads-v1]]
 const DrawnPort = "drawn"
 
-// The node and edge kinds the drawing names, the field the checklist answers under, which CHECKED in src/scripts/pull-route.js owns, and the line a mark falls to where its leaf stands as no heading. [[spec/tickets/the-lens-reads-v1]]
+// The node and edge kinds the drawing names, the field the checklist answers under, which checked in src/pull/pull_route.go owns, and the line a mark falls to where its leaf stands as no heading. [[spec/tickets/the-lens-reads-v1]]
 const (
 	phaseKind  = "phase"
 	leafKind   = "leaf"
@@ -32,7 +32,7 @@ const (
 	personWord = "person"
 )
 
-// The rows a chapter's field counts nothing for, as COMMENT, ANSWERED and FENCE in src/scripts/pull-route.js read them. [[spec/tickets/the-lens-reads-v1]]
+// The rows a chapter's field counts nothing for, as commentRow, answeredRow and fenceRow in src/pull/pull_route.go read them. [[spec/tickets/the-lens-reads-v1]]
 var (
 	commentRow  = regexp.MustCompile(`^\s*<!--.*-->\s*$`)
 	answeredRow = regexp.MustCompile(`^\s*answered:`)
@@ -264,7 +264,7 @@ func entryNamed(walk []entry, want string, holder entry) (entry, bool) {
 	return entry{}, false
 }
 
-// The fields in route order and checked last, as leafOf in src/scripts/pull-route.js gathers them, each at the line headingLines in src/extension/lib/fields.js held, and filled where chapterOf in src/scripts/pull-chapter.js reads a line under it. [[spec/design_output/extension#a-take-marks-the-fields]]
+// The fields in route order and checked last, as LeafOf in src/pull/pull_route.go gathers them, each at the line headingLines in src/extension/lib/fields.js held, and filled where ChapterOf in src/pull/pull_chapter.go reads a line under it. [[spec/design_output/extension#a-take-marks-the-fields]]
 func leafDrawn(walk []entry, leaf entry, sections []note.Section) DrawnLeaf {
 	chain := []entry{}
 	parts := strings.Split(leaf.path, "/")

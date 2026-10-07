@@ -294,3 +294,5 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- pull-scripts-leave removes `guidance-hand.js` and `ephemeral.js`, since `pull-route.js` and `guidance-hand.js` import each other. This ticket keeps `ticket-route.js` and `vehicle.js`.

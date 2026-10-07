@@ -1,6 +1,6 @@
 // The handover marks the door writes off the stops fold's answer, off marksDue,
 // dropsDue and dropsClear in src/bridge/handover.js, and the hand a retro hold
-// meets, off handOf in src/scripts/pull-hand-of.js.
+// meets, off HandOf in src/pull/pull_holds.go.
 // [[spec/tickets/cage-stop-marks-port]]
 package hooks
 
@@ -29,7 +29,7 @@ const (
 	fileMode   = 0o644
 )
 
-// The variables naming the harness, and the name each gives, off HARNESS in src/scripts/pull-hand-of.js. [[spec/design_output/pull#the-hand-rule]]
+// The variables naming the harness, and the name each gives, off harness in src/pull/pull_holds.go. [[spec/design_output/pull#the-hand-rule]]
 var harnesses = [][2]string{
 	{"CLAUDE_CODE_REMOTE", "claude-code-remote"},
 	{"SE_CLOUD", "se-cloud"},

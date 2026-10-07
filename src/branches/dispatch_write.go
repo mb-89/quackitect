@@ -204,7 +204,7 @@ type processRoute struct {
 	Ask, Steps []any
 }
 
-// The route a process file holds, as processAt in src/scripts/process.js reads it. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The route a process file holds, as ProcessAt in src/pull/process.go reads it. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func (d *Doors) processAt(name string) (processRoute, string) {
 	text := d.methodRead(processFolder + "/" + name + processEnd)
 	if text == "" {

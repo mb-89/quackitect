@@ -1,6 +1,5 @@
-// The process read and its hash answer what process.js and processHash
-// answered over the same text, and the tickets a group holds read as
-// pull-hand.js read them.
+// The process read and its hash answer what processHash answered over the
+// same text, and the tickets a group holds read as the pull hands them.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package pull
 

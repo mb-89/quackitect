@@ -1,6 +1,5 @@
 // The guidance module: the notes each leaf of each process reads, resolved
-// off the files the watch mirrors, the rule readsFor in
-// src/scripts/guidance-hand.js holds.
+// off the files the watch mirrors.
 // [[spec/tickets/the-guidance-topic-lands]]
 package guidance
 
@@ -19,7 +18,7 @@ const (
 	StepsPort = "steps"
 )
 
-// The folders the notes and the processes stand in, as guidance-hand.js names them. [[spec/design_input/level-two#guidance]]
+// The folders the notes and the processes stand in. [[spec/design_input/level-two#guidance]]
 const (
 	Guidance  = "spec/guidance"
 	Processes = "spec/processes"
@@ -232,7 +231,7 @@ func processName(at string) (string, bool) {
 	return strings.TrimSuffix(rest, ".yaml"), true
 }
 
-// Every leaf under steps, its tags and reads summed down its chain, the way leafOf in src/scripts/pull-route.js sums them. [[spec/design_input/the-agent-pulls-tickets#the-route]]
+// Every leaf under steps, its tags and reads summed down its chain, the way LeafOf in src/pull/pull_route.go sums them. [[spec/design_input/the-agent-pulls-tickets#the-route]]
 func leavesOf(steps any, parent string, tags, reads []string) []leaf {
 	out := []leaf{}
 	for _, each := range yaml.AsList(steps) {

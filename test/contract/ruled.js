@@ -6,6 +6,7 @@
 
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { faultIn, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -166,4 +167,37 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
   }
 
   return { stands, ifVale: stands ? test : skip, proves, spawned: () => spawned };
+}
+
+// The mode a prose request reads where the past veto alone runs, as src/prose names it. [[spec/tickets/prose-checks-run-in-go]]
+export const PAST = "past";
+
+// The severities of a kept finding that refuse a line. [[spec/tickets/bridge-library-leaves]]
+export const REFUSES = new Set(["error", "warning"]);
+
+// Vale's findings as Go names them, and the key two lists of them meet on. [[spec/tickets/prose-checks-run-in-go]]
+const bareOf = (one) => ({
+  rule: String(one?.rule ?? ""),
+  line: Number(one?.line ?? 0),
+  column: Number(one?.column ?? 0),
+  said: String(one?.said ?? ""),
+});
+const keyOf = (one) => Object.values(bareOf(one)).join("\u0000");
+
+// The findings Go's vetoes keep over one text, off `quack prose` under the root, or null where quack answers nothing a case takes. [[spec/tickets/prose-checks-run-in-go]]
+export function keptOf(it, text, found, mode) {
+  if (!found.length) return [];
+  const bare = join(it.root, BIN);
+  const binary = [bare, `${bare}.exe`].find((one) => it.disk.exists(one));
+  if (!binary) return null;
+  const ask = JSON.stringify({ mode, docs: [{ text, found: found.map(bareOf) }] });
+  try {
+    const ran = it.proc.run([binary, "prose"], { cwd: it.root, stdin: ask });
+    const kept = ran?.exitCode === 0 ? JSON.parse(String(ran.stdout ?? "")).docs?.[0]?.kept : null;
+    if (!Array.isArray(kept)) return null;
+    const keep = new Set(kept.map(keyOf));
+    return found.filter((one) => keep.has(keyOf(one)));
+  } catch {
+    return null;
+  }
 }

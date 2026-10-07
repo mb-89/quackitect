@@ -9,8 +9,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
-import { at, rulesIn } from "./ruled.js";
+import { at, keptOf, PAST, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const { ifVale, proves } = rulesIn(root);

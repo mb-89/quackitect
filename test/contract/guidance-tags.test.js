@@ -1,5 +1,5 @@
 // Guidance resolves by tags, read over this tree itself: the schemas admit the
-// tags, and every note under a subfolder of spec/guidance reaches some step.
+// tags. TestEveryGuidanceNoteUnderASubfolderReachesSomeLeaf holds the reach.
 // [[spec/design_input/level-two#guidance]]
 
 import assert from "node:assert/strict";
@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 import { listOf } from "../../.claude/skills/level0/lib/guidance.js";
 import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { disk } from "../../src/doors/disk.js";
-import { unreached } from "../../src/scripts/guidance-hand.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -30,9 +29,4 @@ test("the ticket schema admits tags on a step, and the guidance schema admits ta
 test("a quoted tag reads as its bare word, and a bare tag reads as itself", () => {
   assert.deepEqual(listOf('["testing", \'code\']'), ["testing", "code"]);
   assert.deepEqual(listOf("[testing, code]"), ["testing", "code"]);
-});
-
-// The battery runs this, so the check refuses a note no step reaches. [[spec/design_input/level-two#guidance]]
-test("every note under a subfolder of spec/guidance reaches some step of a process", () => {
-  assert.deepEqual(unreached({ disk: files, root, method: root, join }), []);
 });

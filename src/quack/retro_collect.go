@@ -229,7 +229,7 @@ func retroCollectAgain(home, into, name string, out, errs io.Writer) int {
 	return exitFailed
 }
 
-// The first hold on this box whose ticket stands, as holdsAnywhere in src/scripts/guidance-hand.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// The first hold on this box whose ticket stands, as EveryHold in src/pull/pull_holds.go reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
 func retroCollectHolding(root string) (string, any, bool) {
 	folder := filepath.Join(root, retroCollectHolds)
 	for _, one := range retroCollectListed(folder) {

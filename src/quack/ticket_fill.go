@@ -27,7 +27,7 @@ const stdoutFlag = "--stdout"
 // The chapters a person writes before the fill, which ride into the mint as they stand. [[spec/schemas/ticket.schema.yaml]]
 var writtenChapters = []string{"Ask", "Discussion"}
 
-// A row holding a comment alone, which COMMENT in src/scripts/pull-route.js names. [[spec/design_output/pull#a-draft-opens]]
+// A row holding a comment alone, which commentRow in src/pull/pull_route.go names. [[spec/design_output/pull#a-draft-opens]]
 var commentRow = regexp.MustCompile(`^\s*<!--.*-->\s*$`)
 
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]

@@ -399,7 +399,7 @@ the verb refuses it. So a desk mints the successor off this route:
 
     ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
-`test/contract/process.test.js` reads that route off disk and holds it open, and
+`TestThePersonRouteOpensAtAPersonStepAndAnyHandCarriesOn` in `src/pull/routes_test.go` reads that route off disk and holds it open, and
 `test/level0/unblock.test.js` mints off it and runs the verb.
 
 # One handover stands
@@ -543,7 +543,7 @@ commits them into the merge. So each commit road reads the marks in `.claude/ski
 
 | the road | what it refuses |
 |---|---|
-| a step verb's landing, in `src/scripts/pull-landed.js` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
+| a step verb's landing, in `src/pull/pull_landed.go` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
 | `./RUNME.sh commit` | an unmerged file carrying a marker on disk, before the tests run, and a marker the index carries |
 | the pre-commit hook | a marker line the staged delta adds |
 | the sweep, as `NoConflictMarkers` in `src/modules/check/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |

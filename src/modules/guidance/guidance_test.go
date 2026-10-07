@@ -1,5 +1,5 @@
-// The module resolves a leaf's notes the way readsFor in
-// src/scripts/guidance-hand.js resolves them.
+// The module resolves a leaf's notes off their tags, their envs and the
+// leaf's own reads.
 // [[spec/tickets/the-guidance-topic-lands]]
 package guidance
 

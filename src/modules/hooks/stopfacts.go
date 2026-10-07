@@ -1,5 +1,5 @@
 // What the door reads off the tree for the stops fold, off the reads behind
-// CHECKS in src/bridge/stop.js and holdsIn in src/scripts/ephemeral.js: the
+// CHECKS in src/bridge/stop.js and EveryHold in src/pull/pull_holds.go: the
 // rules, the plan, the holds, the tickets, and the branches git names.
 // [[spec/tickets/cage-stop-rules-port]]
 package hooks

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// The bless file, off src/scripts/pull-bless.js, under the folder .claude/skills/level0/lib/folders.js owns, and the variables naming the hand and the box, off src/scripts/pull-hand-of.js and lib/cloud.js. [[spec/design_output/pull#the-bless]]
+// The bless file, off src/scripts/pull-bless.js, under the folder .claude/skills/level0/lib/folders.js owns, and the variables naming the hand and the box, off harness and cloudVars in src/pull/pull_holds.go. [[spec/design_output/pull#the-bless]]
 const blessFile = ".se/.runtime/bless.json"
 
 // [[spec/design_output/pull#the-bless]]

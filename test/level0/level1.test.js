@@ -183,7 +183,6 @@ test("the pull hook matches the level zero call, and runs the verb through the b
 // The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
 test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
-  const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
   const calls = [];
   register((event, ...rest) => {
     if (event === "tool.call" && rest.length > 1) calls.push(rest);
@@ -220,14 +219,6 @@ test("the pull tool runs the verb under the harness env the shell verb reads", a
     if (before === undefined) delete process.env.CLAUDE_CODE_REMOTE;
     else process.env.CLAUDE_CODE_REMOTE = before;
   }
-  assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
-  const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
-  const { HARNESS_KEYS } = await import(
-    "../../.claude/skills/level0/hooks/pull-tool.js"
-  );
-  assert.deepEqual(
-    HARNESS_KEYS,
-    HARNESS.map(([key]) => key),
-    "the copy stands equal",
-  );
+  // TestEveryKeyThePullToolForwardsNamesAHarness in src/quack holds the keys to the hand rule. [[spec/tickets/pull-scripts-leave]]
+  assert.equal(opts[0]?.env?.CLAUDE_CODE_REMOTE, "true", "the harness key rides the verb's env");
 });

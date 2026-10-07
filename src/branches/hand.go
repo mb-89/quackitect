@@ -1,6 +1,6 @@
 // The hand a step stands in: the box, the session on it, and the agent inside
 // it where the harness names one, and the hold that hand keeps on the box, as
-// src/scripts/pull-hand-of.js and the hold reads answer them.
+// HandOf in src/pull/pull_holds.go and the hold reads answer them.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 package branches
 

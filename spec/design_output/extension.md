@@ -688,8 +688,8 @@ the marks, and `editor-fields.js` draws them:
 | a hold standing as the editor starts | the marks, and the cursor stays |
 | no person's hold names the ticket | nothing |
 
-The leaf and its fields come from `leafOf` in `src/scripts/pull-route.js`,
-and the lines each field holds from `chapterOf` in `src/scripts/pull-chapter.js`.
+The leaf and its fields come from `LeafOf` in `src/pull/pull_route.go`,
+and the lines each field holds from `ChapterOf` in `src/pull/pull_chapter.go`.
 The hover over a mark shows the leaf's path and `does`, then the field's
 name, `form` and `says`. On `checked` it lists the checklist.
 

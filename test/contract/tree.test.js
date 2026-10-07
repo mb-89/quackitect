@@ -46,7 +46,6 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
-import { SESSION } from "../../src/scripts/pull-hand-of.js";
 import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -402,12 +401,9 @@ test("a spelling of a name the runtime half took is refused where the old place 
 
 // The hooks door writes the session file, and the plugin's library spells it once beside it. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
-  for (const path of [
-    "src/modules/hooks/marks.go",
-    ".claude/skills/level0/lib/pull.js",
-  ]) {
-    assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
-  }
+  const SESSION = /sessionFile = "([^"]+)"/.exec(here.read("src/modules/hooks/marks.go"))?.[1];
+  assert.ok(SESSION, "the hooks door spells the session file");
+  assert.match(here.read(".claude/skills/level0/lib/pull.js"), new RegExp(`"${SESSION}"`));
   assert.doesNotMatch(
     here.read(".claude/skills/level0/hooks/pull-tool.js"),
     new RegExp(`"${SESSION}"`),

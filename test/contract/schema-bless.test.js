@@ -7,14 +7,12 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { CLOUD } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   checkData,
   checkNote,
   readYaml,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { disk } from "../../src/doors/disk.js";
-import { HARNESS } from "../../src/scripts/pull-hand-of.js";
 
 const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const schemaOf = (kind) =>
@@ -101,10 +99,4 @@ test("the ticket schema refuses a bless that is no boolean", () => {
     every,
   );
   assert.ok(named(faults, "bless").length, "a bless takes true or false");
-});
-
-// [[spec/tickets/cloud-list-reads-harness]]
-test("HARNESS carries every name CLOUD carries", () => {
-  const names = HARNESS.map(([name]) => name);
-  for (const name of CLOUD) assert.ok(names.includes(name), name);
 });

@@ -1,6 +1,5 @@
 // The hold a hand works a step in, the hand's name, and the guidance it holds
-// with the step, off guidance-hand.js, pull-hand-of.js, src/engine/named.js
-// and the hold reads in ephemeral.js.
+// with the step.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 package pull
 

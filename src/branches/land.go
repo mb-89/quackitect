@@ -1,6 +1,6 @@
 // A hand-back lands: the ticket goes to disk, the named paths stage, and one
 // commit names the ticket and what changes, as landedAlone in
-// src/scripts/pull-landed.js lands it. A commit the hook refuses lands nothing.
+// src/pull/pull_landed.go lands it. A commit the hook refuses lands nothing.
 // [[spec/design_output/pull#the-refused-commit]]
 package branches
 

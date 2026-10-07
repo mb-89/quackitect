@@ -20,7 +20,6 @@ import { FOLDER as LOG } from "../../.claude/skills/level0/lib/log.js";
 import { WORKTREE } from "../../.claude/skills/level0/lib/review.js";
 import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { FOLDER as UNDO } from "../../.claude/skills/level0/lib/undo.js";
-import { BOX, SESSION } from "../../src/scripts/pull-hand-of.js";
 
 test("the module names the retro folder and the runtime folder, both under the private one", () => {
   assert.equal(PRIVATE, ".se");
@@ -55,8 +54,6 @@ test("every runtime writer names its folder under the runtime half", () => {
       undo: UNDO,
       bin: BIN,
       tools: TOOLS,
-      box: BOX,
-      session: SESSION,
       hold: HOLDS,
     },
     {
@@ -64,15 +61,13 @@ test("every runtime writer names its folder under the runtime half", () => {
       undo: inRun("undo"),
       bin: inRun("bin"),
       tools: inRun("tools.json"),
-      box: inRun("box.json"),
-      session: inRun("session.json"),
       hold: inRun("hold"),
     },
   );
 });
 
 test("every runtime writer stands inside the half the skip reads", () => {
-  for (const one of [WORKTREE, UNDO, BIN, TOOLS, BOX, SESSION, HOLDS]) {
+  for (const one of [WORKTREE, UNDO, BIN, TOOLS, HOLDS]) {
     assert.equal(runs(one), true, one);
   }
 });

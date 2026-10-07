@@ -28,8 +28,10 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
-import { PROCESSES } from "../../src/scripts/process.js";
 import { at, rulesIn } from "./ruled.js";
+
+// The folder the processes stand in, which Processes in src/pull/process.go owns. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+const PROCESSES = "spec/processes";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const { ifVale, proves } = rulesIn(root);

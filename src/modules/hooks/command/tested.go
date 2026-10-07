@@ -140,7 +140,7 @@ func CarriedIn(text string) []string {
 	return out
 }
 
-// The tests every held ticket's command lines carry, off the holds whose ticket still stands, as heldTests in src/scripts/guidance-hand.js. [[spec/tickets/cage-commit-guards-port]]
+// The tests every held ticket's command lines carry, off the holds whose ticket still stands. [[spec/tickets/cage-commit-guards-port]]
 func HeldTests(tree Tree) []string {
 	var out []string
 	for _, name := range tree.List(holdFolder) {

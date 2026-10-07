@@ -177,7 +177,7 @@ func retroMintTicketFaults(said string, ticket *retroMintTicket, root string) []
 	return faults
 }
 
-// Why a process stands nowhere under the root, as processAt in src/scripts/process.js says it, or nothing where it stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// Why a process stands nowhere under the root, as ProcessAt in src/pull/process.go says it, or nothing where it stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func retroMintProcessWhy(root, said string) string {
 	name := strings.TrimSpace(said)
 	name = strings.TrimSuffix(strings.TrimPrefix(name, "[["), "]]")

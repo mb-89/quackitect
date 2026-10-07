@@ -221,7 +221,7 @@ to a fresh conversation of its own, and a clear takes the place of the
 compaction. A ticket is the unit of work, so the ticket in hand runs to its
 end first. The clear then runs as three ephemeral tickets. For the owner's
 words, see [[spec/design_input/the-clear-hands-ephemeral-tickets]].
-`src/bridge/handover.js` holds the door, `src/scripts/ephemeral.js` holds the
+`src/bridge/handover.js` holds the door, `src/pull/pull_ephemeral.go` holds the
 tickets, and the key at zero switches it off.
 
 | step | what happens | who does it |

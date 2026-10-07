@@ -314,7 +314,7 @@ as it stops.
 # The sweep serves the lint
 
 `quack sweep` prints the check module's sweep as JSON once the index settles,
-and `sweepRowsOf` in `src/scripts/quack-topic.js` reads it for the lint:
+and the lint reads it:
 
 | the lint asks | the rows it keeps |
 |---|---|
