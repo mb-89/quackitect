@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: ad7e6f9195dc3f5a
         size: 1398
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: a322d880e7317fc055a2b1b74ac8b1f4d61e211f
+    hash_after: a322d880e7317fc055a2b1b74ac8b1f4d61e211f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9a7920a6333047c5
+        size: 3638
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -250,26 +263,31 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The two plugin-tests cases fail on their own assertions, since no part of that name stands yet, and the part list case fails beside them. The kit cases under .claude/skills/level0/tests pass on the hooks as they stand, twenty cases in four files that type clean under tsc. Three things surprise me. A kit test reaches no file past the plugin folder, so the settings check stays in hooks.test.js. The kit answers a door with value or deny, and an event with its bare result, and it refuses any other shape as no implementation. The live engine drops the own field the pull hook sets on its spawn, so the tag skip in spawn.go never sees it; a private note parks that for the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the kit run line and the line count line meet the two plugin-tests cases, the replaced and deleted tests and helpers meet a checkpoint the gate answers off the tree, and the check line meets the check
+the kit cases stub every door beneath the plugin through world.ts, and the Go cases reach claude through the check fake and the files through a temp root
 
 # gate
 
