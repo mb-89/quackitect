@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -175,6 +175,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 719142468cff513699134ad979bbe84e4928555c
+    hash_after: 719142468cff513699134ad979bbe84e4928555c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   64.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 9bab56971075495f
+        size: 866
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -354,26 +377,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_gaps_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new verb, `./RUNME.sh retro gaps`, prints the counts the retro audit asks for, each item one a line, and exits 0. The first count names each verb or tab no example shows, with the file and line registering it. The second names each test function beside a quack file registering a verb an example shows, as candidates the auditor keeps or cuts. The check module now exports `ExampleCovers`, `ShownNames`, `Registered` and the warning's closing words, so the rule and the verb share one copy of each. The verb joins the retro verb list and its usage, and the audit step of the retro route needs it. The audit checklist names the verb in plain words, since one more code span on that line breaks the route's voice case.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list's files, plus the retro verb list and its test, which the usage test reads
+- the verb reads the tree alone, and check.Texts stands as its fake
+- retro_gaps.go and each export link to the audit guidance or the examples checks
+- the registration pattern and the warning wording stand once, in coverage.go
 
 # accept
 
