@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,22 @@ record:
         hash: e47482696963dde5
         size: 1285
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: b355ee070d667c7038e2469903bd4cc0edcf41ec
+    hash_after: b355ee070d667c7038e2469903bd4cc0edcf41ec
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: c8a973ba05eb98d0
+        size: 2899
+      - name: [[spec/guidance/code/tests]]
+        hash: 1640edfeb6551072
+        size: 2138
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -244,26 +260,33 @@ Assumed: a report at exit 0 serves the audit better than a gate, since a test be
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_gaps_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the stub verb answers 0 and says nothing. The planted tree is a check.Texts, so the verb takes a tree maker, and the live wiring hands it lintTree over the retro root, whose paths git lists. The stub registers retro gaps already, so the coverage report names it until an example shows it. The verb reads files alone, and no door beyond the tree source reaches it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 and 3: TestRetroGapsNamesEachVerbNoExampleShows and TestRetroGapsNamesEachTestBesideAShownVerb, red on their assertions
+- done_when 2: the retro.yaml diff, a checkpoint accept reads
+- done_when 4: ./RUNME.sh check at tests-green
+- fakes: the tree source is the one door, and check.Texts stands as its fake in memory
 
 # gate
 
