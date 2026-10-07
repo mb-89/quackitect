@@ -156,6 +156,7 @@ record:
     hand: box 1fb91bdd8469 · claude-code-remote
     hash_before: c9fd5e7400242e54f5f107e50ad3950f004c7271
     session: cse_01P536X1u8Aahi2wtLPf8JB9
+    hash_after: 7d4dcb75111e3bd5d40d767e023fac8ec9ee18b1
   - step: split
     hand: the engine
     stale: [[spec/design_output/examples]]
@@ -304,7 +305,6 @@ record:
         hash: 20a3015ff99b0dac
         size: 2669
     def: 4da1ca5da87d5bbc
-cloud: true
 ---
 
 # Ask
