@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: b342bcae91e7756b76c737a620bc735fea97741a
+    hash_after: b342bcae91e7756b76c737a620bc735fea97741a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   90.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d1dd9f88b5c81bd1
+        size: 918
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ the fact that a mod loads by default stands in the What the standard road leaves
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The start verb in src/quack/verb_start.go counts the level-zero plugin loaded where its manifest stands, and reads no switch for mods. A client loads a mod by default, and the settings carry no switch, so a desk session holding the plugin met the start refusal. The case of a desk session where the manifest stands and no switch is set turns green. Commit d314010ac.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/verb_start.go alone, which the ask names through the start verb fix
+the start verb reaches the disk and the environment through its outside struct, and the start test fakes both
+the manifest constant points at the boot hook section of the level0 design note, which names the approach
+the fact that a mod loads by default stands in the What the standard road leaves section alone
 
 # accept
 
