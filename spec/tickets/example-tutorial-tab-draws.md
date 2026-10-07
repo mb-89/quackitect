@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,19 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: d387e7164ece2bdbdd8e868d013a67d49068df12
+    hash_after: d387e7164ece2bdbdd8e868d013a67d49068df12
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/examples fails
+    inputs:
+      - name: design/draft
+        hash: 42d25d2c30ab4573
+        size: 3668
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -243,26 +256,33 @@ The tab reads one index name, and F5 posts one action, so the window reads no fi
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/examples/examples_test.go src/tui/tutorial/tab_test.go src/quack/tui_verb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/examples/examples_test.go
+- src/tui/tutorial/tab_test.go
+- src/quack/tui_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cases run over stubs: the module answers no row and no run, and the tab draws nothing and posts nothing, so each fails on its own assertion. The tab cases hand the rows in as the watch does, through a registry.Change, and drive F5 through the window, so the key reaches the tab the way a person presses it. No Markdown renderer stands in the window, so the main view draws the body through RenderParts and marks the fenced blocks itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the chapters and the developer section, the main view, the verdict marks, F5, the tab word, and the check at the end
+- every door the tests reach has a fake: the catalog, the watch and the caller through registry.Fake, and the index through q/qtest
 
 # gate
 
