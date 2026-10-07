@@ -476,20 +476,18 @@ chain carries a checklist, and the ticket door lets the hand write it.
 
 ## The voice reads the evidence
 
-The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, where
-vale stands on the box. `voiceOver` in `src/bridge/findings.js` hands Vale a
-ticket's text on stdin through `valeArgvOf`, and `readsText` reads the answer.
-`findingsOver` calls both over each file the lint reads. `voiceFaults` in
-`src/scripts/pull-chapter.js` hands `voiceOver` the whole ticket, with the
-payload's fields under their headings.
+The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, through
+the Go rules. `voiceFaults` in `src/pull/pull_commands.go` hands the `Voice`
+reader the whole ticket, with the payload's fields under their headings, as
+`voiceText` lays them out.
 
 | part | what the pull does |
 |---|---|
-| the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
+| the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and an exemption marker holds |
 | the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
 | the level | refuses on a private name, and warns on a break of form, so the hand-back goes on and the lint names the same lines |
 
-Every verb taking a hand's prose into a ticket reads it through `voiceOver`,
+Every verb taking a hand's prose into a ticket reads it through the Go rules,
 so no fix commit follows a landing.
 
 | the verb | what it reads |

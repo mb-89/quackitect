@@ -5,28 +5,28 @@
       "name": "a prose check naming no path says why",
       "tool": "check_prose",
       "input": { "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "This call names no path, and the rules read the kind a path names."
     },
     {
       "name": "a prose check carrying no text says why",
       "tool": "check_prose",
       "input": { "path": "spec/a.md" },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "This call carries no text, so there is no draft to read."
     },
     {
       "name": "a clean note reads clean",
       "tool": "check_prose",
       "input": { "path": "spec/a.md", "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
       "name": "a note carrying jargon reads rewrite and names the rule",
       "tool": "check_prose",
       "input": { "path": "spec/a.md", "text": "The door leverages the synergy." },
-      "vale": {
+      "lint": {
         "stands": true,
         "ran": true,
         "found": [
@@ -36,10 +36,10 @@
       "answer": "The voice rules refuse this answer. Write it again.\n\n  spec/a.md:1:10  VoiceVale.Jargon\n    wrote: leverages\n    in: The door leverages the synergy.\n    Name the thing.\n\nHold VoiceVale.Jargon for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
     },
     {
-      "name": "a code path reads clean whatever Vale says",
+      "name": "a code path reads clean whatever the lint says",
       "tool": "check_prose",
       "input": { "path": "src/a.js", "text": "// The door leverages the synergy." },
-      "vale": {
+      "lint": {
         "stands": true,
         "ran": true,
         "found": [
@@ -49,38 +49,38 @@
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
-      "name": "a box with no Vale reads a note clean",
+      "name": "a box with no rules reads a note clean",
       "tool": "check_prose",
       "input": { "path": "spec/a.md", "text": "The door leverages the synergy." },
-      "vale": { "stands": false, "ran": false, "found": [] },
+      "lint": { "stands": false, "ran": false, "found": [] },
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
-      "name": "a Vale that runs nowhere names the fault over a note",
+      "name": "a lint that runs nowhere names the fault over a note",
       "tool": "check_prose",
       "input": { "path": "spec/a.md", "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
+      "lint": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
       "answer": "The voice rules refuse this answer. Write it again.\n\n  spec/a.md:1:1  VoiceRulesRan\n    The voice rules did not run over this file: the config names no style. Mend the rule or the setup it names, and write again.\n\nHold VoiceRulesRan for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
     },
     {
-      "name": "a Vale that runs nowhere reads a path outside prose clean",
+      "name": "a lint that runs nowhere reads a path outside prose clean",
       "tool": "check_prose",
       "input": { "path": "src/a.go", "text": "// The door reads the note." },
-      "vale": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
+      "lint": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
       "name": "an answer check carrying no text says what it takes",
       "tool": "check_answer",
       "input": { "text": "  " },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "check_answer takes the text of one draft."
     },
     {
       "name": "the stop line alone reads clean",
       "tool": "check_answer",
       "input": { "text": "stop: the-work-stands-complete", "stop": true },
-      "vale": {
+      "lint": {
         "stands": true,
         "ran": true,
         "found": [
@@ -90,31 +90,31 @@
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
-      "name": "an answer with no Vale goes unread",
+      "name": "an answer with no rules goes unread",
       "tool": "check_answer",
       "input": { "text": "The door reads the note." },
-      "vale": { "stands": false, "ran": false, "found": [] },
-      "answer": "No vale stands here, so the draft goes unread."
+      "lint": { "stands": false, "ran": false, "found": [] },
+      "answer": "No voice rules stand here, so the draft goes unread."
     },
     {
-      "name": "an answer Vale reads nowhere says why",
+      "name": "an answer the rules read nowhere says why",
       "tool": "check_answer",
       "input": { "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
-      "answer": "Vale read nothing: the config names no style"
+      "lint": { "stands": true, "ran": false, "why": "the config names no style", "found": [] },
+      "answer": "The voice rules read nothing: the config names no style"
     },
     {
       "name": "a clean answer meets the gate clean",
       "tool": "check_answer",
       "input": { "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "No finding stands in this answer, so it meets the gate clean."
     },
     {
       "name": "an answer carrying jargon reads rewrite",
       "tool": "check_answer",
       "input": { "text": "The door leverages the synergy." },
-      "vale": {
+      "lint": {
         "stands": true,
         "ran": true,
         "found": [
@@ -128,22 +128,29 @@
       "tool": "check_answer",
       "asked": 1,
       "input": { "text": "The door reads the note." },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "The voice rules refuse this answer. Write it again.\n\n  level0-answer.md:1:1  QuestionTable\n    wrote: The door reads the note.\n    The prompt asks 1 question, and this answer opens with no table. Open it with a table headed question and answer.\n\nHold QuestionTable for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
     },
     {
       "name": "an answer stopping with no needs table names the table",
       "tool": "check_answer",
       "input": { "text": "The door reads the note.", "stop": true },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "The voice rules refuse this answer. Write it again.\n\n  level0-answer.md:1:1  NeedsTable\n    wrote: The door reads the note.\n    This answer ends on a stop with no table above it. Close it with the heading What the agent needs and a table headed No., question and proposed answer.\n\nHold NeedsTable for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
     },
     {
       "name": "an answer past the word cap names its length",
       "tool": "check_answer",
       "input": { "text": "The door reads the note, and the reader acts on what it reads there, and the door writes the next line of the log." },
-      "vale": { "stands": true, "ran": true, "found": [] },
+      "lint": { "stands": true, "ran": true, "found": [] },
       "answer": "The voice rules refuse this answer. Write it again.\n\n  level0-answer.md:1:1  AnswerLength\n    wrote: The door reads the note, and the reader acts on what it reads there, ...\n    An answer holds 12 words outside its code and tables, and this one holds 24. Cut it to 12.\n\nHold AnswerLength for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
+    },
+    {
+      "name": "a lint that runs nowhere and gives no reason says the rules answered nothing",
+      "tool": "check_prose",
+      "input": { "path": "spec/a.md", "text": "The door reads the note." },
+      "lint": { "stands": true, "ran": false, "found": [] },
+      "answer": "The voice rules refuse this answer. Write it again.\n\n  spec/a.md:1:1  VoiceRulesRan\n    The voice rules did not run over this file: the rules answered nothing. Mend the rule or the setup it names, and write again.\n\nHold VoiceRulesRan for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
     }
   ]
 }

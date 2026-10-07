@@ -16,10 +16,10 @@ import (
 
 // The file an answer lints as, and what the check says where it reads no draft. [[spec/design_output/level0#the-tool-reads-a-draft]]
 const (
-	answerAs   = "level0-answer.md"
-	noDraft    = AnswerVerb + " takes the text of one draft."
-	noVale     = "No vale stands here, so the draft goes unread."
-	valeUnread = "Vale read nothing: "
+	answerAs    = "level0-answer.md"
+	noDraft     = AnswerVerb + " takes the text of one draft."
+	noRules     = "No voice rules stand here, so the draft goes unread."
+	rulesUnread = "The voice rules read nothing: "
 )
 
 // The shape rules, the needs table's heading, its heads and the words a cell holds. [[spec/design_output/level0#the-needs-table]]
@@ -67,10 +67,10 @@ func (from Outside) checksAnswer(in Answer) string {
 	}
 	linted := from.Lint(text, answerAs)
 	if !linted.Stands {
-		return noVale
+		return noRules
 	}
 	if !linted.Ran {
-		return valeUnread + linted.Why
+		return rulesUnread + linted.Why
 	}
 	bands := from.bands()
 	found := append(tableFaults(text, from.questions()), needsFaults(text, in.Stop)...)

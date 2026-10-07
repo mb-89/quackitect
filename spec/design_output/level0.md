@@ -1878,23 +1878,15 @@ answers.
 # The fixer calms a shout
 
 `./RUNME.sh fix` runs a round at a time until the tree stops moving. Each round
-calms every shout this tree finds, then hands the file to `vale fix --apply`.
+calms every shout this tree finds, then applies each finding's `replace` action
+through `rules.Apply` in `src/rules/apply.go`. That action writes the swap
+value, expanding `$1`, and folds no case.
 
-Vale carries the actions below, and none of them folds case:
+So `ShoutedLead` carries no action, and `calm` in `src/quack/verb_fix.go` makes the fix
+from the match the rules already report. The rules skip a code fence and
+honour an exemption marker, so the finding they hand over carries both for free.
 
-| action | what it does |
-|---|---|
-| `suggest` | offers a spelling |
-| `replace` | writes the swap value, expanding `$1` |
-| `remove` | drops the match |
-| `edit` | trims, replaces, truncates, splits or runs a regex |
-| `convert` | lowercases and drops the punctuation |
-
-So `ShoutedLead` carries no action, and `calmed` in `src/quack/verb_fix.go` makes the fix
-from the line and the column Vale already reports. Vale skips a code fence and
-honours an exemption marker, so the finding it hands over carries both for free.
-
-The calming runs first because Vale writes `DON'T STOP AT ALL HERE,` into
+The calming runs first because the contraction rule writes `DON'T STOP AT ALL HERE,` into
 `Do not STOP AT ALL HERE,`, which no longer opens with a run of capitals. Round
 two then catches the contraction the calming uncovers.
 
