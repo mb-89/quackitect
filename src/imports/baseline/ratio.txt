@@ -14,7 +14,7 @@ go src/pointer	15 test lines, 5 code lines
 go src/tui	2088 test lines, 198 code lines
 go src/watcher	134 test lines, 123 code lines
 js .claude	141 test lines, 0 code lines
-js .claude/skills/level0/hooks	1989 test lines, 1070 code lines
+js .claude/skills/level0	27 test lines, 0 code lines
 js spec/config	687 test lines, 0 code lines
 js src/doors	2757 test lines, 708 code lines
 js src/doors/fake	13651 test lines, 681 code lines

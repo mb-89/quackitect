@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,79 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: level-zero-becomes-a-typed-mod
 depends_on: ["level0-hooks-move-to-typescript"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 320ccc21b73ed9c1728ecaa1e7c5aae01d93ea96
+    hash_after: 320ccc21b73ed9c1728ecaa1e7c5aae01d93ea96
+    inputs:
+      - name: ask
+        hash: 780972e44202b6f6
+        size: 888
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 5ab6815c7d9fdc5ec7cff63e1d50397ab10f493a
+    hash_after: 5ab6815c7d9fdc5ec7cff63e1d50397ab10f493a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: cae73f308ee5debe
+        size: 3833
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 5020756b3dd3 · claude-code-remote
+    hash_before: 91e5eba70066a8abc5f12340c3ae2e0c112a1580
+    hash_after: 91e5eba70066a8abc5f12340c3ae2e0c112a1580
+    inputs:
+      - name: design/draft
+        hash: cae73f308ee5debe
+        size: 3833
+      - name: design/tests-red
+        hash: 588124fc0ab64b08
+        size: 1071
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 5020756b3dd3 · claude-code-remote
+    hash_before: 3a29744c31f0a8c8bd5bc30de678c81ef46fdfac
+    hash_after: e8043fe24e7a2f969889b0e83f1c5934da640bf7
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 2af84947558eec1019a3237007f48daf5521ac8c
+    hash_after: 2af84947558eec1019a3237007f48daf5521ac8c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   99.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 588124fc0ab64b08
+        size: 1071
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -162,38 +233,81 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each decision left in the hooks moves to one Go owner, and the hook keeps the plumbing.
+
+- The guard while the door stands down: a cage verb on the index binary reads the event and its input as JSON on stdin, and prints a deny with the refusal text where the call stays guarded. Guarded, recovers, wordsOf, commits, pushesWork, killsRuntime and refusedText move from cage.ts to src/modules/hooks/guard.go. The hook runs the verb through $.process.run on a tool.call while no door answers, since the binary stands while the server is down. A verb that answers nothing passes the call, and the fall line the session already meets says the cage stands down.
+- The step: the door answers each post with a step beside its effects, built by StepOf in src/modules/hooks/step.go, so stepOf leaves cage.ts and the hook reads answer.step. A back post says so in the post, and the door asks back on the first post alone.
+- The merge: the hook posts what next(e) answered and the adds to POST /merge on the door, and Merged in step.go answers the merged value. merged leaves shape.ts.
+- The doored events: Standing in listen.go names them under events, and the hook reads the list off the standing file. With no standing file, the start road runs once and a tool.call meets the cage verb.
+- The old door trim leaves: textsOf, rowOf, beforeIn, trimmed, before and readsRaw go, because every door now trims the raw rows (fold.go).
+- The Copilot door reads the same Go pieces: answer.step and the cage verb.
+- The stub bridgehead keeps its vehicle roads, since no binary stands before its clone, and the design note says so.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/level0.ts seen, door, doorAsk, doorSpawns, promptOf, trimmed, before, readsRaw
+- .claude/skills/level0/hooks/cage.ts doors, stepOf, guarded, recovers, wordsOf, refusedText, postOf
+- .claude/skills/level0/hooks/shape.ts merged
+- .claude/skills/level0/hooks/transcript.ts textsOf, rowOf, beforeIn
+- src/scripts/copilot-door.js answers
+- src/modules/hooks/listen.go Listen and serves
+- src/modules/hooks/hooks.go Door.Hook, Post and Answer
+- test/level0/cage.test.js, shape.test.js, transcript.test.js, caged-door.test.js, door-clear.test.js, door-spawn.test.js, hooks.test.js, copilot.test.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_cage_test.go TestCageVerb
+- src/modules/hooks/guard_test.go TestGuarded and TestRecovers, ported from test/level0/cage.test.js
+- src/modules/hooks/step_test.go TestStepOf and TestMerged, ported from test/level0/cage.test.js and shape.test.js
+- src/modules/hooks/listen_test.go TestStandingNamesEvents
+- test/level0/caged-door.test.js the hook asks the cage verb while the door stands down, and reads the step the door answers
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
+- the gate of level0-hooks-move-to-typescript hands this ticket the stub bridgehead rules, and they stay in the stub because no binary stands before its clone
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/level0.ts
+- .claude/skills/level0/hooks/cage.ts
+- .claude/skills/level0/hooks/shape.ts
+- .claude/skills/level0/hooks/transcript.ts
+- src/scripts/copilot-door.js
+- src/modules/hooks/guard.go
+- src/modules/hooks/guard_test.go
+- src/modules/hooks/step.go
+- src/modules/hooks/step_test.go
+- src/modules/hooks/listen.go
+- src/modules/hooks/hooks.go
+- src/quack/verb_cage.go
+- src/quack/verb_cage_test.go
+- the hook tests under test/level0 named in callers
+- spec/design_output/level0.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+cage.ts, shape.ts, transcript.ts, level0.ts, copilot-door.js, listen.go and Door.Hook in hooks.go stand opened, and each named function stands there
+the callers list names every importer of the hook files, from a search over src, test and the plugin
+the first done_when line meets the Go tests above, the second the caged-door case, and the third ./RUNME.sh check
+the approach adds no config key
 
 ## tests-red
 
@@ -202,26 +316,35 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/guard_test.go src/modules/hooks/step_test.go src/modules/hooks/listen_test.go src/quack/verb_cage_test.go test/level0/caged-door.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/guard_test.go
+- src/modules/hooks/step_test.go
+- src/modules/hooks/listen_test.go
+- src/quack/verb_cage_test.go
+- test/level0/caged-door.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The Go tests port every guard, step and merge case from test/level0/cage.test.js and shape.test.js, and fail on stubs that return nothing. Five caged-door cases fail on the hook today: the cage verb, a pass the verb leaves, the step off the door, the merge post and the doored events. The merge body names said and adds, and the cage verb reads event and e on stdin when it runs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestGuarded, TestRecovers, TestWordsOf, TestRefusedText, TestStepOf, TestMerged, TestStandingNamesEvents and TestCageVerb decide the first done_when line, the caged-door cases the second, and the check the third
+the Go tests reach no door, and the caged-door cases fake the fetch, the disk and the process
 
 # gate
 
@@ -230,8 +353,12 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach moves guard, step, merge and the doored events to one Go owner each, and the hooks keep plumbing: done_when line one
+- guard_test.go, step_test.go, listen_test.go and verb_cage_test.go stand red on stubs and decide line one; caged-door.test.js stands red and decides line two; ./RUNME.sh check decides line three
+- the main merge removes cage.test.js cases that drove the deleted guidance door, and the Go tests keep every moved rule
 
 # implement
 
@@ -242,14 +369,19 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, the hook tests the callers list names, and src/scripts/copilot.js, which hands the Copilot door its run
+the cage verb meets a stub in caged-door.test.js and copilot.test.js, and the door post and merge meet a stub of http
+each Go function and each hook function names level0-hooks-hold-no-rule beside its approach
+the event list stands in Doored in listen.go, the step and the merge in step.go, and the design note points at them
 
 ## tests-green
 
@@ -258,26 +390,33 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/guard_test.go src/modules/hooks/step_test.go src/modules/hooks/listen_test.go src/quack/verb_cage_test.go test/level0/caged-door.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The tests the red leaf wrote pass on the change, after main merges in. Two faults the check named on the way are fixed: guard.go names folders.js above the runtime folder it copies, and the smoke quiet case takes the merge post to the hooks door as the door own. The merge with main left spawn.go on a helper main removed, so it takes yaml.Truthy. Every file under the hooks folder now holds posts, the verb road, shapes and transcript reads, and Go holds the decisions.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches guard.go, probe-dry.js and its test, and spawn.go, each a fault the check or the merge names on this ticket
+the probe-dry quiet case meets a fake post list, and the cage verb meets a stub in caged-door.test.js
+the quiet case names level0-hooks-hold-no-rule beside the door paths it reads
+the door paths name postOf in cage.ts as their owner, and guard.go names folders.js
 
 # accept
 
@@ -302,3 +441,5 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate of [[spec/tickets/level0-hooks-move-to-typescript]] hands this ticket the rules the stub bridgehead holds: the vehicle roads, the home order and the clone, in `src/stub/.claude/skills/level0/hooks/bridgehead.ts`.

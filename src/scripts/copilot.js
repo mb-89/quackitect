@@ -89,6 +89,7 @@ try {
     const result = await answers(event, {
       root,
       read: (rel) => files.read(resolve(root, rel)),
+      run: (argv, init) => outside.run(argv, init),
       fetch: async (url, init) => {
         const said = await fetch(url, { ...init, signal });
         return { ok: said.ok, status: said.status, text: await said.text() };

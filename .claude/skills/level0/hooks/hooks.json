@@ -1,6 +1,6 @@
 {
   "description": "Level zero: one closure on every door, which logs what it gets at debug and hands the event on, and the pull as a tool.",
   "modules": [
-    "./pull-tool.js"
+    "./pull-tool.ts"
   ]
 }

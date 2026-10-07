@@ -146,6 +146,14 @@ func TestLogVerbSays(t *testing.T) {
 			t.Fatalf("log --say leaves %q, and wants %q", text, want)
 		}
 	})
+	t.Run("the bridgehead's row keeps its event and its detail", func(t *testing.T) {
+		root, log := logOver(t, map[string]string{})
+		code, _, _ := runsTwin(log, "log", "--say", `{"level":"warn","kind":"bridge","said":"the server answers nothing at tool.call","extra":{"event":"tool.call","detail":"fetch failed"}}`)
+		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+		if want := `{"at":"2026-10-04T12:00:00.000Z","level":"warn","kind":"bridge","said":"the server answers nothing at tool.call","event":"tool.call","detail":"fetch failed"}` + "\n"; code != 0 || string(text) != want {
+			t.Fatalf("log --say answers %d and leaves %q, and wants %q", code, text, want)
+		}
+	})
 	t.Run("a row no JSON reads exits 2 and writes nothing", func(t *testing.T) {
 		root, log := logOver(t, map[string]string{})
 		code, _, errs := runsTwin(log, "log", "--say", "{torn")

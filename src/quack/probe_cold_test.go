@@ -234,7 +234,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	if !slices.Contains(client, "--plugin-dir") || client[slices.Index(client, "--plugin-dir")+1] != filepath.Join(tree, ".claude", "skills", "level0") {
 		t.Errorf("the client runs as %v", client)
 	}
-	if o.env["CLAUDE_CODE_REMOTE"] != "true" || o.env["CLAUDE_CODE_ENABLE_FUNCTION_HOOKS"] != "1" ||
+	if o.env["CLAUDE_CODE_REMOTE"] != "true" || o.env["CLAUDE_CODE_ENABLE_FUNCTION_HOOKS"] != "" ||
 		o.env["CLAUDE_CONFIG_DIR"] != filepath.Join(temp, "config") || o.env["SE_BRIDGE_PORT"] != strconv.Itoa(coldPort(12345)) {
 		t.Errorf("the client runs under %+v", o)
 	}

@@ -28,7 +28,7 @@ const (
 var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
 // The folders the rules skip, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
-var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
+var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/skills/level0/.claude-plugin/types", ".claude/worktrees"}
 
 var proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
 

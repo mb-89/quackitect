@@ -23,7 +23,7 @@ func TestSessionOfReadsEverySpellingTheHarnessesSend(t *testing.T) {
 
 func TestFieldsOfCarriesTheRootAndTheFillBesideThePayload(t *testing.T) {
 	fill := map[string]any{"k": "v"}
-	got := fieldsOf(Post{Root: "/tree", Fill: fill, E: map[string]any{"a": "b"}})
+	got := fieldsOf(Post{Event: toolEvent, Root: "/tree", Fill: fill, E: map[string]any{"a": "b"}})
 	if got["a"] != "b" || got["root"] != "/tree" || got["fill"] == nil {
 		t.Errorf("fieldsOf answers %v, and the post carries a, root and fill", got)
 	}
