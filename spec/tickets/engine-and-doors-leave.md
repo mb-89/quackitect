@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 2ae87ba2c2fbedf5
         size: 9770
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: be4b9520d2b774d7439b37b8b02f800ab52a6fd4
+    hash_after: be4b9520d2b774d7439b37b8b02f800ab52a6fd4
+    inputs:
+      - name: design/draft
+        hash: 2ae87ba2c2fbedf5
+        size: 9770
+      - name: design/tests-red
+        hash: 86b079a1ad244290
+        size: 2598
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -388,8 +400,9 @@ The tests reach no door. The quack cases glob the disk with no exec, and the bra
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line. TestTheEngineAndThePortedDoorsStandNowhere and TestTheEngineFolderHoldsToolsAlone fail on their own assertions over the first line. The doors and check verbs decide the other two at tests-green. The new sync and group rows pass, since Go already holds each behavior. No staying file reads clock, http, index, log, awake, group.js, named.js or front-merge.js beyond the callers list. The two other readers of src/doors/log.js are fixture strings in tree_test.go and tree.test.js. Points the implementer fixes in place: (1) Approach line 10 names tree-of.js, which tree-libs-leave approach line 24 creates. Check it stands once tree-libs-leave lands, and name test/contract/tree.test.js too, which imports fakeGit. (2) The withEveryTakeClosed case keeps a closed row between two open takes and closes twice. No Go case asserts either, so group_test.go gains that row under approach line 21. (3) spec/design_output/migration.md names named.js in the hold folder readers row. That row joins the callers list and takes the pass of approach line 23. (4) tree-libs-leave line 26 moves its fake clock case into clock.test.js, which this slice deletes. The callers list names that case, and a Discussion line on tree-libs-leave says it leaves. (5) Approach line 9 says the extension tests load fake/behaves.js. The staying disk and proc fakes import it, so line 9 gives that reason. (6) plugin-libs-leave lists src/doors/front.js as gone with this slice. The Discussion line of approach line 13 corrects that row and names schema-libs-leave.
 
 # implement
 
