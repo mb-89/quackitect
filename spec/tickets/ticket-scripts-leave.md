@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: a843dde77873d922
         size: 420
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ba68fb4962b0922c39af1b7a66ceaaa4284b1d12
+    hash_after: 5b62cd4671c55630e0cb2f46f7647ebe7f1bfae8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: cb81d42351d267bf
+        size: 5131
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -270,26 +283,31 @@ Assumed: check.go names lib/vehicle.js, which stays, so its comment stays.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/ticket_scripts_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_scripts_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheTicketAndVehicleScriptsStandNowhere fails on its own assertion. It names src/scripts/ticket-route.js, src/scripts/vehicle.js, test/contract/vehicle.test.js and test/level0/outside-hand.test.js. TestEveryRouteTheDrawingsEditsAnswerKeepsTheReachedLeaves passes now, since RouteAheadOnly in src/pull/route.go already takes the move and the drop. It holds an interface, and is no red case. The fixture holds the exact routes that moved and dropped in edit.js answer over the drawing-edit front. The check names only the red file as red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- TestTheTicketAndVehicleScriptsStandNowhere fails on the first line, the go test line with the new route case decides the second, and the check at tests-green the third
+- neither test reaches a door: the red case reads the tree through filepath.Glob, and the route case reads an embedded fixture in memory
 
 # gate
 
