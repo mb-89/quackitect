@@ -161,6 +161,10 @@ record:
     hand: box bf9a9fb67fb5 · claude-code-remote
     hash_before: 5caf10b9ac63f668859492a1201fbfe1cea274d4
     session: cse_01JR49WAMwFsp1GuB8FX2Gz2
+    hash_after: 931a134aa374db98001c22f4ebec7182e2c28b24
+    model: claude-opus-5-5
+    cost: 0
+    final: work/failures-stand-registered lands through its pull request with auto-merge on.
   - step: split
     hand: box bf9a9fb67fb5 · claude-code-remote
     hash_before: 20abc40a6547556f62ae0f6a57a19a7baffbe6b5
