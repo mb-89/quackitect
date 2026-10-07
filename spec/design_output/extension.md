@@ -315,9 +315,9 @@ argument, and a fake door drives the whole path.
 | `lenses` | the buttons over a ticket, and a watcher over the holds |
 | `runsVerb` | a child process running the pull |
 
-Outside the editor files, the extension imports nothing from `node:`. So the
-`DoorsOnly` rule reads the rest of the folder and finds nothing to refuse: the
-rule names `node:` imports, and `vscode` stands outside its list.
+Outside the editor files, the extension imports nothing from `node:`, so
+nothing in the rest of the folder walks around a door. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
 
 ## The watcher draws it again
 
