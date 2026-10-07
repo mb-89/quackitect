@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: d583a44a03cba5b936dfe689009a39a326f92266
+    hash_after: d583a44a03cba5b936dfe689009a39a326f92266
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes; green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   62.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 513eb42eb823afcb
+        size: 1034
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -353,26 +376,33 @@ the pure module list stands once, in src/owns/script.go, and the doors note and 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns src/modules/check
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every door now refuses a walk around it. Before, every declaration carried report: true, so the guard listed a walk and let it land. The twelve production walks are cleared first. The index declaration names the eight files serving its socket, bus and detach beside door.go. The process door owns context.WithTimeout and time.After, which bound a run, beside the clock door. Then report leaves every owns.yaml. A random door in src/doors owns Math.random and holds no file, so any call walks around it until a door file stands. jsWalks names a node: module no door declares as a walk around no door, past the modules that reach nothing outside the process: node:path, node:url, node:test and node:assert, listed once in src/owns/script.go. The JavaScript guard thus covers all the Vale rule DoorsOnly covered, so DoorsOnly leaves: its rule file and its .vale.ini lines go. Its contract test stays, since the same file holds the contract of OutsideInDoors, and drops the three pieces naming DoorsOnly. The doors note says the rule in one line, and the model note, the migration note, the code guidance and testing rule 1 point at it. The children of this ticket cleared the way: a walk words itself when no door owns its module, the fake vscode and the page mark or own what they reach, the guard reads the skill scripts, and the extension note and testing rationale carry the retirement. The report key now serves no door, and the note report-key-retires parks its removal for the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files of the draft size, and two more the draft missed: the migration note and the model note analyzer line, which named the retired Vale rule
+the random door holds no file, so it has no fake by design, and every other door the change reaches keeps the fake it had
+the comments in src/owns/script.go name the doors note section the guard follows
+the pure module list stands once, in src/owns/script.go, and the notes point at it
 
 # accept
 
