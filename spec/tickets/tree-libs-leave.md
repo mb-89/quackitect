@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["cage-libs-leave"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 81f5177a23131070707263f24214f41e69923202
+    hash_after: 81f5177a23131070707263f24214f41e69923202
+    inputs:
+      - name: ask
+        hash: 501f6e38c8f3a0b9
+        size: 581
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +168,169 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. The nine libraries leave: tree, stop, rulefile, tested, servers, names, private, magic and size.
+2. No staying library imports a leaving one. Inside lib, only tree.js, stop.js and magic.js import the set, and each leaves.
+3. The set reads folders.js, paths.js, tools.js and vale.js, which stay for later slices.
+4. Go owns most rules already: check/tree.go, check/names.go, check/private.go, check/textfaults.go, hooks/stop, command/tested.go and command/private.go.
+5. Four rules ran in tree.test.js alone: EveryModuleTested, StopFolderIsData, PrivateFolderOwned and InstallerHoldsTheNames.
+6. EveryModuleTested leaves with no port, since it reads src/bridge, and src/bridge stands nowhere.
+7. testing.md rule 5 and tree.md drop the EveryModuleTested clause, and keep the commit door's tested delta.
+8. New src/modules/check/folders.go holds Moved, Renamed, Logged, Apart, privateFolderOwned, installerHoldsTheNames and loopNames.
+9. folders.js drops MOVED, RENAMED, LOGGED and APART with a pointer at folders.go, since tree.js read them alone.
+10. tools.js drops loopNames and its helpers, and tools.test.js drops its loop case, since tree.js called it alone.
+11. check.Rules and the Install row of readers gain both folder rules, so the lint and the panel run them.
+12. The escape word stays folders.js, since every Go copy names it. The parent's last slice moves it with folders.js.
+13. The three install.sh marks read folders.go owns these names as, which loopNames reads.
+14. StopFolderIsData ports to TestEveryStopFileReadsWhole in src/quack/stop_rules_test.go, as parent line 16 says.
+15. That test globs spec/config/stop/*.yml, pools each file through stop.Pool, and a later file's claim ends the turn through stop.Decide.
+16. stop_rules_test.go also takes the stop-rules.test.js cases, and the mechanical-check case through stop.KnowsCheck.
+17. New check/tree_test.go holds a TreeOver case for each Go tree rule that tree.test.js alone tested.
+18. check/folders_test.go holds the folders.test.js cases. src/quack/runtime_names_test.go holds its lsp door case over check.Moved and lsp.StandingFile.
+19. private_test.go and tested_test.go under hooks/command gain the rows private.test.js and tested.test.js alone held.
+20. command/private.go exports Nobody. src/quack/nobody_test.go holds Private.yml to it, in place of the vale.test.js case.
+21. tree.test.js drops every case over a leaving library and the real git door. It keeps the count chain, session file and config cases.
+22. The session-file case reads through text in place of here.read.
+23. real-git.test.js drops its tree.test.js entry from KEPT, since that file reads git no more.
+24. treeOf moves to test/contract/tree-of.js, which schema.test.js and ticket.test.js import until schema-libs-leave.
+25. tested.test.js, private.test.js, stop-rules.test.js and folders.test.js leave whole.
+26. The behaves case of tested.test.js moves to fake-paths.test.js, and its clock case to clock.test.js.
+27. install.test.js drops its vale-ls case, and install.sh owns the vale-ls pin and the asset table alone.
+28. setup_verb.go reads check.Extensions, and doctor_verb.go reads check.Settings, in place of their own copies.
+29. Every Go comment and the Private.yml comment naming a leaving file name its Go owner.
+30. tree, stop, private, config, level0, editor, extension, bash, lsp and doors under spec/design_output name the Go owner.
+31. src/quack/tree_libs_test.go globs the nine libraries and the four leaving tests, and stays red until they leave.
+Weighed: keeping the lists in folders.js for Go to parse. Go then reads JavaScript text, and the parent deletes that file anyway.
+Weighed: the two folder rules as a test over this tree alone. The sweep then misses a stray spelling until a test run.
+Weighed: porting EveryModuleTested onto src/extension. That moves its scope, and the owner decides scope, not this ticket.
+Weighed: renaming tree.test.js. Its last cases leave with config-libs-leave and the parent's last slice.
+Weighed: inlining treeOf in schema.test.js and ticket.test.js. Two copies then drift until schema-libs-leave.
+Weighed: a Go copy of the vale-ls asset table. Nothing in Go downloads vale-ls, so the copy holds no reader.
+Assumed: the index mirrors every tracked .go, .js and .sh file, so the sweep reads what git ls-files read.
+Assumed: the privateNow gatherer cases take no port, since commitGuards in src/modules/hooks/commits.go gathers in Go.
+Assumed: config-libs-leave takes the config cases left in tree.test.js, and the parent takes the session-file case.
+Assumed: scripts-folder-leaves and this ticket rebase over each other on install.sh, install.test.js and the Install constant.
+Assumed: the lint group accepts the edits to Private.yml, vale.test.js and clock.test.js.
+Assumed: the hooks/command rows count toward done_when line 3 through the check, which runs go test over every module.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- test/contract/tree.test.js: every case over tree.js, servers.js, stop.js and tested.js, plus here, fakeTree and namesIn
+- test/contract/tree.test.js: the session-file case, which reads here.read
+- test/contract/folders.test.js: every case, reading privateFolderOwned, installerHoldsTheNames, treeOf, MOVED and RUN
+- test/contract/schema.test.js: here and departing, which call treeOf
+- test/contract/ticket.test.js: here, which calls treeOf
+- test/contract/stop-rules.test.js: every case, reading pool
+- test/contract/install.test.js: the vale-ls case, reading VALE_LS_VERSION, VALE_LS_RELEASES and valeLsAsset
+- test/contract/vale.test.js: the nobody case, reading NOBODY
+- test/contract/real-git.test.js: KEPT, naming tree.test.js
+- test/level0/tested.test.js: every case, reading untestedIn, everyModuleTested, carriedIn, treeOf, behaves and fakeClock
+- test/level0/private.test.js: every case, reading the private.js exports
+- test/level0/tools.test.js: the loop reader case, reading loopNames
+- .claude/skills/level0/lib/tools.js: loopNames, meets, markAbove, namesIn, bare, LOOP, MARK and PRIVATE_PATH
+- .claude/skills/level0/lib/folders.js: MOVED, RENAMED, LOGGED and APART, read by tree.js alone
+- src/modules/check/checker.go: Rules and readers, which gain privateFolderOwned and installerHoldsTheNames
+- src/modules/check/textfaults.go: the rule-names comment naming size.js and magic.js
+- src/modules/hooks/command/private.go: nobody, which turns into Nobody, plus the header and the carriedFrom and refusedPrivate comments
+- src/modules/hooks/command/findings.go: the private half comment and the overLong comment
+- src/modules/hooks/command/tested.go: header comment naming lib/tested.js
+- src/modules/hooks/command/tested_test.go: header comment naming lib/tested.js
+- src/modules/hooks/command/private_test.go: header comment naming lib/private.js
+- src/modules/hooks/commits.go: the raw notes comment naming lib/private.js
+- src/modules/hooks/answers.go: the stop tool input comment naming stopSpec in lib/stop.js
+- src/modules/hooks/stops.go: the events comment naming lib/stop.js
+- src/modules/hooks/stop/rules.go: header naming rulefile.js and pool in lib/stop.js
+- src/modules/hooks/stop/vote.go: header naming lib/stop.js
+- src/modules/hooks/stop/stop_test.go: header naming lib/stop.js
+- src/modules/drafts/answer.go: header naming the stop line of lib/stop.js
+- src/quack/setup_verb.go: editorExtensions, which reads check.Extensions
+- src/quack/doctor_verb.go: editorSettings, which reads check.Settings
+- src/scripts/install.sh: the RENAMED, MOVED and LOGGED marks, and the vale-ls pin comment
+- spec/config/styles/VoiceVale/Private.yml: the header comment naming NOBODY in lib/private.js
+- spec/guidance/code/testing.md: rule 5, naming EveryModuleTested
+- spec/design_output: tree.md, stop.md, private.md, config.md, level0.md, editor.md, extension.md, bash.md, lsp.md and doors.md lines naming leaving files
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/tree_libs_test.go: TestTheTreeLibrariesStandNowhere
+- src/quack/stop_rules_test.go: TestEveryStopFileReadsWhole
+- src/quack/stop_rules_test.go: TestEveryMechanicalStopRuleRunsACheckTheDoorHolds
+- src/quack/stop_rules_test.go: TestTheShippedStopRulesKeepTheirYieldsAndRanks
+- src/quack/runtime_names_test.go: TestTheLspDoorFileStandsAmongTheRuntimeNames
+- src/quack/nobody_test.go: TestTheShapesRuleAndTheCommitDoorPassOneListOfNobodyUsers
+- src/modules/check/folders_test.go: TestPrivateFolderOwnedRefusesASpellingNamingNoOwner
+- src/modules/check/folders_test.go: TestAnImportAloneExcusesNoSpellingAndACommentAboveDoes
+- src/modules/check/folders_test.go: TestInstallerHoldsTheNamesRefusesALoopApartFromItsList
+- src/modules/check/folders_test.go: TestLoopNamesReadsEachLoopUnderItsMark
+- src/modules/check/tree_test.go: TestSettingsNameBinariesRefusesAnotherBinaryAndAnInstallWithNoVale
+- src/modules/check/tree_test.go: TestEditorDrawsWriteRulesRefusesItsOwnLevelAStyleAndAMissingConfig
+- src/modules/check/tree_test.go: TestBiomeOnWindowsRefusesAPlainPath
+- src/modules/check/tree_test.go: TestExtensionsOnOfferRefusesADroppedExtensionAndAStrangeFormatter
+- src/modules/check/tree_test.go: TestNoLogDeletedRefusesALineReachingALog
+- src/modules/check/tree_test.go: TestNothingPrivateTravelsRefusesTheBoxNamesAndPassesNobody
+- src/modules/check/tree_test.go: TestSurveyNamesInstallsRefusesAToolTheSurveyMisses
+- src/modules/check/tree_test.go: TestSurveyFindsNodeRefusesAnotherNodeAndAMissingSurvey
+- src/modules/hooks/command/private_test.go: TestPrivateInReadsTheBridgesThreeChecks, gaining the number, home, box, longer-word, five-word, two-line and hyphen rows
+- src/modules/hooks/command/private_test.go: TestAddedInReadsEachAddedLineWithItsPlace, gaining the deleted-file and hunk-number rows
+- src/modules/hooks/command/tested_test.go: TestUntestedInReadsTheBridgesDelta, gaining the copy, editor, taken-away, stray, own-hunk, comment-trade and deleted rows
+- src/modules/hooks/command/tested_test.go: TestAMoveOfAWholeBlockChangesNoCode, gaining the statement-inside-a-body row
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib: tree, stop, rulefile, tested, servers, names, private, magic, size
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/tools.js
+- test/contract/tree.test.js
+- test/contract/folders.test.js
+- test/contract/stop-rules.test.js
+- test/contract/schema.test.js
+- test/contract/ticket.test.js
+- test/contract/tree-of.js
+- test/contract/install.test.js
+- test/contract/vale.test.js
+- test/contract/real-git.test.js
+- test/contract/clock.test.js
+- test/level0/tested.test.js
+- test/level0/private.test.js
+- test/level0/tools.test.js
+- test/level0/fake-paths.test.js
+- src/modules/check: folders.go, folders_test.go, tree_test.go, checker.go, textfaults.go
+- src/modules/hooks/command: private.go, private_test.go, tested.go, tested_test.go, findings.go
+- src/modules/hooks: commits.go, answers.go, stops.go
+- src/modules/hooks/stop: rules.go, vote.go, stop_test.go
+- src/modules/drafts/answer.go
+- src/quack: tree_libs_test.go, stop_rules_test.go, runtime_names_test.go, nobody_test.go, setup_verb.go, doctor_verb.go
+- src/scripts/install.sh
+- spec/config/styles/VoiceVale/Private.yml
+- spec/guidance/code/testing.md
+- spec/design_output: tree.md, stop.md, private.md, config.md, level0.md, editor.md, extension.md, bash.md, lsp.md, doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked: each lib import, tree.js RULES, tested.js, servers.js, folders.js, loopNames, check Rules and readers, stop.Pool, Decide, KnowsCheck, the Go private and tested tables, editorExtensions and editorSettings
+- the callers come from git grep on each leaving file and export over hooks, lib, src, test, RUNME.sh, package.json, .github, .vale.ini, Go comments and spec notes, and no staying library imports a leaving one
+- TestTheTreeLibrariesStandNowhere decides the two git ls-files lines, the new check and quack tests decide the go test line, and ./RUNME.sh check at tests-green decides the fourth
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
