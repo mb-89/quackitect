@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: bfe420c6747c2284
         size: 3869
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-4
+    hash_before: 71d3b35dc119a3ba851edeac9e69808f33196167
+    hash_after: 71d3b35dc119a3ba851edeac9e69808f33196167
+    inputs:
+      - name: design/draft
+        hash: bfe420c6747c2284
+        size: 3869
+      - name: design/tests-red
+        hash: 513eb42eb823afcb
+        size: 1034
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -293,8 +305,14 @@ every door the tests reach has a fake: the owns tests read planted texts and the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- skill-scripts-meet-the-guard: the guard skips every path holding a .claude part (walkPasses in src/modules/check/textfaults.go, read by walkFaults and by walksOver in src/quack/verb_doors.go), so DoorsOnly alone guards the scripts under .claude/skills today, the level0 lib among them. Retiring it leaves those scripts unguarded, against the owner's word that the JS door rules cover the level0 hooks. Let the doors walk read .claude/skills, and declare what the hooks reach, before the group closes.
+- fake-vscode-names-its-door: the draft says no undeclared impure node: import stands, and src/doors/fake/vscode.js imports node:module, held by no door in src/doors/owns.yaml. Once jsWalks names an undeclared module, that line walks around no door and the check goes red. Name the file under a door owning node:module, or mark the line.
+- page-owns-math-random: src/extension/drawing/route.mjs calls Math.random, and the page door holding it as its own outside leaves Math.random out of its js list. Once the random door owns Math.random, that call walks around random and the check goes red. Add Math.random to src/extension/drawing/owns.yaml.
+- doorless-walk-names-no-door: walksSays in src/modules/check/doors.go and walkLine in src/quack/verb_doors.go join the walk's doors, and a walk around no door reads 'walks around .' with an empty list. Word that case as a module no door declares. The draft's size leaves both files out.
+- doorsonly-leaves-every-note: spec/design_output/extension.md and spec/rationales/testing.md still name DoorsOnly and its pure modules, and the draft's size leaves both out. Carry the retirement into each, beside the doors note and the model note.
 
 # implement
 
