@@ -172,6 +172,7 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 }
 
 // A stop returns once the door it stops has exited, so its caller removes a tree no running door holds. [[spec/tickets/smoke-waits-for-the-door]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -342,6 +343,7 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 }
 
 // A reach waits on its door's answer past the old thirty seconds, up to what the hang guard leaves of it. [[spec/tickets/cold-runner-waits-meet-readiness]]
+// level0: RunsAlone - it swaps the package's start clock, which every start beside it reads
 func TestAReachWaitsOnItsDoorUpToTheHangGuard(t *testing.T) {
 	fakeStartClock(t, nil)
 	now := startNow()
@@ -435,6 +437,7 @@ func exitingSpawn(t *testing.T, exits error) {
 }
 
 // An index whose first build runs past the old thirty seconds still stands its door, and the start waits on it. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -453,6 +456,8 @@ func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 }
 
 // An index that exits before its door stands ends the wait at once, naming the exit. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
+// level0: RunsAlone - it swaps the package's spawns and start clock, which every start beside it reads
 func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
@@ -468,6 +473,8 @@ func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 }
 
 // An index that neither stands nor exits meets the hang guard, and the start names it hung. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
+// level0: RunsAlone - it swaps the package's spawns and start clock, which every start beside it reads
 func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
@@ -482,6 +489,7 @@ func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 }
 
 // A caller meeting a claim its holder keeps fresh waits past the old thirty seconds, spawns nothing, and reads the door that index stands. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAWaiterHoldsWhileTheClaimStaysFresh(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")

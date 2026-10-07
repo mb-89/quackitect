@@ -172,6 +172,7 @@ func TestServerRead(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestGoGate(t *testing.T) {
 	t.Parallel()
 	read := func(path string) string {
@@ -258,6 +259,7 @@ func TestTestArgv(t *testing.T) {
 }
 
 // A red check ends by naming each red case with its file, and its line where the run names one. [[spec/tickets/ci-reds-name-their-cases]]
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestCheckEndsOnTheRedCases(t *testing.T) {
 	t.Parallel()
 	ends := func(t *testing.T, run func(doors *checkDoors, argv []string) (int, string)) []string {

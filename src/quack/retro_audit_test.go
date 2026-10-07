@@ -46,6 +46,7 @@ func retroAuditClosed(front, decision string) string {
 }
 
 // The audit names a closed trial whose decision stands empty and which names no successor, and passes one decided or grown. [[spec/tickets/retro-audit-reads-the-decision]]
+// level0: FixtureOutsideHome - the case writes its trials into a tree of its own
 func TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

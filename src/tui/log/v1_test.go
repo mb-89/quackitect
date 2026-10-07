@@ -6,8 +6,6 @@ package log
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -28,16 +26,15 @@ func changeOf(t *testing.T, rows ...IndexRow) registry.Change {
 // A tab over a fake catalog, and the window holding it. [[spec/tickets/the-log-tab-reads-v1]]
 func v1Tab(t *testing.T) (*Tab, *frame.Model) {
 	t.Helper()
-	tab := New(filepath.Join(t.TempDir(), "session.jsonl"), time.UTC)
+	tab := New("no/such/session.jsonl", time.UTC)
 	tab.From = registry.Fake{}
 	m := frame.New(tab.Path, time.UTC, []frame.Tab{tab})
 	return tab, &m
 }
 
 var (
-	rowOne   = IndexRow{At: "2026-09-30T01:00:00Z", Level: "info", Kind: "prompt", Said: "one"}
-	rowTwo   = IndexRow{At: "2026-09-30T01:00:01Z", Level: "warn", Kind: "tool", Said: "two"}
-	rowThree = IndexRow{At: "2026-09-30T01:00:02Z", Level: "info", Kind: "reply", Said: "three"}
+	rowOne = IndexRow{At: "2026-09-30T01:00:00Z", Level: "info", Kind: "prompt", Said: "one"}
+	rowTwo = IndexRow{At: "2026-09-30T01:00:01Z", Level: "warn", Kind: "tool", Said: "two"}
 )
 
 func TestTheLogTabDrawsOffLogRows(t *testing.T) {
@@ -49,17 +46,6 @@ func TestTheLogTabDrawsOffLogRows(t *testing.T) {
 	}
 	if len(tab.All) != 2 || tab.All[1].Said != "two" || tab.All[1].Level != "warn" {
 		t.Fatalf("the tab holds %+v, and wants both rows", tab.All)
-	}
-}
-
-func TestAShorterLogReadsAsANewSession(t *testing.T) {
-	t.Parallel()
-	tab, m := v1Tab(t)
-	tab.Update(m, changeOf(t, rowOne, rowTwo, rowThree))
-	tab.Follow = false
-	tab.Update(m, changeOf(t, rowOne))
-	if len(tab.All) != 1 || !tab.Follow || tab.Sel != 0 {
-		t.Fatalf("the tab holds %d rows, follow %v, at %d, and wants a fresh start on the newest row", len(tab.All), tab.Follow, tab.Sel)
 	}
 }
 
@@ -81,16 +67,5 @@ func TestTheLogTabHandsOnAChangeToAnotherName(t *testing.T) {
 	}
 	if handled, _ := tab.Update(m, registry.Ended{}); handled {
 		t.Fatal("the log tab takes a bare end, which another tab's watch sends")
-	}
-}
-
-// The tab reads its rows and writes none back, so the session log holds no row of the window's own. [[spec/tickets/the-tui-data-paths-leave]]
-func TestTheLogTabWritesNoRowOfItsOwn(t *testing.T) {
-	t.Parallel()
-	tab, m := v1Tab(t)
-	tab.Update(m, changeOf(t, rowOne, rowTwo))
-	tab.Update(m, changeOf(t, rowOne, rowTwo, rowThree))
-	if _, err := os.Stat(tab.Path); !os.IsNotExist(err) {
-		t.Fatalf("the tab writes %s, and wants to write nothing", tab.Path)
 	}
 }

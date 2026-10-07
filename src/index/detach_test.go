@@ -1,7 +1,7 @@
 //go:build !windows
 
 // [[spec/tickets/the-index-outlives-the-check]] [[spec/tickets/platform-draft-names-checkdoors]]
-package index
+package index // level0: InPackageTest - the case reads the unexported exitEnds the door's wait reads
 
 import (
 	"os/exec"

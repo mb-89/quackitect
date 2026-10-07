@@ -15,8 +15,21 @@ import (
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/files"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 	"quackitect/src/ticket"
 )
+
+// A folder a case hands a fake runner as its working folder, built once, which no case writes into. TestMain removes it. [[spec/design_output/model#the-guards-hold-a-baseline]]
+var sharedFolder = qtest.Shared(func() string {
+	dir, err := os.MkdirTemp("", "quack-shared-")
+	if err != nil {
+		panic(err)
+	}
+	buildDirs.Lock()
+	buildDirs.dirs = append(buildDirs.dirs, dir)
+	buildDirs.Unlock()
+	return dir
+})
 
 // The git module's tips, which a case wiring the tickets module and no git feeds empty. [[spec/tickets/the-index-reads-standing-branches]]
 const (

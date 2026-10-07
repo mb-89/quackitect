@@ -1,6 +1,6 @@
 // The branch verbs' doors stand over the work root, and their method disk over
 // the root the method reads. [[spec/tickets/branch-verbs-meet-fake-git]]
-package main
+package main // level0: InPackageTest - the case reads the unexported branchDoors and workRootVar of the command
 
 import (
 	"io"
@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// level0: FixtureOutsideHome - the case writes into a work root and a method root of its own
 func TestTheBranchDoorsWriteTheWorkRootAndReadTheMethodRoot(t *testing.T) {
 	work, method := t.TempDir(), t.TempDir()
 	t.Setenv(workRootVar, work)

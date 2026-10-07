@@ -209,6 +209,7 @@ var buildDirs struct {
 var quackBuilds atomic.Int32
 
 // Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
+// level0: FixtureOutsideHome - the case links the build into two folders of its own
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 	t.Parallel()
 	built(t, t.TempDir())

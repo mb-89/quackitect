@@ -6,7 +6,6 @@ go src/modules/env	75 test lines, 57 code lines
 go src/modules/holds	158 test lines, 127 code lines
 go src/modules/http	14 test lines, 11 code lines
 go src/modules/index	1100 test lines, 890 code lines
-go src/modules/migration	114 test lines, 86 code lines
 go src/modules/session	74 test lines, 70 code lines
 go src/modules/verbs	337 test lines, 247 code lines
 go src/modules/waits	171 test lines, 154 code lines
@@ -16,10 +15,8 @@ go src/tui	2088 test lines, 198 code lines
 go src/watcher	134 test lines, 123 code lines
 js .claude	141 test lines, 0 code lines
 js .claude/skills/level0/hooks	1989 test lines, 1070 code lines
-js .claude/skills/level0/lib	18084 test lines, 10088 code lines
 js spec/config	687 test lines, 0 code lines
 js src/doors	2757 test lines, 708 code lines
 js src/doors/fake	13651 test lines, 681 code lines
-js src/engine	1500 test lines, 504 code lines
 js src/extension/webview	224 test lines, 131 code lines
 js test/contract	369 test lines, 202 code lines

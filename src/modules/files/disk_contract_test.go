@@ -35,7 +35,7 @@ func diskSuite(t *testing.T, open func(t *testing.T) Disk) {
 }
 
 func TestDiskListsEveryFileUnderAFolder(t *testing.T) {
-	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} { // level0: FixtureOutsideHome - the case writes into a real folder of its own
 		for _, path := range []string{"e.md", "ab/d.md", "a/deep/c.md", "a/b.md"} {
 			if err := one.Write(path, "x"); err != nil {
 				t.Fatal(err)
@@ -61,7 +61,7 @@ func TestDiskListsEveryFileUnderAFolder(t *testing.T) {
 
 // A link reads what it names, file or folder, and its removal leaves that standing, as the review verb's worktree links. [[spec/tickets/branch-verbs-meet-fake-git]]
 func TestDiskLinksAPathAndTheUnlinkLeavesItsTarget(t *testing.T) {
-	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} { // level0: FixtureOutsideHome - the case writes into a real folder of its own
 		for path, text := range map[string]string{"lib/x.txt": "held", "a.md": "said"} {
 			if err := one.Write(path, text); err != nil {
 				t.Fatal(err)
@@ -100,7 +100,7 @@ func TestDiskLinksAPathAndTheUnlinkLeavesItsTarget(t *testing.T) {
 
 // A write under a path a file holds, or onto a folder, refuses, and the file stands as it stood. [[spec/design_output/doors#a-fake-behaves]]
 func TestDiskRefusesAWriteThroughAFileOrOntoAFolder(t *testing.T) {
-	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} {
+	for name, one := range map[string]Disk{"fake": NewFakeDisk(), "real": NewDisk(t.TempDir())} { // level0: FixtureOutsideHome - the case writes into a real folder of its own
 		for path, text := range map[string]string{"a": "file", "b/c.md": "c"} {
 			if err := one.Write(path, text); err != nil {
 				t.Fatal(err)

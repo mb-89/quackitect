@@ -2,7 +2,7 @@
 
 // The end of a span ends the child and the processes it started, which a pipe they hold proves by reading to its end.
 // [[spec/tickets/the-check-ends-what-it-drops]]
-package main
+package main // level0: InPackageTest - the case calls the unexported endsWhole of the command
 
 import (
 	"bufio"
@@ -23,6 +23,7 @@ import (
 const doorHelper = "SE_TEST_STARTS_A_DOOR"
 
 // A check gives up on a child that started a door, and the group kill leaves the door standing. [[spec/tickets/the-index-outlives-the-check]]
+// level0: FixtureOutsideHome - the case spawns its own child, which starts a door of its own
 func TestAServerStandingBeforeTheCheckAnswersAfterIt(t *testing.T) {
 	if os.Getenv(doorHelper) == "1" {
 		door := index.Detached(exec.Command("tail", "-f", "/dev/null"))
@@ -67,6 +68,7 @@ func TestAServerStandingBeforeTheCheckAnswersAfterIt(t *testing.T) {
 }
 
 // The child starts a grandchild holding its stdout, so the pipe reads to its end only once both have ended. [[spec/tickets/the-check-ends-what-it-drops]]
+// level0: FixtureOutsideHome - the case spawns its own child and grandchild, then ends them
 func TestAChildTheCheckGivesUpOnEndsWithEveryProcessItStarted(t *testing.T) {
 	t.Parallel()
 	span, stop := context.WithCancel(context.Background())

@@ -2,7 +2,7 @@
 // FakeRepo, the clone's work tree on a FakeDisk, and a FakeRunner taught no
 // git, so every case runs in memory and a reach for the real git answers
 // NotStarted. [[spec/tickets/branch-verbs-meet-fake-git]]
-package branches
+package branches // level0: InPackageTest - the fake tree the package's tests share stands on the unexported doors fetch, push, rev, run and write, and on trunk and workBranch
 
 import (
 	"bytes"

@@ -3,7 +3,6 @@ src/engine/swap/swap_test.go
 src/front/cmd/main_test.go
 src/front/front_test.go
 src/modules/check/buffers_test.go
-src/modules/check/check_test.go
 src/modules/check/features_test.go
 src/modules/check/markers_test.go
 src/modules/check/mint_refusal_test.go
@@ -82,7 +81,6 @@ src/modules/index/module_test.go
 src/modules/index/ops_test.go
 src/modules/log/log_test.go
 src/modules/log/say_test.go
-src/modules/lsp/door_test.go
 src/modules/lsp/features_test.go
 src/modules/lsp/lsp_test.go
 src/modules/lsp/tools_test.go
@@ -90,7 +88,6 @@ src/modules/mcp/mcp_test.go
 src/modules/migration/migration_test.go
 src/modules/modules_test.go
 src/modules/plans/plans_test.go
-src/modules/queue/golden_test.go
 src/modules/queue/outline_test.go
 src/modules/queue/overrides_test.go
 src/modules/queue/places_plan_test.go
@@ -157,19 +154,15 @@ src/q/wiring_test.go
 src/q/writer_test.go
 src/ticket/place_test.go
 src/ticket/ticket_test.go
-src/tui/door_test.go
 src/tui/draw/colour_test.go
 src/tui/draw/table_test.go
 src/tui/frame/door_test.go
 src/tui/frame/part_test.go
 src/tui/frame_root_test.go
-src/tui/frame_test.go
 src/tui/layout_test.go
 src/tui/log/detail_test.go
-src/tui/log/golden_test.go
 src/tui/log/read_test.go
 src/tui/log/v1_test.go
-src/tui/model_test.go
 src/tui/mouse_test.go
 src/tui/panes_test.go
 src/tui/registry/call_contract_test.go
@@ -177,9 +170,6 @@ src/tui/registry/catalog_contract_test.go
 src/tui/registry/tab_test.go
 src/tui/registry/v1_test.go
 src/tui/registry/watch_test.go
-src/tui/shipped_test.go
-src/tui/sort_test.go
-src/tui/switched_test.go
 src/tui/tree/base_test.go
 src/tui/tree/palette_test.go
 src/tui/tree/preset_test.go
@@ -195,7 +185,6 @@ src/tui/work/workitems_test.go
 src/tui/work_test.go
 src/tui/workdetail_test.go
 src/tui/workedit_test.go
-src/tui/workplace_test.go
 src/tui/workplaces_test.go
 src/vehicle/disk_test.go
 src/vehicle/shim_contract_test.go

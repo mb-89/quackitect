@@ -70,6 +70,7 @@ func timerAsked(t *testing.T, asks <-chan time.Duration, span time.Duration) {
 
 // New placements wait the default gap between two spawns, and it stays short. [[spec/tickets/the-modules-start-together]]
 func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
+	t.Parallel()
 	if got := NewPlacements(nil, nil, nil).gap; got != spawnGap {
 		t.Fatalf("new placements wait %v between spawns, and want %v", got, spawnGap)
 	}
@@ -106,6 +107,7 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 
 // The stop answers once the spawner returns, so no spawn lands past it. The timer holds the spawner until the stop begins. [[spec/tickets/stop-join-test-stands-red]]
 func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)

@@ -114,7 +114,7 @@ func retroMintFixedClass() map[string]any {
 // A tree holding the routes and the record, and a runner taught the mint and the open of each ticket. [[spec/guidance/retro/check]]
 func retroMintTree(t *testing.T, classes, promotions []map[string]any) (string, *retroMintFake) {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case writes and mints into a tree of its own
 	retroMintWrite(t, root, "spec/processes/standard.yaml", "steps: []\n")
 	retroMintWrite(t, root, "spec/processes/trivial.yaml", "steps: []\n")
 	if classes == nil {
