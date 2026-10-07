@@ -109,6 +109,22 @@ record:
     hand: the engine
     hash_before: 9bcd4b0e78ebbc1b03c030d1fa9626080e047e60
     hash_after: 9bcd4b0e78ebbc1b03c030d1fa9626080e047e60
+  - step: accept
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 2e35e158b98503c515343b0078143133c1d72d33
+    hash_after: f30fde4663153a9f7a3d7b57638d4810099120df
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lint-without-vale already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b1429804df0c41dd
+        size: 958
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -177,8 +193,10 @@ no open child waits on another: the design notes child reads the tree the closed
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- vale-comments-leave-the-code: comments and names still describe Vale where the Go rules run. These are the doc comments of commitVoice, heard, valeHeard, heardOver and heardIn in src/quack/command.go, with valeHeard renamed. They also take the header and the faultIn message of .claude/skills/level0/lib/vale.js, and TestCommitVoiceReadsNothingWhereNoValeStands in src/quack/commit_voice_test.go. The layer's opening says Vale holds the mechanical rules, in src/modules/hooks/brief/layer.go, src/projection/style.go and lib/guidance.js, and the projection writes it again. Since main took the readers out, src/doors/vale.js and teachRules in test/level0/quack-doors.js stand with no caller past their own contract tests, so they leave too.
 
 # retro
 
