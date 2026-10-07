@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -173,6 +173,21 @@ record:
     skipped: true
     kept: e48ab6d9a8fc1a3dbfedb66a776a2e9f023bccc7
     why: its red tests stand as e48ab6d9a landed them, and a later leaf passed since
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-8
+    hash_before: 05a6f591dbba58e3f73bafea389040d156d91c7d
+    hash_after: 05a6f591dbba58e3f73bafea389040d156d91c7d
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: 871c46a73c83753e
+        size: 23251
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -453,11 +468,10 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-pass
-- move 5 sends every case spawning quack into the one quack contract test, so the box still meets every such case and the door meets its real thing many times. main.go holds no in-process entry taking args and doors. The builder adds one, drives the command-line cases through it over newFakeDisk and the fake runner, and keeps one spawn in src/quack/box_doors_contract_test.go.
-- the six moves name no home for a fake's own file: src/quack/box_doors_test.go, src/quack/vale_fake_test.go, src/q/qtest/clock_test.go and src/watcher/watchertest/watchertest_test.go stand on the red list. The builder writes each fake over io/fs and its door's hands, or names the file under its door's files key, and leaves no marker on a fake.
-- move 1 drops a case; the commit names the case that covers its behaviour, so no behaviour leaves untested.
-Weighed: the size list matches the files the red case names, one for one, beside the case itself. The red case fails on its own assertion once a walk, and `./RUNME.sh doors` decides the first done_when line beside it. `./RUNME.sh check` decides the second. The callers of owns.Read, Door.Holds and TestEveryContractTestNamesItsDoor stand as the draft names them, and the contract key already stands in owns.go. Both dependencies stand closed.
+accept with points
+- quack-row-names-its-contracts: the door-audit row of spec/design_output/doors.md for the box and check doors of quack names none under contract suite, while src/quack/owns.yaml names src/quack/box_doors_contract_test.go, src/quack/ending_contract_test.go and src/quack/ending_windows_contract_test.go under contract. The row names those three, so the chapter and the declaration say one thing.
+- door-families-name-contracts-alone: the family table of spec/design_output/doors.md still names src/quack/cli_test.go, src/quack/dump_test.go, src/quack/main_test.go, src/quack/placements_test.go, src/quack/io_test.go, src/index/watch_test.go, src/watcher/watcher_test.go and src/watcher/watchertest/watchertest_test.go as door tests of a real thing, and after the moves none of them reaches one. The owner tests each door against the real thing once, so each row names its contract files alone.
+- watchertest-helper-meets-its-door: src/watcher/watchertest/watchertest.go carries an OutsideInDoors marker on os to make the folders a real watch hears. The last gate said to leave no marker on a fake or its helper, so the helper takes the disk door, or the file goes under the watch door's files key.
 
 # implement
 
