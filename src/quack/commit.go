@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -53,6 +52,7 @@ type landingDoors struct {
 	voice  func(message string) []heard
 	log    func(row map[string]any) error
 	now    func() time.Time
+	box    boxDoors
 }
 
 // The doors over this box: the root the index names, the cloud the harness variables say, each verb through quack's own road, and claude where the survey or the PATH names it. [[spec/tickets/landing-verbs-port-to-go]]
@@ -61,16 +61,36 @@ func landingHere() landingDoors {
 	if err != nil {
 		root = "."
 	}
+	box := quietBox()
 	return landingDoors{
 		root:   root,
 		git:    git.NewRepo(root, proc.Real),
-		cloud:  commandSettings(root).Cloud,
-		verb:   roadVerb(root),
-		claude: claudeAt(root),
-		voice:  func(message string) []heard { return heardOver(root, commitName, message).rows },
-		log:    appendsRow(root, time.Now),
-		now:    time.Now,
+		cloud:  commandSettings(box, root).Cloud,
+		verb:   roadVerbOver(proc.Real, selfPath, root),
+		claude: claudeAt(box, root),
+		voice:  func(message string) []heard { return heardOver(box, root, commitName, message).rows },
+		log:    appendsRow(box.disk, root, wall.Now),
+		now:    wall.Now,
+		box:    box,
 	}
+}
+
+// The claude the survey names where it stands, else the one on the PATH, else nothing. [[spec/design_output/tools#where-a-caller-looks]]
+func claudeAt(box boxDoors, root string) string {
+	var survey map[string]struct {
+		Path string `json:"path"`
+	}
+	if text, err := box.disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
+		if said := survey["claude"].Path; said != "" && standsUnder(box.disk, "", said) {
+			return said
+		}
+	}
+	for _, place := range placesFor("claude", box.env, "") {
+		if box.disk.standsFile(place) {
+			return place
+		}
+	}
+	return ""
 }
 
 // The commit verb over the doors. A dry run reads the message and writes nothing. [[spec/design_output/work#the-battery-answers-first]]
@@ -155,7 +175,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	// A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !d.cloud && strings.HasPrefix(branch, command.WorkBranch) {
 		raised := failure.Raise(failure.Load(failure.Dir{Root: d.root}), "desk-works-on-trunk", command.DeskSaid("this commit lands nowhere on "+branch))
-		if err := raisedOnto(failureDoors{root: d.root, now: d.now}, raised, errs); err != nil {
+		if err := raisedOnto(failureDoors{root: d.root, now: d.now, disk: d.box.disk}, raised, errs); err != nil {
 			fmt.Fprintln(errs, err)
 		}
 		return exitUsage
@@ -204,7 +224,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		return exitFailed
 	}
 	cold := pull.ColdIn(d.stagedPaths(only))
-	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
+	if len(cold) > 0 && (d.claude == "" || !standsUnder(d.box.disk, "", d.claude)) {
 		d.unstages(only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
 		return exitFailed
@@ -346,7 +366,7 @@ func (d landingDoors) markedUnmerged() string {
 	var marked []markedLine
 	unmerged, _ := d.git.Unmerged()
 	for _, file := range unmerged {
-		text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(file)))
+		text, err := d.box.disk.read(d.at(file))
 		if err != nil {
 			continue
 		}
@@ -388,7 +408,7 @@ func (d landingDoors) movedFrom(paths []string) []string {
 		}
 	}
 	// A journaled old path joins where the staged delta names it or git still holds it, so a move that landed long ago adds no pathspec git refuses. [[spec/tickets/commit-skips-landed-moves]]
-	for _, one := range journaledMoves(d.root) {
+	for _, one := range d.journaledMoves() {
 		for _, path := range paths {
 			var under string
 			switch {
@@ -409,7 +429,7 @@ func (d landingDoors) movedFrom(paths []string) []string {
 
 // A path git add matches stands on disk or in the index. [[spec/tickets/commit-stages-a-moved-path]]
 func (d landingDoors) stagable(path string) bool {
-	return standsUnder(d.root, path) || d.git.Tracked(path)
+	return standsUnder(d.box.disk, d.root, path) || d.git.Tracked(path)
 }
 
 // A move the rename verb journals: its old path and its new one. [[spec/tickets/rename-detection-misses-rewrites]]
@@ -419,15 +439,15 @@ type journaledMove struct {
 }
 
 // The rename verb journals each move, so a rewrite past git's similarity cut still names its old path. [[spec/tickets/rename-detection-misses-rewrites]]
-func journaledMoves(root string) []journaledMove {
-	folder := filepath.Join(root, filepath.FromSlash(undoFolder))
-	found, _ := os.ReadDir(folder)
+func (d landingDoors) journaledMoves() []journaledMove {
+	folder := d.at(undoFolder)
+	found := d.box.disk.listed(folder)
 	var out []journaledMove
 	for _, one := range found {
 		if one.IsDir() || !strings.HasSuffix(one.Name(), ".json") {
 			continue
 		}
-		text, err := os.ReadFile(filepath.Join(folder, one.Name()))
+		text, err := d.box.disk.read(filepath.Join(folder, one.Name()))
 		if err != nil {
 			continue
 		}

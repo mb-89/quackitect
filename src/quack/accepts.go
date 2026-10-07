@@ -37,7 +37,7 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 	edit := edits.Accept(editsOutside(root))
 	find := search.Accept(searchOutside(root, reads))
 	wait := waits.Accept(waitsOutside(root, store))
-	plan := plans.Accept(plansOutside(root, store))
+	plan := plans.Accept(plansOutside(realDisk(), root, store))
 	draft := drafts.Accept(draftsOutside(root, store, draftsLint(root)))
 	return func(asked q.Request) (any, error) {
 		if !acceptsVerb(asked.Module, asked.Verb) {

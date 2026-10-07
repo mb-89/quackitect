@@ -63,7 +63,7 @@ type BookSettings struct {
 
 type Book struct {
 	mu       sync.Mutex
-	now      func() time.Time
+	clock    q.Clock
 	keep     Keep
 	settings BookSettings
 	ops      map[string]*Op
@@ -71,7 +71,7 @@ type Book struct {
 	moved    func(Op)
 	// Each save closes it and lays a new one, so a waiter wakes on every move. [[spec/design_output/model#the-agent-does-not-poll]]
 	changed chan struct{}
-	// The timer a wait arms its span through, which a case swaps. [[spec/tickets/caller-wait-meets-no-sleep]]
+	// The timer a wait arms its span through: the clock's, which a case swaps. [[spec/tickets/caller-wait-meets-no-sleep]]
 	after func(time.Duration) <-chan time.Time
 }
 
@@ -89,12 +89,12 @@ func bookSettingsOf(root string) BookSettings {
 	}
 }
 
-func NewBook(now func() time.Time, keep Keep, settings BookSettings) (*Book, error) {
+func NewBook(clock q.Clock, keep Keep, settings BookSettings) (*Book, error) {
 	all, err := keep.All()
 	if err != nil {
 		return nil, err
 	}
-	b := &Book{now: now, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{}), after: time.After}
+	b := &Book{clock: clock, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{}), after: clock.After}
 	for _, one := range all {
 		held := one
 		b.ops[one.ID] = &held
@@ -115,7 +115,7 @@ func Name(id string) string { return "ops/" + id }
 func (b *Book) Start(action string, input any, caller string, declared q.Declared) (string, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	now := b.now()
+	now := b.clock.Now()
 	b.count++
 	one := &Op{
 		ID:      fmt.Sprintf("%019d-%06d", now.UnixNano(), b.count),
@@ -187,7 +187,7 @@ func (b *Book) Restart() error {
 func (b *Book) Expire() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	now, ended := b.now(), []string{}
+	now, ended := b.clock.Now(), []string{}
 	for _, one := range b.inFlight() {
 		if !one.Deadline.IsZero() && now.After(one.Deadline) && b.move(one, Failed, "the deadline passes", nil) == nil {
 			ended = append(ended, one.ID)
@@ -200,7 +200,7 @@ func (b *Book) Expire() []string {
 func (b *Book) Sweep() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	now, gone := b.now(), []string{}
+	now, gone := b.clock.Now(), []string{}
 	for id, one := range b.ops {
 		window := b.settings.Done
 		if one.State == Failed {
@@ -259,7 +259,7 @@ func (b *Book) move(one *Op, to State, reason string, result any) error {
 	}
 	one.State = to
 	if to != Running {
-		one.Ended, one.Error, one.Result = b.now(), reason, result
+		one.Ended, one.Error, one.Result = b.clock.Now(), reason, result
 	}
 	return b.save(one)
 }

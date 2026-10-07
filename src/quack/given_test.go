@@ -5,7 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"io/fs"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own source, as a build check reads it
 	"path/filepath"
 	"strings"
 	"testing"

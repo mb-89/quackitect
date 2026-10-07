@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"io"
 	"math"
-	"os"
 	"slices"
 	"sort"
 	"strconv"
@@ -234,28 +233,4 @@ func retroCollectPretty(said any) string {
 	writes.SetIndent("", "  ")
 	_ = writes.Encode(said)
 	return out.String()
-}
-
-// The entries of a folder by name, or none where it stands nowhere. [[spec/guidance/retro/collect]]
-func retroCollectListed(at string) []os.DirEntry {
-	entries, err := os.ReadDir(at)
-	if err != nil {
-		return nil
-	}
-	return entries
-}
-
-// A file's text, or nothing. [[spec/guidance/retro/collect]]
-func retroCollectRead(at string) string {
-	text, err := os.ReadFile(at)
-	if err != nil {
-		return ""
-	}
-	return string(text)
-}
-
-// Whether a path stands. [[spec/guidance/retro/collect]]
-func retroCollectExists(at string) bool {
-	_, err := os.Stat(at)
-	return err == nil
 }

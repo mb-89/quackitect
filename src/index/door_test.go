@@ -1,46 +1,63 @@
-// The door, driven over loopback. A case puts one up on a tree it wrote, asks
-// it the questions a verb asks, and reads the answers back as JSON.
+// The door, driven over the fake network. A case puts one up on a tree it
+// wrote, asks it the questions a verb asks, and reads the answers back as JSON.
 // [[spec/design_output/index#the-door-owns-the-database]]
 package index // level0: InPackageTest - it asks through the unexported posts, standingOf and stands
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"strconv"
-	"sync/atomic"
 	"testing"
 	"time"
 
 	"quackitect/src/config"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-// The polls a case waits through for a value the scheduler commits. [[spec/tickets/the-scheduler-runs-providers]]
-const topicPolls = 100
+// A fake clock telling each wait it is asked, so a case moves it on once the code under test waits. [[spec/tickets/test-walks-move-onto-fakes]]
+type toldClock struct {
+	*qtest.FakeClock
+	asked chan time.Duration
+}
 
-func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
-	t.Parallel()
-	standing := bareDoor(t)
-	if standing.Pid == 0 || standing.Port == 0 {
-		t.Fatalf("the standing file says %+v", standing)
-	}
+// The waits a told clock holds before it drops the next one it tells. [[spec/tickets/test-walks-move-onto-fakes]]
+const toldWaits = 256
 
-	said, err := posts(standing, []string{"find", "search"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if said.Error != "" {
-		t.Fatalf("find answered %q", said.Error)
-	}
+func newToldClock() *toldClock {
+	return &toldClock{FakeClock: qtest.NewFake(time.Time{}), asked: make(chan time.Duration, toldWaits)}
+}
 
-	said, err = posts(standing, []string{"dangling"})
-	if err != nil {
-		t.Fatal(err)
+func (one *toldClock) After(span time.Duration) <-chan time.Time {
+	fired := one.FakeClock.After(span)
+	one.tell(span)
+	return fired
+}
+
+func (one *toldClock) AfterFunc(span time.Duration, hand func()) (stop func() bool) {
+	stop = one.FakeClock.AfterFunc(span, hand)
+	one.tell(span)
+	return stop
+}
+
+func (one *toldClock) tell(span time.Duration) {
+	select {
+	case one.asked <- span:
+	default:
 	}
-	rows, ok := said.Result.([]any)
-	if !ok || len(rows) != 1 {
-		t.Fatalf("dangling answered %#v", said.Result)
+}
+
+// Waits until the code under test asks a wait of the span, then moves the clock past it. [[spec/tickets/test-walks-move-onto-fakes]]
+func (one *toldClock) passes(span time.Duration) {
+	one.waitsOn(span)
+	one.Tick(span)
+}
+
+// Waits until the code under test asks a wait of the span. [[spec/tickets/test-walks-move-onto-fakes]]
+func (one *toldClock) waitsOn(span time.Duration) {
+	for got := range one.asked {
+		if got == span {
+			return
+		}
 	}
 }
 
@@ -48,18 +65,9 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
 	c := q.New()
 	q.OutIn(c, "work/open-tasks", 3, q.Doc("a count the case reads"))
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, qtest.Wall(), tree(t), c, nil)
 	said, err := posts(standing, []string{"value", "work/open-tasks"})
 	if err != nil {
 		t.Fatal(err)
@@ -97,29 +105,21 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	clock := newToldClock()
+	_, standing := served(t, clock, root, q.New(), nil)
 
 	write(t, root, "spec/three.md", "---\nid: three\n---\n\nA word nobody indexed yet: marmalade.\n")
-
-	for waited := 0; waited < 100; waited++ {
-		said, err := posts(standing, []string{"find", "marmalade"})
-		if err == nil && said.Error == "" {
-			if rows, ok := said.Result.([]any); ok && len(rows) > 0 {
-				return
-			}
-		}
-		time.Sleep(100 * time.Millisecond)
+	clock.passes(burstSettleDelay)
+	if _, err := posts(standing, []string{"changes", "1"}); err != nil {
+		t.Fatal(err)
 	}
-	t.Fatal("a file written under the tree never reached the index")
+	said, err := posts(standing, []string{"find", "marmalade"})
+	if err != nil || said.Error != "" {
+		t.Fatalf("find answered %v, %q", err, said.Error)
+	}
+	if rows, ok := said.Result.([]any); !ok || len(rows) == 0 {
+		t.Fatal("a file written under the tree never reached the index")
+	}
 }
 
 // level0: FixtureOutsideHome - the case reads a fresh root of its own
@@ -127,7 +127,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 
-	self, _ := os.Executable()
+	self, _ := executableOf()
 
 	if stands(Standing{Root: root, Stamp: stampOf(self), Bin: self}, root) != true {
 		t.Fatal("this build talks to its own door")
@@ -143,21 +143,12 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/index#the-index-fires-on-change]]
-// level0: FixtureOutsideHome - the case writes its own tree
-func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
-	t.Parallel()
+// A changes call past a write answers once the door's clock passes the burst, so it fires within a second of the write. [[spec/design_output/index#the-index-fires-on-change]]
+func changesFireWithinASecond(t *testing.T, rel, text, what string) {
+	t.Helper()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	clock := newToldClock()
+	_, standing := served(t, clock, root, q.New(), nil)
 	first, err := posts(standing, []string{"changes", "0"})
 	if err != nil || first.Error != "" {
 		t.Fatalf("a changes call from nothing answers the tick now, and answered %v %q", err, first.Error)
@@ -167,53 +158,33 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 		t.Fatalf("the walk on the way up counts one, and the tick reads %d", tick)
 	}
 
-	write(t, root, "spec/tickets/late.md", "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA ticket written while the door stands.\n")
-	started := time.Now()
+	write(t, root, rel, text)
+	from := clock.Now()
+	clock.passes(burstSettleDelay)
 	next, err := posts(standing, []string{"changes", strconv.FormatInt(tick, decimalBase)})
 	if err != nil || next.Error != "" {
 		t.Fatalf("a changes call past the tick answers, and answered %v %q", err, next.Error)
 	}
 	if tickOf(t, next) <= tick {
-		t.Fatalf("a sweep past a write counts one more, and the tick stayed at %d", tick)
+		t.Fatalf("%s counts one more, and the tick stayed at %d", what, tick)
 	}
-	if time.Since(started) > time.Second {
-		t.Fatalf("the call fires within a second of the write, and took %v", time.Since(started))
+	if gone := clock.Now().Sub(from); gone > time.Second {
+		t.Fatalf("the call fires within a second of %s, and took %v", what, gone)
 	}
+}
+
+// [[spec/design_output/index#the-index-fires-on-change]]
+// level0: FixtureOutsideHome - the case writes its own tree
+func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
+	t.Parallel()
+	changesFireWithinASecond(t, "spec/tickets/late.md", "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA ticket written while the door stands.\n", "a sweep past a write")
 }
 
 // [[spec/design_output/index#the-index-fires-on-change]]
 // level0: FixtureOutsideHome - the case writes its own tree
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	first, err := posts(standing, []string{"changes", "0"})
-	if err != nil || first.Error != "" {
-		t.Fatalf("a changes call from nothing answers the tick now, and answered %v %q", err, first.Error)
-	}
-	tick := tickOf(t, first)
-
-	write(t, root, Plan, `{"working":"","todos":[]}`)
-	started := time.Now()
-	next, err := posts(standing, []string{"changes", strconv.FormatInt(tick, decimalBase)})
-	if err != nil || next.Error != "" {
-		t.Fatalf("a changes call past the tick answers, and answered %v %q", err, next.Error)
-	}
-	if tickOf(t, next) <= tick {
-		t.Fatalf("a plan write counts one more, so the work tab reads the todos again, and the tick stayed at %d", tick)
-	}
-	if time.Since(started) > time.Second {
-		t.Fatalf("the call fires within a second of the plan write, and took %v", time.Since(started))
-	}
+	changesFireWithinASecond(t, Plan, `{"working":"","todos":[]}`, "a plan write, so the work tab reads the todos again,")
 }
 
 func tickOf(t *testing.T, said answer) int64 {
@@ -232,18 +203,9 @@ func tickOf(t *testing.T, said answer) int64 {
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersWhy(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 0)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, qtest.Wall(), tree(t), catalog, nil)
 	said, err := posts(standing, []string{"why", "t/n"})
 	if err != nil {
 		t.Fatal(err)
@@ -283,66 +245,53 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 	type countOf struct {
 		N int `q:"t/n"`
 	}
-	root := tree(t)
 	catalog := q.New()
 	hand := q.OutIn(catalog, "t/n", 0)
 	q.DerivedIn(catalog, "t/double", 0, func(in countOf) int { return in.N * 2 })
 	moves := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"t/n": 3})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog, moves)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var said answer
-	for range topicPolls {
-		said, err = posts(standing, []string{"call", "read", `{"name":"t/double"}`})
+	one, standing := served(t, qtest.Wall(), tree(t), catalog, nil, moves)
+	for {
+		next := one.nextCommit()
+		said, err := posts(standing, []string{"call", "read", `{"name":"t/double"}`})
 		if err != nil {
 			t.Fatal(err)
 		}
 		if said.Result == float64(6) {
 			return
 		}
-		time.Sleep(100 * time.Millisecond)
+		<-next
 	}
-	t.Fatalf("t/double reads %#v after t/n moves to 3", said.Result)
 }
 
-// The manager's step runs on the work loop, and the loop's idle tick runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
+// The manager's step runs on the work loop, and the loop's beat runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
 	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
-	var stepped atomic.Int64
+	stepped := make(chan struct{}, 1)
 	manage := func(_ string, _ *q.Store, _ OpRows, _ Reads, steps func(func())) (Managed, error) {
-		steps(func() { stepped.Add(1) })
+		steps(func() {
+			select {
+			case stepped <- struct{}{}:
+			default:
+			}
+		})
 		return Managed{Stop: func() {}}, nil
 	}
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	for range topicPolls {
-		if stepped.Load() > 0 {
-			return
-		}
-		time.Sleep(200 * time.Millisecond)
-	}
-	t.Fatal("the work loop runs no step the manager hands it")
+	clock := newToldClock()
+	served(t, clock, root, q.New(), manage)
+	clock.Tick(time.Second)
+	clock.passes(burstSettleDelay)
+	<-stepped
 }
 
 // The value answer drains through the manager's settle, so a reader reads what the placed processes answer before it. [[spec/tickets/callers-name-drains-readers]]
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
 	catalog := q.New()
 	hand := q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
 	manage := func(_ string, store *q.Store, _ OpRows, _ Reads, _ func(func())) (Managed, error) {
@@ -353,11 +302,7 @@ func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 		}
 		return Managed{Stop: func() {}, Settle: settle}, nil
 	}
-	one, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), catalog, manage)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
+	one, _ := served(t, qtest.Wall(), tree(t), catalog, manage)
 	said, err := one.answers(call{Method: "value", Params: json.RawMessage(`{"name":"t/n"}`)})
 	if err != nil || said != 9 {
 		t.Fatalf("the value answer reads %v and %v, and wants the 9 the settle commits", said, err)
@@ -368,18 +313,9 @@ func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
 	catalog := q.New()
 	q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, qtest.Wall(), tree(t), catalog, nil)
 	said, err := posts(standing, []string{"dump", "t/"})
 	if err != nil {
 		t.Fatal(err)

@@ -1,0 +1,3 @@
+# The drafts IO module: the prose and answer checks, which the store reads.
+drafts:
+  go: []

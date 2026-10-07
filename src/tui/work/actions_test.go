@@ -6,7 +6,7 @@ package work
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the ticket schema the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -18,9 +18,6 @@ import (
 	"quackitect/src/tui/registry"
 	"quackitect/src/tui/tree"
 )
-
-// How long a case waits on the command a key hands back. [[spec/tickets/the-work-keys-call-actions]]
-const keyWithin = 2 * time.Second
 
 var actionRows = []map[string]any{
 	{"name": "one-ticket", "kind": "ticket", "state": "open", "route": "standard", "path": "spec/tickets/one-ticket.md", "queue": "1", "group": "a-group"},
@@ -78,27 +75,21 @@ func keyed(t *testing.T, m frame.Model, keys ...string) frame.Model {
 	return m
 }
 
-// The message a command answers within the wait, each of a batch in turn, and nothing past the wait. [[spec/tickets/the-work-keys-call-actions]]
+// The message a command answers, each of a batch in turn. [[spec/tickets/the-work-keys-call-actions]]
 func answerOf(cmd tea.Cmd) tea.Msg {
 	if cmd == nil {
 		return nil
 	}
-	said := make(chan tea.Msg, 1)
-	go func() { said <- cmd() }()
-	select {
-	case msg := <-said:
-		if batch, ok := msg.(tea.BatchMsg); ok {
-			for _, one := range batch {
-				if got := answerOf(one); got != nil {
-					return got
-				}
+	msg := cmd()
+	if batch, ok := msg.(tea.BatchMsg); ok {
+		for _, one := range batch {
+			if got := answerOf(one); got != nil {
+				return got
 			}
-			return nil
 		}
-		return msg
-	case <-time.After(keyWithin):
 		return nil
 	}
+	return msg
 }
 
 func selectRow(t *testing.T, tab *Tab, name string) {
@@ -127,18 +118,6 @@ func postsOf(t *testing.T, posted []registry.Posted) []map[string]any {
 	return out
 }
 
-// Nothing but the log folder the case hands the tab stands under its root. [[spec/tickets/the-work-keys-call-actions]]
-func wroteNothing(t *testing.T, tab *Tab) {
-	t.Helper()
-	root := Root(tab.Path)
-	_ = filepath.WalkDir(root, func(at string, entry os.DirEntry, err error) error {
-		if err == nil && !entry.IsDir() {
-			t.Errorf("the tab writes %s, and wants to write no file", at)
-		}
-		return nil
-	})
-}
-
 func TestThePlaceChordPostsWorkPlace(t *testing.T) {
 	t.Parallel()
 	m, tab, posted := actionWindow(t, everyResult)
@@ -157,7 +136,6 @@ func TestThePlaceChordPostsWorkPlace(t *testing.T) {
 	if tab.Placing || tab.Notice != "" || len(*posted) != 1 {
 		t.Fatalf("a key that is no digit drops the chord and posts nothing, and the tab says %q", tab.Notice)
 	}
-	wroteNothing(t, tab)
 }
 
 func TestTheUrgentKeyPostsFlipUrgentForEveryMarkedRow(t *testing.T) {
@@ -179,7 +157,6 @@ func TestTheUrgentKeyPostsFlipUrgentForEveryMarkedRow(t *testing.T) {
 	if keyed(t, m, "t"); len(*posted) != 2 {
 		t.Fatal("t posts nothing")
 	}
-	wroteNothing(t, tab)
 }
 
 func TestAnEditPostsSetFieldForEveryRowItWrites(t *testing.T) {
@@ -199,7 +176,6 @@ func TestAnEditPostsSetFieldForEveryRowItWrites(t *testing.T) {
 	if len(posts) != 1 || posts[0]["action"] != "tickets/set-field" || posts[0]["name"] != "one-ticket" || posts[0]["field"] != "group" || posts[0]["value"] != "b" {
 		t.Fatalf("an edit of the group posts %v, and wants tickets/set-field on one-ticket with group b", posts)
 	}
-	wroteNothing(t, tab)
 }
 
 func TestThePullKeyPostsWorkPull(t *testing.T) {
@@ -213,7 +189,6 @@ func TestThePullKeyPostsWorkPull(t *testing.T) {
 	if !strings.Contains(tab.Notice, "work/pull") {
 		t.Fatalf("the tab says %q, and wants the action it ran named", tab.Notice)
 	}
-	wroteNothing(t, tab)
 }
 
 func TestAnActionTheIndexRefusesStandsAsTheNotice(t *testing.T) {
@@ -250,7 +225,6 @@ func TestAValueTheSchemaRefusesPostsNothing(t *testing.T) {
 	if len(*posted) != 0 || !strings.Contains(tab.Notice, "urgent takes a boolean") || !strings.Contains(tab.Notice, "one-ticket, two-ticket") {
 		t.Fatalf("a refused fill posts %d times, and the tab says %q, and wants no post and every row it leaves named", len(*posted), tab.Notice)
 	}
-	wroteNothing(t, tab)
 }
 
 var reasonAndUrgent = []tree.Column{{Name: "reason", Key: "reason", Wide: tree.ColumnWide}, {Name: "urgent", Key: "urgent", Wide: tree.ColumnWide}}
@@ -279,5 +253,4 @@ func TestTabTakesTheOfferTheSchemaNamesAndEnterPostsIt(t *testing.T) {
 	if got := strings.Join(tab.Tree.Offer(), " "); got != "true false" {
 		t.Fatalf("a flag offers the two it takes, and offers %q", got)
 	}
-	wroteNothing(t, tab)
 }

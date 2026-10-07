@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path"
 	"path/filepath"
 	"slices"
@@ -33,18 +32,22 @@ const (
 	logFloorKey = "log.level"
 )
 
+// The mode the findings file takes. [[spec/tickets/the-check-lint-runs-in-go]]
+const lintFoundMode = 0o644
+
 // What the lint reads: the root, the tools over the paths named, the check module's sweep, the box's survey rule, the session log and the clock. [[spec/tickets/read-verbs-port-to-go]]
 type lintDoors struct {
 	root  string
 	tools func(where []string) []check.Finding
 	sweep func() ([]check.Finding, error)
 	box   func() []check.Finding
-	// The files the branch changes since it left trunk, and the ones it changes in the working tree. [[spec/tickets/rules-lint-changed-files-first]]
-	changed func() []string
+	// The files the branch changes since it left trunk, and the ones it changes in the working tree, with a line said where no merge base stands. [[spec/tickets/rules-lint-changed-files-first]]
+	changed func(say func(line string)) []string
 	// Leaves the findings where SE_LINT_FOUND points, which the check's stamp and its errors flag read. [[spec/tickets/the-check-lint-runs-in-go]]
 	leave func(found lintFound) error
 	log   func(row map[string]any) error
 	now   func() time.Time
+	disk  diskDoors
 }
 
 func init() { register("lint", lintVerb(lintHere)) }
@@ -55,17 +58,19 @@ func lintHere() (lintDoors, error) {
 	if err != nil {
 		return lintDoors{}, err
 	}
+	hand := quietBox()
 	return lintDoors{
 		root:  root,
-		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
-		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
-		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
-		changed: func() []string {
-			return changedOver(gitAt(root), func(line string) { fmt.Fprintln(os.Stderr, line) })
+		tools: func(where []string) []check.Finding { return toolsOver(hand, root, where) },
+		sweep: func() ([]check.Finding, error) { return sweepRows(askIndex) },
+		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(hand, root)) },
+		changed: func(say func(line string)) []string {
+			return changedOver(gitAt(root), say)
 		},
-		leave: leavesFoundAt(os.Getenv(lintEnv)),
-		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
-		now:   time.Now,
+		leave: leavesFoundAt(hand.disk, hand.env(lintEnv)),
+		log:   keepsFloor(sliceMode(hand.disk, root, logFloorKey), appendsRow(hand.disk, root, wall.Now)),
+		now:   wall.Now,
+		disk:  hand.disk,
 	}, nil
 }
 
@@ -91,7 +96,7 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 		where := whereOf(argv[1:])
 		// The changed files stand in place of the paths named, and a warning refuses under --strict, as the commit and the check read it. [[spec/tickets/rules-lint-changed-files-first]]
 		if slices.Contains(argv[1:], "--changed") {
-			where = handWritten(d.changed())
+			where = handWritten(d.changed(func(line string) { fmt.Fprintln(errs, line) }))
 		}
 		strict := slices.Contains(argv[1:], "--strict")
 		began := d.now()
@@ -152,7 +157,7 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 	where := []string{}
 	for _, one := range asked {
 		// A path the disk no longer holds carries no finding, so no source reads it. [[spec/design_output/level0#a-crash-writes-its-error]]
-		if _, err := os.Stat(filepath.Join(d.root, filepath.FromSlash(one))); one == lintWhole || err == nil {
+		if one == lintWhole || d.disk.stands(filepath.Join(d.root, filepath.FromSlash(one))) {
 			where = append(where, one)
 		}
 	}
@@ -177,7 +182,7 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 		}
 	}
 	found = append(found, rowsUnder(d.box(), where)...)
-	return check.PastHistory(check.TreeOver(d.root, rootDisk{d.root}), found), ""
+	return check.PastHistory(check.TreeOver(d.root, doorSource{d.root, d.disk}), found), ""
 }
 
 // The rows standing on a path asked or under a folder asked, and every row where the whole tree is asked. [[spec/tickets/the-lsp-server-leaves]]
@@ -244,7 +249,7 @@ func lintLine(one check.Finding) string {
 }
 
 // The findings as JSON where SE_LINT_FOUND points, and nothing where it points nowhere. [[spec/tickets/the-check-lint-runs-in-go]]
-func leavesFoundAt(at string) func(found lintFound) error {
+func leavesFoundAt(disk diskDoors, at string) func(found lintFound) error {
 	return func(found lintFound) error {
 		if at == "" {
 			return nil
@@ -253,7 +258,7 @@ func leavesFoundAt(at string) func(found lintFound) error {
 		if err != nil {
 			return err
 		}
-		return os.WriteFile(at, said, 0o644)
+		return disk.write(at, said, lintFoundMode)
 	}
 }
 
@@ -284,15 +289,15 @@ func lintRows(found []check.Finding, refused int) []string {
 }
 
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
-func toolsOver(root string, where []string) []check.Finding {
-	tree := lintTree(root)
+func toolsOver(hand boxDoors, root string, where []string) []check.Finding {
+	tree := lintTree(hand, root)
 	tools := toolsAt(root)
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {
 		said = tools.Sweep(tree)
 	} else {
-		said = tools.Over(tree, filesUnder(tree, root, where))
+		said = tools.Over(tree, filesUnder(hand.disk, tree, root, where))
 	}
 	out := make([]check.Finding, 0, len(said))
 	for _, one := range said {
@@ -302,7 +307,7 @@ func toolsOver(root string, where []string) []check.Finding {
 }
 
 // Each file the paths name: a file itself, and every file the tree holds under a folder. [[spec/design_output/tree#the-tree-handed-in]]
-func filesUnder(tree *check.Tree, root string, where []string) []string {
+func filesUnder(disk diskDoors, tree *check.Tree, root string, where []string) []string {
 	out := []string{}
 	add := func(file string) {
 		if !slices.Contains(out, file) {
@@ -310,7 +315,7 @@ func filesUnder(tree *check.Tree, root string, where []string) []string {
 		}
 	}
 	for _, at := range where {
-		if standsFile(filepath.Join(root, filepath.FromSlash(at))) {
+		if disk.standsFile(filepath.Join(root, filepath.FromSlash(at))) {
 			add(path.Clean(filepath.ToSlash(at)))
 			continue
 		}
@@ -324,19 +329,22 @@ func filesUnder(tree *check.Tree, root string, where []string) []string {
 }
 
 // The tree on the disk under the root, its paths the files git lists, and the survey this box wrote. [[spec/design_output/tree#the-tree-handed-in]]
-func lintTree(root string) *check.Tree {
-	tree := check.TreeOver(root, listedDisk{rootDisk{root}})
-	if said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil {
+func lintTree(hand boxDoors, root string) *check.Tree {
+	tree := check.TreeOver(root, listedDisk{rootDisk{root}, proc.Real})
+	if said, err := hand.disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil {
 		tree.Survey = string(said)
 	}
 	return tree
 }
 
 // The disk under the root, whose paths are the files git tracks and the ones it leaves unignored. [[spec/design_output/tree#the-tree-handed-in]]
-type listedDisk struct{ rootDisk }
+type listedDisk struct {
+	rootDisk
+	run proc.Runner
+}
 
 func (one listedDisk) Paths() []string {
-	said := proc.Real(proc.Command{Argv: []string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}})
+	said := one.run(proc.Command{Argv: []string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}})
 	if said.Code != 0 {
 		return nil
 	}

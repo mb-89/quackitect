@@ -8,7 +8,7 @@ const { fieldMarksOf } = require("./lib/fields.js");
 const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { FLIP, routeHostOf } = require("./lib/route-host.js");
-const { BURST, settled, timer } = require("./lib/settle.js");
+const { BURST, settled } = require("./lib/settle.js");
 const { toastsOf } = require("./lib/states.js");
 
 const VIEW = "quackitect.sidebar";
@@ -17,8 +17,9 @@ const REST = "quackitect.rest";
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
 const SHOW = ".se/.runtime/show-panel";
 
-async function activate(context, given) {
-  const door = given ?? require("./editor.js").editorDoor(context);
+// The root: it builds the doors once and hands them on. [[spec/design_output/doors#one-door-per-outside-thing]]
+async function activate(context, given, load) {
+  const door = given ?? (await editorOf(context, load));
   if (!door.holds() || !(await door.read(SCHEMA))) return;
   door.marks(HERE, true);
   door.quiets();
@@ -87,11 +88,16 @@ async function activate(context, given) {
     await sidebar.opened(door.pid());
     await draw();
     // A burst of index events draws the panel once it settles. [[spec/tickets/the-sidebar-reads-v1]]
-    door.index?.watch(sidebar.names, settled(draw, BURST, door.later ?? timer));
+    door.index?.watch(sidebar.names, settled(draw, BURST, door.later));
     // [[spec/design_output/extension#the-hook-button]]
     door.onProcess?.(draw);
     await door.adoptsProcess?.("bridge.hook");
   });
+}
+
+async function editorOf(context, load) {
+  const doors = await require("./editor-doors.js").doorsOf(context, load);
+  return require("./editor.js").editorDoor(context, doors);
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

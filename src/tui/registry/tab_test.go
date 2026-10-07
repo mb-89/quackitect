@@ -5,7 +5,6 @@ package registry
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -24,7 +23,7 @@ const (
 
 func TestMain(m *testing.M) {
 	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
-	os.Exit(m.Run())
+	m.Run()
 }
 
 // The window over one tab, with the tab's first fetch landed. [[spec/design_output/model#the-registry-tabs]]

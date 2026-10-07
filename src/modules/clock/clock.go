@@ -1,13 +1,16 @@
 // The clock IO module: it writes the minute on its out-port, which the wiring
-// binds to clock/minute. Its file carries the real clock and the fake.
+// binds to clock/minute. Its file carries the real clock, and hands on the fake
+// q/qtest keeps for the packages that import no module.
 // [[spec/design_output/model#its-file-carries-its-fake]]
 package clock
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The out-port, by its local name. [[spec/design_output/model#the-wiring-file]]
@@ -18,17 +21,10 @@ const secondsAMinute = 60
 // The span between two reads of the time, so two clocks started apart turn the minute within it of each other. [[spec/tickets/process-shadow-reads-clean]]
 const poll = time.Second
 
-// [[spec/design_output/model#io-modules-and-their-fakes]]
-type Clock interface {
-	Now() time.Time
-	Every(span time.Duration, hand func(time.Time)) (stop func())
-	After(span time.Duration, hand func(time.Time)) (stop func())
-}
-
 type clock struct{}
 
 // The real clock. [[spec/design_output/model#its-file-carries-its-fake]]
-func New() Clock { return clock{} }
+func New() q.Clock { return clock{} }
 
 func (clock) Now() time.Time { return time.Now() }
 
@@ -54,87 +50,20 @@ func (clock) Every(span time.Duration, hand func(time.Time)) (stop func()) {
 	}
 }
 
-// Calls the hand once the span passes, unless stop comes first. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
-func (clock) After(span time.Duration, hand func(time.Time)) (stop func()) {
-	timer := time.AfterFunc(span, func() { hand(time.Now()) })
-	return func() { timer.Stop() }
+func (clock) After(span time.Duration) <-chan time.Time { return time.After(span) }
+
+func (clock) AfterFunc(span time.Duration, hand func()) (stop func() bool) {
+	return time.AfterFunc(span, hand).Stop
 }
 
-type every struct {
-	span time.Duration
-	last time.Time
-	hand func(time.Time)
+func (clock) WithTimeout(parent context.Context, span time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(parent, span)
 }
 
 // A time that stands still until a test calls Tick. [[spec/design_output/model#io-modules-and-their-fakes]]
-type FakeClock struct {
-	mu     sync.Mutex
-	at     time.Time
-	hands  map[int]*every
-	afters map[int]*every
-	next   int
-}
+type FakeClock = qtest.FakeClock
 
-func NewFake(at time.Time) *FakeClock {
-	return &FakeClock{at: at, hands: map[int]*every{}, afters: map[int]*every{}}
-}
-
-func (one *FakeClock) Now() time.Time {
-	one.mu.Lock()
-	defer one.mu.Unlock()
-	return one.at
-}
-
-func (one *FakeClock) Every(span time.Duration, hand func(time.Time)) (stop func()) {
-	one.mu.Lock()
-	defer one.mu.Unlock()
-	at := one.next
-	one.next++
-	one.hands[at] = &every{span: span, last: one.at, hand: hand}
-	return func() {
-		one.mu.Lock()
-		defer one.mu.Unlock()
-		delete(one.hands, at)
-	}
-}
-
-// Keeps a one-shot hand, which Tick calls once its span passes and then drops. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
-func (one *FakeClock) After(span time.Duration, hand func(time.Time)) (stop func()) {
-	one.mu.Lock()
-	defer one.mu.Unlock()
-	at := one.next
-	one.next++
-	one.afters[at] = &every{span: span, last: one.at, hand: hand}
-	return func() {
-		one.mu.Lock()
-		defer one.mu.Unlock()
-		delete(one.afters, at)
-	}
-}
-
-// Moves the time on, and calls each hand whose span passes. [[spec/design_output/model#io-modules-and-their-fakes]]
-func (one *FakeClock) Tick(span time.Duration) {
-	one.mu.Lock()
-	one.at = one.at.Add(span)
-	now := one.at
-	var due []func(time.Time)
-	for _, each := range one.hands {
-		if now.Sub(each.last) >= each.span {
-			each.last = now
-			due = append(due, each.hand)
-		}
-	}
-	for at, each := range one.afters {
-		if now.Sub(each.last) >= each.span {
-			delete(one.afters, at)
-			due = append(due, each.hand)
-		}
-	}
-	one.mu.Unlock()
-	for _, hand := range due {
-		hand(now)
-	}
-}
+func NewFake(at time.Time) *FakeClock { return qtest.NewFake(at) }
 
 // The minute of a time, counted from the Unix epoch. [[spec/design_output/model#io-modules-and-their-fakes]]
 func Minute(at time.Time) int64 { return at.Unix() / secondsAMinute }
@@ -145,7 +74,7 @@ func Registers(c *q.Catalog) q.Writer {
 }
 
 // Commits the minute at start, and again as the minute turns, read each poll, so the index and the IO process commit the same minute within a poll of each other. [[spec/design_output/model#io-modules-are-modules]] [[spec/tickets/process-shadow-reads-clean]]
-func Start(from Clock, commit func(values map[string]any) error) (stop func()) {
+func Start(from q.Clock, commit func(values map[string]any) error) (stop func()) {
 	var mu sync.Mutex
 	last := Minute(from.Now())
 	_ = commit(map[string]any{Port: last})

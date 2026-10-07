@@ -40,6 +40,8 @@ type Tree struct {
 	parses    map[string]parse
 	ruleKey   string
 	ruleFound []Finding
+	// The declarations and the doors they read as. [[spec/design_output/doors#a-door-declares-its-names]]
+	declared declared
 	// The bodies standing in two packages, by a hash of every Go text. [[spec/tickets/shared-helpers-stand-once]]
 	copyKey   string
 	copyFound []Finding

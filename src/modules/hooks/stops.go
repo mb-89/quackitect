@@ -400,6 +400,17 @@ func tasksRun(tasks any) bool {
 	return false
 }
 
+// The events the fill rides: every call of the agent's own, and the turn's end, which the harness measures only after the vote. [[spec/design_output/stop#the-context-hands-over]]
+var filled = map[string]bool{toolEvent: true, stopEvent: true}
+
+// The fill a post carries where the door reads it: on a filled event of the main agent. The bridgehead sends the session's fill on every event, and a helper's event measures the main agent's context, so it reads none. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+func filledOf(post Post) any {
+	if !filled[post.Event] || textOf(post.E, "agentId", "agent_id") != "" {
+		return nil
+	}
+	return post.Fill
+}
+
 // A fill as the bridge's Number reads it, and whether one stands. [[spec/design_output/stop#the-context-hands-over]]
 func fillOf(said any) (float64, bool) {
 	switch one := said.(type) {

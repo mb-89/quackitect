@@ -18,6 +18,7 @@ rationale: [[spec/rationales/code]]
 10. Search for the function before you write it. Where one stands, call it, and where one stands close, take it further. *
 11. Write a function pure, and give each one reaching the outside a one-line reason: `// level0: Impure - <why>`. The `purity` guard names an unmarked one. A function reaching the outside in place takes the box into every test of it. [[spec/design_output/model#the-guards-hold-a-baseline]]
 12. Promote a step you repeat into a verb or an engine function, and leave no script beside the engine. The `script` guard names a script standing outside it. [[spec/design_output/model#the-guards-hold-a-baseline]]
+13. Reach a name a door owns through that door. A walk around a door fails the check, and a marker naming why the door cannot serve escapes it. [[spec/design_output/doors#nothing-walks-around-a-door]]
 
 # Examples
 

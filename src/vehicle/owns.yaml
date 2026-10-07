@@ -1,0 +1,5 @@
+# The vehicle's door: the disk it reads and writes, and the shell its shim runs.
+vehicle:
+  go: [os, os/exec]
+  files: [disk.go]
+  contract: [src/vehicle/shim_contract_test.go]

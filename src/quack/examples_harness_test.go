@@ -8,7 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
+	"io/fs"
+	"os" // level0: OutsideInDoors - the fixture reads the schemas the tree ships, and the verdicts land where the tutorial tab reads them
 	"path/filepath"
 	"strings"
 	"time"
@@ -24,8 +25,8 @@ import (
 	"quackitect/src/pull"
 )
 
-// The tree every example copies, built once in TestMain, which no example writes to. [[spec/design_output/examples#one-runner-two-drivers]]
-var exampleFixture map[string]string
+// The tree every example copies, built once as the package loads, which no example writes to. [[spec/design_output/examples#one-runner-two-drivers]]
+var exampleFixture = buildsFixture()
 
 // The tree this package stands in, whose schemas the pull reads. [[spec/design_output/examples#one-runner-two-drivers]]
 var exampleMethod, _ = filepath.Abs(filepath.Join("..", ".."))
@@ -115,7 +116,7 @@ func exampleTree() (files.Disk, map[string]twin, error) {
 	// [[spec/design_output/examples#one-runner-two-drivers]]
 	checks := func(out, errs io.Writer) checkDoors {
 		one := (&checkFake{}).doors()
-		one.root, one.disk, one.out, one.errs = exampleRoot, tree, out, errs
+		one.root, one.disk, one.out, one.errs = exampleRoot, diskOverTree(tree, exampleRoot), out, errs
 		return one
 	}
 	// [[spec/design_output/examples#one-runner-two-drivers]]
@@ -159,4 +160,32 @@ func runsExample(path, text string) string {
 func writesVerdicts(root string, misses map[string]string) error {
 	folder := filepath.Join(root, index.Runtime)
 	return errors.Join(os.MkdirAll(folder, 0o755), os.WriteFile(filepath.Join(folder, example.VerdictFile), []byte(examples.VerdictsText(misses)), 0o644))
+}
+
+// The box disk over the fixture tree, each path read under the root the check joins it to. [[spec/design_output/examples#one-runner-two-drivers]]
+func diskOverTree(tree files.Disk, root string) diskDoors {
+	rel := func(path string) string {
+		under, err := filepath.Rel(root, path)
+		if err != nil {
+			return filepath.ToSlash(path)
+		}
+		return filepath.ToSlash(under)
+	}
+	return diskDoors{
+		read: func(path string) ([]byte, error) {
+			text, ok, err := tree.Read(rel(path))
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				return nil, fs.ErrNotExist
+			}
+			return []byte(text), nil
+		},
+		write:   func(path string, data []byte, _ fs.FileMode) error { return tree.Write(rel(path), string(data)) },
+		makeAll: func(string, fs.FileMode) error { return nil },
+		remove:  func(path string) error { return tree.Remove(rel(path)) },
+		list:    func(string) ([]fs.DirEntry, error) { return nil, fs.ErrNotExist },
+		stat:    func(string) (fs.FileInfo, error) { return nil, fs.ErrNotExist },
+	}
 }

@@ -192,12 +192,6 @@
     ],
     "passes": []
   },
-  "VoiceVale.DoorsOnly": {
-    "refuses": [
-      {"Check": "VoiceVale.DoorsOnly", "Line": 1, "Span": [1, 39], "Match": "import { readFileSync } from \"node:fs\";", "Severity": "error"}
-    ],
-    "passes": []
-  },
   "VoiceVale.FakeDoorsInTest": {
     "refuses": [
       {"Check": "VoiceVale.FakeDoorsInTest", "Line": 1, "Span": [1, 47], "Match": "import { disk } from \"../../src/doors/disk.js\";", "Severity": "error"}

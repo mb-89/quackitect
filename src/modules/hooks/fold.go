@@ -87,6 +87,8 @@ type Holds struct {
 	Stood string `json:"stood,omitempty"`
 	// The questions the owner's last prompt asks, which the answer check reads. [[spec/tickets/prose-tools-answer-in-go]]
 	Questions int `json:"questions,omitempty"`
+	// The reply probe's marker armed the next call of the main agent, which lands in the log as the event carries it. [[spec/tickets/the-reply-probe-runs]]
+	Probing bool `json:"probing,omitempty"`
 }
 
 // The engine's ask. [[spec/design_output/stop#the-grace]]
@@ -141,6 +143,7 @@ func stepHolds(state Holds, event q.Event) Holds {
 	switch event.Kind {
 	case promptEvent:
 		state.Stood = ""
+		state.Probing = strings.Contains(textOf(fields, "text"), replyMarker)
 		state.prompted(fields, event.At)
 	case displayEvent:
 		if text := strings.TrimSpace(textOf(fields, "delta")); text != "" {
@@ -154,6 +157,10 @@ func stepHolds(state Holds, event q.Event) Holds {
 	case turnEvent:
 		state.turnEnds(fields)
 	case toolEvent:
+		if state.Probing {
+			state.Probing = false
+			state.Said.Rows = append(state.Said.Rows, probeRowOf(event.At, fields))
+		}
 		state.called(fields, event.At)
 	}
 	return state

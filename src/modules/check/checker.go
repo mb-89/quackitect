@@ -99,6 +99,7 @@ var Rules = []func(*Tree) []Finding{
 	noConflictMarkers,
 	ExampleCovers,
 	exampleProves,
+	declaresFaults,
 	helperCopies,
 }
 

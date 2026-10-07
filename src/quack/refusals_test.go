@@ -4,7 +4,6 @@
 package main // level0: InPackageTest - no external test imports a main package, and the case reaches treeRoot
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -17,7 +16,7 @@ func TestMovedRefusalsPassTheFailureDoor(t *testing.T) {
 	files := map[string]string{}
 	for place := range failure.Moved {
 		for _, path := range goFilesAt(t, filepath.Join(treeRoot, filepath.FromSlash(place))) {
-			text, err := os.ReadFile(path)
+			text, err := realDisk().read(path)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -36,7 +35,7 @@ func TestMovedRefusalsPassTheFailureDoor(t *testing.T) {
 // Every Go file a place names, the file itself or each one in its folder, its cases left out. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
 func goFilesAt(t *testing.T, at string) []string {
 	t.Helper()
-	info, err := os.Stat(at)
+	info, err := realDisk().stat(at)
 	if err != nil {
 		t.Fatal(err)
 	}

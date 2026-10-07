@@ -4,7 +4,6 @@
 package pull // level0: InPackageTest - the case calls the unexported formFault the chapter's fields pass through
 
 import (
-	"os"
 	"strings"
 	"testing"
 
@@ -46,11 +45,11 @@ func TestImproveLinesNameTheirHome(t *testing.T) {
 		}
 	})
 	t.Run("the group route's improve field carries home", func(t *testing.T) {
-		text, err := os.ReadFile("../../spec/processes/group.yaml")
-		if err != nil {
-			t.Fatal(err)
+		text, held := OSDisk{Root: "../.."}.Read("spec/processes/group.yaml")
+		if !held {
+			t.Fatal("the group route stands nowhere")
 		}
-		improve := fieldNamed(yaml.Read(string(text)), "improve")
+		improve := fieldNamed(yaml.Read(text), "improve")
 		if improve == nil || improve.Get("home") != true {
 			t.Fatalf("the improve field reads %v", improve)
 		}

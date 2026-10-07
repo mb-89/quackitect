@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,79 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: level-zero-typed-mod
 depends_on: [level0-hooks-move-to-typescript]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: c67f136b6c069fae8be59de68e3414ffa731c2ac
+    hash_after: c67f136b6c069fae8be59de68e3414ffa731c2ac
+    inputs:
+      - name: ask
+        hash: 5087e2972354c89a
+        size: 1091
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 104cd4382ed985a9fced58c23ccda0eea0ea00a9
+    hash_after: 104cd4382ed985a9fced58c23ccda0eea0ea00a9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 44f026d026534d58
+        size: 1925
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box eabbd46a6a23 · claude-code-remote · helper-4
+    hash_before: cffca6022d4d86c545747e6beb8327e5230023a2
+    hash_after: cffca6022d4d86c545747e6beb8327e5230023a2
+    inputs:
+      - name: design/draft
+        hash: 44f026d026534d58
+        size: 1925
+      - name: design/tests-red
+        hash: d1dd9f88b5c81bd1
+        size: 918
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: e2501f11ac4c4aec42dec5952e3cb361b2eb2b5a
+    hash_after: d314010aca34ad4a8b7107443c58e0cc887ec572
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: b342bcae91e7756b76c737a620bc735fea97741a
+    hash_after: b342bcae91e7756b76c737a620bc735fea97741a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   90.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d1dd9f88b5c81bd1
+        size: 918
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -161,38 +232,52 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The settings already carry no switch, and the design note section What stays off the standard road already gives the reason for the function hooks over settings command hooks. Three gaps close here. First, the start verb in src/quack/verb_start.go still counts the plugin loaded only where the switch is set, so a desk session outside plan mode meets the start refusal although the manifest stands; the verb reads the manifest alone. Second, the boot hook row in that section gives the cloud install its reason and leaves out the desk road, where boot.js hands the hook input to the start verb; the row names both roads and why each stays: the client scans plugins before any hook of a mod runs, and a session loading no plugin has no mod hook to refuse it. Third, the cold probe runs a fresh clone of this commit on this box client with no switch, and its output goes under Discussion.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/boot.js asks, which runs the start verb on a desk session start
+- src/quack/verb_start.go startVerb, registered as the start verb
+- src/modules/hooks/start.go StartRefusal, which the start verb calls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start_test.go TestStartStopsADeskSessionWritingWithNoPlugin, whose case of a manifest with no switch flips to a pass, and whose cases set no switch
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start.go
+- src/quack/verb_start_test.go
+- spec/design_output/level0.md
+- spec/tickets/level0-drops-what-standard-replaces.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened verb_start.go, start.go, boot.js, the settings and the design note section, and each claim stands there
+the callers list names boot.js asks, startVerb and StartRefusal, the only readers of the switch past tests
+the probe line meets the cold probe output, the boot hook line meets the design note row, the function hooks line meets the standing row, and the check line meets the check
+the approach adds no config key
 
 ## tests-red
 
@@ -201,26 +286,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_start_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The start verb prints its stop for a desk session in default mode where the manifest stands and no switch is set, so the case fails on its own assertion. The cold probe passes whole on a fresh clone with client 2.1.292 and no switch, which the Discussion carries. What surprises me: main dropped the switch from the settings while the start verb still read it, so every desk session outside plan mode met the start refusal.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the probe line meets the cold probe output under Discussion, the boot hook line and the function hooks line meet a checkpoint the gate answers off the design note, the start verb fix meets the flipped case, and the check line meets the check
+the start test reaches the root, input, environment and disk through startFake, and the cold probe runs a real clone by design
 
 # gate
 
@@ -229,8 +319,10 @@ from: none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- boot-hook-names-desk-road: spec/design_output/level0.md section The boot hook still says that off a cloud box boot.js runs nothing, while src/scripts/boot.js asks hands the hook input to the start verb there; the implement step rewrites that sentence beside the row it already fixes in What the standard road leaves, so the note names both roads in one place and the row points at it
 
 # implement
 
@@ -241,14 +333,19 @@ from: none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/verb_start.go alone, which the ask names through the start verb fix
+the start verb reaches the disk and the environment through startOutside, whose fakes the start test already holds
+the manifest constant points at spec/design_output/level0#the-boot-hook, which names the approach
+the fact that a mod loads by default stands in the What the standard road leaves section alone, and the code points there through the manifest comment
 
 ## tests-green
 
@@ -257,26 +354,33 @@ from: none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The start verb in src/quack/verb_start.go counts the level-zero plugin loaded where its manifest stands, and reads no switch for mods. A client loads a mod by default, and the settings carry no switch, so a desk session holding the plugin met the start refusal. The case of a desk session where the manifest stands and no switch is set turns green. Commit d314010ac.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/verb_start.go alone, which the ask names through the start verb fix
+the start verb reaches the disk and the environment through its outside struct, and the start test fakes both
+the manifest constant points at the boot hook section of the level0 design note, which names the approach
+the fact that a mod loads by default stands in the What the standard road leaves section alone
 
 # accept
 
@@ -301,3 +405,13 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The cold probe, `./RUNME.sh probe cold`, clones the work branch fresh and runs client 2.1.292 headless once, with no `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` in its environment or in `.claude/settings.json`. The mod loads, so the switch stays nowhere. Its output, with the tool list cut to its first name:
+
+    The install answers 0.
+    PASS hook: bridge row, no index answered, so the bridgehead starts one
+    PASS server: context row, 2 block(s) reach the session
+    PASS rules: context row, level0-tools level0-canary
+    PASS tools: mcp__level0__check_answer, ...
+    PASS canary: the first text opens on it, once: level0 holds this session: 75 rules, 6 notes, the stop hook on.
+    PASS quiet: no row says the server answers nothing past the rules

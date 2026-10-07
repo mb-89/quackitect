@@ -16,6 +16,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/clock"
+	"quackitect/src/q"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/log"
@@ -78,7 +80,7 @@ func runWindow(path, tab string, mouse bool) error {
 
 	door, err := frame.OpenDoor(frame.WindowPort, func(msg any) { program.Send(msg) })
 	if err != nil {
-		if frame.TellPort(frame.WindowPort, tab) {
+		if frame.TellPort(clock.New(), frame.WindowPort, tab) {
 			fmt.Fprintln(stderr, "A window already stands, and it takes the tab.")
 			return nil
 		}
@@ -103,7 +105,7 @@ func windowOpts(mouse bool) []tea.ProgramOption {
 
 // The window over the log tab and the work tab, then the registry tabs, so the log is the first tab. The registry tabs read the index over /v1. [[spec/design_output/model#the-registry-tabs]]
 func newModel(path string, zone *time.Location) frame.Model {
-	return newModelOver(path, zone, indexCatalog{})
+	return newModelOver(path, zone, indexCatalog{clock: clock.New()})
 }
 
 // The window over the catalog handed in, so a case hands the fake. [[spec/design_output/model#the-registry-tabs]]
@@ -117,10 +119,10 @@ func newModelOver(path string, zone *time.Location, catalog work.Source) frame.M
 }
 
 // The real catalog: each read finds the base of /v1 on the door standing over the root, so a restart of the index reaches the next read. [[spec/design_output/model#surfaces]]
-type indexCatalog struct{}
+type indexCatalog struct{ clock q.Clock }
 
-func (indexCatalog) Read(name string) (json.RawMessage, error) {
-	base, err := index.V1()
+func (one indexCatalog) Read(name string) (json.RawMessage, error) {
+	base, err := index.V1(one.clock)
 	if err != nil {
 		return nil, err
 	}
@@ -128,8 +130,8 @@ func (indexCatalog) Read(name string) (json.RawMessage, error) {
 }
 
 // Each watch finds the base the same way, so a restart of the index reaches the next watch. [[spec/tickets/the-work-tab-reads-v1]]
-func (indexCatalog) Watch(ctx context.Context, names []string, each func(registry.Change)) error {
-	base, err := index.V1()
+func (one indexCatalog) Watch(ctx context.Context, names []string, each func(registry.Change)) error {
+	base, err := index.V1(one.clock)
 	if err != nil {
 		return err
 	}
@@ -137,8 +139,8 @@ func (indexCatalog) Watch(ctx context.Context, names []string, each func(registr
 }
 
 // Each call finds the base the same way, so a restart of the index reaches the next call. [[spec/tickets/the-work-keys-call-actions]]
-func (indexCatalog) Call(name string, input any) (registry.Said, error) {
-	base, err := index.V1()
+func (one indexCatalog) Call(name string, input any) (registry.Said, error) {
+	base, err := index.V1(one.clock)
 	if err != nil {
 		return registry.Said{}, err
 	}

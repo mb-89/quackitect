@@ -6,11 +6,10 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os"
+	"io"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/q"
@@ -36,15 +35,9 @@ func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
 
 func TestThePlacementsKeyReadsItsListsOffTheTree(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	at := filepath.Join(root, "spec", "config", "level0.json")
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(`{"processes": {"placements": [["tickets", "queue"]]}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if got := placementLists(root); len(got) != 1 || strings.Join(got[0], ", ") != "tickets, queue" {
+	root, disk := "/tree", newFakeDisk()
+	hq2Seed(t, disk, filepath.Join(root, "spec", "config", "level0.json"), `{"processes": {"placements": [["tickets", "queue"]]}}`)
+	if got := placementLists(disk, root); len(got) != 1 || strings.Join(got[0], ", ") != "tickets, queue" {
 		t.Fatalf("the placements key reads %v, and wants one list of tickets and queue", got)
 	}
 }
@@ -100,7 +93,7 @@ func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
 		t.Fatal(err)
 	}
 	t.Cleanup(done)
-	stop, err := runsModule(bus.URL(), bus.Token(), moduleSide, []string{"doubler"})
+	stop, err := runsModule(bus.URL(), bus.Token(), moduleSide, []string{"doubler"}, io.Discard)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,24 +105,14 @@ func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
 func TestAModuleProcessAnswersAnEmptyCommitWhereNothingMoved(t *testing.T) {
 	t.Parallel()
 	peer, heard := doublerRuns(t)
-	select {
-	case values := <-heard:
-		if string(values["doubler/twice"]) != "42" {
-			t.Fatalf("the run at the start commits %s", values)
-		}
-	case <-time.After(10 * time.Second):
-		t.Fatal("the run at the start commits nothing")
+	if values := <-heard; string(values["doubler/twice"]) != "42" {
+		t.Fatalf("the run at the start commits %s", values)
 	}
 	if err := peer.Run("doubler"); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case values := <-heard:
-		if len(values) != 0 {
-			t.Fatalf("a second run over the same inputs commits %s", values)
-		}
-	case <-time.After(10 * time.Second):
-		t.Fatal("a second run answers nothing")
+	if values := <-heard; len(values) != 0 {
+		t.Fatalf("a second run over the same inputs commits %s", values)
 	}
 }
 
@@ -139,12 +122,7 @@ func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
 	if err := peer.Run("doubler"); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case values := <-heard:
-		if string(values["doubler/twice"]) != "42" {
-			t.Fatalf("the module process commits %s", values)
-		}
-	case <-time.After(10 * time.Second):
-		t.Fatal("the module process commits nothing")
+	if values := <-heard; string(values["doubler/twice"]) != "42" {
+		t.Fatalf("the module process commits %s", values)
 	}
 }

@@ -81,7 +81,7 @@ func reasonOf(err error) string {
 }
 
 func (b *Book) answerOf(one Op) Answer {
-	said := Answer{Handle: one.ID, Result: one.Result, Error: one.Error, Gone: b.now().Sub(one.Started)}
+	said := Answer{Handle: one.ID, Result: one.Result, Error: one.Error, Gone: b.clock.Now().Sub(one.Started)}
 	if one.Progress.Known > 0 {
 		said.Fraction = float64(one.Progress.Done) / float64(one.Progress.Known)
 	}

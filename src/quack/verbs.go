@@ -5,11 +5,8 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -164,11 +161,11 @@ func capped(text string) string {
 }
 
 // The verbs slice's mode off the config under the root, old where nothing answers it. [[spec/tickets/runme-hands-verbs-to-quack]]
-func modeOf(root string) string { return sliceMode(root, verbsKey) }
+func modeOf(disk diskDoors, root string) string { return sliceMode(disk, root, verbsKey) }
 
 // A slice's mode off the config under the root, by its dotted key, and empty where nothing answers it. [[spec/tickets/the-doors-process-stands]]
-func sliceMode(root, key string) string {
-	rows, err := configAt(root)
+func sliceMode(disk diskDoors, root, key string) string {
+	rows, err := configOn(disk, root)
 	if err != nil {
 		return ""
 	}
@@ -180,48 +177,30 @@ func sliceMode(root, key string) string {
 }
 
 // Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
-func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
+func appendsRow(disk diskDoors, root string, now func() time.Time) func(row map[string]any) error {
 	return func(row map[string]any) error {
 		row["at"] = now().UTC().Format(logStamp)
 		line, err := json.Marshal(row)
 		if err != nil {
 			return err
 		}
-		at := filepath.Join(root, filepath.FromSlash(sessionLog))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			return err
-		}
-		file, err := os.OpenFile(at, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		_, err = file.Write(append(line, '\n'))
-		return err
+		return appendsLine(disk, filepath.Join(root, filepath.FromSlash(sessionLog)), string(line))
 	}
 }
 
 // The road over the real doors: the usage door, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/quack-registers-each-verb]] [[spec/tickets/program-of-drops-node]]
-func verbRoad(argv []string) int {
+func verbRoad(argv []string, out, errs io.Writer) int {
 	root, err := index.Root()
 	if err != nil {
 		root = "."
 	}
 	return verbs(verbDoors{
-		mode:  modeOf(root),
-		old:   usageDoor(argv, os.Stderr),
-		alone: func(argv []string) int { return routes(os.Stdout, os.Stderr, index.V1, argv) },
+		mode:  modeOf(realDisk(), root),
+		old:   usageDoor(argv, errs),
+		alone: func(argv []string) int { return routes(out, errs, reachV1, argv) },
 		twins: registry,
-		log:   appendsRow(root, time.Now),
-		out:   os.Stdout,
-		errs:  os.Stderr,
+		log:   appendsRow(realDisk(), root, wall.Now),
+		out:   out,
+		errs:  errs,
 	}, argv)
-}
-
-// The line a failed start says: a runtime missing from the PATH names itself, since the install brings none. [[spec/tickets/bare-desk-names-missing-node]]
-func startFault(runtime string, err error) string {
-	if errors.Is(err, exec.ErrNotFound) {
-		return fmt.Sprintf("No %s stands on the PATH. Install %s, and run this again.", runtime, runtime)
-	}
-	return err.Error()
 }

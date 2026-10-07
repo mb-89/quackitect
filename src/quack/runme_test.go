@@ -5,8 +5,8 @@ package main // level0: InPackageTest - reaches the unexported cloudVariables, a
 
 import (
 	"errors"
-	"os"
-	"os/exec"
+	"os"      // level0: OutsideInDoors - the case lays out a box of links to real tools and reads the RUNME.sh the tree ships, which no fake disk can run
+	"os/exec" // level0: OutsideInDoors - the case runs the real RUNME.sh under sh, as a box does, so no fake runner can stand in
 	"path/filepath"
 	"runtime"
 	"strings"

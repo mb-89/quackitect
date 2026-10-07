@@ -5,7 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"io/fs"
-	"os"
+	"os" // level0: OutsideInDoors - the case drives the example verb over a real clone, the verb's door test
 	"path/filepath"
 	"strings"
 	"testing"
@@ -53,7 +53,7 @@ func runsOver(t *testing.T, text string, plant map[string]string) (string, int, 
 		},
 	}}
 	var said strings.Builder
-	verb := exampleVerb(func() (string, error) { return root, nil }, box.Run, func() { seen = append(seen, said.String()) })
+	verb := exampleVerb(func() (string, error) { return root, nil }, realDisk(), box.Run, func() { seen = append(seen, said.String()) })
 	code := verb([]string{"example", "run", runnablePath}, false, &said, &said)
 	return root, code, said.String(), calls, seen
 }

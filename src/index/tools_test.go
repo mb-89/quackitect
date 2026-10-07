@@ -7,13 +7,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
 )
 
@@ -32,7 +31,7 @@ type listedTool struct {
 	} `json:"inputSchema"`
 }
 
-// The golden file test/level0/index-tools.test.js reads as the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
+// The golden file holding the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
 const toolsGoldenAt = "testdata/tools.golden.json"
 
 var update = flag.Bool("update", false, "write the golden file again off the index")
@@ -40,19 +39,11 @@ var update = flag.Bool("update", false, "write the golden file again off the ind
 // The same body over a catalog the case adds its own actions to. [[spec/tickets/tools-keep-their-own-names]]
 func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 	t.Helper()
-	root := tree(t)
-	c, manage := toolsCatalog(adds)
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	clock := qtest.NewFake(time.Time{})
+	c, manage := toolsCatalog(clock, adds)
+	_, standing := served(t, clock, tree(t), c, manage)
 	said, body := getV1(t, standing, "/v1/tools")
-	if said.StatusCode != http.StatusOK {
+	if said.StatusCode != statusOK {
 		t.Fatalf("/v1/tools answers %d: %.300s", said.StatusCode, body)
 	}
 	return body
@@ -90,7 +81,6 @@ func ghostTools(t *testing.T) (Standing, []listedTool) {
 // A door over the catalog, whose manager answers module t alone, and the tools it lists. [[spec/tickets/tool-list-keeps-unreadable-actions]]
 func toolsOver(t *testing.T, c *q.Catalog, ops q.Writer) (Standing, []listedTool) {
 	t.Helper()
-	root := tree(t)
 	answers := func(module, _ string) bool { return module == "t" }
 	accept := func(asked q.Request) (any, error) {
 		if !answers(asked.Module, asked.Verb) {
@@ -99,24 +89,17 @@ func toolsOver(t *testing.T, c *q.Catalog, ops q.Writer) (Standing, []listedTool
 		in, _ := asked.Args.(addIn)
 		return addOut{Sum: in.A + in.B}, nil
 	}
-	fake := fakeManager(ops, accept)
+	clock := qtest.NewFake(time.Time{})
+	fake := fakeManager(clock, ops, accept)
 	manage := func(root string, store *q.Store, rows OpRows, reads Reads, steps func(func())) (Managed, error) {
 		one, err := fake(root, store, rows, reads, steps)
 		one.Accepts = answers
 		return one, err
 	}
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, clock, tree(t), c, manage)
 	said, body := getV1(t, standing, "/v1/tools")
 	var list []listedTool
-	if err := json.Unmarshal(body, &list); err != nil || said.StatusCode != http.StatusOK {
+	if err := json.Unmarshal(body, &list); err != nil || said.StatusCode != statusOK {
 		t.Fatalf("/v1/tools answers %d, %.300s: %v", said.StatusCode, body, err)
 	}
 	return standing, list
@@ -132,7 +115,7 @@ func TestEachListedToolAnswersACallThroughAct(t *testing.T) {
 	}
 	for _, one := range list {
 		said, body := postV1(t, standing, "/v1/actions/"+one.Action, "wait=5", `{"a":2,"b":3}`)
-		if out := postedOf(t, body); said.StatusCode != http.StatusOK || out.Result == nil || out.Result.Sum != 5 {
+		if out := postedOf(t, body); said.StatusCode != statusOK || out.Result == nil || out.Result.Sum != 5 {
 			t.Errorf("%s answers %d: %s", one.Name, said.StatusCode, body)
 		}
 	}
@@ -176,7 +159,7 @@ func TestTheToolListKeepsAnActionItsZeroInputCannotRead(t *testing.T) {
 func TestTheRoutesServeNoActionNoModuleAccepts(t *testing.T) {
 	t.Parallel()
 	standing, _ := ghostTools(t)
-	if said, body := postV1(t, standing, "/v1/actions/t/ghost", "wait=5", `{"a":2,"b":3}`); said.StatusCode != http.StatusNotFound {
+	if said, body := postV1(t, standing, "/v1/actions/t/ghost", "wait=5", `{"a":2,"b":3}`); said.StatusCode != statusNotFound {
 		t.Errorf("t/ghost answers %d: %s", said.StatusCode, body)
 	}
 }
@@ -305,11 +288,11 @@ func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
+		if err := writeFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
-	body, err := os.ReadFile(toolsGoldenAt)
+	body, err := readFile(toolsGoldenAt)
 	if err != nil {
 		t.Fatalf("%v: run go test ./src/index -run TestTheToolListReadsAsItsGoldenFile -update", err)
 	}

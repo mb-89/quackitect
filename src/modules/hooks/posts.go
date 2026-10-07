@@ -40,8 +40,8 @@ func fieldsOf(post Post) map[string]any {
 	if post.Root != "" {
 		fields["root"] = post.Root
 	}
-	if post.Fill != nil {
-		fields["fill"] = post.Fill
+	if fill := filledOf(post); fill != nil {
+		fields["fill"] = fill
 	}
 	return fields
 }

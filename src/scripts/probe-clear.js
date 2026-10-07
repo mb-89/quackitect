@@ -80,7 +80,7 @@ export async function clearRun(it, tree, raise, seen, outer) {
     const e = event === "turn.complete" ? { reason: "answer", answer: ANSWER } : {};
     await raise(event, e, async () => (event === "turn.complete" ? { text: ANSWER } : {}));
   }
-  await settled(seen);
+  await settled(it, seen);
   const commands = [...seen.commands];
   const prompts = [...seen.prompts];
   const after = { pulled: pull(), read: pull("--pass"), committed: committed(it, tree) };
@@ -162,9 +162,10 @@ function keyed(it, tree) {
   it.disk.write(at, `${JSON.stringify({ ...was, context: { ...was.context, handoverAt: KEY } })}\n`);
 }
 
-async function settled(seen) {
+// The clear's prompt lands a beat after the turn ends, so the probe waits on the hand's clock for it, up to SETTLE. [[spec/design_output/doors#time-is-a-door]]
+export async function settled(it, seen) {
   for (let waited = 0; waited < SETTLE && seen.prompts.length === 0; waited += TICK) {
-    await new Promise((done) => setTimeout(done, TICK));
+    await it.clock.wait(TICK);
   }
 }
 

@@ -4,10 +4,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -16,7 +14,7 @@ import (
 	"quackitect/src/proc"
 )
 
-func init() { register("example", exampleVerb(index.Root, proc.Real, enterOnTerminal)) }
+func init() { register("example", exampleVerb(index.Root, realDisk(), proc.Real, enterOnTerminal)) }
 
 // The folder under the runtime folder holding each example's clone, and the script each step calls. [[spec/design_output/examples#one-runner-two-drivers]]
 const (
@@ -26,16 +24,8 @@ const (
 	runWords = 3
 )
 
-// Waits for the user's Enter where a person sits at the terminal, and runs straight through where the input is a pipe or nothing. [[spec/tickets/example-run-pauses-between-steps]]
-func enterOnTerminal() {
-	if said, err := os.Stdin.Stat(); err == nil && said.Mode()&os.ModeCharDevice != 0 {
-		fmt.Fprint(os.Stderr, "Enter runs the next step.")
-		_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
-	}
-}
-
-// The example verb over its root, its runner and the pause between steps. [[spec/design_output/examples#one-runner-two-drivers]]
-func exampleVerb(rootOf func() (string, error), run proc.Runner, pause func()) twin {
+// The example verb over its root, its disk, its runner and the pause between steps. [[spec/design_output/examples#one-runner-two-drivers]]
+func exampleVerb(rootOf func() (string, error), disk diskDoors, run proc.Runner, pause func()) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		if len(argv) != runWords || argv[1] != "run" {
 			fmt.Fprintln(errs, "example takes run and the example's path: ./RUNME.sh example run spec/examples/110_tickets/pull.md")
@@ -47,7 +37,7 @@ func exampleVerb(rootOf func() (string, error), run proc.Runner, pause func()) t
 			return exitFailed
 		}
 		path := filepath.ToSlash(argv[2])
-		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		text, err := disk.read(filepath.Join(root, filepath.FromSlash(path)))
 		if err != nil {
 			fmt.Fprintf(errs, "%s stands nowhere under the tree: %v\n", path, err)
 			return exitFailed
@@ -58,7 +48,7 @@ func exampleVerb(rootOf func() (string, error), run proc.Runner, pause func()) t
 			return exitFailed
 		}
 		clone := filepath.Join(root, filepath.FromSlash(index.Runtime), examplesFolder, strings.TrimSuffix(filepath.Base(path), ".md"))
-		if err := os.RemoveAll(clone); err != nil {
+		if err := disk.removeAll(clone); err != nil {
 			fmt.Fprintf(errs, "the last clone at %s stays: %v\n", clone, err)
 			return exitFailed
 		}
@@ -68,7 +58,7 @@ func exampleVerb(rootOf func() (string, error), run proc.Runner, pause func()) t
 		}
 		fmt.Fprintf(out, "%s runs in %s, and the clone stays for you to read.\n", path, clone)
 		reads := func(at string) (string, bool) {
-			body, err := os.ReadFile(filepath.Join(clone, filepath.FromSlash(at)))
+			body, err := disk.read(filepath.Join(clone, filepath.FromSlash(at)))
 			return string(body), err == nil
 		}
 		code := 0

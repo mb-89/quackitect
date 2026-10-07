@@ -5,10 +5,11 @@
 package main
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the ticket schema the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,36 +24,14 @@ import (
 // The result each action the work tab posts answers over the fake. [[spec/tickets/the-work-keys-call-actions]]
 var workResults = map[string]any{"work/place": "placed", "tickets/flip-urgent": "flipped", "tickets/set-field": "set", "work/pull": "pulled"}
 
-const childNote = `---
-kind: [[ticket]]
-state: open
-group: one-group
-process: [[trivial]]
-step: do
-steps:
-  - name: do
----
-
-# Ask
-
-One piece of it.
-
-# do
-
-# Discussion
-`
-
-// The window over the rows a catalog answers, the schema this tree ships, and one ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func editWindow(t *testing.T) (frame.Model, string) {
+// The window over the rows a catalog answers, and the schema this tree ships in a fake tree, answering the posts the tab makes. [[spec/design_output/tui#the-work-tab-takes-edits]]
+func editWindow(t *testing.T) (frame.Model, *[]registry.Posted) {
 	t.Helper()
-	root := workTree(t)
 	schema, err := os.ReadFile(filepath.Join("..", "..", work.TicketSchemaAt))
 	if err != nil {
 		t.Fatalf("this tree ships %s, and it read %v", work.TicketSchemaAt, err)
 	}
-	writeAt(t, root, work.TicketSchemaAt, string(schema))
-	writeAt(t, root, "spec/tickets/a-child.md", childNote)
-	path := logOf(root)
+	path := logOf(workTree(t))
 	held := loadWork(t, workRowsSaid)
 	// The shipped table draws no front field a person writes, so the edit road runs over the columns a case adds. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	for _, key := range []string{"group", "step", "reason", "urgent", "kind"} {
@@ -63,10 +42,12 @@ func editWindow(t *testing.T) (frame.Model, string) {
 	theWork(m).Tree = held
 	// The tab posts through a fake, so no case reaches an index standing on this box. [[spec/tickets/the-work-keys-call-actions]]
 	fake := workCatalog(t, workRowsSaid)
-	fake.Results, fake.Posted = workResults, &[]registry.Posted{}
+	posted := &[]registry.Posted{}
+	fake.Results, fake.Posted = workResults, posted
 	theWork(m).From = fake
+	theWork(m).Files = fstest.MapFS{work.TicketSchemaAt: {Data: schema}}
 	m.OpenTab(m.TabNamed("work"))
-	return m, root
+	return m, posted
 }
 
 func pressed(m frame.Model, keys ...string) frame.Model {
@@ -116,15 +97,6 @@ func toRow(m frame.Model, name string) frame.Model {
 	return m
 }
 
-func noteAt(t *testing.T, root string) string {
-	t.Helper()
-	said, err := os.ReadFile(filepath.Join(root, "spec", "tickets", "a-child.md"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(said)
-}
-
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 	t.Parallel()
@@ -154,7 +126,7 @@ func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	t.Parallel()
-	m, root := editWindow(t)
+	m, posted := editWindow(t)
 	// The state stands in the flags now, so the step is the column the verbs own. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	for _, key := range []string{"step"} {
 		held := toRow(toColumn(m, key), "a-child")
@@ -173,8 +145,8 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	if theWork(held).Tree.Editing() || !strings.Contains(theWork(held).Notice, "no ticket's front") {
 		t.Fatalf("a column the index derives refuses the edit, and the tab says %q", theWork(held).Notice)
 	}
-	if noteAt(t, root) != childNote {
-		t.Fatal("a refused edit writes nothing")
+	if len(*posted) != 0 {
+		t.Fatalf("a refused edit posts nothing, and the tab posts %+v", *posted)
 	}
 }
 

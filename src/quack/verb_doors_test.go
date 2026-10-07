@@ -25,6 +25,44 @@ func TestDoorsCountsWhereEveryDoorHoldsATest(t *testing.T) {
 	}
 }
 
+// A tree with the clock declared, a walk around it, one in a skill script, one in the agent's folder past the skills, and a line marked past it. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func walkedRoot(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	seedFile(t, root, "src/modules/clock/owns.yaml", "clock:\n  go: [time.Sleep]\n")
+	seedFile(t, root, "src/engine/wait.go", "package engine\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	seedFile(t, root, "src/engine/hung.go", "package engine\n\nimport \"time\"\n\nfunc Hung() {\n\ttime.Sleep(1) // level0: OutsideInDoors - a hung child needs a deadline\n}\n")
+	seedFile(t, root, ".claude/skills/one/wait.go", "package one\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	seedFile(t, root, ".claude/agents/one/wait.go", "package one\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	return root
+}
+
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
+func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
+	t.Parallel()
+	code, out, errs := doorsRan(walkedRoot(t))
+	if code != exitFailed || errs != ".claude/skills/one/wait.go:5:14: time.Sleep walks around clock\nsrc/engine/wait.go:5:14: time.Sleep walks around clock\n"+walksRefused+"\n" {
+		t.Fatalf("doors answers %d, %q and %q, and wants the walk-around refused", code, out, errs)
+	}
+	if !strings.Contains(out, "src/engine/hung.go:6:2: time.Sleep stands marked: a hung child needs a deadline\n") {
+		t.Fatalf("doors prints %q, and wants the marked line listed", out)
+	}
+}
+
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
+func TestDoorsListsAScriptWalkingAroundADoor(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/doors/clock.js", "export const clock = () => ({ now: () => Date.now() });\n")
+	seedFile(t, root, "src/doors/owns.yaml", "clock:\n  js: [Date.now]\n  files: [clock.js]\n")
+	seedFile(t, root, "test/contract/clock.test.js", "")
+	seedFile(t, root, "src/scripts/wait.js", "export const at = () => Date.now();\n")
+	code, out, errs := doorsRan(root)
+	if code != exitFailed || !strings.Contains(errs, "src/scripts/wait.js:1:25: Date.now walks around clock\n") || strings.Contains(out+errs, "src/doors/clock.js:") {
+		t.Fatalf("doors answers %d, %q and %q, and wants the script's walk-around alone, refused", code, out, errs)
+	}
+}
+
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
@@ -35,5 +73,52 @@ func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	want := "src/doors/git.js has no test/contract/git.test.js.\nA door with no contract test lets its fake drift. Write one.\n"
 	if code != exitFailed || errs != want {
 		t.Fatalf("doors answers %d and %q, and wants %q", code, errs, want)
+	}
+}
+
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
+func TestDoorsListsADeclarationStandingAsItsOwnOutside(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/extension/drawing/owns.yaml", "page:\n  js: [Date.now]\n  files: [route.mjs]\n  outside: true\n")
+	seedFile(t, root, "src/extension/drawing/route.mjs", "export const at = () => Date.now();\n")
+	seedFile(t, root, "src/modules/waits/owns.yaml", "waits:\n  go: [os]\n")
+	code, out, errs := doorsRan(root)
+	if want := "src/extension/drawing/route.mjs stands inside page, its own outside\n"; !strings.Contains(out, want) {
+		t.Errorf("doors prints %q, and wants %q", out, want)
+	}
+	if strings.Contains(out, "inside waits") {
+		t.Errorf("doors prints %q, and wants a door missing its contract kept off the outsides", out)
+	}
+	if code != 0 || strings.Contains(out+errs, "route.mjs:") {
+		t.Fatalf("doors answers %d, %q and %q, and wants no walk in the page's own file", code, out, errs)
+	}
+}
+
+func TestDoorsListsTheContractTestOfTheRootDoor(t *testing.T) {
+	t.Parallel()
+	_, out, _ := doorsRan(treeRoot)
+	if want := "src/quack/box_doors_contract_test.go keeps the contract of quack\n"; !strings.Contains(out, want) {
+		t.Fatalf("doors over the tree prints %q, and wants %q", out, want)
+	}
+}
+
+func TestDoorsReadsTheTreeWithNoMarkedLineOfItsOwn(t *testing.T) {
+	t.Parallel()
+	if _, out, _ := doorsRan(treeRoot); strings.Contains(out, "src/quack/verb_doors.go:") {
+		t.Fatalf("doors over the tree prints %q, and wants no line of src/quack/verb_doors.go", out)
+	}
+}
+
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
+func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/modules/clock/owns.yaml", "clock:\n  go: [time.Sleep]\n  contract: [src/engine/clock_contract_test.go]\n")
+	seedFile(t, root, "src/engine/clock_contract_test.go", "package engine\n\nimport \"time\"\n\nfunc wait() { time.Sleep(1) }\n")
+	seedFile(t, root, "src/engine/wait.go", "package engine\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n")
+	code, out, errs := doorsRan(root)
+	if code != exitFailed || !strings.Contains(errs, "src/engine/wait.go:5:14: time.Sleep walks around clock\n") || !strings.Contains(out, "src/engine/clock_contract_test.go keeps the contract of clock\n") || strings.Contains(out+errs, "clock_contract_test.go:") {
+		t.Fatalf("doors answers %d, %q and %q, and wants the walk in wait.go, the clock's contract test listed under it, and no walk in that test", code, out, errs)
 	}
 }

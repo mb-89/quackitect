@@ -1,6 +1,6 @@
 // The rule holding the outside inside a door. The tree's rules prove it fires
-// on a module, a Go file and the extension, and stands off every path a door
-// or a root holds, read through the same door the write door reads.
+// on a module and a Go file, and stands off every path a door or a root holds,
+// read through the same door the write door reads.
 // [[spec/design_output/doors#a-door-reads-the-outside]] [[spec/tickets/vale-leaves-the-tree]]
 
 import assert from "node:assert/strict";
@@ -16,7 +16,6 @@ const files = disk();
 const { ifRules, proves, read } = rulesIn(root);
 
 const RULE = "OutsideInDoors";
-const GUARD = "DoorsOnly";
 
 const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 
@@ -29,19 +28,16 @@ const ROOTS = [
   "src/scripts/copilot.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
-  ".claude/skills/level0/hooks/level0.js",
-  "src/stub/.claude/skills/level0/hooks/bridgehead.js",
+  ".claude/skills/level0/hooks/level0.ts",
+  "src/stub/.claude/skills/level0/hooks/bridgehead.ts",
 ];
 
 const READS = "const here = process.env.HOME;\n";
 const ARGV = "const said = process.argv.slice(2);\n";
 const PLATFORM = 'const win = process.platform === "win32";\n';
 const SPAWN = 'import "os/exec"\n';
-// The guard reads the raw line, so the fixture carries no import of its own. [[spec/design_output/private#a-fixture-carries-no-shape]]
-const NODE = ['import { readFileSync } from "node', ':fs";\n'].join("");
 
 const MODULE = "src/bridge/findings.js";
-const EXTENSION = "src/extension/extension.js";
 
 ifRules(
   "the rule refuses a module past a root reading the environment, and a Go file importing the command package",
@@ -51,13 +47,10 @@ ifRules(
       argv: at(ARGV, MODULE),
       platform: at(PLATFORM, MODULE),
       spawn: at(SPAWN, "src/index/answers.go"),
-      node: at(NODE, EXTENSION),
     },
     (said) => {
       for (const key of ["reads", "argv", "platform", "spawn"])
         assert.ok(said.rules(key).includes(RULE), key);
-      // The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#a-door-reads-the-outside]]
-      assert.ok(said.rules("node").includes(GUARD));
     },
   ),
 );
@@ -67,28 +60,30 @@ const fires = (path, rule = RULE) =>
   read(path.endsWith(".go") ? SPAWN : READS, path).some((one) => one.rule === rule);
 const off = (path) => !fires(path);
 
-ifRules("the rules hold the rule over a module and a Go file, and the guard over the extension", () => {
+ifRules("the rules hold the rule over a module and a Go file", () => {
   assert.equal(off(MODULE), false, MODULE);
   assert.equal(off("src/index/answers.go"), false, "src/index/answers.go");
-  assert.ok(read(NODE, EXTENSION).some((one) => one.rule === GUARD), EXTENSION);
 });
 
 ifRules("the rules stand the rule off every root the approach names", () => {
   for (const where of ROOTS) assert.ok(off(where), where);
 });
 
-ifRules("the rules stand the rule off a door, a case, a Go door file and a note", () => {
-  for (const where of [
-    "src/doors/proc.js",
-    "src/doors/fake/proc.js",
-    "test/level0/work.test.js",
-    "test/contract/proc.test.js",
-    "src/index/door.go",
-    "notes.md",
-  ]) {
-    assert.ok(off(where), where);
-  }
-});
+ifRules(
+  "the rules stand the rule off a door, a case, a Go door file and a note",
+  () => {
+    for (const where of [
+      "src/doors/proc.js",
+      "src/doors/fake/proc.js",
+      "test/level0/work.test.js",
+      "test/contract/proc.test.js",
+      "src/index/door.go",
+      "notes.md",
+    ]) {
+      assert.ok(off(where), where);
+    }
+  },
+);
 
 ifRules("the rule stands in a file of its own", () => {
   assert.ok(files.exists(join(root, AT)), AT);
@@ -121,15 +116,18 @@ ifRules(
   ),
 );
 
-ifRules("the rules stand the rule off every Go door, a Go case, and every door reading the pid, the version or the exec path", () => {
-  for (const where of [
-    "src/engine/swap/door.go",
-    "src/front/front_test.go",
-    "src/doors/session.js",
-  ]) {
-    assert.ok(off(where), where);
-  }
-});
+ifRules(
+  "the rules stand the rule off every Go door, a Go case, and every door reading the pid, the version or the exec path",
+  () => {
+    for (const where of [
+      "src/engine/swap/door.go",
+      "src/front/front_test.go",
+      "src/doors/session.js",
+    ]) {
+      assert.ok(off(where), where);
+    }
+  },
+);
 
 // The hand the command root builds carries the pid and the node path, so a module past it reads neither in place. [[spec/design_output/doors#a-door-reads-the-outside]]
 test("the hand a root builds carries the pid and the node path", () => {

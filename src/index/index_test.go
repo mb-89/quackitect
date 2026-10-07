@@ -6,7 +6,6 @@ package index // level0: InPackageTest - it declares the shared tree helpers, an
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -38,6 +37,20 @@ func opened(t *testing.T, root string) *sql.DB {
 	}
 	t.Cleanup(func() { db.Close() })
 	if _, _, err := Sweep(db, root); err != nil {
+		t.Fatal(err)
+	}
+	return db
+}
+
+// The index swept against git's list as the case hands it, so a case spawns no git. [[spec/tickets/test-walks-move-onto-fakes]]
+func openedWith(t *testing.T, root string, tracked func(rel string) bool) *sql.DB {
+	t.Helper()
+	db, err := Open(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { db.Close() })
+	if _, _, err := sweep(db, root, tracked); err != nil {
 		t.Fatal(err)
 	}
 	return db
@@ -164,7 +177,7 @@ func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
 		other = strings.ToUpper(volume) + root[2:]
 	}
 
-	self, _ := os.Executable()
+	self, _ := executableOf()
 	if !stands(Standing{Root: other, Stamp: stampOf(self), Bin: self}, root) {
 		t.Fatal("the door stands aside for its own tree under the other drive case")
 	}

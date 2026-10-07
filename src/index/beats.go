@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"quackitect/src/config"
+	"quackitect/src/q"
 )
 
 // The span a tree setting no beat takes. [[spec/design_output/model#a-lease]]
@@ -22,22 +23,22 @@ func spanOf(root, key string, builtIn time.Duration) time.Duration {
 
 // Each beat asks the work loop for a step, so a hung loop runs no step and the manager's lease expires. [[spec/design_output/model#a-lease]]
 func (one *door) beats(every time.Duration) (stop func()) {
-	ticker, done := time.NewTicker(every), make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				select {
-				case one.dirty <- struct{}{}:
-				default:
-				}
-			}
+	return one.clock.Every(every, func(time.Time) {
+		select {
+		case one.dirty <- struct{}{}:
+		default:
 		}
-	}()
-	return func() {
-		ticker.Stop()
-		close(done)
-	}
+	})
+}
+
+// A look each span, dropped while the last one waits, and the stop of the looks. [[spec/tickets/go-waits-on-events]]
+func ticks(clock q.Clock, span time.Duration) (<-chan struct{}, func()) {
+	looks := make(chan struct{}, 1)
+	stop := clock.Every(span, func(time.Time) {
+		select {
+		case looks <- struct{}{}:
+		default:
+		}
+	})
+	return looks, stop
 }

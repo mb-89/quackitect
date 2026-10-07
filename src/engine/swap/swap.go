@@ -7,13 +7,15 @@ package swap
 import (
 	"io/fs"
 	"time"
+
+	"quackitect/src/q"
 )
 
 // How often a server looks at the path it runs from. [[spec/design_output/lsp]]
 const look = 5 * time.Second
 
 // Watches calls gone once another file stands at the path this binary starts from. [[spec/design_output/lsp]]
-func Watches(gone func()) {
+func Watches(clock q.Clock, gone func()) {
 	path, err := executableOf()
 	if err != nil {
 		return
@@ -22,9 +24,25 @@ func Watches(gone func()) {
 	if err != nil {
 		return
 	}
+	watchesAt(clock, statOf, path, first, gone)
+}
+
+// The door a look reads the path through. [[spec/tickets/test-walks-move-onto-fakes]]
+type stat func(path string) (fs.FileInfo, error)
+
+// Looks at the path through the door each span, and calls gone once another file stands there. [[spec/tickets/go-waits-on-events]]
+func watchesAt(clock q.Clock, door stat, path string, first fs.FileInfo, gone func()) {
+	looks := make(chan struct{}, 1)
+	stop := clock.Every(look, func(time.Time) {
+		select {
+		case looks <- struct{}{}:
+		default:
+		}
+	})
 	go func() {
-		for range time.Tick(look) {
-			if Swapped(first, path) {
+		defer stop()
+		for range looks {
+			if swapped(door, first, path) {
 				gone()
 				return
 			}
@@ -32,9 +50,9 @@ func Watches(gone func()) {
 	}()
 }
 
-// Swapped answers whether the file at the path differs from the one the server started from. [[spec/design_output/lsp]]
-func Swapped(first fs.FileInfo, path string) bool {
-	now, err := statOf(path)
+// Whether the file the door reads at the path differs from the one the server started from. [[spec/design_output/lsp]]
+func swapped(door stat, first fs.FileInfo, path string) bool {
+	now, err := door(path)
 	if err != nil {
 		return false
 	}

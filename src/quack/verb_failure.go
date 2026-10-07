@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -43,10 +42,11 @@ var failureUsage = []string{
 	"  count                                                   count each failure id the session log holds",
 }
 
-// What the verb reads: the root and the clock. [[spec/design_output/failures#an-agent-raises-by-verb]]
+// What the verb reads: the root, the clock and the disk. [[spec/design_output/failures#an-agent-raises-by-verb]]
 type failureDoors struct {
 	root string
 	now  func() time.Time
+	disk diskDoors
 	// Stages a written node in git, so the next commit carries it. Nil stages nothing. [[spec/design_output/failures#an-agent-raises-by-verb]]
 	stage func(path string) bool
 }
@@ -57,7 +57,7 @@ func failureHere() (failureDoors, error) {
 	stage := func(path string) bool {
 		return registeredRepo(root).Add([]string{path}) == nil
 	}
-	return failureDoors{root: root, now: time.Now, stage: stage}, err
+	return failureDoors{root: root, now: wall.Now, disk: realDisk(), stage: stage}, err
 }
 
 func init() { register("failure", failureVerb(failureHere)) }
@@ -126,7 +126,7 @@ func raisedOnto(d failureDoors, raised failure.Raised, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	return appendsLine(filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
+	return appendsLine(d.disk, filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
 }
 
 // Writes the node in the shape the failure schema names, through the mint's writer, and reads it back through NodeOf first. It refuses an id off the shape, an id a node carries, a level off the log ladder, no remedy and no when. [[spec/design_output/failures#an-agent-raises-by-verb]] [[spec/tickets/failure-new-shape-once]] [[spec/tickets/failure-new-refusals-tested]]
@@ -163,7 +163,7 @@ func failureWrites(d failureDoors, said []string, out, errs io.Writer) int {
 		fmt.Fprintf(errs, "%s names no --when, the line saying when the failure fires\n", id)
 		return exitUsage
 	}
-	if _, err := os.Stat(filepath.Join(d.root, filepath.FromSlash(where))); err == nil {
+	if d.disk.stands(filepath.Join(d.root, filepath.FromSlash(where))) {
 		fmt.Fprintf(errs, "%s stands already, and failure raise %s raises it\n", where, id)
 		return exitUsage
 	}
@@ -189,7 +189,7 @@ func failureWrites(d failureDoors, said []string, out, errs io.Writer) int {
 
 // Counts each failure id the session file holds, the most first, then by id. A row naming no id counts nowhere. The rotated files stay out, since a retro collects them. [[spec/design_output/failures#an-agent-raises-by-verb]] [[spec/tickets/failure-count-skips-no-id]]
 func failureCounts(d failureDoors, out, errs io.Writer) int {
-	text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(sessionLog)))
+	text, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(sessionLog)))
 	if err != nil {
 		fmt.Fprintln(out, noLog)
 		return 0

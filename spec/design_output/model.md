@@ -8,7 +8,7 @@ refines:
 
 The target architecture, whole. It covers the index and its modules, the IO
 modules, operations, watchdogs, the inner protocol, the processes, the surfaces,
-the views and the hook protocol. The old system calls an IO module a door. Each
+the views and the hook protocol. An IO module is a door written in Go. Each
 part stands in a chapter of its own, and the rules stand in
 [[spec/design_input/the-index-holds-the-model]]. The order of the migration
 stands in [[spec/design_input/the-migration-runs-in-slices]].
@@ -765,6 +765,11 @@ every other module. For the contract, see
 registration carries `q.IO()`. It is one file in a topic package under
 `src/modules/<topic>` beside the others, and no separate tree holds it.
 
+An IO module is a door, so its folder carries the `owns.yaml` naming what it owns.
+For details, see [[spec/design_output/doors#a-door-declares-its-names]].
+A use of a name it owns outside its folder fails the check. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
+
 | what it does | such as |
 |---|---|
 | writes what comes in on its out-ports, which the wiring binds to names | `watch` writes `files/<path...>`, `hooks` writes `session/<id>/events`, `clock` writes `clock/minute` |
@@ -873,10 +878,16 @@ check runs it on Linux and Windows, and reads a package's flag off its
 
 | the analyzer | what it refuses |
 |---|---|
-| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
-| `ioonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in the core, `src/q`, or a renderer |
+| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library. A package a door owns whole reads as reaching outside. So does the floor the analyzer lists for what no door owns, such as `io/fs` and `unsafe`. So `src/config`, `src/index` and a call to `time.Now` stay out |
+| `ioonly` | an import of a package a door owns whole, and a call to `time.Now`, in the core, `src/q`, or a renderer |
 | `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
 | `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
+| `walkaround` | a use of a name a door owns, in a file outside every door owning it |
+
+The analyzers read each list off the `owns.yaml` declarations under the module's
+root, through `owns.Whole`. A door owning a package by a member, as the clock
+owns `time.Sleep`, leaves the package open to an import, so `time.Duration`
+stays pure. For details, see [[spec/design_output/doors#a-door-declares-its-names]].
 
 An IO module imports what its IO needs, and reaches another module through the
 index alone, which `nomodule` holds. `nomodule` checks imports between packages
@@ -885,7 +896,7 @@ purpose. The index process,
 `src/index`, runs the server: it keeps the outside's own libraries, its store and
 the NATS server, and stands outside `ioonly`. The core, `src/q`, stays inside it.
 
-The analyzers replace `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` for
+The analyzers replace `FakeDoorsInTest` and `OutsideInDoors` for
 the Go code, and the Vale rules keep the JavaScript that stays. The code holds
 `nodoor` and `noname` today, and [[spec/tickets/analyzers-read-the-io-flag]]
 replaces them.

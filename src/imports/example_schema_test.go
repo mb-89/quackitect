@@ -4,7 +4,7 @@
 package imports_test
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the example schema and the examples the tree ships, as a build check reads source
 	"path/filepath"
 	"reflect"
 	"slices"

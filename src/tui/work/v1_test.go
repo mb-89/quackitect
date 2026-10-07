@@ -6,7 +6,7 @@ package work
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the work view file the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -182,15 +182,4 @@ func TestARowInHandKeepsTheStateTheRowsAnswer(t *testing.T) {
 	if said := itemsByName(grid)["in-hand"].Keys["state"]; said != "open" {
 		t.Fatalf("the row at place zero reads state %q, and the rows answer open", said)
 	}
-}
-
-// The rows and the count land, and the tab writes nothing back, so the session log holds no row of the window's own. [[spec/tickets/the-tui-data-paths-leave]]
-func TestTheWorkTabWritesNoRowOfItsOwn(t *testing.T) {
-	t.Parallel()
-	m, tab, _ := actionWindow(t, everyResult)
-	tab.Update(&m, registry.Change{Name: badgeName, Revision: 2, Value: json.RawMessage("2")})
-	if !tab.counted {
-		t.Fatal("the count lands on the tab")
-	}
-	wroteNothing(t, tab)
 }

@@ -4,7 +4,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -16,7 +15,7 @@ func seedsRules(t *testing.T, root string) {
 	t.Helper()
 	texts := map[string]string{}
 	if _, err := rules.Load(func(path string) string {
-		text, _ := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(path)))
+		text, _ := realDisk().read(filepath.Join("..", "..", filepath.FromSlash(path)))
 		texts[path] = string(text)
 		return string(text)
 	}); err != nil {

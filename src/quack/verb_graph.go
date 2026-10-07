@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -15,10 +14,10 @@ import (
 	"quackitect/src/modules/tickets"
 )
 
-func init() { register("graph", graphVerb(index.Root)) }
+func init() { register("graph", graphVerb(index.Root, realDisk())) }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-func graphVerb(rootOf func() (string, error)) twin {
+func graphVerb(rootOf func() (string, error), disk diskDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		path := firstWord(argv[1:])
 		if path == "" {
@@ -31,7 +30,7 @@ func graphVerb(rootOf func() (string, error)) twin {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		text, err := os.ReadFile(filepath.Join(root, path))
+		text, err := disk.read(filepath.Join(root, path))
 		if err != nil {
 			fmt.Fprintf(errs, "%s stands nowhere.\n", path)
 			return exitUsage

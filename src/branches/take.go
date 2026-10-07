@@ -94,7 +94,12 @@ func take(d *Doors, name string, argv []string) int {
 		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskSaid("branch take moves this box onto no branch")))
 		return codeRefused
 	}
-	if d.dirty("") {
+	// A named take of the branch this box stands on carries its own commits on, so a box whose hold went stale under another takes it back. [[spec/design_output/work#a-branch-moves-clean]]
+	keeps := ""
+	if name != "" && d.here() == workBranch+name {
+		keeps = workBranch + name
+	}
+	if d.dirtyPast("", keeps) {
 		return codeRefused
 	}
 	d.fetch()
@@ -174,7 +179,7 @@ func take(d *Doors, name string, argv []string) int {
 		return wanted[a].Branch < wanted[b].Branch
 	})
 	for _, one := range wanted {
-		if d.dirty(one.Branch) {
+		if d.dirtyPast(one.Branch, keeps) {
 			return codeRefused
 		}
 		if !d.onBranch(one.Branch) {
@@ -261,7 +266,9 @@ func (d *Doors) onBranch(branch string) bool {
 	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
-	_ = d.Repo.ResetTo("origin/"+branch, true)
+	if !d.Repo.IsAncestor("origin/"+branch, "HEAD") {
+		_ = d.Repo.ResetTo("origin/"+branch, true)
+	}
 	for _, one := range parked {
 		_ = d.write(one.Name, one.Text)
 	}

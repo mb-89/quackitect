@@ -4,7 +4,7 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the examples the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"sync"

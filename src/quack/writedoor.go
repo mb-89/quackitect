@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/edits"
@@ -62,7 +61,7 @@ func writeProse(root, where, text string) []write.Finding {
 	if codeFile.MatchString(where) {
 		return nil
 	}
-	said := heardOver(root, where, text)
+	said := heardOver(quietBox(), root, where, text)
 	if !said.ran {
 		if said.stands && proseFile.MatchString(where) {
 			return []write.Finding{{Rule: unranRule, Line: 1, Column: 1, Message: unranSays, Severity: errorLevel}}
@@ -83,7 +82,7 @@ func writeProse(root, where, text string) []write.Finding {
 // What the edits module reads past its own disk: the ticket door, the write door, the sweep and the mint, over the root. [[spec/tickets/edit-tools-answer-in-go]]
 func editsOutside(root string) edits.Outside {
 	return edits.Outside{
-		Root: root, Now: time.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
+		Root: root, Now: wall.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
 		Ticket: func(name string, files []string) string {
 			for _, one := range files {
 				if one != write.Handover {
@@ -252,3 +251,38 @@ func (one rootDisk) List(folder string) []string { return one.Names(folder) }
 
 // The schema read walks no tree, so the disk lists no path. [[spec/tickets/cage-write-door-port]]
 func (one rootDisk) Paths() []string { return nil }
+
+// The files under a root read through a disk door, as rootDisk reads them off the box. [[spec/tickets/test-walks-move-onto-fakes]]
+type doorSource struct {
+	root string
+	disk diskDoors
+}
+
+func (one doorSource) at(path string) string {
+	return filepath.Join(one.root, filepath.FromSlash(path))
+}
+
+func (one doorSource) Read(path string) (string, bool) {
+	said, err := one.disk.read(one.at(path))
+	return string(said), err == nil
+}
+
+func (one doorSource) Exists(path string) bool { return one.disk.stands(one.at(path)) }
+
+func (one doorSource) Folder(path string) bool {
+	said, err := one.disk.stat(one.at(path))
+	return err == nil && said.IsDir()
+}
+
+func (one doorSource) Names(folder string) []string {
+	out := []string{}
+	for _, each := range one.disk.listed(one.at(folder)) {
+		if !each.IsDir() {
+			out = append(out, each.Name())
+		}
+	}
+	return out
+}
+
+// The read walks no tree, so the door lists no path. [[spec/tickets/test-walks-move-onto-fakes]]
+func (one doorSource) Paths() []string { return nil }

@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"quackitect/src/proc"
+	"quackitect/src/q/qtest"
 )
 
 // The fake process door taught biome, and the commands it takes. [[spec/design_output/doors#the-process-door]]
@@ -192,7 +193,7 @@ func toolsServer(t *testing.T, files map[string]string, tools *Tools) (*Server, 
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
-		Tools: tools, Files: func() map[string]string { return files },
+		Tools: tools, Files: func() map[string]string { return files }, Clock: qtest.Wall(),
 	})
 	var (
 		mu     sync.Mutex
@@ -231,6 +232,21 @@ func holds(drawn []diagnostic, source, code string) bool {
 		}
 	}
 	return false
+}
+
+// The engine lays its declarations inside the plugin, and no rule reads them, as no rule reads the root's. [[spec/tickets/level0-hooks-move-to-typescript]]
+func TestTheLaidTypesStandParked(t *testing.T) {
+	t.Parallel()
+	tools := &Tools{Root: "/tree", Check: fakeCheck}
+	for path, want := range map[string]bool{
+		".claude/types/api.d.ts": true,
+		".claude/skills/level0/.claude-plugin/types/claude-code/index.d.ts": true,
+		".claude/skills/level0/hooks/cage.ts":                               false,
+	} {
+		if got := tools.parked(path); got != want {
+			t.Errorf("%s reads parked %v, and wants %v", path, got, want)
+		}
+	}
 }
 
 // The tools draw the Go rules, an open buffer and a closed file alike. [[spec/tickets/vale-leaves-the-tree]]

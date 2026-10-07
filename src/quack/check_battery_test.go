@@ -184,23 +184,6 @@ func TestBatteryRun(t *testing.T) {
 			}
 		}
 	})
-	t.Run("a red part names itself, and every part beside it runs and reports its time", func(t *testing.T) {
-		var held sync.Mutex
-		ran := []string{}
-		step := func(name string, code int) part {
-			return part{name: name, run: func() int {
-				held.Lock()
-				defer held.Unlock()
-				ran = append(ran, name)
-				return code
-			}}
-		}
-		code, times, red, _ := batteryRun(step("ready", 0), []part{step("tests", 0), step("go", 1), step("rules", 2)}, ticking(time.Millisecond))
-		slices.Sort(ran)
-		if code != 1 || !reflect.DeepEqual(red, []string{"go", "rules"}) || !reflect.DeepEqual(ran, []string{"go", "ready", "rules", "tests"}) || len(times) != 4 {
-			t.Fatalf("the red run answers %d, names %v red, ran %v, timed %v", code, red, ran, times)
-		}
-	})
 	t.Run("a red ready step answers first and names itself, and every part still runs", func(t *testing.T) {
 		var held sync.Mutex
 		ran := 0

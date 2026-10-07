@@ -14,7 +14,7 @@ reads one, how it weighs a note against one, and what it answers.
 | the sweep, beside the tree rules | `src/modules/check/checker.go` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
 | the `mint` verb | `src/quack/verb_mint.go` |
-| the `mint_note` tool | `.claude/skills/level0/hooks/level0.js` |
+| the `mint_note` tool | `src/modules/check/mint.go` |
 
 # The reader and the checker
 

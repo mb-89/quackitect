@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { disk } from "../../src/doors/disk.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { proc } from "../../src/doors/proc.js";
 
@@ -104,6 +105,14 @@ test("a respawn answers a fall inside the window, and none past it, in the real 
     }),
   );
   assert.deepEqual(fake, real);
+});
+
+// The window falls to the clock the door takes, so a test moves it and waits on no wall. [[spec/design_output/doors#time-is-a-door]]
+test("a respawn's window closes when the clock it takes passes it", { timeout: FALL_WAIT }, async () => {
+  const time = fakeClock();
+  const said = proc(time).respawn(LIVES, { waitMs: 60_000 });
+  time.tick(60_000);
+  assert.deepEqual(await said, { fell: false, exitCode: null });
 });
 
 // The child's words outlive the door's own process, so they land in the file the caller names. [[spec/design_output/level0#a-restart-watches-its-child]]

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
@@ -26,7 +27,7 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	}
 	db.Close()
 
-	stop, _, err := Serve(root, at, q.New())
+	stop, _, err := Serve(qtest.Wall(), root, at, q.New())
 	if err != nil {
 		t.Fatal(err)
 	}

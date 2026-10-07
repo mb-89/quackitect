@@ -1,0 +1,5 @@
+# The registry's door: the index it asks over HTTP, and the files it reads.
+registry:
+  go: [os, net/http]
+  files: [door.go]
+  contract: [src/tui/registry/call_contract_test.go, src/tui/registry/catalog_contract_test.go]

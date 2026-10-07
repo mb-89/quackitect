@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"quackitect/src/failure"
+	"quackitect/src/q"
 )
 
 // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
@@ -90,7 +91,7 @@ func spawnPrompt(ticket string, leaf *Leaf, name string) string {
 		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
 	}
 	return strings.Join([]string{
-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
+		fmt.Sprintf("%s, named %s, and you work one step of one ticket.", q.HandOfItsOwn, name),
 		"",
 		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
 		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",

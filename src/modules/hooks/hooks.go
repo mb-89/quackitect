@@ -65,6 +65,10 @@ type Post struct {
 	Harness string         `json:"harness,omitempty"`
 	Fill    any            `json:"fill,omitempty"`
 	Old     any            `json:"old,omitempty"`
+	// The transcript's rows as the session hands them, newest last, which the door trims into the fields its folds read. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/level0-hooks-hold-no-rule]]
+	Messages []any `json:"messages,omitempty"`
+	// Says the post asks back for a step the first post answered, so its rows ask back no more. [[spec/tickets/level0-hooks-hold-no-rule]]
+	Back bool `json:"back,omitempty"`
 }
 
 // [[spec/design_output/model#the-effects]]
@@ -114,7 +118,7 @@ type Outside struct {
 	Bound func(local string) string
 	Call  Call
 	Ops   func(caller string) []Op
-	Now   func() time.Time
+	Clock q.Clock
 	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
 	Shadow func(row map[string]any) error
 	// The tree a post naming no root stands in, what the config says there, and a git read's output there. None reads no tree, no cap and no git. [[spec/tickets/cage-command-rules-port]]
@@ -220,6 +224,7 @@ func (d *Door) hears(post Post) {
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
+	post = transcribed(post)
 	root := post.Root
 	if root == "" {
 		root = d.from.Root
@@ -325,12 +330,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
-func (d *Door) now() time.Time {
-	if d.from.Now == nil {
-		return time.Now()
-	}
-	return d.from.Now()
-}
+func (d *Door) now() time.Time { return d.from.Clock.Now() }
 
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {

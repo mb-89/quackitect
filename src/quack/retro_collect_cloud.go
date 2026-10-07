@@ -5,7 +5,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -37,6 +36,7 @@ type retroClosed struct {
 
 // Every group trunk takes closed since the window: its box's retro chapter, and the time of the trunk commit landing it. [[spec/tickets/the-retro-reads-cloud-retros]]
 func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, refused *[]retroCollectRow) ([]string, string, error) {
+	disk := it.disk
 	bare := []string{}
 	closed := retroClosedIn(it.git, since)
 	if !closed.ok {
@@ -45,14 +45,14 @@ func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, r
 	}
 	at := filepath.Join(into, retroCollectGroups)
 	closesAt := filepath.Join(at, retroCollectCloses)
-	parsed, _ := retroCollectParsed(retroCollectRead(closesAt))
+	parsed, _ := retroCollectParsed(disk.text(closesAt))
 	closes, isObject := parsed.(*retroCollectObject)
 	if !isObject {
 		closes = retroCollectNewObject()
 	}
 	wrote := false
 	for _, landing := range closed.landings {
-		if retroCollectExists(filepath.Join(at, landing.name+retroCollectNoteEnd)) {
+		if disk.stands(filepath.Join(at, landing.name+retroCollectNoteEnd)) {
 			continue
 		}
 		path := retroCollectTickets + "/" + landing.name + retroCollectNoteEnd
@@ -69,11 +69,11 @@ func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, r
 			bare = append(bare, landing.name)
 			continue
 		}
-		if err := os.MkdirAll(at, 0o777); err != nil {
+		if err := disk.makeAll(at, 0o777); err != nil {
 			return bare, at, err
 		}
 		to := filepath.Join(at, landing.name+retroCollectNoteEnd)
-		if err := os.WriteFile(to, []byte(chapter), 0o666); err != nil {
+		if err := disk.write(to, []byte(chapter), 0o666); err != nil {
 			return bare, to, err
 		}
 		when, _ := retroCollectDate(landing.at)
@@ -81,7 +81,7 @@ func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, r
 		wrote = true
 	}
 	if wrote {
-		if err := os.WriteFile(closesAt, []byte(retroCollectPretty(closes)), 0o666); err != nil {
+		if err := disk.write(closesAt, []byte(retroCollectPretty(closes)), 0o666); err != nil {
 			return bare, closesAt, err
 		}
 	}

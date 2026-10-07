@@ -15,10 +15,11 @@ import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
+import { http } from "../doors/http.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { session } from "../doors/session.js";
-import { answers } from "./copilot-door.js";
+import { answers, fetchThrough } from "./copilot-door.js";
 import { rootsHere } from "./vehicle.js";
 
 const DEADLINE = 20000;
@@ -85,14 +86,14 @@ try {
     const event = eventOf(input, name, surface);
     currentEvent = event;
     // The hook asks the hooks door, within the deadline Copilot's hook holds. [[spec/tickets/copilot-answers-off-the-door]]
-    const signal = AbortSignal.timeout(DEADLINE);
+    const deadline = new AbortController();
+    time.after(DEADLINE, () => deadline.abort(), { unref: true });
+    const { signal } = deadline;
     const result = await answers(event, {
       root,
       read: (rel) => files.read(resolve(root, rel)),
-      fetch: async (url, init) => {
-        const said = await fetch(url, { ...init, signal });
-        return { ok: said.ok, status: said.status, text: await said.text() };
-      },
+      run: (argv, init) => outside.run(argv, init),
+      fetch: fetchThrough(http(), signal),
     });
     await book.say(
       result.deny || result.block || result.failed ? "warn" : "info",

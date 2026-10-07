@@ -8,6 +8,7 @@ package work
 
 import (
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"strings"
 
@@ -34,6 +35,8 @@ type Tab struct {
 	// [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Notice string
 	rules  *TicketSchema
+	// The tree the schema reads from, and the tree at the log's root where a caller hands none. [[spec/tickets/test-walks-move-onto-fakes]]
+	Files fs.FS
 	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Placing bool
 	// The catalog and the watch the tab reads through. [[spec/tickets/the-work-tab-reads-v1]]

@@ -5,7 +5,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -33,11 +32,11 @@ func TestTheBranchDoorsLoadTheFailureNodes(t *testing.T) {
 	t.Parallel()
 	method := t.TempDir()
 	at := filepath.Join(method, filepath.FromSlash(failure.Folder))
-	if err := os.MkdirAll(at, 0o755); err != nil {
+	if err := realDisk().makeAll(at, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	node := "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Reopen the group.\"]\n---\n\n# When\n\nThe group stands closed.\n"
-	if err := os.WriteFile(filepath.Join(at, "take-group-closed.md"), []byte(node), 0o644); err != nil {
+	if err := realDisk().write(filepath.Join(at, "take-group-closed.md"), []byte(node), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	var out, errs bytes.Buffer

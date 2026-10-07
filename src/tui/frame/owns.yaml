@@ -1,0 +1,5 @@
+# The frame's door: the index it asks over HTTP.
+frame:
+  go: [net, net/http]
+  files: [door.go]
+  contract: [src/tui/frame/door_contract_test.go]

@@ -42,8 +42,8 @@ type Called struct {
 }
 
 // [[spec/design_output/model#the-index-manager]]
-func ServeManaged(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (func(), net.Listener, error) {
-	_, stop, listen, err := opens(root, at, catalog, manage, starts...)
+func ServeManaged(clock q.Clock, root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (func(), net.Listener, error) {
+	_, stop, listen, err := opens(clock, root, at, catalog, manage, starts...)
 	return stop, listen, err
 }
 

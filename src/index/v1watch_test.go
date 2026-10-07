@@ -7,17 +7,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
-
-// How long a case waits on the next event before it reads the stream as silent. [[spec/design_output/model#surfaces]]
-const watchPatience = 5 * time.Second
 
 type watched struct {
 	Name     string    `json:"name"`
@@ -28,7 +23,6 @@ type watched struct {
 // A door whose one file a case writes again, and the hand that writes it. [[spec/design_output/model#surfaces]]
 func watchingV1(t *testing.T) (Standing, func(text string)) {
 	t.Helper()
-	root := tree(t)
 	c := q.New()
 	hand := q.OutIn(c, "files/<path...>", q.Content{})
 	var later Commit
@@ -36,15 +30,7 @@ func watchingV1(t *testing.T) (Standing, func(text string)) {
 		later = commit
 		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
 	}
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, qtest.Wall(), tree(t), c, nil, file)
 	writes := func(text string) {
 		if err := later(hand, map[string]any{"files/spec/one.md": q.Content{Hash: text, Text: text}}); err != nil {
 			t.Fatal(err)
@@ -54,17 +40,17 @@ func watchingV1(t *testing.T) (Standing, func(text string)) {
 }
 
 // The stream's events, one a message, until the stream ends. [[spec/design_output/model#surfaces]]
-func openWatch(t *testing.T, standing Standing, names string) (*http.Response, <-chan watched) {
+func openWatch(t *testing.T, standing Standing, names string) (reply, <-chan watched) {
 	t.Helper()
-	said, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d/v1/watch?names=%s", standing.V1, names))
+	said, stream, err := streamsDoor("GET", fmt.Sprintf("http://127.0.0.1:%d/v1/watch?names=%s", standing.V1, names), nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { said.Body.Close() })
+	t.Cleanup(func() { stream.Close() })
 	events := make(chan watched)
 	go func() {
 		defer close(events)
-		lines := bufio.NewScanner(said.Body)
+		lines := bufio.NewScanner(stream)
 		for lines.Scan() {
 			data, found := strings.CutPrefix(lines.Text(), "data:")
 			if !found {
@@ -81,16 +67,11 @@ func openWatch(t *testing.T, standing Standing, names string) (*http.Response, <
 
 func nextEvent(t *testing.T, events <-chan watched) watched {
 	t.Helper()
-	select {
-	case one, open := <-events:
-		if !open {
-			t.Fatal("the stream ends, and a case waits on an event")
-		}
-		return one
-	case <-time.After(watchPatience):
-		t.Fatal("the stream sends no event")
+	one, open := <-events
+	if !open {
+		t.Fatal("the stream ends, and a case waits on an event")
 	}
-	return watched{}
+	return one
 }
 
 // level0: FixtureOutsideHome - the case writes to its own watched door
@@ -98,7 +79,7 @@ func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
 	t.Parallel()
 	standing, _ := watchingV1(t)
 	said, events := openWatch(t, standing, "files/spec/one.md")
-	if said.StatusCode != http.StatusOK || !strings.HasPrefix(said.Header.Get("Content-Type"), "text/event-stream") {
+	if said.StatusCode != statusOK || !strings.HasPrefix(said.Header.Get("Content-Type"), "text/event-stream") {
 		t.Fatalf("the watch answers %d, %s", said.StatusCode, said.Header.Get("Content-Type"))
 	}
 	first := nextEvent(t, events)
@@ -123,7 +104,7 @@ func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
 func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/watch?names=t/none")
-	if said.StatusCode != http.StatusNotFound || !strings.Contains(string(body), "t/none") {
+	if said.StatusCode != statusNotFound || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("the watch answers %d: %s", said.StatusCode, body)
 	}
 }

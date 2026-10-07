@@ -4,9 +4,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,28 +17,17 @@ import (
 func rowsIndex(t *testing.T, rows []work.Row) func() (string, error) {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, index.Runtime), 0o755); err != nil {
-		t.Fatal(err)
-	}
 	c := q.New()
 	hand := q.OutIn(c, placeRows, []work.Row{}, q.Doc("the rows as the case seeds them"))
 	seeds := func(_ string, commit index.Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{placeRows: rows})
 	}
-	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
+	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(stop)
-	body, err := os.ReadFile(filepath.Join(root, index.Runtime, "index.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var standing index.Standing
-	if err := json.Unmarshal(body, &standing); err != nil {
-		t.Fatal(err)
-	}
-	base := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1)
+	base := hq3V1Of(t, root)
 	return func() (string, error) { return base, nil }
 }
 

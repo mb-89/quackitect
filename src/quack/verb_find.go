@@ -7,14 +7,12 @@ import (
 	"io"
 	"slices"
 	"strings"
-
-	"quackitect/src/index"
 )
 
 // The flag that turns a find onto the session log. [[spec/design_output/log#one-verb-reads-the-log]]
 const findLog = "--log"
 
-func init() { register("find", findVerb(index.Ask, logVerb(logHere))) }
+func init() { register("find", findVerb(askIndex, logVerb(logHere))) }
 
 // find off the ask, or off the log verb under --log, which reads the other words as the words a row carries. [[spec/tickets/read-verbs-port-to-go]]
 func findVerb(ask asker, log twin) twin {

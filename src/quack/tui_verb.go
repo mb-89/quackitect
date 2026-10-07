@@ -10,10 +10,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"slices"
 	"sort"
 	"strings"
@@ -58,7 +57,14 @@ type tuiDoors struct {
 	run     func(argv []string, cwd string) (int, string, error)
 	launch  func(argv []string, cwd string, out, errs io.Writer) (int, error)
 	tell    func(tab string) bool
+	disk    diskDoors
 }
+
+// The modes a made folder and the stamp take. [[spec/design_output/tui#the-verb-builds-it]]
+const (
+	tuiFolderMode = 0o755
+	tuiStampMode  = 0o644
+)
 
 func init() { register("tui", tuiVerb(tuiReal)) }
 
@@ -105,7 +111,7 @@ func tuiTabWanted(argv []string) string {
 
 // Hands the tab to a window already standing, or launches the viewer holding the terminal. [[spec/design_output/tui#a-second-launch-hands-over]]
 func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
-	if err := os.MkdirAll(filepath.Join(filepath.FromSlash(d.root), filepath.FromSlash(tuiLogFolder)), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Join(filepath.FromSlash(d.root), filepath.FromSlash(tuiLogFolder)), tuiFolderMode); err != nil {
 		fmt.Fprintln(errs, err)
 		return exitFailed
 	}
@@ -133,8 +139,8 @@ func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
 func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, errs io.Writer) int {
 	var read []string
 	if slices.Contains(argv, "--all") {
-		read = logFiles(filepath.FromSlash(d.root), "", time.Time{})
-	} else if tuiExists(session) {
+		read = logFiles(d.disk, filepath.FromSlash(d.root), "", time.Time{})
+	} else if d.disk.stands(session) {
 		read = []string{session}
 	}
 	if len(read) == 0 {
@@ -142,7 +148,7 @@ func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, er
 		return 0
 	}
 	for _, path := range read {
-		body, err := os.ReadFile(path)
+		body, err := d.disk.read(path)
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
@@ -169,11 +175,6 @@ func tuiShow(root, path string) string {
 	return strings.TrimPrefix(said, base+"/")
 }
 
-func tuiExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
 // The viewer's binary, built whenever the source its stamp hashes moves, and why where none runs. A build that lands and swaps not in answers a fault, since the box holds Go. [[spec/tickets/tui-swap-fails-loud]]
 func tuiViewerOf(d tuiDoors) (string, string, error) {
 	exe := d.root + "/" + tuiBin + "/logview"
@@ -181,8 +182,8 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 		exe += ".exe"
 	}
 	stamp := d.root + "/" + tuiStamp
-	hash := index.HashText(tuiSourceText(d.root))
-	if held, err := os.ReadFile(stamp); err == nil && tuiExists(exe) && strings.TrimSpace(string(held)) == hash {
+	hash := index.HashText(tuiSourceText(d.disk, d.root))
+	if held, err := d.disk.read(stamp); err == nil && d.disk.stands(exe) && strings.TrimSpace(string(held)) == hash {
 		return exe, "", nil
 	}
 	// A running binary holds its file on Windows and renames alone, so the build lands beside it and swaps in. [[spec/design_output/tui#the-verb-builds-it]]
@@ -191,14 +192,14 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 	if err != nil {
 		code, stderr = 1, err.Error()
 	}
-	if code == 0 && tuiExists(fresh) {
-		if err := tuiSwapsIn(fresh, exe); err != nil {
+	if code == 0 && d.disk.stands(fresh) {
+		if err := tuiSwapsIn(d.disk, fresh, exe); err != nil {
 			return "", "", err
 		}
-		if err := os.MkdirAll(d.root+"/"+tuiBin, 0o755); err != nil {
+		if err := d.disk.makeAll(d.root+"/"+tuiBin, tuiFolderMode); err != nil {
 			return exe, err.Error(), nil
 		}
-		if err := os.WriteFile(stamp, []byte(hash+"\n"), 0o644); err != nil {
+		if err := d.disk.write(stamp, []byte(hash+"\n"), tuiStampMode); err != nil {
 			return exe, err.Error(), nil
 		}
 		return exe, "", nil
@@ -207,30 +208,30 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 	if why == "" {
 		why = "go builds no viewer here"
 	}
-	if tuiExists(exe) {
+	if d.disk.stands(exe) {
 		return exe, "the build fails, so the last one runs: " + why, nil
 	}
 	return "", why, nil
 }
 
 // The old binary steps aside by rename, and the fresh one takes its name. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiSwapsIn(fresh, exe string) error {
-	if tuiExists(exe) {
-		if err := os.Rename(exe, tuiAsideOf(exe+".old")); err != nil {
+func tuiSwapsIn(disk diskDoors, fresh, exe string) error {
+	if disk.stands(exe) {
+		if err := disk.rename(exe, tuiAsideOf(disk, exe+".old")); err != nil {
 			return err
 		}
 	}
-	return os.Rename(fresh, exe)
+	return disk.rename(fresh, exe)
 }
 
 // The first name beside the binary that stands free or clears, because a window still running one stepped aside earlier holds that file on Windows. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiAsideOf(old string) string {
+func tuiAsideOf(disk diskDoors, old string) string {
 	for n := range tuiAside {
 		at := old
 		if n > 0 {
 			at = fmt.Sprintf("%s%d", old, n)
 		}
-		if !tuiExists(at) || os.Remove(at) == nil {
+		if !disk.stands(at) || disk.remove(at) == nil {
 			return at
 		}
 	}
@@ -238,9 +239,9 @@ func tuiAsideOf(old string) string {
 }
 
 // The text the stamp hashes: every source file's path and text under the viewer's packages and the module files, joined on the unit separator. [[spec/design_output/tui#the-packages-the-window-holds]]
-func tuiSourceText(root string) string {
+func tuiSourceText(disk diskDoors, root string) string {
 	var folders []string
-	for _, one := range tuiGoFoldersOf(root, tuiSource) {
+	for _, one := range tuiGoFoldersOf(disk, root, tuiSource) {
 		folders = append(folders, root+"/"+one)
 	}
 	for _, one := range tuiModuleFiles {
@@ -248,19 +249,18 @@ func tuiSourceText(root string) string {
 	}
 	var parts []string
 	for _, folder := range folders {
-		for _, path := range tuiSourcesUnder(folder) {
-			body, _ := os.ReadFile(path)
-			parts = append(parts, path+tuiJoin+string(body))
+		for _, path := range tuiSourcesUnder(disk, folder) {
+			parts = append(parts, path+tuiJoin+disk.text(path))
 		}
 	}
 	return strings.Join(parts, tuiJoin)
 }
 
 // A package folder and every tree package it imports, to the end of the chain, a folder below another left out. [[spec/tickets/go-code-shares-one-module]]
-func tuiGoFoldersOf(root, folder string) []string {
+func tuiGoFoldersOf(disk diskDoors, root, folder string) []string {
 	seen := []string{folder}
 	for queue := []string{folder}; len(queue) > 0; queue = queue[1:] {
-		for _, next := range tuiImportsOf(root + "/" + queue[0]) {
+		for _, next := range tuiImportsOf(disk, root+"/"+queue[0]) {
 			if !slices.Contains(seen, next) {
 				seen = append(seen, next)
 				queue = append(queue, next)
@@ -282,8 +282,8 @@ func tuiGoFoldersOf(root, folder string) []string {
 }
 
 // The tree packages a folder's own Go files import, the folders below it read too. [[spec/tickets/go-code-shares-one-module]]
-func tuiImportsOf(at string) []string {
-	entries, err := os.ReadDir(at)
+func tuiImportsOf(disk diskDoors, at string) []string {
+	entries, err := disk.list(at)
 	if err != nil {
 		return nil
 	}
@@ -291,10 +291,9 @@ func tuiImportsOf(at string) []string {
 	for _, one := range entries {
 		path := at + "/" + one.Name()
 		if one.IsDir() {
-			out = append(out, tuiImportsOf(path)...)
+			out = append(out, tuiImportsOf(disk, path)...)
 		} else if strings.HasSuffix(one.Name(), ".go") && !strings.HasSuffix(one.Name(), "_test.go") {
-			body, _ := os.ReadFile(path)
-			for _, found := range tuiImport.FindAllStringSubmatch(string(body), -1) {
+			for _, found := range tuiImport.FindAllStringSubmatch(disk.text(path), -1) {
 				out = append(out, found[1])
 			}
 		}
@@ -303,21 +302,21 @@ func tuiImportsOf(at string) []string {
 }
 
 // Every source file under a folder and its packages, in the order localeCompare walks them, so a move under a tab's folder rebuilds the viewer. [[spec/design_output/tui#the-packages-the-window-holds]]
-func tuiSourcesUnder(folder string) []string {
-	if !tuiExists(folder) {
+func tuiSourcesUnder(disk diskDoors, folder string) []string {
+	if !disk.stands(folder) {
 		return nil
 	}
 	if strings.HasSuffix(folder, "/go.mod") || strings.HasSuffix(folder, "/go.sum") {
 		return []string{folder}
 	}
-	entries, _ := os.ReadDir(folder)
-	slices.SortFunc(entries, func(one, other os.DirEntry) int { return tuiCollate(one.Name(), other.Name()) })
+	entries := disk.listed(folder)
+	slices.SortFunc(entries, func(one, other fs.DirEntry) int { return tuiCollate(one.Name(), other.Name()) })
 	var out []string
 	for _, one := range entries {
 		name := one.Name()
 		switch {
 		case one.IsDir():
-			out = append(out, tuiSourcesUnder(folder+"/"+name)...)
+			out = append(out, tuiSourcesUnder(disk, folder+"/"+name)...)
 		case one.Type().IsRegular() && !strings.HasSuffix(name, "_test.go") &&
 			(strings.HasSuffix(name, ".go") || strings.HasSuffix(name, ".mod") || strings.HasSuffix(name, ".sum")):
 			out = append(out, folder+"/"+name)
@@ -379,28 +378,30 @@ func tuiReal() tuiDoors {
 		root = "."
 	}
 	root = filepath.ToSlash(root)
+	box := quietBox()
 	return tuiDoors{
 		root:    root,
-		windows: runtime.GOOS == "windows",
-		goTool:  tuiGoOf(root),
+		windows: box.windows(),
+		goTool:  tuiGoOf(box.disk, root),
 		run:     serveRuns,
 		launch:  tuiLaunch,
 		tell:    tuiTellAt(frame.WindowPort),
+		disk:    box.disk,
 	}
 }
 
 // The go program the tools file names, else one under the binaries' folder, else go off the path, as whereIs in src/engine/tools.js answers. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiGoOf(root string) string {
+func tuiGoOf(disk diskDoors, root string) string {
 	var known map[string]struct {
 		Path string `json:"path"`
 	}
-	if body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(brief.ToolsFile))); err == nil && json.Unmarshal(body, &known) == nil {
-		if said := known["go"].Path; said != "" && tuiExists(said) {
+	if body, err := disk.read(filepath.Join(root, filepath.FromSlash(brief.ToolsFile))); err == nil && json.Unmarshal(body, &known) == nil {
+		if said := known["go"].Path; said != "" && disk.stands(said) {
 			return said
 		}
 	}
 	for _, guess := range []string{tuiBin + "/go.exe", tuiBin + "/go"} {
-		if at := root + "/" + guess; tuiExists(at) {
+		if at := root + "/" + guess; disk.stands(at) {
 			return at
 		}
 	}
@@ -409,7 +410,7 @@ func tuiGoOf(root string) string {
 
 // Runs the viewer on the caller's terminal over the real process door. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiLaunch(argv []string, cwd string, out, errs io.Writer) (int, error) {
-	return tuiLaunchOver(proc.Real, os.Stdin)(argv, cwd, out, errs)
+	return tuiLaunchOver(proc.Real, realBoxDoors(out, errs).input)(argv, cwd, out, errs)
 }
 
 // Runs the viewer through the process door on the input it hands through and the caller's output and error streams, which pass straight through where they are files. A signal's end reads as 1. [[spec/tickets/quack-spawns-all-take-the-runner]]
@@ -428,5 +429,5 @@ func tuiLaunchOver(run proc.Runner, in io.Reader) func(argv []string, cwd string
 
 // The tell to whatever window stands on a port, which answers whether it took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]
 func tuiTellAt(port int) func(tab string) bool {
-	return func(tab string) bool { return frame.TellPort(port, tab) }
+	return func(tab string) bool { return frame.TellPort(wall, port, tab) }
 }

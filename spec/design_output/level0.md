@@ -17,7 +17,7 @@ its first session with nothing typed.
 
 # The bridgehead and the server
 
-Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.js`, is the module the
+Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.ts`, is the module the
 client loads, and the one hook a project carries: one door for every event,
 `*`, and one function behind it. It posts each event to the server at the
 port, with the root the session works in, and does what the answer says. It
@@ -208,8 +208,7 @@ posts once to the server, and a dead server answers one line:
 | a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
 | no launch stands, or a server answers once and then falls | the port and the log |
 
-`test/level0/read-tools.test.js` counts the one post over each of find, patch,
-replace and undo. For the rules riding the first answer, see
+For the rules riding the first answer, see
 [[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
@@ -356,7 +355,7 @@ bridgehead posts there once more before the server reads as down.
 
 The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
 `mcp__level0__wait` post falling with no status after `CUT` or more in
-`.claude/skills/level0/hooks/level0.js` asks `/health` once.
+`.claude/skills/level0/hooks/level0.ts` asks `/health` once.
 
 | the health | the wait |
 |---|---|
@@ -386,7 +385,7 @@ asks after it later.
 
 Under `migration.cage` at `new`, the hooks door decides the events it ports,
 and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
-moves them. `.claude/skills/level0/hooks/cage.js` holds the road.
+moves them. `src/modules/hooks/guard.go` holds the rule, and the hook reaches it through the `cage` verb of the index binary, which stands while the server is down. A verb that answers nothing passes the call, and the fall line says the cage stands down.
 
 | the event | who answers |
 |---|---|
@@ -405,6 +404,16 @@ and `./RUNME.sh serve`. These pass, and so does every other event:
 
 For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
 
+The door owns every other choice the bridgehead once made, and the hook does what it answers:
+
+| the choice | its Go owner | what the hook reads |
+|---|---|---|
+| the events the door decides | `Doored` in `src/modules/hooks/listen.go` | `events` in the standing file |
+| the step the effects answer | `StepOf` in `src/modules/hooks/step.go` | `step` beside the effects, where a back post asks no rows back |
+| the merge of an after into the harness answer | `Merged` in `src/modules/hooks/step.go` | the answer of `POST /merge` |
+
+The stub's bridgehead keeps its vehicle roads, the home order and the clone in TypeScript. No index binary stands on a stub before its clone. [[spec/tickets/level0-hooks-hold-no-rule]]
+
 ## A session says its cage
 
 A session whose server stays down reads like one whose server stands. The agent
@@ -422,7 +431,7 @@ carries one block, `level0-cage`:
 | what the road itself says | the error under the code |
 | `./RUNME.sh`, then `./RUNME.sh serve` | what a person runs to fix it |
 
-`cageText` in `hooks/level0.js` builds the block. The hook holds that code until
+`cageText` in `hooks/level0.ts` builds the block. The hook holds that code until
 a server answers. The block asks the agent to open its first answer with one
 line saying level zero stands down. A person then tells a caged session from
 an uncaged one at a glance.
@@ -608,9 +617,15 @@ validate`, and the client then loads none of the module:
 | the canary is absent from every answer | the standing layer reaches no session |
 
 So one hook of the wrong shape takes the whole cage off, and the readings
-above are how a person catches it. Run `claude plugin validate
-.claude/skills/level0` on the client of the day, because the shape a hook takes
-moves with the build.
+above are how a person catches it. The check's `plugin` part runs `claude
+plugin validate --strict .claude/skills/level0` on the client of the day. It
+fails on a warning, because the shape a hook takes moves with the build.
+
+The check's `plugin-tests` part runs `claude plugin test` over the kit under
+`.claude/skills/level0/tests`, and passes with a line where claude stands
+nowhere. It also counts the test lines there against the lines of every module
+the hooks manifest reaches through a relative import. It fails where the tests
+run longer.
 
 ## A step arrives late
 
@@ -872,7 +887,6 @@ client 2.1.42, reads the box around it:
 
 | what a cloud box carries | what the probe reads |
 |---|---|
-| `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` | `1`, so the switch stands ready |
 | `hasTrustDialogAccepted`, per project | `false`, and the top level holds no key |
 | permission mode | auto, and no call there raises a prompt |
 
@@ -967,11 +981,18 @@ the language server. Those stay wants, and every rule holds without them.
 ## The boot hook
 
 A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
-through node. On a cloud box lacking the plugin manifest, it runs
-`src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
-off a cloud box, it runs nothing. A failed install holds no session up. The
-hook's `timeout` waits out `STARTING`, the span the start road allows the same
-install, so the client cuts no install short before the manifest lands.
+through node. Where the session starts decides its road:
+
+| where the session starts | what the hook does | why it stays a settings hook |
+|---|---|---|
+| a cloud box lacking the plugin manifest | runs `src/scripts/install.sh` under `INSTALL_SKIP` | the client scans plugins before any hook of a mod runs |
+| a cloud box where the manifest stands | runs nothing | |
+| a desk | hands its hook input to the start verb, and prints the stop the verb answers | a session loading no plugin holds no mod hook to refuse it |
+
+A failed install holds no session up, and neither does a start verb that
+fails, stands missing or outlives `ASKING`. The hook's `timeout` waits out
+`STARTING`, the span the start road allows the same install, so the client cuts
+no install short before the manifest lands.
 
 Where the manifest stands the plugin loads. The start road of
 [[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the
@@ -992,6 +1013,21 @@ The probes on a fresh clone with no setup decide what retires:
 
 - whether the first session holds level zero once the hook runs, which retires the install line
 - whether a clone carrying no trust runs a project session start hook at all
+
+## What the standard road leaves
+
+Level zero is a mod of function hooks, and the client loads it as
+`level0@skills-dir`. Client 2.1.287 and later loads a mod by default, so the
+settings carry no switch for mods. These pieces stay off the standard road,
+each for its reason:
+
+| piece | why it stays |
+|---|---|
+| the boot hook in `.claude/settings.json` | it installs the plugin manifest on a cloud box, and it asks the start verb at a desk. Git ignores the manifest, since each box stamps its brand into it. [[spec/design_output/level0#the-boot-hook]] names each road and why it stays |
+| function hooks over settings command hooks alone | the handover clears its own session: `$.command.run` runs `/clear`, then `$.prompt.submit` hands the resume prompt, and a settings command hook answers the client and runs neither |
+
+The cold probe of [[spec/design_output/level0#the-cold-probe]] runs a fresh
+clone with no switch, and decides whether a mod loads there.
 
 ## Where the mode stands
 

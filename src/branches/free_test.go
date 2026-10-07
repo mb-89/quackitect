@@ -4,15 +4,16 @@ package branches // level0: InPackageTest - it drives the unexported staleClaim 
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"quackitect/src/modules/files"
 )
 
 // The settings default of the stale span, read off the schema the tree tracks. [[spec/tickets/every-named-path-resolves]]
 func staleDefault(t *testing.T) int64 {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join("..", "..", "spec", "config", "level0.schema.json"))
+	text, _, err := files.NewDisk(filepath.Join("..", "..")).Read("spec/config/level0.schema.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +28,7 @@ func staleDefault(t *testing.T) int64 {
 			} `json:"work"`
 		} `json:"properties"`
 	}
-	if err := json.Unmarshal(text, &schema); err != nil {
+	if err := json.Unmarshal([]byte(text), &schema); err != nil {
 		t.Fatal(err)
 	}
 	return int64(spanOf(schema.Properties.Work.Properties.StaleAfter.Default))

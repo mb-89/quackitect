@@ -6,7 +6,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"errors"
 	"io"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -15,7 +14,7 @@ import (
 	"quackitect/src/rules"
 )
 
-// The verb over the root with a runner that keeps every argv. [[spec/tickets/config-verbs-port-to-go]]
+// The verb over the root with a runner that keeps every argv. The rules load off the root on the box's disk, so the files stand there too. [[spec/tickets/config-verbs-port-to-go]]
 func fixRan(root string, argv ...string) (int, string, string, []string) {
 	var out, errs strings.Builder
 	var ran []string
@@ -26,7 +25,7 @@ func fixRan(root string, argv ...string) (int, string, string, []string) {
 		}
 		return 0
 	}
-	code := fixVerb(func() (string, error) { return root, nil }, run)(append([]string{"fix"}, argv...), false, &out, &errs)
+	code := fixVerb(func() (string, error) { return root, nil }, run, realDisk())(append([]string{"fix"}, argv...), false, &out, &errs)
 	return code, out.String(), errs.String(), ran
 }
 
@@ -54,7 +53,7 @@ func TestFixSwapsAndCalmsThroughTheRulesWithNoVale(t *testing.T) {
 	seedsRules(t, root)
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and we can't go.\n")
 	code, out, errs, ran := fixRan(root, "a.md")
-	text, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	text, _ := realDisk().read(filepath.Join(root, "a.md"))
 	if code != 0 || string(text) != "# Notes\n\nNothing at all works here, and we cannot go.\n" {
 		t.Fatalf("fix answers %d, %q, %q, and leaves %q", code, out, errs, text)
 	}
@@ -88,7 +87,7 @@ func TestTheFixNamesAFileItCannotWrite(t *testing.T) {
 		t.Fatal(err)
 	}
 	refuse := func(string, []byte) error { return errors.New("the disk refuses") }
-	_, err = fixRound(root, set, []string{"a.md"}, refuse)
+	_, err = fixRound(realDisk(), root, set, []string{"a.md"}, refuse)
 	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "the disk refuses") {
 		t.Fatalf("the fix answers %v, and wants the file and the cause", err)
 	}
@@ -101,7 +100,7 @@ func TestFixCalmsAShoutedLeadThenRunsBiome(t *testing.T) {
 	if code != 0 || out != "Run ./RUNME.sh lint to see what is left for a person.\n" {
 		t.Fatalf("fix answers %d and %q", code, out)
 	}
-	said, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	said, _ := realDisk().read(filepath.Join(root, "a.md"))
 	if string(said) != "# Notes\n\nNothing at all works here, and then calm.\n" {
 		t.Fatalf("a.md reads %q, and wants the lead calmed", said)
 	}
@@ -167,7 +166,7 @@ func TestFixReadsTheTreeWhereNoPathStands(t *testing.T) {
 	t.Parallel()
 	root := fixRoot(t)
 	_, _, _, ran := fixRan(root)
-	said, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	said, _ := realDisk().read(filepath.Join(root, "a.md"))
 	if len(ran) == 0 || !strings.HasSuffix(ran[0], " .") || !strings.HasPrefix(string(said), "# Notes\n\nNothing at all") {
 		t.Fatalf("fix ran %v and leaves %q, and wants the tree", ran, said)
 	}

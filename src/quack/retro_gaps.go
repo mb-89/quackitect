@@ -17,7 +17,10 @@ import (
 var testFuncAt = regexp.MustCompile(`(?m)^func (Test\w+)\(`)
 
 func init() {
-	register("retro gaps", retroGapsVerb(func() *check.Tree { return lintTree(retroRoot()) }))
+	register("retro gaps", retroGapsVerb(func() *check.Tree {
+		box := realBoxDoors(io.Discard, io.Discard)
+		return lintTree(box, retroRootOf(box))
+	}))
 }
 
 // The verb: both counts, each item one a line, at exit 0, since each item is a candidate the auditor weighs. [[spec/guidance/retro/audit]]

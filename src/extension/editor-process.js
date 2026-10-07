@@ -3,8 +3,6 @@
 // [[spec/design_output/extension#the-hook-button]]
 
 const vscode = require("vscode");
-const { mkdirSync, readFileSync, realpathSync } = require("node:fs");
-const http = require("node:http");
 const { dirname, join } = require("node:path");
 
 // The index binary and the standing file of its hooks door, held again here because this module loads as CommonJS and imports no lib. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -18,7 +16,7 @@ const SERVE_LOG = ".se/.log/serve.log";
 const START_WAIT = 3000;
 
 // [[spec/design_output/extension#the-hook-button]]
-function processDoor(context, folder) {
+function processDoor(context, folder, doors) {
   const processes = new Map();
   const watchers = [];
   const followed = new Set();
@@ -31,9 +29,9 @@ function processDoor(context, folder) {
     for (const key of followed) {
       const held = processes.get(key);
       if (held?.starting) continue;
-      const port = held?.port ?? doorPort(work);
+      const port = held?.port ?? doorPort(doors, work);
       if (!port) continue;
-      const alive = await answersOverTheWire(port).catch(() => false);
+      const alive = await answersOverTheWire(doors, port).catch(() => false);
       if (alive && !held) processes.set(key, { how: "on", adopted: true, port });
       else if (!alive && held?.adopted) processes.delete(key);
       else continue;
@@ -55,9 +53,9 @@ function processDoor(context, folder) {
     async adoptsProcess(key, port) {
       followed.add(key);
       if (processes.has(key)) return true;
-      const at = port ?? doorPort(work);
+      const at = port ?? doorPort(doors, work);
       if (!at) return false;
-      const alive = await answersOverTheWire(at).catch(() => false);
+      const alive = await answersOverTheWire(doors, at).catch(() => false);
       if (!alive) return false;
       processes.set(key, { how: "on", adopted: true, port: at });
       changed();
@@ -67,7 +65,7 @@ function processDoor(context, folder) {
     async startProcess(key) {
       if (processes.has(key)) return;
       followed.add(key);
-      const vehicle = await settled(context, work);
+      const vehicle = await settled(doors, work);
       if (!vehicle) return;
       if (await this.adoptsProcess(key)) return;
       // The index starts detached and outlives the window, so a reload adopts the door its standing file names. [[spec/design_output/extension#the-hook-button]]
@@ -75,13 +73,13 @@ function processDoor(context, folder) {
       processes.set(key, held);
       changed();
       const out = join(work, ...SERVE_LOG.split("/"));
-      mkdirSync(dirname(out), { recursive: true });
-      const born = await (await procDoor(context)).respawn(
+      doors.disk.makeDir(dirname(out));
+      const born = await doors.proc.respawn(
         [join(vehicle.method, ...INDEX.split("/")), "serve"],
         { cwd: work, out, waitMs: START_WAIT },
       );
       held.starting = false;
-      held.port = doorPort(work);
+      held.port = doorPort(doors, work);
       if (born.fell && processes.get(key) === held) {
         processes.delete(key);
         vscode.window.showWarningMessage(
@@ -95,44 +93,25 @@ function processDoor(context, folder) {
       const held = processes.get(key);
       if (!held) return;
       processes.delete(key);
-      const vehicle = await settled(context, work);
+      const vehicle = await settled(doors, work);
       if (vehicle) {
-        (await procDoor(context)).run(
-          [join(vehicle.method, ...INDEX.split("/")), "stop"],
-          {
-            cwd: work,
-            timeoutMs: STOP_WAIT,
-          },
-        );
+        doors.proc.run([join(vehicle.method, ...INDEX.split("/")), "stop"], {
+          cwd: work,
+          timeoutMs: STOP_WAIT,
+        });
       }
       changed();
     },
   };
 }
 
-function homeOf(context) {
-  return join(realpathSync.native(context.extensionPath), "..", "..");
-}
-
-// The proc door's detached start, the one a restart takes. [[spec/design_output/level0#a-restart-watches-its-child]]
-async function procDoor(context) {
-  const door = join(homeOf(context), "src", "doors", "proc.js");
-  return (await import(vscode.Uri.file(door).toString())).proc();
-}
-
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
-async function settled(context, work) {
-  const home = homeOf(context);
+async function settled(doors, work) {
+  const { home, disk, clock } = doors;
   try {
     const bridge = await import(
       vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString()
     );
-    const disk = (
-      await import(vscode.Uri.file(join(home, "src", "doors", "disk.js")).toString())
-    ).disk();
-    const clock = (
-      await import(vscode.Uri.file(join(home, "src", "doors", "clock.js")).toString())
-    ).clock();
     const windows = process.platform === "win32";
     return bridge.settles(disk, process.env, clock, work, home, process.pid, windows);
   } catch (error) {
@@ -144,11 +123,10 @@ async function settled(context, work) {
 }
 
 // The port the hooks door's standing file names in the work root, or nothing where none stands. [[spec/design_output/extension#the-hook-button]]
-function doorPort(work) {
+function doorPort(doors, work) {
   try {
     return (
-      Number(JSON.parse(readFileSync(join(work, ...HOOKS.split("/")), "utf8")).port) ||
-      0
+      Number(JSON.parse(doors.disk.read(join(work, ...HOOKS.split("/")))).port) || 0
     );
   } catch {
     return 0;
@@ -156,18 +134,21 @@ function doorPort(work) {
 }
 
 // A door that answers at all stands, whatever it answers an empty post. [[spec/design_output/extension#the-hook-button]]
-function answersOverTheWire(port) {
+function answersOverTheWire({ http, clock }, port) {
   return new Promise((resolve, reject) => {
-    const request = http.request(
-      { host: "127.0.0.1", port, path: "/", method: "POST", timeout: WIRE_WAIT },
-      (response) => {
-        response.resume();
-        response.on("end", () => resolve(response.statusCode > 0));
+    const stop = new AbortController();
+    const late = clock.after(
+      WIRE_WAIT,
+      () => {
+        stop.abort();
+        reject(new Error("timeout"));
       },
+      { unref: true },
     );
-    request.on("error", reject);
-    request.on("timeout", () => request.destroy(new Error("timeout")));
-    request.end("{}");
+    http
+      .send(`http://127.0.0.1:${port}/`, { method: "POST", body: "{}", signal: stop.signal })
+      .then((said) => resolve(said.status > 0), reject)
+      .finally(() => late.cancel());
   });
 }
 

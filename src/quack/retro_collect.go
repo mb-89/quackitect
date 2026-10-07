@@ -9,12 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"quackitect/src/modules/hooks/command"
@@ -48,17 +47,6 @@ var retroCollectStamp = filepath.Join(".se", ".runtime", "check.json")
 // The folder the holds stand in, as HOLDS in .claude/skills/level0/lib/folders.js names it. [[spec/design_output/pull#the-hand-and-the-hold]]
 var retroCollectHolds = filepath.Join(".se", ".runtime", "hold")
 
-// The codes a move can meet, named the way node names them. [[spec/guidance/retro/collect]]
-var retroCollectCodes = map[syscall.Errno]string{
-	syscall.EBUSY:     "EBUSY",
-	syscall.EPERM:     "EPERM",
-	syscall.EXDEV:     "EXDEV",
-	syscall.EACCES:    "EACCES",
-	syscall.ENOENT:    "ENOENT",
-	syscall.ENOTEMPTY: "ENOTEMPTY",
-	syscall.EEXIST:    "EEXIST",
-}
-
 // A manifest row: a file with its size and source, or a path refused with its code. [[spec/guidance/retro/collect]]
 type retroCollectRow struct {
 	Path    string `json:"path"`
@@ -73,11 +61,12 @@ type retroRan struct {
 	out, err string
 }
 
-// What collect reaches: the root, the home and temp folders the harness keeps its sources under, the clock, git and the move. [[spec/guidance/retro/collect]]
+// What collect reaches: the root, the home and temp folders the harness keeps its sources under, the clock, git, the disk and the move. [[spec/guidance/retro/collect]]
 type retroCollectDoors struct {
 	root, home, temp string
 	now              func() time.Time
 	git              func(args ...string) retroRan
+	disk             diskDoors
 	move             func(from, to string) error
 }
 
@@ -85,14 +74,16 @@ func init() { register("retro collect", retroCollectVerb(retroCollectLive)) }
 
 // The doors collect runs on outside a test: the tree's root, home and temp as cli-doors.js reads them, the clock, git and the rename. [[spec/guidance/retro/collect]]
 func retroCollectLive() retroCollectDoors {
-	root := retroRoot()
+	d := quietBox()
+	root := retroRootOf(d)
 	return retroCollectDoors{
 		root: root,
-		home: retroCollectFirst(os.Getenv("USERPROFILE"), os.Getenv("HOME")),
-		temp: retroCollectFirst(os.Getenv("TEMP"), os.Getenv("TMP"), os.Getenv("TMPDIR")),
-		now:  time.Now,
+		home: homeOf(d.env),
+		temp: retroCollectFirst(d.env("TEMP"), d.env("TMP"), d.env("TMPDIR")),
+		now:  d.clock.Now,
 		git:  retroCollectGitIn(root),
-		move: os.Rename,
+		disk: d.disk,
+		move: d.disk.rename,
 	}
 }
 
@@ -132,7 +123,8 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 		fmt.Fprintln(errs, "  ./RUNME.sh retro collect <retro>")
 		return exitUsage
 	}
-	if at, held, found := retroCollectHolding(it.root); found && retroCollectText(retroCollectGet(held, "ticket")) != name {
+	disk := it.disk
+	if at, held, found := retroCollectHolding(disk, it.root); found && retroCollectText(retroCollectGet(held, "ticket")) != name {
 		fmt.Fprintf(errs, "%s stands, and a hand holds a ticket while it works.\n", at)
 		fmt.Fprintln(errs, "Hand that step back, then run collect again.")
 		return exitFailed
@@ -140,8 +132,8 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 
 	home := retroHome(it.root, name)
 	into := filepath.Join(home, retroInput)
-	if !again && retroCollectExists(filepath.Join(into, retroCollectManifest)) {
-		return retroCollectAgain(home, into, name, out, errs)
+	if !again && disk.stands(filepath.Join(into, retroCollectManifest)) {
+		return retroCollectAgain(disk, home, into, name, out, errs)
 	}
 
 	if green, says := retroCollectBattery(it); !green {
@@ -150,14 +142,14 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 		return exitFailed
 	}
 
-	window := retroCollectSinceLast(it.root, name)
+	window := retroCollectSinceLast(disk, it.root, name)
 	since := window
 	if again {
-		if own := retroCollectWhenOf(retroCollectRead(filepath.Join(home, retroCollectCollected))); !own.IsZero() {
+		if own := retroCollectWhenOf(disk.text(filepath.Join(home, retroCollectCollected))); !own.IsZero() {
 			since = own
 		}
 	}
-	if err := os.MkdirAll(into, 0o777); err != nil {
+	if err := disk.makeAll(into, 0o777); err != nil {
 		return retroCollectFailed(errs, into, err)
 	}
 	refused := retroCollectMovedInto(it, into)
@@ -165,19 +157,19 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 	if again {
 		keptSince = since
 	}
-	retroOutsideCopyTree(filepath.Join(it.root, retroCollectPrivate, retroCollectKept), filepath.Join(into, retroCollectKept), keptSince, nil, time.Time{}, &refused)
+	retroOutsideCopyTree(disk, filepath.Join(it.root, retroCollectPrivate, retroCollectKept), filepath.Join(into, retroCollectKept), keptSince, nil, time.Time{}, &refused)
 	folders := retroOutsideInto(it, into, since, window, &refused)
 	bare, at, err := retroCollectCloudInto(it, into, since, &refused)
 	if err != nil {
 		return retroCollectFailed(errs, at, err)
 	}
 
-	rows := append(retroCollectLinesOf(into, ""), refused...)
+	rows := append(retroCollectLinesOf(disk, into, ""), refused...)
 	var manifest strings.Builder
 	for _, one := range rows {
 		manifest.WriteString(retroCollectCompact(one) + "\n")
 	}
-	if at := filepath.Join(into, retroCollectManifest); retroCollectWrite(at, manifest.String(), errs) {
+	if at := filepath.Join(into, retroCollectManifest); retroCollectWrite(disk, at, manifest.String(), errs) {
 		return exitFailed
 	}
 	sinceSaid := ""
@@ -189,11 +181,11 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 		Since   string   `json:"since"`
 		Folders []string `json:"folders"`
 	}{retroCollectISOOf(it.now()), sinceSaid, folders}
-	if at := filepath.Join(home, retroCollectCollected); retroCollectWrite(at, retroCollectPretty(record), errs) {
+	if at := filepath.Join(home, retroCollectCollected); retroCollectWrite(disk, at, retroCollectPretty(record), errs) {
 		return exitFailed
 	}
-	if report := retroKeptReport(retroCollectRead(filepath.Join(it.root, retroCollectStamp))); report != "" {
-		if at := filepath.Join(home, retroBattery); retroCollectWrite(at, report, errs) {
+	if report := retroKeptReport(disk.text(filepath.Join(it.root, retroCollectStamp))); report != "" {
+		if at := filepath.Join(home, retroBattery); retroCollectWrite(disk, at, report, errs) {
 			return exitFailed
 		}
 	}
@@ -205,17 +197,17 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 	for _, one := range refused {
 		fmt.Fprintf(errs, "  refused %s: %s\n", one.Path, one.Refused)
 	}
-	if retroCollectStands(it.root, errs) && len(refused) == 0 {
+	if retroCollectStands(disk, it.root, errs) && len(refused) == 0 {
 		return 0
 	}
 	return exitFailed
 }
 
 // A second run answers what the first recorded, because the live session writes its log again the moment collect ends. [[spec/guidance/retro/collect]]
-func retroCollectAgain(home, into, name string, out, errs io.Writer) int {
-	record, _ := retroCollectParsed(retroCollectRead(filepath.Join(home, retroCollectCollected)))
+func retroCollectAgain(disk diskDoors, home, into, name string, out, errs io.Writer) int {
+	record, _ := retroCollectParsed(disk.text(filepath.Join(home, retroCollectCollected)))
 	refusals := 0
-	for _, row := range strings.Split(retroCollectRead(filepath.Join(into, retroCollectManifest)), "\n") {
+	for _, row := range strings.Split(disk.text(filepath.Join(into, retroCollectManifest)), "\n") {
 		if said, _ := retroCollectParsed(row); yaml.Truthy(retroCollectGet(said, "refused")) {
 			refusals++
 		}
@@ -231,19 +223,19 @@ func retroCollectAgain(home, into, name string, out, errs io.Writer) int {
 }
 
 // The first hold on this box whose ticket stands, as holdsAnywhere in src/scripts/guidance-hand.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
-func retroCollectHolding(root string) (string, any, bool) {
+func retroCollectHolding(disk diskDoors, root string) (string, any, bool) {
 	folder := filepath.Join(root, retroCollectHolds)
-	for _, one := range retroCollectListed(folder) {
+	for _, one := range disk.listed(folder) {
 		if one.IsDir() || !strings.HasSuffix(one.Name(), ".json") {
 			continue
 		}
 		at := filepath.Join(folder, one.Name())
-		text, err := os.ReadFile(at)
+		text, err := disk.read(at)
 		if err != nil {
 			continue
 		}
 		held, ok := retroCollectParsed(string(text))
-		if ok && retroCollectStillHeld(root, held) {
+		if ok && retroCollectStillHeld(disk, root, held) {
 			return at, held, true
 		}
 	}
@@ -251,18 +243,18 @@ func retroCollectHolding(root string) (string, any, bool) {
 }
 
 // A hold stands while its ticket stands nowhere or reads open, as stillHeld in src/engine/named.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
-func retroCollectStillHeld(root string, held any) bool {
+func retroCollectStillHeld(disk diskDoors, root string, held any) bool {
 	path := strings.TrimSpace(retroCollectText(retroCollectGet(held, "path")))
 	if path == "" {
 		return true
 	}
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	text, err := disk.read(filepath.Join(root, filepath.FromSlash(path)))
 	return err != nil || retroCollectFieldOf(string(text), "state") != retroCollectClosed
 }
 
 // The stamp the last check wrote, read against the commit standing now, and red where a warning stands or no count stands. [[spec/guidance/retro/collect]]
 func retroCollectBattery(it retroCollectDoors) (bool, string) {
-	text := retroCollectRead(filepath.Join(it.root, retroCollectStamp))
+	text := it.disk.text(filepath.Join(it.root, retroCollectStamp))
 	sha := ""
 	if it.git != nil {
 		sha = strings.TrimSpace(it.git("rev-parse", "HEAD").out)
@@ -281,9 +273,10 @@ func retroCollectBattery(it retroCollectDoors) (bool, string) {
 
 // Every entry straight under the private folder moves whole, a folder with all it holds. A dot folder stays, and the log is the one dot folder that moves. [[spec/guidance/retro/collect]]
 func retroCollectMovedInto(it retroCollectDoors, into string) []retroCollectRow {
+	disk := it.disk
 	from := filepath.Join(it.root, retroCollectPrivate)
 	out := []retroCollectRow{}
-	for _, one := range retroCollectListed(from) {
+	for _, one := range disk.listed(from) {
 		name := one.Name()
 		if (strings.HasPrefix(name, ".") && name != retroCollectDrained) || name == retroCollectKept {
 			continue
@@ -294,17 +287,17 @@ func retroCollectMovedInto(it retroCollectDoors, into string) []retroCollectRow 
 			now = filepath.Join(into, retroCollectDrainedTo)
 		}
 		var err error
-		if one.IsDir() && retroCollectExists(now) {
-			err = &os.LinkError{Op: "rename", Old: was, New: now, Err: syscall.EEXIST}
+		if one.IsDir() && disk.stands(now) {
+			err = diskTaken(was, now)
 		} else {
-			err = it.move(was, retroCollectFreeName(now))
+			err = it.move(was, retroCollectFreeName(disk, now))
 		}
 		if err == nil {
 			continue
 		}
 		path := retroCollectPrivate + "/" + name
 		if one.IsDir() && retroCollectFileByFile(it, was, now, path, &out) {
-			_ = os.RemoveAll(was)
+			_ = disk.removeAll(was)
 			continue
 		}
 		out = append(out, retroCollectRow{Path: path, Refused: retroCollectReasonOf(err)})
@@ -314,17 +307,18 @@ func retroCollectMovedInto(it retroCollectDoors, into string) []retroCollectRow 
 
 // Moves every file a folder holds, and answers whether none stays behind. [[spec/guidance/retro/collect]]
 func retroCollectFileByFile(it retroCollectDoors, was, now, path string, out *[]retroCollectRow) bool {
+	disk := it.disk
 	whole := true
-	for _, one := range retroCollectListed(was) {
+	for _, one := range disk.listed(was) {
 		from := filepath.Join(was, one.Name())
 		to := filepath.Join(now, one.Name())
 		if one.IsDir() {
 			whole = retroCollectFileByFile(it, from, to, path+"/"+one.Name(), out) && whole
 			continue
 		}
-		err := os.MkdirAll(now, 0o777)
+		err := disk.makeAll(now, 0o777)
 		if err == nil {
-			err = it.move(from, retroCollectFreeName(to))
+			err = it.move(from, retroCollectFreeName(disk, to))
 		}
 		if err != nil {
 			*out = append(*out, retroCollectRow{Path: path + "/" + one.Name(), Refused: retroCollectReasonOf(err)})
@@ -335,8 +329,8 @@ func retroCollectFileByFile(it retroCollectDoors, was, now, path string, out *[]
 }
 
 // A name the input holds already takes a number before its extension, so a second pass overwrites nothing. [[spec/guidance/retro/collect]]
-func retroCollectFreeName(at string) string {
-	if !retroCollectExists(at) {
+func retroCollectFreeName(disk diskDoors, at string) string {
+	if !disk.stands(at) {
 		return at
 	}
 	cut := len(at)
@@ -344,7 +338,7 @@ func retroCollectFreeName(at string) string {
 		cut = dot
 	}
 	for n := 2; ; n++ {
-		if next := at[:cut] + "." + strconv.Itoa(n) + at[cut:]; !retroCollectExists(next) {
+		if next := at[:cut] + "." + strconv.Itoa(n) + at[cut:]; !disk.stands(next) {
 			return next
 		}
 	}
@@ -352,24 +346,21 @@ func retroCollectFreeName(at string) string {
 
 // The code node names an error by, or its message. [[spec/guidance/retro/collect]]
 func retroCollectReasonOf(err error) string {
-	var code syscall.Errno
-	if errors.As(err, &code) {
-		if name, found := retroCollectCodes[code]; found {
-			return name
-		}
+	if name := diskCode(err); name != "" {
+		return name
 	}
 	return err.Error()
 }
 
 // The last retro's collect opens this window, and a retro with none before it takes everything. [[spec/guidance/retro/collect]]
-func retroCollectSinceLast(root, name string) time.Time {
+func retroCollectSinceLast(disk diskDoors, root, name string) time.Time {
 	at := filepath.Join(root, filepath.FromSlash(retroFolder))
 	var newest time.Time
-	for _, one := range retroCollectListed(at) {
+	for _, one := range disk.listed(at) {
 		if !one.IsDir() || one.Name() == name {
 			continue
 		}
-		if when := retroCollectWhenOf(retroCollectRead(filepath.Join(at, one.Name(), retroCollectCollected))); when.After(newest) {
+		if when := retroCollectWhenOf(disk.text(filepath.Join(at, one.Name(), retroCollectCollected))); when.After(newest) {
 			newest = when
 		}
 	}
@@ -399,8 +390,8 @@ func retroCollectISOOf(when time.Time) string {
 }
 
 // Writes a file collect keeps, and answers true where the write fails, after one line on errs naming the file and the error. [[spec/guidance/retro/collect]]
-func retroCollectWrite(at, text string, errs io.Writer) bool {
-	err := os.WriteFile(at, []byte(text), 0o666)
+func retroCollectWrite(disk diskDoors, at, text string, errs io.Writer) bool {
+	err := disk.write(at, []byte(text), 0o666)
 	if err != nil {
 		retroCollectFailed(errs, at, err)
 	}
@@ -409,7 +400,7 @@ func retroCollectWrite(at, text string, errs io.Writer) bool {
 
 // One line naming the file collect fails to write and the error, and the failed exit. [[spec/guidance/retro/collect]]
 func retroCollectFailed(errs io.Writer, at string, err error) int {
-	var path *os.PathError
+	var path *fs.PathError
 	if errors.As(err, &path) {
 		err = path.Err
 	}
@@ -418,9 +409,9 @@ func retroCollectFailed(errs io.Writer, at string, err error) int {
 }
 
 // One row a file the input folder holds, naming the source it comes from. [[spec/guidance/retro/collect]]
-func retroCollectLinesOf(into, rel string) []retroCollectRow {
+func retroCollectLinesOf(disk diskDoors, into, rel string) []retroCollectRow {
 	out := []retroCollectRow{}
-	for _, one := range retroCollectListed(filepath.Join(into, filepath.FromSlash(rel))) {
+	for _, one := range disk.listed(filepath.Join(into, filepath.FromSlash(rel))) {
 		path := one.Name()
 		if rel != "" {
 			path = rel + "/" + one.Name()
@@ -429,11 +420,11 @@ func retroCollectLinesOf(into, rel string) []retroCollectRow {
 			continue
 		}
 		if one.IsDir() {
-			out = append(out, retroCollectLinesOf(into, path)...)
+			out = append(out, retroCollectLinesOf(disk, into, path)...)
 			continue
 		}
 		var size int64
-		if said, err := os.Stat(filepath.Join(into, filepath.FromSlash(path))); err == nil {
+		if said, err := disk.stat(filepath.Join(into, filepath.FromSlash(path))); err == nil {
 			size = said.Size()
 		}
 		out = append(out, retroCollectRow{Path: path, Size: &size, From: retroCollectSourceOf(path)})
@@ -451,9 +442,9 @@ func retroCollectSourceOf(path string) string {
 }
 
 // What stands straight under the private folder past the dot folders and the scripts, which a clean collect leaves empty. [[spec/guidance/retro/collect]]
-func retroCollectStands(root string, errs io.Writer) bool {
+func retroCollectStands(disk diskDoors, root string, errs io.Writer) bool {
 	clean := true
-	for _, one := range retroCollectListed(filepath.Join(root, retroCollectPrivate)) {
+	for _, one := range disk.listed(filepath.Join(root, retroCollectPrivate)) {
 		if strings.HasPrefix(one.Name(), ".") || one.Name() == retroCollectKept {
 			continue
 		}

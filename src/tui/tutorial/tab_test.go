@@ -6,7 +6,7 @@ package tutorial_test
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - TestMain hands the run's code to the process exit
 	"regexp"
 	"strings"
 	"testing"
@@ -251,6 +251,7 @@ func answerOf(cmd tea.Cmd) tea.Msg {
 			return nil
 		}
 		return msg
+	// level0: OutsideInDoors - a tick the tab polls on answers past the wait, and the case reads it as none
 	case <-time.After(keyWithin):
 		return nil
 	}

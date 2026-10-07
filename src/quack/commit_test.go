@@ -6,7 +6,6 @@ package main // level0: InPackageTest - the cases drive the unexported commitVer
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -241,7 +240,7 @@ func TestCommitVerbMoves(t *testing.T) {
 	t.Run("a journaled old path the index still holds stages with the new path", func(t *testing.T) {
 		at := landingRepo(t)
 		lays(t, at.root, "GUIDE.md", "a text written over whole\n")
-		if err := os.Remove(filepath.Join(at.root, "README.md")); err != nil {
+		if err := realDisk().remove(filepath.Join(at.root, "README.md")); err != nil {
 			t.Fatal(err)
 		}
 		journals(t, at.root, "README.md", "GUIDE.md")
