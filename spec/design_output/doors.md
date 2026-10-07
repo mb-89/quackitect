@@ -188,7 +188,7 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |
 | the quack landing and ticket verbs' git | `src/quack/ticket_doors.go` | `FakeRepo` over the case's folder | the git suite above |
-| the box and check doors of quack | `src/quack` | none | none |
+| the box and check doors of quack | `src/quack` | none | `src/quack/box_doors_contract_test.go`, `src/quack/ending_contract_test.go`, `src/quack/ending_windows_contract_test.go` |
 | the viewer's frame over the network | `src/tui/frame` | none | none |
 
 A test outside these suites reaching a real door stands in a family, and each
