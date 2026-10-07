@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: test-walks-move-onto-fakes
+record:
+  - step: do
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 7f04c4047925655801212fed04050a9fc8a427c5
+    hash_after: 6eae95700d5e3931e26d0c97ac2a27c9b47685d0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "   61.4  in all"
+    inputs:
+      - name: ask
+        hash: f183321f76882a8a
+        size: 362
+    def: 16c92ada996c9f36
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the door-audit row of spec/design_output/doors.md for the box and check doors of
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/imports
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The door audit row for the box and check doors of quack in spec/design_output/doors.md named no contract suite. It now names the three files that src/quack/owns.yaml declares under contract. The chapter and the declaration say one thing.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the row names the three files owns.yaml declares, and nothing else changes.
+the change reveals no cleanup.
+owns.yaml holds the contract list, and the audit row names the same files because the audit table names a contract suite on every row.
 
 # Discussion
 
