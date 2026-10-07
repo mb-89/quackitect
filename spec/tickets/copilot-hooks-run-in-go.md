@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: 328419ff3ca12e91
         size: 1002
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 6eb774edb20187bf60aa69e5b7254e4f94ff3c4e
+    hash_after: b601f75b04373977fa37a8aaa4e055576c39b729
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 group: javascript-leaves
 ---
 
@@ -385,14 +394,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, and the decoder stands in the write package, since one module imports no other.
+- The hooks door, the log and the clock reach the tests as fakes, and one case runs the real post against a loopback server.
+- Each new function names this ticket in its comment.
+- The guard cases stand in one table, and the runner line reuses the binary path the serve verb owns.
 
 ## tests-green
 
