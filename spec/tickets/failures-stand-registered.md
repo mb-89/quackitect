@@ -155,6 +155,10 @@ record:
         hash: 25435732da6546b5
         size: 4613
     def: 4da1ca5da87d5bbc
+  - step: children
+    hand: box bf9a9fb67fb5 · claude-code-remote
+    hash_before: 5caf10b9ac63f668859492a1201fbfe1cea274d4
+    session: cse_01JR49WAMwFsp1GuB8FX2Gz2
 step: children
 ---
 
