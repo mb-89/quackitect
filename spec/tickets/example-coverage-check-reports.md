@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -148,6 +148,18 @@ record:
         hash: 83dc7b7ceca2dc35
         size: 2113
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 2f773e176b26706a97bf5754ffeb4eaf75748866
+    hash_after: 2f773e176b26706a97bf5754ffeb4eaf75748866
+    inputs:
+      - name: design/draft
+        hash: 83dc7b7ceca2dc35
+        size: 2113
+      - name: design/tests-red
+        hash: 7cf4ffc5704f346f
+        size: 588
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +288,9 @@ The cases plant a tree of texts: two verbs registered in quack, one registered i
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
