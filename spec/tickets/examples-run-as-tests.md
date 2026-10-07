@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 reason: done
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -249,6 +249,28 @@ record:
     hand: the engine
     hash_before: 9ccf685354f5a79afe25a17fe0c74eaaac4a6055
     hash_after: 9ccf685354f5a79afe25a17fe0c74eaaac4a6055
+  - step: accept
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 8e5f545b74c4687206b8ed89c7a55d4bd3ba1a8d
+    hash_after: 8e5f545b74c4687206b8ed89c7a55d4bd3ba1a8d
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/examples-run-as-tests already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 4df0b47ac1b5a066
+        size: 563
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: children-3
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_output/examples]]
+        hash: cbfcdb18dc87799c
+        size: 8264
+    def: 91c697c27d9620ff
 cloud: true
 ---
 
@@ -332,8 +354,7 @@ report-mode-holds-no-push closed: the lint leaves a report-mode finding out of t
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- report-mode-holds-no-push stands open: the check stamp counts report-mode findings as warnings, so branch done refuses
+accept
 
 # retro
 
