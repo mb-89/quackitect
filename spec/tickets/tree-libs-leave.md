@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["cage-libs-leave"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 6a5b3855ecd529dc
         size: 1801
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 44412bb58fcb83e258e1dee99ece7210aecd8889
+    hash_after: aa64f13c8ba75bb4ce682c064f1e14d8075abe5b
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -413,14 +422,19 @@ accept. The approach answers the ask, and a red test decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && go vet ./... && ./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches only files the size list names, plus test/contract/tree-of.js which approach line 24 names, and test/level0/folders.test.js, which pins the folders.js exports the change cuts.
+The new rules read the tree through TreeOver over Texts in memory, so each case reaches no door.
+Each new function in folders.go carries a pointer to the-runtime-files-stand-apart, the design input the approach implements.
+The folder lists stand in folders.go alone, and folders.js, setup_verb.go and doctor_verb.go now point at the Go owner.
 
 ## tests-green
 
