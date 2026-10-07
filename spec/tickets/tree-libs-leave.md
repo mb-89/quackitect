@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["cage-libs-leave"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 4e094123a41b47c8
         size: 12053
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: dd4f4df3e5c3ef31dccd10a014a040370a2050d7
+    hash_after: dd4f4df3e5c3ef31dccd10a014a040370a2050d7
+    inputs:
+      - name: design/draft
+        hash: 4e094123a41b47c8
+        size: 12053
+      - name: design/tests-red
+        hash: 6a5b3855ecd529dc
+        size: 1801
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -388,8 +400,9 @@ The tests reach no door. Check cases seed Texts in memory, the command rows pars
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line. TestTheTreeLibrariesStandNowhere fails on its own assertion over both git ls-files lines. The folders_test.go, runtime_names_test.go and nobody_test.go cases stand red on their stubs. The ported tree, stop, private and tested rows hold the rules Go already carries. No staying library imports a leaving one. Only tree.js, stop.js and magic.js import the set, and the only callers outside lib are tests, Go comments, notes, install.sh and Private.yml, each in the callers list. No open sibling takes overlapping work. scripts-folder-leaves touches install.sh, install.test.js and Install, and approach line 26 already names that rebase. Points the implementer fixes in place: (1) The stub adds Nobody beside nobody in command/private.go. Rename nobody to Nobody so the file spells one list, as approach line 20 says. (2) Approach line 13 turns the LOGGED mark into folders.go, and install.sh line 93 then loses its folders.js escape. PrivateFolderOwned would refuse that line. Keep folders.js named in that comment run. (3) privateFolderOwned also reads the file at check.Install. Then the root install.sh that scripts-folder-leaves lands stays under the rule.
 
 # implement
 
