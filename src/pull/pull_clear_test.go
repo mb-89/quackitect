@@ -119,3 +119,18 @@ func TestTheClearsTicketsHoldNoPullBackAsATodo(t *testing.T) {
 		}
 	}
 }
+
+// The clear's tickets hand back through the tool, off test/level0/tool-call.test.js. [[spec/tickets/verb-outputs-name-index-tools]]
+func TestTheClearsTicketsHandBackThroughTheToolAndNameNoShellVerb(t *testing.T) {
+	t.Parallel()
+	it := twoChildren(t)
+	pulled(t, it)
+	_ = it.Disk.Write(due, dueText)
+	code, said := pulled(t, it, "alpha", "--pass", "--fields", alphaFields)
+	if code != 0 || !strings.Contains(said, writeTicket+" stands in your hand.") || !strings.Contains(said, `mcp__level0__index_ticket_pull with args ["--pass"]`) {
+		t.Fatalf("the pass past the key answers %d, and wants the handover to hand back through the tool:\n%s", code, said)
+	}
+	if strings.Contains(said, "./RUNME.sh") {
+		t.Fatalf("the handover's ask names a shell verb:\n%s", said)
+	}
+}

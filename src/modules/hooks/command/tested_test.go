@@ -4,6 +4,7 @@ package command
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -54,5 +55,25 @@ func TestHeldTestsReadTheHeldTicketsCommandLines(t *testing.T) {
 	}
 	if got, want := HeldTests(tree), []string{"test/level0/a.test.js", "src/q/q_test.go"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("HeldTests reads %q, want %q", got, want)
+	}
+}
+
+// Several hands hold on one box, so a test two held tickets carry comes back once, off the case test/level0/held-tests.test.js held. [[spec/design_output/tree#the-rules-over-two-files]]
+func TestHeldTestsComeBackOnceAndAHoldWithNoTicketAddsNone(t *testing.T) {
+	ticket := func(line string) string { return "# Ask\n\nA thing.\n\n### tests\n\n    " + line + "\n" }
+	tree := seeded{
+		".se/.runtime/hold/a-hand.json": `{"ticket":"one","path":"spec/tickets/one.md"}`,
+		".se/.runtime/hold/b-hand.json": `{"ticket":"two","path":"spec/tickets/two.md"}`,
+		".se/.runtime/hold/c-hand.json": `{"ticket":"gone","path":"spec/tickets/gone.md"}`,
+		"spec/tickets/one.md":           ticket("./RUNME.sh branch test test/level0/one.test.js"),
+		"spec/tickets/two.md":           ticket("./RUNME.sh branch test test/level0/one.test.js src/q/q_test.go"),
+	}
+	got := HeldTests(tree)
+	slices.Sort(got)
+	if want := []string{"src/q/q_test.go", "test/level0/one.test.js"}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("HeldTests reads %q, and wants each test once and nothing off a hold whose ticket stands nowhere", got)
+	}
+	if got := HeldTests(seeded{}); len(got) != 0 {
+		t.Fatalf("HeldTests over no hold reads %q, and wants nothing", got)
 	}
 }
