@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -191,6 +191,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 7085b7b50e26d4a94fb216bb4dc535e3d3bcc3f4
+    hash_after: 7085b7b50e26d4a94fb216bb4dc535e3d3bcc3f4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -282,38 +294,58 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the take met a conflict with main across eleven files, and the merge resolved them, the check reading its disk through the box disk doors
+- the example verb reads through the disk doors, and its pause stands among the box doors
+- the merge check went green: the fixture guard baseline drops six rows, stale pointers and an anchor point at what main holds, and the hooks guard takes the shared text helper
+- `tips-carry-branch-changes-alone` closed: a tip carries its changes against trunk alone, and the live tips land under the bus cap
+- the group split lists every child, and accept passed
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the conflict resolution read the base beside both sides, so each hunk took a union and no change got dropped
+- a worktree of the branch before the merge told a merge fault from one the branch already carried
+- the red tests from tests-red decided the tips change, so the build ran straight to green
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 21:30 the merge commit refused four times in a row: a model trailer, a stale path, report findings read as refusals, and a copied helper main brought in
+- 21:20 the example fixture went empty after the merge, since main moved its TestMain behind the contract build tag
+- 21:52 the change hand-back refused for no staged test, though its red tests landed a step earlier
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the commit verb names its refusing findings first, apart from the report-mode ones it lists, in `src/quack/commit.go`
+- a fixture built in TestMain lands as a package initializer, so a build tag moving TestMain leaves it standing, in `src/quack/examples_harness_test.go`
+- the tested rule reads the tests-red evidence of a held ticket as carried tests, in `src/modules/hooks/command/tested.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+Most of the session went to taking main in, not to the group's own work. Main carried its own red: a removed test still named, a renamed ticket still pointed at, and a helper copy the rule refuses. The check's rule says to green it whoever put the fault there, so the merge took those fixes in.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fix points at the note owning it, and no rule got copied
+- the change adds one constant, deletedStatus, named once in the git module
+- no new file got a header, and the edited headers count nothing
+- the badly list carries each error with its time off the commits
+- the chapter names the role alone, with no name, address or box path
 
 ## cloud
 
