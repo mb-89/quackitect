@@ -790,7 +790,7 @@ The report fills while the tests run:
 
 | writer | writes |
 |---|---|
-| `src/scripts/battery-reporter.js`, the runner's reporter the check names beside the spec one | a line a case: its file, its time, and the error's first line where it is red |
+| `test/battery-reporter.js`, the runner's reporter the check names beside the spec one | a line a case: its file, its time, and the error's first line where it is red |
 | the process door, where `SE_SPAWNS` names the tally file | a line a spawn, the program's name, in every process the run starts |
 
 So a shell a test starts counts its spawns too, where that shell runs this

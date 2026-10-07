@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/src/scripts/install.sh\" boot",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/install.sh\" boot",
             "timeout": 180
           }
         ]

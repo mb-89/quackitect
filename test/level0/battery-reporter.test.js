@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { rowOf } from "../../src/scripts/battery-reporter.js";
+import { rowOf } from "../battery-reporter.js";
 
 const FROM = "/tree";
 const FILE = "/tree/test/contract/stub.test.js";

@@ -310,7 +310,7 @@ func (d *Doors) filed(one named, parent string) {
 
 // The install RUNME.sh runs before every verb, run again over the merged tree. [[spec/design_output/work#the-merge-lands-the-truth]]
 func (d *Doors) installs() {
-	d.run(d.Root, nil, "", "sh", d.at("src/scripts/install.sh"))
+	d.run(d.Root, nil, "", "sh", d.at("install.sh"))
 }
 
 // The check under --errors on the tree as it stands, and the red cases it prints. [[spec/tickets/the-verbs-need-no-wrapper]]

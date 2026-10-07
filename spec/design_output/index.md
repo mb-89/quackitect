@@ -402,7 +402,7 @@ compiler.
 | the part | what it holds |
 |---|---|
 | the root `go.mod` | the driver's pin |
-| `src/scripts/install.sh` | the index build, beside the language server's |
+| `install.sh` | the index build, beside the language server's |
 | `goEnvOf` in `src/scripts/cli-go.js` | the environment every Go test runs under |
 
 The driver pin stays on a release asking for the Go the root `go.mod` names.

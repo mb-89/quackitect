@@ -53,6 +53,7 @@ func TestUntestedInReadsTheBridgesDelta(t *testing.T) {
 		{"comments alone", deltaOf("src/engine/thing.js", "// a line saying why"), seeded{}, false, nil, nil},
 		{"a test named alike", code + "\n" + deltaOf("test/engine/thing.test.js", "// the test"), seeded{}, false, nil, nil},
 		{"a test importing it on disk", code + "\n" + deltaOf("test/engine/other.test.js", "// the test"), seeded{"test/engine/other.test.js": `import { THING } from "../../src/engine/thing.js";`}, false, nil, nil},
+		{"a test importing it with a query", code + "\n" + deltaOf("test/engine/other.test.js", `const { THING } = await import("../../src/engine/thing.js?case");`), seeded{}, false, nil, nil},
 		{"a merge", code, seeded{}, true, nil, nil},
 		{"a test a held ticket carries", code, seeded{"test/engine/thing-cases.test.js": ""}, false, []string{"test/engine/thing-cases.test.js"}, nil},
 		{"a fake, a copy of its door", deltaOf("src/doors/fake/disk.js", "export const disk = 1;"), seeded{}, false, nil, nil},

@@ -64,7 +64,7 @@ func copilotRegistrations() []copilotFile {
 			"        with:",
 			"          go-version-file: go.mod",
 			"      - name: Install level zero",
-			"        run: sh src/scripts/install.sh",
+			"        run: sh install.sh",
 			"      - name: Prepare cloud hooks",
 			"        run: " + copilotRunner + " setup --cloud",
 			"",

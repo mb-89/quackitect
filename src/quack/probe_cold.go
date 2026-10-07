@@ -49,8 +49,7 @@ var coldPath = []string{
 	".claude/skills/level0/lib/guidance.js",
 	"src/modules/hooks/",
 	"src/quack/",
-	"src/scripts/go-stamp.sh",
-	"src/scripts/install.sh",
+	"install.sh",
 }
 
 // The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
@@ -383,7 +382,7 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 	if !takesDelta(d, box, say) {
 		return ""
 	}
-	installed := d.run([]string{"sh", filepath.Join(box.tree, "src", "scripts", "install.sh")}, runOpts{
+	installed := d.run([]string{"sh", filepath.Join(box.tree, "install.sh")}, runOpts{
 		cwd:     box.tree,
 		env:     map[string]string{"SE_INSTALL_SKIP": installSkip},
 		timeout: probeWait,

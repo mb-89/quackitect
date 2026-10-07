@@ -8,7 +8,7 @@
 # Unix installs through whichever package manager the box carries.
 
 set -eu
-root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 # The runtime folder .claude/skills/level0/lib/folders.js owns, spelled here and
 # nowhere else in this script, because a shell script imports nothing.
 run="$root/.se/.runtime"
@@ -262,17 +262,24 @@ swap_in() {
 # hash of its folder, of each tree package it imports and of the root go.mod
 # and go.sum stands beside it, and a hash that moves asks for the build again.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
+# [[spec/tickets/scripts-folder-leaves]]
+stamp() {
+  [ -x "$bin/se-index${exe}" ] || return 1
+  (cd "$root" && "$bin/se-index${exe}" verb "$root/src/scripts" stamp "$@")
+}
+
 front_here() {
   if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
   have go || return 0
-  sh "$root/src/scripts/go-stamp.sh" fresh se-front 2>/dev/null
+  stamp fresh se-front 2>/dev/null
 }
 
 get_front() {
   say "  building the front writer"
   (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-front${exe}.new" ./src/front/cmd) || return 1
   swap_in "$bin/se-front${exe}.new" "$bin/se-front${exe}" || return 1
-  sh "$root/src/scripts/go-stamp.sh" stamp se-front || return 1
+  [ -x "$bin/se-index${exe}" ] || return 0
+  stamp write se-front || return 1
   front_here
 }
 
@@ -304,7 +311,7 @@ get_modules() {
 index_here() {
   if [ ! -x "$bin/se-index${exe}" ]; then return 1; fi
   have go || return 0
-  sh "$root/src/scripts/go-stamp.sh" fresh se-index 2>/dev/null
+  stamp fresh se-index 2>/dev/null
 }
 
 # [[spec/design_output/index#the-compiler-it-needs]]
@@ -312,7 +319,7 @@ get_index() {
   say "  building the index"
   (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
-  sh "$root/src/scripts/go-stamp.sh" stamp se-index || return 1
+  stamp write se-index || return 1
   index_here
 }
 

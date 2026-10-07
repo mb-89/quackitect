@@ -26,8 +26,8 @@ func peMergeTree(t *testing.T, trunkFiles, branchFiles map[string]string) *tree 
 	if trunkFiles == nil {
 		trunkFiles = map[string]string{}
 	}
-	if _, ok := trunkFiles["src/scripts/install.sh"]; !ok {
-		trunkFiles["src/scripts/install.sh"] = ""
+	if _, ok := trunkFiles["install.sh"]; !ok {
+		trunkFiles["install.sh"] = ""
 	}
 	one := newTree(t, trunkFiles).desk()
 	one.d.Runme = []string{"true"}

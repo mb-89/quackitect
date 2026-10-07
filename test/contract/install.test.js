@@ -7,12 +7,12 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { rebuilt } from "../../.claude/skills/level0/lib/tools.js";
 import { disk } from "../../src/doors/disk.js";
 import { FETCHING } from "./fetching.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const SETUP = join(root, "src", "quack", "setup_verb.go");
+const INSTALL = join(root, "install.sh");
 
 // The setup's wants, read off the Go verb, which names each under want. [[spec/tickets/box-verbs-port-to-go]]
 const WANTS = [
@@ -21,26 +21,16 @@ const WANTS = [
     .matchAll(/^\s*want:\s+"([\w-]+)",$/gm),
 ].map((one) => one[1]);
 
-test("every binary this tree builds rebuilds when its source moves ahead", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  for (const one of ["front", "index"]) {
-    assert.ok(
-      rebuilt(said).includes(one),
-      `${one} never rebuilds when its source moves`,
-    );
-  }
-});
-
 // The verbs run on Node, and the install runs none of it, so a box brings Node with the verbs. [[spec/tickets/install-drops-node]]
 test("the install names no node", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const said = disk().read(INSTALL);
   assert.deepEqual(said.match(/node/gi) ?? [], []);
 });
 
 // The steps that run JavaScript stand behind the setup verb, which the install reaches through the index. [[spec/tickets/install-drops-node]]
 test("the install hands its JavaScript steps to the setup verb, and goes on where it stops", () => {
   const rows = disk()
-    .read(join(root, "src", "scripts", "install.sh"))
+    .read(INSTALL)
     .split("\n");
   const at = rows.findIndex((row) =>
     /\$index" verb "\$root\/src\/scripts" setup/.test(row),
@@ -61,7 +51,7 @@ test("the install hands its JavaScript steps to the setup verb, and goes on wher
 
 // The modules land after Go and before the builds, so the first check fetches nothing, and a skip names the want. [[spec/tickets/the-install-fetches-go-modules]]
 test("the install fetches the Go modules as a want, after go and before the builds", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const said = disk().read(INSTALL);
   const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
   assert.ok(list, "the script loops over its wants");
   const wants = `${list[1]} ${list[2]}`.split(/\s+/);
@@ -82,7 +72,7 @@ test("the install fetches the Go modules as a want, after go and before the buil
 // A verb runs the script first, so a line it says on a warm tree lands before every answer. [[spec/design_output/log#one-verb-reads-the-log]]
 test("both announcement lines wait on a missing want, so a warm tree runs silent", () => {
   const rows = disk()
-    .read(join(root, "src", "scripts", "install.sh"))
+    .read(INSTALL)
     .split("\n")
     .map((row) => row.trim());
 
@@ -104,33 +94,24 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
 
 // A vehicle case skips every want past the box, so the skip list names each one the install and the setup reach. [[spec/tickets/fetching-skip-list-stale]]
 test("the skip list names every want of the install and the setup, and nothing else", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const said = disk().read(INSTALL);
   const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
   const wants = [...`${list[1]} ${list[2]}`.split(/\s+/), ...WANTS];
   assert.deepEqual(FETCHING.split(" ").sort(), wants.sort());
 });
 
-// The setup runs in the index, so a box with no index names the build as its step, and the verb still runs. [[spec/tickets/setup-road-without-index]]
-test("a box with no index names the index build before the verb, and starts no setup", () => {
+// A box with no index hears the install that builds it, and the road runs no program of its own. [[spec/tickets/setup-road-without-index]] [[spec/tickets/scripts-folder-leaves]]
+test("a box with no index names the install that builds it, and starts no program", () => {
   const text = disk().read(join(root, "RUNME.sh"));
-  const rows = text.split("\n");
-  const at = rows.findIndex((row) => /no index here, so the setup waits/.test(row));
-  assert.ok(at >= 0, "the road names the index build");
-  assert.match(
-    rows[at],
-    /install\.sh/,
-    "the line names the install that builds the index",
-  );
-  assert.ok(
-    at < rows.findIndex((row) => /exec node "\$program"/.test(row)),
-    "the line comes before the verb",
-  );
-  assert.doesNotMatch(text, /verbs\/setup\.js/, "the road starts no setup program");
+  const row = text.split("\n").find((one) => /No quack binary stands/.test(one));
+  assert.ok(row, "the road names the missing binary");
+  assert.match(row, /sh install\.sh/, "the line names the install that builds the index");
+  assert.doesNotMatch(text, /exec node|src\/scripts\/verbs/, "the road starts no node program");
 });
 
 // The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]
 test("the install downloads no Zig", () => {
-  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const said = disk().read(INSTALL);
   assert.doesNotMatch(said, /zig/i);
   assert.doesNotMatch(said, /CGO_ENABLED=1|sqlite_fts5/);
 });

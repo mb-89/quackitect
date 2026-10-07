@@ -1,5 +1,5 @@
 // The session start, which install.sh carries as its boot word, so no start
-// road runs node over a script of src/scripts. The boot runs the real
+// road runs node over a script. The boot runs the real
 // install.sh in a temporary tree, with every want skipped.
 // [[spec/tickets/session-start-leaves-node]]
 package main
@@ -20,7 +20,7 @@ import (
 const bootSkipAll = "vale biome vale-ls go go-modules index se-front git-hooks"
 
 // The hook line that runs the boot word of install.sh under the project folder. [[spec/tickets/session-start-leaves-node]]
-var bootHookLine = regexp.MustCompile(`^sh "?\S*src/scripts/install\.sh"? boot$`)
+var bootHookLine = regexp.MustCompile(`^sh "?\S*install\.sh"? boot$`)
 
 // The SessionStart hooks .claude/settings.json carries, each a command and a timeout in seconds. [[spec/tickets/session-start-leaves-node]]
 func bootHooks(t *testing.T) []struct {
@@ -70,11 +70,11 @@ printf '%s' "${SE_INSTALL_SKIP:-}" > "$here/skip-seen"
 func bootTree(t *testing.T) string {
 	t.Helper()
 	tree := filepath.Join(shortDir(t), "tree")
-	body, err := os.ReadFile(filepath.Join(treeRoot, "src", "scripts", "install.sh"))
+	body, err := os.ReadFile(filepath.Join(treeRoot, "install.sh"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	bootWrite(t, filepath.Join(tree, "src", "scripts", "install.sh"), string(body), 0o755)
+	bootWrite(t, filepath.Join(tree, "install.sh"), string(body), 0o755)
 	bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), bootIndex, 0o755)
 	return tree
 }
@@ -101,7 +101,7 @@ func bootRunOn(t *testing.T, tree string, env map[string]string, input string) (
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "src", "scripts", "install.sh"), "boot")
+	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "install.sh"), "boot")
 	run.Dir = tree
 	run.Stdin = strings.NewReader(input)
 	home := filepath.Join(filepath.Dir(tree), "home")
@@ -332,7 +332,7 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		bootWrite(t, filepath.Join(tree, "index-copy"), stampIndex, 0o755)
 		bootWrite(t, filepath.Join(path, "go"), stampGo, 0o755)
 		bootWrite(t, filepath.Join(tree, ".se", ".runtime", "fresh-code"), one.code, 0o644)
-		run := exec.Command("sh", filepath.Join(tree, "src", "scripts", "install.sh"))
+		run := exec.Command("sh", filepath.Join(tree, "install.sh"))
 		run.Dir = tree
 		run.Env = []string{
 			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,

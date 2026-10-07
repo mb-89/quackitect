@@ -9,7 +9,7 @@ const STANDING = ".se/.runtime/hooks.json"; // .claude/skills/level0/lib/folders
 // The binary under the method root, which serveIndexBin in src/quack/serve_verb.go names, and the scripts folder its verb road takes. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const BINARY = ".se/.runtime/bin/se-index"; // .claude/skills/level0/lib/folders.js owns the folder
 const SCRIPTS = "src/scripts";
-const INSTALL = "src/scripts/install.sh";
+const INSTALL = "install.sh";
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], which installSkip in src/quack/probe_cold.go spells again.
 const INSTALL_SKIP = "editor-link editor-extensions editor-client go";
 // The span the down word and the install take: the start of an index on a fresh clone, and an install, each at the host's cap. [[spec/design_output/level0#the-bridgehead-starts-it-too]]

@@ -162,7 +162,7 @@ func (one *Tree) Forgets() {
 }
 
 const (
-	Install = "src/scripts/install.sh"
+	Install = "install.sh"
 	ValeIni = ".vale.ini"
 	// The config the Vale extension reads, which turns on no style. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 	EditorIni = "spec/config/editor.vale.ini"

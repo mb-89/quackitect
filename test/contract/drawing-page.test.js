@@ -3,19 +3,21 @@
 // [[spec/design_output/drawing#a-fake-host-drives-it]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { after, before, test } from "node:test";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { browserFrom } from "../../src/scripts/browser.js";
-import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { ticketDrawn, ticketText } from "../level0/v1-index.js";
 import { moved, reachedIn } from "../../src/extension/webview/route/edit.js";
 
+// The webview and the shipped script, which drawingWebview and drawingOut in src/quack/bundle_verb.go name, and the browser the check hands node. [[spec/tickets/scripts-folder-leaves]]
+const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const WEBVIEW = join(root, "src", "extension", "webview");
+const OUT = join(root, "src", "extension", "drawing", "route.mjs");
 const files = disk();
 const DRIVER = join(WEBVIEW, "node_modules", "playwright-core", "index.mjs");
-const browser = browserFrom(process.env).path;
+const browser = process.env.PLAYWRIGHT_CHROMIUM;
 const why = !files.exists(DRIVER)
   ? "the drawing's modules stand uninstalled, so run ./RUNME.sh"
   : !browser && "no browser stands here, so run ./RUNME.sh";

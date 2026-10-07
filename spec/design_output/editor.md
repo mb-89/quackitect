@@ -63,7 +63,7 @@ and the tracked values apply.
 
 # The asset matrix
 
-`src/scripts/install.sh` pins the version and names one release asset per
+`install.sh` pins the version and names one release asset per
 platform, so the matrix lives in one place.
 
 Windows breaks the pattern: x86 ships a gnu target and arm64 an msvc one. A

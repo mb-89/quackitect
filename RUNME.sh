@@ -7,7 +7,7 @@
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
-sh "$here/src/scripts/install.sh"
+sh "$here/install.sh"
 
 # [[spec/design_output/editor#one-command-opens-the-editor]]
 if [ "$#" -eq 0 ]; then
@@ -22,21 +22,9 @@ if [ "$#" -eq 0 ]; then
   exit 1
 fi
 
-# The binary picks the road off the verbs slice, and the verb's program answers where no binary stands. [[spec/tickets/cli-js-leaves]]
+# The binary picks the road off the verbs slice, and a box with no binary hears the install that builds it. [[spec/tickets/cli-js-leaves]] [[spec/tickets/scripts-folder-leaves]]
 bin="$here/.se/.runtime/bin/se-index"
 [ -x "$bin.exe" ] && bin="$bin.exe"
 [ -x "$bin" ] && exec "$bin" verb "$here/src/scripts" "$@"
-program="$here/src/scripts/verbs/$1.js"
-if [ -f "$program" ]; then
-  shift
-  # The install brings no Node, so a box lacking it hears so in one line. [[spec/tickets/bare-desk-names-missing-node]]
-  command -v node >/dev/null 2>&1 || {
-    printf '%s\n' "No node stands on the PATH, and every verb without a Go twin runs on it. Install node, and run this again." >&2
-    exit 2
-  }
-  # The setup runs in the index, so a box with no index names its build as the step to take. [[spec/tickets/setup-road-without-index]]
-  printf '%s\n' "  no index here, so the setup waits: bring go, and run sh src/scripts/install.sh again." >&2
-  exec node "$program" "$@"
-fi
-printf '%s\n' "No quack binary stands at $bin, so help and $1 answer nothing. Run sh src/scripts/install.sh." >&2
+printf '%s\n' "No quack binary stands at $bin, so help and $1 answer nothing. Run sh install.sh." >&2
 exit 2

@@ -79,6 +79,6 @@ test("a cloud box with no binary installs, then runs the down word", async () =>
     ["sh", BIN],
     "the install runs, then the down word",
   );
-  assert.deepEqual(it.runs[0].argv, ["sh", `${METHOD}/src/scripts/install.sh`]);
+  assert.deepEqual(it.runs[0].argv, ["sh", `${METHOD}/install.sh`]);
   assert.deepEqual(said, { deny: REFUSED });
 });

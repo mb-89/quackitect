@@ -4,6 +4,7 @@
 package check
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -148,6 +149,14 @@ func TestNothingPrivateTravelsRefusesTheBoxNamesAndPassesNobody(t *testing.T) {
 		{"a box naming nobody", over("A cloud box writes under /home/user, as root.", Box{User: "root", Home: "/home/user", Name: "Claude"}), nil},
 		{"a name inside a longer word", over("The oxygen in the galaxy holds.", Box{User: "xy", Home: strings.Join([]string{"/home", "xy"}, "/")}), nil},
 	})
+}
+
+// The installer stands beside RUNME.sh, so every rule over it reads the file the tree runs. [[spec/tickets/scripts-folder-leaves]]
+func TestTheInstallTheRulesReadStandsInTheTree(t *testing.T) {
+	found, err := filepath.Glob(filepath.Join("..", "..", "..", filepath.FromSlash(Install)))
+	if err != nil || len(found) != 1 || strings.Contains(Install, "/") {
+		t.Fatalf("the rules read %s, which stands at %v, and want the installer at the root", Install, found)
+	}
 }
 
 func TestSurveyNamesInstallsRefusesAToolTheSurveyMisses(t *testing.T) {

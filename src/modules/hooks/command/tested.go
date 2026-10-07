@@ -296,7 +296,7 @@ func folderOf(path string) string {
 
 // Whether a text imports the path, since a path inside a string reads as prose. [[spec/design_output/tree#the-rules-over-two-files]]
 func importsIt(said, path string) bool {
-	return regexp.MustCompile(`(?:from|import)\s*\(?\s*["'][^"']*` + regexp.QuoteMeta(path) + `["']`).MatchString(said)
+	return regexp.MustCompile(`(?:from|import)\s*\(?\s*["'][^"']*` + regexp.QuoteMeta(path) + `(?:\?[^"']*)?["']`).MatchString(said)
 }
 
 // [[spec/tickets/cage-commit-guards-port]]

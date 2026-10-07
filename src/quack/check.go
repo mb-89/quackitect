@@ -29,9 +29,9 @@ const (
 	goRedFile   = runtimeDir + "/go-red.json"
 	pointerFile = runtimeDir + "/vehicle.json"
 	indexFile   = runtimeDir + "/index.json"
-	reporter    = "src/scripts/battery-reporter.js"
+	reporter    = "test/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
-	installer   = "src/scripts/install.sh"
+	installer   = "install.sh"
 )
 
 // The flags and variables the parts read: the quiet run, the working change the dry session clones, the tally the process door writes, the list the lint leaves, and Go with no C compiler. [[spec/tickets/the-verbs-need-no-wrapper]] [[spec/tickets/level0-runs-on-the-door]]
@@ -39,6 +39,7 @@ const (
 	errorsFlag  = "--errors"
 	workingFlag = "--working"
 	spawnsEnv   = "SE_SPAWNS"
+	browserEnv  = "PLAYWRIGHT_CHROMIUM"
 	lintEnv     = "SE_LINT_FOUND"
 	noCgo       = "CGO_ENABLED=0"
 	contractTag = "contract"
@@ -478,7 +479,7 @@ func testsRun(d checkDoors, quiet bool) int {
 	lines := []string{}
 	for _, one := range testParts {
 		_ = os.Remove(d.at(one.times))
-		ran, _, err := d.run(append([]string{"node"}, testArgv(d.root, d.red, one)...), []string{spawnsEnv + "=" + tally}, quiet)
+		ran, _, err := d.run(append([]string{"node"}, testArgv(d.root, d.red, one)...), testEnv(d, tally), quiet)
 		if err != nil {
 			fmt.Fprintln(d.errs, startFault("node", err))
 			ran = exitFailed
@@ -495,6 +496,15 @@ func testsRun(d checkDoors, quiet bool) int {
 		return exitFailed
 	}
 	return code
+}
+
+// The variables node runs under: the tally, and the browser the box holds, which the drawing's page test drives. [[spec/tickets/scripts-folder-leaves]]
+func testEnv(d checkDoors, tally string) []string {
+	env := []string{spawnsEnv + "=" + tally}
+	if d.browser != "" {
+		env = append(env, browserEnv+"="+d.browser)
+	}
+	return env
 }
 
 // An empty tally the process door writes into while the tests run. [[spec/design_output/work#the-battery-answers-first]]

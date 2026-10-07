@@ -22,7 +22,6 @@ const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 
 // Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#a-door-reads-the-outside]]
 const ROOTS = [
-  "src/scripts/trust.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.js",

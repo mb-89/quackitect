@@ -103,7 +103,7 @@ for each code `startReasonOf` gives a level:
 
 A cloud box clones the repository fresh when the container starts, and git
 tracks no binary. So where no binary stands on a cloud box, the forwarder runs
-`src/scripts/install.sh` under the skip list the setup names, and then the down
+`install.sh` under the skip list the setup names, and then the down
 word. A box where neither runs passes the event uncaged, and the forwarder says
 so in the chat.
 
@@ -694,7 +694,7 @@ The probe runs one cold box from start to end:
 
 1. It clones the commit this tree stands on into a fresh temp folder.
    It applies the delta the commit verb hands it.
-2. It runs `src/scripts/install.sh` under the skip list the setup names, so
+2. It runs `install.sh` under the skip list the setup names, so
    the plugin manifest lands.
 3. It writes the clone's pointer at a port of its own, so a desk server keeps
    its port.
@@ -796,10 +796,9 @@ door it takes.
 
 ## The setup writes the flag
 
-`src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
-A cloud environment carries neither at setup time. Measured against client
-2.1.267: a
-setup naming `node src/scripts/trust.js` fails, and the session ends at
+The setup below writes it. A cloud environment carries neither the tree nor
+`node` at setup time. Measured against client 2.1.267: a
+setup naming a `node` script fails, and the session ends at
 `init_script` with no first turn. A failing setup takes the session with it, so
 the one an environment carries leans on nothing:
 
@@ -835,7 +834,7 @@ the one an environment carries leans on nothing:
     print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
     SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index" \
-      sh "$repo/src/scripts/install.sh" || true
+      sh "$repo/install.sh" || true
     exit 0
 
 Both readers mark this folder one the client trusts, and both leave every other
@@ -846,7 +845,7 @@ holds the file.
 ## The setup installs the cage
 
 The install line is what makes the trust worth anything: a trusted tree whose
-server cannot boot holds nobody. `src/scripts/install.sh` is `sh` and installs
+server cannot boot holds nobody. `install.sh` is `sh` and installs
 node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
@@ -865,8 +864,8 @@ the language server. Those stay wants, and every rule holds without them.
 ## The boot hook
 
 A `SessionStart` hook in `.claude/settings.json` runs the boot word of
-`src/scripts/install.sh` through sh. On a cloud box lacking the plugin manifest, it runs
-`src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
+`install.sh` through sh. On a cloud box lacking the plugin manifest, it runs
+`install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
 off a cloud box, it runs nothing. A failed install holds no session up. The
 hook's `timeout` waits out `startSpan` in `src/quack/hook_down.go`, the span the start road allows the same
 install. So the client cuts no install short before the manifest lands.

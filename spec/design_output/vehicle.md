@@ -140,7 +140,7 @@ Every vehicle writes itself into `~/.se/.runtime/registry.json`, or into each fo
 `SE_REGISTRY` names, which keeps the file whole. The reader drops an entry
 whose method root holds no marker. A folder that holds something else now
 answers about that something. A box carrying the register right under the
-private folder meets the move in `src/scripts/install.sh`.
+private folder meets the move in `install.sh`.
 
 ## The register holds the port
 

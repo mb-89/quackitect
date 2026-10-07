@@ -19,16 +19,16 @@ Biome holds.
 
 | the rule | the two things it weighs |
 |---|---|
-| `SettingsNameBinaries` | `.vscode/settings.json`, `src/scripts/install.sh` |
+| `SettingsNameBinaries` | `.vscode/settings.json`, `install.sh` |
 | `EditorDrawsWriteRules` | `.vscode/settings.json`, `spec/config/editor.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
 | `NothingPrivateTravels` | every text file git holds, and the box it lints on |
-| `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
+| `SurveyNamesInstalls` | `install.sh`, `lib/tools.js` |
 | `PrivateFolderOwned` | every source file git holds, and `src/modules/check/folders.go` |
-| `InstallerHoldsTheNames` | `src/scripts/install.sh`, `src/modules/check/folders.go` |
+| `InstallerHoldsTheNames` | `install.sh`, `src/modules/check/folders.go` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
 | `NoConflictMarkers` | every text file git holds under `spec`, `src`, `.claude` and `test`. The server holds this one, in `src/modules/check/conflict.go`. For details, see [[spec/design_output/work#no-commit-carries-a-marker]] |
 | `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/modules/check/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |

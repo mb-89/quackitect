@@ -293,3 +293,5 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- [[spec/tickets/scripts-folder-leaves]] takes the stamp and drawing bundle tests out of `test/contract`, and the stamp and bundle verb tests under `src/quack` hold their behaviours.
