@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: examples-run-as-tests
 parent: sweep-reads-tracked-after-restart
+record:
+  - step: do
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: d95896696bc6bed8e308c5afe12deed5641f4043
+    hash_after: 88e99600a47aad917425b18449159a4aa7359825
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   59.5  in all"
+    inputs:
+      - name: ask
+        hash: 4cb40ea171b6714c
+        size: 245
+    def: 7460963fdc3d5ca5
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ Seeds commits the whole standing tree in one message, and the text alone reads a
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The watcher's seed sent the whole standing tree as one bus message, and the text alone fills about a third of the bus cap. The seed now commits in batches of at most seedBatch text bytes, the last batch landing whatever stands. The empty commit the IO process sends after each start still tells a reader the seed stands whole.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the ask: the change takes the batches the gate named
+cleanup: none past the change, since the binary filter lands under sweep-reads-tracked-after-restart
+one place: the cap stands once as seedBatch in src/modules/files/watch.go
 
 # Discussion
 
