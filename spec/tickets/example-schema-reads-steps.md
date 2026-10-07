@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -134,6 +134,19 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 70672ee0ff0d · claude-code-remote
+    hash_before: 626560620aedaf2450030660a0873058396411ea
+    hash_after: 626560620aedaf2450030660a0873058396411ea
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/example fails
+    inputs:
+      - name: design/draft
+        hash: 7d580475d667653d
+        size: 3016
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -244,26 +257,32 @@ The parser reads every `sh`, `bash` or `shell` fence. A line there is blank, a `
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/example/example_test.go
+- src/quack/example_schema_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The schema cases stand in `src/quack` and not in the check package, beside the mint test. A test there reads the real schema file, and a module test seeds its fixture. So the cases prove the shipped file, and the draft's check-package cases merge into them. The parser gains one case: a quoted operator stays a word of the call.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the schema rows in the quack test, the parser in the example test, and the check at the end
+- the tests reach no door: the parser is pure, and the schema test seeds a tree of texts
 
 # gate
 
