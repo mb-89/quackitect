@@ -332,9 +332,9 @@ func level0Runs(d checkDoors, quiet bool) int {
 	return code
 }
 
-// The plugin the engine reads validates, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]]
+// The plugin the engine reads validates strictly, so a warning fails the part, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]] [[spec/tickets/level0-plugin-validate-in-check]]
 func pluginHolds(d checkDoors) int {
-	code, said, err := d.run([]string{"claude", "plugin", "validate", filepath.FromSlash(pluginDir)}, nil, true)
+	code, said, err := d.run([]string{"claude", "plugin", "validate", "--strict", filepath.FromSlash(pluginDir)}, nil, true)
 	if err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so the plugin goes unvalidated here.")
 		return 0

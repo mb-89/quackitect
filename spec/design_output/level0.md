@@ -618,9 +618,9 @@ validate`, and the client then loads none of the module:
 | the canary is absent from every answer | the standing layer reaches no session |
 
 So one hook of the wrong shape takes the whole cage off, and the readings
-above are how a person catches it. Run `claude plugin validate
-.claude/skills/level0` on the client of the day, because the shape a hook takes
-moves with the build.
+above are how a person catches it. The check's `plugin` part runs `claude
+plugin validate --strict .claude/skills/level0` on the client of the day. It
+fails on a warning, because the shape a hook takes moves with the build.
 
 The check's `plugin-tests` part runs `claude plugin test` over the kit under
 `.claude/skills/level0/tests`, and passes with a line where claude stands
