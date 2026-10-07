@@ -217,7 +217,7 @@ record:
   - step: retro/cloud
     hand: box 57a5a484096e · claude-code-remote
     hash_before: 05c99306a095023c509f3a642d06e4946f252e6c
-    hash_after: 4152326d4240e81bfd5cc3a9d5237e821f277f81
+    hash_after: aca5a5355651e0c7bf9e85c6aecd126b991a2819
     inputs:
       - name: retro/write
         hash: a363fa901974280b
@@ -226,6 +226,9 @@ record:
     model: claude-opus-5-5
     cost: 0
     final: "work/engine-verbs-hold takes main in and closes; #122 stands merged"
+    model: claude-opus-5-5
+    cost: 0
+    final: RUNME.sh finds its folder with no dirname; Windows CI runs on aca5a5355
 reason: done
 ---
 
