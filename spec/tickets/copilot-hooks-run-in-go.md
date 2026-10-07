@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: 9bfe92748f776f12
         size: 5593
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 598be4477be0389fe92e92e92b8395ee0f2c2391
+    hash_after: 598be4477be0389fe92e92e92b8395ee0f2c2391
+    inputs:
+      - name: design/draft
+        hash: 9bfe92748f776f12
+        size: 5593
+      - name: design/tests-red
+        hash: 328419ff3ca12e91
+        size: 1002
+    def: dc4904ab364efa10
 group: javascript-leaves
 ---
 
@@ -358,8 +370,11 @@ The cases the first round wrote still fail on their own assertion over the merge
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- copilot-mutations-take-wholeafter: `Mutations` reads Edit, MultiEdit and Write through `write.WholeAfter`, and decodes the patch envelope alone, so one Go function applies an edit.
+- recovers-cases-share-one-table: the recovers cases move to one table under `src/modules/hooks/testdata`, which `down_test.go` and `cage.test.js` both read, so the JS cage and the Go port hold one contract.
 
 # implement
 
