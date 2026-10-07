@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/owner-read
+step: design/draft
 steps:
   - name: design
     steps:
@@ -119,6 +119,10 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: doors-declare-what-they-own
 depends_on: ["go-waits-on-events", "quack-waits-on-the-clock", "quack-reaches-the-box-through-doors", "javascript-reaches-through-doors", "go-tests-meet-the-doors", "test-walks-move-onto-fakes"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
