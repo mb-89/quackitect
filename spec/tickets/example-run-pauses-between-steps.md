@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: examples-run-as-tests
 parent: example-run-verb-clones
+record:
+  - step: do
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 3ba816d52c67cf8293ab73ba6e71aa9156e6ffa1
+    hash_after: 90cc1bb777de2c291198def44a15088f214b740d
+reason: became
+successors: [example-run-verb-clones]
 ---
 
 # Ask
