@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 96e40eead9875aa1
         size: 987
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7374d490a124954124368ca7498151a89e9f0ed3
+    hash_after: 7374d490a124954124368ca7498151a89e9f0ed3
+    answered:
+      - name: lint
+        exit: 0
+        said: "   79.6  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -341,14 +350,19 @@ accept. The approach answers the ask. git ls-files on the done_when patterns nam
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list
+- neither new test reaches a door: the red case reads the tree through filepath.Glob, and the route case reads an embedded fixture
+- the route headers point at RouteAheadOnly and RouteOf in src/pull/route.go and its testdata
+- the routes stand once in src/pull/testdata/drawing_edits.json, which Go and the drawing tests both read
 
 ## tests-green
 
