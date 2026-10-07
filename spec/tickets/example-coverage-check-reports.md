@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 0587e6fdf54a50fc9dd5e963d0a37a1fd36a228e
+    hash_after: 0587e6fdf54a50fc9dd5e963d0a37a1fd36a228e
+    inputs:
+      - name: ask
+        hash: f4be009a917e0225
+        size: 514
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,57 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two tree rules join `Rules` in `src/modules/check`, both in a new `coverage.go`. Each answers its findings at warning, which is the report mode. Turning a rule to refuse is a change of its severity alone.
+
+- `ExampleCovers`: the rule reads the names the examples show off the `interface` field of every file under `spec/examples`, through `example.Read`. It reads the verbs off the `register("…")` and `registerBox("…")` lines of `src/quack/*.go` past the tests, and the tabs off the `tuiTabs` line of `src/quack/tui_verb.go`. A tab counts as shown where an example names `tui <tab>`. Each verb or tab no example names takes one warning, on the line that registers it.
+- `ExampleProves`: for each open ticket on `spec/processes/standard`, the rule reads the list under `# Ask`, which holds the `done_when` lines. Where no line names a path under `spec/examples/`, the ticket takes one warning, on its first list line.
+
+The door-facing features take no list of their own here. A feature a user reaches stands as a verb or a tab, and the doors stand behind them. The rule widens once a list of them stands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/checker.go treeFaults, which runs every rule of Rules
+- src/modules/check/checker.go Sweep, which reaches treeFaults
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/check/example_test.go TestAVerbNoExampleNamesTakesAWarning
+- src/modules/check/example_test.go TestATabNoExampleNamesTakesAWarning
+- src/modules/check/example_test.go TestAStandardTicketNamingNoExampleTakesAWarning
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/check/coverage.go
+- src/modules/check/checker.go
+- src/modules/check/example_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: checker.go with Rules and treeFaults, group.go as the model of a ticket rule, finding.go for the severities, tui_verb.go for tuiTabs, registry.go for register, and standard.yaml for the ask fields
+- the callers list names treeFaults and the sweep, the one road into a rule
+- each done_when line names its test: the verb and tab warnings, the ticket warning, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
