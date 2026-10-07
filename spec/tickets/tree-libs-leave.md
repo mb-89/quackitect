@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ed3a7b8e3b7cc89cd0258df9a2b34ee5b39a949d
+    hash_after: ed3a7b8e3b7cc89cd0258df9a2b34ee5b39a949d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   81.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6a5b3855ecd529dc
+        size: 1801
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -443,26 +466,33 @@ The folder lists stand in folders.go alone, and folders.js, setup_verb.go and do
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/tree_libs_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The nine tree and stop libraries under the level0 plugin lib folder leave, with tested.test.js, private.test.js, stop-rules.test.js and folders.test.js. Each rule they held runs in Go alone. New src/modules/check/folders.go holds the runtime folder lists and two rules over them, and the lint and the panel run both. The stop pool test globs every stop file through stop.Pool, so a broken stop file fails the Go check. command/private.go spells the nobody list once, and Private.yml points at it. The setup and doctor verbs read the editor lists from the check package. The notes and Go headers name each Go owner in place of the leaving file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The tests-green leaf adds no edit past the landed change, whose files stand in the size list plus tree-of.js and the folders.js export case.
+The green tests run over Texts in memory, strings and a disk glob, and reach no door.
+Each changed Go function carries a pointer at the design input or note it implements.
+The folder lists stand in folders.go alone, the nobody list in private.go alone, and the notes point at each Go owner.
 
 # accept
 
