@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 reason: done
-step: person-1
+step: children-3
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -240,6 +240,11 @@ record:
       - name: sync/sync
         exit: 0
         said: work/examples-run-as-tests already carries every commit on main.
+  - step: person-1
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 49264417a5c0ed1f9dc57f16b228937c3f9d9c4a
+    hash_after: 49264417a5c0ed1f9dc57f16b228937c3f9d9c4a
+    def: fd9affffcbd779fb
 cloud: true
 ---
 
@@ -308,8 +313,9 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+report-mode-holds-no-push closed: the lint leaves a report-mode finding out of the stamp, so accept reads the group again and passes
 
 # children-3
 
