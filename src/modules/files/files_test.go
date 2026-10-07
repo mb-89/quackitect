@@ -57,7 +57,7 @@ func TestAPushedChangeReachesTheFamily(t *testing.T) {
 	}
 }
 
-// A built program's first bytes, which a text file never holds. [[spec/tickets/sweep-reads-tracked-after-restart]]
+// A built program's first bytes, a NUL byte among them. [[spec/tickets/sweep-reads-tracked-after-restart]]
 const binaryBody = "\x7fELF\x02\x01\x01\x00"
 
 // The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder, and no binary file. [[spec/tickets/tickets-becomes-a-module]]

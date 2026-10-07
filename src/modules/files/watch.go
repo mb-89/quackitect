@@ -33,6 +33,9 @@ const private = ".se"
 // .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
 var named = map[string]string{".se/.runtime": ".json", ".se/.runtime/hold": ".json", ".se/.log": ".jsonl"}
 
+// Whether a body reads as text: a built program or an image holds a NUL byte, and no text file does. A binary file reaches no rule, reader or search, and its bytes swell a seed past the bus cap. [[spec/tickets/sweep-reads-tracked-after-restart]]
+func textual(body string) bool { return !strings.Contains(body, "\x00") }
+
 // Whether a change at rel reaches the family: a path the walk stands off does not, past a file carrying its folder's extension straight under a named folder. [[spec/design_output/model#everything-on-disk-mirrors]]
 func heard(rel string) bool {
 	parts := strings.Split(rel, "/")
@@ -119,7 +122,7 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
 		hand(rel, "", 0, true)
 		return
 	}
-	if err == nil {
+	if err == nil && textual(string(body)) {
 		hand(rel, string(body), info.ModTime().UnixNano(), false)
 	}
 }
@@ -160,7 +163,7 @@ func Standing(root string, hand Hand) error {
 			return nil
 		}
 		body, err := os.ReadFile(path)
-		if err == nil {
+		if err == nil && textual(string(body)) {
 			hand(rel, string(body), info.ModTime().UnixNano(), false)
 		}
 		return nil
@@ -186,7 +189,7 @@ func NewFakeWatchOver(over *FakeDisk) *FakeWatch {
 }
 
 func (one *FakeWatch) Push(path, text string, gone bool) {
-	if !heard(path) {
+	if !heard(path) || (!gone && !textual(text)) {
 		return
 	}
 	one.mu.Lock()
