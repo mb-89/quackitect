@@ -78,7 +78,7 @@ func cloningBox(t *testing.T, calls *[]proc.Command) *proc.FakeRunner {
 // Runs example run over the root, and answers its code and its output. [[spec/design_output/examples#one-runner-two-drivers]]
 func runsOver(root string, box *proc.FakeRunner) (int, string) {
 	var said strings.Builder
-	verb := exampleVerb(func() (string, error) { return root, nil }, box.Run)
+	verb := exampleVerb(func() (string, error) { return root, nil }, box.Run, func() {})
 	code := verb([]string{"example", "run", runnablePath}, false, &said, &said)
 	return code, said.String()
 }
@@ -137,5 +137,24 @@ func TestAMissExitsOneAndASecondRunClearsTheClone(t *testing.T) {
 	}
 	if _, err := os.Stat(stale); err == nil {
 		t.Fatal("the run leaves the last clone's file standing")
+	}
+}
+
+func TestAnInteractiveRunPausesBetweenSteps(t *testing.T) {
+	t.Parallel()
+	second := "\nA second pull hands the same leaf.\n\n```sh\n./RUNME.sh ticket note\n```\n"
+	root := runRoot(t, runnable+second)
+	calls := []proc.Command{}
+	var said strings.Builder
+	seen := []string{}
+	verb := exampleVerb(func() (string, error) { return root, nil }, cloningBox(t, &calls).Run, func() { seen = append(seen, said.String()) })
+	if code := verb([]string{"example", "run", runnablePath}, false, &said, &said); code != 0 {
+		t.Fatalf("the run exits %d:\n%s", code, said.String())
+	}
+	if len(seen) != 1 {
+		t.Fatalf("the run pauses %d times over two steps, and wants once between them", len(seen))
+	}
+	if !strings.Contains(seen[0], "stands spec/tickets/made.md") || strings.Contains(seen[0], "./RUNME.sh ticket note") {
+		t.Fatalf("the pause comes at the wrong place, after:\n%s", seen[0])
 	}
 }
