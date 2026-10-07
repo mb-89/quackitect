@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "   81.7  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7d025827570377776e62be2c0b0b3c0ad81385d6
+    hash_after: 7d025827570377776e62be2c0b0b3c0ad81385d6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/tickets passes
+      - name: check
+        exit: 0
+        said: "   85.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8a3c23482b079c07
+        size: 886
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -450,26 +473,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/tickets/drawn_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work scripts, the command line glue, editor.js, go-source.js and graph.js stood as dead copies of what src/branches, src/quack and the tickets module run in Go, and their tests cost every check. They leave with those tests. The three scripts reading homeIn spell the home rule in place and point at HomeIn in Go. The extension fake index drew each ticket with a JavaScript copy of the Go drawing. It now reads a golden that Go writes and tests, so the drawing stands in Go alone, and go test ./src/quack -run TestTheDrawnGoldenRedrawsEveryText -update redraws it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past the golden writer in src/quack, which the import rule places there, the contract cases the real git door forces, and the two home-order cases the commit door asks
+- the fake index reads the golden through the disk fake, and the source cases walk the files through the disk door
+- each touched comment points at the Go owner of the leaving script
+- the drawing stands in Go alone, and the golden holds every text the fake index reads
 
 # accept
 
