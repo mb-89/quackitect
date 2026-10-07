@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: aec49710855cdd8c15b1a73733ec5c134ee1a7e0
+    hash_after: aec49710855cdd8c15b1a73733ec5c134ee1a7e0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   81.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 86b079a1ad244290
+        size: 2598
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -443,26 +466,33 @@ Each rule stands once in its Go owner, and every comment and note that named a l
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/engine_doors_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+src/engine loses group.js, named.js and front-merge.js, and keeps tools.js for the lint group. The swap package moves to src/index/swap beside its one reader. The clock, http, index and log doors leave with their fakes and contract tests, and the unused awake fake leaves too. The Go owners in src/branches, src/front and command/ticket.go already hold each rule, and new Go rows cover the clash cases and the take-closing case the JavaScript alone held. The disk, proc, wire, vale, git and front doors stay, since the extension, the lint group or a later slice still reads them. Discussion lines hand the front door to schema-libs-leave and the git door to plugin-libs-leave.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The tests-green leaf adds no edit past the landed change, whose files the approach and the gate points name.
+The green tests glob the disk, run Go rows in memory, and run JS cases on fakeProc, fakeDisk and the fake front.
+Each changed comment names its Go owner or points at this ticket.
+Each rule stands once in its Go owner, and the notes point at that owner.
 
 # accept
 
