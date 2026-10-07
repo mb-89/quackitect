@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: engine-verbs-hold
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 92ffdec01fbd47ecfc40678b9be9b257514e22e6
+    hash_after: 92ffdec01fbd47ecfc40678b9be9b257514e22e6
+    inputs:
+      - name: ask
+        hash: eea6d816b58614e1
+        size: 323
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 1de9acb28a9827394606b88f4acdeae741f7bf9e
+    hash_after: 1de9acb28a9827394606b88f4acdeae741f7bf9e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 109d1abe6f2ad25a
+        size: 1605
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: c20c7e8c4810998b23b12d8cf3b0cf3dee63da60
+    hash_after: c20c7e8c4810998b23b12d8cf3b0cf3dee63da60
+    inputs:
+      - name: design/draft
+        hash: 109d1abe6f2ad25a
+        size: 1605
+      - name: design/tests-red
+        hash: da25498fea11bdac
+        size: 688
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 0e28860425a70a72c869219566a2edd14e78d987
+    hash_after: 0e28860425a70a72c869219566a2edd14e78d987
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 685b8ebc541a468019c9b6df1b7b7b99d2de7b06
+    hash_after: 685b8ebc541a468019c9b6df1b7b7b99d2de7b06
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  107.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: da25498fea11bdac
+        size: 688
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -148,38 +218,52 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`RUNME.sh` runs the install, then reads a bare call. On a cloud box, where `CLAUDE_CODE_REMOTE` or `SE_CLOUD` stands set, the bare call becomes `help`. The script runs `set -- help` and falls through to the verb road, so the binary prints the usage and exits 0. A desk keeps its road: the panel flag, then `code`, or the note and exit 1.
+
+A new Go test runs the real script once by `sh`, in a temporary root. That root holds a copy of `RUNME.sh`, a no-op `src/scripts/install.sh`, and a fake `.se/.runtime/bin/se-index` printing its words. The PATH holds `dirname` and `mkdir` alone, so `code` stands nowhere. The cloud case reads exit 0 and the words `verb <root>/src/scripts help`. The desk case reads exit 1 and the note.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+RUNME.sh the bare branch, which a person runs
+src/quack/doctor_verb.go toolRow and its siblings, whose hint names a bare ./RUNME.sh
+src/quack/lspprobe.go lspProbe, whose hint names a bare ./RUNME.sh
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/runme_test.go TestABareRunmeOnACloudBoxPrintsTheVerbs
+src/quack/runme_test.go TestABareRunmeOnADeskWithNoEditorNamesIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+RUNME.sh
+src/quack/runme_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+RUNME.sh, usageDoor in src/quack/verbs.go, cloudVariables in src/quack/command.go and runShim in src/vehicle/shim_contract_test.go stand opened, and `./RUNME.sh help` exits 0 here.
+A grep for a bare RUNME.sh over src, the workflows and the hooks finds a person and the doctor's hints alone.
+The done_when line on `./RUNME.sh test` meets TestABareRunmeOnACloudBoxPrintsTheVerbs, and the check line meets the check at tests-green.
 
 ## tests-red
 
@@ -188,26 +272,31 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/runme_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/runme_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud case answers 1 and the editor note under both cloud variables, which is the fault the ask names. The desk case passes already, so it guards the desk road through the change. The script calls `sh` by name for the install, so the PATH folder links `sh` beside `dirname` and `mkdir`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The done_when line on `./RUNME.sh test` meets TestABareRunmeOnACloudBoxPrintsTheVerbs, red on its assertion; the check line waits for tests-green.
+The test drives the real script once, and its install and binary are fakes in a temporary root, so no real install or index runs.
 
 # gate
 
@@ -216,8 +305,12 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: a bare call on a cloud box becomes `set -- help` and reaches the binary, which exits 0, and the desk road stands unchanged; the install still runs first, so the doctor and lspProbe hints naming a bare ./RUNME.sh hold on both roads
+- TestABareRunmeOnACloudBoxPrintsTheVerbs decides the test line and fails here on its own assertion under both cloud variables (exit 1 and the editor note); TestABareRunmeOnADeskWithNoEditorNamesIt passes and guards the desk road; the check line waits for tests-green
+- fix in place at implement: the approach reads a cloud variable as set where it stands non-empty, while cloudVariables in src/quack/command.go reads empty, 0 and false as a desk; match that rule in RUNME.sh, and add a desk case under SE_CLOUD=false to runme_test.go
 
 # implement
 
@@ -228,14 +321,19 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches RUNME.sh and src/quack/runme_test.go, the two files the draft names, and nothing past them.
+The test runs the real script with a fake install and a fake binary in a temporary root, so no real install, index or editor runs.
+A comment above cloud_box names the approach and links the ticket, and the bare branch carries its own line.
+The cloud rule points at cloudVariables in src/quack/command.go, and the script follows that rule: a trimmed value, with empty, 0 or false reading as a desk. The desk test now covers SE_CLOUD=false, a padded 0 and an empty value.
 
 ## tests-green
 
@@ -244,26 +342,33 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/runme_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A bare RUNME.sh on a cloud box now hands help to the binary, which prints the verbs and exits 0, in place of the editor note and exit 1. The cloud rule matches cloudVariables in src/quack/command.go, so a cloud variable at false, 0 or empty still reads as a desk and keeps the editor road. The check module size test now takes its golden through embed, since its os import broke the import rule and held the check red for every child.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches RUNME.sh and src/quack/runme_test.go, plus two sibling test files whose faults held the check red: an os import in src/modules/check and a gofmt alignment in src/branches. Cloud rule 11 asks for those fixes whoever made the fault.
+The test runs the real script with a fake install and a fake binary in a temporary root, so no real install, index or editor runs.
+A comment above cloud_box names the approach and links the ticket.
+The cloud rule points at cloudVariables in src/quack/command.go and follows it, and no other place repeats it.
 
 # accept
 

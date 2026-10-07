@@ -61,6 +61,8 @@ type Doors struct {
 	Guidance func() (map[string][]string, error)
 	// The failure nodes each refusal raises through. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
 	Failures failure.Registry
+	// The door every GitHub and routine request goes through. Nil sends nothing. [[spec/tickets/branch-done-opens-the-pr]]
+	Send Send
 }
 
 // Prints what git said on red, as a loud git run does, and answers whether it ran green. [[spec/design_output/doors#a-door-standing-on-another]]

@@ -7,6 +7,7 @@ import {
   binaryOf,
   callsIndexTool,
   isIndexTool,
+  RUNNING,
   registersIndexTools,
   windowsOf,
 } from "../lib/index-tools.js";
@@ -21,7 +22,6 @@ let cli = [binaryOf(".", false), "verb", `./${SCRIPTS}`];
 // The verb and the flag `PullArgvOf` in src/pull/pull.go reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-const RUNNING = 600000;
 const BACKGROUND =
   "The hand works in the background. Take the next item, and pull again once it answers.";
 

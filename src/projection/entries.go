@@ -22,7 +22,7 @@ type Entry struct {
 func EntriesIn(text string) []Entry {
 	out := []Entry{}
 	for _, one := range listOf(dig(parsed(text), "projections")) {
-		if said := asObject(one); said != nil && truthy(said.Get("target")) {
+		if said := asObject(one); said != nil && holdsTrue(said.Get("target")) {
 			out = append(out, Entry{raw: said})
 		}
 	}
@@ -45,7 +45,7 @@ func (one Entry) folder() string { return folderOf(joinString(one.raw.Get("targe
 func (one Entry) reads() []string {
 	out := []string{}
 	for _, key := range []string{"from", "schema"} {
-		if said := one.raw.Get(key); truthy(said) {
+		if said := one.raw.Get(key); holdsTrue(said) {
 			out = append(out, jsString(said))
 		}
 	}
@@ -68,7 +68,7 @@ func ownerOf(entries []Entry, path string) int {
 		if writesIt(entries[i], said) {
 			named = append(named, i)
 		}
-		if !truthy(entries[i].raw.Get("writes")) {
+		if !holdsTrue(entries[i].raw.Get("writes")) {
 			free = append(free, i)
 		}
 	}
@@ -120,7 +120,7 @@ func globsOf(said any) []string {
 	}
 	out := []string{}
 	for _, one := range items {
-		if truthy(one) {
+		if holdsTrue(one) {
 			out = append(out, jsString(one))
 		}
 	}

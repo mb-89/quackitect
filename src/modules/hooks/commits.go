@@ -39,18 +39,20 @@ func (d *Door) commitGuards(line, root string, settings Settings, tree disk) str
 // The findings the voice refuses over the message a commit carries, read off the command or the file it names. A door with no Voice reads none. [[spec/tickets/cage-commit-guards-port]]
 func (d *Door) commitVoice(line, root string, tree disk) []command.Row {
 	said, ok := command.CommitIn(line)
-	if !ok || d.from.Voice == nil {
+	if !ok {
 		return nil
 	}
 	message := said.Text
 	if said.Form == command.FormFile {
 		message = tree.text(said.File)
 	}
+	// The model read needs no Vale, so it runs ahead of the voice. [[spec/tickets/model-trailer-refuses-in-place]]
+	rows := command.ModelTrailers(message)
 	text := command.WithoutTrailers(message)
-	if strings.TrimSpace(text) == "" {
-		return nil
+	if d.from.Voice == nil || strings.TrimSpace(text) == "" {
+		return rows
 	}
-	return command.RefusesIn(d.from.Voice(root, text))
+	return append(rows, command.RefusesIn(d.from.Voice(root, text))...)
 }
 
 // A commit's delta carries no private shape, no name the box answers, and no text out of a raw note. [[spec/design_output/private#both-doors-one-check]]

@@ -251,7 +251,7 @@ func manages(as q.Writer, open doors) index.Manage {
 			stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: func() { split.Stop(); stop() }, Bus: split.Bus, Away: split.Away, Settle: split.Settle, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		return index.Managed{Stop: func() { split.Stop(); stop() }, Bus: split.Bus, Away: split.Away, Settle: split.Settle, Accepts: acceptsVerb, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil

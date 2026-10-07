@@ -17,9 +17,6 @@ export const DRAFT = "draft";
 // The one mark a hand reads before it takes the next thing. [[spec/design_output/work#the-mark-and-what-waits]]
 export const URGENT = "urgent";
 
-// [[spec/design_output/work#a-stale-group-is-yours]]
-export const STALE = "12h";
-
 const SPAN = /^(\d+)\s*([mhd])$/;
 const SPANS = { m: 60, h: 3600, d: 86400 };
 

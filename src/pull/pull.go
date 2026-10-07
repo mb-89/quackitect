@@ -231,8 +231,9 @@ func (it *It) Pull(argv []string) int {
 		return it.takeBack(who, name, said.reason)
 	}
 	// A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-road-stands-first]]
-	working := it.workingTodo()
-	todo := working
+	// A helper's --as binds to the ticket the plan names, which holds no plain pull. [[spec/tickets/helpers-keep-the-plan-ticket]]
+	working := it.planWorking()
+	todo := it.workingTodo()
 	if held != nil || said.said != "" {
 		todo = ""
 	}
@@ -280,6 +281,14 @@ func (it *It) Pull(argv []string) int {
 	if !it.fetched(branch) {
 		return 1
 	}
+	// A desk on trunk fast-forwards main in fetched, so the cold check reads a work branch alone. [[spec/tickets/running-work-takes-main-fixes]]
+	if !onTrunk {
+		if cold := it.coldMoved(); len(cold) > 0 {
+			it.Refuse(failure.Raise(it.Failures, "pull-cold-path-moved", fmt.Sprintf("main moves the cold path past %s: %s.", branch, strings.Join(cold, ", ")),
+				fmt.Sprintf("Run ./RUNME.sh branch sync, then %s again.", CallOf("ticket", "pull"))))
+			return 1
+		}
+	}
 	if group != "" && GroupClosed(it.Disk, group) {
 		it.Say(Done, fmt.Sprintf("%s stands closed, so work/%s takes no more work.", group, group),
 			fmt.Sprintf("Call %s, then %s from %s.", CallOf("branch", "done"), CallOf("ticket", "pull"), Trunk))
@@ -312,6 +321,25 @@ func (it *It) fetched(branch string) bool {
 	it.Refuse(failure.Raise(it.Failures, "pull-origin-diverges", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
 		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch)))
 	return false
+}
+
+// The cold path files origin/main moves past HEAD, which a running box takes in through a sync before it works on. [[spec/tickets/running-work-takes-main-fixes]]
+func (it *It) coldMoved() []string {
+	_ = it.Git.Fetch(Trunk)
+	main := "origin/" + Trunk
+	base, ok := it.Git.MergeBase("HEAD", main)
+	if !ok {
+		return nil
+	}
+	moved, _ := it.Git.Diff(base, main)
+	var paths []string
+	for _, one := range moved {
+		paths = append(paths, one.Path)
+		if one.From != "" {
+			paths = append(paths, one.From)
+		}
+	}
+	return ColdIn(paths)
 }
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -395,7 +423,7 @@ func (it *It) takeBack(who *Who, name, path string) int {
 	}
 	var wrote *yaml.Doc
 	for _, entry := range entriesOf(one.Front) {
-		if yaml.AsString(entry.Get("step")) == path && !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if yaml.AsString(entry.Get("step")) == path && !yaml.Truthy(entry.Get("skipped")) {
 			wrote = entry
 		}
 	}

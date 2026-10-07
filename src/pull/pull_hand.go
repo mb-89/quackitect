@@ -517,7 +517,7 @@ func excludes(front *yaml.Doc, leaf *Leaf, hand string) string {
 	}
 	wrote := false
 	for _, entry := range entriesOf(front) {
-		if paths[round.ReplaceAllString(yaml.AsString(entry.Get("step")), "")] && !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if paths[round.ReplaceAllString(yaml.AsString(entry.Get("step")), "")] && !yaml.Truthy(entry.Get("skipped")) {
 			wrote = true
 			if yaml.AsString(entry.Get("hand")) == RoleOf(hand) {
 				return fmt.Sprintf("waits for a hand other than %s, which wrote %s", hand, named.Path)

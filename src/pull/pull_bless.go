@@ -55,7 +55,7 @@ func blessedEntry(entry *yaml.Doc) bool {
 }
 
 func verdictEntry(entry *yaml.Doc) bool {
-	return !blessedEntry(entry) && !truthy(yaml.AsString(entry.Get("skipped"))) && !truthy(yaml.AsString(entry.Get("returns"))) &&
+	return !blessedEntry(entry) && !yaml.Truthy(entry.Get("skipped")) && !yaml.Truthy(entry.Get("returns")) &&
 		!(yaml.AsString(entry.Get("hash_before")) != "" && yaml.AsString(entry.Get("hash_after")) == "")
 }
 

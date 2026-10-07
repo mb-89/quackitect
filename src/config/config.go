@@ -79,6 +79,11 @@ func Where(root, key string) (any, string, bool) {
 	return out, layer, true
 }
 
+// A key's built-in, the schema's default, read off no other layer, for a reader whose config door answers nothing. [[spec/tickets/stale-span-reads-schema-unset]]
+func Default(root, key string) (any, bool) {
+	return defaultIn(read(root, Schema), key)
+}
+
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
 func Map(root, path, key string) map[string]string {
 	said, found := valueIn(read(root, path), key)
@@ -160,6 +165,21 @@ func ordered(root, path string) q.Ordered {
 		return q.Ordered{}
 	}
 	return out
+}
+
+// The default a schema names for a dotted key, under each segment's properties. [[spec/tickets/the-config-schema-gets-generated]]
+func defaultIn(schema map[string]any, key string) (any, bool) {
+	var here any = schema
+	for _, part := range strings.Split(key, ".") {
+		step, _ := here.(map[string]any)
+		properties, _ := step["properties"].(map[string]any)
+		if here = properties[part]; here == nil {
+			return nil, false
+		}
+	}
+	entry, _ := here.(map[string]any)
+	said, ok := entry["default"]
+	return said, ok
 }
 
 func valueIn(said map[string]any, key string) (any, bool) {

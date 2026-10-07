@@ -120,6 +120,27 @@ func TestMintVerb(t *testing.T) {
 			t.Errorf("the session log holds %q, and wants the failure's row", row)
 		}
 	})
+	// [[spec/tickets/verbs-mint-tickets-and-keys]]
+	t.Run("a ticket takes the gain the breaks and the done when as fields", func(t *testing.T) {
+		root := mintTree(t, "")
+		standard, err := os.ReadFile(filepath.Join("..", "..", "spec", "processes", "standard.yaml"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		seedsFile(t, root, "spec/processes/standard.yaml", string(standard))
+		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=standard",
+			"--gain=A box mints with no sed.", "--breaks=Clones carry stray fields.", "--done_when=one passes", "--done_when=two passes")
+		got, _ := readsBack(t, root, "spec/tickets/fresh.md")
+		if code != 0 || !strings.Contains(got, "# Ask\n\nA box mints with no sed.\n\nClones carry stray fields.\n\n- one passes\n- two passes\n") {
+			t.Fatalf("the mint answers %d: %s\nand writes:\n%s", code, said, got)
+		}
+	})
+	t.Run("a ticket naming the Ask and an ask field comes back refused", func(t *testing.T) {
+		root := mintTree(t, "")
+		if code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small", "--Ask=an ask", "--why=a field"); code != exitUsage || !strings.Contains(said, "--Ask") {
+			t.Fatalf("the mint answers %d: %s", code, said)
+		}
+	})
 	t.Run("a ticket on a work branch copies the route and its hash in, and joins the group", func(t *testing.T) {
 		root := mintTree(t, "work/grp")
 		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small", "--Ask=Some ask that says what it wants.")

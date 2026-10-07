@@ -33,7 +33,7 @@ func RedList(text string) []string {
 	}
 	passed := map[string]bool{}
 	for _, item := range yaml.AsList(front.Get("record")) {
-		if one := yaml.AsDoc(item); one != nil && !truthy(one.Get("skipped")) {
+		if one := yaml.AsDoc(item); one != nil && !yaml.Truthy(one.Get("skipped")) {
 			step := yaml.AsString(one.Get("step"))
 			passed[step[strings.LastIndex(step, "/")+1:]] = true
 		}

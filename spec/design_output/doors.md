@@ -108,9 +108,7 @@ driving a door through a fake asserts on something.
 The bridgehead is a door: it sits in the agent's path, and it is the outside
 thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
 and in no `src/doors`, because the client loads a hooks module from that
-folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
-straight into `decide`, so a test drives the server with no client, no wire
-and no port. For details, see
+folder alone. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # The folders, and their cost
@@ -206,6 +204,7 @@ family carries its fate:
 | a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
 | a child ended whole, and a door standing apart from its starter | `src/quack/ending_test.go`, `src/quack/ending_windows_test.go`, `src/index/detach_test.go`, `src/index/detach_windows_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
 | the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
+| a bare RUNME.sh under sh | `src/quack/runme_test.go` | door test of the road's shell entry, over a planted path of real tools |
 
 The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
 

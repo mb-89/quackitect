@@ -62,6 +62,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 		},
 		Runme:    selfRoad(method),
 		Failures: failure.Load(failure.Dir{Root: method}),
+		Send:     httpSend,
 		Queue:    func() int { return branchQueue(v1)([]string{"branch", "list", "--queue"}, false, out, errs) },
 		Value: func(name string, into any) error {
 			base, err := v1()
