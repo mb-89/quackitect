@@ -34,6 +34,22 @@ func TestConfigRowsReadEveryLayer(t *testing.T) {
 	}
 }
 
+func TestConfigRowsReadALocalFileHoldingNoJSONAsEmpty(t *testing.T) {
+	t.Parallel()
+	tracked := []byte(`{"stop": {"enabled": true}, "log": {"level": "info"}}`)
+	rows, err := configRows(tracked, []byte("{ this is no json"), map[string]string{"SE_LOG_LEVEL": "warn"}, map[string]q.Key{})
+	if err != nil {
+		t.Fatalf("the rows answer %v, and want the local file read as empty", err)
+	}
+	want := map[string]configRow{
+		"stop.enabled": {Value: json.RawMessage(`true`), Layer: oldconfig.Tracked},
+		"log.level":    {Value: json.RawMessage(`"warn"`), Layer: "SE_LOG_LEVEL"},
+	}
+	if !reflect.DeepEqual(rows, want) {
+		t.Fatalf("the rows read %v, and want %v", rows, want)
+	}
+}
+
 func TestConfigTextHoldsOneKeyALine(t *testing.T) {
 	t.Parallel()
 	text, err := configText(map[string]configRow{

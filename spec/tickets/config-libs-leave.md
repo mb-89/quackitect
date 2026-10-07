@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["tree-libs-leave"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: c28f6d7555e8edae
         size: 369
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 3f7b91bccec44914d3dc6145de242ca71aed7440
+    hash_after: 3f7b91bccec44914d3dc6145de242ca71aed7440
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: f5412ff3e27f4a4a
+        size: 7883
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -292,26 +305,46 @@ Assumed: the parent last slice takes the session-file case and the count chain c
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/config_libs_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/config_libs_test.go
+- src/quack/config_test.go
+- src/quack/verb_config_test.go
+- src/modules/config/env_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheConfigLibrariesStandNowhere fails on its assertion and names config.js, layer.js and both leaving tests.
+TestAKeyNamesOneVariableHoweverItsLeafIsSpelled fails because q.EnvOf answers SE_STOP_MOSTINAROW and SE_PLAN_EVERYCALLS.
+Its Rows row also fails, since SE_STOP_MOST_IN_A_ROW answers no row for stop.mostInARow today.
+TestEveryShippedKeyNamesAVariableOfItsOwn fails on its assertion and names every shipped camel key.
+TestConfigRowsReadALocalFileHoldingNoJSONAsEmpty fails because configRows answers a parse error.
+Some rows pass now because Go already holds the behavior.
+TestRowsReadEveryLeafOfBothFilesPastTheComment and TestCoercedTypesATextAsTheCatalogSays pass now.
+TestConfigWritesAKeyTheCatalogLeavesOutAsItsText and TestTheShippedConfigCarriesNoTypeFaultAndNoJudge pass now.
+TestInheritsReadsTheWorkRootOverTheMethodRoot passes now, so src/projection stands green.
+One surprise: the config module declares keys like watchdog.lease with no instance.
+The first variable case read off Instance and Local, and wanted SE__WATCHDOG_LEASE.
+The variable case therefore kebabs each dotted segment instead.
+No stub was needed, since every Go owner already exists.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestTheConfigLibrariesStandNowhere decides the git ls-files line, and env_test decides the go test line. The check at tests-green decides the third.
+The tests reach no door. Module rows run in memory, and the quack cases use temp roots and read the tree through Glob and ReadFile.
 
 # gate
 

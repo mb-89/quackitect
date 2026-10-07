@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/q"
 )
 
 // A root holding the tree's wiring, so the catalog declares every key, and the tracked file the case names. [[spec/tickets/config-verbs-port-to-go]]
@@ -76,6 +78,77 @@ func TestConfigNamesAKeyCarryingTheWrongType(t *testing.T) {
 	_, _, errs := configRan(configRoot(t, `{"answer": {"words": "many"}}`))
 	if errs != "answer.words carries a string, and the schema says number, and the code reading it finds nothing.\n" {
 		t.Fatalf("config names %q, and wants the type fault", errs)
+	}
+}
+
+func TestCoercedTypesATextAsTheCatalogSays(t *testing.T) {
+	t.Parallel()
+	for _, row := range []struct{ said, kind, want string }{
+		{"5", "number", `5`},
+		{"5", "string", `"5"`},
+		{"true", "boolean", `true`},
+		{"false", "boolean", `false`},
+		{"haiku", "number", `"haiku"`},
+		{"5", "", `"5"`},
+	} {
+		if got := coerced(row.said, row.kind); got != row.want {
+			t.Errorf("coerced(%q, %q) answers %s, and wants %s", row.said, row.kind, got, row.want)
+		}
+	}
+}
+
+func TestConfigWritesAKeyTheCatalogLeavesOutAsItsText(t *testing.T) {
+	t.Parallel()
+	root := configRoot(t, `{}`)
+	if code, out, _ := configRan(root, "later.key", "4"); code != 0 || out != "later.key is \"4\" in .se/.runtime/config.json.\n" {
+		t.Fatalf("config later.key 4 answers %d and %q, and wants the text quoted", code, out)
+	}
+	wrote, err := os.ReadFile(filepath.Join(root, ".se", ".runtime", "config.json"))
+	if err != nil || string(wrote) != "{\n  \"later\": {\n    \"key\": \"4\"\n  }\n}\n" {
+		t.Fatalf("the local layer reads %q and %v, and wants later.key as the text 4", wrote, err)
+	}
+	if code, out, _ := configRan(root, "later.key"); code != 0 || out != "later.key              4         .se/.runtime/config.json\n" {
+		t.Fatalf("config later.key answers %d and %q, and wants the local row", code, out)
+	}
+}
+
+func TestTheShippedConfigCarriesNoTypeFaultAndNoJudge(t *testing.T) {
+	t.Parallel()
+	faults, err := configFaults(treeRoot)
+	if err != nil || len(faults) > 0 {
+		t.Fatalf("the shipped config names %v and %v, and wants no fault", faults, err)
+	}
+	for _, path := range []string{"spec/config/level0.json", "spec/config/level0.schema.json"} {
+		file := orderedAt(filepath.Join(treeRoot, filepath.FromSlash(path)))
+		if _, ok := memberAt(file, []string{"judge"}); ok {
+			t.Errorf("%s names a judge section, and the engine holds no model call", path)
+		}
+		if _, ok := memberAt(file, []string{"properties", "judge"}); ok {
+			t.Errorf("%s declares a judge key, and the engine holds no model call", path)
+		}
+	}
+}
+
+func TestEveryShippedKeyNamesAVariableOfItsOwn(t *testing.T) {
+	t.Parallel()
+	declared, err := declaredAt(treeRoot)
+	if err != nil || len(declared) == 0 {
+		t.Fatalf("the shipped wiring declares %d keys and answers %v", len(declared), err)
+	}
+	owner := map[string]string{}
+	for dotted := range declared {
+		name := q.EnvOf(dotted)
+		segments := strings.Split(dotted, ".")
+		for i, one := range segments {
+			segments[i] = strings.ReplaceAll(q.Kebab(one), "-", "_")
+		}
+		if want := "SE_" + strings.ToUpper(strings.Join(segments, "_")); name != want {
+			t.Errorf("%s names %s, and wants %s, each segment kebabbed", dotted, name, want)
+		}
+		if other, held := owner[name]; held {
+			t.Errorf("%s and %s both name %s", other, dotted, name)
+		}
+		owner[name] = dotted
 	}
 }
 

@@ -266,6 +266,28 @@ func TestNumbersPrintAsJavaScriptPrintsThem(t *testing.T) {
 	}
 }
 
+func TestInheritsReadsTheWorkRootOverTheMethodRoot(t *testing.T) {
+	method := Texts{"g/voice.md": "the method says", "g/working.md": "stands", "f/x/deep.md": "under"}
+	work := Texts{"g/voice.md": "the work says", "g/house.md": "joins", "f/x": "a file"}
+	tree := Inherits(method, work)
+	for path, want := range map[string]bool{"g/working.md": true, "g/house.md": true, "g/nowhere.md": false} {
+		if tree.Exists(path) != want {
+			t.Errorf("%s exists %v, and wants %v", path, !want, want)
+		}
+	}
+	for path, want := range map[string]string{"g/voice.md": "the work says", "g/working.md": "stands", "g/house.md": "joins"} {
+		if got := tree.Read(path); got != want {
+			t.Errorf("%s reads %q, and wants %q", path, got, want)
+		}
+	}
+	if got := tree.List("f"); len(got) != 1 || got[0] != (Listed{Name: "x"}) {
+		t.Errorf("f lists %v, and wants the work root's file x alone", got)
+	}
+	if got := tree.List("nowhere"); len(got) != 0 {
+		t.Errorf("a folder neither root holds lists %v", got)
+	}
+}
+
 func TestInheritsJoinsAJSONFileKeyByKey(t *testing.T) {
 	method := Texts{"a.json": `{"x": {"p": 1, "q": 2}, "y": 1}`, "b.md": "method", "f/one.md": "1"}
 	work := Texts{"a.json": `{"x": {"q": 3}}`, "b.md": "work", "f/two.md": "2"}
