@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,15 @@ record:
     hand: box eabbd46a6a23 · claude-code-remote
     hash_before: fc41c9687cbed3390f0ec36a85e08b7f472b7a69
     session: cse_01TMpYhceevNqNNEKTryYJRo
+  - step: sync
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 045621def3c6ce7230fb93daa5e24d302572f8f3
+    hash_after: 045621def3c6ce7230fb93daa5e24d302572f8f3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/level-zero-becomes-a-typed-mod already carries every commit on main.
+    def: 8a9850a81227554b
 cloud: true
 ---
 
@@ -120,8 +129,9 @@ goal: Level zero stands as a standard, typed Claude Code mod, tested with the te
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
