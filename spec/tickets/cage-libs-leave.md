@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 164fad3bbb8e7d407c130a33be4029a77c9a36a4
+    hash_after: 164fad3bbb8e7d407c130a33be4029a77c9a36a4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   89.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 565ee4c834c9a880
+        size: 1177
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -387,26 +410,33 @@ every fact the change adds stands in one place: CloudVariables and InCloud in co
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/cage_libs_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The thirteen cage libraries under the level0 plugin lib folder leave, with trunk.test.js and markers.test.js. Each cage rule now lives in Go alone under src/modules/hooks/command, so a rule changes in one language. The cloud read moves into command/cloud.go, and quack calls it in place of its own copy. The describe module hands its line verbs out through one exported function, so the quack test reads them through the interface. The Go tests gain the rows the deleted JavaScript tests held: trunk, version guard, desk guard, markers and merge refusal. cloud-desk.test.js keeps its two folder cases under the name ticket-folders.test.js. The notes and Go headers name each Go owner in place of the leaving file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the tests-green leaf adds no edit past the landed change, whose files stand in the size list plus the pull_landed_test.go header gate point 2 adds
+every door the change reaches has a fake: the green tests run over a map for the environment, pure lists and a disk glob, and reach no door
+a comment names the approach the change implements: each changed Go line carries a pointer at the cloud guidance, the bash note or the work note
+every fact the change adds stands in one place: one cloud read in command/cloud.go, one line verb list in describe.go, and the notes point at each Go owner
 
 # accept
 
