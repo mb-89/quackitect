@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -130,6 +130,15 @@ record:
     hand: box dcf1ea3c64fd · claude-code-remote
     hash_before: b5287724e9522e961800fc2616bd9cc5e6ff58a5
     session: cse_01JQCqCqANP4YpSAFbbhiD1M
+  - step: split
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: bf6d8af517ae4b63bc6516a99b61f638980a72d5
+    hash_after: bf6d8af517ae4b63bc6516a99b61f638980a72d5
+    inputs:
+      - name: ask
+        hash: 94aff2f3cc1fa455
+        size: 623
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -159,25 +168,54 @@ Done when the guard refuses, not reports, every walk-around, the walk-around lis
 <!-- the form is list -->
 
 [[spec/tickets/a-guard-reads-door-declarations]] standard, closed
+[[spec/tickets/a-live-branch-holds-its-dependents]] standard, closed
+[[spec/tickets/clock-test-asserts-q-clock]] trivial, closed
+[[spec/tickets/contract-beside-files-key]] trivial, closed
+[[spec/tickets/contract-names-its-door]] trivial, closed
+[[spec/tickets/door-families-name-contracts-alone]] trivial, closed
 [[spec/tickets/door-lists-take-whole-packages]] trivial, closed
+[[spec/tickets/door-tables-name-standing-doors]] trivial, closed
+[[spec/tickets/doorless-walk-names-no-door]] trivial, closed
+[[spec/tickets/doors-lists-contract-tests]] trivial, closed
+[[spec/tickets/doors-lists-declared-outsides]] trivial, closed
 [[spec/tickets/doors-only-reads-the-declarations]] trivial, closed
+[[spec/tickets/doorsonly-leaves-every-note]] trivial, closed
 [[spec/tickets/draft-lists-match-red-tests]] trivial, closed
+[[spec/tickets/extension-loads-doors-async]] trivial, closed
+[[spec/tickets/extension-root-is-activate]] trivial, closed
+[[spec/tickets/fake-vscode-names-its-door]] trivial, closed
+[[spec/tickets/family-rows-name-standing-files]] trivial, closed
+[[spec/tickets/go-rows-name-declared-contracts]] trivial, closed
+[[spec/tickets/go-tests-meet-the-doors]] standard, closed
+[[spec/tickets/go-waits-on-events]] standard, closed
+[[spec/tickets/javascript-reaches-through-doors]] standard, closed
 [[spec/tickets/owns-joins-the-pure-tree]] trivial, closed
-[[spec/tickets/go-waits-on-events]] standard
-[[spec/tickets/quack-waits-on-the-clock]] standard
-[[spec/tickets/quack-reaches-the-box-through-doors]] standard
-[[spec/tickets/javascript-reaches-through-doors]] standard
-[[spec/tickets/go-tests-meet-the-doors]] standard
-[[spec/tickets/the-guard-refuses]] standard
+[[spec/tickets/page-owns-math-random]] trivial, closed
+[[spec/tickets/quack-boxfiles-joins-door]] trivial, closed
+[[spec/tickets/quack-door-keeps-contract]] trivial, closed
+[[spec/tickets/quack-marks-name-reasons]] trivial, closed
+[[spec/tickets/quack-reaches-the-box-through-doors]] standard, closed
+[[spec/tickets/quack-row-names-its-contracts]] trivial, closed
+[[spec/tickets/quack-size-names-files]] trivial, closed
+[[spec/tickets/quack-waits-on-the-clock]] standard, closed
+[[spec/tickets/skill-scripts-meet-the-guard]] trivial, closed
+[[spec/tickets/test-walks-move-onto-fakes]] standard, closed
+[[spec/tickets/tests-list-misses-callers]] trivial, closed
+[[spec/tickets/tests-reach-the-fake-clock]] trivial, closed
+[[spec/tickets/the-guard-refuses]] standard, closed
+[[spec/tickets/watchertest-helper-meets-its-door]] trivial, closed
+[[spec/tickets/watchertest-waits-through-clock]] trivial, closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-each open child takes one slice of the walk-around list `./RUNME.sh doors` prints, by language, by production or test, and by root or not, so a review reads one slice whole
-the five slices cover every walk-around the list holds, and `the-guard-refuses` takes the refusal, the retirement of `DoorsOnly` and the guidance, which closes the goal
-`go-tests-meet-the-doors` names `tests-meet-the-doors-once` under depends_on, since that group moves the tests onto fakes, and `the-guard-refuses` names the five slices
+every child closed at a size one review reads whole, the largest the-guard-refuses at one commit of declarations and one of the guard
+the children add up to the goal: the guard refuses every walk, the list stands empty, and the doors note, the model note and the code and testing guidance carry the rule, so nothing of the goal stands outside them
+no child waits on another now, since every child stands closed
+the five children the gate of the-guard-refuses minted landed before its implement step, which read them, and the rest landed in their pull order
+the group mints no further child, so its diff stops here, and the retro reads it as one review
 
 # children
 
