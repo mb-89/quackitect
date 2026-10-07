@@ -107,6 +107,10 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: 19b6849b1f151cd5
+  - step: children
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 2b55f3452f9c85794ab53ace94bb4d949edfddae
+    session: cse_019ptR8yR5LL6i15jhgQ32Ag
 ---
 
 # Ask
