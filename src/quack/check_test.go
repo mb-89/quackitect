@@ -91,7 +91,7 @@ func partNamed(parts []part, name string) part {
 
 func TestCheckParts(t *testing.T) {
 	t.Parallel()
-	t.Run("the battery holds its eight parts", func(t *testing.T) {
+	t.Run("the battery holds its parts, in order", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
 		names := []string{}
