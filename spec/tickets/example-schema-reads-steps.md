@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -159,6 +159,15 @@ record:
         hash: 8ad2d654834a376c
         size: 691
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 0639c0ee399ef31a6aa3c371c0fafa1c882f547f
+    hash_after: 0639c0ee399ef31a6aa3c371c0fafa1c882f547f
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -316,14 +325,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the two red test files the tests-red step names and one imports case
+- the parser is pure and the check hook reads texts alone, so the change reaches no door
+- each new function points at its section of spec/design_output/examples
+- the expect forms stand once, in the forms map of src/example, and the check reads the parser for them
 
 ## tests-green
 

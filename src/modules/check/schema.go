@@ -61,7 +61,7 @@ func isNoteSchema(said *yaml.Doc) bool {
 		return false
 	}
 	body := yaml.AsDoc(said.Get("body"))
-	return body != nil && len(yaml.AsList(body.Get("sections"))) > 0
+	return body != nil && (len(yaml.AsList(body.Get("sections"))) > 0 || yaml.AsString(body.Get("x-steps")) != "")
 }
 
 // [[spec/design_output/schema#the-schemas-read-once]]
@@ -115,8 +115,13 @@ func checkNoteIn(tree *Tree, text string, schema *yaml.Doc, where string) []Find
 func checkNote(text string, schema *yaml.Doc, where string) []Finding {
 	note := readNote(text)
 	kind := yaml.AsString(schema.Get("kind"))
-	out := frontFaults(note, yaml.AsDoc(schema.Get("frontmatter")), kind, where)
-	return append(out, bodyFaults(note, yaml.AsDoc(schema.Get("body")), kind, where)...)
+	front, body := yaml.AsDoc(schema.Get("frontmatter")), yaml.AsDoc(schema.Get("body"))
+	out := frontFaults(note, front, kind, where)
+	if note.Front.Stands {
+		out = append(out, edgeFaults(note, yaml.AsDoc(front.Get("properties")), kind, where)...)
+	}
+	out = append(out, bodyFaults(note, body, kind, where)...)
+	return append(out, stepFaults(text, body, where)...)
 }
 
 func frontFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {

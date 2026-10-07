@@ -18,7 +18,7 @@ const planted = "---\nkind: [[example]]\ntitle: A pull hands out the next leaf\n
 
 const userPath = "spec/examples/110_tickets/pull.md"
 
-// An example whose one block holds the line named, at line 11, under a call at line 10 where the line is no call. [[spec/design_output/examples#the-format]]
+// An example whose one block holds the line named, at line 12, under a call at line 11 where the line is no call. [[spec/design_output/examples#the-format]]
 func holding(line string) string {
 	return "---\nkind: [[example]]\ntitle: A thing\nkeywords: [thing]\ninterface: [check]\n---\n\nThe check runs.\n\n```sh\n./RUNME.sh check\n" + line + "\n```\n"
 }
@@ -69,7 +69,7 @@ func TestALinePastRunmeRefuses(t *testing.T) {
 		"./RUNME.sh ticket pull `cat name`",
 		"# a comment no expect line opens",
 	} {
-		t.Run(line, func(t *testing.T) { faultsAt(t, holding(line), 11, "Call") })
+		t.Run(line, func(t *testing.T) { faultsAt(t, holding(line), 12, "Call") })
 	}
 }
 
@@ -91,14 +91,14 @@ func TestAnExpectFormOutsideTheTableRefuses(t *testing.T) {
 		"# expect: stands",
 		"# expect: field one state",
 	} {
-		t.Run(line, func(t *testing.T) { faultsAt(t, holding(line), 11, "Expect") })
+		t.Run(line, func(t *testing.T) { faultsAt(t, holding(line), 12, "Expect") })
 	}
 }
 
 func TestAnExpectBeforeAnyCallRefuses(t *testing.T) {
 	t.Parallel()
 	text := strings.Replace(holding("# expect: exit 0"), "./RUNME.sh check\n# expect: exit 0", "# expect: exit 0\n./RUNME.sh check", 1)
-	faultsAt(t, text, 10, "Expect")
+	faultsAt(t, text, 11, "Expect")
 }
 
 func TestTheChapterNamesADeveloperCase(t *testing.T) {

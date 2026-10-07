@@ -164,6 +164,14 @@ func TestAModuleImportsTheFrontWriter(t *testing.T) {
 	}
 }
 
+// The example parser the check, the harness and the tab share passes, as the note reader does. [[spec/design_output/examples#one-runner-two-drivers]]
+func TestAModuleImportsTheExampleParser(t *testing.T) {
+	t.Parallel()
+	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/example"}); len(said) != 0 {
+		t.Fatalf("src/example reads as past q: %v", said)
+	}
+}
+
 func TestEveryPureReaderImportsThePureLibraryAlone(t *testing.T) {
 	t.Parallel()
 	for _, path := range pureTree {
