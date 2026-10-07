@@ -44,6 +44,13 @@ func TestShownNamesHoldsEveryNameAnExampleShows(t *testing.T) {
 	}
 }
 
+// The coverage rules stand in report mode, and a tree rule outside it still refuses. [[spec/design_output/examples#the-checks]]
+func TestTheCoverageRulesStandInReportMode(t *testing.T) {
+	if !Reports(coversRule) || !Reports(provesRule) || Reports("EveryNamedPathStands") {
+		t.Fatal("report mode holds the two coverage rules alone")
+	}
+}
+
 func TestAVerbNoExampleNamesTakesAWarning(t *testing.T) {
 	t.Parallel()
 	got := warned(t, ExampleCovers(coveredTree(nil)), "ExampleCovers")

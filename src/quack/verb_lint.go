@@ -118,7 +118,7 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 		})
 		refused := 0
 		for _, one := range found {
-			if strict || one.Severity != check.SeverityWarning {
+			if refuses(one, strict) {
 				refused++
 			}
 		}
@@ -220,11 +220,16 @@ func lintSays(d lintDoors, errs io.Writer, row map[string]any) {
 	}
 }
 
+// Whether the lint refuses a finding: any past a warning, and a warning under strict, where its rule stands outside report mode. [[spec/design_output/examples#the-checks]]
+func refuses(one check.Finding, strict bool) bool {
+	return !check.Reports(one.Rule) && (strict || one.Severity != check.SeverityWarning)
+}
+
 // A finding the lint refuses leaves as its line under erred, so --errors names it, and a warning it lets pass stands by its file and source. [[spec/tickets/lint-strict-leaves-erred]]
 func lintFoundOf(found []check.Finding, strict bool) lintFound {
 	out := lintFound{Stood: []finding{}, Erred: []string{}}
 	for _, one := range found {
-		if strict || one.Severity != check.SeverityWarning {
+		if refuses(one, strict) {
 			out.Erred = append(out.Erred, lintLine(one))
 		} else {
 			out.Stood = append(out.Stood, finding{File: one.File, Source: one.Source})

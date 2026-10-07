@@ -16,7 +16,7 @@ const (
 	onHanded  = "handed"
 )
 
-// The `from:` line under `# Ask` that sends a ticket through a leaf gated `when: handed`, as `askLine` in src/scripts/pull-when.js reads it. [[spec/design_output/pull#a-condition-skips-a-leaf]]
+// The `from:` line under `# Ask` that sends a ticket through a leaf gated `when: handed`. [[spec/design_output/pull#a-condition-skips-a-leaf]]
 var fromHandover = regexp.MustCompile(`(?im)^from:[ \t]*handover[ \t]*$`)
 
 // An open group holds no child at a step a person takes, so a cloud box works the group to its merge and waits on nobody. [[spec/design_output/work#a-person-step-leaves]]

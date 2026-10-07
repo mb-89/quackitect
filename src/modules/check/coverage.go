@@ -6,11 +6,18 @@ package check
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"quackitect/src/example"
 	"quackitect/src/yaml"
 )
+
+// The rules in report mode: the lint lists them and refuses none, strict or not, until the tree meets them. Turning one to refuse drops it here. [[spec/design_output/examples#the-checks]]
+var reportRules = []string{coversRule, provesRule}
+
+// Whether the lint reports a rule's findings and refuses none. [[spec/design_output/examples#the-checks]]
+func Reports(rule string) bool { return slices.Contains(reportRules, rule) }
 
 const (
 	coversRule   = "ExampleCovers"
