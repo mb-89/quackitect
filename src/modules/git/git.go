@@ -428,15 +428,11 @@ func Start(from Git, every func(time.Duration, func(time.Time)) func(), commit f
 		if err != nil {
 			tracked = []string{}
 		}
-		moved := map[string]any{}
+		// Each port commits alone, and stands sent once its commit lands, so a port past the bus cap leaves the others landing and retries on the next span. [[spec/tickets/sweep-reads-tracked-after-restart]]
 		for port, value := range map[string]any{Port: tips, TrunkPort: trunk, StoodPort: stood, TrackedPort: tracked} {
-			if key, _ := json.Marshal(value); string(key) != last[port] {
+			if key, _ := json.Marshal(value); string(key) != last[port] && commit(map[string]any{port: value}) == nil {
 				last[port] = string(key)
-				moved[port] = value
 			}
-		}
-		if len(moved) > 0 {
-			_ = commit(moved)
 		}
 	}
 	send()
