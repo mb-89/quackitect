@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -260,6 +260,15 @@ record:
         hash: 58fd51bc5be6f489
         size: 22757
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 7a883cb4c3cc57e45f904b7efc9bcfe49640e7ab
+    hash_after: 7a883cb4c3cc57e45f904b7efc9bcfe49640e7ab
+    answered:
+      - name: lint
+        exit: 0
+        said: "   64.3  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -551,14 +560,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test files, their fakes and helpers, the owns declarations and the doors note, each of which the ask names or a gate point asks for.
+every door the change reaches has a fake or stands as its own contract test, and the owns guard and the audit guard hold both.
+the moved cases and helpers carry a comment linking spec/tickets/test-walks-move-onto-fakes, which names the approach.
+each contract file stands once in its owns.yaml, and the doors note names those files with no second list of its own.
 
 ## tests-green
 
