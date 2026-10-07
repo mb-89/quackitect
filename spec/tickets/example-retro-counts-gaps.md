@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -151,6 +151,21 @@ record:
         hash: 1640edfeb6551072
         size: 2138
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: d607b8a661cee250b369fdb1a59a8388af6586db
+    hash_after: d607b8a661cee250b369fdb1a59a8388af6586db
+    inputs:
+      - name: design/draft
+        hash: c8a973ba05eb98d0
+        size: 2899
+      - name: design/tests-red
+        hash: 9bab56971075495f
+        size: 866
+      - name: [[spec/guidance/code/tests]]
+        hash: 1640edfeb6551072
+        size: 2138
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -295,8 +310,10 @@ Both cases fail on their own assertion: the stub verb answers 0 and says nothing
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- example-retro-gaps-shown-name: the draft renames shownNames to Shown, but src/modules/check/export.go already exports the constant Shown (= shown, from lsp-rules-move-to-check), so the rename breaks the build; implement exports it under another name, such as ShownNames, and fixes the name in the approach
 
 # implement
 
