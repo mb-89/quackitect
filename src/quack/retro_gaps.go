@@ -1,4 +1,4 @@
-// The retro's two counts on examples: each verb no example shows, and each
+// The retro's counts on examples: each verb no example shows, and each
 // test standing beside a verb an example shows, for the audit to read.
 // [[spec/guidance/retro/audit]]
 package main

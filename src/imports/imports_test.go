@@ -231,6 +231,12 @@ func TestAWindowImportPastItsRowIsNamed(t *testing.T) {
 	if said := WindowFaults("quackitect/src/tui/unnamed", []string{"quackitect/src/tui/frame"}); len(said) != 0 {
 		t.Fatalf("a package the table leaves out reads %v", said)
 	}
+	if said := WindowFaults("quackitect/src/tui", []string{"quackitect/src/tui/tutorial"}); len(said) != 0 {
+		t.Fatalf("the root importing the tutorial tab reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui/tutorial", []string{"quackitect/src/tui/registry", "quackitect/src/tui/tree"}); len(said) != 1 || !strings.Contains(said[0], "src/tui/tree") {
+		t.Fatalf("the tutorial tab importing tree reads %v", said)
+	}
 }
 
 // A module the index reaches below its own imports is named. [[spec/tickets/tickets-becomes-a-module]]

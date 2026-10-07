@@ -38,8 +38,9 @@ var window = map[string][]string{
 	"frame":    {"draw", "tree"},
 	"log":      {"frame", "tree", "draw", "registry"},
 	"work":     {"frame", "tree", "draw", "registry"},
+	"tutorial": {"frame", "draw", "registry"},
 	"registry": {"frame", "draw"},
-	".":        {"frame", "log", "work", "registry", "draw"},
+	".":        {"frame", "log", "work", "tutorial", "registry", "draw"},
 }
 
 // The package the index stands in, whose every import below it holds no module. [[spec/tickets/tickets-becomes-a-module]]
