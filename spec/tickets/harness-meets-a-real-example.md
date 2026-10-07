@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: examples-run-as-tests
 parent: example-harness-runs-on-fakes
+record:
+  - step: do
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: c2fe5c23b140dec86ce8f0609e1d9c2062f16973
+    hash_after: 5eb304c8aea4fd27abdc29267a574f9e1bf18dac
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "   68.7  in all"
+    inputs:
+      - name: ask
+        hash: 173f7e3cbc01348b
+        size: 233
+    def: 6a9703180e521855
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ spec/examples stands absent, so TestEveryExampleHoldsItsSteps runs no subtest an
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+spec/examples/110_tickets/pull.md is the first example, so TestEveryExampleHoldsItsSteps runs a subtest for it in place of passing empty. The harness cases read that file in place of a planted constant, and the planted pull case gives way to the per-example run, so the example stands once. The run asserts its steps once the parent builds the harness, since src/quack/examples_test.go stands on that ticket red list.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the first example lands with the group
+- the cleanup the change reveals: the planted twin of the example leaves the test file
+- every fact stands once: the example text stands in its file alone, and the cases read it there
 
 # Discussion
 
