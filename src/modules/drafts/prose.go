@@ -1,5 +1,4 @@
-// The prose check, off readsDraft in src/bridge/prose.js and proseFaults in
-// src/bridge/write.js, and the wording both checks answer in, off
+// The prose check, and the wording both checks answer in, off
 // answerFindings in lib/refuse.js.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
@@ -72,7 +71,7 @@ func (from Outside) proseFaults(text, where string) []prose.Refused {
 	return withContext(text, linted.Found)
 }
 
-// Each row the rules keep, with its trimmed line as context, off withContext in src/bridge/prose.js. [[spec/tickets/prose-tools-answer-in-go]]
+// Each row the rules keep, with its trimmed line as context. [[spec/tickets/prose-tools-answer-in-go]]
 func withContext(text string, found []Finding) []prose.Refused {
 	lines := strings.Split(text, "\n")
 	out := make([]prose.Refused, 0, len(found))

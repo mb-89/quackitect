@@ -1,6 +1,5 @@
-// The close over a fake clone, as test/level0/work.test.js drives it through
-// fake doors: a branch inside trunk goes, one outside it stays, and a trunk
-// ahead of origin holds every branch.
+// The close over a fake clone through fake doors: a branch inside trunk goes,
+// one outside it stays, and a trunk ahead of origin holds every branch.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it runs close through the unexported tree fixture and the pa helpers, and reads the exit codes
 

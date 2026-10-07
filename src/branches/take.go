@@ -1,6 +1,5 @@
 // The take and the open: a group reaches the cloud as a branch of its own, and
-// a cloud box takes the next free one and writes its claim on the group, as
-// openGroup, take and claimGroup in src/scripts/work.js answer them.
+// a cloud box takes the next free one and writes its claim on the group.
 // [[spec/design_output/work#the-take-writes-the-record]]
 package branches
 

@@ -1,5 +1,5 @@
-// The listing, ported off test/level0/work-list.test.js: open work alone by
-// default, everything under --all, and a group row behind main keeps its mark.
+// The listing: open work alone by default, everything under --all, and a
+// group row behind main keeps its mark.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it runs list through the pd helpers and reads the unexported trunk and closedState
 

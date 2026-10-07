@@ -54,15 +54,12 @@ The fronts below ask for a reading, and each reaches one rule set:
 own rules, and the tools beside them. A box whose quack answers no sweep names
 the fault in the lint, because the tree has no second road.
 
-`test/contract/one-reading.test.js` holds the fronts against each other over
-one file.
-
 ## The lint ends on findings
 
 `./RUNME.sh lint` prints the count a rule first, then the sum, then the
 finding lines. A long run scrolls its head away, and the eye lands on the
 last lines. So the lines a hand fixes stand last. `lintRows` in
-`src/scripts/cli-read.js` owns the order, and the warning note stands between
+`src/quack/verb_lint.go` owns the order, and the warning note stands between
 the count and the findings.
 
 # The server reads the index
@@ -320,8 +317,8 @@ and `sweepRowsOf` in `src/scripts/quack-topic.js` reads it for the lint:
 | a file | the rows on that file |
 | a folder | the rows under that folder |
 
-`readingFor` in `src/scripts/cli-read.js` lays the tools' rows `findingsOver`
-draws beside them. The survey stands on the box alone, so the lint reads `SurveyFindsNode` off the
+`lintReading` in `src/quack/verb_lint.go` lays the tools' rows beside the
+sweep's rows. The survey stands on the box alone, so the lint reads `SurveyFindsNode` off the
 box. The sweep reads the tracked files, and leaves that rule out.
 
 # A closed ticket is history
@@ -346,8 +343,8 @@ carries.
 `index_here` and `front_here` in `src/scripts/install.sh` ask
 `src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
 its source. The hash reads the binary's folder, every tree package it imports
-and the root `go.mod` and `go.sum`, through `sourceHash` in
-`src/scripts/tui-build.js`. A test file moves nothing. The build writes the
+and the root `go.mod` and `go.sum`, through `tuiSourceText` in
+`src/quack/tui_verb.go`. A test file moves nothing. The build writes the
 stamp.
 
 # The client starts it again

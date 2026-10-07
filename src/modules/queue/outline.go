@@ -1,4 +1,4 @@
-// The queue as an outline, ported from src/scripts/pull-outline.js. A row at
+// The queue as an outline. A row at
 // the left takes one number, a ticket under it a sub-number, and a person's row
 // a negative number that sorts first.
 // [[spec/tickets/the-queue-moves-to-plan]]

@@ -1,6 +1,5 @@
-// The ticket verb's bless and bless --desk in Go, over the roads
-// test/level0/pull-bless.test.js and test/level0/bless-desk.test.js drive
-// through the ticket verb: who blesses where, and the desk's own word.
+// The ticket verb's bless and bless --desk in Go, through the ticket verb:
+// who blesses where, and the desk's own word.
 // [[spec/design_output/pull#the-bless]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

@@ -18,7 +18,7 @@ import (
 // The hold files, which .claude/skills/level0/lib/folders.js owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
 const Glob = ".se/.runtime/hold/*.json"
 
-// The bless file, which BLESS_FILE in src/scripts/pull-bless.js owns and a module spells again, and the name its word answers at. [[spec/design_output/pull#the-bless]]
+// The bless file, which BlessFile in src/pull/pull_bless.go owns and a module spells again, and the name its word answers at. [[spec/design_output/pull#the-bless]]
 const (
 	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/pull#the-bless]]
 	Bless     = ".se/.runtime/bless.json"

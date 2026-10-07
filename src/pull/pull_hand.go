@@ -1,6 +1,6 @@
 // Which tickets stand, which of them a hand takes, and who takes which leaf:
 // the offer, the hold, and the rules a hand meets on its way to one, off
-// src/scripts/pull-hand.js and writesHere in lib/ticket.js.
+// writesHere in lib/ticket.js.
 // [[spec/design_output/pull#the-hand-out]]
 package pull
 

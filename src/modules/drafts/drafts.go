@@ -1,6 +1,5 @@
-// The drafts module: the prose check and the answer check, off readsDraft in
-// src/bridge/prose.js and checksAnswer in src/bridge/tools.js. It stands off
-// the bridge's tools until the flip.
+// The drafts module: the prose check and the answer check. It stands off the
+// bridge's tools until the flip.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
 
@@ -21,7 +20,7 @@ const (
 	readOnly     = "a check reads a draft, and writes nothing"
 )
 
-// What each check says of itself, off proseSpec in src/bridge/prose.js and checkSpec in lib/answer.js. [[spec/tickets/prose-tools-answer-in-go]]
+// What each check says of itself, off checkSpec in lib/answer.js. [[spec/tickets/prose-tools-answer-in-go]]
 const (
 	proseDoc  = "Reads a draft note through the write door's own rules and answers every finding at once. It writes nothing. Pass the whole file as the write would land it, so a table row reads with its header."
 	answerDoc = "Reads a draft answer through the voice rules and answers its findings, in the wording the gate uses at the turn's end. Check every draft over 60 words before you send it, because a draft checked here meets the gate clean. Two fields: the text of the draft, and stop, true where the answer ends on a stop call, so the check demands the needs table."

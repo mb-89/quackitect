@@ -1,5 +1,4 @@
-// The ticket a name finds, which every ticket verb reads first, off
-// ticketAt in src/scripts/ticket.js.
+// The ticket a name finds, which every ticket verb reads first.
 // [[spec/design_output/pull#the-private-queue]]
 package pull
 

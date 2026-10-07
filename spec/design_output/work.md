@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/work.js` holds every verb over a work branch, and
+`src/branches/branch.go` holds every verb over a work branch, and
 `src/engine/group.js` holds what a group's ticket reads and writes. This note
 covers the branch, the group on it, and the round trip.
 
@@ -56,8 +56,8 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 | its children | every ticket under `spec/tickets` naming it under `group` |
 | the claim | the push that writes the record |
 
-The children stand before their group. `emptyGroup` in
-`src/scripts/pull-hand.js` refuses a group mint and a group open while no
+The children stand before their group. `EmptyGroup` in
+`src/pull/tickets.go` refuses a group mint and a group open while no
 ticket names the group under `group`, so no group stands empty.
 
 A group of one ticket is the ordinary case, and a group of many is the same
@@ -77,7 +77,7 @@ reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
 | a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/branches/dispatch_write.go` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
 | each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/branches/dispatch.go` |
-| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
+| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/branches/merge.go` |
 
 A group no hand reaches stands open on trunk, on no branch, opens none in
 this run, and waits on nothing.
@@ -100,7 +100,7 @@ refuses leaves the ticket as the take finds it, and the take stops.
 A sync conflict after the claim still prints the ask.
 
 The name decides which ask a take hands, through `pastHold` in
-`src/scripts/work-held.js`:
+`src/branches/held.go`:
 
 | the take names | the branch this box holds stands | the take |
 |---|---|---|
@@ -111,7 +111,7 @@ The name decides which ask a take hands, through `pastHold` in
 No take hands the ask of a branch it does not name.
 
 The take reads the group before it writes that entry, through `standsOpen` in
-`src/scripts/work.js`. A group whose open children hold no step a hand can take
+`src/branches/take.go`. A group whose open children hold no step a hand can take
 stays at `todo`, and the take names the step each child waits at. The take
 then reads the next free group, and claims the first one holding a step a hand
 takes. So one group waiting on a person holds no other group up, and the record
@@ -152,7 +152,7 @@ all:
 
 # One reading answers git
 
-`answerOf` in `src/scripts/work-answer.js` reads what git knows once, and
+`branchesOf` in `src/modules/tickets/tickets.go` reads what git knows once, and
 `branch list --queue` orders that one reading. No verb writes it to a file.
 The work tab reads the index instead, where a branch informs a ticket's
 standing and nothing more. For what the tab draws, see
@@ -316,7 +316,7 @@ is the box saying it leaves. It reads in this order:
 | an open child group | files it into the group's parent |
 | the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
 
-`leftOpen` in `src/scripts/work-fix.js` reads what stands open. The person
+`leftOpen` in `src/branches/fix.go` reads what stands open. The person
 route is the one ticket leaving a group. A ticket the mint writes on a `work/`
 branch names that branch's group, through `joinsGroup` beside it. So a box's own
 question, finding or fix stays in the group until it closes.
@@ -402,7 +402,7 @@ the verb refuses it. So a desk mints the successor off this route:
     ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
 `test/contract/process.test.js` reads that route off disk and holds it open, and
-`test/level0/unblock.test.js` mints off it and runs the verb.
+`src/branches/port_f_unblock_test.go` runs the verb.
 
 # One handover stands
 
@@ -816,7 +816,7 @@ reads, in the steps below:
 
 | the step | what it runs | what it answers on red |
 |---|---|---|
-| the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the message | `messageFindings`, in `src/quack/commit.go` | every finding at once, and no commit |
 | the tests | `./RUNME.sh test`, before anything stages | what the run says, and no commit |
 | the commit | `git add -A` and `git commit`, over the paths the call names or the whole tree | what git says, with the staging back |
 | the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
@@ -876,7 +876,7 @@ again, so `main` takes a branch only where the merged tree passes.
 `branch done` leaves no open ticket on the branch. So an open ticket naming the
 group at the merge is one trunk gains after the branch's last sync. It loses its
 `group` field inside the merge commit, through `freeChildren` in
-`src/scripts/work-merge.js`, and stands loose on trunk, where `branch list` names
+`src/branches/merge.go`, and stands loose on trunk, where `branch list` names
 it and the next pull hands it out. A closed ticket keeps its `group`, because the
 pair is the history of one group and what it holds.
 

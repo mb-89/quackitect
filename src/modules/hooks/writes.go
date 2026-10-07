@@ -1,4 +1,4 @@
-// The write door over a harness write, off onToolWrite in src/bridge/write.js:
+// The write door over a harness write:
 // a path outside the tree passes, the handover meets its schema and the voice,
 // and every other path meets the no-ticket refusal.
 // [[spec/tickets/cage-write-door-port]]

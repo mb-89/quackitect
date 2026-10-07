@@ -1,6 +1,6 @@
 // The trunk end of a work branch: merge takes a done branch into trunk, and
-// close deletes a branch trunk already carries, as src/scripts/work-merge.js
-// answers them, with the cloud marker trunk's copy of a group carries.
+// close deletes a branch trunk already carries, with the cloud marker trunk's
+// copy of a group carries.
 // [[spec/design_output/work#a-merged-branch-closes]]
 package branches
 

@@ -83,6 +83,6 @@ The pull, the take and the mint raise their refusals through the door first. Eac
 | `src/pull` | every refusal the pull says, `stillHeld` among them |
 | `src/branches/take.go` | each refusal of the open and the take, and the git output under one stays its detail |
 | `src/quack/verb_mint.go` | each refusal the mint verb prints, the message its builders answer among them |
-| `src/bridge/bash.js` | the desk guard's refusal, which raises `desk-works-on-trunk` through `src/doors/failure.js` |
+| `src/modules/hooks/commits.go` | the desk guard's refusal, which raises `desk-works-on-trunk` through `src/failure` |
 
 The Go verbs replace the JavaScript pull and work twins under `src/scripts`, which run under tests alone and keep their text. The note `js-twins-retire` parks their removal. `Moved` names the Go files alone. `go test ./src/pull/` reads the ids the fake door keeps.

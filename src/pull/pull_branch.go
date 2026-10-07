@@ -1,5 +1,5 @@
 // The branch a pull takes on trunk, the free tickets a desk works there,
-// and the prompt a hand of its own takes, off src/scripts/pull-hand.js.
+// and the prompt a hand of its own takes.
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 package pull
 

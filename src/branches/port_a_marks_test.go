@@ -1,6 +1,5 @@
-// The pure reads behind the work verbs, as test/level0/work.test.js holds
-// them: the mark, the dependencies, what waits, the branches close reaches,
-// and the paths the standing read names.
+// The pure reads behind the work verbs: the mark, the dependencies, what
+// waits, the branches close reaches, and the paths the standing read names.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it drives the unexported standing marks: whyOf, waitingOn, changedIn and ownBranch
 

@@ -1,5 +1,4 @@
-// ticket urgent flips a ticket's urgent mark, and drops it where it turns off,
-// off the roads test/level0/ticket-edit.test.js covers.
+// ticket urgent flips a ticket's urgent mark, and drops it where it turns off.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

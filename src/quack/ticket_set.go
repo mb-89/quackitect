@@ -1,6 +1,5 @@
-// ticket set: one field of a ticket's front, written as the schema takes it,
-// off set and written in src/scripts/ticket-edit.js. ticket urgent writes
-// through the same road.
+// ticket set: one field of a ticket's front, written as the schema takes it.
+// ticket urgent writes through the same road.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main
 

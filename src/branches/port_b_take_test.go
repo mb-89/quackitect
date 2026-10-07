@@ -1,6 +1,5 @@
-// The take over a fake tree, ported from test/level0/work-group.test.js: the
-// claim, a group no hand here takes, a named take, a refused push, a refused
-// commit and a sync conflict after the claim.
+// The take over a fake tree: the claim, a group no hand here takes, a named
+// take, a refused push, a refused commit and a sync conflict after the claim.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it reads the unexported heldIn, named and waitsAt after take runs
 

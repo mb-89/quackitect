@@ -1,6 +1,5 @@
-// The take over a fake clone, as test/level0/work.test.js drives it through
-// fake doors: the uncommitted check, the parked ticket, the unpushed branch,
-// and the stuck hand-over handed out first.
+// The take over a fake clone through fake doors: the uncommitted check, the
+// parked ticket, the unpushed branch, and the stuck hand-over handed out first.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it reads the unexported staleKey and the group editors after take runs
 

@@ -1,5 +1,5 @@
 // What the hooks door's review reads off this box: the material the branch
-// verb gathers for a branch, as reviewsBranch in src/bridge/review.js runs it.
+// verb gathers for a branch, as reviewAsked in src/modules/hooks/review.go runs it.
 // [[spec/tickets/review-spawns-off-the-door]]
 package main
 

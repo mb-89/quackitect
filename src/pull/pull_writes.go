@@ -1,6 +1,5 @@
 // What a hand-back writes: the record, the step it moves to, the commit and
-// the push. Each one ends by handing the next leaf out, off
-// src/scripts/pull-writes.js and pull-children.js.
+// the push. Each one ends by handing the next leaf out.
 // [[spec/design_output/pull#the-pass]]
 package pull
 

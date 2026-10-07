@@ -41,7 +41,7 @@ var needVerbs = map[string][]string{
 	"retro":  {"notes", "audit", "collect", "new", "timeline", "chapters", "matrix", "read", "effect", "classes", "mint"},
 }
 
-// The words the branch verb answers, as WORK_VERBS in src/scripts/work.js names them. [[spec/design_output/pull#a-need-is-a-verb]]
+// The words the branch verb answers. [[spec/design_output/pull#a-need-is-a-verb]]
 var workVerbs = []string{"open", "take", "sync", "done", "release", "merge", "close", "read", "review", "list", "escalate", "guidance", "unblock", "test"}
 
 // [[spec/design_output/config#the-engine-controls]]

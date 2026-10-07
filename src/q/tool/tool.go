@@ -219,7 +219,7 @@ type Plan struct {
 	Add     []PlanTodo `json:"add,omitempty" nullable:"false" doc:"The todos you add, each with the place you do it at."`
 }
 
-// The description the plan field carries, as planField in src/bridge/plan.js words it. [[spec/design_output/stop#the-plan]]
+// The description the plan field carries. [[spec/design_output/stop#the-plan]]
 const planDoc = "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add."
 
 // A tool's schema with the plan field among its properties, so the plan's answer rides any call, and the plan tool's own as it stands. [[spec/design_output/stop#the-plan]]

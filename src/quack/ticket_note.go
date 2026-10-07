@@ -1,5 +1,4 @@
-// ticket note: a private ticket off the note process, and the hand carries on,
-// off note in src/scripts/ticket.js and the Ask's voice in ticket-ask-lint.js.
+// ticket note: a private ticket off the note process, and the hand carries on.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package main
 

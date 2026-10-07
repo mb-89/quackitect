@@ -265,7 +265,6 @@ Every rule here reads strings, so every case hands one in.
 - `test/level0/private.test.js` drives the functions, the reader and the checks over strings and a fixture diff.
 - `test/level0/precommit.test.js` drives the hook script over a fake disk and a fake git.
 - `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
-- `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
 
 ## What it costs
 

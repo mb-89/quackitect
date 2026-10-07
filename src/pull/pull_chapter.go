@@ -1,6 +1,6 @@
 // The text a hand writes and the engine reads: the answer a hand-out prints,
 // the chapter a leaf owns, and the evidence weighed against the leaf's
-// fields, off src/scripts/pull-chapter.js and pull-format.js.
+// fields.
 // [[spec/design_output/pull#the-work-answer]]
 package pull
 

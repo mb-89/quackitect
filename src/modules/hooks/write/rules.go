@@ -1,5 +1,5 @@
-// The edit door's rules past the schema and the voice, off onWrite in
-// src/bridge/write.js: the bless file, the markers of a merge, the open
+// The edit door's rules past the schema and the voice:
+// the bless file, the markers of a merge, the open
 // ticket, the engine's fields, and the projection owning a path.
 // [[spec/tickets/edit-door-rules-port]]
 package write
@@ -13,7 +13,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The owner's word on who blesses, which src/scripts/pull-bless.js names, the folder the tickets on git stand in, and the chapter anybody writes. [[spec/design_output/pull#the-bless]]
+// The owner's word on who blesses, which src/pull/pull_bless.go names, the folder the tickets on git stand in, and the chapter anybody writes. [[spec/design_output/pull#the-bless]]
 const (
 	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-bless]]
 	BlessFile     = ".se/.runtime/bless.json"

@@ -1,5 +1,5 @@
 // The hand back: a verdict the agent hands in, the refusals it meets, and
-// the signs a person step takes, off src/scripts/pull.js.
+// the signs a person step takes.
 // [[spec/design_output/pull#the-hand-back]]
 package pull
 

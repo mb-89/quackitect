@@ -1,5 +1,5 @@
-// ticket urgent: the ticket's urgent mark flipped, off urgent in
-// src/scripts/ticket-edit.js, written through the road ticket set takes.
+// ticket urgent: the ticket's urgent mark flipped, written through the road
+// ticket set takes.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main
 

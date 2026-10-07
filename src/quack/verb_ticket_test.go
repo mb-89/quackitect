@@ -1,11 +1,11 @@
-// The bare ticket prints the usage ticket.js prints, and exits 0 with no word
+// The bare ticket prints the usage, and exits 0 with no word
 // and 2 on a word no sub-verb answers.
 // [[spec/tickets/ticket-verbs-port-to-go]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 
-// The usage src/scripts/ticket.js prints, byte for byte. [[spec/tickets/ticket-verbs-port-to-go]]
+// The usage the bare ticket prints, byte for byte. [[spec/tickets/ticket-verbs-port-to-go]]
 const ticketUsageWant = "Usage: ./RUNME.sh ticket <verb>\n\n" +
 	"  pull [ticket]       take the next leaf of this group, or hand one back with --pass, --fail, --became, --answered\n" +
 	"  note <name> <line>  write a private ticket off the note process, and carry on\n" +

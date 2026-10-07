@@ -1,6 +1,6 @@
 // The pull over an origin and a clone in memory: the hand-out, the hold, the
 // hand-back's checks, the pass and its commit, the drop, the todo in hand and
-// the queue binding, off the roads test/level0/pull.test.js covers.
+// the queue binding.
 // [[spec/design_output/pull#the-answers]]
 package pull
 

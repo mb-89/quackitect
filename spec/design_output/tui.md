@@ -358,7 +358,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 # The verb builds it
 
 `./RUNME.sh tui` builds the viewer into `.se/.runtime/bin/logview`, and runs it over
-`.se/.log/session.jsonl`. `viewerOf` in `src/scripts/tui-build.js` decides:
+`.se/.log/session.jsonl`. `tuiViewerOf` in `src/quack/tui_verb.go` decides:
 
 | what stands | what the verb does |
 |---|---|

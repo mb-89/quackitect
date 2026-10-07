@@ -77,7 +77,7 @@ change of a door. Headless turns say so, against client 2.1.269:
 ## The cloud starts the server
 
 Nobody presses the hook button on a cloud box. So the pull that takes a
-branch there ends on the index, through `src/scripts/serve.js`. It runs the
+branch there ends on the index, through `src/quack/serve_verb.go`. It runs the
 start road, which runs the index with `standing`. That verb starts the index's
 door where none answers, so one call starts it and probes it. The pull's last
 line reads the port off `.se/.runtime/hooks.json`, and says which of these
@@ -102,7 +102,7 @@ from the shell where none answers, and returns.
 
 The door stays when the shell closes, and a second run finds it standing and
 starts nothing. A start that falls names what the index writes to its error
-stream. `detachedStart` in `src/scripts/serve.js` holds it.
+stream. `serveDetachedStart` in `src/quack/serve_verb.go` holds it.
 
 ## The bridgehead starts it too
 
@@ -157,7 +157,7 @@ Nothing in level zero waits on a clock. What a session reads depends on which
 events a server already answered.
 
 The server keeps one mark a session: whether the session holds its standing
-layer. `layerRides` in `src/bridge/guidance.js` reads the mark.
+layer. `called` in `src/modules/hooks/brief.go` reads the mark.
 
 | the event | what the server does |
 |---|---|
@@ -470,7 +470,7 @@ the probe says what it meets, and leaves the battery running.
 
 A server standing and failing its own health call is the one red here.
 Something runs there, and it names itself broken. `serverRead` in
-`src/scripts/cli-check.js` reads the three apart, and `serverSays` takes the
+`src/quack/check.go` reads the three apart, and `serverHolds` takes the
 fetch as a door, so a test drives each one.
 
 `./RUNME.sh doctor` names the server still. That verb is where a reader asks
@@ -490,7 +490,7 @@ name, and says which one answers.
 
 `SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
 those names, and the home file takes the first of them under the home path.
-`hooksNamed` in `src/scripts/cli-check.js` reads them in that order, and takes
+`hooksNamed` in `src/quack/hookprobe.go` reads them in that order, and takes
 every string under `hooks`. It keeps the ones a URL parses as `http:` or
 `https:`.
 
@@ -1054,10 +1054,10 @@ forgets to take a ticket up and to put it down.
 
 | the road | what it names | where the door reads it |
 |---|---|---|
-| `mcp__level0__patch`, `mcp__level0__replace` | the `ticket` field | `unnamedIn` in `src/bridge/apply.js` |
+| `mcp__level0__patch`, `mcp__level0__replace` | the `ticket` field | `lands` in `src/modules/edits/edits.go` |
 | `./RUNME.sh commit` | `<ticket>:` at the head of the message | `commitVerb` in `src/quack/commit.go` |
-| Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
-| Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
+| Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `writeDoor` in `src/modules/hooks/writes.go`, which refuses them and names `mcp__level0__patch` |
+| Bash, PowerShell | `<ticket>:` at the head of `description` | `TicketDoor` in `src/modules/hooks/command/ticket.go` |
 
 `ticketFault` in `src/engine/named.js` reads the name against what stands in
 hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
@@ -1094,9 +1094,9 @@ These write with no ticket named:
 ## A shell names its ticket
 
 A Bash or PowerShell call names the open ticket it serves at the head of its
-`description`, the way a patch names it in its `ticket` field. `ticketDoor`
-in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
-`ticketFault`, and `DESCRIPTION_HOW` in `src/engine/named.js` says how to
+`description`, the way a patch names it in its `ticket` field. `TicketDoor`
+in `src/modules/hooks/command/ticket.go` reads the description through
+`TicketOf` and `TicketFault`, and `DESCRIPTION_HOW` in `src/engine/named.js` says how to
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
@@ -1193,7 +1193,7 @@ back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]
 
 A refusal naming the file ceiling names `./RUNME.sh split <file>`, the verb
 that cuts the file. The write stays refused. A function ceiling alone names no
-cut. `src/bridge/code.js` owns the refusal.
+cut.
 
 ## The path a rule reads
 
@@ -1253,8 +1253,8 @@ under a subfolder, where its `env` hands it to every step on that machine.
 The style sits in the cached prefix, so the same text costs full price once a
 session. A line injected into a user turn sits behind the cache line, and it
 costs full price every turn. So the style carries the rules, and no hook does.
-`guidanceHere` in `src/bridge/guidance.js` counts the top notes and writes the
-helper's text, and `styleFrom` in `lib/projection.js` writes the style.
+`CountsOf` in `src/modules/hooks/brief/brief.go` counts the top notes,
+`ForHelper` writes the helper's text, and `styleFrom` in `lib/projection.js` writes the style.
 
 ## The canary
 
@@ -1344,9 +1344,8 @@ compaction line `onSessionCompact` writes.
 | the compaction line | the debt stands, and the gate asks again |
 | neither | the debt stands, and the gate asks again |
 
-`afterARestart` in `src/bridge/guidance.js` builds the session a restart takes,
-and `sessionHere` is the one place calling it. A session opening on
-this box reaches `onSessionStart` instead, which writes the state fresh.
+`stepBrief` in `src/modules/hooks/brief.go` folds the session a restart takes
+off the events the door stamps. A session start writes the state fresh.
 
 A compaction opens the debt again and takes the payment off with it, so the
 line lands once more after one.
@@ -1510,8 +1509,8 @@ delivery receipts, so a door reading it bites the wrong turn.
 
 ## An Agent call runs behind
 
-A helper the turn waits on holds every prompt behind it. So `onAgent` in
-`src/bridge/agent.js` refuses an `Agent` call carrying `run_in_background:
+A helper the turn waits on holds every prompt behind it. So `agentRefusal` in
+`src/modules/hooks/agent.go` refuses an `Agent` call carrying `run_in_background:
 false`, and names the background road. The door reads the flat field, the way
 the command door reads `command`.
 
@@ -1534,7 +1533,7 @@ picks the model.
 | change | a scoped change with its test, or a review against a list | `helper.change` |
 | decide | a design, an unknown cause, or a verdict the owner reads | `helper.decide` |
 
-`src/bridge/agent.js` owns the tiers. The tools block carries a line naming
+`src/modules/hooks/brief/brief.go` owns the tiers. The tools block carries a line naming
 each tier and its model, so a spawn names the model before the door asks.
 
 | the call | what it meets |
@@ -1556,9 +1555,9 @@ the config.
     The log takes the answer from the chat, so the log tool answers nothing.
 
 The refusal opens with the demand. The rest is the rule in its own words, and
-a refusal quoting the rule teaches it better than a refusal naming it. `SAYS`
-in `.claude/skills/level0/lib/answer.js` holds these words, and a case there
-asserts each line of them.
+a refusal quoting the rule teaches it better than a refusal naming it. `says`
+in `src/modules/hooks/fold.go` holds these words, and a case in
+`test/replay/cage/call-holds-cases.json` asserts them.
 
 ## Where it must not bite
 
@@ -1580,7 +1579,7 @@ matcher, so one hook holds both.
 
 ## The cloud ask door
 
-Nobody sits beside a cloud box, so an `AskUserQuestion` there meets nobody. `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses it where `cloudHere` holds. The refusal names the question ticket and the push, and points at [[spec/guidance/cloud/cloud]].
+Nobody sits beside a cloud box, so an `AskUserQuestion` there meets nobody. `chain` in `src/modules/hooks/fold.go` refuses it where the settings mark a cloud box. The refusal names the question ticket and the push, and points at [[spec/guidance/cloud/cloud]].
 
 - `onToolCall` reads it after the owner's hold and before the grace.
 - A helper's call meets it too, since nobody sits beside a helper on a cloud box either.
@@ -1681,8 +1680,8 @@ refusing nothing leaves open.
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
 
-`readsAnswer` in `src/bridge/answer-read.js` holds the reading, and the tool
-and the stop door both call it.
+`checksAnswer` in `src/modules/drafts/answer.go` holds the reading, and the
+tool calls it.
 
 ## The stop holds a rewrite
 
@@ -1708,16 +1707,16 @@ answers every finding at once:
 
 | what it reads | where that stands |
 |---|---|
-| the rules over a draft | `proseFaults`, exported from `src/bridge/write.js` |
-| the findings a note keeps | `readsProse`, under `src/bridge/prose.js` |
+| the rules over a draft | `proseFaults`, in `src/modules/drafts/prose.go` |
+| the findings a note keeps | `readsDraft`, in `src/modules/drafts/prose.go` |
 | the wording of the answer | `answerFindings`, beside `refusal` |
 
 The door calls `proseFaults` too, so one read serves both and a clean draft
 passes the door on its first write. The tool writes nothing, so it takes the
 wording `check_answer` takes, and the refusal wording stays with the door.
 
-`src/bridge/prose.js` holds the spec and the handler, and exports the `SPECS`
-and `TOOLS` pair.
+`src/modules/drafts/drafts.go` holds the spec and the handler, `Registers` and
+`Accept`.
 
 # The question comes first
 
@@ -1921,7 +1920,7 @@ the same package. `quack prose` answers them, and every reader asks there.
 
 | the reader | the vetoes it asks |
 |---|---|
-| `readsProse` in `src/bridge/prose.js`: the write door, the draft check and the commit message | all |
+| the write door, the draft check and the commit message, through `prose.Kept` | all |
 | `readsText` in `src/bridge/findings.js`: the pull and the lint, one file a request | past |
 | `readThrough` in `src/bridge/findings.js`: the check and the terminal push door, every file in one request | past |
 | the LSP module, through `prose.ReadsAsPast` | past |
@@ -1997,9 +1996,8 @@ its cap where none comes. A hand asks it where it writes a loop of sleeps today.
 | `output` | the file stands quiet past `wait.quiet`, or the process `pid` names exits |
 | `files` | every named file stands quiet past `wait.quiet` |
 
-A helper's stop is its report. `helperReports` in `src/bridge/wait.js` writes
-a `report` row to the log with the helper's `agentId`, and keeps the id on the
-box for the wait. A file stands quiet while its size and its stamp hold, and
+A helper's stop is its report. `reports` in `src/modules/session/session.go`
+keeps the helper's `agentId` off its stop, for the wait. A file stands quiet while its size and its stamp hold, and
 the span counts from the last change the wait sees. The process door's
 `alive` reads a process's end off its number.
 

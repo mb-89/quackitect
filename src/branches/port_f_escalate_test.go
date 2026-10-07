@@ -1,6 +1,5 @@
-// The escalation over a fake clone, ported off test/level0/pull-escalate.test.js:
-// the person step it puts in, the choice its options write, the hand it reads,
-// and the roads it refuses on.
+// The escalation over a fake clone: the person step it puts in, the choice
+// its options write, the hand it reads, and the roads it refuses on.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it drives the unexported escalate parsers and holdOf, handOf and splitsKey
 

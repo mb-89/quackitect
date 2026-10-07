@@ -1,6 +1,5 @@
 // The write door's pure reads: the refusal a harness write naming no ticket
-// meets, the road a write takes, and the file an edit leaves, off onToolWrite
-// and onWrite in src/bridge/write.js.
+// meets, the road a write takes, and the file an edit leaves.
 // [[spec/tickets/cage-write-door-port]]
 package write
 
@@ -22,7 +21,7 @@ const (
 	TicketHow    = "Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
 )
 
-// A path the tree reads as its own, and one standing outside it, as outside in src/bridge/write.js reads it. [[spec/design_output/level0#the-write-door]]
+// A path the tree reads as its own, and one standing outside it. [[spec/design_output/level0#the-write-door]]
 var outsidePath = regexp.MustCompile(`^([A-Za-z]:)?[\\/]`)
 
 // One finding the voice keeps over a written file, as Vale answers it. [[spec/tickets/cage-write-door-port]]

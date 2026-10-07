@@ -118,7 +118,7 @@ func (one *repo) Trunk() ([]ticket.File, error) {
 	return files, nil
 }
 
-// The second each path under the ticket folder came in on the checkout's history, off one git log, the reading stoodHere in src/scripts/pull-queue.js holds. It reads again where the checkout moves. [[spec/tickets/verbs-queue-order]]
+// The second each path under the ticket folder came in on the checkout's history, off one git log, which the queue's score in src/modules/queue/score.go weighs. It reads again where the checkout moves. [[spec/tickets/verbs-queue-order]]
 func (one *repo) Stood() (map[string]int64, error) {
 	head, err := one.run(nil, "rev-parse", "--verify", "--quiet", "HEAD")
 	if err != nil {

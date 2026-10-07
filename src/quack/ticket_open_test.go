@@ -1,6 +1,5 @@
 // ticket open turns a draft with an Ask into an open ticket at its first leaf,
-// through the voice and the group checks, off the roads
-// test/level0/ask-lint.test.js and pull-leaves.test.js cover.
+// through the voice and the group checks.
 // [[spec/design_output/pull#a-draft-opens]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

@@ -1,8 +1,7 @@
 // The voice verbs in Go. `measure` scores a folder of prose through the rules,
 // and `refused` ranks what the doors turn away. The pure half takes rows and
 // answers rows, and Run reaches the disk, the rules and the clock through Doors,
-// so a test drives it over a fixture. It prints what
-// .claude/skills/level0/lib/voice.js prints, line for line.
+// so a test drives it over a fixture.
 // [[spec/design_output/projection#the-second-target]]
 package voice
 

@@ -1,6 +1,5 @@
 // The script rules of the VoiceParagraph style, and the schema reader and the
-// Tengo helpers they share, read the way rulesFrom in
-// .claude/skills/level0/lib/paragraph.js reads them into Tengo.
+// Tengo helpers they share, which read them into Tengo.
 // [[spec/design_output/rules#a-script-answers-offsets]]
 package rules
 

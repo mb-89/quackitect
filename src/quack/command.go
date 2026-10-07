@@ -45,13 +45,13 @@ const (
 	handoverAtKey  = "context.handoverAt"
 )
 
-// The helper tiers the Agent door reads, off TIERS in src/bridge/agent.js. [[spec/design_output/level0#a-spawn-names-its-tier]]
+// The helper tiers the Agent door reads, off Tiers in src/modules/hooks/brief/brief.go. [[spec/design_output/level0#a-spawn-names-its-tier]]
 var helperTiers = []string{"find", "change", "decide"}
 
 // The variables saying the box stands in the cloud, off .claude/skills/level0/lib/cloud.js. [[spec/guidance/cloud/cloud]]
 var cloudVariables = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD"}
 
-// The variables naming the box's user and its home folder, first set first, off boxHere in src/bridge/bash.js. [[spec/tickets/cage-commit-guards-port]]
+// The variables naming the box's user and its home folder, first set first. [[spec/tickets/cage-commit-guards-port]]
 var (
 	userVariables = []string{"USER", "USERNAME", "LOGNAME"}
 	homeVariables = []string{"HOME", "USERPROFILE"}

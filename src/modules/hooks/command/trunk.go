@@ -1,5 +1,5 @@
-// The desk guard and the trunk guard, off lib/trunk.js, lib/cloud.js and
-// src/bridge/bash.js: whether a command commits or pushes, whether it lands
+// The desk guard and the trunk guard, off lib/trunk.js and lib/cloud.js:
+// whether a command commits or pushes, whether it lands
 // on the trunk, and the text each guard answers.
 // [[spec/tickets/cage-commit-guards-port]]
 package command

@@ -1,6 +1,5 @@
 // The guidance a hand holds: unnamed the held step's notes and the always-on
-// ones, named one note, and --step the notes a process step resolves, as
-// src/scripts/guidance-verb.js answers it.
+// ones, named one note, and --step the notes a process step resolves.
 // [[spec/design_output/pull#the-work-answer]]
 package branches
 

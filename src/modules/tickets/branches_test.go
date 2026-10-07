@@ -1,6 +1,6 @@
 // A standing branch speaks for its group and the tickets naming it, its copy
 // wins over trunk's by name, and a branch trunk reads closed speaks for
-// nothing, the rule ticketsIn in src/scripts/work-answer.js holds.
+// nothing.
 // [[spec/tickets/the-index-reads-standing-branches]]
 package tickets
 
@@ -134,7 +134,7 @@ func TestABranchWhoseTicketIsNoGroupCarriesNoGroupCopy(t *testing.T) {
 	}
 }
 
-// A child standing on the branch of a marked group alone stands on the cloud, as cloudsIn in src/scripts/work-answer.js reads the folded list. [[spec/tickets/the-queue-reads-the-marker]]
+// A child standing on the branch of a marked group alone stands on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
 func TestTheCloudReadsATipChildOfAMarkedGroup(t *testing.T) {
 	marked := "---\nkind: [[ticket]]\nstate: open\ncloud: true\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nMarked.\n"
 	files := map[string]any{"files/spec/tickets/the-group.md": file(marked)}

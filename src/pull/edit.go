@@ -1,6 +1,5 @@
-// The edit helpers the ticket verbs share, off src/scripts/ticket-edit.js and
-// bare in src/scripts/ticket.js: the schema's weighing of a value, the place
-// a row takes, the plan file a place writes, and the front writes.
+// The edit helpers the ticket verbs share: the schema's weighing of a value,
+// the place a row takes, the plan file a place writes, and the front writes.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package pull
 
@@ -65,7 +64,7 @@ func noFrontStands(text string, err error) (string, error) {
 	return text, err
 }
 
-// Why the field refuses the value, and nothing where the schema takes it, off weighs in ticket-edit.js. Weighs in src/tui/work/workedit.go holds the tab's twin, whose words differ, so this port stands apart from it. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
+// Why the field refuses the value, and nothing where the schema takes it. Weighs in src/tui/work/workedit.go holds the tab's twin, whose words differ, so this port stands apart from it. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
 func Weighs(schema, key, said string) string {
 	frontmatter := yaml.AsDoc(yaml.AsDoc(yaml.Read(schema)).Get("frontmatter"))
 	var rule *yaml.Doc
@@ -121,7 +120,7 @@ func jsStrings(said any) []string {
 
 var jsInteger = regexp.MustCompile(`^-?\d+$`)
 
-// Whether one JSON Schema type takes the value, as typeTakes in ticket-edit.js reads it. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
+// Whether one JSON Schema type takes the value. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
 func typeTakes(kind, said string) bool {
 	switch kind {
 	case "string":
@@ -159,7 +158,7 @@ func JSNumber(said string) (float64, bool) {
 	return 0, false
 }
 
-// A row at one level of the queue, as levelOf in ticket-edit.js draws it. [[spec/tickets/view-actions-run-through-verbs]]
+// A row at one level of the queue. [[spec/tickets/view-actions-run-through-verbs]]
 type PlaceRow struct {
 	Name  string `json:"name"`
 	Queue string `json:"queue"`

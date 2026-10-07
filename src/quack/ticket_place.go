@@ -1,5 +1,5 @@
 // ticket place: the ticket placed at 1 to 9 in its queue level, written as
-// an override into the plan file, off place in src/scripts/ticket-edit.js.
+// an override into the plan file.
 // The level reads off the index's work rows in place of answerOf.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main

@@ -1,5 +1,5 @@
 // ticket set writes one field of a ticket's front as the schema takes it, and
-// refuses a field the engine owns, off the roads test/level0/ticket-edit.test.js covers.
+// refuses a field the engine owns.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

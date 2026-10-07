@@ -1,6 +1,6 @@
 // quack serve: the index behind the bridgehead. It runs the index standing,
 // which starts its door where none answers, so the verb returns and the door
-// stays. Ported from detachedStart in src/scripts/serve.js.
+// stays.
 // [[spec/design_output/level0#a-desk-serve-returns]]
 package main
 

@@ -32,7 +32,7 @@ const (
 	errorLevel = "error"
 )
 
-// What the schemas answer over a written note, off schemaDoor in src/bridge/write.js: the stranger fault of the schema governing its path first, then the faults its own kind's schema finds. [[spec/design_output/schema#the-door-refuses-a-departure]]
+// What the schemas answer over a written note: the stranger fault of the schema governing its path first, then the faults its own kind's schema finds. [[spec/design_output/schema#the-door-refuses-a-departure]]
 func writeSchema(root, where, text string) write.Judged {
 	schemas := check.SchemasIn(check.TreeOver(root, rootDisk{root}))
 	if governor := check.GovernorOf(schemas, where); governor != nil {
@@ -57,7 +57,7 @@ func judgedOf(found []check.Finding) []write.Finding {
 	return out
 }
 
-// The findings the voice keeps over a written file, off proseFaults in src/bridge/write.js: none over code or on a box with no Vale, and a refusing row over prose where Vale answers nothing. [[spec/design_output/level0#a-note-reads-clean-first]]
+// The findings the voice keeps over a written file: none over code or on a box with no Vale, and a refusing row over prose where Vale answers nothing. [[spec/design_output/level0#a-note-reads-clean-first]]
 func writeProse(root, where, text string) []write.Finding {
 	if codeFile.MatchString(where) {
 		return nil
@@ -98,7 +98,7 @@ func editsOutside(root string) edits.Outside {
 	}
 }
 
-// The write door over a text an edit writes, in the order onWrite in src/bridge/write.js reads it: the bless file, a draft or a path outside passing, the markers of a merge, the open ticket, the engine's fields, the owner, the private notes, then the schema and the voice. [[spec/tickets/edit-door-rules-port]]
+// The write door over a text an edit writes, in this order: the bless file, a draft or a path outside passing, the markers of a merge, the open ticket, the engine's fields, the owner, the private notes, then the schema and the voice. [[spec/tickets/edit-door-rules-port]]
 func editDoor(root string) func(where, was string, stands bool, text string) edits.Judged {
 	return func(where, was string, stands bool, text string) edits.Judged {
 		if where == write.BlessFile {

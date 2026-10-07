@@ -1,5 +1,5 @@
 // ticket todo: a ticket parked for the next pull, and --off takes the tag
-// away, off todo in src/scripts/ticket.js.
+// away.
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 package main
 

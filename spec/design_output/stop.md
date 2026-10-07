@@ -379,7 +379,7 @@ decides, see [[spec/guidance/cloud/cloud]].
 ## A refusal names its check
 
 Every refusal of a claim says which check falls, and what the check sees.
-`claimFalls` in `src/bridge/stop.js` writes the sentence, and both doors read it:
+`ClaimFalls` in `src/modules/hooks/stop/checks.go` writes the sentence, and both doors read it:
 
 | door | what it answers where the claim falls |
 |---|---|
@@ -393,7 +393,7 @@ skips the checks reading the answer's text, since no answer stands yet.
 ## A refusal names the binding
 
 The last line of every refusal names the binding, the file that sets it, and a
-moment. `bindingLine` in `src/bridge/binding.js` writes it.
+moment. `BindingLine` in `src/modules/hooks/stop/vote.go` writes it.
 
 - `whereFrom` in `src/bridge/config.js` reads the local file, then the tracked file.
 - `asks` reads those same layers, so the line names no layer the hook skips.

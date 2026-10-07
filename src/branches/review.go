@@ -1,6 +1,5 @@
 // The review: gathers what a reader needs of a work branch, runs the check on
-// it in a worktree of its own, and prints the report, as
-// src/scripts/work-review.js answers it. No model runs here.
+// it in a worktree of its own, and prints the report. No model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
 package branches
 

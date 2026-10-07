@@ -1,5 +1,5 @@
 // The bare ticket: the usage, one line a sub-verb, which twinOf reaches where
-// no longer words name a registered verb, off ticket in src/scripts/ticket.js.
+// no longer words name a registered verb.
 // [[spec/tickets/ticket-verbs-port-to-go]]
 package main
 

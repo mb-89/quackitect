@@ -138,7 +138,7 @@ func TestAPaidUpdateDropsTheAsk(t *testing.T) {
 	}
 }
 
-// An ask pressed to another value since the demand opened stands at its pay, as dropsAsk in src/bridge/ask.js leaves it. [[spec/tickets/cage-hold-drops-port]]
+// An ask pressed to another value since the demand opened stands at its pay. [[spec/tickets/cage-hold-drops-port]]
 func TestAnAskPressedSinceStandsAtItsPay(t *testing.T) {
 	land := stepper()
 	land(toolEvent, "", map[string]any{"tool": "Read", heldField: map[string]any{heldAsk: "brief"}})

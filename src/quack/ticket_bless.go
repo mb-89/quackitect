@@ -1,6 +1,6 @@
 // ticket bless: the verdict a gate asking one holds, blessed and the step moved
-// on, or --desk=<true|false> the desk's own word, off bless and blessDesk in
-// src/scripts/pull-bless.js, through the pull over the doors this box holds.
+// on, or --desk=<true|false> the desk's own word, through the pull over the
+// doors this box holds.
 // [[spec/design_output/pull#the-bless]]
 package main
 
