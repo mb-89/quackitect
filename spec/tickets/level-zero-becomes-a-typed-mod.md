@@ -104,6 +104,8 @@ record:
     hand: box eabbd46a6a23 · claude-code-remote
     hash_before: fc41c9687cbed3390f0ec36a85e08b7f472b7a69
     session: cse_01TMpYhceevNqNNEKTryYJRo
+    hash_after: 702e6bd13c632deb0c237df9bdde21a8c77a84d2
+    final: "The group closes: the start verb reads the manifest alone, the check validates the plugin strictly, the boot hook note names both roads, and the pull hand takes no session tag."
   - step: sync
     hand: box eabbd46a6a23 · claude-code-remote
     hash_before: 045621def3c6ce7230fb93daa5e24d302572f8f3
@@ -172,7 +174,6 @@ record:
         hash: 2589cc56f5b87ee3
         size: 3974
     def: 4da1ca5da87d5bbc
-cloud: true
 reason: done
 ---
 
