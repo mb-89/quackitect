@@ -384,3 +384,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The names every example shows export as `check.ShownNames`, since `check.Shown` stands already as a constant. The approach's `Shown` reads as `ShownNames`. [[spec/tickets/example-retro-gaps-shown-name]]

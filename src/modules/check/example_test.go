@@ -36,6 +36,14 @@ func warned(t *testing.T, found []Finding, rule string) map[string]int {
 	return out
 }
 
+func TestShownNamesHoldsEveryNameAnExampleShows(t *testing.T) {
+	t.Parallel()
+	got := ShownNames(coveredTree(nil))
+	if len(got) != 2 || !got["ticket pull"] || !got["tui log"] {
+		t.Fatalf("the shown names read %v, and want ticket pull and tui log", got)
+	}
+}
+
 func TestAVerbNoExampleNamesTakesAWarning(t *testing.T) {
 	t.Parallel()
 	got := warned(t, exampleCovers(coveredTree(nil)), "ExampleCovers")

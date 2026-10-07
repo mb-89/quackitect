@@ -33,7 +33,7 @@ var (
 )
 
 // The names every example shows under interface. [[spec/design_output/examples#the-checks]]
-func shownNames(tree *Tree) map[string]bool {
+func ShownNames(tree *Tree) map[string]bool {
 	out := map[string]bool{}
 	for _, path := range tree.Paths() {
 		if !exampleAt.MatchString(path) {
@@ -49,7 +49,7 @@ func shownNames(tree *Tree) map[string]bool {
 
 // Each verb and tab no example names under interface. [[spec/design_output/examples#the-checks]]
 func exampleCovers(tree *Tree) []Finding {
-	shown := shownNames(tree)
+	shown := ShownNames(tree)
 	out := []Finding{}
 	for _, path := range tree.Paths() {
 		name := strings.TrimPrefix(path, quackAt)
