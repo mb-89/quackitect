@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -148,6 +148,18 @@ record:
         hash: bcee0b043437dbd6
         size: 2740
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 42197a224bb7 · claude-code-remote · helper-4
+    hash_before: e47b4bf21e49c4391efc22b0d4cce9c4e0e604eb
+    hash_after: e47b4bf21e49c4391efc22b0d4cce9c4e0e604eb
+    inputs:
+      - name: design/draft
+        hash: bcee0b043437dbd6
+        size: 2740
+      - name: design/tests-red
+        hash: 4083b33505207200
+        size: 893
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -286,8 +298,13 @@ The registry twin of ticket pull reaches time.Now, proc.Real and the live index 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- harness-draft-follows-seen: the draft approach keeps a real temporary folder and its size list leaves out src/quack/examples_harness_test.go, while tests-red moves the harness onto files.FakeDisk in that file; the builder follows seen and brings the approach and size in line
+- harness-fakes-the-model: the ask names the model faked, and seen leaves it out because no verb in the table reaches it; the builder adds a case where a verb reaching the model misses as outside the table, or answers it through the fake process table
+- harness-copies-stand-apart: no red test shows each example runs over its own copy; the builder adds a case where one example's write stays unseen by another run beside it
+- harness-meets-a-real-example: spec/examples stands absent, so TestEveryExampleHoldsItsSteps runs no subtest and passes empty, and the check line rests on the tests-green check command alone; the first example lands with the group before the accept reads the check
 
 # implement
 
