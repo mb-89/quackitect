@@ -17,7 +17,7 @@ rationale: [[spec/rationales/classifying]]
 8. Run `./RUNME.sh retro matrix <retro>` again, so the report opens on the class fixes.
 9. Hand every class on to the check step, and name its tickets there. A class this step turns into a ticket skips the tree the check reads. *
 10. Give every collected note and memory a disposition: a class, done and where, a ticket, or a reason to drop. A note with no disposition stays on the box and drains nowhere. *
-11. Promote every script under `.se/scripts`, and every heredoc script off the transcripts, into a verb or an engine function, and give each a disposition under `script:<name>`. A script left standing runs by hand again next session.
+11. Promote every script under `.se/scripts`, and every heredoc script off the transcripts, into a verb or an engine function. Give each a disposition under `script:<name>`. A script still standing runs by hand again next session.
 12. Check a note against the tree before judging it. Most open notes stand built already, and a ticket for a built thing costs a hand a round. *
 13. Name a fix a ticket plans already by that ticket, and mint no second one. Two tickets for one fix send two hands after it. *
 14. Name what this retro reads nowhere, and why, under limits. A retro naming no limit reads as complete, and the next one repeats its blind spot. *

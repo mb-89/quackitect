@@ -16,7 +16,7 @@ type Guard struct {
 	Name    string
 	Refuses bool
 	Names   func(tracked []string, read func(path string) string) []string
-	// The package an offender stands in, which a report counts by, or nil where the guard names packages itself.
+	// The package an offender stands in, which a report counts by, or nil where the guard names packages itself. [[spec/design_output/model#the-guards-hold-a-baseline]]
 	PackageOf func(offender string) string
 }
 

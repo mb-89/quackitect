@@ -32,7 +32,10 @@ func TestATrackedScriptOutsideTheEngineIsNamed(t *testing.T) {
 
 func TestAMarkerPastTheOpeningLinesSparesNothing(t *testing.T) {
 	t.Parallel()
-	said := scriptsOver(map[string]string{"tools/late.sh": "#!/bin/sh\n\n\n\n\n\n# level0: HandScript - too late\n"})
+	said := scriptsOver(map[string]string{
+		"tools/late.sh": "#!/bin/sh\n\n\n\n\n# level0: HandScript - the sixth line\n",
+		"tools/edge.sh": "#!/bin/sh\n\n\n\n# level0: HandScript - the fifth line\n",
+	})
 	if want := []string{"tools/late.sh"}; !slices.Equal(said, want) {
 		t.Fatalf("a marker past the opening lines answers %q", said)
 	}
