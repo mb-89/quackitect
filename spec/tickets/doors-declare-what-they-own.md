@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -168,6 +168,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 042a3cbde6f4c85cd570620832017b2303e441a8
+    hash_after: 042a3cbde6f4c85cd570620832017b2303e441a8
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -279,38 +291,77 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+doorless-walk-names-no-door: owns.Walk.Says owns the wording of a walk, and a walk around no door reads as a module no door declares
+doorsonly-leaves-every-note: the extension note and the testing rationale carry the guard in place of DoorsOnly
+fake-vscode-names-its-door: the fake vscode marks its two reaches into the node loader
+page-owns-math-random: the page outside owns Math.random beside the clock names
+skill-scripts-meet-the-guard: the guard reads .claude/skills past the lint walk, and the hooks declare their own outside over the clock
+the-guard-refuses: report leaves every declaration, the index names its serving files, the process door owns its wait, a random door owns Math.random, the guard names an undeclared node: module, DoorsOnly retires
+main taken in: four groups and 64 conflicts, with DoorsOnly retired from the Go rule port too, the failure door declared, and main's new code reaching the box through its doors
+the merged tree meets main's guards: blackbox and fixture offenders marked or moved to outside packages, the q.Clock suite beside the fake, duplicate tests cut from quack, owns and the clock module
+the report key retires with its paths and tests, as the note report-key-retires asked
+the note root-cases-take-their-doors closes dropped: the fixture guard and its shrinking baseline hold every such case now, each with its marker
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+a gate helper read the draft against the tree and caught five real gaps before the implement step, so the implement change landed green on the first check
+splitting the 64-file merge across three helpers by package kept each helper inside one set of files, and each reported what it kept from each side
+the waiter blocked on a written file inside the turn, with no timer, for every helper and engine hand-back
+the commit door's test-beside rule pushed real tightening into the callers' tests: each now holds every word of the line it pins
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+16:23 and 16:44: a hand-back through the MCP pull dropped while the index restarted, and the shell verb carried it
+16:31 to 16:36: a tests field took three tries: quotes reached go test as characters, a pipe ran as a shell pipe, and expects green reads the first word green, which go test never prints
+16:51: a hand-back answered nothing for the check inside the engine while a waiter ran beside it, and the same call passed alone
+17:15: a patch called a helper that stood nowhere, and vet caught it
+17:23: the draft said to delete test/contract/outside-in-doors.test.js, which holds the contract of OutsideInDoors as well, and the gate did not catch it
+17:53: removing .vale.ini mid-merge left the write door with no rules to run, and every write met VoiceRulesRan until the file stood again
+17:56 to 18:05: the stop hook refused your-helpers-still-run three times while Agent helpers ran
+18:07: the waiter read --help as a file to watch and hung
+18:10: a commit trailer naming a model met the owner's trailer rule
+18:21: the merge commit landed with the check red on main's guards, 42 new offenders past their baselines
+18:25 and 18:41: two commits landed with the check red on gofmt alone, since the patches skipped the formatter
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the commit verb runs gofmt -l over the staged Go files in its fast gate, beside lint --strict, so a format fault refuses before the commit lands: `src/quack/commit.go`
+a command field expecting green names the verb that answers green in its refusal, as the test verb or check piped to echo green: `src/pull/pull_commands.go`
+the stop hook counts the Agent helpers a session started as running hands: `src/modules/hooks/stop/rules.go`
+the gate checklist asks that each file a draft deletes stand opened, with every rule its tests hold named: `spec/processes/standard.yaml`
+the waiter under .se/scripts becomes a mode of the wait verb, a file write signal answered inside the turn: `src/modules/waits`
+the guards run in the sync verb right after a merge resolves, so the baselines meet the merged tree before the merge commit: `src/branches`
+the fake port table of the index tests counts its ports and fails past the first real port, since a real listener at a fake port would route to the fake: `src/index/door_fake_test.go`
+the shared temp folder of the quack tests takes a cleanup in a default-build TestMain beside the contract one: `src/quack/main_test.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The gate is where this group turned. Its helper read the draft against the tree, not against the draft, and found that a guard reading only the lint walk leaves the skill scripts unguarded, and that a guard which refuses must first see two files it would break. The merge was larger than the group: main built its purity and fixture guards on this group's declarations, so the two halves met only at the merge, and the new guards measured this group's tests against a baseline that never knew them. A marker with a reason is the honest answer there, and a cut test is the honest answer to the ratio. The stop hook and the waiter pulled against each other: the hook wanted the turn held, the owner wanted no timers, and a file a helper writes at its end bridged both.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact the retro adds points at its home, a path in backticks, and repeats no rule
+the retro adds no number of its own, past the times and the counts the run met
+the retro writes no file header
+the chapter carries the run's errors with their times; this run carried no owner prompt past the cleared session's fire
+the chapter names roles and paths in the tree alone, and no name, address or box path
 
 ## cloud
 
