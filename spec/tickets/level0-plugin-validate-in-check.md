@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 8543dea7171ef73d42146fc2aa0d23b8828123e9
+    hash_after: 8543dea7171ef73d42146fc2aa0d23b8828123e9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   93.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: b8b7bace0d37b348
+        size: 636
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ the strict run stands in pluginHolds alone, and the note names the plugin part
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The plugin part of the check in src/quack/check.go runs claude plugin validate with --strict, so a warning on the manifest or the hooks file fails the check as an error does. The part test feeds the part a refusing validate, reads it fail, and reads --strict in the argv. The level0 note names the plugin part where it asked a person to run validate by hand. The smoke holds runtime checks alone, so it loses nothing. Commit e3adb5dc3.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go and spec/design_output/level0.md, which the draft names
+the part reaches claude through the check doors, and the part test fakes that door
+the comment over the part says it validates strictly and points at this ticket
+the strict run stands in the part alone, and the note names the part
 
 # accept
 
