@@ -1,6 +1,6 @@
 // The plugin-tests part: the kit run over the plugin, and the count of its
 // tests against the code the hooks entry reaches.
-// [[spec/tickets/level0-tests-move-to-plugin-test]]
+// [[spec/tickets/level0-tests-to-plugin-test]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (

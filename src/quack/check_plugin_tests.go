@@ -1,6 +1,6 @@
 // The plugin-tests part: the kit Claude Code ships runs the plugin's tests, and
 // those tests stand at or under the code the hooks entry reaches.
-// [[spec/tickets/level0-tests-move-to-plugin-test]]
+// [[spec/tickets/level0-tests-to-plugin-test]]
 package main
 
 import (
@@ -13,13 +13,13 @@ import (
 	"quackitect/src/imports"
 )
 
-// The plugin's test folder and the manifest naming its hook modules. [[spec/tickets/level0-tests-move-to-plugin-test]]
+// The plugin's test folder and the manifest naming its hook modules. [[spec/tickets/level0-tests-to-plugin-test]]
 const (
 	pluginTestsDir = pluginDir + "/tests"
 	pluginHooksDir = pluginDir + "/hooks"
 )
 
-// The kit runs the plugin's tests, and a box with no claude says so and carries on. The test lines then stand at or under the lines the hooks entry reaches. [[spec/tickets/level0-tests-move-to-plugin-test]]
+// The kit runs the plugin's tests, and a box with no claude says so and carries on. The test lines then stand at or under the lines the hooks entry reaches. [[spec/tickets/level0-tests-to-plugin-test]]
 func pluginTestsHold(d checkDoors) int {
 	code, said, err := d.run([]string{"claude", "plugin", "test", filepath.FromSlash(pluginDir)}, nil, true)
 	if err != nil {
@@ -37,7 +37,7 @@ func pluginTestsHold(d checkDoors) int {
 	return 0
 }
 
-// The lines of every file under the plugin's test folder. [[spec/tickets/level0-tests-move-to-plugin-test]]
+// The lines of every file under the plugin's test folder. [[spec/tickets/level0-tests-to-plugin-test]]
 func pluginTestLines(d checkDoors) int {
 	lines := 0
 	files, _ := d.disk.walkFiles(d.at(pluginTestsDir))
@@ -47,7 +47,7 @@ func pluginTestLines(d checkDoors) int {
 	return lines
 }
 
-// The lines of every file the modules the hooks manifest names reach through relative imports. [[spec/tickets/level0-tests-move-to-plugin-test]]
+// The lines of every file the modules the hooks manifest names reach through relative imports. [[spec/tickets/level0-tests-to-plugin-test]]
 func hooksReachedLines(d checkDoors) int {
 	var manifest struct {
 		Modules []string `json:"modules"`

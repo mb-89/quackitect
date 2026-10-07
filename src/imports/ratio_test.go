@@ -55,7 +55,7 @@ func TestAJavaScriptTestBelongsToTheFolderItImports(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/level0-tests-move-to-plugin-test]]
+// [[spec/tickets/level0-tests-to-plugin-test]]
 func TestTheReachedLinesCountEachFileTheEntriesImportOnce(t *testing.T) {
 	t.Parallel()
 	texts := map[string]string{

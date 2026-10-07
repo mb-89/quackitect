@@ -59,7 +59,7 @@ func TextLines(text string) int {
 	return lines
 }
 
-// The lines of every file the entries reach through relative imports, each file counted once. [[spec/tickets/level0-tests-move-to-plugin-test]]
+// The lines of every file the entries reach through relative imports, each file counted once. [[spec/tickets/level0-tests-to-plugin-test]]
 func ReachedLines(entries []string, read func(path string) string) int {
 	seen := map[string]bool{}
 	lines := 0

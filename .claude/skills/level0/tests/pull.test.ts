@@ -1,5 +1,5 @@
 // The pull as a tool, and the index tools the binary lists.
-// [[spec/tickets/level0-tests-move-to-plugin-test]] [[spec/tickets/the-judge-leaves-the-code]]
+// [[spec/tickets/level0-tests-to-plugin-test]] [[spec/tickets/the-judge-leaves-the-code]]
 
 import { expect, test } from "claude-code/testing";
 import { SESSION } from "../lib/pull.js";

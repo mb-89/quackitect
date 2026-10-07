@@ -1,5 +1,5 @@
 // The hooks door standing: what the hook posts it, and what it does with the step the door answers.
-// [[spec/tickets/level0-tests-move-to-plugin-test]] [[spec/tickets/level0-runs-on-the-door]]
+// [[spec/tickets/level0-tests-to-plugin-test]] [[spec/tickets/level0-runs-on-the-door]]
 
 import { expect, mock, test } from "claude-code/testing";
 import { DONE, START, STEP, stepping, world } from "./world.ts";
