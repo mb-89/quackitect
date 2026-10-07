@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: b5cf549abb3ce3a03db77ffd536574cf7c63a31e
+    hash_after: b5cf549abb3ce3a03db77ffd536574cf7c63a31e
+    inputs:
+      - name: ask
+        hash: b1fcb495716c6933
+        size: 915
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -166,38 +175,51 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The plugin part of the check, pluginHolds in src/quack/check.go, runs claude plugin validate with --strict, so a warning the runtime tolerates fails the check too. The standing case of check_test.go already feeds the part a refusing validate and reads it fail, so it now expects --strict in the argv. The design note line in level0.md that tells a person to run validate says the check runs it with --strict. The smoke cut takes nothing: validate reads the manifest, hooks.json, the module parse, the hooks it names and the nouns its source touches, statically. Each of the seven smoke checks reads runtime behavior through the Go door: door, rules, prompt, tools, guard, canary and quiet. So no smoke check repeats a proof validate gives, and the table under Discussion says so check by check.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf, which names the plugin part
+- src/quack/check_test.go the plugin part case, which drives pluginHolds
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go the plugin part validates the plugin strictly, and passes where claude stands nowhere
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/check.go
+- src/quack/check_test.go
+- spec/design_output/level0.md
+- spec/tickets/level0-plugin-validate-in-check.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened check.go pluginHolds and partsOf, check_test.go, probe-dry.js DRY and SMOKE and smokeTree, and the note lines on validate, and each claim stands there
+the callers list names partsOf and the plugin part case, the only callers of pluginHolds
+the strict line meets the plugin part case, the refusing validate line meets the same case, the smoke line meets the table the gate reads, and the check line meets the check
+the approach adds no config key
 
 ## tests-red
 
