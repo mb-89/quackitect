@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/owner-read
+step: design/draft
 steps:
   - name: design
     steps:
@@ -119,6 +119,10 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["branch-scripts-leave", "pull-scripts-leave", "ticket-scripts-leave", "session-start-leaves-node"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
