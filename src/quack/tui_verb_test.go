@@ -451,3 +451,12 @@ func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
 		}
 	}
 }
+
+// The collation puts punctuation first, then digits, then letters in either case with lower case first on a tie, then any other rune. [[spec/design_output/tui#the-verb-builds-it]]
+func TestTuiCollateOrdersEachClassOfRune(t *testing.T) {
+	names := []string{"é", "b", "B", "a", "9", "0", "_"}
+	slices.SortFunc(names, tuiCollate)
+	if want := []string{"_", "0", "9", "a", "b", "B", "é"}; !slices.Equal(names, want) {
+		t.Errorf("the collation orders %q, and wants %q", names, want)
+	}
+}

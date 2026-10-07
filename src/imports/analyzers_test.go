@@ -35,9 +35,9 @@ func plantFlagged(t *testing.T) string {
 	return dir
 }
 
+// Each analyzer loads the planted tree on its own, so the loads run side by side. [[spec/design_output/model#the-build-checks-imports]]
 func TestAnIOModuleImportingOsIsNamedByNone(t *testing.T) {
 	t.Parallel()
-	// Each analyzer loads the planted tree on its own, so the loads run side by side.
 	for _, one := range []*analysis.Analyzer{OnlyQ, IOOnly, FakeSuite, NoModule} {
 		t.Run(one.Name, func(t *testing.T) {
 			t.Parallel()
