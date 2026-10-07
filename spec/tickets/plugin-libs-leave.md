@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 91da51c15ab79d9ae30a7b98749f4042820ae4e5
+    hash_after: dddeed8fe5bad8f8f301b74ccbc7dd84acd69756
+    inputs:
+      - name: ask
+        hash: 283da134d28cade9
+        size: 373
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,120 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. The ask splits. Six children take the libraries in import order, and this ticket lands the last slice.
+2. src/quack/plugin_libs_test.go globs .claude/skills/level0/lib/*.js through filepath.Glob, and stays red while a file past vale.js stands.
+3. The last slice deletes folders, log, index, index-tools, tools, pull, apply, undo, review, runs and hash.
+4. Go owners: src/index/binary.go, src/index/tools.go, src/quack/survey.go, src/quack/verb_log.go, src/pull, src/modules/edits, src/quack/check.go.
+5. The slice waits on every child, engine-and-doors-leave and scripts-folder-leaves, since src/engine, src/doors and bundle.js import these.
+6. test/level0 folders, log, index and level1 tests leave whole, since each reads a leaving library alone.
+7. index-tools.test.js keeps its pull-tool.js register cases, and drops the cases over index-tools.js.
+8. index-tools.test.js and pull-spawn-hook.test.js spell PULL_CALL, as pull-tool.js already does.
+9. lsp.test.js and test/contract/ruled.js spell the index binary path, with a pointer at src/index/binary.go.
+10. src/engine/tools.js takes the survey pieces the Vale door reads, with a pointer at src/quack/survey.go.
+11. tools.test.js imports those pieces from src/engine/tools.js.
+12. The install case over rebuilt ports to src/quack/install_test.go, and install.test.js drops it.
+13. tree.test.js drops the session-file case reading lib/pull.js. pull-tool.js and src/pull own the name.
+14. Every Go comment and design note naming a leaving file names its Go owner.
+15. tested.go keeps lib in its source pattern, since vale.js stays there.
+16. StopFolderIsData: tree-libs-leave ports it to TestEveryStopFileReadsWhole in src/quack/stop_rules_test.go, before the rule leaves.
+17. TestTheRulesReadAsThePoolReadsThem already holds that rule's second-file half, through stop.Pool.
+Children: cage-libs-leave takes bash.js, its readers, trunk, cloud and markers onto src/modules/hooks/command.
+Children: tree-libs-leave takes tree, stop, rulefile, tested, servers, names, private, magic and size, and ports their rules to Go.
+Children: schema-libs-leave takes the eight schema files, ticket, todo, slug, paths, vocabulary, snippets, helpers and refuse.
+Children: config-libs-leave takes config.js and layer.js onto src/modules/config.
+Children: stub-settings-shim-runs-in-go moves the shimSettings call in src/stub/RUNME.sh onto a Go verb.
+Children: guidance-lib-leaves takes guidance.js, its three contract tests and its cold path entry.
+Weighed: one change over every library. It reaches the engine, extension tests, the stub and the lint group, past one review.
+Weighed: cutting the engine and door imports in place. Those files leave in engine-and-doors-leave, so the edit buys nothing.
+Weighed: a JavaScript front reader kept as an extension test helper. It keeps a YAML parser as test lines.
+Weighed: retiring StopFolderIsData with no port. A broken stop file then drops out of the pool and nobody hears.
+Assumed: the six children stand minted in javascript-leaves on the standard process, with depends_on set.
+Assumed: engine-and-doors-leave depends on cage-libs-leave in place of this ticket, so no cycle stands.
+Assumed: the lint group accepts edits to src/engine/tools.js and test/contract/ruled.js.
+Assumed: scripts-folder-leaves takes the hashText import of src/scripts/bundle.js.
+Assumed: no route reaches the archive and naming cases of log.test.js, so they leave with no Go port.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/engine/tools.js: survey, readTools, whereIs, which import RUN, BIN, TOOLS, WANTED and the survey readers
+- test/contract/ruled.js: the Vale run, which reads BIN from lib/index.js
+- test/level0/lsp.test.js: the server ask case, which reads BIN as INDEX
+- test/level0/index-tools.test.js: every case, reading binaryOf, callsIndexTool, registersIndexTools and PULL_CALL
+- test/level0/pull-spawn-hook.test.js: the spawn case, which reads PULL_CALL
+- test/level0/tools.test.js: every case reading lib/tools.js exports
+- test/contract/install.test.js: the rebuild case, which reads rebuilt
+- test/contract/tree.test.js: the session-file case, which reads the text of lib/pull.js
+- test/level0/folders.test.js, log.test.js, index.test.js, level1.test.js: every case
+- src/doors/index.js, log.js, front.js, fake/index.js, fake/log.js: imports, gone with engine-and-doors-leave
+- src/engine/group.js and named.js: imports of folders, apply and runs, gone with engine-and-doors-leave
+- src/scripts/bundle.js: stampOf, which reads hashText, taken by scripts-folder-leaves
+- Go comments in src/branches, src/index, src/modules/edits, src/modules/hooks, src/pull, src/quack and src/voice naming leaving files
+- spec/design_output: apply.md, extension.md, level0.md, log.md, migration.md and work.md lines naming leaving files
+- spec/tickets/engine-and-doors-leave.md and test-lines-stay-under-code.md: depends_on
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/plugin_libs_test.go: TestThePluginLibrariesHoldTheValeLibraryAlone
+- src/quack/install_test.go: TestEveryBuiltBinaryRebuildsWhenItsSourceMovesAhead
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/log.js
+- .claude/skills/level0/lib/index.js
+- .claude/skills/level0/lib/index-tools.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/pull.js
+- .claude/skills/level0/lib/apply.js
+- .claude/skills/level0/lib/undo.js
+- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/hash.js
+- test/level0/folders.test.js
+- test/level0/log.test.js
+- test/level0/index.test.js
+- test/level0/level1.test.js
+- test/level0/index-tools.test.js
+- test/level0/pull-spawn-hook.test.js
+- test/level0/lsp.test.js
+- test/level0/tools.test.js
+- test/contract/install.test.js
+- test/contract/tree.test.js
+- test/contract/ruled.js
+- src/engine/tools.js
+- src/quack/plugin_libs_test.go
+- src/quack/install_test.go
+- Go files whose comments name a leaving file, under src/branches, src/index, src/modules, src/pull, src/quack, src/voice
+- spec/design_output/apply.md, extension.md, level0.md, log.md, migration.md, work.md
+- spec/tickets: the six children, engine-and-doors-leave and test-lines-stay-under-code
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked: every lib import, tree.js rules, stop.Pool, shimSettings, the cold path and the Go owners
+- the callers come from git grep on each leaving file over imports, comments, RUNME.sh, src/stub, .github, .vale.ini, package.json and notes
+- TestThePluginLibrariesHoldTheValeLibraryAlone decides the first line, go test ./src/modules/... the second, and ./RUNME.sh check at tests-green the third
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
