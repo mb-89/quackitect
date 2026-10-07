@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: ec101ae395b95f41
         size: 1914
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: 6c6103b611a2b9d46e7117c5e1b15b6c31d46850
+    hash_after: 6c6103b611a2b9d46e7117c5e1b15b6c31d46850
+    inputs:
+      - name: design/draft
+        hash: ec101ae395b95f41
+        size: 1914
+      - name: design/tests-red
+        hash: 8ccf079c6ecfa0e9
+        size: 776
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -266,8 +278,11 @@ fakes: the tests reach the disk and the watch, and FakeDisk and FakeWatch stand 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- seed-splits-under-bus-cap: Seeds commits the whole standing tree in one message, and the text alone reads about a third of the 64 MiB bus cap (src/index/bus.go busPayload); a growing tree or a large text file meets the same death, so the seed wants batches or a size guard
+- io-start-fault-shows: ioOver in src/quack/io.go exits the whole IO process on one instance's start fault, and the daemon's stderr reaches nowhere, so git dies beside watch with no line a reader sees; the fault wants a log row or a lone instance down
 
 # implement
 
