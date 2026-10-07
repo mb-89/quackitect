@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -147,6 +147,18 @@ record:
         hash: 7d580475d667653d
         size: 3016
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 3cca88ad95cc5cfcfd8629c8ea5e2c2faca1da3b
+    hash_after: 3cca88ad95cc5cfcfd8629c8ea5e2c2faca1da3b
+    inputs:
+      - name: design/draft
+        hash: 7d580475d667653d
+        size: 3016
+      - name: design/tests-red
+        hash: 8ad2d654834a376c
+        size: 691
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -291,8 +303,9 @@ The schema cases stand in `src/quack` and not in the check package, beside the m
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
