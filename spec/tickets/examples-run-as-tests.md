@@ -112,6 +112,10 @@ record:
     hash_before: 2b55f3452f9c85794ab53ace94bb4d949edfddae
     session: cse_019ptR8yR5LL6i15jhgQ32Ag
     hash_after: b411f17cb44a63904b8358f37cf4bbd6e92a3caa
+  - step: children
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: b3a71e59f78677e453d134e3c75d47d0460d12d6
+    session: cse_01Dx32SEhQn8DWKT3wqYqKkH
 ---
 
 # Ask
