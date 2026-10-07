@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 688fbd249e8fb513e0609f899d54f17094c95378
+    hash_after: 688fbd249e8fb513e0609f899d54f17094c95378
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    2.5  test/contract/vale-fix.test.js a contraction is written out, and the line keeps its case"
+    inputs:
+      - name: design/tests-red
+        hash: c4466ee89d0179fe
+        size: 1191
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -558,26 +581,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/probe_cold_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The folder `src/bridge` leaves the tree, since no process ran it. The doors read the slice names off the schema migration block, so a new slice needs no list. `REFUSES` stands beside `keptOf` in `src/scripts/quack-topic.js`. The JS tests of bridge code leave with it, and the cases of live code in the vehicle and outside-hand tests stay. Each comment that named a bridge file as owner now names the Go owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches files the draft names, and no file past them.
+- The slice read goes through the disk door `cli-doors.js` holds, which has its fake.
+- The comment over `slicesIn` names this ticket.
+- `REFUSES` stands in one file, and the Go lists point at `walkPasses` and `parkedFolders`.
 
 # accept
 
