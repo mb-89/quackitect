@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 62cb00bd9dda6a1856589ce0aa8e330044f86f44
+    hash_after: 62cb00bd9dda6a1856589ce0aa8e330044f86f44
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/example passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   68.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4083b33505207200
+        size: 893
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -345,26 +368,33 @@ go vet ./src/quack/ ./src/example/
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/example/expect_test.go src/quack/examples_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every example under spec/examples now runs as a subtest of TestEveryExampleHoldsItsSteps, over its own copy of one fixture tree built in TestMain. Each copy is a clone in memory, with a fake disk, git, process table and clock. The ticket pull and note verbs take the pull they run over, so the harness dispatches each call in process. A call outside the table misses, naming its verb. Holds in src/example judges each expect line, and a miss names the file, the step and the line. The verdicts land in .se/.runtime/examples.json for the Tutorial tab.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list and the Discussion name, and the verbs the callers list names
+- every door has a fake: files.FakeDisk, a FakeRepo clone, a FakeRunner and a fixed clock, and a verb reaching the model misses outside the table
+- the comment on src/quack/examples_harness_test.go names the approach, and links the design
+- every fact stands once: Holds is the one evaluator, VerdictFile names the file, and the example text stands in its file alone
 
 # accept
 
