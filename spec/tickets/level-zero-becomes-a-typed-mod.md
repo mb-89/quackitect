@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: ea7917f00193bc9bebddda2a3e8bf49c6ec7eacf
+    hash_after: ea7917f00193bc9bebddda2a3e8bf49c6ec7eacf
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 cloud: true
 ---
 
@@ -230,38 +242,73 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+`level0-drops-what-standard-replaces`: the start verb reads the manifest alone, at d314010ac
+`boot-hook-names-desk-road`: the boot hook section names the cloud road and the desk road, and the standard road row points at it, at 4b13c0876
+`level0-plugin-validate-in-check`: the plugin part runs validate with --strict, and the level0 note names the part, at e3adb5dc3
+`hand-spawn-skips-session-tag`: the spawn answer leaves the pull hand untagged off the hand line q owns, at 7e1d8ff1b
+the private notes `check-answers-no-green` and `kit-drops-the-own-spawn` stand decided
+the battery before, at 376fa30: the check exits 1 in 1m50s wall, its tests part red on a vale limit
+the battery after, at ea7917f00: the check exits 0 in 98s wall, 95.6s across its parts, with rules at 58.8s the longest
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+each gate went to a hand of its own, and the gate on the start verb found the stale boot hook sentence the do step then fixed
+the commit door ran the check and the cold probe on every commit, so no push landed red
+the red test before each fix named the fault in its own words, so the fix took one write
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+17:34 the canary hook asked the line again after it opened the first answer
+17:40 the stop under your-helpers-still-run fell, since a cloud box stops its helpers at the turn end, and the wait tool returned at once with its result on the next turn
+17:36 the gate hand named a child past five words, and the pull refused it once
+17:51 the design note edit broke CountedList, DigitInProse and Sentence, and the check went red on it
+17:59 and 18:04 the pull refused the tests field twice: a green field wants a last line opening on green, and the check ends on its timing line
+18:05 the commit door refused a message naming no ticket, then a trailer naming the model the harness attribution asks for
+18:06 the plugin pull tool answered no tool.call hook, and the shell verb took its place
+18:20 the second gate hand pulled under --as with no ticket name, and the pull read the plan working item, still a closed ticket
+18:3x the accept hand-back with --pass was refused, since the verdict field decides
+18:56 the commit door refused a change to q and the pull with no test of their own staged, and a test literal named a field the Leaf type embeds
+the beat wrote nothing all window, since its push met no git proxy
+no owner prompt reached this window past the routine prompt at the session start
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the do step of `spec/processes/trivial` says the tests field takes a test of the code the change describes, since the check prints no green verdict
+`src/pull/pull_branch.go` spawnPrompt names the ticket in its first pull, so a hand reads no stale plan item
+`src/modules/waits` blocks inside the call up to its cap on a cloud box, so a wait ends no turn
+`.claude/skills/level0/hooks/pull-tool.ts` answers every call of the tool it registers
+`.claude/settings.json` carries the attribution setting with no co-author line, so the harness asks for no trailer the commit door refuses
+`src/branches` beat pushes through the same remote the commit verb reaches
+`spec/guidance/tickets` rule 15 holds the Leaf literal miss: open the type before the test writes it
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The window read the handover first and took the queue as the road, and the door kept the agent on the ticket in hand. Most of the time went to the engine rather than the change: the wait that returns at once, the green form, the stale hand. Each answer was found by reading the engine source, which the next box can skip once the improve lines land.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact stands once: the battery stands in the done list, and each improve line points at its home
+the numbers are measured times off the check and the log, each beside its commit
+the chapter writes no file header
+the chapter carries the errors off the log with their times, and says no new owner prompt reached the window
+the chapter names roles alone, and carries repository paths with no box path
 
 ## cloud
 
