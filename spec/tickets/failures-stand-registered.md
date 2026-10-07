@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -211,6 +211,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box bf9a9fb67fb5 · claude-code-remote
+    hash_before: 252921bbf1b3b4ee4e756b031cc274d51a29dc45
+    hash_after: 252921bbf1b3b4ee4e756b031cc274d51a29dc45
+    inputs:
+      - name: retro/write
+        hash: eafa7ee853223742
+        size: 2745
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -394,28 +404,26 @@ The merge carried the risk: main ported the take, pull and bash guard to Go whil
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- 16:26 to 17:15: the auto mode classifier denied one command as irreversible local destruction
-- 16:26 to 17:15: a push of a stale branch met remote rejected, cannot lock ref
+- the rm of the stale index database, which the cage refuses while the index stands down, at the first serve
+- a delete op on the patch door, at the merge accepting the deletions of main
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- 16:26 to 17:15: the trunk guard refused a checkout of main, and refused a push of main from a cloud box
-- 16:26 to 21:17: the context cap cleared the conversation five times, and each window began on the handover
-- 16:26 to 18:21: the index dropped during a tests-green hand-back through the pull tool, a fault of this box alone, and the shell hand-back stood in
-- 19:44: the commit hook refused code with no test beside it
-- 21:26 and 21:30: LandingFollowsItsGate refused a piped landing, and the stop hook refused a stop that waited on helpers
+- a conflict at sync: 21 files, at the take
+- the cage refusing calls while the index stands down, at the first serve and after the merge opened
+- LandingFollowsItsGate on a pull chained after a script, at the split and the retro
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- no person step stands parked
-- no ticket stands minted with no group
-- the handover says the group carries three open children the retro minted: index-survives-a-long-call, the-twins-leave-whole and the-hooks-feed-the-sentinel
+- no person step parked
+- no ticket minted outside the group
+- the handover: the group stands at done once branch done runs, and its pull request lands on main with auto-merge on
 
 # Discussion
 
