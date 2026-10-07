@@ -326,7 +326,7 @@ func (d *Doors) takeable(one named, all []named, group string) string {
 	return at.Path
 }
 
-// Whether a dependency stands closed, here or on trunk, open while its group's work branch stands, and closed where it stands nowhere. [[spec/design_output/pull#a-live-branch-holds-its-dependents]]
+// Whether a dependency stands closed, here or on trunk, open while its group's work branch stands, and closed where it stands nowhere. [[spec/design_output/pull#a-live-branch-holds-dependents]]
 func (d *Doors) closedHere(all []named, dep string) bool {
 	for _, one := range all {
 		if one.Name == dep {
