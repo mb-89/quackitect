@@ -15,7 +15,7 @@ func TestTheGoVerbsPrintTheirUsage(t *testing.T) {
 	root := func() (string, error) { return t.TempDir(), nil }
 	v1 := func() (string, error) { return "", nil }
 	var out, errs bytes.Buffer
-	if code := branchVerb(root, v1)([]string{"branch"}, false, &out, &errs); code != 0 || !bytes.Contains(out.Bytes(), []byte("Usage: ./RUNME.sh branch <verb>")) {
+	if code := branchVerb(branchingHere(root, v1))([]string{"branch"}, false, &out, &errs); code != 0 || !bytes.Contains(out.Bytes(), []byte("Usage: ./RUNME.sh branch <verb>")) {
 		t.Fatalf("branch answers %d: %s", code, out.String())
 	}
 	out.Reset()

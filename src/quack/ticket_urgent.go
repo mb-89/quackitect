@@ -11,20 +11,20 @@ import (
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket urgent", ticketUrgent(index.Root)) }
+func init() { register("ticket urgent", ticketUrgent(pullingHere(index.Root, registeredRepo))) }
 
 // The one mark a hand reads before it takes the next thing. [[spec/design_output/work#the-mark-and-what-waits]]
 const urgentKey = "urgent"
 
 // [[spec/tickets/view-actions-run-through-verbs]]
-func ticketUrgent(rootOf func() (string, error)) twin {
+func ticketUrgent(here pullOver) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
-		disk, err := workDisk(rootOf)
-		if err != nil {
-			fmt.Fprintln(errs, err)
-			return exitFailed
+		it, code := here(out, errs)
+		if it == nil {
+			return code
 		}
+		disk := it.Disk
 		at, found := ticketNamed(disk, said)
 		if !found {
 			fmt.Fprintf(errs, "%s names no ticket: ./RUNME.sh ticket urgent slow-lint\n", nameOr(said, "ticket urgent"))

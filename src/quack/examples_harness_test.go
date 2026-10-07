@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/branches"
 	"quackitect/src/example"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
@@ -36,7 +37,7 @@ const (
 )
 
 // The fixture's own folders, read off the tree, past which the planted group stands. [[spec/design_output/examples#doors-fixtures-and-the-ratio]]
-var fixtureFolders = []string{"spec/processes", "spec/config"}
+var fixtureFolders = []string{"spec/processes", "spec/config", "spec/schemas"}
 
 // The planted group and its one child, the leaf a first pull hands out. [[spec/design_output/examples#doors-fixtures-and-the-ratio]]
 var plantedTickets = map[string]string{
@@ -71,34 +72,46 @@ func exampleShell(one proc.Command) proc.Said {
 	return proc.Said{Err: "sh: not found\n", Code: 127}
 }
 
-// A clone on the planted group's branch of an origin holding a copy of the fixture, and the pull over it on a cloud box. [[spec/design_output/examples#one-runner-two-drivers]]
-func exampleTree() (files.Disk, pullOver, error) {
+// The file a commit on origin's main lands past the seed, so a sync has a commit to take. [[spec/design_output/examples#doors-fixtures-and-the-ratio]]
+const exampleMainMoves = "MAIN.md"
+
+// A clone on the planted group's branch of an origin holding a copy of the fixture, and the pull and the branch doors over it on a cloud box. [[spec/design_output/examples#one-runner-two-drivers]]
+func exampleTree() (files.Disk, pullOver, doorsOver, error) {
 	now := func() time.Time { return time.Unix(0, 0) }
 	seed := files.NewFakeDisk()
 	for path, text := range exampleFixture {
 		if err := seed.Write(path, text); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 	origin := git.NewFakeRepo(seed, now)
 	if err := origin.AddAll(); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if _, err := origin.Commit("seed", nil); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if err := origin.Branch(exampleBranch, "main"); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	if err := seed.Write(exampleMainMoves, "main moves on\n"); err != nil {
+		return nil, nil, nil, err
+	}
+	if err := origin.AddAll(); err != nil {
+		return nil, nil, nil, err
+	}
+	if _, err := origin.Commit("main moves on", nil); err != nil {
+		return nil, nil, nil, err
 	}
 	tree := files.NewFakeDisk()
 	repo := origin.Clone(tree)
 	if err := repo.Switch(exampleBranch, false); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	repo.Set("user.name", "example")
 	repo.Set("user.email", "example@example")
 	if err := tree.Write(exampleBox, `{"id":"cafecafecafe"}`+"\n"); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	box := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": exampleShell}}
 	here := func(out, errs io.Writer) (*pull.It, int) {
@@ -109,12 +122,26 @@ func exampleTree() (files.Disk, pullOver, error) {
 			Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(exampleMethod, rootDisk{exampleMethod})) },
 		}, 0
 	}
-	return tree, here, nil
+	doors := func(out, errs io.Writer) *branches.Doors {
+		return &branches.Doors{
+			Root: exampleRoot, Method: exampleMethod, Repo: repo, Run: box.Run, Disk: tree, Now: now, Out: out, Errs: errs,
+			Env:      map[string]string{"CLAUDE_CODE_REMOTE": "true"},
+			Config:   func(string) any { return nil },
+			Runme:    []string{"sh", "RUNME.sh"},
+			Value:    func(name string, _ any) error { return fmt.Errorf("no index answers %s here", name) },
+			Guidance: func() (map[string][]string, error) { return map[string][]string{}, nil },
+		}
+	}
+	return tree, here, doors, nil
 }
 
 // The verbs an example reaches, each over the pull on its own copy; a verb joins once its constructor takes every door it reaches. [[spec/design_output/examples#one-runner-two-drivers]]
-func exampleTable(here pullOver) map[string]twin {
-	return map[string]twin{"ticket pull": ticketPull(here), "ticket note": ticketNote(here)}
+func exampleTable(here pullOver, doors doorsOver) map[string]twin {
+	return map[string]twin{
+		"branch": branchVerb(doors),
+		"ticket pull": ticketPull(here), "ticket note": ticketNote(here),
+		"ticket set": ticketSet(here), "ticket todo": ticketTodo(here), "ticket urgent": ticketUrgent(here),
+	}
 }
 
 // The verb a call names in the table, by its longest name. [[spec/design_output/examples#one-runner-two-drivers]]
@@ -133,7 +160,7 @@ func runsExample(path, text string) string {
 	if len(faults) > 0 {
 		return fmt.Sprintf("%s: line %d: %s", path, faults[0].Line, faults[0].Message)
 	}
-	tree, here, err := exampleTree()
+	tree, here, doors, err := exampleTree()
 	if err != nil {
 		return fmt.Sprintf("%s: the fixture tree builds no copy: %v", path, err)
 	}
@@ -141,7 +168,7 @@ func runsExample(path, text string) string {
 		text, ok, err := tree.Read(at)
 		return text, ok && err == nil
 	}
-	table := exampleTable(here)
+	table := exampleTable(here, doors)
 	for n, step := range read.Steps {
 		verb, ok := verbOf(table, step.Call)
 		if !ok {
