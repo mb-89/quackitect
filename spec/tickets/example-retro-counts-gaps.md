@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 16643b85e4a7a1c08affb35ba026f7b478db55f4
+    hash_after: bafe536fbb2aefd6e3458e2444987033f03762d3
+    inputs:
+      - name: ask
+        hash: 411852f0b0608d7f
+        size: 521
+      - name: [[spec/guidance/retro/audit]]
+        hash: e47482696963dde5
+        size: 1285
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,71 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb, `./RUNME.sh retro gaps`, prints both counts the audit asks for, each item one a line, and exits 0: it reports, and the auditor decides.
+
+| count | source | each item |
+|---|---|---|
+| features with no example | the coverage guard: `check.ExampleCovers`, the rule exported under its own name | `./RUNME.sh <verb>` and the file and line registering it |
+| tests beside a shown verb | `check.Shown` names every verb an example shows, and the verb reads the `src/quack` file registering each, then every `Test` function in the `_test.go` file beside it | the test file and the test name |
+
+The second count names candidates. A test standing beside a verb an example shows asserts that verb again, or holds an edge the command line cannot reach. The auditor reads each one and keeps it or cuts it, per [[spec/guidance/code/tests]] rule 1.
+
+The verb stands in `src/quack/retro_gaps.go`, registered as `retro gaps`, over `retroRoot` as `retro audit` is. It reads the tree through `lintTree(root)`, whose paths git lists, since `rootDisk` lists none. `src/modules/check/coverage.go` renames `exampleCovers` to `ExampleCovers` and `shownNames` to `Shown`, so one place owns each count. The audit step in `spec/processes/retro.yaml` adds `retro gaps` under `needs`, and its examples item names the verb. `retro_usage.go` lists the verb.
+
+Assumed: a report at exit 0 serves the audit better than a gate, since a test beside a shown verb is a candidate, and a gate on it refuses every edge test.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/checker.go Rules, which lists exampleCovers
+- src/modules/check/coverage.go exampleCovers, which calls shownNames
+- src/modules/check/example_test.go TestAVerbNoExampleNamesTakesAWarning and TestATabNoExampleNamesTakesAWarning, which call exampleCovers
+- src/quack/retro_usage.go retroUsageVerb, which lists the retro verbs
+- spec/processes/retro.yaml the audit step
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps_test.go TestRetroGapsNamesEachVerbNoExampleShows
+- src/quack/retro_gaps_test.go TestRetroGapsNamesEachTestBesideAShownVerb
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps.go
+- src/quack/retro_gaps_test.go
+- src/quack/retro_usage.go
+- src/modules/check/coverage.go
+- src/modules/check/checker.go
+- src/modules/check/example_test.go
+- spec/processes/retro.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: coverage.go, checker.go Rules, retro_audit.go, retro_audit_test.go, retro_home.go retroRoot, verb_lint.go lintTree, writedoor.go rootDisk, the audit step of retro.yaml and audit guidance rule 6
+- callers: a grep for shownNames and exampleCovers names each line, and retro_usage.go registers the retro usage
+- done_when 1 and 3: the two retro_gaps_test.go cases on a planted temp tree, which hand the verb a Texts tree so no git runs
+- done_when 2: the retro.yaml diff, read at accept
+- done_when 4: ./RUNME.sh check at tests-green
+- config keys: none added
 
 ## tests-red
 
