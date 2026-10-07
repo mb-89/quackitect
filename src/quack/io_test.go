@@ -5,6 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"os"
 	"path/filepath"
@@ -297,6 +298,7 @@ func TestTheHooksDoorReadsTheIndexLease(t *testing.T) {
 	}
 }
 
+// A start that fails writes its row, and the instances beside it commit on. [[spec/tickets/io-start-fault-shows]]
 func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 	t.Parallel()
 	bus, err := index.StartBus()
@@ -318,11 +320,16 @@ func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 	start := func(_ string, commit index.Commit) (func(), error) {
 		return func() {}, commit(q.Writer{}, map[string]any{"fake/out": 7})
 	}
-	stop, err := runsIO(bus.URL(), bus.Token(), map[string]index.Start{"fake": start})
+	broken := func(string, index.Commit) (func(), error) { return func() {}, errors.New("payload exceeded") }
+	rows := make(chan map[string]any, 4)
+	stop, err := runsIO(bus.URL(), bus.Token(), map[string]index.Start{"broken": broken, "fake": start}, func(row map[string]any) error { rows <- row; return nil })
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stop()
+	if row := <-rows; row["kind"] != ioStartFault || row["instance"] != "broken" || row["said"] != "payload exceeded" {
+		t.Fatalf("a start that fails writes %v, and wants a row naming broken and its fault", row)
+	}
 	select {
 	case values := <-heard:
 		if string(values["fake/out"]) != "7" {
