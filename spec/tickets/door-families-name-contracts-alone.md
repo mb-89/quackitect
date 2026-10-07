@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: test-walks-move-onto-fakes
+record:
+  - step: do
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: d81e21859c88aaeb38c266d28a3e22fd135d86d5
+    hash_after: fab45bf4c27f831e3bd931546e2e0c52619adeb4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "   67.2  in all"
+    inputs:
+      - name: ask
+        hash: 88d1a6d06aff47b4
+        size: 459
+    def: 16c92ada996c9f36
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the family table of spec/design_output/doors.md still names src/quack/cli_test.g
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/imports
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Three family rows of spec/design_output/doors.md now name their contract files alone: the placements row names src/quack/box_doors_contract_test.go, the index door row names src/index/index_contract_test.go, and the file watch row names src/modules/files/watch_contract_test.go. Each list matches the contract key of the owns.yaml beside it. TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit in src/imports reads the real note and names any test waiting on the box with no span there, and it passes with the dropped files gone, so none of them sleeps or spawns.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the eight files leave their rows, and the audit guard holds the claim that none of them waits on the box. src/quack/cli_test.go, dump_test.go and main_test.go still serve an index over a temp folder, and src/index/watch_test.go opens a watch over one. The note .se/tickets/root-cases-take-their-doors.md holds that work, and the sibling watchertest-helper-meets-its-door holds the watchertest helper.
+the cleanup this change reveals stands in the note and the sibling ticket named above, so the change carries none.
+every contract file stands once in the owns.yaml contract key, and the family rows name those same files with no second list.
 
 # Discussion
 
