@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 513eb42eb823afcb
         size: 1034
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 7830e3eb3c190042b2a17b5fc03765f0bb555b69
+    hash_after: 630ca21903ba7ba1f3886f748af1a896cdf76095
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -323,14 +332,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files of the draft size, past two the draft left out: spec/design_output/migration.md and the model note analyzer line, which named the retired Vale rule, and the outside rule contract test keeps its file and drops the three pieces naming DoorsOnly, since the same file holds the contract of OutsideInDoors
+the random door holds no file, so it has no fake by design: every call of Math.random walks around it until a door file and its fake stand; every other door the change reaches keeps the fake it had
+the comments name the approach: pureModules and moduleOf in src/owns/script.go point at the doors note section the guard follows
+the pure module list stands once, in src/owns/script.go, and the doors note and the testing rationale point at it; the report key, now carried by no door, stays as a parked note, report-key-retires, for the retro
 
 ## tests-green
 
