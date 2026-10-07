@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: c67f136b6c069fae8be59de68e3414ffa731c2ac
+    hash_after: c67f136b6c069fae8be59de68e3414ffa731c2ac
+    inputs:
+      - name: ask
+        hash: 5087e2972354c89a
+        size: 1091
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -166,38 +175,52 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The settings already carry no switch, and the design note section What stays off the standard road already gives the reason for the function hooks over settings command hooks. Three gaps close here. First, the start verb in src/quack/verb_start.go still counts the plugin loaded only where the switch is set, so a desk session outside plan mode meets the start refusal although the manifest stands; the verb reads the manifest alone. Second, the boot hook row in that section gives the cloud install its reason and leaves out the desk road, where boot.js hands the hook input to the start verb; the row names both roads and why each stays: the client scans plugins before any hook of a mod runs, and a session loading no plugin has no mod hook to refuse it. Third, the cold probe runs a fresh clone of this commit on this box client with no switch, and its output goes under Discussion.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/boot.js asks, which runs the start verb on a desk session start
+- src/quack/verb_start.go startVerb, registered as the start verb
+- src/modules/hooks/start.go StartRefusal, which the start verb calls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start_test.go TestStartStopsADeskSessionWritingWithNoPlugin, whose case of a manifest with no switch flips to a pass, and whose cases set no switch
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start.go
+- src/quack/verb_start_test.go
+- spec/design_output/level0.md
+- spec/tickets/level0-drops-what-standard-replaces.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened verb_start.go, start.go, boot.js, the settings and the design note section, and each claim stands there
+the callers list names boot.js asks, startVerb and StartRefusal, the only readers of the switch past tests
+the probe line meets the cold probe output, the boot hook line meets the design note row, the function hooks line meets the standing row, and the check line meets the check
+the approach adds no config key
 
 ## tests-red
 
