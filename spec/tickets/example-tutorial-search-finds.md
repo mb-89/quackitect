@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -175,6 +175,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: c9d1592c996f7c1c735fa9d70f6b9909b77e3e3d
+    hash_after: c9d1592c996f7c1c735fa9d70f6b9909b77e3e3d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tutorial passes
+      - name: check
+        exit: 0
+        said: "   58.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 534e9b74e1d3d6d2
+        size: 1118
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -346,26 +369,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tutorial/tab_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Tutorial tab's search takes two modes. Title mode keeps each example whose title holds the word. Content mode also reads each keyword and the body, and lights every match in the main view in reverse video. The `alt+m` key turns the mode over, and works while the filter line takes letters. A dim line over the tree names the mode while the search holds a word. Clearing the line brings back every row, with the selection where it stood. The footer cannot name the mode, since it reads the marks of the log tab. The test helper opens the filter pane only where it stands closed, because a second open closes it. Its gofmt line on the Tab struct landed in c9d1592c9, beside example-first-chapters-stand, since the check reads the whole tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/tutorial/tab.go and its test alone
+- the cases reach the registry door alone, through registry.Fake
+- each new function and the alt+m key link to spec/design_output/examples#the-search
+- the mode names and the match style stand once, as names at the top of tab.go
 
 # accept
 
