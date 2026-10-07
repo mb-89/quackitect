@@ -136,6 +136,10 @@ record:
         hash: b1429804df0c41dd
         size: 958
     def: 19b6849b1f151cd5
+  - step: children
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 43d1136b2b3d3327a2b94c6cefb020ff6d378f72
+    session: cse_01BXnrFXaextXggvGwAnAU5j
 ---
 
 # Ask
