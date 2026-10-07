@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: d1dd9f88b5c81bd1
         size: 918
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: e2501f11ac4c4aec42dec5952e3cb361b2eb2b5a
+    hash_after: d314010aca34ad4a8b7107443c58e0cc887ec572
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/verb_start.go alone, which the ask names through the start verb fix
+the start verb reaches the disk and the environment through startOutside, whose fakes the start test already holds
+the manifest constant points at spec/design_output/level0#the-boot-hook, which names the approach
+the fact that a mod loads by default stands in the What the standard road leaves section alone, and the code points there through the manifest comment
 
 ## tests-green
 
