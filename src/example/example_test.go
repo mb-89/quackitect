@@ -1,12 +1,14 @@
 // The one parser of an example: a planted file reads into prose, calls and
 // expect lines, and a line out of shape names its line and its rule.
 // [[spec/design_output/examples#the-format]]
-package example
+package example_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"quackitect/src/example"
 )
 
 // A user example holding every expect form the design note names. [[spec/design_output/examples#the-format]]
@@ -25,20 +27,20 @@ func holding(line string) string {
 
 func TestAPlantedExampleReadsEachExpectForm(t *testing.T) {
 	t.Parallel()
-	read, faults := Read(userPath, planted)
+	read, faults := example.Read(userPath, planted)
 	if len(faults) != 0 {
 		t.Fatalf("the planted example reads with faults %+v", faults)
 	}
 	if read.Title != "A pull hands out the next leaf" || !reflect.DeepEqual(read.Keywords, []string{"ticket", "pull"}) || !reflect.DeepEqual(read.Interface, []string{"ticket pull"}) {
 		t.Fatalf("the front reads %q, %q, %q", read.Title, read.Keywords, read.Interface)
 	}
-	want := []Step{
-		{Prose: "A box pulls, and the engine hands it the first leaf.", Call: []string{"ticket", "pull"}, Line: 11, Expects: []Expect{
+	want := []example.Step{
+		{Prose: "A box pulls, and the engine hands it the first leaf.", Call: []string{"ticket", "pull"}, Line: 11, Expects: []example.Expect{
 			{Form: "exit", Words: []string{"0"}, Line: 12},
 			{Form: "says", Words: []string{"leaf 1 of"}, Line: 13},
 			{Form: "quiet", Words: []string{"refused"}, Line: 14},
 		}},
-		{Prose: "The hand-back writes the field.", Call: []string{"ticket", "pull", "one", "--pass", "--fields", `{"a": "b c"}`}, Line: 20, Expects: []Expect{
+		{Prose: "The hand-back writes the field.", Call: []string{"ticket", "pull", "one", "--pass", "--fields", `{"a": "b c"}`}, Line: 20, Expects: []example.Expect{
 			{Form: "stands", Words: []string{"spec/tickets/one.md"}, Line: 21},
 			{Form: "field", Words: []string{"one", "state", "closed"}, Line: 22},
 		}},
@@ -51,7 +53,7 @@ func TestAPlantedExampleReadsEachExpectForm(t *testing.T) {
 // A fault at the line named, under the rule named. [[spec/design_output/examples#the-format]]
 func faultsAt(t *testing.T, text string, line int, rule string) {
 	t.Helper()
-	_, faults := Read(userPath, text)
+	_, faults := example.Read(userPath, text)
 	if len(faults) != 1 || faults[0].Line != line || faults[0].Rule != rule || faults[0].Message == "" {
 		t.Fatalf("the example reads with faults %+v, and wants one %s fault at line %d", faults, rule, line)
 	}
@@ -75,7 +77,7 @@ func TestALinePastRunmeRefuses(t *testing.T) {
 
 func TestAQuotedOperatorStaysAWord(t *testing.T) {
 	t.Parallel()
-	read, faults := Read(userPath, holding("./RUNME.sh ticket note one \"a | b && c\""))
+	read, faults := example.Read(userPath, holding("./RUNME.sh ticket note one \"a | b && c\""))
 	if len(faults) != 0 || len(read.Steps) != 2 || !reflect.DeepEqual(read.Steps[1].Call, []string{"ticket", "note", "one", "a | b && c"}) {
 		t.Fatalf("the quoted call reads %+v with faults %+v", read.Steps, faults)
 	}
@@ -110,13 +112,13 @@ func TestTheChapterNamesADeveloperCase(t *testing.T) {
 		{"spec/examples/110_tickets/pull.md", "110_tickets", false},
 		{"spec/examples/910_dev_tickets/pull.md", "910_dev_tickets", true},
 	} {
-		read, faults := Read(one.path, holding(""))
+		read, faults := example.Read(one.path, holding(""))
 		if len(faults) != 0 || read.Chapter != one.chapter || read.Dev != one.dev {
 			t.Fatalf("%s reads chapter %q, dev %v, faults %+v, and wants %q, %v", one.path, read.Chapter, read.Dev, faults, one.chapter, one.dev)
 		}
 	}
 	for _, path := range []string{"spec/examples/pull.md", "spec/examples/tickets/pull.md"} {
-		if _, faults := Read(path, holding("")); len(faults) != 1 || faults[0].Line != 1 || faults[0].Rule != "Chapter" {
+		if _, faults := example.Read(path, holding("")); len(faults) != 1 || faults[0].Line != 1 || faults[0].Rule != "Chapter" {
 			t.Fatalf("%s reads with faults %+v, and wants one Chapter fault at line 1", path, faults)
 		}
 	}

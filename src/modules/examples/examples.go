@@ -31,7 +31,20 @@ var exampleAt = regexp.MustCompile(`^spec/examples/[^/]+/[^/]+\.md$`)
 // One verdict as the harness writes it. [[spec/design_output/examples#one-runner-two-drivers]]
 type verdict struct {
 	Verdict string `json:"verdict"`
-	Miss    string `json:"miss"`
+	Miss    string `json:"miss,omitempty"`
+}
+
+// The verdict file's text over each example's miss, pass where the miss is empty. [[spec/design_output/examples#one-runner-two-drivers]]
+func VerdictsText(misses map[string]string) string {
+	said := map[string]verdict{}
+	for path, miss := range misses {
+		said[path] = verdict{Verdict: "pass"}
+		if miss != "" {
+			said[path] = verdict{Verdict: "fail", Miss: miss}
+		}
+	}
+	text, _ := json.MarshalIndent(said, "", "  ")
+	return string(text) + "\n"
 }
 
 // One example as the tab reads it. [[spec/design_output/examples#the-tutorial-tab]]

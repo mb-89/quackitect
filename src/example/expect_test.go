@@ -1,7 +1,7 @@
 // The one evaluator of an expect line: each form holds over the outcome and the
 // tree it names, and a miss says what it wants and what it got.
 // [[spec/design_output/examples#the-format]]
-package example
+package example // level0: InPackageTest - it reads expectOf, the one line reader the parser keeps unexported
 
 import (
 	"strings"

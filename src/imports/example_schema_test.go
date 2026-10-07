@@ -1,12 +1,13 @@
 // The example schema this tree ships, read off spec/schemas: the check the lint
 // and the write door ask refuses an example out of shape, field by field.
 // [[spec/design_output/examples#the-format]]
-package main
+package imports_test
 
 import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -17,26 +18,12 @@ import (
 // A user example the schema passes whole. [[spec/design_output/examples#the-format]]
 const wholeExample = "---\nkind: [[example]]\ntitle: The check runs\nkeywords: [check]\ninterface: [check]\n---\n\nThe check runs.\n\n```sh\n./RUNME.sh check\n# expect: exit 0\n```\n"
 
-// The schema and example rules the checker names over one example, sorted. [[spec/design_output/examples#the-format]]
-func exampleRules(t *testing.T, path, text string) []string {
-	t.Helper()
+func TestTheExampleSchemaRefusesAnExampleOutOfShape(t *testing.T) {
+	t.Parallel()
 	schema, err := os.ReadFile(filepath.Join("..", "..", "spec", "schemas", "example.schema.yaml"))
 	if err != nil {
 		t.Fatalf("the example schema stands nowhere: %v", err)
 	}
-	tree := check.TreeOver("/tree", check.Texts{"spec/schemas/example.schema.yaml": string(schema), path: text})
-	out := []string{}
-	for _, one := range check.CheckerOver(tree, 0, 0).Over(path) {
-		if strings.HasPrefix(one.Rule, "Schema.") || strings.HasPrefix(one.Rule, "Example.") {
-			out = append(out, one.Rule)
-		}
-	}
-	sort.Strings(out)
-	return out
-}
-
-func TestTheExampleSchemaRefusesAnExampleOutOfShape(t *testing.T) {
-	t.Parallel()
 	dev := strings.Replace(wholeExample, "interface: [check]\n", "interface: [check]\nedge: a check on an empty tree\n", 1)
 	for _, one := range []struct {
 		name, path, text string
@@ -52,11 +39,39 @@ func TestTheExampleSchemaRefusesAnExampleOutOfShape(t *testing.T) {
 		{"a call past ./RUNME.sh refuses", "spec/examples/110_check/runs.md", strings.Replace(wholeExample, "./RUNME.sh check\n", "./RUNME.sh check | tail\n", 1), []string{"Example.Call"}},
 		{"an expect form outside the table refuses", "spec/examples/110_check/runs.md", strings.Replace(wholeExample, "exit 0", "golden out.txt", 1), []string{"Example.Expect"}},
 	} {
-		t.Run(one.name, func(t *testing.T) {
-			t.Parallel()
-			if got := exampleRules(t, one.path, one.text); !reflect.DeepEqual(got, one.want) {
-				t.Fatalf("the check names %v, and wants %v", got, one.want)
+		tree := check.TreeOver("/tree", check.Texts{"spec/schemas/example.schema.yaml": string(schema), one.path: one.text})
+		got := []string{}
+		for _, found := range check.CheckerOver(tree, 0, 0).Over(one.path) {
+			if strings.HasPrefix(found.Rule, "Schema.") || strings.HasPrefix(found.Rule, "Example.") {
+				got = append(got, found.Rule)
 			}
+		}
+		if sort.Strings(got); !reflect.DeepEqual(got, one.want) {
+			t.Errorf("%s: the check names %v, and wants %v", one.name, got, one.want)
+		}
+	}
+}
+
+// The verbs the first chapters show, which the coverage rule names no more over this tree's examples and verb files. [[spec/tickets/example-first-chapters-stand]]
+func TestTheFirstChaptersLeaveTheirVerbsUnreported(t *testing.T) {
+	t.Parallel()
+	root, texts := filepath.Join("..", ".."), check.Texts{}
+	for _, folder := range []string{"spec/examples", "src/quack"} {
+		_ = filepath.WalkDir(filepath.Join(root, folder), func(at string, one os.DirEntry, err error) error {
+			if err == nil && !one.IsDir() && !strings.HasSuffix(at, "_test.go") {
+				text, _ := os.ReadFile(at)
+				rel, _ := filepath.Rel(root, at)
+				texts[filepath.ToSlash(rel)] = string(text)
+			}
+			return err
 		})
+	}
+	if texts["spec/examples/110_tickets/pull.md"] == "" {
+		t.Fatal("the tree the rule reads holds no first example")
+	}
+	for _, one := range check.ExampleCovers(check.TreeOver("/tree", texts)) {
+		if call, _, _ := strings.Cut(one.Message, check.UnshownSays); slices.Contains([]string{"ticket pull", "ticket note", "ticket set", "ticket todo", "ticket urgent", "branch", "check"}, strings.TrimPrefix(call, "./RUNME.sh ")) {
+			t.Errorf("the coverage report names a verb the first chapters show: %s", one.Message)
+		}
 	}
 }

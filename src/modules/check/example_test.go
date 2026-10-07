@@ -1,7 +1,7 @@
 // The x-under glob holds a field to its chapters, whether the path reads from
 // the tree root or whole, as the write door holds it.
 // [[spec/design_output/examples#the-places]]
-package check
+package check // level0: InPackageTest - it reaches the unexported rule exampleProves and the glob matcher underGlob
 
 import (
 	"strings"

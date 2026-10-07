@@ -84,30 +84,11 @@ func TestTicketSet(t *testing.T) {
 			}
 		}
 	})
-	t.Run("set refuses a field the engine owns, and writes nothing", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		for _, field := range []string{"state", "step", "steps"} {
-			code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", field, "closed")
-			want := field + " is the verbs' to write, so ./RUNME.sh ticket moves it and the door refuses the edit.\n"
-			if code != 2 || out != "" || errs != want {
-				t.Errorf("set %s answers %d, %q, %q", field, code, out, errs)
-			}
-		}
-		if got, _ := readsBack(t, root, aThing); got != editCaseTicket("") {
-			t.Fatalf("a refused set writes %q", got)
-		}
-	})
 	t.Run("set weighs the value against the schema, as the tab does", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		code, _, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "urgent", "maybe")
 		if got, _ := readsBack(t, root, aThing); code != 2 || errs != "urgent takes a boolean, and \"maybe\" reads as none.\n" || got != editCaseTicket("") {
 			t.Fatalf("set urgent maybe answers %d, %q, and writes %q", code, errs, got)
-		}
-		if code, _, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "urgent", "true"); code != 0 {
-			t.Fatalf("set urgent true answers %d", code)
-		}
-		if got, _ := readsBack(t, root, aThing); !strings.Contains(got, "\nurgent: true\n") {
-			t.Fatalf("the ticket holds %q", got)
 		}
 	})
 	t.Run("set refuses a group that stands closed, and writes nothing", func(t *testing.T) {

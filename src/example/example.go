@@ -17,7 +17,7 @@ import (
 const (
 	runme      = "./RUNME.sh"
 	expectOpen = "# expect:"
-	// A field expect names its ticket, its field and its value.
+	// [[spec/design_output/examples#the-format]]
 	fieldWords = 3
 )
 

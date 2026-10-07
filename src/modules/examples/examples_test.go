@@ -1,13 +1,15 @@
 // examples/rows reads each example with its chapter and its last verdict, and
 // examples/run asks the node module for the run verb.
 // [[spec/design_output/examples#the-tutorial-tab]]
-package examples
+package examples_test
 
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
+	"quackitect/src/modules/examples"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
@@ -18,21 +20,24 @@ const (
 )
 
 func TestTheRowsReadEachExampleWithItsChapterAndVerdict(t *testing.T) {
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	index := qtest.New(t, func(c *q.Catalog) { examples.Registers(c) })
 	index.Seed(map[string]any{
 		"files/spec/examples/910_dev_pull/edge.md": q.Content{Hash: "e", Text: edgeText},
 		"files/spec/examples/110_tickets/pull.md":  q.Content{Hash: "p", Text: pullText},
 		"files/spec/tickets/one.md":                q.Content{Hash: "o", Text: "---\nkind: [[ticket]]\n---\n"},
-		"files/.se/.runtime/examples.json":         q.Content{Hash: "v", Text: `{"spec/examples/110_tickets/pull.md":{"verdict":"fail","miss":"a miss"}}`}, // .claude/skills/level0/lib/folders.js owns the runtime folder, and the harness writes the verdicts there.
+		"files/" + examples.VerdictsAt:             q.Content{Hash: "v", Text: examples.VerdictsText(map[string]string{"spec/examples/110_tickets/pull.md": "a miss", "spec/examples/110_tickets/gone.md": ""})},
 	})
-	if err := index.Store().Run(RowsName); err != nil {
-		t.Fatalf("%s runs nowhere: %v", RowsName, err)
+	if !strings.Contains(examples.VerdictsText(map[string]string{"a.md": ""}), `"verdict": "pass"`) {
+		t.Fatal("an example with no miss reads no pass")
 	}
-	form, _ := json.Marshal(index.Read(RowsName))
-	var rows []Row
+	if err := index.Store().Run(examples.RowsName); err != nil {
+		t.Fatalf("%s runs nowhere: %v", examples.RowsName, err)
+	}
+	form, _ := json.Marshal(index.Read(examples.RowsName))
+	var rows []examples.Row
 	_ = json.Unmarshal(form, &rows)
 	if len(rows) != 2 {
-		t.Fatalf("%s reads %s, and wants the two examples alone", RowsName, form)
+		t.Fatalf("%s reads %s, and wants the two examples alone", examples.RowsName, form)
 	}
 	pull, edge := rows[0], rows[1]
 	if pull.Path != "spec/examples/110_tickets/pull.md" || pull.Chapter != "110_tickets" || pull.Dev || pull.Title != "A pull hands out a leaf" || pull.Verdict != "fail" || pull.Miss != "a miss" || pull.Body != pullText {
@@ -44,18 +49,18 @@ func TestTheRowsReadEachExampleWithItsChapterAndVerdict(t *testing.T) {
 }
 
 func TestRunAsksTheNodeModuleForTheExampleRun(t *testing.T) {
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
-	body, _ := json.Marshal(RunIn{Path: "spec/examples/110_tickets/pull.md"})
-	input, err := index.Store().Input(RunName, body)
+	index := qtest.New(t, func(c *q.Catalog) { examples.Registers(c) })
+	body, _ := json.Marshal(examples.RunIn{Path: "spec/examples/110_tickets/pull.md"})
+	input, err := index.Store().Input(examples.RunName, body)
 	if err != nil {
-		t.Fatalf("%s takes %s to %v", RunName, body, err)
+		t.Fatalf("%s takes %s to %v", examples.RunName, body, err)
 	}
-	asked, err := index.Store().Act(RunName, input)
+	asked, err := index.Store().Act(examples.RunName, input)
 	if err != nil || len(asked) != 1 {
-		t.Fatalf("%s lists %+v, %v, and wants one run", RunName, asked, err)
+		t.Fatalf("%s lists %+v, %v, and wants one run", examples.RunName, asked, err)
 	}
 	args, _ := json.Marshal(asked[0].Args)
 	if asked[0].Module != "node" || asked[0].Verb != "run" || string(args) != `["example","run","spec/examples/110_tickets/pull.md"]` || asked[0].NoUndo == "" {
-		t.Fatalf("%s lists %s %s %s, and wants node run of the example run verb", RunName, asked[0].Module, asked[0].Verb, args)
+		t.Fatalf("%s lists %s %s %s, and wants node run of the example run verb", examples.RunName, asked[0].Module, asked[0].Verb, args)
 	}
 }

@@ -13,7 +13,7 @@ A box takes `main` in before it works, so a late conflict costs nothing.
 # expect: says "took 1 commit(s) from main"
 ```
 
-A second sync finds nothing left to take.
+A second sync finds nothing more to take.
 
 ```sh
 ./RUNME.sh branch sync

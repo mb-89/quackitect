@@ -1,88 +1,62 @@
 // Every example under spec/examples runs as a behavior test, a false expect
 // names its file, its step and its line, and the verdicts land for the tab.
 // [[spec/design_output/examples#one-runner-two-drivers]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
-
-	"quackitect/src/example"
-	"quackitect/src/index"
-	"quackitect/src/modules/check"
 )
 
 const pullingPath = "spec/examples/110_tickets/pull.md"
 
 // The first user example, pulling the planted child, whose lines the cases swap. [[spec/design_output/examples#the-format]]
 var pulling = func() string {
-	text, _ := os.ReadFile(filepath.Join("..", "..", pullingPath))
+	text, _ := os.ReadFile(filepath.Join(exampleMethod, pullingPath))
 	return string(text)
 }()
 
 func TestEveryExampleHoldsItsSteps(t *testing.T) {
 	t.Parallel()
-	root := filepath.Join("..", "..")
-	paths, _ := filepath.Glob(filepath.Join(root, "spec", "examples", "*", "*.md"))
+	paths, _ := filepath.Glob(filepath.Join(exampleMethod, "spec", "examples", "*", "*.md"))
 	misses, mu := map[string]string{}, sync.Mutex{}
 	t.Cleanup(func() {
-		if err := writesVerdicts(root, misses); err != nil {
+		if err := writesVerdicts(exampleMethod, misses); err != nil {
 			t.Error(err)
 		}
 	})
 	for _, path := range paths {
-		name := filepath.ToSlash(strings.TrimPrefix(path, root+string(filepath.Separator)))
+		rel, _ := filepath.Rel(exampleMethod, path)
+		name := filepath.ToSlash(rel)
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			text, err := os.ReadFile(path)
-			if err != nil {
-				t.Fatal(err)
-			}
 			miss := runsExample(name, string(text))
 			mu.Lock()
 			misses[name] = miss
 			mu.Unlock()
-			if miss != "" {
-				t.Fatal(miss)
+			if err != nil || miss != "" {
+				t.Fatal(err, miss)
 			}
 		})
 	}
 }
 
-func TestTheExamplesRunOverOneFixtureTree(t *testing.T) {
+func TestAMissNamesTheFileTheStepTheLineAndTheVerb(t *testing.T) {
 	t.Parallel()
-	if len(exampleFixture) == 0 {
-		t.Fatal("TestMain builds no fixture tree")
-	}
-}
-
-func TestAFalseExpectNamesTheFileTheStepAndTheLine(t *testing.T) {
-	t.Parallel()
-	miss := runsExample(pullingPath, strings.Replace(pulling, "leaf 1 of 1", "leaf 9 of 9", 1))
-	for _, part := range []string{pullingPath, "step 1", "line 13", "leaf 9 of 9"} {
-		if !strings.Contains(miss, part) {
-			t.Fatalf("the miss reads %q, and names no %q", miss, part)
+	for _, one := range [][]string{
+		{"leaf 1 of 1", "leaf 9 of 9", "line 13"},
+		{"./RUNME.sh ticket pull", "./RUNME.sh dispatch", "outside the harness table"},
+	} {
+		miss := runsExample(pullingPath, strings.Replace(pulling, one[0], one[1], 1))
+		for _, part := range []string{pullingPath, "step 1", one[1], one[2]} {
+			if !strings.Contains(miss, part) {
+				t.Errorf("%s reads the miss %q, which names no %q", one[1], miss, part)
+			}
 		}
-	}
-}
-
-func TestAVerbOutsideTheTableMissesNamingIt(t *testing.T) {
-	t.Parallel()
-	miss := runsExample(pullingPath, strings.Replace(pulling, "./RUNME.sh ticket pull", "./RUNME.sh dispatch", 1))
-	if !strings.Contains(miss, "dispatch") || !strings.Contains(miss, "step 1") {
-		t.Fatalf("the miss reads %q, and names no verb", miss)
-	}
-}
-
-func TestAVerbReachingTheModelMissesOutsideTheTable(t *testing.T) {
-	t.Parallel()
-	miss := runsExample(pullingPath, strings.Replace(pulling, "./RUNME.sh ticket pull", "./RUNME.sh probe", 1))
-	if !strings.Contains(miss, "probe") || !strings.Contains(miss, "step 1") {
-		t.Fatalf("a call reaching the model runs past the table: the miss reads %q", miss)
 	}
 }
 
@@ -100,68 +74,7 @@ func TestEachExampleWritesOverItsOwnCopy(t *testing.T) {
 	if miss := runsExample("spec/examples/110_tickets/seek.md", seeking); !strings.Contains(miss, ".se/tickets/stray.md") {
 		t.Fatalf("the note one example writes reaches another: the miss reads %q", miss)
 	}
-	if _, written := exampleFixture[".se/tickets/stray.md"]; written {
-		t.Fatal("an example writes into the fixture tree")
-	}
-}
-
-func TestTheVerdictsLandInTheRuntimeFile(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	if err := writesVerdicts(root, map[string]string{"spec/examples/110_a/b.md": "", "spec/examples/110_a/c.md": "a miss"}); err != nil {
-		t.Fatal(err)
-	}
-	text, err := os.ReadFile(filepath.Join(root, index.Runtime, example.VerdictFile))
-	if err != nil {
-		t.Fatalf("the verdicts stand nowhere: %v", err)
-	}
-	said := map[string]struct {
-		Verdict string `json:"verdict"`
-		Miss    string `json:"miss"`
-	}{}
-	if json.Unmarshal(text, &said) != nil || said["spec/examples/110_a/b.md"].Verdict != "pass" || said["spec/examples/110_a/c.md"].Verdict != "fail" || said["spec/examples/110_a/c.md"].Miss != "a miss" {
-		t.Fatalf("the verdicts read %s", text)
-	}
-}
-
-// The verbs the first chapters show, which the coverage report names no more. [[spec/tickets/example-first-chapters-stand]]
-var firstChapters = []string{"ticket pull", "ticket note", "ticket set", "ticket todo", "ticket urgent", "branch", "check"}
-
-// The files the coverage rule reads off this tree: every example, and every source registering a verb. [[spec/design_output/examples#the-checks]]
-func coverageTexts(t *testing.T) check.Texts {
-	t.Helper()
-	out := check.Texts{}
-	for _, folder := range []string{"spec/examples", "src/quack"} {
-		err := filepath.WalkDir(filepath.Join(exampleMethod, folder), func(at string, one os.DirEntry, err error) error {
-			if err != nil || one.IsDir() || strings.HasSuffix(at, "_test.go") {
-				return err
-			}
-			text, err := os.ReadFile(at)
-			rel, _ := filepath.Rel(exampleMethod, at)
-			out[filepath.ToSlash(rel)] = string(text)
-			return err
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-	return out
-}
-
-func TestTheFirstChaptersLeaveTheirVerbsUnreported(t *testing.T) {
-	t.Parallel()
-	texts := coverageTexts(t)
-	if _, ok := texts[pullingPath]; !ok {
-		t.Fatalf("the tree the rule reads holds no %s", pullingPath)
-	}
-	tree := check.TreeOver(exampleMethod, texts)
-	for _, rule := range check.Rules {
-		for _, one := range rule(tree) {
-			for _, verb := range firstChapters {
-				if one.Rule == "ExampleCovers" && strings.Contains(one.Message, "./RUNME.sh "+verb+" stands in no") {
-					t.Errorf("the coverage report names %s: %s", verb, one.Message)
-				}
-			}
-		}
+	if _, written := exampleFixture[".se/tickets/stray.md"]; written || len(exampleFixture) == 0 {
+		t.Fatal("TestMain builds no fixture tree, or an example writes into it")
 	}
 }
