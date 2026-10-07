@@ -2,7 +2,7 @@
 // marked not provided, and its next commit clears the mark. The fake IO
 // process is this test binary, run again with the bus in its environment.
 // [[spec/design_output/model#a-process-ends]]
-package index
+package index // level0: InPackageTest - it declares the fakeStore, until and read helpers placements share
 
 import (
 	"flag"
@@ -16,6 +16,7 @@ import (
 
 // The fake IO process: it commits its pid and a value, and runs until a kill. It runs only where a placed process spawns it. [[spec/design_output/model#a-process-ends]]
 func TestFakeIOProcess(t *testing.T) {
+	t.Parallel()
 	if os.Getenv(BusEnv) == "" {
 		return
 	}
@@ -37,6 +38,7 @@ func TestFakeIOProcess(t *testing.T) {
 
 // The fake module process: it dials the bus and commits nothing, so the index's side alone decides a case. [[spec/design_output/model#the-placements]]
 func TestFakeIdleProcess(t *testing.T) {
+	t.Parallel()
 	if os.Getenv(BusEnv) == "" {
 		return
 	}
@@ -108,6 +110,7 @@ func kills(t *testing.T, pid any) {
 }
 
 func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
+	t.Parallel()
 	store, stop := placedFake(t, time.Hour)
 	defer stop()
 	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
@@ -122,6 +125,7 @@ func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 
 // A crash in one placed process leaves every other one running and answering. [[spec/tickets/the-split-deployment-takes-over]]
 func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -147,6 +151,7 @@ func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
 
 // A reader settling the placements reads what a process commits at its spawn, and a stopped placement waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
 func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -173,6 +178,7 @@ func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
 
 // A run sent to a process that exited holds no reader, since nothing answers it until the restart. [[spec/tickets/the-split-deployment-takes-over]]
 func TestASettleWaitsOnNoProcessStandingDown(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
 	placed.Command = []string{os.Args[0], "-test.run=^$"}
 	placements := NewPlacements(bus, store, []Placed{placed})
@@ -219,6 +225,7 @@ func (d *refusingDog) counts() (int, int) {
 }
 
 func TestAPlacedProcessHoldsItsLeaseAndStaysDownWhereTheDogRefusesARestart(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -248,6 +255,7 @@ func TestAPlacedProcessHoldsItsLeaseAndStaysDownWhereTheDogRefusesARestart(t *te
 }
 
 func TestTheNextCommitOfARestartedProcessClearsTheMark(t *testing.T) {
+	t.Parallel()
 	store, stop := placedFake(t, 50*time.Millisecond)
 	defer stop()
 	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })

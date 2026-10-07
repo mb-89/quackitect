@@ -1,7 +1,7 @@
 // The manager folds src/ops and src/watchdog into its module, and the root
 // loads it where the wiring loads nothing else.
 // [[spec/design_output/model#the-index-manager]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -209,6 +209,7 @@ var buildDirs struct {
 var quackBuilds atomic.Int32
 
 // Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
+// level0: FixtureOutsideHome - the case links the build into two folders of its own
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 	t.Parallel()
 	built(t, t.TempDir())

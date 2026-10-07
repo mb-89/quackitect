@@ -2,7 +2,7 @@
 // words, the measure table, a dry run, and the lines the JavaScript prints
 // where Vale or the run falls.
 // [[spec/design_output/projection#the-second-target]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ const voiceTen = "one two three four five six seven eight nine ten"
 // A temp tree holding files at slash paths under it. [[spec/design_output/projection#the-second-target]]
 func voiceTree(t *testing.T, files map[string]string) string {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case writes the files of a tree of its own
 	for path, text := range files {
 		at := filepath.Join(root, filepath.FromSlash(path))
 		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
@@ -173,7 +173,7 @@ func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
 	t.Parallel()
 	fake := &proc.FakeRunner{}
 	want := fake.Run(proc.Command{Argv: []string{taughtVale}}).Err
-	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, sharedFolder())
 	if err == nil || !strings.Contains(err.Error(), want) || said != "" {
 		t.Fatalf("a Vale that never starts answers %q %v, and wants the fault %q", said, err, want)
 	}
@@ -185,7 +185,7 @@ func TestVoiceRunsValeAnswersTheFaultOfAValeASignalEnds(t *testing.T) {
 	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
 		return proc.Said{Out: "{", Err: "killed", Code: proc.Signalled}
 	}}}
-	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, sharedFolder())
 	if err == nil || err.Error() != "killed" || said != "" {
 		t.Fatalf("a Vale a signal ends answers %q %v, and wants the fault killed", said, err)
 	}

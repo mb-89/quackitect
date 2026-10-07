@@ -1,6 +1,6 @@
 // A command field missing what it expects logs the command's whole output,
 // and its refusal says the log holds it. [[spec/tickets/red-commands-log-their-output]]
-package pull
+package pull // level0: InPackageTest - the case reads the unexported commandsRun and redLogged
 
 import (
 	"strings"

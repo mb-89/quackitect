@@ -1,6 +1,6 @@
 // The record rows the cases write.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported entryRow the in-package done and desk tests use
 
 import "quackitect/src/front"
 

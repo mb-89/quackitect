@@ -1,6 +1,6 @@
 // The tools verb: the survey file it writes whole, and the rows it prints.
 // [[spec/design_output/tools#what-the-survey-writes]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

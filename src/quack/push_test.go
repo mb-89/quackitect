@@ -2,7 +2,7 @@
 // commit pushes the branch, and no stamp or a stamp on another commit pushes
 // nothing.
 // [[spec/tickets/landing-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

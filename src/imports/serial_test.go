@@ -1,7 +1,7 @@
 // The tests that run alone, named over planted source and over the packages
 // the check spends its go part on.
 // [[spec/guidance/code/testing]]
-package imports
+package imports_test
 
 import (
 	"go/ast"
@@ -10,10 +10,12 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
+
+	"quackitect/src/imports"
 )
 
 // The packages whose tests the go part waits on longest, per the measure on [[spec/tickets/the-check-fits-its-budget]].
-var slowPackages = []string{"src/branches", "src/quack", "src/imports", "src/pull"}
+var slowPackages = []string{"src/branches", "src/quack", "src/imports", "src/pull", "src/index"}
 
 const plantedTests = `package p
 
@@ -38,15 +40,25 @@ func TestAlone(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {}
+
+// level0: RunsAlone - swaps a package variable
+func swapsState(t *testing.T) {}
+
+func TestSwaps(t *testing.T) {
+	swapsState(t)
+}
+
+// level0: RunsAlone - swaps a package variable
+func TestMarked(t *testing.T) {}
 `
 
 func TestATestRunningAloneWithNothingBarringItIsNamed(t *testing.T) {
 	t.Parallel()
-	file, err := parser.ParseFile(token.NewFileSet(), "p_test.go", plantedTests, 0)
+	file, err := parser.ParseFile(token.NewFileSet(), "p_test.go", plantedTests, parser.ParseComments)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if said := SerialTests([]*ast.File{file}); !slices.Equal(said, []string{"TestAlone"}) {
+	if said := imports.SerialTests([]*ast.File{file}); !slices.Equal(said, []string{"TestAlone"}) {
 		t.Fatalf("the tests named alone read %v", said)
 	}
 }
@@ -61,13 +73,13 @@ func TestTheSlowPackagesRunEveryTestBesideTheOthers(t *testing.T) {
 		fset := token.NewFileSet()
 		files := []*ast.File{}
 		for _, path := range paths {
-			file, err := parser.ParseFile(fset, path, nil, 0)
+			file, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}
 			files = append(files, file)
 		}
-		for _, name := range SerialTests(files) {
+		for _, name := range imports.SerialTests(files) {
 			t.Errorf("%s: %s runs alone, so call t.Parallel at its top", pkg, name)
 		}
 	}

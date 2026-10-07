@@ -1,7 +1,7 @@
 // The retro's backlog read: every prose criterion a ticket the window closes
 // carries, printed for a verdict, and the verb green once each holds one.
 // [[spec/tickets/the-retro-reads-the-backlog]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"
@@ -45,7 +45,7 @@ func retroBacklogTrunk() *retroTrunk {
 // Runs retro backlog over a tree holding the retro's record and the verdicts given, and answers its code and everything it says. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroRunBacklog(t *testing.T, verdicts string) (int, string) {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case lays its tickets and retro under a root of its own
 	home := retroHome(root, retroBacklogName)
 	if err := os.MkdirAll(home, 0o755); err != nil {
 		t.Fatal(err)

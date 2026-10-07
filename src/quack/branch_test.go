@@ -1,7 +1,7 @@
 // The branch and cloud verbs print their usage, and run each other through
 // this binary's verb road.
 // [[spec/tickets/work-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

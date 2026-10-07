@@ -1,7 +1,7 @@
 // The real-wait guard, named over a planted file and over every test the tree
 // holds against the door audit.
 // [[spec/guidance/code/testing]]
-package imports
+package imports_test
 
 import (
 	"go/ast"
@@ -13,6 +13,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/imports"
 )
 
 // The note whose tables list every test reaching a real door. [[spec/design_output/doors#one-contract-test-per-door]]
@@ -55,7 +57,7 @@ func TestASleepAndASpawnAreNamedThroughTheirImportNames(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess", "proc.Real"}
-	if said := RealWaits(file); !slices.Equal(said, want) {
+	if said := imports.RealWaits(file); !slices.Equal(said, want) {
 		t.Fatalf("the real waits read %v, where %v stand", said, want)
 	}
 }
@@ -77,7 +79,7 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 		"c/quiet_test.go":   parsed(plantedQuiet),
 	}
 	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess, proc.Real"}
-	if said := UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
+	if said := imports.UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
 		t.Fatalf("the guard names %v, where %v stands", said, want)
 	}
 }
@@ -112,7 +114,7 @@ func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	if !strings.Contains(string(note), "_test.go`") {
 		t.Fatalf("%s lists no test file", doorAudit)
 	}
-	for _, line := range UnauditedWaits(string(note), files) {
+	for _, line := range imports.UnauditedWaits(string(note), files) {
 		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)
 	}
 }

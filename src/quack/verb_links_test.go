@@ -1,7 +1,7 @@
 // The links verb asks what reaches the target named, and what reaches nothing
 // where no target comes.
 // [[spec/tickets/read-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

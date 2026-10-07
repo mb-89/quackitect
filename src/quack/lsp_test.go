@@ -1,7 +1,7 @@
 // quack lsp relays the editor's stdio to the lsp IO module whole, the token
 // line first.
 // [[spec/tickets/the-lsp-door-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

@@ -1,6 +1,6 @@
 // The doctor verb over fake doors: every row it prints, each road a row
 // takes, and the order the rows stand in. [[spec/tickets/box-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

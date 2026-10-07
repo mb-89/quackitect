@@ -1,7 +1,7 @@
 // The landing verbs commit, push and rename over a landing repository and a
 // fake verb road.
 // [[spec/tickets/landing-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

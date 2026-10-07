@@ -1,6 +1,6 @@
 // The dispatch opens the pull request of a done work branch that holds none,
 // and reads a standing one. [[spec/tickets/branch-done-opens-the-pr]]
-package branches
+package branches // level0: InPackageTest - reaches the in-package helpers dpTree, dpShut, ticketAt, newHub and the dfHub fake, and the unexported codeOK
 
 import (
 	"regexp"

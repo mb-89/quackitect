@@ -114,6 +114,7 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 }
 
 // A commit whose trailer names a model meets a refusal at the door, with no Vale on the box. [[spec/tickets/commit-door-refuses-model-trailers]]
+// level0: FixtureOutsideHome - the case writes the message file its commit names into its own root.
 func TestCommitVoiceRefusesAModelTrailerWithNoVale(t *testing.T) {
 	root := t.TempDir()
 	line := "Co-Authored-By: Claude Opus 5.5"

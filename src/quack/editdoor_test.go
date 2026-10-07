@@ -1,7 +1,7 @@
 // The edit door's rules past the schema and the voice, each driven through a
 // patch over a tree in a temp folder.
 // [[spec/tickets/edit-door-rules-port]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

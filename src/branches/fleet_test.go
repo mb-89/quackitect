@@ -1,6 +1,6 @@
 // The fleet rows: one a work branch, off the record its group carries.
 // [[spec/tickets/boxes-write-their-final-record]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported fleetRows, boxRow and the wake readers, and declares cloudSays
 
 import (
 	"slices"

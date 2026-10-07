@@ -890,6 +890,54 @@ the Go code, and the Vale rules keep the JavaScript that stays. The code holds
 `nodoor` and `noname` today, and [[spec/tickets/analyzers-read-the-io-flag]]
 replaces them.
 
+## The guards hold a baseline
+
+A guard reads the tree's source and names each offender of one rule of
+[[spec/guidance/code/testing]] or [[spec/guidance/code/code]]. Its function
+stands pure in `src/imports`, and takes parsed files or a file list.
+
+| the guard | what it names | the marker sparing a line |
+|---|---|---|
+| `blackbox` | a Go test file whose package clause lacks `_test` | `level0: InPackageTest - <why>` on the clause or in the file's doc |
+| `fixture` | a top-level Go test reaching a fixture build outside the home, through its own body or a helper of its package | `level0: FixtureOutsideHome - <why>` on the call's line or in the test's doc |
+| `ratio` | a module whose test lines pass its code lines, per language | none: cut tests, or write code |
+| `script` | a tracked script outside the engine | `level0: HandScript - <why>` in the script's first lines |
+| `purity` | a Go function outside an IO module and its tests calling a name `OutsideKinds` lists: files, processes, network, clock, random numbers, git and the index | `level0: Impure - <why>` in the function's doc or body |
+
+| the term | what it holds |
+|---|---|
+| a fixture build | a call to `TempDir`, `MkdirTemp`, `exec.Command` or `exec.CommandContext`, or an index start: `index.Run`, `index.Serve`, `index.StartBus` |
+| the fixture home | a package's `main_test.go`, whose `TestMain` builds once, and `src/q/qtest` |
+| a shared builder | `qtest.Shared`: it builds on the first call and answers that build after, and a test writes none of it |
+| a line | a line holding text, which the `ratio` guard counts |
+| a Go module | a package folder: its `_test.go` files against the rest |
+| a JavaScript module | the folder, under the root's top folder, of the first source file a test imports. A test importing none belongs to its own folder |
+| a script | a tracked file ending `.sh`, `.py` or `.bash`, or opening on `#!` |
+| the engine | `RUNME.sh`, `src/` and `.claude/skills/` |
+
+A script a hand writes under `.se/scripts` reaches the retro's input through
+`retro collect`. There `retro classes` refuses one that carries no disposition,
+as it refuses a note.
+
+Each guard keeps a baseline, `src/imports/baseline/<guard>.txt`, one offender
+a line. The baseline holds the offenders standing on the guard's first commit.
+
+`./RUNME.sh guards` runs every guard over the tracked tree and reads each
+baseline. It prints each offender standing outside the baseline, and each
+baseline line the guard no longer names. A guard in report mode also prints
+its offenders: counted per package where it names files in Go packages, and
+each one whole otherwise. The check runs it as its part
+`guards`.
+
+| the mode | a new offender | a stale baseline line |
+|---|---|---|
+| report | printed, and the verb answers 0 | printed, and the verb answers 0 |
+| refuse | printed, and the verb answers 1 | printed, and the verb answers 1 |
+
+`./RUNME.sh guards --update` writes each baseline again. In report mode it
+writes what the guard names. In refuse mode it drops the stale lines alone, so a
+baseline only shrinks, and a new offender takes a marker with its reason.
+
 # Operations
 
 Operations: the record every call takes, the wait a caller sets, the states,

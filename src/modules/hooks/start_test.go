@@ -1,10 +1,12 @@
 // The start road over its inputs alone: the folder, the plugin, the box and the mode.
 // [[spec/tickets/the-coordinator-runs-under-level0]]
-package hooks
+package hooks_test
 
 import (
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks"
 )
 
 func TestStartRefusesADeskSessionWritingWithNoPlugin(t *testing.T) {
@@ -24,7 +26,7 @@ func TestStartRefusesADeskSessionWritingWithNoPlugin(t *testing.T) {
 		{"a desk session naming no mode with no plugin", false, false, "", true},
 	}
 	for _, one := range cases {
-		got := StartRefusal(root, one.plugin, one.cloud, one.mode)
+		got := hooks.StartRefusal(root, one.plugin, one.cloud, one.mode)
 		if !one.refuses {
 			if got != "" {
 				t.Errorf("%s: refuses with %q, want a pass", one.name, got)

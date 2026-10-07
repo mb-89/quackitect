@@ -1,7 +1,7 @@
 // A folder belongs to the tree it names, the way the retro's collect reads
 // the harness's own folders under home and under temp.
 // [[spec/guidance/retro/collect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

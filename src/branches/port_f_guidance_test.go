@@ -2,7 +2,7 @@
 // test/level0/guidance-tags.test.js and topic-readers.test.js: the notes a
 // process step resolves, and the refusals of a step or a process standing nowhere.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs guidance through the pf helpers and the unexported tree fixture
 
 import (
 	"strings"

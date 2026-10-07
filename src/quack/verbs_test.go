@@ -1,7 +1,7 @@
 // The road hands each verb by the verbs slice's mode, and a twin in shadow
 // writes a shadow row where it answers apart from the verb's program.
 // [[spec/tickets/runme-hands-verbs-to-quack]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
