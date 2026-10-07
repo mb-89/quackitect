@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -127,6 +127,22 @@ record:
     hand: the engine
     hash_before: ac04e1c9221c9d41b2967cac4191edfb18d1aa28
     hash_after: ac04e1c9221c9d41b2967cac4191edfb18d1aa28
+  - step: accept
+    hand: box 55abcb1f8a0e · claude-code-remote
+    hash_before: 67d1cb147d32238aafc9bce7f937ba8622cf9789
+    hash_after: 67d1cb147d32238aafc9bce7f937ba8622cf9789
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/code-is-pure-tests-behave already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e76229b0876aa7d0
+        size: 2886
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -200,8 +216,9 @@ Each analyzer or measure lands in report mode first, listing offenders, then the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: each of the seven rules stands in spec/guidance/code/code.md or testing.md with its guard named, and spec/processes/retro.yaml with spec/guidance/retro/audit.md carries them into every audit. The blackbox, fixture, ratio and script guards refuse with empty baselines, and ./RUNME.sh check answers green on the branch head. Purity runs in report mode, as the owner's redraft on purity-guard-covers-every-outside sets, and its refuse switch rides with the doors-declare-what-they-own group, as the ask says. The merges of main carry only guard markers, blackbox moves and ratio cuts, plus one guard fix: fixture markers now key by file and line.
 
 # retro
 
