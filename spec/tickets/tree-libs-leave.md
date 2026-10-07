@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["cage-libs-leave"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 501f6e38c8f3a0b9
         size: 581
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 8aaff978995a4fe2db0c99a9dfca317a8e04e79e
+    hash_after: 8aaff978995a4fe2db0c99a9dfca317a8e04e79e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 4e094123a41b47c8
+        size: 12053
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -339,26 +352,34 @@ Assumed: the hooks/command rows count toward done_when line 3 through the check,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/tree_libs_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/tree_libs_test.go
+- src/quack/runtime_names_test.go
+- src/quack/nobody_test.go
+- src/modules/check/folders_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheTreeLibrariesStandNowhere fails on its assertion and names the nine libraries and the four leaving tests. The two folder rule tests fail on their assertions because the folders.go stubs answer nothing. TestLoopNamesReadsEachLoopUnderItsMark also fails on its assertion, for the same reason. TestTheLspDoorFileStandsAmongTheRuntimeNames fails because the check.Moved stub is nil. TestTheShapesRuleAndTheCommitDoorPassOneListOfNobodyUsers fails because the command.Nobody stub is nil. Some ported rows pass now because Go already holds the behavior. These are every tree_test.go case and the three stop folder tests. They also include the new private and tested rows and the statement-inside-a-body move row. One surprise: src/quack/stop_rules_test.go already existed, holding TestTheTreeHoldsACloudBoxDecides. The new cases join it, and it gains a header. Another surprise: a hyphenated run makes the NoteTextStaysHome Said repeat the raw token once per word, in Go and in the JS alike. So that row asserts the rule alone, as its JS case did. A third surprise: in Go, a dropped biome extension also strands the json formatter. That row therefore wants two findings. check.Extensions and check.Settings already stand, so they need no stub.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each go test done_when line meets a red test or a ported row. TestTheTreeLibrariesStandNowhere decides both git ls-files lines, and the check at tests-green decides the fourth.
+The tests reach no door. Check cases seed Texts in memory, the command rows parse strings, and the quack cases read the tree through Glob and ReadFile.
 
 # gate
 

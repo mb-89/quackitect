@@ -29,6 +29,9 @@ const (
 // The users naming nobody. [[spec/design_output/private#the-box-names-the-owner]]
 var nobody = []string{"user", "root", "one", "somebody", "nobody", "agent", "claude", "runner", "ubuntu", "vscode"}
 
+// The users naming nobody, which the shapes rule under spec/config/styles/VoiceVale/Private.yml spells again. [[spec/design_output/private#the-box-names-the-owner]]
+var Nobody []string
+
 // The shapes a line carries a person in, and the paths the delta leaves home. [[spec/design_output/private#the-delta-a-commit-carries]]
 var (
 	privateFree  = []*regexp.Regexp{regexp.MustCompile(`^\.se(/|$)`), regexp.MustCompile(`^\.git(/|$)`)}
