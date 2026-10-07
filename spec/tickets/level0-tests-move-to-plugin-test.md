@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 9a7920a6333047c5
         size: 3638
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box eabbd46a6a23 · claude-code-remote · helper-4
+    hash_before: ab13c874a4f1ee7fc5ac8e0fefb2c78415c087b9
+    hash_after: ab13c874a4f1ee7fc5ac8e0fefb2c78415c087b9
+    inputs:
+      - name: design/draft
+        hash: 9a7920a6333047c5
+        size: 3638
+      - name: design/tests-red
+        hash: 35102a24cf31d4c6
+        size: 1150
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -296,8 +308,11 @@ the kit cases stub every door beneath the plugin through world.ts, and the Go ca
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- parts-case-drops-count: the TestCheckParts case named the battery holds its eight parts wants ten parts once plugin-tests joins; the implementer drops the count from the case name in place
+- level0-note-names-plugin-tests: size lists spec/design_output/level0.md while the approach names no change there; the implementer writes the plugin-tests part beside the plugin part there, or drops the file from size
 
 # implement
 
