@@ -1,7 +1,7 @@
 // The config verb in Go: every key with its value and layer, one key alone,
 // the refusal of a key no layer answers, and a write to the local layer.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -55,6 +55,7 @@ func TestConfigPrintsEveryRowAndItsLayer(t *testing.T) {
 }
 
 // A write naming --tracked lands in the tracked file, and the local layer stays unwritten. [[spec/tickets/verbs-mint-tickets-and-keys]]
+// level0: FixtureOutsideHome - the case writes the tracked layer into its own root.
 func TestConfigWritesTheTrackedLayerWithTracked(t *testing.T) {
 	t.Parallel()
 	root := configRoot(t, `{"log": {"level": "warn"}}`)

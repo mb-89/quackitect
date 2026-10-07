@@ -2,7 +2,7 @@
 // narrows the rows by span, level, kind, words and count, prints them the way
 // the window does, and appends one row under --say.
 // [[spec/design_output/log#one-verb-reads-the-log]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

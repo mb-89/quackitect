@@ -1,7 +1,7 @@
 // ticket todo parks a ticket for the next pull, and --off takes the tag away,
 // off the roads test/level0/ticket-todo.test.js covers.
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

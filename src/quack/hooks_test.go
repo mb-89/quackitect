@@ -1,7 +1,7 @@
 // The wiring loads the hooks IO module and the folds over session/, and an
 // event the door writes lands under session/<id>/ by the names it binds.
 // [[spec/tickets/the-hooks-door-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

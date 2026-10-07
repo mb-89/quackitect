@@ -1,6 +1,6 @@
 // quack sweep asks the index for the settled sweep and prints it whole.
 // [[spec/tickets/the-lsp-server-leaves]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

@@ -1,6 +1,6 @@
 // The trunk end: merge refuses short of done, and stands aside for a pull request.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs merge through the unexported tree fixture and reads quiet and the exit codes
 
 import "testing"
 

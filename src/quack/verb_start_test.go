@@ -1,6 +1,6 @@
 // The start verb over a fake root, input, environment and disk.
 // [[spec/tickets/the-coordinator-runs-under-level0]]
-package main
+package main // level0: InPackageTest - the case drives the unexported startVerb, startManifest and startOutside
 
 import (
 	"encoding/json"

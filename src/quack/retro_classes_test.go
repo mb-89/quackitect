@@ -1,7 +1,7 @@
 // The retro's class fixes over a seeded retro: every finding, note and memory
 // carries a disposition, and each class a rate.
 // [[spec/guidance/retro/classify]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -75,18 +75,22 @@ func TestRetroClassesHoldEveryNoteAndMemoryAndTheReportListsThemWithTheChecklist
 		"input/tickets/a-parked-thought.md":  "---\nkind: [[ticket]]\n---\n",
 		"input/memory/the-project/MEMORY.md": "- an index line\n",
 		"input/memory/the-project/a-rule.md": "a remembered rule\n",
+		"input/scripts/a-loop.sh":            "for one in *; do echo $one; done\n",
 	}))
 
 	code, _, errs := retroReadingRun(retroClassesVerb, root, "retro", "classes", retroClassesFirst)
-	if code != 1 || !strings.Contains(errs, "note:a-parked-thought carries no disposition") || !strings.Contains(errs, "memory:a-rule carries no disposition") {
+	if code != 1 || !strings.Contains(errs, "note:a-parked-thought carries no disposition") || !strings.Contains(errs, "memory:a-rule carries no disposition") || !strings.Contains(errs, "script:a-loop.sh carries no disposition") {
 		t.Fatalf("an undisposed note and memory answer %d, %q", code, errs)
+	}
+	if strings.Contains(errs, "script:a-loop\n") || strings.Contains(errs, "script:a-loop ") {
+		t.Fatalf("a script loses its ending in its id: %q", errs)
 	}
 	if strings.Contains(errs, "memory:MEMORY") {
 		t.Fatalf("the memory index asks a disposition: %q", errs)
 	}
 
 	retroReadingLay(t, root, retroClassesFirst, map[string]string{"classes.json": `{"classes":[` + retroClassesClass + `],` +
-		`"dispositions":{` + retroClassesDispositions + `,"note:a-parked-thought":"done: the land verb carries it","memory:a-rule":"ticket: the-rule-moves-home"},` +
+		`"dispositions":{` + retroClassesDispositions + `,"note:a-parked-thought":"done: the land verb carries it","memory:a-rule":"ticket: the-rule-moves-home","script:a-loop.sh":"ticket: the-loop-becomes-a-verb"},` +
 		retroClassesPromotions + `,` +
 		`"checklist":[{"item":"Does every change reach the running system?","why":"three classes share it"}],` +
 		`"limits":[{"what":"the thinking","why":"the transcripts keep it empty"}]}`})

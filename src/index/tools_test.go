@@ -1,7 +1,7 @@
 // The index generates one tool an action off the registry: its name, its doc
 // and its input schema, with a bare input carried as one property.
 // [[spec/tickets/the-hook-registers-index-tools]]
-package index
+package index // level0: InPackageTest - it drives the unexported opens and standingOf
 
 import (
 	"encoding/json"
@@ -37,27 +37,12 @@ const toolsGoldenAt = "testdata/tools.golden.json"
 
 var update = flag.Bool("update", false, "write the golden file again off the index")
 
-// The body /v1/tools answers over a door holding t/add and t/echo. [[spec/tickets/the-hook-registers-index-tools]]
-func toolsBody(t *testing.T) []byte {
-	t.Helper()
-	return toolsBodyWith(t, func(*q.Catalog) {})
-}
-
 // The same body over a catalog the case adds its own actions to. [[spec/tickets/tools-keep-their-own-names]]
 func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 	t.Helper()
 	root := tree(t)
-	c := q.New()
-	adds(c)
-	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
-	q.ActionIn(c, "t/add", func(in addIn) []q.Request {
-		return []q.Request{{Module: "t", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
-	}, q.Doc("adds two terms"))
-	q.ActionIn(c, "t/echo", func(in string) []q.Request {
-		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
-	}, q.Doc("echoes its input"))
-	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
+	c, manage := toolsCatalog(adds)
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,6 +123,7 @@ func toolsOver(t *testing.T, c *q.Catalog, ops q.Writer) (Standing, []listedTool
 }
 
 // Each tool the list names answers a call through the route act posts to. [[spec/tickets/every-index-tool-answers]]
+// level0: FixtureOutsideHome - the case opens its own index over its own catalog and fake manager, and posts into its store.
 func TestEachListedToolAnswersACallThroughAct(t *testing.T) {
 	t.Parallel()
 	standing, list := ghostTools(t)
@@ -153,6 +139,7 @@ func TestEachListedToolAnswersACallThroughAct(t *testing.T) {
 }
 
 // The list keeps an action whose zero input it cannot read: one that panics on it, one that opens no request on it, and one that asks a refused module only past it. [[spec/tickets/tool-list-keeps-unreadable-actions]]
+// level0: FixtureOutsideHome - the case opens its own index over a catalog it declares itself.
 func TestTheToolListKeepsAnActionItsZeroInputCannotRead(t *testing.T) {
 	t.Parallel()
 	c := q.New()
@@ -185,6 +172,7 @@ func TestTheToolListKeepsAnActionItsZeroInputCannotRead(t *testing.T) {
 }
 
 // The routes serve no action whose request no module accepts, so the route and the list agree. [[spec/tickets/accepts-reads-away-modules]]
+// level0: FixtureOutsideHome - the case opens its own index over its own catalog and fake manager, and posts into its store.
 func TestTheRoutesServeNoActionNoModuleAccepts(t *testing.T) {
 	t.Parallel()
 	standing, _ := ghostTools(t)
@@ -194,6 +182,7 @@ func TestTheRoutesServeNoActionNoModuleAccepts(t *testing.T) {
 }
 
 // The list leaves out an action whose request no module accepts, and keeps the one a module answers. [[spec/tickets/every-index-tool-answers]]
+// level0: FixtureOutsideHome - the case opens its own index over its own catalog and fake manager.
 func TestTheToolListSkipsAnActionNoModuleAccepts(t *testing.T) {
 	t.Parallel()
 	_, list := ghostTools(t)
@@ -207,6 +196,7 @@ func TestTheToolListSkipsAnActionNoModuleAccepts(t *testing.T) {
 }
 
 func TestV1ListsEachActionAsATool(t *testing.T) {
+	t.Parallel()
 	add, ok := listedTools(t)["index_t_add"]
 	if !ok || add.Action != "t/add" || add.Description != "adds two terms" || add.Bare || add.InputSchema.Type != "object" {
 		t.Fatalf("the list holds %+v for t/add", add)
@@ -218,6 +208,7 @@ func TestV1ListsEachActionAsATool(t *testing.T) {
 
 // Every tool the list names spells its action as the shared surface does, so the hooks door and the mcp module read it back. [[spec/tickets/tool-surface-moves-into-q]]
 func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
+	t.Parallel()
 	listed := listedTools(t)
 	if len(listed) == 0 {
 		t.Fatal("the list holds no tool, and wants t/add and t/echo")
@@ -230,7 +221,9 @@ func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
 }
 
 // An action carrying its own tool name lists under that name, and still names its action. [[spec/tickets/tools-keep-their-own-names]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
+	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {
 		q.ActionIn(c, "t/plan", func(in string) []q.Request {
 			return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "a plan writes nothing here"}}
@@ -254,6 +247,7 @@ func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
 
 // Every listed tool carries the plan field, so the plan's answer rides any call. [[spec/tickets/plan-writes-off-go]]
 func TestEveryListedToolCarriesThePlanField(t *testing.T) {
+	t.Parallel()
 	listed := listedTools(t)
 	if len(listed) == 0 {
 		t.Fatal("the list holds no tool, and wants t/add and t/echo")
@@ -266,7 +260,9 @@ func TestEveryListedToolCarriesThePlanField(t *testing.T) {
 }
 
 // The plan tool takes the plan as its input, and carries no plan field of its own. [[spec/tickets/plan-writes-off-go]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestThePlanToolCarriesNoPlanField(t *testing.T) {
+	t.Parallel()
 	body := toolsBodyWith(t, func(c *q.Catalog) {
 		q.ActionIn(c, "t/plan", func(tool.Plan) []q.Request { return nil }, q.Doc("plans the work"), q.ToolName(tool.PlanTool))
 	})
@@ -290,6 +286,7 @@ func TestThePlanToolCarriesNoPlanField(t *testing.T) {
 }
 
 func TestABareInputRidesAsOneProperty(t *testing.T) {
+	t.Parallel()
 	echo, ok := listedTools(t)["index_t_echo"]
 	if !ok || !echo.Bare || echo.InputSchema.Type != "object" || echo.InputSchema.Properties["input"].Type != "string" {
 		t.Fatalf("the list holds %+v for t/echo", echo)
@@ -298,6 +295,7 @@ func TestABareInputRidesAsOneProperty(t *testing.T) {
 
 // The list /v1/tools generates reads as the golden file, so the hook's case holds the one shape the index answers. [[spec/tickets/tool-list-shape-held-once]]
 func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
+	t.Parallel()
 	var said, held any
 	if err := json.Unmarshal(toolsBody(t), &said); err != nil {
 		t.Fatal(err)

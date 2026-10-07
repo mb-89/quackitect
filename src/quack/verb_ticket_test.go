@@ -1,7 +1,7 @@
 // The bare ticket prints the usage ticket.js prints, and exits 0 with no word
 // and 2 on a word no sub-verb answers.
 // [[spec/tickets/ticket-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

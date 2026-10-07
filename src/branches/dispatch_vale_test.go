@@ -1,7 +1,7 @@
 // The door test of vale in the branch package: the dispatcher's fix ask runs
 // through vale itself, the one case here spawning a process.
 // [[spec/design_output/doors#one-contract-test-per-door]]
-package branches
+package branches // level0: InPackageTest - the case builds on the in-package helpers dpTree, pcLoose and the dispatch write fakes, and reads the unexported runtimeFolder and ticketAt
 
 import (
 	"encoding/json"

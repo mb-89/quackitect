@@ -1,7 +1,7 @@
 // The quack verbs' repository cases run on FakeRepo, so they spawn no git, and
 // the doors chapter lists them among no test reaching a real door.
 // [[spec/tickets/quack-repos-meet-fake-git]]
-package main
+package main_test
 
 import (
 	"go/ast"

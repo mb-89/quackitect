@@ -1,7 +1,7 @@
 // The work and tickets module types take the view actions beside their own
 // names, so an instance of either answers the calls the base files name.
 // [[spec/tickets/view-actions-run-through-verbs]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"testing"

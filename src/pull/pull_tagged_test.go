@@ -1,6 +1,6 @@
 // A tag parks a ticket for the next pull, and a work branch takes its own
 // group's tagged tickets alone. [[spec/tickets/box-opens-its-pr]]
-package pull
+package pull // level0: InPackageTest - reaches the in-package helper cloudPull and the unexported childTicket
 
 import (
 	"strings"

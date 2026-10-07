@@ -1,7 +1,7 @@
 // quack reads the guidance files off the tree, each keyed by its path under
 // the root.
 // [[spec/tickets/the-guidance-topic-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

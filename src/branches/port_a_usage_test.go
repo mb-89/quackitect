@@ -1,7 +1,7 @@
 // The rows the branch verb prints as its usage, as
 // test/level0/work-usage.test.js reads them: one verb a row.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs the verbs through the unexported tree fixture and reads codeOK
 
 import (
 	"slices"

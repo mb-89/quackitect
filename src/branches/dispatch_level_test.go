@@ -1,6 +1,6 @@
 // A done branch main already carries holds nothing to merge, so the dispatch
 // opens no pull request over it. [[spec/tickets/dispatch-skips-merged-done-branches]]
-package branches
+package branches // level0: InPackageTest - reaches the in-package helpers dfDoneTree, dpPlan and newHub, and the unexported workBranch, trunk and codeOK
 
 import "testing"
 

@@ -1,7 +1,7 @@
 // The log, report and stop tools answer the bridge's text off the hooks door
 // over the real wiring, before any action runs.
 // [[spec/tickets/log-report-stop-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

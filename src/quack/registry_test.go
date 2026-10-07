@@ -1,7 +1,7 @@
 // A verb registered from its own file runs in Go, and a verb nothing
 // registers reaches node, on the road and through the node module alike.
 // [[spec/tickets/quack-registers-each-verb]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"

@@ -2,7 +2,7 @@
 // cases of named.test.js covered: the message, the gates, the paths it lands,
 // the cold probe, the merge, and the push from a cloud box, each over FakeRepo.
 // [[spec/tickets/quack-repos-meet-fake-git]]
-package main
+package main // level0: InPackageTest - the cases drive the unexported commitVerb over the in-package helper fakeLanding
 
 import (
 	"encoding/json"
@@ -268,6 +268,7 @@ func TestCommitVerbMoves(t *testing.T) {
 }
 
 // The commit verb refuses a message whose trailer names a model, before anything runs or lands. [[spec/tickets/commit-door-refuses-model-trailers]]
+// level0: FixtureOutsideHome - the case lays a file into its own landing repository, which landingRepo builds per case.
 func TestCommitVerbRefusesAModelTrailer(t *testing.T) {
 	t.Parallel()
 	at := landingRepo(t)

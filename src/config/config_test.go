@@ -11,7 +11,7 @@ import (
 // A root holding the files a case names, written under the test's own folder. [[spec/tickets/the-colours-stand-in-config]]
 func rootWith(t *testing.T, files map[string]string) string {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case writes the layer files of its own root
 	for path, said := range files {
 		at := filepath.Join(root, filepath.FromSlash(path))
 		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {

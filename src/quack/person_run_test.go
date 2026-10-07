@@ -1,7 +1,7 @@
 // The node module runs a request a person marks with the harness variables
 // taken out, so the verb reads a person's hand.
 // [[spec/tickets/the-lens-calls-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"io"

@@ -1,7 +1,7 @@
 // The fix verb in Go: the flags it refuses, the rounds of Vale's fixes over
 // the paths with the shouted leads calmed first, and biome after them.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -45,7 +45,7 @@ func binNamed(name string) string {
 
 // A root with both tools standing in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
 func fixRoot(t *testing.T) string {
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
 	seedFile(t, root, ".se/.runtime/bin/"+binNamed("vale"), "")
 	seedFile(t, root, ".se/.runtime/bin/"+binNamed("biome"), "")
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n")
@@ -77,7 +77,7 @@ func TestFixPrintsItsUsage(t *testing.T) {
 
 func TestFixRefusesWhereNoValeStands(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
 	if code, _, errs, _ := fixRan(root); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
 		t.Fatalf("fix answers %d and %q, and wants the refusal", code, errs)
 	}
@@ -175,7 +175,7 @@ func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
 		"NOTHING AT ALL WORKS HERE, and then calm.": "Nothing at all works here, and then calm.",
 		"DON'T STOP AT ALL HERE, and then calm.":    "Don't stop at all here, and then calm.",
 	} {
-		at := filepath.Join(t.TempDir(), "it.md")
+		at := filepath.Join(t.TempDir(), "it.md") // level0: FixtureOutsideHome - the case makes a file it cannot write in a folder of its own
 		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
