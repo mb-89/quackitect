@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: cb81d42351d267bf
         size: 5131
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 4e3ede97c305d8e146689b3aa68f4d0c7231413f
+    hash_after: 4e3ede97c305d8e146689b3aa68f4d0c7231413f
+    inputs:
+      - name: design/draft
+        hash: cb81d42351d267bf
+        size: 5131
+      - name: design/tests-red
+        hash: 96e40eead9875aa1
+        size: 987
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -316,8 +328,9 @@ TestTheTicketAndVehicleScriptsStandNowhere fails on its own assertion. It names 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask. git ls-files on the done_when patterns names ticket-route.js and vehicle.js alone, and a git grep for both paths and every export outside spec/tickets and spec/retros finds no caller the callers list leaves out. ./RUNME.sh branch test src/quack/ticket_scripts_test.go answers assertion, and go test names the four standing files in the case's own Fatalf. TestTheTicketAndVehicleScriptsStandNowhere decides the first done_when line, the go test line decides the second, and the check at tests-green the third. The Go cases the draft cites stand in src/vehicle/vehicle_test.go and cover the leaving JS cases: StandsAlone takes identity and roots, CopiesANestedFileByteExactAndCounts takes the run bit, TheRegisterSplitsItsListTheWayTheCallerSays takes outside-hand and USERPROFILE before HOME, TheShimsWorkRootBeatsTheTree takes SE_WORK_ROOT. TestVehicleVerbHere replays recorded answers and spawns no script. Points the implementer fixes in place: the drawing-edit and drawing-page tests read src/pull/testdata/drawing_edits.json across the folder line, so confirm the JS test runner and biome reach that path; the ticket_route.go and ticket_route_test.go headers name src/scripts/ticket.js, which already stands nowhere, so point them at the Go owner with the rest.
 
 # implement
 
