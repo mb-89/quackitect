@@ -4,7 +4,7 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tracked settings file the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strings"

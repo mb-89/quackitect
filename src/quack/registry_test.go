@@ -6,7 +6,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the package's own Go files, as a build check reads source
 	"path/filepath"
 	"regexp"
 	"slices"

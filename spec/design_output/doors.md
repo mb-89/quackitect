@@ -183,7 +183,7 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | the viewer's catalog | `src/tui/registry` | `Fake` | `src/tui/registry/catalog_contract_test.go` |
 | index | `src/index` | `src/q/qtest` | `src/index/contract_test.go` |
 | bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
-| a placed process | `src/index/procs.go` | none | `src/index/procs_test.go` |
+| a placed process | `src/index/procs.go` | the case's `Spawner` | `src/index/procs_test.go` |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |
@@ -196,17 +196,17 @@ family carries its fate:
 
 | family | files | fate |
 |---|---|---|
-| the placements over real processes | `src/index/placements_test.go`, `src/quack/placements_test.go`, `src/quack/io_test.go`, `src/quack/split_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
+| the placements over real processes | `src/quack/placements_test.go`, `src/quack/io_test.go`, `src/quack/box_doors_contract_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
 | the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
-| the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
+| the quack binary each case builds | `src/quack/manager_test.go`, `src/quack/box_doors_contract_test.go` | builds once a package run |
 | the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
 | the index and session suites running the fake beside the real door | `test/contract/index.test.js`, `test/contract/session.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
-| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
-| the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
+| the index door over a real listener | `src/index/index_contract_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
+| the index's own reads of git | `src/index/index_contract_test.go` | door tests of the index's git read |
 | a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_contract_test.go` | door tests of the file watch |
-| a child ended whole, and a door standing apart from its starter | `src/quack/ending_test.go`, `src/quack/ending_windows_test.go`, `src/index/detach_test.go`, `src/index/detach_windows_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
+| a child ended whole, and a door standing apart from its starter | `src/quack/ending_contract_test.go`, `src/quack/ending_windows_contract_test.go`, `src/index/detach_contract_test.go`, `src/index/detach_windows_contract_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
 | the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
 
 The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]

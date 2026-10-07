@@ -6,7 +6,7 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the JS answers the tree keeps under testdata, as a build check reads source
 	"strings"
 	"testing"
 

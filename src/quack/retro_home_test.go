@@ -38,7 +38,7 @@ func retroBoxAt(root string) func() boxDoors {
 		return boxDoors{
 			root: root,
 			env:  func(string) string { return "" },
-			disk: realDisk(),
+			disk: hq2RetroDisk(root),
 			run:  func([]string, runOpts) ranResult { return ranResult{code: exitFailed} },
 		}
 	}

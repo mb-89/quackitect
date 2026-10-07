@@ -3,12 +3,11 @@
 package main
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/q"
@@ -25,7 +24,7 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 		t.Fatal(err)
 	}
 	root := t.TempDir()
-	if err := os.WriteFile(filepath.Join(root, "seen.md"), []byte("a dumped line\n"), 0o644); err != nil {
+	if err := realDisk().write(filepath.Join(root, "seen.md"), []byte("a dumped line\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	c := q.New()
@@ -40,26 +39,19 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 	defer stop()
 	t.Setenv("QUACKITECT_ROOT", root)
 	at := filepath.Join(root, filepath.FromSlash(dumpPath("files/")))
-	written := ""
-	for range ticketPolls {
-		if err := dumps("files/"); err != nil {
-			t.Fatal(err)
-		}
-		body, err := os.ReadFile(at)
-		if err != nil {
-			t.Fatal(err)
-		}
-		written = string(body)
-		if strings.Contains(written, "files/seen.md") && strings.Contains(written, "a dumped line") {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
+	if err := dumps("files/"); err != nil {
+		t.Fatal(err)
 	}
+	body, err := realDisk().read(at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	written := string(body)
 	said, err := askIndex("dump", "files/")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(written, "files/seen.md") || written != said {
+	if !strings.Contains(written, "files/seen.md") || !strings.Contains(written, "a dumped line") || written != said {
 		t.Fatalf("quack dump writes %q where the index answers %q", written, said)
 	}
 }

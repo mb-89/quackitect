@@ -6,9 +6,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -107,31 +104,15 @@ func TestTheNewRoadRunsTheTwinForReal(t *testing.T) {
 	}
 }
 
-// A box with no runtime hears which one to install, in one line. [[spec/tickets/bare-desk-names-missing-node]]
-func TestAStartFaultNamesAMissingRuntime(t *testing.T) {
-	t.Parallel()
-	_, err := exec.LookPath("no-such-runtime")
-	said := startFault("no-such-runtime", err)
-	if strings.Contains(said, "\n") || said != "No no-such-runtime stands on the PATH. Install no-such-runtime, and run this again." {
-		t.Fatalf("the fault reads %q", said)
-	}
-}
-
 // The mode reads the verbs key off the tracked file under the root, and none where the file sets none. [[spec/tickets/runme-hands-verbs-to-quack]]
 func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	if said := modeOf(root); said != "" {
+	disk := newFakeDisk()
+	if said := modeOf(disk, "/tree"); said != "" {
 		t.Fatalf("a bare root reads %q", said)
 	}
-	at := filepath.Join(root, "spec", "config")
-	if err := os.MkdirAll(at, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"migration": {"verbs": "new"}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if said := modeOf(root); said != "new" {
+	hq1SeedDisk(t, disk, "/tree", map[string]string{"spec/config/level0.json": `{"migration": {"verbs": "new"}}`})
+	if said := modeOf(disk, "/tree"); said != "new" {
 		t.Fatalf("the root reads %q, and wants new", said)
 	}
 }

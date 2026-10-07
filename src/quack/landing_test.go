@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -189,29 +188,23 @@ func (at *landing) landedNames() string {
 // Moves a path on disk and stages both sides, as git mv does. [[spec/tickets/quack-repos-meet-fake-git]]
 func (at *landing) moves(from, to string) {
 	at.t.Helper()
-	at.must(os.Rename(filepath.Join(at.root, filepath.FromSlash(from)), filepath.Join(at.root, filepath.FromSlash(to))))
+	at.must(realDisk().rename(filepath.Join(at.root, filepath.FromSlash(from)), filepath.Join(at.root, filepath.FromSlash(to))))
 	at.must(at.repo.Add([]string{from, to}))
 }
 
 // A fresh folder under a short name. t.TempDir names its folder after the test, and a path under it runs past the Windows path limit. [[spec/tickets/landing-verbs-windows-green]]
 func shortDir(t *testing.T) string {
 	t.Helper()
-	at, err := os.MkdirTemp("", "land")
+	at, err := realDisk().makeTemp("", "land")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { os.RemoveAll(at) })
+	t.Cleanup(func() { _ = realDisk().removeAll(at) })
 	return at
 }
 
 // Writes a file under the root, its folder first. [[spec/tickets/landing-verbs-port-to-go]]
 func lays(t *testing.T, root, path, text string) {
 	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(path))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq1SeedDisk(t, realDisk(), root, map[string]string{path: text})
 }

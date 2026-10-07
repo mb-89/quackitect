@@ -47,7 +47,7 @@ func configVerb(root func() (string, error), now func() time.Time, disk diskDoor
 		if len(words) > 1 {
 			return configWrites(disk, at, words[0], strings.Join(words[1:], " "), dry, now, out, errs)
 		}
-		rows, err := configAt(at)
+		rows, err := configOn(disk, at)
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
@@ -229,7 +229,7 @@ func configWrites(disk diskDoors, root, key, said string, dry bool, now func() t
 		if err == nil {
 			err = disk.write(local, body, 0o644)
 		}
-		if err == nil && slices.Contains(logsInfo, configLevel(root)) {
+		if err == nil && slices.Contains(logsInfo, configLevel(disk, root)) {
 			err = appendsRow(disk, root, now)(map[string]any{"level": "info", "kind": "config", "said": key + " is " + shownValue(json.RawMessage(literal)), "detail": config.Local})
 		}
 		if err != nil {
@@ -242,8 +242,8 @@ func configWrites(disk diskDoors, root, key, said string, dry bool, now func() t
 }
 
 // The log level the config under the root names, or nothing where none answers. [[spec/design_output/log#a-setting-writes-a-line]]
-func configLevel(root string) string {
-	rows, err := configAt(root)
+func configLevel(disk diskDoors, root string) string {
+	rows, err := configOn(disk, root)
 	if err != nil {
 		return ""
 	}

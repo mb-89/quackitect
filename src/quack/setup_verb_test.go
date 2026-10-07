@@ -5,7 +5,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -17,7 +16,7 @@ const setupClient = "src/extension/node_modules/vscode-languageclient/package.js
 // The fake doors with the env a case names past the PATH, and every run read as one line. [[spec/tickets/install-drops-node]]
 func setupBox(t *testing.T, env map[string]string) (boxDoors, *fakeRunner, *strings.Builder, func() []string) {
 	t.Helper()
-	d, runner, out, _ := boxDoorsOnDisk(t)
+	d, runner, out, _ := fakeBoxDoors(t)
 	path := d.env("PATH")
 	d.env = func(key string) string {
 		if key == "PATH" {
@@ -38,8 +37,16 @@ func setupBox(t *testing.T, env map[string]string) (boxDoors, *fakeRunner, *stri
 // A tree holding the client, a browser and the survey, so no item but the ones a case drops stands missing. [[spec/tickets/install-drops-node]]
 func heldTree(t *testing.T, d boxDoors) map[string]string {
 	t.Helper()
-	seedTree(t, d.root, map[string]string{setupClient: "{}", toolsFile: "{}", "chrome": ""})
+	hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}", "chrome": ""})
 	return map[string]string{"PLAYWRIGHT_CHROMIUM": filepath.Join(d.root, "chrome")}
+}
+
+// Writes each file under the root on a disk door. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2SeedTree(t *testing.T, disk diskDoors, root string, files map[string]string) {
+	t.Helper()
+	for rel, text := range files {
+		hq2Seed(t, disk, filepath.Join(root, filepath.FromSlash(rel)), text)
+	}
 }
 
 func saidLine(out *strings.Builder, start string) bool {
@@ -48,15 +55,15 @@ func saidLine(out *strings.Builder, start string) bool {
 
 func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T) {
 	t.Parallel()
-	home := t.TempDir()
-	seedTree(t, home, map[string]string{".vscode/extensions/extensions.json": "[]"})
+	home := "/home"
 	d, runner, out, lines := setupBox(t, map[string]string{"HOME": home, "SE_INSTALL_SKIP": "browser editor-link"})
-	seedTree(t, d.root, map[string]string{toolsFile: "{}"})
+	hq2SeedTree(t, d.disk, home, map[string]string{".vscode/extensions/extensions.json": "[]"})
+	hq2SeedTree(t, d.disk, d.root, map[string]string{toolsFile: "{}"})
 	runner.answers["code --list-extensions"] = ranResult{}
 	fake := d.run
 	d.run = func(argv []string, o runOpts) ranResult {
 		if argv[0] == "npm" {
-			seedTree(t, d.root, map[string]string{setupClient: "{}"})
+			hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}"})
 		}
 		return fake(argv, o)
 	}
@@ -78,7 +85,7 @@ func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T
 	if slices.ContainsFunc(said, func(one string) bool { return strings.Contains(one, "playwright") }) {
 		t.Error("a skipped browser downloads")
 	}
-	if stands(filepath.Join(home, ".vscode", "extensions", editorTestID+"-0.1.0")) {
+	if d.disk.stands(filepath.Join(home, ".vscode", "extensions", editorTestID+"-0.1.0")) {
 		t.Error("a skipped editor link links")
 	}
 	if !saidLine(out, "editor-client:") || saidLine(out, "browser:") || saidLine(out, "editor-link:") {
@@ -100,16 +107,16 @@ func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 	if code := setupVerb(d, []string{"--landed"}); code != 0 {
 		t.Fatalf("the setup answers %d", code)
 	}
-	if survey, _ := readText(filepath.Join(d.root, filepath.FromSlash(toolsFile))); !strings.Contains(survey, `"node": null`) {
+	if survey := d.disk.text(filepath.Join(d.root, filepath.FromSlash(toolsFile))); !strings.Contains(survey, `"node": null`) {
 		t.Errorf("a landed setup writes no survey: %s", survey)
 	}
 	for _, one := range copilotRegistrations() {
-		if !stands(filepath.Join(d.root, filepath.FromSlash(one.name))) {
+		if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(one.name))) {
 			t.Errorf("%s stands not", one.name)
 		}
 	}
 	brand := brandOf(d.root)
-	market, _ := readText(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget)))
+	market := d.disk.text(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget)))
 	var held struct{ Name string }
 	if json.Unmarshal([]byte(market), &held) != nil || held.Name != brand {
 		t.Errorf("the marketplace reads\n%s", market)
@@ -125,15 +132,15 @@ func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 	quiet.env = func(key string) string { return quietEnv[key] }
 	quietRunner.answers["code --list-extensions"] = runner.answers["code --list-extensions"]
 	setupVerb(quiet, nil)
-	if survey, _ := readText(filepath.Join(quiet.root, filepath.FromSlash(toolsFile))); survey != "{}" {
+	if survey := quiet.disk.text(filepath.Join(quiet.root, filepath.FromSlash(toolsFile))); survey != "{}" {
 		t.Error("a survey standing, with nothing landed, takes a write")
 	}
 	missing, _, _, _ := setupBox(t, nil)
 	missingEnv := heldTree(t, missing)
 	missing.env = func(key string) string { return missingEnv[key] }
-	_ = os.Remove(filepath.Join(missing.root, filepath.FromSlash(toolsFile)))
+	_ = missing.disk.remove(filepath.Join(missing.root, filepath.FromSlash(toolsFile)))
 	setupVerb(missing, nil)
-	if !stands(filepath.Join(missing.root, filepath.FromSlash(toolsFile))) {
+	if !missing.disk.stands(filepath.Join(missing.root, filepath.FromSlash(toolsFile))) {
 		t.Error("a box with no survey writes none")
 	}
 }
@@ -206,14 +213,14 @@ func TestACopilotSetupThatStopsSaysAWarningAndTheBrandStillRuns(t *testing.T) {
 	env["TERM_PROGRAM"] = "vscode"
 	d.env = func(key string) string { return env[key] }
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
-	seedTree(t, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
+	hq2SeedTree(t, d.disk, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
 	if code := setupVerb(d, nil); code != 0 {
 		t.Fatalf("the setup answers %d", code)
 	}
 	if !saidLine(out, "  the copilot setup stopped") {
 		t.Errorf("the stop names itself not:\n%s", out)
 	}
-	if !stands(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget))) {
+	if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget))) {
 		t.Error("the brand runs not past the stop")
 	}
 }
@@ -237,7 +244,7 @@ func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
-	seedTree(t, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
+	hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
 	runner.answers["npx"] = ranResult{code: 1}
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
 	if code := setupVerb(d, nil); code != 0 {
@@ -252,7 +259,7 @@ func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 	if slices.ContainsFunc(lines(), func(one string) bool { return strings.Contains(one, "bundle") }) {
 		t.Error("a step bundles the drawing")
 	}
-	if !stands(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget))) {
+	if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(marketplaceTarget))) {
 		t.Error("the setup goes not on to the brand")
 	}
 }
@@ -260,14 +267,14 @@ func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 // The editor link links the sidebar where the editor's folder stands, and a second run finds it standing. [[spec/design_output/extension#the-link-stands]]
 func TestTheSetupLinksTheSidebarWhereTheEditorStands(t *testing.T) {
 	t.Parallel()
-	home := t.TempDir()
-	seedTree(t, home, map[string]string{".vscode/extensions/.keep": ""})
+	home := "/home"
 	d, runner, out, _ := setupBox(t, map[string]string{"HOME": home})
+	hq2SeedTree(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
 	env := heldTree(t, d)
 	env["HOME"] = home
 	d.env = func(key string) string { return env[key] }
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
-	seedTree(t, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
+	hq2SeedTree(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
 	setupVerb(d, nil)
 	if !saidLine(out, "editor-link:") || !saidLine(out, "quackitect.quackitect: the entry went in.") || saidLine(out, "  the sidebar stays unlinked") {
 		t.Errorf("the link says\n%s", out)

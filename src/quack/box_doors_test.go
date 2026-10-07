@@ -6,7 +6,6 @@ package main
 import (
 	"errors"
 	"io/fs"
-	"os"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -47,10 +46,22 @@ func (f *fakeDisk) folder(key string) bool {
 	return err == nil && said.IsDir()
 }
 
+// The key a path reaches, each link it names followed as the box's own disk follows it. [[spec/tickets/test-walks-move-onto-fakes]]
+func (f *fakeDisk) follow(key string) string {
+	for range 8 {
+		held, ok := f.files[key]
+		if !ok || held.Mode&fs.ModeSymlink == 0 {
+			return key
+		}
+		key = fakeKey(string(held.Data))
+	}
+	return key
+}
+
 func (f *fakeDisk) read(at string) ([]byte, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return fs.ReadFile(f.files, fakeKey(at))
+	return fs.ReadFile(f.files, f.follow(fakeKey(at)))
 }
 
 func (f *fakeDisk) write(at string, data []byte, perm fs.FileMode) error {
@@ -84,10 +95,10 @@ func (f *fakeDisk) symlink(target, at string) error {
 	defer f.mu.Unlock()
 	key := fakeKey(at)
 	if !f.folder(path.Dir(key)) {
-		return &os.LinkError{Op: "symlink", Old: target, New: at, Err: fs.ErrNotExist}
+		return &fs.PathError{Op: "symlink", Path: at, Err: fs.ErrNotExist}
 	}
 	if _, err := fs.Stat(f.files, key); err == nil {
-		return &os.LinkError{Op: "symlink", Old: target, New: at, Err: fs.ErrExist}
+		return &fs.PathError{Op: "symlink", Path: at, Err: fs.ErrExist}
 	}
 	f.files[key] = &fstest.MapFile{Data: []byte(target), Mode: fs.ModeSymlink | 0o777, ModTime: time.Unix(0, 0)}
 	return nil
@@ -120,7 +131,7 @@ func (f *fakeDisk) makeTemp(dir, pattern string) (string, error) {
 func (f *fakeDisk) stat(at string) (fs.FileInfo, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return fs.Stat(f.files, fakeKey(at))
+	return fs.Stat(f.files, f.follow(fakeKey(at)))
 }
 
 func (f *fakeDisk) list(at string) ([]fs.DirEntry, error) {
@@ -183,13 +194,13 @@ func (f *fakeDisk) rename(from, to string) error {
 	defer f.mu.Unlock()
 	was, now := fakeKey(from), fakeKey(to)
 	if _, err := fs.Stat(f.files, was); err != nil {
-		return &os.LinkError{Op: "rename", Old: from, New: to, Err: fs.ErrNotExist}
+		return &fs.PathError{Op: "rename", Path: from, Err: fs.ErrNotExist}
 	}
 	if !f.folder(path.Dir(now)) {
-		return &os.LinkError{Op: "rename", Old: from, New: to, Err: fs.ErrNotExist}
+		return &fs.PathError{Op: "rename", Path: from, Err: fs.ErrNotExist}
 	}
 	if len(f.under(now)) > 1 {
-		return &os.LinkError{Op: "rename", Old: from, New: to, Err: fs.ErrExist}
+		return &fs.PathError{Op: "rename", Path: from, Err: fs.ErrExist}
 	}
 	if !f.folder(was) {
 		delete(f.files, now)
@@ -242,7 +253,21 @@ func boxDoorsOnDisk(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *s
 	t.Helper()
 	d, runner, out, errs := fakeBoxDoors(t, programs...)
 	d.disk = realDisk()
+	hq1SeedPrograms(t, d.disk, d.env("PATH"), programs)
 	return d, runner, out, errs
+}
+
+// Seeds an empty program for each name in the PATH folder on a disk door. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq1SeedPrograms(t *testing.T, disk diskDoors, folder string, programs []string) {
+	t.Helper()
+	if err := disk.makeAll(folder, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, one := range programs {
+		if err := disk.write(filepath.Join(folder, one), nil, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
 }
 
 // The fake doors over a temporary tree, with the named programs standing on its PATH. [[spec/tickets/box-verbs-no-node-test]]
@@ -250,14 +275,8 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 	t.Helper()
 	root := t.TempDir()
 	path := filepath.Join(root, "path")
-	if err := os.MkdirAll(path, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range programs {
-		if err := os.WriteFile(filepath.Join(path, one), nil, 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
+	disk := newFakeDisk()
+	hq1SeedPrograms(t, disk, path, programs)
 	env := map[string]string{"PATH": path}
 	// A Windows box names PATHEXT, which splits its PATH on semicolons, so a drive letter stays whole. [[spec/design_output/tools#reading-the-path-variable]]
 	if runtime.GOOS == "windows" {
@@ -280,7 +299,7 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 		run:   runner.run,
 		get:   func(string, time.Duration) (string, error) { return "", errors.New("no wire here") },
 		clock: qtest.NewFake(time.Unix(0, 0)),
-		disk:  newFakeDisk(),
+		disk:  disk,
 		input: strings.NewReader(""),
 		out:   &out,
 		errs:  &errs,
@@ -291,21 +310,52 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 func TestABoxVerbStampsTheTimeTheFakeClockStandsAt(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
-	d.disk = realDisk()
 	at := time.Date(2026, 3, 4, 5, 6, 7, 8_000_000, time.UTC)
 	d.clock = qtest.NewFake(at)
-	home := t.TempDir()
-	seedTree(t, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
-	seedTree(t, home, map[string]string{".vscode/extensions/.keep": ""})
+	home := "/home/one"
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
+	hq1SeedDisk(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
 	d.env = func(key string) string { return map[string]string{"HOME": home}[key] }
 	if !editorLink(d, true) {
 		t.Fatalf("the link falls:\n%s", out)
 	}
-	list, err := os.ReadFile(filepath.Join(home, ".vscode", "extensions", editorList))
+	list, err := d.disk.read(filepath.Join(home, ".vscode", "extensions", editorList))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if want := `"installedTimestamp":` + strconv.FormatInt(at.UnixMilli(), 10) + `,`; !strings.Contains(string(list), want) {
 		t.Errorf("the list stamps no %s:\n%s", want, list)
 	}
+}
+
+// Seeds each file under the root on a disk door, its folders made first. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq1SeedDisk(t *testing.T, disk diskDoors, root string, files map[string]string) {
+	t.Helper()
+	for rel, text := range files {
+		at := filepath.Join(root, filepath.FromSlash(rel))
+		if err := disk.makeAll(filepath.Dir(at), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := disk.write(at, []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// Seeds each file under a root on the box's own disk, for a case whose code reads the disk past the door. [[spec/tickets/test-walks-move-onto-fakes]]
+func seedTree(t *testing.T, root string, files map[string]string) {
+	t.Helper()
+	hq1SeedDisk(t, realDisk(), root, files)
+}
+
+// Seeds one file under a root on the box's own disk. [[spec/tickets/edit-tools-answer-in-go]]
+func seedFile(t *testing.T, root, path, text string) {
+	t.Helper()
+	hq1SeedDisk(t, realDisk(), root, map[string]string{path: text})
+}
+
+// The text a file under the root holds on the box's own disk, and whether it stands. [[spec/tickets/edit-tools-answer-in-go]]
+func readIn(root, path string) (string, bool) {
+	body, err := realDisk().read(filepath.Join(root, filepath.FromSlash(path)))
+	return string(body), err == nil
 }

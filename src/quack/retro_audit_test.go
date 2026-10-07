@@ -17,7 +17,7 @@ func TestRetroAuditHoldsWhileATrialStandsOpenAndNamesEachOne(t *testing.T) {
 	retroMintWrite(t, root, "spec/tickets/a-trial.md", retroAuditTrial("a trial", "open"))
 	retroMintWrite(t, root, "spec/tickets/a-closed-trial.md", retroAuditTrial("a closed trial", "closed"))
 	retroMintWrite(t, root, "spec/tickets/a-plain-one.md", "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/standard]]\n---\n\n# Ask\n\nA thing.\n")
-	if got := retroAuditOpenTrials(realDisk(), root); len(got) != 1 || got[0] != "a-trial" {
+	if got := retroAuditOpenTrials(hq2RetroDisk(root), root); len(got) != 1 || got[0] != "a-trial" {
 		t.Fatalf("the open trials read %v", got)
 	}
 }

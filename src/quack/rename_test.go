@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -15,20 +14,20 @@ import (
 	"quackitect/src/modules/edits"
 )
 
-// The text of a file under the root, and whether it stands. [[spec/tickets/landing-verbs-port-to-go]]
-func textAt(root, path string) (string, bool) {
-	said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+// The text of a file under the root, read through the disk door the verb runs on, and whether it stands. [[spec/tickets/test-walks-move-onto-fakes]]
+func textAt(d landingDoors, path string) (string, bool) {
+	said, err := d.box.disk.read(filepath.Join(d.root, filepath.FromSlash(path)))
 	return string(said), err == nil
 }
 
-// The journal entries the rename leaves under the root. [[spec/tickets/landing-verbs-port-to-go]]
-func renameEntries(t *testing.T, root string) []renameEntry {
+// The journal entries the rename leaves under the root, read through the disk door the verb runs on. [[spec/tickets/test-walks-move-onto-fakes]]
+func renameEntries(t *testing.T, d landingDoors) []renameEntry {
 	t.Helper()
-	folder := filepath.Join(root, filepath.FromSlash(undoFolder))
-	found, _ := os.ReadDir(folder)
+	folder := filepath.Join(d.root, filepath.FromSlash(undoFolder))
+	found, _ := d.box.disk.list(folder)
 	var out []renameEntry
 	for _, one := range found {
-		text, err := os.ReadFile(filepath.Join(folder, one.Name()))
+		text, err := d.box.disk.read(filepath.Join(folder, one.Name()))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -69,10 +68,10 @@ func TestRenameMoves(t *testing.T) {
 		if code != 0 || !strings.HasPrefix(out, "pics stands at art.\n") {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if said, _ := textAt(root, "src/a.txt"); said != "see art/a.png\n" {
+		if said, _ := textAt(d, "src/a.txt"); said != "see art/a.png\n" {
 			t.Fatalf("src/a.txt reads %q", said)
 		}
-		if said, ok := textAt(root, "art/a.png"); !ok || !strings.HasSuffix(said, " pics/a.png") {
+		if said, ok := textAt(d, "art/a.png"); !ok || !strings.HasSuffix(said, " pics/a.png") {
 			t.Fatalf("art/a.png reads %q, and the picture's bytes stand unread", said)
 		}
 		if !strings.Contains(out, "  the reader reads art/a.png as a picture, so the rewrite leaves it alone") || !strings.Contains(out, "  src/a.txt\n") || !strings.HasSuffix(out, "Run ./RUNME.sh links, then ./RUNME.sh check.\n") {
@@ -92,10 +91,10 @@ func TestRenameMoves(t *testing.T) {
 		if code, out, errs := runsTwin(renameVerb(d), "rename", "lib", "pkg/lib"); code != 0 {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if _, ok := textAt(root, "pkg/lib/node_modules/x.js"); !ok {
+		if _, ok := textAt(d, "pkg/lib/node_modules/x.js"); !ok {
 			t.Fatal("the skipped folder stays behind")
 		}
-		if said, _ := textAt(root, "src/b.js"); said != "import { a } from \"../pkg/lib/a.js\";\n" {
+		if said, _ := textAt(d, "src/b.js"); said != "import { a } from \"../pkg/lib/a.js\";\n" {
 			t.Fatalf("src/b.js reads %q", said)
 		}
 		if staged := at.staged(); !strings.Contains(staged, "lib/a.js") || !strings.Contains(staged, "pkg/lib/a.js") {
@@ -111,7 +110,7 @@ func TestRenameMoves(t *testing.T) {
 		if code, out, errs := runsTwin(renameVerb(d), "rename", "spec/a.md", "spec/c.md"); code != 0 {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if said, _ := textAt(root, "spec/b.md"); said != "see [[spec/c]] and spec/c.md\n" {
+		if said, _ := textAt(d, "spec/b.md"); said != "see [[spec/c]] and spec/c.md\n" {
 			t.Fatalf("spec/b.md reads %q", said)
 		}
 	})
@@ -125,10 +124,10 @@ func TestRenameMoves(t *testing.T) {
 		if code, out, errs := runsTwin(renameVerb(d), "rename", "spec/a.md", "spec/a/a.md"); code != 0 {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if said, _ := textAt(root, "spec/b.md"); said != "see [[spec/a/a]]\n" {
+		if said, _ := textAt(d, "spec/b.md"); said != "see [[spec/a/a]]\n" {
 			t.Fatalf("spec/b.md reads %q", said)
 		}
-		if said, _ := textAt(root, "spec/tickets/shut.md"); !strings.Contains(said, "see [[spec/a]]") {
+		if said, _ := textAt(d, "spec/tickets/shut.md"); !strings.Contains(said, "see [[spec/a]]") {
 			t.Fatalf("the closed ticket reads %q", said)
 		}
 	})
@@ -141,10 +140,10 @@ func TestRenameMoves(t *testing.T) {
 		if code != 0 || !strings.Contains(out, "  src/a.go\n") {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if said, _ := textAt(root, "src/a.go"); said != "quackitect/src/newname\n" {
+		if said, _ := textAt(d, "src/a.go"); said != "quackitect/src/newname\n" {
 			t.Fatalf("src/a.go reads %q", said)
 		}
-		if len(renameEntries(t, root)) != 0 {
+		if len(renameEntries(t, d)) != 0 {
 			t.Fatal("the text rename writes a journal entry")
 		}
 	})
@@ -154,10 +153,9 @@ func TestRenameVerb(t *testing.T) {
 	t.Parallel()
 	t.Run("a name standing nowhere answers a fault, moves nothing, and writes no journal", func(t *testing.T) {
 		at := landingRepo(t)
-		root := at.root
 		d, _, _ := fakeLanding(at)
 		code, _, errs := runsTwin(renameVerb(d), "rename", "nowhere", "somewhere")
-		if code != exitFailed || errs != "nowhere stands nowhere under this tree.\n" || len(renameEntries(t, root)) != 0 {
+		if code != exitFailed || errs != "nowhere stands nowhere under this tree.\n" || len(renameEntries(t, d)) != 0 {
 			t.Fatalf("rename answers %d, %q", code, errs)
 		}
 	})
@@ -185,7 +183,7 @@ func TestRenameVerb(t *testing.T) {
 		if code, out, errs := runsTwin(renameVerb(d), "rename", "README.md", "GUIDE.md"); code != 0 {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		entries := renameEntries(t, root)
+		entries := renameEntries(t, d)
 		if len(entries) != 1 {
 			t.Fatalf("the journal holds %v", entries)
 		}
@@ -228,7 +226,7 @@ func TestRenameVerb(t *testing.T) {
 		if code, out, errs := runsTwin(renameVerb(d), "rename", "README.md", "GUIDE.md"); code != 0 {
 			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
 		}
-		if entries := renameEntries(t, root); len(entries) != 1 || entries[0].Ticket != "" {
+		if entries := renameEntries(t, d); len(entries) != 1 || entries[0].Ticket != "" {
 			t.Fatalf("the journal holds %+v", entries)
 		}
 	})

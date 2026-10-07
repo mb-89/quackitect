@@ -6,10 +6,12 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"quackitect/src/modules/edits"
 )
 
 const (
@@ -30,40 +32,51 @@ func runsVerb(t *testing.T, root string, words ...string) (int, string) {
 	return code, said.String()
 }
 
-// A tree holding the source the cases cut. [[spec/design_output/level0#a-verb-cuts-the-file]]
-func splitTree(t *testing.T) string {
+// A fake disk holding the source the cases cut under /tree. [[spec/design_output/level0#a-verb-cuts-the-file]]
+func splitTree(t *testing.T) diskDoors {
 	t.Helper()
-	root := t.TempDir()
-	seedsFile(t, root, splitSource, splitText)
-	return root
+	disk := newFakeDisk()
+	hq1SeedDisk(t, disk, "/tree", map[string]string{splitSource: splitText})
+	return disk
 }
 
+// Runs the split verb over the fake disk under /tree, and answers its exit code and everything it said. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq3Splits(disk diskDoors, words ...string) (int, string) {
+	var said strings.Builder
+	split := splitVerb(func() (string, error) { return "/tree", nil }, func() time.Time { return time.Unix(0, 0) }, disk)
+	code := split(words, false, &said, &said)
+	return code, said.String()
+}
+
+// The text a file under /tree holds on the fake disk, and whether it stands. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq3ReadsBack(disk diskDoors, path string) (string, bool) {
+	text, err := disk.read(filepath.Join("/tree", filepath.FromSlash(path)))
+	return string(text), err == nil
+}
+
+// Seeds one file under a root on the box's own disk, for a verb reaching the disk past its door. [[spec/design_output/level0#a-verb-cuts-the-file]]
 func seedsFile(t *testing.T, root, path, text string) {
 	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(path))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq1SeedDisk(t, realDisk(), root, map[string]string{path: text})
 }
 
+// The text a file under a root holds on the box's own disk, and whether it stands. [[spec/design_output/level0#a-verb-cuts-the-file]]
 func readsBack(t *testing.T, root, path string) (string, bool) {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	text, err := realDisk().read(filepath.Join(root, filepath.FromSlash(path)))
 	return string(text), err == nil
 }
 
 func TestSplitVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("the verb writes every target, the rest and one journal entry", func(t *testing.T) {
-		root := splitTree(t)
-		code, said := runsVerb(t, root, "split", splitSource, "--to", "src/a.js", "--lines", "1-2", "--to", "src/b.js", "--lines", "4-5")
+		disk := splitTree(t)
+		code, said := hq3Splits(disk, "split", splitSource, "--to", "src/a.js", "--lines", "1-2", "--to", "src/b.js", "--lines", "4-5")
 		if code != 0 {
 			t.Fatalf("the split answers %d: %s", code, said)
 		}
 		for path, want := range map[string]string{"src/a.js": "one\ntwo\n", "src/b.js": "four\nfive\n", splitSource: "three\n"} {
-			if got, _ := readsBack(t, root, path); got != want {
+			if got, _ := hq3ReadsBack(disk, path); got != want {
 				t.Errorf("%s holds %q, and wants %q", path, got, want)
 			}
 		}
@@ -72,11 +85,12 @@ func TestSplitVerb(t *testing.T) {
 				t.Errorf("the split says %q, and wants %q", said, line)
 			}
 		}
-		entries, err := filepath.Glob(filepath.Join(root, ".se", ".runtime", "undo", "*.json"))
-		if err != nil || len(entries) != 1 {
+		journal := filepath.Join("/tree", filepath.FromSlash(edits.Journal))
+		entries := disk.listed(journal)
+		if len(entries) != 1 || !strings.HasSuffix(entries[0].Name(), ".json") {
 			t.Fatalf("the journal holds %v, and wants one entry for the whole cut", entries)
 		}
-		text, _ := os.ReadFile(entries[0])
+		text, _ := disk.read(filepath.Join(journal, entries[0].Name()))
 		var entry struct {
 			On    string `json:"on"`
 			By    string `json:"by"`
@@ -98,63 +112,63 @@ func TestSplitVerb(t *testing.T) {
 		}
 	})
 	t.Run("the dry flag names the cuts and writes nothing", func(t *testing.T) {
-		root := splitTree(t)
-		code, said := runsVerb(t, root, "split", splitSource, "--to", "src/a.js", "--lines", "1-2", "--dry")
+		disk := splitTree(t)
+		code, said := hq3Splits(disk, "split", splitSource, "--to", "src/a.js", "--lines", "1-2", "--dry")
 		if code != 0 || !strings.Contains(said, "src/a.js takes 2 line(s).") || !strings.Contains(said, "src/long.js keeps 3 line(s).") {
 			t.Fatalf("the dry split answers %d, %q", code, said)
 		}
-		if _, stands := readsBack(t, root, "src/a.js"); stands {
+		if _, stands := hq3ReadsBack(disk, "src/a.js"); stands {
 			t.Fatal("the dry split writes a target")
 		}
-		if got, _ := readsBack(t, root, splitSource); got != splitText {
+		if got, _ := hq3ReadsBack(disk, splitSource); got != splitText {
 			t.Fatalf("the dry split writes the source: %q", got)
 		}
 	})
 	t.Run("a target under a folder nothing holds makes that folder, and writes", func(t *testing.T) {
-		root := splitTree(t)
-		if code, said := runsVerb(t, root, "split", splitSource, "--to", "src/fresh/a.js", "--lines", "1-2"); code != 0 {
+		disk := splitTree(t)
+		if code, said := hq3Splits(disk, "split", splitSource, "--to", "src/fresh/a.js", "--lines", "1-2"); code != 0 {
 			t.Fatalf("the split answers %d: %s", code, said)
 		}
-		if got, _ := readsBack(t, root, "src/fresh/a.js"); got != "one\ntwo\n" {
+		if got, _ := hq3ReadsBack(disk, "src/fresh/a.js"); got != "one\ntwo\n" {
 			t.Fatalf("the target holds %q", got)
 		}
 	})
 	t.Run("a source past the dry flag reads as the source", func(t *testing.T) {
-		root := splitTree(t)
-		code, said := runsVerb(t, root, "split", "--dry", splitSource, "--to", "src/a.js", "--lines", "1-2")
+		disk := splitTree(t)
+		code, said := hq3Splits(disk, "split", "--dry", splitSource, "--to", "src/a.js", "--lines", "1-2")
 		if code != 0 || !strings.Contains(said, "src/a.js takes 2 line(s).") {
 			t.Fatalf("the dry split answers %d, %q", code, said)
 		}
-		if _, stands := readsBack(t, root, "src/a.js"); stands {
+		if _, stands := hq3ReadsBack(disk, "src/a.js"); stands {
 			t.Fatal("the dry split writes a target")
 		}
 	})
 	t.Run("a journal the disk refuses answers a line, and no target lands", func(t *testing.T) {
-		root := splitTree(t)
-		seedsFile(t, root, ".se", "a file where the folder stands")
-		code, said := runsVerb(t, root, "split", splitSource, "--to", "src/a.js", "--lines", "1-2")
+		disk := splitTree(t)
+		hq1SeedDisk(t, disk, "/tree", map[string]string{".se": "a file where the folder stands"})
+		code, said := hq3Splits(disk, "split", splitSource, "--to", "src/a.js", "--lines", "1-2")
 		if code != exitFailed || !strings.Contains(said, "The journal would not write, so nothing did:") || strings.Contains(said, "goroutine") {
 			t.Fatalf("the split answers %d, %q", code, said)
 		}
-		if _, stands := readsBack(t, root, "src/a.js"); stands {
+		if _, stands := hq3ReadsBack(disk, "src/a.js"); stands {
 			t.Fatal("a refused journal lets a target land")
 		}
-		if got, _ := readsBack(t, root, splitSource); got != splitText {
+		if got, _ := hq3ReadsBack(disk, splitSource); got != splitText {
 			t.Fatalf("a refused journal writes the source: %q", got)
 		}
 	})
 	t.Run("a target the disk refuses answers a line, and names the way back", func(t *testing.T) {
-		root := splitTree(t)
-		code, said := runsVerb(t, root, "split", splitSource, "--to", splitSource+"/a.js", "--lines", "1-2")
+		disk := splitTree(t)
+		code, said := hq3Splits(disk, "split", splitSource, "--to", splitSource+"/a.js", "--lines", "1-2")
 		if code != exitFailed || !strings.Contains(said, "src/long.js/a.js would not write, and ") || !strings.Contains(said, "holds the way back.") {
 			t.Fatalf("the split answers %d, %q", code, said)
 		}
-		if got, _ := readsBack(t, root, splitSource); got != splitText {
+		if got, _ := hq3ReadsBack(disk, splitSource); got != splitText {
 			t.Fatalf("a refused target writes the source: %q", got)
 		}
 	})
 	t.Run("the help flag prints the usage", func(t *testing.T) {
-		code, said := runsVerb(t, splitTree(t), "split", "--help")
+		code, said := hq3Splits(splitTree(t), "split", "--help")
 		if code != 0 || !strings.Contains(said, "Usage: ./RUNME.sh split <file> --to <path> --lines <from>-<to> [...] [--dry]") {
 			t.Fatalf("the help answers %d, %q", code, said)
 		}
@@ -179,15 +193,15 @@ func TestSplitVerb(t *testing.T) {
 	}
 	for _, one := range refusals {
 		t.Run(one.name+" comes back refused, and nothing writes", func(t *testing.T) {
-			root := splitTree(t)
-			code, said := runsVerb(t, root, append([]string{"split"}, one.argv...)...)
+			disk := splitTree(t)
+			code, said := hq3Splits(disk, append([]string{"split"}, one.argv...)...)
 			if code != one.code || !strings.Contains(said, one.says) {
 				t.Fatalf("the split answers %d, %q, and wants %d, %q", code, said, one.code, one.says)
 			}
-			if _, stands := readsBack(t, root, "src/a.js"); stands {
+			if _, stands := hq3ReadsBack(disk, "src/a.js"); stands {
 				t.Fatal("a refused split writes a target")
 			}
-			if got, _ := readsBack(t, root, splitSource); got != splitText {
+			if got, _ := hq3ReadsBack(disk, splitSource); got != splitText {
 				t.Fatalf("a refused split writes the source: %q", got)
 			}
 		})

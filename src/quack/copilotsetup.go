@@ -73,14 +73,14 @@ func copilotRegistrations() []copilotFile {
 
 // Whether this box runs Copilot's cloud agent: the mark a cloud setup leaves, or the two variables the agent sets. [[spec/design_output/copilot#setup-and-discovery]]
 func copilotCloud(d boxDoors) bool {
-	return stands(filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))) ||
+	return d.disk.stands(filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))) ||
 		(d.env("GITHUB_COPILOT_GIT_TOKEN") != "" && d.env("COPILOT_AGENT_PROMPT") != "")
 }
 
 // Whether this box runs Copilot: the cloud, the editor's terminal, a registration standing, or an editor listing the extension. [[spec/design_output/copilot#setup-and-discovery]]
 func copilotDetected(d boxDoors) bool {
 	if copilotCloud(d) || d.env("TERM_PROGRAM") == "vscode" ||
-		stands(filepath.Join(d.root, ".github", "hooks", "level0.json")) {
+		d.disk.stands(filepath.Join(d.root, ".github", "hooks", "level0.json")) {
 		return true
 	}
 	for _, editor := range []string{"code", "code-insiders"} {

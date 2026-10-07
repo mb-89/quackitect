@@ -7,7 +7,7 @@ package main
 import (
 	"io"
 	"io/fs"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the scripts the tree holds, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"

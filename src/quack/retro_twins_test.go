@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,9 +19,6 @@ import (
 func notesTree(t *testing.T, rows []ticket.Ticket) func() (string, error) {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, index.Runtime), 0o755); err != nil {
-		t.Fatal(err)
-	}
 	c := q.New()
 	hand := q.OutIn(c, "tickets/all", []ticket.Ticket{}, q.Doc("the tickets as the case seeds them"))
 	seeds := func(_ string, commit index.Commit) (func(), error) {
@@ -33,7 +29,7 @@ func notesTree(t *testing.T, rows []ticket.Ticket) func() (string, error) {
 		t.Fatal(err)
 	}
 	t.Cleanup(stop)
-	body, err := os.ReadFile(filepath.Join(root, index.Runtime, "index.json"))
+	body, err := realDisk().read(filepath.Join(root, index.Runtime, "index.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

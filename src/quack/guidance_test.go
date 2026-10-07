@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -13,15 +12,15 @@ import (
 
 func TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root, disk := "/tree", newFakeDisk()
 	at := filepath.Join(root, filepath.FromSlash(guidance.Guidance), "code")
-	if err := os.MkdirAll(at, 0o755); err != nil {
+	if err := disk.makeAll(at, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
+	if err := disk.write(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	said, err := guidanceFiles(realDisk(), root)
+	said, err := guidanceFiles(disk, root)
 	if err != nil {
 		t.Fatal(err)
 	}

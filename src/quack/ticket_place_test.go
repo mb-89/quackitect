@@ -4,9 +4,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,9 +17,6 @@ import (
 func rowsIndex(t *testing.T, rows []work.Row) func() (string, error) {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, index.Runtime), 0o755); err != nil {
-		t.Fatal(err)
-	}
 	c := q.New()
 	hand := q.OutIn(c, placeRows, []work.Row{}, q.Doc("the rows as the case seeds them"))
 	seeds := func(_ string, commit index.Commit) (func(), error) {
@@ -33,15 +27,7 @@ func rowsIndex(t *testing.T, rows []work.Row) func() (string, error) {
 		t.Fatal(err)
 	}
 	t.Cleanup(stop)
-	body, err := os.ReadFile(filepath.Join(root, index.Runtime, "index.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var standing index.Standing
-	if err := json.Unmarshal(body, &standing); err != nil {
-		t.Fatal(err)
-	}
-	base := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1)
+	base := hq3V1Of(t, root)
 	return func() (string, error) { return base, nil }
 }
 

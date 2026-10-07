@@ -6,7 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own case table, as a build check reads source
 	"path/filepath"
 	"testing"
 

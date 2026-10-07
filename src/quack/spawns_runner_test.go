@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -99,16 +98,11 @@ func TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv(t *testing.T) {
 
 func TestValeHeardOverTheDoorReadsTheTextAsTheFile(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root, disk := "/tree", newFakeDisk()
 	vale := filepath.Join(root, filepath.FromSlash(check.Bin), "vale")
-	if err := os.MkdirAll(filepath.Dir(vale), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(vale, nil, 0o755); err != nil {
-		t.Fatal(err)
-	}
+	hq2Seed(t, disk, vale, "")
 	fake, ran := teaches(vale, proc.Said{Err: "the config breaks", Code: 2})
-	got := heardInOver(fake.Run, realDisk(), root, "spec/a.md", "a text", prose.All)
+	got := heardInOver(fake.Run, disk, root, "spec/a.md", "a text", prose.All)
 	if !got.stands || got.ran || got.why != "the config breaks" {
 		t.Fatalf("an unread Vale answers %+v, and wants it standing, unread, with its stderr as why", got)
 	}

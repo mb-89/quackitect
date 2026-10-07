@@ -5,8 +5,8 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
+	"os"      // level0: OutsideInDoors - the case reads the tree's own files and fixtures, as a build check reads source
+	"os/exec" // level0: OutsideInDoors - the case lists the tree's own files with git, as a build check reads source
 	"path"
 	"path/filepath"
 	"sort"

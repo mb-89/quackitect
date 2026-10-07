@@ -102,84 +102,8 @@ func dumps(prefix string) error {
 func main() {
 	// This binary is the index, so a verb that finds no door starts this one. [[spec/design_output/index#a-door-comes-back]]
 	index.Serving()
-	if len(os.Args) == 2 && os.Args[1] == "lsp" {
-		if err := lspVerb(os.Stdin, os.Stdout); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	// [[spec/tickets/the-doors-process-stands]]
-	if len(os.Args) == 2 && os.Args[1] == ioVerb {
-		if err := ioMain(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	// [[spec/tickets/the-system-places-modules]]
-	if len(os.Args) > 2 && os.Args[1] == moduleVerb {
-		if err := moduleMain(realBoxDoors(os.Stdout, os.Stderr), os.Args[2:]); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
-		os.Exit(verbRoad(os.Args[3:], os.Stdout, os.Stderr))
-	}
-	if len(os.Args) == 2 && os.Args[1] == "config" {
-		if err := configs("."); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) >= 2 && os.Args[1] == "schema" {
-		if err := schemas(realBoxDoors(os.Stdout, os.Stderr), ".", len(os.Args) == schemaArgs && os.Args[2] == "--write"); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == 2 && os.Args[1] == "guidance" {
-		if err := guidances(realBoxDoors(os.Stdout, os.Stderr), "."); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == 2 && os.Args[1] == "log" {
-		if err := logs(realBoxDoors(os.Stdout, os.Stderr), "."); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	// [[spec/tickets/the-lsp-server-leaves]]
-	if len(os.Args) == 2 && os.Args[1] == "sweep" {
-		if err := sweeps(os.Stdout, askIndex); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == 2 && os.Args[1] == "prose" {
-		if err := proses("."); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) == dumpArgs && os.Args[1] == "dump" {
-		if err := dumps(os.Args[2]); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		return
-	}
-	if len(os.Args) > 1 && cliVerbs[os.Args[1]] {
-		os.Exit(routes(os.Stdout, os.Stderr, reachV1, os.Args[1:]))
+	if code, ran := runWith(realBoxDoors(os.Stdout, os.Stderr), os.Args[1:]); ran {
+		os.Exit(code)
 	}
 	as := manager.Registers(q.Main)
 	doors, err := wired()
@@ -398,7 +322,12 @@ func wired() (doors, error) {
 	if err != nil {
 		return doors{}, err
 	}
-	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	return wiredOver(root, os.Executable)
+}
+
+// The wiring's instances under the root, or the vehicle's where the root holds no wiring file, the vehicle read off the binary's own path the self door names. [[spec/tickets/test-walks-move-onto-fakes]]
+func wiredOver(root string, self func() (string, error)) (doors, error) {
+	text, err := wiringOf(root, vehicleOf(self()))
 	if text == "" || err != nil {
 		return doors{}, err
 	}
@@ -481,8 +410,8 @@ func loaded(w q.Wiring, into *q.Catalog) ([]index.Start, map[string]q.Writer, er
 }
 
 // Prints every key off the config module, over both files under the root, the wiring and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
-func configs(root string) error {
-	rows, err := configAt(root)
+func configs(d boxDoors, root string) error {
+	rows, err := configOn(d.disk, root)
 	if err != nil {
 		return err
 	}
@@ -490,14 +419,19 @@ func configs(root string) error {
 	if err != nil {
 		return err
 	}
-	_, err = os.Stdout.Write(text)
+	_, err = d.out.Write(text)
 	return err
 }
 
 // Every key both config files under the root hold, resolved over the wiring's shared keys and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func configAt(root string) (map[string]configRow, error) {
+	return configOn(realDisk(), root)
+}
+
+// Every key both config files under the root hold, read through the disk door, resolved over the wiring's shared keys and the SE_ variables. [[spec/tickets/test-walks-move-onto-fakes]]
+func configOn(disk diskDoors, root string) (map[string]configRow, error) {
 	read := func(path string) []byte {
-		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		body, _ := disk.read(filepath.Join(root, filepath.FromSlash(path)))
 		return body
 	}
 	declared, err := declaredKeys(string(read(q.WiringFile)))
@@ -514,14 +448,13 @@ func configAt(root string) (map[string]configRow, error) {
 }
 
 // Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]
-func proses(root string) error {
+func proses(d boxDoors, root string) error {
 	read := func(path string) string {
-		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		return string(body)
+		return d.disk.text(filepath.Join(root, filepath.FromSlash(path)))
 	}
 	caps, paths := proseSchema([]byte(read(paragraphSchema)))
 	words := prose.Words(read(paths[0]), read(paths[1]), read(paths[2]))
-	ask, err := io.ReadAll(os.Stdin)
+	ask, err := io.ReadAll(d.input)
 	if err != nil {
 		return err
 	}
@@ -529,6 +462,6 @@ func proses(root string) error {
 	if err != nil {
 		return err
 	}
-	_, err = os.Stdout.Write(text)
+	_, err = d.out.Write(text)
 	return err
 }

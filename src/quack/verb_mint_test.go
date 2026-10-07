@@ -5,7 +5,7 @@
 package main
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the schemas the tree holds, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"

@@ -6,7 +6,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the schema and default config the tree holds, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"

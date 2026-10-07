@@ -5,7 +5,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -37,19 +36,13 @@ func (f *retroMintFake) run(dir string, argv []string, env map[string]string) re
 // Writes a file under the root, its folders made. [[spec/guidance/retro/check]]
 func retroMintWrite(t *testing.T, root, path, text string) {
 	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(path))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq2Seed(t, hq2RetroDisk(root), filepath.Join(root, filepath.FromSlash(path)), text)
 }
 
 // Reads a file under the root, or the empty text where none stands. [[spec/guidance/retro/check]]
 func retroMintReadFile(t *testing.T, root, path string) string {
 	t.Helper()
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	body, err := hq2RetroDisk(root).read(filepath.Join(root, filepath.FromSlash(path)))
 	if err != nil {
 		return ""
 	}
@@ -170,11 +163,16 @@ func TestRetroMintWritesTheRecordAsJsonStringifyDoes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	at := filepath.Join(t.TempDir(), "classes.json")
-	if !retroMintWrites(realDisk(), at, retroMintKept(read), os.Stderr) {
-		t.Fatal("the record lands nowhere")
+	disk := newFakeDisk()
+	at := "/tree/classes.json"
+	if err := disk.makeAll("/tree", 0o755); err != nil {
+		t.Fatal(err)
 	}
-	if got, _ := os.ReadFile(at); string(got) != want {
+	var errs strings.Builder
+	if !retroMintWrites(disk, at, retroMintKept(read), &errs) {
+		t.Fatalf("the record lands nowhere: %s", errs.String())
+	}
+	if got, _ := disk.read(at); string(got) != want {
 		t.Fatalf("the record reads %q, want %q", got, want)
 	}
 }
@@ -279,7 +277,7 @@ func TestRetroMintNamesAPromotionCarryingNoTicketByItsWhatOrItsPlace(t *testing.
 func TestRetroMintChecksAPromotionsTicketAlone(t *testing.T) {
 	t.Parallel()
 	record := retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule"}}}
-	if got := retroMintFaults(realDisk(), record, ""); len(got) != 5 {
+	if got := retroMintFaults(newFakeDisk(), record, ""); len(got) != 5 {
 		t.Fatalf("the mint names %v", got)
 	}
 }
@@ -289,7 +287,7 @@ func TestRetroMintRefusesAPromotionNamingAProcessThatStandsNowhere(t *testing.T)
 	t.Parallel()
 	root, _ := retroMintTree(t, nil, nil)
 	ticket := retroMintTicket{Name: "the-rule-lands", Process: "nowhere", Gain: "a commit lands in one call", Breaks: "every commit costs a round of refusals", DoneWhen: []string{"./RUNME.sh land answers 0 over a clean tree"}}
-	got := retroMintFaults(realDisk(), retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
+	got := retroMintFaults(hq2RetroDisk(root), retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
 	want := `promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.`
 	if len(got) != 1 || got[0] != want {
 		t.Fatalf("the mint names %q", got)

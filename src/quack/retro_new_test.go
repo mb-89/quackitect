@@ -5,7 +5,8 @@
 package main
 
 import (
-	"os"
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -153,7 +154,7 @@ func TestRetroNewRemovesItsDraftWhereTheOpenRefuses(t *testing.T) {
 	if code != 1 || !strings.Contains(errs, "the ask breaks a rule") {
 		t.Fatalf("retro new answers %d and says %q", code, errs)
 	}
-	if _, err := os.Stat(filepath.Join(root, "spec", "tickets", "retro-one.md")); !os.IsNotExist(err) {
+	if _, err := hq2RetroDisk(root).stat(filepath.Join(root, "spec", "tickets", "retro-one.md")); !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("the draft stands after a refused open: %v", err)
 	}
 	if strings.Contains(retroNewCalls(fake), "ticket pull") {

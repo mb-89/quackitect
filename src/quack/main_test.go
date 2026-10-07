@@ -5,11 +5,10 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/config"
@@ -86,13 +85,7 @@ func TestTheServedIndexAnswersItsTickets(t *testing.T) {
 	}
 	root := t.TempDir()
 	ticket := func(path, ask string) {
-		at := filepath.Join(root, filepath.FromSlash(path))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte("---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\n"+ask+"\n"), 0o644); err != nil {
-			t.Fatal(err)
-		}
+		seedTree(t, root, map[string]string{path: "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\n" + ask + "\n"})
 	}
 	ticket("spec/tickets/grows.md", "It grows.")
 	ticket(".se/tickets/parked.md", "Later.")
@@ -101,30 +94,38 @@ func TestTheServedIndexAnswersItsTickets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	committed := make(chan struct{}, 1)
+	for at, start := range starts {
+		starts[at] = func(root string, commit index.Commit) (func(), error) {
+			return start(root, func(as q.Writer, values map[string]any) error {
+				err := commit(as, values)
+				select {
+				case committed <- struct{}{}:
+				default:
+				}
+				return err
+			})
+		}
+	}
 	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stop()
 	t.Setenv("QUACKITECT_ROOT", root)
-	awaits(t, map[string]string{"grows": "It grows.", "parked": "Later."})
+	awaits(t, committed, map[string]string{"grows": "It grows.", "parked": "Later."})
 	ticket("spec/tickets/late.md", "Written after the start.")
-	awaits(t, map[string]string{"grows": "It grows.", "parked": "Later.", "late": "Written after the start."})
+	awaits(t, committed, map[string]string{"grows": "It grows.", "parked": "Later.", "late": "Written after the start."})
 }
 
-// The polls a case waits through for the scheduler to commit the tickets. [[spec/tickets/tickets-becomes-a-module]]
-const ticketPolls = 100
-
-// Asks the served index for the tickets until each name reads its Ask. [[spec/tickets/tickets-becomes-a-module]]
-func awaits(t *testing.T, want map[string]string) {
+// Asks the served index for the tickets until each name reads its Ask, asking again at each commit an IO module lands. [[spec/tickets/tickets-becomes-a-module]]
+func awaits(t *testing.T, committed <-chan struct{}, want map[string]string) {
 	t.Helper()
-	var said any
-	for range ticketPolls {
+	for {
 		read, err := askIndex("tickets")
 		if err != nil {
 			t.Fatal(err)
 		}
-		said = read
 		rows, _ := read.([]any)
 		names := map[string]string{}
 		for _, one := range rows {
@@ -140,9 +141,8 @@ func awaits(t *testing.T, want map[string]string) {
 		if met {
 			return
 		}
-		time.Sleep(100 * time.Millisecond)
+		<-committed
 	}
-	t.Fatalf("the tickets read %#v", said)
 }
 
 // The wiring loads the tickets module, which reads files/ in and answers tickets/all out. [[spec/tickets/tickets-becomes-a-module]]
@@ -262,7 +262,7 @@ func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
 		t.Fatal(err)
 	}
-	if body, err := os.ReadFile(filepath.Join(root, "a.md")); err != nil || string(body) != "one" {
+	if body, err := realDisk().read(filepath.Join(root, "a.md")); err != nil || string(body) != "one" {
 		t.Fatalf("disk writes %q, %v", body, err)
 	}
 	if _, err := accept(q.Request{Module: "git", Verb: "commit"}); err == nil || !strings.Contains(err.Error(), "git.commit") {

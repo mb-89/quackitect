@@ -6,8 +6,6 @@ package main
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -31,16 +29,8 @@ type lintFake struct {
 
 func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 	t.Helper()
-	root := t.TempDir()
-	for at, text := range files {
-		path := filepath.Join(root, filepath.FromSlash(at))
-		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, files)
 	return lintVerb(func() (lintDoors, error) {
 		return lintDoors{
 			root: root,
@@ -55,7 +45,7 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 				return nil
 			},
 			now:  func() time.Time { return logNow },
-			disk: realDisk(),
+			disk: disk,
 		}, nil
 	})
 }

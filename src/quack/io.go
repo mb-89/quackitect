@@ -198,7 +198,7 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 	if err != nil {
 		return index.Managed{}, err
 	}
-	instances, placed := open.io, placementsOf(open.wiring, open.hands, placementLists(root), self)
+	instances, placed := open.io, placementsOf(open.wiring, open.hands, placementLists(realDisk(), root), self)
 	if len(instances) == 0 && len(placed) == 0 {
 		return index.Managed{Stop: func() {}}, nil
 	}
@@ -272,8 +272,8 @@ func beatsIndex(bus *index.Bus, store *q.Store) (*index.Peer, error) {
 }
 
 // The lists of instances the processes/placements key holds, each list one process. [[spec/design_output/model#the-placements]]
-func placementLists(root string) [][]string {
-	rows, err := configAt(root)
+func placementLists(disk diskDoors, root string) [][]string {
+	rows, err := configOn(disk, root)
 	if err != nil {
 		return nil
 	}

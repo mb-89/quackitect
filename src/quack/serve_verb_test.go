@@ -6,7 +6,6 @@ package main
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -18,6 +17,7 @@ const serveDoorText = `{"port":7001,"token":"t"}`
 // What a fake box records: every run and its folder. [[spec/design_output/level0#a-desk-serve-returns]]
 type serveBox struct {
 	root  string
+	disk  diskDoors
 	ran   [][]string
 	cwds  []string
 	code  int
@@ -28,7 +28,7 @@ type serveBox struct {
 
 func serveBoxAt(t *testing.T) *serveBox {
 	t.Helper()
-	return &serveBox{root: filepath.ToSlash(t.TempDir()), door: serveDoorText}
+	return &serveBox{root: "/tree", disk: newFakeDisk(), door: serveDoorText}
 }
 
 func (box *serveBox) hooks() string {
@@ -38,12 +38,7 @@ func (box *serveBox) hooks() string {
 // Writes the hooks door's standing file, as the index does once its door listens. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 func (box *serveBox) stands(t *testing.T, text string) {
 	t.Helper()
-	if err := os.MkdirAll(filepath.Dir(box.hooks()), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(box.hooks(), []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq2Seed(t, box.disk, box.hooks(), text)
 }
 
 func (box *serveBox) runs(t *testing.T, argv ...string) (int, string, string) {
@@ -51,7 +46,7 @@ func (box *serveBox) runs(t *testing.T, argv ...string) (int, string, string) {
 	doors := func() serveDoors {
 		return serveDoors{
 			root: box.root,
-			disk: realDisk(),
+			disk: box.disk,
 			run: func(argv []string, cwd string) (int, string, error) {
 				box.ran = append(box.ran, argv)
 				box.cwds = append(box.cwds, cwd)

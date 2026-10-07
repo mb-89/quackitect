@@ -6,41 +6,24 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
-const fakeGoRedEnv = "QUACK_FAKE_GO_RED"
+// What a red go test prints. [[spec/tickets/test-walks-move-onto-fakes]]
+const hq1GoRedText = "--- FAIL: TestA (0.00s)\n    a_test.go:7: one is two\nFAIL\nFAIL\tquackitect/src/one\t0.01s\nFAIL\n"
 
-// A process printing what a red go test prints, run as this test binary under the variable. [[spec/guidance/code/testing]]
-func TestFakeGoRedProcess(t *testing.T) {
-	t.Parallel()
-	if os.Getenv(fakeGoRedEnv) == "" {
-		return
-	}
-	fmt.Print("--- FAIL: TestA (0.00s)\n    a_test.go:7: one is two\nFAIL\nFAIL\tquackitect/src/one\t0.01s\nFAIL\n")
-	os.Exit(1)
-}
-
-// A loud run prints the process's output and keeps it, so the Go gate writes the red case the report reads. [[spec/tickets/ci-reds-name-their-cases]]
+// A loud red run keeps what the go run said, so the Go gate writes the red case the report reads. The runner's own print stands in the contract test. [[spec/tickets/ci-reds-name-their-cases]]
 func TestLoudRunKeepsAGoRedForTheReport(t *testing.T) {
 	t.Parallel()
-	var out, errs strings.Builder
-	real := runsUnder(t.TempDir(), map[string]string{}, &out, &errs)
 	doors := (&checkFake{}).doors()
-	doors.root = t.TempDir()
+	doors.root = "/tree"
 	doors.run = func(argv, env []string, quiet bool) (int, string, error) {
-		return real([]string{os.Args[0], "-test.run=^TestFakeGoRedProcess$"}, append(env, fakeGoRedEnv+"=1"), quiet)
+		return 1, hq1GoRedText, nil
 	}
 	if code := goGate(doors, false, nil); code != 1 {
-		t.Fatalf("a red Go run answers %d: %q %q", code, out.String(), errs.String())
-	}
-	if !strings.Contains(out.String(), "--- FAIL: TestA") {
-		t.Fatalf("the loud run prints %q", out.String())
+		t.Fatalf("a red Go run answers %d", code)
 	}
 	var red []redCase
 	if err := json.Unmarshal([]byte(doors.text(goRedFile)), &red); err != nil {

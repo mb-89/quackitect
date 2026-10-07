@@ -161,11 +161,11 @@ func capped(text string) string {
 }
 
 // The verbs slice's mode off the config under the root, old where nothing answers it. [[spec/tickets/runme-hands-verbs-to-quack]]
-func modeOf(root string) string { return sliceMode(root, verbsKey) }
+func modeOf(disk diskDoors, root string) string { return sliceMode(disk, root, verbsKey) }
 
 // A slice's mode off the config under the root, by its dotted key, and empty where nothing answers it. [[spec/tickets/the-doors-process-stands]]
-func sliceMode(root, key string) string {
-	rows, err := configAt(root)
+func sliceMode(disk diskDoors, root, key string) string {
+	rows, err := configOn(disk, root)
 	if err != nil {
 		return ""
 	}
@@ -195,7 +195,7 @@ func verbRoad(argv []string, out, errs io.Writer) int {
 		root = "."
 	}
 	return verbs(verbDoors{
-		mode:  modeOf(root),
+		mode:  modeOf(realDisk(), root),
 		old:   usageDoor(argv, errs),
 		alone: func(argv []string) int { return routes(out, errs, reachV1, argv) },
 		twins: registry,

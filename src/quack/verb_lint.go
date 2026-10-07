@@ -57,7 +57,7 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(hand, root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(askIndex) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(hand, root)) },
-		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(hand.disk, root, wall.Now)),
+		log:   keepsFloor(sliceMode(hand.disk, root, logFloorKey), appendsRow(hand.disk, root, wall.Now)),
 		now:   wall.Now,
 		disk:  hand.disk,
 	}, nil
@@ -161,7 +161,7 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 		}
 	}
 	found = append(found, rowsUnder(d.box(), where)...)
-	return check.PastHistory(check.TreeOver(d.root, rootDisk{d.root}), found), ""
+	return check.PastHistory(check.TreeOver(d.root, doorSource{d.root, d.disk}), found), ""
 }
 
 // The rows standing on a path asked or under a folder asked, and every row where the whole tree is asked. [[spec/tickets/the-lsp-server-leaves]]

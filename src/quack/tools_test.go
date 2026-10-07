@@ -4,7 +4,7 @@
 package main
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the wiring the tree holds, as a build check reads source
 	"path/filepath"
 	"testing"
 

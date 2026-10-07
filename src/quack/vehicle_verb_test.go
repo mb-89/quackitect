@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,33 +15,32 @@ import (
 // The stamp the fixed clock answers. [[spec/design_output/doors#a-fake-behaves]]
 const vehicleTestStamp = "2026-01-01T00:00:00.000Z"
 
-// Writes each file under the root, its folders first. [[spec/guidance/code/testing]]
+// Writes each file under the root through the vehicle's disk door, its folders first. [[spec/guidance/code/testing]]
 func vehicleSeed(t *testing.T, root string, files map[string]string) {
 	t.Helper()
 	for rel, text := range files {
 		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := vehicle.OS().MakeDir(filepath.Dir(at)); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+		if err := vehicle.OS().Write(at, text); err != nil {
 			t.Fatal(err)
 		}
 	}
 }
 
+// The text a file holds, read through the vehicle's disk door. [[spec/tickets/test-walks-move-onto-fakes]]
 func vehicleRead(t *testing.T, at string) string {
 	t.Helper()
-	said, err := os.ReadFile(at)
+	said, err := vehicle.OS().Read(at)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return string(said)
+	return said
 }
 
-func vehicleExists(at string) bool {
-	_, err := os.Stat(at)
-	return err == nil
-}
+// Whether a path stands, read through the vehicle's disk door. [[spec/tickets/test-walks-move-onto-fakes]]
+func vehicleExists(at string) bool { return vehicle.OS().Exists(at) }
 
 // A method holding the marker, its identity, the package and the hook's closure, and the doors over it. [[spec/design_output/doors#a-door-reads-the-outside]]
 func vehicleFixture(t *testing.T) (string, vehicleDoors) {
@@ -186,7 +184,7 @@ func TestVehicleVerbRegister(t *testing.T) {
 func TestVehicleVerbMakesAnIdentityOnEveryRoad(t *testing.T) {
 	t.Parallel()
 	_, doors := vehicleFixture(t)
-	os.Remove(filepath.Join(doors.root, filepath.FromSlash(vehicle.Identity)))
+	_ = vehicle.OS().Remove(filepath.Join(doors.root, filepath.FromSlash(vehicle.Identity)))
 	code, _, _ := vehicleRun(doors, false, "detach")
 	if code != 0 || !vehicleExists(filepath.Join(doors.root, filepath.FromSlash(vehicle.Identity))) {
 		t.Fatal("every road makes the identity")

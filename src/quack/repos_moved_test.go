@@ -7,7 +7,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the doors chapter the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strconv"

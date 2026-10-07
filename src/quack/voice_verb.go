@@ -21,16 +21,19 @@ type voiceOutside struct {
 	run  func(argv []string, cwd string) (string, error)
 	now  func() time.Time
 	disk diskDoors
+	// The count a config key answers under the root. [[spec/tickets/test-walks-move-onto-fakes]]
+	count func(root, key string) int
 }
 
 func init() {
 	disk := realDisk()
 	register("voice", voiceVerb(voiceOutside{
-		root: index.Root,
-		vale: func(root string) string { return valeAt(disk, root) },
-		run:  voiceRunsValeOver(proc.Real),
-		now:  wall.Now,
-		disk: disk,
+		root:  index.Root,
+		vale:  func(root string) string { return valeAt(disk, root) },
+		run:   voiceRunsValeOver(proc.Real),
+		now:   wall.Now,
+		disk:  disk,
+		count: settingsreader.Count,
 	}))
 }
 
@@ -68,7 +71,7 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		MakeDir: func(path string) error { return disk.makeAll(path, voiceFolderMode) },
 		Vale:    outside.run,
 		Now:     outside.now,
-		Ceiling: settingsreader.Count(root, answerCeilingKey),
+		Ceiling: outside.count(root, answerCeilingKey),
 	}
 }
 

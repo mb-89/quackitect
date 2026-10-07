@@ -251,3 +251,38 @@ func (one rootDisk) List(folder string) []string { return one.Names(folder) }
 
 // The schema read walks no tree, so the disk lists no path. [[spec/tickets/cage-write-door-port]]
 func (one rootDisk) Paths() []string { return nil }
+
+// The files under a root read through a disk door, as rootDisk reads them off the box. [[spec/tickets/test-walks-move-onto-fakes]]
+type doorSource struct {
+	root string
+	disk diskDoors
+}
+
+func (one doorSource) at(path string) string {
+	return filepath.Join(one.root, filepath.FromSlash(path))
+}
+
+func (one doorSource) Read(path string) (string, bool) {
+	said, err := one.disk.read(one.at(path))
+	return string(said), err == nil
+}
+
+func (one doorSource) Exists(path string) bool { return one.disk.stands(one.at(path)) }
+
+func (one doorSource) Folder(path string) bool {
+	said, err := one.disk.stat(one.at(path))
+	return err == nil && said.IsDir()
+}
+
+func (one doorSource) Names(folder string) []string {
+	out := []string{}
+	for _, each := range one.disk.listed(one.at(folder)) {
+		if !each.IsDir() {
+			out = append(out, each.Name())
+		}
+	}
+	return out
+}
+
+// The read walks no tree, so the door lists no path. [[spec/tickets/test-walks-move-onto-fakes]]
+func (one doorSource) Paths() []string { return nil }

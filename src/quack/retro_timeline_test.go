@@ -6,12 +6,35 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 )
+
+// The fake disk each retro case's root stands on, keyed by the root so parallel cases stay apart. [[spec/tickets/test-walks-move-onto-fakes]]
+var hq2RetroDisks sync.Map
+
+// The one fake disk under a root, which the seed helpers and retroBoxAt share. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2RetroDisk(root string) diskDoors {
+	if held, ok := hq2RetroDisks.Load(root); ok {
+		return held.(diskDoors)
+	}
+	held, _ := hq2RetroDisks.LoadOrStore(root, newFakeDisk())
+	return held.(diskDoors)
+}
+
+// Writes a file on a disk door, its folders made, and the case stops where the door refuses. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2Seed(t *testing.T, disk diskDoors, at, text string) {
+	t.Helper()
+	if err := disk.makeAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := disk.write(at, []byte(text), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
 
 // The retro every reading case names. [[spec/guidance/retro/chapter]]
 const retroReadingName = "retro-a1b2c3"
@@ -33,13 +56,7 @@ const retroReadingCuts = `[{"id":"c1","title":"the morning","from":"2026-09-19T0
 func retroReadingLay(t *testing.T, root, name string, files map[string]string) {
 	t.Helper()
 	for rel, body := range files {
-		at := filepath.Join(retroHome(root, name), filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(body), 0o644); err != nil {
-			t.Fatal(err)
-		}
+		hq2Seed(t, hq2RetroDisk(root), filepath.Join(retroHome(root, name), filepath.FromSlash(rel)), body)
 	}
 }
 
@@ -58,7 +75,7 @@ func retroReadingWith(base, more map[string]string) map[string]string {
 // A file under the retro's home, read, and the case stops where none stands. [[spec/guidance/retro/chapter]]
 func retroReadingFile(t *testing.T, root, name, rel string) string {
 	t.Helper()
-	body, err := os.ReadFile(filepath.Join(retroHome(root, name), filepath.FromSlash(rel)))
+	body, err := hq2RetroDisk(root).read(filepath.Join(retroHome(root, name), filepath.FromSlash(rel)))
 	if err != nil {
 		t.Fatalf("the verb writes no %s: %v", rel, err)
 	}

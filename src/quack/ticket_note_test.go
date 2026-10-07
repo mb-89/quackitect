@@ -6,7 +6,7 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the ticket schema and the wiring the tree holds, as a build check reads source
 	"path/filepath"
 	"regexp"
 	"strconv"

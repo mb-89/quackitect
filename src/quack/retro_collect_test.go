@@ -6,17 +6,35 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"reflect"
 	"regexp"
 	"slices"
 	"sort"
 	"strings"
-	"syscall"
 	"testing"
+	"testing/fstest"
 	"time"
 )
+
+// A fake disk as the hand a verb takes, and the disk itself, whose files a case dates. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2FakeDisk() (diskDoors, *fakeDisk) {
+	f := &fakeDisk{files: fstest.MapFS{}}
+	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename, appendTo: f.appendTo, readlink: f.readlink, symlink: f.symlink, makeTemp: f.makeTemp}, f
+}
+
+// The error code a disk names, as diskCodes reads it. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2Errno(t *testing.T, name string) error {
+	t.Helper()
+	for code, said := range diskCodes {
+		if said == name {
+			return code
+		}
+	}
+	t.Fatalf("diskCodes names no %s", name)
+	return nil
+}
 
 // The retro every case collects for, and the time the clock stands at. [[spec/guidance/retro/collect]]
 const (
@@ -31,12 +49,15 @@ type retroCollectWorld struct {
 	root, home, temp, slug string
 	trunk                  *retroTrunk
 	move                   func(from, to string) error
+	disk                   diskDoors
+	fake                   *fakeDisk
 }
 
 // A world seeded with the files every case starts on. [[spec/guidance/retro/collect]]
 func retroNewCollectWorld(t *testing.T, trunk *retroTrunk) *retroCollectWorld {
 	t.Helper()
-	w := &retroCollectWorld{t: t, root: t.TempDir(), home: t.TempDir(), temp: t.TempDir(), trunk: trunk, move: os.Rename}
+	disk, fake := hq2FakeDisk()
+	w := &retroCollectWorld{t: t, root: "/work/tree", home: "/work/home", temp: "/work/temp", trunk: trunk, move: disk.rename, disk: disk, fake: fake}
 	w.slug = retroSlugOf(w.root)
 	w.seed(retroCollectFiles(w.slug))
 	return w
@@ -87,39 +108,37 @@ func (w *retroCollectWorld) seed(files map[string]string) {
 // Writes one file dated at the epoch. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) write(key, text string) {
 	w.t.Helper()
-	at := w.at(key)
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		w.t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		w.t.Fatal(err)
-	}
+	hq2Seed(w.t, w.disk, w.at(key), text)
 	w.touch(key, "1970-01-01T00:00:00Z")
 }
 
 // Dates a file at a time. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) touch(key, when string) {
 	w.t.Helper()
-	if err := os.Chtimes(w.at(key), retroWhen(when), retroWhen(when)); err != nil {
-		w.t.Fatal(err)
+	w.fake.mu.Lock()
+	defer w.fake.mu.Unlock()
+	held, ok := w.fake.files[fakeKey(w.at(key))]
+	if !ok {
+		w.t.Fatalf("%s stands nowhere to date", key)
 	}
+	held.ModTime = retroWhen(when)
 }
 
 // The text a file holds, or nothing. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) read(key string) string {
-	text, _ := os.ReadFile(w.at(key))
+	text, _ := w.disk.read(w.at(key))
 	return string(text)
 }
 
 // Whether a file or a folder stands. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) exists(key string) bool {
-	_, err := os.Stat(w.at(key))
+	_, err := w.disk.stat(w.at(key))
 	return err == nil
 }
 
 // When a file last changed. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) modified(key string) time.Time {
-	said, err := os.Stat(w.at(key))
+	said, err := w.disk.stat(w.at(key))
 	if err != nil {
 		return time.Time{}
 	}
@@ -134,7 +153,7 @@ func (w *retroCollectWorld) run(argv ...string) (int, string) {
 		temp: w.temp,
 		now:  func() time.Time { return retroWhen(retroCollectNow) },
 		git:  w.trunk.run,
-		disk: realDisk(),
+		disk: w.disk,
 		move: w.move,
 	}
 	var said strings.Builder
@@ -149,7 +168,7 @@ func (w *retroCollectWorld) collect(more ...string) (int, string) {
 
 // The names standing under the private folder, sorted. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) standing() []string {
-	entries, _ := os.ReadDir(w.at("tree:.se"))
+	entries, _ := w.disk.list(w.at("tree:.se"))
 	out := []string{}
 	for _, one := range entries {
 		out = append(out, one.Name())
@@ -246,7 +265,7 @@ func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
 func TestRetroCollectFailsAndNamesTheManifestWhereItsWriteFails(t *testing.T) {
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
-	if err := os.MkdirAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
+	if err := w.disk.makeAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -414,7 +433,7 @@ func TestRetroCollectSecondRunAnswersTheFirstAndATornRunCarriesOn(t *testing.T) 
 		t.Fatalf("a second run answers %d: %q", code, said)
 	}
 
-	if err := os.Remove(w.at(retroInputKey("manifest.jsonl"))); err != nil {
+	if err := w.disk.remove(w.at(retroInputKey("manifest.jsonl"))); err != nil {
 		t.Fatal(err)
 	}
 	w.write("tree:.se/late.md", "written after the first run\n")
@@ -461,12 +480,12 @@ func TestRetroCollectSecondPassMergesWhatArrivesSinceAndKeepsBothLogs(t *testing
 }
 
 // A move failing on the error a disk names, the way a busy or a watched path refuses its rename. [[spec/guidance/retro/collect]]
-func retroRefusingMove(refuses func(from string) bool, code syscall.Errno) func(from, to string) error {
+func retroRefusingMove(refuses func(from string) bool, code error, move func(from, to string) error) func(from, to string) error {
 	return func(from, to string) error {
 		if refuses(filepath.ToSlash(from)) {
-			return &os.LinkError{Op: "rename", Old: from, New: to, Err: code}
+			return &fs.PathError{Op: "rename", Path: from, Err: code}
 		}
-		return os.Rename(from, to)
+		return move(from, to)
 	}
 }
 
@@ -474,7 +493,7 @@ func retroRefusingMove(refuses func(from string) bool, code syscall.Errno) func(
 func TestRetroCollectMoveTheDiskRefusesTakesAManifestLineAndTheVerbNamesWhatStays(t *testing.T) {
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.move = retroRefusingMove(func(from string) bool { return strings.Contains(from, "check.out") }, syscall.EBUSY)
+	w.move = retroRefusingMove(func(from string) bool { return strings.Contains(from, "check.out") }, hq2Errno(t, "EBUSY"), w.disk.rename)
 
 	code, said := w.collect()
 
@@ -497,7 +516,7 @@ func TestRetroCollectFolderTheDiskRefusesToMoveWholeMovesFileByFile(t *testing.T
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write("tree:.se/tmp/ste/words.txt", "one\n")
-	w.move = retroRefusingMove(func(from string) bool { return strings.HasSuffix(from, ".se/tmp") }, syscall.EPERM)
+	w.move = retroRefusingMove(func(from string) bool { return strings.HasSuffix(from, ".se/tmp") }, hq2Errno(t, "EPERM"), w.disk.rename)
 
 	code, said := w.collect()
 

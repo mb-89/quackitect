@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -18,8 +17,12 @@ import (
 // A shouted lead Vale names at line three of a.md. [[spec/tickets/config-verbs-port-to-go]]
 const shoutedRow = `{"a.md": [{"Check": "VoiceVale.ShoutedLead", "Line": 3, "Span": [1, 25], "Match": "NOTHING AT ALL WORKS HERE"}]}`
 
-// The verb over the root with a runner that keeps every argv and answers Vale's JSON with the row. [[spec/tickets/config-verbs-port-to-go]]
-func fixRan(root string, argv ...string) (int, string, string, []string) {
+// The root the fix cases run under on the fake disk. [[spec/tickets/test-walks-move-onto-fakes]]
+const fixAt = "/tree"
+
+// The verb over the root on the disk with a runner that keeps every argv and answers Vale's JSON with the row. [[spec/tickets/config-verbs-port-to-go]]
+func fixRan(disk diskDoors, argv ...string) (int, string, string, []string) {
+	root := fixAt
 	var out, errs strings.Builder
 	var ran []string
 	run := func(dir string, said, _ io.Writer, words ...string) int {
@@ -32,7 +35,7 @@ func fixRan(root string, argv ...string) (int, string, string, []string) {
 		}
 		return 0
 	}
-	code := fixVerb(func() (string, error) { return root, nil }, run, realDisk())(append([]string{"fix"}, argv...), false, &out, &errs)
+	code := fixVerb(func() (string, error) { return root, nil }, run, disk)(append([]string{"fix"}, argv...), false, &out, &errs)
 	return code, out.String(), errs.String(), ran
 }
 
@@ -44,13 +47,15 @@ func binNamed(name string) string {
 	return name
 }
 
-// A root with both tools standing in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
-func fixRoot(t *testing.T) string {
-	root := t.TempDir()
-	seedFile(t, root, ".se/.runtime/bin/"+binNamed("vale"), "")
-	seedFile(t, root, ".se/.runtime/bin/"+binNamed("biome"), "")
-	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n")
-	return root
+// A fake disk whose root holds both tools in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
+func fixRoot(t *testing.T) diskDoors {
+	disk := newFakeDisk()
+	hq1SeedDisk(t, disk, fixAt, map[string]string{
+		".se/.runtime/bin/" + binNamed("vale"):  "",
+		".se/.runtime/bin/" + binNamed("biome"): "",
+		"a.md":                                  "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n",
+	})
+	return disk
 }
 
 func TestFixRefusesAnUnknownFlag(t *testing.T) {
@@ -70,22 +75,20 @@ func TestFixPrintsItsUsage(t *testing.T) {
 
 func TestFixRefusesWhereNoValeStands(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	if code, _, errs, _ := fixRan(root); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
+	if code, _, errs, _ := fixRan(newFakeDisk()); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
 		t.Fatalf("fix answers %d and %q, and wants the refusal", code, errs)
 	}
 }
 
 func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
 	t.Parallel()
-	root := fixRoot(t)
+	refuse := fixRoot(t)
 	run := func(_ string, said, _ io.Writer, _ ...string) int {
 		fmt.Fprint(said, shoutedRow)
 		return 0
 	}
-	refuse := realDisk()
 	refuse.write = func(string, []byte, fs.FileMode) error { return errors.New("the disk refuses") }
-	err := calm(root, "vale", []string{"a.md"}, run, refuse)
+	err := calm(fixAt, "vale", []string{"a.md"}, run, refuse)
 	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "the disk refuses") {
 		t.Fatalf("the calm answers %v, and wants the file and the cause", err)
 	}
@@ -93,13 +96,13 @@ func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
 
 func TestFixCalmsAShoutedLead(t *testing.T) {
 	t.Parallel()
-	root := fixRoot(t)
-	code, out, _, ran := fixRan(root, "a.md")
+	disk := fixRoot(t)
+	root := fixAt
+	code, out, _, ran := fixRan(disk, "a.md")
 	if code != 0 || out != "Run ./RUNME.sh lint to see what is left for a person.\n" {
 		t.Fatalf("fix answers %d and %q", code, out)
 	}
-	said, _ := os.ReadFile(filepath.Join(root, "a.md"))
-	if string(said) != "# Notes\n\nNothing at all works here, and then calm.\n" {
+	if said := disk.text(filepath.Join(root, "a.md")); said != "# Notes\n\nNothing at all works here, and then calm.\n" {
 		t.Fatalf("a.md reads %q, and wants the lead calmed", said)
 	}
 	vale, biome := filepath.Join(root, ".se", ".runtime", "bin", binNamed("vale")), filepath.Join(root, ".se", ".runtime", "bin", binNamed("biome"))
@@ -154,31 +157,6 @@ func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
 	got := calmed("# Notes\r\n\r\nNOTHING AT ALL WORKS, yes\r\n", []valeRow{{Line: 3, Span: []int{1, 21}, Match: "NOTHING AT ALL WORKS,"}})
 	if got != "# Notes\r\n\r\nNothing at all works, yes\r\n" {
 		t.Fatalf("the calm writes %q", got)
-	}
-}
-
-// Real Vale names the shout, and the calm writes it in sentence case; a box with no Vale skips it. [[spec/design_output/doors#one-contract-test-per-door]]
-func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
-	t.Parallel()
-	root, _ := filepath.Abs(filepath.Join("..", ".."))
-	vale := toolHere(realDisk(), root, "vale")
-	if vale == "" {
-		t.Skip("no vale stands on this box")
-	}
-	for shouted, want := range map[string]string{
-		"NOTHING AT ALL WORKS HERE, and then calm.": "Nothing at all works here, and then calm.",
-		"DON'T STOP AT ALL HERE, and then calm.":    "Don't stop at all here, and then calm.",
-	} {
-		at := filepath.Join(t.TempDir(), "it.md")
-		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
-			t.Fatal(err)
-		}
-		if err := calm(root, vale, []string{at}, toolRuns, realDisk()); err != nil {
-			t.Fatal(err)
-		}
-		if got, _ := os.ReadFile(at); string(got) != "# Notes\n\n"+want+"\n" {
-			t.Fatalf("the calm over real Vale writes %q, and wants %q", got, want)
-		}
 	}
 }
 

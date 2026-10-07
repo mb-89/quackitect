@@ -408,7 +408,7 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	if ran.fault != "" {
 		say("The client stops: " + ran.fault + ".")
 	}
-	checks := readsCold(probeRows(filepath.Join(box.tree, filepath.FromSlash(sessionLog))), stepsOf(ran.stdout))
+	checks := readsCold(probeRows(d.disk, filepath.Join(box.tree, filepath.FromSlash(sessionLog))), stepsOf(ran.stdout))
 	for _, line := range coldLines(checks) {
 		say(line)
 	}

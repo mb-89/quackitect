@@ -5,7 +5,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -209,10 +208,8 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	d.pid = 12345
-	// The client writes its log on the box, and the probe reads it there. [[spec/design_output/level0#the-cold-probe]]
-	d.disk = realDisk()
 	clientAnswers(&d, func(_ []string, o runOpts) ranResult {
-		writeLog(t, o.cwd, logText(coldWhole()...))
+		writeLog(t, d.disk, o.cwd, logText(coldWhole()...))
 		return ranResult{stdout: stream(streamSaid(coldSentence+"\nTOOLS: mcp__level0__stop", nil), streamCalls("Read"))}
 	})
 	if code := probeVerb(d, []string{"cold"}); code != 0 {
@@ -241,7 +238,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	if stop := runner.ran[3]; !slices.Equal(stop, []string{filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), "stop"}) {
 		t.Errorf("the stop runs as %v", stop)
 	}
-	if _, err := os.Stat(temp); err == nil {
+	if _, err := d.disk.stat(temp); err == nil {
 		t.Error("the clone still stands")
 	}
 	if !strings.Contains(out.String(), "The install answers 0.\nPASS hook: ") {
@@ -252,12 +249,11 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 func TestAClientStandingNowhereFailsTheColdProbeAndTheCloneStillGoes(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
-	d.disk = realDisk()
 	clientAnswers(&d, func([]string, runOpts) ranResult { return ranResult{code: 1, missing: true} })
 	if code := probeVerb(d, []string{"cold"}); code != 1 || !strings.Contains(out.String(), "claude stands nowhere") {
 		t.Errorf("a missing client answers %d\n%s", code, out)
 	}
-	if _, err := os.Stat(filepath.Dir(cloneOf(t, runner))); err == nil {
+	if _, err := d.disk.stat(filepath.Dir(cloneOf(t, runner))); err == nil {
 		t.Error("the clone still stands")
 	}
 }

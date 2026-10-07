@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -451,7 +450,7 @@ func TestCheckVerb(t *testing.T) {
 		}
 	})
 	t.Run("the standing file names a door where its process lives", func(t *testing.T) {
-		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, os.Getpid()): true} {
+		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, quietBox().pid): true} {
 			if indexStands(text) != want {
 				t.Fatalf("%q reads a door %v", text, !want)
 			}
@@ -537,7 +536,7 @@ func TestTestVerb(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()
 		doors.root = t.TempDir()
-		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, os.Executable)([]string{"test"}, false, io.Discard, io.Discard)
+		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, func() (string, error) { return "/bin/quack", nil })([]string{"test"}, false, io.Discard, io.Discard)
 		if len(fake.runs) != len(testParts) || fake.runs[0][0] != "node" {
 			t.Fatalf("the verb ran %v", fake.runs)
 		}
