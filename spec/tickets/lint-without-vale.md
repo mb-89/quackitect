@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -185,6 +185,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 3bf41ceaec88427150bd09d31ec7c5e64237916b
+    hash_after: 3bf41ceaec88427150bd09d31ec7c5e64237916b
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -281,38 +293,59 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- main merged into the branch with no rebase: the check keeps main's lead parts and the branch's changed lint first, the lsp tools keep the Go rules over main's Vale retry, and main's cell-run case runs under ifRules
+- `drafts-name-no-vale`: the drafts module, the write door, their tests and two design notes name the Go rules in place of Vale
+- accept passed over every line of the ask, after its one point closed
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the merge kept both sides' intent, since each conflict read against the commit that made it on each side
+- the check answered green on the merged tree before the merge commit, so the commit landed in one try
+- the accept point closed inside the group, since it stayed small enough for the trivial route
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 14:20 a bare `branch take` moved this box onto a stale hand-over of another group, ahead of the group the handover named
+- 14:22 every patch stood at zero while the index rebuilt after the merge, then failed when the index restarted, and the box restarted it through `./RUNME.sh serve`
+- 14:23 a resolution written through a shell heredoc met the door, and the box wrote it again through patch
+- 14:29 the working name the patch set read as a todo in hand, so the pull answered wait until the plan dropped it
+- 14:35 the first commit of the fix met the door for want of a Go test beside the code, since a case table under testdata counts for none
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the handover prompt names `./RUNME.sh branch take <group>` where it hands a named group: `.claude/skills/work/SKILL.md`
+- a write meeting a rebuilding index answers that the index rebuilds, in place of standing at zero: `a-down-index-refuses-calls`
+- the plan field on a write names the ticket as working and adds no todo: `src/quack/verb_ticket.go`
+- the commit door counts an embedded case table beside the test reading it: `src/modules/hooks/command/tested.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The take's preference for a stale hand-over is right for a fire naming no group, and wrong for a handover naming one. The box read the take's code to find the name argument, and the prompt could carry it. The index churn after a merge of many commits cost the most wall time, and nothing in the door said it rebuilt.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact stands in one place: each improve line points at the file or ticket owning the fix
+the change adds no number
+the change writes no header
+the chapter carries the run's errors off the transcript, each with its time, and the run met no owner prompt past the handover
+the chapter names the role and the box nowhere
 
 ## cloud
 
