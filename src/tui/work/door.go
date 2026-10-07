@@ -4,7 +4,10 @@
 
 package work
 
-import "os"
+import (
+	"io/fs"
+	"os"
+)
 
-// The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
-func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
+// The outside every other file of this package reads through: the tree at that root. [[spec/design_output/doors#a-door-reads-the-outside]]
+func treeAt(root string) fs.FS { return os.DirFS(root) }

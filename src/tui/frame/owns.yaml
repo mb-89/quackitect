@@ -2,4 +2,5 @@
 frame:
   go: [net, net/http]
   files: [door.go]
+  contract: [src/tui/frame/door_contract_test.go]
   report: true

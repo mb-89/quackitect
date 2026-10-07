@@ -6,7 +6,6 @@ package log
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -318,5 +317,5 @@ func row(at int, door, said string) Record {
 // The rows wear the colours the config names, and a case run stands in for the window's start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
 	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
-	os.Exit(m.Run())
+	m.Run()
 }

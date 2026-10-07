@@ -5,20 +5,16 @@
 package log
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
+	"testing/fstest"
 )
 
 func TestReadLogTakesEveryWholeLineAndLeavesAHalfOne(t *testing.T) {
 	t.Parallel()
-	path := filepath.Join(t.TempDir(), "session.jsonl")
 	body := `{"at":"2026-09-11T15:00:01Z","level":"info","kind":"prompt","said":"one"}` + "\n" +
 		`{"level":"warn","kind":"tool","said":"two"}` + "\n" + `{"said":"half`
-	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	recs, err := ReadLog(path)
+	disk := fstest.MapFS{"session.jsonl": {Data: []byte(body)}}
+	recs, err := readLog(disk.ReadFile, "session.jsonl")
 	if err != nil || len(recs) != 2 {
 		t.Fatalf("the read answers %d rows and %v, and wants the two whole lines", len(recs), err)
 	}
@@ -29,7 +25,7 @@ func TestReadLogTakesEveryWholeLineAndLeavesAHalfOne(t *testing.T) {
 
 func TestReadLogAnswersNothingWhereNoFileStands(t *testing.T) {
 	t.Parallel()
-	recs, err := ReadLog(filepath.Join(t.TempDir(), "none.jsonl"))
+	recs, err := readLog(fstest.MapFS{}.ReadFile, "none.jsonl")
 	if err != nil || recs != nil {
 		t.Fatalf("a missing file answers %v and %v, and wants nothing", recs, err)
 	}
