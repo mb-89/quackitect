@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 59055ecaa00ed26d
         size: 2620
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: b26fb59bdcac6dace2e540e5393088ee96fad60e
+    hash_after: b26fb59bdcac6dace2e540e5393088ee96fad60e
+    inputs:
+      - name: design/draft
+        hash: 59055ecaa00ed26d
+        size: 2620
+      - name: design/tests-red
+        hash: 1caa5ffda3b7aa95
+        size: 875
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,9 @@ Each fails on its own assertion: the suite answers every branch file with no Gon
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
