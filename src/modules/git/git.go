@@ -37,9 +37,11 @@ const (
 
 // The refs the reader reads, as a fetch leaves them: every work branch, and trunk, which the listing in src/scripts/work-stands.js reads the same way. [[spec/design_output/work#the-listing-reads-git-once]]
 const (
-	workRefs  = "refs/remotes/origin/work/"
-	trunkRef  = "refs/remotes/origin/main"
-	refFormat = "--format=%(refname) %(objectname)"
+	workRefs = "refs/remotes/origin/work/"
+	trunkRef = "refs/remotes/origin/main"
+	// The status a two-dot diff gives a path the commit drops. [[spec/tickets/tips-carry-branch-changes-alone]]
+	deletedStatus = "D"
+	refFormat     = "--format=%(refname) %(objectname)"
 )
 
 // A batch header reads `<name> <kind> <size>`, and a missing object `<ask> missing`. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -200,36 +202,66 @@ func headsIn(refs string) (string, [][2]string) {
 	return trunk, heads
 }
 
-// One branch's ticket files and trunk's copy of its group ticket, read in one batch. [[spec/design_output/work#the-listing-reads-git-once]]
+// One branch's ticket files and trunk's copy of its group ticket, read in one batch. Against trunk the tip carries the files its branch changes alone, and the ones it drops under Gone. [[spec/design_output/work#the-listing-reads-git-once]] [[spec/tickets/tips-carry-branch-changes-alone]]
 func (one *repo) tipAt(name, commit, trunk string) (ticket.Tip, error) {
-	var more []string
-	if trunk != "" {
-		more = []string{trunk + ":" + ticketAt(name)}
+	if trunk == "" {
+		files, _, err := one.filesAt(commit, nil)
+		return ticket.Tip{Name: name, Files: files}, err
 	}
-	files, extra, err := one.filesAt(commit, more)
+	changed, gone, err := one.changedAt(trunk, commit)
 	if err != nil {
 		return ticket.Tip{}, err
 	}
-	tip := ticket.Tip{Name: name, Files: files}
-	if trunk != "" {
-		tip.Trunk = extra[0]
+	files, extra, err := one.textsAt(commit, changed, []string{trunk + ":" + ticketAt(name)})
+	if err != nil {
+		return ticket.Tip{}, err
 	}
-	return tip, nil
+	return ticket.Tip{Name: name, Trunk: extra[0], Files: files, Gone: gone}, nil
+}
+
+// The ticket paths a commit adds or changes against trunk, and the ones it drops, off one two-dot diff, so a path it leaves out stands as trunk holds it. [[spec/tickets/tips-carry-branch-changes-alone]]
+func (one *repo) changedAt(trunk, commit string) ([]string, []string, error) {
+	said, err := one.run(nil, "diff", "--name-status", "--no-renames", trunk, commit, "--", ticketsFolder)
+	if err != nil {
+		return nil, nil, err
+	}
+	changed, gone := []string{}, []string(nil)
+	for _, line := range strings.Split(strings.TrimSpace(said), "\n") {
+		status, at, ok := strings.Cut(line, "\t")
+		if !ok || !ticketPath(at) {
+			continue
+		}
+		if status == deletedStatus {
+			gone = append(gone, at)
+		} else {
+			changed = append(changed, at)
+		}
+	}
+	return changed, gone, nil
 }
 
 // The ticket files a commit holds directly under the ticket folder, and the text of each further ask, read in one batch. [[spec/design_output/work#the-listing-reads-git-once]]
 func (one *repo) filesAt(commit string, more []string) ([]ticket.File, []string, error) {
-	files := []ticket.File{}
 	listing, err := one.run(nil, "ls-tree", "--name-only", commit, ticketsFolder)
 	if err != nil {
 		return nil, nil, err
 	}
-	asks := []string{}
+	paths := []string{}
 	for _, at := range strings.Split(strings.TrimSpace(listing), "\n") {
 		if ticketPath(at) {
-			files = append(files, ticket.File{Path: at})
-			asks = append(asks, commit+":"+at)
+			paths = append(paths, at)
 		}
+	}
+	return one.textsAt(commit, paths, more)
+}
+
+// The files at paths on a commit, and the text of each further ask, read in one batch. [[spec/design_output/work#the-listing-reads-git-once]]
+func (one *repo) textsAt(commit string, paths, more []string) ([]ticket.File, []string, error) {
+	files := []ticket.File{}
+	asks := []string{}
+	for _, at := range paths {
+		files = append(files, ticket.File{Path: at})
+		asks = append(asks, commit+":"+at)
 	}
 	asks = append(asks, more...)
 	if len(asks) == 0 {
@@ -355,7 +387,19 @@ func (one *FakeGit) Tips() ([]ticket.Tip, error) {
 	defer one.mu.Unlock()
 	out := []ticket.Tip{}
 	for name, files := range one.branches {
-		out = append(out, ticket.Tip{Name: name, Trunk: one.trunk[ticketAt(name)], Files: ticketFiles(files)})
+		changed := map[string]string{}
+		for at, text := range files {
+			if was, stands := one.trunk[at]; !stands || was != text {
+				changed[at] = text
+			}
+		}
+		var gone []string
+		for _, file := range ticketFiles(one.trunk) {
+			if _, stands := files[file.Path]; !stands {
+				gone = append(gone, file.Path)
+			}
+		}
+		out = append(out, ticket.Tip{Name: name, Trunk: one.trunk[ticketAt(name)], Files: ticketFiles(changed), Gone: gone})
 	}
 	sort.Slice(out, func(a, b int) bool { return out[a].Name < out[b].Name })
 	return out, nil

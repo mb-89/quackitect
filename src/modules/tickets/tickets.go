@@ -7,6 +7,7 @@ package tickets
 import (
 	"path"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -94,7 +95,7 @@ func branchedOf(in tipsIn) []Ticket {
 		if merged(tip) {
 			continue
 		}
-		for _, one := range owned(tip) {
+		for _, one := range owned(tip, in.Trunk) {
 			if seen[one.Name] {
 				continue
 			}
@@ -127,7 +128,7 @@ func branchesOf(in tipsIn) []ticket.Branch {
 	out := []ticket.Branch{}
 	for _, tip := range in.Tips {
 		branch := ticket.Branch{Name: tip.Name, Merged: merged(tip), Children: []Ticket{}}
-		for _, one := range owned(tip) {
+		for _, one := range owned(tip, in.Trunk) {
 			switch {
 			case one.Name == tip.Name && one.Route == groupRoute:
 				branch.Ticket = one
@@ -140,15 +141,34 @@ func branchesOf(in tipsIn) []ticket.Branch {
 	return out
 }
 
-// The tickets a branch owns: its group's and the ones naming that group. Any other ticket on it is a stale copy of trunk's. [[spec/design_output/pull#the-queue-is-an-outline]]
-func owned(tip ticket.Tip) []Ticket {
+// The tickets a branch owns: its group's and the ones naming that group, read off its tree. Any other ticket on it is a stale copy of trunk's. [[spec/design_output/pull#the-queue-is-an-outline]]
+func owned(tip ticket.Tip, trunk []ticket.File) []Ticket {
 	out := []Ticket{}
-	for _, file := range tip.Files {
+	for _, file := range treeOf(tip, trunk) {
 		one := Of(file.Path, strings.TrimSuffix(path.Base(file.Path), noteExt), file.Text, 0)
 		if one.Name == tip.Name || one.Group == tip.Name {
 			out = append(out, one)
 		}
 	}
+	return out
+}
+
+// A branch's ticket files: trunk's, less the ones the tip drops, with the tip's own over them, in path order. [[spec/tickets/tips-carry-branch-changes-alone]]
+func treeOf(tip ticket.Tip, trunk []ticket.File) []ticket.File {
+	byPath := map[string]ticket.File{}
+	for _, file := range trunk {
+		if !slices.Contains(tip.Gone, file.Path) {
+			byPath[file.Path] = file
+		}
+	}
+	for _, file := range tip.Files {
+		byPath[file.Path] = file
+	}
+	out := make([]ticket.File, 0, len(byPath))
+	for _, file := range byPath {
+		out = append(out, file)
+	}
+	sort.Slice(out, func(a, b int) bool { return out[a].Path < out[b].Path })
 	return out
 }
 

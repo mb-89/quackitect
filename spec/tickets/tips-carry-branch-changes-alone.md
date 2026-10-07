@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 1caa5ffda3b7aa95
         size: 875
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 41ef7e1e27a3c0bffc42b8faf8a6cb91360a105d
+    hash_after: 41ef7e1e27a3c0bffc42b8faf8a6cb91360a105d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/git/git.go src/modules/tickets/tickets.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches git.go and tickets.go alone, both in the draft size list
+- the change reaches git, whose FakeGit answers the same diff
+- each new function and constant points at this ticket
+- the deleted status stands once, and the tip-over-trunk rule once
 
 ## tests-green
 
@@ -359,3 +373,7 @@ accept
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The red tests from tests-red prove the change:
+
+    go test -tags contract ./src/modules/git/ -run 'TestGit|TestTheLiveTipsLandUnderTheBusCap' src/modules/git/git_contract_test.go src/modules/tickets/branches_test.go
