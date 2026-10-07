@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -186,7 +186,30 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: f340b207bcaab277ea5d224bd8875fb86ce152b2
+    hash_after: 7874eab871722c9dd59c3f0750218bf47a940cf6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   96.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4103cfc6fb205414
+        size: 1027
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: javascript-leaves
+reason: done
 ---
 
 # Ask
@@ -391,26 +414,42 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/probe_dry_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dry and smoke probes run in Go, and the three probe scripts and their tests leave.
+
+- probe_dry.go holds both roads over one probed road. Each stands a clone, starts its door through se-index standing, and posts a session's events to it with the bearer token.
+- probe_clear.go holds the clear road, which moved out of probe-clear.js. It took a file of its own to keep probe_dry.go under the file ceiling.
+- probe_cold.go owns coldPath and coldIn, which moved from commit.go, and coldTree checks the clone out at the revision --at names.
+- boxdoors.go gains the real post door, and cli-check.js drops its deltaOf export.
+
+The approach left out turn.said. The door hears the canary on that post alone, so the session posts it before the message display, as the hook does. The red test's event list gained turn.said, its one edit.
+
+The probes need no part of level0-hooks-forward-to-go, since the door already makes every decision the dry checks read. ./RUNME.sh probe dry passes all eight checks, and the check runs the smoke green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list's files, plus probe_clear.go for the file ceiling and commit_test.go for a repeated case
+- the post door has its fake in box_doors_test.go, and every other door rides boxDoors
+- each file header names the road it implements and links the ticket
+- coldPath stands in probe_cold.go alone, and the level0 design note points at that file
 
 # accept
 
