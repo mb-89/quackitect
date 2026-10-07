@@ -1,4 +1,4 @@
-// The tested delta, off lib/tested.js: the code files a staged delta changes
+// The tested delta: the code files a staged delta changes
 // with no test beside them, and the tests a held ticket's command lines carry.
 // [[spec/tickets/cage-commit-guards-port]]
 package command

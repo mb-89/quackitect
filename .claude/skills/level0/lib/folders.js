@@ -7,44 +7,7 @@ export const PRIVATE = ".se";
 export const RETRO = `${PRIVATE}/.retro`;
 export const RUN = `${PRIVATE}/.runtime`;
 
-// The names the runtime half took, so a spelling of one straight under the private folder is a reader the move left behind. [[spec/design_output/private#three-kinds-stand-apart]]
-export const MOVED = [
-  "bin",
-  "box.json",
-  "check.json",
-  "config.json",
-  "copilot",
-  "copilot-cloud",
-  "hold",
-  "identity.json",
-  "index.db",
-  "index.json",
-  "lsp-door.json",
-  "measure",
-  "project.json",
-  "registry.json",
-  "review",
-  "session.json",
-  "show-panel",
-  "tools.json",
-  "undo",
-  "vehicle.json",
-];
-
-// The older names of the runtime folder, which the installer renames before anything else. [[spec/design_input/the-runtime-files-stand-apart]]
-export const RENAMED = ["run", "runtime"];
-
-// The older places of the log, which stands outside the half because the retro collects it. [[spec/design_input/the-runtime-files-stand-apart]]
-export const LOGGED = ["log", "run/log", "runtime/log", ".runtime/log"];
-
-// A name one side holds alone, with the side missing it and the reason. [[spec/design_input/the-runtime-files-stand-apart]]
-export const APART = {
-  "hold.json": { side: "rule", why: "the hold folder beside it carries the spelling" },
-  "registry.json": {
-    side: "loop",
-    why: "the home register moves in a block of its own",
-  },
-};
+// The names the runtime half took, its older names, the older places of the log, and a name one side holds alone, stand in src/modules/check/folders.go. [[spec/design_output/private#three-kinds-stand-apart]]
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export const HOLDS = `${RUN}/hold`;

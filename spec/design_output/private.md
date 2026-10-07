@@ -64,22 +64,22 @@ reaches one reader once, and level zero deletes the copy it reads.
 
 # The run and the token
 
-`.claude/skills/level0/lib/private.js` holds the functions, v3's guard over
+`src/modules/hooks/command/private.go` holds the functions, v3's guard over
 strings. Both read strings alone, so a caller hands the texts in and a
 test touches memory.
 
 | what it answers | the function |
 |---|---|
-| the longest run of words two texts share, in order | `longestSharedRun`, over `longestRun` |
-| the identifier-shaped tokens both texts carry | `sharedIdentifiers`, over `sharedTokens` |
-| the first note a write carries something from | `carriedFrom` |
-| what the door says back | `refusedPrivate` |
+| the longest run of words two texts share, in order | `longestRun` |
+| the identifier-shaped tokens both texts carry | `sharedTokens` |
+| the first note a write carries something from | `CarriedFrom` |
+| what the door says back | `RefusedPrivate` |
 
-A run of `COPY_RUN` words shared with a note is a copy. Shorter, and an honest
+A run of `copyRun` words shared with a note is a copy. Shorter, and an honest
 rewrite of a one-line note trips it, because the texts are about the same
 thing and share their nouns. Longer, and a pasted fragment walks through.
 
-`COPY_RUN` in `private.js` holds that six, in the open, so the first run of
+`copyRun` in `private.go` holds that six, in the open, so the first run of
 real data moves it without archaeology.
 
 The commit door reads the same checks over the lines a file adds. One word
@@ -122,8 +122,7 @@ and nothing tells it from any other word. Lowering the opaque threshold far
 enough to catch one flags every long word in the language.
 
 So a name travels where an author writes one, and the author stands alone
-against that. `test/level0/private.test.js` says so in a case named for it, and
-the judged question below is what reaches the rest.
+against that. The judged question below is what reaches the rest.
 
 # The door reads the notes
 
@@ -170,7 +169,7 @@ it adds. So a refusal points at the line the person or the session sees.
 | a file the delta deletes whole | passes it, because `/dev/null` names no file |
 
 A removed line passing is the load-bearing half: taking a leak out of the tree
-is the one commit that lands always. `addedIn` in `lib/private.js` is the
+is the one commit that lands always. `AddedIn` in `private.go` is the
 reader, and the checks below read the lines it answers.
 
 ## The three checks
@@ -261,7 +260,7 @@ way only where somebody writes the join on purpose.
 
 Every rule here reads strings, so every case hands one in.
 
-- `test/level0/private.test.js` drives the functions, the reader and the checks over strings and a fixture diff.
+- `src/modules/hooks/command/private_test.go` drives the functions, the reader and the checks over strings and a fixture diff.
 - `src/quack/hook_verb_test.go` drives the hook verb over a real repository and its bare origin.
 - `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
 - `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
@@ -273,7 +272,7 @@ reads the delta once. The run check weighs the words of one file against the
 words of each note. That part alone grows with the size of both.
 
 `.se/notes` stands empty today, so the run check answers on an empty list and
-the whole cost is the delta walk. `node --test test/level0/private.test.js`
+the whole cost is the delta walk. `go test ./src/modules/hooks/command`
 answers in milliseconds, and a heavy note set over a full delta costs whole
 seconds instead. Roads out stand open: cap what the run check reads, or index
 the note words once per commit.
@@ -290,8 +289,8 @@ prose, as one script rule:
 | a date | the ISO form, or a month's name beside a day |
 | a home path | `/home`, `/Users`, or a drive letter over `Users` |
 
-The names on `NOBODY` pass, the same list the commit door reads, and a
-contract test holds the rule's list to it. A cloud box writes paths under
+The names on `Nobody` pass, the same list the commit door reads, and
+`src/quack/nobody_test.go` holds the rule's list to it. A cloud box writes paths under
 `/home/user`, a runner under `/home/runner`, and a fixture writes `/Users/one`.
 
 The rule reads prose alone. A fence, a four-space indent and an inline code
@@ -304,7 +303,7 @@ finding on the line carrying it.
 
 # The box names the owner
 
-`NothingPrivateTravels` in `lib/tree.js` reads the box at lint time, the way
+`NothingPrivateTravels` in `src/modules/check/tree.go` reads the box at lint time, the way
 `SurveyFindsNode` reads it, and walks every tracked text file for what it
 finds:
 
@@ -315,12 +314,12 @@ finds:
 | the git name on this box | `git config user.name` |
 | the git address on this box | `git config user.email` |
 
-`boxOf` in `lib/private.js` reads those four, and `./RUNME.sh lint` hands them
-to the tree. So the same tree lints clean on a cloud box and names the owner on
+`privateDelta` in `src/modules/hooks/commits.go` reads those four for the commit
+door. So the same tree lints clean on a cloud box and names the owner on
 the owner's desk, which is where the leak starts.
 
 A name matches on a word boundary, so a two-letter handle stands out of the
-middle of an ordinary word. `NOBODY` in `private.js` holds the names carrying
+middle of an ordinary word. `Nobody` in `private.go` holds the names carrying
 no person: the nobody users, and the agent names a cloud box runs under.
 
 # The judged half

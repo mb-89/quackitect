@@ -1,6 +1,6 @@
-// The rules over the files, and the tracked files they read. Each case breaks
-// one rule on a fake tree and asserts the finding, then hands the rule this
-// tree and asserts none. A rule reaching lint reaches the problems panel.
+// The tracked files the config and the session file stand in, read off this
+// tree. Each tree rule runs in Go, and its cases stand in
+// src/modules/check/tree_test.go and src/modules/check/folders_test.go.
 // [[spec/design_output/tree#what-a-rule-answers]]
 
 import assert from "node:assert/strict";
@@ -16,43 +16,11 @@ import {
   TRACKED,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
-import {
-  EDITOR_EXTENSIONS,
-  EDITOR_SETTINGS,
-  EDITOR_VALE_INI,
-} from "../../.claude/skills/level0/lib/servers.js";
-import { pool } from "../../.claude/skills/level0/lib/stop.js";
-import { everyModuleTested } from "../../.claude/skills/level0/lib/tested.js";
-import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
-import {
-  biomeOnWindows,
-  editorDrawsWriteRules,
-  extensionsOnOffer,
-  INSTALL,
-  installerHoldsTheNames,
-  nameHoldsTheWords,
-  noLogDeleted,
-  nothingPrivateTravels,
-  privateFolderOwned,
-  settingsNameBinaries,
-  stopFolderIsData,
-  surveyFindsNode,
-  surveyNamesInstalls,
-  treeOf,
-} from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
-import { git } from "../../src/doors/git.js";
-import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const outside = proc();
-
-const STOP = "spec/config/stop";
-const NODE = process.version.replace(/^v/, "");
-const FAKE = "/tree";
+const EDITOR_SETTINGS = ".vscode/settings.json";
 
 const read = (where) => JSON.parse(files.read(join(root, where)));
 const text = (where) => files.read(join(root, where));
@@ -60,41 +28,6 @@ const settings = configOf({
   read: async (where) => files.read(join(root, where)),
   readEnv: async () => ({}),
 });
-const words = await settings.ask("names.words");
-// The tracked list reaches one case alone: the rules over this tree no check runs. [[spec/design_output/tree#the-rules-over-two-files]]
-const here = treeOf({
-  disk: files,
-  git: git(outside, root),
-  root,
-  words,
-  node: NODE,
-});
-
-const fakeTree = (seed, paths = [], node = NODE, box = {}) =>
-  treeOf({
-    disk: fakeDisk(
-      Object.fromEntries(
-        Object.entries(seed).map(([at, said]) => [`${FAKE}/${at}`, said]),
-      ),
-    ),
-    git: fakeGit({ "git ls-files": { stdout: paths.join("\n") } }, FAKE),
-    root: FAKE,
-    words,
-    node,
-    box,
-  });
-
-const namesIn = (at, end) =>
-  files
-    .list(at)
-    .filter((one) => one.kind === "file" && one.name.endsWith(end))
-    .map((one) => one.name);
-
-const edited = (where, change) => {
-  const said = read(where);
-  change(said);
-  return JSON.stringify(said, null, 2);
-};
 
 // The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
 test("no count chain stands in the verb, the viewer or the badge line", () => {
@@ -107,332 +40,16 @@ test("no count chain stands in the verb, the viewer or the badge line", () => {
   }
 });
 
-// [[spec/design_output/tree#the-rules-over-two-files]]
-// The lint's sweep holds every other rule over this tree, so this case reads these alone. [[spec/design_output/tree#the-rules-over-two-files]]
-test("this tree breaks none of the rules the sweep leaves out", () => {
-  const unswept = [
-    everyModuleTested,
-    stopFolderIsData,
-    privateFolderOwned,
-    installerHoldsTheNames,
-  ];
-  assert.deepEqual(
-    unswept.flatMap((rule) => rule(here)),
-    [],
-  );
-});
-
-// [[spec/design_output/private#a-fixture-carries-no-shape]]
-const FNORDWICK_HOME = ["C:/Users", "fnordwick"].join("/");
-
-// [[spec/design_output/private#the-box-names-the-owner]]
-test("a tracked file carrying a name off this box is refused", () => {
-  const seed = {
-    "test/level0/paths.test.js": `const ROOT = "${FNORDWICK_HOME}/ai";\n`,
-    "spec/guidance/one.md": "The maintainer reaches nobody at all here.\n",
-  };
-  const paths = ["test/level0/paths.test.js", "spec/guidance/one.md"];
-  const found = nothingPrivateTravels(
-    fakeTree(seed, paths, NODE, {
-      user: "fnordwick",
-      home: FNORDWICK_HOME,
-      name: "Fnordwick",
-      email: "fnordwick@example.com",
-    }),
-  );
-
-  assert.equal(found.length, 2, "the user and the home folder both stand in that line");
-  assert.equal(found[0].rule, "NothingPrivateTravels");
-  assert.equal(found[0].file, "test/level0/paths.test.js");
-  assert.equal(found[0].line, 1);
-  assert.match(found[0].message, /the user this box runs as/);
-  assert.match(found[1].message, /the home folder on this box/);
-});
-
-test("a git name and a git address off this box are refused too", () => {
-  const seed = { "spec/funnel/one.md": "Ask Fnordwick, or fnordwick@example.com.\n" };
-  const found = nothingPrivateTravels(
-    fakeTree(seed, ["spec/funnel/one.md"], NODE, {
-      user: "",
-      home: "/home/user",
-      name: "Fnordwick",
-      email: "fnordwick@example.com",
-    }),
-  );
-
-  assert.deepEqual(
-    found.map((one) => one.message.replace(/, and git.*/, "")),
-    [
-      "This line carries the git name on this box",
-      "This line carries the git address on this box",
-    ],
-  );
-});
-
-test("a box naming nobody reads clean", () => {
-  const seed = {
-    "spec/funnel/one.md": "A cloud box writes under /home/user, as root.\n",
-  };
-  const box = { user: "root", home: "/home/user", name: "Claude", email: "" };
-  assert.deepEqual(
-    nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
-    [],
-  );
-});
-
-// [[spec/design_output/private#a-fixture-carries-no-shape]]
-test("a name standing inside a longer word carries no person", () => {
-  const seed = { "spec/funnel/one.md": "The oxygen in the galaxy holds.\n" };
-  const box = { user: "xy", home: ["/home", "xy"].join("/"), name: "", email: "" };
-  assert.deepEqual(
-    nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
-    [],
-  );
-});
-
-test("a settings file naming another binary is refused", () => {
-  const found = settingsNameBinaries(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.path"] = "vale";
-      }),
-      [INSTALL]: text(INSTALL),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "SettingsNameBinaries");
-  assert.equal(found[0].file, EDITOR_SETTINGS);
-  assert.match(found[0].message, /vale\.valeCLI\.path/);
-  assert.ok(found[0].line > 1, "it points at the line naming the binary");
-});
-
-// The install writes vale.exe on Windows, so the rule takes it, and the tracked settings keep the plain name. [[spec/tickets/the-small-faults-land]]
-test("a settings file naming the Windows vale passes, and the tracked one names the plain vale", () => {
-  const found = settingsNameBinaries(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.path"] = ".se/.runtime/bin/vale.exe";
-      }),
-      [INSTALL]: text(INSTALL),
-    }),
-  );
-
-  assert.deepEqual(found, []);
-  assert.equal(read(EDITOR_SETTINGS)["vale.valeCLI.path"], ".se/.runtime/bin/vale");
-});
-
-test("an install script installing no vale is refused", () => {
-  const found = settingsNameBinaries(
-    fakeTree({
-      [EDITOR_SETTINGS]: text(EDITOR_SETTINGS),
-      [INSTALL]: text(INSTALL).replace(/^\s*vale\)\s*\[ -x.*$/m, "    vale) true ;;"),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].file, INSTALL);
-  assert.match(found[0].message, /installs no vale/);
-});
-
-test("a settings file drawing at its own level is refused", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.minAlertLevel"] = "warning";
-      }),
-      [EDITOR_VALE_INI]: text(EDITOR_VALE_INI),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "EditorDrawsWriteRules");
-  assert.match(found[0].message, /inherited/);
-});
-
-// [[spec/design_output/lsp#the-panel-reads-the-battery]]
-test("an editor config turning on a style is refused, because the panel reads the battery", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({
-      [EDITOR_SETTINGS]: text(EDITOR_SETTINGS),
-      [EDITOR_VALE_INI]: `${text(EDITOR_VALE_INI)}[*.md]\nBasedOnStyles = VoiceParagraph\n`,
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.match(found[0].message, /turns on a style/);
-});
-
-test("a settings file naming a config nobody wrote is refused", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({ [EDITOR_SETTINGS]: text(EDITOR_SETTINGS) }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.match(found[0].message, /vale\.valeCLI\.config/);
-});
-
-test("a plain biome path on Windows is refused", () => {
-  const found = biomeOnWindows(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["biome.lsp.bin"]["win32-x64"] = ".se/.runtime/bin/biome";
-      }),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "BiomeOnWindows");
-  assert.match(found[0].message, /win32-x64/);
-});
-
-test("a clone opening without both extensions is refused", () => {
-  const dropped = extensionsOnOffer(
-    fakeTree({
-      [EDITOR_EXTENSIONS]: edited(EDITOR_EXTENSIONS, (said) => {
-        said.recommendations = said.recommendations.filter(
-          (one) => !one.includes("biome"),
-        );
-      }),
-    }),
-  );
-
-  assert.equal(dropped.length, 1);
-  assert.equal(dropped[0].rule, "ExtensionsOnOffer");
-  assert.match(dropped[0].message, /biomejs\.biome/);
-
-  const stranger = extensionsOnOffer(
-    fakeTree({
-      [EDITOR_EXTENSIONS]: text(EDITOR_EXTENSIONS),
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["[json]"] = { "editor.defaultFormatter": "somebody.else" };
-      }),
-    }),
-  );
-
-  assert.equal(stranger.length, 1);
-  assert.equal(stranger[0].file, EDITOR_SETTINGS);
-  assert.match(stranger[0].message, /somebody\.else/);
-});
-
-// [[spec/design_output/stop#where-the-rules-live]]
-test("a stop file short of a field is refused", () => {
-  const found = stopFolderIsData(
-    fakeTree({ [`${STOP}/level0.yml`]: "- id: only-an-id\n" }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "StopFolderIsData");
-  assert.equal(found[0].file, `${STOP}/level0.yml`);
-});
-
-test("a line deleting a log file is refused", () => {
-  const found = noLogDeleted(
-    fakeTree(
-      {
-        "src/doors/log.js": "export function log() {\n  files.remove(logFolder);\n}\n",
-      },
-      ["src/doors/log.js"],
-    ),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "NoLogDeleted");
-  assert.equal(found[0].line, 2);
-});
-
-// [[spec/design_input/the-runtime-files-stand-apart]]
-test("a file spelling the runtime folder without naming its owner is refused", () => {
-  const found = privateFolderOwned(
-    fakeTree(
-      {
-        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/.runtime/hold";\n',
-        "src/index/split.go": 'const at = ".se", ".runtime"\n',
-      },
-      ["src/scripts/stray.js", "src/index/split.go"],
-    ),
-  );
-
-  assert.deepEqual(
-    found.map((one) => [one.rule, one.file, one.line]),
-    [
-      ["PrivateFolderOwned", "src/scripts/stray.js", 2],
-      ["PrivateFolderOwned", "src/index/split.go", 1],
-    ],
-  );
-});
-
-// A reader the move left behind spells the old place, and that is the drift. [[spec/design_input/the-runtime-files-stand-apart]]
-test("a spelling of a name the runtime half took is refused where the old place stands", () => {
-  const stale = {
-    "src/bridge/left.js": 'const at = join(work, ".se", "hold");\n',
-    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/.log";\n',
-  };
-  assert.deepEqual(
-    privateFolderOwned(fakeTree(stale, Object.keys(stale))).map((one) => [
-      one.file,
-      one.line,
-    ]),
-    [
-      ["src/bridge/left.js", 1],
-      ["src/scripts/old.js", 1],
-    ],
-  );
-
-  const kept = { "src/scripts/rest.js": 'const notes = ".se/notes";\n' };
-  assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
-});
-
 // The hooks door writes the session file, and the plugin's library spells it once beside it. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
-  const SESSION = /sessionFile = "([^"]+)"/.exec(here.read("src/modules/hooks/marks.go"))?.[1];
+  const SESSION = /sessionFile = "([^"]+)"/.exec(text("src/modules/hooks/marks.go"))?.[1];
   assert.ok(SESSION, "the hooks door spells the session file");
-  assert.match(here.read(".claude/skills/level0/lib/pull.js"), new RegExp(`"${SESSION}"`));
+  assert.match(text(".claude/skills/level0/lib/pull.js"), new RegExp(`"${SESSION}"`));
   assert.doesNotMatch(
-    here.read(".claude/skills/level0/hooks/pull-tool.js"),
+    text(".claude/skills/level0/hooks/pull-tool.js"),
     new RegExp(`"${SESSION}"`),
     "the hook leaves the session file to the door",
   );
-});
-
-// [[spec/design_output/level0#a-name-meets-the-cap]]
-test("a tracked name past the cap is refused", () => {
-  const long = Array.from({ length: words + 1 }, (_, i) => `word${i}`).join("-");
-  const found = nameHoldsTheWords(
-    fakeTree({ [`src/${long}.js`]: "export {};\n" }, [`src/${long}.js`]),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "NameHoldsTheWords");
-  assert.match(found[0].message, new RegExp(String(words)));
-});
-
-// [[spec/design_output/tools#what-the-survey-names]]
-test("an install of a tool the survey misses is refused", () => {
-  const found = surveyNamesInstalls(
-    fakeTree({
-      [INSTALL]: `${text(INSTALL)}\nhere() {\n  case $1 in\n    probe) [ -x "$bin/probe" ] ;;\n  esac\n}\n`,
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "SurveyNamesInstalls");
-  assert.match(found[0].message, /probe/);
-});
-
-// [[spec/design_output/tools#what-the-survey-writes]]
-test("a survey naming another node is refused", () => {
-  const stale = surveyFindsNode(
-    fakeTree({ [TOOLS]: JSON.stringify({ node: { version: "18.0.0" } }, null, 2) }),
-  );
-
-  assert.equal(stale.length, 1);
-  assert.equal(stale[0].rule, "SurveyFindsNode");
-  assert.match(stale[0].message, /18\.0\.0/);
-
-  const absent = surveyFindsNode(fakeTree({}));
-  assert.equal(absent.length, 1);
-  assert.equal(absent[0].file, INSTALL);
 });
 
 // [[spec/design_output/config#the-editor-draws-the-schema]]
@@ -454,24 +71,6 @@ test("the schema passes the config this tree ships, and refuses a field of the w
   assert.deepEqual(faultsIn(read(SCHEMA), wrong), [
     "stop.mostInARow carries a string, and the schema says number",
   ]);
-});
-
-// [[spec/design_output/stop#the-mechanical-checks]]
-test("every mechanical check the stop table names stands in the stop door", () => {
-  const door = join(root, "src", "modules", "hooks", "stop");
-  const hook = namesIn(door, ".go")
-    .filter((name) => !name.endsWith("_test.go"))
-    .map((name) => files.read(join(door, name)))
-    .join("\n");
-  const at = join(root, STOP);
-  const named = pool(
-    namesIn(at, ".yml").map((name) => ({ name, text: files.read(join(at, name)) })),
-  ).rules.filter((one) => one.decides === "mechanical");
-
-  assert.ok(named.length, "the table names a mechanical rule");
-  for (const one of named) {
-    assert.match(hook, new RegExp(`"${one.runs}"`), `the hook answers ${one.runs}`);
-  }
 });
 
 // [[spec/design_output/config#a-variable-names-a-key]]

@@ -1,4 +1,4 @@
-// The tested delta over a staged delta, off the bridge's lib/tested.js.
+// The tested delta over a staged delta, which tested.go owns.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 

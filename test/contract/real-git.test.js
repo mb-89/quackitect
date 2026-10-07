@@ -18,10 +18,6 @@ const SELF = "test/contract/real-git.test.js";
 // Each file here keeps one case over the tracked list, because no check reads the rule it holds. The entry leaves once a check takes the rule. [[spec/design_output/tree#the-rules-over-two-files]]
 const KEPT = new Map([
   [
-    "test/contract/tree.test.js",
-    "everyModuleTested, stopFolderIsData, privateFolderOwned and installerHoldsTheNames over this tree",
-  ],
-  [
     "test/contract/schema.test.js",
     "the process schema over the process files git holds",
   ],

@@ -5,10 +5,9 @@
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
@@ -267,14 +266,6 @@ ifVale(
     },
   ),
 );
-
-test("the shapes rule and the commit door pass one list of nobody users", () => {
-  const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
-  const listed = /nobody := \[([^\]]*)\]/.exec(rule);
-  assert.ok(listed, "the rule names its nobody users");
-  const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
-  assert.deepEqual(names.sort(), [...NOBODY].sort());
-});
 
 const DESIGN = "spec/design_output/probe.md";
 const BARE = "The verb exits 0 on survives.\n";

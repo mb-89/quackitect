@@ -474,8 +474,7 @@ wants: a box carrying no editor answers them and prints nothing.
 | `editor-extensions` | installs the two ids the settings point at | no `code` on the PATH |
 
 The link points at the tree, so an edit draws on the next window and no second
-install stands between them. `servers.js` holds both ids, so the shell names
-none of its own.
+install stands between them. `Extensions` in `src/modules/check/tree.go` holds the ids, and the setup verb reads it.
 
 ## The link stands
 

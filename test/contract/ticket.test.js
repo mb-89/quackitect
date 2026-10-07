@@ -18,9 +18,9 @@ import {
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
-import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { treeOf } from "./tree-of.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 // The schemas read off disk, so git stands fake and answers nothing. [[spec/design_output/doors#a-door-standing-on-another]]

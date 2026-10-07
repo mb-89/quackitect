@@ -22,7 +22,7 @@ func CheckerOver(tree *Tree, pointer, rule int) *Checker {
 // [[spec/design_output/tree#the-rules-over-two-files]]
 var readers = map[string][]func(*Tree) []Finding{
 	Settings:  {settingsNameBinaries, editorDrawsWriteRules, biomeOnWindows, extensionsOnOffer},
-	Install:   {settingsNameBinaries, surveyNamesInstalls},
+	Install:   {settingsNameBinaries, surveyNamesInstalls, installerSpellsNoFolder, installerHoldsTheNames},
 	ValeIni:   {editorDrawsWriteRules},
 	EditorIni: {editorDrawsWriteRules},
 	Offered:   {extensionsOnOffer},
@@ -86,6 +86,8 @@ var Rules = []func(*Tree) []Finding{
 	biomeOnWindows,
 	extensionsOnOffer,
 	noLogDeleted,
+	privateFolderOwned,
+	installerHoldsTheNames,
 	nameHoldsTheWords,
 	nothingPrivateTravels,
 	surveyNamesInstalls,

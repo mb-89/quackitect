@@ -145,7 +145,7 @@ without a contract test. `check` runs it after the tests, before the rules.
 
 Other contract tests stand there too, because they drive a real thing as well.
 `vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
-files this tree tracks.
+config and the session file this tree tracks.
 
 | door | real | fake | contract suite |
 |---|---|---|---|

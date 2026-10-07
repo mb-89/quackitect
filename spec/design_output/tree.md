@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/tree.js` holds the rules weighing one file against another.
+`src/modules/check` holds the rules weighing one file against another.
 This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files
@@ -13,7 +13,7 @@ Vale hands a rule one buffer. Its script sandbox offers `text` and `fmt` alone,
 so a rule weighing a config against the code reading it finds no second file
 there.
 
-These rules live in `.claude/skills/level0/lib/tree.js`. `./RUNME.sh lint`
+These rules live in `src/modules/check`, and `Rules` in `checker.go` names them. `./RUNME.sh lint`
 runs each one over the whole tree, beside the rules Vale holds and the rules
 Biome holds.
 
@@ -23,18 +23,17 @@ Biome holds.
 | `EditorDrawsWriteRules` | `.vscode/settings.json`, `spec/config/editor.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
-| `StopFolderIsData` | `spec/config/stop`, `lib/stop.js` |
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
 | `NothingPrivateTravels` | every text file git holds, and the box it lints on |
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
-| `InstallerHoldsTheNames` | `src/scripts/install.sh`, `lib/folders.js` |
+| `PrivateFolderOwned` | every source file git holds, and `src/modules/check/folders.go` |
+| `InstallerHoldsTheNames` | `src/scripts/install.sh`, `src/modules/check/folders.go` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
-| `EveryModuleTested` | a module of the server, and the tests importing it |
 | `NoConflictMarkers` | every text file git holds under `spec`, `src`, `.claude` and `test`. The server holds this one, in `src/modules/check/conflict.go`. For details, see [[spec/design_output/work#no-commit-carries-a-marker]] |
 | `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/modules/check/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
 
-The commit door reads the staged delta with `EveryModuleTested` too, and asks
+The commit door reads the staged delta, and asks
 for a test beside each source file the delta changes. It reads each file's
 hunk both ways, the lines it adds and the lines it takes away:
 
@@ -91,21 +90,21 @@ answers the line holding it.
 
 # The tree handed in
 
-`treeOf` builds the reader every rule takes. It holds the disk door, the git
-door and the root, and it answers relative paths:
+`TreeOver` in `src/modules/check/tree.go` builds the reader every rule takes. It
+holds the root and the source it reads through, and it answers relative paths:
 
 | it answers | what it gives |
 |---|---|
-| `read(path)` | the text at that path, or the empty string |
-| `exists(path)` | whether the path stands |
-| `names(folder, end)` | the file names in a folder, by ending |
-| `paths()` | every path git holds |
-| `words` | the cap `names.words` says |
-| `node` | the version of the node running the sweep |
-| `box` | the user, the home folder and the git name and address here |
+| `Read(path)` | the text at that path, or the empty string |
+| `Exists(path)` | whether the path stands |
+| `Names(folder, end)` | the file names in a folder, by ending |
+| `Paths()` | every path the source holds |
+| `Words` | the cap `names.words` says |
+| `Node` | the version of the node running the sweep |
+| `Box` | the user, the home folder and the git name and address here |
 
-A rule reaches nothing else, so a test hands it a fake tree over `fakeDisk` and
-`fakeGit` and touches memory alone. `boxOf` in `lib/private.js` reads the four
+A rule reaches nothing else, so a test hands it `Texts` in memory and touches
+no disk. `src/modules/hooks/commits.go` gathers the four
 names in `box`, and [[spec/design_output/private#the-box-names-the-owner]] says
 what the rule over them does.
 

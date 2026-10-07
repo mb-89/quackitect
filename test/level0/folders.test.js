@@ -15,11 +15,33 @@ import {
   runs,
   TICKETS as NOTES,
 } from "../../.claude/skills/level0/lib/folders.js";
+import * as folders from "../../.claude/skills/level0/lib/folders.js";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { FOLDER as LOG } from "../../.claude/skills/level0/lib/log.js";
 import { WORKTREE } from "../../.claude/skills/level0/lib/review.js";
 import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { FOLDER as UNDO } from "../../.claude/skills/level0/lib/undo.js";
+
+// The runtime lists stand in src/modules/check/folders.go. [[spec/design_output/private#three-kinds-stand-apart]]
+test("the module exports the folder names and their readers, and no runtime list", () => {
+  assert.deepEqual(Object.keys(folders).sort(), [
+    "DUE",
+    "HANDOVER",
+    "HOLD",
+    "HOLDS",
+    "LOG",
+    "NOTES",
+    "NOTE_END",
+    "PRIVATE",
+    "PUBLIC_TICKETS",
+    "RETRO",
+    "RUN",
+    "TICKETS",
+    "inRetro",
+    "inRun",
+    "runs",
+  ]);
+});
 
 test("the module names the retro folder and the runtime folder, both under the private one", () => {
   assert.equal(PRIVATE, ".se");

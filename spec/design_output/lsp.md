@@ -174,8 +174,9 @@ Biome extension:
 | Vale answers a fault, or stands nowhere | `ValeRuns` on the config, in Vale's own words, so a broken rule stands in the panel |
 | no Biome | no Biome row |
 
-`StopFolderIsData` and `GridHolds` read JavaScript modules, so this server
-draws neither.
+`GridHolds` reads JavaScript modules, so this server draws none of it.
+`TestEveryStopFileReadsWhole` in `src/quack/stop_rules_test.go` holds the stop
+folder to the pool.
 
 # The config reads absolute paths
 

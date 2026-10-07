@@ -142,7 +142,7 @@ The same parse answers whether the commit steps past the pre-commit hook, and
 # A branch meets the cap
 
 The mint refuses a long name, and `git checkout -b` reaches the same tree.
-`overLong` in `lib/names.js` counts the words, and the door calls it on:
+`overLong` in `src/modules/hooks/command/findings.go` counts the words, and the door calls it on:
 
 - `git checkout -b <name>`, and `-B`
 - `git switch -c <name>`, `-C`, and `--create`

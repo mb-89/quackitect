@@ -48,7 +48,7 @@ relative to the workspace folder:
 
 `.vscode/extensions.json` offers the Vale and Biome extensions, and
 `bierner.markdown-mermaid`, which draws the Mermaid diagrams of the design notes
-in the Markdown preview. `EXTENSIONS` in `.claude/skills/level0/lib/servers.js`
+in the Markdown preview. `Extensions` in `src/modules/check/tree.go`
 names the list, and the install takes it.
 
 `SettingsNameBinaries`, `EditorDrawsWriteRules`, `BiomeOnWindows` and
@@ -63,9 +63,8 @@ and the tracked values apply.
 
 # The asset matrix
 
-`.claude/skills/level0/lib/servers.js` pins the version and names one release asset per
-platform. The install scripts ask node for the URL, so the matrix lives in one
-place and a test drives it.
+`src/scripts/install.sh` pins the version and names one release asset per
+platform, so the matrix lives in one place.
 
 Windows breaks the pattern: x86 ships a gnu target and arm64 an msvc one. A
 test holds both, because a guess costs a person one install that fails.

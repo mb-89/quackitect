@@ -32,7 +32,7 @@ type ReportInput struct {
 	Text string `json:"text" doc:"The reply, as you would write it in the chat."`
 }
 
-// The stop tool's input, as stopSpec in .claude/skills/level0/lib/stop.js declares it. [[spec/design_output/stop#the-claim-rides-the-call]]
+// The stop tool's input, as the stop tool declares it. [[spec/design_output/stop#the-claim-rides-the-call]]
 type StopInput struct {
 	Reason string `json:"reason" doc:"The id of your reason, one of the stop rules this tree holds."`
 	Next   string `json:"next" doc:"What the owner does next, in one sentence."`

@@ -133,8 +133,8 @@ the resolver and hands the value in:
 
 | what asks | who hands it in |
 |---|---|
-| `overLong` in `lib/names.js` | the command line, out of `names.words` |
-| `atTurnEnd` in `lib/stop.js` | the write door at each turn end, out of `stop.mostInARow` |
+| `overLong` in `src/modules/check/names.go` | the command line, out of `names.words` |
+| `AtTurnEnd` in `src/modules/hooks/stop/vote.go` | the write door at each turn end, out of `stop.mostInARow` |
 
 The tooth reads its cap at each turn end, so a write to the per-box file
 mid-session reaches the turn after it.
@@ -243,7 +243,7 @@ The rule takes no options in Biome 2.5.12, so what it lets through stands bare:
 | an array index | a position, and no value |
 | an initial value in a declaration, and a default in a parameter | the declaration is the name |
 
-Biome reads no Go, so `lib/magic.js` reads every Go file under the check with
+Biome reads no Go, so `magicIn` in `src/modules/check/textfaults.go` reads every Go file under the check with
 the same rule, and `./RUNME.sh check` names what it finds as a warning. A number
 a module holds twice for a technical reason says so beside the second copy.
 [[spec/design_output/schema#warning-now-and-error-later]]

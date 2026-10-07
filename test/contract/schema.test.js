@@ -22,12 +22,12 @@ import {
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
-import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
+import { treeOf } from "./tree-of.js";
 import { at, rulesIn } from "./ruled.js";
 
 // The folder the processes stand in, which Processes in src/pull/process.go owns. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

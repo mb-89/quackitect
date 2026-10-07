@@ -10,7 +10,7 @@ import (
 	"quackitect/src/modules/hooks/command"
 )
 
-// The raw notes the private delta reads. lib/private.js owns them, and the module spells them again. [[spec/tickets/cage-commit-guards-port]]
+// The raw notes the private delta reads. lib/folders.js owns them as NOTES, and the module spells them again. [[spec/tickets/cage-commit-guards-port]]
 const (
 	rawNotes   = ".se/notes"
 	noteSuffix = ".md"

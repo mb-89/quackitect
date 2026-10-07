@@ -15,6 +15,13 @@ const shaped = (door) => ({
   agrees: door.stamp().slice(0, 10) === door.now().toISOString().slice(0, 10),
 });
 
+test("the clock a test hands in takes the guard", () => {
+  const held = fakeClock();
+
+  assert.equal(typeof held.now().getTime(), "number");
+  assert.throws(() => held.sleep(1), /clock/);
+});
+
 test("the real clock answers a date and the stamp it prints", () => {
   const said = clock();
   assert.ok(said.now() instanceof Date);

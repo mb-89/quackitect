@@ -22,7 +22,7 @@ const (
 	holdsField   = "holds"
 )
 
-// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off src/bridge/handover.js and lib/stop.js. [[spec/tickets/cage-stop-rules-port]]
+// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off src/bridge/handover.js and the stop package. [[spec/tickets/cage-stop-rules-port]]
 const (
 	startEvent   = "session.start"
 	endEvent     = "session.end"

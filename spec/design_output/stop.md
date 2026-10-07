@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/stop.js` decides whether a turn ends. This note
+`src/modules/hooks/stop` decides whether a turn ends. This note
 covers the tooth, the vote it runs, and the claim the agent makes.
 
 # What the tooth is
@@ -62,7 +62,7 @@ and its result says to end the message with the line. A claim lives until the
 turn's end.
 
 A message holding the stop line alone ends a turn too, and the answer gate
-reads it clean. `stopsAlone` in `lib/stop.js` holds the test, and
+reads it clean. `stopLine` in `src/modules/drafts/answer.go` holds the test, and
 `test/level0/stop-dry-run.test.js` runs both gates over one answer.
 
 ## A turn with no line
@@ -332,7 +332,7 @@ and writes one `warn` line.
 
 A rule deciding `claimed` names a check too, and then both halves answer before
 it fires. The agent claims the reason, the check says the moment stands, and a
-claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
+claim outside that moment fires nothing. `fires` in `src/modules/hooks/stop/vote.go` holds it, and
 a claimed rule naming no check fires on the claim alone.
 
 ## A helper still runs
@@ -406,7 +406,7 @@ moment. `bindingLine` in `src/bridge/binding.js` writes it.
 ## A check beats a claim
 
 A rule carrying `yields` loses to any mechanical continue that fires, whatever
-the priorities say. `decide` in `lib/stop.js` holds it, and the vote reports the
+the priorities say. `Decide` in `src/modules/hooks/stop/vote.go` holds it, and the vote reports the
 yield under `yields`.
 
 The flag marks a stop the agent claims over its own work. Such a claim reads the
@@ -518,7 +518,7 @@ the session and no sooner.
 
 # Where the rules live
 
-`spec/config/stop/level0.yml` holds one entry per rule. `stop.js` reads every
+`spec/config/stop/level0.yml` holds one entry per rule. `Pool` in `src/modules/hooks/stop/rules.go` reads every
 file in that folder and pools the entries, so a later level drops `level1.yml`
 beside it and changes no code. The header of that file says what each key
 holds.
@@ -527,7 +527,7 @@ A rule missing an id, a side, a priority or a way of deciding stands out of the
 vote. Its file comes back named on one `warn` line, and a broken rule file
 leaves every turn as it stands.
 
-`readEntries` in `rulefile.js` reads the shape, the way `readRule` reads a
+`entriesOf` in `src/modules/hooks/stop/rules.go` reads the shape, the way `readRule` reads a
 judged rule. One reader holds both, because this tree writes both files the way
 Vale writes its own.
 

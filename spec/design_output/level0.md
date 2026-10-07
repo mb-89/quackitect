@@ -1052,7 +1052,7 @@ way a save-time formatter works for a person.
 ## The size ceiling
 
 A function holds one thing and a file one topic, and `spec/config/level0.json`
-names the ceiling of each in lines under `code`. `lib/size.js` counts both over
+names the ceiling of each in lines under `code`. `sizeFaults` in `src/modules/check/textfaults.go` counts both over
 a brace language. A function opens where a line names one and a brace opens,
 and it closes where the brace depth comes back. A brace in a string or a
 comment counts none.
@@ -1657,7 +1657,7 @@ takes its row, and the answer cell says what blocks it. The finding reads
 
 - Outcome: a numbered needs table closes every answer ending on a stop call.
 - Finding: `NeedsTable`.
-- Teacher: the stop texts in `lib/stop.js`.
+- Teacher: the stop texts in `src/modules/hooks/stop/vote.go`.
 
 | the check reads | what it demands |
 |---|---|
@@ -1690,7 +1690,7 @@ Both kinds reach a person the same way, through the command line and the panel:
 
 | the rule | where it lives |
 |---|---|
-| a rule weighing two files | `.claude/skills/level0/lib/tree.js` |
+| a rule weighing two files | `src/modules/check` |
 | a rule over a shell script | `spec/config/styles/VoiceScript` |
 
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
@@ -1710,7 +1710,7 @@ A heading, a file name, a folder name and a branch name each hold the words
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. The mint refuses a
+`overLong` in `src/modules/check/names.go` counts a name instead. The mint refuses a
 long ticket name, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 

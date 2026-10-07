@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/modules/check"
 )
 
 // The exit cmd answers where the command it runs stands nowhere. [[spec/tickets/windows-missing-code-reads-absent]]
@@ -17,12 +19,8 @@ const cmdMissing = 9009
 // The programs Windows ships as cmd shims. [[spec/tickets/setup-reaches-windows-shims]]
 var setupShims = []string{"npm", "npx", "code"}
 
-// The extensions the tracked settings point at, the list .claude/skills/level0/lib/servers.js owns as EXTENSIONS. [[spec/design_output/lsp#the-panel-reads-the-battery]]
-var editorExtensions = []string{
-	"chrischinchilla.vale-vscode",
-	"biomejs.biome",
-	"bierner.markdown-mermaid",
-}
+// The extensions the tracked settings point at. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+var editorExtensions = check.Extensions
 
 // One want of the setup: its name, why a box wants it, whether it stands, how to get it, and what a miss costs. [[spec/tickets/install-drops-node]]
 type setupItem struct {

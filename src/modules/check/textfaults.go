@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// The rule names and the words the JavaScript twins write, in unreasoned of .claude/skills/level0/lib/vale.js, size.js and magic.js beside it, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The rule names and the words this module owns, with the exemption rule unreasoned of .claude/skills/level0/lib/vale.js spells again, because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	Unreasoned      = "ExemptionCarriesAReason"
 	FileCeiling     = "FileCeiling"

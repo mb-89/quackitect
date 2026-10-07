@@ -1,5 +1,4 @@
-// The vote at a turn's end, off decide, toothOf, stopReasons and namesNext in
-// .claude/skills/level0/lib/stop.js, and the block text asksForStop in
+// The vote at a turn's end, and the block text asksForStop in
 // src/bridge/stop.js writes. [[spec/tickets/cage-stop-rules-port]]
 package stop
 

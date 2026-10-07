@@ -44,7 +44,7 @@ fi
 
 # The folder answers to .runtime, so a box carrying an older name renames it
 # first, before anything below creates the new one beside it.
-# folders.js owns these names as RENAMED.
+# folders.go owns these names as RENAMED.
 for one in "$root/.se/run" "$root/.se/runtime"; do
   if [ -d "$one" ] && [ ! -d "$run" ]; then
     mv "$one" "$run" 2>/dev/null || true
@@ -53,7 +53,7 @@ done
 
 mkdir -p "$run"
 # The log stays out of the move, because the retro collects it.
-# folders.js owns these names as MOVED.
+# folders.go owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp-door.json copilot-cloud \
   show-panel config.json identity.json project.json vehicle.json; do
@@ -88,8 +88,8 @@ fi
 
 # The log is history and no runtime state, and it answers to .se/.log, a dot
 # folder a running session writes while the retro holds the rest. Every older
-# spelling of the folder comes home.
-# folders.js owns these names as LOGGED.
+# spelling of the folder comes home, and folders.js owns the folder it spells.
+# folders.go owns these names as LOGGED.
 for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
   if [ -d "$one" ]; then
     mkdir -p "$root/.se/.log"
@@ -102,8 +102,7 @@ done
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
-# vale-ls pins itself in .claude/skills/level0/lib/servers.js. A shell script
-# imports nothing, so it spells the same pin, and a contract case holds the two equal.
+# vale-ls pins itself here, beside its asset table, and nothing else downloads it.
 vale_ls_version=0.5.1
 vale_ls_releases=https://github.com/vale-cli/vale-ls/releases/download
 
