@@ -41,17 +41,3 @@ export function carryQuack(it, falls, root = it.method ?? it.root) {
   else it.proc = proseProc(falls);
   return it;
 }
-
-// The status a box answers where it holds no program for a call. [[spec/tickets/vale-leaves-the-tree]]
-const UNTAUGHT = 127;
-
-// The rules door's verb taught to a box's fake proc, beside quack prose: the answer reads each rules-over call, and any other quack call the case leaves untaught answers as no program. [[spec/tickets/vale-leaves-the-tree]]
-export function teachRules(it, answer, root = it.method ?? it.root) {
-  const at = quackUnder(root);
-  it.disk.write(at, "");
-  it.proc.teach([at], (argv, init) => {
-    if (!argv.includes("rules-over")) return { exitCode: UNTAUGHT, stdout: "", stderr: "untaught" };
-    return typeof answer === "function" ? answer(argv, init) : answer;
-  });
-  return it;
-}

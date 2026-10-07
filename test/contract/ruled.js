@@ -1,15 +1,15 @@
-// The one reach the rule tests make to the tree's rules: the rules door over
-// each probe at its own path, and the fix verb over real files. A file declares
-// its probes at the top, and each case reads its findings off one settle, so a
-// rule stands proven against the real thing.
+// The one reach the rule tests make to the tree's rules: the rules-over verb
+// over each probe at its own path, and the fix verb over real files. A file
+// declares its probes at the top, and each case reads its findings off one
+// settle, so a rule stands proven against the real thing.
 // [[spec/design_output/doors#one-contract-test-per-door]] [[spec/tickets/vale-leaves-the-tree]]
 
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { vale } from "../../src/doors/vale.js";
 
 export const NOTE = "notes.md";
 
@@ -19,8 +19,8 @@ export const at = (text, where) => ({ text, where });
 export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
   const files = disk();
   const outside = proc();
-  const door = vale(files, outside, root);
-  const stands = door.stands();
+  const binary = join(root, BIN);
+  const stands = files.exists(binary);
   const pending = [];
 
   const declare = (one) => {
@@ -30,18 +30,30 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
     return probe;
   };
 
-  // The rules over one text at its path, through the door the write door reads. [[spec/design_output/doors#one-contract-test-per-door]]
+  // The rules over one text at its path, through the rules-over verb the proc door runs. [[spec/design_output/doors#one-contract-test-per-door]]
   const read = (text, path) => {
-    const said = door.lintNow(text, path);
-    if (!said.ran) throw new Error(`the rules ran not: ${said.why}`);
-    return said.found;
+    const said = outside.run(
+      [binary, "verb", join(root, "src", "scripts"), "rules-over", `--path=${path}`],
+      {
+        stdin: text,
+        cwd: root,
+      },
+    );
+    const fault =
+      said?.exitCode === 0
+        ? faultIn(said.stdout)
+        : String(said?.stderr || "the rules answered nothing").trim();
+    if (fault) throw new Error(`the rules ran not: ${fault}`);
+    return fromJson(said.stdout);
   };
 
   const pathOf = (folder, probe) => join(folder, ...probe.key.split("/"));
 
   // The fixer writes the files in place, so a round reads each one back, and two rounds prove the second changes nothing. [[spec/design_output/doors#one-contract-test-per-door]]
   const fixed = (batch, folder, field) => {
-    outside.run([join(root, BIN), "verb", join(root, "src", "scripts"), "fix", folder], { cwd: root });
+    outside.run([binary, "verb", join(root, "src", "scripts"), "fix", folder], {
+      cwd: root,
+    });
     for (const probe of batch) probe[field] = files.read(pathOf(folder, probe));
   };
 

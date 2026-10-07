@@ -1,28 +1,22 @@
-// Vale, and the one place this tree calls it. A caller hands in
-// run(argv, { stdin, cwd }); the rules live in spec/config/styles.
+// The prose file shape, and the readers of the JSON the rules-over verb writes:
+// each path names its rows, and each row names its check, line, span and match.
 // [[spec/design_output/level0#where-a-rule-lives]]
 
 export const PROSE = /\.(md|markdown|txt)$/i;
-// The rule an exemption with no reason draws, named once so the panel labels its source. [[spec/design_output/level0#where-a-rule-lives]]
-export const UNREASONED = "ExemptionCarriesAReason";
-
-const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 
 // [[spec/design_output/projection#the-second-target]]
 const PROSE_STYLE = /^Voice(Vale|Paragraph)\./;
-const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
-// [[spec/design_output/level0#a-broken-rule-says-so]]
+// Why the rules-over verb's answer reads as no rows, or nothing where it reads as JSON. [[spec/design_output/level0#a-broken-rule-says-so]]
 export function faultIn(stdout) {
-  let read;
   try {
-    read = JSON.parse(stdout || "{}");
+    JSON.parse(stdout || "{}");
+    return "";
   } catch {
-    return String(stdout ?? "").trim() ? "vale answered something other than JSON" : "";
+    return String(stdout ?? "").trim()
+      ? "the rules-over verb answered something other than JSON"
+      : "";
   }
-  const code = read?.Code;
-  if (typeof code !== "string" || !/^E\d+$/.test(code)) return "";
-  return `${code} ${String(read.Text ?? "").split(/\r?\n/)[0]}`.trim();
 }
 
 export function fromJson(stdout) {
@@ -50,33 +44,4 @@ export function fromJson(stdout) {
     }
   }
   return out.sort((a, b) => a.line - b.line || a.column - b.column);
-}
-
-export function unreasoned(text) {
-  const lines = String(text ?? "").split(/\r?\n/);
-  const out = [];
-  let fenced = false;
-  for (let i = 0; i < lines.length; i++) {
-    if (/^\s*(```|~~~)/.test(lines[i])) {
-      fenced = !fenced;
-      continue;
-    }
-    if (fenced) continue;
-
-    const bare = lines[i].replace(/`[^`]*`/g, "");
-    const found = MARKER.exec(bare);
-    if (!found) continue;
-    const above = i > 0 ? lines[i - 1] : "";
-    if (REASON.test(lines[i]) || REASON.test(above)) continue;
-    out.push({
-      rule: UNREASONED,
-      line: i + 1,
-      column: 1,
-      said: found[0],
-      message: `An exemption names why the rule is off. Write <!-- because: why --> above it.`,
-      severity: "error",
-      fixable: false,
-    });
-  }
-  return out;
 }

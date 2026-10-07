@@ -89,6 +89,9 @@ func TestTheHelperReadsTheLayerBeforeItsTask(t *testing.T) {
 	if !strings.HasPrefix(wrapped, "# How this tree is worked") || !strings.HasSuffix(wrapped, "# Your task\n\ndo the thing") {
 		t.Fatalf("the wrapped prompt reads\n%s", wrapped)
 	}
+	if !strings.Contains(wrapped, "The Go rules hold the mechanical ones") || strings.Contains(wrapped, "Vale") {
+		t.Fatalf("the layer's opening names no Go rules, or names Vale:\n%s", wrapped)
+	}
 	if got := ForHelper("", "do the thing"); got != "do the thing" {
 		t.Fatalf("no layer answers %q, and wants the prompt alone", got)
 	}

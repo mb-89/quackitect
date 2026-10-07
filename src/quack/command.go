@@ -113,7 +113,7 @@ func firstSet(names []string) string {
 	return ""
 }
 
-// The findings the voice keeps over a commit message: Vale over it as level0-commit.md, each past the Go prose vetoes. A box with no Vale, or a Vale answering no rows, reads none, as messageFaults does. [[spec/tickets/cage-commit-guards-port]]
+// The findings the voice keeps over a commit message: the Go rules over it as level0-commit.md, each past the Go prose vetoes. A root where no rules load, or rules answering no rows, reads none. [[spec/tickets/cage-commit-guards-port]]
 func commitVoice(root, message string) []command.Row {
 	var out []command.Row
 	for _, one := range heardOver(root, commitName, message).rows {
@@ -122,29 +122,29 @@ func commitVoice(root, message string) []command.Row {
 	return out
 }
 
-// One row Vale answers past the vetoes, with its message and severity. [[spec/tickets/cage-write-door-port]]
+// One row the Go rules answer past the vetoes, with its message and severity. [[spec/tickets/cage-write-door-port]]
 type heard struct {
 	found    prose.Finding
 	message  string
 	severity string
 }
 
-// What Vale answers over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether a Vale stands, whether it answered JSON, and why where it did not. [[spec/tickets/cage-write-door-port]] [[spec/tickets/drafts-lint-seam-carries-why]]
-type valeHeard struct {
+// What the Go rules answer over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether the rules load and run, and why where they do not. [[spec/tickets/cage-write-door-port]] [[spec/tickets/drafts-lint-seam-carries-why]]
+type rulesHeard struct {
 	rows   []heard
 	stands bool
 	ran    bool
 	why    string
 }
 
-// Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
-func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
+// The Go rules over a text as the named file, each row past every Go prose veto. A root where no rules load reads nothing. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
+func heardOver(root, name, text string) rulesHeard { return heardIn(root, name, text, prose.All) }
 
-// What the Go rules answer over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
-func heardIn(root, name, text, mode string) valeHeard {
+// The Go rules over a text as the named file, kept through the Go prose vetoes the mode names, and the load error where no rules load. [[spec/tickets/prose-checks-run-in-go]]
+func heardIn(root, name, text, mode string) rulesHeard {
 	set, err := rulesAt(root)
 	if err != nil {
-		return valeHeard{why: err.Error()}
+		return rulesHeard{why: err.Error()}
 	}
 	read := map[string][]rules.Finding{name: set.Lint(name, text)}
 	body := func(path string) string {
@@ -169,7 +169,7 @@ func heardIn(root, name, text, mode string) valeHeard {
 		}
 		return all[a].found.Column < all[b].found.Column
 	})
-	out := valeHeard{stands: true, ran: true}
+	out := rulesHeard{stands: true, ran: true}
 	for _, one := range all {
 		if len(prose.Kept(text, []prose.Finding{one.found}, caps, words, mode)) > 0 {
 			out.rows = append(out.rows, one)

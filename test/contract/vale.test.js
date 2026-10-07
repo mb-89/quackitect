@@ -1,7 +1,6 @@
-// The Vale door, and the voice rules through the tree's rules. One case drives
-// the door against the binary and holds the fake to the same answer. The rule
-// cases read their findings off the one run the helper makes for this file,
-// because a rule asserted against a stub is a rule nobody has run.
+// The voice rules through the tree's rules-over verb. The rule cases read their
+// findings off the one run the helper makes for this file, because a rule
+// asserted against a stub is a rule nobody has run.
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
@@ -10,54 +9,11 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { disk } from "../../src/doors/disk.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
-import { proc } from "../../src/doors/proc.js";
-import { vale } from "../../src/doors/vale.js";
-import { at, NOTE, rulesIn } from "./ruled.js";
+import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const outside = proc();
 const { ifRules, proves } = rulesIn(root);
-
-// The real run teaches the fake, so the door answers the same through both. [[spec/design_output/doors#one-contract-test-per-door]]
-ifRules(
-  "the door stands where the binary is, reads a text under its path, and the fake answers the same",
-  async () => {
-    const taught = {};
-    const recording = {
-      run: (argv, init) => {
-        const said = outside.run(argv, init);
-        taught[argv.join(" ")] = said;
-        return said;
-      },
-    };
-    const door = vale(files, recording, root);
-    assert.equal(door.stands(), true);
-
-    const text = "THIS IS THE SHOUTED PART, and it follows.\n";
-    const said = await door.lint(text, NOTE);
-    assert.equal(said.ran, true, said.why);
-    assert.deepEqual(
-      said.found.map((one) => one.rule),
-      ["ShoutedLead"],
-    );
-
-    const twin = vale(files, fakeProc(taught), root);
-    assert.deepEqual(await twin.lint(text, NOTE), said);
-  },
-);
-
-test("a box with no binary reads no rule, and says so", async () => {
-  const door = vale(fakeDisk(), fakeProc(), "/tree");
-  assert.equal(door.stands(), false);
-  assert.deepEqual(await door.lint("A line.\n", NOTE), {
-    ran: false,
-    why: "no rules stand here",
-    found: [],
-  });
-});
 
 ifRules(
   "a shouted lead is refused and an acronym inside a sentence passes",
@@ -370,7 +326,10 @@ ifRules(
   "a line counting the list under it warns in a note, and a line naming the list passes",
   proves(
     {
-      counted: at("The three steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
+      counted: at(
+        "The three steps below run in order:\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
       named: at("The steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
     },
     (said) => {
@@ -398,7 +357,10 @@ ifRules(
         "// The four doors this module reads.\n\nexport const one = 1;\n",
         "src/bridge/probe.js",
       ),
-      plain: at("// The doors this module reads.\n\nexport const one = 1;\n", "src/bridge/probe.js"),
+      plain: at(
+        "// The doors this module reads.\n\nexport const one = 1;\n",
+        "src/bridge/probe.js",
+      ),
     },
     (said) => {
       for (const key of ["long", "counted"]) {
@@ -479,9 +441,18 @@ ifRules(
   "a heading counting the list or the table under it warns",
   proves(
     {
-      list: at("# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n", "notes.md"),
-      table: at("# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n", "notes.md"),
-      named: at("# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n", "notes.md"),
+      list: at(
+        "# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
+      table: at(
+        "# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n",
+        "notes.md",
+      ),
+      named: at(
+        "# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
     },
     (said) => {
       for (const key of ["list", "table"]) {

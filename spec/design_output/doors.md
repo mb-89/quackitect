@@ -159,7 +159,6 @@ files this tree tracks.
 | `awake` | `src/doors/awake.js` | `src/doors/fake/awake.js` | `test/contract/awake.test.js` |
 | `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
 | `session` | `src/doors/session.js` | `src/doors/fake/session.js` | `test/contract/session.test.js` |
-| `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
 | `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
 

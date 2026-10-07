@@ -5,11 +5,11 @@ import (
 	"testing"
 )
 
-// A root with no Vale under it reads no voice, as the bridge reads none. [[spec/tickets/cage-commit-guards-port]]
-func TestCommitVoiceReadsNothingWhereNoValeStands(t *testing.T) {
+// A root where no rules load reads no voice. [[spec/tickets/cage-commit-guards-port]]
+func TestCommitVoiceReadsNothingWhereNoRulesLoad(t *testing.T) {
 	t.Parallel()
 	if rows := commitVoice(t.TempDir(), "a commit message"); rows != nil {
-		t.Errorf("commitVoice answers %v under a root with no Vale", rows)
+		t.Errorf("commitVoice answers %v under a root where no rules load", rows)
 	}
 }
 

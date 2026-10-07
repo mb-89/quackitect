@@ -155,6 +155,9 @@ func TestStyleNumbersEachNotesRulesAndItsExamples(t *testing.T) {
 	if strings.Contains(got, "deep") || strings.Contains(got, "## a") {
 		t.Errorf("the style carries a note it leaves out:\n%s", got)
 	}
+	if !strings.Contains(got, "The Go rules hold the\nmechanical ones") || strings.Contains(got, "Vale") {
+		t.Errorf("the style's opening names no Go rules, or names Vale:\n%s", got)
+	}
 }
 
 func TestStyleWritesNothingWhereNoNoteCarriesARule(t *testing.T) {

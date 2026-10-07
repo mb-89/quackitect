@@ -1,6 +1,5 @@
 // The rules-over verb: the Go rules over the text on stdin, read as the file the
-// path names, answered as Vale's JSON reporter wrote it, so every JavaScript
-// caller of the Vale door reads it unchanged.
+// path names, answered as JSON naming each path's rows.
 // [[spec/tickets/go-rules-replace-vale]]
 package main
 

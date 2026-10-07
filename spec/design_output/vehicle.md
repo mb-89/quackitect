@@ -80,8 +80,7 @@ in the work root, because that is the tree a person opens.
 ## Rules read the work root
 
 The Go rules read the rule files `ruleFiles` in `src/rules/load.go` names. The
-vale door in `src/doors/vale.js` runs the method's `rules-over` verb inside the
-work root:
+method's `rules-over` verb runs inside the work root:
 
 | what | where it comes from |
 |---|---|
