@@ -163,7 +163,7 @@ func TestStamp(t *testing.T) {
 		}
 	})
 	t.Run("the stamp counts every warning but the prose of a ticket", func(t *testing.T) {
-		stood := []finding{{"spec/tickets/a-ticket.md", "vale"}, {"/tree/.se/tickets/a-note.md", "vale"}, {"spec/tickets/a-ticket.md", "tree"}, {"spec/guidance/working.md", "vale"}}
+		stood := []finding{{"spec/tickets/a-ticket.md", "rules"}, {"/tree/.se/tickets/a-note.md", "rules"}, {"spec/tickets/a-ticket.md", "tree"}, {"spec/guidance/working.md", "rules"}}
 		said := stampFor(0, "abc", true, batteryAt, stood, nil, nil, 1)
 		if said.Warnings != 2 || !reflect.DeepEqual(said.Files, []string{"spec/guidance/working.md", "spec/tickets/a-ticket.md"}) {
 			t.Fatalf("the stamp reads %d warnings in %v", said.Warnings, said.Files)
