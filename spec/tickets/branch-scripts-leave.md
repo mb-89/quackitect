@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 8a3c23482b079c07
         size: 886
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 738e928d6becc6183f114da65dee019b288402c9
+    hash_after: cfad307995e1d3685138c79a2234248ff35f4409
+    answered:
+      - name: lint
+        exit: 0
+        said: "   81.7  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -420,14 +429,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past src/quack/drawn_golden_test.go, which holds the golden writer since the import rule refuses os under src/modules, the tree-extension contract cases the real git door forces, and one home-order case each in trust and vehicle tests the commit door asks
+- the extension fake index reads the Go-written golden through the disk fake, and the source-grep cases walk the files through the disk door in a contract test
+- each touched comment points at the Go owner of the leaving script, and the golden writer names drawn_test.go and the projection it pins
+- the drawing stands in Go alone: the golden holds its texts and drawings, and v1-index.js reads it in place of a JavaScript twin
 
 ## tests-green
 
