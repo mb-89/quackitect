@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 670ba430798efdd43eabb3bff18faa0aa7f62659
+    hash_after: 670ba430798efdd43eabb3bff18faa0aa7f62659
+    inputs:
+      - name: ask
+        hash: 35216ca059f5678c
+        size: 572
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,136 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The design stands in [[spec/design_output/examples]]; this ticket applies it to three verb families, in three moves.
+
+1. The doors. Each verb the chapters show joins the harness table once its constructor takes a fakeable door:
+
+| verb | today | the change |
+|---|---|---|
+| `ticket set`, `ticket todo`, `ticket urgent` | build `pull.OSDisk` off `rootOf` | take `pullOver`, as `ticket note` does, and read `it.Disk`; `init` passes `pullingHere(index.Root, registeredRepo)` |
+| `branch` | builds `branchDoors` inside the twin | `branchVerb` takes `func(out, errs io.Writer) *branches.Doors`; `init` wraps `branchDoors(index.Root, index.V1, ...)` |
+| `check` | takes `doorsOf` already | no change; the harness builds a `checkDoors` whose `run`, `verb`, `get` and `git` answer from fakes |
+
+The harness adds `spec/schemas` to `fixtureFolders`, builds `branches.Doors` over the same fake tree, fake repo and fake runner the pull holds, answers `Value`, `Guidance` and `Queue` from fixed fakes, and pushes one commit to origin `main` past the seed, so a sync has something to take.
+
+2. The chapters, each file one behavior:
+
+| file | interface | shows |
+|---|---|---|
+| `110_tickets/pull.md` | ticket pull | stands |
+| `110_tickets/note.md` | ticket note | a note lands under `.se/tickets` |
+| `110_tickets/set.md` | ticket set | a field lands, read back by `field` |
+| `110_tickets/todo.md` | ticket todo | a free note takes the todo flag |
+| `110_tickets/urgent.md` | ticket urgent | a ticket takes the urgent mark |
+| `120_branches/list.md` | branch | the listing shows the open group |
+| `120_branches/sync.md` | branch | a work branch takes main |
+| `120_branches/release.md` | branch | a level branch hands back |
+| `130_check/check.md` | check | a green run exits 0 and says so |
+| `910_dev_tickets/set-refuses-engine-field.md` | ticket set | edge: `state` refuses |
+| `910_dev_tickets/todo-refuses-grouped.md` | ticket todo | edge: a ticket riding a group refuses |
+| `920_dev_branches/release-refuses-unpushed.md` | branch | edge: unpushed commits refuse |
+| `920_dev_branches/sync-refuses-other-branch.md` | branch | edge: a branch off `main` and `work/` refuses |
+| `930_dev_check/check-red-exits-1.md` | check | edge: a red part exits 1 |
+
+`branch take` and `branch done` stay out of the first chapters: take needs a free group the fixture plants already taken, and done needs a written retro and a green stamp. Each joins with the chapter that plants them.
+
+3. The cuts. At tests-green, each test below leaves where the example asserts every claim of its name, and stays where it asserts more; the Discussion lists each one cut or kept, with the reason:
+
+- `src/quack/ticket_note_test.go` TestTicketNote, the landing row
+- `src/quack/ticket_set_test.go` TestTicketSet, the landing and the engine-field rows
+- `src/quack/ticket_todo_test.go` TestTicketTodo, the flag and the grouped rows
+- `src/quack/ticket_urgent_test.go` TestTicketUrgent, the mark row
+- `src/branches/port_d_list_test.go` TestPDTheListingShowsOpenWorkByDefault
+- `src/branches/port_d_sync_test.go` TestPDSyncOnAWorkBranchTakesMain
+- `src/branches/sync_test.go` TestTheSyncRefusesAnyOtherBranch
+- `src/branches/port_a_leave_test.go` TestPALevelBranchReleases, TestPAReleaseRefusesUnpushedCommits
+- `src/quack/check_test.go` TestCheckVerb, the green and red rows
+
+Assumed: one example per verb family covers its registered name, since `ExampleCovers` reads `branch` and `check` as one name each; the coverage report drops `ticket set`, `ticket todo`, `ticket urgent`, `branch` and `check`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_set.go init
+- src/quack/ticket_todo.go init
+- src/quack/ticket_urgent.go init
+- src/quack/ticket_set_test.go TestTicketSet, through the registered verb
+- src/quack/ticket_todo_test.go TestTicketTodo, through the registered verb
+- src/quack/ticket_urgent_test.go TestTicketUrgent, through the registered verb
+- src/quack/branch.go init
+- src/quack/branch_test.go TestTheGoVerbsPrintTheirUsage
+- src/quack/dispatch.go dispatchVerb, which calls branchDoors and stays as it stands
+- src/quack/cloud.go cloudVerb, which calls branchDoors and stays as it stands
+- src/quack/examples_harness_test.go exampleTable and exampleTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- spec/examples/110_tickets/note.md, run by src/quack/examples_test.go TestEveryExampleHoldsItsSteps
+- spec/examples/110_tickets/set.md, same
+- spec/examples/110_tickets/todo.md, same
+- spec/examples/110_tickets/urgent.md, same
+- spec/examples/120_branches/list.md, same
+- spec/examples/120_branches/sync.md, same
+- spec/examples/120_branches/release.md, same
+- spec/examples/130_check/check.md, same
+- spec/examples/910_dev_tickets/set-refuses-engine-field.md, same
+- spec/examples/910_dev_tickets/todo-refuses-grouped.md, same
+- spec/examples/920_dev_branches/release-refuses-unpushed.md, same
+- spec/examples/920_dev_branches/sync-refuses-other-branch.md, same
+- spec/examples/930_dev_check/check-red-exits-1.md, same
+- src/modules/check/coverage_test.go TestTheFirstChaptersLeaveTheirVerbsUnreported: ExampleCovers over the tree names none of ticket set, ticket todo, ticket urgent, branch, check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_set.go
+- src/quack/ticket_todo.go
+- src/quack/ticket_urgent.go
+- src/quack/branch.go
+- src/quack/examples_harness_test.go
+- src/modules/check/coverage_test.go
+- src/quack/ticket_note_test.go
+- src/quack/ticket_set_test.go
+- src/quack/ticket_todo_test.go
+- src/quack/ticket_urgent_test.go
+- src/quack/check_test.go
+- src/branches/port_d_list_test.go
+- src/branches/port_d_sync_test.go
+- src/branches/sync_test.go
+- src/branches/port_a_leave_test.go
+- spec/examples/110_tickets/*.md
+- spec/examples/120_branches/*.md
+- spec/examples/130_check/check.md
+- spec/examples/910_dev_tickets/*.md
+- spec/examples/920_dev_branches/*.md
+- spec/examples/930_dev_check/check-red-exits-1.md
+- spec/tickets/example-first-chapters-stand.md, the Discussion
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: branch.go, check.go, checkdoors.go, ticket_set.go, ticket_todo.go, ticket_note.go, ticket_pull.go, ticket_doors.go, examples_harness_test.go, coverage.go and the test names above; ticket_urgent.go read by its init and signature alone, and implement opens its body before the change
+- callers: a grep for branchVerb, branchDoors, ticketSet, ticketTodo, ticketUrgent and checkVerb across src names each line above
+- done_when: chapters by TestEveryExampleHoldsItsSteps; cuts by the Discussion list; fewer features by TestTheFirstChaptersLeaveTheirVerbsUnreported; check exits 0 by ./RUNME.sh check at tests-green
+- config keys: the approach adds none
 
 ## tests-red
 
