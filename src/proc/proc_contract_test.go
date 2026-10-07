@@ -198,18 +198,16 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 
 // A run on the caller's terminal stays in the caller's process group, so its reads reach the terminal, and a run reading none stands in a group of its own. [[spec/tickets/process-group-run-untested]]
 func TestARunOnTheCallersStreamsStaysInTheCallersGroup(t *testing.T) {
-	t.Parallel()
 	if runtime.GOOS == "windows" {
 		t.Skip("a Windows box carries no process groups")
 	}
 	line := []string{"sh", "-c", "echo $(ps -o pgid= -p $$) $(ps -o pgid= -p $PPID)"}
 	var out strings.Builder
-	Real(Command{Argv: line, Streams: &Streams{Out: &out, Err: &out}})
-	if own, caller, _ := strings.Cut(strings.TrimSpace(out.String()), " "); own != caller {
-		t.Errorf("a streamed run stands in group %q, apart from the caller's %q", own, caller)
-	}
-	if own, caller, _ := strings.Cut(strings.TrimSpace(Real(Command{Argv: line}).Out), " "); own == caller {
-		t.Errorf("a run reading no streams shares the caller's group %q", caller)
+	Real(Command{Argv: line, Streams: &Streams{Out: &out}})
+	own, caller, _ := strings.Cut(strings.TrimSpace(out.String()), " ")
+	alone, theirs, _ := strings.Cut(strings.TrimSpace(Real(Command{Argv: line}).Out), " ")
+	if own != caller || alone == theirs {
+		t.Errorf("a streamed run stands in group %q beside the caller's %q, and a whole run in %q beside %q", own, caller, alone, theirs)
 	}
 }
 
