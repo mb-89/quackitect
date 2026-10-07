@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 reason: done
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -280,6 +280,21 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 8d1634e2b9fc6c635b75637e619b66d3aae4a789
+    hash_after: 8d1634e2b9fc6c635b75637e619b66d3aae4a789
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+      - name: children-3
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 09f609304ea9fbde
 cloud: true
 ---
 
@@ -392,6 +407,7 @@ accept
 - the merge check went green: the fixture guard baseline drops six rows, stale pointers and an anchor point at what main holds, and the hooks guard takes the shared text helper
 - `tips-carry-branch-changes-alone` closed: a tip carries its changes against trunk alone, and the live tips land under the bus cap
 - the group split lists every child, and accept passed
+- `report-mode-holds-no-push` closed: a report-mode finding holds no push, so branch done passes while coverage gaps stand
 
 ### well
 
@@ -410,6 +426,7 @@ accept
 - 21:30 the merge commit refused four times in a row: a model trailer, a stale path, report findings read as refusals, and a copied helper main brought in
 - 21:20 the example fixture went empty after the merge, since main moved its TestMain behind the contract build tag
 - 21:52 the change hand-back refused for no staged test, though its red tests landed a step earlier
+- 22:05 branch done refused on 64 report-mode coverage findings the stamp counted as warnings
 
 ### improve
 
@@ -419,6 +436,7 @@ accept
 - the commit verb names its refusing findings first, apart from the report-mode ones it lists, in `src/quack/commit.go`
 - a fixture built in TestMain lands as a package initializer, so a build tag moving TestMain leaves it standing, in `src/quack/examples_harness_test.go`
 - the tested rule reads the tests-red evidence of a held ticket as carried tests, in `src/modules/hooks/command/tested.go`
+- a report-mode rule stays out of the stamp, in `src/quack/verb_lint.go`
 
 ### thoughts
 
