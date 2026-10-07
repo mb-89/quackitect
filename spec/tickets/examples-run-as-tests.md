@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 reason: done
 step: retro/cloud
 steps:
@@ -295,6 +295,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 09f609304ea9fbde
+  - step: retro/cloud
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 816bd1836eebe28f3d460e163e313619f859b79b
+    hash_after: 816bd1836eebe28f3d460e163e313619f859b79b
+    inputs:
+      - name: retro/write
+        hash: 20a3015ff99b0dac
+        size: 2669
+    def: 4da1ca5da87d5bbc
 cloud: true
 ---
 
@@ -474,6 +483,7 @@ Most of the session went to taking main in, not to the group's own work. Main ca
 
 - 21:15 a conflict at sync with main across eleven files
 - 21:52 the commit hook refusing a change whose tests landed a step earlier
+- 22:05 branch done refusing on report-mode findings the stamp counted
 
 ### left
 
