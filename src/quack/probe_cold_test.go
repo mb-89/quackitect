@@ -350,7 +350,7 @@ func TestTheFreshBoxPointsTheHookAtAPortOfItsOwn(t *testing.T) {
 // A commit touching the cold path runs the cold probe. [[spec/tickets/probes-leave-node]]
 func TestTheColdPathTakesTheHooksFolderAndTheNamedFiles(t *testing.T) {
 	t.Parallel()
-	paths := []string{".claude/skills/level0/hooks/start.js", "src/modules/hooks/stops.go", "src/quack/probe_dry.go", "src/scripts/install.sh", "src/bridge/guidance.js"}
+	paths := []string{".claude/skills/level0/hooks/start.js", "src/modules/hooks/stops.go", "src/quack/probe_dry.go", "src/scripts/install.sh"}
 	if got := coldIn(paths); !slices.Equal(got, paths) {
 		t.Errorf("the cold path takes %v", got)
 	}
@@ -372,6 +372,19 @@ func TestTheColdPathNamesNoScriptOfItsOwn(t *testing.T) {
 		}
 	}
 	if got := coldIn([]string{"src/scripts/probe-cold.js"}); len(got) != 0 {
+		t.Errorf("the cold path takes %v", got)
+	}
+}
+
+// The bridge leaves the tree, so the cold path names no file under it. [[spec/tickets/bridge-library-leaves]]
+func TestTheColdPathNamesNoBridgeFile(t *testing.T) {
+	t.Parallel()
+	for _, one := range coldPath {
+		if strings.HasPrefix(one, "src/bridge/") {
+			t.Errorf("the cold path names %s", one)
+		}
+	}
+	if got := coldIn([]string{"src/bridge/guidance.js", "src/bridge/config.js"}); len(got) != 0 {
 		t.Errorf("the cold path takes %v", got)
 	}
 }

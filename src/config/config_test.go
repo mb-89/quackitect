@@ -205,6 +205,60 @@ func TestDefaultInHoldsNothingTheSchemaLeavesOut(t *testing.T) {
 	}
 }
 
+// The slices whose mode the bridge's slicesOf read off the config. [[spec/tickets/bridge-library-leaves]]
+var slicesRead = []string{"config", "log", "guidance", "check", "prose"}
+
+// A slice's mode reads the local layer again at each ask, so a drop reaches the next reader. [[spec/tickets/bridge-library-leaves]]
+func TestASliceModeReadsTheLocalLayerAgainAtEachAsk(t *testing.T) {
+	t.Parallel()
+	for _, slice := range slicesRead {
+		key := "migration." + slice
+		root := rootWith(t, map[string]string{
+			Tracked: `{"migration": {"` + slice + `": "shadow"}}`,
+			Local:   `{"migration": {"` + slice + `": "old"}}`,
+		})
+		for at, mode := range []string{"old", "new", "old"} {
+			if at > 0 {
+				if err := Drop(root, key, mode); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if said, layer, held := Where(root, key); !held || said != mode || layer != Local {
+				t.Errorf("%s reads %v off %q at ask %d, and wants %s off %s", key, said, layer, at, mode, Local)
+			}
+			if said, held := Value(root, key); !held || said != mode {
+				t.Errorf("the value of %s reads %v at ask %d, and wants %s", key, said, at, mode)
+			}
+		}
+	}
+}
+
+// A slice's mode no file sets reads the schema's default under the layer built-in, and a slice the schema gives no default reads nothing. [[spec/tickets/bridge-library-leaves]]
+func TestASliceModeNoFileSetsReadsTheSchemaDefault(t *testing.T) {
+	t.Parallel()
+	for _, slice := range slicesRead {
+		key := "migration." + slice
+		root := rootWith(t, map[string]string{
+			Tracked: `{"migration": {"cage": "old"}}`,
+			Local:   `{"log": {"level": "debug"}}`,
+			Schema:  `{"properties": {"migration": {"properties": {"` + slice + `": {"type": "string", "default": "new"}}}}}`,
+		})
+		if said, layer, held := Where(root, key); !held || said != "new" || layer != BuiltIn {
+			t.Errorf("%s reads %v off %q, and wants new off %s", key, said, layer, BuiltIn)
+		}
+		if said, held := Value(root, key); !held || said != "new" {
+			t.Errorf("the value of %s reads %v, and wants new", key, said)
+		}
+	}
+	bare := rootWith(t, map[string]string{
+		Tracked: `{}`,
+		Schema:  `{"properties": {"migration": {"properties": {"check": {"type": "string"}}}}}`,
+	})
+	if said, layer, held := Where(bare, "migration.check"); held || layer != "" || said != nil {
+		t.Errorf("a slice with no default reads %v off %q", said, layer)
+	}
+}
+
 // A drop writes its key and keeps every other key of the local layer, and makes the layer where none stands. [[spec/tickets/cage-hold-drops-port]]
 func TestDropWritesOneKeyOfTheLocalLayer(t *testing.T) {
 	root := rootWith(t, map[string]string{Local: `{"stop": {"hold": "finish", "other": "kept"}, "ask": {"wanted": "brief"}}`})

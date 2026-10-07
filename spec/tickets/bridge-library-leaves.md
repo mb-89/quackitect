@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 4bd97f6aec4aa1b6
         size: 454
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 6906f6b579e44f9dea7b3feb8e79d3f8240b9063
+    hash_after: 6906f6b579e44f9dea7b3feb8e79d3f8240b9063
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 619a2ce107374093
+        size: 13619
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -446,26 +459,40 @@ Weighed: the owner leaves the lint and Vale scripts to the lint-without-vale gro
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/probe_cold_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/probe_cold_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The check and config cases pass at once, since their Go twins stand. `TestTheColdPathNamesNoBridgeFile` fails on its own assertion, because `coldPath` still names `src/bridge/guidance.js`.
+
+What surprises me:
+
+- The config package holds no fake of its own.
+- Its doors are plain functions, so its cases read a temp root through `rootWith`.
+- No case reads the real tree.
+- `TestTheColdPathTakesTheHooksFolderAndTheNamedFiles` named `src/bridge/guidance.js`.
+- That case now drops the path, so it passes before and after the change.
+- A `walkPasses` comment in `textfaults.go` still names `src/bridge/findings.js` as its owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `git ls-files src/bridge` is a checkpoint the hand answers, and it lists the bridge files today. The six Go cases decide the second line, and `TestTheColdPathNamesNoBridgeFile` stands red. `./RUNME.sh check` exits 0 at tests-green.
+- The check cases read a memory tree through `Texts`. The config cases read a temp root through `rootWith`, since the package's doors are plain functions. The cold path case reads `coldPath` alone.
 
 # gate
 
