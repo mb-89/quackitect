@@ -8,10 +8,13 @@ import (
 	"testing"
 )
 
-// A tree holding one ticket, which a field and a stands line read. [[spec/design_output/examples#the-format]]
+// A tree holding one ticket and one private note, which a field and a stands line read. [[spec/design_output/examples#the-format]]
 func reads(path string) (string, bool) {
 	if path == "spec/tickets/one.md" {
 		return "---\nkind: [[ticket]]\nstate: closed\n---\n\n# Ask\n", true
+	}
+	if path == ".se/tickets/stray.md" {
+		return "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n", true
 	}
 	return "", false
 }
@@ -34,6 +37,7 @@ func TestEachExpectFormHoldsOverAnOutcome(t *testing.T) {
 		{"field one state closed", ""},
 		{"field one state open", "closed"},
 		{"field two state open", "two"},
+		{"field stray state open", ""},
 	} {
 		t.Run(one.line, func(t *testing.T) {
 			t.Parallel()
