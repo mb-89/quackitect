@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 45cf891d892c9e1f8a8e644ddd18e47dcf1c39a6
+    hash_after: 45cf891d892c9e1f8a8e644ddd18e47dcf1c39a6
+    inputs:
+      - name: ask
+        hash: d521b63d31f8a074
+        size: 715
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +168,76 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The guard already refuses a walk from a door that holds no report flag. The lint's WalksAroundADoor marks it an error, so the check, the commit, the push, CI and the editor refuse it, and the doors part of the check exits red. So the work clears the twelve production walks, drops report, closes the one gap the JavaScript leaves, and retires DoorsOnly.
+
+1. The index door names its serving files. The index is the server, and actions.go, bus.go, main.go, ops.go, tools.go, v1.go, detach_unix.go and detach_windows.go serve its socket, its bus and its detach. src/index/owns.yaml names them under files beside door.go, so the net, net/http and syscall uses there stand held. Vale's OutsideInDoors still keeps os in door.go alone. Cost: a new serving file needs a line in the declaration, which is the refusal doing its work.
+2. The process door owns its own wait. proc.go bounds a run with context.WithTimeout, and FakeRunner falls back to time.After. src/proc/owns.yaml adds both names under go, beside the clock door, since the doors note lets several doors own one name.
+3. Every owns.yaml drops report: true. A door with no report refuses each walk.
+4. A random door owns Math.random. src/doors/owns.yaml gains random with js [Math.random] and files [], so every call walks around it until a door file stands. No tracked script calls it today.
+5. jsWalks in src/owns/script.go names a node: module no door declares as a walk around no door, past the pure modules DoorsOnly passes: path, url, test, assert and assert/strict. No such import stands today.
+6. DoorsOnly retires as the doors note says: spec/config/styles/VoiceVale/DoorsOnly.yml, its lines in .vale.ini and test/contract/outside-in-doors.test.js leave together.
+7. The rule lands in the notes. The doors note drops the report and DoorsOnly paragraphs for one line: a walk around a door fails the check, and the marker naming its reason is the one escape. The model note's IO module chapter and spec/guidance/code/code and spec/guidance/code/testing carry the same rule, each with a link to the doors note.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/check/doors.go walkFaults, through owns.Walks and owns.Read
+src/imports/walkaround.go WalkFaults, through owns.Walks
+src/imports/imports.go the doors read, through owns.Read
+src/quack/verb_doors.go walksOver, through owns.Walks and owns.Read
+src/quack/check.go the doors part, through the doors verb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/owns/owns_test.go TestANodeModuleNoDoorDeclaresIsAWalk
+src/owns/owns_test.go TestAPureNodeModuleIsNoWalk
+src/owns/tree_test.go TestNoDoorStandsAtReport
+src/owns/tree_test.go TestTheRandomDoorOwnsMathRandomAndHoldsNoFile
+src/modules/check/doors_test.go TestAWalkAroundStandsAtErrorInTheLint, which stands already and decides the planted walk
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/index/owns.yaml
+src/proc/owns.yaml
+src/doors/owns.yaml
+every other owns.yaml holding report: true
+src/owns/script.go
+src/owns/owns_test.go
+src/owns/tree_test.go
+spec/config/styles/VoiceVale/DoorsOnly.yml
+.vale.ini
+test/contract/outside-in-doors.test.js
+spec/design_output/doors.md
+spec/design_output/model.md
+spec/guidance/code/code.md
+spec/guidance/code/testing.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened: walksOver, owns.Walks, jsWalks, the owns declarations, the DoorsOnly rule and its test, and the doors note's retirement paragraph.
+the callers list names the lint, the analyzer, the doors verb and the check part, each a caller of owns.Walks or owns.Read.
+the first done_when line falls to ./RUNME.sh doors and TestNoDoorStandsAtReport, the second to TestAWalkAroundStandsAtErrorInTheLint and the check's doors part, the third to TestANodeModuleNoDoorDeclaresIsAWalk and TestTheRandomDoorOwnsMathRandomAndHoldsNoFile, and the fourth to ./RUNME.sh check with a read of the four notes.
+the approach adds no config key.
 
 ## tests-red
 
