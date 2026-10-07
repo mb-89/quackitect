@@ -55,10 +55,10 @@ func tipsRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip
 func gitRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip, trunk []ticket.File) any {
 	t.Helper()
 	var hand q.Writer
-	index := qtest.New(t, func(c *q.Catalog) { hand = withTips(c) })
-	index.Seed(files)
-	index.SeedAs(hand, map[string]any{TipsPort: tips, TrunkPort: trunk})
-	return index.Run(port)
+	fake := qtest.New(t, func(c *q.Catalog) { hand = withTips(c) })
+	fake.Seed(files)
+	fake.SeedAs(hand, map[string]any{TipsPort: tips, TrunkPort: trunk})
+	return fake.Run(port)
 }
 
 func branchedBy(t *testing.T, files map[string]any, tips []ticket.Tip) map[string]Ticket {
