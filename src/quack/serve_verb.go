@@ -140,7 +140,7 @@ func servePortOf(door string) string {
 	if json.Unmarshal([]byte(door), &said) != nil {
 		return "0"
 	}
-	number := 0.0
+	var number float64
 	switch port := said.Port.(type) {
 	case float64:
 		number = port
@@ -149,7 +149,7 @@ func servePortOf(door string) string {
 			number = 1
 		}
 	case string:
-		if parsed, err := strconv.ParseFloat(strings.TrimSpace(port), 64); err == nil {
+		if parsed, err := strconv.ParseFloat(strings.TrimSpace(port), numberBits); err == nil {
 			number = parsed
 		}
 	}

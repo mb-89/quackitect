@@ -14,11 +14,8 @@ import (
 	"quackitect/src/proc"
 )
 
-// The longest a tool runs before the module gives up on it, and the Vale config the assembly writes where the root holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
-const (
-	toolWait  = 3 * time.Minute
-	valeBuilt = ".se/vale/.vale.ini"
-)
+// The longest a tool runs before the module gives up on it. [[spec/design_output/lsp#the-server-runs-the-tools]]
+const toolWait = 3 * time.Minute
 
 // The tools the box names in its survey, else the runtime binary folder, each read again before a whole run. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func ToolsAt(root string, rules Check) *Tools {
@@ -32,12 +29,7 @@ func ToolsAt(root string, rules Check) *Tools {
 func reads(one *Tools) {
 	known := toolsIn(filepath.Join(one.Root, filepath.FromSlash(one.Check.Survey)))
 	bin := filepath.Join(one.Root, filepath.FromSlash(one.Check.Bin))
-	one.Vale = toolAt(bin, known, "vale")
 	one.Biome = toolAt(bin, known, "biome")
-	one.Config = one.Check.ValeIni
-	if !standsAt(filepath.Join(one.Root, one.Check.ValeIni)) && standsAt(filepath.Join(one.Root, filepath.FromSlash(valeBuilt))) {
-		one.Config = valeBuilt
-	}
 	one.Function = config.Count(one.Root, "code.functionLines")
 	one.File = config.Count(one.Root, "code.fileLines")
 }

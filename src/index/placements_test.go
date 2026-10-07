@@ -33,7 +33,7 @@ func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 	return store, placements, func() { stop(); bus.Close() }
 }
 
-// The cap on a wait for the spawner's ask, which a green run never meets. [[spec/tickets/each-door-meets-one-test]]
+// The cap on a wait for the spawner's ask, which a green run stays under. [[spec/tickets/each-door-meets-one-test]]
 const askCap = 5 * time.Second
 
 // A timer that answers a wait of nothing at once and holds every other, and sends each span it is asked on the channel it answers. [[spec/tickets/each-door-meets-one-test]]

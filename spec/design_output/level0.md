@@ -216,7 +216,7 @@ replace and undo. For the rules riding the first answer, see
 
 The server imports its doors and its libs once, so a fix to one reaches no
 running session by itself. So the server notes its own code at the first
-event: every script under the roots it watches, and every
+event. That code is every script under the roots it watches, and every
 module it imports, at any depth. After every tool run it
 reads the time and the size of each again, and reads no script whole. A file
 that differs restarts the server through the road the `/restart` request
@@ -413,7 +413,7 @@ The door owns every other choice the bridgehead once made, and the hook does wha
 | the step the effects answer | `StepOf` in `src/modules/hooks/step.go` | `step` beside the effects, where a back post asks no rows back |
 | the merge of an after into the harness answer | `Merged` in `src/modules/hooks/step.go` | the answer of `POST /merge` |
 
-The stub's bridgehead keeps its vehicle roads, the home order and the clone in TypeScript, because no index binary stands on a stub before its clone. [[spec/tickets/level0-hooks-hold-no-rule]]
+The stub's bridgehead keeps its vehicle roads, the home order and the clone in TypeScript. No index binary stands on a stub before its clone. [[spec/tickets/level0-hooks-hold-no-rule]]
 
 ## A session says its cage
 
@@ -625,7 +625,7 @@ moves with the build.
 The check's `plugin-tests` part runs `claude plugin test` over the kit under
 `.claude/skills/level0/tests`, and passes with a line where claude stands
 nowhere. It also counts the test lines there against the lines of every module
-the hooks manifest reaches through a relative import, and fails where the tests
+the hooks manifest reaches through a relative import. It fails where the tests
 run longer.
 
 ## A step arrives late
@@ -1008,15 +1008,16 @@ The probes on a fresh clone with no setup decide what retires:
 - whether the first session holds level zero once the hook runs, which retires the install line
 - whether a clone carrying no trust runs a project session start hook at all
 
-## What stays off the standard road
+## What the standard road leaves
 
-Level zero is a mod of function hooks, loaded as `level0@skills-dir`. Client
-2.1.287 and later loads a mod by default, so the settings carry no switch for
-mods. Two pieces stay off the standard road, each for its reason:
+Level zero is a mod of function hooks, and the client loads it as
+`level0@skills-dir`. Client 2.1.287 and later loads a mod by default, so the
+settings carry no switch for mods. These pieces stay off the standard road,
+each for its reason:
 
 | piece | why it stays |
 |---|---|
-| the boot hook in `.claude/settings.json` | it installs the plugin manifest, which git ignores because each box stamps its brand into it, and the client scans plugins before any hook of a mod runs |
+| the boot hook in `.claude/settings.json` | it installs the plugin manifest, which git ignores since each box stamps its brand into it. The client scans plugins before any hook of a mod runs |
 | function hooks over settings command hooks alone | the handover clears its own session: `$.command.run` runs `/clear`, then `$.prompt.submit` hands the resume prompt, and a settings command hook answers the client and runs neither |
 
 The cold probe of [[spec/design_output/level0#the-cold-probe]] runs a fresh
@@ -1226,15 +1227,16 @@ cut. `src/bridge/code.js` owns the refusal.
 
 ## The path a rule reads
 
-Hand every rule the path the repo root holds. Vale scopes on it.
+Hand every rule the path the repo root holds. The Go rules scope on it.
 
 | what the client sends | what the door hands on |
 |---|---|
 | `C:\...\quackitect-v5\spec\rationales\working.md` | `spec/rationales/working.md` |
 | `spec/rationales/working.md` | `spec/rationales/working.md` |
 
-Keep every folder in that path, so `[spec/rationales/*.md]` and each other
-`.vale.ini` section matches what Vale reads at `--path`.
+Keep every folder in that path, so `**/spec/rationales/*.md` and each other
+row of `sections` in `src/rules/scope.go` matches what `rules-over` reads at
+`--path`.
 
 Ask git for the root once a session, through `git rev-parse --show-toplevel`,
 and take it off the front with `relativeTo`. Leave the path whole where the box
@@ -1640,8 +1642,9 @@ copy honest. A copy nobody can edit needs no guard.
 
 # The gate reads the answer
 
-The turn's end runs the answer through Vale under the `*answer.md` section of
-`.vale.ini`, and the score of what comes back cuts into bands. The reply
+The turn's end runs the answer through the Go rules under the `*answer.md` row
+of `sections` in `src/rules/scope.go`. The score of what comes back cuts into
+bands. The reply
 already stands on screen when `turn.complete` fires, so that gate refuses
 nothing. It re-prompts, it carries a line into the next prompt, or it does
 nothing at all. The stop door reads the same answer before the turn ends,
@@ -1851,9 +1854,9 @@ For details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 # A broken rule says so
 
-Vale answers a broken rule file with an `E201`. It writes that to standard
-error and leaves standard output empty, so a reader parsing JSON alone finds no
-breach. So one broken rule turns every rule in the tree off, and the tree
+A broken rule file stops the load. `rules-over` writes the fault to standard
+error, leaves standard output empty, and exits non-zero. A reader parsing JSON
+alone then finds no breach. So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
 `faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
@@ -1863,17 +1866,18 @@ The write door reads a lint that runs nowhere the same way, whatever the fault:
 |---|---|
 | a broken rule, an answer other than JSON, a spawn that falls, a timeout | refuses a prose write, names the fault, and writes it to the log at `warn` |
 | the same fault over a write outside prose | lets it land, so the hand mending a rule file writes it |
-| no Vale on the box | lets the write land, and says so in the log once |
+| no tree binary on the box | lets the write land, and says so in the log once |
 
 # Where a rule lives
 
 | folder | holder |
 |---|---|
-| `spec/config/styles` | Vale reads its style folders, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles` | the Go rules read its rule files, and `sections` in `src/rules/scope.go` says which style reaches which path |
 | `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/tui#colours]] says |
 | `spec/config/biome.json` | Biome reads it |
 
-The comments in `.vale.ini` say why each section stands.
+For how a rule reaches a path, see
+[[spec/design_output/rules#a-rule-reads-its-paths]].
 
 The prose rules stay away from a rule file, because such a file lists the
 words they refuse.
@@ -1902,23 +1906,15 @@ answers.
 # The fixer calms a shout
 
 `./RUNME.sh fix` runs a round at a time until the tree stops moving. Each round
-calms every shout this tree finds, then hands the file to `vale fix --apply`.
+calms every shout this tree finds, then applies each finding's `replace` action
+through `rules.Apply` in `src/rules/apply.go`. That action writes the swap
+value, expanding `$1`, and folds no case.
 
-Vale carries the actions below, and none of them folds case:
+So `ShoutedLead` carries no action, and `calm` in `src/quack/verb_fix.go` makes the fix
+from the match the rules already report. The rules skip a code fence and
+honour an exemption marker, so the finding they hand over carries both for free.
 
-| action | what it does |
-|---|---|
-| `suggest` | offers a spelling |
-| `replace` | writes the swap value, expanding `$1` |
-| `remove` | drops the match |
-| `edit` | trims, replaces, truncates, splits or runs a regex |
-| `convert` | lowercases and drops the punctuation |
-
-So `ShoutedLead` carries no action, and `calmed` in `src/quack/verb_fix.go` makes the fix
-from the line and the column Vale already reports. Vale skips a code fence and
-honours an exemption marker, so the finding it hands over carries both for free.
-
-The calming runs first because Vale writes `DON'T STOP AT ALL HERE,` into
+The calming runs first because the contraction rule writes `DON'T STOP AT ALL HERE,` into
 `Do not STOP AT ALL HERE,`, which no longer opens with a run of capitals. Round
 two then catches the contraction the calming uncovers.
 

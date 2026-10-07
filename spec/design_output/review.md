@@ -144,7 +144,7 @@ report with nothing to fix fits on one line:
 ## The unreached row
 
 The accept refuses a group that leaves dead code behind. The verb reads git
-at the branch's ref, never the working tree:
+at the branch's ref alone:
 
 | the step | what it reads |
 |---|---|
@@ -158,15 +158,15 @@ A folder counts reached where one of these holds:
 - a file the branch adds there says `package main`
 - the folder holds tests alone
 - the folder sits under `testdata`
-- a Go file past the folder imports its quoted path, so `src/used` never matches `src/usedfoo`
+- a Go file past the folder imports its quoted path, so `src/usedfoo` falls outside `src/used`
 
-Every added file of a folder left unreached stands in the `unreached` row, one
-a line, and the row counts one fix:
+Every file the branch adds to an unreached folder stands in the `unreached`
+row, one a line, and the row counts one fix:
 
     unreached  src/lone/lone.go
                src/lone/lone_test.go
 
-The word is unreached, because [[spec/vocabulary/terms.yml]] gives orphan to a
+The row says unreached, because [[spec/vocabulary/terms.yml]] gives orphan to a
 branch sharing no history with main.
 
 # The queue takes done branches

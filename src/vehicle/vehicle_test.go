@@ -285,7 +285,7 @@ func TestVehicleCarriesTheMethodAndNothingPrivate(t *testing.T) {
 	if exists(filepath.Join(dest, ".git")) || exists(filepath.Join(dest, ".se")) {
 		t.Fatal("the private folders stay behind")
 	}
-	if Travels(".git") || Travels(".se/.runtime/bin/vale") || !Travels("src/parts/one.js") || Travels("") || Travels(".") {
+	if Travels(".git") || Travels(".se/.runtime/bin/biome") || !Travels("src/parts/one.js") || Travels("") || Travels(".") {
 		t.Fatal("travels reads the first folder")
 	}
 }

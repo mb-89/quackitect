@@ -7,12 +7,14 @@ import (
 	"strings"
 )
 
-// The endings a script carries, the engine's roots, and how many opening lines a marker stands in. [[spec/design_output/model#the-guards-hold-a-baseline]]
+// How many opening lines a marker stands in. [[spec/design_output/model#the-guards-hold-a-baseline]]
+const markerLines = 5
+
+// The endings a script carries and the engine's roots. [[spec/design_output/model#the-guards-hold-a-baseline]]
 var (
 	scriptEndings = []string{".sh", ".py", ".bash"}
 	engineRoots   = []string{"src/", ".claude/skills/"}
 	engineFile    = "RUNME.sh"
-	markerLines   = 5
 )
 
 // The marker sparing a script outside the engine, with its reason. [[spec/design_output/model#the-guards-hold-a-baseline]]

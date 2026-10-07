@@ -1,7 +1,7 @@
-// The fixer, over real files. `vale fix --apply` writes to disk, so a fixer
+// The fixer, over real files. The fix verb writes to disk, so a fixer
 // asserted against a stub is a fixer nobody has run. The helper runs it twice
 // over every text this file declares, and each case reads its own back.
-// [[spec/design_output/doors#one-contract-test-per-door]]
+// [[spec/design_output/doors#one-contract-test-per-door]] [[spec/tickets/vale-leaves-the-tree]]
 
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
@@ -11,11 +11,11 @@ const SHOUTED = "ShoutedLead";
 import { NOTE, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const { ifVale, proves } = rulesIn(root, NOTE, { fixes: true });
+const { ifRules, proves } = rulesIn(root, NOTE, { fixes: true });
 
 const noted = (line) => `# Notes\n\n${line}\n`;
 
-ifVale(
+ifRules(
   "a contraction is written out, and the line keeps its case",
   proves({ it: noted("It's here. don't go. WON'T stop. We've seen it.") }, (said) => {
     assert.equal(
@@ -25,7 +25,7 @@ ifVale(
   }),
 );
 
-ifVale(
+ifRules(
   "every contraction in the swap map has a written form",
   proves(
     {
@@ -42,7 +42,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a Latin short form is written out in English",
   proves(
     { it: noted("A duck, e.g. a mallard, i.e. loud. Viz. this. Cf. that.") },
@@ -57,7 +57,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "etc. is reported and left standing, because its full stop needs a person",
   proves({ it: noted("Ducks, geese, etc. We saw them.") }, (said) => {
     assert.equal(said.fixed("it"), said.text("it"));
@@ -65,7 +65,7 @@ ifVale(
   }),
 );
 
-ifVale(
+ifRules(
   "a shouted lead is reported with no action, so the fixer calms it",
   proves({ it: noted("NOTHING AT ALL WORKS HERE, and then calm.") }, (said) => {
     const shouts = said.found("it").filter((one) => one.rule === SHOUTED);
@@ -75,7 +75,7 @@ ifVale(
 );
 
 // The calm text stands declared as well, so the fixer reads it off the same rounds. [[spec/design_output/doors#one-contract-test-per-door]]
-ifVale(
+ifRules(
   "calming a shout uncovers the contraction inside it",
   proves(
     {
@@ -92,7 +92,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a second run leaves the file byte for byte the same",
   proves(
     { it: noted("It's a duck, e.g. a mallard. They're loud, i.e. they quack.") },
@@ -103,14 +103,14 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "fenced code keeps every breach it carries",
   proves({ it: "# Notes\n\n```\nIt's a duck, e.g. a mallard.\n```\n" }, (said) => {
     assert.equal(said.fixed("it"), said.text("it"));
   }),
 );
 
-ifVale(
+ifRules(
   "an exempted span keeps its breach",
   proves(
     {

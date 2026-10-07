@@ -122,15 +122,15 @@ hand-back still lands, so a leaf in hand closes where it stands.
 A box staying past the close works tickets nobody expects on that branch, and
 they merge unread. For the run behind this, see [[spec/rationales/pull]].
 
-## A closed group takes no child
+## A closed group stays shut
 
 A ticket naming a closed group under `group` reaches no hand. So the mint, the
-open and `ticket set` refuse it, and name the two roads out:
+open and `ticket set` refuse it, and name each road out:
 
 | the road | what the hand does |
 |---|---|
 | standalone | mints the ticket with no group |
-| reopen | the hand that passed the group's last leaf takes it back with `ticket pull <group> --back <leaf>` |
+| reopen | the hand behind the group's last leaf takes it back with `ticket pull <group> --back <leaf>` |
 
 A ticket minted on a closed group's own branch joins no group, and stands
 free. For the run behind this, see [[spec/rationales/pull]].
@@ -341,17 +341,19 @@ stands before, or one of the words below:
 | `end` | after every row at its level, which a place digit past the queue writes |
 | a name standing nowhere | first at its level, because the row it names stands off the queue |
 
-A todo of the plan stands before every ticket. It anchors at `true` or on
-another todo of the plan, and any other anchor reads as `last`.
-
-The place moves as the queue drains, because the todo holds the order and
-no number. Todos of the plan tied on every score keep the order the plan
-writes them in. The work tab posts `work/place` under `p` and a digit, the pull hands a
-tagged ticket out first, and the `T` letter lights on every tagged row.
-
-The tab draws the place it reads and holds no rule of its own. A place
-compares segment by segment as numbers, so `1.10` stands after `1.2`, and
-`branch list --queue` prints the placed rows in that order.
+- A todo of the plan stands before every ticket. It anchors at `true` or on
+  another todo of the plan, and any other anchor reads as `last`.
+- A box on a work branch takes a tagged ticket of its own group, or a private
+  note, and no other. A gate parks its points under `todo` in its own group,
+  so another group's box meets none of them.
+- The place moves as the queue drains, because the todo holds the order and
+  no number. Todos of the plan tied on every score keep the order the plan
+  writes them in.
+- The work tab posts `work/place` under `p` and a digit. The pull hands a
+  tagged ticket out first, and the `T` letter lights on every tagged row.
+- The tab draws the place it reads and holds no rule of its own. A place
+  compares segment by segment as numbers, so `1.10` stands after `1.2`.
+  `branch list --queue` prints the placed rows in that order.
 
 # A hand of its own
 
@@ -467,27 +469,25 @@ nests, and each field is the heading one level under it. A comment, an
 | `choice` | one line, among the options |
 | `verdict` | opens with `pass`, `pass with findings` or `fail`. A fail carries a finding, and a pass with findings carries a row a child, as `- <child-name>: <finding>` |
 | `checked` | one line per item of the checklist, where the leaf or a phase above carries one |
-| `list` with `home: true` | every line names a home that stands: a link resolving in the tree, a ticket name in backticks, or a path in backticks whose file or folder stands. A backticked span holding a space names none |
+| `list` with `home: true` | every line names a home that stands. A home is a link resolving in the tree, or a code span naming a ticket or a standing file or folder. A code span holding a space names none |
 
 The schema renders `checked` as an optional chapter under every leaf whose
 chain carries a checklist, and the ticket door lets the hand write it.
 
 ## The voice reads the evidence
 
-The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, where
-vale stands on the box. `voiceOver` in `src/bridge/findings.js` hands Vale a
-ticket's text on stdin through `valeArgvOf`, and `readsText` reads the answer.
-`findingsOver` calls both over each file the lint reads. `voiceFaults` in
-`src/scripts/pull-chapter.js` hands `voiceOver` the whole ticket, with the
-payload's fields under their headings.
+The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, through
+the Go rules. `voiceFaults` in `src/pull/pull_commands.go` hands the `Voice`
+reader the whole ticket, with the payload's fields under their headings, as
+`voiceText` lays them out.
 
 | part | what the pull does |
 |---|---|
-| the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
+| the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and an exemption marker holds |
 | the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
 | the level | refuses on a private name, and warns on a break of form, so the hand-back goes on and the lint names the same lines |
 
-Every verb taking a hand's prose into a ticket reads it through `voiceOver`,
+Every verb taking a hand's prose into a ticket reads it through the Go rules,
 so no fix commit follows a landing.
 
 | the verb | what it reads |

@@ -25,7 +25,7 @@ export function raiser(nodeOf, log) {
   };
 }
 
-// The lines a raise prints, at once and with no row, for a caller answering its code before the log could write. [[spec/tickets/the-twins-leave-whole]]
+// The lines a raise prints, at once and with no row, for a caller answering its code before the log writes. [[spec/tickets/the-twins-leave-whole]]
 export function liner(nodeOf) {
   return (id, ...lines) => linesOf(nodeOf(id), id, lines.flat().map(String));
 }

@@ -1,33 +1,25 @@
-// The tools the lsp IO module runs beside the check module's sweep: Vale over
-// the prose, Biome over the code, and the code faults, each row under its own
-// source, the way the lint runs them.
+// The tools the lsp IO module runs beside the check module's sweep: the Go
+// rules over the prose, Biome over the code, and the code faults, each row
+// under its own source, the way the lint runs them.
 // [[spec/tickets/lsp-module-draws-the-tools]]
 package lsp
 
 import (
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 
 	"quackitect/src/proc"
-	"quackitect/src/prose"
 )
 
-// The names the lint spells in src/bridge/findings.js and .claude/skills/level0/lib/code.js, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The names the tools draw under, and the Biome config .claude/skills/level0/lib/code.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
-	valeSkips   = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/skills/level0/.claude-plugin/types,.claude/worktrees}/**,**/_*}"
 	biomeConfig = "spec/config"
-	pastRule    = "PastTense"
-	// The code Vale names a script rule past its cap with, and the runs a sweep spends on it. [[spec/tickets/vale-retries-its-timeout]]
-	valeTimedOut = "E201"
-	valeTries    = 3
-	// The rule a Vale answering a fault draws, so a broken rule stands in the panel. [[spec/design_output/lsp#the-server-runs-the-tools]]
-	ValeRuns  = "ValeRuns"
-	fromVale  = "vale"
+	// The rule a rules load that fails draws, so a broken rule stands in the panel. [[spec/tickets/vale-leaves-the-tree]]
+	RulesLoad = "RulesLoad"
+	fromRules = "rules"
 	fromBiome = "biome"
 	fromTree  = "tree"
 )
@@ -35,20 +27,17 @@ const (
 // The files the tools read beside the tree, so a change to one runs them over the whole tree again. A name closing on a slash names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
 var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
-// The folders Vale skips, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The folders the rules skip, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/skills/level0/.claude-plugin/types", ".claude/worktrees"}
 
-var (
-	valeCode  = regexp.MustCompile(`^E\d+$`)
-	proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
-)
+var proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
 
 // The tools a run takes, where the box holds them, and the ceilings the code faults read. [[spec/tickets/lsp-module-draws-the-tools]]
 type Tools struct {
-	Root     string
-	Vale     string
+	Root string
+	// The Go rules over one text read as the file at the path, which the wiring hands in. [[spec/tickets/go-rules-replace-vale]]
+	Rules    func(path, text string) []Finding
 	Biome    string
-	Config   string
 	Function int
 	File     int
 	Run      proc.Runner
@@ -76,7 +65,6 @@ type Check struct {
 	Faults   func(tree Tree, path string, function, file int, source string) []Finding
 	Draft    func(path string) bool
 	Relative func(root, path string) string
-	ValeIni  string
 	Survey   string
 	Bin      string
 	// The features the check module reads over the tree: the hover, the completion, the links and the folds, each answering a value the reply marshals whole. Links and folds read no position. [[spec/tickets/lsp-module-serves-the-features]]
@@ -96,13 +84,13 @@ func (one *Tools) Sweep(tree Tree) []Finding {
 	}
 	held := one.kept(tree.Buffers())
 	out := []Finding{}
-	for _, said := range one.vale(tree, []string{"."}, nil) {
-		if said.Rule == ValeRuns || !slices.Contains(held, said.File) {
+	for _, said := range one.prose(tree, []string{"."}, nil) {
+		if said.Rule == RulesLoad || !slices.Contains(held, said.File) {
 			out = append(out, said)
 		}
 	}
 	if len(held) > 0 {
-		out = append(out, one.vale(tree, nil, held)...)
+		out = append(out, one.prose(tree, nil, held)...)
 	}
 	for _, path := range tree.Paths() {
 		out = append(out, one.textFaults(tree, path)...)
@@ -125,7 +113,7 @@ func (one *Tools) Over(tree Tree, paths []string) []Finding {
 		}
 		disk = append(disk, at)
 	}
-	out := one.vale(tree, disk, held)
+	out := one.prose(tree, disk, held)
 	for _, at := range every {
 		out = append(out, one.textFaults(tree, at)...)
 	}
@@ -139,7 +127,7 @@ func (one *Tools) textFaults(tree Tree, path string) []Finding {
 	return one.Check.Faults(tree, path, one.Function, one.File, fromTree)
 }
 
-// The paths no rule reads: a draft, and a folder the lint's Vale skips. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The paths no rule reads: a draft, and a folder the rules skip. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func (one *Tools) parked(path string) bool {
 	if one.Check.Draft(path) {
 		return true
@@ -166,7 +154,7 @@ func (one *Tools) kept(paths []string) []string {
 func (one *Tools) onTheTree(tree Tree, found []Finding) []Finding {
 	out := []Finding{}
 	for _, said := range found {
-		if said.Rule == ValeRuns {
+		if said.Rule == RulesLoad {
 			out = append(out, said)
 			continue
 		}
@@ -178,148 +166,27 @@ func (one *Tools) onTheTree(tree Tree, found []Finding) []Finding {
 	return out
 }
 
-// A Vale row, and the words it matched, which the tense reader weighs. [[spec/design_output/lsp#the-server-runs-the-tools]]
-type valeHeard struct {
-	Finding
-	said string
+// The rule a check id names, its style left off where the style is the voice's own. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func RuleOf(check string) string {
+	return proseKind.ReplaceAllString(check, "")
 }
 
-// Vale over the paths the disk holds and the buffers an editor holds, each row past the tense reader. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
-	if len(disk)+len(held) == 0 {
+// The prose rows over the paths named, off the Go rules the wiring hands in. A dot names every path the tree holds. [[spec/tickets/go-rules-replace-vale]]
+func (one *Tools) prose(tree Tree, disk, held []string) []Finding {
+	if one.Rules == nil {
 		return nil
 	}
-	if one.Vale == "" {
-		return []Finding{one.valeFault("Vale stands nowhere here. Run ./RUNME.sh once, and it installs.")}
-	}
-	base := []string{"--config=" + one.Config, "--output=JSON", "--no-exit"}
-	heard := []valeHeard{}
-	if len(disk) > 0 {
-		argv := append(append(append([]string{}, base...), valeSkips), disk...)
-		said, fault := one.valeRun("", argv)
-		if fault != "" {
-			return []Finding{one.valeFault(fault)}
-		}
-		heard = append(heard, said...)
-	}
-	for _, path := range held {
-		argv := append(append([]string{}, base...), "--path="+filepath.Join(one.Root, filepath.FromSlash(path)))
-		said, fault := one.valeRun(tree.Read(path), argv)
-		if fault != "" {
-			return []Finding{one.valeFault(fault)}
-		}
-		for i := range said {
-			said[i].File = path
-		}
-		heard = append(heard, said...)
-	}
-	return one.vetoes(tree, heard)
-}
-
-// Vale stops a script rule past its own cap and names it E201, which a loaded box trips on a sound tree, so the run goes again up to valeTries times. [[spec/tickets/vale-retries-its-timeout]]
-func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
-	for try := 1; ; try++ {
-		said, fault := one.valeOnce(input, argv)
-		if !strings.Contains(fault, valeTimedOut) || try >= valeTries {
-			return said, fault
-		}
-	}
-}
-
-// One Vale run through the process door, and its rows or its fault. [[spec/tickets/vale-retries-its-timeout]]
-func (one *Tools) valeOnce(input string, argv []string) ([]valeHeard, string) {
-	out, fault := one.runs(input, one.Vale, argv)
-	if fault != "" {
-		return nil, fault
-	}
-	return one.valeRowsOf(out)
-}
-
-// One tool run through the process door in the root, up to the wait, and the fault a run answering no output and a nonzero code reads as. [[spec/design_output/doors#the-process-door]]
-func (one *Tools) runs(input, name string, argv []string) (string, string) {
-	said := one.Run(proc.Command{Argv: append([]string{name}, argv...), Dir: one.Root, Stdin: input, Wait: toolWait})
-	if said.Code != 0 && said.Out == "" {
-		return "", fmt.Sprintf("exit status %d: %s", said.Code, strings.TrimSpace(said.Err))
-	}
-	return said.Out, ""
-}
-
-func (one *Tools) valeFault(why string) Finding {
-	return Finding{File: one.Config, Rule: ValeRuns, Line: 1, Column: 1, Message: "Vale reads no file, so every rule it holds stands unchecked: " + why, Severity: severe, Source: fromVale}
-}
-
-// Vale's answer as rows, or the fault it names in place of rows. The shape follows fromJson and faultIn in .claude/skills/level0/lib/vale.js. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Tools) valeRowsOf(stdout string) ([]valeHeard, string) {
-	if strings.TrimSpace(stdout) == "" {
-		return nil, ""
-	}
-	var fault struct {
-		Code string `json:"Code"`
-		Text string `json:"Text"`
-	}
-	if json.Unmarshal([]byte(stdout), &fault) == nil && valeCode.MatchString(fault.Code) {
-		first, _, _ := strings.Cut(fault.Text, "\n")
-		return nil, strings.TrimSpace(fault.Code + " " + strings.TrimSpace(first))
-	}
-	var read map[string]json.RawMessage
-	if json.Unmarshal([]byte(stdout), &read) != nil {
-		return nil, "vale answered something other than JSON"
-	}
-	out := []valeHeard{}
-	for file, raw := range read {
-		var rows []struct {
-			Check    string `json:"Check"`
-			Line     int    `json:"Line"`
-			Span     []int  `json:"Span"`
-			Match    string `json:"Match"`
-			Message  string `json:"Message"`
-			Severity string `json:"Severity"`
-		}
-		if json.Unmarshal(raw, &rows) != nil {
-			continue
-		}
-		path := strings.TrimPrefix(one.Check.Relative(one.Root, file), "./")
-		for _, row := range rows {
-			said := Finding{File: path, Rule: proseKind.ReplaceAllString(row.Check, ""), Line: max(row.Line, 1), Column: 1, Message: row.Message, Severity: row.Severity, Source: fromVale}
-			if len(row.Span) > 0 {
-				said.Column = row.Span[0]
-			}
-			if said.Severity == "" {
-				said.Severity = severe
-			}
-			out = append(out, valeHeard{Finding: said, said: row.Match})
-		}
-	}
-	sort.SliceStable(out, func(a, b int) bool {
-		if out[a].File != out[b].File {
-			return out[a].File < out[b].File
-		}
-		if out[a].Line != out[b].Line {
-			return out[a].Line < out[b].Line
-		}
-		return out[a].Column < out[b].Column
-	})
-	return out, ""
-}
-
-// A past tense row stands where the Go tense reader reads the word as the past. [[spec/tickets/go-prose-checks-stand-alone]]
-func (one *Tools) vetoes(tree Tree, heard []valeHeard) []Finding {
-	texts := map[string][]string{}
 	out := []Finding{}
-	for _, row := range heard {
-		if !strings.HasSuffix(row.Rule, pastRule) {
-			out = append(out, row.Finding)
-			continue
+	for _, at := range append(append([]string{}, disk...), held...) {
+		paths := []string{at}
+		if at == "." {
+			paths = one.kept(tree.Paths())
 		}
-		if _, read := texts[row.File]; !read {
-			texts[row.File] = strings.Split(tree.Read(row.File), "\n")
-		}
-		line := ""
-		if lines := texts[row.File]; row.Line >= 1 && row.Line <= len(lines) {
-			line = lines[row.Line-1]
-		}
-		if prose.ReadsAsPast(line, row.said) {
-			out = append(out, row.Finding)
+		for _, path := range paths {
+			for _, said := range one.Rules(path, tree.Read(path)) {
+				said.File, said.Source = path, fromRules
+				out = append(out, said)
+			}
 		}
 	}
 	return out
@@ -336,6 +203,15 @@ func (one *Tools) biome(where []string) []Finding {
 		return nil
 	}
 	return one.biomeRowsOf(out, where[0])
+}
+
+// One tool run through the process door in the root, up to the wait, and the fault a run answering no output and a nonzero code reads as. [[spec/design_output/doors#the-process-door]]
+func (one *Tools) runs(input, name string, argv []string) (string, string) {
+	said := one.Run(proc.Command{Argv: append([]string{name}, argv...), Dir: one.Root, Stdin: input, Wait: toolWait})
+	if said.Code != 0 && said.Out == "" {
+		return "", fmt.Sprintf("exit status %d: %s", said.Code, strings.TrimSpace(said.Err))
+	}
+	return said.Out, ""
 }
 
 // Biome's answer as rows, the way fromJson in .claude/skills/level0/lib/code.js reads it. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -420,9 +296,6 @@ func textOf(said any) string {
 // Whether a path the index moves is one the tools read beside the tree. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *Tools) readByTools(paths []string) bool {
 	for _, path := range paths {
-		if path == one.Check.ValeIni {
-			return true
-		}
 		for _, input := range toolInputs {
 			if path == input || (strings.HasSuffix(input, "/") && strings.HasPrefix(path, input)) {
 				return true
@@ -430,16 +303,6 @@ func (one *Tools) readByTools(paths []string) bool {
 		}
 	}
 	return false
-}
-
-// Vale's answer as findings, and the fault it names in place of them, which the twin goldens read beside the JavaScript side. [[spec/tickets/the-lsp-server-leaves]]
-func (one *Tools) ValeRows(stdout string) ([]Finding, string) {
-	heard, fault := one.valeRowsOf(stdout)
-	out := make([]Finding, 0, len(heard))
-	for _, said := range heard {
-		out = append(out, said.Finding)
-	}
-	return out, fault
 }
 
 // Biome's answer as findings, which the twin goldens read beside the JavaScript side. [[spec/tickets/the-lsp-server-leaves]]

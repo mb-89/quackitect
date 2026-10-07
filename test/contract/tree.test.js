@@ -17,17 +17,12 @@ import {
   TRACKED,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
-import {
-  EDITOR_EXTENSIONS,
-  EDITOR_SETTINGS,
-  EDITOR_VALE_INI,
-} from "../../.claude/skills/level0/lib/servers.js";
+import { EDITOR_EXTENSIONS, EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
 import { everyModuleTested } from "../../.claude/skills/level0/lib/tested.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
   biomeOnWindows,
-  editorDrawsWriteRules,
   extensionsOnOffer,
   INSTALL,
   installerHoldsTheNames,
@@ -208,11 +203,11 @@ test("a name standing inside a longer word carries no person", () => {
   );
 });
 
-test("a settings file naming another binary is refused", () => {
+test("a settings file naming another config is refused", () => {
   const found = settingsNameBinaries(
     fakeTree({
       [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.path"] = "vale";
+        said["biome.configurationPath"] = "biome.json";
       }),
       [INSTALL]: text(INSTALL),
     }),
@@ -221,73 +216,21 @@ test("a settings file naming another binary is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "SettingsNameBinaries");
   assert.equal(found[0].file, EDITOR_SETTINGS);
-  assert.match(found[0].message, /vale\.valeCLI\.path/);
-  assert.ok(found[0].line > 1, "it points at the line naming the binary");
+  assert.match(found[0].message, /biome\.configurationPath/);
+  assert.ok(found[0].line > 1, "it points at the line naming the config");
 });
 
-// The install writes vale.exe on Windows, so the rule takes it, and the tracked settings keep the plain name. [[spec/tickets/the-small-faults-land]]
-test("a settings file naming the Windows vale passes, and the tracked one names the plain vale", () => {
-  const found = settingsNameBinaries(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.path"] = ".se/.runtime/bin/vale.exe";
-      }),
-      [INSTALL]: text(INSTALL),
-    }),
-  );
-
-  assert.deepEqual(found, []);
-  assert.equal(read(EDITOR_SETTINGS)["vale.valeCLI.path"], ".se/.runtime/bin/vale");
-});
-
-test("an install script installing no vale is refused", () => {
+test("an install script installing no biome is refused", () => {
   const found = settingsNameBinaries(
     fakeTree({
       [EDITOR_SETTINGS]: text(EDITOR_SETTINGS),
-      [INSTALL]: text(INSTALL).replace(/^\s*vale\)\s*\[ -x.*$/m, "    vale) true ;;"),
+      [INSTALL]: text(INSTALL).replace(/^\s*biome\)\s*\[ -x.*$/m, "    biome) true ;;"),
     }),
   );
 
   assert.equal(found.length, 1);
   assert.equal(found[0].file, INSTALL);
-  assert.match(found[0].message, /installs no vale/);
-});
-
-test("a settings file drawing at its own level is refused", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({
-      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["vale.valeCLI.minAlertLevel"] = "warning";
-      }),
-      [EDITOR_VALE_INI]: text(EDITOR_VALE_INI),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "EditorDrawsWriteRules");
-  assert.match(found[0].message, /inherited/);
-});
-
-// [[spec/design_output/lsp#the-panel-reads-the-battery]]
-test("an editor config turning on a style is refused, because the panel reads the battery", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({
-      [EDITOR_SETTINGS]: text(EDITOR_SETTINGS),
-      [EDITOR_VALE_INI]: `${text(EDITOR_VALE_INI)}[*.md]\nBasedOnStyles = VoiceParagraph\n`,
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.match(found[0].message, /turns on a style/);
-});
-
-test("a settings file naming a config nobody wrote is refused", () => {
-  const found = editorDrawsWriteRules(
-    fakeTree({ [EDITOR_SETTINGS]: text(EDITOR_SETTINGS) }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.match(found[0].message, /vale\.valeCLI\.config/);
+  assert.match(found[0].message, /installs no biome/);
 });
 
 test("a plain biome path on Windows is refused", () => {

@@ -95,36 +95,36 @@ test("a whole run passes every check the dry probe names", () => {
 
 // [[spec/tickets/level0-smoke-runs-in-seconds]]
 test("the smoke stands the clone with the root's built tools and installs nothing", () => {
-  const disk = fakeDisk({
-    "/r/.se/.runtime/bin/se-index": "index",
-    "/r/.se/.runtime/bin/vale": "vale",
-    "/r/.se/.runtime/bin/se-index.old": "old",
-  });
-  const proc = fakeProc({ git: { exitCode: 0 } });
-  const it = { disk, proc, join: (...parts) => parts.join("/") };
-  const stood = smokeTree("/r", it, () => {}, {
-    temp: "/t",
-    tree: "/t/tree",
-    port: 7001,
-    delta: "",
-  });
-  assert.equal(stood, true);
-  assert.deepEqual(
-    proc.ran.map((one) => one.argv),
-    [["git", "clone", "--quiet", "--shared", "/r", "/t/tree"]],
-    "one shared clone, and no install",
-  );
-  assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
-  assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
-  assert.equal(
-    disk.exists("/t/tree/.se/.runtime/bin/se-index.old"),
-    false,
-    "a kept old build stays behind",
-  );
-  assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), {
-    method: "/t/tree",
-    port: 7001,
-  });
+	const disk = fakeDisk({
+		"/r/.se/.runtime/bin/se-index": "index",
+		"/r/.se/.runtime/bin/biome": "biome",
+		"/r/.se/.runtime/bin/se-index.old": "old",
+	});
+	const proc = fakeProc({ git: { exitCode: 0 } });
+	const it = { disk, proc, join: (...parts) => parts.join("/") };
+	const stood = smokeTree("/r", it, () => {}, {
+		temp: "/t",
+		tree: "/t/tree",
+		port: 7001,
+		delta: "",
+	});
+	assert.equal(stood, true);
+	assert.deepEqual(
+		proc.ran.map((one) => one.argv),
+		[["git", "clone", "--quiet", "--shared", "/r", "/t/tree"]],
+		"one shared clone, and no install",
+	);
+	assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
+	assert.equal(disk.read("/t/tree/.se/.runtime/bin/biome"), "biome");
+	assert.equal(
+		disk.exists("/t/tree/.se/.runtime/bin/se-index.old"),
+		false,
+		"a kept old build stays behind",
+	);
+	assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), {
+		method: "/t/tree",
+		port: 7001,
+	});
 });
 
 // [[spec/tickets/probe-at-revision-guards-merges]]
@@ -357,12 +357,12 @@ test("a temp tree the box still holds stays named, and the probe's verdict stand
 });
 
 test("the probe's main runs nothing where another program is main", async () => {
-  let ran = false;
-  // A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
-  await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
-    ran = true;
-  });
-  assert.equal(ran, false);
+	let ran = false;
+	// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first. [[spec/tickets/the-doors-pr-goes-green]]
+	await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
+		ran = true;
+	});
+	assert.equal(ran, false);
 });
 
 // [[spec/tickets/every-named-path-resolves]]

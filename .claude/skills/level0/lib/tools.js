@@ -9,9 +9,7 @@ export const BIN = inRun("bin");
 
 export const WANTED = [
   { name: "node", asks: ["--version"], for: "a helper script" },
-  { name: "vale", asks: ["--version"], for: "the prose rules" },
   { name: "biome", asks: ["--version"], for: "formatting and linting the JavaScript" },
-  { name: "vale-ls", asks: ["--version"], for: "the prose rules inside an editor" },
   { name: "go", asks: ["version"], for: "building the index and the viewer" },
   { name: "git", asks: ["--version"], for: "history and diffs" },
   { name: "claude", asks: ["--version"], for: "a session of its own, and the probe" },

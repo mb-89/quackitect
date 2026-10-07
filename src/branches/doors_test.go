@@ -29,9 +29,6 @@ func TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere(t *tes
 		t.Fatal(err)
 	}
 	for _, name := range names {
-		if name == valeDoorTest {
-			continue
-		}
 		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
 		if err != nil {
 			t.Fatal(err)

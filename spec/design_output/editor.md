@@ -15,19 +15,18 @@ rule name at the door.
 
 | server | holds | arrives through |
 |---|---|---|
-| `quack lsp` | every Vale rule, through the tense reader, and the tree's own checks, off the lsp IO module. For details, see [[spec/design_output/lsp]] | the quackitect extension, which asks the bridge for the battery's list |
+| `quack lsp` | every Go prose rule, through the tense reader, and the tree's own checks, off the lsp IO module. For details, see [[spec/design_output/lsp]] | the quackitect extension, which asks the bridge for the battery's list |
 | `biome lsp-proxy` | every Biome rule over JavaScript and JSON | `.se/.runtime/bin/biome`, one subcommand |
 
-The Vale extension stays installed, and reads a config that turns on no style.
-Raw Vale lacks the tense reader, so it draws what the battery vetoes. For
-details, see [[spec/design_output/lsp#the-panel-reads-the-battery]].
+For how the panel draws each source, see
+[[spec/design_output/lsp#the-panel-reads-the-battery]].
 
 `./RUNME.sh doctor` names both, and their versions.
 
 # Where the judged rules stay
 
 `spec/config/styles/VoiceJudged` asks a model one question per span. No language
-server speaks that, so the panel draws the Vale rules and the door draws the
+server speaks that, so the panel draws the Go rules and the door draws the
 rest.
 
 # What the tracked settings say
@@ -38,52 +37,23 @@ relative to the workspace folder:
 
 | setting | value | why |
 |---|---|---|
-| `vale.valeCLI.path` | `.se/.runtime/bin/vale` | vale-ls spawns Vale with the workspace folder as its working directory |
-| `vale.valeCLI.config` | `spec/config/editor.vale.ini` | a config turning on no style, so the extension draws nothing beside `quack lsp` |
-| `vale.valeCLI.installVale` | `false` | the Vale the installer pins answers, so no second copy arrives |
-| `vale.enableSpellcheck` | `false` | spelling sits outside VoiceVale, so the panel matches the door |
-| `vale.valeCLI.lintOnChange` | `true` | a rule that draws while typing costs less than one that waits for a save |
 | `biome.lsp.bin` | a path per platform | Windows takes `biome.exe`, and the rest take `biome` |
 | `biome.configurationPath` | `spec/config/biome.json` | Biome looks for its config at the root, and this tree holds it under `spec` |
 
-`.vscode/extensions.json` offers the Vale and Biome extensions, and
+`.vscode/extensions.json` offers the Biome extension, and
 `bierner.markdown-mermaid`, which draws the Mermaid diagrams of the design notes
 in the Markdown preview. `EXTENSIONS` in `.claude/skills/level0/lib/servers.js`
 names the list, and the install takes it.
 
-`SettingsNameBinaries`, `EditorDrawsWriteRules`, `BiomeOnWindows` and
-`ExtensionsOnOffer` weigh both files and hold every row above, so the settings
+`SettingsNameBinaries`, `BiomeOnWindows` and `ExtensionsOnOffer` weigh both files and hold every row above, so the settings
 and `.se/.runtime/bin` move together. `./RUNME.sh lint` runs them, so a drift lands in
 the problems panel of the editor they configure.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
-VS Code holds `vale.valeCLI.path` and `vale.valeCLI.config` at their user-level
-value until a person trusts the workspace. Trust the folder on the first open,
-and the tracked values apply.
-
-# The asset matrix
-
-`.claude/skills/level0/lib/servers.js` pins the version and names one release asset per
-platform. The install scripts ask node for the URL, so the matrix lives in one
-place and a test drives it.
-
-Windows breaks the pattern: x86 ships a gnu target and arm64 an msvc one. A
-test holds both, because a guess costs a person one install that fails.
-
-# The doors hold without vale-ls
-
-The Vale extension downloads its own vale-ls into per-extension storage and
-checks a SHA-256. It reads `vale.valeCLI.path` for the Vale binary alone, so no
-setting points it at `.se/.runtime/bin/vale-ls`.
-
-So the copy in `.se/.runtime/bin` serves both readers: `doctor`, and an editor that starts
-a server binary by path. A download that fails costs one warning line, and
-`./RUNME.sh` goes on, because Vale and Biome carry the doors.
-
 # The agent surface needs nothing
 
-Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
-the judge there. That door sits inside the harness process and speaks no
+Level zero reads every Write and Edit at `tool.call` and runs the Go rules,
+Biome and the judge there. That door sits inside the harness process and speaks no
 language server protocol, so `.claude` takes no editor entry at all.
 
 # One command opens the editor

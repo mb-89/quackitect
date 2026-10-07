@@ -153,7 +153,6 @@ src/quack/commit_test.go TestCommitVerbDesk
 src/quack/commit_test.go TestCommitVerbGates
 src/quack/commit_test.go TestCommitVerbMoves
 src/quack/commit_test.go TestCommitVerbRescue
-src/quack/commit_voice_test.go TestCommitVoiceReadsNothingWhereNoValeStands
 src/quack/dispatch_test.go TestDispatchVerbRunsTheDryPlanOverTheDoors
 src/quack/doctor_verb_test.go TestTheBrowserRowNamesEachRungOfTheOrder
 src/quack/doctor_verb_test.go TestTheDoctorPrintsARowAHookAfterTheServer
@@ -354,7 +353,6 @@ src/quack/verb_standing_test.go TestStandingSaysTheStopHookOff
 src/quack/verb_standing_test.go TestStandingSaysWhereNoNoteCarriesRules
 src/quack/verb_ticket_test.go TestTicketVerbUsage
 src/quack/verbs_test.go TestTheModeReadsTheVerbsKeyOffTheTrackedFile
-src/quack/voice_verb_test.go TestVoiceRunsValeKeepsTheOutputOfAFailedExit
 src/quack/waits_test.go TestAWaitPastTheCallWaitAnswersARunningHandle
 src/quack/waits_test.go TestAWaitReturnsOnAHelpersReport
 src/quack/waits_test.go TestTheDoorAnswersAWaitPastItsCallWaitAsRunning

@@ -212,7 +212,7 @@ func coerced(said, kind string) string {
 	case "boolean":
 		return strconv.FormatBool(said == "true")
 	case "number":
-		if number, err := strconv.ParseFloat(strings.TrimSpace(said), 64); err == nil && !math.IsInf(number, 0) {
+		if number, err := strconv.ParseFloat(strings.TrimSpace(said), numberBits); err == nil && !math.IsInf(number, 0) {
 			body, _ := json.Marshal(number)
 			return string(body)
 		}

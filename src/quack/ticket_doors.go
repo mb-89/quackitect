@@ -80,9 +80,7 @@ func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 		}
 		return said[key]
 	}
-	if valeAt(method) != "" {
-		it.Voice = pullVoice(method)
-	}
+	it.Voice = pullVoice(method)
 	scripts := filepath.Join(method, "src", "scripts")
 	it.Take = func(group string) int { return takesBranch(scripts, group, it) }
 	it.Ready = it.ReadyToMerge

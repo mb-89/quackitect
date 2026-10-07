@@ -55,7 +55,7 @@ func valueOf(reads *json.Decoder) (any, error) {
 		}
 		return arrayOf(reads)
 	case json.Number:
-		n, _ := strconv.ParseFloat(one.String(), 64)
+		n, _ := strconv.ParseFloat(one.String(), bitSize)
 		return n, nil
 	case nil:
 		return Null{}, nil

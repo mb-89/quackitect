@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"quackitect/src/modules/files"
+	"quackitect/src/rules"
 	"quackitect/src/yaml"
 )
 
@@ -200,6 +201,43 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	if len(made) != 1 || len(strings.Split(made[0], "-")) > 3 {
 		t.Fatalf("the fix groups read %v", made)
 	}
+}
+
+// The fix ask meets the tree's Go voice rules, as askFaults reads them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]] [[spec/tickets/vale-leaves-the-tree]]
+func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
+	t.Parallel()
+	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
+	set, err := rules.Load(func(path string) string {
+		text, _, _ := one.d.Methods.Read(path)
+		return text
+	})
+	if err != nil {
+		t.Fatalf("the rules load nothing: %v", err)
+	}
+	one.dpGreen()
+	_, fix := one.dpWriteBranch()
+	text := one.dpWritten(fix)
+	if !strings.Contains(text, "# Ask\n\nThe loose agent tickets") {
+		t.Fatalf("the ask holds no line:\n%s", text)
+	}
+	ask, last := dpAskSpan(text)
+	for _, row := range set.Lint(ticketAt(fix), text) {
+		if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
+			t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
+		}
+	}
+}
+
+// The lines the Ask chapter spans, its heading first. [[spec/tickets/dispatch-verbs-port-to-go]]
+func dpAskSpan(text string) (int, int) {
+	lines := strings.Split(text, "\n")
+	first := slices.Index(lines, "# Ask") + 1
+	for at := first; at < len(lines); at++ {
+		if strings.HasPrefix(lines[at], "# ") {
+			return first, at
+		}
+	}
+	return first, len(lines)
 }
 
 func TestDispatchWritesNothingToTheDiskAndMovesNoCheckout(t *testing.T) {

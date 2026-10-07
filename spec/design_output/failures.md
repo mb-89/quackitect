@@ -46,7 +46,7 @@ Cases under `src/failure` read the tree, and the check runs them:
 - an id a `Raise` or a `raise` names, with no node beside it, fails
 - a refusal written past the door in a moved file fails, through `TestMovedRefusalsPassTheFailureDoor` in `src/quack/refusals_test.go`
 
-`Moved` in `src/failure` names each moved place, a file or a folder of files, and the refusal call it held before the move. Each move adds its place there, so the check reaches each file the day it moves.
+`Moved` in `src/failure` names each place a move reaches, a file or a folder of files, and the refusal call it held before the move. Each move adds its place there, so the check reaches each file the day it moves.
 
 # The sentinel fires a watch
 

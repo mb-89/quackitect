@@ -194,7 +194,7 @@ func isSource(path string) bool {
 
 // A hunk of comments alone, or a move, changes no code; a hunk taking lines away and adding none does. [[spec/design_output/tree#the-rules-over-two-files]]
 func codeIn(one *hunks) bool {
-	if movedWhole(one.blocks) {
+	if movedWhole(one.blocks) || layoutAlone(one) {
 		return false
 	}
 	if len(one.added) == 0 && len(one.removed) > 0 {
@@ -206,6 +206,24 @@ func codeIn(one *hunks) bool {
 		}
 	}
 	return false
+}
+
+// Whether in each hunk the lines added read as the lines taken away once each run of spacing reads as one space, as a formatter's alignment leaves them. [[spec/tickets/go-rules-exemption-marker]]
+func layoutAlone(one *hunks) bool {
+	if len(one.blocks) == 0 {
+		return false
+	}
+	for _, hunk := range one.blocks {
+		if len(hunk.added) == 0 || len(hunk.added) != len(hunk.removed) {
+			return false
+		}
+		for index, line := range hunk.added {
+			if strings.Join(strings.Fields(line), " ") != strings.Join(strings.Fields(hunk.removed[index]), " ") {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 // Whether every hunk takes away or adds one whole block, and each block taken away lands again in order. [[spec/tickets/a-reorder-asks-a-test]]

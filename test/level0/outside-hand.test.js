@@ -11,8 +11,6 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { registerDirs } from "../../src/scripts/vehicle.js";
 
-const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
-
 // A tree with no identity runs the road that makes one, and the pid the case hands ends it. [[spec/design_output/doors#a-door-reads-the-outside]]
 test("the port road makes an identity off the pid the root hands in", () => {
   const files = fakeDisk({ "/tools/package.json": '{"version":"0.1.0"}' });
