@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -163,6 +163,25 @@ record:
     hand: the engine
     hash_before: 5b0edb901a52ecebb9563642a05515f2659e6a4c
     hash_after: 5b0edb901a52ecebb9563642a05515f2659e6a4c
+  - step: accept
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 9a53cedbb5cafce3535bfb5464ebc050700cc875
+    hash_after: 9a53cedbb5cafce3535bfb5464ebc050700cc875
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/examples-run-as-tests already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 4df0b47ac1b5a066
+        size: 563
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_output/examples]]
+        hash: cbfcdb18dc87799c
+        size: 8264
+    def: 07c43ae7253713ec
 ---
 
 # Ask
