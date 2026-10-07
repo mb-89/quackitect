@@ -196,7 +196,7 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 	}
 }
 
-// A run on the caller's terminal stays in the caller's process group, so its reads reach the terminal, and a run reading none stands in a group of its own. [[spec/tickets/process-group-run-untested]]
+// A run on the caller's terminal stays in the caller's process group, so its reads reach the terminal, and a run reading none stands in a group of its own. [[spec/tickets/the-check-ends-what-it-drops]]
 func TestARunOnTheCallersStreamsStaysInTheCallersGroup(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("a Windows box carries no process groups")

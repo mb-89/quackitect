@@ -122,7 +122,7 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 	return named
 }
 
-// The names a function binds itself, its parameters and its variables, so a call on one reaches no helper of the package. [[spec/tickets/fixture-guard-matches-by-bare]]
+// The names a function binds itself, its parameters and its variables, so a call on one reaches no helper of the package. [[spec/design_output/model#the-guards-hold-a-baseline]]
 func locals(fn *ast.FuncDecl) map[string]bool {
 	bound := map[string]bool{}
 	bind := func(names []*ast.Ident) {
