@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/cloud
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -212,6 +212,15 @@ record:
     hash_after: db99954d4f6a628f1421e2ff0634bade94d6ec3e
     returns: 1
     why: the hand takes it back
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: aa72a3922e4fb228def0b379735182cdd3aea002
+    hash_after: b32f3c8da55669b131c76ab2f3b2d86ad2dd6959
+    inputs:
+      - name: retro/write
+        hash: 06136bf143995702
+        size: 2556
+    def: 4da1ca5da87d5bbc
 reason: done
 ---
 
@@ -382,6 +391,7 @@ the chapter names the role and the box nowhere
 - 14:20 a conflict at the merge of main, over the check parts, the lsp tools and their test, and a paragraph contract case
 - 14:22 the index rebuilding after the merge held every write until it came back up
 - 14:35 the commit hook refusing code with no Go test beside it
+- 14:44 the done gate counting warnings over the whole tree, which `the-tree-lints-clean` clears
 
 ### left
 
@@ -389,7 +399,7 @@ the chapter names the role and the box nowhere
 <!-- the form is list -->
 
 - no person step parked, and no ticket minted outside the group
-- the handover asks for the pull request against main with auto-merge on, and this box opens it next
+- the handover asks for the pull request against main with auto-merge on, and this box opens it after the cleanup
 
 # Discussion
 
