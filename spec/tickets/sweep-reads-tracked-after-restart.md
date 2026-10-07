@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/quack/voice_verb.go:25:1: ExampleCovers: ./RUNME.sh voice stands in no example's interface. Write an example under s"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 989959e96675f8c27064c4fdb735e72df2d46a5a
+    hash_after: 989959e96675f8c27064c4fdb735e72df2d46a5a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/modules/check passes; green, src/modules/files passes; green, src/modules/git pas
+      - name: check
+        exit: 0
+        said: "   63.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8ccf079c6ecfa0e9
+        size: 776
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ one place: seedBatch, textual and Reports each stand once
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The tree rules stood silent after an index restart because three faults stood in a row. The watcher handed a stray build binary into its seed, which outgrew the bus cap and killed the IO process that runs git too. The git instance sent its four ports in one commit and dropped the refusal, so the tracked paths never landed beside the oversized tips. The check module threw away the writer owning the sweep, so the index refused each sweep the placed process committed. The watcher now hands no binary file, each git port commits alone and retries once refused, and the check module hands back its writer. With the sweep live, the check names the coverage report and the dead paths main left, which this change also clears. The coverage rules stand in report mode, which the lint lists and never refuses.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+files past the ask: the dead paths and restated rules ride along because the restored sweep makes the check refuse them
+fakes: FakeWatch, FakeGit and the store in memory carry the cases
+comments: each change names its ticket in a pointer
+one place: seedBatch, textual and Reports each stand once
 
 # accept
 
