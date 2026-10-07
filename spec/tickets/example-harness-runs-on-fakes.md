@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -160,6 +160,15 @@ record:
         hash: 4083b33505207200
         size: 893
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 4e0c0887abe9a332a6c3b5be2f7555d26bd95827
+    hash_after: 7a34c8a1dcf79a187cd8c3990479800965cf652f
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -315,14 +324,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/quack/ ./src/example/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list and the Discussion name, and the pull and note verbs and ticket_doors.go, which the callers list names through ticketPull and ticketNote
+- every door has a fake: the disk is files.FakeDisk, git a FakeRepo clone, the process a FakeRunner, the clock fixed, and a verb reaching the model stays outside the table
+- the comment on src/quack/examples_harness_test.go names the approach, and links the design
+- every fact stands once: Holds is the one evaluator, VerdictFile names the file, and pullOver is the one seam the verbs take
 
 ## tests-green
 
