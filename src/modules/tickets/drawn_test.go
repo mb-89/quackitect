@@ -6,7 +6,6 @@ package tickets
 import (
 	"embed"
 	"encoding/json"
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -15,7 +14,7 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-//go:embed testdata/drawn-one.md testdata/drawn-two.md
+//go:embed testdata
 var drawnData embed.FS
 
 // The family the drawing stands under, by its local name, and the folder a fixture seeds into. [[spec/tickets/the-lens-reads-v1]]
@@ -124,7 +123,7 @@ func TestDrawnMarksTheOpenFields(t *testing.T) {
 
 // [[spec/tickets/branch-scripts-leave]]
 func TestEveryDrawnGoldenMatchesTheProjection(t *testing.T) {
-	body, err := os.ReadFile(drawnGolden)
+	body, err := drawnData.ReadFile(drawnGolden)
 	if err != nil {
 		t.Fatalf("%s reads %v, and wants the entries go test -update writes", drawnGolden, err)
 	}
