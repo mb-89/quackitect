@@ -28,6 +28,9 @@ func TestStaleSpanReadsTheConfigOrTheDefault(t *testing.T) {
 	if said := StaleSpan(""); said != int64(spanOf(staleSpan)) {
 		t.Fatalf("StaleSpan answers %d, and wants the default span", said)
 	}
+	if said := StaleSpan("nonsense"); said != int64(spanOf(staleSpan)) {
+		t.Fatalf("StaleSpan over an unreadable span answers %d, and wants the default span", said)
+	}
 }
 
 // [[spec/design_output/work#a-hold-beats-with-its-session]]

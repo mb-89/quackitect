@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 13b6271a6373fb9e
         size: 652
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ad0a35d5c59db350711c6a91216228595f832c41
+    hash_after: ad0a35d5c59db350711c6a91216228595f832c41
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/tickets fails
+    inputs:
+      - name: design/draft
+        hash: 45b32651036ec082
+        size: 9100
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -338,26 +351,36 @@ Assumed: `design_input` notes and `spec/pages` stay untouched, since they hold t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/tickets/drawn_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/drawn_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The golden case fails on its own assertion, since `testdata/drawn.golden.json` stands nowhere yet. The branch cases and the pull cap case pass at once, because Go already holds what each pins. They stay as the Go home of what the leaving JS tests held.
+
+What surprises me:
+
+- The `-update` writer fits better in the test file than in `drawn.go`, so implement declares the flag in the tickets test package.
+- The golden reads off disk, because an embed of a missing file breaks the build in place of an assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The golden case fails on its assertion, and `go test ./src/branches/...` and the check decide the other lines at tests-green.
+- The branch cases run on the package fixtures and its fake clock, and the cap case reads a temp root.
 
 # gate
 

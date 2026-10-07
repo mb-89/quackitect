@@ -6,6 +6,7 @@ package tickets
 import (
 	"embed"
 	"encoding/json"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -24,6 +25,21 @@ const (
 )
 
 var drawnFixtures = []string{"drawn-one.md", "drawn-two.md"}
+
+// The golden the JavaScript fakes read each drawing off. [[spec/tickets/branch-scripts-leave]]
+const drawnGolden = "testdata/drawn.golden.json"
+
+// One golden entry: a ticket text and the drawing Go answers for it. [[spec/tickets/branch-scripts-leave]]
+type goldenDrawn struct {
+	Text  string          `json:"text"`
+	Drawn json.RawMessage `json:"drawn"`
+}
+
+// Whether two JSON bodies hold the same value, whatever their key order and spacing. [[spec/tickets/branch-scripts-leave]]
+func sameJSON(a, b []byte) bool {
+	var left, right any
+	return json.Unmarshal(a, &left) == nil && json.Unmarshal(b, &right) == nil && reflect.DeepEqual(left, right)
+}
 
 type drawnField struct {
 	Name   string   `json:"name"`
@@ -103,6 +119,23 @@ func TestDrawnMarksTheOpenFields(t *testing.T) {
 	}
 	if !reflect.DeepEqual(leaf.Fields, want) {
 		t.Fatalf("design/draft draws the fields %+v, and wants %+v", leaf.Fields, want)
+	}
+}
+
+// [[spec/tickets/branch-scripts-leave]]
+func TestEveryDrawnGoldenMatchesTheProjection(t *testing.T) {
+	body, err := os.ReadFile(drawnGolden)
+	if err != nil {
+		t.Fatalf("%s reads %v, and wants the entries go test -update writes", drawnGolden, err)
+	}
+	var entries []goldenDrawn
+	if err := json.Unmarshal(body, &entries); err != nil || len(entries) == 0 {
+		t.Fatalf("%s holds %d entries (%v), and wants one a drawn ticket", drawnGolden, len(entries), err)
+	}
+	for at, one := range entries {
+		if got, _ := json.Marshal(drawnOf(one.Text)); !sameJSON(got, one.Drawn) {
+			t.Errorf("entry %d draws %s, and the golden holds %s", at, got, one.Drawn)
+		}
 	}
 }
 
