@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "   83.6  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 06ee7a8a313ea3bdbaef3d4e8ad4f36e12746c33
+    hash_after: 06ee7a8a313ea3bdbaef3d4e8ad4f36e12746c33
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   91.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: de7fcee9eddfa970
+        size: 1238
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -483,26 +506,33 @@ accept. The approach answers the ask: the nine scripts git ls-files names leave,
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/pull_scripts_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull runs in Go under src/pull, so the nine JavaScript pull scripts stood as dead copies that their own tests alone ran. chapter.js, guidance-hand.js, ephemeral.js and held-tests.js import them, so the four leave in the same commit, and ticket-scripts-leave records the move under Discussion. Every behaviour a deleted test held gains a Go test, mostly through the ticket pull verb over the in-memory git and disk fakes. The real Vale route check stays in JavaScript beside the Vale door, and its prose filter moves into test/contract/ruled.js. Go comments and design notes naming a deleted script name its Go owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past the test files tests-red landed
+- the new Go cases run on the in-memory FakeRepo and FakeDisk, the fake sh runner and a fixed clock
+- each touched Go header names the Go owner in place of the leaving script
+- the prose filter stands once in test/contract/ruled.js, and the other tests import it
 
 # accept
 
