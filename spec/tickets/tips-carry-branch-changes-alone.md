@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 186341f580a7f62e0c61d817f051bc9746f233ed
+    hash_after: 186341f580a7f62e0c61d817f051bc9746f233ed
+    inputs:
+      - name: ask
+        hash: c15bc62210a85ef6
+        size: 431
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,61 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A tip carries its ticket-folder diff against trunk, and the tickets module lays it over trunk's files. (1) ticket.Tip gains Gone []string (json gone): the ticket paths trunk holds and the tip lacks. (2) git.repo.tipAt runs `git diff --name-status --no-renames <trunk> <commit> -- spec/tickets/` (two-dot, so a path it leaves out is byte-identical to trunk's), keeps paths passing ticketPath, reads A/M/T paths' text plus trunk's group copy in the one cat-file batch, and lists D paths under Gone. With no trunk ref it keeps the whole listing, as now. (3) FakeGit.Tips answers the same diff: a branch file whose text differs from trunk's or trunk lacks, and trunk's ticket files the branch lacks under Gone. (4) tickets: a helper treeOf(tip, trunk []ticket.File) []ticket.File answers trunk's files, minus Gone, with the tip's files over them, in path order. owned reads treeOf, so branchedOf and branchesOf take in.Trunk through it. A tip carrying every file reads the same as before, so callers building full tips keep their answers. Weighed: two-dot over three-dot, which drifts from the tip's own copy. Assumed: stale copies of files trunk moved after the fork ride along, bounded by drift.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/git/git.go repo.Tips
+- src/modules/git/git.go repo.tipAt
+- src/modules/git/git.go repo.filesAt
+- src/modules/git/git.go FakeGit.Tips
+- src/modules/tickets/tickets.go branchedOf
+- src/modules/tickets/tickets.go branchesOf
+- src/modules/tickets/tickets.go owned
+- src/ticket/ticket.go Tip
+- .se/scripts/gitsize/main.go main
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_contract_test.go gitSuite: a tip carries only the ticket files its branch changes against trunk, and a dropped one under Gone (rewritten want)
+- src/modules/tickets/branches_test.go TestABranchReadsTrunkUnderItsChanges
+- src/modules/git/git_contract_test.go TestTheLiveTipsLandUnderTheBusCap (contract tag, reads the checkout through New, skips where no origin work ref stands)
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/ticket/ticket.go
+- src/modules/git/git.go
+- src/modules/git/git_contract_test.go
+- src/modules/tickets/tickets.go
+- src/modules/tickets/branches_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened git.go Tips/tipAt/filesAt/FakeGit.Tips, tickets.go branchedOf/branchesOf/owned/merged, ticket.go Tip, wiring.yaml git.tips and tickets.tips, the contract suite and gitsize probe
+- callers came from a grep for .Tips, ticket.Tip and Tip{ across src; only the tickets module reads the port
+- done_when's two lines: the case is gitSuite's rewritten want, the cap is TestTheLiveTipsLandUnderTheBusCap
+- the approach adds no config key
 
 ## tests-red
 
