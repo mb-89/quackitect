@@ -3,7 +3,7 @@
 // [[spec/rationales/go-stands-as-one-module]]
 module quackitect
 
-go 1.24.2
+go 1.25
 
 require (
 	github.com/aaaton/golem/v4 v4.0.2
@@ -13,11 +13,16 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.11.6
 	github.com/danielgtaylor/huma/v2 v2.36.0
+	github.com/dlclark/regexp2/v2 v2.5.2
 	github.com/fsnotify/fsnotify v1.10.1
+	github.com/jdkato/prose/v3 v3.2.1
 	github.com/muesli/termenv v0.16.0
 	github.com/nats-io/nats-server/v2 v2.11.9
 	github.com/nats-io/nats.go v1.45.0
+	github.com/yuin/goldmark v1.7.8
+	golang.org/x/net v0.50.0
 	golang.org/x/tools v0.42.0
+	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.46.1
 )
 
@@ -36,6 +41,7 @@ require (
 	github.com/google/go-tpm v0.9.5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
@@ -53,11 +59,12 @@ require (
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/time v0.13.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/neurosnap/sentences.v1 v1.0.6 // indirect
 	modernc.org/libc v1.67.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect

@@ -27,7 +27,7 @@ type LogInput struct {
 	Level string `json:"level,omitempty" doc:"debug, info, warn, error or fatal."`
 }
 
-// The report tool's input, as reportSpec in src/bridge/report.js declared it. [[spec/design_output/extension#the-ask-is-a-line]]
+// The report tool's input, as the bridge's reportSpec declared it. [[spec/design_output/extension#the-ask-is-a-line]]
 type ReportInput struct {
 	Text string `json:"text" doc:"The reply, as you would write it in the chat."`
 }
@@ -90,7 +90,7 @@ func (state *Holds) reports(said string, held map[string]any, at time.Time) {
 	state.Said.Result = "The reply stands in the log, and it answers: " + why + ". Write it in the chat too, as text, and carry on."
 }
 
-// The log lands one row at the level the call names, as writesLine in src/bridge/logline.js answers it. [[spec/design_output/log#the-log-tool]]
+// The log lands one row at the level the call names, as the bridge's writesLine answered it. [[spec/design_output/log#the-log-tool]]
 func (state *Holds) logs(fields map[string]any, at time.Time) {
 	kind, said := strings.TrimSpace(callField(fields, "kind")), strings.TrimSpace(callField(fields, "said"))
 	if kind == "" || said == "" {

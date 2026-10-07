@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// The exit code a run answers where its program never starts, or where the halt or its wait kills it, and the span a killed run's pipes stay open before its wait gives up on them. [[spec/design_output/doors#the-process-door]]
+// The exit code a run answers where its program fails to start, or where the halt or its wait kills it, and the span a killed run's pipes stay open before its wait gives up on them. [[spec/design_output/doors#the-process-door]]
 const (
 	NotStarted = -1
 	pipesClose = time.Second
@@ -62,7 +62,7 @@ type Said struct {
 // The door: one run of one command. [[spec/design_output/doors#the-process-door]]
 type Runner func(Command) Said
 
-// The real runner, through exec, under a life that never ends. [[spec/design_output/doors#the-process-door]]
+// The real runner, through exec, under the background life the whole process holds. [[spec/design_output/doors#the-process-door]]
 func Real(one Command) Said {
 	return runUnder(context.Background(), one)
 }
@@ -117,7 +117,7 @@ func command(life context.Context, one Command) *exec.Cmd {
 	cmd.Dir = one.Dir
 	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
 	if one.Streams == nil {
-		whole(cmd)
+		Whole(cmd)
 	}
 	return cmd
 }
@@ -127,12 +127,15 @@ func signalled(goos string, code int) bool {
 	if code < 0 {
 		return true
 	}
-	signal := code >> 8
+	signal := code >> signalShift
 	return goos == "windows" && code&0xff == 0 && signal >= 1 && signal <= maxSignal
 }
 
-// The highest signal number MSYS writes into an exit code. [[spec/tickets/the-doors-pr-goes-green]]
-const maxSignal = 64
+// The highest signal number MSYS writes into an exit code, and the shift that reads it from the high byte. [[spec/tickets/the-doors-pr-goes-green]]
+const (
+	maxSignal   = 64
+	signalShift = 8
+)
 
 // The pairs of an environment whose names the drop leaves out. [[spec/design_output/doors#the-process-door]]
 func without(env, drop []string) []string {

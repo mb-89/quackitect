@@ -1,6 +1,6 @@
-// The rules the lint reads over a file's text past Vale and Biome: an
-// exemption naming no reason, the code ceilings, and the magic numbers. Each
-// reads what its JavaScript twin reads, so the lint and the panel agree.
+// The rules the lint reads over a file's text past the Go rules and Biome: an
+// exemption naming no reason, the code ceilings, and the magic numbers. A rule
+// with a JavaScript twin reads what it reads, so the lint and the panel agree.
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
 package check
 
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// The rule names and the words the JavaScript twins write, in unreasoned of .claude/skills/level0/lib/vale.js, size.js and magic.js beside it, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The rule names and the words the lint writes, the ceilings and the magic numbers spelled as size.js and magic.js under .claude/skills/level0/lib write them, again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	Unreasoned      = "ExemptionCarriesAReason"
 	FileCeiling     = "FileCeiling"
@@ -101,10 +101,13 @@ func unreasoned(path, text string) []Finding {
 	return out
 }
 
-// A file past its ceiling, and each function past its own, in lines. A ceiling of nothing holds its rule off. [[spec/design_output/level0#the-size-ceiling]]
+// A code file past its ceiling, and each function past its own, in lines. A ceiling of nothing holds its rule off, and a file holding no code meets none. [[spec/design_output/level0#the-size-ceiling]]
 func sizeFaults(path, text string, function, file int) []Finding {
-	lines := lineBreak.Split(text, -1)
 	out := []Finding{}
+	if !sizedFile.MatchString(path) {
+		return out
+	}
+	lines := lineBreak.Split(text, -1)
 	if file > 0 && len(lines) > file {
 		out = append(out, warn(FileCeiling, path, 1, fmt.Sprintf(fileSays, file, len(lines))))
 	}

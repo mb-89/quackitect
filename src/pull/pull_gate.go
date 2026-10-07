@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -32,7 +33,7 @@ func (it *It) rejected(who *Who, one *Held, leaf *Leaf, held Hold, reason string
 		pair("returns", round), pair("why", reason), pair("answered", answeredRows(answered)))
 	first, names := it.reworked(one, leaf.Path, round)
 	if first == "" {
-		it.Say(Refused, leaf.Path+" stands after no phase, so a reject puts nothing in again.")
+		it.Refuse(failure.Raise(it.Failures, "pull-reject-no-phase", leaf.Path+" stands after no phase, so a reject puts nothing in again."))
 		return 1
 	}
 	changes := []string{"rejects at " + leaf.Path, "inserts " + strings.Join(names, ", ")}

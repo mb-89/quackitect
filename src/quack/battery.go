@@ -26,12 +26,10 @@ const (
 	tenthsInSecond = 10
 )
 
-// The source whose warnings a ticket's prose holds, which FROM.vale in src/bridge/findings.js names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
-const valeSource = "vale"
+// The source whose warnings a ticket's prose holds, which fromRules in src/modules/lsp/tools.go names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
+const proseSource = "rules"
 
 var ticketFolders = []string{"spec/tickets", ".se/tickets"}
-
-var valeBinary = regexp.MustCompile(`(?i)(^|[\\/])vale(\.exe)?$`)
 
 // The module every Go package's path opens on, the header over the red cases, and the rows go test prints: a failing case, its message under it, and the package line closing them. [[spec/rationales/go-stands-as-one-module]] [[spec/tickets/ci-reds-name-their-cases]]
 const (
@@ -76,8 +74,7 @@ type redCase struct {
 }
 
 type spawnTally struct {
-	All  int `json:"all"`
-	Vale int `json:"vale"`
+	All int `json:"all"`
 }
 
 // One report of the battery. [[spec/guidance/retro/effect]]
@@ -227,7 +224,7 @@ func redSaid(red []redCase) []string {
 	return rows
 }
 
-// The tally the process door writes, one line a spawn: how many in all, and how many are Vale. [[spec/guidance/retro/effect]]
+// The tally the process door writes, one line a spawn: how many in all. [[spec/guidance/retro/effect]]
 func spawnsIn(tally string) spawnTally {
 	out := spawnTally{}
 	for _, line := range strings.Split(tally, "\n") {
@@ -235,9 +232,6 @@ func spawnsIn(tally string) spawnTally {
 			continue
 		}
 		out.All++
-		if valeBinary.MatchString(line) {
-			out.Vale++
-		}
 	}
 	return out
 }
@@ -327,7 +321,7 @@ func stampFor(code int, sha string, clean bool, at string, stood []finding, repo
 
 // A ticket's prose stands at warning by rule, so it holds no push, and every other warning does. [[spec/design_output/work#the-battery-answers-first]]
 func holdsPush(one finding) bool {
-	if one.Source != valeSource {
+	if one.Source != proseSource {
 		return true
 	}
 	file := strings.ReplaceAll(one.File, `\`, "/")

@@ -1,7 +1,7 @@
 // The drafts module loads beside the others, and quack answers its checks
-// through the IO side, with Vale off heardOver.
+// through the IO side, with the lint off heardOver.
 // [[spec/tickets/prose-tools-answer-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -25,15 +25,15 @@ func TestTheDraftsModuleLoads(t *testing.T) {
 	}
 }
 
-// A tree with no Vale reads the draft nowhere, as the bridge says. [[spec/tickets/prose-tools-answer-in-go]]
-func TestQuackAnswersAnAnswerCheckWithNoValeAsTheBridgeDoes(t *testing.T) {
+// A tree with no rules reads the draft nowhere, as the bridge says. [[spec/tickets/prose-tools-answer-in-go]]
+func TestQuackAnswersAnAnswerCheckWithNoRulesAsTheBridgeDoes(t *testing.T) {
 	t.Parallel()
-	ask := accepts(t.TempDir(), nil, nil)
+	ask := accepts(t.TempDir(), nil, nil) // level0: FixtureOutsideHome - the check reads a root of the case's own where no Vale stands
 	said, err := ask(q.Request{Module: drafts.Module, Verb: drafts.AnswerVerb, Args: drafts.Answer{Text: "The door reads the note."}})
 	if err != nil {
 		t.Fatalf("quack refuses the drafts module: %v", err)
 	}
-	if want := "No vale stands here, so the draft goes unread."; said != want {
+	if want := "No voice rules stand here, so the draft goes unread."; said != want {
 		t.Errorf("the answer check answers %q, and wants %q", said, want)
 	}
 }
@@ -53,17 +53,17 @@ type wiredDrafts struct {
 			Text string `json:"text"`
 			Stop bool   `json:"stop"`
 		} `json:"input"`
-		Vale struct {
+		Lint struct {
 			Stands bool             `json:"stands"`
 			Ran    bool             `json:"ran"`
 			Why    string           `json:"why"`
 			Found  []drafts.Finding `json:"found"`
-		} `json:"vale"`
+		} `json:"lint"`
 		Answer string `json:"answer"`
 	} `json:"cases"`
 }
 
-// Each case of the table reaches the wired module as a call, through the outside quack builds over a Vale the case fakes. [[spec/tickets/prose-tools-answer-in-go]]
+// Each case of the table reaches the wired module as a call, through the outside quack builds over a lint the case fakes. [[spec/tickets/prose-tools-answer-in-go]]
 func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
 	t.Parallel()
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(draftCasesFile)))
@@ -76,13 +76,13 @@ func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
 	}
 	for _, one := range table.Cases {
 		t.Run(one.Name, func(t *testing.T) {
-			root := t.TempDir()
+			root := t.TempDir() // level0: FixtureOutsideHome - each case writes its draft under a root of its own
 			c := q.New()
 			as := manager.Registers(c)
 			drafts.Registers(c)
 			store := q.NewStore(c)
 			out := draftsOutside(root, store, func(string, string) drafts.Linted {
-				return drafts.Linted{Found: one.Vale.Found, Stands: one.Vale.Stands, Ran: one.Vale.Ran, Why: one.Vale.Why}
+				return drafts.Linted{Found: one.Lint.Found, Stands: one.Lint.Stands, Ran: one.Lint.Ran, Why: one.Lint.Why}
 			})
 			out.Questions = func() int { return one.Asked }
 			out.Bands = func() drafts.Bands { return table.Bands }

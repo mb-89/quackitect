@@ -2,10 +2,14 @@
 // [[spec/tickets/the-check-ends-what-it-drops]]
 package main
 
-import "os/exec"
+import (
+	"os/exec"
 
-// Readies a command so the end of its context ends the child and every process under it. The platform files hold how. [[spec/tickets/the-check-ends-what-it-drops]]
+	"quackitect/src/proc"
+)
+
+// Readies a command so the end of its context ends the child and every process under it. The process door holds how. [[spec/tickets/the-check-ends-what-it-drops]]
 func endsWhole(run *exec.Cmd) *exec.Cmd {
-	whole(run)
+	proc.Whole(run)
 	return run
 }

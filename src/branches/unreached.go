@@ -1,5 +1,5 @@
 // The unreached scan: every Go file a branch adds in a folder nothing past it
-// imports, read off git at the branch's ref, never the working tree.
+// imports, read off git at the branch's ref, the working tree left alone.
 // [[spec/design_output/review#the-unreached-row]]
 package branches
 

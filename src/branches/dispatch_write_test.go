@@ -1,8 +1,8 @@
 // The dispatcher's writes over a fake origin and its clone: one fix group, one
 // commit on claude/dispatch-<commit> made off main's tree, and no push of
-// main, ported off test/level0/dispatch.test.js.
+// main, ported off the JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported write rows, cutTo and the fix helpers, and declares dpWriteBranch for the fire test
 
 import (
 	"os"
@@ -12,8 +12,31 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/src/modules/files"
+	"quackitect/src/rules"
 	"quackitect/src/yaml"
 )
+
+// The fix group the dispatch mints stands open at its route's first leaf, so its box finds work at once. [[spec/tickets/dispatch-mints-fix-groups-open]]
+func TestFixGroupWritesTheGroupOpenAtItsFirstStep(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	d := &Doors{Method: root, Methods: files.NewDisk(root)}
+	route, why := d.processAt(groupRoute)
+	if why != "" {
+		t.Fatal(why)
+	}
+	text, why := d.fixGroup("loose-fixes-abc1234", "")
+	if why != "" {
+		t.Fatal(why)
+	}
+	if state, step := fieldOf(text, "state"), fieldOf(text, "step"); state != openState || step == "" || step != firstLeaf(route.Steps, "") {
+		t.Errorf("the fix group reads state %q, step %q", state, step)
+	}
+}
 
 // The write branch this tree's main names, and the top fix group's name. [[spec/tickets/dispatch-verbs-port-to-go]]
 func (one *tree) dpWriteBranch() (string, string) {
@@ -178,6 +201,43 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	if len(made) != 1 || len(strings.Split(made[0], "-")) > 3 {
 		t.Fatalf("the fix groups read %v", made)
 	}
+}
+
+// The fix ask meets the tree's Go voice rules, as askFaults reads them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]] [[spec/tickets/vale-leaves-the-tree]]
+func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
+	t.Parallel()
+	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
+	set, err := rules.Load(func(path string) string {
+		text, _, _ := one.d.Methods.Read(path)
+		return text
+	})
+	if err != nil {
+		t.Fatalf("the rules load nothing: %v", err)
+	}
+	one.dpGreen()
+	_, fix := one.dpWriteBranch()
+	text := one.dpWritten(fix)
+	if !strings.Contains(text, "# Ask\n\nThe loose agent tickets") {
+		t.Fatalf("the ask holds no line:\n%s", text)
+	}
+	ask, last := dpAskSpan(text)
+	for _, row := range set.Lint(ticketAt(fix), text) {
+		if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
+			t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
+		}
+	}
+}
+
+// The lines the Ask chapter spans, its heading first. [[spec/tickets/dispatch-verbs-port-to-go]]
+func dpAskSpan(text string) (int, int) {
+	lines := strings.Split(text, "\n")
+	first := slices.Index(lines, "# Ask") + 1
+	for at := first; at < len(lines); at++ {
+		if strings.HasPrefix(lines[at], "# ") {
+			return first, at
+		}
+	}
+	return first, len(lines)
 }
 
 func TestDispatchWritesNothingToTheDiskAndMovesNoCheckout(t *testing.T) {

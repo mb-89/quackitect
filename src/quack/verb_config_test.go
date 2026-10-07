@@ -1,9 +1,10 @@
 // The config verb in Go: every key with its value and layer, one key alone,
 // the refusal of a key no layer answers, and a write to the local layer.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,8 +49,28 @@ func TestConfigPrintsEveryRowAndItsLayer(t *testing.T) {
 			t.Fatalf("config prints no row %q in:\n%s", row, out)
 		}
 	}
-	if !strings.HasSuffix(out, "\n\nWrite one: ./RUNME.sh config <key> <value>, which lands in .se/.runtime/config.json.\n") {
+	if !strings.HasSuffix(out, "\n\nWrite one: ./RUNME.sh config <key> <value>, which lands in .se/.runtime/config.json, or add --tracked to land it in spec/config/level0.json.\n") {
 		t.Fatalf("config ends on no write line:\n%s", out)
+	}
+}
+
+// A write naming --tracked lands in the tracked file, and the local layer stays unwritten. [[spec/tickets/verbs-mint-tickets-and-keys]]
+// level0: FixtureOutsideHome - the case writes the tracked layer into its own root.
+func TestConfigWritesTheTrackedLayerWithTracked(t *testing.T) {
+	t.Parallel()
+	root := configRoot(t, `{"log": {"level": "warn"}}`)
+	code, out, errs := configRan(root, "log.level", "debug", "--tracked")
+	text, err := os.ReadFile(filepath.Join(root, "spec", "config", "level0.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var tracked map[string]map[string]any
+	if err := json.Unmarshal(text, &tracked); err != nil {
+		t.Fatal(err)
+	}
+	_, local := os.Stat(filepath.Join(root, ".se", ".runtime", "config.json"))
+	if code != 0 || errs != "" || tracked["log"]["level"] != "debug" || local == nil || !strings.Contains(out, "spec/config/level0.json") {
+		t.Fatalf("config --tracked answers %d, %q, %q, and the tracked file reads %s", code, out, errs, text)
 	}
 }
 

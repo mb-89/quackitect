@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"quackitect/src/failure"
 )
 
 // The clear's three tickets, the files they read and write, and the short hash a refusal names. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
@@ -66,7 +68,7 @@ func (it *It) ephemeralPull(who *Who, verdict string) int {
 		return 0
 	}
 	if verdict != "pass" {
-		it.Say(Refused, held.Ticket+" is an ephemeral ticket, and takes --pass alone.")
+		it.Refuse(failure.Raise(it.Failures, "pull-ephemeral-pass-only", held.Ticket+" is an ephemeral ticket, and takes --pass alone."))
 		return 1
 	}
 	switch held.Ticket {
@@ -76,7 +78,7 @@ func (it *It) ephemeralPull(who *Who, verdict string) int {
 			fault = it.localWorkFault()
 		}
 		if fault != "" {
-			it.Say(Refused, fault, "", "Fix it, and "+writeTicket+" stays in hand.")
+			it.Refuse(failure.Raise(it.Failures, "pull-handover-fault", fault, "", "Fix it, and "+writeTicket+" stays in hand."))
 			return 1
 		}
 		if tip := it.handedOverAt(); tip != "" {
@@ -85,7 +87,7 @@ func (it *It) ephemeralPull(who *Who, verdict string) int {
 		it.marksHandoverTip()
 		return it.handsEphemeral(who.Hand, clearTicket, writeTicket+" closes, and "+Handover+" stands.")
 	case clearTicket:
-		it.Say(Refused, asksOf(clearTicket)...)
+		it.Refuse(failure.Raise(it.Failures, "pull-clear-waits", asksOf(clearTicket)...))
 		return 1
 	case readTicket:
 		// The clear has run, so the mark it answered drops, and the hand-out after the read hands a leaf. [[spec/tickets/the-clear-hands-back-the-leaf]]

@@ -1,7 +1,7 @@
 // The work trees the git suite hands FakeRepo: one in memory, one over a
 // folder, each standing local so the suite imports no other module.
 // [[spec/design_output/doors#the-git-door-carries-writes]]
-package git
+package git // level0: InPackageTest - the trees the contract suite hands FakeRepo reach its unexported mu and root
 
 import (
 	"errors"

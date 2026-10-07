@@ -48,20 +48,12 @@ func TestConfigKeysNameEachLayer(t *testing.T) {
 		"queue.weight": {"5", Tracked},
 		"queue.depth":  {"6", Local},
 		"queue.fail":   {"7", OverrideLayer},
+		"queue.day":    {"4", BuiltIn},
 	} {
 		row := rows[key]
 		if fmt.Sprint(row["value"]) != want[0] || row["layer"] != want[1] {
 			t.Fatalf("%s reads %v, and wants %s off %s", key, row, want[0], want[1])
 		}
-	}
-}
-
-func TestConfigKeysCarryTheBuiltInWhereNoLayerSets(t *testing.T) {
-	ix := layered(t, "queue", fourDeclared)
-	ix.Seed(files(`{}`, `{}`))
-	row := keyRows(t, ix)["queue.day"]
-	if fmt.Sprint(row["value"]) != "4" || row["layer"] != "built-in" {
-		t.Fatalf("queue.day reads %v, and wants its built-in 4 off the built-in layer, as quack config names it", row)
 	}
 }
 
@@ -112,13 +104,5 @@ func TestOpenedDropsTheOverridesOfOtherWindows(t *testing.T) {
 	landsAll(t, ix, posted(t, ix, "config/opened", `{"window": "w3"}`))
 	if held, _ := ix.Read(HeldName).(Held); len(held.Overrides) != 0 {
 		t.Fatalf("%s holds %+v after a third window opens", HeldName, held)
-	}
-}
-
-// A dotted key names the key the catalog declares, and reads back the same. [[spec/design_output/model#config-comes-off-the-registrations]]
-func TestADottedKeyNamesTheCatalogKey(t *testing.T) {
-	key := KeyOfDotted("stop.mostInARow")
-	if key.Name != "stop/config/most-in-a-row" || key.Dotted() != "stop.mostInARow" {
-		t.Fatalf("stop.mostInARow names %q and reads back %q", key.Name, key.Dotted())
 	}
 }

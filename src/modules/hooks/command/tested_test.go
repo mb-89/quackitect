@@ -45,6 +45,21 @@ func TestAMoveOfAWholeBlockChangesNoCode(t *testing.T) {
 	}
 }
 
+func TestALayoutChangeAloneChangesNoCode(t *testing.T) {
+	aligned := "diff --git a/src/a.go b/src/a.go\n@@ -1,2 +1,2 @@\n-\tRoot     string\n-\tVale  string\n+\tRoot string\n+\tVale string"
+	if got := UntestedIn(aligned, nil, false, nil); got != nil {
+		t.Fatalf("a change of spacing alone reads as untested %q", got)
+	}
+	spaced := "diff --git a/src/a.go b/src/a.go\n@@ -1 +1 @@\n-\tx := a+b\n+\tx := a + c"
+	if got := UntestedIn(spaced, nil, false, nil); len(got) != 1 {
+		t.Fatalf("a change past spacing reads as tested")
+	}
+	reordered := "diff --git a/src/a.go b/src/a.go\n@@ -2 +1,0 @@\n-\treturn x\n@@ -3,0 +3 @@\n+\treturn x"
+	if got := UntestedIn(reordered, nil, false, nil); len(got) != 1 {
+		t.Fatalf("a line moved between hunks reads as layout")
+	}
+}
+
 func TestHeldTestsReadTheHeldTicketsCommandLines(t *testing.T) {
 	tree := seeded{
 		".se/.runtime/hold/one.json": `{"ticket":"a-ticket","path":"spec/tickets/a-ticket.md"}`,

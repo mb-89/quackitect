@@ -1,6 +1,6 @@
 // quack prose answers each document of a request with what the Go vetoes
 // keep. [[spec/tickets/prose-checks-run-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

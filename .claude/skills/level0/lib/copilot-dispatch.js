@@ -37,10 +37,12 @@ export async function dispatch(it) {
             "Publish setup and hook registrations to the default branch before dispatch.",
           );
       }
-      const { exitCode: code } = it.proc.run([it.join(it.root, "RUNME.sh"), "branch", "take"], {
+      const taken = it.proc.run([it.join(it.root, "RUNME.sh"), "branch", "take"], {
         cwd: it.root,
         timeoutMs: TAKE_WAIT,
       });
+      for (const said of [taken.stdout, taken.stderr]) if (said?.trim()) console.log(said.trimEnd());
+      const code = taken.exitCode;
       const assigned = branch();
       if (assigned.startsWith("work/")) {
         state.branch = assigned;

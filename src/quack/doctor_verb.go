@@ -3,6 +3,8 @@
 package main
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
 	"os"
@@ -208,7 +210,7 @@ func serverLine(d boxDoors) string {
 	var said struct {
 		OK any `json:"ok"`
 	}
-	if err == nil && json.Unmarshal([]byte(body), &said) == nil && truthy(said.OK) {
+	if err == nil && json.Unmarshal([]byte(body), &said) == nil && yaml.Truthy(said.OK) {
 		return "stands at " + where
 	}
 	return "none at " + where

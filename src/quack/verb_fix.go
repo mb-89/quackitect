@@ -1,36 +1,30 @@
 // The fix verb: the fixes a program can make, over the paths or the tree.
-// Each round calms the shouted leads Vale names, then lets Vale fix the rest,
-// until a round changes nothing; biome writes its fixes last.
-// [[spec/tickets/the-small-faults-land]]
+// Each round applies the Go rules' swaps and calms the shouted leads they
+// name, until a round changes nothing; biome writes its fixes last.
+// [[spec/tickets/the-small-faults-land]] [[spec/tickets/vale-leaves-the-tree]]
 package main
 
 import (
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"slices"
-	"sort"
 	"strings"
 	"unicode"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/proc"
+	"quackitect/src/rules"
 )
 
-// The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
-const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
-
-// The usage, the rounds Vale fixes at most, Vale's config, biome's config folder, the rule the calm reads and the mode a calmed file keeps. [[spec/tickets/the-small-faults-land]]
+// The usage, the rounds the rules fix at most, biome's config folder, the rule the calm reads, the action its rows carry and the mode a fixed file keeps. [[spec/tickets/the-small-faults-land]]
 const (
 	fixUsage    = "Usage: ./RUNME.sh fix [path ...], over the paths or the tree."
 	fixRounds   = 5
-	valeIni     = ".vale.ini"
 	biomeFolder = "spec/config"
 	shoutedLead = "ShoutedLead"
 	calmedMode  = 0o644
@@ -39,18 +33,15 @@ const (
 // The flags that ask for the usage. [[spec/tickets/the-small-faults-land]]
 var fixHelp = []string{"--help", "-h"}
 
-// The folders the stamp's walk passes, as SKIP in src/bridge/findings.js names them; proseFile in writedoor.go names the files it reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-var (
-	walkSkips   = map[string]bool{".git": true, "node_modules": true, ".se": true, ".claude": true, ".claude-plugin": true}
-	proseStyles = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
-)
+// The folders the fix's walk passes, as SKIP in src/bridge/findings.js names them; proseFile in writedoor.go names the files it reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+var walkSkips = map[string]bool{".git": true, "node_modules": true, ".se": true, ".claude": true, ".claude-plugin": true}
 
 // A tool run under a folder, writing to the streams, which answers its exit code. [[spec/tickets/config-verbs-port-to-go]]
 type fixRunner func(dir string, out, errs io.Writer, argv ...string) int
 
 func init() { register("fix", fixVerb(index.Root, toolRuns)) }
 
-// fix over the root: the flags it knows, then the rounds over the paths, then biome. [[spec/tickets/the-small-faults-land]]
+// fix over the root: the flags it knows, then the rounds of the rules over the paths, then biome. [[spec/tickets/the-small-faults-land]] [[spec/tickets/vale-leaves-the-tree]]
 func fixVerb(root func() (string, error), run fixRunner) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		var paths, unknown []string
@@ -81,22 +72,21 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		vale := toolHere(at, "vale")
-		if vale == "" {
-			fmt.Fprintln(errs, "Vale is missing. Run ./RUNME.sh once and it installs.")
-			return exitUsage
+		set, err := rulesAt(at)
+		if err != nil {
+			fmt.Fprintln(errs, "The rules load nothing:", err)
+			return exitFailed
 		}
 		if dry {
 			return 0
 		}
 		for range fixRounds {
-			was := stampOf(at, paths)
-			if err := calm(at, vale, paths, run, writeCalmed); err != nil {
+			changed, err := fixRound(at, set, paths, writeCalmed)
+			if err != nil {
 				fmt.Fprintln(errs, err)
 				return exitFailed
 			}
-			run(at, out, errs, append([]string{vale, "fix", "--apply", "--config=" + valeIni, valeParked}, paths...)...)
-			if stampOf(at, paths) == was {
+			if changed == 0 {
 				break
 			}
 		}
@@ -138,7 +128,7 @@ func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
 	return toolRunsOver(proc.Real, os.Stdin)(dir, out, errs, argv...)
 }
 
-// A tool run through the process door with the caller's streams and the input it hands through, answering its exit code, and exitFailed with the fault where it never starts or a signal ends it. [[spec/tickets/quack-spawns-all-take-the-runner]]
+// A tool run through the process door with the caller's streams and the input it hands through, answering its exit code, and exitFailed with the fault where it fails to start or a signal ends it. [[spec/tickets/quack-spawns-all-take-the-runner]]
 func toolRunsOver(run proc.Runner, in io.Reader) fixRunner {
 	return func(dir string, out, errs io.Writer, argv ...string) int {
 		said := run(proc.Command{Argv: argv, Dir: dir, Streams: &proc.Streams{In: in, Out: out, Err: errs}})
@@ -150,81 +140,46 @@ func toolRunsOver(run proc.Runner, in io.Reader) fixRunner {
 	}
 }
 
-// One row of Vale's JSON the calm reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-type valeRow struct {
-	Check string
-	Line  int
-	Span  []int
-	Match string
-}
-
-// Sentence-cases every shouted lead Vale names over the paths, since Vale reports that fix and applies none. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func calm(root, vale string, paths []string, run fixRunner, write func(string, []byte) error) error {
-	var said strings.Builder
-	run(root, &said, io.Discard, append([]string{vale, "--config=" + valeIni, "--output=JSON", "--no-exit", valeParked}, paths...)...)
-	var read map[string][]valeRow
-	if json.Unmarshal([]byte(said.String()), &read) != nil {
-		return nil
-	}
-	for file, rows := range read {
-		var shouts []valeRow
-		for _, one := range rows {
-			if proseStyles.ReplaceAllString(one.Check, "") == shoutedLead && one.Match != "" {
-				shouts = append(shouts, one)
-			}
-		}
-		if len(shouts) == 0 {
-			continue
-		}
-		path := file
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(root, filepath.FromSlash(file))
-		}
+// One round of the rules over every prose file under the paths: each file's swaps and calms applied, and written where it changes. It answers how many files changed. [[spec/tickets/vale-leaves-the-tree]]
+func fixRound(root string, set *rules.Set, paths []string, write func(string, []byte) error) (int, error) {
+	changed := 0
+	for _, path := range proseFilesUnder(root, paths) {
 		was, err := os.ReadFile(path)
 		if err != nil {
 			continue
 		}
-		if now := calmed(string(was), shouts); now != string(was) {
-			if err := write(path, []byte(now)); err != nil {
-				return fmt.Errorf("the calm writes no %s: %w", file, err)
-			}
+		name := filepath.ToSlash(path)
+		if rel, err := filepath.Rel(root, path); err == nil && !strings.HasPrefix(rel, "..") {
+			name = filepath.ToSlash(rel)
 		}
+		found := set.Lint(name, string(was))
+		now := rules.Apply(string(was), append(found, calm(found)...))
+		if now == string(was) {
+			continue
+		}
+		if err := write(path, []byte(now)); err != nil {
+			return changed, fmt.Errorf("the fix writes no %s: %w", name, err)
+		}
+		changed++
 	}
-	return nil
+	return changed, nil
 }
 
-// Writes a calmed file over itself. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+// The rules' shouted lead rows as swaps to sentence case, since the rule names that fix and carries none. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+func calm(found []rules.Finding) []rules.Finding {
+	var out []rules.Finding
+	for _, one := range found {
+		if proseStyle.ReplaceAllString(one.Check, "") != shoutedLead || one.Match == "" {
+			continue
+		}
+		one.Action = &rules.Action{Name: rules.ActionReplace, Params: []string{sentenceCase(one.Match)}}
+		out = append(out, one)
+	}
+	return out
+}
+
+// Writes a fixed file over itself. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func writeCalmed(path string, text []byte) error { return os.WriteFile(path, text, calmedMode) }
-
-// The text with each shout sentence-cased where it stands at its line and column, the last first, so an earlier span keeps its column. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func calmed(text string, shouts []valeRow) string {
-	sort.SliceStable(shouts, func(i, j int) bool {
-		if shouts[i].Line != shouts[j].Line {
-			return shouts[i].Line > shouts[j].Line
-		}
-		return columnOf(shouts[i]) > columnOf(shouts[j])
-	})
-	lines := strings.SplitAfter(text, "\n")
-	for _, one := range shouts {
-		if one.Line < 1 || one.Line > len(lines) {
-			continue
-		}
-		line := []rune(lines[one.Line-1])
-		from, match := columnOf(one)-1, []rune(one.Match)
-		if from < 0 || from+len(match) > len(line) || string(line[from:from+len(match)]) != one.Match {
-			continue
-		}
-		lines[one.Line-1] = string(line[:from]) + sentenceCase(one.Match) + string(line[from+len(match):])
-	}
-	return strings.Join(lines, "")
-}
-
-func columnOf(one valeRow) int {
-	if len(one.Span) == 0 {
-		return 1
-	}
-	return one.Span[0]
-}
 
 // The first letter upper and every character after it lower. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func sentenceCase(said string) string {
@@ -237,11 +192,14 @@ func sentenceCase(said string) string {
 	return said[:first] + string(unicode.ToUpper(letter)) + strings.ToLower(rest)
 }
 
-// What every prose file under the paths holds, so a round that changes nothing reads the same stamp. [[spec/tickets/the-small-faults-land]]
-func stampOf(root string, paths []string) string {
-	sum := sha256.New()
+// Every prose file under the paths, past the skipped folders and every name opening on an underscore. [[spec/tickets/the-small-faults-land]]
+func proseFilesUnder(root string, paths []string) []string {
+	var out []string
 	for _, one := range paths {
-		base := filepath.Join(root, filepath.FromSlash(one))
+		base := one
+		if !filepath.IsAbs(base) {
+			base = filepath.Join(root, filepath.FromSlash(one))
+		}
 		_ = filepath.WalkDir(base, func(at string, entry os.DirEntry, err error) error {
 			if err != nil {
 				return nil
@@ -252,13 +210,11 @@ func stampOf(root string, paths []string) string {
 				}
 				return nil
 			}
-			if entry.IsDir() || !proseFile.MatchString(entry.Name()) {
-				return nil
+			if !entry.IsDir() && proseFile.MatchString(entry.Name()) {
+				out = append(out, at)
 			}
-			body, _ := os.ReadFile(at)
-			fmt.Fprintf(sum, "%s\x00%s\x00", at, body)
 			return nil
 		})
 	}
-	return fmt.Sprintf("%x", sum.Sum(nil))
+	return out
 }

@@ -1,7 +1,7 @@
 // The retro's chapters over a seeded input: every timed line handed to one
 // chapter, and a gap or a stray line refused.
 // [[spec/guidance/retro/chapter]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -24,7 +24,7 @@ test("the check runs on a Linux runner and a Windows runner", () => {
   assert.match(text, /key: se-bin-\$\{\{ runner\.os \}\}-/);
 });
 
-// A pull request against main runs the check GitHub's auto-merge waits on, and a branch push runs none. [[spec/tickets/groups-land-through-pull-requests]] [[spec/design_output/work#the-check-runs-once-a-head]]
+// A pull request against main runs the check GitHub's auto-merge waits on, and a branch push runs none. [[spec/tickets/groups-land-through-pull-requests]] [[spec/design_output/work#one-check-runs-a-head]]
 test("the check runs on a push to main, and on a pull request against main", () => {
   const text = disk().read(WORKFLOW);
   assert.match(
@@ -33,7 +33,7 @@ test("the check runs on a push to main, and on a pull request against main", () 
   );
 });
 
-// A newer head cancels a pull request's superseded run, a run on main cancels nothing, and the required check names stand. [[spec/design_output/work#the-check-runs-once-a-head]]
+// A newer head cancels a pull request's superseded run, a run on main cancels nothing, and the required check names stand. [[spec/design_output/work#one-check-runs-a-head]]
 test("a pull request's newer head cancels its superseded run, and a run on main stands alone", () => {
   const text = disk().read(WORKFLOW);
   assert.match(

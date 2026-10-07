@@ -127,11 +127,12 @@ func (it *It) ticketsHere() []*Held {
 	return out
 }
 
-// The tickets a tag parks for the next pull. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-func taggedIn(list []*Held) []*Held {
+// The tickets a tag parks for the next pull. On a group's branch a ticket naming another group stays out, so a gate's points in one group jump no other group's queue. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+func taggedIn(list []*Held, group string) []*Held {
 	out := []*Held{}
 	for _, one := range list {
-		if todoOf(one.Front) != "" {
+		named := FieldOf(one.Text, GroupField)
+		if todoOf(one.Front) != "" && (group == "" || named == "" || named == group) {
 			out = append(out, one)
 		}
 	}
@@ -203,7 +204,7 @@ func (it *It) handOut(who *Who) int {
 			break
 		}
 	}
-	tagged := taggedIn(all)
+	tagged := taggedIn(all, who.Group)
 	isTagged := map[*Held]bool{}
 	for _, one := range tagged {
 		isTagged[one] = true
@@ -516,7 +517,7 @@ func excludes(front *yaml.Doc, leaf *Leaf, hand string) string {
 	}
 	wrote := false
 	for _, entry := range entriesOf(front) {
-		if paths[round.ReplaceAllString(yaml.AsString(entry.Get("step")), "")] && !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if paths[round.ReplaceAllString(yaml.AsString(entry.Get("step")), "")] && !yaml.Truthy(entry.Get("skipped")) {
 			wrote = true
 			if yaml.AsString(entry.Get("hand")) == RoleOf(hand) {
 				return fmt.Sprintf("waits for a hand other than %s, which wrote %s", hand, named.Path)

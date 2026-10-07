@@ -10,6 +10,8 @@ const REWARM = 60000;
 const ASKING = 20000;
 const WARMING = 60000;
 const NO_BINARY = 127;
+// The variable the binary reads its root off before its working folder. A child of the index inherits it, so the door names its own root. [[spec/tickets/index-survives-a-long-call]]
+const ROOT_VAR = "QUACKITECT_ROOT";
 // What se-index prints where the door stands and answers the question with its own fault: a pattern Go reads as no regexp, a search with no pattern, a method it holds nowhere. [[spec/design_output/index#a-dead-index-speaks]]
 const QUERY_FAULT = /error parsing regexp|a search takes a pattern|no method called|the call reads as no JSON/i;
 
@@ -34,7 +36,7 @@ export function index(disk, proc, clock, method, work = method) {
         stderr: `no ${BIN} stands on this box`,
       };
     try {
-      return proc.run([binary, ...argv], { cwd: work, timeoutMs });
+      return proc.run([binary, ...argv], { cwd: work, env: { [ROOT_VAR]: work }, timeoutMs });
     } catch (error) {
       return { exitCode: 1, stdout: "", stderr: String(error?.message ?? error) };
     }

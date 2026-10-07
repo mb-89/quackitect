@@ -66,6 +66,11 @@ func V1() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return V1At(root)
+}
+
+// The base of the /v1 door standing for the tree at root. [[spec/guidance/code/testing]]
+func V1At(root string) (string, error) {
 	if _, err := reaches(root, []string{"standing"}); err != nil {
 		return "", err
 	}

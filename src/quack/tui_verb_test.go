@@ -2,7 +2,7 @@
 // rows, the handover to a standing window, the launch, and the viewer build
 // with its source stamp, each held to what the JavaScript answers.
 // [[spec/design_output/tui#the-verb-builds-it]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -450,5 +450,15 @@ func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
 		if !strings.HasPrefix(one, runtime) {
 			t.Errorf("%s stands outside %s", one, runtime)
 		}
+	}
+}
+
+// The collation puts punctuation first, then digits, then letters in either case with lower case first on a tie, then any other rune. [[spec/design_output/tui#the-verb-builds-it]]
+func TestTuiCollateOrdersEachClassOfRune(t *testing.T) {
+	t.Parallel()
+	names := []string{"é", "b", "B", "a", "9", "0", "_"}
+	slices.SortFunc(names, tuiCollate)
+	if want := []string{"_", "0", "9", "a", "b", "B", "é"}; !slices.Equal(names, want) {
+		t.Errorf("the collation orders %q, and wants %q", names, want)
 	}
 }

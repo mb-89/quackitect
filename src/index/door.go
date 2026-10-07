@@ -74,6 +74,9 @@ type door struct {
 	dirty chan struct{}
 	eyes  *watcher.Watcher
 
+	// Whether a module answers a verb, which the tool list and the action routes read. [[spec/tickets/every-index-tool-answers]]
+	accepts func(module, verb string) bool
+
 	pending atomic.Bool
 	// The paths the watch names since the last settle, whether git's own index moved, and whether the plan moved. [[spec/design_output/index#a-change-moves-its-rows]]
 	heard   sync.Mutex
@@ -110,55 +113,6 @@ func standingPath(root string) string {
 	return filepath.Join(root, Runtime, "index.json")
 }
 
-// The command line asks for a door, and this spawns the tree's index where none stands, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
-func starts(root string) error {
-	self, err := executableOf()
-	if err != nil {
-		return err
-	}
-	bin := serverOf(self, root)
-	if _, err := statOf(bin); err != nil {
-		return fmt.Errorf("no index binary stands at %s, and ./RUNME.sh builds one: %w", bin, err)
-	}
-	marker := startingPath(root)
-	var exited <-chan error
-	spawned := false
-	from := startNow()
-	for {
-		if _, err := standingOf(root); err == nil {
-			return nil
-		}
-		if !spawned && claims(marker) {
-			defer os.Remove(marker)
-			spawned = true
-			if exited, err = spawns(bin, root); err != nil {
-				return err
-			}
-		}
-		if spawned {
-			select {
-			case said := <-exited:
-				if _, err := standingOf(root); err == nil {
-					return nil
-				}
-				return errorOf(fmt.Sprintf("the index exits before its door stands: %v", said))
-			default:
-			}
-			now := startNow()
-			_ = os.Chtimes(marker, now, now)
-		}
-		if startNow().Sub(from) >= startHang {
-			return errorOf(fmt.Sprintf("the index neither stands its door nor exits within %v, so it hangs", startHang))
-		}
-		startPause()
-	}
-}
-
-// The claim a caller holds while the index it spawned comes up. [[spec/tickets/reaches-keeps-the-post-fault]]
-func startingPath(root string) string {
-	return filepath.Join(root, Runtime, "index.starting")
-}
-
 // The first caller claims the start, and a caller meeting a fresh claim waits on the index that claim spawns, so callers racing a start spawn one index. The holder renews its claim at each poll, so a claim nobody renews within the span stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
 func claims(marker string) bool {
 	if said, err := os.Stat(marker); err == nil && startNow().Sub(said.ModTime()) > startPolls*startPollPause {
@@ -172,12 +126,6 @@ func claims(marker string) bool {
 	made.Close()
 	return true
 }
-
-// The clock and the pause a start's wait reads, which a case drives fake so it sleeps no real second. [[spec/design_output/index#a-door-comes-back]]
-var (
-	startNow   = time.Now
-	startPause = func() { time.Sleep(startPollPause) }
-)
 
 // Runs the binary with serve over the root, and answers its exit, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]
 var spawns = func(bin, root string) (<-chan error, error) {
@@ -292,6 +240,7 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 		}
 	}
 	one.call = managed.Call
+	one.accepts = managed.Accepts
 	one.bus = managed.Bus
 	stops, err := one.starts(starts)
 	if err != nil {
@@ -601,6 +550,9 @@ func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
 func lstatOf(path string) (fs.FileInfo, error)    { return os.Lstat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
+func chtimesOf(path string, at, mod time.Time) error {
+	return os.Chtimes(path, at, mod)
+}
 
 // The stop a person or a swapped binary sends, so main waits on one channel and names no signal. [[spec/design_output/doors#a-door-reads-the-outside]]
 func stops(swapped func(gone func())) <-chan struct{} {

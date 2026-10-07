@@ -1,8 +1,52 @@
 // The cloud trigger: the routine, and the branches free.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported staleClaim and the stand and routineID readers
 
-import "testing"
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+// The settings default of the stale span, read off the schema the tree tracks. [[spec/tickets/every-named-path-resolves]]
+func staleDefault(t *testing.T) int64 {
+	t.Helper()
+	text, err := os.ReadFile(filepath.Join("..", "..", "spec", "config", "level0.schema.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var schema struct {
+		Properties struct {
+			Work struct {
+				Properties struct {
+					StaleAfter struct {
+						Default string `json:"default"`
+					} `json:"staleAfter"`
+				} `json:"properties"`
+			} `json:"work"`
+		} `json:"properties"`
+	}
+	if err := json.Unmarshal(text, &schema); err != nil {
+		t.Fatal(err)
+	}
+	return int64(spanOf(schema.Properties.Work.Properties.StaleAfter.Default))
+}
+
+// Where no layer sets the key, the stale span reads the settings default, and no constant of its own. [[spec/tickets/every-named-path-resolves]]
+func TestTheStaleSpanReadsTheSettingsDefault(t *testing.T) {
+	t.Parallel()
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := staleDefault(t)
+	for _, d := range []*Doors{{Method: root}, {Method: root, Config: func(string) any { return nil }}} {
+		if got := d.staleSpan(); want == 0 || got != want {
+			t.Errorf("the stale span reads %d, and the settings default %d", got, want)
+		}
+	}
+}
 
 // The trigger names the routine, and each free branch, past one waiting on another. [[spec/design_output/work#the-routine-a-verb-names]]
 func TestTheTriggerNamesTheFreeBranches(t *testing.T) {

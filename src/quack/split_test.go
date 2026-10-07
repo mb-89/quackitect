@@ -1,7 +1,7 @@
 // The live split: ioProcesses spawns quack io and a module process for each
 // placement off the wiring, and a crash in one leaves the others answering.
 // [[spec/tickets/kill-case-drives-live-split]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

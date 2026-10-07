@@ -65,6 +65,22 @@ func commitTableOf(t *testing.T) commitTable {
 }
 
 // A git read answering each read the case teaches, and every other read empty, as the bridge's git reads a failing run. [[spec/tickets/cage-commit-guards-port]]
+// A desk commit on a work branch raises desk-works-on-trunk off the root's nodes, and an id the root carries no node for still prints, named unregistered. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+// level0: FixtureOutsideHome - the guard reads its node off a root of the case's own, and a bare root holding none
+func TestTheDeskGuardRaisesItsNodeThroughTheFailureDoor(t *testing.T) {
+	node := "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main.\"]\n---\n\n# When\n\nA desk lands work on a work branch.\n"
+	d := &Door{}
+	d.from.Git = taughtGit(map[string]string{"rev-parse --abbrev-ref HEAD": "work/one"})
+	said := d.deskGuard("git commit -m x", treeOf(t, map[string]string{"spec/failures/desk-works-on-trunk.md": node}, ""), Settings{})
+	want := "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/one.\nfailure desk-works-on-trunk at warn\nremedy: Run git switch main."
+	if said != want {
+		t.Errorf("the guard says\n%s\nwant\n%s", said, want)
+	}
+	if bare := d.deskGuard("git commit -m x", t.TempDir(), Settings{}); !strings.Contains(bare, "failure desk-works-on-trunk stands unregistered") {
+		t.Errorf("a root with no node says %q", bare)
+	}
+}
+
 func taughtGit(answers map[string]string) func(string, ...string) string {
 	return func(_ string, args ...string) string { return answers[strings.Join(args, " ")] }
 }
@@ -110,6 +126,20 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 				t.Fatalf("the door says\n%s\nwhere the bridge says\n%s", got, one.Text)
 			}
 		})
+	}
+}
+
+// A commit whose trailer names a model meets a refusal at the door, with no Vale on the box. [[spec/tickets/commit-door-refuses-model-trailers]]
+// level0: FixtureOutsideHome - the case writes the message file its commit names into its own root.
+func TestCommitVoiceRefusesAModelTrailerWithNoVale(t *testing.T) {
+	root := t.TempDir()
+	line := "Co-Authored-By: Claude Opus 5.5"
+	if err := os.WriteFile(root+"/message.txt", []byte("a-ticket: the change\n\n"+line+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	rows := (&Door{}).commitVoice("git commit -F message.txt", root, disk{root})
+	if len(rows) != 1 || rows[0].Rule != "ModelTrailer" || rows[0].Said != line {
+		t.Errorf("the door reads %v", rows)
 	}
 }
 

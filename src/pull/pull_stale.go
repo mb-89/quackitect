@@ -200,7 +200,7 @@ func (it *It) movedOf(text string, inputs any) []string {
 func lastOf(text, path string) *yaml.Doc {
 	var out *yaml.Doc
 	for _, entry := range entriesAt(text, path) {
-		if !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if !yaml.Truthy(entry.Get("skipped")) {
 			out = entry
 		}
 	}

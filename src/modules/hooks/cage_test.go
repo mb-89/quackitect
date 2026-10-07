@@ -24,6 +24,7 @@ func TestDecisionOfReadsTheBridgesAnswer(t *testing.T) {
 		{toolEvent, map[string]any{"result": map[string]any{"block": "reply first"}}, RefuseWord},
 		{stopEvent, map[string]any{"result": map[string]any{"block": "wait"}}, BlockWord},
 		{stopEvent, map[string]any{"needs": "reply"}, HoldWord},
+		{stopEvent, map[string]any{"needs": 0.0}, PassWord},
 	} {
 		if got := OldDecisionOf(one.event, one.answer); got != one.want {
 			t.Errorf("OldDecisionOf(%s, %v) reads %q, want %q", one.event, one.answer, got, one.want)

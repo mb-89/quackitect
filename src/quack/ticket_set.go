@@ -70,7 +70,7 @@ func ticketWritten(disk pull.Disk, at, key, value string, dry bool, out, errs io
 	if value == "" || value == pull.FlagOff {
 		written, err = pull.WithoutField(text, key)
 	}
-	// [[spec/design_output/pull#a-closed-group-takes-no-child]]
+	// [[spec/design_output/pull#a-closed-group-stays-shut]]
 	if key == pull.GroupField && err == nil {
 		if why := pull.ClosedGroup(disk, written); why != "" {
 			fmt.Fprintln(errs, why)

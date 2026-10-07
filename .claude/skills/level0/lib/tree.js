@@ -1,4 +1,4 @@
-// Every rule weighing one file against another. Vale hands a rule one buffer,
+// Every rule weighing one file against another. A linter hands a rule one buffer,
 // so a rule reading the files lives here, and the command line runs it over the
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
@@ -7,19 +7,12 @@ import { APART, LOGGED, MOVED, PRIVATE, RENAMED, RETRO, RUN } from "./folders.js
 import { overLong } from "./names.js";
 import { isDraft } from "./paths.js";
 import { carriesTheName, namesAPerson } from "./private.js";
-import {
-  EDITOR_EXTENSIONS,
-  EDITOR_SETTINGS,
-  EDITOR_VALE_INI,
-  EXTENSIONS,
-  namesTheBinaries,
-} from "./servers.js";
+import { EDITOR_EXTENSIONS, EDITOR_SETTINGS, EXTENSIONS, namesTheBinaries } from "./servers.js";
 import { decide, pool, RULES as STOP } from "./stop.js";
 import { everyModuleTested } from "./tested.js";
 import { BIN, installedTools, loopNames, TOOLS, WANTED } from "./tools.js";
 
 export const INSTALL = "src/scripts/install.sh";
-export const VALE_INI = ".vale.ini";
 
 const STOP_LIB = ".claude/skills/level0/lib/stop.js";
 export const FOLDERS = ".claude/skills/level0/lib/folders.js";
@@ -50,15 +43,6 @@ const LATER = {
 };
 
 const BINARIES = {
-  vale: ["vale.valeCLI.path", `The editor runs ${BIN}/vale, which ${INSTALL} writes.`],
-  valeConfig: [
-    "vale.valeCLI.config",
-    `The editor reads ${EDITOR_VALE_INI}, which turns on no style, so the panel draws Vale off the battery.`,
-  ],
-  managesVale: [
-    "vale.valeCLI.installVale",
-    `${INSTALL} pins Vale, so the extension installs none of its own.`,
-  ],
   biome: ["biome.lsp.bin", `The editor runs ${BIN}/biome, which ${INSTALL} writes.`],
   biomeConfig: [
     "biome.configurationPath",
@@ -128,81 +112,9 @@ export function settingsNameBinaries(tree) {
   }
 
   const installs = installedTools(tree.read(INSTALL));
-  for (const name of ["vale", "biome"]) {
-    if (installs.includes(name)) continue;
+  if (!installs.includes("biome")) {
     out.push(
-      fault(
-        rule,
-        INSTALL,
-        `${EDITOR_SETTINGS} runs ${BIN}/${name}, and this script installs no ${name}.`,
-      ),
-    );
-  }
-  return out;
-}
-
-// [[spec/design_output/editor#what-the-editor-runs]]
-export function editorDrawsWriteRules(tree) {
-  const rule = "EditorDrawsWriteRules";
-  const text = tree.read(EDITOR_SETTINGS);
-  const said = parsed(text);
-  if (!said) return [unread(rule, EDITOR_SETTINGS)];
-
-  const out = [];
-  const where = said["vale.valeCLI.config"] ?? "";
-  const ini = where ? tree.read(where) : "";
-  if (!ini) {
-    out.push(
-      fault(
-        rule,
-        EDITOR_SETTINGS,
-        `vale.valeCLI.config names ${where || "nothing"}, and the editor reads ${EDITOR_VALE_INI}.`,
-        lineOf(text, "vale.valeCLI.config"),
-      ),
-    );
-    return out;
-  }
-
-  // The editor's Vale turns on no style, so raw Vale draws nothing beside the battery's list. [[spec/design_output/lsp#the-panel-reads-the-battery]]
-  if (/^\s*BasedOnStyles/m.test(ini)) {
-    out.push(
-      fault(
-        rule,
-        EDITOR_SETTINGS,
-        `${where} turns on a style, so the editor draws raw Vale beside the battery's list.`,
-        lineOf(text, "vale.valeCLI.config"),
-      ),
-    );
-  }
-  const level = /^\s*MinAlertLevel\s*=\s*(\S+)/m.exec(ini)?.[1] ?? "";
-  if (said["vale.valeCLI.minAlertLevel"] !== "inherited") {
-    out.push(
-      fault(
-        rule,
-        EDITOR_SETTINGS,
-        `${where} draws at ${level || "its own level"}. Set vale.valeCLI.minAlertLevel to inherited.`,
-        lineOf(text, "vale.valeCLI.minAlertLevel"),
-      ),
-    );
-  }
-  if (!/BasedOnStyles.*Spelling/.test(ini) && said["vale.enableSpellcheck"] !== false) {
-    out.push(
-      fault(
-        rule,
-        EDITOR_SETTINGS,
-        `${where} names no spelling style. Set vale.enableSpellcheck to false.`,
-        lineOf(text, "vale.enableSpellcheck"),
-      ),
-    );
-  }
-  if (said["vale.valeCLI.lintOnChange"] !== true) {
-    out.push(
-      fault(
-        rule,
-        EDITOR_SETTINGS,
-        "Set vale.valeCLI.lintOnChange to true, so a rule draws while a person types.",
-        lineOf(text, "vale.valeCLI.lintOnChange"),
-      ),
+      fault(rule, INSTALL, `${EDITOR_SETTINGS} runs ${BIN}/biome, and this script installs no biome.`),
     );
   }
   return out;
@@ -557,7 +469,6 @@ export function surveyFindsNode(tree) {
 export const RULES = [
   everyModuleTested,
   settingsNameBinaries,
-  editorDrawsWriteRules,
   biomeOnWindows,
   extensionsOnOffer,
   stopFolderIsData,

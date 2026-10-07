@@ -11,6 +11,14 @@ import (
 	"testing"
 )
 
+// The paths of a map come back in sorted order, the same each call. [[spec/tickets/config-verbs-port-to-go]]
+func TestPathsAnswerTheKeysSorted(t *testing.T) {
+	t.Parallel()
+	if got := Paths(map[string]string{"b": "", "a": "", "c": ""}); !slices.Equal(got, []string{"a", "b", "c"}) {
+		t.Fatalf("Paths answers %v", got)
+	}
+}
+
 // The entries one or more entry texts name. [[spec/tickets/config-verbs-port-to-go]]
 func entries(t *testing.T, text string) []Entry {
 	t.Helper()
@@ -155,6 +163,9 @@ func TestStyleNumbersEachNotesRulesAndItsExamples(t *testing.T) {
 	if strings.Contains(got, "deep") || strings.Contains(got, "## a") {
 		t.Errorf("the style carries a note it leaves out:\n%s", got)
 	}
+	if !strings.Contains(got, "The Go rules hold the\nmechanical ones") || strings.Contains(got, "Vale") {
+		t.Errorf("the style's opening names no Go rules, or names Vale:\n%s", got)
+	}
 }
 
 func TestStyleWritesNothingWhereNoNoteCarriesARule(t *testing.T) {
@@ -198,21 +209,11 @@ func TestParagraphRulesTakeTheirSideAndTheBanner(t *testing.T) {
 	if markup := said.Wanted["r/Markup.yml"]; !strings.Contains(markup, "\nlevel: error\n") {
 		t.Error("a side outside error and warning reads as other than error")
 	}
-	if chars := said.Wanted["r/Characters.yml"]; !strings.Contains(chars, "`[^\\pL\\pN\\s\\,\\(\\)]`") {
-		t.Errorf("the character rule's class reads wrong:\n%s", chars)
+	if chars := said.Wanted["r/Characters.yml"]; !strings.Contains(chars, "letters, digits, space, and , ( ).") || strings.Contains(chars, "script:") {
+		t.Errorf("the character rule's set reads wrong, or it carries a script body:\n%s", chars)
 	}
 	if _, held := said.Wanted["r/Vocabulary.yml"]; held {
 		t.Error("the vocabulary rule stands, and no list names a word")
-	}
-}
-
-func TestRestatedTableLooksUpRunsOfTheLengthItsLayerNames(t *testing.T) {
-	schema := "rules:\n  RestatedTable: warning\nlayers:\n  restated:\n    table: 4\n"
-	rule := readOver(t, paragraphEntry, Texts{"p.yaml": schema}).Wanted["r/RestatedTable.yml"]
-	for _, want := range []string{"runsOf(wordsOf(one), 4)", "shares(mine, cell, 4)"} {
-		if !strings.Contains(rule, want) {
-			t.Errorf("the table rule carries no %s:\n%s", want, rule)
-		}
 	}
 }
 
@@ -278,5 +279,25 @@ func TestInheritsJoinsAJSONFileKeyByKey(t *testing.T) {
 	}
 	if got := tree.List("f"); len(got) != 2 {
 		t.Errorf("the folder lists %v, and the union holds two", got)
+	}
+}
+
+// A number text reads in the base its prefix names, and a plain one in base ten, as Number reads it in JavaScript. [[spec/tickets/config-verbs-port-to-go]]
+func TestANumberTextReadsInTheBaseItsPrefixNames(t *testing.T) {
+	t.Parallel()
+	for text, want := range map[string]float64{"0x1F": 31, "0X1f": 31, "0o17": 15, "0O17": 15, "0b11": 3, "42": 42} {
+		if got := numberOfText(text); got != want {
+			t.Errorf("%s reads as %v, and wants %v", text, got, want)
+		}
+	}
+	if got := numberString(1e21); got != "1e+21" {
+		t.Errorf("1e21 prints as %s, and wants 1e+21", got)
+	}
+}
+
+// The Null mark, a zero and NaN read false in a condition, and a word reads true. [[spec/tickets/shared-helpers-stand-once]]
+func TestAConditionReadsAsJavaScriptReadsIt(t *testing.T) {
+	if holdsTrue(Null{}) || holdsTrue(nil) || holdsTrue(0.0) || holdsTrue(math.NaN()) || holdsTrue("") || !holdsTrue("x") || !holdsTrue(1.0) {
+		t.Fatal("a condition reads otherwise than JavaScript reads it")
 	}
 }

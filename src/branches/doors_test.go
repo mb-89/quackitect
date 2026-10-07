@@ -1,7 +1,7 @@
 // The doors: no case here spawns a process, the disk doors name the files and
 // keep a link, and a take and a dispatch run whole on the fakes.
 // [[spec/tickets/branch-verbs-meet-fake-git]]
-package branches
+package branches // level0: InPackageTest - the cases build on the in-package helpers newTree, groupNote and dpTree, and reach the unexported disk doors link, unlink, names and filesUnder
 
 import (
 	"go/parser"
@@ -29,9 +29,6 @@ func TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere(t *tes
 		t.Fatal(err)
 	}
 	for _, name := range names {
-		if name == valeDoorTest {
-			continue
-		}
 		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
 		if err != nil {
 			t.Fatal(err)

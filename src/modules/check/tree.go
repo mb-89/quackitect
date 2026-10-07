@@ -40,6 +40,9 @@ type Tree struct {
 	parses    map[string]parse
 	ruleKey   string
 	ruleFound []Finding
+	// The bodies standing in two packages, by a hash of every Go text. [[spec/tickets/shared-helpers-stand-once]]
+	copyKey   string
+	copyFound []Finding
 }
 
 // The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
@@ -162,12 +165,9 @@ func (one *Tree) Forgets() {
 }
 
 const (
-	Install = "src/scripts/install.sh"
-	ValeIni = ".vale.ini"
-	// The config the Vale extension reads, which turns on no style. [[spec/design_output/lsp#the-panel-reads-the-battery]]
-	EditorIni = "spec/config/editor.vale.ini"
-	Settings  = ".vscode/settings.json"
-	Offered   = ".vscode/extensions.json"
+	Install  = "src/scripts/install.sh"
+	Settings = ".vscode/settings.json"
+	Offered  = ".vscode/extensions.json"
 	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 	ToolsAt = ".se/.runtime/tools.json"
 	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
@@ -175,10 +175,10 @@ const (
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]
-var Extensions = []string{"chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"}
+var Extensions = []string{"biomejs.biome", "bierner.markdown-mermaid"}
 
 // [[spec/design_output/tools#what-the-survey-writes]]
-var Wanted = []string{"node", "vale", "biome", "vale-ls", "go", "git", "claude", "sh", "python"}
+var Wanted = []string{"node", "biome", "go", "git", "claude", "sh", "python"}
 
 // [[spec/design_output/editor#what-the-tracked-settings-say]]
 func settingsNameBinaries(tree *Tree) []Finding {
@@ -198,12 +198,9 @@ func settingsNameBinaries(tree *Tree) []Finding {
 	}
 
 	installs := installedTools(tree.Read(Install))
-	for _, name := range []string{"vale", "biome"} {
-		if has(installs, name) {
-			continue
-		}
+	if !has(installs, "biome") {
 		out = append(out, fault(rule, Install, 1,
-			Settings+" runs "+Bin+"/"+name+", and this script installs no "+name+"."))
+			Settings+" runs "+Bin+"/biome, and this script installs no biome."))
 	}
 	return out
 }
@@ -234,69 +231,10 @@ func namesTheBinaries(said map[string]any) []binaryCheck {
 	_ = holdsBiome
 
 	return []binaryCheck{
-		{"vale.valeCLI.path", "The editor runs " + Bin + "/vale, which " + Install + " writes.",
-			valeNamed(asText(said["vale.valeCLI.path"]))},
-		{"vale.valeCLI.config", "The editor reads " + EditorIni + ", which turns on no style, so the panel draws Vale off the battery.",
-			asText(said["vale.valeCLI.config"]) == EditorIni},
-		{"vale.valeCLI.installVale", Install + " pins Vale, so the extension installs none of its own.",
-			said["vale.valeCLI.installVale"] == false},
 		{"biome.lsp.bin", "The editor runs " + Bin + "/biome, which " + Install + " writes.", named},
 		{"biome.configurationPath", "Biome reads spec/config/biome.json, which this tree tracks.",
 			asText(said["biome.configurationPath"]) == "spec/config/biome.json"},
 	}
-}
-
-// The install writes vale.exe on Windows, so either name holds. [[spec/tickets/the-small-faults-land]]
-func valeNamed(path string) bool {
-	return path == Bin+"/vale" || path == Bin+"/vale.exe"
-}
-
-// [[spec/design_output/editor#what-the-editor-runs]]
-func editorDrawsWriteRules(tree *Tree) []Finding {
-	rule := "EditorDrawsWriteRules"
-	text := tree.Read(Settings)
-	said := parsedJSON(text)
-	if said == nil {
-		return []Finding{unread(rule, Settings)}
-	}
-
-	out := []Finding{}
-	where := asText(said["vale.valeCLI.config"])
-	ini := ""
-	if where != "" {
-		ini = tree.Read(where)
-	}
-	if ini == "" {
-		names := where
-		if names == "" {
-			names = "nothing"
-		}
-		return append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
-			"vale.valeCLI.config names "+names+", and the editor reads "+EditorIni+"."))
-	}
-
-	if basedOnStyles.MatchString(ini) {
-		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
-			where+" turns on a style, so the editor draws raw Vale beside the battery's list."))
-	}
-	level := valeLevel(ini)
-	if asText(said["vale.valeCLI.minAlertLevel"]) != "inherited" {
-		drawn := level
-		if drawn == "" {
-			drawn = "its own level"
-		}
-		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.minAlertLevel"),
-			where+" draws at "+drawn+". Set vale.valeCLI.minAlertLevel to inherited."))
-	}
-	if !spellingStyle(ini) && said["vale.enableSpellcheck"] != false {
-		out = append(out, fault(rule, Settings, lineOf(text, "vale.enableSpellcheck"),
-			where+" names no spelling style. Set vale.enableSpellcheck to false."))
-	}
-	if said["vale.valeCLI.lintOnChange"] != true {
-		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.lintOnChange"),
-			"Set vale.valeCLI.lintOnChange to true, so a rule draws while a person types."))
-	}
-	return out
 }
 
 // [[spec/design_output/editor#what-the-tracked-settings-say]]

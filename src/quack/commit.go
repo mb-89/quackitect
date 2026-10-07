@@ -14,11 +14,13 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/proc"
+	"quackitect/src/pull"
 )
 
 // The usage, the flag keeping a commit home, the name a finding of the message stands under, and the road the message names its ticket by. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -34,17 +36,6 @@ const (
 	movedStatus = "R"
 	every       = "."
 )
-
-// The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
-var coldPath = []string{
-	".claude/skills/level0/hooks/",
-	".claude/skills/level0/lib/guidance.js",
-	"src/modules/hooks/",
-	"src/quack/",
-	"src/scripts/go-stamp.sh",
-	"src/scripts/install.sh",
-	"src/scripts/probe-cold.js",
-}
 
 func init() {
 	register("commit", func(argv []string, dry bool, out, errs io.Writer) int {
@@ -102,6 +93,13 @@ func commitVerb(d landingDoors) twin {
 			fmt.Fprintln(errs, fault)
 			return exitUsage
 		}
+		// A trailer naming a model stops the commit before anything stages. [[spec/tickets/commit-door-refuses-model-trailers]]
+		if rows := command.ModelTrailers(message); len(rows) > 0 {
+			for _, one := range rows {
+				fmt.Fprintf(errs, "%s: %s\n", one.Said, one.Message)
+			}
+			return exitUsage
+		}
 		refused, form := messageFindings(d, message)
 		if len(refused) > 0 {
 			fmt.Fprintln(errs, "The voice rules refuse this message. Write it again.")
@@ -156,18 +154,15 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	branch, _ := d.git.Head()
 	// A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !d.cloud && strings.HasPrefix(branch, command.WorkBranch) {
-		fmt.Fprintln(errs, command.DeskRefusal("this commit lands nowhere on "+branch))
+		raised := failure.Raise(failure.Load(failure.Dir{Root: d.root}), "desk-works-on-trunk", command.DeskSaid("this commit lands nowhere on "+branch))
+		if err := raisedOnto(failureDoors{root: d.root, now: d.now}, raised, errs); err != nil {
+			fmt.Fprintln(errs, err)
+		}
 		return exitUsage
 	}
 	// A merge lands through this verb once its files carry no marker, so a marker refuses before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
 	if said := d.markedUnmerged(); said != "" {
 		fmt.Fprintln(errs, said)
-		return exitFailed
-	}
-	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-	if code, said := d.verb("test"); code != 0 {
-		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
-		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
 		return exitFailed
 	}
 	// The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
@@ -184,6 +179,20 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	if len(adds) > 0 {
 		stage = func() error { return d.git.Add(adds) }
 	}
+	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
+	if reach := handWritten(d.stagesTo(adds, only)); len(reach) > 0 {
+		if code, said := d.verb(append([]string{"lint", "--strict"}, reach...)...); code != 0 {
+			fmt.Fprintln(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:")
+			fmt.Fprintln(errs, orNothing(said, "the lint answers nothing"))
+			return exitFailed
+		}
+	}
+	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+	if code, said := d.verb("test"); code != 0 {
+		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
+		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
+		return exitFailed
+	}
 	if err := stage(); err != nil {
 		fmt.Fprintln(errs, "The staging comes back refused, so the commit stands undone:")
 		fmt.Fprintln(errs, err)
@@ -194,7 +203,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	cold := coldIn(d.stagedPaths(only))
+	cold := pull.ColdIn(d.stagedPaths(only))
 	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
 		d.unstages(only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
@@ -238,10 +247,10 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	return 0
 }
 
-// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueBranch = "rescue/"
 
-// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) rescues(branch string, errs io.Writer) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !d.cloud || !onWork {
@@ -256,7 +265,7 @@ func (d landingDoors) rescues(branch string, errs io.Writer) {
 	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
 }
 
-// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) dropsRescue(branch string) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !onWork {
@@ -271,7 +280,7 @@ func (d landingDoors) dropsRescue(branch string) {
 	}
 }
 
-// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueRef = "refs/heads/"
 
 func orNothing(said, nothing string) string {
@@ -307,20 +316,6 @@ func (d landingDoors) stagedPaths(only []string) []string {
 			out = append(out, one.From)
 		}
 		out = append(out, one.Path)
-	}
-	return out
-}
-
-// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
-func coldIn(paths []string) []string {
-	var out []string
-	for _, path := range paths {
-		for _, cold := range coldPath {
-			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
-				out = append(out, path)
-				break
-			}
-		}
 	}
 	return out
 }

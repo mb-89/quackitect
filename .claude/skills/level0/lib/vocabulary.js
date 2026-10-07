@@ -1,9 +1,9 @@
 // The word lists, read into the set a paragraph writes and the swaps a refusal
-// teaches. The projection inlines them into one rule, so a term lands on the
-// list and the next write reads it.
+// teaches. A list holding a word writes the vocabulary rule's head, and the Go
+// rules read the lists themselves, so a term lands and the next write reads it.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 
-import { grouped, left, pattern, prelude, quoted, scripted } from "./snippets.js";
+import { scripted } from "./snippets.js";
 
 export const CORE = "spec/vocabulary/core.yml";
 export const TERMS = "spec/vocabulary/terms.yml";
@@ -11,7 +11,7 @@ export const SWAPS = "spec/vocabulary/swaps.yml";
 export const STEMS = "spec/config/stems.yaml";
 
 const WORD = /^[a-z][a-z-]*( [a-z][a-z-]*)*$/;
-// A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+// A part shorter than this stands in the check. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 const SHORTEST = 3;
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -125,21 +125,6 @@ export function knownIn(held, stems) {
     );
 }
 
-// The table read as the Tengo the rule runs. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-function endingLines(stems) {
-  const out = [];
-  for (const row of stems.endings) {
-    out.push(`  if n > ${overOf(row)} && text.has_suffix(w, ${quoted(row.end)}) {`);
-    for (const to of row.to) {
-      const cut = `w[:n-${cutOf(row, to)}]`;
-      const stem = addOf(to) ? `${cut} + ${quoted(addOf(to))}` : cut;
-      out.push(`    if inside[${stem}] != undefined { return true }`);
-    }
-    out.push("  }");
-  }
-  return out;
-}
-
 // Every word of a means line the lists leave out, one row a term. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function looseMeanings(lists) {
   const known = knownIn(new Set(wordsOf(lists)), stemsOf(lists?.stems));
@@ -174,112 +159,10 @@ function pathOf(layer) {
 }
 
 // The rule refuses a word the list leaves out. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-export function vocabularyRule(layer, lists) {
-  const words = wordsOf(lists);
-  const swaps = swapsOf(lists);
-  const stems = stemsOf(lists?.stems);
+export function vocabularyRule(layer) {
   const where = pathOf(layer);
-  const tail =
-    "stands outside the words this tree writes. Write a core word, or add it to " +
-    `${where} with one line that says what it means.`;
-
-  return scripted(`A word ${tail}`, [
-    ...prelude([], true, layer.prose),
-    // [[spec/design_output/projection#the-second-target]]
-    // A map literal this long overruns the Tengo stack. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "list := `",
-    ...grouped(words),
-    "`",
-    "",
-    "inside := {}",
-    "for w in text.re_split(`\\s+`, list, -1) {",
-    "  if len(w) > 0 { inside[w] = 1 }",
-    "}",
-    "",
-    "roads := `",
-    ...grouped([...swaps].map(([from, to]) => `${from}=${to}`)),
-    "`",
-    "",
-    "swaps := {}",
-    "for one in text.re_split(`\\s+`, roads, -1) {",
-    '  pair := text.split(one, "=")',
-    "  if len(pair) == 2 { swaps[pair[0]] = pair[1] }",
-    "}",
-    "",
-    // [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "listed := func(w) {",
-    "  if inside[w] != undefined { return true }",
-    "  n := len(w)",
-    ...endingLines(stems),
-    "  return false",
-    "}",
-    "",
-    // A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "known := func(w) {",
-    "  if listed(w) { return true }",
-    `  for pre in [${stems.prefixes.map(quoted).join(", ")}] {`,
-    "    if len(w) > len(pre) + 2 && text.has_prefix(w, pre) && listed(w[len(pre):]) { return true }",
-    "  }",
-    "  return false",
-    "}",
-    "",
-    "said := plain(scope)",
-    "said = blanked(said, `(?m)^#{1,6} +`)",
-    "said = blanked(said, `(?m)^[ \\t]*(?:[-*+]|[0-9]+[.)]) +`)",
-    "said = blanked(said, `(?m)^[ \\t]*> ?`)",
-    "said = blanked(said, `\\|`)",
-    "said = blanked(said, `[*_]`)",
-    ...left(layer).map((one) => `said = blanked(said, ${quoted(pattern(one))})`),
-    "",
-    // A capital past the first word names a thing. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "opens := func(at) {",
-    "  i := at - 1",
-    "  for i >= 0 {",
-    "    c := said[i:i+1]",
-    '    if c == " " || c == "\\t" || c == "\\n" { i-- ; continue }',
-    '    if c == "." || c == "!" || c == "?" || c == ":" || c == ";" { return true }',
-    "    return false",
-    "  }",
-    "  return true",
-    "}",
-    "",
-    "found := text.re_find(`[A-Za-z][A-Za-z0-9'’-]*`, said, -1)",
-    "if is_undefined(found) { found = [] }",
-    "",
-    "for one in found {",
-    "  m := one[0]",
-    "  w := m.text",
-    "  if text.re_match(`[0-9_]`, w) { continue }",
-    "  head := w[0:1]",
-    "  if head != text.to_lower(head) && !opens(m.begin) { continue }",
-    // One letter names a key, a column or a label. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "  if len(w) == 1 { continue }",
-    "",
-    "  low := text.to_lower(w)",
-    '  low = text.trim_suffix(low, "\'s")',
-    '  low = text.trim_suffix(low, "’s")',
-    '  if text.contains(low, "\'") || text.contains(low, "’") { continue }',
-    "",
-    '  bad := ""',
-    '  for part in text.split(low, "-") {',
-    "    p := text.trim_space(part)",
-    // A prefix such as re- or co- stands on no list. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    `    if len(p) < ${SHORTEST} { continue }`,
-    "    if known(p) { continue }",
-    "    bad = p",
-    "    break",
-    "  }",
-    '  if bad == "" { continue }',
-    "",
-    "  road := swaps[bad]",
-    '  say := bad + " stands outside the words this tree writes. "',
-    "  if road != undefined {",
-    '    say += "Write " + road + " instead."',
-    "  } else {",
-    `    say += ${quoted("Write a core word, or add ")} + bad +`,
-    `      ${quoted(` to ${where} with one line that says what it means.`)}`,
-    "  }",
-    "  matches = append(matches, {begin: m.begin, end: m.end, message: say})",
-    "}",
-  ]);
+  return scripted(
+    "A word stands outside the words this tree writes. Write a core word, or add it to " +
+      `${where} with one line that says what it means.`,
+  );
 }

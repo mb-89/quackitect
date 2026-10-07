@@ -89,3 +89,12 @@ func TestStandingMarksThePersonsHold(t *testing.T) {
 		t.Fatalf("the named hold reads the hand %q", rows["named"].Hand)
 	}
 }
+
+// A hold field written as a number reads as its JSON text, and a null as nothing, as String reads them. [[spec/tickets/shared-helpers-stand-once]]
+func TestAHoldFieldReadsAsItsText(t *testing.T) {
+	t.Parallel()
+	rows := standingOf(standingIn{Files: map[string]q.Content{".se/.runtime/hold/a.json": {Hash: "h", Text: `{"ticket": 7, "path": null, "step": "build", "hand": "box"}`}}})
+	if len(rows) != 1 || rows[0].Ticket != "7" || rows[0].Path != "" || rows[0].Step != "build" {
+		t.Fatalf("the rows read %+v", rows)
+	}
+}

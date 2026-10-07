@@ -1,7 +1,6 @@
-// The Vale door, and the voice rules through the real Vale. One case drives
-// the door against the binary and holds the fake to the same answer. The rule
-// cases read their findings off the one run the helper makes for this file,
-// because a rule asserted against a stub is a rule nobody has run.
+// The voice rules through the tree's rules-over verb. The rule cases read their
+// findings off the one run the helper makes for this file, because a rule
+// asserted against a stub is a rule nobody has run.
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
@@ -10,56 +9,13 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { disk } from "../../src/doors/disk.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
-import { proc } from "../../src/doors/proc.js";
-import { vale } from "../../src/doors/vale.js";
-import { at, NOTE, rulesIn } from "./ruled.js";
+import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const outside = proc();
-const { ifVale, proves } = rulesIn(root);
+const { ifRules, proves } = rulesIn(root);
 
-// The real run teaches the fake, so the door answers the same through both. [[spec/design_output/doors#one-contract-test-per-door]]
-ifVale(
-  "the door stands where the binary is, reads a text under its path, and the fake answers the same",
-  async () => {
-    const taught = {};
-    const recording = {
-      run: (argv, init) => {
-        const said = outside.run(argv, init);
-        taught[argv.join(" ")] = said;
-        return said;
-      },
-    };
-    const door = vale(files, recording, root);
-    assert.equal(door.stands(), true);
-
-    const text = "THIS IS THE SHOUTED PART, and it follows.\n";
-    const said = await door.lint(text, NOTE);
-    assert.equal(said.ran, true, said.why);
-    assert.deepEqual(
-      said.found.map((one) => one.rule),
-      ["ShoutedLead"],
-    );
-
-    const twin = vale(files, fakeProc(taught), root);
-    assert.deepEqual(await twin.lint(text, NOTE), said);
-  },
-);
-
-test("a box with no binary reads no rule, and says so", async () => {
-  const door = vale(fakeDisk(), fakeProc(), "/tree");
-  assert.equal(door.stands(), false);
-  assert.deepEqual(await door.lint("A line.\n", NOTE), {
-    ran: false,
-    why: "no vale stands here",
-    found: [],
-  });
-});
-
-ifVale(
+ifRules(
   "a shouted lead is refused and an acronym inside a sentence passes",
   proves(
     {
@@ -73,7 +29,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "antithesis is refused",
   proves({ it: "It is a door rather than a window." }, (said) => {
     assert.ok(said.rules("it").includes("Antithesis"));
@@ -81,7 +37,7 @@ ifVale(
 );
 
 // A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-marker-carries-old-news]]
-ifVale(
+ifRules(
   "a history marker is refused and the standing claim passes",
   proves(
     {
@@ -97,7 +53,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "the passive is refused and the active passes",
   proves(
     {
@@ -111,7 +67,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a table and a list are not paragraphs",
   proves({ table: "| a | b |\n| - | - |\n", list: "- one\n- two\n" }, (said) => {
     assert.deepEqual(said.rules("table"), []);
@@ -119,7 +75,7 @@ ifVale(
   }),
 );
 
-ifVale(
+ifRules(
   "fenced code carries none of these rules",
   proves(
     { fenced: "```\nTHIS IS SHOUTED CODE, and it is left alone.\n```\n" },
@@ -133,7 +89,7 @@ const BINDS = "- The door shall refuse the write, and it should name the rule.\n
 const INPUT = "spec/design_input/one.md";
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "the requirement register takes shall and should, and no other does",
   proves(
     {
@@ -149,7 +105,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "the register outside the set stands refused inside it too",
   proves(
     { loose: at("- The door may refuse the write, and it would say why.\n", INPUT) },
@@ -168,7 +124,7 @@ const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
 const CALLED = ["+49 30", "1234 5678"].join(" ");
 
 // [[spec/design_output/private#the-shapes]]
-ifVale(
+ifRules(
   "the shapes rule refuses an address, a number, a date and a home path",
   proves(
     [
@@ -185,7 +141,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a nobody user, a version and an example pass the shapes rule",
   proves(
     [
@@ -209,7 +165,7 @@ const saidOf = (said, key, rule) =>
     .map((one) => one.message);
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "a word the list leaves out is refused, and the refusal names it",
   proves({ it: "The door refuses a flibbertigibbet." }, (said) => {
     const found = saidOf(said, "it", "Vocabulary");
@@ -223,7 +179,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "a word the list swaps is refused, and the refusal names the swap",
   proves({ it: "The door utilize the list." }, (said) => {
     assert.deepEqual(saidOf(said, "it", "Vocabulary"), [
@@ -233,7 +189,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "the words this tree writes pass, and so does what stands outside a layer",
   proves(
     [
@@ -253,7 +209,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "a plural, a past form and an -ing form of a listed word stand",
   proves(
     [
@@ -280,7 +236,7 @@ const DESIGN = "spec/design_output/probe.md";
 const BARE = "The verb exits 0 on survives.\n";
 
 // [[spec/design_output/config#the-magic-numbers-take-names]]
-ifVale(
+ifRules(
   "a digit in a design note's prose is refused, and a version, a unit and a table pass",
   proves(
     {
@@ -312,7 +268,7 @@ ifVale(
 );
 
 // A count spelled in words before the things it counts meets the digit rule, and a word counting nothing passes. [[spec/guidance/voice]]
-ifVale(
+ifRules(
   "a count in words before a plural meets the digit rule, and a count word alone passes",
   proves(
     {
@@ -339,7 +295,7 @@ ifVale(
 );
 
 // A span inside one line pairs first, so a lone mark takes no opening mark off the line under it, and every fault names the item's line. [[spec/tickets/a-lone-mark-pairs-wrong]]
-ifVale(
+ifRules(
   "a lone mark on a list item pairs with no span under it",
   proves(
     {
@@ -366,11 +322,14 @@ ifVale(
 );
 
 // A line counting the list or the table under it says what the structure says already. [[spec/tickets/a-count-meets-the-lint]]
-ifVale(
+ifRules(
   "a line counting the list under it warns in a note, and a line naming the list passes",
   proves(
     {
-      counted: at("The three steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
+      counted: at(
+        "The three steps below run in order:\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
       named: at("The steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
     },
     (said) => {
@@ -386,7 +345,7 @@ ifVale(
 );
 
 // A header past five lines, or one carrying a count, refuses at the write door. [[spec/tickets/a-count-meets-the-lint]]
-ifVale(
+ifRules(
   "a header past five lines refuses, a header carrying a count refuses, and a short plain one passes",
   proves(
     {
@@ -398,7 +357,10 @@ ifVale(
         "// The four doors this module reads.\n\nexport const one = 1;\n",
         "src/bridge/probe.js",
       ),
-      plain: at("// The doors this module reads.\n\nexport const one = 1;\n", "src/bridge/probe.js"),
+      plain: at(
+        "// The doors this module reads.\n\nexport const one = 1;\n",
+        "src/bridge/probe.js",
+      ),
     },
     (said) => {
       for (const key of ["long", "counted"]) {
@@ -414,8 +376,42 @@ ifVale(
   ),
 );
 
+// A comment line past the code passes where it points, suppresses or directs, as rules 1, 3 and 4 of the code guidance say. [[spec/tickets/comment-rules-meet-the-lint]]
+ifRules(
+  "a comment past the code passes with a pointer, a suppression or a directive, and warns bare",
+  proves(
+    {
+      pointed: at(
+        "export const one = 1;\n// The one the door reads. [[spec/tickets/a-thing]]\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+      suppressed: at(
+        "export const one = 1;\n// level0: CodeComment - a fixture\n// nolint: a fixture\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+      bare: at(
+        "export const one = 1;\n// The one the door reads.\nexport const two = 2;\n",
+        "src/bridge/probe.js",
+      ),
+    },
+    (said) => {
+      for (const key of ["pointed", "suppressed"]) {
+        assert.deepEqual(
+          said.rules(key).filter((one) => one === "CodeComment"),
+          [],
+          `${key} passes`,
+        );
+      }
+      assert.deepEqual(
+        said.rules("bare").filter((one) => one === "CodeComment"),
+        ["CodeComment"],
+      );
+    },
+  ),
+);
+
 // A number word counts a thing whatever word follows it. The fixture is the header ephemeral.js carried. [[spec/tickets/each-fact-keeps-one-owner]]
-ifVale(
+ifRules(
   "a header naming a number word refuses, over the header ephemeral.js carried",
   proves(
     {
@@ -441,13 +437,22 @@ ifVale(
 );
 
 // A heading counting the structure under it says what the rows say. [[spec/tickets/each-fact-keeps-one-owner]]
-ifVale(
+ifRules(
   "a heading counting the list or the table under it warns",
   proves(
     {
-      list: at("# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n", "notes.md"),
-      table: at("# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n", "notes.md"),
-      named: at("# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n", "notes.md"),
+      list: at(
+        "# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
+      table: at(
+        "# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n",
+        "notes.md",
+      ),
+      named: at(
+        "# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n",
+        "notes.md",
+      ),
     },
     (said) => {
       for (const key of ["list", "table"]) {

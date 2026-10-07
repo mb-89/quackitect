@@ -4,9 +4,7 @@
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 
 export const FETCHING = [
-  "vale",
   "biome",
-  "vale-ls",
   "go",
   "go-modules",
   "index",

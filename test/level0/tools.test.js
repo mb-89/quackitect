@@ -28,14 +28,14 @@ const UNIX = { PATH: "/usr/bin:/bin" };
 const boxWith = (paths) => fakeDisk(Object.fromEntries(paths.map((at) => [at, ""])));
 
 test("the survey names the path and the version of a tool in .se/.runtime/bin", () => {
-  const files = boxWith([`${BIN}/vale`]);
+  const files = boxWith([`${BIN}/biome`]);
   const outside = fakeProc({
-    [`${BIN}/vale --version`]: { stdout: "vale version 3.20.0" },
+    [`${BIN}/biome --version`]: { stdout: "Version: 2.5.12" },
   });
 
   const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
 
-  assert.deepEqual(found.vale, { path: `${BIN}/vale`, version: "3.20.0" });
+  assert.deepEqual(found.biome, { path: `${BIN}/biome`, version: "2.5.12" });
 });
 
 test("the survey finds a tool on the path variable where .se/.runtime/bin holds none", () => {
@@ -84,8 +84,8 @@ test("python answers to python3 first, and to python after it", () => {
 });
 
 test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
-  const files = boxWith([`${BIN}/vale`]);
-  const outside = fakeProc({ [`${BIN}/vale --version`]: { stdout: "3.20.0" } });
+  const files = boxWith([`${BIN}/biome`]);
+  const outside = fakeProc({ [`${BIN}/biome --version`]: { stdout: "2.5.12" } });
 
   writeSurvey({ disk: files, proc: outside }, ROOT, UNIX);
   const read = surveyOf(files.read(`${ROOT}/${TOOLS}`));
@@ -94,7 +94,7 @@ test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
     Object.keys(read),
     WANTED.map((one) => one.name),
   );
-  assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
+  assert.equal(pathOf(read, "biome"), `${BIN}/biome`);
   assert.equal(
     files.exists(`${ROOT}/${TOOLS}.part`),
     false,
@@ -145,10 +145,7 @@ test("a caller takes the surveyed path, and the guess where none stands", () => 
 });
 
 test("a guess names the Windows binary and the plain one, and nothing else", () => {
-  assert.deepEqual(guesses("vale-ls"), [
-    ".se/.runtime/bin/vale-ls.exe",
-    ".se/.runtime/bin/vale-ls",
-  ]);
+  assert.deepEqual(guesses("biome"), [".se/.runtime/bin/biome.exe", ".se/.runtime/bin/biome"]);
 });
 
 test("a box with no survey file hands the caller an empty one", () => {

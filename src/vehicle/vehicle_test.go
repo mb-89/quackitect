@@ -285,7 +285,7 @@ func TestVehicleCarriesTheMethodAndNothingPrivate(t *testing.T) {
 	if exists(filepath.Join(dest, ".git")) || exists(filepath.Join(dest, ".se")) {
 		t.Fatal("the private folders stay behind")
 	}
-	if Travels(".git") || Travels(".se/.runtime/bin/vale") || !Travels("src/parts/one.js") || Travels("") || Travels(".") {
+	if Travels(".git") || Travels(".se/.runtime/bin/biome") || !Travels("src/parts/one.js") || Travels("") || Travels(".") {
 		t.Fatal("travels reads the first folder")
 	}
 }
@@ -560,6 +560,21 @@ func TestVehicleWithPortTakesTheFirstFreePort(t *testing.T) {
 	}
 	if method, port, ok := PointerOf(`{"method":"/m"}`); !ok || method != "/m" || port != PortBase {
 		t.Fatal(method, port, ok)
+	}
+}
+
+// A pointer naming no method names nothing, and a port of zero or none reads the base port, as JavaScript reads the condition. [[spec/tickets/vehicle-truthy-joins-yaml]]
+func TestPointerOfReadsTheMethodAndPortAsJavaScriptDoes(t *testing.T) {
+	t.Parallel()
+	for _, read := range []string{`{}`, `{"method":""}`, `{"method":null,"port":6512}`} {
+		if method, port, ok := PointerOf(read); ok {
+			t.Errorf("%s names %q at %v", read, method, port)
+		}
+	}
+	for read, want := range map[string]float64{`{"method":"/m","port":0}`: PortBase, `{"method":"/m","port":""}`: PortBase, `{"method":"/m","port":6512}`: 6512} {
+		if method, port, ok := PointerOf(read); !ok || method != "/m" || port != want {
+			t.Errorf("%s reads %q at %v, %v, and wants /m at %v", read, method, port, ok, want)
+		}
 	}
 }
 

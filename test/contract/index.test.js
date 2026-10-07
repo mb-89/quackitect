@@ -209,6 +209,34 @@ ifBuilt("a stopped index leaves no se-index process past the case", () => {
   assert.equal(alive, false, `se-index at pid ${pid} stands past its stop`);
 });
 
+// A check run inside an index call inherits QUACKITECT_ROOT, and a case's stop reached the index that root names. [[spec/tickets/index-survives-a-long-call]]
+ifBuilt("a door over one work folder leaves the index an inherited QUACKITECT_ROOT names standing", () => {
+  const other = files.tempDir("other-");
+  files.makeDir(join(other, "spec", "tickets"));
+  const work = files.tempDir("own-");
+  files.makeDir(join(work, "spec", "tickets"));
+  const kept = index(files, proc(), clock(), root, other);
+  const was = process.env.QUACKITECT_ROOT;
+  try {
+    kept.ask("changes", { since: 0 });
+    const { pid } = JSON.parse(files.read(join(other, ".se", ".runtime", "index.json")));
+    process.env.QUACKITECT_ROOT = other;
+    const it = index(files, proc(), clock(), root, work);
+    try {
+      it.ask("changes", { since: 0 });
+      const standing = join(work, ".se", ".runtime", "index.json");
+      assert.ok(files.exists(standing), "the door over the work folder stands an index there");
+      assert.notEqual(JSON.parse(files.read(standing)).pid, pid, "the work folder's index is its own");
+    } finally {
+      it.ask("stop", {});
+    }
+  } finally {
+    if (was === undefined) delete process.env.QUACKITECT_ROOT;
+    else process.env.QUACKITECT_ROOT = was;
+    kept.ask("stop", {});
+  }
+});
+
 // The Windows runner ends a battery by killing an orphan se-index, so a case starting one leaves it behind. [[spec/tickets/windows-ci-turns-green]]
 test("every case starting the index asks it to stop", () => {
   const source = files.read(fileURLToPath(import.meta.url));

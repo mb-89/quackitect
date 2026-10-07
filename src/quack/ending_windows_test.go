@@ -2,7 +2,7 @@
 
 // The end of a span ends the child and the process it started on Windows, which a pipe they hold proves by reading to its end.
 // [[spec/tickets/ending-windows-tree-tested]]
-package main
+package main // level0: InPackageTest - the case calls the unexported endsWhole of the command
 
 import (
 	"bufio"
@@ -29,6 +29,7 @@ func holdsForever() {
 }
 
 // The child starts a grandchild holding its stdout, so the pipe reads to its end only once taskkill ends both. [[spec/tickets/ending-windows-tree-tested]]
+// level0: FixtureOutsideHome - the case spawns its own child and grandchild, then ends them
 func TestAChildTheCheckGivesUpOnEndsWithItsTreeOnWindows(t *testing.T) {
 	self := "-test.run=^TestAChildTheCheckGivesUpOnEndsWithItsTreeOnWindows$"
 	switch os.Getenv(treeHelper) {

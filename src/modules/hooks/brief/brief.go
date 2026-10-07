@@ -37,9 +37,7 @@ const (
 // The tools the survey names, in the order the block lists them, off WANTED in .claude/skills/level0/lib/tools.js. [[spec/tickets/brief-answers-off-the-door]]
 var wanted = [][2]string{
 	{"node", "a helper script"},
-	{"vale", "the prose rules"},
 	{"biome", "formatting and linting the JavaScript"},
-	{"vale-ls", "the prose rules inside an editor"},
 	{"go", "building the index and the viewer"},
 	{"git", "history and diffs"},
 	{"claude", "a session of its own, and the probe"},

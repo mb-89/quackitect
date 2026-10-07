@@ -1,7 +1,7 @@
 // ticket yours reads work/yours off the index and prints what the verb's program prints,
 // and the node module answers a registered verb through the accepts.
 // [[spec/tickets/ticket-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
@@ -39,7 +39,6 @@ func TestTicketYoursNextNamesTheFirstOpenPersonRow(t *testing.T) {
 
 // The node module answers a registered verb through the accepts with its output, and fails with the output where the exit reads past 0. [[spec/tickets/program-of-drops-node]]
 func TestTheAcceptsAnswerARegisteredVerb(t *testing.T) {
-	t.Parallel()
 	registersFor(t, "registry accepts", func(argv []string, _ bool, out, _ io.Writer) int {
 		fmt.Fprintln(out, strings.Join(argv[2:], " "))
 		if len(argv) > 2 && argv[2] == "fail" {

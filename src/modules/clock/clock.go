@@ -22,6 +22,7 @@ const poll = time.Second
 type Clock interface {
 	Now() time.Time
 	Every(span time.Duration, hand func(time.Time)) (stop func())
+	After(span time.Duration, hand func(time.Time)) (stop func())
 }
 
 type clock struct{}
@@ -53,6 +54,12 @@ func (clock) Every(span time.Duration, hand func(time.Time)) (stop func()) {
 	}
 }
 
+// Calls the hand once the span passes, unless stop comes first. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func (clock) After(span time.Duration, hand func(time.Time)) (stop func()) {
+	timer := time.AfterFunc(span, func() { hand(time.Now()) })
+	return func() { timer.Stop() }
+}
+
 type every struct {
 	span time.Duration
 	last time.Time
@@ -61,13 +68,16 @@ type every struct {
 
 // A time that stands still until a test calls Tick. [[spec/design_output/model#io-modules-and-their-fakes]]
 type FakeClock struct {
-	mu    sync.Mutex
-	at    time.Time
-	hands map[int]*every
-	next  int
+	mu     sync.Mutex
+	at     time.Time
+	hands  map[int]*every
+	afters map[int]*every
+	next   int
 }
 
-func NewFake(at time.Time) *FakeClock { return &FakeClock{at: at, hands: map[int]*every{}} }
+func NewFake(at time.Time) *FakeClock {
+	return &FakeClock{at: at, hands: map[int]*every{}, afters: map[int]*every{}}
+}
 
 func (one *FakeClock) Now() time.Time {
 	one.mu.Lock()
@@ -88,6 +98,20 @@ func (one *FakeClock) Every(span time.Duration, hand func(time.Time)) (stop func
 	}
 }
 
+// Keeps a one-shot hand, which Tick calls once its span passes and then drops. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func (one *FakeClock) After(span time.Duration, hand func(time.Time)) (stop func()) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	at := one.next
+	one.next++
+	one.afters[at] = &every{span: span, last: one.at, hand: hand}
+	return func() {
+		one.mu.Lock()
+		defer one.mu.Unlock()
+		delete(one.afters, at)
+	}
+}
+
 // Moves the time on, and calls each hand whose span passes. [[spec/design_output/model#io-modules-and-their-fakes]]
 func (one *FakeClock) Tick(span time.Duration) {
 	one.mu.Lock()
@@ -97,6 +121,12 @@ func (one *FakeClock) Tick(span time.Duration) {
 	for _, each := range one.hands {
 		if now.Sub(each.last) >= each.span {
 			each.last = now
+			due = append(due, each.hand)
+		}
+	}
+	for at, each := range one.afters {
+		if now.Sub(each.last) >= each.span {
+			delete(one.afters, at)
 			due = append(due, each.hand)
 		}
 	}

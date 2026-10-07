@@ -1,6 +1,6 @@
 // The listing: a row a group, its tickets under it, and the done ones.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported list columns colBranch, colChild and padEnd
 
 import "testing"
 

@@ -1,7 +1,7 @@
 // The retro's collect over a fake trunk: the retro chapter of every group
 // closing inside the window, taken once, with the commit landing it.
 // [[spec/tickets/the-retro-reads-cloud-retros]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"

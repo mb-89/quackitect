@@ -1,7 +1,7 @@
 // quack io publishes what its instances commit over the bus, and the watchdogs
 // span the processes.
 // [[spec/design_output/model#the-io-process]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -1,7 +1,7 @@
 // The vehicle verb over a temp method: here, produce, into, attach, detach and
 // register, each line as the JavaScript verb prints it.
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

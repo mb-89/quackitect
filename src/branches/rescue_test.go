@@ -1,7 +1,7 @@
 // A takeover takes in the rescue branch a dead box left on origin, and leaves
 // a rescue that conflicts standing for a hand.
 // [[spec/tickets/takeover-rescues-unpushed-commits]]
-package branches
+package branches // level0: InPackageTest - it runs rescue through the unexported tree fixture and reads quiet and workBranch
 
 import (
 	"testing"
