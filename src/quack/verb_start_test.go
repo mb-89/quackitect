@@ -18,13 +18,6 @@ func startFake(input string, env map[string]string, manifest bool) startOutside 
 	}
 }
 
-func TestStartRegistersUnderItsWord(t *testing.T) {
-	t.Parallel()
-	if registry["start"] == nil {
-		t.Fatal("the registry holds no start")
-	}
-}
-
 func TestStartStopsADeskSessionWritingWithNoPlugin(t *testing.T) {
 	t.Parallel()
 	hooked := map[string]string{"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"}

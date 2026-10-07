@@ -4,7 +4,7 @@
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const FOLDERS = ["spec/tickets", ".se/tickets"];
-// The marker of [[spec/tickets/marked-groups-stay-cloud]], owned by `cloudMark` in src/modules/tickets/tickets.go and spelled again here because the extension bundles alone.
+// The marker of [[spec/tickets/marked-groups-stay-cloud]], owned by `cloudMark` in src/branches/merge.go and spelled again here because the extension bundles alone.
 const CLOUD = "cloud";
 // The index values the lens reads: the standing holds, the tickets the cloud holds, and every ticket, whose change draws a ticket again. [[spec/tickets/the-lens-reads-v1]]
 const STANDING = "holds/standing";

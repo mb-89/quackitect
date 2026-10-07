@@ -1,6 +1,6 @@
 // The strings behind the work group: the line a config entry runs, the count
 // and the next ticket the verbs answer, and the new ticket's path. The bare
-// ticket's text moves to the ticket verb, which test/level0/ticket-new.test.js holds.
+// ticket's text moves to the ticket verb, which src/quack/ticket_new_test.go holds.
 // [[spec/tickets/the-work-group-draws-buttons]] [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";

@@ -47,7 +47,6 @@ var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 var coldPath = []string{
 	".claude/skills/level0/hooks/",
 	".claude/skills/level0/lib/guidance.js",
-	"src/bridge/guidance.js",
 	"src/modules/hooks/",
 	"src/quack/",
 	"src/scripts/go-stamp.sh",

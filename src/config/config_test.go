@@ -53,21 +53,34 @@ func TestTheEnvironmentBeatsTheTrackedLayer(t *testing.T) {
 	if !held {
 		t.Fatal("the environment holds the key, and the reader answers nothing")
 	}
-	if said != "5" {
+	if said != float64(5) {
 		t.Fatalf("the reader answers %v, and the environment says 5", said)
 	}
 }
 
-func TestTheLocalLayerBeatsTheEnvironment(t *testing.T) {
+func TestTheEnvironmentBeatsTheLocalLayer(t *testing.T) {
 	root := rootWith(t, map[string]string{
-		Tracked: `{"names": {"words": 3}}`,
-		Local:   `{"names": {"words": 7}}`,
+		Tracked: `{"answer": {"words": 3}}`,
+		Local:   `{"answer": {"words": 7}}`,
 	})
-	t.Setenv("SE_NAMES_WORDS", "5")
+	t.Setenv("SE_ANSWER_WORDS", "5")
 
-	said, _ := Value(root, "names.words")
-	if whole, ok := said.(float64); !ok || int(whole) != 7 {
-		t.Fatalf("the reader answers %v, and the local layer says 7", said)
+	said, _ := Value(root, "answer.words")
+	if whole, ok := said.(float64); !ok || int(whole) != 5 {
+		t.Fatalf("the reader answers %v, and the environment says 5", said)
+	}
+}
+
+// A shared key reads the tracked file alone, whatever the variable and the local file say. [[spec/design_output/model#a-keys-layers]]
+func TestASharedKeyReadsTheTrackedFileAlone(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Schema:  `{"properties": {"migration": {"properties": {"opentasks": {"type": "string", "default": "new", "shared": true}}}}}`,
+		Tracked: `{"migration": {"opentasks": "shadow"}}`,
+		Local:   `{"migration": {"opentasks": "old"}}`,
+	})
+	t.Setenv("SE_MIGRATION_OPENTASKS", "old")
+	if said, layer, _ := Where(root, "migration.opentasks"); said != "shadow" || layer != Tracked {
+		t.Fatalf("migration.opentasks reads %v off %s, and wants shadow off %s", said, layer, Tracked)
 	}
 }
 
@@ -146,14 +159,14 @@ func TestACountReadsANumberOrATextAndZeroWhereNoneStands(t *testing.T) {
 	}
 }
 
-// Where names the layer answering: the local file over the variable over the tracked file. [[spec/tickets/cfg-topic-holds-one-resolver]]
+// Where names the layer answering: the variable over the local file over the tracked file. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func TestWhereNamesTheLayer(t *testing.T) {
 	root := rootWith(t, map[string]string{Tracked: `{"names": {"words": 3, "kept": 1}}`, Local: `{"names": {"words": 8}}`})
 	t.Setenv("SE_NAMES_KEPT", "4")
 	if _, layer, held := Where(root, "names.words"); !held || layer != Local {
 		t.Fatalf("names.words reads off %q", layer)
 	}
-	if said, layer, held := Where(root, "names.kept"); !held || layer != "SE_NAMES_KEPT" || said != "4" {
+	if said, layer, held := Where(root, "names.kept"); !held || layer != "SE_NAMES_KEPT" || said != float64(4) {
 		t.Fatalf("names.kept reads %v off %q", said, layer)
 	}
 	if _, layer, held := Where(root, "names.none"); held || layer != "" {
@@ -180,26 +193,11 @@ func TestWhereAnswersTheBuiltIn(t *testing.T) {
 	}
 }
 
-// A shared key reads the default file over its built-in, and no local file. [[spec/tickets/the-config-schema-gets-generated]]
-func TestSharedReadsTheDefaultFileThenTheBuiltIn(t *testing.T) {
-	root := rootWith(t, map[string]string{
-		Tracked: `{"migration": {"lsp": "shadow"}}`,
-		Local:   `{"migration": {"lsp": "new", "log": "new"}}`,
-		Schema:  `{"properties": {"migration": {"properties": {"lsp": {"default": "old"}, "log": {"default": "old"}}}}}`,
-	})
-	if said, _ := Shared(root, "migration.lsp"); said != "shadow" {
-		t.Fatalf("the lsp slice reads %v, and wants shadow", said)
-	}
-	if said, _ := Shared(root, "migration.log"); said != "old" {
-		t.Fatalf("the log slice reads %v, and wants its built-in old", said)
-	}
-}
-
 // A key the schema leaves out, or names with no default, holds no built-in. [[spec/tickets/the-config-schema-gets-generated]]
-func TestDefaultInHoldsNothingTheSchemaLeavesOut(t *testing.T) {
-	schema := map[string]any{"properties": map[string]any{"names": map[string]any{"properties": map[string]any{"words": map[string]any{"type": "number"}}}}}
+func TestAKeyTheSchemaLeavesOutHoldsNoBuiltIn(t *testing.T) {
+	root := rootWith(t, map[string]string{Schema: `{"properties": {"names": {"properties": {"words": {"type": "number"}}}}}`})
 	for _, key := range []string{"names.words", "names.none", "none.words"} {
-		if said, ok := defaultIn(schema, key); ok {
+		if said, _, ok := Where(root, key); ok {
 			t.Fatalf("%s holds the built-in %v, and wants none", key, said)
 		}
 	}

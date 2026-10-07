@@ -58,7 +58,7 @@ let roadRan = false;
 // The span a post runs before a fall with no status reads as the host's cut. The host cuts at its own timeout, well past this, and a fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
 const CUT = 1000;
 let cut = CUT;
-// The wait tool's name, which `WAIT_CALL` in src/bridge/wait.js owns, spelled again here because this hook imports its own folder alone. [[spec/design_output/level0#the-wait-returns-on-signals]]
+// The wait tool's name, which the waits module in src/modules/waits registers, spelled again here because this hook imports its own folder alone. [[spec/design_output/level0#the-wait-returns-on-signals]]
 const WAIT_CALL = "mcp__level0__wait";
 // The client drops the registered tools when it loads this module again, so a module fresh from a load asks for them on each post until an answer hands them back. [[spec/design_output/level0#the-first-call-pays]]
 let armed = false;

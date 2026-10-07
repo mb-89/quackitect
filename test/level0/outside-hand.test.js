@@ -6,13 +6,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MARKER, REGISTER } from "../../.claude/skills/level0/lib/vehicle.js";
-import { guidanceHere } from "../../src/bridge/guidance.js";
 import { registeredPort } from "../../src/bridge/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { handRule } from "../../src/scripts/pull-hand.js";
 import { registerDirs } from "../../src/scripts/vehicle.js";
-import { work } from "../../src/scripts/work.js";
 
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 
@@ -22,12 +19,6 @@ test("the port road makes an identity off the pid the root hands in", () => {
   registeredPort(files, { SE_REGISTRY: "/reg" }, fakeClock(), "/tools", 7, false);
   const made = JSON.parse(files.read("/tools/.se/.runtime/identity.json"));
   assert.ok(made.id.endsWith("7"), `the identity reads ${made.id}`);
-});
-
-test("the hand rule reads the cloud off the hand, and none off the box", () => {
-  assert.equal(handRule({ env: CLOUD }, {}, [], "").cloud, true);
-  assert.equal(handRule({ env: {} }, {}, [], "").cloud, false);
-  assert.equal(handRule({}, {}, [], "").cloud, false);
 });
 
 test("the register splits its list the way the caller says", () => {
@@ -48,13 +39,4 @@ test("the port reading takes the platform and reaches the same register", () => 
   });
   const env = { SE_REGISTRY: "/one;/two" };
   assert.equal(registeredPort(files, env, fakeClock(), "/tools", 7, true), 6543);
-});
-
-test("the guidance reading takes an empty map where nobody hands one", () => {
-  const said = guidanceHere(fakeDisk(), "/tree");
-  assert.equal(typeof said, "object");
-});
-
-test("the work verbs stand after the change", () => {
-  assert.equal(typeof work, "function");
 });
