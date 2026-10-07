@@ -116,6 +116,7 @@ record:
     hand: box 23ee163eaf36 · claude-code-remote
     hash_before: b3a71e59f78677e453d134e3c75d47d0460d12d6
     session: cse_01Dx32SEhQn8DWKT3wqYqKkH
+    hash_after: c9fd5e7400242e54f5f107e50ad3950f004c7271
   - step: children
     hand: the engine
     hash_before: b6a6c61304229f75c584cc0fb9595299b1ce96d1
@@ -139,6 +140,10 @@ record:
         hash: cbfcdb18dc87799c
         size: 8264
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: c9fd5e7400242e54f5f107e50ad3950f004c7271
+    session: cse_01P536X1u8Aahi2wtLPf8JB9
 ---
 
 # Ask
