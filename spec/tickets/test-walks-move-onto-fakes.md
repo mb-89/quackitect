@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -169,6 +169,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    skipped: true
+    kept: e48ab6d9a8fc1a3dbfedb66a776a2e9f023bccc7
+    why: its red tests stand as e48ab6d9a landed them, and a later leaf passed since
 ---
 
 # Ask
