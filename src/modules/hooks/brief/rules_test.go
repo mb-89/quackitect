@@ -15,6 +15,9 @@ func TestTheRulesReadNumberedWithTheirExamples(t *testing.T) {
 	if got := RulesOf(text); !slices.Equal(got, want) {
 		t.Fatalf("the rules read %q", got)
 	}
+	if got := RulesOf("# Actionables\n\n1. Star a rule. `*`\n"); len(got) != 1 || got[0] != "1. Star a rule." {
+		t.Fatalf("a star in a code span reads %q", got)
+	}
 	if got := RulesOf("# Nothing\n"); len(got) != 0 {
 		t.Fatalf("a note with no rules reads %q", got)
 	}

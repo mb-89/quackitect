@@ -137,6 +137,23 @@ func TestAWorkRootNoteStandsOverTheMethodRootNote(t *testing.T) {
 	}
 }
 
+// The mint tool writes a flow list quoted, and a quoted tag reaches the leaf its bare word reaches. [[spec/design_input/level-two#guidance]]
+func TestAQuotedTagReachesTheLeafItsBareWordReaches(t *testing.T) {
+	steps := stepsOver(t, map[string]string{
+		"spec/processes/standard.yaml": process,
+		"spec/guidance/code/bare.md":   "---\ntags: [testing, code]\n---\n# Bare\n",
+		"spec/guidance/code/flow.md":   "---\ntags: [\"testing\", 'code']\n---\n# Flow\n",
+		"spec/guidance/code/block.md":  "---\ntags:\n  - \"testing\"\n  - 'code'\n---\n# Block\n",
+	})
+	want := []string{"spec/guidance/code/bare", "spec/guidance/code/block", "spec/guidance/code/flow", "spec/guidance/own"}
+	if got := notesOf(steps["standard:design/tests-red"]); !reflect.DeepEqual(got, want) {
+		t.Errorf("design/tests-red reads %v, and wants %v", got, want)
+	}
+	if got := notesOf(steps["standard:design/draft"]); len(got) != 0 {
+		t.Errorf("design/draft reads %v, and wants none, since it holds no testing tag", got)
+	}
+}
+
 func TestANoteOpeningWithAnUnderscoreStandsAsADraft(t *testing.T) {
 	steps := stepsOver(t, map[string]string{
 		"spec/processes/standard.yaml": process,

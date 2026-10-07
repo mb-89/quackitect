@@ -358,7 +358,7 @@ func TestTheColdPathTakesTheHooksFolderAndTheNamedFiles(t *testing.T) {
 
 func TestAPathElsewhereSitsOffTheColdPath(t *testing.T) {
 	t.Parallel()
-	if got := coldIn([]string{"README.md", "install.sh.bak", "src/modules/hooksy/a.go", ".claude/skills/level0/lib/vehicle.js"}); len(got) != 0 {
+	if got := coldIn([]string{"README.md", "install.sh.bak", "src/modules/hooksy/a.go", ".claude/skills/level0/lib/vehicle.js", ".claude/skills/level0/lib/guidance.js"}); len(got) != 0 {
 		t.Errorf("the cold path takes %v", got)
 	}
 }

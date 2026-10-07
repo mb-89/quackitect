@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 0121eb48e90b7349
         size: 395
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: eb9b987f3e97e8c70334e60eef7461e98d292bc1
+    hash_after: eb9b987f3e97e8c70334e60eef7461e98d292bc1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: acd1a3fd713bb611
+        size: 6831
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -283,26 +296,39 @@ Assumed: schema-libs-leave loses one schema.js importer here and needs no edit f
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/guidance_lib_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/guidance_lib_test.go
+- src/quack/probe_cold_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheGuidanceParserStandsNowhere fails on its assertion and names guidance.js and the three contract tests.
+TestAPathElsewhereSitsOffTheColdPath fails on its assertion, since coldPath still names guidance.js.
+The branch test verb exits 1 and ends on: assertion, a test of src/quack fails.
+The code-span star row in rules_test.go passes now, since markAt in brief.go already strips a star inside backticks.
+TestAQuotedTagReachesTheLeafItsBareWordReaches passes now, since words in guidance.go already trims both quote kinds.
+The quoted-tag case also covers a block list with quoted items, which the JS case never read.
+No stub was needed, since the four listed tests call only Go that already exists.
+The draft lists no test over HeardSame or ReplySays, so those constants wait for implement.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestTheGuidanceParserStandsNowhere decides the git ls-files line, the brief and guidance rows decide the go test line, and the check at tests-green decides the third.
+The tests reach no door. The quack cases glob the disk with no exec, and the module rows seed text in memory through qtest.
 
 # gate
 
