@@ -1,5 +1,4 @@
-// The cloud read over either variable, off the cases test/level0/writes-here.test.js
-// and test/level0/cloud-desk.test.js held over lib/cloud.js.
+// The cloud read over either variable, where a flat value reads false.
 // [[spec/tickets/cage-libs-leave]]
 package command
 

@@ -1,5 +1,4 @@
-// The bless guard, off src/bridge/bless.js, and the version guard, off
-// lib/trunk.js: a command reaches neither the bless file nor a variable naming
+// The bless guard and the version guard: a command reaches neither the bless file nor a variable naming
 // the hand, and rewrites or deletes no version branch.
 // [[spec/tickets/cage-command-rules-port]]
 package command

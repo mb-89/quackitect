@@ -148,8 +148,8 @@ line safe to commit, and a tracked line stands as long as the tree does.
 
 # The second door
 
-A shell reaches every file a Write reaches, so `lib/bash.js` holds the second
-door. `addsIn` reads a command and answers every path under `.se` a `git add`
+A shell reaches every file a Write reaches, so `src/modules/hooks/command` holds the
+second door. `addsIn` reads a command and answers every path under `.se` a `git add`
 names, with `-f` or without.
 
 `PrivateStaysHome` is the finding. One door into git means one place the
@@ -206,7 +206,7 @@ where the leak starts.
 
 | the commit comes from | the door |
 |---|---|
-| a session, through the Bash tool | `lib/bash.js` and the hook, before the command runs |
+| a session, through the Bash tool | `src/modules/hooks/command` and the hook, before the command runs |
 | a person, in a terminal | `.githooks/pre-commit`, which git runs |
 
 Both call `privateNow` over the same delta, so the two refuse the same thing in

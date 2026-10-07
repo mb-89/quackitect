@@ -998,8 +998,8 @@ in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
-A session holds no ticket before its first take or pull, so `freeOfTicket` in
-`.claude/skills/level0/lib/bash.js` reads these forms as needing none:
+A session holds no ticket before its first take or pull, so `FreeOfTicket` in
+`src/modules/hooks/command/findings.go` reads these forms as needing none:
 
 - `./RUNME.sh branch take`
 - `./RUNME.sh branch list`

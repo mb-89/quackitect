@@ -151,7 +151,7 @@ rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 | each binary | `.se/.runtime/tools.json`, else the runtime binary folder |
 | the Vale config | `.vale.ini` at the root, else the one the assembly writes under `.se/vale` |
 | the folders Vale skips | `PARKED` in `src/bridge/findings.js` |
-| the Biome config | `CONFIG_DIR` in `.claude/skills/level0/lib/code.js` |
+| the Biome config | `biomeConfig` in `src/modules/lsp/tools.go` |
 | a past tense row | `prose.ReadsAsPast` in `src/prose` |
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
 

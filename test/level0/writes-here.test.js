@@ -4,7 +4,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 
 const leaf = (by) => ({ by, path: "design/review" });
@@ -61,15 +60,4 @@ test("a children's step refuses every hand, whatever the box is", () => {
 test("a retro step takes a hand at a retro, and refuses one away from it", () => {
   assert.equal(writesHere(leaf("retro"), agent).writes, false);
   assert.equal(writesHere(leaf("retro"), { agent: true, atRetro: true }).writes, true);
-});
-
-// [[spec/guidance/cloud/cloud]]
-test("the cloud test reads either variable, and a flat value reads false", () => {
-  assert.equal(inCloud({ CLAUDE_CODE_REMOTE: "1" }), true);
-  assert.equal(inCloud({ SE_CLOUD: "yes" }), true);
-  assert.equal(inCloud({ CLAUDE_CODE_REMOTE: "0" }), false);
-  assert.equal(inCloud({ SE_CLOUD: "false" }), false);
-  assert.equal(inCloud({ SE_CLOUD: "" }), false);
-  assert.equal(inCloud({}), false);
-  assert.equal(inCloud(), false);
 });

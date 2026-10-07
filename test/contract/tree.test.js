@@ -7,7 +7,6 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { VERBS } from "../../.claude/skills/level0/lib/bash.js";
 import {
   configOf,
   faultsIn,
@@ -46,13 +45,11 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
-import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
 
-const SCRIPTS = join(root, "src", "scripts");
 const STOP = "spec/config/stop";
 const NODE = process.version.replace(/^v/, "");
 const FAKE = "/tree";
@@ -98,19 +95,6 @@ const edited = (where, change) => {
   change(said);
   return JSON.stringify(said, null, 2);
 };
-
-// [[spec/design_output/bash#the-description-names-verbs]]
-// A verb stands as a program, or registered in Go. [[spec/tickets/work-verbs-port-to-go]]
-test("every verb the Bash description names stands as a program or in Go", () => {
-  assert.ok(VERBS.length, "the description names at least one verb");
-  const inGo = goVerbs();
-  for (const verb of VERBS) {
-    assert.ok(
-      inGo.has(verb) || files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
-      `./RUNME.sh ${verb} stands`,
-    );
-  }
-});
 
 // The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
 test("no count chain stands in the verb, the viewer or the badge line", () => {

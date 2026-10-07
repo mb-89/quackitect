@@ -1,5 +1,5 @@
 // The paths a command writes: a redirection, a tee, an edit in place, a copy,
-// and a heredoc or an inline script, off the write half of lib/bash.js.
+// and a heredoc or an inline script.
 // [[spec/tickets/cage-command-rules-port]]
 package command
 

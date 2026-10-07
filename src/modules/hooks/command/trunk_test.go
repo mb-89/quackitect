@@ -1,5 +1,5 @@
 // Whether a command commits, pushes or lands on the trunk, and the battery,
-// off the bridge's lib/trunk.js and lib/runs.js.
+// off the bridge's lib/runs.js.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 

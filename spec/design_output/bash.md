@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/bash.js` reads every command the agent runs. This
+`src/modules/hooks/command` reads every command the agent runs. This
 note covers the parse it makes and the rules standing on that parse. The
 delta a commit carries stands in [[spec/design_output/private]].
 
@@ -179,7 +179,7 @@ road back. For details, see [[spec/design_output/private#the-second-door]].
 # A landing follows its gate
 
 A landing waits on the command before it. `LandingFollowsItsGate` in
-`lib/bash.js` refuses a landing whose gate runs it whatever the gate answers.
+`src/modules/hooks/command/findings.go` refuses a landing whose gate runs it whatever the gate answers.
 
 | the landing | what it lands |
 |---|---|
@@ -199,7 +199,7 @@ reads as no gate.
 # A pull commit stands
 
 A pull commit moves a ticket's `step`, `state` and evidence, and the take-back
-verb restores all three. `PullCommitStands` in `lib/pulled.js` refuses a shell
+verb restores all three. `PullCommitStands` in `src/modules/hooks/command/pulled.go` refuses a shell
 undo over one, and names `./RUNME.sh ticket pull <name> --back <leaf>`.
 
 | the undo | what the door reads |
@@ -225,14 +225,14 @@ The command line lands its own commits past this door, so a pull meets no row.
 # Git writes take verbs
 
 The agent reaches git through the engine alone. `GitWritesThroughAVerb` in
-`lib/git-writes.js` refuses every git command that writes the repository.
-`GIT_WRITES` there names the verb standing for each. Where no verb stands, the
+`src/modules/hooks/command/gitwrites.go` refuses every git command that writes the repository.
+`gitWrites` there names the verb standing for each. Where no verb stands, the
 row names the road instead, as for `stash` or `reset`. The verbs run git inside
 node, past this door, so they still land.
 
 A `git mv` under `spec/tickets` answers `TicketMovesByRename` alone, which names
-`./RUNME.sh rename`. So one command answers one row. The rule stands in its own
-file, because `lib/bash.js` stands past the file ceiling already.
+`./RUNME.sh rename`. So one command answers one row. The rule stands beside the git writes, in
+`src/modules/hooks/command/gitwrites.go`.
 
 The bridge holds these rows back to the last check of the door. So a guard
 reading a git write answers its own reason first, as the private delta, the
@@ -243,9 +243,9 @@ test rule and the desk guard do. The verb answers what passes them all.
 `tool.describe` rewrites what the model reads before it reaches for a tool. It
 is the carrot to the sticks above.
 
-Bash's description gains a paragraph naming the tree's verbs, and `VERBS` in
-`lib/bash.js` holds the list. A contract test reads `src/scripts/verbs` and
-asserts every named verb stands there as a program. So the carrot points at a road that
+Bash's description gains a paragraph naming the tree's verbs, and `lineVerbs` in
+`src/modules/hooks/describe.go` holds the list. `TestEveryVerbTheBashLineNamesStandsRegistered`
+in `src/quack` asserts the Go registry holds every named verb. So the carrot points at a road that
 runs.
 
 The engine caches a rendered description for the session, so `verbLine()` takes

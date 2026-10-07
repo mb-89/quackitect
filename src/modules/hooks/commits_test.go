@@ -113,7 +113,7 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 	}
 }
 
-// A desk refuses a landing on a work branch alone, and a cloud box lands there, off the cases test/level0/cloud-desk.test.js held over lib/cloud.js. [[spec/tickets/cage-libs-leave]]
+// A desk refuses a landing on a work branch alone, and a cloud box lands there. [[spec/tickets/cage-libs-leave]]
 func TestTheDeskGuardRefusesAWorkBranchOffTheCloudAlone(t *testing.T) {
 	for _, one := range []struct {
 		cloud   bool

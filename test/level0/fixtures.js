@@ -247,9 +247,3 @@ export const named = (root) => ({
 // The git-write rule answers last at the Bash door, so a refusal naming it alone says every other guard passes. [[spec/design_output/bash#git-writes-take-verbs]]
 export const VERB_ALONE =
   /^Level zero refuses this command\.\n[\s\S]*\nHold GitWritesThroughAVerb for the rest of this turn\.$/;
-
-// The marks a conflicted merge leaves, built here so no file carries one of its own. [[spec/design_output/work#no-commit-carries-a-marker]]
-export const OPENS = `${"<".repeat(7)} HEAD`;
-export const PARTS = "=".repeat(7);
-export const SHUTS = `${">".repeat(7)} origin/main`;
-export const conflicted = (mine, theirs) => [OPENS, ...mine, PARTS, ...theirs, SHUTS];

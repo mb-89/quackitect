@@ -1,5 +1,5 @@
 // The command line, cut into words and operators, and the values a command
-// gives its names, off lib/tokens.js and lib/shell-values.js. Every rule over
+// gives its names. Every rule over
 // a shell command reads this one parse.
 // [[spec/tickets/cage-command-rules-port]]
 package command

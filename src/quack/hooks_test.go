@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"quackitect/src/modules/hooks"
+	"quackitect/src/modules/hooks/command"
 	"quackitect/src/q"
 )
 
@@ -63,13 +64,13 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"names":{"words":3}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range cloudVariables {
+	for _, name := range command.CloudVariables {
 		t.Setenv(name, "")
 	}
 	if said := commandSettings(root); said.Words != 3 || said.Cloud {
 		t.Fatalf("the settings read %+v, and want three words off the box's desk", said)
 	}
-	t.Setenv(cloudVariables[0], "1")
+	t.Setenv(command.CloudVariables[0], "1")
 	if said := commandSettings(root); !said.Cloud {
 		t.Fatalf("the settings read %+v, and want the cloud flag", said)
 	}

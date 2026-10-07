@@ -97,7 +97,7 @@ already differ.
 | the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `named.js`, `lens.js` | `folders.test.js` checks only that the copies agree |
 | session log rows | `lib/log.js`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
 | the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `src/doors/index.js`, `lib/index.js` | each asks its own way |
-| cloud detection | `cloud.js`, the hook's start script, `copilot.js`, the Copilot runtime | `cloud.js` reads `0` as off, and the start script reads any value as on |
+| cloud detection | `InCloud` in `src/modules/hooks/command/cloud.go`, the hook's start script, `copilot.js`, the Copilot runtime | `InCloud` reads `0` as off, and the start script reads any value as on |
 | walk skip lists and globs | four skip lists, three glob translators | the two Go translators take different features |
 | runtime paths, the port, `se-index`, `plan.json`, `tools.json` | Go, JavaScript, shell, and the stub hook | each spells them again |
 

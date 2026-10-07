@@ -1,5 +1,4 @@
-// The desk guard and the trunk guard, off lib/trunk.js, lib/cloud.js and
-// src/bridge/bash.js: whether a command commits or pushes, whether it lands
+// The desk guard and the trunk guard: whether a command commits or pushes, whether it lands
 // on the trunk, and the text each guard answers.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
@@ -124,7 +123,7 @@ func namesABranch(command string) bool {
 	return false
 }
 
-// The desk guard's text, off deskRefusal in lib/cloud.js. [[spec/design_output/work#a-desk-works-on-trunk]]
+// The desk guard's text. [[spec/design_output/work#a-desk-works-on-trunk]]
 func DeskRefusal(what string) string {
 	return strings.Join([]string{
 		"A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + ".",

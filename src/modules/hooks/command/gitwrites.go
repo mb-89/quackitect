@@ -1,5 +1,4 @@
-// The git commands that write the repository, off lib/git-writes.js, each
-// with the verb standing for it or the road where none stands.
+// The git commands that write the repository, each with the verb standing for it or the road where none stands.
 // [[spec/tickets/cage-command-rules-port]]
 package command
 

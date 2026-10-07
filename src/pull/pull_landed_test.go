@@ -1,8 +1,7 @@
 // A hand-back lands through the pull: the hand's own journaled paths stage
 // beside the ticket, a path git refuses stays out, a merge standing open
 // refuses the landing, a skip commits the ticket alone, a private note commits
-// nothing, and a desk pushes nothing, off the cases test/level0/landed.test.js
-// and test/level0/cloud-desk.test.js held.
+// nothing, and a desk pushes nothing.
 // [[spec/tickets/pull-scripts-leave]]
 package pull
 

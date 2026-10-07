@@ -1,5 +1,4 @@
-// The version guard over every write a command makes to a version branch, off
-// the cases test/level0/trunk.test.js held over lib/trunk.js.
+// The version guard over every write a command makes to a version branch.
 // [[spec/tickets/cage-libs-leave]]
 package command
 

@@ -2,10 +2,12 @@
 // answers `ran`, the commands it saw, in the order it saw them.
 // [[spec/design_output/doors#a-door-standing-on-another]]
 
-import { TRUNK } from "../../../.claude/skills/level0/lib/trunk.js";
 import { git } from "../git.js";
 import { behaves } from "./behaves.js";
 import { fakeProc } from "./proc.js";
+
+// The trunk, off Trunk in src/modules/hooks/command/trunk.go. [[spec/design_output/work#a-desk-works-on-trunk]]
+const TRUNK = "main";
 
 export function fakeGit(answers = {}, root = "/tree") {
   const outside = fakeProc({ git: { exitCode: 0 }, ...answers });

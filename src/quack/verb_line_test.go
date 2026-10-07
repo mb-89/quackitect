@@ -1,5 +1,4 @@
-// Every verb the Bash description names stands registered in Go, off the case
-// test/contract/tree.test.js held over lib/bash.js.
+// Every verb the Bash description names stands registered in Go.
 // [[spec/tickets/cage-libs-leave]]
 package main
 

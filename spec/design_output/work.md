@@ -34,7 +34,7 @@ So both push doors refuse the command before git runs it:
 | `--force`, `-f`, `--force-with-lease`, or a ref pair opening with a plus | refused, as a rewrite |
 | a push that moves the branch forward | nothing, and it stands |
 
-`VERSION` in `.claude/skills/level0/lib/trunk.js` says what a version branch
+`version` in `src/modules/hooks/command/guards.go` says what a version branch
 is, and both doors read that one name. A branch merely opening with `v` stands
 outside it, so `v4-recovered` pushes and deletes the way any branch does.
 
@@ -539,7 +539,7 @@ the merge commits. For details, see [[spec/design_output/pull#a-merge-opens-the-
 
 A merge conflict leaves marker lines in a file, and a verb staging the whole
 tree stages them as resolved. A step verb running past a stopped sync
-commits them into the merge. So each commit road reads the marks in `.claude/skills/level0/lib/markers.js`:
+commits them into the merge. So each commit road reads the marks before it lands:
 
 | the road | what it refuses |
 |---|---|
@@ -627,10 +627,10 @@ A desk works on `main` alone, and takes a cloud branch into `main` through
 `branch merge` alone. A cloud box owns its branch, and the owner reads a desk's
 work on `main`.
 
-`cloudHere` in `.claude/skills/level0/lib/cloud.js` is the one read of the
-cloud, for the Bash door and the verbs alike. The doors' own `cloud` flag
-answers first, and the cloud variables answer where it stands unset. `onDesk`
-beside it answers where a box off the cloud stands on a `work/` branch.
+`InCloud` in `src/modules/hooks/command/cloud.go` reads the cloud variables
+for the Bash door, which carries its answer as `Settings.Cloud`. `deskGuard`
+in `src/modules/hooks/commits.go` refuses where a box off the cloud lands on a
+`work/` branch.
 
 Each road below refuses on a desk, and the refusal names `git switch main` and
 `branch merge`:

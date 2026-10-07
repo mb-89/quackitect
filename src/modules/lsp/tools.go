@@ -17,7 +17,7 @@ import (
 	"quackitect/src/prose"
 )
 
-// The names the lint spells in src/bridge/findings.js and .claude/skills/level0/lib/code.js, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The globs, the config folder and the rule names the lint spells. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	valeSkips   = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
 	biomeConfig = "spec/config"
@@ -338,7 +338,7 @@ func (one *Tools) biome(where []string) []Finding {
 	return one.biomeRowsOf(out, where[0])
 }
 
-// Biome's answer as rows, the way fromJson in .claude/skills/level0/lib/code.js reads it. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// Biome's answer as rows. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func (one *Tools) biomeRowsOf(stdout, where string) []Finding {
 	var read struct {
 		Diagnostics []struct {
