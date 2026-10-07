@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 8c1fd8f36b5c7797
         size: 11401
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 89a6f254e892facc2c0d7d63f7a62fe61486e8a1
+    hash_after: 89a6f254e892facc2c0d7d63f7a62fe61486e8a1
+    inputs:
+      - name: design/draft
+        hash: 8c1fd8f36b5c7797
+        size: 11401
+      - name: design/tests-red
+        hash: de7fcee9eddfa970
+        size: 1238
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -428,8 +440,9 @@ TestThePullScriptsStandNowhere fails on its own assertion and names the nine scr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask: the nine scripts git ls-files names leave, with chapter.js, guidance-hand.js, ephemeral.js and held-tests.js taken in as a named assumption over the import cycle. A git grep on each leaving script finds no caller past the callers list; the extra hits in src/extension/editor.js, test/level0/tested.test.js and src/modules/hooks/hooks_test.go name editor-process.js and one-tool-call.jsonl, not a leaving script. The named Go tests stand in src/pull, src/quack and src/modules/hooks/command, and go test ./src/pull/... passes. ./RUNME.sh branch test src/quack/pull_scripts_test.go fails on its own assertion and lists the thirteen scripts that still stand. Points for implement, fixed in place: the tests-red seen text says the red case names nine scripts, and it names thirteen; TestTestArgv in src/quack/check_test.go still names test/level0/chapter.test.js and moves to logbook.test.js, as approach line 19 says.
 
 # implement
 
