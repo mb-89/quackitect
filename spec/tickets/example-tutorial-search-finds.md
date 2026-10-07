@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,22 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: dc59c52ecdc209add95d2ea475ec7c558c643058
+    hash_after: dc59c52ecdc209add95d2ea475ec7c558c643058
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tutorial fails
+    inputs:
+      - name: design/draft
+        hash: 2c01e3f3b017de14
+        size: 3315
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -239,26 +255,31 @@ Assumptions: a match is a case-blind substring, as `kept()` reads it today; the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tutorial/tab_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion, and the four cases standing before pass. Title and content cases miss the mode line on the tree. alt+m falls through to the text input and types an m, so the line reads boxm. Clearing finds the selection on the first row, since content mode never keeps the keyword row. The light case counts no lit match. A surprise: no test in src/tui forces a colour profile, so a lit match reads as plain text. A TestMain sets the ANSI profile once before any case, which keeps the cases parallel.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 meets TestTitleModeKeepsTheExamplesWhoseTitleMatches, 2 meets TestContentModeKeepsTitleKeywordsOrBodyMatches and TestContentModeLightsEveryMatchInTheMainView, 3 meets TestAltMTurnsTheModeOverUnderTheFilterPane and TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld, and 4 meets those cases with ./RUNME.sh check at implement
+- the tests reach the registry door alone, through registry.Fake, which the window helper already hands the tab
 
 # gate
 
