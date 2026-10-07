@@ -37,6 +37,7 @@ var Commands = []Verb{
 	{Name: "voice", Doc: "measure scores a folder, and refused ranks what the doors turn away"},
 	{Name: "tui", Doc: "the window this tree builds, which holds a terminal, so a tool call answers with its refusal"},
 	{Name: "log", Doc: "the session log, narrowed by span, level, kind and count"},
+	{Name: "failure", Doc: "failures by id: raise one, write a new node, count them in the session log"},
 	{Name: "split", Doc: "cut a file past the ceiling into the targets you name, with one undo"},
 	{Name: "commit", Doc: "read the message, land the commit, run the check, and push on green from a cloud box"},
 	{Name: "push", Doc: "push the branch you stand on, once the check answers green on it"},

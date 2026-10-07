@@ -20,7 +20,11 @@ func TestALoudVerbLogsItsCode(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	var rows []string
-	one.d.Log = func(level, kind, said string, _ map[string]any) { rows = append(rows, level+" "+kind+" "+said) }
+	one.d.Log = func(level, kind, said string, _ map[string]any) {
+		if kind == "work" {
+			rows = append(rows, level+" "+kind+" "+said)
+		}
+	}
 	one.branchSays("open")
 	if len(rows) != 1 || rows[0] != "warn work open answered 2" {
 		t.Fatalf("the log holds %v", rows)

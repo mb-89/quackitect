@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
@@ -293,5 +294,37 @@ func TestAStringResultReachesTheHarnessUnderAResultKey(t *testing.T) {
 	other := doorOver(t, &calls{said: Called{Result: listed, Handle: "h2"}}, &book{})
 	if got := hooks(t, other.door, toolCall(nil)).Effects[0].Result; !reflect.DeepEqual(got, listed) {
 		t.Errorf("the door answers %#v, and wants the list as it stands", got)
+	}
+}
+
+// The sentinel hears each post as its event and its payload, so a watch matches a tool's command. [[spec/tickets/the-hooks-feed-the-sentinel]]
+// level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own
+func TestHookHandsEachPostToHear(t *testing.T) {
+	heard := []failure.Event{}
+	one := doorOver(t, &calls{}, &book{})
+	one.door.from.Hear = func(event failure.Event) { heard = append(heard, event) }
+	hooks(t, one.door, toolCall(map[string]any{"command": "./RUNME.sh branch take"}))
+	if len(heard) != 1 || heard[0].Kind != "tool.call" || !strings.Contains(heard[0].Text, "branch take") {
+		t.Fatalf("the sentinel hears %+v, and wants one tool.call whose text carries the command", heard)
+	}
+}
+
+// A timer whose span never passes, since a module imports no other module's clock. [[spec/tickets/hooks-test-reads-fired-row]]
+type stillTimer struct{}
+
+func (stillTimer) After(time.Duration, func(time.Time)) (stop func()) { return func() {} }
+
+// A post a watch matches fires its failure, and the row lands through the say the sentinel holds. [[spec/tickets/hooks-test-reads-fired-row]]
+// level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own
+func TestHookPostFiresTheWatchedRow(t *testing.T) {
+	rows := []map[string]any{}
+	say := func(row map[string]any) { rows = append(rows, row) }
+	dir := failure.FakeDir{failure.Folder + "/take-watched.md": "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run the take again.\"]\nwatch:\n  event: tool.call\n  match: \"branch take\"\n---\n\n# When\n\nA box takes a branch.\n"}
+	sentinel := failure.NewSentinel(failure.Load(dir), stillTimer{}, func(raised failure.Raised) { say(raised.Row("")) }, &failure.FakeRunner{})
+	one := doorOver(t, &calls{}, &book{})
+	one.door.from.Hear = sentinel.Hear
+	hooks(t, one.door, toolCall(map[string]any{"command": "./RUNME.sh branch take"}))
+	if len(rows) != 1 || rows[0][failure.IDField] != "take-watched" {
+		t.Fatalf("the post writes %+v, and wants one row of take-watched", rows)
 	}
 }

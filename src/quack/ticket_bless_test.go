@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/src/failure"
 	"quackitect/src/pull"
 )
 
@@ -130,10 +131,15 @@ func blessHand(t *testing.T, agent, cloud bool) {
 // The last commit's subject in the repository the verbs reach under the root. [[spec/tickets/quack-repos-meet-fake-git]]
 func blessSubject(root string) string { return subjectOf(standingRepo(root), "HEAD") }
 
+// The refusal the bless prints over a tree holding no node: the message, then the line the door writes for the id. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func blessRefusal(id, said string) string {
+	return "refused\n  " + strings.Join(failure.Raise(failure.Fake(), id, said).Lines(), "\n  ") + "\n"
+}
+
 func TestTicketBless(t *testing.T) {
-	refused := func(t *testing.T, root string, code int, out, errs, want string) {
+	refused := func(t *testing.T, root string, code int, out, errs, id, want string) {
 		t.Helper()
-		if code != exitFailed || out != "" || errs != "refused\n  "+want+"\n" {
+		if code != exitFailed || out != "" || errs != blessRefusal(id, want) {
 			t.Fatalf("the bless answers %d, %q, %q, and wants a refusal saying %q", code, out, errs, want)
 		}
 		if got, _ := readsBack(t, root, blessTicket); pull.FieldOf(got, "step") != "gate" || strings.Contains(got, "blessed:") {
@@ -160,7 +166,7 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, false, false)
 		root := blessTree(t, blessWaiting(), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless")
-		if code != exitUsage || out != "" || errs != "refused\n  nothing names no ticket, so nothing blesses.\n" {
+		if code != exitUsage || out != "" || errs != blessRefusal("pull-bless-no-ticket", "nothing names no ticket, so nothing blesses.") {
 			t.Fatalf("the bless answers %d, %q, %q", code, out, errs)
 		}
 	})
@@ -168,7 +174,7 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, false, false)
 		root := blessTree(t, blessWaiting(), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", "no-such")
-		if code != exitUsage || out != "" || errs != "refused\n  no-such names no ticket, so nothing blesses.\n" {
+		if code != exitUsage || out != "" || errs != blessRefusal("pull-bless-no-ticket", "no-such names no ticket, so nothing blesses.") {
 			t.Fatalf("the bless answers %d, %q, %q", code, out, errs)
 		}
 	})
@@ -176,7 +182,7 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, true, false)
 		root := blessTree(t, blessWaiting(), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", "a-child")
-		refused(t, root, code, out, errs, "an agent at a desk blesses where .se/.runtime/bless.json holds agent true, and the sidebar button writes it.")
+		refused(t, root, code, out, errs, "pull-bless-refused", "an agent at a desk blesses where .se/.runtime/bless.json holds agent true, and the sidebar button writes it.")
 	})
 	t.Run("an agent at a desk blesses where the bless file holds agent true", func(t *testing.T) {
 		blessHand(t, true, false)
@@ -188,7 +194,7 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, true, false)
 		root := blessTree(t, blessWaiting(), map[string]string{pull.BlessFile: `{"agent":false}`})
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", "a-child")
-		refused(t, root, code, out, errs, "an agent at a desk blesses where .se/.runtime/bless.json holds agent true, and the sidebar button writes it.")
+		refused(t, root, code, out, errs, "pull-bless-refused", "an agent at a desk blesses where .se/.runtime/bless.json holds agent true, and the sidebar button writes it.")
 	})
 	t.Run("an agent on a cloud box blesses", func(t *testing.T) {
 		blessHand(t, true, true)
@@ -209,13 +215,13 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, false, false)
 		root := blessTree(t, strings.Replace(blessWaiting(), "    bless: true\n", "", 1), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", "a-child")
-		refused(t, root, code, out, errs, "a-child stands at gate, which asks no bless.")
+		refused(t, root, code, out, errs, "pull-bless-not-asked", "a-child stands at gate, which asks no bless.")
 	})
 	t.Run("a bless gate holding no verdict yet is refused", func(t *testing.T) {
 		blessHand(t, false, false)
 		root := blessTree(t, blessGated(""), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", "a-child")
-		refused(t, root, code, out, errs, "a-child at gate holds no verdict to bless yet.")
+		refused(t, root, code, out, errs, "pull-bless-no-verdict", "a-child at gate holds no verdict to bless yet.")
 	})
 	t.Run("bless --desk writes the bless file for a person", func(t *testing.T) {
 		blessHand(t, false, false)
@@ -234,7 +240,7 @@ func TestTicketBless(t *testing.T) {
 		blessHand(t, true, false)
 		root := blessTree(t, blessWaiting(), nil)
 		code, out, errs := runsApart(t, root, false, "ticket", "bless", pull.Desk+"true")
-		if code != exitFailed || out != "" || errs != "refused\n  "+pull.BlessRefusal()+"\n" || !strings.Contains(errs, "sidebar button") {
+		if code != exitFailed || out != "" || errs != blessRefusal("pull-bless-agent", pull.BlessRefusal()) || !strings.Contains(errs, "sidebar button") {
 			t.Fatalf("an agent's --desk answers %d, %q, %q", code, out, errs)
 		}
 		if _, stands := readsBack(t, root, pull.BlessFile); stands {

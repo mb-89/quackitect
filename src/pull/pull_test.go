@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
@@ -286,6 +287,16 @@ func TestPull(t *testing.T) {
 		it.Cloud = false
 		if code := it.Pulling([]string{"pull"}); code != 2 || !strings.Contains(errs.String(), "A desk works on main alone, and a cloud box works each work/ branch, so the pull hands nothing out on work/g.") {
 			t.Fatalf("the pull answers %d:\n%s", code, errs)
+		}
+	})
+	// The message carries no remedy, so the node's remedy prints once. [[spec/tickets/go-pull-desk-remedy-once]]
+	t.Run("a desk pull prints the node's remedy once", func(t *testing.T) {
+		it, _, errs := cloudPull(t)
+		it.Cloud = false
+		it.Failures = failure.Fake(failure.Node{ID: "desk-works-on-trunk", Level: "warn", Remedies: []string{"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."}})
+		it.Pulling([]string{"pull"})
+		if count := strings.Count(errs.String(), "git switch main"); count != 1 {
+			t.Fatalf("the pull prints the remedy %d times:\n%s", count, errs)
 		}
 	})
 	t.Run("the tool's input reads as the words a person types", func(t *testing.T) {

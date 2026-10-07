@@ -79,6 +79,17 @@ func mintTree(t *testing.T, branch string) string {
 		}
 		seedsFile(t, root, "spec/schemas/"+filepath.Base(one), string(text))
 	}
+	nodes, err := filepath.Glob(filepath.Join("..", "..", "spec", "failures", "*.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, one := range nodes {
+		text, err := os.ReadFile(one)
+		if err != nil {
+			t.Fatal(err)
+		}
+		seedsFile(t, root, "spec/failures/"+filepath.Base(one), string(text))
+	}
 	seedsFile(t, root, "spec/processes/small.yaml", mintProcess)
 	seedsFile(t, root, "spec/processes/group.yaml", mintProcess)
 	repo := standsInRepo(t, root)
@@ -92,6 +103,23 @@ func mintTree(t *testing.T, branch string) string {
 }
 
 func TestMintVerb(t *testing.T) {
+	// [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+	t.Run("a path that stands comes back refused through the failure door, which logs its row", func(t *testing.T) {
+		root := mintTree(t, "")
+		seedsFile(t, root, "spec/tickets/fresh.md", closedGroupTicket)
+		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small")
+		if code != exitUsage {
+			t.Fatalf("the mint answers %d: %s, and wants %d", code, said, exitUsage)
+		}
+		for _, line := range []string{"spec/tickets/fresh.md stands already.", "failure mint-path-stands at warn", "remedy: Name a path nothing holds yet"} {
+			if !strings.Contains(said, line) {
+				t.Errorf("the mint says %q, and wants %q", said, line)
+			}
+		}
+		if row, _ := readsBack(t, root, sessionLog); !strings.Contains(row, `"failure":"mint-path-stands"`) {
+			t.Errorf("the session log holds %q, and wants the failure's row", row)
+		}
+	})
 	// [[spec/tickets/verbs-mint-tickets-and-keys]]
 	t.Run("a ticket takes the gain the breaks and the done when as fields", func(t *testing.T) {
 		root := mintTree(t, "")
@@ -198,7 +226,7 @@ func TestMintVerb(t *testing.T) {
 		if code != 2 {
 			t.Fatalf("the mint answers %d: %s, and wants 2", code, said)
 		}
-		for _, line := range []string{"shut stands closed, so it takes no new child.", "Mint the ticket with no group, or reopen shut", "--back"} {
+		for _, line := range []string{"shut stands closed, so it takes no new child.", "Mint the ticket with no group, or reopen shut", "--back", "failure mint-group-closed at warn"} {
 			if !strings.Contains(said, line) {
 				t.Errorf("the mint says %q, and wants %q", said, line)
 			}
@@ -227,11 +255,11 @@ func TestMintVerb(t *testing.T) {
 		says []string
 	}{
 		{"a call naming no path prints the usage", []string{"ticket"}, []string{"Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]", "spec/schemas holds ", "A ticket takes --process=<name>, and the route and its hash copy in. One off a handover line takes --from=handover."}},
-		{"a kind no schema names", []string{"frog", "spec/tickets/fresh.md"}, []string{"spec/schemas holds no frog. It holds "}},
-		{"a field the schema names nowhere", []string{"ticket", "spec/tickets/fresh.md", "--frog=1"}, []string{"frog names no field of a ticket note. It takes kind, state, "}},
-		{"a process standing nowhere", []string{"ticket", "spec/tickets/fresh.md", "--process=nope"}, []string{"spec/processes holds no nope. It holds group, small."}},
-		{"a path standing already", []string{"ticket", "spec/processes/small.yaml", "--process=small"}, []string{"spec/processes/small.yaml stands already. Name a path nothing holds yet."}},
-		{"a group no child names", []string{"ticket", "spec/tickets/lonely.md", "--process=group"}, []string{"lonely is a group, and no ticket names it under group. Mint a child naming lonely under group first, then the group."}},
+		{"a kind no schema names", []string{"frog", "spec/tickets/fresh.md"}, []string{"spec/schemas holds no frog. It holds ", "failure mint-kind-unknown at warn"}},
+		{"a field the schema names nowhere", []string{"ticket", "spec/tickets/fresh.md", "--frog=1"}, []string{"frog names no field of a ticket note. It takes kind, state, ", "failure mint-fields-refused at warn"}},
+		{"a process standing nowhere", []string{"ticket", "spec/tickets/fresh.md", "--process=nope"}, []string{"spec/processes holds no nope. It holds group, small.", "failure mint-route-refused at warn"}},
+		{"a path standing already", []string{"ticket", "spec/processes/small.yaml", "--process=small"}, []string{"spec/processes/small.yaml stands already.", "failure mint-path-stands at warn", "remedy: Name a path nothing holds yet"}},
+		{"a group no child names", []string{"ticket", "spec/tickets/lonely.md", "--process=group"}, []string{"lonely is a group, and no ticket names it under group. Mint a child naming lonely under group first, then the group.", "failure mint-group-empty at warn"}},
 	}
 	for _, one := range refusals {
 		t.Run(one.name+" comes back refused", func(t *testing.T) {

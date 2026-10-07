@@ -53,6 +53,9 @@ func TestTakeOverRefusesAHoldThatStillBeats(t *testing.T) {
 		if code := one.branchSays(argv...); code != codeRed {
 			t.Fatalf("%v over a beating hold answers %d: %s", argv, code, one.pcSaid())
 		}
+		if argv[1] == pcGroup && !strings.Contains(one.errs.String(), "failure take-branch-held-live ") {
+			t.Fatalf("%v raises no take-branch-held-live: %s", argv, one.errs.String())
+		}
 		if held := heldIn(one.show("origin/"+workBranch+pcGroup, ticketAt(pcGroup))); held == nil || held.Hand != pcOther {
 			t.Fatalf("%v moves the beating hold: %+v", argv, held)
 		}

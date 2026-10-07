@@ -126,12 +126,9 @@ func namesABranch(command string) bool {
 	return false
 }
 
-// The desk guard's text, off deskRefusal in lib/cloud.js. [[spec/design_output/work#a-desk-works-on-trunk]]
-func DeskRefusal(what string) string {
-	return strings.Join([]string{
-		"A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + ".",
-		"Run git switch " + Trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>.",
-	}, "\n")
+// The message a desk refusal builds, off deskSaid in lib/cloud.js, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func DeskSaid(what string) string {
+	return "A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + "."
 }
 
 // Whether the check's stamp answers green on the sha, and what it says, off stampOf and saysGreen in lib/runs.js. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
