@@ -375,3 +375,9 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft follows seen, and this line holds over the approach where the two part:
+
+- the disk: the harness builds a `pull.It` over `files.FakeDisk`, a `FakeRepo` clone, a `FakeRunner` and a fixed clock, as the pull tests build theirs, and no real temporary folder
+- the size: `src/quack/examples_harness_test.go` joins the list, and holds the harness as test code of quack
+- the copy: `TestEachExampleWritesOverItsOwnCopy` in `src/quack/examples_test.go` holds each example to its own copy of the fixture
