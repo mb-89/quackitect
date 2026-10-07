@@ -1,6 +1,5 @@
 // The leave: done hands a finished group back, release lets a hold go, and
-// read prints what a branch carries, as finish, release and read in
-// src/scripts/work.js answer them.
+// read prints what a branch carries.
 // [[spec/design_output/work#a-box-leaves]]
 package branches
 

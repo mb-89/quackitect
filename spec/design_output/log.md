@@ -38,7 +38,7 @@ A reply ending the turn stands at the turn's end, and a reply to a demand stands
 
 ## A prompt is the owner's
 
-`onPromptSubmit` in `src/bridge/answer.js` reads where a prompt comes from:
+`prompted` in `src/modules/hooks/fold.go` reads where a prompt comes from:
 
 | the origin | the row | a reply owed |
 |---|---|---|

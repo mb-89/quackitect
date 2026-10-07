@@ -1,5 +1,5 @@
-// branch done over a real tree, ported from test/level0/work-done.test.js:
-// the box leaves, closes its group on the branch, and hands the branch back.
+// branch done over a real tree: the box leaves, closes its group on the
+// branch, and hands the branch back.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it drives the unexported doneReason and freeChildren, and declares pcDone for the record test
 

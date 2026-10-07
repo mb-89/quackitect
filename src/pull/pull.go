@@ -1,7 +1,6 @@
 // The pull. One verb hands a hand the next leaf of a ticket, and the same verb
 // takes the leaf back with a verdict. The engine checks the hand-back, writes
-// the record, moves the step, commits, pushes, and hands out the next leaf,
-// off src/scripts/pull.js, pulling in work.js and pull-tool.js.
+// the record, moves the step, commits, pushes, and hands out the next leaf.
 // [[spec/design_output/pull#the-answers]]
 package pull
 

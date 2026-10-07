@@ -1,5 +1,5 @@
 // The person steps a ticket's route holds, repaired to name the engine as
-// their reader, off src/scripts/pull-hand.js.
+// their reader.
 // [[spec/design_output/pull#the-work-answer]]
 package pull
 

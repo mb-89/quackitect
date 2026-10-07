@@ -42,8 +42,9 @@ var window = map[string][]string{
 	"frame":    {"draw", "tree"},
 	"log":      {"frame", "tree", "draw", "registry"},
 	"work":     {"frame", "tree", "draw", "registry"},
+	"tutorial": {"frame", "draw", "registry"},
 	"registry": {"frame", "draw"},
-	".":        {"frame", "log", "work", "registry", "draw"},
+	".":        {"frame", "log", "work", "tutorial", "registry", "draw"},
 }
 
 // The package the index stands in, whose every import below it holds no module. [[spec/tickets/tickets-becomes-a-module]]
@@ -66,7 +67,7 @@ var (
 )
 
 // The tree's own readers a module takes beside q, each importing the pure standard library alone, the one q rests on among them. [[spec/tickets/tickets-becomes-a-module]]
-var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front", module + "src/owns"}
+var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front", module + "src/example", module + "src/owns"}
 
 // The standard library packages past the pure library that no door owns whole, each with every package below it, per [[spec/design_output/model#the-build-checks-imports]].
 var floor = []string{"io/fs", "io/ioutil", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}

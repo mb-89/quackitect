@@ -1,6 +1,6 @@
 // A standing branch speaks for its group and the tickets naming it, its copy
 // wins over trunk's by name, and a branch trunk reads closed speaks for
-// nothing, the rule ticketsIn in src/scripts/work-answer.js holds.
+// nothing.
 // [[spec/tickets/the-index-reads-standing-branches]]
 package tickets
 
@@ -55,10 +55,10 @@ func tipsRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip
 func gitRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip, trunk []ticket.File) any {
 	t.Helper()
 	var hand q.Writer
-	index := qtest.New(t, func(c *q.Catalog) { hand = withTips(c) })
-	index.Seed(files)
-	index.SeedAs(hand, map[string]any{TipsPort: tips, TrunkPort: trunk})
-	return index.Run(port)
+	fake := qtest.New(t, func(c *q.Catalog) { hand = withTips(c) })
+	fake.Seed(files)
+	fake.SeedAs(hand, map[string]any{TipsPort: tips, TrunkPort: trunk})
+	return fake.Run(port)
 }
 
 func branchedBy(t *testing.T, files map[string]any, tips []ticket.Tip) map[string]Ticket {
@@ -122,6 +122,28 @@ func TestABranchCarriesItsGroupCopyAndTheChildrenOnItsTip(t *testing.T) {
 	}
 }
 
+// A tip carries its changes against trunk alone, so a child it leaves untouched reads off trunk, and one it drops leaves. [[spec/tickets/tips-carry-branch-changes-alone]]
+func TestABranchReadsTrunkUnderItsChanges(t *testing.T) {
+	trunk := []ticket.File{
+		{Path: "spec/tickets/dropped-child.md", Text: child("the-group", "open")},
+		{Path: "spec/tickets/kept-child.md", Text: child("the-group", "open")},
+		{Path: "spec/tickets/the-group.md", Text: groupAt("open", "children")},
+	}
+	tips := []ticket.Tip{{
+		Name:  "the-group",
+		Trunk: groupAt("open", "children"),
+		Files: []ticket.File{{Path: "spec/tickets/the-group.md", Text: groupAt("open", "retro/cloud")}},
+		Gone:  []string{"spec/tickets/dropped-child.md"},
+	}}
+	branches, _ := gitRead(t, BranchesPort, map[string]any{}, tips, trunk).([]ticket.Branch)
+	if len(branches) != 1 || branches[0].Ticket.Step != "retro/cloud" {
+		t.Fatalf("the branch reads its own group copy, and reads %+v", branches)
+	}
+	if kids := branches[0].Children; len(kids) != 1 || kids[0].Name != "kept-child" {
+		t.Fatalf("the branch's children are trunk's untouched child alone, and read %+v", kids)
+	}
+}
+
 // A branch whose ticket runs no group route carries no group copy, so the work draws its row with no step, as the verb's program does. [[spec/tickets/the-index-reads-standing-branches]]
 func TestABranchWhoseTicketIsNoGroupCarriesNoGroupCopy(t *testing.T) {
 	tips := []ticket.Tip{{Name: "one-ticket", Files: []ticket.File{{Path: "spec/tickets/one-ticket.md", Text: "---\nkind: ticket\nstate: open\nstep: design/tests-red\n---\n\n# Ask\n\nOne.\n"}}}}
@@ -134,7 +156,7 @@ func TestABranchWhoseTicketIsNoGroupCarriesNoGroupCopy(t *testing.T) {
 	}
 }
 
-// A child standing on the branch of a marked group alone stands on the cloud, as cloudsIn in src/scripts/work-answer.js reads the folded list. [[spec/tickets/the-queue-reads-the-marker]]
+// A child standing on the branch of a marked group alone stands on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
 func TestTheCloudReadsATipChildOfAMarkedGroup(t *testing.T) {
 	marked := "---\nkind: [[ticket]]\nstate: open\ncloud: true\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nMarked.\n"
 	files := map[string]any{"files/spec/tickets/the-group.md": file(marked)}

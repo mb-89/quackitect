@@ -35,6 +35,8 @@ func TestGuarded(t *testing.T) {
 		{"the check stays guarded", "tool.call", bash("./RUNME.sh check"), true},
 		{"a command under input passes", "tool.call", map[string]any{"tool": "Bash", "input": map[string]any{"command": "git status"}}, false},
 		{"a bash naming no command stands guarded", "tool.call", map[string]any{"tool": "Bash"}, true},
+		{"a nil command on the call reads the one under input", "tool.call", map[string]any{"tool": "Bash", "command": nil, "input": map[string]any{"command": "git status"}}, false},
+		{"a tool named by no text reads as its text, and stands guarded", "tool.call", map[string]any{"tool": 7}, true},
 	}
 	for _, one := range cases {
 		if got := hooks.Guarded(one.event, one.e); got != one.guarded {

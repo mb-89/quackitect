@@ -1,6 +1,6 @@
 // The waits module: the wait tool, which returns on the first signal it hears,
 // a helper's report, an output's end, or a quiet set of files, and at its cap
-// where none comes, off src/bridge/wait.js.
+// where none comes.
 // [[spec/tickets/find-and-wait-in-go]]
 package waits
 

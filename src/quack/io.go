@@ -28,6 +28,8 @@ const (
 	ioBeat        = 5 * time.Second
 	ioRestart     = 5 * time.Second
 	answerWait    = 30 * time.Second
+	// The kind of the session log row a failed start writes. [[spec/tickets/io-start-fault-shows]]
+	ioStartFault = "io-start-fault"
 )
 
 // quack io: the IO process the index spawns, which runs the wiring's IO instances until the bus goes. [[spec/design_output/model#the-io-process]]
@@ -49,7 +51,7 @@ func ioMain() error {
 		return err
 	}
 	defer peer.Close()
-	stop, err := ioOver(peer, root, ioStarts(w))
+	stop, err := ioOver(peer, root, ioStarts(w), appendsRow(realDisk(), root, wall.Now))
 	if err != nil {
 		return err
 	}
@@ -113,12 +115,12 @@ func moduleOf(w q.Wiring, instance string) string {
 }
 
 // Runs each start over the bus, publishing what it commits on commit.<instance>, and answers the stop of them all. [[spec/design_output/model#the-io-process]]
-func runsIO(url, token string, starts map[string]index.Start) (func(), error) {
+func runsIO(url, token string, starts map[string]index.Start, say func(row map[string]any) error) (func(), error) {
 	peer, err := index.Dial(url, token)
 	if err != nil {
 		return nil, err
 	}
-	stop, err := ioOver(peer, "", starts)
+	stop, err := ioOver(peer, "", starts, say)
 	if err != nil {
 		peer.Close()
 		return nil, err
@@ -161,8 +163,8 @@ func watchesIndex(peer *index.Peer, from q.Clock, term time.Duration, say func(r
 	}, nil
 }
 
-// Each start commits over the peer under its instance, and the IO process beats its lease while it runs. [[spec/design_output/model#a-lease]]
-func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(), error) {
+// Each start commits over the peer under its instance, and the IO process beats its lease while it runs. A start that fails writes a row through say, and the others run on. [[spec/design_output/model#a-lease]] [[spec/tickets/io-start-fault-shows]]
+func ioOver(peer *index.Peer, root string, starts map[string]index.Start, say func(row map[string]any) error) (func(), error) {
 	var stops []func()
 	halt := func() {
 		for _, one := range stops {
@@ -172,8 +174,8 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 	for instance, start := range starts {
 		stop, err := start(root, func(_ q.Writer, values map[string]any) error { return peer.Commit(instance, values) })
 		if err != nil {
-			halt()
-			return nil, fmt.Errorf("%s starts not: %w", instance, err)
+			_ = say(map[string]any{"kind": ioStartFault, "instance": instance, "said": err.Error()})
+			continue
 		}
 		stops = append(stops, stop)
 		// An empty commit says the start stands, after what it seeds, so a reader waits on the seed and on no later event. [[spec/tickets/the-split-deployment-takes-over]]
@@ -182,7 +184,7 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 			return nil, fmt.Errorf("%s answers not: %w", instance, err)
 		}
 	}
-	watching, err := watchesIndex(peer, wall, manager.LeaseTerm(root), appendsRow(realDisk(), root, wall.Now))
+	watching, err := watchesIndex(peer, wall, manager.LeaseTerm(root), say)
 	if err != nil {
 		halt()
 		return nil, err

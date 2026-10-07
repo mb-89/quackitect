@@ -38,7 +38,7 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 			last = <-seen
 		}
 	})
-	t.Run("a runtime JSON file comes back, and the database does not", func(t *testing.T) {
+	t.Run("a runtime JSON file comes back, and the database, a new empty file and a binary file do not", func(t *testing.T) {
 		disk, watch := open(t)
 		for _, folder := range []string{".se/.runtime/hold/keep.json", ".se/.runtime/undo/keep.json"} {
 			if err := disk.Write(folder, "{}\n"); err != nil {
@@ -58,6 +58,12 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 			t.Fatal(err)
 		}
 		defer stop()
+		if err := disk.Write("quack", ""); err != nil {
+			t.Fatal(err)
+		}
+		if err := disk.Write("quack", binaryBody); err != nil {
+			t.Fatal(err)
+		}
 		for _, path := range []string{".se/.runtime/index.db", ".se/.runtime/undo/one.json", ".se/.runtime/plan.json"} {
 			if err := disk.Write(path, "{}\n"); err != nil {
 				t.Fatal(err)

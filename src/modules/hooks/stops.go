@@ -1,6 +1,6 @@
 // The stops fold: what the bridge keeps on its box for the turn's end, and the
 // answer to a Stop in the order the bridge's classic.Stop ran:
-// a helper's stop, holdsForHandover, then onStop in src/bridge/stop.js. The
+// a helper's stop, holdsForHandover, then onStop. The
 // fold reads the tree off the door's stamp and the holds off their own fold.
 // [[spec/tickets/cage-stop-rules-port]]
 package hooks
@@ -254,7 +254,7 @@ func (state *Stops) claims(fields, held map[string]any, facts Stopped, holds Hol
 	}
 	reason := callField(fields, "reason")
 	rule, known := stop.ReasonOf(facts.Rules, reason)
-	// The call words its answer as claims in src/bridge/stop.js does. [[spec/tickets/log-report-stop-in-go]]
+	// The call words its answer as claims. [[spec/tickets/log-report-stop-in-go]]
 	if !known {
 		var ids []string
 		for _, one := range stop.StopReasons(rulesOr(facts.Rules)) {

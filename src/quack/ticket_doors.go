@@ -44,6 +44,14 @@ func registeredRepo(root string) git.Repo { return standingRepo(root) }
 // The rules whose findings refuse at a door: a lint that ran nowhere reads no rule, and a private name leaves the box. [[spec/design_output/level0#the-panel-holds-a-warning]]
 var refusing = map[string]bool{"VoiceRulesRan": true, "Private": true}
 
+// The pull a verb runs over, built for one call's output and errors: the live one on this box, or one over the fakes in the example harness. [[spec/design_output/examples#one-runner-two-drivers]]
+type pullOver func(out, errs io.Writer) (*pull.It, int)
+
+// The live pull over the roots and the repository a registered verb takes. [[spec/design_output/pull#the-answers]]
+func pullingHere(rootOf func() (string, error), repoAt func(root string) git.Repo) pullOver {
+	return func(out, errs io.Writer) (*pull.It, int) { return pullHere(rootOf, repoAt, out, errs) }
+}
+
 // The pull over this box: the disk and git under the work root, the config under the method root, and the verbs and topics other code answers. [[spec/design_output/pull#the-answers]]
 func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, out, errs io.Writer) (*pull.It, int) {
 	method, work, err := rootsOf(rootOf)

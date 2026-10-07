@@ -1,4 +1,4 @@
-// The Agent door, off onAgent in src/bridge/agent.js: a call waiting on its
+// The Agent door: a call waiting on its
 // helper refuses, and so does a call naming no model of the tiers, where the
 // config names any. [[spec/design_output/level0#an-agent-call-runs-behind]]
 package hooks

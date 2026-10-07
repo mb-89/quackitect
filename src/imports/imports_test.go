@@ -84,6 +84,14 @@ func TestAModuleImportsTheFrontWriter(t *testing.T) {
 	}
 }
 
+// The example parser the check, the harness and the tab share passes, as the note reader does. [[spec/design_output/examples#one-runner-two-drivers]]
+func TestAModuleImportsTheExampleParser(t *testing.T) {
+	t.Parallel()
+	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/example"}, nil); len(said) != 0 {
+		t.Fatalf("src/example reads as past q: %v", said)
+	}
+}
+
 // The declaration reader the check module takes passes, as the pointer reader does. [[spec/tickets/owns-joins-the-pure-tree]]
 func TestAModuleImportsTheDeclarationReader(t *testing.T) {
 	t.Parallel()
@@ -143,6 +151,12 @@ func TestAWindowImportPastItsRowIsNamed(t *testing.T) {
 	}
 	if said := WindowFaults("quackitect/src/tui/unnamed", []string{"quackitect/src/tui/frame"}); len(said) != 0 {
 		t.Fatalf("a package the table leaves out reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui", []string{"quackitect/src/tui/tutorial"}); len(said) != 0 {
+		t.Fatalf("the root importing the tutorial tab reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui/tutorial", []string{"quackitect/src/tui/registry", "quackitect/src/tui/tree"}); len(said) != 1 || !strings.Contains(said[0], "src/tui/tree") {
+		t.Fatalf("the tutorial tab importing tree reads %v", said)
 	}
 }
 

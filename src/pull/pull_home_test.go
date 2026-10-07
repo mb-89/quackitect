@@ -29,7 +29,7 @@ func TestImproveLinesNameTheirHome(t *testing.T) {
 		for _, row := range []string{
 			"- a case in `src/pull/pull_chapter.go` holds it",
 			"- a check in `src/pull/pull_home.go` holds it",
-			"- a rule in [[spec/guidance/working#rules]] holds it",
+			"- a rule in [[spec/guidance/working#actionables]] holds it",
 			"- `slow-lint` builds it",
 		} {
 			if got := it.formFault(field, []string{row}, where, nil, Hold{}); len(got) > 0 {

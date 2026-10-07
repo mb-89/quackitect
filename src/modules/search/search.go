@@ -1,5 +1,5 @@
 // The search module: the find tool off the rows the index ranks, and a
-// function's body off the disk, off src/bridge/search.js. It stands off the
+// function's body off the disk. It stands off the
 // wiring until the flip.
 // [[spec/tickets/find-and-wait-in-go]]
 package search

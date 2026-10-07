@@ -66,7 +66,7 @@ type part struct {
 	lead bool
 }
 
-// What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, the disk under it, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
 	self      string

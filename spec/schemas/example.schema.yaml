@@ -1,0 +1,48 @@
+# A tutorial, a use case and a behavior test in one file. The front names what
+# the example shows, and the shell blocks hold the calls and the behavior each
+# asserts, which the one parser in src/example reads into steps.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: example
+
+governs:
+  - spec/examples/**
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - title
+    - keywords
+    - interface
+  properties:
+    kind:
+      const: example
+      x-link: true
+      description: the schema this note is minted from
+
+    title:
+      type: string
+      description: the behavior the example shows, as a claim
+
+    keywords:
+      type: array
+      description: the words a title search and a content search meet
+
+    interface:
+      type: array
+      description: each verb, tab or door-facing feature the example shows, by its catalog name
+
+    edge:
+      type: string
+      x-under: spec/examples/9*_dev_*/**
+      description: the edge a developer case shows, and only there
+
+body:
+  headingLevel: 1
+  order: free
+  extraSections: true
+  x-steps: example

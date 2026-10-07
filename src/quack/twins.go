@@ -22,7 +22,7 @@ import (
 // The state a row stands open at, as OPEN in src/engine/group.js names it. [[spec/tickets/ticket-verbs-become-actions]]
 const openRow = "open"
 
-// The state a note stands closed at, the folder NOTES in src/scripts/ticket.js names, and the name the tickets module answers every ticket under. [[spec/tickets/retro-verbs-become-actions]]
+// The state a note stands closed at, the folder the private notes stand in, and the name the tickets module answers every ticket under. [[spec/tickets/retro-verbs-become-actions]]
 const (
 	closedRow   = "closed"
 	notesFolder = ".se/tickets"
@@ -32,7 +32,7 @@ const (
 // The name spec/wiring.yaml binds the work module's yours port under. [[spec/tickets/ticket-verbs-become-actions]]
 const yoursName = "work/" + work.YoursPort
 
-// The columns and the empty line queueOnly in src/scripts/work-list.js prints. [[spec/tickets/work-verbs-become-actions]]
+// The columns and the empty line the queue list prints. [[spec/tickets/work-verbs-become-actions]]
 const (
 	queuePlaceWidth = 6
 	queueNameWidth  = 34

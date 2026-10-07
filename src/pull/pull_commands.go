@@ -1,5 +1,5 @@
 // The voice the pull reads over the evidence, and the commands a leaf names
-// as run, off src/scripts/pull-chapter.js.
+// as run.
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 package pull
 

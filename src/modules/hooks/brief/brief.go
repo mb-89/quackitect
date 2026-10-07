@@ -45,7 +45,7 @@ var wanted = [][2]string{
 	{"python", "a helper script"},
 }
 
-// The tiers, lightest first, each with the work it takes, off TIERS in src/bridge/agent.js. The config names the model of each. [[spec/design_output/level0#a-spawn-names-its-tier]]
+// The tiers, lightest first, each with the work it takes. The config names the model of each. [[spec/design_output/level0#a-spawn-names-its-tier]]
 var Tiers = [][2]string{
 	{"find", "find, list, read and report: work you check by looking"},
 	{"change", "a scoped change in one to three files with its test, or a review against a list"},
@@ -113,7 +113,7 @@ func (one layered) List(folder string) []string {
 	return out
 }
 
-// The counts off the notes at the top of the guidance folder that bind here and name no kind, as guidanceHere in src/bridge/guidance.js counts them. [[spec/design_output/level0#the-style-carries-the-top]]
+// The counts off the notes at the top of the guidance folder that bind here and name no kind. [[spec/design_output/level0#the-style-carries-the-top]]
 func CountsOf(tree Tree, env func(string) string) Counts {
 	var out Counts
 	for _, name := range tree.List(Guidance) {
@@ -213,7 +213,7 @@ func ToolsText(survey, tiers string) string {
 	return strings.Join(out, "\n")
 }
 
-// The block the handover rides in, off handoverText in src/bridge/guidance.js. [[spec/design_output/work#one-handover-stands]]
+// The block the handover rides in. [[spec/design_output/work#one-handover-stands]]
 func HandoverText(text string) string {
 	return strings.Join([]string{
 		"# The handover the last session left", "", text, "",

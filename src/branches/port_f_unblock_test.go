@@ -1,4 +1,4 @@
-// The unblock over a real clone, ported off test/level0/unblock.test.js: the
+// The unblock over a real clone: the
 // child closes as became, the successor carries the question in its shape, and
 // every road it refuses on leaves the child open.
 // [[spec/tickets/work-verbs-port-to-go]]

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -168,6 +169,14 @@ var selfPath = os.Executable
 
 // The input this process reads, which a verb reading its event takes. [[spec/tickets/level0-hooks-hold-no-rule]]
 var stdin io.Reader = os.Stdin
+
+// Waits for the user's Enter where a person sits at the terminal, and runs straight through where the input is a pipe or nothing. [[spec/tickets/example-run-pauses-between-steps]]
+func enterOnTerminal() {
+	if said, err := os.Stdin.Stat(); err == nil && said.Mode()&os.ModeCharDevice != 0 {
+		fmt.Fprint(os.Stderr, "Enter runs the next step.")
+		_, _ = bufio.NewReader(os.Stdin).ReadString('\n')
+	}
+}
 
 // A process stands alive where it takes signal zero. Windows takes no signal, so there a process stands alive while it opens. [[spec/tickets/find-and-wait-in-go]]
 func alive(pid int) bool {

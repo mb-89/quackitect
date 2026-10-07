@@ -1,6 +1,5 @@
 // The stale read: a passed leaf keeps the hash of each input and of its own
-// definition, and a pull marks the leaves whose hashes no longer match, off
-// src/scripts/pull-stale.js.
+// definition, and a pull marks the leaves whose hashes no longer match.
 // [[spec/design_output/pull#an-input-marks-its-steps]]
 package pull
 

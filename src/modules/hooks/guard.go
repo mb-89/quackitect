@@ -5,10 +5,11 @@
 package hooks
 
 import (
-	"fmt"
 	"regexp"
 	"slices"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // The runtime folder a pkill names and the alarm the index keeps its fault under, which index.Runtime and index.AlarmsName own, spelled again here because the hooks module imports no index. [[spec/rationales/the-cage-refuses-while-down]]
@@ -40,7 +41,7 @@ const (
 
 // Whether a call stays guarded while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]
 func Guarded(event string, e map[string]any) bool {
-	tool := stringOf(e["tool"])
+	tool := yaml.FieldText(e["tool"])
 	if event != toolEvent || slices.Contains(unguarded, tool) {
 		return false
 	}
@@ -50,21 +51,10 @@ func Guarded(event string, e map[string]any) bool {
 // The command a Bash call carries, on the call or under its input. [[spec/tickets/a-down-index-refuses-calls]]
 func commandOf(e map[string]any) string {
 	if command, ok := e["command"]; ok && command != nil {
-		return stringOf(command)
+		return yaml.FieldText(command)
 	}
 	input, _ := e["input"].(map[string]any)
-	return stringOf(input["command"])
-}
-
-// A value as text, and nothing as the empty text. [[spec/tickets/a-down-index-refuses-calls]]
-func stringOf(value any) string {
-	if value == nil {
-		return ""
-	}
-	if text, ok := value.(string); ok {
-		return text
-	}
-	return fmt.Sprint(value)
+	return yaml.FieldText(input["command"])
 }
 
 // Whether a command brings the index back or saves the work, so a box whose door falls mid-work recovers and pushes. Every other command stays guarded. [[spec/tickets/the-cage-survives-its-index]] [[spec/rationales/the-cage-refuses-while-down]]
@@ -191,7 +181,7 @@ func killsRuntime(words []string) bool {
 func RefusedText(e map[string]any) string {
 	tool := "this call"
 	if named, ok := e["tool"]; ok && named != nil {
-		tool = stringOf(named)
+		tool = yaml.FieldText(named)
 	}
 	return strings.Join([]string{
 		"Level zero refuses " + tool + ": the index answers nothing,",

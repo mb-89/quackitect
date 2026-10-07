@@ -97,7 +97,7 @@ worker on the group of a worker that dies.
 | what it files | tickets for an agent, and tickets for a person | tickets for a person alone |
 
 A fix group carries fixes alone. A ticket's hand reads off the ticket: one standing at a `by: person` leaf, or at draft, waits on a person, as
-`waitsOnPerson` in `src/scripts/work-answer.js` reads it. Every other open
+`waitsOnPerson` in `src/modules/queue/places.go` reads it. Every other open
 ticket is an agent's.
 
 A fix group files no ticket for an agent. What it leaves goes out as a question

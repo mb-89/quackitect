@@ -23,7 +23,7 @@ const (
 	RideWord  = "ride"
 )
 
-// The events the fold reads, the field the door stamps, and the words and tools the holds name, off src/bridge/stop.js, grace.js, plan.js, answer.js and ask.js. [[spec/tickets/cage-call-holds-port]]
+// The events the fold reads, the field the door stamps, and the words and tools the holds name. [[spec/tickets/cage-call-holds-port]]
 const (
 	promptEvent  = "prompt.submit"
 	displayEvent = "classic.MessageDisplay"
@@ -71,7 +71,7 @@ var (
 	spaces   = regexp.MustCompile(`\s+`)
 )
 
-// The refusal of a cloud box's question, off ASKS_NOBODY in src/bridge/cloud-ask.js. [[spec/design_output/level0#the-cloud-ask-door]]
+// The refusal of a cloud box's question. [[spec/design_output/level0#the-cloud-ask-door]]
 const asksNobody = "Nobody sits beside this cloud box, so a question in the chat meets nobody. Where you can decide, decide, and say what you weigh and assume. Where a person alone can, mint a ticket on the person route: `./RUNME.sh mint ticket spec/tickets/<name>.md --process=person`. Write every command they need into its ask, push it, and go on with the branch. Rule 7 of spec/guidance/cloud/cloud says why."
 
 // What the holds keep over a session: the finish calls of the turn, the agent's calls since the plan's last answer, the engine's ask, the reply the owner waits for, the update ask standing, the newest text, and the answer to the newest event. [[spec/tickets/cage-call-holds-port]]
@@ -91,7 +91,7 @@ type Holds struct {
 	Probing bool `json:"probing,omitempty"`
 }
 
-// The engine's ask, off wants in src/bridge/grace.js. [[spec/design_output/stop#the-grace]]
+// The engine's ask. [[spec/design_output/stop#the-grace]]
 type Grace struct {
 	Why   string `json:"why"`
 	React string `json:"react"`
@@ -99,7 +99,7 @@ type Grace struct {
 	Left  int    `json:"left"`
 }
 
-// The reply the owner waits for, off demands in src/bridge/answer.js. Block says the demand's block rides its skips, and Update names the update ask it pays. [[spec/design_output/level0#the-owners-prompt-comes-first]]
+// The reply the owner waits for. Block says the demand's block rides its skips, and Update names the update ask it pays. [[spec/design_output/level0#the-owners-prompt-comes-first]]
 type Demand struct {
 	Why    string `json:"why"`
 	Seen   string `json:"seen"`
@@ -178,7 +178,7 @@ func (state Holds) copied() Holds {
 	return state
 }
 
-// A prompt names its row, a prompt row for an owner and an agent row for anything else. An owner's prompt opens a demand, keyed by the newest row the bridgehead found at it, and answers with the answer-first line in front, as onPromptSubmit in src/bridge/answer.js does. A prompt naming a note waits on the note, which the port leaves to the bridge. [[spec/design_output/level0#which-prompt-opens-a-turn]] [[spec/tickets/prompt-answers-off-the-door]]
+// A prompt names its row, a prompt row for an owner and an agent row for anything else. An owner's prompt opens a demand, keyed by the newest row the bridgehead found at it, and answers with the answer-first line in front. A prompt naming a note waits on the note, which the port leaves to the bridge. [[spec/design_output/level0#which-prompt-opens-a-turn]] [[spec/tickets/prompt-answers-off-the-door]]
 func (state *Holds) prompted(fields map[string]any, at time.Time) {
 	origin, _ := fields["origin"].(map[string]any)
 	from, text := textOf(origin, "kind"), textOf(fields, "text")
@@ -222,7 +222,7 @@ var (
 	questionRun = regexp.MustCompile(`\?+`)
 )
 
-// The answer-first line, off warns in .claude/skills/level0/lib/answer.js. [[spec/tickets/prompt-answers-off-the-door]]
+// The answer-first line. [[spec/tickets/prompt-answers-off-the-door]]
 func warns(why string) string {
 	return why + ", and nothing has answered it yet. Write the answer in the chat, as text before the next tool call: what you understood and what you do next. Level zero refuses that call until an answer stands in the chat."
 }
@@ -249,7 +249,7 @@ func (state *Holds) spoke(fields map[string]any) {
 	state.Said.Text = says(state.Demand.Why) + " The last text seen stands from before the ask, and reads: \"" + head(state.Demand.Seen) + "\"."
 }
 
-// The turn's end pays with its answer or drops the demand, and puts the finish calls back. A finish or a stop hold drops to off and stands as the stood mark, as dropsHold in src/bridge/stop.js does. [[spec/design_output/stop#the-hold]] [[spec/tickets/cage-hold-drops-port]]
+// The turn's end pays with its answer or drops the demand, and puts the finish calls back. A finish or a stop hold drops to off and stands as the stood mark. [[spec/design_output/stop#the-hold]] [[spec/tickets/cage-hold-drops-port]]
 func (state *Holds) turnEnds(fields map[string]any) {
 	held := heldIn(fields)
 	if hold := textOf(held, heldHold); hold == finishHold || hold == stopHold {
@@ -271,7 +271,7 @@ func (state *Holds) turnEnds(fields map[string]any) {
 	state.Finish = 0
 }
 
-// The pay clears the demand. Where it pays an update and the ask still stands at the paid value, the ask drops to quiet, as dropsAsk in src/bridge/ask.js does. A value pressed since stands. [[spec/tickets/cage-hold-drops-port]]
+// The pay clears the demand. Where it pays an update and the ask still stands at the paid value, the ask drops to quiet. A value pressed since stands. [[spec/tickets/cage-hold-drops-port]]
 func (state *Holds) paid(text string, held map[string]any) {
 	if wanted := state.Demand.Update; wanted != "" {
 		state.Asked = ""
@@ -436,7 +436,7 @@ func refusedByGrace(grace Grace) string {
 	return grace.Why + " The grace is spent, so this call is refused. " + react + ", and the calls pass again." + load
 }
 
-// The answer door's words, off SAYS in src/bridge/answer.js. [[spec/design_output/level0#the-reply-line]]
+// The answer door's words. [[spec/design_output/level0#the-reply-line]]
 func says(why string) string {
 	return why + ", and nothing has answered it. Answer it before the next tool call: write it in the chat as text, which pays this door the moment the chat shows it. Call " + reportCall + " with the same text so the log carries it. Say what you understood and what you do next. Then work."
 }

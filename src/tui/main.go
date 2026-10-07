@@ -22,6 +22,7 @@ import (
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/log"
 	"quackitect/src/tui/registry"
+	"quackitect/src/tui/tutorial"
 	"quackitect/src/tui/work"
 )
 
@@ -113,7 +114,7 @@ func newModelOver(path string, zone *time.Location, catalog work.Source) frame.M
 	logTab.From = catalog
 	workTab := work.New(path)
 	workTab.From = catalog
-	return frame.New(path, zone, []frame.Tab{logTab, workTab,
+	return frame.New(path, zone, []frame.Tab{logTab, workTab, tutorial.New(catalog),
 		registry.Index(catalog), registry.Cli(catalog), registry.Help(catalog)})
 }
 

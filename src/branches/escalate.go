@@ -1,6 +1,6 @@
 // The escalation: a hand reaching no answer without a person puts a person
 // step into its route before the leaf in hand, lands and pushes it, and the
-// pull hands the next leaf, as src/scripts/pull-escalate.js answers it.
+// pull hands the next leaf.
 // [[spec/design_output/pull#a-person-step-goes-in]]
 package branches
 

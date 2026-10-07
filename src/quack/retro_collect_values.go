@@ -55,7 +55,7 @@ func retroKeptReport(stamp string) string {
 	return retroCollectPretty(out)
 }
 
-// Each part's median over the runs, as medianParts in src/scripts/battery.js reads it. [[spec/guidance/retro/effect]]
+// Each part's median over the runs. [[spec/guidance/retro/effect]]
 func retroCollectMedianParts(runs []any) *retroCollectObject {
 	held := retroCollectNewObject()
 	for _, run := range runs {

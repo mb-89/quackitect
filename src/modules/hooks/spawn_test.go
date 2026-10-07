@@ -1,5 +1,5 @@
-// The layer the door puts into a spawned helper's prompt, off onAgentSpawn in
-// src/bridge/guidance.js: one case table, which the JavaScript builders write.
+// The layer the door puts into a spawned helper's prompt: one case table,
+// which the JavaScript builders write.
 // [[spec/tickets/spawn-answers-off-the-door]]
 package hooks
 

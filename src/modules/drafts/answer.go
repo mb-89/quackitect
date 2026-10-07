@@ -1,6 +1,5 @@
-// The answer check, off checksAnswer in src/bridge/tools.js and readsAnswer in
-// src/bridge/answer-read.js, with the shape rules of lib/answer.js and the
-// stop line of lib/stop.js.
+// The answer check, with the shape rules of lib/answer.js and the stop line of
+// lib/stop.js.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
 

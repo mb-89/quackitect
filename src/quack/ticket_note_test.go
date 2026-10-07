@@ -1,6 +1,4 @@
-// ticket note writes a private ticket off the note process and carries on,
-// off the roads test/level0/ticket-verb.test.js, ticket-todo.test.js and
-// roots.test.js cover.
+// ticket note writes a private ticket off the note process and carries on.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

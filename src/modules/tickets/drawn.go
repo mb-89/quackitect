@@ -264,7 +264,7 @@ func entryNamed(walk []entry, want string, holder entry) (entry, bool) {
 	return entry{}, false
 }
 
-// The fields in route order and checked last, as leafOf in src/scripts/pull-route.js gathers them, each at the line headingLines in src/extension/lib/fields.js held, and filled where chapterOf in src/scripts/pull-chapter.js reads a line under it. [[spec/design_output/extension#a-take-marks-the-fields]]
+// The fields in route order and checked last, as leafOf in src/scripts/pull-route.js gathers them, each at the line headingLines in src/extension/lib/fields.js held, and filled where ChapterOf in src/pull/pull_chapter.go reads a line under it. [[spec/design_output/extension#a-take-marks-the-fields]]
 func leafDrawn(walk []entry, leaf entry, sections []note.Section) DrawnLeaf {
 	chain := []entry{}
 	parts := strings.Split(leaf.path, "/")

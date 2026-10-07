@@ -1,6 +1,6 @@
 // The final acceptance: a gate carrying final waits on the work under it,
 // reads the diff since its last verdict, and closes onto a question past its
-// cap, off src/scripts/pull-accept.js.
+// cap.
 // [[spec/design_output/pull#the-final-acceptance]]
 package pull
 

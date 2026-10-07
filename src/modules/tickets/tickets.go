@@ -7,6 +7,7 @@ package tickets
 import (
 	"path"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -82,7 +83,7 @@ type tipsIn struct {
 	Trunk []ticket.File `q:"trunk"`
 }
 
-// Every ticket the work names, each once: an unmerged branch speaks for its own tickets first, then the folders speak for the rest, as ticketsIn in src/scripts/work-answer.js reads them. A branch's copy keeps the working tree's path, and one standing on the branch alone carries none. [[spec/design_output/work#one-reading-answers-git]]
+// Every ticket the work names, each once: an unmerged branch speaks for its own tickets first, then the folders speak for the rest. A branch's copy keeps the working tree's path, and one standing on the branch alone carries none. [[spec/design_output/work#one-reading-answers-git]]
 func branchedOf(in tipsIn) []Ticket {
 	here := map[string]Ticket{}
 	for _, one := range in.All {
@@ -94,7 +95,7 @@ func branchedOf(in tipsIn) []Ticket {
 		if merged(tip) {
 			continue
 		}
-		for _, one := range owned(tip) {
+		for _, one := range owned(tip, in.Trunk) {
 			if seen[one.Name] {
 				continue
 			}
@@ -122,12 +123,12 @@ func branchedOf(in tipsIn) []Ticket {
 	return All(out)
 }
 
-// Each standing branch with the tip's copy of its group ticket, where that copy runs the group route, and the tip's tickets naming the group, as answerOf in src/scripts/work-answer.js draws them. [[spec/design_output/work#one-reading-answers-git]]
+// Each standing branch with the tip's copy of its group ticket, where that copy runs the group route, and the tip's tickets naming the group. [[spec/design_output/work#one-reading-answers-git]]
 func branchesOf(in tipsIn) []ticket.Branch {
 	out := []ticket.Branch{}
 	for _, tip := range in.Tips {
 		branch := ticket.Branch{Name: tip.Name, Merged: merged(tip), Children: []Ticket{}}
-		for _, one := range owned(tip) {
+		for _, one := range owned(tip, in.Trunk) {
 			switch {
 			case one.Name == tip.Name && one.Route == groupRoute:
 				branch.Ticket = one
@@ -140,10 +141,10 @@ func branchesOf(in tipsIn) []ticket.Branch {
 	return out
 }
 
-// The tickets a branch owns: its group's and the ones naming that group. Any other ticket on it is a stale copy of trunk's. [[spec/design_output/pull#the-queue-is-an-outline]]
-func owned(tip ticket.Tip) []Ticket {
+// The tickets a branch owns: its group's and the ones naming that group, read off its tree. Any other ticket on it is a stale copy of trunk's. [[spec/design_output/pull#the-queue-is-an-outline]]
+func owned(tip ticket.Tip, trunk []ticket.File) []Ticket {
 	out := []Ticket{}
-	for _, file := range tip.Files {
+	for _, file := range treeOf(tip, trunk) {
 		one := Of(file.Path, strings.TrimSuffix(path.Base(file.Path), noteExt), file.Text, 0)
 		if one.Name == tip.Name || one.Group == tip.Name {
 			out = append(out, one)
@@ -152,12 +153,31 @@ func owned(tip ticket.Tip) []Ticket {
 	return out
 }
 
+// A branch's ticket files: trunk's, less the ones the tip drops, with the tip's own over them, in path order. [[spec/tickets/tips-carry-branch-changes-alone]]
+func treeOf(tip ticket.Tip, trunk []ticket.File) []ticket.File {
+	byPath := map[string]ticket.File{}
+	for _, file := range trunk {
+		if !slices.Contains(tip.Gone, file.Path) {
+			byPath[file.Path] = file
+		}
+	}
+	for _, file := range tip.Files {
+		byPath[file.Path] = file
+	}
+	out := make([]ticket.File, 0, len(byPath))
+	for _, file := range byPath {
+		out = append(out, file)
+	}
+	sort.Slice(out, func(a, b int) bool { return out[a].Path < out[b].Path })
+	return out
+}
+
 // A branch landed once trunk carries its group ticket closed, the rule landedHere in src/scripts/work-stands.js holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 func merged(tip ticket.Tip) bool {
 	return tip.Trunk != "" && Of("", "", tip.Trunk, 0).State == closedState
 }
 
-// Every ticket the cloud holds, by name: a group carrying the mark, and every ticket naming one, over the tickets a standing branch folds in, the rule cloudsIn in src/scripts/work-answer.js holds. [[spec/tickets/the-queue-reads-the-marker]]
+// Every ticket the cloud holds, by name: a group carrying the mark, and every ticket naming one, over the tickets a standing branch folds in. [[spec/tickets/the-queue-reads-the-marker]]
 func cloudOf(in branchedIn) []string {
 	marked := map[string]bool{}
 	for _, one := range in.Branched {
@@ -175,7 +195,7 @@ func cloudOf(in branchedIn) []string {
 	return out
 }
 
-// The key a group's front carries where the cloud holds it, which CLOUD_MARK in src/scripts/work-merge.js names and a Go module spells again. [[spec/tickets/the-queue-reads-the-marker]]
+// The key a group's front carries where the cloud holds it. [[spec/tickets/the-queue-reads-the-marker]]
 const cloudMark = "cloud"
 
 // The hand a leaf names where a person takes it. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -366,7 +386,7 @@ func trimOne(said, quotes string) string {
 	return said
 }
 
-// The hand-backs that failed on a ticket, each a record item carrying returns, the rule failsOn in src/scripts/pull-queue.js holds. [[spec/tickets/the-queue-moves-to-plan]]
+// The hand-backs that failed on a ticket, each a record item carrying returns, which the fail weight in src/modules/queue/score.go counts. [[spec/tickets/the-queue-moves-to-plan]]
 func failsIn(front *yaml.Doc) int {
 	count := 0
 	for _, item := range yaml.AsList(front.Get("record")) {
@@ -398,7 +418,7 @@ func stepIn(front *yaml.Doc) string {
 	return strings.Join(path, "/")
 }
 
-// Whether the leaf the step names says by: person, the first leaf where no step stands, the rule personStep in src/scripts/work-answer.js holds. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+// Whether the leaf the step names says by: person, the first leaf where no step stands. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
 func personIn(front *yaml.Doc, step string) bool {
 	steps := yaml.AsList(front.Get("steps"))
 	var leaf *yaml.Doc

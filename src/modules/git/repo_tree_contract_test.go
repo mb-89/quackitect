@@ -207,11 +207,12 @@ func TestRepoPatchNamesTheLinesTwoRefsDifferIn(t *testing.T) {
 func TestRepoCommitFilesWritesOverAParentsTreeAndMovesNoRef(t *testing.T) {
 	t.Parallel()
 	for _, w := range worlds(t) {
-		hash, err := w.here.CommitFiles("HEAD", map[string]string{"notes/deep/x.md": "x\n", "README.md": "over\n"}, "writes")
+		written := map[string]string{"notes/deep/x.md": "x\n", "README.md": "over\n", "a.md": "a\n", "m/y.md": "y\n"}
+		hash, err := w.here.CommitFiles("HEAD", written, "writes")
 		if err != nil || len(hash) != hashLength {
 			t.Errorf("the %s repo's commit of files answers %q, %v", w.name, hash, err)
 		}
-		for path, want := range map[string]string{"notes/deep/x.md": "x\n", "README.md": "over\n"} {
+		for path, want := range written {
 			if said, ok := w.here.Show(hash, path); !ok || said != want {
 				t.Errorf("the %s repo's new commit holds %s as %q, %v", w.name, path, said, ok)
 			}

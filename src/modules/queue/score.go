@@ -1,4 +1,4 @@
-// The queue's score, ported from src/scripts/pull-queue.js. The mark stands
+// The queue's score. The mark stands
 // over the score, and the score weighs what waits under a row, how long it
 // stands and how often a hand failed on it. A caller hands the rows in, so the
 // order reads no git and no file.

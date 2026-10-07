@@ -1,8 +1,7 @@
 // quack tui: the window this tree builds, on the tab the caller names. A
 // window already standing takes the tab over its own port and the second
 // launch ends, so one window stands at a time. A tree carrying no Go prints
-// the rows plain instead. The viewer build stamps its source as viewerOf in
-// src/scripts/tui-build.js does, so the check and the verb share one stamp.
+// the rows plain instead.
 // [[spec/design_output/tui#the-verb-builds-it]]
 package main
 
@@ -26,7 +25,7 @@ import (
 )
 
 // The tabs a caller names, the first one a handover opens where none is named. [[spec/design_output/tui#a-tab-the-caller-names]]
-var tuiTabs = []string{"log", "work"}
+var tuiTabs = []string{"log", "work", "tutorial"}
 
 // The log's folders, as FOLDER and OLD in .claude/skills/level0/lib/log.js name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (
@@ -47,7 +46,7 @@ const (
 // The module files each stamp reads beside its folders. [[spec/tickets/go-code-shares-one-module]]
 var tuiModuleFiles = []string{"go.mod", "go.sum"}
 
-// A tree import names a package folder under the root, as IMPORT in src/scripts/cli-go.js reads it. [[spec/tickets/go-code-shares-one-module]]
+// A tree import names a package folder under the root. [[spec/tickets/go-code-shares-one-module]]
 var tuiImport = regexp.MustCompile(`"quackitect/(src/[^"]+)"`)
 
 // What the tui verb reaches: the root, the box's kind, the go program, a captured run, a launch holding the terminal, and the tell to a standing window. [[spec/design_output/tui#the-verb-builds-it]]
@@ -257,7 +256,7 @@ func tuiSourceText(disk diskDoors, root string) string {
 	return strings.Join(parts, tuiJoin)
 }
 
-// A package folder and every tree package it imports, to the end of the chain, a folder below another left out, as goFoldersOf in src/scripts/cli-go.js answers. [[spec/tickets/go-code-shares-one-module]]
+// A package folder and every tree package it imports, to the end of the chain, a folder below another left out. [[spec/tickets/go-code-shares-one-module]]
 func tuiGoFoldersOf(disk diskDoors, root, folder string) []string {
 	seen := []string{folder}
 	for queue := []string{folder}; len(queue) > 0; queue = queue[1:] {

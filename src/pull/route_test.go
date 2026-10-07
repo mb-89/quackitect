@@ -1,5 +1,4 @@
-// The reads the route, fill and update verbs share, each case off
-// test/level0/ticket-route.test.js, ticket-drift.test.js and ticket-verb.test.js.
+// The reads the route, fill and update verbs share.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package pull
 

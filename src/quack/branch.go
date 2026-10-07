@@ -18,12 +18,20 @@ import (
 	"quackitect/src/proc"
 )
 
-func init() { register("branch", branchVerb(index.Root, reachV1)) }
+func init() { register("branch", branchVerb(branchingHere(index.Root, reachV1))) }
 
-// branch off the doors over the root and the index, every word past the verb handed to the package. [[spec/tickets/work-verbs-port-to-go]]
-func branchVerb(root func() (string, error), v1 func() (string, error)) twin {
+// The doors a branch verb runs behind, built for one call's output and errors: the live ones on this box, or fakes in the example harness. [[spec/design_output/examples#one-runner-two-drivers]]
+type doorsOver func(out, errs io.Writer) *branches.Doors
+
+// The live doors over the root and the index. [[spec/design_output/vehicle#the-work-root-inherits]]
+func branchingHere(root func() (string, error), v1 func() (string, error)) doorsOver {
+	return func(out, errs io.Writer) *branches.Doors { return branchDoors(root, v1, out, errs) }
+}
+
+// branch off the doors it takes, every word past the verb handed to the package. [[spec/tickets/work-verbs-port-to-go]]
+func branchVerb(doors doorsOver) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		return branches.Branch(branchDoors(root, v1, out, errs), argv[1:])
+		return branches.Branch(doors(out, errs), argv[1:])
 	}
 }
 

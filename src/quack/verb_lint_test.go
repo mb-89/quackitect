@@ -139,8 +139,9 @@ func TestLintVerb(t *testing.T) {
 		}
 	})
 	// A red changed part names its warnings under --errors. [[spec/tickets/lint-strict-leaves-erred]]
-	t.Run("a warning under --strict leaves as an erred line, and stands under stood nowhere", func(t *testing.T) {
-		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)}}
+	// A rule in report mode leaves under neither list, so it holds no push. [[spec/tickets/report-mode-holds-no-push]]
+	t.Run("a warning under --strict leaves as an erred line, and a report-mode warning leaves under neither", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning), lintRow("b.go", "ExampleCovers", check.SeverityWarning)}}
 		runsTwin(fake.verb(t, nil), "lint", "--strict")
 		want := lintFound{Stood: []finding{}, Erred: []string{"a.md:2:3: Sentence: Sentence says"}}
 		if len(fake.left) != 1 || !reflect.DeepEqual(fake.left[0], want) {

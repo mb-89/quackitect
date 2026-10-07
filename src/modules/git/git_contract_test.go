@@ -7,6 +7,7 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -39,21 +40,23 @@ func gitSuite(t *testing.T, one Git, hands remote) {
 	if said := tips(); len(said) != 0 {
 		t.Fatalf("a remote with no work branch answers %+v", said)
 	}
-	hands.land(map[string]string{"spec/tickets/the-group.md": "trunk's copy\n"})
+	hands.land(map[string]string{"spec/tickets/the-group.md": "trunk's copy\n", "spec/tickets/shared.md": "shared\n", "spec/tickets/dropped.md": "dropped\n"})
 	hands.push("the-group", map[string]string{
 		"spec/tickets/the-group.md":   "the tip's copy\n",
 		"spec/tickets/a-child.md":     "a child\n",
+		"spec/tickets/shared.md":      "shared\n",
 		"spec/tickets/nested/deep.md": "no ticket\n",
 		"spec/tickets/notes.txt":      "no note\n",
 		"spec/other.md":               "outside\n",
 	})
 	hands.push("another", map[string]string{"spec/tickets/another.md": "its own\n"})
 	want := []ticket.Tip{
-		{Name: "another", Files: []ticket.File{{Path: "spec/tickets/another.md", Text: "its own\n"}}},
+		{Name: "another", Files: []ticket.File{{Path: "spec/tickets/another.md", Text: "its own\n"}},
+			Gone: []string{"spec/tickets/dropped.md", "spec/tickets/shared.md", "spec/tickets/the-group.md"}},
 		{Name: "the-group", Trunk: "trunk's copy\n", Files: []ticket.File{
 			{Path: "spec/tickets/a-child.md", Text: "a child\n"},
 			{Path: "spec/tickets/the-group.md", Text: "the tip's copy\n"},
-		}},
+		}, Gone: []string{"spec/tickets/dropped.md"}},
 	}
 	if said := tips(); !reflect.DeepEqual(said, want) {
 		t.Fatalf("the remote answers %+v, and wants %+v", said, want)
@@ -63,7 +66,7 @@ func gitSuite(t *testing.T, one Git, hands remote) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if wantTrunk := []ticket.File{{Path: "spec/tickets/the-group.md", Text: "trunk's copy\n"}}; !reflect.DeepEqual(trunk, wantTrunk) {
+	if wantTrunk := []ticket.File{{Path: "spec/tickets/dropped.md", Text: "dropped\n"}, {Path: "spec/tickets/shared.md", Text: "shared\n"}, {Path: "spec/tickets/the-group.md", Text: "trunk's copy\n"}}; !reflect.DeepEqual(trunk, wantTrunk) {
 		t.Fatalf("trunk answers %+v, and wants %+v", trunk, wantTrunk)
 	}
 	hands.drop("another")
@@ -144,6 +147,27 @@ func TestGitKeepsItsContract(t *testing.T) {
 			write: func(files map[string]string) { written(t, local, files) },
 		})
 	})
+}
+
+// The bus caps a message at 64 MiB. [[spec/tickets/seed-splits-under-bus-cap]]
+const busCap = 64 << 20
+
+// The tips this checkout reads off origin land under the bus cap. [[spec/tickets/tips-carry-branch-changes-alone]]
+func TestTheLiveTipsLandUnderTheBusCap(t *testing.T) {
+	tips, err := New(filepath.Join("..", "..", "..")).Tips()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tips) == 0 {
+		t.Skip("no work branch stands on origin")
+	}
+	all, err := json.Marshal(tips)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) > busCap {
+		t.Fatalf("the tips carry %d bytes over %d branches, past the bus cap of %d", len(all), len(tips), busCap)
+	}
 }
 
 // A shallow clone reads its ages again once a fetch deepens it, though HEAD stands still. [[spec/tickets/verbs-queue-order]]

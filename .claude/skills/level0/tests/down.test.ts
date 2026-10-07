@@ -1,5 +1,5 @@
 // The hooks door standing down: the start road, the cage verb, and the fall said once.
-// [[spec/tickets/level0-tests-move-to-plugin-test]] [[spec/tickets/a-down-index-refuses-calls]]
+// [[spec/tickets/level0-tests-to-plugin-test]] [[spec/tickets/a-down-index-refuses-calls]]
 
 import { expect, test } from "claude-code/testing";
 import { STARTING } from "../hooks/level0.ts";

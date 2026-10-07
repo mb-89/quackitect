@@ -6,8 +6,8 @@ refines:
 
 # Scope
 
-`src/scripts/pull.js` holds the pull, under `./RUNME.sh ticket`, and the test
-verb, under `./RUNME.sh branch`. This note covers the hand-out, the hand-back with its checks,
+`src/pull/pull.go` holds the pull, under `./RUNME.sh ticket`, and
+`src/branches/test.go` the test verb, under `./RUNME.sh branch`. This note covers the hand-out, the hand-back with its checks,
 and the answers. It covers the record, the hold per hand, and what the
 stop hook reads off the hold. The verbs around the branch stand in
 [[spec/design_output/work]].
@@ -175,7 +175,7 @@ reason. The pull then moves to the next leaf, or closes the ticket `done` past
 the last. A closed ticket carrying `when: returned` stands as history, and the
 check reads no row on it.
 
-The conditions below read the ticket's Ask, and `src/scripts/pull-when.js` reads them:
+The conditions below read the ticket's Ask, and `src/pull/pull_when.go` reads them:
 
 | `when` | holds where the Ask carries |
 |---|---|
@@ -206,7 +206,7 @@ that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
 reads the commits between the take and the tip, and refuses where one names
 this ticket. A sibling hand's commit costs the reading nothing. `commitsFor`,
-under `src/scripts/pull-writes.js`, answers that split off the name `landed`
+under `src/pull/pull_writes.go`, answers that split off the name `landed`
 writes before the first colon.
 
 | what the flag says | what the record holds |
@@ -270,7 +270,7 @@ the next. It takes `--pass` alone. The work answer draws it as a held row at
 `0`, the way it draws a plan todo.
 
 `src/scripts/ephemeral.js` names the tickets and their asks, and
-`src/scripts/ephemeral-pull.js` hands them out and takes them back. The clear
+`src/pull/pull_ephemeral.go` hands them out and takes them back. The clear
 runs as three of them. For details, see
 [[spec/design_output/stop#the-context-hands-over]].
 
@@ -434,13 +434,13 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 A hand hands the fields back as the pull's payload, and the engine writes the
 ticket file. `--fields '{"verdict": "pass"}'` carries one key per field of
 the leaf in hand, and `checked` where a checklist stands. `formatted` in
-`src/scripts/pull-format.js` formats each answer first. The engine puts each
+`src/pull/pull_chapter.go` formats each answer first. The engine puts each
 text under its heading in memory, past the mint's comments, and runs the
 checks over that text. The pull refuses a key naming no field of the leaf.
 
 The write door refuses an agent a write to an open ticket under
 `spec/tickets`, past its Discussion. A draft and a closed ticket take one.
-`ticketDoor` in `src/bridge/write.js` holds it. The work tab draws the
+`OpenTicketRefusal` in `src/modules/hooks/write/rules.go` holds it. The work tab draws the
 progress the index row carries: the leaves the record closes over the leaves
 of the route.
 
@@ -510,10 +510,10 @@ so no fix commit follows a landing.
 | `ticket note` | the Ask it mints, before it writes |
 | `retro new` | the Ask carrying the `--why` line, before it writes |
 
-The road reads through `readsText`, the lint's own reading. `readsProse` in
-`src/bridge/prose.js` serves the write door, and it drops a long sentence and a
+The road reads through `readsText`, the lint's own reading. `prose.Kept` in
+`src/prose/prose.go` serves the write door, and it drops a long sentence and a
 word outside the vocabulary where it judges the finding false. The lint keeps
-those findings, so a verb reading through `readsProse` lets a line through that
+those findings, so a verb reading through `prose.Kept` lets a line through that
 the lint names later.
 
 A contract case in `test/contract/process.test.js` mints a ticket off every
@@ -544,7 +544,7 @@ last. It sets `state: open`, stages everything, and commits as `<ticket>:
 ## A finding rides out
 
 A verdict opening `pass with findings` mints a child ticket a row, and the
-parent goes on to its next leaf. `verdictIn` in `src/scripts/pull-chapter.js`
+parent goes on to its next leaf. `VerdictIn` in `src/pull/pull_chapter.go`
 answers `findings` with each row's name and finding, and a plain `pass` keeps
 its rows as the reason.
 
@@ -556,7 +556,7 @@ its rows as the reason.
 | a name a ticket carries, or a name twice | refuses, and names the name |
 | every row sound | mints each child, then passes the parent |
 
-`minted` in `src/scripts/pull-writes.js` builds every child before it writes
+`minted` in `src/pull/pull_writes.go` builds every child before it writes
 any. A child follows `spec/processes/trivial.yaml` and stands at `draft`. It
 carries `parent`, the parent's `group` where one stands, and the finding as its
 Ask. The children land in the parent's pass commit, whose subject reads
@@ -591,7 +591,7 @@ rebase runs on those words alone. A rebase that fails puts the tree back, and
 the answer says to push the branch and pull again.
 
 The re-push of a hand-back the record holds already answers the same way.
-`repairPersonSteps` in `src/scripts/pull-hand.js` lands the engine's own repair,
+`repairPersonSteps` in `src/pull/pull_person.go` lands the engine's own repair,
 and it reads no answer, so it stays quiet.
 
 ## The refused commit
@@ -667,7 +667,7 @@ hand reaches the person step, and one mechanism inserts every kind.
 
 A design review fails an unusable approach alone, so a second fail says
 the approach stays unusable. The owner rules that it goes to the owner. `failed` in
-`src/scripts/pull-writes.js` calls `withPersonStep` before it lands, so the
+`src/pull/pull_writes.go` calls `withPersonStep` before it lands, so the
 person step and the fail share one commit. The counts below stand:
 
 | the count | what the pull does |
@@ -690,17 +690,17 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 |---|---|
 | `accept` | reads as `pass`, and hands out the next phase |
 | `accept with points` | mints a fix ticket a row on the trivial route, `open` and `todo: true`, carrying `parent`, and goes on |
-| `reject` | `rejected` in `src/scripts/pull-gate.js` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
+| `reject` | `rejected` in `src/pull/pull_gate.go` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
 | a second `reject` | puts a person step in before the copies too, through `withPersonStep` |
 
-- The hand-out of a gate prints its question, and `BEFORE_CLEAR` in `src/scripts/pull-chapter.js` beside it.
+- The hand-out of a gate prints its question, and `beforeClear` in `src/pull/pull_chapter.go` beside it.
 - The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.
 - A copy keeps no leaf a condition holds, no person step and no earlier copy.
 - Tests-red lists its red files under `red`. `RedList` in `src/modules/tickets/red.go` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.
 
 ## The final acceptance
 
-A gate carrying `final: true` reads the whole work, and the process closes on its verdict. [[spec/design_input/level-two#the-final-acceptance]] asks it, and `src/scripts/pull-accept.js` holds it.
+A gate carrying `final: true` reads the whole work, and the process closes on its verdict. [[spec/design_input/level-two#the-final-acceptance]] asks it, and `src/pull/pull_accept.go` holds it.
 
 | the moment | what the engine does |
 |---|---|
@@ -721,7 +721,7 @@ The standard route carries its acceptance under `when: backlog`, which holds whe
 
 ## The bless
 
-A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design_input/level-two#the-bless]] asks it, and `src/scripts/pull-bless.js` holds it.
+A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design_input/level-two#the-bless]] asks it, and `src/pull/pull_bless.go` holds it.
 
 | the moment | what the engine does |
 |---|---|
@@ -757,7 +757,7 @@ So a hand fixes what the sweep names later through the one road there is.
 
 ## An input marks its steps
 
-A passed leaf keeps the hash of each input and of its own definition. A pull finds the leaves whose hashes no longer match. [[spec/design_input/level-two#evidence-and-stale-steps]] asks it, and `src/scripts/pull-stale.js` holds it.
+A passed leaf keeps the hash of each input and of its own definition. A pull finds the leaves whose hashes no longer match. [[spec/design_input/level-two#evidence-and-stale-steps]] asks it, and `src/pull/pull_stale.go` holds it.
 
 | the record field | what it holds |
 |---|---|
@@ -786,14 +786,14 @@ A leaf linking a ticket under `spec/tickets` or `.se/tickets` hashes that ticket
 
 ## Kept red leaves
 
-A red leaf holds a command field expecting `assertion`. Once the change lands, its tests pass, so a rewind handing it out again strands the ticket. `keptRed` in `src/scripts/pull-kept.js` keeps it, and `stepOn` and `advanced` write its entry and walk on.
+A red leaf holds a command field expecting `assertion`. Once the change lands, its tests pass, so a rewind handing it out again strands the ticket. `keptRed` in `src/pull/pull_kept.go` keeps it, and `stepOn` and `advanced` write its entry and walk on.
 
 | read | how |
 |---|---|
 | the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` |
 | a later pass | an entry after it, of a leaf past the red leaf in route order, of the same kind |
 | the red commit | the first commit after the red pass's `hash_after` whose subject names the ticket and carries the whole change `passes <leaf>` |
-| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/pull-kept.js`, or the files under `test/` the red commit lands where the leaf lists none |
+| the red tests | the leaf's `red` list, through `redListOf` in `src/pull/pull_kept.go`, or the files under `test/` the red commit lands where the leaf lists none |
 | they stand | `git diff -M --name-status` from the red commit to HEAD deletes none of them, and a rename keeps one |
 
 The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the change line reads `keeps <leaf>`.
@@ -855,14 +855,14 @@ writes, and nothing else. A group opens with its children standing, as
 
 A draft on the `trivial` route waits on no person:
 
-- the pull opens it through `opensDraft` in `src/scripts/ticket.js`, the verb's own road
+- the pull opens it through `OpensDraft` in `src/pull/pull_ticket.go`, the verb's own road
 - the pull hands its first leaf
 - the queue counts it among the agent's rows
 - a refusal on that road leaves the draft standing, and the wait answer names the refusal
 
 The verb reads the voice rules over the Ask too. A break of form warns, names
 each line, and the ticket opens. A private name refuses. `askFaults` in
-`src/scripts/ticket-ask-lint.js` hands `voiceOver` the whole ticket, and keeps
+`src/pull/pull_ticket.go` hands the voice the whole ticket, and keeps
 the findings on the Ask's lines, so a line number names the file's line. The
 Ask is the engine's from the open on, so the ticket door refuses every later
 hand there. A box with no Vale opens as it stands.

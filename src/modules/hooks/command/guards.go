@@ -1,4 +1,4 @@
-// The bless guard, off src/bridge/bless.js, and the version guard, off
+// The bless guard, and the version guard off
 // lib/trunk.js: a command reaches neither the bless file nor a variable naming
 // the hand, and rewrites or deletes no version branch.
 // [[spec/tickets/cage-command-rules-port]]
@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// The bless file, off src/scripts/pull-bless.js, under the folder .claude/skills/level0/lib/folders.js owns, and the variables naming the hand and the box, off src/scripts/pull-hand-of.js and lib/cloud.js. [[spec/design_output/pull#the-bless]]
+// The bless file, off src/pull/pull_bless.go, under the folder .claude/skills/level0/lib/folders.js owns, and the variables naming the hand and the box, off src/scripts/pull-hand-of.js and lib/cloud.js. [[spec/design_output/pull#the-bless]]
 const blessFile = ".se/.runtime/bless.json"
 
 // [[spec/design_output/pull#the-bless]]

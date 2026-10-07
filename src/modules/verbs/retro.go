@@ -7,6 +7,7 @@ package verbs
 var RetroVerbs = []Verb{
 	{Name: "notes", Doc: "the private notes still open on this box, and 0 when none stands"},
 	{Name: "audit", Doc: "the experiments still open, and 0 once each stands decided"},
+	{Name: "gaps", Doc: "each verb no example shows, and each test beside a verb an example shows"},
 	{Name: "backlog", Doc: "every prose criterion the window closes, and 0 once each holds a verdict"},
 	{Name: "collect", Doc: "copies this box into the retro's folder, and writes its manifest; --again merges what arrived since"},
 	{Name: "timeline", Doc: "the hours holding work, per source, with the idle stretches between"},

@@ -1,5 +1,5 @@
 // The test verb: the tests the branch changes since the take, run once, and
-// one word on what came back, as src/scripts/work-test.js answers it. A red
+// one word on what came back. A red
 // run sets the sources aside and runs the test over HEAD's text.
 // [[spec/design_output/pull#the-test-verb]]
 package branches

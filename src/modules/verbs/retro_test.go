@@ -12,7 +12,7 @@ import (
 
 // Every retro verb stands as an action of the retro topic, with its doc. [[spec/tickets/retro-verbs-become-actions]]
 func TestEveryRetroVerbStandsAsAnAction(t *testing.T) {
-	want := []string{"notes", "audit", "backlog", "collect", "timeline", "chapters", "matrix", "read", "effect", "classes", "mint", "new", "score"}
+	want := []string{"notes", "audit", "gaps", "backlog", "collect", "timeline", "chapters", "matrix", "read", "effect", "classes", "mint", "new", "score"}
 	var names []string
 	for _, one := range RetroVerbs {
 		names = append(names, one.Name)

@@ -1,6 +1,5 @@
 // The review tool off the door: a call answers a spawn of the reader under a
-// token, and agent answered answers the report the token names, as
-// reviewsBranch and onAgentAnswered in src/bridge/review.js answer.
+// token, and agent answered answers the report the token names.
 // [[spec/tickets/review-spawns-off-the-door]]
 package hooks
 

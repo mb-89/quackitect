@@ -1,6 +1,6 @@
 // The queue's places: every open row's outline place, off the tickets, the
-// plan, the cloud's mark, the time each ticket came in and the minute, ported
-// from placesIn in src/scripts/work-answer.js. It reads no git.
+// plan, the cloud's mark, the time each ticket came in and the minute.
+// It reads no git.
 // [[spec/tickets/the-queue-becomes-a-module]]
 package queue
 

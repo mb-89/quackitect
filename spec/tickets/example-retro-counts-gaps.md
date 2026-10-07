@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,88 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-depends_on: [example-coverage-check-reports]
+depends_on: ["example-coverage-check-reports"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 16643b85e4a7a1c08affb35ba026f7b478db55f4
+    hash_after: bafe536fbb2aefd6e3458e2444987033f03762d3
+    inputs:
+      - name: ask
+        hash: 411852f0b0608d7f
+        size: 521
+      - name: [[spec/guidance/retro/audit]]
+        hash: e47482696963dde5
+        size: 1285
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: b355ee070d667c7038e2469903bd4cc0edcf41ec
+    hash_after: b355ee070d667c7038e2469903bd4cc0edcf41ec
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: c8a973ba05eb98d0
+        size: 2899
+      - name: [[spec/guidance/code/tests]]
+        hash: 1640edfeb6551072
+        size: 2138
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: d607b8a661cee250b369fdb1a59a8388af6586db
+    hash_after: d607b8a661cee250b369fdb1a59a8388af6586db
+    inputs:
+      - name: design/draft
+        hash: c8a973ba05eb98d0
+        size: 2899
+      - name: design/tests-red
+        hash: 9bab56971075495f
+        size: 866
+      - name: [[spec/guidance/code/tests]]
+        hash: 1640edfeb6551072
+        size: 2138
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: a36fca876a354b1f59eb83b2f6f975b185a2acbd
+    hash_after: a36fca876a354b1f59eb83b2f6f975b185a2acbd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 719142468cff513699134ad979bbe84e4928555c
+    hash_after: 719142468cff513699134ad979bbe84e4928555c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   64.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 9bab56971075495f
+        size: 866
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -154,38 +234,71 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb, `./RUNME.sh retro gaps`, prints both counts the audit asks for, each item one a line, and exits 0: it reports, and the auditor decides.
+
+| count | source | each item |
+|---|---|---|
+| features with no example | the coverage guard: `check.ExampleCovers`, the rule exported under its own name | `./RUNME.sh <verb>` and the file and line registering it |
+| tests beside a shown verb | `check.Shown` names every verb an example shows, and the verb reads the `src/quack` file registering each, then every `Test` function in the `_test.go` file beside it | the test file and the test name |
+
+The second count names candidates. A test standing beside a verb an example shows asserts that verb again, or holds an edge the command line cannot reach. The auditor reads each one and keeps it or cuts it, per [[spec/guidance/code/tests]] rule 1.
+
+The verb stands in `src/quack/retro_gaps.go`, registered as `retro gaps`, over `retroRoot` as `retro audit` is. It reads the tree through `lintTree(root)`, whose paths git lists, since `rootDisk` lists none. `src/modules/check/coverage.go` renames `exampleCovers` to `ExampleCovers` and `shownNames` to `Shown`, so one place owns each count. The audit step in `spec/processes/retro.yaml` adds `retro gaps` under `needs`, and its examples item names the verb. `retro_usage.go` lists the verb.
+
+Assumed: a report at exit 0 serves the audit better than a gate, since a test beside a shown verb is a candidate, and a gate on it refuses every edge test.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/checker.go Rules, which lists exampleCovers
+- src/modules/check/coverage.go exampleCovers, which calls shownNames
+- src/modules/check/example_test.go TestAVerbNoExampleNamesTakesAWarning and TestATabNoExampleNamesTakesAWarning, which call exampleCovers
+- src/quack/retro_usage.go retroUsageVerb, which lists the retro verbs
+- spec/processes/retro.yaml the audit step
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps_test.go TestRetroGapsNamesEachVerbNoExampleShows
+- src/quack/retro_gaps_test.go TestRetroGapsNamesEachTestBesideAShownVerb
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps.go
+- src/quack/retro_gaps_test.go
+- src/quack/retro_usage.go
+- src/modules/check/coverage.go
+- src/modules/check/checker.go
+- src/modules/check/example_test.go
+- spec/processes/retro.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: coverage.go, checker.go Rules, retro_audit.go, retro_audit_test.go, retro_home.go retroRoot, verb_lint.go lintTree, writedoor.go rootDisk, the audit step of retro.yaml and audit guidance rule 6
+- callers: a grep for shownNames and exampleCovers names each line, and retro_usage.go registers the retro usage
+- done_when 1 and 3: the two retro_gaps_test.go cases on a planted temp tree, which hand the verb a Texts tree so no git runs
+- done_when 2: the retro.yaml diff, read at accept
+- done_when 4: ./RUNME.sh check at tests-green
+- config keys: none added
 
 ## tests-red
 
@@ -194,26 +307,33 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_gaps_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/retro_gaps_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the stub verb answers 0 and says nothing. The planted tree is a check.Texts, so the verb takes a tree maker, and the live wiring hands it lintTree over the retro root, whose paths git lists. The stub registers retro gaps already, so the coverage report names it until an example shows it. The verb reads files alone, and no door beyond the tree source reaches it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 and 3: TestRetroGapsNamesEachVerbNoExampleShows and TestRetroGapsNamesEachTestBesideAShownVerb, red on their assertions
+- done_when 2: the retro.yaml diff, a checkpoint accept reads
+- done_when 4: ./RUNME.sh check at tests-green
+- fakes: the tree source is the one door, and check.Texts stands as its fake in memory
 
 # gate
 
@@ -222,8 +342,10 @@ none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- example-retro-gaps-shown-name: the draft renames shownNames to Shown, but src/modules/check/export.go already exports the constant Shown (= shown, from lsp-rules-move-to-check), so the rename breaks the build; implement exports it under another name, such as ShownNames, and fixes the name in the approach
 
 # implement
 
@@ -234,14 +356,19 @@ none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_gaps.go src/quack/retro_usage.go src/quack/retro_usage_test.go src/modules/check/coverage.go src/modules/check/checker.go src/modules/check/example_test.go src/modules/verbs/retro.go src/modules/verbs/retro_test.go spec/processes/retro.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list's files, plus src/modules/verbs/retro.go and its test, since the retro usage test reads the verb list there
+- the verb reads the tree alone, and check.Texts stands as its fake
+- retro_gaps.go and each export in coverage.go link to the audit guidance or the examples checks
+- the registration pattern and the warning's wording stand once, in coverage.go, and the verb reads them through Registered and UnshownSays
 
 ## tests-green
 
@@ -250,26 +377,33 @@ none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_gaps_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new verb, `./RUNME.sh retro gaps`, prints the counts the retro audit asks for, each item one a line, and exits 0. The first count names each verb or tab no example shows, with the file and line registering it. The second names each test function beside a quack file registering a verb an example shows, as candidates the auditor keeps or cuts. The check module now exports `ExampleCovers`, `ShownNames`, `Registered` and the warning's closing words, so the rule and the verb share one copy of each. The verb joins the retro verb list and its usage, and the audit step of the retro route needs it. The audit checklist names the verb in plain words, since one more code span on that line breaks the route's voice case.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list's files, plus the retro verb list and its test, which the usage test reads
+- the verb reads the tree alone, and check.Texts stands as its fake
+- retro_gaps.go and each export link to the audit guidance or the examples checks
+- the registration pattern and the warning wording stand once, in coverage.go
 
 # accept
 
@@ -294,3 +428,5 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The names every example shows export as `check.ShownNames`, since `check.Shown` stands already as a constant. The approach's `Shown` reads as `ShownNames`. [[spec/tickets/example-retro-gaps-shown-name]]

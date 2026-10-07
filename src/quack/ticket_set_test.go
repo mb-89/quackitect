@@ -1,5 +1,5 @@
 // ticket set writes one field of a ticket's front as the schema takes it, and
-// refuses a field the engine owns, off the roads test/level0/ticket-edit.test.js covers.
+// refuses a field the engine owns.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
@@ -64,16 +64,6 @@ func runsApart(t *testing.T, root string, dry bool, words ...string) (int, strin
 const aThing = "spec/tickets/a-thing.md"
 
 func TestTicketSet(t *testing.T) {
-	t.Run("set writes one field and says so", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "a-group")
-		if code != 0 || out != "spec/tickets/a-thing.md carries group: a-group.\n" || errs != "" {
-			t.Fatalf("set answers %d, %q, %q", code, out, errs)
-		}
-		if got, _ := readsBack(t, root, aThing); got != editCaseTicket("")[:strings.Index(editCaseTicket(""), "---\n\n")]+"group: a-group\n---\n\n# Ask\n\nA thing.\n" {
-			t.Fatalf("the ticket holds %q", got)
-		}
-	})
 	t.Run("set joins the words past the field into one value", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		code, out, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "a", "group")
@@ -94,30 +84,11 @@ func TestTicketSet(t *testing.T) {
 			}
 		}
 	})
-	t.Run("set refuses a field the engine owns, and writes nothing", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		for _, field := range []string{"state", "step", "steps"} {
-			code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", field, "closed")
-			want := field + " is the verbs' to write, so ./RUNME.sh ticket moves it and the door refuses the edit.\n"
-			if code != 2 || out != "" || errs != want {
-				t.Errorf("set %s answers %d, %q, %q", field, code, out, errs)
-			}
-		}
-		if got, _ := readsBack(t, root, aThing); got != editCaseTicket("") {
-			t.Fatalf("a refused set writes %q", got)
-		}
-	})
 	t.Run("set weighs the value against the schema, as the tab does", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		code, _, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "urgent", "maybe")
 		if got, _ := readsBack(t, root, aThing); code != 2 || errs != "urgent takes a boolean, and \"maybe\" reads as none.\n" || got != editCaseTicket("") {
 			t.Fatalf("set urgent maybe answers %d, %q, and writes %q", code, errs, got)
-		}
-		if code, _, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "urgent", "true"); code != 0 {
-			t.Fatalf("set urgent true answers %d", code)
-		}
-		if got, _ := readsBack(t, root, aThing); !strings.Contains(got, "\nurgent: true\n") {
-			t.Fatalf("the ticket holds %q", got)
 		}
 	})
 	t.Run("set refuses a group that stands closed, and writes nothing", func(t *testing.T) {

@@ -54,5 +54,5 @@ function ticketPathOf(opens, name) {
     .join(said);
 }
 
-// NEW_TICKET moves to the ticket verb in src/scripts/ticket.js, which tickets/new runs. [[spec/tickets/the-sidebar-writes-through-actions]]
+// NEW_TICKET moves to the ticket verb in src/quack/ticket_new.go, which tickets/new runs. [[spec/tickets/the-sidebar-writes-through-actions]]
 module.exports = { countIn, lineArgvOf, nameIn, nextIn, ticketPathOf };

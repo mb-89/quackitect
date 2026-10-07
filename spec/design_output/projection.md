@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/projection.js` writes one source into every target.
+`src/projection/projection.go` writes one source into every target.
 This note covers the projections, the door refusing a target, and the verb.
 
 # One source, written everywhere

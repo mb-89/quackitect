@@ -1,6 +1,5 @@
 // What the take reads of the branch this box holds: the hold itself, and
-// whether the branch stands past its work, as src/scripts/work-held.js reads
-// them, and the release that lets a hold go.
+// whether the branch stands past its work, and the release letting a hold go.
 // [[spec/design_output/work#the-take-writes-the-record]]
 package branches
 

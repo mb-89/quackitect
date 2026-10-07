@@ -1,4 +1,4 @@
-// The prompt the door answers, off onPromptSubmit in src/bridge/answer.js:
+// The prompt the door answers:
 // the answer-first line in front of an owner's prompt, and a row of the
 // session log for every prompt.
 // [[spec/tickets/prompt-answers-off-the-door]]

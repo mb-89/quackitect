@@ -68,7 +68,7 @@ func (state *Holds) answers(fields, held map[string]any, at time.Time) {
 	}
 }
 
-// The report pays the demand it fits, says what it lacks, or stands as a reply nothing asked for, as pays in src/bridge/answer.js words it. [[spec/design_output/extension#the-ask-is-a-line]]
+// The report pays the demand it fits, says what it lacks, or stands as a reply nothing asked for. [[spec/design_output/extension#the-ask-is-a-line]]
 func (state *Holds) reports(said string, held map[string]any, at time.Time) {
 	if said == "" {
 		state.Said.Result = "report takes the text of the reply."

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, and the warning PROMPT_WHY in src/bridge/answer.js opens on. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, and the warning the prompt opens on. [[spec/tickets/the-reply-probe-runs]]
 const (
 	replyMarker = "se-probe-reply"
 	replyEvent  = "probe.reply"

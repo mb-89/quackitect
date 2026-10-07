@@ -29,6 +29,7 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
 | `src/tui/log` | the log tab: its records, its rows off the watch, its columns, its details, the `said` style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
 | `src/tui/work` | the work tab: its tree, its edit, and its rows and count off the watch | the frame, the tree and the draw packages, the registry package for the catalog and the watch, and `src/yaml` for the ticket schema |
+| `src/tui/tutorial` | the tutorial tab: the examples by chapter off the watch, the selected one's prose and calls, and F5 posting its run | the frame and the draw packages, and the registry package for the catalog, the watch and the call |
 | `src/tui/registry` | the registry tabs `index`, `cli` and `help`, and the catalog door they read through, with its fake and its `/v1` road | the frame and the draw packages |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language, and `src/index` for the base of `/v1` |
 
@@ -357,7 +358,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 # The verb builds it
 
 `./RUNME.sh tui` builds the viewer into `.se/.runtime/bin/logview`, and runs it over
-`.se/.log/session.jsonl`. `viewerOf` in `src/scripts/tui-build.js` decides:
+`.se/.log/session.jsonl`. `tuiViewerOf` in `src/quack/tui_verb.go` decides:
 
 | what stands | what the verb does |
 |---|---|

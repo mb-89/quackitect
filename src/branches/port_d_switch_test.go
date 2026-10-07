@@ -1,6 +1,6 @@
-// The switch, ported off test/level0/work-switch.test.js: a group naming a
-// config key under enabled_by waits while trunk's tracked config reads it
-// anything but true, so the take, the list and the trigger pass it over.
+// The switch: a group naming a config key under enabled_by waits while
+// trunk's tracked config reads it anything but true, so the take, the list
+// and the trigger pass it over.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it drives the unexported switch readers shutBy, switchField, textAt and trackedConfig
 

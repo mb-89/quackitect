@@ -1,5 +1,5 @@
 // The ticket verbs and the pull in Go: the reads every verb shares, the
-// writes, and the pull itself, off src/scripts/ticket.js and pull*.js. This
+// writes, and the pull itself. This
 // file holds the disk door and its fake, and no other file reaches outside.
 // [[spec/tickets/ticket-verbs-port-to-go]]
 package pull

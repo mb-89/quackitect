@@ -145,7 +145,7 @@ func TestATodoNamingARowLightsTheFlag(t *testing.T) {
 	}
 }
 
-// The ticket the JavaScript cases call forPerson and loosePerson, which personStep in src/scripts/work-answer.js reads the same way. [[spec/tickets/groups-hold-groups]]
+// The ticket the JavaScript cases call forPerson and loosePerson. [[spec/tickets/groups-hold-groups]]
 const forPerson = `---
 kind: [[ticket]]
 state: open
@@ -163,7 +163,7 @@ steps:
 A question for the owner.
 `
 
-// The row reads person while its current step says by: person, whatever the state, as personStep in src/scripts/work-answer.js does. [[spec/tickets/groups-hold-groups]]
+// The row reads person while its current step says by: person, whatever the state. [[spec/tickets/groups-hold-groups]]
 func TestPersonReadsTheStepHand(t *testing.T) {
 	cases := map[string]bool{
 		forPerson: true,

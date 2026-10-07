@@ -1,5 +1,5 @@
 // The door's answer to a spawn: the spawn's own event, its prompt under the
-// layer its kind reads, as onAgentSpawn in src/bridge/guidance.js answers.
+// layer its kind reads.
 // [[spec/tickets/spawn-answers-off-the-door]]
 package hooks
 

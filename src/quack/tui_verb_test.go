@@ -115,6 +115,7 @@ func TestTuiTabWanted(t *testing.T) {
 	}{
 		{[]string{"tui", "--tab", "work"}, "work"},
 		{[]string{"tui", "log"}, "log"},
+		{[]string{"tui", "tutorial"}, "tutorial"},
 		{[]string{"tui", "work", "--count"}, "work"},
 		{[]string{"tui", "--tab", "nope", "work"}, ""},
 		{[]string{"tui", "--tab"}, ""},
