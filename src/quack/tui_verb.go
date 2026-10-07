@@ -32,7 +32,7 @@ import (
 )
 
 // The tabs a caller names, the first one a handover opens where none is named. [[spec/design_output/tui#a-tab-the-caller-names]]
-var tuiTabs = []string{"log", "work"}
+var tuiTabs = []string{"log", "work", "tutorial"}
 
 // The log's folders, as FOLDER and OLD in .claude/skills/level0/lib/log.js name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (

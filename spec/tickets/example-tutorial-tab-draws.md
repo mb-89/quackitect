@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -160,6 +160,15 @@ record:
         hash: 6e5266e5a67686d0
         size: 997
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: c945ac8dbf87eb109bd72072d0e829674a413881
+    hash_after: c945ac8dbf87eb109bd72072d0e829674a413881
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -316,14 +325,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && go vet ./src/tui/... ./src/modules/examples/ ./src/quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change touches the draft's size list, plus src/tui/window_test.go, whose strip case pins the tab order the draft changes
+- doors: the tab reads and posts through the Source the work tab takes, whose fake is registry.Fake, and the module reads files through the index, whose fake is qtest
+- approach: each new function carries a pointer at spec/design_output/examples, the tab at the-tutorial-tab and the narrow at the-search
+- one place: RowsName and RunName stand in the module, and the tab spells them again with a comment naming the owner, as the work tab does
 
 ## tests-green
 

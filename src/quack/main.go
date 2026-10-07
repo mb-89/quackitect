@@ -17,6 +17,7 @@ import (
 	"quackitect/src/index"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
+	"quackitect/src/modules/examples"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
@@ -36,7 +37,7 @@ const (
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
-var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers}
+var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers, examples.Registers}
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
 type projection struct {

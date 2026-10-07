@@ -66,7 +66,7 @@ func TestTheIndexCatalogAnswersAnErrorForAnActionNoIndexTakes(t *testing.T) {
 // The declared views stand first, and the registry tabs after them. [[spec/design_output/model#the-registry-tabs]]
 func TestTheStripNamesTheRegistryTabsAfterTheViews(t *testing.T) {
 	m := newModel(filepath.Join(t.TempDir(), "session.jsonl"), time.UTC)
-	for at, want := range []string{"log", "work", "index", "cli", "help"} {
+	for at, want := range []string{"log", "work", "tutorial", "index", "cli", "help"} {
 		if at >= len(m.Tabs) || m.Tabs[at].Name() != want {
 			t.Fatalf("the tab at %d reads %v, not %s", at+1, m.Tabs, want)
 		}

@@ -3,7 +3,14 @@
 // [[spec/design_output/examples#the-tutorial-tab]]
 package examples
 
-import "quackitect/src/q"
+import (
+	"encoding/json"
+	"regexp"
+	"sort"
+
+	"quackitect/src/example"
+	"quackitect/src/q"
+)
 
 // The name the tab reads, the action F5 posts, and the verdict file the harness writes, which src/example owns and a module spells again. [[spec/design_output/examples#the-tutorial-tab]]
 const (
@@ -11,6 +18,21 @@ const (
 	RunName    = "examples/run"
 	VerdictsAt = ".se/.runtime/examples.json" // .claude/skills/level0/lib/folders.js owns the runtime folder.
 )
+
+// The node module's name and its verb, which src/modules/verbs owns, spelled again because a module imports q alone. [[spec/tickets/the-lens-calls-actions]]
+const (
+	nodeModule = "node"
+	nodeRun    = "run"
+)
+
+// An example under its chapter. [[spec/design_output/examples#the-format]]
+var exampleAt = regexp.MustCompile(`^spec/examples/[^/]+/[^/]+\.md$`)
+
+// One verdict as the harness writes it. [[spec/design_output/examples#one-runner-two-drivers]]
+type verdict struct {
+	Verdict string `json:"verdict"`
+	Miss    string `json:"miss"`
+}
 
 // One example as the tab reads it. [[spec/design_output/examples#the-tutorial-tab]]
 type Row struct {
@@ -43,7 +65,27 @@ func Registers(c *q.Catalog) q.Writer {
 }
 
 // Each example as a row, in path order. [[spec/design_output/examples#the-tutorial-tab]]
-func rowsOf(in filesIn) []Row { return []Row{} }
+func rowsOf(in filesIn) []Row {
+	verdicts := map[string]verdict{}
+	_ = json.Unmarshal([]byte(in.Files[VerdictsAt].Text), &verdicts)
+	out := []Row{}
+	for path, content := range in.Files {
+		if !exampleAt.MatchString(path) {
+			continue
+		}
+		read, _ := example.Read(path, content.Text)
+		said := verdicts[path]
+		out = append(out, Row{
+			Path: path, Chapter: read.Chapter, Dev: read.Dev, Title: read.Title, Keywords: read.Keywords,
+			Interface: read.Interface, Body: content.Text, Verdict: said.Verdict, Miss: said.Miss,
+		})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Path < out[j].Path })
+	return out
+}
 
 // The run verb, through the node module. [[spec/design_output/examples#one-runner-two-drivers]]
-func runOf(in RunIn) []q.Request { return nil }
+func runOf(in RunIn) []q.Request {
+	args := []string{"example", "run", in.Path}
+	return []q.Request{{Module: nodeModule, Verb: nodeRun, Args: args, NoUndo: "example run works in a clone of its own, which keeps no undo"}}
+}
