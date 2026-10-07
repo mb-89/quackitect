@@ -10,7 +10,6 @@ import { processHash, readYaml, schemasFrom } from "../../.claude/skills/level0/
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
-import { firstLeaf } from "../../src/engine/group.js";
 import { proc } from "../../src/doors/proc.js";
 import { at, keptOf, PAST, REFUSES, rulesIn } from "./ruled.js";
 
@@ -35,6 +34,14 @@ const askRows = (ask) =>
     .filter((one) => one?.name)
     .map((one) => `<!-- ${one.name}, as ${one.form ?? "text"}: ${one.says ?? ""} -->`)
     .join("\n");
+
+// The first leaf of a route, as firstLeafOf in src/pull/pull_ticket.go reads it. [[spec/design_output/pull#a-draft-opens]]
+const firstLeaf = (steps, path = "") => {
+  const one = [steps ?? []].flat()[0];
+  if (!one?.name) return path;
+  const deeper = path ? `${path}/${one.name}` : String(one.name);
+  return one.steps ? firstLeaf(one.steps, deeper) : deeper;
+};
 
 // Every route's minted ticket, declared up front, so one Vale run reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
 const routes = files

@@ -17,9 +17,6 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 | `proc` | a program | `src/doors/proc.js` |
 | `disk` | the filesystem | `src/doors/disk.js` |
 | `git` | a repository | `src/doors/git.js` |
-| `clock` | the time now | `src/doors/clock.js` |
-| `log` | the log every door writes | `src/doors/log.js` |
-| `http` | a server over the network | `src/doors/http.js` |
 
 Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands
@@ -63,18 +60,15 @@ nothing.
 
 # A door standing on another
 
-Git runs a program, and the log writes a file, so each takes the door beneath it
-and builds on that. A fake of the door beneath then stands in for the one
-above, and one file holds each pairing under one name.
+Git runs a program, so it takes the door beneath it and builds on that. A fake
+of the door beneath then stands in for the one above, and one file holds the
+pairing under one name.
 
 | door | stands on | its fake |
 |---|---|---|
 | `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
-| `log` | `disk` and `clock` | `src/doors/fake/log.js`, over the fake disk |
 
-The fake git answers `ran`, the commands it takes, in order. The fake log
-answers `files`, the fake disk holding what it writes. For what one log line
-holds, see [[spec/design_output/log]].
+The fake git answers `ran`, the commands it takes, in order.
 
 # A fake behaves
 
@@ -82,9 +76,6 @@ Each door has a fake beside it in `src/doors/fake`. A fake behaves: a test
 writes to the fake disk and reads the same bytes back. The fake process answers
 from a table and throws on any command outside it. A test scripting the answers
 tests its own script, so no door here has a mock.
-
-The fake clock stands still until a test moves it with `tick`, so a case that
-reads the time replays.
 
 | the call | the real disk and the fake |
 |---|---|
@@ -152,11 +143,6 @@ config and the session file this tree tracks.
 | `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
 | `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
 | `git` | `src/doors/git.js` | `src/doors/fake/git.js` | `test/contract/git.test.js` |
-| `clock` | `src/doors/clock.js` | `src/doors/fake/clock.js` | `test/contract/clock.test.js` |
-| `log` | `src/doors/log.js` | `src/doors/fake/log.js` | `test/contract/log.test.js` |
-| `http` | `src/doors/http.js` | `src/doors/fake/http.js` | `test/contract/http.test.js` |
-| `index` | `src/doors/index.js` | `src/doors/fake/index.js` | `test/contract/index.test.js` |
-| `awake` | `src/doors/awake.js` | `src/doors/fake/awake.js` | `test/contract/awake.test.js` |
 | `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
 | `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
 | `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
@@ -198,7 +184,6 @@ family carries its fate:
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
 | the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
-| the index suite running the fake beside the real door | `test/contract/index.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |

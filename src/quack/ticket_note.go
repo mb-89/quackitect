@@ -144,7 +144,7 @@ func noteTwinOf(disk pull.Disk, line string) string {
 	return ""
 }
 
-// Every row of a ticket's Ask, its comments among them, as askOf in src/engine/group.js reads it. [[spec/tickets/the-verbs-need-no-wrapper]]
+// Every row of a ticket's Ask, its comments among them, as askOf in src/branches/group.go reads it. [[spec/tickets/the-verbs-need-no-wrapper]]
 func askRowsOf(text string) string {
 	for _, one := range note.Read(text).Sections {
 		if strings.ToLower(one.Header) == "ask" {

@@ -92,6 +92,25 @@ func TestAReleaseClosesTheOpenTakeAndLeavesTheRowsPastIt(t *testing.T) {
 	}
 }
 
+// Closing every take shuts each open row a merge left, keeps a closed row between them, and a free group stays as it stands. [[spec/design_output/work#held-derives-from-the-record]]
+func TestClosingEveryTakeShutsEachOpenRowAndKeepsAClosedOne(t *testing.T) {
+	t.Parallel()
+	one := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "a1"}})
+	done := withEntry(one, front.Ordered{{Key: "step", Value: "split"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "a1"}, {Key: "hash_after", Value: "b2"}})
+	both := withEntry(done, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box two"}, {Key: "hash_before", Value: "d4"}})
+	shut := withEveryTakeClosed(both, "ff")
+	after := []string{}
+	for _, row := range recordIn(shut) {
+		after = append(after, entryField(row, "hash_after"))
+	}
+	if heldIn(shut) != nil || !slices.Equal(after, []string{"ff", "b2", "ff"}) {
+		t.Fatalf("closing every take leaves hashes after %v", after)
+	}
+	if withEveryTakeClosed(shut, "ee") != shut {
+		t.Fatal("a second close changes a free group")
+	}
+}
+
 // A ticket loses its group, the route under it stands, and a second drop changes nothing. [[spec/design_output/work#the-merge-frees-the-tickets]]
 func TestAGroupDropLeavesTheRouteStanding(t *testing.T) {
 	t.Parallel()

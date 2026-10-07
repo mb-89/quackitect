@@ -249,7 +249,7 @@ func retroCollectHolding(root string) (string, any, bool) {
 	return "", nil, false
 }
 
-// A hold stands while its ticket stands nowhere or reads open, as stillHeld in src/engine/named.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// A hold stands while its ticket stands nowhere or reads open, as stillHeld in src/modules/hooks/command/ticket.go reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
 func retroCollectStillHeld(root string, held any) bool {
 	path := strings.TrimSpace(retroCollectText(retroCollectGet(held, "path")))
 	if path == "" {

@@ -295,3 +295,5 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+[[spec/tickets/engine-and-doors-leave]] leaves `src/doors/front.js`, `src/doors/fake/front.js` and `test/contract/front.test.js` standing, since the schema-mint tests pass in the fake front. This ticket takes the front door once those tests leave.

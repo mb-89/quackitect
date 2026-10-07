@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   attachOf,
   clonedAt,
@@ -68,7 +68,7 @@ function hand(files, outside) {
       exists: async (rel) => files.exists(at(rel)),
       write: async (rel, text) => files.write(at(rel), text),
     },
-    process: { run: async (argv, init) => outside.proc.run(argv, init) },
+    process: { run: async (argv, init) => outside.run(argv, init) },
     ui: { log: (text) => logged.push(text) },
   };
 }
@@ -133,10 +133,8 @@ test("the commands carry the upstream, the clone folder, the work root and the v
 
 test("a cloud box with an empty register clones the upstream from vehicle.json, attaches, starts the server and says the vehicle stands", async () => {
   const files = stub();
-  const outside = fakeGit(
-    { node: ENV, git: cloneInto(files), env: attachInto(files), sh: { exitCode: 0 } },
-    STUB,
-  );
+  const outside = fakeProc(
+    { node: ENV, git: cloneInto(files), env: attachInto(files), sh: { exitCode: 0 } });
   const { $, context } = await started(files, outside);
 
   const argvs = outside.ran.map((one) => one.argv);
@@ -193,7 +191,7 @@ test("a stub holding the pointer runs no command and hands no block", async () =
       port: 6511,
     }),
   });
-  const outside = fakeGit({}, STUB);
+  const outside = fakeProc({});
   const { context } = await started(files, outside);
   assert.equal(outside.ran.length, 0);
   assert.equal(context.blocks.length, 1);
@@ -207,7 +205,7 @@ test("a vehicle at SE_VEHICLE clones nothing, and the attach runs its RUNME", as
   const env = {
     stdout: JSON.stringify({ home: HOME, vehicle: "/desk/acme", work: STUB }),
   };
-  const outside = fakeGit({ node: env, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  const outside = fakeProc({ node: env, env: attachInto(files), sh: { exitCode: 0 } });
   await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
   assert.equal(
@@ -230,7 +228,7 @@ test("a register entry naming the record's identity is the vehicle", async () =>
       { id: "abc123", method_root: "/elsewhere/acme", port: 6512 },
     ]),
   });
-  const outside = fakeGit({ node: ENV, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  const outside = fakeProc({ node: ENV, env: attachInto(files), sh: { exitCode: 0 } });
   await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
   assert.deepEqual(argvs[1], attachOf("/elsewhere/acme", STUB));
@@ -245,7 +243,7 @@ test("the attach always runs the standing", async () => {
   const env = {
     stdout: JSON.stringify({ home: HOME, vehicle: "/desk/acme", work: STUB }),
   };
-  const outside = fakeGit({ node: env, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  const outside = fakeProc({ node: env, env: attachInto(files), sh: { exitCode: 0 } });
   const { $ } = await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
   assert.deepEqual(argvs.slice(1), [attachOf("/desk/acme", STUB), serveOf("/desk/acme")]);
@@ -254,7 +252,7 @@ test("the attach always runs the standing", async () => {
 
 test("a clone that fails stops the road, and the log names the step and its last line", async () => {
   const files = stub();
-  const outside = fakeGit(
+  const outside = fakeProc(
     {
       node: ENV,
       git: {
@@ -262,9 +260,7 @@ test("a clone that fails stops the road, and the log names the step and its last
         stderr:
           "Cloning into 'acme'...\nfatal: repository 'https://host/acme/acme.git/' not found\n",
       },
-    },
-    STUB,
-  );
+    });
   const { $, context } = await started(files, outside);
   assert.equal(outside.ran.length, 2, "the clone is the last command");
   assert.equal(files.exists(`${STUB}/.se/.runtime/project.json`), false, "no driver");
@@ -285,7 +281,7 @@ test("a record naming no upstream stops before the clone", async () => {
       upstream: "",
     }),
   });
-  const outside = fakeGit({ node: ENV }, STUB);
+  const outside = fakeProc({ node: ENV });
   await started(files, outside);
   assert.equal(
     outside.ran.some((one) => one.argv[0] === "git"),

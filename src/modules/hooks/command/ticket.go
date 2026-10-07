@@ -1,4 +1,4 @@
-// The ticket a call names, read off the tree, off src/engine/named.js: an
+// The ticket a call names, read off the tree: an
 // open ticket, what stands in hand, or the fault that stops the call.
 // [[spec/tickets/cage-command-rules-port]]
 package command

@@ -517,3 +517,5 @@ The folder lists stand in folders.go alone, the nobody list in private.go alone,
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The fake clock case approach line 26 moved into `test/contract/clock.test.js` leaves with the clock door, since [[spec/tickets/engine-and-doors-leave]] deletes the clock door, its fake and that test.

@@ -171,7 +171,7 @@ func retroCollectHoldsText(own []string) bool {
 	})
 }
 
-// A field of a note's front, bare of its link marks, as fieldOf in src/engine/group.js reads it. [[spec/design_output/work#a-group-is-a-ticket]]
+// A field of a note's front, bare of its link marks, as fieldOf in src/branches/group.go reads it. [[spec/design_output/work#a-group-is-a-ticket]]
 func retroCollectFieldOf(text, key string) string {
 	said := note.Read(text).Front.Said.Get(key)
 	if said == nil {

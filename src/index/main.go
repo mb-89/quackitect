@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"quackitect/src/engine/swap"
+	"quackitect/src/index/swap"
 	"quackitect/src/q"
 )
 

@@ -48,7 +48,7 @@ A box reads the argument here before it asks about a ruling:
 | `src/q` | the model's core: names, providers, the store and the catalog check, which the index and every module import | new |
 | `src/lsp` | the `lsp` IO module keeps the protocol, and the checks and schema rules become the check module | splits |
 | `src/tui` | `quack tui`: `frame` becomes the generic shell and `tree` the base-view renderer, and the log and the work become declared views | reshaped |
-| `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the config module and every `<instance>/config/` subtopic, and the index manager's supervision | merged |
+| `src/config`, `src/yaml`, `src/pointer`, `src/index/swap` | the config module and every `<instance>/config/` subtopic, and the index manager's supervision | merged |
 | `src/scripts` | the module processes, such as work, pull, retro and vehicle, and a Go command line in place of `cli.js` | ported, topic by topic |
 | `src/bridge` | the `hooks` IO module, and modules for the write, bash, stop, answer and handover rules | ported |
 | `src/engine`, `src/doors` | modules, such as retro, projection and group, and the outbound IO modules | ported |
@@ -90,13 +90,13 @@ already differ.
 | the fact | the copies | what already differs |
 |---|---|---|
 | config resolution | `lib/config.js`, `src/config`, `src/bridge/config.js`, `src/extension/lib/widgets.js`, `src/lsp/config.go` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
-| frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `schema-read.js` and `group.js`, and three writers | Go quotes a value, and JavaScript leaves it bare |
-| the Ask chapter | `group.js`, `pull-chapter.js`, `index/ticket.go` | `group.js` keeps comments and the other two drop them, so the queue's text and the index's differ |
-| held and group standing | `group.js`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
-| the current leaf of a route | `group.js`, `pull-route.js`, `ticket.js`, `lsp/group.go`, the extension's `lens.js` | a fixture test exists only to keep two of them in step |
-| the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `named.js`, `lens.js` | `folders.test.js` checks only that the copies agree |
+| frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `schema-read.js` and `branches/group.go`, and three writers | Go quotes a value, and JavaScript leaves it bare |
+| the Ask chapter | `branches/group.go`, `pull-chapter.js`, `index/ticket.go` | `branches/group.go` keeps comments and the other two drop them, so the queue's text and the index's differ |
+| held and group standing | `branches/group.go`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
+| the current leaf of a route | `branches/group.go`, `pull-route.js`, `ticket.js`, `lsp/group.go`, the extension's `lens.js` | a fixture test exists only to keep two of them in step |
+| the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `command/ticket.go`, `lens.js` | `folders.test.js` checks only that the copies agree |
 | session log rows | `lib/log.js`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
-| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `src/doors/index.js`, `lib/index.js` | each asks its own way |
+| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `lib/index.js` | each asks its own way |
 | cloud detection | `InCloud` in `src/modules/hooks/command/cloud.go`, the hook's start script, `copilot.js`, the Copilot runtime | `InCloud` reads `0` as off, and the start script reads any value as on |
 | walk skip lists and globs | four skip lists, three glob translators | the two Go translators take different features |
 | runtime paths, the port, `se-index`, `plan.json`, `tools.json` | Go, JavaScript, shell, and the stub hook | each spells them again |

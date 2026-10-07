@@ -4,8 +4,9 @@ kind: [[design_output]]
 
 # Scope
 
-`src/doors/log.js` writes one line for each thing a door does. This note covers
-the shape of a line, who says what, and who reads it back.
+The session log holds one line for each thing a hook, a verb or the sidebar
+does. This note covers the shape of a line, who says what, and who reads it
+back.
 
 # What one line looks like
 
@@ -145,13 +146,8 @@ The viewer holds a floor of its own over what the disk carries. For details, see
 writers below read it, one for each runtime:
 
 - `logHere` in `hooks/level0.js`, through `$.fs`
-- `src/doors/log.js`, through the disk door, for the command line
+- `appendRows` in `src/modules/hooks/rows.go`, for the Go hooks and verbs
 - `src/extension/lib/logbook.js`, through the editor door, for the sidebar
-
-The door takes the disk and the clock as arguments, the way the git door takes
-the process door. The door writes a row and forgets it. `src/doors/fake/log.js`
-pairs it with the fake disk and asks it to keep its rows, so a test reads back
-what a door says and touches nothing.
 
 # Every writer appends
 

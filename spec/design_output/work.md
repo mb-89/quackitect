@@ -4,8 +4,8 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/work.js` holds every verb over a work branch, and
-`src/engine/group.js` holds what a group's ticket reads and writes. This note
+`src/branches` holds every verb over a work branch, and
+`src/branches/group.go` holds what a group's ticket reads and writes. This note
 covers the branch, the group on it, and the round trip.
 
 # What a work branch is
@@ -68,11 +68,11 @@ naming one of them. The ask says what the group adds up to.
 
 A child group names its parent under `group`, per
 [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]. Each rule
-reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
+reads the chain `ancestorsOf` in `src/branches/group.go` walks off trunk:
 
 | the rule | where it stands |
 |---|---|
-| a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
+| a parent is a group some group names | `parentsIn` in `src/branches/group.go` |
 | a child waits on every ancestor's `depends_on` | `waitsIn` in `src/branches/stands.go` |
 | a parent reaches no worker, and opens no branch | `freeIn` in `src/branches/free.go`, and `opensOf` in `src/branches/dispatch_write.go` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
@@ -128,7 +128,7 @@ and the frontmatter then reads as broken. Vale reads no line of such a file,
 and the lint over the tree exits one. The ticket door refuses the hand that
 repairs it, because the record is the engine's.
 
-So `quoted` in `src/engine/group.js` wraps a value in double quotes where
+So `Quote` in `src/front/front.go` wraps a value in double quotes where
 it carries any of these, and escapes the backslash and the quote inside:
 
 | what | why a reader trips |
@@ -516,7 +516,7 @@ committing on `main` pushes after another box pushes first.
 A group ticket conflicts on nearly every sync. The branch appends to `record`,
 and `main` adds a key such as `cloud` or `depends_on`. So `branch sync` reads
 each unmerged ticket under `spec/tickets` through its stages, the base, the
-branch and `main`, and `mergedFront` in `src/engine/front-merge.js` merges
+branch and `main`, and `mergedFront` in `src/branches/sync.go` merges
 the front key by key:
 
 | what the two sides do to a key | what the merge takes |

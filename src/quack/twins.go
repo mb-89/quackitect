@@ -21,7 +21,7 @@ import (
 	"quackitect/src/ticket"
 )
 
-// The state a row stands open at, as OPEN in src/engine/group.js names it. [[spec/tickets/ticket-verbs-become-actions]]
+// The state a row stands open at, as openState in src/branches/group.go names it. [[spec/tickets/ticket-verbs-become-actions]]
 const openRow = "open"
 
 // The state a note stands closed at, the folder NOTES in src/scripts/ticket.js names, and the name the tickets module answers every ticket under. [[spec/tickets/retro-verbs-become-actions]]

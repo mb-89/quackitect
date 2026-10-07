@@ -1,4 +1,4 @@
-// A group, read off its ticket, as src/engine/group.js reads it: the front,
+// A group, read off its ticket: the front,
 // the record, the step and the ask, and the writes through the Go front
 // writer. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]

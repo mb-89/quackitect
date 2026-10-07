@@ -667,9 +667,8 @@ proves the block stands in front of the model past the compaction.
 
 The verb exits `0` on `survives` and `1` on anything else.
 
-`test/contract/compact.test.js` drives the verb against the real client. One
-run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
-`./RUNME.sh check` stays fast without it.
+The owner runs the verb against the real client, and
+`src/quack/probe_verb_test.go` holds its reading of the rows.
 
 ## The cold probe
 
@@ -956,7 +955,7 @@ forgets to take a ticket up and to put it down.
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
-`ticketFault` in `src/engine/named.js` reads the name against what stands in
+`TicketFault` in `src/modules/hooks/command/ticket.go` reads the name against what stands in
 hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
 `working` todo. Every hand writes through the same door, so a helper's hold
 passes its own ticket.
@@ -993,7 +992,7 @@ These write with no ticket named:
 A Bash or PowerShell call names the open ticket it serves at the head of its
 `description`, the way a patch names it in its `ticket` field. `ticketDoor`
 in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
-`ticketFault`, and `DESCRIPTION_HOW` in `src/engine/named.js` says how to
+`ticketFault`, and `DescriptionHow` in `src/modules/hooks/command/ticket.go` says how to
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
