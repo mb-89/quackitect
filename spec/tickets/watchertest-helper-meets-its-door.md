@@ -71,3 +71,7 @@ src/watcher/watchertest/watchertest.go carries an OutsideInDoors marker on os to
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The wall clock in `src/q/qtest/wall.go` carries the same markers on the clock, so a door at `src/q/qtest` declares it too. The new tree test refuses any walk in a fake or a test helper, marked or not. The two helper suites show the helpers still behave once their markers leave:
+
+    ./RUNME.sh test src/owns/tests_tree_test.go src/q/qtest/clock_test.go src/watcher/watchertest/watchertest_test.go

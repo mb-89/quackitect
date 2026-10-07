@@ -17,11 +17,9 @@ type wall struct{}
 // [[spec/tickets/go-waits-on-events]]
 func Wall() q.Clock { return wall{} }
 
-// level0: OutsideInDoors - a case importing no module reads the real time through the wall
 func (wall) Now() time.Time { return time.Now() }
 
 func (wall) Every(span time.Duration, hand func(time.Time)) (stop func()) {
-	// level0: OutsideInDoors - a case importing no module waits on the real time through the wall
 	ticker := time.NewTicker(span)
 	done := make(chan struct{})
 	go func() {
@@ -43,15 +41,12 @@ func (wall) Every(span time.Duration, hand func(time.Time)) (stop func()) {
 	}
 }
 
-// level0: OutsideInDoors - a case importing no module waits on the real time through the wall
 func (wall) After(span time.Duration) <-chan time.Time { return time.After(span) }
 
 func (wall) AfterFunc(span time.Duration, hand func()) (stop func() bool) {
-	// level0: OutsideInDoors - a case importing no module waits on the real time through the wall
 	return time.AfterFunc(span, hand).Stop
 }
 
 func (wall) WithTimeout(parent context.Context, span time.Duration) (context.Context, context.CancelFunc) {
-	// level0: OutsideInDoors - a case importing no module waits on the real time through the wall
 	return context.WithTimeout(parent, span)
 }

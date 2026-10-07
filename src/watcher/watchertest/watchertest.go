@@ -6,7 +6,7 @@ package watchertest
 import (
 	"errors"
 	"fmt"
-	"os" // level0: OutsideInDoors - a test helper makes the folders a real watch hears
+	"os"
 	"path/filepath"
 	"testing"
 	"time"

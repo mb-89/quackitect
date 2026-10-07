@@ -38,3 +38,26 @@ func TestNoTestFileWalksAroundADoor(t *testing.T) {
 		}
 	}
 }
+
+// Whether the path names a Go fake or a helper a test package imports. [[spec/tickets/watchertest-helper-meets-its-door]]
+func fakeOrHelper(at string) bool {
+	return path.Ext(at) == ".go" && !strings.HasSuffix(at, "_test.go") && (strings.HasSuffix(path.Dir(at), "test") || strings.Contains(path.Base(at), "fake"))
+}
+
+// A fake or a test helper reaches the outside through a door that holds it, and a marker passes none. [[spec/tickets/watchertest-helper-meets-its-door]]
+func TestNoFakeOrTestHelperWalksAroundADoorMarkedOrNot(t *testing.T) {
+	t.Parallel()
+	doors, files := doorsOf(t)
+	for at := range files {
+		if !fakeOrHelper(at) {
+			continue
+		}
+		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(at)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, one := range Walks(at, string(text), doors) {
+			t.Errorf("%s:%d:%d: %s walks around %s", at, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+		}
+	}
+}

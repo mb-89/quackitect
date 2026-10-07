@@ -1,0 +1,7 @@
+# The watch: the helper making the folders a real watch hears.
+# [[spec/tickets/a-watch-stops-mid-add]]
+watch:
+  go: [os]
+  files: [watchertest/watchertest.go]
+  contract: [src/modules/files/watch_contract_test.go]
+  report: true
