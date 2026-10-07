@@ -60,6 +60,7 @@ func TestMain(m *testing.M) {
 		main()
 		os.Exit(0)
 	}
+	exampleFixture = buildsFixture()
 	code := m.Run()
 	for _, dir := range buildDirs.dirs {
 		os.RemoveAll(dir)

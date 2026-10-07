@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,19 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 96cf9c303a0ac49a9c1de4f204ce84b040aff14d
+    hash_after: 96cf9c303a0ac49a9c1de4f204ce84b040aff14d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/example fails
+    inputs:
+      - name: design/draft
+        hash: bcee0b043437dbd6
+        size: 2740
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -239,26 +252,32 @@ The disk stays a real temporary folder, since the ticket verbs read their root i
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/example/expect_test.go
+- src/quack/examples_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The registry twin of ticket pull reaches time.Now, proc.Real and the live index through pullHere. So the harness builds a pull.It over files.FakeDisk, a FakeRepo clone, a FakeRunner and a fixed clock, as the pull tests build theirs. That meets the fake disk the ask names, which the draft deferred. The method root stays the tree itself, read for its schemas alone. The harness lives in examples_harness_test.go, so it counts as test code of quack.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the fixture and the planted pull, the false expect naming file, step and line, the verdict file, and the check at the end
+- every door the tests reach has a fake: the disk, git, the process table and the clock, and the model stays out, since no verb in the table reaches it
 
 # gate
 
