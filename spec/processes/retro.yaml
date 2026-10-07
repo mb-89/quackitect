@@ -42,12 +42,12 @@ steps:
     does: auditors walk the checklist over what the window lands, and write a findings column each
     by: anyone
     input: effect
-    needs: ["retro", "retro audit"]
+    needs: ["retro", "retro audit", "retro gaps"]
     tags: [retro, audit]
     checklist:
       - the code the window lands follows [[spec/guidance/code/code]]
       - every change lands with a test that fails before it and passes after, as [[spec/guidance/code/testing]] asks
-      - every verb, tab and door-facing feature the window lands has an example, and no test it lands asserts again what an example shows, as [[spec/guidance/code/examples]] asks
+      - every verb, tab and door-facing feature the window lands has an example, and no test it lands asserts again what an example shows, as [[spec/guidance/code/examples]] asks, and `./RUNME.sh retro gaps` names both
       - no module holds more test lines than code lines, and no test outlives its code or its phase, as [[spec/guidance/code/tests]] asks
       - every note the window writes holds the shape [[spec/guidance/guidance]] asks
       - the work follows [[spec/guidance/working]], a turn at a time

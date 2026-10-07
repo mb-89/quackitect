@@ -10,6 +10,7 @@ const retroUsage = `Usage: ./RUNME.sh retro <verb>
 
   notes            the private notes still open on this box, and 0 when none stands
   audit            the experiments still open, and 0 once each stands decided
+  gaps             each verb no example shows, and each test beside a verb an example shows
   collect <ticket> copies this box into the retro's folder, and writes its manifest; --again merges what arrived since
   new              mints a retro off its route, opens it, and hands out its first leaf
   timeline <retro> the hours holding work, per source, with the idle stretches between

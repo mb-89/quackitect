@@ -46,7 +46,7 @@ func TestShownNamesHoldsEveryNameAnExampleShows(t *testing.T) {
 
 func TestAVerbNoExampleNamesTakesAWarning(t *testing.T) {
 	t.Parallel()
-	got := warned(t, exampleCovers(coveredTree(nil)), "ExampleCovers")
+	got := warned(t, ExampleCovers(coveredTree(nil)), "ExampleCovers")
 	if line, held := got["src/quack/doctor.go"]; !held || line != 3 {
 		t.Fatalf("the rule names %v, and wants doctor at src/quack/doctor.go line 3", got)
 	}
@@ -60,7 +60,7 @@ func TestAVerbNoExampleNamesTakesAWarning(t *testing.T) {
 
 func TestATabNoExampleNamesTakesAWarning(t *testing.T) {
 	t.Parallel()
-	found := exampleCovers(coveredTree(nil))
+	found := ExampleCovers(coveredTree(nil))
 	work, log := false, false
 	for _, one := range found {
 		if one.File == "src/quack/tui_verb.go" {

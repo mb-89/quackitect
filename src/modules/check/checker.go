@@ -93,7 +93,7 @@ var Rules = []func(*Tree) []Finding{
 	everyPointerResolves,
 	groupAsksNobody,
 	noConflictMarkers,
-	exampleCovers,
+	ExampleCovers,
 	exampleProves,
 }
 

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -166,6 +166,15 @@ record:
         hash: 1640edfeb6551072
         size: 2138
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: a36fca876a354b1f59eb83b2f6f975b185a2acbd
+    hash_after: a36fca876a354b1f59eb83b2f6f975b185a2acbd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -324,14 +333,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_gaps.go src/quack/retro_usage.go src/quack/retro_usage_test.go src/modules/check/coverage.go src/modules/check/checker.go src/modules/check/example_test.go src/modules/verbs/retro.go src/modules/verbs/retro_test.go spec/processes/retro.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list's files, plus src/modules/verbs/retro.go and its test, since the retro usage test reads the verb list there
+- the verb reads the tree alone, and check.Texts stands as its fake
+- retro_gaps.go and each export in coverage.go link to the audit guidance or the examples checks
+- the registration pattern and the warning's wording stand once, in coverage.go, and the verb reads them through Registered and UnshownSays
 
 ## tests-green
 

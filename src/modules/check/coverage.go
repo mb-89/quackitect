@@ -47,8 +47,17 @@ func ShownNames(tree *Tree) map[string]bool {
 	return out
 }
 
+// The verb names a quack file registers, in the order it registers them. [[spec/design_output/examples#the-checks]]
+func Registered(text string) []string {
+	out := []string{}
+	for _, found := range registerAt.FindAllStringSubmatch(text, -1) {
+		out = append(out, found[1])
+	}
+	return out
+}
+
 // Each verb and tab no example names under interface. [[spec/design_output/examples#the-checks]]
-func exampleCovers(tree *Tree) []Finding {
+func ExampleCovers(tree *Tree) []Finding {
 	shown := ShownNames(tree)
 	out := []Finding{}
 	for _, path := range tree.Paths() {
@@ -57,9 +66,9 @@ func exampleCovers(tree *Tree) []Finding {
 			continue
 		}
 		for at, line := range strings.Split(tree.Read(path), "\n") {
-			for _, found := range registerAt.FindAllStringSubmatch(line, -1) {
-				if !shown[found[1]] {
-					out = append(out, unshown(path, at+1, found[1]))
+			for _, name := range Registered(line) {
+				if !shown[name] {
+					out = append(out, unshown(path, at+1, name))
 				}
 			}
 			if path != tabsFile {
@@ -77,9 +86,12 @@ func exampleCovers(tree *Tree) []Finding {
 	return out
 }
 
+// The words that close the call a coverage warning opens on. [[spec/design_output/examples#the-checks]]
+const UnshownSays = " stands in no example's interface."
+
 // The warning on a verb or tab no example shows. [[spec/design_output/examples#the-checks]]
 func unshown(path string, line int, name string) Finding {
-	said := fault(coversRule, path, line, fmt.Sprintf("./RUNME.sh %s stands in no example's interface. Write an example under spec/examples naming it, per [[spec/design_output/examples#the-checks]].", name))
+	said := fault(coversRule, path, line, fmt.Sprintf("./RUNME.sh %s"+UnshownSays+" Write an example under spec/examples naming it, per [[spec/design_output/examples#the-checks]].", name))
 	said.Severity = SeverityWarning
 	return said
 }
