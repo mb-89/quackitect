@@ -1,5 +1,5 @@
 // What the verbs past the check read off cli-check.js: the doors the log verb
-// runs on, the Go test names and the working change. The check's read of the
+// runs on and the Go test names. The check's read of the
 // server stands in Go.
 // [[spec/design_output/level0#the-check-reads-the-server]]
 
@@ -33,20 +33,5 @@ test("the Go test names read each test function once, in order, and pass over a 
     ),
     ["TestOne", "TestTwo"],
   );
-});
-
-// [[spec/tickets/model-marks-io-names]]
-test("the delta keeps the blank context line a hunk ends on, and a refused diff hands none", () => {
-  const patch = "@@ -1,2 +1,2 @@\n-a\n+b\n \n";
-  const asked = [];
-  const proc = (exitCode) => ({
-    run: (args, opts) => {
-      asked.push([args, opts.cwd]);
-      return { exitCode, stdout: patch, stderr: "" };
-    },
-  });
-  assert.equal(check.deltaOf({ proc: proc(0) }, "/tree"), patch);
-  assert.deepEqual(asked[0], [["git", "diff", "HEAD", "--binary", "--no-renames"], "/tree"]);
-  assert.equal(check.deltaOf({ proc: proc(1) }, "/tree"), "");
 });
 

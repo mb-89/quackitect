@@ -131,9 +131,21 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 	}
 }
 
-// The post door, a stub until the implement step lands it. [[spec/tickets/probes-leave-node]]
-func realPost(string, string, string, time.Duration) (int, string, error) {
-	return 0, "", errors.New("the post door stands unbuilt")
+// Posts the JSON body to the address under the bearer token, and answers the status and the text. [[spec/tickets/probes-leave-node]]
+func realPost(url, token, body string, wait time.Duration) (int, string, error) {
+	asked, err := http.NewRequest(http.MethodPost, url, strings.NewReader(body))
+	if err != nil {
+		return 0, "", err
+	}
+	asked.Header.Set("Content-Type", "application/json")
+	asked.Header.Set("Authorization", "Bearer "+token)
+	said, err := (&http.Client{Timeout: wait}).Do(asked)
+	if err != nil {
+		return 0, "", err
+	}
+	defer said.Body.Close()
+	text, err := io.ReadAll(said.Body)
+	return said.StatusCode, string(text), err
 }
 
 func realGet(url string, wait time.Duration) (string, error) {

@@ -1,7 +1,7 @@
 // The probe verb: measures the client itself. compact, cold and reply drive
-// the claude client in Go, and dry hands its one road to the JavaScript entry
-// that loads the plugin's hook module.
-// [[spec/tickets/box-verbs-port-to-go]]
+// the claude client, and dry and smoke post a session's events to the door a
+// clone stands, all in Go.
+// [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/probes-leave-node]]
 package main
 
 import (
@@ -25,9 +25,6 @@ const probeWait = 900 * time.Second
 
 // The plugin folder the client loads, as PLUGIN_FOLDER in .claude/skills/level0/lib/vehicle.js names it. [[spec/design_output/level0#the-cold-probe]]
 const pluginFolder = ".claude/skills/level0"
-
-// The dry probe's own program, as ENTRY in src/scripts/probe-dry.js names it. [[spec/tickets/probe-dry-entry]]
-const dryEntry = "src/scripts/probe-dry.js"
 
 // The word naming the revision the dry road runs at. [[spec/tickets/probe-at-revision-guards-merges]]
 const atFlag = "--at"
@@ -78,6 +75,9 @@ func probeVerb(d boxDoors, argv []string) int {
 		if code != 0 {
 			return code
 		}
+		if said == "smoke" {
+			return probeSmoke(d, resolved)
+		}
 		return probeDry(d, resolved)
 	// [[spec/tickets/the-reply-probe-runs]]
 	case "reply":
@@ -110,18 +110,6 @@ func resolvedAt(d boxDoors, argv []string) ([]string, int) {
 	resolved := slices.Clone(argv)
 	resolved[at+1] = strings.TrimSpace(ran.stdout)
 	return resolved, 0
-}
-
-// Hands the dry road to its JavaScript entry with the words as they stand, since its session loads the plugin's hook module in process. [[spec/tickets/probe-dry-leaves-node]]
-func probeDry(d boxDoors, argv []string) int {
-	node := whereIs(d.root, "node", readSurvey(d.root))
-	entry := filepath.Join(d.root, filepath.FromSlash(dryEntry))
-	ran := d.run(append([]string{node, entry}, argv...), runOpts{cwd: d.root, inherit: true})
-	if ran.missing {
-		fmt.Fprintln(d.errs, "node stands nowhere, so this box probes no dry start.")
-		return exitFailed
-	}
-	return ran.code
 }
 
 // What the compaction probe reads off the log: the reads, the word, and why. [[spec/design_output/level0#what-the-probe-reads]]

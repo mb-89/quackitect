@@ -443,11 +443,3 @@ func journals(t *testing.T, root, from, to string) {
 	}
 	lays(t, root, ".se/.runtime/undo/20260102030405000000.json", string(text))
 }
-
-// The Go verb runs the cold probe, so a change to the old script starts no cold run. [[spec/tickets/cold-comments-name-go-owner]]
-func TestACommitTouchingTheOldColdScriptAloneRunsNoColdProbe(t *testing.T) {
-	t.Parallel()
-	if got := coldIn([]string{"src/scripts/probe-cold.js"}); len(got) != 0 {
-		t.Errorf("the commit takes %v as cold", got)
-	}
-}

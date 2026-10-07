@@ -35,17 +35,6 @@ const (
 	every       = "."
 )
 
-// The cold path: a commit touching one runs the cold probe. [[spec/design_output/level0#the-cold-probe]]
-var coldPath = []string{
-	".claude/skills/level0/hooks/",
-	".claude/skills/level0/lib/guidance.js",
-	"src/bridge/guidance.js",
-	"src/modules/hooks/",
-	"src/quack/",
-	"src/scripts/go-stamp.sh",
-	"src/scripts/install.sh",
-}
-
 func init() {
 	register("commit", func(argv []string, dry bool, out, errs io.Writer) int {
 		return commitVerb(landingHere())(argv, dry, out, errs)
@@ -307,20 +296,6 @@ func (d landingDoors) stagedPaths(only []string) []string {
 			out = append(out, one.From)
 		}
 		out = append(out, one.Path)
-	}
-	return out
-}
-
-// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
-func coldIn(paths []string) []string {
-	var out []string
-	for _, path := range paths {
-		for _, cold := range coldPath {
-			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
-				out = append(out, path)
-				break
-			}
-		}
 	}
 	return out
 }

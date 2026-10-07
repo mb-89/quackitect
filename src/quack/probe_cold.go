@@ -43,6 +43,31 @@ const (
 // The checks the cold probe reads, in order. [[spec/design_output/level0#the-cold-probe]]
 var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 
+// The cold path: a commit touching one runs the cold probe. [[spec/design_output/level0#the-cold-probe]]
+var coldPath = []string{
+	".claude/skills/level0/hooks/",
+	".claude/skills/level0/lib/guidance.js",
+	"src/bridge/guidance.js",
+	"src/modules/hooks/",
+	"src/quack/",
+	"src/scripts/go-stamp.sh",
+	"src/scripts/install.sh",
+}
+
+// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
+func coldIn(paths []string) []string {
+	var out []string
+	for _, path := range paths {
+		for _, cold := range coldPath {
+			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
+				out = append(out, path)
+				break
+			}
+		}
+	}
+	return out
+}
+
 // The prompt the cold client runs. [[spec/design_output/level0#the-cold-probe]]
 var coldPrompt = strings.Join([]string{
 	"This session probes a fresh box. Make two tool calls, one after the other.",
@@ -349,6 +374,13 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 		say("FAIL clone: " + tail(orElse(cloned.stderr, cloned.fault)))
 		return ""
 	}
+	if box.at != "" {
+		checked := d.run([]string{"git", "checkout", "--quiet", "--detach", box.at}, runOpts{cwd: box.tree, timeout: probeWait})
+		if checked.code != 0 {
+			say("FAIL checkout: " + tail(orElse(checked.stderr, checked.fault)))
+			return ""
+		}
+	}
 	if !takesDelta(d, box, say) {
 		return ""
 	}
@@ -361,13 +393,17 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 	if installed.code != 0 {
 		say(tail(orElse(installed.stderr, installed.stdout)))
 	}
-	// A desk runs a server at the base port, so the clone's hook reads its own port off the pointer. [[spec/design_output/level0#the-cold-probe]]
-	pointer := filepath.Join(box.tree, filepath.FromSlash(vehiclePointer))
-	_ = os.MkdirAll(filepath.Dir(pointer), 0o755)
-	_ = os.WriteFile(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), 0o644)
+	points(box)
 	config := filepath.Join(box.temp, "config")
 	_ = os.MkdirAll(config, 0o755)
 	return config
+}
+
+// A desk runs a server at the base port, so the clone's hook reads its own port off the pointer. [[spec/design_output/level0#the-cold-probe]]
+func points(box coldBox) {
+	pointer := filepath.Join(box.tree, filepath.FromSlash(vehiclePointer))
+	_ = os.MkdirAll(filepath.Dir(pointer), 0o755)
+	_ = os.WriteFile(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), 0o644)
 }
 
 // The first text, or the second where the first is empty, as || reads them. [[spec/design_output/level0#the-cold-probe]]

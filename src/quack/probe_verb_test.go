@@ -1,6 +1,6 @@
 // The probe verb over fake doors: the compaction probe's reading and its run,
-// the dry road handed to its JavaScript entry, and the usage.
-// [[spec/tickets/box-verbs-port-to-go]]
+// the dry and smoke roads run in Go, and the usage.
+// [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/probes-leave-node]]
 package main
 
 import (
@@ -155,43 +155,33 @@ func TestTheProbeRunsTheClientTheSurveyNames(t *testing.T) {
 	}
 }
 
-// The dry road starts its JavaScript entry with the words as they stand. [[spec/tickets/probe-dry-leaves-node]]
-func TestTheDryProbeHandsItsRoadToTheEntry(t *testing.T) {
+// The dry road with the working change reads the diff, then clones, and starts no node. [[spec/tickets/probes-leave-node]]
+func TestTheDryProbeRunsItsRoadInGo(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
-	runner.answers["node"] = ranResult{code: 4}
-	if code := probeVerb(d, []string{"dry", "--working"}); code != 4 {
-		t.Errorf("the dry road answers %d", code)
+	probeVerb(d, []string{"dry", "--working"})
+	ran := ranWords(runner)
+	if len(ran) < 2 || ran[0] != "git diff HEAD --binary --no-renames" || !strings.HasPrefix(ran[1], "git clone --quiet --no-hardlinks ") {
+		t.Errorf("the dry road runs %v", ran)
 	}
-	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "dry", "--working"}
-	if len(runner.ran) != 1 || !slices.Equal(runner.ran[0], want) {
-		t.Errorf("the dry road runs %v", runner.ran)
-	}
-	if o := runner.opts[0]; o.cwd != d.root || !o.inherit {
-		t.Errorf("the dry road runs under %+v", o)
-	}
-	gone, _, _, errs := fakeBoxDoors(t)
-	gone.run = func([]string, runOpts) ranResult { return ranResult{code: 1, missing: true} }
-	if code := probeVerb(gone, []string{"dry"}); code != 1 || !strings.Contains(errs.String(), "node stands nowhere") {
-		t.Errorf("a missing node answers %d: %s", code, errs)
+	for _, one := range runner.ran {
+		if filepath.Base(one[0]) == "node" {
+			t.Errorf("the dry road starts node: %v", one)
+		}
 	}
 }
 
-// The dry road at a revision resolves it to a commit, and hands the entry that commit. [[spec/tickets/probe-at-revision-guards-merges]]
+// The dry road at a revision resolves it to a commit, and checks the clone out there. [[spec/tickets/probe-at-revision-guards-merges]]
 func TestTheDryProbeRunsAtARevision(t *testing.T) {
 	t.Parallel()
-	d, runner, _, errs := fakeBoxDoors(t)
+	d, runner, _, _ := fakeBoxDoors(t)
 	runner.answers["git rev-parse"] = ranResult{stdout: "abc123\n"}
-	runner.answers["node"] = ranResult{}
-	if code := probeVerb(d, []string{"dry", "--at", "HEAD~1"}); code != 0 {
-		t.Fatalf("the dry road at a revision answers %d: %s", code, errs)
-	}
-	if len(runner.ran) != 2 || !slices.Equal(runner.ran[0][1:], []string{"rev-parse", "--verify", "--quiet", "HEAD~1^{commit}"}) {
+	probeVerb(d, []string{"dry", "--at", "HEAD~1"})
+	if len(runner.ran) < 2 || !slices.Equal(runner.ran[0][1:], []string{"rev-parse", "--verify", "--quiet", "HEAD~1^{commit}"}) {
 		t.Fatalf("the dry road runs %v", runner.ran)
 	}
-	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "dry", "--at", "abc123"}
-	if !slices.Equal(runner.ran[1], want) {
-		t.Errorf("the entry runs %v", runner.ran[1])
+	if !slices.Contains(ranWords(runner), "git checkout --quiet --detach abc123") {
+		t.Errorf("the clone never checks out the commit: %v", ranWords(runner))
 	}
 }
 
@@ -223,17 +213,14 @@ func TestTheDryProbeRefusesARevisionBesideTheWorkingChange(t *testing.T) {
 	}
 }
 
-// The smoke road starts the same entry with its words, as the dry road does. [[spec/tickets/level0-smoke-runs-in-seconds]]
-func TestTheSmokeProbeHandsItsRoadToTheEntry(t *testing.T) {
+// The smoke road reads the working change and stands a shared clone. [[spec/tickets/level0-smoke-runs-in-seconds]]
+func TestTheSmokeProbeRunsItsRoadInGo(t *testing.T) {
 	t.Parallel()
-	d, runner, _, errs := fakeBoxDoors(t)
-	runner.answers["node"] = ranResult{code: 0}
-	if code := probeVerb(d, []string{"smoke", "--working"}); code != 0 {
-		t.Errorf("the smoke road answers %d: %s", code, errs)
-	}
-	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "smoke", "--working"}
-	if len(runner.ran) != 1 || !slices.Equal(runner.ran[0], want) {
-		t.Errorf("the smoke road runs %v", runner.ran)
+	d, runner, _, _ := fakeBoxDoors(t)
+	probeVerb(d, []string{"smoke", "--working"})
+	ran := ranWords(runner)
+	if len(ran) < 2 || ran[0] != "git diff HEAD --binary --no-renames" || !strings.HasPrefix(ran[1], "git clone --quiet --shared ") {
+		t.Errorf("the smoke road runs %v", ran)
 	}
 }
 

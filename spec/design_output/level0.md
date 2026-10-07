@@ -779,7 +779,7 @@ run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
 
 A unit test passes on each part, and a real box still breaks where the parts
 meet. So the commit verb runs the cold probe on every commit touching the cold
-path, and no hand remembers it. `COLD_PATH` in `src/scripts/probe-cold.js`
+path, and no hand remembers it. `coldPath` in `src/quack/probe_cold.go`
 names the path: the bridgehead, the start road, the guidance delivery and the
 probe itself.
 
@@ -808,7 +808,7 @@ The probe runs one cold box from start to end:
 5. It reads the clone's session log and the client's stream.
 6. It stops the server the clone launched, and removes the folder.
 
-`readsCold` in `src/scripts/probe-cold.js` answers each check from the rows
+`readsCold` in `src/quack/probe_cold.go` answers each check from the rows
 and the stream:
 
 | the check | it passes where |
@@ -973,7 +973,7 @@ A `SessionStart` hook in `.claude/settings.json` runs the boot word of
 `src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
 off a cloud box, it runs nothing. A failed install holds no session up. The
 hook's `timeout` waits out `startSpan` in `src/quack/hook_down.go`, the span the start road allows the same
-install, so the client cuts no install short before the manifest lands.
+install. So the client cuts no install short before the manifest lands.
 
 Where the manifest stands the plugin loads. The start road of
 [[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the

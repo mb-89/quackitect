@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: 4103cfc6fb205414
         size: 1027
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: c5dd015afdbf46ea3b9e89954daa3b6df0922b38
+    hash_after: c5dd015afdbf46ea3b9e89954daa3b6df0922b38
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: javascript-leaves
 ---
 
@@ -361,14 +370,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/probe_dry.go src/quack/probe_clear.go src/quack/probe_cold.go src/quack/commit.go src/quack/probe_verb.go src/quack/boxdoors.go src/quack/probe_verb_test.go src/quack/commit_test.go src/scripts/cli-check.js test/level0/check-server.test.js spec/design_output/level0.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus probe_clear.go, which the clear road takes so probe_dry.go stays under the file ceiling, and commit_test.go, which drops a case probe_cold_test.go repeats
+- the post door is real in boxdoors.go and fake in box_doors_test.go, and every other door the roads reach rides boxDoors with its fake
+- each file header names the dry, smoke and clear roads the approach describes, and links the ticket
+- coldPath and coldIn stand in probe_cold.go alone, and the level0 design note points at that file for the cold path
 
 ## tests-green
 

@@ -163,7 +163,7 @@ func TestTheDryProbeStandsTheDoorAndPostsEveryEventToIt(t *testing.T) {
 	if installed < 0 || installed > stood || runner.opts[stood].cwd != tree {
 		t.Errorf("the standing runs at %d under %+v: %v", stood, runner.opts[stood], ran)
 	}
-	want := []string{"session.start", "prompt.submit", "prompt.context", "classic.MessageDisplay", "tool.call", "tool.call", "classic.Stop"}
+	want := []string{"session.start", "prompt.submit", "prompt.context", "turn.said", "classic.MessageDisplay", "tool.call", "tool.call", "classic.Stop"}
 	if got := door.events(); len(got) < len(want) || !slices.Equal(got[:len(want)], want) {
 		t.Errorf("the door hears %v", got)
 	}

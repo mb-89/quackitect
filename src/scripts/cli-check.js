@@ -6,7 +6,6 @@ import { join, sep } from "node:path";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 
-export { deltaOf } from "./probe-dry.js";
 import {
   CONTRACT,
   DOORS,
