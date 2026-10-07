@@ -197,7 +197,7 @@ current one alone.
 
 `./RUNME.sh log` answers the rows the log holds, narrowed by the flags below:
 
-| the flag | what it reads | the owner it calls |
+| the flag | what it reads | the owner it calls in `src/quack/verb_log.go` |
 |---|---|---|
 | `--since <span>` | the rows whose stamp falls inside the span | `spanOf` |
 | `--level <name>` | the rows at that level and above | `narrowed` |
@@ -205,8 +205,6 @@ current one alone.
 | `--words <text>` | the rows carrying every word, in any case | `carries` |
 | `--last <count>` | the last rows, after every filter above | `lastOf` |
 | `--count` | one row a kind, the most first, over the rows the filters keep | `logCounts` |
-
-Each owner stands in `src/quack/verb_log.go`.
 
 `./RUNME.sh find --log <words>` hands its words to this verb, because the index
 walks no log. `logFiles` in `src/quack/verb_log.go` owns the files the read

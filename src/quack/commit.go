@@ -165,12 +165,6 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-	if code, said := d.verb("test"); code != 0 {
-		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
-		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
-		return exitFailed
-	}
 	// The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
 	moved := d.movedFrom(paths)
 	only := append(slices.Clone(paths), moved...)
@@ -184,6 +178,20 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	stage := d.git.AddAll
 	if len(adds) > 0 {
 		stage = func() error { return d.git.Add(adds) }
+	}
+	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
+	if reach := handWritten(d.stagesTo(adds, only)); len(reach) > 0 {
+		if code, said := d.verb(append([]string{"lint", "--strict"}, reach...)...); code != 0 {
+			fmt.Fprintln(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:")
+			fmt.Fprintln(errs, orNothing(said, "the lint answers nothing"))
+			return exitFailed
+		}
+	}
+	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+	if code, said := d.verb("test"); code != 0 {
+		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
+		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
+		return exitFailed
 	}
 	if err := stage(); err != nil {
 		fmt.Fprintln(errs, "The staging comes back refused, so the commit stands undone:")
@@ -239,10 +247,10 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	return 0
 }
 
-// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueBranch = "rescue/"
 
-// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) rescues(branch string, errs io.Writer) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !d.cloud || !onWork {
@@ -257,7 +265,7 @@ func (d landingDoors) rescues(branch string, errs io.Writer) {
 	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
 }
 
-// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) dropsRescue(branch string) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !onWork {
@@ -272,7 +280,7 @@ func (d landingDoors) dropsRescue(branch string) {
 	}
 }
 
-// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueRef = "refs/heads/"
 
 func orNothing(said, nothing string) string {

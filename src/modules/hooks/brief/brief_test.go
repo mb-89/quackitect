@@ -63,6 +63,10 @@ func TestTheToolsBlockReadsTheSurvey(t *testing.T) {
 	if ToolsText("", tiers) != "" {
 		t.Fatal("a missing survey answers a tools block")
 	}
+	// The Go rules own the prose, so a survey still naming Vale lists no row of it. [[spec/tickets/vale-leaves-the-tree]]
+	if old := ToolsText(`{"vale":{"version":"3.20.0"},"git":{"version":"2.43.0"}}`, tiers); strings.Contains(old, "vale") {
+		t.Fatalf("the tools block names vale:\n%s", old)
+	}
 }
 
 // The canary opening an answer reads same, another count reads other, and a line past the first reads none. [[spec/tickets/brief-answers-off-the-door]]
@@ -84,6 +88,9 @@ func TestTheHelperReadsTheLayerBeforeItsTask(t *testing.T) {
 	wrapped := ForHelper("### voice\n\n1. Say what is.", "do the thing")
 	if !strings.HasPrefix(wrapped, "# How this tree is worked") || !strings.HasSuffix(wrapped, "# Your task\n\ndo the thing") {
 		t.Fatalf("the wrapped prompt reads\n%s", wrapped)
+	}
+	if !strings.Contains(wrapped, "The Go rules hold the mechanical ones") || strings.Contains(wrapped, "Vale") {
+		t.Fatalf("the layer's opening names no Go rules, or names Vale:\n%s", wrapped)
 	}
 	if got := ForHelper("", "do the thing"); got != "do the thing" {
 		t.Fatalf("no layer answers %q, and wants the prompt alone", got)

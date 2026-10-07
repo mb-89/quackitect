@@ -98,7 +98,7 @@ func TestCheckParts(t *testing.T) {
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"tests", "level0", "go", "doors", "guards", "projections", "plugin", "server", "rules"}
+		want := []string{"changed", "tests", "level0", "go", "doors", "guards", "projections", "plugin", "server", "rules"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
@@ -112,6 +112,14 @@ func TestCheckParts(t *testing.T) {
 		want := [][]string{{"probe", "smoke", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
 		if !reflect.DeepEqual(fake.verbs, want) {
 			t.Fatalf("the verbs read %v, and want %v", fake.verbs, want)
+		}
+	})
+	// A warning in a file the branch changes turns the check red, before the tests run. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("the changed part runs the strict lint over the changed files", func(t *testing.T) {
+		fake := &checkFake{}
+		partNamed(partsOf(fake.doors(), nil, false), "changed").run()
+		if !reflect.DeepEqual(fake.verbs, [][]string{{"lint", "--changed", "--strict"}}) {
+			t.Fatalf("the changed part ran %v", fake.verbs)
 		}
 	})
 	t.Run("the rules read the root where the words name no path", func(t *testing.T) {

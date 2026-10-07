@@ -39,6 +39,10 @@ type lintDoors struct {
 	tools func(where []string) []check.Finding
 	sweep func() ([]check.Finding, error)
 	box   func() []check.Finding
+	// The files the branch changes since it left trunk, and the ones it changes in the working tree. [[spec/tickets/rules-lint-changed-files-first]]
+	changed func() []string
+	// Leaves the findings where SE_LINT_FOUND points, which the check's stamp and its errors flag read. [[spec/tickets/the-check-lint-runs-in-go]]
+	leave func(found lintFound) error
 	log   func(row map[string]any) error
 	now   func() time.Time
 }
@@ -56,6 +60,10 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
+		changed: func() []string {
+			return changedOver(gitAt(root), func(line string) { fmt.Fprintln(os.Stderr, line) })
+		},
+		leave: leavesFoundAt(os.Getenv(lintEnv)),
 		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
 		now:   time.Now,
 	}, nil
@@ -81,6 +89,11 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 			return exitFailed
 		}
 		where := whereOf(argv[1:])
+		// The changed files stand in place of the paths named, and a warning refuses under --strict, as the commit and the check read it. [[spec/tickets/rules-lint-changed-files-first]]
+		if slices.Contains(argv[1:], "--changed") {
+			where = handWritten(d.changed())
+		}
+		strict := slices.Contains(argv[1:], "--strict")
 		began := d.now()
 		found, fault := lintReading(d, where)
 		if fault != "" {
@@ -88,6 +101,11 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 			return exitFailed
 		}
 		ms := d.now().Sub(began).Milliseconds()
+		if d.leave != nil {
+			if err := d.leave(lintFoundOf(found, strict)); err != nil {
+				fmt.Fprintln(errs, "The lint leaves no findings for the check:", err)
+			}
+		}
 		// The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
 		if len(found) == 0 {
 			lintSays(d, errs, map[string]any{"level": "debug", "kind": lintKind, "said": "the rules pass over " + strings.Join(where, " "), "ms": ms})
@@ -100,7 +118,7 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 		})
 		refused := 0
 		for _, one := range found {
-			if one.Severity != check.SeverityWarning {
+			if strict || one.Severity != check.SeverityWarning {
 				refused++
 			}
 		}
@@ -143,8 +161,8 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 	}
 	found := []check.Finding{}
 	for _, one := range d.tools(where) {
-		if one.Rule == lsp.ValeRuns {
-			return nil, one.Message + "\nVale read no file, so every rule it holds stands unchecked."
+		if one.Rule == lsp.RulesLoad {
+			return nil, one.Message
 		}
 		found = append(found, one)
 	}
@@ -202,6 +220,38 @@ func lintSays(d lintDoors, errs io.Writer, row map[string]any) {
 	}
 }
 
+// A finding the lint refuses leaves as its line under erred, so --errors names it, and a warning it lets pass stands by its file and source. [[spec/tickets/lint-strict-leaves-erred]]
+func lintFoundOf(found []check.Finding, strict bool) lintFound {
+	out := lintFound{Stood: []finding{}, Erred: []string{}}
+	for _, one := range found {
+		if strict || one.Severity != check.SeverityWarning {
+			out.Erred = append(out.Erred, lintLine(one))
+		} else {
+			out.Stood = append(out.Stood, finding{File: one.File, Source: one.Source})
+		}
+	}
+	return out
+}
+
+// A finding as one line: its place, its rule and its message. [[spec/design_output/lsp#the-lint-ends-on-findings]]
+func lintLine(one check.Finding) string {
+	return fmt.Sprintf("%s:%d:%d: %s: %s", one.File, one.Line, one.Column, one.Rule, one.Message)
+}
+
+// The findings as JSON where SE_LINT_FOUND points, and nothing where it points nowhere. [[spec/tickets/the-check-lint-runs-in-go]]
+func leavesFoundAt(at string) func(found lintFound) error {
+	return func(found lintFound) error {
+		if at == "" {
+			return nil
+		}
+		said, err := json.Marshal(found)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(at, said, 0o644)
+	}
+}
+
 // The count reads first, and the finding lines stand last, where the reader's eye lands. [[spec/design_output/lsp#the-lint-ends-on-findings]]
 func lintRows(found []check.Finding, refused int) []string {
 	per, order := map[string]int{}, []string{}
@@ -223,7 +273,7 @@ func lintRows(found []check.Finding, refused int) []string {
 	}
 	out = append(out, "")
 	for _, one := range found {
-		out = append(out, fmt.Sprintf("%s:%d:%d: %s: %s", one.File, one.Line, one.Column, one.Rule, one.Message))
+		out = append(out, lintLine(one))
 	}
 	return out
 }
@@ -231,7 +281,7 @@ func lintRows(found []check.Finding, refused int) []string {
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func toolsOver(root string, where []string) []check.Finding {
 	tree := lintTree(root)
-	tools := lsp.ToolsAt(root, lspChecks(root))
+	tools := toolsAt(root)
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {

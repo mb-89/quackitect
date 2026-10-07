@@ -15,6 +15,15 @@ import (
 	"unicode/utf8"
 )
 
+// The base and bit size a number text parses in, the shift to a byte's high hex digit, and the bounds JavaScript prints a number inside without an exponent. [[spec/design_output/vehicle#what-a-vehicle-needs]]
+const (
+	decimalBase   = 10
+	bitSize       = 64
+	nibble        = 4
+	exponentAbove = 1e21
+	exponentBelow = 1e-6
+)
+
 // Object is a JSON object holding its keys in the order they came. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 type Object struct {
 	keys []string
@@ -43,8 +52,8 @@ func (o *Object) Keys() []string {
 		}
 	}
 	slices.SortFunc(indexes, func(a, b string) int {
-		x, _ := strconv.ParseUint(a, 10, 64)
-		y, _ := strconv.ParseUint(b, 10, 64)
+		x, _ := strconv.ParseUint(a, decimalBase, bitSize)
+		y, _ := strconv.ParseUint(b, decimalBase, bitSize)
 		return int(int64(x) - int64(y))
 	})
 	return append(indexes, rest...)
@@ -55,7 +64,7 @@ func isIndex(key string) bool {
 	if key == "" || (len(key) > 1 && key[0] == '0') {
 		return false
 	}
-	said, err := strconv.ParseUint(key, 10, 64)
+	said, err := strconv.ParseUint(key, decimalBase, bitSize)
 	return err == nil && said < math.MaxUint32
 }
 
@@ -126,7 +135,7 @@ func valueOf(reads *json.Decoder) (any, error) {
 		_, err := reads.Token()
 		return out, err
 	case json.Number:
-		number, err := strconv.ParseFloat(string(said), 64)
+		number, err := strconv.ParseFloat(string(said), bitSize)
 		if err != nil && !errors.Is(err, strconv.ErrRange) {
 			return nil, err
 		}
@@ -236,7 +245,7 @@ func quote(out *strings.Builder, said string) {
 			out.WriteString(`\t`)
 		case one < 0x20:
 			out.WriteString(`\u00`)
-			out.WriteByte(hex[one>>4])
+			out.WriteByte(hex[one>>nibble])
 			out.WriteByte(hex[one&0xf])
 		default:
 			out.WriteString(said[at : at+size])
@@ -251,13 +260,13 @@ func Number(said float64) string {
 	if said == 0 {
 		return "0"
 	}
-	if size := math.Abs(said); size >= 1e21 || size < 1e-6 {
-		text := strconv.FormatFloat(said, 'e', -1, 64)
+	if size := math.Abs(said); size >= exponentAbove || size < exponentBelow {
+		text := strconv.FormatFloat(said, 'e', -1, bitSize)
 		mantissa, exponent, _ := strings.Cut(text, "e")
 		sign, digits := exponent[:1], strings.TrimLeft(exponent[1:], "0")
 		return mantissa + "e" + sign + digits
 	}
-	return strconv.FormatFloat(said, 'f', -1, 64)
+	return strconv.FormatFloat(said, 'f', -1, bitSize)
 }
 
 // JSString writes a value as JavaScript's String does. [[spec/design_output/vehicle#what-a-vehicle-needs]]
@@ -318,7 +327,7 @@ func ToNumber(value any) float64 {
 		if text == "" {
 			return 0
 		}
-		if number, err := strconv.ParseFloat(text, 64); err == nil && !strings.ContainsAny(text, "_xXpPnN") {
+		if number, err := strconv.ParseFloat(text, bitSize); err == nil && !strings.ContainsAny(text, "_xXpPnN") {
 			return number
 		}
 		if text == "Infinity" || text == "+Infinity" {
@@ -327,7 +336,7 @@ func ToNumber(value any) float64 {
 		if text == "-Infinity" {
 			return math.Inf(-1)
 		}
-		if number, err := strconv.ParseInt(text, 0, 64); err == nil && len(text) > 2 && text[0] == '0' && strings.ContainsAny(text[1:2], "xXoObB") {
+		if number, err := strconv.ParseInt(text, 0, bitSize); err == nil && len(text) > 2 && text[0] == '0' && strings.ContainsAny(text[1:2], "xXoObB") {
 			return float64(number)
 		}
 		return math.NaN()

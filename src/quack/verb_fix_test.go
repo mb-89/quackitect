@@ -1,33 +1,28 @@
-// The fix verb in Go: the flags it refuses, the rounds of Vale's fixes over
-// the paths with the shouted leads calmed first, and biome after them.
-// [[spec/tickets/config-verbs-port-to-go]]
+// The fix verb in Go: the flags it refuses, the rounds of the Go rules' swaps
+// and calms over the paths, and biome after them.
+// [[spec/tickets/config-verbs-port-to-go]] [[spec/tickets/vale-leaves-the-tree]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"quackitect/src/rules"
 )
 
-// A shouted lead Vale names at line three of a.md. [[spec/tickets/config-verbs-port-to-go]]
-const shoutedRow = `{"a.md": [{"Check": "VoiceVale.ShoutedLead", "Line": 3, "Span": [1, 25], "Match": "NOTHING AT ALL WORKS HERE"}]}`
-
-// The verb over the root with a runner that keeps every argv and answers Vale's JSON with the row. [[spec/tickets/config-verbs-port-to-go]]
+// The verb over the root with a runner that keeps every argv. [[spec/tickets/config-verbs-port-to-go]]
 func fixRan(root string, argv ...string) (int, string, string, []string) {
 	var out, errs strings.Builder
 	var ran []string
-	run := func(dir string, said, _ io.Writer, words ...string) int {
+	run := func(dir string, _, _ io.Writer, words ...string) int {
 		ran = append(ran, strings.Join(words, " "))
 		if dir != root {
 			panic("the runner runs outside the root")
-		}
-		if strings.Contains(strings.Join(words, " "), "--output=JSON") {
-			fmt.Fprint(said, shoutedRow)
 		}
 		return 0
 	}
@@ -43,13 +38,31 @@ func binNamed(name string) string {
 	return name
 }
 
-// A root with both tools standing in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
+// A root holding the tree's rules and biome in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
 func fixRoot(t *testing.T) string {
 	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
-	seedFile(t, root, ".se/.runtime/bin/"+binNamed("vale"), "")
+	seedsRules(t, root)
 	seedFile(t, root, ".se/.runtime/bin/"+binNamed("biome"), "")
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n")
 	return root
+}
+
+// The fix swaps and calms through the Go rules, so a box with no Vale fixes. [[spec/tickets/vale-leaves-the-tree]]
+func TestFixSwapsAndCalmsThroughTheRulesWithNoVale(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
+	seedsRules(t, root)
+	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and we can't go.\n")
+	code, out, errs, ran := fixRan(root, "a.md")
+	text, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	if code != 0 || string(text) != "# Notes\n\nNothing at all works here, and we cannot go.\n" {
+		t.Fatalf("fix answers %d, %q, %q, and leaves %q", code, out, errs, text)
+	}
+	for _, one := range ran {
+		if strings.Contains(one, "vale") {
+			t.Fatalf("fix runs %q", one)
+		}
+	}
 }
 
 func TestFixRefusesAnUnknownFlag(t *testing.T) {
@@ -67,29 +80,21 @@ func TestFixPrintsItsUsage(t *testing.T) {
 	}
 }
 
-func TestFixRefusesWhereNoValeStands(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
-	if code, _, errs, _ := fixRan(root); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
-		t.Fatalf("fix answers %d and %q, and wants the refusal", code, errs)
-	}
-}
-
-func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
+func TestTheFixNamesAFileItCannotWrite(t *testing.T) {
 	t.Parallel()
 	root := fixRoot(t)
-	run := func(_ string, said, _ io.Writer, _ ...string) int {
-		fmt.Fprint(said, shoutedRow)
-		return 0
+	set, err := rulesAt(root)
+	if err != nil {
+		t.Fatal(err)
 	}
 	refuse := func(string, []byte) error { return errors.New("the disk refuses") }
-	err := calm(root, "vale", []string{"a.md"}, run, refuse)
+	_, err = fixRound(root, set, []string{"a.md"}, refuse)
 	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "the disk refuses") {
-		t.Fatalf("the calm answers %v, and wants the file and the cause", err)
+		t.Fatalf("the fix answers %v, and wants the file and the cause", err)
 	}
 }
 
-func TestFixCalmsAShoutedLead(t *testing.T) {
+func TestFixCalmsAShoutedLeadThenRunsBiome(t *testing.T) {
 	t.Parallel()
 	root := fixRoot(t)
 	code, out, _, ran := fixRan(root, "a.md")
@@ -100,16 +105,9 @@ func TestFixCalmsAShoutedLead(t *testing.T) {
 	if string(said) != "# Notes\n\nNothing at all works here, and then calm.\n" {
 		t.Fatalf("a.md reads %q, and wants the lead calmed", said)
 	}
-	vale, biome := filepath.Join(root, ".se", ".runtime", "bin", binNamed("vale")), filepath.Join(root, ".se", ".runtime", "bin", binNamed("biome"))
-	want := []string{
-		vale + " --config=.vale.ini --output=JSON --no-exit " + valeParked + " a.md",
-		vale + " fix --apply --config=.vale.ini " + valeParked + " a.md",
-		vale + " --config=.vale.ini --output=JSON --no-exit " + valeParked + " a.md",
-		vale + " fix --apply --config=.vale.ini " + valeParked + " a.md",
-		biome + " check --write --config-path=spec/config a.md",
-	}
-	if strings.Join(ran, "\n") != strings.Join(want, "\n") {
-		t.Fatalf("fix ran\n%s\nand wants two rounds, then biome:\n%s", strings.Join(ran, "\n"), strings.Join(want, "\n"))
+	biome := filepath.Join(root, ".se", ".runtime", "bin", binNamed("biome"))
+	if want := biome + " check --write --config-path=spec/config a.md"; strings.Join(ran, "\n") != want {
+		t.Fatalf("fix ran %q, and wants biome alone: %q", ran, want)
 	}
 }
 
@@ -128,20 +126,22 @@ func TestSentenceCaseKeepsWhatStandsBeforeTheFirstLetter(t *testing.T) {
 	}
 }
 
+// A shouted lead row as the rules answer it. [[spec/tickets/vale-leaves-the-tree]]
+func shout(line, from int, match string) rules.Finding {
+	return rules.Finding{Check: "VoiceVale." + shoutedLead, Line: line, Span: [2]int{from, from + len([]rune(match)) - 1}, Match: match}
+}
+
 func TestTheCalmLeavesAStaleSpanAlone(t *testing.T) {
 	t.Parallel()
 	was := "# Notes\n\nSomething else entirely.\n"
-	if got := calmed(was, []valeRow{{Line: 3, Span: []int{1, 15}, Match: "NOTHING AT ALL,"}}); got != was {
+	if got := rules.Apply(was, calm([]rules.Finding{shout(3, 1, "NOTHING AT ALL,")})); got != was {
 		t.Fatalf("the calm writes %q over a stale span", got)
 	}
 }
 
 func TestTheCalmCalmsTwoShoutsOnOneLine(t *testing.T) {
 	t.Parallel()
-	got := calmed("AAAA BBBB CCCC, and DDDD EEEE FFFF, done\n", []valeRow{
-		{Line: 1, Span: []int{1, 15}, Match: "AAAA BBBB CCCC,"},
-		{Line: 1, Span: []int{21, 35}, Match: "DDDD EEEE FFFF,"},
-	})
+	got := rules.Apply("AAAA BBBB CCCC, and DDDD EEEE FFFF, done\n", calm([]rules.Finding{shout(1, 1, "AAAA BBBB CCCC,"), shout(1, 21, "DDDD EEEE FFFF,")}))
 	if got != "Aaaa bbbb cccc, and Dddd eeee ffff, done\n" {
 		t.Fatalf("the calm writes %q", got)
 	}
@@ -149,41 +149,26 @@ func TestTheCalmCalmsTwoShoutsOnOneLine(t *testing.T) {
 
 func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
 	t.Parallel()
-	got := calmed("# Notes\r\n\r\nNOTHING AT ALL WORKS, yes\r\n", []valeRow{{Line: 3, Span: []int{1, 21}, Match: "NOTHING AT ALL WORKS,"}})
+	got := rules.Apply("# Notes\r\n\r\nNOTHING AT ALL WORKS, yes\r\n", calm([]rules.Finding{shout(3, 1, "NOTHING AT ALL WORKS,")}))
 	if got != "# Notes\r\n\r\nNothing at all works, yes\r\n" {
 		t.Fatalf("the calm writes %q", got)
 	}
 }
 
-// Real Vale names the shout, and the calm writes it in sentence case; a box with no Vale skips it. [[spec/design_output/doors#one-contract-test-per-door]]
-func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
+func TestTheCalmReadsShoutedLeadRowsAlone(t *testing.T) {
 	t.Parallel()
-	root, _ := filepath.Abs(filepath.Join("..", ".."))
-	vale := toolHere(root, "vale")
-	if vale == "" {
-		t.Skip("no vale stands on this box")
-	}
-	for shouted, want := range map[string]string{
-		"NOTHING AT ALL WORKS HERE, and then calm.": "Nothing at all works here, and then calm.",
-		"DON'T STOP AT ALL HERE, and then calm.":    "Don't stop at all here, and then calm.",
-	} {
-		at := filepath.Join(t.TempDir(), "it.md") // level0: FixtureOutsideHome - the case makes a file it cannot write in a folder of its own
-		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
-			t.Fatal(err)
-		}
-		if err := calm(root, vale, []string{at}, toolRuns, writeCalmed); err != nil {
-			t.Fatal(err)
-		}
-		if got, _ := os.ReadFile(at); string(got) != "# Notes\n\n"+want+"\n" {
-			t.Fatalf("the calm over real Vale writes %q, and wants %q", got, want)
-		}
+	other := rules.Finding{Check: "VoiceParagraph.Passive", Line: 1, Span: [2]int{1, 4}, Match: "WENT"}
+	if got := calm([]rules.Finding{other, shout(1, 1, "")}); len(got) != 0 {
+		t.Fatalf("the calm swaps %+v", got)
 	}
 }
 
 func TestFixReadsTheTreeWhereNoPathStands(t *testing.T) {
 	t.Parallel()
-	_, _, _, ran := fixRan(fixRoot(t))
-	if len(ran) == 0 || !strings.HasSuffix(ran[0], valeParked+" .") {
-		t.Fatalf("fix ran %v, and wants the tree", ran)
+	root := fixRoot(t)
+	_, _, _, ran := fixRan(root)
+	said, _ := os.ReadFile(filepath.Join(root, "a.md"))
+	if len(ran) == 0 || !strings.HasSuffix(ran[0], " .") || !strings.HasPrefix(string(said), "# Notes\n\nNothing at all") {
+		t.Fatalf("fix ran %v and leaves %q, and wants the tree", ran, said)
 	}
 }

@@ -249,6 +249,11 @@ func TestMintVerb(t *testing.T) {
 			t.Errorf("the mint says %q, and wants %q", said, line)
 		}
 	})
+}
+
+// level0: FixtureOutsideHome - each refusal reads back a tree of its own, so a stray write shows
+func TestMintVerbRefusals(t *testing.T) {
+	// [[spec/tickets/verbs-mint-tickets-and-keys]]
 	refusals := []struct {
 		name string
 		argv []string

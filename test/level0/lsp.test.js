@@ -62,22 +62,25 @@ test("the client watches markdown and every file a two-file rule reads", () => {
     "**/.vscode/settings.json",
     "**/.vscode/extensions.json",
     "**/src/scripts/install.sh",
-    "**/.vale.ini",
   ]) {
     assert.ok(patterns.includes(one), one);
   }
+  assert.ok(
+    patterns.every((one) => !/vale/i.test(one)),
+    "the Go rules read no prose linter's config",
+  );
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("a built server starts, and an unbuilt one starts nothing", async () => {
-  const built = doorOf({ [BIN]: [binaryOf(process.platform), "vale"] });
+  const built = doorOf({ [BIN]: [binaryOf(process.platform), "biome"] });
   assert.equal(
     await startsServer(built),
     `/at/root/${BIN}/${binaryOf(process.platform)}`,
   );
   assert.equal(built.asked.length, 1);
 
-  const bare = doorOf({ [BIN]: ["vale"] });
+  const bare = doorOf({ [BIN]: ["biome"] });
   assert.equal(await startsServer(bare), "");
   assert.equal(bare.asked.length, 0);
 });

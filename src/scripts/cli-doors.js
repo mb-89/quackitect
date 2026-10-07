@@ -106,9 +106,6 @@ export const files = it.disk;
 export const outside = it.proc;
 
 export const known = readTools(files, root);
-export const bin = whereIs(files, root, "vale", known);
-// [[spec/design_output/pull#the-voice-reads-the-evidence]]
-it.vale = bin;
 export const go = whereIs(files, root, "go", known);
 export const biome = whereIs(files, root, "biome", known);
 export const DOORS = join(root, "src", "doors");

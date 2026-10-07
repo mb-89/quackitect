@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "chrischinchilla.vale-vscode",
-    "biomejs.biome",
-    "bierner.markdown-mermaid"
-  ]
+  "recommendations": ["biomejs.biome", "bierner.markdown-mermaid"]
 }

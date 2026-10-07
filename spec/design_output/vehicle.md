@@ -77,26 +77,18 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
-## The styles assemble once
+## Rules read the work root
 
-A project writes a rule of its own, and the method's rules keep standing over
-it. Both roots hold their styles under `spec/config/styles`, and `assemble` in
-`src/scripts/styles.js` writes the pair into one folder:
+The Go rules read the rule files `ruleFiles` in `src/rules/load.go` names. The
+method's `rules-over` verb runs inside the work root:
 
-| what the assembly writes | where it stands |
+| what | where it comes from |
 |---|---|
-| the styles both roots hold | `.se/vale/styles` under the work root |
-| the config naming that folder | `.se/vale/.vale.ini` beside it |
+| the binary | the method root |
+| each rule file | `spec/config/styles` under the work root |
+| a rule file the work root lacks | nowhere, so the load fails and names the file |
 
-The method's files land first, and a name the work root holds again replaces
-one. The config comes from the work root where it holds one, and from the
-method otherwise. The vale door hands that config to Vale, and a tree driving
-itself hands its own.
-
-The private folder stands off git, so nobody edits what the assembly writes.
-The assembly writes again where a source reads newer than the derived config.
-It writes again too where the names the roots hold differ from the copies
-standing there, so a rule a root drops refuses no write.
+For details, see [[spec/design_output/rules#load-reads-the-rule-files]].
 
 ## A vehicle stands alone
 

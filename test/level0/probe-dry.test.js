@@ -92,7 +92,7 @@ test("a whole run passes every check the dry probe names", () => {
 test("the smoke stands the clone with the root's built tools and installs nothing", () => {
 	const disk = fakeDisk({
 		"/r/.se/.runtime/bin/se-index": "index",
-		"/r/.se/.runtime/bin/vale": "vale",
+		"/r/.se/.runtime/bin/biome": "biome",
 		"/r/.se/.runtime/bin/se-index.old": "old",
 	});
 	const proc = fakeProc({ git: { exitCode: 0 } });
@@ -110,7 +110,7 @@ test("the smoke stands the clone with the root's built tools and installs nothin
 		"one shared clone, and no install",
 	);
 	assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
-	assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
+	assert.equal(disk.read("/t/tree/.se/.runtime/bin/biome"), "biome");
 	assert.equal(
 		disk.exists("/t/tree/.se/.runtime/bin/se-index.old"),
 		false,
@@ -352,7 +352,7 @@ test("a temp tree the box still holds stays named, and the probe's verdict stand
 
 test("the probe's main runs nothing where another program is main", async () => {
 	let ran = false;
-	// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
+	// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first. [[spec/tickets/the-doors-pr-goes-green]]
 	await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
 		ran = true;
 	});

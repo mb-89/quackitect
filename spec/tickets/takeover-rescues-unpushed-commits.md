@@ -337,7 +337,7 @@ accept with points
 
 the change touches no file the ask leaves out: src/quack/commit.go and src/branches/rescue.go and take.go carry the change, spec/design_output/work.md carries its section, and the size golden moves with that note
 every door the change reaches has a fake: the change reaches git and the clock; both packages drive git through a temp origin, as their other cases do, and the clock through the fake pcClock
-a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-a-rescue-branch
+a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-rescue
 every fact stands in one place: the section in work.md owns the design, and both packages point at it; the rescue prefix stands once per package, since the two share no module, and each comment says so
 
 ## tests-green
@@ -372,7 +372,7 @@ A red commit a cloud box makes on work/<group> now reaches origin on rescue/<gro
 
 the change touches no file the ask leaves out: commit.go, rescue.go and take.go carry the code, work.md the design, and the size golden moves with that note
 every door the change reaches has a fake: git runs against a temp origin as in every other case of both packages, and the clock through pcClock
-a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-a-rescue-branch
+a comment names the approach: each function points at spec/design_output/work#a-red-commit-reaches-rescue
 every fact stands in one place: work.md owns the design, and both packages point at it
 
 # accept

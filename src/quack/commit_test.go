@@ -107,7 +107,7 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("commit says %q", errs)
 		}
 	})
-	t.Run("the tests run before the staging, and the check after the commit", func(t *testing.T) {
+	t.Run("the rules and the tests run before the staging, and the check after the commit", func(t *testing.T) {
 		at := landingRepo(t)
 		lays(t, at.root, "src/a.go", "package a\n")
 		d, _, _ := fakeLanding(at)
@@ -119,7 +119,7 @@ func TestCommitVerb(t *testing.T) {
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 {
 			t.Fatalf("commit answers %d, %q", code, errs)
 		}
-		want := []string{"test staged= head=a-ticket: the tree opens", "check staged= head=" + opens}
+		want := []string{"lint staged= head=a-ticket: the tree opens", "test staged= head=a-ticket: the tree opens", "check staged= head=" + opens}
 		if strings.Join(seen, "|") != strings.Join(want, "|") {
 			t.Fatalf("the verbs ran as %v, and want %v", seen, want)
 		}
@@ -357,6 +357,44 @@ func TestCommitVerbRescue(t *testing.T) {
 // The commit verb at its gates: the cold probe, the paths it names, and the conflict markers. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerbGates(t *testing.T) {
 	t.Parallel()
+	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("a staged file the rules refuse stops the commit before the tests, and stages nothing", func(t *testing.T) {
+		at := landingRepo(t)
+		lays(t, at.root, "spec/a.md", "a note\n")
+		d, heard, _ := fakeLanding(at)
+		heard.answers["lint --strict spec/a.md"] = verbAnswer{exitFailed, "spec/a.md:1:1: Sentence: A sentence holds 25 words."}
+		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+		if code != exitFailed || at.subject() == opens || at.staged() != "" || at.originSubject("main") == opens {
+			t.Fatalf("commit answers %d, %q, HEAD %q, staged %q", code, errs, at.subject(), at.staged())
+		}
+		if heard.reached("test") || heard.reached("check") || !strings.Contains(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:") || !strings.Contains(errs, "spec/a.md:1:1: Sentence") {
+			t.Fatalf("commit ran %v and said %q", heard.ran, errs)
+		}
+	})
+	t.Run("a merge in progress lints the hand's files, and passes a file standing as the merged commit holds it", func(t *testing.T) {
+		at := landingRepo(t)
+		at.must(at.repo.Switch("side", true))
+		lays(t, at.root, "spec/trunk.md", "trunk's note\n")
+		at.commits("side: trunk's note")
+		side := at.head()
+		at.must(at.repo.Switch(trunkBranch, false))
+		lays(t, at.root, "spec/trunk.md", "trunk's note\n")
+		lays(t, at.root, "spec/a.md", "a note\n")
+		at.must(at.repo.UpdateRef(mergeHeadRef, side))
+		d, heard, _ := fakeLanding(at)
+		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("lint --strict spec/a.md") {
+			t.Fatalf("commit answers %d, %q, ran %v, and wants the strict lint over spec/a.md alone", code, errs, heard.ran)
+		}
+	})
+	t.Run("the rules read the staged files past the tickets", func(t *testing.T) {
+		at := landingRepo(t)
+		lays(t, at.root, "spec/a.md", "a note\n")
+		lays(t, at.root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n\nmore\n")
+		d, heard, _ := fakeLanding(at)
+		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("lint --strict spec/a.md") {
+			t.Fatalf("commit answers %d, %q, ran %v, and wants the strict lint over spec/a.md alone", code, errs, heard.ran)
+		}
+	})
 	t.Run("a staged file on the cold path runs the probe after the tests, and the commit stands on its pass", func(t *testing.T) {
 		at := landingRepo(t)
 		lays(t, at.root, "src/quack/a.go", "package main\n")
@@ -366,7 +404,7 @@ func TestCommitVerbGates(t *testing.T) {
 		if code != 0 || at.subject() != opens || !heard.reached("probe cold") {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
-		if heard.ran[0][0] != "test" || !strings.Contains(out, "The cold probe passes on the staged change to src/quack/a.go.") {
+		if heard.ran[1][0] != "test" || !strings.Contains(out, "The cold probe passes on the staged change to src/quack/a.go.") {
 			t.Fatalf("commit ran %v and said %q", heard.ran, out)
 		}
 	})

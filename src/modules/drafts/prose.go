@@ -21,10 +21,10 @@ const (
 	underIt   = "The voice rules read this answer, and it stands under the ceiling."
 )
 
-// The rule a lint that ran nowhere names, the reason where Vale gives none, and the vocabulary rule's ending. [[spec/design_output/level0#a-broken-rule-says-so]]
+// The rule a lint that ran nowhere names, the reason where the rules give none, and the vocabulary rule's ending. [[spec/design_output/level0#a-broken-rule-says-so]]
 const (
 	unranRule  = "VoiceRulesRan"
-	unranWhy   = "vale answered nothing"
+	unranWhy   = "the rules answered nothing"
 	vocabulary = "Vocabulary"
 	termsFile  = "spec/vocabulary/terms.yml"
 	wordsShown = 5
@@ -50,7 +50,7 @@ func (from Outside) readsDraft(in Prose) string {
 	return answerFindings(in.Path, found, len(found) > 0)
 }
 
-// The findings a note meets: none on a code path or a box with no Vale, the fault where Vale ran nowhere over prose, else the kept rows with their lines. [[spec/design_output/level0#a-broken-rule-says-so]]
+// The findings a note meets: none on a code path or a box with no rules, the fault where the rules ran nowhere over prose, else the kept rows with their lines. [[spec/design_output/level0#a-broken-rule-says-so]]
 func (from Outside) proseFaults(text, where string) []prose.Refused {
 	if codePath.MatchString(where) {
 		return nil
@@ -72,7 +72,7 @@ func (from Outside) proseFaults(text, where string) []prose.Refused {
 	return withContext(text, linted.Found)
 }
 
-// Each row Vale keeps, with its trimmed line as context, off withContext in src/bridge/prose.js. [[spec/tickets/prose-tools-answer-in-go]]
+// Each row the rules keep, with its trimmed line as context, off withContext in src/bridge/prose.js. [[spec/tickets/prose-tools-answer-in-go]]
 func withContext(text string, found []Finding) []prose.Refused {
 	lines := strings.Split(text, "\n")
 	out := make([]prose.Refused, 0, len(found))

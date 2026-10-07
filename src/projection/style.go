@@ -69,9 +69,9 @@ func styleFrom(entry Entry, texts map[string]string) map[string]string {
 		"",
 		"# How this tree works",
 		"",
-		"These rules hold over every answer you write. Vale holds the mechanical",
-		"ones at the write door, so a write breaking one comes back with the",
-		"reason and the line.",
+		"These rules hold over every answer you write. The Go rules hold the",
+		"mechanical ones at the write door, so a write breaking one comes back",
+		"with the reason and the line.",
 		"",
 	}
 	out[entry.folder()+"/"+styleName+noteEnding] = strings.Join(append(lines, body...), "\n")

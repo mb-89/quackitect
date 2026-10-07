@@ -1,18 +1,15 @@
-// The quack spawns past the node module and Vale, each over a FakeRunner
+// The quack spawns past the node module, each over a FakeRunner
 // taught the program its command names, so no case starts a process.
 // [[spec/tickets/quack-spawns-all-take-the-runner]]
 package main // level0: InPackageTest - the cases swap the package's spawns through its unexported seams, over the in-package helpers fakeQuack and fakeSelf
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
 
-	"quackitect/src/modules/check"
 	"quackitect/src/proc"
-	"quackitect/src/prose"
 	"quackitect/src/pull"
 )
 
@@ -94,28 +91,6 @@ func TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv(t *testing.T) {
 	}
 	if got := retroMintRunmeOver((&proc.FakeRunner{}).Run)(dir, []string{"/fake/none"}, nil); got.code != exitFailed || got.errs == "" {
 		t.Fatalf("a program that never starts answers %+v, and wants exitFailed and its fault", got)
-	}
-}
-
-// level0: FixtureOutsideHome - the case plants a Vale program in a root of its own
-func TestValeHeardOverTheDoorReadsTheTextAsTheFile(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	vale := filepath.Join(root, filepath.FromSlash(check.Bin), "vale")
-	if err := os.MkdirAll(filepath.Dir(vale), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(vale, nil, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	fake, ran := teaches(vale, proc.Said{Err: "the config breaks", Code: 2})
-	got := heardInOver(fake.Run, root, "spec/a.md", "a text", prose.All)
-	if !got.stands || got.ran || got.why != "the config breaks" {
-		t.Fatalf("an unread Vale answers %+v, and wants it standing, unread, with its stderr as why", got)
-	}
-	want := []string{vale, "--config=" + valeOwn, "--path=spec/a.md", "--output=JSON", "--no-exit"}
-	if one := ranOnce(t, *ran); !slices.Equal(one.Argv, want) || one.Dir != root || one.Stdin != "a text" || one.Wait != valeSpan {
-		t.Fatalf("Vale runs %+v, and wants %q in %s reading the text under its span", one, want, root)
 	}
 }
 

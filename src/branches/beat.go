@@ -1,6 +1,6 @@
 // The beat: a box holding a group pushes a parentless commit on the empty tree
 // to the branch beats/<group>, so a hold reads whether its box still lives.
-// [[spec/design_output/work#a-hold-beats-with-its-session]]
+// [[spec/design_output/work#the-session-beats-its-hold]]
 package branches
 
 import (
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// The key naming the span a beat stays live for, its default, the refs the beats stand under, and the words a beat's subject ends on. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// The key naming the span a beat stays live for, its default, the refs the beats stand under, and the words a beat's subject ends on. [[spec/design_output/work#the-session-beats-its-hold]]
 const (
 	beatKey   = "work.beatAfter"
 	beatSpan  = "10m"
@@ -21,14 +21,14 @@ const (
 	overFlag  = "--over"
 )
 
-// A beat: when its commit was written, by which hand, and whether it ends the hold. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// A beat: when its commit was written, by which hand, and whether it ends the hold. [[spec/design_output/work#the-session-beats-its-hold]]
 type beat struct {
 	When  int64
 	Hand  string
 	Ended bool
 }
 
-// Writes this box's beat on the group it holds, and answers 0 whatever comes, since the Stop hook runs it at every turn's end. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Writes this box's beat on the group it holds, and answers 0 whatever comes, since the Stop hook runs it at every turn's end. [[spec/design_output/work#the-session-beats-its-hold]]
 func beatVerb(d *Doors, _ string, argv []string) int {
 	holding := d.heldHere()
 	if holding == nil {
@@ -44,7 +44,7 @@ func beatVerb(d *Doors, _ string, argv []string) int {
 	return codeOK
 }
 
-// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) writeBeat(group, hand string, ended bool) bool {
 	word := beatsWord
 	if ended {
@@ -62,7 +62,7 @@ func (d *Doors) writeBeat(group, hand string, ended bool) bool {
 	return true
 }
 
-// The log row a beat that writes nothing leaves. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// The log row a beat that writes nothing leaves. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) beatFails(group, why string) bool {
 	if d.Log != nil {
 		d.Log("warn", "work", "the beat on "+group+" writes nothing", map[string]any{"err": why})
@@ -70,7 +70,7 @@ func (d *Doors) beatFails(group, why string) bool {
 	return false
 }
 
-// The span a beat stays live for, the config's or the default. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// The span a beat stays live for, the config's or the default. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) beatSpanSeconds() int64 {
 	if said := spanOf(d.config(beatKey)); said > 0 {
 		return int64(said)
@@ -99,7 +99,7 @@ func (d *Doors) beatsSeen() map[string]beat {
 	return d.beats
 }
 
-// How a hold reads off its beat: dead at once on an end at or past the tip, live on a beat inside the span, and by the tip's age otherwise. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// How a hold reads off its beat: dead at once on an end at or past the tip, live on a beat inside the span, and by the tip's age otherwise. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) staleClaim(one stand, now int64) claim {
 	held := tipAge(one, now)
 	if held < 0 {
@@ -122,7 +122,7 @@ func (d *Doors) staleClaim(one stand, now int64) claim {
 	return read
 }
 
-// The refusal a take meets on a hold whose box still beats, or nothing. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// The refusal a take meets on a hold whose box still beats, or nothing. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) liveHold(stood []stand, standing map[string]string, branch string) string {
 	for _, one := range stood {
 		if one.Branch != branch || standing[branch] != held {
@@ -135,7 +135,7 @@ func (d *Doors) liveHold(stood []stand, standing map[string]string, branch strin
 	return ""
 }
 
-// Takes the first hold whose box stopped beating, ahead of any branch at todo. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Takes the first hold whose box stopped beating, ahead of any branch at todo. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) takeOver(read freeRead) int {
 	for _, one := range read.Free {
 		if read.Standing[one.Branch] != held {

@@ -40,7 +40,7 @@ func TestALineThatDoesNotParseStandsAsAnUnparsedRow(t *testing.T) {
 	}
 }
 
-// The details show the door, the time, the fields and the whole text, and leave out the permalink, the file, the received time and the level.
+// The details show the door, the time, the fields and the whole text, and leave out the permalink, the file, the received time and the level. [[spec/design_output/tui]]
 func TestTheDetailsShowTheDoorTheTimeTheFieldsAndTheWholeText(t *testing.T) {
 	t.Parallel()
 	long := strings.Repeat("word ", 40)

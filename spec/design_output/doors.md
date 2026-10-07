@@ -44,12 +44,12 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the lsp IO module reads the box through its own `door.go` |
 
 A root stands off the rule, because it builds the hand every module past it
-reads. `.vale.ini` names each one in a section, beside the doors and their
-fakes. Each rule takes its own switch, because a file standing off one wants
+reads. `sections` in `src/rules/scope.go` names each one in a row, beside the
+doors and their fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`test/contract/outside-in-doors.test.js` drives Vale over the name of each
-file, so a section a hand writes meets its case.
+`test/contract/outside-in-doors.test.js` drives the tree's rules over the name
+of each file, so a row a hand writes meets its case.
 
 # A raw run keeps bytes
 
@@ -157,7 +157,6 @@ files this tree tracks.
 | `awake` | `src/doors/awake.js` | `src/doors/fake/awake.js` | `test/contract/awake.test.js` |
 | `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
 | `session` | `src/doors/session.js` | `src/doors/fake/session.js` | `test/contract/session.test.js` |
-| `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
 | `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
 
@@ -201,12 +200,11 @@ family carries its fate:
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
-| a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
+| a real file watch that stops mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
 | a child ended whole, and a door standing apart from its starter | `src/quack/ending_test.go`, `src/quack/ending_windows_test.go`, `src/index/detach_test.go`, `src/index/detach_windows_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
-| the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
 | a bare RUNME.sh under sh | `src/quack/runme_test.go` | door test of the road's shell entry, over a planted path of real tools |
 
-The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
+The check reads every code span naming a test file in these tables. It names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
 
 The one state a module holds is `namePatterns` in
 `src/modules/check/private.go`, a memo of a pure compile, and it stands as the
@@ -214,7 +212,7 @@ named exception.
 
 # The git door carries writes
 
-`FakeGit` holds four reads. The branch verbs, the quack verbs and the pull run
+`FakeGit` holds reads alone. The branch verbs, the quack verbs and the pull run
 git's whole command line, writes among it, so a test of them spawns git. One
 door carrying the writes, with a fake and one contract suite, moves those cases
 into memory. [[spec/tickets/unfaked-doors-take-fakes]]
@@ -222,22 +220,35 @@ into memory. [[spec/tickets/unfaked-doors-take-fakes]]
 | part | what it holds |
 |---|---|
 | `Repo` in `src/modules/git` | the typed operations below, each one git command line in the real door |
-| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, a merge's stages, the worktrees, the hooks a case sets, and the work tree on a `FakeDisk` or a real folder, and the four reads of `Git` answered off them, so `FakeGit` leaves once its cases move |
+| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index and a merge's stages. It holds the worktrees, the hooks a case sets, and the work tree on a `FakeDisk` or a real folder. It answers the reads of `Git` off them, so `FakeGit` leaves once its cases move |
 | an origin | a second `FakeRepo`, which push and fetch move commits and refs between |
 | `src/modules/git/repo_contract_test.go` | each case run against `FakeRepo` and a real repository under a temporary folder, the one door test of git's writes |
 
-The operations the three packages run:
+The operations the branch verbs, the quack verbs and the pull run:
 
 | kind | operations |
 |---|---|
-| reads | the head and its branch, a ref resolved, a file at a ref or at a merge's stage, many files at refs in one ask, the files at a ref under a folder, the paths two refs differ in, the patch or its stat between two refs, the commits one ref stands ahead and behind, the commits a ref carries whose patch another lacks, the merge base, the first-parent line, the work tree's status, the log over a range, the refs under a prefix, the refs under a prefix a ref holds, the second a commit was made, a config key, a commit's signature, the paths the ignore file holds out, whether the index tracks a path, the unmerged paths, the index's changes against `HEAD`, the lines the index adds, the log of one path, the branches origin holds, the refs origin holds under a prefix with their commits |
-| writes to the work tree | add, reset of paths or to a ref, a reset that keeps or drops local changes, a path restored from `HEAD`, commit, an amend, switch with or without a new branch, a worktree added and removed |
-| writes across refs | merge under a message of its own or with no fast-forward, naming the paths that conflict, rebase onto a ref, a fast-forward, update or delete of a ref, a commit off a ref's tree or off files written over it that moves no ref, push with a lease, push of a commit to a branch, a branch deleted on origin, fetch of a branch or of every branch with prune, a shallow clone fetched whole |
+| reads of a ref | the head and its branch, a ref resolved, the merge base, the first-parent line |
+| reads of ref lists | the refs under a prefix, and the ones under a prefix a ref holds |
+| reads of origin | the branches origin holds, and the refs origin holds under a prefix with their commits |
+| reads of files | a file at a ref or at a merge's stage, and many files at refs in one ask |
+| reads of trees | the files at a ref under a folder, the paths two refs differ in, the patch or its stat between them |
+| reads of commits | the commits one ref stands ahead and behind, the commits a ref carries whose patch another lacks, and the time a commit carries |
+| reads of logs | the log over a range, the log of one path, and a commit's signature |
+| reads of the box | the work tree's status, a config key, the paths the ignore file holds out, and whether the index tracks a path |
+| reads of the index | the unmerged paths, the index's changes against `HEAD`, and the lines the index adds |
+| writes to the index | add, a reset of paths or to a ref, a reset that keeps or drops local changes, commit, and an amend |
+| writes to the work tree | a path `HEAD` restores, a switch with or without a new branch, and a worktree's add and removal |
+| merges | a merge with its own message or no fast-forward, naming the paths that conflict, and a rebase onto a ref |
+| moves of a ref | a fast-forward, and an update or delete of a ref |
+| commits off a tree | a commit that moves no ref, off a ref's tree or off the files a call writes over it |
+| pushes | a push with a lease, a push of a commit to a branch, and a branch's delete on origin |
+| fetches | a fetch of a branch, a fetch of every branch that drops each ref origin removes, and a shallow clone's whole history |
 
-The fake merges three ways a path at a time. A path both sides change
+The fake merges a path at a time, its base against both sides. A path both sides change
 differently conflicts whole, where git merges hunks apart. A case needing a
-merge of lines stays a door test, and the contract suite holds one case proving
-the two agree on a path one side alone changes.
+merge of lines stays a door test. The contract suite holds one case proving the
+two agree on a path one side alone changes.
 
 The probe's clone and apply stay on the real door, because the probe measures a
 cold box.
@@ -252,12 +263,12 @@ with the halt and the wait they need.
 | part | what it holds |
 |---|---|
 | `Runner` in `src/proc` | the door, a function the real one fills with `exec`, outside `src/modules`, since it registers no ports |
-| `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it never starts |
+| `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it starts no process |
 | `Wait` on a command | the span past which a run ends with a fault, and zero sets no limit |
-| `Streams` on a command | the caller's input and output streams, which a run reads and writes in place of `Stdin` and the buffers, so a viewer or a tool hands the terminal straight through |
+| `Streams` on a command | the caller's input and output streams, which a run reads and writes in place of `Stdin` and the buffers. A viewer or a tool hands the terminal straight through them |
 | `Signalled` | the code a run a signal ends answers, apart from `NotStarted` |
-| `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does, and its own `Halt`, `Ends` and `After` for the halt and the wait |
-| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, the streams, a signal's end, a program that never starts, the halt and the wait |
+| `FakeRunner` beside it | a table from a program's name to a handler, answering a fault on a program outside the table, as `src/doors/fake/proc.js` does. It carries its own `Halt`, `Ends` and `After` for the halt and the wait |
+| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env and the streams. Others cover a signal's end, a program that fails to start, the halt and the wait |
 
 The branch verbs' `rawEnv`, the pull's shell, and every spawn in the quack
 verbs outside the box and check doors take the `Runner`. Each quack spawn

@@ -68,7 +68,7 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 		Root: root, Store: store, As: one.as, Bound: one.bound,
 		Sweep: func() any { return store.Snapshot().Read(sweepName) },
 		// [[spec/tickets/lsp-module-draws-the-tools]]
-		Tools: lsp.ToolsAt(root, lspChecks(root)), Quiet: -1,
+		Tools: toolsAt(root), Quiet: -1,
 		// [[spec/tickets/lsp-module-serves-the-features]]
 		Check: lspChecks(root),
 		Files: func() map[string]string {
@@ -95,7 +95,7 @@ func lspChecks(root string) lsp.Check {
 			return out
 		},
 		Draft: check.IsDraft, Relative: check.RelativeTo,
-		ValeIni: check.ValeIni, Survey: check.ToolsAt, Bin: check.Bin,
+		Survey: check.ToolsAt, Bin: check.Bin,
 		// [[spec/tickets/lsp-module-serves-the-features]]
 		Hover: overTree(func(tree *check.Tree, path string, line, character int) any {
 			return check.HoverAt(tree, path, line, character)

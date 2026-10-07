@@ -1,6 +1,6 @@
-// The rules the lint reads over a file's text past Vale and Biome: an
-// exemption naming no reason, the code ceilings, and the magic numbers. Each
-// reads what its JavaScript twin reads, so the lint and the panel agree.
+// The rules the lint reads over a file's text past the Go rules and Biome: an
+// exemption naming no reason, the code ceilings, and the magic numbers. A rule
+// with a JavaScript twin reads what it reads, so the lint and the panel agree.
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
 package check
 
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// The rule names and the words the JavaScript twins write, in unreasoned of .claude/skills/level0/lib/vale.js, size.js and magic.js beside it, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The rule names and the words the lint writes, the ceilings and the magic numbers spelled as size.js and magic.js under .claude/skills/level0/lib write them, again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	Unreasoned      = "ExemptionCarriesAReason"
 	FileCeiling     = "FileCeiling"

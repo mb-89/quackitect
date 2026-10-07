@@ -35,9 +35,9 @@ func TestAModuleImportingAModuleIsNamed(t *testing.T) {
 	analysistest.Run(t, plantedTree(), imports.NoModule, "quackitect/src/modules/greedy")
 }
 
+// Each analyzer loads the planted tree on its own, so the loads run side by side. [[spec/design_output/model#the-build-checks-imports]]
 func TestAnIOModuleImportingOsIsNamedByNone(t *testing.T) {
 	t.Parallel()
-	// Each analyzer loads the planted tree on its own, so the loads run side by side.
 	for _, one := range []*analysis.Analyzer{imports.OnlyQ, imports.IOOnly, imports.FakeSuite, imports.NoModule} {
 		t.Run(one.Name, func(t *testing.T) {
 			t.Parallel()

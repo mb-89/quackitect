@@ -100,9 +100,21 @@ function isTest(path) {
 function codeIn(hunk) {
   const added = hunk?.added ?? [];
   const removed = hunk?.removed ?? [];
-  if (movedWhole(hunk?.blocks ?? [])) return false;
+  if (movedWhole(hunk?.blocks ?? []) || layoutAlone(hunk?.blocks ?? [])) return false;
   if (!added.length && removed.length) return true;
   return [...added, ...removed].some((line) => !COMMENT.test(line));
+}
+
+// A change of spacing alone changes no code: in each hunk the lines added read as the lines taken away once each run of spacing reads as one space. [[spec/tickets/go-rules-exemption-marker]]
+function layoutAlone(blocks) {
+  const spaced = (line) => line.trim().split(/\s+/).join(" ");
+  return (
+    blocks.length > 0 &&
+    blocks.every(
+      ({ added, removed }) =>
+        added.length > 0 && added.length === removed.length && added.every((line, index) => spaced(line) === spaced(removed[index])),
+    )
+  );
 }
 
 // A move changes no code where every hunk takes away or adds one whole block, and each block taken away lands again, its lines in order. A block is whole where it opens at the left margin and its brackets close, so a statement moved inside a body still asks. [[spec/tickets/a-reorder-asks-a-test]]

@@ -122,7 +122,7 @@ func fixName(words int, main, parent string) string {
 
 var nameJoins = regexp.MustCompile(`[-_.]+`)
 
-// A name past the words it may hold keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/tickets/prose-verbs-land-first-try]]
+// A name past its cap of words keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/tickets/prose-verbs-land-first-try]]
 func cutTo(name string, most int) string {
 	if most <= 0 || check.OverLong(name, most) == "" {
 		return name

@@ -1,6 +1,6 @@
-// Every rule the paragraph schema projects, through the real Vale. A rule
+// Every rule the paragraph schema projects, through the tree's rules. A rule
 // asserted against a stub is a rule nobody has run, so each case feeds the
-// binary something the rule refuses and something it passes, off the one run
+// rules something they refuse and something they pass, off the one settle
 // the helper makes for this file.
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
@@ -13,7 +13,7 @@ import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const { ifVale, proves } = rulesIn(root);
+const { ifRules, proves } = rulesIn(root);
 
 const ANSWER = "answer.md";
 const answer = (text) => at(text, ANSWER);
@@ -38,7 +38,7 @@ const paragraphs = (n) =>
   );
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "a character outside the set is refused, and a code span passes",
   proves(
     {
@@ -58,7 +58,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-second-target]]
-ifVale(
+ifRules(
   "a long heading, a second title and a long lead are refused",
   proves(
     {
@@ -77,7 +77,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-ifVale(
+ifRules(
   "a run of four paragraphs is refused, and three pass",
   proves({ four: `${paragraphs(4)}\n`, three: `${paragraphs(3)}\n` }, (said) => {
     refuses(said, "Shape", "four");
@@ -89,7 +89,7 @@ ifVale(
 const opened = (n) => `- The bottom line stands here.\n\n${paragraphs(n)}`;
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-ifVale(
+ifRules(
   "the answer register takes the tighter run, and prose keeps its own",
   proves(
     {
@@ -109,7 +109,7 @@ ifVale(
 const TABLE = "| question | answer |\n|---|---|\n| where | here |\n";
 
 // [[spec/design_output/projection#the-list-opens-an-answer]]
-ifVale(
+ifRules(
   "an answer opening with a heading or prose is refused",
   proves(
     {
@@ -133,7 +133,7 @@ ifVale(
 const TWO_UNDER_ONE =
   "- The bottom line.\n\n# One\n\nA paragraph.\n\nA second paragraph.\n";
 
-ifVale(
+ifRules(
   "a heading opens a fresh prose budget, and a third paragraph breaks it",
   proves(
     {
@@ -152,7 +152,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-ifVale(
+ifRules(
   "a paragraph over the sentence cap is refused, in prose and in an answer",
   proves(
     {
@@ -171,7 +171,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-ifVale(
+ifRules(
   "a sentence over the word cap is refused, and a list item takes less",
   proves(
     {
@@ -190,7 +190,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-ifVale(
+ifRules(
   "a sentence over the code span cap is refused, and a table row passes",
   proves(
     {
@@ -214,7 +214,7 @@ const noted = (key) =>
   `---\nkind: ticket\nrecord:\n  - step: do\n    ${key}: ${FRONT_SPANS}\n---\n\nA body.\n`;
 
 // [[spec/tickets/voice-rules-skip-the-record]]
-ifVale(
+ifRules(
   "a record the verbs wrote passes, and a field the schema calls prose is read",
   proves(
     {
@@ -235,7 +235,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-grammar-rules]]
-ifVale(
+ifRules(
   "the perfect and the progressive are refused, and the simple tense passes",
   proves(
     {
@@ -257,7 +257,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-grammar-rules]]
-ifVale(
+ifRules(
   "a modal outside the register is refused, and one inside it passes",
   proves(
     {
@@ -276,7 +276,7 @@ ifVale(
 );
 
 // [[spec/design_output/projection#the-grammar-rules]]
-ifVale(
+ifRules(
   "a contraction and a short form are refused, and the writing out passes",
   proves(
     {
@@ -318,7 +318,7 @@ const recorded = (key) =>
     TICKET,
   );
 
-ifVale(
+ifRules(
   "the rules read past the engine's field, and hold a person's own",
   proves(
     { why: recorded("why"), asks: recorded("asks"), does: recorded("does") },
@@ -334,7 +334,7 @@ ifVale(
 const restated = (lead, cell) =>
   `${lead}\n\n| what stands | what it does |\n|---|---|\n| ${cell} | it names the line |\n`;
 
-ifVale(
+ifRules(
   "a paragraph restating the table beside it is refused",
   proves(
     {
@@ -358,7 +358,7 @@ ifVale(
 const twoCells = (lead, left, right) =>
   `${lead}\n\n| what stands | what it does |\n|---|---|\n| ${left} | ${right} |\n`;
 
-ifVale(
+ifRules(
   "a run of six words a cell holds is refused, and five pass, as does a run across two cells",
   proves(
     {
@@ -374,7 +374,7 @@ ifVale(
   ),
 );
 
-// A long table beside a long paragraph stays inside the budget Vale gives a script. [[spec/tickets/restated-table-runs-in-time]]
+// A long table beside a long paragraph finishes in a lookup a run, and restates nothing. [[spec/tickets/restated-table-runs-in-time]]
 const wordy = (tag, n) => Array.from({ length: n }, (_, i) => `${tag}w${i}`).join(" ");
 const longTable = () => {
   const lines = Array.from({ length: 40 }, (_, i) => wordy(`p${i}`, 12));
@@ -382,13 +382,13 @@ const longTable = () => {
   return `${lines.join("\n")}\n\n| one | two |\n|---|---|\n${rows.join("\n")}\n`;
 };
 
-ifVale(
+ifRules(
   "a long table beside a long paragraph finishes, and restates nothing",
   proves({ long: longTable() }, (said) => passes(said, "RestatedTable", "long")),
 );
 
 // The tense reader stands over the rule, so a word this tree means in the present reads past it. [[spec/design_output/projection#the-grammar-rules]]
-ifVale(
+ifRules(
   "the past tense is refused, and the words this tree means pass",
   proves(
     {
