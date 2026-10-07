@@ -67,8 +67,9 @@ func NewWatch(root string) Watch { return watch{root} }
 
 func (one watch) Changes(hand Hand) (func(), error) {
 	// The watcher's loop adds a folder while a stop runs, and its Close returns. [[spec/tickets/a-watch-stops-mid-add]]
+	known := map[string]bool{}
 	eyes, err := watcher.New(func(eyes *watcher.Watcher, event fsnotify.Event) {
-		one.hears(eyes, event, hand)
+		one.hears(eyes, event, hand, known)
 	})
 	if err != nil {
 		return func() {}, err
@@ -96,7 +97,7 @@ func (one watch) adds(eyes *watcher.Watcher, from string) error {
 	})
 }
 
-func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
+func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, known map[string]bool) {
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
@@ -109,6 +110,7 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
 		return
 	}
 	if event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
+		delete(known, rel)
 		hand(rel, "", 0, true)
 		return
 	}
@@ -125,7 +127,12 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
 		hand(rel, "", 0, true)
 		return
 	}
-	if err == nil && textual(string(body)) {
+	// A read lands before its writer's bytes, and the write that follows brings them. [[spec/tickets/sweep-reads-tracked-after-restart]]
+	if err != nil || (len(body) == 0 && !known[rel]) {
+		return
+	}
+	known[rel] = textual(string(body))
+	if known[rel] {
 		hand(rel, string(body), info.ModTime().UnixNano(), false)
 	}
 }
@@ -178,10 +185,12 @@ type FakeWatch struct {
 	mu    sync.Mutex
 	hands map[int]Hand
 	next  int
+	// The paths heard with bytes, so a new empty file stays unheard as the real watch leaves it. [[spec/tickets/sweep-reads-tracked-after-restart]]
+	known map[string]bool
 }
 
 func NewFakeWatch() *FakeWatch {
-	return &FakeWatch{hands: map[int]Hand{}}
+	return &FakeWatch{hands: map[int]Hand{}, known: map[string]bool{}}
 }
 
 // [[spec/design_output/model#io-modules-and-their-fakes]]
@@ -196,6 +205,11 @@ func (one *FakeWatch) Push(path, text string, gone bool) {
 		return
 	}
 	one.mu.Lock()
+	if !gone && text == "" && !one.known[path] {
+		one.mu.Unlock()
+		return
+	}
+	one.known[path] = !gone
 	hands := make([]Hand, 0, len(one.hands))
 	for _, hand := range one.hands {
 		hands = append(hands, hand)
