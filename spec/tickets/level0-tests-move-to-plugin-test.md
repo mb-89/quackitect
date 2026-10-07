@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 64d4538033df17782bae9f8691fb71261064b76d
+    hash_after: 64d4538033df17782bae9f8691fb71261064b76d
+    inputs:
+      - name: ask
+        hash: ad7e6f9195dc3f5a
+        size: 1398
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -169,38 +178,70 @@ Tests under `test/level0` covering `lib/` files the hooks entry never reaches, a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hook tests move onto the kit Claude Code ships. Each case raises an event on the kit engine and stubs every door beneath the plugin through on, answering value or deny. A probe test on this box shows the kit loads the real plugin, runs the cage road, and refuses an import past the plugin folder. Three test files under .claude/skills/level0/tests take the behaviors. door.test.ts covers a standing door: the hook post, the step answers, the merge post, the events the standing file leaves alone, the ask back on agent.spoke, the spawn and its back post, the clear at the turn completion or on the mock clock, and the step text on turn.said. down.test.ts covers a door standing down: the start road once with its span, the cage verb deny and pass, the fall line said once and again after a recovery, the quiet session start, and the log row through the log verb or the session file. pull.test.ts covers the pull tool: the tools it registers, the verb it runs, and the one spawn. A world.ts beside them holds the stubs the three share. The eleven test files under test/level0 that import a hook module go, with the inline fakes of the engine they carry. hooks.test.js keeps its boot cases, and reads STARTING off the line of level0.ts that sets it, since a kit test reaches no file past the plugin. A new check part, plugin-tests in src/quack/check.go, runs claude plugin test over the plugin and fails where it fails. It passes with a line where claude stands nowhere, as the plugin part does. Then it counts the lines of the files under tests against the lines of every file the hooks entry reaches, following relative imports from the modules hooks.json names, and fails where the tests run longer.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf, which names the new plugin-tests part
+- src/quack/check_test.go the plugin-tests cases, which drive pluginTestsHold
+- test/level0/hooks.test.js the boot hook span case, which reads STARTING
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/tests/door.test.ts the cases of a standing door
+- .claude/skills/level0/tests/down.test.ts the cases of a door standing down
+- .claude/skills/level0/tests/pull.test.ts the cases of the pull tool
+- src/quack/check_test.go the plugin-tests part runs the kit over the plugin, and passes where claude stands nowhere
+- src/quack/check_test.go the plugin-tests part fails where the tests run longer than the code the entry reaches
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/check.go
+- src/quack/check_test.go
+- .claude/skills/level0/tests/door.test.ts
+- .claude/skills/level0/tests/down.test.ts
+- .claude/skills/level0/tests/pull.test.ts
+- .claude/skills/level0/tests/world.ts
+- test/level0/hooks.test.js
+- test/level0/cage.test.js deleted
+- test/level0/caged-door.test.js deleted
+- test/level0/clear.test.js deleted
+- test/level0/door-clear.test.js deleted
+- test/level0/door-spawn.test.js deleted
+- test/level0/index-tools.test.js deleted
+- test/level0/level1.test.js deleted
+- test/level0/pull-spawn-hook.test.js deleted
+- test/level0/start-road.test.js deleted
+- test/level0/transcript.test.js deleted
+- spec/design_output/level0.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened the hooks, hooks.json, each hook test and helper under test/level0, check.go partsOf and checkDoors, and the kit types, and a probe test ran the kit on the plugin
+the callers list names partsOf, the check cases and the hooks.test.js span case, the only readers of what changes
+the first line meets the plugin-tests case, the second and third meet the deleted files and a check part, the line count meets its plugin-tests case, and the last meets the check
+the approach adds no config key
 
 ## tests-red
 
