@@ -175,9 +175,9 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | the pull's disk | `src/pull/door.go` | `FakeDisk` | `src/pull/disk_contract_test.go` |
 | the viewer's caller | `src/tui/registry` | `Fake` | `src/tui/registry/call_contract_test.go` |
 | the viewer's catalog | `src/tui/registry` | `Fake` | `src/tui/registry/catalog_contract_test.go` |
-| index | `src/index` | `src/q/qtest` | `src/index/contract_test.go` |
-| bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
-| a placed process | `src/index/procs.go` | the case's `Spawner` | `src/index/procs_test.go` |
+| index | `src/index` | `src/q/qtest` | `src/index/fakeindex_contract_test.go` |
+| bus | `src/index/bus.go` | none | `src/index/bus_contract_test.go` |
+| a placed process | `src/index/procs.go` | the case's `Spawner` | `src/index/detach_contract_test.go`, `src/index/detach_windows_contract_test.go` and the spawned process suite below |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |

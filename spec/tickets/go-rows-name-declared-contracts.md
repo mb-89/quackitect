@@ -38,7 +38,7 @@ parent: test-walks-move-onto-fakes
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-the Go contract table in spec/design_output/doors.md names `src/index/contract_test.go`, `src/index/bus_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
+the Go contract table in spec/design_output/doors.md names `src/index/fakeindex_contract_test.go`, `src/index/bus_contract_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
 
 # do
 
@@ -71,3 +71,5 @@ the Go contract table in spec/design_output/doors.md names `src/index/contract_t
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The rename verb rewrote the ask's names. The ask first named `src/index/contract_test.go` and `src/index/bus_test.go`, which this change renames to the two contract files the ask now shows.

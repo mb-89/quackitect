@@ -338,7 +338,7 @@ src/imports/clock_test.go
 src/imports/imports_test.go
 src/imports/walkaround_test.go
 src/index/actions_test.go
-src/index/bus_test.go
+src/index/bus_contract_test.go
 src/index/detach_test.go
 src/index/detach_windows_test.go
 src/index/door_test.go
@@ -523,7 +523,7 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- the form is verdict -->
 
 accept with points
-- go-rows-name-declared-contracts: the Go contract table in spec/design_output/doors.md names `src/index/contract_test.go`, `src/index/bus_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
+- go-rows-name-declared-contracts: the Go contract table in spec/design_output/doors.md names `src/index/fakeindex_contract_test.go`, `src/index/bus_contract_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
 
 # implement
 
