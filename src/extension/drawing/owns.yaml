@@ -1,6 +1,6 @@
-# The page: the editor's webview reaches time on its own, where no node door
+# The page: the editor's webview reaches time and chance on its own, where no node door
 # reaches, so the bundle stands as its own outside.
 page:
-  js: [Date.now, new Date(), setTimeout, clearTimeout, setInterval, clearInterval, performance.now]
+  js: [Date.now, new Date(), setTimeout, clearTimeout, setInterval, clearInterval, performance.now, Math.random]
   files: [route.mjs]
   outside: true
