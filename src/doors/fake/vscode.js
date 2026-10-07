@@ -2,6 +2,7 @@
 // editor. The door requires vscode, and this answers that name with the fake.
 // [[spec/design_output/doors#a-fake-behaves]]
 
+// level0: OutsideInDoors - the fake answers vscode through node's own loader, inside the process
 import { createRequire } from "node:module";
 import { join } from "node:path";
 
@@ -11,6 +12,7 @@ const EXTENSION = join(import.meta.dirname, "..", "..", "extension");
 // A require from the test's own place, where vscode answers the fake the case hands in. [[spec/design_output/doors#a-fake-behaves]]
 export function editorRequire(fake, from) {
   const require = createRequire(from);
+  // level0: OutsideInDoors - the fake answers vscode through node's own loader, inside the process
   const Module = require("node:module");
   const resolve = Module._resolveFilename;
   if (!resolve.fake) {
