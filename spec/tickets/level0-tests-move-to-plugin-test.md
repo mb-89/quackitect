@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 20fc2b4974ad3dd907c359be0e08b7907eb48860
+    hash_after: 20fc2b4974ad3dd907c359be0e08b7907eb48860
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s); green, src/imports passes
+      - name: check
+        exit: 0
+        said: "    2.3  test/contract/vale-fix.test.js a contraction is written out, and the line keeps its case"
+    inputs:
+      - name: design/tests-red
+        hash: 35102a24cf31d4c6
+        size: 1150
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -353,26 +376,33 @@ Each fact stands in one place: imports owns the line count and the import reach,
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/imports/ratio_test.go test/contract/boot-span.test.js test/level0/hooks.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hook tests run on the kit Claude Code ships. A new check part, plugin-tests, runs claude plugin test over the plugin and counts the kit test lines against the code the hooks manifest reaches. The ten hook tests under test/level0 go, with the engine fakes they carry. The boot span case moves to test/contract, since it reads level0.ts off the disk. The two plugin-tests cases and the parts case in TestCheckParts pass. check_test.go stays on the red list for the --strict case, which level0-plugin-validate-in-check owns.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the size list names, plus the shared count in src/imports, the ratio baseline, four stale comments, a new check_plugin_tests.go and the contract case for the boot span.
+The part reaches claude and the disk through the check doors, which the check fake stands for, and the contract case reads through the disk door, whose fake stands in src/doors/fake.
+Each new function and file points at spec/tickets/level0-tests-move-to-plugin-test, whose approach it implements.
+The line count and the import reach stand in src/imports alone, and the part and the guard both call them.
 
 # accept
 
