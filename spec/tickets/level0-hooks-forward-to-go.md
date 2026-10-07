@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: d5c38a694506234e
         size: 7730
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 1f3157e377ddc6029fba42dfa9619cca3669a7b7
+    hash_after: 1f3157e377ddc6029fba42dfa9619cca3669a7b7
+    inputs:
+      - name: design/draft
+        hash: d5c38a694506234e
+        size: 7730
+      - name: design/tests-red
+        hash: a87b1f36ee56086b
+        size: 1329
+    def: dc4904ab364efa10
 group: javascript-leaves
 ---
 
@@ -406,8 +418,9 @@ The twenty Go cases the redraft names still fail on their own assertion, against
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 

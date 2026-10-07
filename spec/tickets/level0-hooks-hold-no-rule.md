@@ -302,3 +302,5 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- level0-hooks-forward-to-go lands first and moves the cage, start, clear, shape and transcript rules into Go. Draft this ticket against what that change leaves under `.claude/skills/level0/hooks/`, and keep the TypeScript move to the typed-mod group.
