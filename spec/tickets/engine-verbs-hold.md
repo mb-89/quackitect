@@ -217,12 +217,15 @@ record:
   - step: retro/cloud
     hand: box 57a5a484096e · claude-code-remote
     hash_before: 05c99306a095023c509f3a642d06e4946f252e6c
-    hash_after: 05c99306a095023c509f3a642d06e4946f252e6c
+    hash_after: 4152326d4240e81bfd5cc3a9d5237e821f277f81
     inputs:
       - name: retro/write
         hash: a363fa901974280b
         size: 4034
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: "work/engine-verbs-hold takes main in and closes; #122 stands merged"
 reason: done
 ---
 
