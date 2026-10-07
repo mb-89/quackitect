@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: b8b7bace0d37b348
         size: 636
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: c1e9c2ebcebbaefe7db3e8ebf076169e62daf257
+    hash_after: e3adb5dc3142ac0f655bb24cb5eedb6b196a00e7
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go and spec/design_output/level0.md, which the draft names in its size list
+the part reaches claude through checkDoors run, and the part test fakes that door with a refusing validate
+the comment over pluginHolds says it validates strictly and points at this ticket
+the strict run stands in pluginHolds alone, and the note names the plugin part
 
 ## tests-green
 
