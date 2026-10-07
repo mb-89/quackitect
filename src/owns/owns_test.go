@@ -270,6 +270,15 @@ func TestAWalkSaysTheDoorsItWalksAroundOrThatNoDoorDeclaresIt(t *testing.T) {
 	}
 }
 
+func TestTheGuardsWalkReachesTheSkillsAloneInTheAgentsFolder(t *testing.T) {
+	t.Parallel()
+	for at, want := range map[string]bool{".claude": true, ".claude/skills/level0/hooks/start.js": true, "src/stub/.claude/skills/level0/hooks/shape.js": true, ".claude/agents/one.md": false, ".claude/settings.json": false, "src/doors/clock.js": false} {
+		if got := OnSkills(at); got != want {
+			t.Errorf("%s reads %v on the skills road, and wants %v", at, got, want)
+		}
+	}
+}
+
 func TestAPureNodeModuleIsNoWalk(t *testing.T) {
 	t.Parallel()
 	text := "import { join } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { test } from \"node:test\";\nimport assert from \"node:assert\";\nimport strict from \"node:assert/strict\";\n"

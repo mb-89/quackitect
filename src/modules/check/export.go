@@ -63,6 +63,7 @@ var (
 	Textual                  = textual
 	UnreasonedIn             = unreasoned
 	Walked                   = walked
+	DoorsWalked              = doorsWalked
 	WordsIn                  = wordsIn
 )
 

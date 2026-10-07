@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"quackitect/src/owns"
 )
 
 // The rule names and the words the JavaScript twins write, in unreasoned of .claude/skills/level0/lib/vale.js, size.js and magic.js beside it, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -51,7 +53,20 @@ var (
 
 // Whether the lint's walk reaches a path: no folder it passes, and no draft. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func walked(path string) bool {
+	return reached(path, false)
+}
+
+// Whether the doors' guard reaches a path: the lint's walk, and the skill scripts past the agent's folder. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func doorsWalked(path string) bool {
+	return reached(path, owns.OnSkills(slashed(path)))
+}
+
+// Whether a walk reaches a path, passing the agent's folder where the path stands on the road to its skills. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func reached(path string, skills bool) bool {
 	for _, part := range strings.Split(slashed(path), "/") {
+		if skills && part == owns.AgentFolder {
+			continue
+		}
 		if walkPasses[part] || strings.HasPrefix(part, "_") {
 			return false
 		}
@@ -62,17 +77,19 @@ func walked(path string) bool {
 // The rules over one file's text, where the lint's walk reaches it, under the ceilings named and each finding marked as the source says. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func textFaults(tree *Tree, path string, function, file int, source string) []Finding {
 	prose, sized := proseFile.MatchString(path), sizedFile.MatchString(path)
-	if (!prose && !sized) || !walked(path) {
+	if (!prose && !sized) || !doorsWalked(path) {
 		return nil
 	}
-	text := tree.Read(path)
+	text, linted := tree.Read(path), walked(path)
 	out := []Finding{}
-	if prose {
+	if prose && linted {
 		out = append(out, unreasoned(path, text)...)
 	}
-	if sized {
+	if sized && linted {
 		out = append(out, sizeFaults(path, text, function, file)...)
 		out = append(out, magicIn(path, text)...)
+	}
+	if sized {
 		out = append(out, walkFaults(tree, slashed(path))...)
 	}
 	for i := range out {

@@ -46,7 +46,7 @@ func doorsOf(tree *Tree) ([]owns.Door, []owns.Fault) {
 	if !sameList(kept.from, all) {
 		kept = declared{from: all}
 		for _, at := range all {
-			if owns.Declares(at) && walked(at) {
+			if owns.Declares(at) && doorsWalked(at) {
 				kept.paths = append(kept.paths, at)
 			}
 		}

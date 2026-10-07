@@ -179,6 +179,7 @@ async function logs($, row) {
     let held = String(await readIf($, SESSION));
     if (held && !held.endsWith("\n")) held += "\n";
     const line = JSON.stringify({
+      // level0: OutsideInDoors - the engine hands the hooks $, and $ carries no clock
       at: new Date().toISOString(),
       kind: "bridge",
       ...row,

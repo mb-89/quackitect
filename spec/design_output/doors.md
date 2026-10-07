@@ -354,6 +354,11 @@ surface asks it:
 | `walkaround` in `src/imports` | names it in a Go package, beside `onlyq` |
 | `./RUNME.sh doors` | lists every door's contract tests, its walk-arounds and its marked lines |
 
+The guard reads every file the lint's walk reaches, and the scripts under
+`.claude/skills` past it, the level0 hooks among them. `OnSkills` in
+`src/owns/owns.go` names that road. The other rules of the lint stay off the
+agent's folder.
+
 A door standing at `report` lists its walk-arounds through `./RUNME.sh doors`
 and refuses none, and the editor draws each as a hint in a file it holds
 open. A door drops `report` once its list reaches zero.

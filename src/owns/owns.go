@@ -20,6 +20,12 @@ const (
 	Marker = "level0: OutsideInDoors - "
 )
 
+// The agent's folder, which the lint's walk passes, and the skills folder inside it, whose scripts the guard reads all the same. [[spec/design_output/doors#nothing-walks-around-a-door]]
+const (
+	AgentFolder  = ".claude"
+	skillsFolder = "skills"
+)
+
 // How a walk reads: around the doors owning its name, or past every door where none declares it. [[spec/design_output/doors#nothing-walks-around-a-door]]
 const (
 	walksAround = "%s walks around %s"
@@ -73,6 +79,17 @@ type Walk struct {
 	Marked bool
 	Reason string
 	Report bool
+}
+
+// Whether a slash path names the agent's folder or stands under its skills folder, so the guard's walk reaches it. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func OnSkills(path string) bool {
+	parts := strings.Split(path, "/")
+	for k, part := range parts {
+		if part == AgentFolder {
+			return k+1 == len(parts) || parts[k+1] == skillsFolder
+		}
+	}
+	return false
 }
 
 // The walk in words, naming its doors, or the module no door declares. [[spec/design_output/doors#nothing-walks-around-a-door]]

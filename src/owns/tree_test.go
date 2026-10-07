@@ -19,6 +19,17 @@ const root = "../.."
 // The folders a walk of the tree passes, as the lint's walk passes them. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var passed = map[string]bool{".git": true, "node_modules": true, ".se": true, ".claude": true, ".claude-plugin": true}
 
+// Whether the guard's walk reaches a path: no folder the lint passes, past the agent's folder on the road to its skills, and no draft. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func reached(rel string) bool {
+	skills := OnSkills(rel)
+	for _, part := range strings.Split(rel, "/") {
+		if (passed[part] && !(skills && part == AgentFolder)) || strings.HasPrefix(part, "_") {
+			return false
+		}
+	}
+	return true
+}
+
 // Every file of the tree by its slash path, and the declarations among them. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 func treeOf(t *testing.T) (map[string]bool, map[string]string) {
 	t.Helper()
@@ -30,9 +41,12 @@ func treeOf(t *testing.T) (map[string]bool, map[string]string) {
 		rel, _ := filepath.Rel(root, at)
 		rel = filepath.ToSlash(rel)
 		if entry.IsDir() {
-			if passed[entry.Name()] || strings.HasPrefix(entry.Name(), "_") {
+			if rel != "." && !reached(rel) {
 				return filepath.SkipDir
 			}
+			return nil
+		}
+		if !reached(rel) {
 			return nil
 		}
 		files[rel] = true

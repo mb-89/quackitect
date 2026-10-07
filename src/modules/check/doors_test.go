@@ -38,6 +38,18 @@ func TestAWalkAroundStandsAtErrorInTheLint(t *testing.T) {
 	}
 }
 
+func TestTheLintNamesAWalkInASkillScriptAndNoneElseInTheAgentsFolder(t *testing.T) {
+	t.Parallel()
+	skill, agent := ".claude/skills/one/wait.go", ".claude/agents/one/wait.go"
+	tree := TreeOver("", Texts{clockAt: "clock:\n  go: [time.Sleep]\n", skill: waitText, agent: waitText})
+	if found := ruled(textFaults(tree, skill, 0, 0, "tree"), WalksAroundADoor); len(found) != 1 || found[0].Source != "tree" {
+		t.Fatalf("the lint reads %+v over a skill script, and wants one walk-around", found)
+	}
+	if found := textFaults(tree, agent, 0, 0, "tree"); len(found) != 0 {
+		t.Fatalf("the lint reads %+v in the agent's folder past its skills, and wants nothing", found)
+	}
+}
+
 func TestAMarkedWalkAroundPassesTheLint(t *testing.T) {
 	t.Parallel()
 	marked := strings.Replace(waitText, "func For", "// level0: OutsideInDoors - a hung child needs a deadline\nfunc For", 1)

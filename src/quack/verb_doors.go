@@ -92,7 +92,7 @@ func walksOver(root string, out, errs io.Writer) int {
 			return nil
 		}
 		rel = filepath.ToSlash(rel)
-		if !check.Walked(rel) {
+		if !check.DoorsWalked(rel) {
 			if entry.IsDir() {
 				return filepath.SkipDir
 			}
