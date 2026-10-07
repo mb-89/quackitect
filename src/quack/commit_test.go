@@ -150,6 +150,18 @@ func TestCommitVerbDesk(t *testing.T) {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
 	})
+	// The desk refusal raises its node through the failure door. [[spec/tickets/the-twins-leave-whole]]
+	t.Run("a desk's commit on a work branch raises desk-works-on-trunk, and prints its remedy once", func(t *testing.T) {
+		at := landingRepo(t)
+		lays(t, at.root, "spec/failures/desk-works-on-trunk.md", "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>.\"]\n---\n\n# When\n\nA desk works a work branch.\n")
+		at.must(at.repo.Switch("work/a-group", true))
+		d, _, _ := fakeLanding(at)
+		d.cloud = false
+		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+		if code != exitUsage || !strings.Contains(errs, "failure desk-works-on-trunk at warn") || strings.Count(errs, "git switch main") != 1 {
+			t.Fatalf("commit answers %d, %q", code, errs)
+		}
+	})
 	t.Run("the no-push flag leaves the branch where it stands", func(t *testing.T) {
 		at := landingRepo(t)
 		lays(t, at.root, "src/a.go", "package a\n")

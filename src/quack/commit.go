@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
@@ -153,7 +154,10 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	branch, _ := d.git.Head()
 	// A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !d.cloud && strings.HasPrefix(branch, command.WorkBranch) {
-		fmt.Fprintln(errs, command.DeskRefusal("this commit lands nowhere on "+branch))
+		raised := failure.Raise(failure.Load(failure.Dir{Root: d.root}), "desk-works-on-trunk", command.DeskSaid("this commit lands nowhere on "+branch))
+		if err := raisedOnto(failureDoors{root: d.root, now: d.now}, raised, errs); err != nil {
+			fmt.Fprintln(errs, err)
+		}
 		return exitUsage
 	}
 	// A merge lands through this verb once its files carry no marker, so a marker refuses before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]

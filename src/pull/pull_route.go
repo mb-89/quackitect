@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -206,17 +207,28 @@ func (leaf *Leaf) holdsForm(form string) *yaml.Doc {
 	return nil
 }
 
-// The answer word and its rows, indented, on the stream the word belongs on. [[spec/design_output/pull#the-hand-out]]
-func (it *It) Say(word string, rows ...string) {
+// The answer word and its rows, indented, on the standard stream. [[spec/design_output/pull#the-hand-out]]
+func (it *It) Say(word string, rows ...string) { fmt.Fprintln(it.Out, answerOf(word, rows)) }
+
+// A refusal through the failure door: the message the site builds, the id and each remedy, on the error stream. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func (it *It) Refuse(raised failure.Raised) { fmt.Fprintln(it.Err, it.refusal(raised)) }
+
+// The text a raised refusal prints, once the log holds its row with the id. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func (it *It) refusal(raised failure.Raised) string {
+	if it.Log != nil {
+		said, _ := raised.Row("")["said"].(string)
+		it.Log(raised.Level, failure.RowKind, said, map[string]any{failure.IDField: raised.ID})
+	}
+	return answerOf(Refused, raised.Lines())
+}
+
+// [[spec/design_output/pull#the-hand-out]]
+func answerOf(word string, rows []string) string {
 	out := []string{word}
 	for _, row := range rows {
 		out = append(out, "  "+row)
 	}
-	if word == Refused {
-		fmt.Fprintln(it.Err, strings.Join(out, "\n"))
-		return
-	}
-	fmt.Fprintln(it.Out, strings.Join(out, "\n"))
+	return strings.Join(out, "\n")
 }
 
 // One line to the standard stream. [[spec/design_output/pull#the-hand-out]]

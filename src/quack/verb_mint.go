@@ -10,7 +10,9 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
@@ -18,15 +20,15 @@ import (
 	"quackitect/src/yaml"
 )
 
-func init() { register("mint", mintVerb(index.Root, registeredRepo)) }
+func init() { register("mint", mintVerb(index.Root, registeredRepo, time.Now)) }
 
 // The kind whose mint joins the box's group. [[spec/tickets/a-box-keeps-its-tickets]]
 const ticketKind = "ticket"
 
 var fieldFlag = regexp.MustCompile(`(?s)^--([^=]+)=(.*)$`)
 
-// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
+// Each refusal raises its own node through the failure door, which prints its lines and logs its row; the usage text and an I/O fault print as they stand. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo, now func() time.Time) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		words := argv[1:]
 		places := []string{}
@@ -40,6 +42,14 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) 
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
+		nodes := failure.Load(failure.Dir{Root: method})
+		refuses := func(raised failure.Raised) int {
+			if err := raisedOnto(failureDoors{root: method, now: now}, raised, errs); err != nil {
+				fmt.Fprintln(errs, err)
+				return exitFailed
+			}
+			return exitUsage
+		}
 		schemas := check.SchemasIn(check.TreeOver(method, rootDisk{method}))
 		kinds := strings.Join(schemas.Names(), ", ")
 		if len(places) < 2 {
@@ -51,8 +61,7 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) 
 		kind, where := places[0], places[1]
 		schema := schemas.Get(kind)
 		if schema == nil {
-			fmt.Fprintf(errs, "%s holds no %s. It holds %s.\n", check.Schemas, kind, kinds)
-			return exitUsage
+			return refuses(failure.Raise(nodes, "mint-kind-unknown", fmt.Sprintf("%s holds no %s. It holds %s.", check.Schemas, kind, kinds)))
 		}
 		// [[spec/tickets/the-owners-words-travel-verbatim]]
 		handover := false
@@ -74,17 +83,15 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) 
 				fields[askField] = pull.AskFrom(ask, said)
 			}
 		}
-		if why == "" {
-			why = withRoute(pull.OSDisk{Root: method}, schema, fields)
-		}
 		if why != "" {
-			fmt.Fprintln(errs, why)
-			return exitUsage
+			return refuses(failure.Raise(nodes, "mint-fields-refused", why))
+		}
+		if why := withRoute(pull.OSDisk{Root: method}, schema, fields); why != "" {
+			return refuses(failure.Raise(nodes, "mint-route-refused", why))
 		}
 		disk := pull.OSDisk{Root: work}
 		if disk.Exists(where) {
-			fmt.Fprintf(errs, "%s stands already. Name a path nothing holds yet.\n", where)
-			return exitUsage
+			return refuses(failure.Raise(nodes, "mint-path-stands", where+" stands already."))
 		}
 		if handover {
 			fields[askField] = pull.HandedOver(yaml.AsString(fields[askField]))
@@ -104,16 +111,15 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) 
 			}
 		}
 		text, why := check.Minted(schemas, kind, where, fields)
-		if why == "" {
-			// [[spec/design_output/work#a-group-is-a-ticket]]
-			why = pull.EmptyGroup(disk, text, name)
-		}
-		if why == "" {
-			why = pull.ClosedGroup(disk, text)
-		}
 		if why != "" {
-			fmt.Fprintln(errs, why)
-			return exitUsage
+			return refuses(failure.Raise(nodes, "mint-shape-refused", why))
+		}
+		// [[spec/design_output/work#a-group-is-a-ticket]]
+		if why := pull.EmptyGroup(disk, text, name); why != "" {
+			return refuses(failure.Raise(nodes, "mint-group-empty", why))
+		}
+		if why := pull.ClosedGroup(disk, text); why != "" {
+			return refuses(failure.Raise(nodes, "mint-group-closed", why))
 		}
 		if err := disk.Write(where, text); err != nil {
 			fmt.Fprintln(errs, err)

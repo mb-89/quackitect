@@ -7,6 +7,7 @@ package hooks
 import (
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/hooks/command"
 )
 
@@ -113,7 +114,7 @@ func (d *Door) todoOnPush(line, root string) string {
 	return ""
 }
 
-// A desk lands nothing on a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
+// A desk lands nothing on a work branch, and the refusal raises its node through the failure door. The bridge writes the row, since this door decides in its shadow. [[spec/design_output/work#a-desk-works-on-trunk]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
 func (d *Door) deskGuard(line, root string, settings Settings) string {
 	commits, pushes := command.TouchesGit(line)
 	if !commits && !pushes {
@@ -127,7 +128,8 @@ func (d *Door) deskGuard(line, root string, settings Settings) string {
 	if commits {
 		how = command.HowCommit
 	}
-	return command.DeskRefusal("this " + how + " lands nowhere on " + branch)
+	said := command.DeskSaid("this " + how + " lands nowhere on " + branch)
+	return strings.Join(failure.Raise(failure.Load(failure.Dir{Root: root}), "desk-works-on-trunk", said).Lines(), "\n")
 }
 
 // A landing on the trunk takes a green battery and the verb, and a cloud box holding a work branch hands it back. [[spec/design_output/work#a-box-writes-its-branch]]

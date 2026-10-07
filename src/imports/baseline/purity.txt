@@ -6,6 +6,10 @@ src/config/door.go writeFile
 src/engine/swap/door.go executableOf
 src/engine/swap/door.go statOf
 src/engine/swap/swap.go Watches
+src/failure/door.go Dir.Files
+src/failure/door.go Dir.Read
+src/failure/door.go Dir.Walk
+src/failure/door.go Shell.Run
 src/front/cmd/door.go files.read
 src/front/cmd/door.go files.write
 src/front/cmd/door.go main
@@ -184,6 +188,9 @@ src/quack/vehicle_verb.go vehicleRootHere
 src/quack/verb_config.go configWrites
 src/quack/verb_config.go declaredAt
 src/quack/verb_config.go orderedAt
+src/quack/verb_failure.go failureCounts
+src/quack/verb_failure.go failureHere
+src/quack/verb_failure.go failureWrites
 src/quack/verb_fix.go standsHere
 src/quack/verb_fix.go toolHere
 src/quack/verb_fix.go writeCalmed
