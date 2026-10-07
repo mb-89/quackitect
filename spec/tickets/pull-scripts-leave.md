@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 2e2636029a8ff4a4197b3152cba4e26588d768bc
+    hash_after: 2e2636029a8ff4a4197b3152cba4e26588d768bc
+    inputs:
+      - name: ask
+        hash: e617375ba72d869f
+        size: 447
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,213 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. The nine scripts the first done_when line names leave.
+2. chapter.js, guidance-hand.js, ephemeral.js and held-tests.js leave with them, since each imports a leaving script.
+3. pull-route.js and guidance-hand.js import each other, so the two can only leave in one commit.
+4. A Discussion line on ticket-scripts-leave says its scope shrinks to ticket-route.js and vehicle.js.
+5. pull-hand-of, landed, tool-call, chapter and held-tests tests leave, and so do the orphan helpers pull-doors.js, pull-schema.js and quack-doors.js.
+6. New Go tests in pull_landed_test.go hold the landing cases landed.test.js held, through `ticket pull --pass`.
+7. The marker refusal case holds the put-back and the unlanded rows that the hook refusal case held.
+8. pull_hand_test.go holds the box id, identity, owner's word and cloud-variable cases.
+9. pull_test.go and pull_clear_test.go hold the tool-call wording, the spawn prompt and the chapter rows.
+10. routes_test.go reads the tree's processes through ProcessAt, LeafOf and StepPathOf, one test per route case in process.test.js.
+11. process.test.js keeps only its Vale case on the minted routes, and reads each route with lib's readYaml and processHash.
+12. keptOf, keptOver, topicOf, PAST and REFUSES move into test/contract/ruled.js, beside the Vale run they filter.
+13. paragraph.test.js and process.test.js import keptOf from ruled.js.
+14. schema.test.js spells spec/processes itself, and schema-bless.test.js drops its HARNESS case.
+15. tree.test.js reads the session file's spelling out of marks.go in place of SESSION.
+16. folders.test.js drops BOX and SESSION. cloud-desk.test.js drops its push case.
+17. level1.test.js reads CLAUDE_CODE_REMOTE off the env, and a Go test owns the HARNESS_KEYS copy check.
+18. guidance-tags.test.js drops the unreached case, and guidance_test.go in quack holds it over guidanceRows.
+19. TestTestArgv in check_test.go names logbook.test.js in place of chapter.test.js.
+20. Every Go comment and design note naming a leaving script names its Go owner.
+Weighed: flipping the order with ticket-scripts-leave. The pull-route and guidance-hand cycle breaks either order.
+Weighed: inlining callOf and the three regexes into the dead twins. That edits code that only its tests run.
+Weighed: a Go-written golden of minted routes for the Vale case. Tests rule five keeps tree content out of a golden.
+Weighed: porting the Vale case to Go. No Go test runs real Vale, and the lint group keeps that door in JavaScript.
+Assumed: taking guidance-hand.js, ephemeral.js, chapter.js and held-tests.js here, since a cloud box decides its group's scope.
+Assumed: the lint group accepts edits to ruled.js and paragraph.test.js.
+Assumed: the schema-bless HARNESS case moves to Go over Go's own lists, since lib/cloud.js leaves later.
+Assumed: vale.test.js keeps the ephemeral.js path as a fixture label, which needs no file.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/pull-route.js: imports pull-cap, pull-hand-of, quack-topic, tool-call, pull-spawn and guidance-hand
+- src/scripts/pull-cap.js: imports asOf and writeHold from guidance-hand.js
+- src/scripts/pull-landed.js: takenOf, which reads holdsIn from ephemeral.js
+- src/scripts/pull-spawn.js: spawnPrompt, which reads callOf
+- src/scripts/chapter.js: lines, which reads ANSWERED, COMMENT and FENCE from pull-route.js
+- src/scripts/guidance-hand.js: imports agentOf, BOX, handOf, leafOf and leavesOf
+- src/scripts/ephemeral.js: ASKS, which read callOf from tool-call.js
+- src/scripts/held-tests.js: heldTests, which reads holdsIn from ephemeral.js
+- test/level0/pull-hand-of.test.js: every case
+- test/level0/landed.test.js: every case
+- test/level0/tool-call.test.js: every case
+- test/level0/chapter.test.js: every case
+- test/level0/held-tests.test.js: every case
+- test/level0/cloud-desk.test.js: the case reading pushed, and its comment naming handDoors
+- test/level0/folders.test.js: the two runtime writer cases reading BOX and SESSION
+- test/level0/level1.test.js: the harness env case reading agentOf and HARNESS
+- test/contract/process.test.js: every case, which reads leafOf, processAt, askRows, schemasHere, readsFor and keptOf
+- test/contract/paragraph.test.js: the past tense case reading keptOf and PAST
+- test/contract/schema.test.js: the two process cases reading PROCESSES
+- test/contract/schema-bless.test.js: the case reading HARNESS
+- test/contract/tree.test.js: the session file case reading SESSION
+- test/contract/guidance-tags.test.js: the case reading unreached
+- test/contract/ruled.js: rulesIn, which gains keptOf beside the Vale run
+- src/quack/check_test.go: TestTestArgv, which names test/level0/chapter.test.js
+- test/level0/pull-doors.js, pull-schema.js and quack-doors.js: orphan helpers no file imports
+- src/branches/dispatch_write.go: the route comment naming processAt in process.js
+- src/branches/hand.go and land.go: header comments naming pull-hand-of.js and pull-landed.js
+- src/modules/check/group.go: the leaf comment naming leafOf and stepPathOf
+- src/modules/guidance/guidance.go and guidance_test.go: comments naming guidance-hand.js and pull-route.js
+- src/modules/hooks/command/guards.go: the comment naming pull-bless.js and pull-hand-of.js
+- src/modules/hooks/command/tested.go: HeldTests, whose comment names guidance-hand.js
+- src/modules/hooks/marks.go: the header and harnesses comments naming pull-hand-of.js
+- src/modules/hooks/stopfacts.go: the header naming ephemeral.js
+- src/modules/tickets/drawn.go: three comments naming pull-route.js
+- src/pull: process.go, pull_cap.go, pull_holds.go, pull_landed.go, pull_route.go, pull_ephemeral.go, pull_chapter.go, pull_commands.go headers
+- src/pull/process_test.go: the header naming process.js
+- src/quack: retro_mint.go, verb_mint.go, ticket_fill.go, retro_collect.go, retro_collect_cloud.go comments naming leaving scripts
+- spec/design_output: pull.md, work.md, extension.md, lsp.md, migration.md, stop.md lines naming leaving scripts or tests
+- spec/tickets/ticket-scripts-leave.md: Discussion, since its guidance-hand.js and ephemeral.js leave here
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/pull/pull_landed_test.go: TestAPassStagesTheHandsJournaledPathsAndLeavesASiblingsEditOut
+- src/pull/pull_landed_test.go: TestAPassStagesNoPathGitIgnoresStandingNowhereOrMarkedUnlanded
+- src/pull/pull_landed_test.go: TestAPassWhileGitListsAnUnmergedPathWritesNothingAndNamesIt
+- src/pull/pull_landed_test.go: TestAPassWhoseStagedDeltaAddsAMarkerPutsTheTicketBackAndSaysWhereItStays
+- src/pull/pull_landed_test.go: TestAStepTheEngineSkipsCommitsTheTicketAloneAndLeavesTheTreeOut
+- src/pull/pull_landed_test.go: TestAPrivateNotesPassLandsOnDiskAndCommitsNothing
+- src/pull/pull_landed_test.go: TestADeskPassStandsOnThisBoxWhateverTheEnvironmentSays
+- src/pull/pull_hand_test.go: TestAWorkRootWithNoBoxFileTakesTheIdentityUnderTheMethodRoot
+- src/pull/pull_hand_test.go: TestTheBoxIDReadsTheBoxFileThenTheIdentityAndWritesNothing
+- src/pull/pull_hand_test.go: TestTheOwnersWordSendsAnAgentsHandIntoAPersonStep
+- src/pull/pull_hand_test.go: TestEveryCloudVariableNamesAHarness
+- src/pull/pull_test.go: TestASecondPullNamesTheHandBackAsAToolCallWithItsWords
+- src/pull/pull_test.go: TestASpawnPromptNamesTheToolCallsAndNoShellVerb
+- src/pull/pull_test.go: TestAHandBackCountsNoFencedRowAsText
+- src/pull/pull_test.go: TestAHandBackOnATicketWithNoChapterForItsLeafStandsRefused
+- src/pull/pull_clear_test.go: TestTheClearsTicketsHandBackThroughTheToolAndNameNoShellVerb
+- src/pull/routes_test.go: TestTheQuestionRouteOpensAtAStepWaitingForAPerson
+- src/pull/routes_test.go: TestThePersonRouteOpensAtAPersonStepAndAnyHandCarriesOn
+- src/pull/routes_test.go: TestTheGroupRouteReadsItsChildrenThroughAFinalAcceptance
+- src/pull/routes_test.go: TestTheStandardRouteGatesTheDesignOnceAndHandsOnToTheRetro
+- src/pull/routes_test.go: TestTheRetroRouteEndsOnTheReportThenTheMint
+- src/pull/routes_test.go: TestTheRetroAuditReadsWholeAndCollectNamesTheScriptsFolder
+- src/pull/routes_test.go: TestTheGroupsWriteStepAsksThePromptsAndErrorsWithTheirTimes
+- src/pull/routes_test.go: TestTheReaderRuleHandsEachGroupChapterByItsClose
+- src/pull/routes_test.go: TestTheStandardRouteAsksForTheViewInTheOwnersWords
+- src/pull/routes_test.go: TestTheNoteRouteAsksForTheOwnersQuotedWords
+- src/pull/routes_test.go: TestTheStandardRouteOpensOnTheOwnersReadOffAHandover
+- src/quack/guidance_test.go: TestTheStandardGateReadsTheDesignReviewNoteAlone
+- src/quack/guidance_test.go: TestEveryGuidanceNoteUnderASubfolderReachesSomeLeaf
+- src/quack/hooks_folder_test.go: TestEveryKeyThePullToolForwardsNamesAHarness
+- src/modules/hooks/command/tested_test.go: TestHeldTestsComeBackOnceAndAHoldWithNoTicketAddsNone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/process.js
+- src/scripts/pull-cap.js
+- src/scripts/pull-hand-of.js
+- src/scripts/pull-landed.js
+- src/scripts/pull-push.js
+- src/scripts/pull-route.js
+- src/scripts/pull-spawn.js
+- src/scripts/quack-topic.js
+- src/scripts/tool-call.js
+- src/scripts/chapter.js
+- src/scripts/guidance-hand.js
+- src/scripts/ephemeral.js
+- src/scripts/held-tests.js
+- test/level0/pull-hand-of.test.js
+- test/level0/landed.test.js
+- test/level0/tool-call.test.js
+- test/level0/chapter.test.js
+- test/level0/held-tests.test.js
+- test/level0/pull-doors.js
+- test/level0/pull-schema.js
+- test/level0/quack-doors.js
+- test/level0/cloud-desk.test.js
+- test/level0/folders.test.js
+- test/level0/level1.test.js
+- test/contract/process.test.js
+- test/contract/paragraph.test.js
+- test/contract/ruled.js
+- test/contract/schema.test.js
+- test/contract/schema-bless.test.js
+- test/contract/tree.test.js
+- test/contract/guidance-tags.test.js
+- src/pull/pull_landed_test.go
+- src/pull/pull_hand_test.go
+- src/pull/routes_test.go
+- src/pull/pull_test.go
+- src/pull/pull_clear_test.go
+- src/pull/process_test.go
+- src/pull/process.go
+- src/pull/pull_cap.go
+- src/pull/pull_holds.go
+- src/pull/pull_landed.go
+- src/pull/pull_route.go
+- src/pull/pull_ephemeral.go
+- src/pull/pull_chapter.go
+- src/pull/pull_commands.go
+- src/quack/guidance_test.go
+- src/quack/hooks_folder_test.go
+- src/quack/check_test.go
+- src/quack/retro_mint.go
+- src/quack/verb_mint.go
+- src/quack/ticket_fill.go
+- src/quack/retro_collect.go
+- src/quack/retro_collect_cloud.go
+- src/modules/hooks/command/tested_test.go
+- src/modules/hooks/command/tested.go
+- src/modules/hooks/command/guards.go
+- src/modules/hooks/marks.go
+- src/modules/hooks/stopfacts.go
+- src/modules/guidance/guidance.go
+- src/modules/guidance/guidance_test.go
+- src/modules/tickets/drawn.go
+- src/modules/check/group.go
+- src/branches/dispatch_write.go
+- src/branches/hand.go
+- src/branches/land.go
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- spec/design_output/extension.md
+- spec/design_output/lsp.md
+- spec/design_output/migration.md
+- spec/design_output/stop.md
+- spec/tickets/ticket-scripts-leave.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every script, test, helper, Go owner and verb named here stands opened, among them landed, pushed, HandOf, BoxIDHere, spawnPrompt, CallOf, ChapterOf, HeldTests and guidanceRows
+- the callers come from a git grep on each leaving file, over imports, comments, RUNME.sh, .github, .vale.ini, package.json, src/stub and design notes
+- git ls-files decides the first done_when line, the new src/pull tests the second, and ./RUNME.sh check the third
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
