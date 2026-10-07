@@ -622,6 +622,12 @@ above are how a person catches it. Run `claude plugin validate
 .claude/skills/level0` on the client of the day, because the shape a hook takes
 moves with the build.
 
+The check's `plugin-tests` part runs `claude plugin test` over the kit under
+`.claude/skills/level0/tests`, and passes with a line where claude stands
+nowhere. It also counts the test lines there against the lines of every module
+the hooks manifest reaches through a relative import, and fails where the tests
+run longer.
+
 ## A step arrives late
 
 `turn.step` fires at the step's first tool result, so its first call runs
