@@ -6,7 +6,6 @@ package watchertest
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -37,7 +36,7 @@ func Appearing(root string) (stop func()) {
 			default:
 			}
 			at = filepath.Join(at, fmt.Sprint(n%depth))
-			if os.MkdirAll(at, 0o755) != nil || n%depth == depth-1 {
+			if makeAll(at) != nil || n%depth == depth-1 {
 				at = root
 			}
 		}
