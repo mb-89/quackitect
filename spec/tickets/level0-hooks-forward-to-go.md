@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -186,7 +186,30 @@ record:
         exit: 0
         said: "   87.9  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 029695cea065d1751b6ee216103dc58c39d52564
+    hash_after: 029695cea065d1751b6ee216103dc58c39d52564
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 2 file(s); green, src/modules/hooks passes; green, src/quack passes; green, src/pull passes
+      - name: check
+        exit: 0
+        said: "  132.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: a87b1f36ee56086b
+        size: 1329
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: javascript-leaves
+reason: done
 ---
 
 # Ask
@@ -461,26 +484,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/spawn_test.go src/modules/hooks/probe_test.go src/modules/hooks/session_test.go src/modules/hooks/transcript_test.go src/modules/hooks/hooks_test.go src/quack/hook_down_test.go src/quack/hooks_folder_test.go src/pull/pull_test.go test/level0/caged-door.test.js test/level0/bridgehead.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The level zero hook holds no rule now. level0.js posts every event to the Go hooks door with the bearer token, runs the effects the door answers, and keeps the clear and the step-text stream, which JavaScript alone reaches. The session file, the reply probe row, the spawn tag, the transcript picks and the event list move into the Go door. Where a post fails, the hook runs the se-index hook down word, which starts the index on a cloud box and otherwise answers the cage block, the refusal or the fall line. The pull tool registers what se-index tools and ticket pull --spec print, the stub always runs the standing, and cage.js, start.js, clear.js, shape.js and transcript.js leave with their tests. The forwarder drops the wait re-post, since the Go door reads no since stamp.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past the stub Go files the red tests call, hook_verb.go for the down word, comment lines naming the deleted scripts, and drawn_test.go, whose os read broke the import rule
+- the down word reaches the run door, and the door tests run on the fake disk, post, process and clock
+- each new Go file opens on a header pointing at spec/design_output/level0.md, which names the forwarder
+- the event list, the probe marker and the start reasons stand in Go alone, and level0.md points at the files
 
 # accept
 
