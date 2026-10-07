@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -174,6 +174,22 @@ record:
     hand: the engine
     hash_before: b0799a1b3a4659e51242cd29a1e1ca170736baa6
     hash_after: b0799a1b3a4659e51242cd29a1e1ca170736baa6
+  - step: accept
+    hand: box bf9a9fb67fb5 · claude-code-remote
+    hash_before: f14fb54fbc95a9f4f53a93ae4cefd05d94fbf933
+    hash_after: f14fb54fbc95a9f4f53a93ae4cefd05d94fbf933
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/failures-stand-registered already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 8602fdf90b84396a
+        size: 1198
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -267,7 +283,7 @@ Every failure the tree raises takes its registered name, the way a log call take
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept
+accept: every child closes, and each goal line stands in code: the nodes under spec/failures with remedies, the Go door and src/doors/failure.js, the check in src/failure/check.go, the sentinel on the clock door, the failure verb with raise, new and count, and the pull, take and mint refusals raising through failure.Raise. The merge of main keeps that, and ./RUNME.sh check answers green.
 
 # retro
 
