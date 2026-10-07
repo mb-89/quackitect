@@ -113,6 +113,27 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 	}
 }
 
+// A desk refuses a landing on a work branch alone, and a cloud box lands there, off the cases test/level0/cloud-desk.test.js held over lib/cloud.js. [[spec/tickets/cage-libs-leave]]
+func TestTheDeskGuardRefusesAWorkBranchOffTheCloudAlone(t *testing.T) {
+	for _, one := range []struct {
+		cloud   bool
+		branch  string
+		refuses bool
+	}{
+		{false, "work/one-group", true},
+		{false, "main", false},
+		{false, "claude/a-thing", false},
+		{true, "work/one-group", false},
+	} {
+		d := &Door{}
+		d.from.Git = taughtGit(map[string]string{"rev-parse --abbrev-ref HEAD": one.branch})
+		said := d.deskGuard("git commit -m x", t.TempDir(), Settings{Cloud: one.cloud})
+		if refused := strings.Contains(said, "lands nowhere on "+one.branch); refused != one.refuses {
+			t.Errorf("the desk guard over %s, cloud %v, says %q, and wants a refusal %v", one.branch, one.cloud, said, one.refuses)
+		}
+	}
+}
+
 // A door reaching no git and no voice reads neither, and its guards pass a commit. [[spec/tickets/cage-commit-guards-port]]
 func TestADoorWithNoGitOrVoiceReadsNeither(t *testing.T) {
 	root := t.TempDir()

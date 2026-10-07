@@ -58,10 +58,26 @@ func TestHoldStaleReadsTheBeatBeforeTheTipsAge(t *testing.T) {
 	}
 }
 
-func TestMergeRefusalNamesEachMarker(t *testing.T) {
+func TestMergeRefusalNamesEachUnmergedPathAndMarker(t *testing.T) {
 	t.Parallel()
 	delta := "diff --git a/a.md b/a.md\n+++ b/a.md\n@@ -0,0 +7 @@\n+<<<<<<< ours\n"
-	if said := MergeRefusal(nil, MarkersIn(delta)); !strings.Contains(said, "a.md:7  a conflict marker") {
-		t.Fatalf("MergeRefusal answers %q, and wants the marker's file and line", said)
+	for _, one := range []struct {
+		unmerged []string
+		delta    string
+		wants    []string
+	}{
+		{nil, delta, []string{"a.md:7  a conflict marker", "Resolve the merge first"}},
+		{[]string{"src/a.go"}, "", []string{"src/a.go  git lists it unmerged", "Resolve the merge first"}},
+		{[]string{"src/a.go"}, delta, []string{"src/a.go  git lists it unmerged", "a.md:7  a conflict marker"}},
+	} {
+		said := MergeRefusal(one.unmerged, MarkersIn(one.delta))
+		for _, want := range one.wants {
+			if !strings.Contains(said, want) {
+				t.Errorf("MergeRefusal answers %q, and wants %q", said, want)
+			}
+		}
+	}
+	if said := MergeRefusal(nil, nil); said != "" {
+		t.Errorf("MergeRefusal over nothing answers %q, and wants nothing", said)
 	}
 }

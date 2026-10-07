@@ -20,6 +20,14 @@ func TestTouchesGitReadsNestedGit(t *testing.T) {
 		{"sudo -u root git push", false, false},
 		{`echo "git push"`, false, false},
 		{"git status && git push origin main", false, true},
+		{"ls -la", false, false},
+		{"node --test", false, false},
+		{"./RUNME.sh check", false, false},
+		{"npm run digit", false, false},
+		{`grep -rn "git push" src`, false, false},
+		{"rg 'git commit -m' .", false, false},
+		{`echo "git push origin main"`, false, false},
+		{`./RUNME.sh commit "the row reads git commit; and git push origin main"`, false, false},
 	} {
 		commits, pushes := TouchesGit(one.command)
 		if commits != one.commits || pushes != one.pushes {
@@ -40,6 +48,22 @@ func TestLandsOnTrunkReadsTheBridgesLanding(t *testing.T) {
 		{"git push origin work/a", "main", ""},
 		{"git push -u origin work/a", "work/a", ""},
 		{`./RUNME.sh commit "push to main" && git status`, "work/a", ""},
+		{"ls -la", "main", ""},
+		{"git push origin HEAD:main", "work/a", HowPush},
+		{"git push -u origin main", "work/a", HowPush},
+		{"git push", "work/a", ""},
+		{"git push origin", "main", HowPush},
+		{"git push -u origin HEAD", "main", HowPush},
+		{`bash -c "git push origin main"`, "work/a", HowPush},
+		{"echo x | xargs git commit -m", "main", HowCommit},
+		{"cd a && git push origin main", "work/a", HowPush},
+		{"git -C . commit -m x", "main", HowCommit},
+		{"git --no-pager commit -m x", "main", HowCommit},
+		{"./RUNME.sh branch take", "main", ""},
+		{"./RUNME.sh branch done", "main", ""},
+		{"RUNME.ps1 branch open x", "main", ""},
+		{`./RUNME.sh commit "the row reads git commit; and git push origin main"`, "main", ""},
+		{`./RUNME.sh commit "the row reads git commit; and git push origin main" && git push origin main`, "work/x", HowPush},
 	} {
 		if got := LandsOnTrunk(one.command, one.branch); got != one.want {
 			t.Errorf("LandsOnTrunk(%q, %s) reads %q, want %q", one.command, one.branch, got, one.want)

@@ -22,6 +22,9 @@ var (
 	toolVerbs = []string{"check", "branch", "doctor"}
 )
 
+// The verbs the line names where the store lists no verb tool. A stub until implement lands the copy. [[spec/tickets/cage-libs-leave]]
+func LineVerbs() []string { return nil }
+
 // The refusals the shell door makes, which close the line. [[spec/design_output/bash#the-description-names-verbs]]
 const refusals = "Level zero refuses a shell write to a file the rules reach, a commit carrying " +
 	"no message, a branch name past five words, a test run naming no file, a commit " +
