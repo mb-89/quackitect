@@ -19,7 +19,11 @@ function engine() {
   const $ = {
     tool: { register: () => {} },
     process: {
-      run: async (argv) => void ran.push(argv) || { stdout: SPAWN, exitCode: 0 },
+      run: async (argv) =>
+        void ran.push(argv) || {
+          stdout: JSON.stringify({ result: SPAWN, spawn: SPAWN.split("\n\n")[1] }),
+          exitCode: 0,
+        },
     },
     agent: { spawn: async (one) => void spawned.push(one) || { text: "started" } },
     fs: { read: async () => "", write: async () => {} },
@@ -43,6 +47,7 @@ test("the pull tool spawns the hand in the background once, and pulls no second 
 
   assert.equal(it.spawned.length, 1, "one hand spawns");
   assert.equal(it.spawned[0].background, true, "the hand runs in the background");
+  assert.equal(it.spawned[0].prompt, "You are a hand of your own, named helper-2.\n1. Run it.");
   assert.equal(it.ran.length, 1, "the tool waits on no hand before it answers");
   assert.match(
     said.result,

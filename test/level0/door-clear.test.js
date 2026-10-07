@@ -7,17 +7,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
-import { TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const STUB = "/stub";
 const RESUME = "Run ./RUNME.sh ticket pull.";
 
-// A box whose cage reads new, and whose door answers every post with a clear. [[spec/tickets/clear-answers-off-the-door]]
+// A box whose door answers every post with a clear. [[spec/tickets/clear-answers-off-the-door]]
 function caged() {
   const files = fakeDisk({
     [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
-    [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "new" } }),
     [`${STUB}/.se/.log/session.jsonl`]: "",
   });
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);

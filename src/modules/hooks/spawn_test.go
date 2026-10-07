@@ -68,7 +68,7 @@ func kinded(one layerRow) bool {
 	return one.Kind != "" && one.Layer == one.Kind
 }
 
-// The prompt a spawn carries, and the tag of the hand of session s1 the session file names, off spawnTagOf in .claude/skills/level0/hooks/start.js. [[spec/tickets/level0-hooks-forward-to-go]]
+// The prompt a spawn carries, and the tag of the hand of session s1 the session file names, as the old start hook spelled it. [[spec/tickets/level0-hooks-forward-to-go]]
 const (
 	spawnPrompt = "read the branch"
 	handTag     = "You are the hand of session s1 on this box, so you pull under no --as."

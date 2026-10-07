@@ -274,7 +274,7 @@ func TestTheListenAnswersAPostAndStandsItsPort(t *testing.T) {
 	}
 }
 
-// The events the door decides, as DOORED in .claude/skills/level0/hooks/cage.js listed them. [[spec/tickets/level0-hooks-forward-to-go]]
+// The events the door decides, as the old cage listed them. [[spec/tickets/level0-hooks-forward-to-go]]
 var doored = []string{
 	"session.start", "prompt.context", "prompt.submit", "classic.MessageDisplay", "agent.spoke",
 	"session.compact", "session.end", "session.measure", "turn.said", "turn.complete",

@@ -400,10 +400,10 @@ test("a spelling of a name the runtime half took is refused where the old place 
   assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
 });
 
-// A plugin imports nothing past its own folder, so the plugin spells the session file the hand writes once in its library, and the pull hook imports it from there. [[spec/design_input/the-runtime-files-stand-apart]]
+// The hooks door writes the session file, and the plugin's library spells it once beside it. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
-    ".claude/skills/level0/hooks/level0.js",
+    "src/modules/hooks/marks.go",
     ".claude/skills/level0/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
@@ -411,7 +411,7 @@ test("every forced copy of the session file says what the hand module says", () 
   assert.doesNotMatch(
     here.read(".claude/skills/level0/hooks/pull-tool.js"),
     new RegExp(`"${SESSION}"`),
-    "the hook imports the path from the library beside it",
+    "the hook leaves the session file to the door",
   );
 });
 

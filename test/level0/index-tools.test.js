@@ -25,6 +25,7 @@ function engine(answer = { stdout: JSON.stringify(LIST), exitCode: 0 }) {
       run: async (argv) => {
         ran.push(argv);
         if (answer instanceof Error) throw answer;
+        if (argv.includes("--spec")) return { stdout: '{"name":"pull"}\n', exitCode: 0 };
         return argv[1] === "tools" ? answer : { stdout: '{"sum": 5}\n', exitCode: 0 };
       },
     },
@@ -40,7 +41,7 @@ test("the binary stands under the method root's runtime folder", () => {
   assert.equal(binaryOf("/method", true), `${BIN}.exe`);
 });
 
-test("the hook reads the generated list and registers each tool beside the pull", async () => {
+test("the hook registers each tool the binary lists, and the pull its verb prints", async () => {
   const held = [];
   register(
     (event, filter, made) => void held.push({ event, filter, run: made ?? filter }),
@@ -57,7 +58,8 @@ test("the hook reads the generated list and registers each tool beside the pull"
     names.includes("index_t_add") && names.includes("index_t_echo"),
     names.join(", "),
   );
-  assert.deepEqual(ran.at(-1), [BIN, "tools"]);
+  assert.deepEqual(ran[0], [BIN, "tools"]);
+  assert.deepEqual(ran[1], [BIN, "verb", "/method/src/scripts", "ticket", "pull", "--spec"]);
   const add = registered.find((one) => one.name === "index_t_add");
   assert.deepEqual(Object.keys(add).sort(), ["description", "inputSchema", "name"]);
 });

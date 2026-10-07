@@ -1,4 +1,4 @@
-// The commands a down door lets through, read off the table cage.test.js reads too.
+// The commands a down door lets through, read off one table.
 // [[spec/tickets/recovers-cases-share-one-table]]
 package hooks
 

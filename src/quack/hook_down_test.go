@@ -1,5 +1,5 @@
 // The hook verb's down word over fakes, off the cases caged-door.test.js and
-// start.test.js held: the cloud start, the door asked again once it stands,
+// start.test.js held, now gone: the cloud start, the door asked again once it stands,
 // the refusal of a guarded call, the cage block, the codes and the fall line.
 // [[spec/tickets/level0-hooks-forward-to-go]]
 package main

@@ -14,7 +14,6 @@ import {
   roadsOf,
   serveOf,
 } from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
-import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
 
 const STUB = "/stub";
 const HOME = "/home/agent";
@@ -59,7 +58,7 @@ function attachInto(files) {
   };
 }
 
-function hand(files, outside, { answers = false } = {}) {
+function hand(files, outside) {
   const logged = [];
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);
   return {
@@ -70,22 +69,16 @@ function hand(files, outside, { answers = false } = {}) {
       write: async (rel, text) => files.write(at(rel), text),
     },
     process: { run: async (argv, init) => outside.proc.run(argv, init) },
-    http: {
-      fetch: async () => {
-        if (answers) return { ok: true, status: 200, text: "{}" };
-        throw new Error("Unable to connect");
-      },
-    },
     ui: { log: (text) => logged.push(text) },
   };
 }
 
-async function started(files, outside, options) {
+async function started(files, outside) {
   const hooks = {};
   register((event, fn) => {
     hooks[event] = fn;
   }, {});
-  const $ = hand(files, outside, options);
+  const $ = hand(files, outside);
   await hooks["session.start"]($, { cwd: STUB }, async (e) => e);
   const context = await hooks["prompt.context"]($, {}, async () => ({
     blocks: [{ name: "other", text: "x" }],
@@ -160,7 +153,7 @@ test("a cloud box with an empty register clones the upstream from vehicle.json, 
   assert.deepEqual(
     argvs[3],
     serveOf(CLONED),
-    "nothing answers at the port, so the server starts",
+    "the attach runs the standing, which starts a door where none answers",
   );
   assert.equal(argvs.length, 4);
 
@@ -214,8 +207,8 @@ test("a vehicle at SE_VEHICLE clones nothing, and the attach runs its RUNME", as
   const env = {
     stdout: JSON.stringify({ home: HOME, vehicle: "/desk/acme", work: STUB }),
   };
-  const outside = fakeGit({ node: env, env: attachInto(files) }, STUB);
-  await started(files, outside, { answers: true });
+  const outside = fakeGit({ node: env, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
   assert.equal(
     argvs.some((one) => one[0] === "git"),
@@ -223,7 +216,6 @@ test("a vehicle at SE_VEHICLE clones nothing, and the attach runs its RUNME", as
     "no clone",
   );
   assert.deepEqual(argvs[1], attachOf("/desk/acme", STUB));
-  assert.equal(argvs.length, 2, "a server answering at the port starts no second one");
   assert.equal(
     JSON.parse(files.read(`${STUB}/.se/.runtime/vehicle.json`)).method,
     "/desk/acme",
@@ -238,11 +230,26 @@ test("a register entry naming the record's identity is the vehicle", async () =>
       { id: "abc123", method_root: "/elsewhere/acme", port: 6512 },
     ]),
   });
-  const outside = fakeGit({ node: ENV, env: attachInto(files) }, STUB);
-  await started(files, outside, { answers: true });
+  const outside = fakeGit({ node: ENV, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
   assert.deepEqual(argvs[1], attachOf("/elsewhere/acme", STUB));
-  assert.equal(argvs.length, 2);
+});
+
+// The standing answers at once where a door stands, so the attach asks no port first. [[spec/tickets/level0-hooks-forward-to-go]]
+test("the attach always runs the standing", async () => {
+  const files = stub({
+    "/desk/acme/RUNME.sh": "run me",
+    [`/desk/acme/${HOOK}`]: "the hook",
+  });
+  const env = {
+    stdout: JSON.stringify({ home: HOME, vehicle: "/desk/acme", work: STUB }),
+  };
+  const outside = fakeGit({ node: env, env: attachInto(files), sh: { exitCode: 0 } }, STUB);
+  const { $ } = await started(files, outside);
+  const argvs = outside.ran.map((one) => one.argv);
+  assert.deepEqual(argvs.slice(1), [attachOf("/desk/acme", STUB), serveOf("/desk/acme")]);
+  assert.match(String($.logged[0] ?? ""), /acme stands/, "the vehicle says it stands");
 });
 
 test("a clone that fails stops the road, and the log names the step and its last line", async () => {
@@ -290,112 +297,3 @@ test("a record naming no upstream stops before the clone", async () => {
   assert.match(line.detail, /upstream/);
 });
 
-// A server tool the harness registered once answers nowhere past the hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
-test("a mcp__level0__plan call with no server answers the line", async () => {
-  const hooks = {};
-  level0((event, fn) => {
-    hooks[event] = fn;
-  }, {});
-  const files = fakeDisk();
-  const $ = hand(files, fakeGit({}, STUB));
-  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
-
-  const said = await hooks["*"]($, { tool: "mcp__level0__plan" }, handed);
-
-  assert.match(String(said?.result ?? ""), /no server answers at .*6510/);
-  assert.match(String(said.result), /mcp__level0__plan/, "the line names the tool");
-  assert.match(
-    String(said.result),
-    /\.\/RUNME\.sh serve/,
-    "the line names the road back",
-  );
-});
-
-// The client drops the tools when it loads the module again, so the module marks its posts fresh until an answer hands the tools back. [[spec/design_output/level0#the-first-call-pays]]
-test("a module loaded again marks its posts fresh until the tools come back", async () => {
-  const hooks = {};
-  level0((event, fn) => {
-    hooks[event] = fn;
-  }, {});
-  const bodies = [];
-  const registered = [];
-  let answer = { register: [{ name: "plan" }] };
-  const $ = {
-    ...hand(fakeDisk(), fakeGit({}, STUB)),
-    http: {
-      fetch: async (_url, init) => {
-        bodies.push(JSON.parse(init.body));
-        const said = answer;
-        answer = {};
-        return { ok: true, status: 200, text: JSON.stringify(said) };
-      },
-    },
-    tool: { register: async (spec) => registered.push(spec) },
-  };
-  const handed = Object.assign(async (e) => e, { event: "tool.call" });
-
-  await hooks["*"]($, { tool: "Read" }, handed);
-  await hooks["*"]($, { tool: "Read" }, handed);
-
-  assert.equal(bodies[0].fresh, true, "the first post asks for the tools");
-  assert.deepEqual(registered, [{ name: "plan" }], "the answer registers them");
-  assert.equal(bodies[1].fresh, undefined, "and the next post asks no more");
-});
-
-// A wire where the host cuts the first post of a wait at its own timeout, and /health answers while the server stands. [[spec/tickets/every-server-stands-and-answers]]
-function cutting(stands) {
-  const posts = [];
-  const fetch = async (url, init) => {
-    if (url.endsWith("/health")) {
-      if (stands) return { ok: true, status: 200, text: "{}" };
-      throw new Error("Unable to connect");
-    }
-    posts.push(JSON.parse(init.body));
-    if (posts.length === 1 || !stands) throw new Error("The operation timed out.");
-    const line = "The helper a1 reports.";
-    return {
-      ok: true,
-      status: 200,
-      text: JSON.stringify({ result: { result: line } }),
-    };
-  };
-  return { posts, fetch };
-}
-
-// [[spec/tickets/every-server-stands-and-answers]]
-test("a wait the host cuts answers its signal on a live server, and the line on a dead one", async () => {
-  const hooks = {};
-  level0(
-    (event, fn) => {
-      hooks[event] = fn;
-    },
-    { cut: 0 },
-  );
-  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
-  const call = { tool: "mcp__level0__wait", agent: "a1" };
-
-  const live = cutting(true);
-  const $ = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: live.fetch } };
-  const said = await hooks["*"]($, call, handed);
-
-  assert.equal(
-    said?.result,
-    "The helper a1 reports.",
-    "the signal takes the line's place",
-  );
-  assert.equal(live.posts.length, 2, "the cut post goes again");
-  assert.ok(live.posts[0].e.since > 0, "the post carries the wait's since");
-  assert.equal(
-    live.posts[1].e.since,
-    live.posts[0].e.since,
-    "and the post again the same",
-  );
-  assert.deepEqual($.logged, [], "a cut on a live server tells nobody it falls");
-
-  const dead = cutting(false);
-  const gone = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: dead.fetch } };
-  const line = await hooks["*"](gone, call, handed);
-
-  assert.match(String(line?.result ?? ""), /no server answers at .*mcp__level0__wait/);
-  assert.equal(dead.posts.length, 1, "a dead server takes no post again");
-});

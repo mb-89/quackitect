@@ -1,5 +1,5 @@
 // The session file the door writes on a session's start, off wrote in
-// .claude/skills/level0/hooks/pull-tool.js: the id and the harness, and nothing
+// the old pull hook: the id and the harness, and nothing
 // where the start names no id.
 // [[spec/tickets/level0-hooks-forward-to-go]]
 package hooks

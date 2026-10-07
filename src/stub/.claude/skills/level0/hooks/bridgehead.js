@@ -63,10 +63,9 @@ async function starts($) {
   const attached = await run($, attachOf(vehicle, env.work), ATTACH_WAIT);
   if (attached.exitCode) return fails($, "attach", lastLine(attached));
   const port = Number(parsed(await readIf($, POINTER))?.port) || PORT;
-  if (!(await answers($, port, env.work))) {
-    const served = await run($, serveOf(vehicle), SERVE_WAIT);
-    if (served.exitCode) return fails($, "serve", lastLine(served));
-  }
+  // The standing answers at once where a door stands, and starts one where none does. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  const served = await run($, serveOf(vehicle), SERVE_WAIT);
+  if (served.exitCode) return fails($, "serve", lastLine(served));
   const line = `The vehicle ${link.name} stands at ${vehicle}, attached to this stub at port ${port}. The cage holds from the next session.`;
   await logs($, { level: "info", said: line, vehicle, port });
   say($, line);
@@ -128,19 +127,6 @@ async function standingOf($, roads) {
     if (await exists($, `${one}/RUNME.sh`)) return one;
   }
   return "";
-}
-
-async function answers($, port, root) {
-  try {
-    const said = await $.http.fetch(`http://127.0.0.1:${port}/event`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ event: "bridgehead.probe", e: {}, root }),
-    });
-    return Boolean(said?.ok);
-  } catch {
-    return false;
-  }
 }
 
 async function fails($, step, detail) {

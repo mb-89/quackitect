@@ -1,6 +1,6 @@
 // The cage while the hooks door stands down: a guarded call meets the
 // refusal, and the commands that bring the index back or save the work pass.
-// recovers in .claude/skills/level0/hooks/cage.js holds the same contract.
+// The hook verb's down word answers off it while the door answers nothing.
 // [[spec/tickets/copilot-hooks-run-in-go]]
 package hooks
 
