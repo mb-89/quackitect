@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: e617375ba72d869f
         size: 447
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: d213b0787fd6690a7f0985de19647f73b5d02468
+    hash_after: 39e686431c190bd28a794386e497a4b3aa7b76d8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 8c1fd8f36b5c7797
+        size: 11401
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -382,26 +395,31 @@ Assumed: vale.test.js keeps the ephemeral.js path as a fixture label, which need
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/pull_scripts_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/pull_scripts_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestThePullScriptsStandNowhere fails on its own assertion and names the nine scripts that still stand. Every other new case passes now, because Go already does what each one checks. Those cases stay as the Go home of what the deleted JavaScript tests held: the routes, the landing, the hand, the tool-call wording, the chapter rows, the clear asks, the guidance reach, the harness keys and the held tests. None needed a stub. The check refused a first red case that called git through exec.Command outside the door audit, so the case now reads the disk with filepath.Glob and starts no process. git ls-files stays the hand's checkpoint for the first done_when line. The red case stands in a file of its own, so the check leaves that file out and still runs hooks_folder_test.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- pull_scripts_test.go fails until the scripts leave and decides the first line, the new src/pull cases decide go test ./src/pull/..., and ./RUNME.sh check decides the third at tests-green
+- the pull cases run on the in-memory FakeRepo and FakeDisk, the fake sh runner and a fixed clock, and none waits or starts a process
 
 # gate
 
