@@ -45,7 +45,7 @@ func took(ran <-chan time.Time) bool {
 	}
 }
 
-// The hand runs once its span passes, once alone, and never after a stop. Await reads whether the hand ran, the real clock blocking on it and the fake reading it at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+// The hand runs once its span passes, once alone, and before any stop. Await reads whether the hand ran, the real clock blocking on it and the fake reading it at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
 func afterSuite(t *testing.T, one Clock, pass func(time.Duration), await func(<-chan time.Time) bool) {
 	ran := make(chan time.Time, 2)
 	one.After(time.Millisecond, func(at time.Time) { ran <- at })

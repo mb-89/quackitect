@@ -309,7 +309,7 @@ func TestHookHandsEachPostToHear(t *testing.T) {
 	}
 }
 
-// A timer whose span never passes, since a module imports no other module's clock. [[spec/tickets/hooks-test-reads-fired-row]]
+// A timer whose span stays open, since a module imports no other module's clock. [[spec/tickets/hooks-test-reads-fired-row]]
 type stillTimer struct{}
 
 func (stillTimer) After(time.Duration, func(time.Time)) (stop func()) { return func() {} }

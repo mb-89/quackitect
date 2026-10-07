@@ -6,4 +6,4 @@ remedies: ["Fix the fault the refusal names: write the handover whole, or commit
 
 # When
 
-The handover stands absent or breaks its form, or a cloud box holds work it never pushed.
+The handover stands absent or breaks its form, or a cloud box holds work its origin lacks.

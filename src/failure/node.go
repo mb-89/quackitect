@@ -1,5 +1,5 @@
 // A failure node: the id, the level, the remedies, and the reaction and the
-// watch a node may name, read off one note's front.
+// watch a node names, read off one note's front.
 // [[spec/design_output/failures#a-failure-is-a-node]]
 package failure
 

@@ -6,4 +6,4 @@ remedies: ["Take back a leaf your own hand handed back, or ask the hand that hol
 
 # When
 
-A take-back names a leaf another hand handed back.
+A take-back names a leaf whose hand-back belongs to another hand.
