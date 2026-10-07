@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -227,6 +227,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-14
+    hash_before: eed93ce40ff9dc7700083fdc922b7eebd06c2fca
+    hash_after: eed93ce40ff9dc7700083fdc922b7eebd06c2fca
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: 605084ff53452741
+        size: 22647
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -508,7 +523,7 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- the form is verdict -->
 
 accept with points
-- door-tables-name-standing-doors: spec/design_output/doors.md names JS doors the tree no longer holds. The stands-on table and the contract table name `awake` (src/doors/awake.js, src/doors/fake/awake.js, test/contract/awake.test.js) and `biome` (src/doors/biome.js, test/contract/biome.test.js), and the bridgehead chapter names src/doors/fake/bridgehead.js. dead-js-tests-leave removed them in 8094440a2, and the-bridge-server-leaves removed the bridgehead fake in 1e7ebd952. The rows name only doors src/doors and test/contract hold, and the check that reads the family row spans reads these tables too.
+- go-rows-name-declared-contracts: the Go contract table in spec/design_output/doors.md names `src/index/contract_test.go`, `src/index/bus_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
 
 # implement
 
