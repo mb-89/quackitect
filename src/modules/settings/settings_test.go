@@ -52,14 +52,14 @@ func TestAKeyTakesTheTypeOfItsBuiltIn(t *testing.T) {
 	}
 }
 
-// The check's budget stands under battery, near the run the owner remembers. [[spec/tickets/the-check-runs-fast-again]]
+// The check's budget stands under battery, a fifth over a clean check whose parts start at once. [[spec/tickets/the-check-runs-fast-again]] [[spec/tickets/the-budget-reads-the-span]]
 func TestTheCheckBudgetReadsItsBuiltIn(t *testing.T) {
 	c := q.New()
 	Of("battery")(c)
 	for _, key := range c.Keys() {
 		if key.Local == "budget" {
-			if key.Default != "120000" {
-				t.Fatalf("budget reads the built-in %s, and wants 120000", key.Default)
+			if key.Default != "150000" {
+				t.Fatalf("budget reads the built-in %s, and wants 150000", key.Default)
 			}
 			return
 		}
