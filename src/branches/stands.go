@@ -415,7 +415,10 @@ type change struct {
 }
 
 // Whether work stands uncommitted or unpushed, which holds every branch where it stands. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-func (d *Doors) dirty(branch string) bool {
+func (d *Doors) dirty(branch string) bool { return d.dirtyPast(branch, "") }
+
+// Whether work stands uncommitted or unpushed, where the branch keeps names one whose commits a take carries on as a fast-forward of origin. [[spec/design_output/work#a-branch-moves-clean]]
+func (d *Doors) dirtyPast(branch, keeps string) bool {
 	for _, one := range d.standingIn() {
 		if !one.Parked {
 			d.raises(failure.Raise(d.Failures, "branch-tree-dirty", "This tree carries uncommitted changes, so no branch may move.", "Commit them, or stash them, and run this again."))
@@ -429,11 +432,22 @@ func (d *Doors) dirty(branch string) bool {
 		}
 	}
 	for _, one := range walked {
+		if one == keeps && d.fastForward(one) {
+			continue
+		}
 		if d.unpushed(one) {
 			return true
 		}
 	}
 	return false
+}
+
+// Whether a branch stands on origin's tip or past it, so a push carries it on with no commit lost. [[spec/design_output/work#a-branch-moves-clean]]
+func (d *Doors) fastForward(branch string) bool {
+	if _, ok := d.Repo.Resolve("origin/" + branch); !ok {
+		return false
+	}
+	return d.Repo.IsAncestor("origin/"+branch, branch)
 }
 
 // Whether a branch holds commits origin lacks, which a move drops. [[spec/design_output/work#a-branch-moves-clean]]

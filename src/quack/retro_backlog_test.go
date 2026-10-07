@@ -4,7 +4,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -45,21 +44,17 @@ func retroBacklogTrunk() *retroTrunk {
 // Runs retro backlog over a tree holding the retro's record and the verdicts given, and answers its code and everything it says. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroRunBacklog(t *testing.T, verdicts string) (int, string) {
 	t.Helper()
-	root := t.TempDir() // level0: FixtureOutsideHome - each case lays its tickets and retro under a root of its own
+	root := "/tree"
+	disk := newFakeDisk()
 	home := retroHome(root, retroBacklogName)
-	if err := os.MkdirAll(home, 0o755); err != nil {
-		t.Fatal(err)
-	}
 	files := map[string]string{"collected.json": `{"at":"2026-09-20T00:00:00.000Z","since":"2026-09-10T00:00:00.000Z"}`}
 	if verdicts != "" {
 		files["backlog.json"] = verdicts
 	}
 	for name, text := range files {
-		if err := os.WriteFile(filepath.Join(home, name), []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
+		hq2Seed(t, disk, filepath.Join(home, name), text)
 	}
-	doors := retroBacklogDoors{root: root, git: retroBacklogTrunk().run}
+	doors := retroBacklogDoors{root: root, disk: disk, git: retroBacklogTrunk().run}
 	var said strings.Builder
 	code := retroBacklogVerb(func() retroBacklogDoors { return doors })([]string{"retro", "backlog", retroBacklogName}, false, &said, &said)
 	return code, said.String()

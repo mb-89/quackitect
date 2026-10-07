@@ -74,7 +74,7 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 	})
 	door := New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
-		Call: c.call, Ops: b.of, Now: func() time.Time { return fixed },
+		Call: c.call, Ops: b.of, Clock: qtest.NewFake(fixed),
 		Root:   treeOf(t, commandTableOf(t).Tree, ""),
 		Config: func(string) Settings { return Settings{Words: nameWords} },
 	})
@@ -312,7 +312,9 @@ func TestHookHandsEachPostToHear(t *testing.T) {
 // A timer whose span stays open, since a module imports no other module's clock. [[spec/tickets/hooks-test-reads-fired-row]]
 type stillTimer struct{}
 
-func (stillTimer) After(time.Duration, func(time.Time)) (stop func()) { return func() {} }
+func (stillTimer) AfterFunc(time.Duration, func()) (stop func() bool) {
+	return func() bool { return true }
+}
 
 // A post a watch matches fires its failure, and the row lands through the say the sentinel holds. [[spec/tickets/hooks-test-reads-fired-row]]
 // level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own

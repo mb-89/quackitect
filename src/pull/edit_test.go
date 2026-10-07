@@ -5,7 +5,6 @@ package pull
 
 import (
 	"encoding/json"
-	"os"
 	"testing"
 )
 
@@ -74,9 +73,9 @@ func TestJSNumber(t *testing.T) {
 // The cases the work tab and the JS verb share. [[spec/tickets/view-actions-run-through-verbs]]
 func TestPlaceValueOverTheSharedCases(t *testing.T) {
 	t.Parallel()
-	text, err := os.ReadFile("../tui/work/testdata/places.json")
-	if err != nil {
-		t.Fatal(err)
+	text, held := OSDisk{Root: ".."}.Read("tui/work/testdata/places.json")
+	if !held {
+		t.Fatal("the shared cases stand nowhere")
 	}
 	var shared struct {
 		Rows  []PlaceRow `json:"rows"`
@@ -85,7 +84,7 @@ func TestPlaceValueOverTheSharedCases(t *testing.T) {
 			N                int
 		} `json:"cases"`
 	}
-	if err := json.Unmarshal(text, &shared); err != nil || len(shared.Cases) == 0 {
+	if err := json.Unmarshal([]byte(text), &shared); err != nil || len(shared.Cases) == 0 {
 		t.Fatalf("the shared cases read %v, %v", shared, err)
 	}
 	for _, one := range shared.Cases {

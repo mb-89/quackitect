@@ -4,8 +4,8 @@
 
 export function http() {
   return {
-    async send(url, { method = "GET", headers = {}, body } = {}) {
-      const answer = await fetch(url, { method, headers, body });
+    async send(url, { method = "GET", headers = {}, body, signal } = {}) {
+      const answer = await fetch(url, { method, headers, body, signal });
       return {
         status: answer.status,
         text: await answer.text(),

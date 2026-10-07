@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -21,12 +20,16 @@ const (
 	retroNewMinted   = "SE_MINTED"
 )
 
-func init() { register("retro new", retroNewVerb(retroRoot, retroMintRunme)) }
+func init() {
+	register("retro new", retroNewVerb(quietBox, retroMintRunme))
+}
 
 // The verb: mints the retro off its route, writes the reason into its ask, opens it and pulls it. [[spec/design_input/the-agent-pulls-tickets]]
-func retroNewVerb(root func() string, run retroMintRun) twin {
+func retroNewVerb(box func() boxDoors, run retroMintRun) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		home := root()
+		d := box()
+		disk := d.disk
+		home := retroRootOf(d)
 		rest := argv[min(len(argv), 2):]
 		name := retroNewFlag(rest, "--name")
 		if name == "" {
@@ -39,7 +42,7 @@ func retroNewVerb(root func() string, run retroMintRun) twin {
 		}
 		path := retroMintTickets + "/" + name + ".md"
 		at := filepath.Join(home, filepath.FromSlash(path))
-		if _, err := os.Stat(at); err == nil {
+		if disk.stands(at) {
 			fmt.Fprintf(errs, "%s stands already. Name a retro nothing holds yet.\n", path)
 			return exitFailed
 		}
@@ -48,9 +51,9 @@ func retroNewVerb(root func() string, run retroMintRun) twin {
 			retroNewSays(errs, ran.errs)
 			return exitFailed
 		}
-		text, err := os.ReadFile(at)
+		text, err := disk.read(at)
 		if err == nil {
-			err = os.WriteFile(at, []byte(retroNewWithWhy(string(text), why)), 0o644)
+			err = disk.write(at, []byte(retroNewWithWhy(string(text), why)), 0o644)
 		}
 		if err != nil {
 			fmt.Fprintln(errs, err)
@@ -59,7 +62,7 @@ func retroNewVerb(root func() string, run retroMintRun) twin {
 		opened := run(home, []string{retroMintRunmeAt, "ticket", "open", name}, env)
 		retroNewSays(errs, opened.errs)
 		if opened.code != 0 {
-			_ = os.Remove(at)
+			_ = disk.remove(at)
 			return exitFailed
 		}
 		pulled := run(home, []string{retroMintRunmeAt, "ticket", "pull", name}, map[string]string{workRoot: home, retroNewMinted: name})

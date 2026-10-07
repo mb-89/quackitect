@@ -3,13 +3,9 @@
 // [[spec/tickets/read-verbs-port-to-go]]
 package main
 
-import (
-	"io"
+import "io"
 
-	"quackitect/src/index"
-)
-
-func init() { register("notes", notesVerb(index.Ask)) }
+func init() { register("notes", notesVerb(askIndex)) }
 
 // notes off the ask, with the words as the index reads them. [[spec/tickets/read-verbs-port-to-go]]
 func notesVerb(ask asker) twin {

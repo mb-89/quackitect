@@ -6,7 +6,6 @@ package hooks
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -24,7 +23,7 @@ func ridingDoor(t *testing.T, c *calls) *Door {
 	})
 	return New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
-		Call: c.call, Ops: (&book{}).of, Now: func() time.Time { return fixed },
+		Call: c.call, Ops: (&book{}).of, Clock: qtest.NewFake(fixed),
 	})
 }
 

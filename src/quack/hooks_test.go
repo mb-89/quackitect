@@ -5,7 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -40,7 +40,7 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 	if folds := strings.Join(s.Folds("session/<id>/"), " "); folds != "session/<id>/fill session/<id>/last session/<id>/reports" {
 		t.Fatalf("the folds under session/ read %q, and want the fill, the last and the reports", folds)
 	}
-	door := hooks.New(hooks.Outside{Store: s, As: hook.as, Bound: hook.bound})
+	door := hooks.New(hooks.Outside{Store: s, As: hook.as, Bound: hook.bound, Clock: wall})
 	if _, err := door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{"tool": "Read", "session_id": "s1"}, Fill: 900}); err != nil {
 		t.Fatal(err)
 	}
@@ -56,21 +56,15 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 // The command rules read the name cap off the root's config and the cloud flag off the environment. [[spec/tickets/cage-command-rules-port]]
 func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 	root := t.TempDir()
-	at := filepath.Join(root, "spec", "config")
-	if err := os.MkdirAll(at, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"names":{"words":3}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	seedTree(t, root, map[string]string{"spec/config/level0.json": `{"names":{"words":3}}`})
 	for _, name := range cloudVariables {
 		t.Setenv(name, "")
 	}
-	if said := commandSettings(root); said.Words != 3 || said.Cloud {
+	if said := commandSettings(quietBox(), root); said.Words != 3 || said.Cloud {
 		t.Fatalf("the settings read %+v, and want three words off the box's desk", said)
 	}
 	t.Setenv(cloudVariables[0], "1")
-	if said := commandSettings(root); !said.Cloud {
+	if said := commandSettings(quietBox(), root); !said.Cloud {
 		t.Fatalf("the settings read %+v, and want the cloud flag", said)
 	}
 	if said := gitRead(root, "no-such-verb"); said != "" {
@@ -82,15 +76,9 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 func TestCommandSettingsReadTheHoldKeys(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	at := filepath.Join(root, "spec", "config")
-	if err := os.MkdirAll(at, 0o755); err != nil {
-		t.Fatal(err)
-	}
 	config := `{"stop":{"hold":"finish"},"ask":{"wanted":"short"},"engine":{"binding":"god"},"grace":{"finish":3,"update":2},"plan":{"everyCalls":4,"grace":1,"mostOpen":5},"helper":{"find":"haiku","change":"opus","decide":"opus"}}`
-	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(config), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	body, _ := json.Marshal(commandSettings(root))
+	seedTree(t, root, map[string]string{"spec/config/level0.json": config})
+	body, _ := json.Marshal(commandSettings(quietBox(), root))
 	var said map[string]any
 	if err := json.Unmarshal(body, &said); err != nil {
 		t.Fatal(err)

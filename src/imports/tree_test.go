@@ -5,6 +5,7 @@ package imports_test
 
 import (
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -61,6 +62,11 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 	if len(loaded) == 0 {
 		t.Fatal("the load answers no package")
 	}
+	root, err := filepath.Abs("../..")
+	if err != nil {
+		t.Fatal(err)
+	}
+	owned := imports.Owned(root)
 	graph := map[string][]string{}
 	for _, one := range loaded {
 		if strings.HasSuffix(one.PkgPath, ".test") {
@@ -76,14 +82,17 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 				t.Error(fault)
 			}
 		}
-		for _, fault := range imports.FaultsIn(one.PkgPath, imported, imports.CarriesIO(one.Syntax)) {
+		for _, fault := range imports.FaultsIn(one.PkgPath, imported, owned, imports.CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
-		for _, fault := range imports.RendererFaults(one.PkgPath, one.Fset, one.Syntax) {
+		for _, fault := range imports.RendererFaults(one.PkgPath, one.Fset, one.Syntax, owned) {
 			t.Error(fault)
 		}
 		for _, fault := range imports.SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
+		}
+		for _, fault := range imports.WalkFaults(root, one.Fset, one.Syntax) {
+			t.Errorf("%s: %s", one.Fset.Position(fault.At()), fault)
 		}
 	}
 	for _, folder := range imports.WindowFolders() {
@@ -101,10 +110,10 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 
 func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
 	t.Parallel()
-	if said := imports.Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}, nil); len(said) != 0 {
 		t.Fatalf("src/modulesx reads as a module: %v", said)
 	}
-	if said := imports.Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}, nil); len(said) != 0 {
 		t.Fatalf("the q core reads as a door: %v", said)
 	}
 }

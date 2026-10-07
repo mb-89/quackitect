@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -151,7 +150,7 @@ func (d landingDoors) filesUnder(where string) []string {
 	var out []string
 	var into func(at string)
 	into = func(at string) {
-		found, err := os.ReadDir(filepath.Join(d.root, filepath.FromSlash(at)))
+		found, err := d.box.disk.list(filepath.Join(d.root, filepath.FromSlash(at)))
 		if err != nil {
 			return
 		}
@@ -182,7 +181,7 @@ func (d landingDoors) writtenFiles() ([]string, map[string]string, []string) {
 	var read, skipped []string
 	texts := map[string]string{}
 	for _, one := range d.filesUnder(".") {
-		said, err := os.ReadFile(d.at(one))
+		said, err := d.box.disk.read(d.at(one))
 		if err != nil {
 			continue
 		}
@@ -197,6 +196,12 @@ func (d landingDoors) writtenFiles() ([]string, map[string]string, []string) {
 }
 
 func (d landingDoors) at(path string) string { return filepath.Join(d.root, filepath.FromSlash(path)) }
+
+// The modes a rewritten file and a made folder take. [[spec/design_output/index#a-rename-reaches-a-name]]
+const (
+	renamedMode       = 0o644
+	renamedFolderMode = 0o755
+)
 
 // A closed ticket keeps its text, because the ticket door refuses its fields to every hand. [[spec/tickets/rename-rewrites-each-link-once]]
 func keepsItsText(path, text string) bool {
@@ -213,7 +218,7 @@ func (d landingDoors) renamingText(from, to string) renamed {
 			continue
 		}
 		if said := renamedForms(text, [][2]string{{from, to}}); said != text {
-			if err := os.WriteFile(d.at(file), []byte(said), 0o644); err != nil {
+			if err := d.box.disk.write(d.at(file), []byte(said), renamedMode); err != nil {
 				return renamed{why: err.Error()}
 			}
 			wrote = append(wrote, file)
@@ -225,10 +230,10 @@ func (d landingDoors) renamingText(from, to string) renamed {
 // The move: the folder carries whole, then every reach rewrites, and the journal holds both halves. [[spec/design_output/index#a-rename-reaches-a-name]]
 func (d landingDoors) renaming(from, to string) renamed {
 	source, target := d.at(from), d.at(to)
-	if !standsUnder("", source) {
+	if !standsUnder(d.box.disk, "", source) {
 		return renamed{why: from + " stands nowhere under this tree."}
 	}
-	if standsUnder("", target) {
+	if standsUnder(d.box.disk, "", target) {
 		return renamed{why: to + " stands already, so the move stops."}
 	}
 	held := d.filesUnder(from)
@@ -237,10 +242,10 @@ func (d landingDoors) renaming(from, to string) renamed {
 	}
 	order, journal := d.movesOf(held, from, to)
 	// The folder moves whole, so a folder the walk skips and a picture's bytes move with it. [[spec/design_output/index#a-rename-reaches-a-name]]
-	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+	if err := d.box.disk.makeAll(filepath.Dir(target), renamedFolderMode); err != nil {
 		return renamed{why: err.Error()}
 	}
-	if err := os.Rename(source, target); err != nil {
+	if err := d.box.disk.rename(source, target); err != nil {
 		return renamed{why: err.Error()}
 	}
 	// Every reader of the tree asks git for its file list, so the move reaches git too. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -256,7 +261,7 @@ func (d landingDoors) renaming(from, to string) renamed {
 		if said == text {
 			continue
 		}
-		if err := os.WriteFile(d.at(file), []byte(said), 0o644); err != nil {
+		if err := d.box.disk.write(d.at(file), []byte(said), renamedMode); err != nil {
 			return renamed{why: err.Error()}
 		}
 		wrote = append(wrote, file)
@@ -278,7 +283,7 @@ func (d landingDoors) movesOf(files []string, from, to string) ([]string, map[st
 	var order []string
 	out := map[string]*journaled{}
 	for _, file := range files {
-		said, err := os.ReadFile(d.at(file))
+		said, err := d.box.disk.read(d.at(file))
 		if err != nil || !readsAsText(said) {
 			continue
 		}
@@ -314,10 +319,10 @@ func (d landingDoors) journals(from, to string, order []string, journal map[stri
 		return err
 	}
 	folder := d.at(undoFolder)
-	if err := os.MkdirAll(folder, 0o755); err != nil {
+	if err := d.box.disk.makeAll(folder, renamedFolderMode); err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(folder, edits.NameOf(stamp)), append(text, '\n'), 0o644)
+	return d.box.disk.write(filepath.Join(folder, edits.NameOf(stamp)), append(text, '\n'), renamedMode)
 }
 
 // Several holds name several tickets, and a move belongs to none of them alone. [[spec/tickets/journal-the-rename-verb]]

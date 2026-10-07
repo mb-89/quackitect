@@ -17,7 +17,7 @@ func TestRetroAuditHoldsWhileATrialStandsOpenAndNamesEachOne(t *testing.T) {
 	retroMintWrite(t, root, "spec/tickets/a-trial.md", retroAuditTrial("a trial", "open"))
 	retroMintWrite(t, root, "spec/tickets/a-closed-trial.md", retroAuditTrial("a closed trial", "closed"))
 	retroMintWrite(t, root, "spec/tickets/a-plain-one.md", "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/standard]]\n---\n\n# Ask\n\nA thing.\n")
-	if got := retroAuditOpenTrials(root); len(got) != 1 || got[0] != "a-trial" {
+	if got := retroAuditOpenTrials(hq2RetroDisk(root), root); len(got) != 1 || got[0] != "a-trial" {
 		t.Fatalf("the open trials read %v", got)
 	}
 }
@@ -27,14 +27,14 @@ func TestRetroAuditAnswersAWaitOverAnOpenTrialAndPassesOverNone(t *testing.T) {
 	t.Parallel()
 	held := t.TempDir()
 	retroMintWrite(t, held, "spec/tickets/a-trial.md", retroAuditTrial("a trial", "open"))
-	code, out, _ := retroMintHeard(retroAuditVerb(func() string { return held }), "retro", "audit")
+	code, out, _ := retroMintHeard(retroAuditVerb(retroBoxAt(held)), "retro", "audit")
 	want := "1 experiment(s) stand open. Take each one to its decide step, then run this again:\n  a-trial\n"
 	if code != 1 || out != want {
 		t.Fatalf("the audit answers %d and prints %q", code, out)
 	}
 	clear := t.TempDir()
 	retroMintWrite(t, clear, "spec/tickets/a-trial.md", retroAuditClosed("", "keep"))
-	code, out, _ = retroMintHeard(retroAuditVerb(func() string { return clear }), "retro", "audit")
+	code, out, _ = retroMintHeard(retroAuditVerb(retroBoxAt(clear)), "retro", "audit")
 	if code != 0 || out != "Every experiment stands decided, so the retro closes.\n" {
 		t.Fatalf("the audit answers %d and prints %q", code, out)
 	}
@@ -53,7 +53,7 @@ func TestRetroAuditNamesAClosedTrialWhoseDecisionStandsEmpty(t *testing.T) {
 	retroMintWrite(t, root, "spec/tickets/a-silent-trial.md", retroAuditClosed("", ""))
 	retroMintWrite(t, root, "spec/tickets/a-kept-trial.md", retroAuditClosed("", "keep"))
 	retroMintWrite(t, root, "spec/tickets/a-grown-trial.md", retroAuditClosed("reason: became\nsuccessors: [a-successor]\n", ""))
-	code, out, _ := retroMintHeard(retroAuditVerb(func() string { return root }), "retro", "audit")
+	code, out, _ := retroMintHeard(retroAuditVerb(retroBoxAt(root)), "retro", "audit")
 	want := "1 experiment(s) stand closed with no decision and no successor. Write the decision under each one's decide step, then run this again:\n  a-silent-trial\n"
 	if code != 1 || out != want {
 		t.Fatalf("the audit answers %d and prints %q", code, out)

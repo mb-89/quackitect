@@ -5,16 +5,17 @@
 package imports_test
 
 import (
-	"os"
-	"path/filepath"
 	"sync"
 	"testing"
+
+	"golang.org/x/tools/go/analysis/analysistest"
 
 	"quackitect/src/q/qtest"
 )
 
 // The packages of the import rules: each refused import carries a want comment, and a clean one carries none. [[spec/design_output/model#the-build-checks-imports]]
 var planted = map[string]string{
+	"doors/disk/owns.yaml":     "disk:\n  go: [os]\n",
 	"doors/disk/disk.go":       "package disk\n\nfunc Read() string { return \"\" }\n",
 	"doors/nosy/nosy.go":       "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
 	"modules/nosy/nosy.go":     "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
@@ -37,32 +38,27 @@ var flagged = map[string]string{
 	"modules/lonely/lonely.go":           "package lonely\n\ntype FakeThing struct{} // want `quackitect/src/modules/lonely declares FakeThing with no contract suite beside it`\n",
 }
 
-// The planted trees built so far, which TestMain removes. [[spec/design_output/model#the-build-checks-imports]]
+// The removals of the planted trees built so far, which TestMain runs. [[spec/design_output/model#the-build-checks-imports]]
 var (
 	builtMu sync.Mutex
-	built   []string
+	built   []func()
 )
 
-// A GOPATH holding each set's files under quackitect/src. [[spec/design_output/model#the-build-checks-imports]]
+// A GOPATH holding each set's files under quackitect/src, written by the analysis test's own writer. [[spec/tickets/test-walks-move-onto-fakes]]
 func plantTree(sets ...map[string]string) string {
-	dir, err := os.MkdirTemp("", "imports-planted-")
+	under := map[string]string{}
+	for _, set := range sets {
+		for rel, text := range set {
+			under["quackitect/src/"+rel] = text
+		}
+	}
+	dir, removal, err := analysistest.WriteFiles(under)
 	if err != nil {
 		panic(err)
 	}
 	builtMu.Lock()
-	built = append(built, dir)
+	built = append(built, removal)
 	builtMu.Unlock()
-	for _, set := range sets {
-		for rel, text := range set {
-			at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
-			if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-				panic(err)
-			}
-			if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-				panic(err)
-			}
-		}
-	}
 	return dir
 }
 
@@ -73,9 +69,8 @@ var plantedTree = qtest.Shared(func() string { return plantTree(planted) })
 var flaggedTree = qtest.Shared(func() string { return plantTree(planted, flagged) })
 
 func TestMain(m *testing.M) {
-	code := m.Run()
-	for _, dir := range built {
-		_ = os.RemoveAll(dir)
+	m.Run()
+	for _, removal := range built {
+		removal()
 	}
-	os.Exit(code)
 }

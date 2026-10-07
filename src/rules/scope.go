@@ -24,16 +24,15 @@ type turn struct {
 
 // The sections in the order a path meets them. [[spec/design_output/rules#a-rule-reads-its-paths]]
 var sections = []section{
-	{glob: "*.{md,markdown,txt}", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceParagraph.ShapeAnswer", false}, {"VoiceParagraph.ParagraphAnswer", false}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceVale.CodeComment", false}, {"VoiceVale.CodeHeader", false}, {"VoiceVale.DoorsOnly", false}, {"VoiceVale.OutsideInDoors", false}, {"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.DigitInProse", false}}},
-	{glob: "*.{js,ts,tsx,go}", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceVale.Private", false}, {"VoiceVale.CodeComment", true}, {"VoiceVale.CodeHeader", true}, {"VoiceVale.CountedList", false}, {"VoiceVale.DoorsOnly", true}, {"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.DigitInProse", false}, {"VoiceParagraph.Characters", false}, {"VoiceParagraph.ListItem", false}, {"VoiceParagraph.CodeSpans", false}, {"VoiceParagraph.Markup", false}, {"VoiceParagraph.Shape", false}, {"VoiceParagraph.ShapeAnswer", false}, {"VoiceParagraph.ParagraphAnswer", false}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceParagraph.Vocabulary", false}}},
-	{glob: "**/src/doors/*.js", turns: []turn{{"VoiceVale.DoorsOnly", false}, {"VoiceVale.OutsideInDoors", false}}},
-	{glob: "**/src/doors/fake/*.js", turns: []turn{{"VoiceVale.DoorsOnly", false}, {"VoiceVale.OutsideInDoors", false}}},
-	{glob: "**/src/{modules,q,quack}/**/*.go", turns: []turn{{"VoiceVale.DoorsOnly", false}, {"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.OutsideInDoors", false}}},
-	{glob: "**/src/extension/editor*.js", turns: []turn{{"VoiceVale.DoorsOnly", false}}},
+	{glob: "*.{md,markdown,txt}", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceParagraph.ShapeAnswer", false}, {"VoiceParagraph.ParagraphAnswer", false}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceVale.CodeComment", false}, {"VoiceVale.CodeHeader", false}, {"VoiceVale.OutsideInDoors", false}, {"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.DigitInProse", false}}},
+	{glob: "*.{js,ts,tsx,go}", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceVale.Private", false}, {"VoiceVale.CodeComment", true}, {"VoiceVale.CodeHeader", true}, {"VoiceVale.CountedList", false}, {"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.DigitInProse", false}, {"VoiceParagraph.Characters", false}, {"VoiceParagraph.ListItem", false}, {"VoiceParagraph.CodeSpans", false}, {"VoiceParagraph.Markup", false}, {"VoiceParagraph.Shape", false}, {"VoiceParagraph.ShapeAnswer", false}, {"VoiceParagraph.ParagraphAnswer", false}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceParagraph.Vocabulary", false}}},
+	{glob: "**/src/doors/*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
+	{glob: "**/src/doors/fake/*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
+	{glob: "**/src/{modules,q,quack}/**/*.go", turns: []turn{{"VoiceVale.FakeDoorsInTest", false}, {"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/src/extension/*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/.claude/skills/inset-probe/*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
-	{glob: "**/.claude/skills/level0/hooks/*.ts", turns: []turn{{"VoiceVale.DoorsOnly", false}, {"VoiceVale.OutsideInDoors", false}}},
-	{glob: "**/src/stub/.claude/skills/level0/hooks/*.ts", turns: []turn{{"VoiceVale.DoorsOnly", false}, {"VoiceVale.OutsideInDoors", false}}},
+	{glob: "**/.claude/skills/level0/hooks/*.ts", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
+	{glob: "**/src/stub/.claude/skills/level0/hooks/*.ts", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/test/level0/*.js", turns: []turn{{"VoiceVale.FakeDoorsInTest", true}, {"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/test/contract/*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/src/scripts/{cli*,vehicle-verb,mint-verb}.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
@@ -51,7 +50,7 @@ var sections = []section{
 	{glob: "**/spec/vocabulary/*.yml", based: []string{"VoiceShape"}, turns: []turn{{"VoiceShape.GuidanceEnv", false}, {"VoiceShape.GuidanceChapter", false}, {"VoiceShape.GuidanceCap", false}, {"VoiceShape.StopRule", false}}},
 	{glob: "*.{sh,ps1}", based: []string{"VoiceScript"}},
 	{glob: "**/spec/config/stop/*.yml", based: []string{"VoiceShape"}, turns: []turn{{"VoiceShape.GuidanceEnv", false}, {"VoiceShape.GuidanceChapter", false}, {"VoiceShape.GuidanceCap", false}, {"VoiceShape.VocabularyEntry", false}}},
-	{glob: "**/prototype/**/*.js", based: []string{}, turns: []turn{{"VoiceVale.CodeComment", false}, {"VoiceVale.CodeHeader", false}, {"VoiceVale.DoorsOnly", false}}},
+	{glob: "**/prototype/**/*.js", based: []string{}, turns: []turn{{"VoiceVale.CodeComment", false}, {"VoiceVale.CodeHeader", false}}},
 	{glob: "{_*,**/_*}", based: []string{}},
 	{glob: "**/src/imports/baseline/*.txt", based: []string{}},
 }

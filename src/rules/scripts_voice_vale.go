@@ -193,34 +193,6 @@ func digitInProse(in scriptIn) []scriptMatch {
 	return out
 }
 
-var valePure = []string{"path", "url", "test", "assert", "assert/strict"}
-var valeImport = regexp.MustCompile(`from ["']node:`)
-var valeRequire = regexp.MustCompile(`require\(["']node:`)
-var valeOutside = []*regexp.Regexp{regexp.MustCompile(`\bDate\.now\(`), regexp.MustCompile(`\bnew Date\(\)`), regexp.MustCompile(`\bMath\.random\(`)}
-
-// Whether an import line names a pure node module alone. [[spec/design_output/rules#a-script-answers-offsets]]
-func valeIsPure(t string) bool {
-	for _, name := range valePure {
-		if strings.Contains(t, `"node:`+name+`"`) || strings.Contains(t, `'node:`+name+`'`) {
-			return true
-		}
-	}
-	return false
-}
-
-// Whether a code line reaches outside past a door. [[spec/design_output/rules#a-script-answers-offsets]]
-func valeReachesOut(t string) bool {
-	if valeImport.MatchString(t) || valeRequire.MatchString(t) {
-		return !valeIsPure(t)
-	}
-	for _, shape := range valeOutside {
-		if shape.MatchString(t) {
-			return true
-		}
-	}
-	return false
-}
-
 // Every line past a line comment that refuses answers its whole line. [[spec/design_output/rules#a-script-answers-offsets]]
 func valeCodeRefuses(text string, refuses func(t string) bool) []scriptMatch {
 	out := []scriptMatch{}
@@ -231,11 +203,6 @@ func valeCodeRefuses(text string, refuses func(t string) bool) []scriptMatch {
 		}
 	}
 	return out
-}
-
-// VoiceVale.DoorsOnly: an impure node import, a clock read or a random draw outside a door. [[spec/design_output/rules#a-script-answers-offsets]]
-func doorsOnly(in scriptIn) []scriptMatch {
-	return valeCodeRefuses(in.Text, valeReachesOut)
 }
 
 var valeRealDoor = regexp.MustCompile(`doors/(disk|proc|git|clock|log)\.js`)

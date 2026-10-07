@@ -118,7 +118,7 @@ type Outside struct {
 	Bound func(local string) string
 	Call  Call
 	Ops   func(caller string) []Op
-	Now   func() time.Time
+	Clock q.Clock
 	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
 	Shadow func(row map[string]any) error
 	// The tree a post naming no root stands in, what the config says there, and a git read's output there. None reads no tree, no cap and no git. [[spec/tickets/cage-command-rules-port]]
@@ -330,12 +330,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
-func (d *Door) now() time.Time {
-	if d.from.Now == nil {
-		return time.Now()
-	}
-	return d.from.Now()
-}
+func (d *Door) now() time.Time { return d.from.Clock.Now() }
 
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {

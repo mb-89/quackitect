@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"quackitect/src/proc"
+	"quackitect/src/q/qtest"
 )
 
 // The fake process door taught biome, and the commands it takes. [[spec/design_output/doors#the-process-door]]
@@ -192,7 +193,7 @@ func toolsServer(t *testing.T, files map[string]string, tools *Tools) (*Server, 
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
-		Tools: tools, Files: func() map[string]string { return files },
+		Tools: tools, Files: func() map[string]string { return files }, Clock: qtest.Wall(),
 	})
 	var (
 		mu     sync.Mutex

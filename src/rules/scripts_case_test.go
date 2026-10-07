@@ -5,7 +5,7 @@ package rules // level0: InPackageTest - the cases drive the unexported run, scr
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the rule files the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"

@@ -28,19 +28,20 @@ Three checks hold the rules above:
 
 | check | what it refuses | where it runs |
 |---|---|---|
-| `DoorsOnly` | a `node:` import, a `Date.now`, a `new Date()`, a `Math.random` | outside `src/doors` |
+| `WalksAroundADoor` | a name a door owns, and a `node:` module no door declares | outside the door owning it |
 | `FakeDoorsInTest` | a real door | inside `test/level0` |
 | `./RUNME.sh doors` | a door standing without a contract test | over both folders |
 
-Five modules pass `DoorsOnly`, because they reach nothing outside: `node:path`,
-`node:url`, `node:test`, `node:assert` and `node:assert/strict`. Both Vale rules
-read the whole file, because a rule over code needs `scope: raw`: on a code file
-Vale otherwise sees comments alone. The third rule spans two folders, which no
-pattern holds, so the command line holds it and `check` runs it.
+The guard passes the `node:` modules that reach nothing outside, and
+`src/owns/script.go` lists them. The `FakeDoorsInTest` rule reads the whole
+file, as a rule over code does. The third rule spans two folders, which no
+pattern holds, so the command line holds it and `check` runs it. The hooks
+module declares its own outside over the clock, because the engine hands it
+`$`, and `$` carries no clock.
 
-The hooks module is exempt, because its environment carries no `node:` at all.
-The engine interface `$` is its door layer already, and a test drives it by
-handing in a `$` of its own.
+`DoorsOnly`, a Vale rule, held the JavaScript while every door in it stood at
+report. It retired once a declaration owned `Math.random` and the guard refused
+a `node:` module no door declared, since the guard then refused all it did.
 
 An earlier line wrote fifteen rules of testing craft as guidance and enforced
 none of them. The rules were right and the suite grew slow anyway, which is the

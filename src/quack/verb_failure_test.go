@@ -5,7 +5,6 @@ package main // level0: InPackageTest - no external test imports a main package,
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -25,7 +24,7 @@ const (
 // A root holding the failure schema and the files named under it, and the failure verb over it at the case's now. [[spec/design_output/failures#an-agent-raises-by-verb]]
 func failureOver(t *testing.T, files map[string]string) (string, twin) {
 	t.Helper()
-	schema, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(failureSchema)))
+	schema, err := realDisk().read(filepath.Join("..", "..", filepath.FromSlash(failureSchema)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,15 +35,15 @@ func failureOver(t *testing.T, files map[string]string) (string, twin) {
 	}
 	for at, text := range seeded {
 		path := filepath.Join(root, filepath.FromSlash(at))
-		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		if err := realDisk().makeAll(filepath.Dir(path), 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
+		if err := realDisk().write(path, []byte(text), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
 	return root, failureVerb(func() (failureDoors, error) {
-		return failureDoors{root: root, now: func() time.Time { return failureNow }}, nil
+		return failureDoors{root: root, now: func() time.Time { return failureNow }, disk: realDisk()}, nil
 	})
 }
 
@@ -104,7 +103,7 @@ func TestFailureNewStagesTheNodeItWrites(t *testing.T) {
 	root, _ := failureOver(t, map[string]string{})
 	var staged []string
 	verb := failureVerb(func() (failureDoors, error) {
-		return failureDoors{root: root, now: func() time.Time { return failureNow }, stage: func(path string) bool {
+		return failureDoors{root: root, now: func() time.Time { return failureNow }, disk: realDisk(), stage: func(path string) bool {
 			staged = append(staged, path)
 			return true
 		}}, nil
@@ -128,7 +127,7 @@ func TestFailureNewRefusesANodeWithNoRemedy(t *testing.T) {
 	if !strings.Contains(errs.String(), "remedies") && !strings.Contains(errs.String(), "bare names no remedy") {
 		t.Errorf("new says %q, and names no missing remedy", errs.String())
 	}
-	if _, err := os.Stat(filepath.Join(root, "spec", "failures", "bare.md")); err == nil {
+	if realDisk().stands(filepath.Join(root, "spec", "failures", "bare.md")) {
 		t.Error("new writes a node with no remedy")
 	}
 }
@@ -156,7 +155,7 @@ func TestFailureNewRefusesEachShapeOffTheSchema(t *testing.T) {
 		if held, _ := readIn(root, "spec/failures/leaf-held.md"); held != heldFailure {
 			t.Errorf("%s: new writes over the standing node", name)
 		}
-		if _, err := os.Stat(filepath.Join(root, "spec", "escape.md")); err == nil {
+		if realDisk().stands(filepath.Join(root, "spec", "escape.md")) {
 			t.Errorf("%s: new writes outside spec/failures", name)
 		}
 	}

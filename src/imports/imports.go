@@ -7,13 +7,17 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"os" // level0: OutsideInDoors - fakesuite reads the folder a package stands in, as a build check reads source
+	"io/fs"
+	"os" // level0: OutsideInDoors - fakesuite and the declarations read the folders a package stands in, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"golang.org/x/tools/go/analysis"
+
+	"quackitect/src/owns"
 )
 
 // The generated main of a package's tests, which no rule reads, and the files naming a suite. [[spec/design_output/model#the-build-checks-imports]]
@@ -46,28 +50,96 @@ var window = map[string][]string{
 const indexPath = module + "src/index"
 
 type rule struct {
-	from, to func(string) bool
-	says     string
-	past     func(from, to string) bool
-	flagged  bool
-	spare    func(pkg, file string) bool
+	from    func(string) bool
+	to      func(path string, owned []string) bool
+	says    string
+	past    func(from, to string) bool
+	flagged bool
+	spare   func(pkg, file string) bool
 }
 
 var (
-	noModule = rule{from: seesModules, to: isModule, says: "a module, a door, the index or a renderer imports no other module", past: ownModule}
+	noModule = rule{from: seesModules, to: func(path string, _ []string) bool { return isModule(path) }, says: "a module, a door, the index or a renderer imports no other module", past: ownModule}
 	onlyQ    = rule{from: isModule, to: pastQ, says: "a module imports q, q/qtest and the pure standard library alone", flagged: true}
-	ioOnly   = rule{from: isCore, to: reachesOut, says: "the core imports no os, os/exec, net or net/http"}
-	drawOnly = rule{from: isRenderer, to: reachesOut, says: "a renderer imports no os, os/exec, net or net/http outside its door.go", spare: beside}
+	ioOnly   = rule{from: isCore, to: reachesOut, says: "the core imports no package a door owns whole"}
+	drawOnly = rule{from: isRenderer, to: reachesOut, says: "a renderer imports no package a door owns whole outside its door.go", spare: beside}
 )
 
-// The imports ioonly refuses, per [[spec/design_output/model#the-build-checks-imports]].
-var outside = []string{"os", "os/exec", "net", "net/http"}
-
 // The tree's own readers a module takes beside q, each importing the pure standard library alone, the one q rests on among them. [[spec/tickets/tickets-becomes-a-module]]
-var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front"}
+var pureTree = []string{module + "src/yaml", module + "src/ticket", module + "src/pointer", module + "src/note", module + "src/front", module + "src/owns"}
 
-// The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
-var impure = []string{"os", "io/fs", "io/ioutil", "net", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
+// The standard library packages past the pure library that no door owns whole, each with every package below it, per [[spec/design_output/model#the-build-checks-imports]].
+var floor = []string{"io/fs", "io/ioutil", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
+
+// Whether a package reaches the outside: a door owns it whole, or the floor holds it. [[spec/design_output/model#the-build-checks-imports]]
+func impure(path string, owned []string) bool {
+	if slices.Contains(owned, path) {
+		return true
+	}
+	for _, one := range floor {
+		if path == one || strings.HasPrefix(path, one+"/") {
+			return true
+		}
+	}
+	return false
+}
+
+var declared sync.Map
+
+// The packages the declarations under the root own whole. [[spec/design_output/model#the-build-checks-imports]]
+func Owned(root string) []string {
+	return owns.Whole(Doors(root))
+}
+
+// Every door the declarations under the root name, read once a root. [[spec/design_output/doors#a-door-declares-its-names]]
+func Doors(root string) []owns.Door {
+	if held, ok := declared.Load(root); ok {
+		return held.([]owns.Door)
+	}
+	texts := map[string]string{}
+	_ = filepath.WalkDir(root, func(at string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if entry.IsDir() && at != root && (strings.HasPrefix(entry.Name(), ".") || entry.Name() == "node_modules") {
+			return filepath.SkipDir
+		}
+		if rel, err := filepath.Rel(root, at); err == nil && !entry.IsDir() && owns.Declares(rel) {
+			if text, err := os.ReadFile(at); err == nil {
+				texts[filepath.ToSlash(rel)] = string(text)
+			}
+		}
+		return nil
+	})
+	doors, _ := owns.Read(texts, func(rel string) bool {
+		_, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel)))
+		return err == nil
+	})
+	held, _ := declared.LoadOrStore(root, doors)
+	return held.([]owns.Door)
+}
+
+// The folder the module stands in, off the first file of the pass and its package path, or empty. [[spec/design_output/model#the-build-checks-imports]]
+func rootOf(pass *analysis.Pass) string {
+	if len(pass.Files) == 0 {
+		return ""
+	}
+	rel, ok := strings.CutPrefix(strings.TrimSuffix(pass.Pkg.Path(), "_test"), module)
+	folder := filepath.Dir(pass.Fset.File(pass.Files[0].Pos()).Name())
+	root, cut := strings.CutSuffix(folder, string(filepath.Separator)+filepath.FromSlash(rel))
+	if !ok || !cut {
+		return ""
+	}
+	return root
+}
+
+// The packages a door owns whole under the pass's root. [[spec/design_output/model#the-build-checks-imports]]
+func ownedOf(pass *analysis.Pass) []string {
+	if root := rootOf(pass); root != "" {
+		return Owned(root)
+	}
+	return nil
+}
 
 var OnlyQ = &analysis.Analyzer{
 	Name: "onlyq",
@@ -78,7 +150,7 @@ var OnlyQ = &analysis.Analyzer{
 // [[spec/design_output/model#the-build-checks-imports]]
 var IOOnly = &analysis.Analyzer{
 	Name: "ioonly",
-	Doc:  "the core imports no os, os/exec, net or net/http, and a renderer none outside its door.go",
+	Doc:  "the core imports no package a door owns whole, and a renderer none outside its door.go",
 	Run: func(pass *analysis.Pass) (any, error) {
 		if _, err := ioOnly.run(pass); err != nil {
 			return nil, err
@@ -88,7 +160,7 @@ var IOOnly = &analysis.Analyzer{
 }
 
 // The faults of a renderer package's files, which the tree test reads beside the analyzer. [[spec/design_output/model#the-build-checks-imports]]
-func RendererFaults(pkg string, fset *token.FileSet, files []*ast.File) []string {
+func RendererFaults(pkg string, fset *token.FileSet, files []*ast.File, owned []string) []string {
 	out := []string{}
 	for _, file := range files {
 		if drawOnly.spare(pkg, fset.File(file.Pos()).Name()) {
@@ -96,7 +168,7 @@ func RendererFaults(pkg string, fset *token.FileSet, files []*ast.File) []string
 		}
 		for _, spec := range file.Imports {
 			if path, err := strconv.Unquote(spec.Path.Value); err == nil {
-				if fault := drawOnly.fault(pkg, path); fault != "" {
+				if fault := drawOnly.fault(pkg, path, owned); fault != "" {
 					out = append(out, fault)
 				}
 			}
@@ -248,19 +320,19 @@ var NoModule = &analysis.Analyzer{
 }
 
 // [[spec/design_output/model#the-build-checks-imports]]
-func Faults(from string, imported []string) []string {
-	return FaultsIn(from, imported, false)
+func Faults(from string, imported, owned []string) []string {
+	return FaultsIn(from, imported, owned, false)
 }
 
-// The faults of a package, where io says its registration carries q.IO(), which onlyq lets pass. [[spec/design_output/model#the-build-checks-imports]]
-func FaultsIn(from string, imported []string, io bool) []string {
+// The faults of a package, against the packages a door owns whole, where io says its registration carries q.IO(), which onlyq lets pass. [[spec/design_output/model#the-build-checks-imports]]
+func FaultsIn(from string, imported, owned []string, io bool) []string {
 	out := []string{}
 	for _, one := range []rule{noModule, onlyQ, ioOnly} {
 		if one.flagged && io {
 			continue
 		}
 		for _, path := range imported {
-			if fault := one.fault(from, path); fault != "" {
+			if fault := one.fault(from, path, owned); fault != "" {
 				out = append(out, fault)
 			}
 		}
@@ -268,8 +340,8 @@ func FaultsIn(from string, imported []string, io bool) []string {
 	return out
 }
 
-func (one rule) fault(from, path string) string {
-	if !one.from(from) || !one.to(path) || (one.past != nil && one.past(from, path)) {
+func (one rule) fault(from, path string, owned []string) string {
+	if !one.from(from) || !one.to(path, owned) || (one.past != nil && one.past(from, path)) {
 		return ""
 	}
 	return fmt.Sprintf("%s imports %s: %s", from, path, one.says)
@@ -280,6 +352,7 @@ func (one rule) run(pass *analysis.Pass) (any, error) {
 	if strings.HasSuffix(pass.Pkg.Path(), testMain) || (one.flagged && CarriesIO(pass.Files)) {
 		return nil, nil
 	}
+	owned := ownedOf(pass)
 	for _, file := range pass.Files {
 		if one.spare != nil && one.spare(pass.Pkg.Path(), pass.Fset.File(file.Pos()).Name()) {
 			continue
@@ -289,7 +362,7 @@ func (one rule) run(pass *analysis.Pass) (any, error) {
 			if err != nil {
 				continue
 			}
-			if fault := one.fault(pass.Pkg.Path(), path); fault != "" {
+			if fault := one.fault(pass.Pkg.Path(), path, owned); fault != "" {
 				pass.Reportf(spec.Pos(), "%s", fault)
 			}
 		}
@@ -337,17 +410,12 @@ func beside(_, file string) bool {
 	return name == "door.go" || strings.HasSuffix(name, testFile)
 }
 
-func reachesOut(path string) bool {
-	for _, one := range outside {
-		if path == one {
-			return true
-		}
-	}
-	return false
+func reachesOut(path string, owned []string) bool {
+	return slices.Contains(owned, path)
 }
 
 // A module path falls to nomodule, so one import names one fault. [[spec/tickets/the-wiring-file-binds-ports]]
-func pastQ(path string) bool {
+func pastQ(path string, owned []string) bool {
 	if path == module+"src/q" || path == module+"src/q/qtest" || isDoor(path) || isModule(path) {
 		return false
 	}
@@ -360,12 +428,7 @@ func pastQ(path string) bool {
 	if strings.Contains(first, ".") || strings.HasPrefix(path, module) {
 		return true
 	}
-	for _, one := range impure {
-		if path == one || strings.HasPrefix(path, one+"/") {
-			return true
-		}
-	}
-	return false
+	return impure(path, owned)
 }
 
 // A package importing another module breaks nomodule. [[spec/tickets/the-wiring-file-binds-ports]]

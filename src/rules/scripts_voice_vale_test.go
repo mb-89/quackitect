@@ -10,7 +10,6 @@ func TestAValeScriptRefusesTheBranchesTheCorpusMisses(t *testing.T) {
 		{check: "VoiceVale.CodeHeader", text: "// a\n// b\n// c\n// d\n// e\n// f [[x]]\n// g\n// It reads 3 doors.\nexport const one = 1;\n", want: []voicePlaced{{7, [2]int{1, 4}, ""}, {8, [2]int{13, 19}, ""}}},
 		{check: "VoiceVale.CodeComment", text: "#!/usr/bin/env node\n/* head\n */\nexport const one = 1;\n/* a\n   b\n*/\n// eslint: off\nexport const two = 2;\n", want: []voicePlaced{{5, [2]int{1, 4}, ""}, {6, [2]int{1, 4}, ""}, {7, [2]int{1, 2}, ""}}},
 		{check: "VoiceVale.CountedList", text: "The 3 rows below:\n\n| a |\n\nTwo steps here.\n\n1. one\n", want: []voicePlaced{{1, [2]int{5, 10}, ""}, {5, [2]int{1, 9}, ""}}},
-		{check: "VoiceVale.DoorsOnly", text: "const t = Date.now();\nconst f = require('node:fs');\nconst p = require('node:path');\n// Math.random()\nconst r = Math.random();\n", want: []voicePlaced{{1, [2]int{1, 21}, ""}, {2, [2]int{1, 29}, ""}, {5, [2]int{1, 24}, ""}}},
 		{check: "VoiceVale.OutsideInDoors", text: "const a = process.argv;\nimport \"os\"\n", want: []voicePlaced{{1, [2]int{1, 23}, ""}, {2, [2]int{1, 11}, ""}}},
 	})
 }

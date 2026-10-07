@@ -3,7 +3,7 @@
 package rules // level0: InPackageTest - the cases read the unexported parseRule, ruleFiles, swapRow, defaultLevel and defaultScope
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the vocabulary the tree ships, as a build check reads source
 	"path/filepath"
 	"slices"
 	"testing"

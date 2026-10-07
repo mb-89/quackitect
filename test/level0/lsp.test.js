@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { BIN as INDEX } from "../../.claude/skills/level0/lib/index.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { startsServer } from "../../src/extension/extension.js";
 import {
   BIN,
@@ -129,6 +130,25 @@ test("the client the editor builds starts the server again on every close, past 
   const bare = new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
   for (let at = 0; at < 12; at++) await bare.closes();
   assert.equal(bare.starts, 4, "the client's own handler gives up at its cap");
+});
+
+// The pause waits on the clock door the caller hands in, so the client holds no timer of its own. [[spec/design_output/doors#time-is-a-door]]
+test("the client starts the server again once the clock it is handed passes the pause", async () => {
+  const time = fakeClock();
+  const client = clientOf(clientModule(), serverAsk("/at/root", "linux"), time.wait);
+  let closed = false;
+  const closing = client.closes().then(() => {
+    closed = true;
+  });
+  await Promise.resolve();
+  assert.equal(closed, false, "the close waits on the clock");
+  time.tick();
+  await closing;
+  assert.equal(client.starts, 1);
+  await assert.rejects(
+    clientOf(clientModule(), serverAsk("/at/root", "linux")).handler.closed(),
+    "a client handed no clock holds no wait of its own",
+  );
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

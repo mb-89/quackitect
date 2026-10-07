@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 
 	"quackitect/src/modules/hooks"
 )
@@ -18,7 +17,7 @@ type caged struct {
 	E     map[string]any `json:"e"`
 }
 
-func init() { register("cage", cageVerb(os.Stdin)) }
+func init() { register("cage", cageVerb(stdin)) }
 
 // The verb over the input it reads: one deny line where the call stays guarded, and nothing where it passes. An input reading as no JSON exits 1, and the bridgehead passes the call. [[spec/tickets/level0-hooks-hold-no-rule]]
 func cageVerb(input io.Reader) twin {

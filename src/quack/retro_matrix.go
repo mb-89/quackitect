@@ -7,28 +7,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 )
 
 // The report a retro draws. [[spec/guidance/retro/read]]
 const retroReportFile = "report.md"
 
-func init() { register("retro matrix", retroMatrixVerb(retroRoot)) }
+func init() { register("retro matrix", retroMatrixVerb(quietBox)) }
 
 // The verb: refuses a column short of its findings, and writes the report. [[spec/guidance/retro/read]]
-func retroMatrixVerb(root func() string) twin {
+func retroMatrixVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name := root(), retroWordAt(argv, 2)
+		d := box()
+		disk := d.disk
+		base, name := retroRootOf(d), retroWordAt(argv, 2)
 		home := ""
 		if name != "" {
 			home = retroHome(base, name)
 		}
-		if home == "" || !retroIsThere(filepath.Join(home, retroCutsFile)) {
+		if home == "" || !disk.stands(filepath.Join(home, retroCutsFile)) {
 			fmt.Fprintln(errs, "retro matrix reads the chapters of a retro, and none stand: ./RUNME.sh retro chapters <retro>")
 			return 2
 		}
-		columns, faults := retroColumnsOf(home)
+		columns, faults := retroColumnsOf(disk, home)
 		if len(faults) > 0 {
 			for _, one := range faults {
 				fmt.Fprintln(errs, one)
@@ -36,24 +37,24 @@ func retroMatrixVerb(root func() string) twin {
 			return 1
 		}
 		later := retroLater{}
-		if text := retroFileText(filepath.Join(home, retroClassesFile)); text != "" {
+		if text := disk.text(filepath.Join(home, retroClassesFile)); text != "" {
 			later.record = retroRecordOf(text)
 		}
-		if text := retroFileText(filepath.Join(home, retroRatesFile)); text != "" {
+		if text := disk.text(filepath.Join(home, retroRatesFile)); text != "" {
 			later.rates = &retroRates{}
 			if err := json.Unmarshal([]byte(text), later.rates); err != nil {
 				fmt.Fprintf(errs, "%s: %v\n", retroRatesFile, err)
 				return 1
 			}
 		}
-		if text := retroFileText(filepath.Join(home, retroEffectFile)); text != "" {
+		if text := disk.text(filepath.Join(home, retroEffectFile)); text != "" {
 			later.effect = &retroEffectRecord{}
 			if err := json.Unmarshal([]byte(text), later.effect); err != nil {
 				fmt.Fprintf(errs, "%s: %v\n", retroEffectFile, err)
 				return 1
 			}
 		}
-		if err := os.WriteFile(filepath.Join(home, retroReportFile), []byte(retroReportOf(name, columns, later)), 0o666); err != nil {
+		if err := disk.write(filepath.Join(home, retroReportFile), []byte(retroReportOf(name, columns, later)), 0o666); err != nil {
 			fmt.Fprintln(errs, err)
 			return 1
 		}

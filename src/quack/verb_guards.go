@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -35,12 +34,13 @@ func guardsVerb(root func() (string, error)) twin {
 			return text
 		}
 		if slices.Contains(argv, updateFlag) {
+			box := realDisk()
 			for path, text := range baselinesOf(imports.Guards, tracked, read) {
-				if err := os.MkdirAll(filepath.Dir(disk.at(path)), 0o755); err != nil {
+				if err := box.makeAll(filepath.Dir(disk.at(path)), 0o755); err != nil {
 					fmt.Fprintln(errs, err)
 					return exitFailed
 				}
-				if err := os.WriteFile(disk.at(path), []byte(text), 0o644); err != nil {
+				if err := box.write(disk.at(path), []byte(text), 0o644); err != nil {
 					fmt.Fprintln(errs, err)
 					return exitFailed
 				}

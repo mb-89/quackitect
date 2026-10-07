@@ -6,7 +6,7 @@ package rules // level0: InPackageTest - the cases read the unexported scriptMak
 import (
 	_ "embed"
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the rule files and cases the tree ships, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strings"

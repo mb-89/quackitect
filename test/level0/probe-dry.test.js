@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { RESUME } from "../../src/bridge/handover.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
@@ -284,6 +285,18 @@ test("the engine wraps each registration around the ones after it, reads a filte
   assert.deepEqual(heard, origin, "the origin rides the next a hook reads");
   assert.deepEqual(chunks, [{ kind: "text", through: true }]);
   assert.deepEqual(order, ["all:tool.call", "all:tool.call", "all:prompt.submit"]);
+});
+
+test("the harness times its hooks and cuts a hung process on the hand's clock", { timeout: 1000 }, async () => {
+  const time = fakeClock();
+  const it = { clock: time, proc: { start: () => new Promise(() => {}) } };
+  const { $ } = harnessOf(it, "/t/tree", {});
+  const fired = [];
+  $.clock.after(1000, () => fired.push("after"));
+  const ran = $.process.run(["hangs"], { timeoutMs: 2000 });
+  time.tick(2000);
+  assert.deepEqual(fired, ["after"]);
+  await assert.rejects(ran, /no answer in 2000ms/);
 });
 
 test("the harness reads the clone's files, records each post and tool, and hands back the transcript the session keeps", async () => {

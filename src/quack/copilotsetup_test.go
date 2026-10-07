@@ -25,7 +25,7 @@ func TestTheRegistrationsEqualTheTrackedFiles(t *testing.T) {
 
 func TestTheSetupWritesOnceAndLeavesTheClaudeSettings(t *testing.T) {
 	t.Parallel()
-	d, _, _, _ := fakeBoxDoors(t)
+	d, _, _, _ := boxDoorsOnDisk(t)
 	seedTree(t, d.root, map[string]string{".claude/settings.json": "original"})
 	written, err := copilotSetup(d, "vscode")
 	if err != nil || len(written) != 2 {
@@ -41,7 +41,7 @@ func TestTheSetupWritesOnceAndLeavesTheClaudeSettings(t *testing.T) {
 
 func TestTheSetupRefusesAFileAPersonOwns(t *testing.T) {
 	t.Parallel()
-	d, _, _, _ := fakeBoxDoors(t)
+	d, _, _, _ := boxDoorsOnDisk(t)
 	seedTree(t, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
 	if _, err := copilotSetup(d, "vscode"); err == nil || err.Error() != "Keep .github/workflows/copilot-setup-steps.yml: it belongs to you. Merge the generated registration manually." {
 		t.Errorf("the setup answers %v", err)
@@ -59,7 +59,7 @@ func TestTheSetupRefusesAFileAPersonOwns(t *testing.T) {
 
 func TestAutoWaitsOnCopilotAndCloudWritesItsMark(t *testing.T) {
 	t.Parallel()
-	d, runner, _, _ := fakeBoxDoors(t)
+	d, runner, _, _ := boxDoorsOnDisk(t)
 	if written, err := copilotSetup(d, "auto"); err != nil || len(written) != 0 {
 		t.Errorf("auto with no Copilot writes %v, %v", written, err)
 	}
@@ -76,12 +76,12 @@ func TestAutoWaitsOnCopilotAndCloudWritesItsMark(t *testing.T) {
 
 func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
 	t.Parallel()
-	d, runner, _, _ := fakeBoxDoors(t)
+	d, runner, _, _ := boxDoorsOnDisk(t)
 	runner.answers["code --list-extensions"] = ranResult{stdout: "GitHub.copilot-chat\n"}
 	if !copilotDetected(d) {
 		t.Error("an editor listing Copilot reads as none")
 	}
-	d, _, _, _ = fakeBoxDoors(t)
+	d, _, _, _ = boxDoorsOnDisk(t)
 	d.env = func(key string) string { return map[string]string{"TERM_PROGRAM": "vscode"}[key] }
 	if !copilotDetected(d) {
 		t.Error("the editor's terminal reads as no Copilot")
@@ -92,7 +92,7 @@ func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
 	if !copilotCloud(d) {
 		t.Error("the cloud agent's variables read as no cloud")
 	}
-	d, runner, _, _ = fakeBoxDoors(t)
+	d, runner, _, _ = boxDoorsOnDisk(t)
 	d.goos = "windows"
 	copilotDetected(d)
 	if len(runner.ran) == 0 || runner.ran[0][0] != "cmd" {

@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -46,6 +45,7 @@ type checkFake struct {
 func (one *checkFake) doors() checkDoors {
 	d := checkDoors{
 		root:     "/tree",
+		disk:     newFakeDisk(),
 		platform: "linux",
 		verb: func(words []string, _ bool) int {
 			one.held.Lock()
@@ -277,7 +277,7 @@ func TestTestArgv(t *testing.T) {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
 	red := "test/level0/trust.test.js"
-	argv := testArgv(root, []string{red}, testParts[0])
+	argv := testArgv(realDisk(), root, []string{red}, testParts[0])
 	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/chapter.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
@@ -289,7 +289,7 @@ func TestTestArgv(t *testing.T) {
 	if !slices.Contains(argv, "--experimental-test-isolation=none") || !slices.Contains(argv, "--test") {
 		t.Fatalf("the unit run reads %v, and wants one shared process", argv)
 	}
-	if !slices.Contains(testArgv(root, nil, testParts[1]), "test/contract/*.test.js") {
+	if !slices.Contains(testArgv(realDisk(), root, nil, testParts[1]), "test/contract/*.test.js") {
 		t.Fatal("no red list runs the glob")
 	}
 }
@@ -319,8 +319,8 @@ func TestCheckEndsOnTheRedCases(t *testing.T) {
 				return 0, ""
 			}
 			row := caseLine(map[string]any{"file": "test/level0/a.test.js", "name": "a case", "nesting": 0, "ms": 3, "ok": false, "said": "it broke", "line": 12})
-			_ = os.MkdirAll(filepath.Dir(doors.at(testParts[0].times)), 0o755)
-			_ = os.WriteFile(doors.at(testParts[0].times), []byte(row+"\n"), 0o644)
+			_ = doors.disk.makeAll(filepath.Dir(doors.at(testParts[0].times)), checkFolderMode)
+			_ = doors.disk.write(doors.at(testParts[0].times), []byte(row+"\n"), checkFileMode)
 			return 1, ""
 		})
 		if want := []string{"The red cases:", "  test/level0/a.test.js:12: a case: it broke"}; !reflect.DeepEqual(rows, want) {
@@ -488,7 +488,7 @@ func TestCheckVerb(t *testing.T) {
 		}
 	})
 	t.Run("the standing file names a door where its process lives", func(t *testing.T) {
-		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, os.Getpid()): true} {
+		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, quietBox().pid): true} {
 			if indexStands(text) != want {
 				t.Fatalf("%q reads a door %v", text, !want)
 			}
@@ -500,8 +500,8 @@ func TestCheckVerb(t *testing.T) {
 		doors.root = t.TempDir()
 		doors.verb = func(words []string, _ bool) int {
 			if words[0] == "lint" {
-				_ = os.MkdirAll(filepath.Dir(doors.at(lintFile)), 0o755)
-				_ = os.WriteFile(doors.at(lintFile), []byte(`{"stood":[{"file":"src/a.go","source":"tree"}],"erred":[]}`), 0o644)
+				_ = doors.disk.makeAll(filepath.Dir(doors.at(lintFile)), 0o755)
+				_ = doors.disk.write(doors.at(lintFile), []byte(`{"stood":[{"file":"src/a.go","source":"tree"}],"erred":[]}`), 0o644)
 			}
 			return 0
 		}
@@ -574,7 +574,7 @@ func TestTestVerb(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()
 		doors.root = t.TempDir()
-		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, os.Executable)([]string{"test"}, false, io.Discard, io.Discard)
+		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, func() (string, error) { return "/bin/quack", nil })([]string{"test"}, false, io.Discard, io.Discard)
 		if len(fake.runs) != len(testParts) || fake.runs[0][0] != "node" {
 			t.Fatalf("the verb ran %v", fake.runs)
 		}

@@ -20,7 +20,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-func init() { register("mint", mintVerb(index.Root, registeredRepo, time.Now)) }
+func init() { register("mint", mintVerb(index.Root, registeredRepo, wall.Now)) }
 
 // The kind whose mint joins the box's group. [[spec/tickets/a-box-keeps-its-tickets]]
 const ticketKind = "ticket"
@@ -44,7 +44,7 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 		}
 		nodes := failure.Load(failure.Dir{Root: method})
 		refuses := func(raised failure.Raised) int {
-			if err := raisedOnto(failureDoors{root: method, now: now}, raised, errs); err != nil {
+			if err := raisedOnto(failureDoors{root: method, now: now, disk: realDisk()}, raised, errs); err != nil {
 				fmt.Fprintln(errs, err)
 				return exitFailed
 			}

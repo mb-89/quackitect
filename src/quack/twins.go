@@ -8,12 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
-	"quackitect/src/index"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/proc"
@@ -41,7 +39,7 @@ const (
 	noQueue         = "No ticket stands in the queue."
 )
 
-func init() { register("ticket yours", ticketYours(index.V1)) }
+func init() { register("ticket yours", ticketYours(reachV1)) }
 
 // ticket yours off work/yours over the base v1 answers, one JSON object as ticket-yours.js prints it. [[spec/tickets/ticket-verbs-become-actions]]
 func ticketYours(v1 func() (string, error)) twin {
@@ -95,7 +93,7 @@ func printsLine(out, errs io.Writer, value any) int {
 	return 0
 }
 
-func init() { register("retro notes", retroNotes(index.V1)) }
+func init() { register("retro notes", retroNotes(reachV1)) }
 
 // retro notes off tickets/all over the base v1 answers: every note under .se/tickets standing open. [[spec/tickets/retro-verbs-become-actions]]
 func retroNotes(v1 func() (string, error)) twin {
@@ -131,7 +129,7 @@ func retroNotes(v1 func() (string, error)) twin {
 	}
 }
 
-func init() { register("branch list --queue", branchQueue(index.V1)) }
+func init() { register("branch list --queue", branchQueue(reachV1)) }
 
 // branch list --queue off work/yours over the base v1 answers: each placed row off the cloud, place then name then step. [[spec/tickets/work-verbs-become-actions]]
 func branchQueue(v1 func() (string, error)) twin {
@@ -161,7 +159,7 @@ func branchQueue(v1 func() (string, error)) twin {
 
 // The node module over the real process door and this binary. [[spec/tickets/program-of-drops-node]]
 func nodeAccept(root string) func(q.Request) (any, error) {
-	return nodeAcceptOver(proc.Real, os.Executable, root)
+	return nodeAcceptOver(proc.Real, selfPath, root)
 }
 
 // The node module: answers a registered verb's words, in process or as a person's child road under the root through the process door, and refuses a word nothing registers. [[spec/tickets/quack-spawns-meet-fake-process]]

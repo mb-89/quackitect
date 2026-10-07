@@ -5,7 +5,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -24,7 +23,7 @@ var printedLines = regexp.MustCompile(`\r?\n`)
 
 // The branch verb off the method root, run in the work root, and its material or why it gathered none. [[spec/tickets/review-spawns-off-the-door]] [[spec/tickets/work-verbs-port-to-go]]
 func reviewOver(method string) func(root, branch string) (review.Material, string) {
-	return reviewRunOver(proc.Real, os.Executable, method)
+	return reviewRunOver(proc.Real, selfPath, method)
 }
 
 // The branch verb off the method root, run in the work root through the process door under the binary the self answers, and its material or why it gathered none. [[spec/tickets/quack-spawns-all-take-the-runner]]

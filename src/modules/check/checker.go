@@ -97,6 +97,7 @@ var Rules = []func(*Tree) []Finding{
 	everyNamedPathStands,
 	groupAsksNobody,
 	noConflictMarkers,
+	declaresFaults,
 	helperCopies,
 }
 

@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -33,7 +32,7 @@ func init() {
 			fmt.Fprintln(errs, "The rules load nothing:", err)
 			return exitFailed
 		}
-		return rulesOverVerb(os.Stdin, treeLint)(argv, quiet, out, errs)
+		return rulesOverVerb(quietBox().input, treeLint)(argv, quiet, out, errs)
 	})
 }
 
@@ -45,7 +44,7 @@ var loadedRules = struct {
 
 // The Go rules over a root's own schema and lists, loaded once a run. [[spec/tickets/go-rules-replace-vale]]
 func rulesAt(root string) (*rules.Set, error) {
-	return rulesUnder(root, vehicleOf(os.Executable()))
+	return rulesUnder(root, ownVehicle())
 }
 
 // The Go rules over a work root, each file from the root and else from its vehicle, as the wiring reads. [[spec/tickets/vehicle-rules-come-down]]
@@ -66,12 +65,13 @@ func rulesUnder(root, vehicle string) (*rules.Set, error) {
 
 // A reader of a slashed path under the first root holding it, and empty where none does. [[spec/tickets/vehicle-rules-come-down]]
 func readUnder(roots ...string) func(path string) string {
+	disk := realDisk()
 	return func(path string) string {
 		for _, root := range roots {
 			if root == "" {
 				continue
 			}
-			if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path))); err == nil {
+			if text, err := disk.read(filepath.Join(root, filepath.FromSlash(path))); err == nil {
 				return string(text)
 			}
 		}

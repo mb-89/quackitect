@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -27,6 +26,7 @@ const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder .claude/
 type serveDoors struct {
 	root  string
 	run   func(argv []string, cwd string) (int, string, error)
+	disk  diskDoors
 	env   func(string) string
 	self  string
 	index string
@@ -99,7 +99,7 @@ func serveOnCloud(env func(string) string) bool {
 
 // The index answers its standing by starting its door where none answers, so one run starts it and probes it. [[spec/design_output/level0#a-desk-serve-returns]]
 func serveDetachedStart(d serveDoors) (int, string) {
-	was := serveDoorOf(d.root)
+	was := serveDoorOf(d.disk, d.root)
 	bin := d.index
 	if bin == "" {
 		bin = d.root + "/" + serveIndexBin
@@ -115,7 +115,7 @@ func serveDetachedStart(d serveDoors) (int, string) {
 		}
 		return 1, "The index falls: " + why
 	}
-	door := serveDoorOf(d.root)
+	door := serveDoorOf(d.disk, d.root)
 	port := servePortOf(door)
 	if was != "" && was == door {
 		return 0, fmt.Sprintf("The index answers at port %s.", port)
@@ -124,12 +124,8 @@ func serveDetachedStart(d serveDoors) (int, string) {
 }
 
 // What the hooks door's standing file says, or nothing where none stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-func serveDoorOf(root string) string {
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
-	if err != nil {
-		return ""
-	}
-	return string(body)
+func serveDoorOf(disk diskDoors, root string) string {
+	return disk.text(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
 }
 
 // The port the door names, as Number(JSON.parse(door).port) || 0 prints it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -165,11 +161,12 @@ func serveReal() serveDoors {
 	if err != nil {
 		root = "."
 	}
-	self, err := os.Executable()
+	box := quietBox()
+	self, err := selfPath()
 	if err != nil {
 		self = ""
 	}
-	return serveDoors{root: filepath.ToSlash(root), run: serveRuns, env: os.Getenv, self: self}
+	return serveDoors{root: filepath.ToSlash(root), run: serveRuns, disk: box.disk, env: box.env, self: self}
 }
 
 // Runs a program in a folder over the real process door. [[spec/design_output/level0#a-desk-serve-returns]]

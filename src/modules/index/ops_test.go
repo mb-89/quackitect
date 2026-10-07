@@ -10,9 +10,14 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-type clock struct{ now time.Time }
+// A time the case moves by hand, beside the wall's waits, so a call's wait still runs out. [[spec/tickets/go-waits-on-events]]
+type clock struct {
+	q.Clock
+	now time.Time
+}
 
 func (c *clock) Now() time.Time          { return c.now }
 func (c *clock) pass(span time.Duration) { c.now = c.now.Add(span) }
@@ -36,12 +41,12 @@ var (
 
 func bookOf(t *testing.T, rows ...Op) (*Book, *clock, *memory) {
 	t.Helper()
-	c := &clock{now: time.Unix(1_700_000_000, 0)}
+	c := &clock{Clock: qtest.Wall(), now: time.Unix(1_700_000_000, 0)}
 	m := &memory{rows: map[string]Op{}}
 	for _, one := range rows {
 		m.rows[one.ID] = one
 	}
-	b, err := NewBook(c.Now, m, BookSettings{Done: time.Hour, Failed: 24 * time.Hour})
+	b, err := NewBook(c, m, BookSettings{Done: time.Hour, Failed: 24 * time.Hour})
 	if err != nil {
 		t.Fatal(err)
 	}

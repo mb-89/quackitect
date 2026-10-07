@@ -4,23 +4,24 @@
 package imports_test
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"quackitect/src/imports"
+	"quackitect/src/modules/files"
 )
 
 func treeText(t *testing.T, paths ...string) string {
 	t.Helper()
+	tree := files.NewDisk(filepath.Join("..", ".."))
 	var out strings.Builder
 	for _, one := range paths {
-		read, err := os.ReadFile(filepath.Join("..", "..", one))
+		read, _, err := tree.Read(one)
 		if err != nil {
 			t.Fatal(err)
 		}
-		out.Write(read)
+		out.WriteString(read)
 	}
 	return out.String()
 }

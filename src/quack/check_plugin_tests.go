@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -40,15 +39,11 @@ func pluginTestsHold(d checkDoors) int {
 
 // The lines of every file under the plugin's test folder. [[spec/tickets/level0-tests-move-to-plugin-test]]
 func pluginTestLines(d checkDoors) int {
-	// level0: Impure - it walks the plugin's test folder on the disk
 	lines := 0
-	_ = filepath.WalkDir(d.at(pluginTestsDir), func(at string, entry os.DirEntry, err error) error {
-		if err == nil && !entry.IsDir() {
-			text, _ := os.ReadFile(at)
-			lines += imports.TextLines(string(text))
-		}
-		return nil
-	})
+	files, _ := d.disk.walkFiles(d.at(pluginTestsDir))
+	for _, at := range files {
+		lines += imports.TextLines(d.disk.text(at))
+	}
 	return lines
 }
 

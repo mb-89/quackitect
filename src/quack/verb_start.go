@@ -6,10 +6,8 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"os"
 	"path/filepath"
 
-	"quackitect/src/index"
 	"quackitect/src/modules/hooks"
 )
 
@@ -31,15 +29,19 @@ type startStop struct {
 }
 
 func init() {
-	register("start", startVerb(startOutside{
-		root:  index.Root,
-		input: os.Stdin,
-		env:   os.Getenv,
-		exists: func(path string) bool {
-			_, err := os.Stat(path)
-			return err == nil
-		},
-	}))
+	register("start", func(argv []string, quiet bool, out, errs io.Writer) int {
+		return startVerb(startOutsideOf(quietBox()))(argv, quiet, out, errs)
+	})
+}
+
+// The start verb's outside, off the box: its root, its input, its environment and its disk. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func startOutsideOf(box boxDoors) startOutside {
+	return startOutside{
+		root:   func() (string, error) { return box.root, nil },
+		input:  box.input,
+		env:    box.env,
+		exists: box.disk.stands,
+	}
 }
 
 // [[spec/tickets/the-coordinator-runs-under-level0]]

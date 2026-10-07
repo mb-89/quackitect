@@ -6,8 +6,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -34,16 +32,8 @@ type lintFake struct {
 
 func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 	t.Helper()
-	root := t.TempDir()
-	for at, text := range files {
-		path := filepath.Join(root, filepath.FromSlash(at))
-		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, files)
 	return lintVerb(func() (lintDoors, error) {
 		return lintDoors{
 			root: root,
@@ -53,7 +43,7 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 			},
 			sweep:   func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
 			box:     func() []check.Finding { return fake.box },
-			changed: func() []string { return fake.changed },
+			changed: func(func(string)) []string { return fake.changed },
 			leave: func(found lintFound) error {
 				fake.left = append(fake.left, found)
 				return nil
@@ -62,7 +52,8 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 				fake.rows = append(fake.rows, row)
 				return nil
 			},
-			now: func() time.Time { return logNow },
+			now:  func() time.Time { return logNow },
+			disk: disk,
 		}, nil
 	})
 }

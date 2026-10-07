@@ -5,11 +5,14 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"flag"
-	"os"
+	"errors"
+	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -17,20 +20,51 @@ import (
 	"quackitect/src/modules/clock"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-// The lease a silent fake holds, the dog over it, the poll of the wait on its real process, and the room the wait leaves under the suite's deadline for the report, which both alarm cases share. [[spec/tickets/lease-waits-meet-a-fake-clock]] [[spec/tickets/cold-runner-waits-meet-readiness]]
+// The lease a silent fake holds, and the mark each of its runs commits, which both alarm cases share. [[spec/tickets/lease-waits-meet-a-fake-clock]]
 const (
-	silentTerm   = 200 * time.Millisecond
-	silentPoll   = 20 * time.Millisecond
-	silentMargin = 5 * time.Second
-	silentMark   = "fake/run"
+	silentTerm = 200 * time.Millisecond
+	silentMark = "fake/run"
 )
+
+// The runs the silent fakes start, each committing its own mark. [[spec/tickets/test-walks-move-onto-fakes]]
+var hq1SilentRuns atomic.Int64
+
+// A silent process in memory: it dials the bus the placements name, commits its run, beats its lease once, and then lives on without a beat until the placements kill it. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq1SilentSpawn(command, env []string) (index.Process, error) {
+	vars := map[string]string{}
+	for _, one := range env {
+		if key, value, ok := strings.Cut(one, "="); ok {
+			vars[key] = value
+		}
+	}
+	part := command[len(command)-1]
+	kill, exited := make(chan struct{}), make(chan error, 1)
+	go func() {
+		peer, err := index.Dial(vars[index.BusEnv], vars[index.TokenEnv])
+		if err != nil {
+			exited <- err
+			return
+		}
+		defer peer.Close()
+		if err := peer.Commit("fake", map[string]any{silentMark: hq1SilentRuns.Add(1)}); err != nil {
+			exited <- err
+			return
+		}
+		_ = peer.Beat(part)
+		<-kill
+		exited <- errors.New("killed")
+	}()
+	var once sync.Once
+	return index.Process{Kill: func() { once.Do(func() { close(kill) }) }, Exited: exited}, nil
+}
 
 var silentDog = manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute}
 
-// Places one silent fake process under a dog on a fake clock, and polls until held answers true. The clock moves past the lease on each poll while the run the fake last committed stands unexpired, so a slow spawn counts against no lease, and a beat landing late meets the next tick. A run commits a mark of its own, because Windows hands a killed process's pid to the next one. The alarm stops the restarts, so the wait ends on it. The process and the bus stay real, so this is the door test of a placed process. [[spec/tickets/lease-waits-meet-a-fake-clock]] [[spec/tickets/cold-runner-waits-meet-readiness]]
-func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot, runs int) bool) {
+// Places one silent fake process in memory under a dog on a fake clock, and reads the store again at each commit until held answers true. The clock moves past the lease while the run the fake last committed stands unexpired, so a slow start counts against no lease, and a beat landing late meets the next tick. A run commits a mark of its own. The alarm stops the restarts, so the wait ends on it. The bus stays real. [[spec/tickets/lease-waits-meet-a-fake-clock]] [[spec/tickets/cold-runner-waits-meet-readiness]]
+func silentRun(t *testing.T, part, wants string, held func(snap q.Snapshot, runs int) bool) {
 	t.Helper()
 	c := q.New()
 	as := manager.Registers(c)
@@ -39,21 +73,28 @@ func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
 	store := q.NewStore(c)
-	at := clock.NewFake(time.Now())
+	committed := make(chan struct{}, 1)
+	store.OnCommit(func(map[string]any) {
+		select {
+		case committed <- struct{}{}:
+		default:
+		}
+	})
+	at := clock.NewFake(time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC))
 	dog := manager.NewDog(at.Now, store, as, silentDog)
 	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer bus.Close()
-	placed := index.Placed{Name: part, Command: []string{os.Args[0], "-test.run=^" + fake + "$", "--", part}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: dog, Term: silentTerm}
-	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	placed := index.Placed{Name: part, Command: []string{"fake", part}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: dog, Term: silentTerm, Spawn: hq1SilentSpawn}
+	stop, err := index.NewPlacements(wall, bus, store, []index.Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stop()
 	runs, expired := map[any]bool{}, map[any]bool{}
-	for end := silentEnd(t); end.IsZero() || time.Now().Before(end); time.Sleep(silentPoll) {
+	for {
 		snap := store.Snapshot()
 		run := snap.Read(silentMark)
 		if run != 0 {
@@ -67,71 +108,28 @@ func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot
 		}
 		if run != 0 && !expired[run] {
 			at.Tick(silentTerm + time.Millisecond)
-			if slices.Contains(dog.Check(), part) {
-				expired[run] = true
+			if !slices.Contains(dog.Check(), part) {
+				runtime.Gosched()
+				continue
 			}
+			expired[run] = true
 		}
+		<-committed
 	}
 	t.Fatalf("the silent fake runs %d time(s), and session/alarms reads %v: wants %s", len(runs), store.Snapshot().Read(manager.AlarmsName), wants)
 }
 
-// The end of the wait on the real process: the suite's deadline less the margin, or none where the run sets no timeout. A loaded box slows the spawns and turns the case red on a hang alone. [[spec/tickets/cold-runner-waits-meet-readiness]]
-func silentEnd(t *testing.T) time.Time {
-	if end, ok := t.Deadline(); ok {
-		return end.Add(-silentMargin)
-	}
-	return time.Time{}
-}
-
-// The fake silent IO process: it commits its run, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
-func TestFakeSilentIO(t *testing.T) {
-	t.Parallel()
-	if os.Getenv(index.BusEnv) == "" {
-		return
-	}
-	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
-	if err != nil {
-		os.Exit(3)
-	}
-	if err := peer.Commit("fake", map[string]any{silentMark: time.Now().UnixNano()}); err != nil {
-		os.Exit(4)
-	}
-	_ = peer.Beat(flag.Arg(0))
-	for {
-		time.Sleep(time.Hour)
-	}
-}
-
 func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 	t.Parallel()
-	silentRun(t, ioPart, "TestFakeSilentIO", "the silent IO process", func(snap q.Snapshot, _ int) bool {
+	silentRun(t, ioPart, "the silent IO process", func(snap q.Snapshot, _ int) bool {
 		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
 		return len(alarms) == 1 && alarms[0].Part == ioPart
 	})
 }
 
-// The fake silent module process: it commits its run, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
-func TestFakeSilentModule(t *testing.T) {
-	t.Parallel()
-	if os.Getenv(index.BusEnv) == "" {
-		return
-	}
-	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
-	if err != nil {
-		os.Exit(3)
-	}
-	if err := peer.Commit("fake", map[string]any{silentMark: time.Now().UnixNano()}); err != nil {
-		os.Exit(4)
-	}
-	_ = peer.Beat(flag.Arg(0))
-	for {
-		time.Sleep(time.Hour)
-	}
-}
-
 func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 	t.Parallel()
-	silentRun(t, "fake", "TestFakeSilentModule", "a restart, then the alarm", func(snap q.Snapshot, runs int) bool {
+	silentRun(t, "fake", "a restart, then the alarm", func(snap q.Snapshot, runs int) bool {
 		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
 		return runs > 1 && len(alarms) == 1 && alarms[0].Part == "fake"
 	})
@@ -213,7 +211,9 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	}
 	defer watcher.Close()
 	rows := make(chan map[string]any, 4)
-	stop, err := watchesIndex(watcher, 100*time.Millisecond, func(row map[string]any) error { rows <- row; return nil })
+	fake := qtest.NewFake(time.Unix(0, 0))
+	term := 100 * time.Millisecond
+	stop, err := watchesIndex(watcher, fake, term, func(row map[string]any) error { rows <- row; return nil })
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -226,13 +226,17 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	if err := indexSide.Beat("index"); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case row := <-rows:
-		if row["kind"] != "watchdog" || row["part"] != "index" {
-			t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+	for {
+		fake.Tick(2 * term)
+		select {
+		case row := <-rows:
+			if row["kind"] != "watchdog" || row["part"] != "index" {
+				t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+			}
+			return
+		default:
+			runtime.Gosched()
 		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("the IO process writes no row where the index falls silent")
 	}
 }
 
@@ -265,16 +269,11 @@ func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer beating.Close()
-	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: time.Now(), Term: time.Minute}}); err != nil {
+	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC), Term: time.Minute}}); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case part := <-heard:
-		if part != indexPart {
-			t.Fatalf("the health commit beats %q, and wants the index", part)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("the health commit beats nothing")
+	if part := <-heard; part != indexPart {
+		t.Fatalf("the health commit beats %q, and wants the index", part)
 	}
 }
 
@@ -323,12 +322,7 @@ func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stop()
-	select {
-	case values := <-heard:
-		if string(values["fake/out"]) != "7" {
-			t.Fatalf("the commit arrives as %s", values)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("quack io publishes no commit")
+	if values := <-heard; string(values["fake/out"]) != "7" {
+		t.Fatalf("the commit arrives as %s", values)
 	}
 }

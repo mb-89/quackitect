@@ -6,22 +6,22 @@ package index // level0: InPackageTest - it drives the unexported posts and valu
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-func getV1(t *testing.T, standing Standing, path string) (*http.Response, []byte) {
+func getV1(t *testing.T, standing Standing, path string) (reply, []byte) {
 	t.Helper()
-	said, body, err := fetchV1(standing, path)
+	said, err := fetchV1(standing, path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return said, body
+	return said, said.Body
 }
 
 func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
@@ -32,7 +32,7 @@ func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
 		Name  string `json:"name"`
 		Value any    `json:"value"`
 	}
-	if said.StatusCode != http.StatusOK || json.Unmarshal(body, &found) != nil || found.Name != "files/spec/one.md" {
+	if said.StatusCode != statusOK || json.Unmarshal(body, &found) != nil || found.Name != "files/spec/one.md" {
 		t.Fatalf("/v1 answers %d: %s", said.StatusCode, body)
 	}
 	old, err := posts(standing, []string{"call", "read", `{"name":"files/spec/one.md"}`})
@@ -47,7 +47,7 @@ func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
 func TestV1AnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/values/t/none")
-	if said.StatusCode != http.StatusNotFound || !strings.Contains(said.Header.Get("Content-Type"), "problem+json") || !strings.Contains(string(body), "t/none") {
+	if said.StatusCode != statusNotFound || !strings.Contains(said.Header.Get("Content-Type"), "problem+json") || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("/v1 answers %d, %s: %s", said.StatusCode, said.Header.Get("Content-Type"), body)
 	}
 }
@@ -55,7 +55,7 @@ func TestV1AnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/openapi.json")
-	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "/values/") {
+	if said.StatusCode != statusOK || !strings.Contains(string(body), "/values/") {
 		t.Fatalf("the document answers %d: %.200s", said.StatusCode, body)
 	}
 }
@@ -96,7 +96,7 @@ func TestV1SettlesBeforeItReads(t *testing.T) {
 func TestV1DrawsItsDocs(t *testing.T) {
 	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/docs")
-	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "openapi") {
+	if said.StatusCode != statusOK || !strings.Contains(string(body), "openapi") {
 		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
 	}
 }
@@ -105,7 +105,7 @@ func TestV1DrawsItsDocs(t *testing.T) {
 func TestV1AnswersTheBaseOfTheStandingDoor(t *testing.T) {
 	t.Parallel()
 	standing := standingV1(t)
-	base, err := V1At(standing.Root)
+	base, err := V1At(qtest.Wall(), standing.Root)
 	if want := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1); err != nil || base != want {
 		t.Fatalf("V1 answers %q, %v, not %q", base, err, want)
 	}

@@ -6,13 +6,12 @@ package index // level0: InPackageTest - its builders drive the unexported door,
 import (
 	"database/sql"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
+	"os" // level0: OutsideInDoors - the fixture home makes and removes the run's own temp folder, and the run exits on its code
 	"path/filepath"
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -30,10 +29,10 @@ var treeFiles = [][2]string{
 // Writes one file under root, with the folders it stands in. [[spec/guidance/code/testing]]
 func plantFile(root, rel, text string) error {
 	at := filepath.Join(root, filepath.FromSlash(rel))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := makeDir(filepath.Dir(at), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(at, []byte(text), 0o644)
+	return writeFile(at, []byte(text), 0o644)
 }
 
 // Writes the case tree's files under root. [[spec/guidance/code/testing]]
@@ -139,16 +138,29 @@ func sweptDB(t *testing.T) *sql.DB {
 	return swept.db
 }
 
-// Gets path off the /v1 surface of the door standing. [[spec/design_output/model#surfaces]]
-func fetchV1(standing Standing, path string) (*http.Response, []byte, error) {
-	said, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d%s", standing.V1, path))
-	if err != nil {
-		return nil, nil, err
-	}
-	defer said.Body.Close()
-	body, err := io.ReadAll(said.Body)
-	return said, body, err
+// Gets path off the /v1 surface of the door standing, over the transport a client posts on. [[spec/design_output/model#surfaces]]
+func fetchV1(standing Standing, path string) (reply, error) {
+	return asksDoor("GET", fmt.Sprintf("http://127.0.0.1:%d%s", standing.V1, path), nil, nil)
 }
+
+// A door over the fake network and the clock the case hands, and the standing file it writes. [[spec/tickets/test-walks-move-onto-fakes]]
+func served(t *testing.T, clock q.Clock, root string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, Standing) {
+	t.Helper()
+	fake := newMemNet(t)
+	one, stop, _, err := opensOn(clock, fake.listen, root, filepath.Join(t.TempDir(), "index.db"), catalog, manage, starts...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(stop)
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return one, standing
+}
+
+// The network the shared doors listen on, over the port table every case shares. [[spec/tickets/test-walks-move-onto-fakes]]
+var sharedNet = &memNet{}
 
 // A shared door: its standing, or the fault that refused it. [[spec/design_output/index#the-door-owns-the-database]]
 type sharedDoor struct {
@@ -156,7 +168,7 @@ type sharedDoor struct {
 	err      error
 }
 
-// Serves a door over a fresh case tree under the fixture home, stopped at the end of the run. [[spec/design_output/index#the-door-owns-the-database]]
+// Serves a door on the fake network over a fresh case tree under the fixture home, stopped at the end of the run. [[spec/design_output/index#the-door-owns-the-database]]
 func serveShared(c *q.Catalog, starts ...Start) (out sharedDoor) {
 	root, err := sharedRoot(true)
 	if err != nil {
@@ -168,7 +180,7 @@ func serveShared(c *q.Catalog, starts ...Start) (out sharedDoor) {
 		out.err = err
 		return out
 	}
-	stop, _, err := Serve(root, at, c, starts...)
+	_, stop, _, err := opensOn(qtest.Wall(), sharedNet.listen, root, at, c, nil, starts...)
 	if err != nil {
 		out.err = err
 		return out
@@ -216,8 +228,8 @@ func standingV1(t *testing.T) Standing {
 	return sharedV1().of(t)
 }
 
-// The catalog of the tools door: the case's own actions, then t/add and t/echo under the fake manager. [[spec/tickets/the-hook-registers-index-tools]]
-func toolsCatalog(adds func(*q.Catalog)) (*q.Catalog, Manage) {
+// The catalog of the tools door: the case's own actions, then t/add and t/echo under the fake manager on the clock the case hands. [[spec/tickets/the-hook-registers-index-tools]]
+func toolsCatalog(clock q.Clock, adds func(*q.Catalog)) (*q.Catalog, Manage) {
 	c := q.New()
 	adds(c)
 	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
@@ -228,7 +240,7 @@ func toolsCatalog(adds func(*q.Catalog)) (*q.Catalog, Manage) {
 		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
 	}, q.Doc("echoes its input"))
 	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
-	return c, fakeManager(ops, accept)
+	return c, fakeManager(clock, ops, accept)
 }
 
 // The body /v1/tools answers over one door holding t/add and t/echo, fetched once a run. [[spec/tickets/the-hook-registers-index-tools]]
@@ -246,8 +258,9 @@ var sharedTools = qtest.Shared(func() (out struct {
 		out.err = err
 		return out
 	}
-	c, manage := toolsCatalog(func(*q.Catalog) {})
-	_, stop, _, err := opens(root, at, c, manage)
+	clock := qtest.NewFake(time.Time{})
+	c, manage := toolsCatalog(clock, func(*q.Catalog) {})
+	_, stop, _, err := opensOn(clock, sharedNet.listen, root, at, c, manage)
 	if err != nil {
 		out.err = err
 		return out
@@ -258,16 +271,16 @@ var sharedTools = qtest.Shared(func() (out struct {
 		out.err = err
 		return out
 	}
-	said, body, err := fetchV1(standing, "/v1/tools")
+	said, err := fetchV1(standing, "/v1/tools")
 	if err != nil {
 		out.err = err
 		return out
 	}
-	if said.StatusCode != http.StatusOK {
-		out.err = fmt.Errorf("/v1/tools answers %d: %.300s", said.StatusCode, body)
+	if said.StatusCode != statusOK {
+		out.err = fmt.Errorf("/v1/tools answers %d: %.300s", said.StatusCode, said.Body)
 		return out
 	}
-	out.body = body
+	out.body = said.Body
 	return out
 })
 

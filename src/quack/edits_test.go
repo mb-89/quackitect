@@ -7,7 +7,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"os" // level0: OutsideInDoors - the case copies the tree's own schemas and reads its wiring, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -51,24 +51,6 @@ func editTree(t *testing.T) string {
 	return root
 }
 
-// [[spec/tickets/edit-tools-answer-in-go]]
-func seedFile(t *testing.T, root, path, text string) {
-	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(path))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
-}
-
-// The text a file under the root holds, and whether it stands. [[spec/tickets/edit-tools-answer-in-go]]
-func readIn(root, path string) (string, bool) {
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-	return string(body), err == nil
-}
-
 // The journal entries standing under the root. [[spec/tickets/edit-tools-answer-in-go]]
 func journalsIn(root string) []string {
 	found, _ := filepath.Glob(filepath.Join(root, filepath.FromSlash(journalFolder), "*.json"))
@@ -86,8 +68,7 @@ func editCall(t *testing.T, root, name string, input any) string {
 	store := q.NewStore(c)
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+		Steps: func(func()) {}, Clock: stillClock(),
 		Accept: accepts(root, store, nil),
 	})
 	if err != nil {
@@ -227,7 +208,7 @@ func TestTheJournalReadsAsTheBridgeWritesIt(t *testing.T) {
 	if len(found) != 1 {
 		t.Fatalf("%s holds %v after the patch, and wants one entry", journalFolder, found)
 	}
-	body, err := os.ReadFile(found[0])
+	body, err := realDisk().read(found[0])
 	if err != nil {
 		t.Fatal(err)
 	}

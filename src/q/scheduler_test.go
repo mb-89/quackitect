@@ -7,10 +7,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"time"
 )
-
-const runWait = time.Second
 
 type countOf struct {
 	N int `q:"t/n"`
@@ -119,11 +116,7 @@ func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 	s := NewStore(c)
 	scheduler := NewScheduler(s, spawned, failOn(t))
 	seed(t, s, hand, "t/n", 1)
-	select {
-	case <-started:
-	case <-time.After(runWait):
-		t.Fatalf("no run of t/slow starts after t/n moves")
-	}
+	<-started
 	seed(t, s, hand, "t/n", 2)
 	seed(t, s, hand, "t/n", 3)
 	close(release)

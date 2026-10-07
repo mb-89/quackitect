@@ -5,7 +5,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -41,7 +40,7 @@ func (d landingDoors) stagesTo(adds, only []string) []string {
 		named := len(adds) == 0 || slices.ContainsFunc(adds, func(at string) bool {
 			return one.Path == at || strings.HasPrefix(one.Path, strings.TrimSuffix(at, "/")+"/")
 		})
-		if (named || slices.Contains(staged, one)) && standsUnder(d.root, one.Path) && !(merging && d.asMerged(merged, one.Path)) {
+		if (named || slices.Contains(staged, one)) && standsUnder(d.box.disk, d.root, one.Path) && !(merging && d.asMerged(merged, one.Path)) {
 			paths = append(paths, one.Path)
 		}
 	}
@@ -92,6 +91,6 @@ func changedOver(git gitAnswers, say func(line string)) []string {
 // Whether the file on disk reads as the merged commit holds it, so a merge's strict lint passes trunk's own files. [[spec/tickets/rules-lint-changed-files-first]]
 func (d landingDoors) asMerged(merged, path string) bool {
 	there, held := d.git.Show(merged, path)
-	text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(path)))
+	text, err := d.box.disk.read(filepath.Join(d.root, filepath.FromSlash(path)))
 	return held && err == nil && there == string(text)
 }

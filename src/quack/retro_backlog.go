@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -25,9 +24,10 @@ var (
 	retroBacklogTicked = regexp.MustCompile("`[^`]+`")
 )
 
-// What backlog reaches: the root and git. [[spec/tickets/the-retro-reads-the-backlog]]
+// What backlog reaches: the root, the disk and git. [[spec/tickets/the-retro-reads-the-backlog]]
 type retroBacklogDoors struct {
 	root string
+	disk diskDoors
 	git  func(args ...string) retroRan
 }
 
@@ -35,30 +35,32 @@ func init() { register("retro backlog", retroBacklogVerb(retroBacklogLive)) }
 
 // The doors backlog runs on outside a test. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroBacklogLive() retroBacklogDoors {
-	root := retroRoot()
-	return retroBacklogDoors{root: root, git: retroCollectGitIn(root)}
+	d := quietBox()
+	root := retroRootOf(d)
+	return retroBacklogDoors{root: root, disk: d.disk, git: retroCollectGitIn(root)}
 }
 
 // retro backlog <retro>: prints each prose criterion, and answers 0 once each holds a verdict with its reason. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroBacklogVerb(doors func() retroBacklogDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		it := doors()
+		disk := it.disk
 		home := ""
 		if len(argv) > 2 && argv[2] != "" {
 			home = retroHome(it.root, argv[2])
 		}
-		if home == "" || !retroCollectExists(home) {
+		if home == "" || !disk.stands(home) {
 			fmt.Fprintln(errs, "retro backlog reads the folder of a retro, and none stands.")
 			return exitUsage
 		}
-		record, _ := retroCollectParsed(retroBacklogRead(filepath.Join(home, retroCollectCollected)))
+		record, _ := retroCollectParsed(disk.text(filepath.Join(home, retroCollectCollected)))
 		since, _ := retroCollectDate(retroCollectText(retroCollectGet(record, "since")))
 		closed := retroClosedIn(it.git, since)
 		if !closed.ok {
 			fmt.Fprintf(errs, "retro backlog reads no trunk: %s\n", closed.err)
 			return exitFailed
 		}
-		verdicts, _ := retroCollectParsed(retroBacklogRead(filepath.Join(home, retroBacklogVerdicts)))
+		verdicts, _ := retroCollectParsed(disk.text(filepath.Join(home, retroBacklogVerdicts)))
 		waiting := 0
 		for _, landing := range closed.landings {
 			shown := it.git("show", landing.sha+":"+retroCollectTickets+"/"+landing.name+retroCollectNoteEnd)
@@ -85,15 +87,6 @@ func retroBacklogVerb(doors func() retroBacklogDoors) twin {
 		fmt.Fprintf(errs, "%d criterion(s) wait on a verdict in %s: %s with its reason.\n", waiting, retroBacklogVerdicts, strings.Join(retroBacklogWords, " or "))
 		return exitFailed
 	}
-}
-
-// A file's text, or nothing. [[spec/tickets/the-retro-reads-the-backlog]]
-func retroBacklogRead(at string) string {
-	text, err := os.ReadFile(at)
-	if err != nil {
-		return ""
-	}
-	return string(text)
 }
 
 // A backlog ticket closes on trunk and stands in no group. [[spec/tickets/the-retro-reads-the-backlog]]

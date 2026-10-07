@@ -7,6 +7,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { pathToFileURL } from "node:url";
 import { editorRequire } from "../../src/doors/fake/vscode.js";
 
 const HERE = join(import.meta.dirname, "..", "..", "src", "extension", "extension.js");
@@ -23,7 +24,11 @@ function anything() {
 }
 
 test("the extension loads and activates as the editor loads it", async () => {
-  const extension = editorRequire(anything(), import.meta.url)(HERE);
+  const editor = new Proxy(anything(), {
+    get: (held, key) =>
+      key === "Uri" ? { file: pathToFileURL, joinPath: anything() } : held[key],
+  });
+  const extension = editorRequire(editor, import.meta.url)(HERE);
   const context = {
     subscriptions: [],
     extensionPath: join(HERE, ".."),

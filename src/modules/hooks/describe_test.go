@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -61,7 +60,7 @@ func describeDoor(t *testing.T, tools []string) *Door {
 	})
 	return New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
-		Now: func() time.Time { return fixed }, Root: treeOf(t, nil, ""),
+		Clock: qtest.NewFake(fixed), Root: treeOf(t, nil, ""),
 		Config: func(string) Settings { return Settings{Words: nameWords} },
 	})
 }

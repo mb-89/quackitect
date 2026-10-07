@@ -16,7 +16,7 @@ const reactionFails = "failure-reaction-fails"
 
 // The clock the sentinel arms a quiet watch on, which the clock module's Clock answers. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
 type Timer interface {
-	After(span time.Duration, hand func(time.Time)) (stop func())
+	AfterFunc(span time.Duration, hand func()) (stop func() bool)
 }
 
 // One event the hooks door hears: its kind and its text. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
@@ -27,7 +27,7 @@ type Event struct {
 
 // One quiet watch armed on the clock: its stop, and the round that armed it, so a hand firing as its stop lands drops its fire. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
 type armed struct {
-	stop  func()
+	stop  func() bool
 	round int
 }
 
@@ -96,7 +96,7 @@ func (one *Sentinel) arm(node Node) {
 	}
 	one.rounds++
 	round := one.rounds
-	one.armed[node.ID] = &armed{round: round, stop: one.clock.After(time.Duration(node.Watch.Quiet)*time.Minute, func(time.Time) { one.quietPasses(node, round) })}
+	one.armed[node.ID] = &armed{round: round, stop: one.clock.AfterFunc(time.Duration(node.Watch.Quiet)*time.Minute, func() { one.quietPasses(node, round) })}
 }
 
 // Fires a quiet watch once its span passes, where no later round armed it again, and leaves it unarmed until a matching event comes. [[spec/design_output/failures#the-sentinel-fires-a-watch]]

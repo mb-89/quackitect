@@ -388,7 +388,7 @@ func (it *It) offer(who *Who, one *Held, all []*Held) offered {
 	return it.admits(who, one, leaf, all)
 }
 
-// [[spec/design_output/pull#children-before-their-group]]
+// [[spec/design_output/pull#a-live-branch-holds-dependents]]
 func (it *It) closedHere(all []*Held, dep string) bool {
 	for _, one := range all {
 		if one.Name == dep {
@@ -396,7 +396,11 @@ func (it *It) closedHere(all []*Held, dep string) bool {
 		}
 	}
 	said, ok := it.Git.Show("origin/"+Trunk, Tickets+"/"+dep+".md")
-	return !ok || FieldOf(said, "state") == Closed
+	if !ok {
+		_, live := it.Git.Resolve("refs/remotes/origin/" + WorkBranch + dep)
+		return !live
+	}
+	return FieldOf(said, "state") == Closed
 }
 
 // The walk past every leaf a condition skips, a kept red leaf, or a children step whose children all stand closed, to the leaf a hand takes. [[spec/design_output/pull#a-condition-skips-a-leaf]]

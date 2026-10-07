@@ -4,7 +4,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -32,8 +31,9 @@ func TestPluginTestsPart(t *testing.T) {
 			tests int
 			want  int
 		}{{tests: 9, want: 0}, {tests: 10, want: 1}} {
-			root := t.TempDir() // level0: FixtureOutsideHome - each case writes a plugin tree of its own size
-			plugin := filepath.Join(root, ".claude", "skills", "level0")
+			fake := &checkFake{}
+			doors := fake.doors()
+			plugin := filepath.Join(doors.root, ".claude", "skills", "level0")
 			for rel, text := range map[string]string{
 				"hooks/hooks.json":   `{"modules": ["./a.ts"]}`,
 				"hooks/a.ts":         "import { b } from \"./b.ts\";\nimport { c } from \"../lib/c.js\";\n" + lines(2),
@@ -43,16 +43,14 @@ func TestPluginTestsPart(t *testing.T) {
 				"tests/world.ts":     lines(4),
 				"tests/door.test.ts": lines(one.tests - 4),
 			} {
-				if err := os.MkdirAll(filepath.Dir(filepath.Join(plugin, rel)), 0o755); err != nil {
+				at := filepath.Join(plugin, filepath.FromSlash(rel))
+				if err := doors.disk.makeAll(filepath.Dir(at), 0o755); err != nil {
 					t.Fatal(err)
 				}
-				if err := os.WriteFile(filepath.Join(plugin, rel), []byte(text), 0o644); err != nil {
+				if err := doors.disk.write(at, []byte(text), 0o644); err != nil {
 					t.Fatal(err)
 				}
 			}
-			fake := &checkFake{}
-			doors := fake.doors()
-			doors.root = root
 			var said strings.Builder
 			doors.errs = &said
 			if code := partNamed(partsOf(doors, nil, false), "plugin-tests").run(); code != one.want {

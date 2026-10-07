@@ -4,7 +4,7 @@
 package failure // level0: InPackageTest - reaches heldNode, which registry_test declares in-package
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the failure schema the tree ships, as a build check reads source
 	"path/filepath"
 	"testing"
 

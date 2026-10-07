@@ -5,7 +5,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -59,7 +58,7 @@ func TestRetroChaptersRefuseAGapBetweenTwoCutsAndALinePastEveryChapter(t *testin
 	if code != 1 || errs != "c1 ends apart from where c2 starts: a gap or an overlap\n" {
 		t.Fatalf("a gap answers %d, %q", code, errs)
 	}
-	if _, err := os.Stat(filepath.Join(retroHome(root, retroReadingName), "chapters", "c1.json")); err == nil {
+	if _, err := hq2RetroDisk(root).stat(filepath.Join(retroHome(root, retroReadingName), "chapters", "c1.json")); err == nil {
 		t.Fatal("a refused cut writes c1.json")
 	}
 

@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"quackitect/src/failure"
 	"quackitect/src/index"
@@ -60,7 +59,7 @@ func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 	}
 	rows, _ := configAt(method)
 	it := &pull.It{
-		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: time.Now, Out: out, Err: errs,
+		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: wall.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),
 		Words: configInt(rows, "names.words"), Fails: configInt(rows, "work.failsBeforePerson"),
 		Refusals: configInt(rows, "work.refusalsBeforeFail"), Splits: configInt(rows, "work.stepsBeforeSplit"),
@@ -74,7 +73,7 @@ func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 		Failures: failure.Load(failure.Dir{Root: method}),
 	}
 	it.Notes = func(key string) []string {
-		said, err := guidanceRows(method, env)
+		said, err := guidanceRows(realDisk(), method, env)
 		if err != nil {
 			return []string{}
 		}
@@ -123,7 +122,7 @@ const (
 
 // The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as rowOf in lib/log.js shapes it. [[spec/design_output/log#what-one-line-looks-like]]
 func pullLog(work, floor string) func(level, kind, said string, extra map[string]any) {
-	write := appendsRow(work, time.Now)
+	write := appendsRow(realDisk(), work, wall.Now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {
@@ -158,7 +157,7 @@ func pullVoice(root string) func(path, text string, first, last int) []pull.Voic
 		if strings.TrimSpace(text) == "" {
 			return nil
 		}
-		said := heardIn(root, path, text, prose.Past)
+		said := heardIn(quietBox(), root, path, text, prose.Past)
 		if !said.ran {
 			return nil
 		}
@@ -189,7 +188,7 @@ const hooksDoor = index.Runtime + "/hooks.json"
 // The index this box serves, started where none answers, and the port it stands at. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func servesHere(root string) string {
 	was, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))
-	if _, err := index.V1(); err != nil {
+	if _, err := reachV1(); err != nil {
 		return "No index answers, and the start fails: " + err.Error()
 	}
 	door, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))

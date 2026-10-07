@@ -1,25 +1,17 @@
 package watchertest
 
 import (
-	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
-	"time"
 )
 
 // [[spec/tickets/a-watch-stops-mid-add]]
 func TestFoldersAppearUntilQuitAndAQuickStopPasses(t *testing.T) {
 	root := t.TempDir()
 	stop := Appearing(root)
-	deadline := time.Now().Add(Hung)
-	for {
-		entries, err := os.ReadDir(root)
-		if err == nil && len(entries) > 0 {
-			break
-		}
-		if time.Now().After(deadline) {
-			t.Fatal("no folder appears under the root")
-		}
-		time.Sleep(time.Millisecond)
+	for stands, _ := filepath.Glob(filepath.Join(root, "*")); len(stands) == 0; stands, _ = filepath.Glob(filepath.Join(root, "*")) {
+		runtime.Gosched()
 	}
 	Returns(t, func() error { stop(); return nil })
 }

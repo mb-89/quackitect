@@ -28,7 +28,20 @@ type Placed struct {
 	Term  time.Duration
 	// Where the placements hear that an instance answers, up by a commit or down by an exit. A nil hears nothing. [[spec/tickets/the-split-deployment-takes-over]]
 	answered func(instance string, up bool)
+	// The placements' clock, which the wait before a restart runs on. [[spec/tickets/go-waits-on-events]]
+	clock q.Clock
+	// The spawn the process runs through: a real process where it stands nil, and one in memory a case hands. [[spec/tickets/test-walks-move-onto-fakes]]
+	Spawn Spawner
 }
+
+// One process a spawn starts: the kill that ends it, and the channel its one exit lands on. [[spec/tickets/test-walks-move-onto-fakes]]
+type Process struct {
+	Kill   func()
+	Exited <-chan error
+}
+
+// Starts the command with the environment added to the index's own. [[spec/tickets/test-walks-move-onto-fakes]]
+type Spawner func(command, env []string) (Process, error)
 
 // What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
 type Leases interface {
@@ -43,6 +56,7 @@ var errSilent = errors.New("the lease expires with no beat")
 
 // Every placed process the index runs over one bus. [[spec/design_output/model#the-placements]]
 type Placements struct {
+	clock   q.Clock
 	bus     *Bus
 	store   *q.Store
 	placed  []Placed
@@ -57,7 +71,7 @@ type Placements struct {
 	after time.Duration
 	// The wait between two spawns. [[spec/tickets/the-modules-start-together]]
 	gap time.Duration
-	// The timer the spawner waits the start window and each gap on, which a case swaps for one it answers. [[spec/tickets/each-door-meets-one-test]]
+	// The timer the spawner waits the start window and each gap on: the clock's, which a case swaps for one it answers. [[spec/tickets/each-door-meets-one-test]]
 	timer func(time.Duration) <-chan time.Time
 	// Closes as the spawner returns, which the stop waits on. [[spec/tickets/stop-join-test-stands-red]]
 	spawned chan struct{}
@@ -78,13 +92,13 @@ func (p *Placements) Settle(wait time.Duration) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	spent := false
-	timer := time.AfterFunc(wait, func() {
+	stop := p.clock.AfterFunc(wait, func() {
 		p.mu.Lock()
 		spent = true
 		p.idle.Broadcast()
 		p.mu.Unlock()
 	})
-	defer timer.Stop()
+	defer stop()
 	for len(p.pending) > 0 && !p.stopped && !spent {
 		p.idle.Wait()
 	}
@@ -122,12 +136,12 @@ func (p *Placements) Timer(timer func(time.Duration) <-chan time.Time) *Placemen
 const spawnGap = 20 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
-func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, gap: spawnGap, timer: time.After, spawned: make(chan struct{}), moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
+func NewPlacements(clock q.Clock, bus *Bus, store *q.Store, placed []Placed) *Placements {
+	p := &Placements{clock: clock, bus: bus, store: store, gap: spawnGap, timer: clock.After, spawned: make(chan struct{}), moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {
-		one.answered = p.answered
+		one.answered, one.clock = p.answered, clock
 		for instance := range one.Instances {
 			p.pending[instance] = true
 		}
@@ -361,12 +375,12 @@ func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map
 func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}) {
 	for {
 		p.holds(expired)
-		cmd, exited := p.spawn(bus)
+		kill, exited := p.spawn(bus)
 		var err error
 		select {
 		case <-stopping:
-			if cmd != nil {
-				_ = cmd.Process.Kill()
+			if kill != nil {
+				kill()
 				<-exited
 			}
 			return
@@ -374,8 +388,8 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}
 			fmt.Fprintln(stderr, p.Name, "exits:", err)
 		case <-expired:
 			fmt.Fprintln(stderr, p.Name, "exits:", errSilent)
-			if cmd != nil {
-				_ = cmd.Process.Kill()
+			if kill != nil {
+				kill()
 			}
 			<-exited
 			err = errSilent
@@ -392,7 +406,7 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}
 		select {
 		case <-stopping:
 			return
-		case <-time.After(wait):
+		case <-p.clock.After(wait):
 		}
 	}
 }
@@ -410,17 +424,31 @@ func (p Placed) holds(expired <-chan struct{}) {
 }
 
 // A spawn that fails answers its fault as an exit, so the restart takes it. [[spec/design_output/model#a-process-ends]]
-func (p Placed) spawn(bus *Bus) (*exec.Cmd, <-chan error) {
-	exited := make(chan error, 1)
-	cmd := exec.Command(p.Command[0], p.Command[1:]...)
-	cmd.Env = append(os.Environ(), BusEnv+"="+bus.URL(), TokenEnv+"="+bus.Token())
+func (p Placed) spawn(bus *Bus) (func(), <-chan error) {
+	start := p.Spawn
+	if start == nil {
+		start = spawnsProcess
+	}
+	one, err := start(p.Command, []string{BusEnv + "=" + bus.URL(), TokenEnv + "=" + bus.Token()})
+	if err != nil {
+		failed := make(chan error, 1)
+		failed <- err
+		return nil, failed
+	}
+	return one.Kill, one.Exited
+}
+
+// The real spawn: the command runs as a process of its own, its fault on the index's. [[spec/tickets/test-walks-move-onto-fakes]]
+func spawnsProcess(command, env []string) (Process, error) {
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Env = append(os.Environ(), env...)
 	cmd.Stderr = stderr
 	if err := cmd.Start(); err != nil {
-		exited <- err
-		return nil, exited
+		return Process{}, err
 	}
+	exited := make(chan error, 1)
 	go func() { exited <- cmd.Wait() }()
-	return cmd, exited
+	return Process{Kill: func() { _ = cmd.Process.Kill() }, Exited: exited}, nil
 }
 
 func (p Placed) down(store *q.Store) {

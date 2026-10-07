@@ -4,7 +4,7 @@
 package vehicle
 
 import (
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -23,33 +23,32 @@ const fixedStamp = "2026-01-01T00:00:00.000Z"
 
 func fixed() time.Time { return time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC) }
 
-// Writes each file under the root, its folders first. [[spec/guidance/code/testing]]
+// Writes each file under the root through the disk door, its folders first. [[spec/tickets/test-walks-move-onto-fakes]]
 func seed(t *testing.T, root string, files map[string]string) {
 	t.Helper()
 	for rel, text := range files {
 		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := OS().MakeDir(filepath.Dir(at)); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+		if err := OS().Write(at, text); err != nil {
 			t.Fatal(err)
 		}
 	}
 }
 
+// The text at a path, read through the disk door. [[spec/tickets/test-walks-move-onto-fakes]]
 func readOf(t *testing.T, at string) string {
 	t.Helper()
-	said, err := os.ReadFile(at)
+	said, err := OS().Read(at)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return string(said)
+	return said
 }
 
-func exists(at string) bool {
-	_, err := os.Stat(at)
-	return err == nil
-}
+// Whether a path stands, read through the disk door. [[spec/tickets/test-walks-move-onto-fakes]]
+func exists(at string) bool { return OS().Exists(at) }
 
 // The method tree the JavaScript cases call /tools. [[spec/guidance/code/testing]]
 func tree(t *testing.T, extra map[string]string) (string, string) {
@@ -148,7 +147,7 @@ func TestVehicleTheIdentityLivesInTheMethodTree(t *testing.T) {
 	if id, err := IdentityHere(OS(), fixed, tools, 7); err != nil || id != "abc123" {
 		t.Fatal(id, err)
 	}
-	os.Remove(filepath.Join(tools, filepath.FromSlash(Identity)))
+	OS().Remove(filepath.Join(tools, filepath.FromSlash(Identity)))
 	made, err := IdentityHere(OS(), fixed, tools, 7)
 	if err != nil {
 		t.Fatal(err)
@@ -294,7 +293,7 @@ func TestVehicleCarriesTheMethodAndNothingPrivate(t *testing.T) {
 func TestVehicleCopiesANestedFileByteExactAndCounts(t *testing.T) {
 	bytes := "line one\r\nline two\n\ttabbed ünïcode\n"
 	where, tools := tree(t, map[string]string{"src/parts/deep/one.js": bytes})
-	os.Chmod(filepath.Join(tools, "RUNME.sh"), 0o755)
+	OS().Runnable(filepath.Join(tools, "RUNME.sh"))
 	dest := filepath.Join(where, "vehicle")
 	put, err := Produce(OS(), tools, dest, false)
 	if err != nil {
@@ -307,7 +306,7 @@ func TestVehicleCopiesANestedFileByteExactAndCounts(t *testing.T) {
 		t.Fatal("the run bit travels")
 	}
 	count := 0
-	filepath.WalkDir(dest, func(at string, one os.DirEntry, _ error) error {
+	filepath.WalkDir(dest, func(at string, one fs.DirEntry, _ error) error {
 		if !one.IsDir() {
 			count++
 		}
@@ -321,7 +320,7 @@ func TestVehicleCopiesANestedFileByteExactAndCounts(t *testing.T) {
 func TestVehicleLandsInANewPlaceAndNeverOverItsMethod(t *testing.T) {
 	where, tools := tree(t, nil)
 	taken := filepath.Join(where, "taken")
-	os.MkdirAll(taken, 0o755)
+	OS().MakeDir(taken)
 	if put, _ := Produce(OS(), tools, taken, false); put.OK || put.Why != taken+" stands already. A vehicle lands in a new place" {
 		t.Fatal(put)
 	}
@@ -338,13 +337,23 @@ func TestVehicleLandsInANewPlaceAndNeverOverItsMethod(t *testing.T) {
 
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 // A file's permission bits, and whether the disk keeps any: a Windows disk keeps no run bit, so a case reads the bit off Windows alone. [[spec/tickets/window-verbs-windows-green]]
-func permOf(t *testing.T, path string) (os.FileMode, bool) {
+func permOf(t *testing.T, path string) (fs.FileMode, bool) {
 	t.Helper()
-	info, err := os.Stat(path)
+	var perm fs.FileMode
+	err := filepath.WalkDir(path, func(_ string, one fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		info, err := one.Info()
+		if err == nil {
+			perm = info.Mode().Perm()
+		}
+		return err
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return info.Mode().Perm(), runtime.GOOS != "windows"
+	return perm, runtime.GOOS != "windows"
 }
 
 // A vehicle lands beside its method however the destination spells it, so a Windows path naming the method refuses before any copy. [[spec/tickets/window-verbs-windows-green]]
@@ -361,14 +370,14 @@ func TestVehicleAProducedVehicleStandsAlone(t *testing.T) {
 	where := t.TempDir()
 	method := filepath.Join(where, "method")
 	seed(t, method, map[string]string{Marker: "{}\n", "RUNME.sh": "#!/bin/sh\n", "package.json": "{}\n", ".se/held.md": "{}\n"})
-	os.Chmod(filepath.Join(method, "RUNME.sh"), 0o755)
+	OS().Runnable(filepath.Join(method, "RUNME.sh"))
 	dest := filepath.Join(where, "vehicle")
 	put, err := Produce(OS(), method, dest, false)
 	if err != nil || put.Count != 3 {
 		t.Fatal(put, err)
 	}
-	mine, _ := IdentityHere(OS(), time.Now, method, os.Getpid()+1)
-	other, _ := IdentityHere(OS(), time.Now, dest, os.Getpid())
+	mine, _ := IdentityHere(OS(), fixed, method, 8)
+	other, _ := IdentityHere(OS(), fixed, dest, 7)
 	if other == "" || other == mine || !exists(filepath.Join(dest, filepath.FromSlash(Identity))) {
 		t.Fatal("the vehicle holds its own identity")
 	}

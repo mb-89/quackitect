@@ -3,13 +3,12 @@
 // [[spec/design_output/extension#a-click-writes-the-file]]
 
 const vscode = require("vscode");
-const { appendFile, mkdir } = require("node:fs/promises");
 const { dirname } = require("node:path");
 
 const NAME = "quackitect";
 
 // [[spec/design_output/extension#a-click-writes-the-file]]
-function fileDoor(context, folder, uriOf) {
+function fileDoor(context, folder, uriOf, doors) {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let console_ = null;
@@ -45,11 +44,11 @@ function fileDoor(context, folder, uriOf) {
       await vscode.workspace.fs.writeFile(uriOf(path), encoder.encode(String(text)));
     },
 
-    // The editor's file system offers no append, so the door takes node's, and a line lands after every line another writer holds. [[spec/design_output/log#every-writer-appends]]
+    // The editor's file system offers no append, so the door takes the disk door's, and a line lands after every line another writer holds. [[spec/design_output/log#every-writer-appends]]
     async append(path, text) {
       const at = uriOf(path).fsPath;
-      await mkdir(dirname(at), { recursive: true });
-      await appendFile(at, String(text), "utf8");
+      doors.disk.makeDir(dirname(at));
+      doors.disk.append(at, String(text));
     },
 
     // The markdown editor opens the file, where the lens and the fill on save take it. [[spec/tickets/the-work-group-draws-buttons]]

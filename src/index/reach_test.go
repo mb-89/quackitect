@@ -6,47 +6,42 @@ package index // level0: InPackageTest - it drives the unexported stands, stampO
 import (
 	"encoding/json"
 	"errors"
-	"net"
-	"net/http"
-	"net/http/httptest"
-	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // A build of the tree's index, which no case runs, so its stamp stands apart from the test binary's. [[spec/design_output/index#a-door-comes-back]]
 func builtIndex(t *testing.T, root, body string) string {
 	t.Helper()
 	bin := indexBinary(root)
-	if err := os.MkdirAll(filepath.Dir(bin), 0o755); err != nil {
+	if err := makeDir(filepath.Dir(bin), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(bin, []byte(body), 0o755); err != nil {
+	if err := writeFile(bin, []byte(body), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	return bin
 }
 
-// A door that answers every call and names each method it hears. [[spec/design_output/index#a-door-comes-back]]
-func heardDoor(t *testing.T) (*httptest.Server, func() []string) {
+// A door on the fake network that answers every call and names each method it hears. [[spec/design_output/index#a-door-comes-back]]
+func heardDoor(t *testing.T, fake *memNet) (int, func() []string) {
 	t.Helper()
 	var guard sync.Mutex
 	var heard []string
-	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var said call
-		json.NewDecoder(r.Body).Decode(&said)
+	port := fake.serves(t, func(said call) answer {
 		guard.Lock()
 		heard = append(heard, said.Method)
 		guard.Unlock()
-		writes(w, answer{Result: map[string]any{"method": said.Method}, ID: said.ID})
-	}))
-	t.Cleanup(door.Close)
-	return door, func() []string {
+		return answer{Result: map[string]any{"method": said.Method}}
+	})
+	return port, func() []string {
 		guard.Lock()
 		defer guard.Unlock()
 		return append([]string(nil), heard...)
@@ -59,10 +54,10 @@ func standsAt(t *testing.T, root string, said Standing) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Dir(standingPath(root)), 0o755); err != nil {
+	if err := makeDir(filepath.Dir(standingPath(root)), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(standingPath(root), body, 0o644); err != nil {
+	if err := writeFile(standingPath(root), body, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -89,7 +84,7 @@ func TestAClientKeepsTheDoorTheTreesIndexStands(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	self, _ := os.Executable()
+	self, _ := executableOf()
 	if stampOf(bin) == stampOf(self) {
 		t.Fatal("the case needs a build apart from the caller's")
 	}
@@ -117,7 +112,7 @@ func TestAStartRunsTheTreesIndexAndNeverTheCaller(t *testing.T) {
 	ran := fakeSpawn(t, func(root string) {
 		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 	})
-	if err := starts(root); err != nil {
+	if err := starts(qtest.Wall(), root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 1 || got[0] != bin {
@@ -129,13 +124,12 @@ func TestAStartRunsTheTreesIndexAndNeverTheCaller(t *testing.T) {
 func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	door, heard := heardDoor(t)
-	port := door.Listener.Addr().(*net.TCPAddr).Port
+	port, heard := heardDoor(t, newMemNet(t))
 	live := Standing{Port: port, Pid: 1, Root: root, Stamp: stampOf(bin)}
 	standsAt(t, root, live)
 	ran := fakeSpawn(t, func(root string) { standsAt(t, root, live) })
 
-	if _, err := reaches(root, []string{"standing"}); err != nil {
+	if _, err := reaches(qtest.Wall(), root, []string{"standing"}); err != nil {
 		t.Fatal(err)
 	}
 	if got := heard(); len(got) != 1 || got[0] != "standing" {
@@ -152,8 +146,7 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	door, heard := heardDoor(t)
-	port := door.Listener.Addr().(*net.TCPAddr).Port
+	port, heard := heardDoor(t, newMemNet(t))
 	standsAt(t, root, Standing{Port: port, Pid: 1, Root: root, Stamp: stampOf(bin)})
 	if _, live := liveDoor(root); !live {
 		t.Fatal("a serve reads the live door on its build as gone")
@@ -177,13 +170,9 @@ func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	const doorPid = 4242
-	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var said call
-		json.NewDecoder(r.Body).Decode(&said)
-		writes(w, answer{Result: map[string]any{"stopping": root, "pid": doorPid}, ID: said.ID})
-	}))
-	t.Cleanup(door.Close)
-	port := door.Listener.Addr().(*net.TCPAddr).Port
+	port := newMemNet(t).serves(t, func(call) answer {
+		return answer{Result: map[string]any{"stopping": root, "pid": doorPid}}
+	})
 	standsAt(t, root, Standing{Port: port, Pid: doorPid, Root: root, Stamp: stampOf(bin)})
 	ran := fakeSpawn(t, nil)
 	var waited []int
@@ -191,7 +180,7 @@ func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
 	awaits = func(pid int) { waited = append(waited, pid) }
 	t.Cleanup(func() { awaits = was })
 
-	if code := asks(root, []string{"stop"}); code != 0 {
+	if code := asks(qtest.Wall(), root, []string{"stop"}); code != 0 {
 		t.Fatalf("a stop answers %d, where the door takes it", code)
 	}
 	if len(waited) != 1 || waited[0] != doorPid {
@@ -213,28 +202,37 @@ func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
 		t.Fatalf("a door drops another door's standing file: %v", err)
 	}
 	dropsOwn(root, 2)
-	if _, err := os.Stat(standingPath(root)); err == nil {
+	if _, err := statOf(standingPath(root)); err == nil {
 		t.Fatal("a door leaving keeps its own standing file")
 	}
 }
 
-// A door stays while the standing file names it, and leaves once the file names another door. [[spec/tickets/process-shadow-reads-clean]]
+// A door stays while the standing file names it, and leaves once the file names another door: the clock looks again on each tick. [[spec/tickets/process-shadow-reads-clean]]
 // level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestADisplacedDoorLeaves(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
-	gone := displaced(root, 2, time.Millisecond)
+	clock := qtest.NewFake(time.Time{})
+	gone := displaced(clock, root, 2, time.Millisecond)
+	for range 2 * displacedLooks {
+		clock.Tick(time.Millisecond)
+		runtime.Gosched()
+	}
 	select {
 	case <-gone:
 		t.Fatal("a door the standing file names leaves")
-	case <-time.After(20 * time.Millisecond):
+	default:
 	}
 	standsAt(t, root, Standing{Port: 4, Pid: 5, Root: root})
-	select {
-	case <-gone:
-	case <-time.After(time.Second):
-		t.Fatal("a door the standing file no longer names stays")
+	for {
+		clock.Tick(time.Millisecond)
+		select {
+		case <-gone:
+			return
+		default:
+			runtime.Gosched()
+		}
 	}
 }
 
@@ -243,14 +241,14 @@ func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	built := filepath.Join(t.TempDir(), "another-index")
-	if err := os.WriteFile(built, []byte("a build elsewhere"), 0o755); err != nil {
+	if err := writeFile(built, []byte("a build elsewhere"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	stamp := stampOf(built)
 	if !stands(Standing{Root: root, Stamp: stamp, Bin: built}, root) {
 		t.Fatal("a door standing off a build elsewhere stands aside while that build lies unchanged")
 	}
-	if err := os.WriteFile(built, []byte("a build elsewhere, rebuilt longer"), 0o755); err != nil {
+	if err := writeFile(built, []byte("a build elsewhere, rebuilt longer"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if stands(Standing{Root: root, Stamp: stamp, Bin: built}, root) {
@@ -262,7 +260,7 @@ func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
 func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 	root := t.TempDir()
 	ran := fakeSpawn(t, nil)
-	if err := starts(root); err == nil {
+	if err := starts(qtest.Wall(), root); err == nil {
 		t.Fatal("a start with no index built answers no fault")
 	}
 	if got := ran(); len(got) != 0 {
@@ -274,16 +272,8 @@ func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	self, _ := os.Executable()
+	_, standing := served(t, qtest.Wall(), root, q.New(), nil)
+	self, _ := executableOf()
 	if standing.Bin != self || !stands(standing, root) {
 		t.Fatalf("the standing file says %+v, where this build stands it", standing)
 	}
@@ -299,7 +289,7 @@ func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
 		t.Fatalf("a client with no index beside it starts %q, where the tree's stands at %q", got, indexBinary(root))
 	}
 	beside := filepath.Join(vehicle, filepath.Base(indexBinary(root)))
-	if err := os.WriteFile(beside, []byte("the vehicle's index"), 0o755); err != nil {
+	if err := writeFile(beside, []byte("the vehicle's index"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if got := serverOf(self, root); got != beside {
@@ -317,21 +307,11 @@ func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
 func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	late := make(chan struct{})
-	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		<-late
-	}))
-	t.Cleanup(door.Close)
-	t.Cleanup(func() { close(late) })
-	was := postTimeout
-	postTimeout = 50 * time.Millisecond
-	t.Cleanup(func() { postTimeout = was })
-	port := door.Listener.Addr().(*net.TCPAddr).Port
-	busy := Standing{Port: port, Pid: 1, Root: root, Stamp: stampOf(bin)}
+	busy := Standing{Port: newMemNet(t).lates(), Pid: 1, Root: root, Stamp: stampOf(bin)}
 	standsAt(t, root, busy)
 	ran := fakeSpawn(t, func(root string) { standsAt(t, root, busy) })
 
-	if _, err := reaches(root, []string{"standing"}); err == nil {
+	if _, err := reaches(qtest.Wall(), root, []string{"standing"}); err == nil {
 		t.Fatal("a client answers no fault, where the door answers late")
 	}
 	if got := ran(); len(got) != 0 {
@@ -343,19 +323,29 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 }
 
 // A reach waits on its door's answer past the old thirty seconds, up to what the hang guard leaves of it. [[spec/tickets/cold-runner-waits-meet-readiness]]
-// level0: RunsAlone - it swaps the package's start clock, which every start beside it reads
 func TestAReachWaitsOnItsDoorUpToTheHangGuard(t *testing.T) {
-	fakeStartClock(t, nil)
-	now := startNow()
-	if got := postSpan(now); got != startHang || got <= 30*time.Second {
+	t.Parallel()
+	clock, _ := fakeStartClock(t, time.Time{}, nil)
+	now := clock.Now()
+	if got := postSpan(clock, now); got != startHang || got <= 30*time.Second {
 		t.Fatalf("a fresh reach waits %v on its door, and wants the hang guard of %v", got, startHang)
 	}
-	if got := postSpan(now.Add(-3 * time.Minute)); got != startHang-3*time.Minute {
+	if got := postSpan(clock, now.Add(-3*time.Minute)); got != startHang-3*time.Minute {
 		t.Fatalf("a reach three minutes in waits %v, and wants what the guard leaves", got)
 	}
-	if got := postSpan(now.Add(-2 * startHang)); got != startPollPause {
+	if got := postSpan(clock, now.Add(-2*startHang)); got != startPollPause {
 		t.Fatalf("a reach past its guard waits %v, and wants one pause", got)
 	}
+}
+
+// The time the claim at the root was last renewed. [[spec/tickets/test-walks-move-onto-fakes]]
+func claimedAt(t *testing.T, root string) time.Time {
+	t.Helper()
+	said, err := statOf(startingPath(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return said.ModTime()
 }
 
 // A caller meeting a fresh claim spawns nothing, and reads the door the claiming caller's index stands. [[spec/tickets/reaches-keeps-the-post-fault]]
@@ -364,14 +354,15 @@ func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	ran := fakeSpawn(t, nil)
-	if !claims(startingPath(root)) {
+	if !claims(qtest.Wall(), startingPath(root)) {
 		t.Fatal("the first caller claims no start")
 	}
-	go func() {
-		time.Sleep(3 * startPollPause)
-		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
-	}()
-	if err := starts(root); err != nil {
+	clock, _ := fakeStartClock(t, claimedAt(t, root), func(_ time.Time, waited time.Duration) {
+		if waited == 3*startPollPause {
+			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
+		}
+	})
+	if err := starts(clock, root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 0 {
@@ -384,45 +375,51 @@ func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 func TestAStaleClaimGivesWay(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
-	if !claims(startingPath(root)) {
+	if !claims(qtest.Wall(), startingPath(root)) {
 		t.Fatal("the first caller claims no start")
-	}
-	long := time.Now().Add(-2 * startPolls * startPollPause)
-	if err := os.Chtimes(startingPath(root), long, long); err != nil {
-		t.Fatal(err)
 	}
 	ran := fakeSpawn(t, func(root string) {
 		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 	})
-	if err := starts(root); err != nil {
+	clock, _ := fakeStartClock(t, claimedAt(t, root).Add(2*startPolls*startPollPause), nil)
+	if err := starts(clock, root); err != nil {
 		t.Fatal(err)
 	}
 	if got := ran(); len(got) != 1 {
 		t.Fatalf("a caller meeting a stale claim spawns %q", got)
 	}
-	if _, err := os.Stat(startingPath(root)); err == nil {
+	if _, err := statOf(startingPath(root)); err == nil {
 		t.Fatal("the claim outlives the start it guards")
 	}
 }
 
-// A start's clock standing still until each pause moves it on, so a case waits minutes and sleeps none. Each pause runs the hand the case gives, with the time waited so far. [[spec/design_output/index#a-door-comes-back]]
-func fakeStartClock(t *testing.T, each func(waited time.Duration)) func() time.Duration {
-	t.Helper()
-	from := time.Now()
-	at := from
-	wasNow, wasPause := startNow, startPause
-	startNow = func() time.Time { return at }
-	startPause = func() {
-		at = at.Add(startPollPause)
-		if each != nil {
-			each(at.Sub(from))
-		}
+// A start's clock standing still until each wait moves it on by its span, so a case waits minutes and sleeps none. Each wait runs the hand the case gives, with the time it stands at and the time waited so far. [[spec/design_output/index#a-door-comes-back]]
+type stepClock struct {
+	*qtest.FakeClock
+	from time.Time
+	each func(now time.Time, waited time.Duration)
+}
+
+func (one *stepClock) After(span time.Duration) <-chan time.Time {
+	one.Tick(span)
+	now := one.Now()
+	if one.each != nil {
+		one.each(now, now.Sub(one.from))
 	}
-	t.Cleanup(func() { startNow, startPause = wasNow, wasPause })
-	return func() time.Duration { return at.Sub(from) }
+	fired := make(chan time.Time, 1)
+	fired <- now
+	return fired
+}
+
+// The stepping clock a case hands the start from the time it names, and the time it waited. [[spec/design_output/index#a-door-comes-back]]
+func fakeStartClock(t *testing.T, from time.Time, each func(now time.Time, waited time.Duration)) (*stepClock, func() time.Duration) {
+	t.Helper()
+	clock := &stepClock{FakeClock: qtest.NewFake(from), from: from, each: each}
+	return clock, func() time.Duration { return clock.Now().Sub(from) }
 }
 
 // A spawn whose index answers the exit the case hands, and stands no door. [[spec/design_output/index#a-door-comes-back]]
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func exitingSpawn(t *testing.T, exits error) {
 	t.Helper()
 	was := spawns
@@ -442,12 +439,12 @@ func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	ran := fakeSpawn(t, nil)
-	fakeStartClock(t, func(waited time.Duration) {
+	clock, _ := fakeStartClock(t, time.Time{}, func(_ time.Time, waited time.Duration) {
 		if waited == 2*startPolls*startPollPause {
 			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 		}
 	})
-	if err := starts(root); err != nil {
+	if err := starts(clock, root); err != nil {
 		t.Fatalf("a start gives up on an index still coming up: %v", err)
 	}
 	if got := ran(); len(got) != 1 {
@@ -457,13 +454,13 @@ func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 
 // An index that exits before its door stands ends the wait at once, naming the exit. [[spec/design_output/index#a-door-comes-back]]
 // level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
-// level0: RunsAlone - it swaps the package's spawns and start clock, which every start beside it reads
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
 	exitingSpawn(t, errors.New("exit status 2"))
-	waited := fakeStartClock(t, nil)
-	err := starts(root)
+	clock, waited := fakeStartClock(t, time.Time{}, nil)
+	err := starts(clock, root)
 	if err == nil || !strings.Contains(err.Error(), "exits before its door stands: exit status 2") {
 		t.Fatalf("a start answers %v, and wants the index's exit", err)
 	}
@@ -474,13 +471,13 @@ func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 
 // An index that neither stands nor exits meets the hang guard, and the start names it hung. [[spec/design_output/index#a-door-comes-back]]
 // level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
-// level0: RunsAlone - it swaps the package's spawns and start clock, which every start beside it reads
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
 	exitingSpawn(t, nil)
-	waited := fakeStartClock(t, nil)
-	if err := starts(root); err == nil || !strings.Contains(err.Error(), "hangs") {
+	clock, waited := fakeStartClock(t, time.Time{}, nil)
+	if err := starts(clock, root); err == nil || !strings.Contains(err.Error(), "hangs") {
 		t.Fatalf("a start answers %v over a hung index, and wants the hang named", err)
 	}
 	if waited() < startHang {
@@ -494,17 +491,16 @@ func TestAWaiterHoldsWhileTheClaimStaysFresh(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	ran := fakeSpawn(t, nil)
-	if !claims(startingPath(root)) {
+	if !claims(qtest.Wall(), startingPath(root)) {
 		t.Fatal("the first caller claims no start")
 	}
-	fakeStartClock(t, func(waited time.Duration) {
-		now := startNow()
-		_ = os.Chtimes(startingPath(root), now, now)
+	clock, _ := fakeStartClock(t, claimedAt(t, root), func(now time.Time, waited time.Duration) {
+		_ = chtimesOf(startingPath(root), now, now)
 		if waited == 2*startPolls*startPollPause {
 			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 		}
 	})
-	if err := starts(root); err != nil {
+	if err := starts(clock, root); err != nil {
 		t.Fatalf("a caller gives up on a claim its holder keeps fresh: %v", err)
 	}
 	if got := ran(); len(got) != 0 {

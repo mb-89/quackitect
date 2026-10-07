@@ -12,6 +12,18 @@ import {
 } from "../../.claude/skills/level0/hooks/cage.ts";
 import { callsOf, postedAs } from "../../.claude/skills/level0/lib/copilot.js";
 
+// The statuses a fetch reads as ok. [[spec/tickets/copilot-answers-off-the-door]]
+const OK_FROM = 200;
+const OK_PAST = 300;
+
+// The fetch answers takes, sent through the http door under the hook's deadline. [[spec/tickets/copilot-answers-off-the-door]]
+export function fetchThrough(web, signal) {
+  return async (url, init) => {
+    const said = await web.send(url, { ...init, signal });
+    return { ok: said.status >= OK_FROM && said.status < OK_PAST, status: said.status, text: said.text };
+  };
+}
+
 // The result a Copilot event answers: the first deny or block a call meets, else the afters joined as context. A door that answers nothing hands each call to the cage verb. [[spec/tickets/copilot-answers-off-the-door]]
 export async function answers(event, it) {
   const posted = postedAs(event.event);

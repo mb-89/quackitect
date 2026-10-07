@@ -5,10 +5,12 @@ package front
 
 import (
 	"encoding/json"
-	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/files"
 )
 
 const body = "\n# Ask\n\nA body: with a colon, and --- a fence of its own.\n"
@@ -155,28 +157,37 @@ func TestACrlfFrontKeepsItsLineEnds(t *testing.T) {
 	}
 }
 
-// The tickets stand at the root of the module, two folders up. [[spec/tickets/go-writes-the-frontmatter]]
+// The tickets stand at the root of the module, two folders up, read through the disk door. [[spec/tickets/test-walks-move-onto-fakes]]
 func TestNormaliseRunsTwiceAsOnce(t *testing.T) {
-	paths, err := filepath.Glob(filepath.Join("..", "..", "spec", "tickets", "*.md"))
-	if err != nil || len(paths) == 0 {
-		t.Fatalf("the tree holds no ticket to read: %v", err)
+	tree := files.NewDisk(filepath.Join("..", ".."))
+	listed, err := tree.List("spec/tickets")
+	if err != nil {
+		t.Fatal(err)
 	}
-	for _, path := range paths {
-		said, err := os.ReadFile(path)
+	read := 0
+	for _, at := range listed {
+		if path.Dir(at) != "spec/tickets" || path.Ext(at) != ".md" {
+			continue
+		}
+		read++
+		said, _, err := tree.Read(at)
 		if err != nil {
 			t.Fatal(err)
 		}
-		once, err := Normalise(string(said))
+		once, err := Normalise(said)
 		if err != nil {
-			t.Fatalf("%s: %v", path, err)
+			t.Fatalf("%s: %v", at, err)
 		}
 		twice, _ := Normalise(once)
 		if twice != once {
-			t.Errorf("%s moves on a second run", path)
+			t.Errorf("%s moves on a second run", at)
 		}
-		if !strings.HasSuffix(once, bodyOf(string(said))) {
-			t.Errorf("%s loses its body", path)
+		if !strings.HasSuffix(once, bodyOf(said)) {
+			t.Errorf("%s loses its body", at)
 		}
+	}
+	if read == 0 {
+		t.Fatal("the tree holds no ticket to read")
 	}
 }
 

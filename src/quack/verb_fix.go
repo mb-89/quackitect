@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -39,10 +39,10 @@ var walkSkips = map[string]bool{".git": true, "node_modules": true, ".se": true,
 // A tool run under a folder, writing to the streams, which answers its exit code. [[spec/tickets/config-verbs-port-to-go]]
 type fixRunner func(dir string, out, errs io.Writer, argv ...string) int
 
-func init() { register("fix", fixVerb(index.Root, toolRuns)) }
+func init() { register("fix", fixVerb(index.Root, toolRuns, realDisk())) }
 
 // fix over the root: the flags it knows, then the rounds of the rules over the paths, then biome. [[spec/tickets/the-small-faults-land]] [[spec/tickets/vale-leaves-the-tree]]
-func fixVerb(root func() (string, error), run fixRunner) twin {
+func fixVerb(root func() (string, error), run fixRunner, disk diskDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		var paths, unknown []string
 		help := false
@@ -81,7 +81,7 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 			return 0
 		}
 		for range fixRounds {
-			changed, err := fixRound(at, set, paths, writeCalmed)
+			changed, err := fixRound(disk, at, set, paths, writesCalmed(disk))
 			if err != nil {
 				fmt.Fprintln(errs, err)
 				return exitFailed
@@ -90,7 +90,7 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 				break
 			}
 		}
-		if biome := toolHere(at, "biome"); biome != "" {
+		if biome := toolHere(disk, at, "biome"); biome != "" {
 			run(at, out, errs, append([]string{biome, "check", "--write", "--config-path=" + biomeFolder}, paths...)...)
 		}
 		fmt.Fprintln(out, "Run ./RUNME.sh lint to see what is left for a person.")
@@ -99,12 +99,12 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 }
 
 // The path the survey names for a tool where a file stands there, else the one in the runtime binary folder, else nothing. [[spec/design_output/tools#where-a-caller-looks]]
-func toolHere(root, name string) string {
+func toolHere(disk diskDoors, root, name string) string {
 	var said map[string]struct {
 		Path string `json:"path"`
 	}
-	if body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(body, &said) == nil {
-		if at := said[name].Path; at != "" && standsHere(at) {
+	if body, err := disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(body, &said) == nil {
+		if at := said[name].Path; at != "" && disk.stands(at) {
 			return at
 		}
 	}
@@ -112,20 +112,15 @@ func toolHere(root, name string) string {
 	if runtime.GOOS == "windows" {
 		guess += ".exe"
 	}
-	if standsHere(guess) {
+	if disk.stands(guess) {
 		return guess
 	}
 	return ""
 }
 
-func standsHere(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
-// A tool run over the real process door, on the terminal's input. [[spec/tickets/the-small-faults-land]]
+// A tool run over the real process door, on the box's input. [[spec/tickets/the-small-faults-land]]
 func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
-	return toolRunsOver(proc.Real, os.Stdin)(dir, out, errs, argv...)
+	return toolRunsOver(proc.Real, quietBox().input)(dir, out, errs, argv...)
 }
 
 // A tool run through the process door with the caller's streams and the input it hands through, answering its exit code, and exitFailed with the fault where it fails to start or a signal ends it. [[spec/tickets/quack-spawns-all-take-the-runner]]
@@ -141,10 +136,10 @@ func toolRunsOver(run proc.Runner, in io.Reader) fixRunner {
 }
 
 // One round of the rules over every prose file under the paths: each file's swaps and calms applied, and written where it changes. It answers how many files changed. [[spec/tickets/vale-leaves-the-tree]]
-func fixRound(root string, set *rules.Set, paths []string, write func(string, []byte) error) (int, error) {
+func fixRound(disk diskDoors, root string, set *rules.Set, paths []string, write func(string, []byte) error) (int, error) {
 	changed := 0
-	for _, path := range proseFilesUnder(root, paths) {
-		was, err := os.ReadFile(path)
+	for _, path := range proseFilesUnder(disk, root, paths) {
+		was, err := disk.read(path)
 		if err != nil {
 			continue
 		}
@@ -178,8 +173,10 @@ func calm(found []rules.Finding) []rules.Finding {
 	return out
 }
 
-// Writes a fixed file over itself. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func writeCalmed(path string, text []byte) error { return os.WriteFile(path, text, calmedMode) }
+// Writes a fixed file over itself through the disk. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+func writesCalmed(disk diskDoors) func(path string, text []byte) error {
+	return func(path string, text []byte) error { return disk.write(path, text, calmedMode) }
+}
 
 // The first letter upper and every character after it lower. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func sentenceCase(said string) string {
@@ -192,29 +189,34 @@ func sentenceCase(said string) string {
 	return said[:first] + string(unicode.ToUpper(letter)) + strings.ToLower(rest)
 }
 
-// Every prose file under the paths, past the skipped folders and every name opening on an underscore. [[spec/tickets/the-small-faults-land]]
-func proseFilesUnder(root string, paths []string) []string {
+// Every prose file under the paths, past the skipped folders and every name opening on an underscore, in the order the disk lists them. [[spec/tickets/the-small-faults-land]]
+func proseFilesUnder(disk diskDoors, root string, paths []string) []string {
 	var out []string
 	for _, one := range paths {
 		base := one
 		if !filepath.IsAbs(base) {
 			base = filepath.Join(root, filepath.FromSlash(one))
 		}
-		_ = filepath.WalkDir(base, func(at string, entry os.DirEntry, err error) error {
-			if err != nil {
-				return nil
-			}
-			if at != base && (walkSkips[entry.Name()] || strings.HasPrefix(entry.Name(), "_")) {
-				if entry.IsDir() {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if !entry.IsDir() && proseFile.MatchString(entry.Name()) {
-				out = append(out, at)
-			}
-			return nil
-		})
+		if said, err := disk.stat(base); err == nil {
+			out = proseFilesInto(out, disk, base, fs.FileInfoToDirEntry(said), true)
+		}
+	}
+	return out
+}
+
+// Adds each prose file under the entry, past the folders the walk skips. [[spec/tickets/the-small-faults-land]]
+func proseFilesInto(out []string, disk diskDoors, at string, entry fs.DirEntry, base bool) []string {
+	if !base && (walkSkips[entry.Name()] || strings.HasPrefix(entry.Name(), "_")) {
+		return out
+	}
+	if !entry.IsDir() {
+		if proseFile.MatchString(entry.Name()) {
+			out = append(out, at)
+		}
+		return out
+	}
+	for _, one := range disk.listed(at) {
+		out = proseFilesInto(out, disk, filepath.Join(at, one.Name()), one, false)
 	}
 	return out
 }

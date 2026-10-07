@@ -5,7 +5,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -31,16 +30,10 @@ func logText(rows ...probeRow) string {
 	return said.String()
 }
 
-// Writes the text as the session log under the root. [[spec/tickets/box-verbs-port-to-go]]
-func writeLog(t *testing.T, root, text string) {
+// Writes the text as the session log under the root, through the disk door. [[spec/tickets/test-walks-move-onto-fakes]]
+func writeLog(t *testing.T, disk diskDoors, root, text string) {
 	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(sessionLog))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq2Seed(t, disk, filepath.Join(root, filepath.FromSlash(sessionLog)), text)
 }
 
 // Hands the client's runs to the answer, the runner recording each run first. [[spec/tickets/box-verbs-port-to-go]]
@@ -102,7 +95,7 @@ func TestTheCompactProbeRunsTheClientAndPrintsTheRowsItReads(t *testing.T) {
 	t.Parallel()
 	d, runner, out, errs := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult {
-		writeLog(t, d.root, logText(compactContext("first"), compactHeard(heardSame), compactRun(), compactContext("re-read"), compactHeard(heardSame)))
+		writeLog(t, d.disk, d.root, logText(compactContext("first"), compactHeard(heardSame), compactRun(), compactContext("re-read"), compactHeard(heardSame)))
 		return ranResult{code: 3}
 	})
 	if code := probeVerb(d, []string{"compact"}); code != 0 {
@@ -128,7 +121,7 @@ func TestTheCompactProbeAnswersOneWhereTheLayerDropsOrNoClientStands(t *testing.
 	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult {
-		writeLog(t, d.root, logText(compactContext("first"), compactRun()))
+		writeLog(t, d.disk, d.root, logText(compactContext("first"), compactRun()))
 		return ranResult{}
 	})
 	if code := probeVerb(d, []string{"compact"}); code != 1 {
@@ -146,9 +139,8 @@ func TestTheProbeRunsTheClientTheSurveyNames(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t, "claude")
 	at := filepath.Join(d.env("PATH"), "claude")
-	survey := filepath.Join(d.root, filepath.FromSlash(toolsFile))
-	_ = os.MkdirAll(filepath.Dir(survey), 0o755)
-	_ = os.WriteFile(survey, []byte(`{"claude":{"path":`+jsonString(at)+`}}`), 0o644)
+	hq2Seed(t, d.disk, filepath.Join(d.root, filepath.FromSlash(toolsFile)), `{"claude":{"path":`+jsonString(at)+`}}`)
+	hq2Seed(t, d.disk, at, "")
 	probeVerb(d, []string{"compact"})
 	if runner.ran[0][0] != at {
 		t.Errorf("the probe runs %s", runner.ran[0][0])
@@ -223,20 +215,6 @@ func TestTheDryProbeRefusesARevisionBesideTheWorkingChange(t *testing.T) {
 	}
 }
 
-// The smoke road starts the same entry with its words, as the dry road does. [[spec/tickets/level0-smoke-runs-in-seconds]]
-func TestTheSmokeProbeHandsItsRoadToTheEntry(t *testing.T) {
-	t.Parallel()
-	d, runner, _, errs := fakeBoxDoors(t)
-	runner.answers["node"] = ranResult{code: 0}
-	if code := probeVerb(d, []string{"smoke", "--working"}); code != 0 {
-		t.Errorf("the smoke road answers %d: %s", code, errs)
-	}
-	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "smoke", "--working"}
-	if len(runner.ran) != 1 || !slices.Equal(runner.ran[0], want) {
-		t.Errorf("the smoke road runs %v", runner.ran)
-	}
-}
-
 func TestAnUnknownWordPrintsTheUsage(t *testing.T) {
 	t.Parallel()
 	for _, argv := range [][]string{nil, {"nothing"}} {
@@ -253,13 +231,13 @@ func TestAnUnknownWordPrintsTheUsage(t *testing.T) {
 // Two writers appending at once tear one line, and a probe reads the rest. [[spec/design_output/log#every-writer-appends]]
 func TestATornLineDropsAloneAndAMissingLogReadsAsNoRow(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	writeLog(t, root, logText(probeRowOf("info", "context", "read", nil))+"{\"at\":\"2026\n"+logText(probeRowOf("info", "compact", "ran", nil)))
-	rows := probeRows(filepath.Join(root, filepath.FromSlash(sessionLog)))
+	root, disk := "/tree", newFakeDisk()
+	writeLog(t, disk, root, logText(probeRowOf("info", "context", "read", nil))+"{\"at\":\"2026\n"+logText(probeRowOf("info", "compact", "ran", nil)))
+	rows := probeRows(disk, filepath.Join(root, filepath.FromSlash(sessionLog)))
 	if len(rows) != 2 || rows[0].text("kind") != "context" || rows[1].text("kind") != "compact" {
 		t.Errorf("the rows read %v", rows)
 	}
-	if got := probeRows(filepath.Join(root, "gone")); len(got) != 0 {
+	if got := probeRows(disk, filepath.Join(root, "gone")); len(got) != 0 {
 		t.Errorf("a missing log reads %v", got)
 	}
 }

@@ -7,8 +7,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -20,14 +20,14 @@ import (
 const workRootVar = "SE_WORK_ROOT"
 
 // Every leaf's notes, off the processes and the guidance notes under root, under the env this box reads. [[spec/tickets/the-guidance-topic-lands]]
-func guidanceRows(root string, env map[string]string) (map[string][]string, error) {
-	method, err := guidanceFiles(root)
+func guidanceRows(disk diskDoors, root string, env map[string]string) (map[string][]string, error) {
+	method, err := guidanceFiles(disk, root)
 	if err != nil {
 		return nil, err
 	}
 	work := map[string]q.Content{}
 	if at := strings.TrimSpace(env[workRootVar]); at != "" && filepath.Clean(at) != filepath.Clean(root) {
-		if work, err = guidanceFiles(at); err != nil {
+		if work, err = guidanceFiles(disk, at); err != nil {
 			return nil, err
 		}
 	}
@@ -39,41 +39,34 @@ func guidanceRows(root string, env map[string]string) (map[string][]string, erro
 }
 
 // The files under the processes and the guidance folders of one root, keyed by their path under it. [[spec/tickets/the-guidance-topic-lands]]
-func guidanceFiles(root string) (map[string]q.Content, error) {
+func guidanceFiles(disk diskDoors, root string) (map[string]q.Content, error) {
 	out := map[string]q.Content{}
 	for _, folder := range []string{guidance.Processes, guidance.Guidance} {
-		base := filepath.Join(root, filepath.FromSlash(folder))
-		err := filepath.WalkDir(base, func(at string, entry fs.DirEntry, err error) error {
-			if err != nil || entry.IsDir() {
-				return err
-			}
-			body, err := os.ReadFile(at)
+		files, err := disk.walkFiles(filepath.Join(root, filepath.FromSlash(folder)))
+		if errors.Is(err, fs.ErrNotExist) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		for _, at := range files {
+			body, err := disk.read(at)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			rel, err := filepath.Rel(root, at)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			out[filepath.ToSlash(rel)] = q.Content{Hash: "disk", Text: string(body)}
-			return nil
-		})
-		if err != nil && !os.IsNotExist(err) {
-			return nil, err
 		}
 	}
 	return out, nil
 }
 
 // Prints every leaf's notes under the root, under the whole environment of this process. [[spec/tickets/the-guidance-topic-lands]]
-func guidances(root string) error {
-	env := map[string]string{}
-	for _, one := range os.Environ() {
-		if name, value, ok := strings.Cut(one, "="); ok {
-			env[name] = value
-		}
-	}
-	rows, err := guidanceRows(root, env)
+func guidances(box boxDoors, root string) error {
+	rows, err := guidanceRows(box.disk, root, vehicleEnv(box.environ()))
 	if err != nil {
 		return err
 	}
@@ -81,6 +74,6 @@ func guidances(root string) error {
 	if err != nil {
 		return err
 	}
-	_, err = os.Stdout.Write(append(text, '\n'))
+	_, err = box.out.Write(append(text, '\n'))
 	return err
 }

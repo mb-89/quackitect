@@ -50,9 +50,9 @@ func TestTheReplyReadsWhetherTheAnswerQuotesTheWarning(t *testing.T) {
 func TestTheReplyProbePrintsTheFieldsTheRunAdds(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
-	writeLog(t, d.root, logText(replyCalled(replyFields("tool", "Read", "old", "x"))))
+	writeLog(t, d.disk, d.root, logText(replyCalled(replyFields("tool", "Read", "old", "x"))))
 	clientAnswers(&d, func([]string, runOpts) ranResult {
-		writeLog(t, d.root, logText(replyCalled(replyFields("tool", "Read", "old", "x")), replyCalled(`{"tool":"Read","text":"`+replySays+`"}`)))
+		writeLog(t, d.disk, d.root, logText(replyCalled(replyFields("tool", "Read", "old", "x")), replyCalled(`{"tool":"Read","text":"`+replySays+`"}`)))
 		return ranResult{stdout: `"` + promptWhy + `, and nothing has answered it yet."`}
 	})
 	if code := probeVerb(d, []string{"reply"}); code != 0 {
@@ -71,9 +71,9 @@ func TestTheReplyProbePrintsTheFieldsTheRunAdds(t *testing.T) {
 func TestTheReplyProbeReadsPastATornLine(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
-	writeLog(t, d.root, "")
+	writeLog(t, d.disk, d.root, "")
 	clientAnswers(&d, func([]string, runOpts) ranResult {
-		writeLog(t, d.root, "{\"at\":\"2026\n"+logText(replyCalled(`{"tool":"Read","text":"`+replySays+`"}`)))
+		writeLog(t, d.disk, d.root, "{\"at\":\"2026\n"+logText(replyCalled(`{"tool":"Read","text":"`+replySays+`"}`)))
 		return ranResult{}
 	})
 	if code := probeVerb(d, []string{"reply"}); code != 0 {

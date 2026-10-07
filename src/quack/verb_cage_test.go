@@ -5,9 +5,18 @@ package main // level0: InPackageTest - reaches the unexported cageVerb
 
 import (
 	"encoding/json"
+	"io"
 	"strings"
 	"testing"
 )
+
+// The cage verb and the box doors read the one input the box doors name. [[spec/tickets/doors-pr-windows-goes-green]]
+func TestTheBoxDoorsReadTheProcessInput(t *testing.T) {
+	t.Parallel()
+	if got := realBoxDoors(io.Discard, io.Discard).input; got != stdin {
+		t.Fatalf("the box doors read %v, and want the process input %v", got, stdin)
+	}
+}
 
 // Runs the cage verb over the input, and answers what it prints. [[spec/tickets/level0-hooks-hold-no-rule]]
 func cageSays(t *testing.T, input string) (string, int) {

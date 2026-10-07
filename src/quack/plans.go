@@ -7,9 +7,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"os"
 	"path/filepath"
-	"time"
 
 	settingsreader "quackitect/src/config"
 	"quackitect/src/modules/plans"
@@ -25,29 +23,35 @@ const (
 	queueModuleType = "queue"
 )
 
-func plansOutside(root string, store *q.Store) plans.Outside {
+func plansOutside(disk diskDoors, root string, store *q.Store) plans.Outside {
 	path := filepath.Join(root, filepath.FromSlash(planPath))
 	return plans.Outside{
 		Read: func() (string, error) {
-			text, err := os.ReadFile(path)
+			text, err := disk.read(path)
 			return string(text), err
 		},
 		Write: func(text string) error {
-			if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			if err := disk.makeAll(filepath.Dir(path), planFolderMode); err != nil {
 				return err
 			}
-			return os.WriteFile(path, []byte(text), 0o644)
+			return disk.write(path, []byte(text), planFileMode)
 		},
-		Now:    time.Now,
+		Now:    wall.Now,
 		Most:   settingsreader.Count(root, planMostOpenKey),
-		Places: placesOver(root, store),
+		Places: placesOver(disk, root, store),
 	}
 }
 
+// The modes the plan's folder and file take. [[spec/design_output/stop#the-plan]]
+const (
+	planFolderMode = 0o755
+	planFileMode   = 0o644
+)
+
 // The queue's places over a plan text, off the snapshot values the wiring binds to the queue's ports, and none where the wiring loads no queue. The wiring reads at each call, as the file stands then. [[spec/tickets/plan-writes-off-go]]
-func placesOver(root string, store *q.Store) func(string) map[string]string {
+func placesOver(disk diskDoors, root string, store *q.Store) func(string) map[string]string {
 	return func(plan string) map[string]string {
-		if bound, ok := queueBound(root); ok && store != nil {
+		if bound, ok := queueBound(disk, root); ok && store != nil {
 			snap := store.Snapshot()
 			rows, _ := snap.Read(bound(queue.RowsPort)).([]ticket.Ticket)
 			cloud, _ := snap.Read(bound(queue.CloudPort)).([]string)
@@ -67,8 +71,8 @@ func placesOver(root string, store *q.Store) func(string) map[string]string {
 }
 
 // The name each local name of the first queue instance binds to, off the wiring under the root. [[spec/tickets/plan-writes-off-go]]
-func queueBound(root string) (func(local string) string, bool) {
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(q.WiringFile)))
+func queueBound(disk diskDoors, root string) (func(local string) string, bool) {
+	text, err := disk.read(filepath.Join(root, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		return nil, false
 	}

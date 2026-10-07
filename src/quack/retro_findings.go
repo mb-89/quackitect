@@ -5,7 +5,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -96,17 +95,17 @@ func retroItemsOf(columns []retroColumn) []retroItem {
 }
 
 // The columns a retro's findings fill, and the faults of a column standing incomplete. [[spec/guidance/retro/read]]
-func retroColumnsOf(home string) ([]retroColumn, []string) {
-	cuts, _ := retroCutsOf(retroFileText(filepath.Join(home, retroCutsFile)))
+func retroColumnsOf(disk diskDoors, home string) ([]retroColumn, []string) {
+	cuts, _ := retroCutsOf(disk.text(filepath.Join(home, retroCutsFile)))
 	wanted := []retroColumn{}
 	for _, one := range cuts {
 		wanted = append(wanted, retroColumn{id: one.id, title: one.title})
 	}
-	if retroIsThere(filepath.Join(home, retroFindingsFolder, retroFeedback+".md")) {
+	if disk.stands(filepath.Join(home, retroFindingsFolder, retroFeedback+".md")) {
 		wanted = append(wanted, retroColumn{id: retroFeedback, title: "field feedback"})
 	}
 	audits := []string{}
-	entries, _ := os.ReadDir(filepath.Join(home, retroFindingsFolder))
+	entries := disk.listed(filepath.Join(home, retroFindingsFolder))
 	for _, one := range entries {
 		if strings.HasPrefix(one.Name(), retroAuditPrefix) && strings.HasSuffix(one.Name(), ".md") {
 			audits = append(audits, one.Name())
@@ -121,12 +120,12 @@ func retroColumnsOf(home string) ([]retroColumn, []string) {
 	columns := []retroColumn{}
 	for _, one := range wanted {
 		at := filepath.Join(home, retroFindingsFolder, one.id+".md")
-		if !retroIsThere(at) {
+		if !disk.stands(at) {
 			faults = append(faults, fmt.Sprintf("%s/%s.md stands nowhere", retroFindingsFolder, one.id))
 			columns = append(columns, retroColumn{id: one.id, title: one.title, findings: map[string][]string{}})
 			continue
 		}
-		findings := retroFindingsOf(retroFileText(at))
+		findings := retroFindingsOf(disk.text(at))
 		for _, row := range retroRows {
 			if findings[row] == nil {
 				faults = append(faults, fmt.Sprintf("%s/%s.md carries no %s section", retroFindingsFolder, one.id, row))
@@ -143,16 +142,4 @@ func retroWordAt(argv []string, at int) string {
 		return argv[at]
 	}
 	return ""
-}
-
-// Whether a path stands on the disk. [[spec/tickets/retro-verbs-port-to-go]]
-func retroIsThere(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
-// A file's text, or none where it reads as nothing. [[spec/tickets/retro-verbs-port-to-go]]
-func retroFileText(path string) string {
-	body, _ := os.ReadFile(path)
-	return string(body)
 }

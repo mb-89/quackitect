@@ -4,12 +4,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -264,7 +262,7 @@ func follows(errs io.Writer, handle string) (any, error) {
 		if op.Value.Progress.Known > 0 {
 			fmt.Fprintf(errs, "%d of %d done\n", op.Value.Progress.Done, op.Value.Progress.Known)
 		}
-		time.Sleep(followPause)
+		<-wall.After(followPause)
 	}
 }
 
@@ -274,49 +272,6 @@ func actionsOf(base string) ([]actionRow, error) {
 	}
 	err := reads(base+actionsPath, &said)
 	return said.Value, err
-}
-
-func posts(url, prefer string, body []byte) (called, error) {
-	var said called
-	asked, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
-	if err != nil {
-		return said, err
-	}
-	asked.Header.Set("Content-Type", "application/json")
-	asked.Header.Set("Prefer", prefer)
-	err = answers(asked, &said)
-	return said, err
-}
-
-func reads(url string, into any) error {
-	asked, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return err
-	}
-	return answers(asked, into)
-}
-
-// Sends the request, and decodes a success into into, or answers the problem's detail. [[spec/design_output/model#surfaces]]
-func answers(asked *http.Request, into any) error {
-	said, err := http.DefaultClient.Do(asked)
-	if err != nil {
-		return err
-	}
-	defer said.Body.Close()
-	body, err := io.ReadAll(said.Body)
-	if err != nil {
-		return err
-	}
-	if said.StatusCode >= http.StatusBadRequest {
-		var problem struct {
-			Detail string `json:"detail"`
-		}
-		if json.Unmarshal(body, &problem) == nil && problem.Detail != "" {
-			return fmt.Errorf("%s", problem.Detail)
-		}
-		return fmt.Errorf("%s answers %d: %s", asked.URL.Path, said.StatusCode, body)
-	}
-	return json.Unmarshal(body, into)
 }
 
 func prints(out io.Writer, value any) error {

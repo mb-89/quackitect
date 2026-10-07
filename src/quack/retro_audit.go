@@ -13,12 +13,12 @@ import (
 // The process a trial runs, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
 const retroAuditExperiment = "spec/processes/experiment"
 
-func init() { register("retro audit", retroAuditVerb(retroRoot)) }
+func init() { register("retro audit", retroAuditVerb(quietBox)) }
 
 // Every trial standing open under the root, by name. [[spec/design_output/work#an-experiment-decides]]
-func retroAuditOpenTrials(root string) []string {
+func retroAuditOpenTrials(disk diskDoors, root string) []string {
 	open := []string{}
-	for _, one := range retroScoreNotes(root) {
+	for _, one := range retroScoreNotes(disk, root) {
 		if retroScoreField(one.text, "process") == retroAuditExperiment && retroScoreField(one.text, "state") != closedRow {
 			open = append(open, one.name)
 		}
@@ -27,9 +27,9 @@ func retroAuditOpenTrials(root string) []string {
 }
 
 // Every trial standing closed with no decision and no successor, by name. [[spec/design_output/work#an-experiment-decides]]
-func retroAuditUndecided(root string) []string {
+func retroAuditUndecided(disk diskDoors, root string) []string {
 	silent := []string{}
-	for _, one := range retroScoreNotes(root) {
+	for _, one := range retroScoreNotes(disk, root) {
 		if retroScoreField(one.text, "process") == retroAuditExperiment && retroScoreField(one.text, "state") == closedRow && !retroAuditKept(one.text) {
 			silent = append(silent, one.name)
 		}
@@ -47,10 +47,11 @@ func retroAuditKept(text string) bool {
 }
 
 // The verb: 0 once every experiment stands decided, and 1 naming each one still open or closed silent. [[spec/design_output/work#an-experiment-decides]]
-func retroAuditVerb(root func() string) twin {
+func retroAuditVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		open := retroAuditOpenTrials(root())
-		silent := retroAuditUndecided(root())
+		d := box()
+		open := retroAuditOpenTrials(d.disk, retroRootOf(d))
+		silent := retroAuditUndecided(d.disk, retroRootOf(d))
 		if len(open) == 0 && len(silent) == 0 {
 			fmt.Fprintln(out, "Every experiment stands decided, so the retro closes.")
 			return 0

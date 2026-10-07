@@ -3,10 +3,7 @@
 // [[spec/design_output/index#a-reader-takes-the-tree]]
 package index // level0: InPackageTest - it reaches the shared tree, opened and sweptDB helpers
 
-import (
-	"os/exec"
-	"testing"
-)
+import "testing"
 
 // level0: FixtureOutsideHome - the case writes its own tree
 func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(t *testing.T) {
@@ -34,18 +31,10 @@ func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(
 	}
 }
 
-// level0: FixtureOutsideHome - the case runs git in its own tree
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
 	t.Parallel()
-	root := tree(t)
-	for _, argv := range [][]string{{"init", "-q"}, {"add", "spec/one.md"}} {
-		run := exec.Command("git", argv...)
-		run.Dir = root
-		if said, err := run.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %s", argv, said)
-		}
-	}
-	db := opened(t, root)
+	db := openedWith(t, tree(t), func(rel string) bool { return rel == "spec/one.md" })
 
 	held, err := Files(db)
 	if err != nil {

@@ -56,7 +56,6 @@ var ruleFiles = []string{
 	"spec/config/styles/VoiceVale/CodeHeader.yml",
 	"spec/config/styles/VoiceVale/CountedList.yml",
 	"spec/config/styles/VoiceVale/DigitInProse.yml",
-	"spec/config/styles/VoiceVale/DoorsOnly.yml",
 	"spec/config/styles/VoiceVale/FakeDoorsInTest.yml",
 	"spec/config/styles/VoiceVale/History.yml",
 	"spec/config/styles/VoiceVale/OutsideInDoors.yml",

@@ -5,7 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the write tables the tree holds, as a build check reads source
 	"reflect"
 	"testing"
 

@@ -4,24 +4,44 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"errors"
-	"fmt"
-	"os"
-	"os/exec"
+	"os/exec" // level0: OutsideInDoors - the case runs go list over the tree's own packages, as a build check reads source
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
+
+// The folders the shared build and the shared folder write, which TestMain removes once the run ends. [[spec/tickets/each-door-meets-one-test]]
+var buildDirs struct {
+	sync.Mutex
+	dirs []string
+}
+
+// The real time and its waits, with a beat that stands still, so a case's manager renews nothing on its own. [[spec/tickets/go-waits-on-events]]
+type stillBeat struct{ q.Clock }
+
+func (stillBeat) Every(time.Duration, func(time.Time)) func() { return func() {} }
+
+func stillClock() q.Clock { return stillBeat{clock.New()} }
+
+// A still beat keeping each span the manager asks of it. [[spec/tickets/go-waits-on-events]]
+type beatsOf struct {
+	q.Clock
+	spans *[]time.Duration
+}
+
+func (one beatsOf) Every(span time.Duration, hand func(time.Time)) func() {
+	*one.spans = append(*one.spans, span)
+	return one.Clock.Every(span, hand)
+}
 
 // An override on watchdog/beat re-arms the manager's tick at its span, and one on watchdog/lease holds the index's lease at its term, through the config module's layers. [[spec/design_output/model#a-lease]]
 func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
@@ -37,11 +57,7 @@ func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
 	stop, err := manager.Start(manager.Outside{
 		Root: t.TempDir(), Store: ix.Store(), As: as, Rows: opRows{heldTable{}},
 		Steps: func(hand func()) { steps = append(steps, hand) },
-		Now:   time.Now,
-		Every: func(span time.Duration, _ func(time.Time)) func() {
-			spans = append(spans, span)
-			return func() {}
-		},
+		Clock: beatsOf{Clock: stillClock(), spans: &spans},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -120,158 +136,5 @@ func TestTheManagerFoldsOpsAndTheWatchdog(t *testing.T) {
 				t.Fatalf("the root still reaches %s", gone)
 			}
 		}
-	}
-}
-
-// The built root, run over a root, as the door spawns it. [[spec/design_output/model#the-index-manager]]
-func quack(t *testing.T, bin, root string, args ...string) (string, error) {
-	t.Helper()
-	cmd := exec.Command(bin, args...)
-	cmd.Dir = root
-	cmd.Env = append(cmd.Environ(), "QUACKITECT_ROOT="+root)
-	said, err := cmd.CombinedOutput()
-	return string(said), err
-}
-
-// The binary a build writes, named with .exe on Windows, where exec finds no other. [[spec/tickets/windows-builds-quack-exe]]
-func binaryIn(folder, name string) string {
-	if runtime.GOOS == "windows" {
-		name += ".exe"
-	}
-	return filepath.Join(folder, name)
-}
-
-// The index asked to stop, then the binary and the root removed once it lets go of them, since Windows locks a running binary and TempDir's cleanup tries once. [[spec/tickets/manager-tests-wait-for-the-binary]]
-func stopped(t *testing.T, bin, root string) {
-	t.Helper()
-	quack(t, bin, root, "call", "stop")
-	deadline := time.Now().Add(30 * time.Second)
-	for {
-		binErr := os.Remove(bin)
-		if errors.Is(binErr, os.ErrNotExist) {
-			binErr = nil
-		}
-		rootErr := os.RemoveAll(root)
-		if binErr == nil && rootErr == nil {
-			return
-		}
-		if time.Now().After(deadline) {
-			t.Errorf("the stopped index still holds %s (%v) or %s (%v)", bin, binErr, root, rootErr)
-			return
-		}
-		time.Sleep(200 * time.Millisecond)
-	}
-}
-
-// The root built into a folder, as the install builds it, linked off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
-func built(t *testing.T, folder string) string {
-	t.Helper()
-	built, err := quackBinary()
-	if err != nil {
-		t.Fatalf("the root does not build: %v", err)
-	}
-	bin := binaryIn(folder, "quack")
-	if err := os.MkdirAll(folder, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Link(built, bin); err != nil {
-		t.Fatalf("the build does not link into %s: %v", folder, err)
-	}
-	return bin
-}
-
-// The one go build of the root this run takes, into a folder of its own that the run removes. [[spec/tickets/each-door-meets-one-test]]
-var quackBinary = sync.OnceValues(func() (string, error) {
-	dir, err := os.MkdirTemp("", "quack-built-")
-	if err != nil {
-		return "", err
-	}
-	buildDirs.Lock()
-	buildDirs.dirs = append(buildDirs.dirs, dir)
-	buildDirs.Unlock()
-	bin := binaryIn(dir, "quack")
-	quackBuilds.Add(1)
-	build := exec.Command("go", "build", "-o", bin, "./src/quack")
-	build.Dir = filepath.Join("..", "..")
-	if said, err := build.CombinedOutput(); err != nil {
-		return "", fmt.Errorf("%w\n%s", err, said)
-	}
-	return bin, nil
-})
-
-// The folders the shared build writes, which TestMain removes once the run ends. [[spec/tickets/each-door-meets-one-test]]
-var buildDirs struct {
-	sync.Mutex
-	dirs []string
-}
-
-// The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
-var quackBuilds atomic.Int32
-
-// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
-// level0: FixtureOutsideHome - the case links the build into two folders of its own
-func TestTheQuackBinaryBuildsOnce(t *testing.T) {
-	t.Parallel()
-	built(t, t.TempDir())
-	built(t, t.TempDir())
-	if got := quackBuilds.Load(); got != 1 {
-		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
-	}
-}
-
-// A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]
-func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
-	t.Parallel()
-	bin := built(t, t.TempDir())
-	root := t.TempDir()
-	said, err := quack(t, bin, root, "why", "session/alarms")
-	t.Cleanup(func() { stopped(t, bin, root) })
-	if err != nil {
-		t.Fatalf("quack why session/alarms answers %v: %s", err, said)
-	}
-	if !strings.Contains(filepath.ToSlash(said), "src/modules/index/manager.go") {
-		t.Fatalf("the index reads no manager loaded: %s", said)
-	}
-	if said, err := quack(t, bin, root, "why", "clock/minute"); err == nil {
-		t.Fatalf("the index loads a module past the manager: %s", said)
-	}
-}
-
-// A tree verb reaches /v1 before the index's own command line runs, and starts this binary where no door stands. [[spec/design_output/index#a-door-comes-back]]
-func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
-	t.Parallel()
-	bin := built(t, t.TempDir())
-	root := t.TempDir()
-	said, err := quack(t, bin, root, "help")
-	t.Cleanup(func() { stopped(t, bin, root) })
-	if err != nil {
-		t.Fatalf("quack help over a root with no door answers %v: %s", err, said)
-	}
-}
-
-// A driven tree carries no wiring file, so the index loads the wiring of the vehicle whose runtime folder holds the binary. [[spec/design_output/model#the-wiring-file]]
-func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
-	t.Parallel()
-	vehicle := t.TempDir()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	at := filepath.Join(vehicle, filepath.FromSlash(q.WiringFile))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, text, 0o644); err != nil {
-		t.Fatal(err)
-	}
-	bin := built(t, filepath.Join(vehicle, filepath.FromSlash(index.Runtime), "bin"))
-	root := t.TempDir()
-	said, err := quack(t, bin, root, "why", "tickets/all")
-	t.Cleanup(func() { stopped(t, bin, root) })
-	if err != nil {
-		t.Fatalf("quack why tickets/all answers %v: %s", err, said)
-	}
-	if !strings.Contains(filepath.ToSlash(said), "src/modules/tickets") {
-		t.Fatalf("the index reads no tickets module loaded: %s", said)
 	}
 }

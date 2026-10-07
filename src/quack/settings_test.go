@@ -4,7 +4,7 @@ package main // level0: InPackageTest - the case reads the unexported settingsFi
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tracked settings file the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strings"

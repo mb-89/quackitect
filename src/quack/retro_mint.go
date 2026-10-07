@@ -8,8 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"maps"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -70,7 +70,9 @@ type retroMintRecord struct {
 	Promotions []retroMintPromotion `json:"promotions"`
 }
 
-func init() { register("retro mint", retroMintVerb(retroRoot, retroMintRunme)) }
+func init() {
+	register("retro mint", retroMintVerb(quietBox, retroMintRunme))
+}
 
 // Runs a program under the root over the real process door. [[spec/design_output/vehicle#the-work-root-inherits]]
 func retroMintRunme(dir string, argv []string, env map[string]string) retroMintRan {
@@ -139,7 +141,7 @@ func retroMintPromotionName(one retroMintPromotion, at int) string {
 }
 
 // Every fault standing between the classes and promotions and their tickets; an empty root checks no process. [[spec/guidance/retro/check]]
-func retroMintFaults(record retroMintRecord, root string) []string {
+func retroMintFaults(disk diskDoors, record retroMintRecord, root string) []string {
 	faults := []string{}
 	for _, one := range record.Classes {
 		closed := slices.ContainsFunc(retroMintClosed, func(word string) bool {
@@ -152,19 +154,19 @@ func retroMintFaults(record retroMintRecord, root string) []string {
 		if one.Status != retroMintOpen || len(one.Tickets) > 0 {
 			continue
 		}
-		faults = append(faults, retroMintTicketFaults(one.ID+" stands open", one.Ticket, root)...)
+		faults = append(faults, retroMintTicketFaults(disk, one.ID+" stands open", one.Ticket, root)...)
 	}
 	for at, one := range record.Promotions {
 		if len(one.Tickets) > 0 {
 			continue
 		}
-		faults = append(faults, retroMintTicketFaults(retroMintPromotionName(one, at)+" waits", one.Ticket, root)...)
+		faults = append(faults, retroMintTicketFaults(disk, retroMintPromotionName(one, at)+" waits", one.Ticket, root)...)
 	}
 	return faults
 }
 
 // Every field a ticket to mint carries none of, each named after the thing it serves. [[spec/tickets/a-promotion-names-its-fault]]
-func retroMintTicketFaults(said string, ticket *retroMintTicket, root string) []string {
+func retroMintTicketFaults(disk diskDoors, said string, ticket *retroMintTicket, root string) []string {
 	if ticket == nil {
 		ticket = &retroMintTicket{}
 	}
@@ -178,7 +180,7 @@ func retroMintTicketFaults(said string, ticket *retroMintTicket, root string) []
 	if process == "" {
 		faults = append(faults, said+", and its ticket carries no process")
 	} else if root != "" {
-		if why := retroMintProcessWhy(root, process); why != "" {
+		if why := retroMintProcessWhy(disk, root, process); why != "" {
 			faults = append(faults, fmt.Sprintf("%s, and its ticket names process %s: %s", said, process, why))
 		}
 	}
@@ -189,13 +191,13 @@ func retroMintTicketFaults(said string, ticket *retroMintTicket, root string) []
 }
 
 // Why a process stands nowhere under the root, as processAt in src/scripts/process.js says it, or nothing where it stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func retroMintProcessWhy(root, said string) string {
+func retroMintProcessWhy(disk diskDoors, root, said string) string {
 	name := strings.TrimSpace(said)
 	name = strings.TrimSuffix(strings.TrimPrefix(name, "[["), "]]")
 	name = strings.TrimPrefix(name, retroMintProcesses+"/")
 	name = strings.TrimSpace(strings.TrimSuffix(name, ".yaml"))
 	standing := []string{}
-	if entries, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(retroMintProcesses))); err == nil {
+	if entries, err := disk.list(filepath.Join(root, filepath.FromSlash(retroMintProcesses))); err == nil {
 		for _, one := range entries {
 			if one.Type().IsRegular() && strings.HasSuffix(one.Name(), ".yaml") {
 				standing = append(standing, strings.TrimSuffix(one.Name(), ".yaml"))
@@ -206,20 +208,22 @@ func retroMintProcessWhy(root, said string) string {
 	if name == "" {
 		return fmt.Sprintf("Name a process. %s holds %s.", retroMintProcesses, strings.Join(standing, ", "))
 	}
-	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(retroMintProcesses), name+".yaml")); err != nil {
+	if !disk.stands(filepath.Join(root, filepath.FromSlash(retroMintProcesses), name+".yaml")) {
 		return fmt.Sprintf("%s holds no %s. It holds %s.", retroMintProcesses, name, strings.Join(standing, ", "))
 	}
 	return ""
 }
 
 // The verb: mints one ticket a class standing open and a promotion waiting, writes its ask and opens the draft. [[spec/guidance/retro/check]]
-func retroMintVerb(root func() string, run retroMintRun) twin {
+func retroMintVerb(box func() boxDoors, run retroMintRun) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		at, home := "", root()
+		d := box()
+		disk := d.disk
+		at, home := "", retroRootOf(d)
 		if len(argv) > 2 && argv[2] != "" {
 			at = filepath.Join(retroHome(home, argv[2]), retroMintRecordAt)
 		}
-		text, err := os.ReadFile(at)
+		text, err := disk.read(at)
 		if at == "" || err != nil {
 			fmt.Fprintf(errs, "retro mint reads %s of a retro, and none stands.\n", retroMintRecordAt)
 			return exitUsage
@@ -231,7 +235,7 @@ func retroMintVerb(root func() string, run retroMintRun) twin {
 		}
 		kept := retroMintKept(read)
 		record := retroMintRecordOf(kept)
-		if faults := retroMintFaults(record, home); len(faults) > 0 {
+		if faults := retroMintFaults(disk, record, home); len(faults) > 0 {
 			for _, one := range faults {
 				fmt.Fprintln(errs, one)
 			}
@@ -257,16 +261,16 @@ func retroMintVerb(root func() string, run retroMintRun) twin {
 		}
 		made := 0
 		for _, one := range waiting {
-			if !retroMintOne(home, run, one.ticket, one.label, out, errs) {
+			if !retroMintOne(disk, home, run, one.ticket, one.label, out, errs) {
 				return exitFailed
 			}
 			one.node.set("tickets", &retroMintNode{kind: 'a', items: []*retroMintNode{{kind: 's', text: one.ticket.Name}}})
 			made++
-			if !retroMintWrites(at, kept, errs) {
+			if !retroMintWrites(disk, at, kept, errs) {
 				return exitFailed
 			}
 		}
-		if !retroMintWrites(at, kept, errs) || !retroMintKeeps(home, argv[2], errs) {
+		if !retroMintWrites(disk, at, kept, errs) || !retroMintKeeps(disk, home, argv[2], errs) {
 			return exitFailed
 		}
 		closed := 0
@@ -281,7 +285,7 @@ func retroMintVerb(root func() string, run retroMintRun) twin {
 }
 
 // Mints the ticket a class or a promotion carries, writes its ask, opens the draft and names it back. [[spec/tickets/the-retro-finishes-its-asks]]
-func retroMintOne(root string, run retroMintRun, ticket *retroMintTicket, label string, out, errs io.Writer) bool {
+func retroMintOne(disk diskDoors, root string, run retroMintRun, ticket *retroMintTicket, label string, out, errs io.Writer) bool {
 	path := retroMintTickets + "/" + ticket.Name + ".md"
 	env := map[string]string{workRoot: root}
 	ran := run(root, []string{retroMintRunmeAt, "mint", "ticket", path, "--process=" + strings.TrimSpace(ticket.Process)}, env)
@@ -290,9 +294,9 @@ func retroMintOne(root string, run retroMintRun, ticket *retroMintTicket, label 
 		return false
 	}
 	file := filepath.Join(root, filepath.FromSlash(path))
-	text, err := os.ReadFile(file)
+	text, err := disk.read(file)
 	if err == nil {
-		err = os.WriteFile(file, []byte(retroMintWithAsk(string(text), retroMintAskOf(*ticket))), 0o644)
+		err = disk.write(file, []byte(retroMintWithAsk(string(text), retroMintAskOf(*ticket))), 0o644)
 	}
 	if err != nil {
 		fmt.Fprintln(errs, err)
@@ -308,11 +312,11 @@ func retroMintOne(root string, run retroMintRun, ticket *retroMintTicket, label 
 }
 
 // Writes the record as JSON.stringify with two spaces writes it, and a closing line. [[spec/guidance/retro/check]]
-func retroMintWrites(at string, kept *retroMintNode, errs io.Writer) bool {
+func retroMintWrites(disk diskDoors, at string, kept *retroMintNode, errs io.Writer) bool {
 	var text strings.Builder
 	kept.write(&text, "")
 	text.WriteString("\n")
-	if err := os.WriteFile(at, []byte(text.String()), 0o644); err != nil {
+	if err := disk.write(at, []byte(text.String()), 0o644); err != nil {
 		fmt.Fprintln(errs, err)
 		return false
 	}
@@ -320,30 +324,30 @@ func retroMintWrites(at string, kept *retroMintNode, errs io.Writer) bool {
 }
 
 // Copies the classes, the rates and the collect time into the tracked folder, so a fresh box's effect measures against them; the collect time keeps its time alone, and a missing file stays missing. [[spec/tickets/retro-read-reads-every-record]]
-func retroMintKeeps(root, name string, errs io.Writer) bool {
+func retroMintKeeps(disk diskDoors, root, name string, errs io.Writer) bool {
 	home, into := retroHome(root, name), filepath.Join(root, filepath.FromSlash(retroKept), name)
-	if err := os.MkdirAll(into, 0o777); err != nil {
+	if err := disk.makeAll(into, 0o777); err != nil {
 		fmt.Fprintln(errs, err)
 		return false
 	}
 	for _, file := range []string{retroClassesFile, retroRatesFile} {
-		text, err := os.ReadFile(filepath.Join(home, file))
-		if errors.Is(err, os.ErrNotExist) {
+		text, err := disk.read(filepath.Join(home, file))
+		if errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
 		if err == nil {
-			err = os.WriteFile(filepath.Join(into, file), text, 0o644)
+			err = disk.write(filepath.Join(into, file), text, 0o644)
 		}
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return false
 		}
 	}
-	read, ok := retroJSParse(retroFileText(filepath.Join(home, retroEffectCollected)))
+	read, ok := retroJSParse(disk.text(filepath.Join(home, retroEffectCollected)))
 	if !ok {
 		return true
 	}
-	if err := retroJSWrite(filepath.Join(into, retroEffectCollected), retroJSObject("at", retroJSField(read, "at"))); err != nil {
+	if err := retroJSWrite(disk, filepath.Join(into, retroEffectCollected), retroJSObject("at", retroJSField(read, "at"))); err != nil {
 		fmt.Fprintln(errs, err)
 		return false
 	}

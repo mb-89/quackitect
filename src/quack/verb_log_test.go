@@ -5,7 +5,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,19 +15,16 @@ import (
 var logNow = time.Date(2026, 10, 4, 12, 0, 0, 0, time.UTC)
 
 // A root holding the files named under it, and the log verb over it at the case's now. [[spec/design_output/log#one-verb-reads-the-log]]
-func logOver(t *testing.T, files map[string]string) (string, twin) {
+func logOver(t *testing.T, files map[string]string) (diskDoors, twin) {
 	t.Helper()
-	root := t.TempDir()
-	for at, text := range files {
-		path := filepath.Join(root, filepath.FromSlash(at))
-		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, files)
+	if err := disk.makeAll(root, 0o755); err != nil {
+		t.Fatal(err)
 	}
-	return root, logVerb(func() (logDoors, error) { return logDoors{root: root, now: func() time.Time { return logNow }}, nil })
+	return disk, logVerb(func() (logDoors, error) {
+		return logDoors{root: root, now: func() time.Time { return logNow }, disk: disk}, nil
+	})
 }
 
 // One line of the log, stamped minutes before the case's now. [[spec/design_output/log#one-verb-reads-the-log]]
@@ -129,36 +125,36 @@ func TestLogSpanSeconds(t *testing.T) {
 func TestLogVerbSays(t *testing.T) {
 	t.Parallel()
 	t.Run("say appends one row and keeps the rows another writer lands", func(t *testing.T) {
-		root, log := logOver(t, map[string]string{sessionLog: logRow(1, "info", "tool", "theirs")})
+		disk, log := logOver(t, map[string]string{sessionLog: logRow(1, "info", "tool", "theirs")})
 		code, _, _ := runsTwin(log, "log", "--say", `{"level":"warn","kind":"side","said":"  two\n  lines ","extra":{"level":"x","ms":3,"detail":"`+strings.Repeat("d", 130)+`"}}`)
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
-		lines := strings.Split(strings.TrimSpace(string(text)), "\n")
+		text := disk.text(filepath.Join("/tree", filepath.FromSlash(sessionLog)))
+		lines := strings.Split(strings.TrimSpace(text), "\n")
 		want := `{"at":"2026-10-04T12:00:00.000Z","level":"warn","kind":"side","said":"two lines","ms":3,"detail":"` + strings.Repeat("d", logDetailCap) + `"}`
 		if code != 0 || len(lines) != 2 || !strings.Contains(lines[0], "theirs") || lines[1] != want {
 			t.Fatalf("log --say answers %d and leaves %q, and wants %s after the row standing", code, lines, want)
 		}
 	})
 	t.Run("a level the ladder holds nowhere reads as info, and a reply keeps its lines", func(t *testing.T) {
-		root, log := logOver(t, map[string]string{})
+		disk, log := logOver(t, map[string]string{})
 		runsTwin(log, "log", "--say", `{"level":"loud","kind":"reply","said":" a\nb "}`)
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
-		if want := `{"at":"2026-10-04T12:00:00.000Z","level":"info","kind":"reply","said":"a\nb"}` + "\n"; string(text) != want {
+		text := disk.text(filepath.Join("/tree", filepath.FromSlash(sessionLog)))
+		if want := `{"at":"2026-10-04T12:00:00.000Z","level":"info","kind":"reply","said":"a\nb"}` + "\n"; text != want {
 			t.Fatalf("log --say leaves %q, and wants %q", text, want)
 		}
 	})
 	t.Run("the bridgehead's row keeps its event and its detail", func(t *testing.T) {
-		root, log := logOver(t, map[string]string{})
+		disk, log := logOver(t, map[string]string{})
 		code, _, _ := runsTwin(log, "log", "--say", `{"level":"warn","kind":"bridge","said":"the server answers nothing at tool.call","extra":{"event":"tool.call","detail":"fetch failed"}}`)
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
-		if want := `{"at":"2026-10-04T12:00:00.000Z","level":"warn","kind":"bridge","said":"the server answers nothing at tool.call","event":"tool.call","detail":"fetch failed"}` + "\n"; code != 0 || string(text) != want {
+		text := disk.text(filepath.Join("/tree", filepath.FromSlash(sessionLog)))
+		if want := `{"at":"2026-10-04T12:00:00.000Z","level":"warn","kind":"bridge","said":"the server answers nothing at tool.call","event":"tool.call","detail":"fetch failed"}` + "\n"; code != 0 || text != want {
 			t.Fatalf("log --say answers %d and leaves %q, and wants %q", code, text, want)
 		}
 	})
 	t.Run("a row no JSON reads exits 2 and writes nothing", func(t *testing.T) {
-		root, log := logOver(t, map[string]string{})
+		disk, log := logOver(t, map[string]string{})
 		code, _, errs := runsTwin(log, "log", "--say", "{torn")
-		if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(sessionLog))); code != exitUsage || !strings.Contains(errs, "takes one JSON row") || err == nil {
-			t.Fatalf("log --say answers %d, %q, the file stands %v, and wants 2 and no file", code, errs, err == nil)
+		if stands := disk.stands(filepath.Join("/tree", filepath.FromSlash(sessionLog))); code != exitUsage || !strings.Contains(errs, "takes one JSON row") || stands {
+			t.Fatalf("log --say answers %d, %q, the file stands %v, and wants 2 and no file", code, errs, stands)
 		}
 	})
 }

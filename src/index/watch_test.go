@@ -2,12 +2,11 @@ package index // level0: InPackageTest - it drives the unexported watches and th
 
 import (
 	"testing"
-	"time"
 
 	"quackitect/src/watcher/watchertest"
 )
 
-// The door's stop closes the watch while its loop adds a folder. [[spec/tickets/a-watch-stops-mid-add]]
+// The door's stop closes the watch while its loop adds a folder: the case closes it once the watch hears the first folder appear. [[spec/tickets/a-watch-stops-mid-add]]
 // level0: FixtureOutsideHome - the case makes folders appear under its own root
 func TestTheIndexWatchStopsWhileFoldersAppear(t *testing.T) {
 	t.Parallel()
@@ -19,7 +18,7 @@ func TestTheIndexWatchStopsWhileFoldersAppear(t *testing.T) {
 			t.Fatal(err)
 		}
 		stop := watchertest.Appearing(root)
-		time.Sleep(5 * time.Millisecond)
+		<-one.dirty
 		watchertest.Returns(t, eyes.Close)
 		stop()
 	}

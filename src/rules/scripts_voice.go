@@ -28,7 +28,6 @@ var voiceScripts = map[string]scriptMaker{
 	"VoiceVale.CodeHeader":              voicePlain(codeHeader),
 	"VoiceVale.CountedList":             voicePlain(countedList),
 	"VoiceVale.DigitInProse":            voicePlain(digitInProse),
-	"VoiceVale.DoorsOnly":               voicePlain(doorsOnly),
 	"VoiceVale.FakeDoorsInTest":         voicePlain(fakeDoorsInTest),
 	"VoiceVale.OutsideInDoors":          voicePlain(outsideInDoors),
 	"VoiceVale.Private":                 voicePlain(private),

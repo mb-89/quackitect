@@ -192,12 +192,6 @@
     "passes": "The verb exits `0` on survives.\n"
   },
   {
-    "check": "VoiceVale.DoorsOnly",
-    "path": "src/bridge/probe.js",
-    "refuses": "import { readFileSync } from \"node:fs\";\n",
-    "passes": "import { join } from \"node:path\";\n"
-  },
-  {
     "check": "VoiceVale.FakeDoorsInTest",
     "path": "test/level0/probe.test.js",
     "refuses": "import { disk } from \"../../src/doors/disk.js\";\n",

@@ -5,7 +5,7 @@
 package tree
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the view files the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"

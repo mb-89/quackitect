@@ -9,7 +9,7 @@ import (
 // level0: FixtureOutsideHome - the case needs an empty root of its own, where no rules load
 func TestCommitVoiceReadsNothingWhereNoRulesLoad(t *testing.T) {
 	t.Parallel()
-	if rows := commitVoice(t.TempDir(), "a commit message"); rows != nil {
+	if rows := commitVoice(quietBox(), t.TempDir(), "a commit message"); rows != nil {
 		t.Errorf("commitVoice answers %v under a root where no rules load", rows)
 	}
 }
@@ -18,7 +18,7 @@ func TestCommitVoiceReadsNothingWhereNoRulesLoad(t *testing.T) {
 func TestCommitVoiceRefusesAPrivateShape(t *testing.T) {
 	t.Parallel()
 	root := filepath.Join("..", "..")
-	rows := commitVoice(root, "cage-commit-guards-port: the guard lands\n\nmail somebody at someone"+"@"+"somewhere.net\n")
+	rows := commitVoice(quietBox(), root, "cage-commit-guards-port: the guard lands\n\nmail somebody at someone"+"@"+"somewhere.net\n")
 	for _, one := range rows {
 		if one.Rule == "Private" {
 			return

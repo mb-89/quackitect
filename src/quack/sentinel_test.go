@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -61,14 +60,14 @@ func TestSentinelOverSaysALostRow(t *testing.T) {
 func TestSentinelHereWritesTheSessionLog(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(failure.Folder)), 0o755); err != nil {
+	if err := realDisk().makeAll(filepath.Join(root, filepath.FromSlash(failure.Folder)), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(failure.Folder), "take-watched.md"), []byte(watchedNode), 0o644); err != nil {
+	if err := realDisk().write(filepath.Join(root, filepath.FromSlash(failure.Folder), "take-watched.md"), []byte(watchedNode), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	sentinelHere(root, io.Discard)(failure.Event{Kind: "tool.call", Text: `{"command":"./RUNME.sh branch take"}`})
-	said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+	said, err := realDisk().read(filepath.Join(root, filepath.FromSlash(sessionLog)))
 	if err != nil || !strings.Contains(string(said), `"take-watched"`) {
 		t.Fatalf("the session log reads %q (%v), and wants the row of take-watched", said, err)
 	}

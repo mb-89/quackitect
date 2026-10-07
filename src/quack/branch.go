@@ -6,10 +6,8 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"quackitect/src/branches"
 	"quackitect/src/config"
@@ -20,7 +18,7 @@ import (
 	"quackitect/src/proc"
 )
 
-func init() { register("branch", branchVerb(index.Root, index.V1)) }
+func init() { register("branch", branchVerb(index.Root, reachV1)) }
 
 // branch off the doors over the root and the index, every word past the verb handed to the package. [[spec/tickets/work-verbs-port-to-go]]
 func branchVerb(root func() (string, error), v1 func() (string, error)) twin {
@@ -35,8 +33,9 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 	if err != nil {
 		method = "."
 	}
+	box := realBoxDoors(out, errs)
 	work := method
-	if at := strings.TrimSpace(os.Getenv(workRootVar)); at != "" {
+	if at := strings.TrimSpace(box.env(workRootVar)); at != "" {
 		work = at
 	}
 	return &branches.Doors{
@@ -46,7 +45,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 		Run:     proc.Real,
 		Disk:    files.NewDisk(work),
 		Methods: files.NewDisk(method),
-		Now:     time.Now,
+		Now:     wall.Now,
 		Out:     out,
 		Errs:    errs,
 		Log: func(level, kind, said string, more map[string]any) {
@@ -54,7 +53,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 			for key, value := range more {
 				row[key] = value
 			}
-			_ = appendsRow(work, time.Now)(row)
+			_ = appendsRow(box.disk, work, wall.Now)(row)
 		},
 		Config: func(key string) any {
 			said, _ := config.Value(work, key)
@@ -78,19 +77,13 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 			return json.Unmarshal(said.Value, into)
 		},
 		Guidance: func() (map[string][]string, error) {
-			env := map[string]string{}
-			for _, one := range os.Environ() {
-				if name, value, ok := strings.Cut(one, "="); ok {
-					env[name] = value
-				}
-			}
-			return guidanceRows(method, env)
+			return guidanceRows(box.disk, method, vehicleEnv(box.environ()))
 		},
 	}
 }
 
 // The road a verb runs another verb by: this binary's verb road over the scripts folder, as RUNME.sh hands it past the install, or RUNME.sh where the binary names no path. [[spec/tickets/the-verbs-need-no-wrapper]]
-func selfRoad(method string) []string { return selfRoadOver(os.Executable, method) }
+func selfRoad(method string) []string { return selfRoadOver(selfPath, method) }
 
 // The verb road off the binary the self answers, or RUNME.sh where it names none. [[spec/tickets/quack-spawns-all-take-the-runner]]
 func selfRoadOver(binary func() (string, error), method string) []string {

@@ -5,7 +5,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -26,7 +25,7 @@ func TestTheRootHoldsTheWindowAlone(t *testing.T) {
 		}
 	}
 	for _, folder := range []string{"draw", "tree", "frame", "log", "work"} {
-		if said, err := os.Stat(folder); err != nil || !said.IsDir() {
+		if held, _ := filepath.Glob(filepath.Join(folder, "*.go")); len(held) == 0 {
 			t.Fatalf("%s stands nowhere, and the chapter names it", folder)
 		}
 	}

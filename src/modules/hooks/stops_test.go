@@ -13,6 +13,7 @@ import (
 
 	"quackitect/src/modules/hooks/stop"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The case table the bridge's own answers wrote, the tree's root the live files stand under, and the layer the config and the schema answer from. [[spec/tickets/cage-stop-rules-port]]
@@ -133,7 +134,7 @@ func TestTheStopBlocksWhatTheBridgeBlocks(t *testing.T) {
 			root := stopTreeOf(t, table, one)
 			door := holdDoor(t, stopSettingsOf(one))
 			door.from.Git = taughtGit(one.Git)
-			door.from.Now = func() time.Time { return now }
+			door.from.Clock = qtest.NewFake(now)
 			for _, each := range one.Events {
 				post := postOf(each)
 				post.Root = root

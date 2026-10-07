@@ -1,0 +1,3 @@
+# The mcp IO module: the server the agent calls over HTTP.
+mcp:
+  go: [os, net, net/http]
