@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 6d3d2e4498090324852c4ab57b6465044db6efcc
+    hash_after: 6d3d2e4498090324852c4ab57b6465044db6efcc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/example passes; green, src/imports passes; green, src/modules/check passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   65.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8ad2d654834a376c
+        size: 691
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -346,26 +369,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A pure package src/example owns the one parser of an example. It reads the front, the chapter off the path and the steps of every sh block, and it refuses a line past ./RUNME.sh or an expect form outside the design table. The schema spec/schemas/example.schema.yaml governs spec/examples, and the check reads the parser through x-steps and holds edge to the developer chapters through x-under, so lint, the write door and the mint refuse an example out of shape off one road.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, the red test files and one imports case
+- the parser is pure and the check hook reads texts alone, so the change reaches no door
+- each new function points at its section of spec/design_output/examples
+- the expect forms stand once, in the forms map of src/example
 
 # accept
 

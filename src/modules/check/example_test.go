@@ -9,9 +9,9 @@ func TestAnUnderGlobMatchesATailOfThePath(t *testing.T) {
 	t.Parallel()
 	glob := "spec/examples/9*_dev_*/**"
 	for path, want := range map[string]bool{
-		"spec/examples/910_dev_check/empty.md":            true,
+		"spec/examples/910_dev_check/empty.md":           true,
 		"/srv/tree/spec/examples/910_dev_check/empty.md": true,
-		"spec/examples/110_check/runs.md":                 false,
+		"spec/examples/110_check/runs.md":                false,
 		"/srv/tree/spec/examples/110_check/runs.md":      false,
 	} {
 		if got := underGlob(glob, path); got != want {
