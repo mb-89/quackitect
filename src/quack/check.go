@@ -77,6 +77,7 @@ type checkDoors struct {
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
 	platform  string
+	browser   string
 	red       []string
 	config    func(key string) float64
 	git       func(args ...string) string

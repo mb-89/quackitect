@@ -298,3 +298,57 @@ func TestTheBootReadsTheManifestTheBrandWrites(t *testing.T) {
 		t.Errorf("where the brand wrote %s, the boot answers %d and runs the install %v: %s", pluginTarget, code, ran, said)
 	}
 }
+
+// A fake index writing down each call, its stamp fresh answering the code a file holds, and its stamp write turning that code to 0. [[spec/tickets/scripts-folder-leaves]]
+const stampIndex = `#!/bin/sh
+here=$(dirname "$0")
+printf '%s\n' "$*" >> "$here/../seen"
+case "$*" in
+  *" stamp fresh se-index") exit "$(cat "$here/../fresh-code")";;
+  *" stamp write se-index") printf '0' > "$here/../fresh-code";;
+esac
+exit 0
+`
+
+// A fake go whose build copies the fake index to the file -o names and marks the build. [[spec/tickets/scripts-folder-leaves]]
+const stampGo = `#!/bin/sh
+[ "$1" = build ] || exit 0
+while [ $# -gt 0 ]; do
+  if [ "$1" = -o ]; then cp "$STAMP_INDEX" "$2"; chmod +x "$2"; touch "$STAMP_BUILT"; fi
+  shift
+done
+`
+
+func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		name, code string
+		built      bool
+	}{{"a fresh stamp builds nothing", "0", false}, {"a stale stamp builds and writes the stamp", "1", true}} {
+		tree := bootTree(t)
+		bin := filepath.Join(tree, ".se", ".runtime", "bin")
+		path := filepath.Join(tree, "path")
+		bootWrite(t, filepath.Join(bin, "se-index"), stampIndex, 0o755)
+		bootWrite(t, filepath.Join(tree, "index-copy"), stampIndex, 0o755)
+		bootWrite(t, filepath.Join(path, "go"), stampGo, 0o755)
+		bootWrite(t, filepath.Join(tree, ".se", ".runtime", "fresh-code"), one.code, 0o644)
+		run := exec.Command("sh", filepath.Join(tree, "src", "scripts", "install.sh"))
+		run.Dir = tree
+		run.Env = []string{
+			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,
+			"SE_INSTALL_SKIP=vale biome vale-ls go-modules se-front git-hooks",
+			"STAMP_INDEX=" + filepath.Join(tree, "index-copy"), "STAMP_BUILT=" + filepath.Join(tree, "built"),
+		}
+		said, err := run.CombinedOutput()
+		if err != nil {
+			t.Fatalf("%s: the install fails: %v: %s", one.name, err, said)
+		}
+		seen, _ := os.ReadFile(filepath.Join(tree, ".se", ".runtime", "seen"))
+		asked := strings.Contains(string(seen), "stamp fresh se-index\n")
+		wrote := strings.Contains(string(seen), "stamp write se-index\n")
+		_, built := os.Stat(filepath.Join(tree, "built"))
+		if !asked || wrote != one.built || (built == nil) != one.built {
+			t.Errorf("%s: the index heard %q and built %v, and wants stamp fresh asked, the build and the write %v: %s", one.name, seen, built == nil, one.built, said)
+		}
+	}
+}
