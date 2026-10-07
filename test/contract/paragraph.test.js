@@ -354,6 +354,26 @@ ifRules(
   ),
 );
 
+// The rule refuses a run as long as its table setting, inside one cell, and nothing shorter. [[spec/tickets/the-parts-start-at-once]]
+const twoCells = (lead, left, right) =>
+  `${lead}\n\n| what stands | what it does |\n|---|---|\n| ${left} | ${right} |\n`;
+
+ifRules(
+  "a run of six words a cell holds is refused, and five pass, as does a run across two cells",
+  proves(
+    {
+      six: restated("Somewhere a box keeps every open ticket warm.", "each box keeps every open ticket warm today"),
+      five: restated("Somewhere the index keeps every open ticket warm.", "each box keeps every open ticket warm today"),
+      across: twoCells("Each box keeps every open ticket warm.", "each box keeps", "every open ticket warm"),
+    },
+    (said) => {
+      refuses(said, "RestatedTable", "six");
+      passes(said, "RestatedTable", "five");
+      passes(said, "RestatedTable", "across");
+    },
+  ),
+);
+
 // A long table beside a long paragraph finishes in a lookup a run, and restates nothing. [[spec/tickets/restated-table-runs-in-time]]
 const wordy = (tag, n) => Array.from({ length: n }, (_, i) => `${tag}w${i}`).join(" ");
 const longTable = () => {
