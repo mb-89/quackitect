@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 2af84947558eec1019a3237007f48daf5521ac8c
+    hash_after: 2af84947558eec1019a3237007f48daf5521ac8c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   99.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 588124fc0ab64b08
+        size: 1071
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -367,26 +390,33 @@ the event list stands in Doored in listen.go, the step and the merge in step.go,
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/guard_test.go src/modules/hooks/step_test.go src/modules/hooks/listen_test.go src/quack/verb_cage_test.go test/level0/caged-door.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The tests the red leaf wrote pass on the change, after main merges in. Two faults the check named on the way are fixed: guard.go names folders.js above the runtime folder it copies, and the smoke quiet case takes the merge post to the hooks door as the door own. The merge with main left spawn.go on a helper main removed, so it takes yaml.Truthy. Every file under the hooks folder now holds posts, the verb road, shapes and transcript reads, and Go holds the decisions.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches guard.go, probe-dry.js and its test, and spawn.go, each a fault the check or the merge names on this ticket
+the probe-dry quiet case meets a fake post list, and the cage verb meets a stub in caged-door.test.js
+the quiet case names level0-hooks-hold-no-rule beside the door paths it reads
+the door paths name postOf in cage.ts as their owner, and guard.go names folders.js
 
 # accept
 
