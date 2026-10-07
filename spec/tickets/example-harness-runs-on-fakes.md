@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 410e7ae2ec804367dee3ada6e689802373a2fb60
+    hash_after: 410e7ae2ec804367dee3ada6e689802373a2fb60
+    inputs:
+      - name: ask
+        hash: afba7a969ff67496
+        size: 759
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -160,38 +172,65 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The harness stands in `src/quack`, where every verb's constructor lives, as `examples_test.go`.
+
+- The existing `TestMain` in `split_test.go` builds the fixture folder once: the tree's `spec/schemas`, `spec/processes`, `spec/config` and a planted group of tickets. No example writes to it.
+- Each example runs as a parallel subtest over its own copy of that folder. A `git.FakeRepo` over `files.NewDisk` of the copy commits it whole, and `caseNow` stands for the clock.
+- The harness builds a twin table per case off each verb's constructor, such as `ticketPull(rootOf, repoAt)`, with the root and the repo pointed at the copy. A call reaching a verb outside the table fails, naming the verb, so no example reaches the real git, process or model. The table starts with the ticket and mint verbs, and a verb joins it once its constructor takes every door it reaches.
+- `src/example` gains `Holds(expect, Outcome, read)`, the one evaluator of an expect line over an exit code, an output and a file read. The run verb reuses it.
+- A miss names the file, the step's number and the expect line, as `<path>: step <n>, line <l>: <what it wants>, and <what it got>`.
+- The parent test's cleanup writes every verdict to `.se/.runtime/examples.json` at the tree root, keyed by path, with `pass` or `fail` and the miss. `src/example` names the file once, as `VerdictFile`.
+
+The disk stays a real temporary folder, since the ticket verbs read their root in place. The fake disk waits on those verbs taking a disk door, and the harness switches over once they do.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/split_test.go TestMain, which builds the fixture folder
+- src/quack/ticket_pull.go ticketPull, which the twin table calls
+- src/quack/ticket_note.go ticketNote, which the twin table calls
+- src/quack/verb_mint.go mintVerb, which the twin table calls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/example/expect_test.go TestEachExpectFormHoldsOverAnOutcome
+- src/quack/examples_test.go TestEveryExampleHoldsItsSteps
+- src/quack/examples_test.go TestAFalseExpectNamesTheFileTheStepAndTheLine
+- src/quack/examples_test.go TestTheVerdictsLandInTheRuntimeFile
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/example/expect.go
+- src/example/expect_test.go
+- src/quack/examples_test.go
+- src/quack/split_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every function named stands opened: ticketPull, ticketNote, mintVerb, standsInRepo, caseNow, git.NewFakeRepo, files.NewDisk, TestMain in split_test.go
+- the callers list names each constructor the twin table calls and the TestMain it extends
+- each done_when line names its test: the fixture and the dispatch in TestEveryExampleHoldsItsSteps, the planted miss and the verdict file in their own cases, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
