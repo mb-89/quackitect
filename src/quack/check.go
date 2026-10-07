@@ -15,6 +15,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"quackitect/src/modules/files"
 )
 
 // The runtime folder .claude/skills/level0/lib/folders.js owns, spelled again here because Go imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
@@ -67,9 +69,10 @@ type part struct {
 	lead bool
 }
 
-// What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, the disk under it, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
+	disk      files.Disk
 	self      string
 	verb      func(words []string, quiet bool) int
 	run       func(argv, env []string, quiet bool) (int, string, error)
@@ -128,8 +131,8 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		if quiet {
 			d.out = io.Discard
 		}
-		_ = os.Remove(d.at(lintFile))
-		_ = os.Remove(d.at(goRedFile))
+		_ = d.files().Remove(lintFile)
+		_ = d.files().Remove(goRedFile)
 		owned := !d.indexUp()
 		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
 		if owned {
@@ -142,8 +145,8 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		var found lintFound
 		_ = json.Unmarshal([]byte(d.text(lintFile)), &found)
 		var spawns *spawnTally
-		if tally, err := os.ReadFile(d.at(spawnsFile)); err == nil {
-			one := spawnsIn(string(tally))
+		if tally, ok, err := d.files().Read(spawnsFile); ok && err == nil {
+			one := spawnsIn(tally)
 			spawns = &one
 		}
 		report := batteryOf(times, lines, slowestKept, nil, spawns, total)
@@ -187,25 +190,28 @@ func saysParts(d checkDoors, report batteryReport) {
 
 // The stamp the check leaves, which a door reads before a push. [[spec/design_output/work#the-battery-answers-first]]
 func writesStamp(d checkDoors, code int, stood []finding, report *batteryReport) error {
-	at := d.at(stampFile)
-	before, _ := os.ReadFile(at)
-	said := stampFor(code, d.git("rev-parse", "HEAD"), d.git("status", "--porcelain") == "", d.now().UTC().Format(logStamp), stood, report, before, int(d.config(runsKey)))
+	said := stampFor(code, d.git("rev-parse", "HEAD"), d.git("status", "--porcelain") == "", d.now().UTC().Format(logStamp), stood, report, []byte(d.text(stampFile)), int(d.config(runsKey)))
 	text, err := json.MarshalIndent(said, "", "  ")
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(at, append(text, '\n'), 0o644)
+	return d.files().Write(stampFile, string(text)+"\n")
 }
 
 // A path under the root, and the text a file there holds, or nothing. [[spec/design_output/work#the-battery-answers-first]]
 func (d checkDoors) at(rel string) string { return filepath.Join(d.root, filepath.FromSlash(rel)) }
 
 func (d checkDoors) text(rel string) string {
-	said, _ := os.ReadFile(d.at(rel))
-	return string(said)
+	said, _, _ := d.files().Read(rel)
+	return said
+}
+
+// The disk the doors carry, or the real one under the root where they carry none. [[spec/design_output/examples#one-runner-two-drivers]]
+func (d checkDoors) files() files.Disk {
+	if d.disk == nil {
+		return files.NewDisk(d.root)
+	}
+	return d.disk
 }
 
 // The battery: the ready step alone, then each lead part alone in part order, then every other part at once. The last wave reads every start of its parts, then starts them and waits for all of them, each part timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, every lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
@@ -457,10 +463,7 @@ func writesGoRed(d checkDoors, red []redCase) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(d.at(goRedFile)), 0o755); err != nil {
-		return err
-	}
-	return os.WriteFile(d.at(goRedFile), text, 0o644)
+	return d.files().Write(goRedFile, string(text))
 }
 
 // The test part: the unit run, then the contract run, the red list apart, each run's cases written for the battery's report. The runs go one after the other, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-tests-start-fewer-processes]] [[spec/design_output/pull#the-gate]]
@@ -476,7 +479,7 @@ func testsRun(d checkDoors, quiet bool) int {
 	code := 0
 	lines := []string{}
 	for _, one := range testParts {
-		_ = os.Remove(d.at(one.times))
+		_ = d.files().Remove(one.times)
 		ran, _, err := d.run(append([]string{"node"}, testArgv(d.root, d.red, one)...), []string{spawnsEnv + "=" + tally}, quiet)
 		if err != nil {
 			fmt.Fprintln(d.errs, startFault("node", err))
@@ -485,11 +488,11 @@ func testsRun(d checkDoors, quiet bool) int {
 		if code == 0 {
 			code = ran
 		}
-		if said, err := os.ReadFile(d.at(one.times)); err == nil {
-			lines = append(lines, string(said))
+		if said, ok, err := d.files().Read(one.times); ok && err == nil {
+			lines = append(lines, said)
 		}
 	}
-	if err := os.WriteFile(d.at(timesFile), []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+	if err := d.files().Write(timesFile, strings.Join(lines, "\n")); err != nil {
 		fmt.Fprintln(d.errs, err)
 		return exitFailed
 	}
@@ -498,11 +501,7 @@ func testsRun(d checkDoors, quiet bool) int {
 
 // An empty tally the process door writes into while the tests run. [[spec/design_output/work#the-battery-answers-first]]
 func freshTally(d checkDoors) (string, error) {
-	at := d.at(spawnsFile)
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		return "", err
-	}
-	return at, os.WriteFile(at, nil, 0o644)
+	return d.at(spawnsFile), d.files().Write(spawnsFile, "")
 }
 
 // The runner's flags for one part: the spec report to the screen, the battery's reporter to the part's file, and every test file the glob reaches less the red list. A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/pull#the-gate]]

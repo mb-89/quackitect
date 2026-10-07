@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -166,6 +166,15 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 6411a7c0c87b07fa3b410e0d811a696133c4eb4e
+    hash_after: 9b8f27ea63d6331d99a768ae314b9829e322832e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -395,14 +404,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/check.go src/quack/branch.go src/quack/branch_test.go src/quack/examples_harness_test.go src/quack/ticket_set.go src/quack/ticket_todo.go src/quack/ticket_urgent.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus check.go, which the gate adds to it
+- ticket set, todo and urgent take the pull door, branch takes a doors constructor, and check carries a disk, so the harness hands each one a fake over the copy
+- each new type and function links to spec/design_output/examples#one-runner-two-drivers
+- the harness table stands in exampleTable alone, and the main commit file name stands once, as a constant
 
 ## tests-green
 

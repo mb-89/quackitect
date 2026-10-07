@@ -136,11 +136,32 @@ func exampleTree() (files.Disk, pullOver, doorsOver, error) {
 }
 
 // The verbs an example reaches, each over the pull on its own copy; a verb joins once its constructor takes every door it reaches. [[spec/design_output/examples#one-runner-two-drivers]]
-func exampleTable(here pullOver, doors doorsOver) map[string]twin {
+func exampleTable(here pullOver, doors doorsOver, tree files.Disk) map[string]twin {
 	return map[string]twin{
-		"branch": branchVerb(doors),
-		"ticket pull": ticketPull(here), "ticket note": ticketNote(here),
-		"ticket set": ticketSet(here), "ticket todo": ticketTodo(here), "ticket urgent": ticketUrgent(here),
+		"branch":        branchVerb(doors),
+		"check":         checkVerb(exampleCheck(tree)),
+		"ticket pull":   ticketPull(here),
+		"ticket note":   ticketNote(here),
+		"ticket set":    ticketSet(here),
+		"ticket todo":   ticketTodo(here),
+		"ticket urgent": ticketUrgent(here),
+	}
+}
+
+// The check's doors over the copy: every process, verb and health call green, the index standing, and the runtime files on the copy's disk. [[spec/design_output/examples#one-runner-two-drivers]]
+func exampleCheck(tree files.Disk) func(out, errs io.Writer) checkDoors {
+	return func(out, errs io.Writer) checkDoors {
+		return checkDoors{
+			root: exampleRoot, disk: tree, platform: "linux", out: out, errs: errs,
+			verb:    func([]string, bool) int { return 0 },
+			run:     func([]string, []string, bool) (int, string, error) { return 0, "", nil },
+			get:     func(string) ([]byte, error) { return []byte(`{"ok":true}`), nil },
+			indexUp: func() bool { return true },
+			now:     func() time.Time { return time.Unix(0, 0) },
+			config:  func(string) float64 { return 0 },
+			git:     func(...string) string { return "" },
+			log:     func(map[string]any) error { return nil },
+		}
 	}
 }
 
@@ -168,7 +189,7 @@ func runsExample(path, text string) string {
 		text, ok, err := tree.Read(at)
 		return text, ok && err == nil
 	}
-	table := exampleTable(here, doors)
+	table := exampleTable(here, doors, tree)
 	for n, step := range read.Steps {
 		verb, ok := verbOf(table, step.Call)
 		if !ok {
