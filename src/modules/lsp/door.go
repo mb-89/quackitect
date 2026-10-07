@@ -4,18 +4,14 @@
 package lsp
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
 
 	"quackitect/src/config"
+	"quackitect/src/proc"
 )
 
 // The longest a tool runs before the module gives up on it, and the Vale config the assembly writes where the root holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -26,18 +22,10 @@ const (
 
 // The tools the box names in its survey, else the runtime binary folder, each read again before a whole run. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func ToolsAt(root string, rules Check) *Tools {
-	runs, halt := runsUntilHalt()
+	runs, halt := proc.Halting()
 	one := &Tools{Root: root, Run: runs, Halt: halt, Again: reads, Check: rules}
 	reads(one)
 	return one
-}
-
-// A runner whose runs the halt ends, so a stopped index leaves no tool running past it. [[spec/tickets/the-index-stops-its-tools]]
-func runsUntilHalt() (Runner, func()) {
-	life, halt := context.WithCancel(context.Background())
-	return func(dir, input, name string, argv ...string) (string, error) {
-		return runsIn(life, dir, input, name, argv...)
-	}, halt
 }
 
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -86,24 +74,6 @@ func toolAt(bin string, known map[string]string, name string) string {
 		return guess
 	}
 	return ""
-}
-
-// One run of a binary in the folder, its input on standard in, and its output back, up to the wait. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func runsIn(life context.Context, dir, input, name string, argv ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(life, toolWait)
-	defer cancel()
-	one := exec.CommandContext(ctx, name, argv...)
-	one.Dir = dir
-	if input != "" {
-		one.Stdin = strings.NewReader(input)
-	}
-	var out, errs bytes.Buffer
-	one.Stdout, one.Stderr = &out, &errs
-	err := one.Run()
-	if err != nil && out.Len() == 0 {
-		return "", fmt.Errorf("%v: %s", err, strings.TrimSpace(errs.String()))
-	}
-	return out.String(), nil
 }
 
 func standsAt(path string) bool {

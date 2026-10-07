@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -17,12 +16,9 @@ import (
 const undoFolder = runtimeFolder + "/undo"
 
 var (
-	unmergedRow = regexp.MustCompile(`^\d+ [0-9a-f]+ ([123])\t(.+)$`)
-	opensMark   = regexp.MustCompile(`^<{7}(?: |$)`)
-	hunkAt      = regexp.MustCompile(`^@@+ .*\+(\d+)(?:,\d+)? @@`)
-	movedPush   = regexp.MustCompile(`\((?:fetch first|non-fast-forward)\)`)
-	pushNoise   = regexp.MustCompile(`^(?:error: failed to push|hint:|To )`)
-	absolute    = regexp.MustCompile(`^([A-Za-z]:)?[\\/]`)
+	opensMark = regexp.MustCompile(`^<{7}(?: |$)`)
+	pushNoise = regexp.MustCompile(`^(?:error: failed to push|hint:|To )`)
+	absolute  = regexp.MustCompile(`^([A-Za-z]:)?[\\/]`)
 )
 
 // The hand's own paths stage beside the ticket, and a hand writing through no journal hands back the tree the other hands' journals leave. [[spec/design_output/pull#the-refused-commit]]
@@ -42,17 +38,15 @@ func (it *It) landedAlone(one *Held, changes []string, also ...string) string {
 // A journal names files git ignores, and a move leaves its old path standing nowhere, and git refuses a commit naming either. [[spec/design_output/pull#the-refused-commit]]
 func (it *It) tracked(paths []string) []string {
 	ignored := map[string]bool{}
-	for _, row := range strings.Split(it.Git.Run(append([]string{"check-ignore", "--"}, paths...)...).Out, "\n") {
-		if row = strings.TrimSpace(row); row != "" {
-			ignored[row] = true
-		}
+	for _, row := range it.Git.Ignored(paths) {
+		ignored[row] = true
 	}
 	out := []string{}
 	for _, one := range paths {
 		if ignored[one] {
 			continue
 		}
-		if it.Disk.Exists(one) || it.Git.Run("ls-files", "--error-unmatch", "--", one).OK {
+		if it.Disk.Exists(one) || it.Git.Tracked(one) {
 			out = append(out, one)
 		}
 	}
@@ -72,31 +66,25 @@ func (it *It) landing(one *Held, changes, paths, kept []string) string {
 		return ""
 	}
 	if paths != nil {
-		it.Git.Run(append([]string{"add", "--"}, paths...)...)
+		_ = it.Git.Add(paths)
 	} else {
-		it.Git.Run("add", "-A")
+		_ = it.Git.AddAll()
 		if len(kept) > 0 {
-			it.Git.Run(append([]string{"reset", "-q", "--"}, kept...)...)
+			_ = it.Git.Reset(kept)
 		}
 	}
-	only := []string{}
-	if paths != nil {
-		only = append([]string{"--"}, paths...)
-	}
-	ran := Ran{Err: it.stagedFault(only)}
-	if ran.Err == "" {
-		ran = it.Git.Run(append([]string{"commit", "-m", one.Name + ": " + strings.Join(changes, ", ")}, only...)...)
-		if ran.OK {
+	why := it.stagedFault(paths)
+	if why == "" {
+		_, err := it.Git.Commit(one.Name+": "+strings.Join(changes, ", "), paths)
+		if err == nil {
 			return ""
 		}
+		why = strings.TrimSpace(err.Error())
 	}
-	it.Git.Run(append([]string{"reset", "-q"}, only...)...)
+	_ = it.Git.Reset(paths)
 	_ = it.Disk.Write(one.Path, stood)
-	switch {
-	case ran.Err != "":
-		return ran.Err
-	case ran.Out != "":
-		return ran.Out
+	if why != "" {
+		return why
 	}
 	return "the commit answers nothing"
 }
@@ -168,13 +156,7 @@ func contains(list []string, one string) bool {
 
 // What a step verb meets before it stages: any unmerged path refuses it. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (it *It) unmergedFault() string {
-	paths := map[string]bool{}
-	for _, row := range strings.Split(it.Git.Run("ls-files", "-u").Out, "\n") {
-		if found := unmergedRow.FindStringSubmatch(strings.TrimSpace(row)); found != nil {
-			paths[found[2]] = true
-		}
-	}
-	unmerged := sortedKeys(paths)
+	unmerged, _ := it.Git.Unmerged()
 	return mergeRefusal(unmerged, nil)
 }
 
@@ -186,33 +168,12 @@ type marked struct {
 
 // What a verb meets once it stages: a marker the index carries refuses it. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (it *It) stagedFault(only []string) string {
-	delta := it.Git.Run(append([]string{"diff", "--cached", "--unified=0"}, only...)...).Out
+	adds, _ := it.Git.StagedAdds(only)
 	out := []marked{}
-	file, at, binary := "", 0, false
-	for _, line := range rowsOf(delta) {
-		switch {
-		case strings.HasPrefix(line, "diff --git "):
-			file, binary = "", false
-			continue
-		case strings.HasPrefix(line, "Binary files") || strings.HasPrefix(line, "GIT binary patch"):
-			binary = true
-			continue
-		case strings.HasPrefix(line, "+++ "):
-			file = strings.TrimPrefix(strings.TrimPrefix(line[len("+++ "):], "b/"), `"`)
-			file = strings.TrimSuffix(file, `"`)
-			continue
+	for _, add := range adds {
+		if opensMark.MatchString(add.Text) {
+			out = append(out, marked{file: add.File, line: add.Line})
 		}
-		if found := hunkAt.FindStringSubmatch(line); found != nil {
-			at, _ = strconv.Atoi(found[1])
-			continue
-		}
-		if !strings.HasPrefix(line, "+") || strings.HasPrefix(line, "+++") {
-			continue
-		}
-		if file != "" && file != "/dev/null" && !binary && opensMark.MatchString(line[1:]) {
-			out = append(out, marked{file: file, line: at})
-		}
-		at++
 	}
 	return mergeRefusal(nil, out)
 }
@@ -243,9 +204,8 @@ func (it *It) pushed(branch string) (bool, []string) {
 	if ok || !moved {
 		return ok, why
 	}
-	it.Git.Run("fetch", "origin", branch)
-	if !it.Git.Run("rebase", "origin/"+branch).OK {
-		it.Git.Run("rebase", "--abort")
+	_ = it.Git.Fetch(branch)
+	if it.Git.Rebase("origin/"+branch) != nil {
 		return false, []string{fmt.Sprintf("%s moves on origin, and one rebase falls short. Push %s, then pull again.", branch, branch)}
 	}
 	ok, _, why = it.tried(branch)
@@ -261,7 +221,7 @@ func (it *It) sentOut(one *Held, branch string) (bool, []string) {
 }
 
 func (it *It) tried(branch string) (ok, moved bool, why []string) {
-	ran := it.Git.Run("push", "origin", branch)
+	ran := it.Git.Push(branch, false)
 	if ran.OK {
 		return true, false, nil
 	}
@@ -274,5 +234,5 @@ func (it *It) tried(branch string) (ok, moved bool, why []string) {
 	if len(lines) == 0 {
 		lines = []string{"it names no cause"}
 	}
-	return false, movedPush.MatchString(ran.Err), append([]string{"The push door refuses " + branch + ":"}, lines...)
+	return false, ran.Moved, append([]string{"The push door refuses " + branch + ":"}, lines...)
 }

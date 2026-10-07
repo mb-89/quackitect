@@ -14,6 +14,15 @@ import (
 // The key the group ticket on trunk carries while its branch stands in the cloud. [[spec/rationales/git-stays-the-archive]]
 const cloudMark = "cloud"
 
+// Where a local branch stands, and where origin keeps each pull request's head. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+const (
+	localRefs = "refs/heads/"
+	pullRefs  = "refs/pull/"
+)
+
+// The error a two-answer call ends on. [[spec/design_output/doors#a-door-standing-on-another]]
+func second[T any](_ T, err error) error { return err }
+
 // A branch a cloud routine cuts carries no group, so it reads against trunk by its commits. [[spec/design_output/work#a-cloud-branch-comes-in]]
 var cloudBranch = regexp.MustCompile(`^claude/`)
 
@@ -34,7 +43,7 @@ func (d *Doors) marks(name string, on bool) bool {
 		text = withoutField(text, cloudMark)
 	}
 	_ = d.write(at, text)
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 	return true
 }
 
@@ -43,8 +52,8 @@ func (d *Doors) marksTrunk(name string) bool {
 	if !d.marks(name, true) {
 		return true
 	}
-	d.quiet("commit", "-m", name+": opens in the cloud")
-	if d.loud("push", "origin", trunk).OK {
+	_, _ = d.Repo.Commit(name+": opens in the cloud", nil)
+	if d.push(trunk) {
 		return true
 	}
 	d.warn("The push of %s comes back refused, so it carries no marker. Run ./RUNME.sh branch open %s again.", trunk, name)
@@ -109,7 +118,7 @@ func merge(d *Doors, name string, argv []string) int {
 		return codeRed
 	}
 	was := d.head()
-	if !d.loud("merge", "--no-ff", "--no-edit", "origin/"+branch).OK {
+	if _, err := d.Repo.Merge("origin/"+branch, "", true); !d.loudly(err) {
 		held := d.conflicted(ticketAt(name))
 		if !held {
 			d.marks(name, false)
@@ -122,11 +131,11 @@ func merge(d *Doors, name string, argv []string) int {
 	}
 	freed := d.freeChildren(name, "")
 	if unmarked := d.marks(name, false); len(freed) > 0 || unmarked {
-		d.quiet("commit", "--amend", "--no-edit")
+		_ = d.Repo.Amend()
 	}
 	d.installs()
 	if ok, says := d.checkSays(); !ok {
-		d.quiet("reset", "--hard", was)
+		_ = d.Repo.ResetTo(was, true)
 		d.warn("The check answers red on the merge commit, so %s stands where it was.", trunk)
 		if says == "" {
 			says = "Run ./RUNME.sh check to read what it says."
@@ -138,7 +147,7 @@ func merge(d *Doors, name string, argv []string) int {
 	for _, one := range freed {
 		d.say("  %s lost its group, and stands loose on %s.", one, trunk)
 	}
-	if !d.loud("push", "origin", trunk).OK {
+	if !d.push(trunk) {
 		d.say("Push %s, then run ./RUNME.sh branch close %s.", trunk, name)
 		return codeOK
 	}
@@ -150,27 +159,21 @@ func merge(d *Doors, name string, argv []string) int {
 
 // Whether git lists the path unmerged. [[spec/tickets/conflicts-drop-the-marker]]
 func (d *Doors) conflicted(at string) bool {
-	return slices.Contains(strings.Split(d.quiet("diff", "--name-only", "--diff-filter=U").Out, "\n"), at)
+	unmerged, _ := d.Repo.Unmerged()
+	return slices.Contains(unmerged, at)
 }
 
 // The number of the pull request whose head stands at the branch tip, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
 func (d *Doors) pullCarrying(branch string) string {
-	tip := d.quiet("rev-parse", "origin/"+branch).Out
+	tip := d.rev("origin/" + branch)
 	if tip == "" {
 		return ""
 	}
-	for _, row := range strings.Split(d.quiet("ls-remote", "origin", "refs/pull/*/head").Out, "\n") {
-		parts := strings.Split(row, "\t")
-		if parts[0] != tip {
-			continue
+	pulls, _ := d.Repo.RemoteRefs(pullRefs)
+	for _, one := range pulls {
+		if number, ok := strings.CutSuffix(strings.TrimPrefix(one.Name, pullRefs), "/head"); ok && one.Hash == tip && !strings.Contains(number, "/") {
+			return number
 		}
-		if len(parts) < 2 {
-			return ""
-		}
-		if ref := strings.Split(parts[1], "/"); len(ref) > 2 {
-			return ref[2]
-		}
-		return ""
 	}
 	return ""
 }
@@ -185,21 +188,17 @@ func (d *Doors) mergeCloud(branch string) int {
 		return codeRefused
 	}
 	d.fetch()
-	left := 0
-	for _, row := range strings.Split(d.quiet("cherry", trunk, "origin/"+branch).Out, "\n") {
-		if strings.HasPrefix(row, "+") {
-			left++
-		}
-	}
+	carried, _ := d.Repo.Cherry(trunk, "origin/"+branch)
+	left := len(carried)
 	was := d.head()
-	if left > 0 && !d.loud("merge", "--no-ff", "--no-edit", "origin/"+branch).OK {
+	if left > 0 && !d.loudly(second(d.Repo.Merge("origin/"+branch, "", true))) {
 		d.warn("%s conflicts. Resolve it, commit, then run branch close.", branch)
 		return codeRed
 	}
 	d.installs()
 	if ok, says := d.checkSays(); !ok {
 		if left > 0 {
-			d.quiet("reset", "--hard", was)
+			_ = d.Repo.ResetTo(was, true)
 		}
 		d.warn("The check answers red on %s, so %s stands.", trunk, branch)
 		if says == "" {
@@ -208,14 +207,14 @@ func (d *Doors) mergeCloud(branch string) int {
 		d.warn("%s", says)
 		return codeRed
 	}
-	if !d.loud("push", "origin", trunk).OK {
+	if !d.push(trunk) {
 		d.warn("The push of %s comes back refused, so %s stands.", trunk, branch)
 		return codeRed
 	}
-	if !d.loud("push", "origin", "--delete", branch).OK {
+	if !d.loudly(d.Repo.DeleteRemote(branch)) {
 		return codeRed
 	}
-	d.quiet("branch", "-D", branch)
+	_ = d.Repo.DeleteRef(localRefs + branch)
 	if left > 0 {
 		d.say("%s is merged, the check passes, and the branch is gone.", branch)
 	} else {
@@ -237,12 +236,15 @@ func (d *Doors) movedOnTrunk(branch string) []movedTicket {
 		return nil
 	}
 	var out []movedTicket
-	for _, path := range strings.Split(d.quiet("diff", "--name-only", base+"..origin/"+branch, "--", ticketsFolder).Out, "\n") {
-		if path == "" {
+	touched, _ := d.Repo.Diff(base, "origin/"+branch)
+	for _, change := range touched {
+		path := change.Path
+		if !strings.HasPrefix(path, ticketsFolder+"/") {
 			continue
 		}
 		var lines []string
-		for _, one := range strings.Split(d.quiet("diff", "--unified=0", base+"..origin/"+trunk, "--", path).Out, "\n") {
+		patch, _ := d.Repo.Patch(base, "origin/"+trunk, false, path)
+		for _, one := range strings.Split(patch, "\n") {
 			if diffLine.MatchString(one) && !diffHead.MatchString(one) {
 				lines = append(lines, one)
 			}
@@ -303,7 +305,7 @@ func (d *Doors) filed(one named, parent string) {
 		text = withField(one.Text, groupField, parent)
 	}
 	_ = d.write(at, text)
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 }
 
 // The install RUNME.sh runs before every verb, run again over the merged tree. [[spec/design_output/work#the-merge-lands-the-truth]]
@@ -324,8 +326,8 @@ func closeVerb(d *Doors, name string, argv []string) int {
 		return codeRefused
 	}
 	d.fetch()
-	if ahead := d.quiet("rev-list", "--count", "origin/"+trunk+".."+trunk).Out; ahead != "0" && !forced {
-		d.warn("%s holds %s commit(s) origin has never seen.", trunk, ahead)
+	if ahead := d.ahead("origin/"+trunk, trunk); ahead != 0 && !forced {
+		d.warn("%s holds %d commit(s) origin has never seen.", trunk, ahead)
 		d.warn("Push %s first, so the merge outlives the branch.", trunk)
 		return codeRed
 	}
@@ -354,16 +356,16 @@ func closeVerb(d *Doors, name string, argv []string) int {
 			continue
 		}
 		if d.marks(ticketNamed(branch), false) {
-			d.quiet("commit", "-m", ticketNamed(branch)+": leaves the cloud")
-			if !d.loud("push", "origin", trunk).OK {
+			_, _ = d.Repo.Commit(ticketNamed(branch)+": leaves the cloud", nil)
+			if !d.push(trunk) {
 				d.warn("The push of %s comes back refused, so %s stands.", trunk, branch)
 				continue
 			}
 		}
-		if !d.loud("push", "origin", "--delete", branch).OK {
+		if !d.loudly(d.Repo.DeleteRemote(branch)) {
 			continue
 		}
-		d.quiet("branch", "-D", branch)
+		_ = d.Repo.DeleteRef(localRefs + branch)
 		unmerged := ""
 		if !inTrunk[branch] {
 			unmerged = ", unmerged"

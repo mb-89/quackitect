@@ -13,11 +13,11 @@ import (
 func pdOrphaned(t *testing.T) *tree {
 	t.Helper()
 	one := newTree(t, nil)
-	one.git("switch", "-q", "--orphan", "work/orphan")
+	one.must(one.repo.Orphan("work/orphan"))
 	one.land("orphan lands", map[string]string{".gitignore": ".se/\n", ticketAt("orphan"): pdGroupNote})
-	one.git("push", "-q", "origin", "work/orphan")
-	one.git("switch", "-q", trunk)
-	one.git("branch", "-q", "-D", "work/orphan")
+	one.push("work/orphan")
+	one.switchTo(trunk)
+	one.drop("work/orphan")
 	one.branch("fine", map[string]string{ticketAt("fine"): strings.Replace(pdGroupNote, "urgent: true\n", "", 1)})
 	return one
 }
@@ -28,12 +28,12 @@ func pdShallow(t *testing.T) (*tree, string) {
 	one := newTree(t, nil)
 	one.branch("old", map[string]string{ticketAt("old"): strings.Replace(pdGroupNote, "urgent: true\n", "", 1)})
 	pdMainMoves(one, 1)
-	base := one.git("merge-base", "origin/main", "origin/work/old")
-	shallow := t.TempDir()
-	one.sh(shallow, "git", "clone", "-q", "--depth", "1", "--no-single-branch", "file://"+one.from, ".")
-	one.root, one.d.Root = shallow, shallow
-	if one.git("rev-parse", "--is-shallow-repository") != "true" {
-		t.Fatal("the clone stands whole")
+	base, _ := one.repo.MergeBase("origin/main", "origin/work/old")
+	one.disk = newFakeDisk()
+	one.repo = one.origin.CloneShallow(one.disk)
+	one.d.Repo, one.d.Disk = one.repo, one.disk
+	if said, ok := one.repo.MergeBase("origin/main", "origin/work/old"); ok {
+		t.Fatalf("the clone stands whole, and finds the base %s", said)
 	}
 	return one, base
 }
@@ -45,10 +45,10 @@ func TestPDTakePassesOverAnOrphan(t *testing.T) {
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if here := one.git("rev-parse", "--abbrev-ref", "HEAD"); here != "work/fine" {
+	if here := one.here(); here != "work/fine" {
 		t.Fatalf("the take stands on %s", here)
 	}
-	if one.d.quiet("rev-parse", "-q", "--verify", "refs/heads/work/orphan").OK {
+	if one.rev("refs/heads/work/orphan") != "" {
 		t.Fatal("the take touches the orphan")
 	}
 	holds(t, one.out.String(), "work/orphan")
@@ -68,7 +68,7 @@ func TestPDListUnshallowsBeforeTheOrphanMark(t *testing.T) {
 	t.Parallel()
 	one, _ := pdShallow(t)
 	one.branchSays("list")
-	if one.git("rev-parse", "--is-shallow-repository") != "false" {
+	if one.repo.Unshallow() {
 		t.Fatal("the listing leaves the clone shallow")
 	}
 	pdMisses(t, one.out.String(), `work/old\s+orphan`)

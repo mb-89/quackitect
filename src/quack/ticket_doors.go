@@ -8,14 +8,15 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 	"quackitect/src/pull"
 )
@@ -31,19 +32,20 @@ func rootsOf(rootOf func() (string, error)) (method, work string, err error) {
 	return method, work, nil
 }
 
-// One git call under the root, answering what it printed with the end trimmed, and whether it ran clean. [[spec/tickets/ticket-verbs-port-to-go]]
-func gitIn(root string, args ...string) (string, bool) {
-	run := exec.Command("git", args...)
-	run.Dir = root
-	said, err := run.Output()
-	return strings.TrimSpace(string(said)), err == nil
-}
+// The real repository under a root. [[spec/design_output/doors#the-git-door-carries-writes]]
+func realRepo(root string) git.Repo { return git.NewRepo(root, proc.Real) }
+
+// The repository a registered verb reaches: the real one, which a case stands a FakeRepo in for over its run. [[spec/tickets/route-cases-hand-their-repo]]
+var standingRepo = realRepo
+
+// The repository under a root that every registered verb takes. [[spec/tickets/route-cases-hand-their-repo]]
+func registeredRepo(root string) git.Repo { return standingRepo(root) }
 
 // The rules whose findings refuse at a door: a lint that ran nowhere reads no rule, and a private name leaves the box. [[spec/design_output/level0#the-panel-holds-a-warning]]
 var refusing = map[string]bool{"VoiceRulesRan": true, "Private": true}
 
 // The pull over this box: the disk and git under the work root, the config under the method root, and the verbs and topics other code answers. [[spec/design_output/pull#the-answers]]
-func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int) {
+func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, out, errs io.Writer) (*pull.It, int) {
 	method, work, err := rootsOf(rootOf)
 	if err != nil {
 		fmt.Fprintln(errs, err)
@@ -57,7 +59,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 	}
 	rows, _ := configAt(method)
 	it := &pull.It{
-		Disk: pull.OSDisk{Root: work}, Git: pull.GitDoor{Root: work}, Now: time.Now, Out: out, Err: errs,
+		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: time.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),
 		Words: configInt(rows, "names.words"), Fails: configInt(rows, "work.failsBeforePerson"),
 		Refusals: configInt(rows, "work.refusalsBeforeFail"), Splits: configInt(rows, "work.stepsBeforeSplit"),
@@ -66,7 +68,7 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 		Binding:     configWord(rows, "engine.binding"), CapBytes: configInt(rows, "pull.cap"), CapMargin: configInt(rows, "pull.margin"),
 		Log:     pullLog(work, configWord(rows, "log.level")),
 		Rules:   brief.RulesOf,
-		Shell:   pull.OSShell(work),
+		Shell:   pull.ShellOver(proc.Real, work),
 		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
 	}
 	it.Notes = func(key string) []string {
@@ -179,33 +181,6 @@ func pullVoice(root string) func(path, text string, first, last int) []pull.Voic
 		}
 		return out
 	}
-}
-
-// The branch take a cloud box runs on trunk, through the verb road, so the branch verbs answer it wherever they stand, and the index it serves. [[spec/design_output/pull#the-engine-takes-the-branch]]
-func takesBranch(scripts, group string, it *pull.It) int {
-	self, err := os.Executable()
-	if err != nil {
-		fmt.Fprintln(it.Err, err)
-		return exitFailed
-	}
-	args := []string{"verb", scripts, "branch", "take"}
-	if group != "" {
-		args = append(args, group)
-	}
-	run := exec.Command(self, args...)
-	run.Dir, run.Stdout, run.Stderr = it.Root, it.Out, it.Err
-	code := 0
-	if err := run.Run(); err != nil {
-		code = exitFailed
-		if exit, ok := err.(*exec.ExitError); ok {
-			code = exit.ExitCode()
-		}
-	}
-	if code != 0 || !it.Cloud {
-		return code
-	}
-	fmt.Fprintln(it.Out, servesHere(it.Root))
-	return code
 }
 
 // The hooks door the index writes, and the port it names. [[spec/design_output/pull#the-engine-takes-the-branch]]

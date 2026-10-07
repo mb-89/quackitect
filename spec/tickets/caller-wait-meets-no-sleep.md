@@ -1,0 +1,405 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: 22b42ea1501e8967
+group: tests-meet-the-doors-once
+depends_on: ["the-testing-rules-name-the-doors"]
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 0d0d629cd5092214d5ba69528a8b9e5412fe2250
+    hash_after: 0d0d629cd5092214d5ba69528a8b9e5412fe2250
+    inputs:
+      - name: ask
+        hash: 519f80ce0658be38
+        size: 556
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: ee0a6b84dfb1cf97e35682a365f4d13c789228cc
+    hash_after: ee0a6b84dfb1cf97e35682a365f4d13c789228cc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/index fails
+    inputs:
+      - name: design/draft
+        hash: 543b3deeb4147393
+        size: 1363
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 7627a9e3369bc6592be61172f2bf3801ac7e060e
+    hash_after: 7627a9e3369bc6592be61172f2bf3801ac7e060e
+    inputs:
+      - name: design/draft
+        hash: 543b3deeb4147393
+        size: 1363
+      - name: design/tests-red
+        hash: bd05809591ad6e05
+        size: 753
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: af4dc3382e9fcc37ff421dca3eb15ddf0494ba0d
+    hash_after: af4dc3382e9fcc37ff421dca3eb15ddf0494ba0d
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 004df0d1821a1c0c1a04ca20c4d20a051448f39f
+    hash_after: 004df0d1821a1c0c1a04ca20c4d20a051448f39f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "  104.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: bd05809591ad6e05
+        size: 753
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+The wait on a session tests in memory, and a loaded box leaves its result alone.
+
+<!-- breaks, as text: what breaks if it is never done -->
+The case on a wait with no handle sleeps a fifth of its span, so the wait reads the open operations before they end. A loaded box runs the close first, and the wait reads none.
+
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+- `TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations` in `src/modules/index/call_test.go` closes the held operations on a signal that the wait reads them, and calls no `time.Sleep`
+- its row leaves the family table in `spec/design_output/doors.md`
+- `./RUNME.sh check` stands green
+
+<!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
+none
+
+<!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
+none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+Book.Wait reads the wall clock through time.After, against rule 8 of the testing guidance. The book takes its timer as a field, after, which NewBook fills with time.After, and Wait arms its span through it. The case on a wait with no handle hands in an after that signals the first time a wait arms. WaitCaller reads the open operations before its first Wait, so the case closes the gate on that signal, and calls no time.Sleep. Its row leaves the family table.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- src/modules/index/call.go Call, through b.Wait
+- src/modules/index/call.go WaitCaller, through b.Wait
+- src/modules/index/ops.go NewBook, which fills the field
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- src/modules/index/call_test.go TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations, on the signal
+- src/modules/index/call_test.go TestAWaitArmsItsSpanThroughTheBooksTimer
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- src/modules/index/ops.go
+- src/modules/index/call.go
+- src/modules/index/call_test.go
+- spec/design_output/doors.md
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- Book, NewBook, Wait, WaitCaller, bookOf and the case stand opened, and WaitCaller reads Open before its first Wait
+- the callers come off a grep of .Wait( under src, where hooks and mcp call tool.Wait, another function
+- the first done_when line meets both cases and the real-wait guard, the second the guard over the narrowed row, the third the check
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/call_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/modules/index/call_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+Both cases fail on their own assertion: the wait arms nothing through the book timer, and the case on s1 never sees it arm. The book takes the field and NewBook fills it, so the cases compile, and Wait still reads time.After. A surprise: the hang guard on the signal reads the wall clock through time.After, which the real-wait guard leaves alone, since it bounds a hang and waits on nothing that passes.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the first done_when line meets both cases, the second the real-wait guard once the row leaves, the third the check
+- the cases reach no door: the book runs on the fake clock and the memory keep bookOf hands in
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: Book.Wait arms its span through the book's after field, which NewBook fills with time.After, and the case on a wait with no handle closes the held operations once the wait arms, after WaitCaller reads Open. The first done_when line meets TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations and TestAWaitArmsItsSpanThroughTheBooksTimer, both red on their own assertion. The second line met no red test, since call_test.go calls no time.Sleep and the check passes with the row standing; the gate adds TestTheWaitCasesSleepOnNothingAndTheDoorsChapterListsThemNowhere in src/modules/index/call_test.go, after the guards in src/pull and src/branches, red until the row leaves doors.md. The third line rests on the check at tests-green.
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches src/modules/index/call.go and spec/design_output/doors.md, both on the draft's size list, and ops.go and call_test.go took their part at tests-red and gate
+- the wait reaches the clock alone, and the book's after field stands as its fake, filled with time.After by NewBook
+- Book.Wait points at the wait chapter of spec/design_output/model.md, and the draft names the approach
+- the timer stands once, in the book's after field, and the doors chapter no longer lists the case
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/call_test.go
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+Book.Wait in src/modules/index/call.go arms its span through the book's after field in place of time.After, and NewBook fills that field with time.After. The case on a wait with no handle hands in an after that signals the first time a wait arms, and it closes the held operations on that signal. Before, it slept a fifth of its span and hoped the wait read the open operations first, which a loaded box broke. The case leaves the doors chapter's family table, and a guard in call_test.go fails once the file sleeps or the chapter lists it again.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches the files the draft's size list names
+- the wait reaches the clock alone, and the after field stands as its fake
+- Book.Wait points at the wait chapter of spec/design_output/model.md
+- the timer stands once, in the book's after field
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

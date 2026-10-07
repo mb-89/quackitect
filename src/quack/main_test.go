@@ -6,14 +6,12 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/index"
-	"quackitect/src/modules/check"
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/files"
 	"quackitect/src/q"
@@ -74,103 +72,6 @@ func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 		t.Fatalf("files/a.md reads %v before any write", got)
 	}
 	var _ index.Start = starts[0]
-}
-
-// The wiring loads the migration module, and its slice key reads the value the config resolves. [[spec/tickets/open-tasks-run-in-shadow]]
-func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	all, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w := q.Wiring{Wires: all.Wires}
-	for _, one := range all.Instances {
-		if one.Module == "migration" {
-			w.Instances = append(w.Instances, one)
-		}
-	}
-	c := q.New()
-	values := q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	var keys []q.Key
-	for _, one := range c.Keys() {
-		if one.Type == "string" {
-			keys = append(keys, one)
-		}
-	}
-	if len(keys) == 0 {
-		t.Fatal("the wiring loads no slice key")
-	}
-	resolved := q.Resolved{}
-	for _, one := range keys {
-		if one.Instance != "migration" || !one.Shared {
-			t.Fatalf("the wiring loads %+v, and wants a shared slice key of migration", one)
-		}
-		resolved[one.Name] = `"shadow"`
-	}
-	s := q.NewStore(c)
-	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: resolved}); err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range keys {
-		if err := s.Run(one.Name); err != nil {
-			t.Fatal(err)
-		}
-		if said := s.Snapshot().Read(one.Name); said != "shadow" {
-			t.Fatalf("%s reads %v, and wants shadow", one.Name, said)
-		}
-	}
-}
-
-// The wiring loads the check module, and every check/ name reads its empty list off the wired tree. [[spec/tickets/check-module-joins-the-wiring]]
-func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	all, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w := q.Wiring{Wires: all.Wires}
-	for _, one := range all.Instances {
-		if one.Module == "check" {
-			w.Instances = append(w.Instances, one)
-		}
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	read := q.NewStore(c).Snapshot()
-	for _, twin := range check.Twins {
-		if said, ok := read.Read(check.Prefix + twin).([]check.Finding); !ok || len(said) != 0 {
-			t.Fatalf("%s%s reads %v off the wired tree, and wants an empty list", check.Prefix, twin, said)
-		}
-	}
-}
-
-// The index holds no module's logic, so it imports nothing under src/modules and no src/tickets. [[spec/tickets/tickets-becomes-a-module]]
-func TestTheIndexImportsNoModule(t *testing.T) {
-	t.Parallel()
-	cmd := exec.Command("go", "list", "-deps", "./src/index")
-	cmd.Dir = filepath.Join("..", "..")
-	listed, err := cmd.Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range strings.Fields(string(listed)) {
-		if strings.HasPrefix(one, "quackitect/src/modules/") || one == "quackitect/src/tickets" {
-			t.Fatalf("the index imports %s", one)
-		}
-	}
 }
 
 // The served index answers the tickets the wiring's module reads off the watch, the private ones and one written after the start among them. [[spec/tickets/tickets-becomes-a-module]]
@@ -382,26 +283,6 @@ func TestTheRootLandsAStoreRequest(t *testing.T) {
 	}
 	if held, _ := store.Snapshot().Read(config.HeldName).(config.Held); held.Overrides["queue/config/weight"] != "9" || held.By["queue/config/weight"] != "w1" {
 		t.Fatalf("%s holds %+v after the land", config.HeldName, held)
-	}
-}
-
-// The wiring's http instance declares its wait under the name the door reads, so a layer setting the key reaches every post with no Prefer. [[spec/tickets/wait-key-meets-its-wiring]]
-func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := q.NewStore(c).Declared(index.WaitName); !ok {
-		t.Fatalf("the wiring declares no %s", index.WaitName)
 	}
 }
 

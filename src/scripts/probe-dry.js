@@ -62,7 +62,8 @@ export function smokeTree(root, it, say, { temp, tree, port, delta }) {
   const from = it.join(root, BIN);
   const to = it.join(tree, BIN);
   it.disk.makeDir(to);
-  for (const one of builtIn(it, from)) it.disk.copy(it.join(from, one), it.join(to, one));
+  for (const one of builtIn(it, from))
+    it.disk.copy(it.join(from, one), it.join(to, one));
   it.disk.makeDir(it.join(tree, POINTER, ".."));
   it.disk.write(it.join(tree, POINTER), `${JSON.stringify({ method: tree, port })}\n`);
   return true;
@@ -101,13 +102,22 @@ export function deltaOf(here, at) {
 
 // [[spec/tickets/level0-runs-on-the-door]]
 export function probeDry(root, it, say = console.log, delta = "", at = "") {
-  const stands = (from, doors, said, where) => coldTree(from, doors, said, { ...where, at });
-  return probed(root, it, say, delta, { stands, clears: true, checks: DRY.checks });
+  const stands = (from, doors, said, where) =>
+    coldTree(from, doors, said, { ...where, at });
+  return probed(root, it, say, delta, {
+    stands,
+    clears: true,
+    checks: DRY.checks,
+  });
 }
 
 // [[spec/tickets/level0-smoke-runs-in-seconds]]
 export function probeSmoke(root, it, say = console.log, delta = "") {
-  return probed(root, it, say, delta, { stands: smokeTree, clears: false, checks: SMOKE.checks });
+  return probed(root, it, say, delta, {
+    stands: smokeTree,
+    clears: false,
+    checks: SMOKE.checks,
+  });
 }
 
 async function probed(root, it, say, delta, { stands, clears, checks: names }) {
@@ -122,7 +132,16 @@ async function probed(root, it, say, delta, { stands, clears, checks: names }) {
     return checks.every((one) => one.pass) ? 0 : 1;
   } finally {
     stops(it, tree);
+    leaves(it, temp, say);
+  }
+}
+
+// Removes the probe's temp tree, and names it where the box still holds it, since a folder a process lets go of a moment after its stop says nothing of level zero. [[spec/tickets/the-doors-pr-goes-green]]
+export function leaves(it, temp, say) {
+  try {
     it.disk.remove(temp);
+  } catch (err) {
+    say(`the temp tree stays at ${temp}: ${err?.code ?? err?.message ?? err}`);
   }
 }
 
@@ -174,7 +193,9 @@ export function harnessOf(it, tree, env) {
       },
     },
     env: { get: async (key) => env[key] },
-    tool: { register: async (spec) => void seen.registered.push(String(spec?.name)) },
+    tool: {
+      register: async (spec) => void seen.registered.push(String(spec?.name)),
+    },
     ui: { log: (line) => void seen.said.push(String(line)) },
     session: {
       messages: async () => seen.held,
@@ -264,12 +285,21 @@ async function session(it, tree, clears) {
     }
   };
 
-  const opening = raise("session.start", { session_id: `dry-${it.pid}`, cwd: tree });
+  const opening = raise("session.start", {
+    session_id: `dry-${it.pid}`,
+    cwd: tree,
+  });
   const prompt = { text: COLD.prompt };
   const submitted = await raise("prompt.submit", prompt, async (said) => said, OWNER);
   // The client's transcript keeps each row as the session runs, which the answer door reads the reply off. [[spec/tickets/a-reply-follows-its-prompt]]
-  seen.held.push({ role: "user", id: "u1", text: String(submitted?.text ?? "") });
-  const context = await raise("prompt.context", {}, async () => ({ blocks: [] }));
+  seen.held.push({
+    role: "user",
+    id: "u1",
+    text: String(submitted?.text ?? ""),
+  });
+  const context = await raise("prompt.context", {}, async () => ({
+    blocks: [],
+  }));
   await opening;
   const blocks = context?.blocks ?? [];
   const sentence =
@@ -345,7 +375,10 @@ function rulesHanded(rows, seen) {
       evidence: `the context read hands the client ${names.join(" ") || "no block"}`,
     };
   if (!seen.sentence)
-    return { pass: false, evidence: "the canary block holds no canary sentence" };
+    return {
+      pass: false,
+      evidence: "the canary block holds no canary sentence",
+    };
   if (!rows.some((one) => one.kind === "context"))
     return { pass: false, evidence: "no context row" };
   return {

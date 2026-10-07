@@ -22,7 +22,6 @@ import {
 } from "../extension/lib/grid.js";
 import { answerOf, keptOf, keptOver, PAST } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
-import { valeRowsOver } from "./vale-rows.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -44,11 +43,8 @@ export async function findingsOver(it, asked) {
     (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
   );
   if (!where.length) return { found: [], fault: "" };
-  // The lint keeps Vale's rows a file, so a file unchanged since the last lint takes no Vale run. [[spec/tickets/the-check-runs-fast-again]]
   const argv = [...valeArgvOf(it), OURS];
-  const ran = it.valeCache
-    ? await valeRowsOver(it, argv, where)
-    : await it.proc.start([...argv, ...where], { cwd: it.root });
+  const ran = await it.proc.start([...argv, ...where], { cwd: it.root });
   const fault =
     faultIn(ran.stdout) ||
     (ran.exitCode !== 0 && !ran.stdout ? String(ran.stderr ?? "").trim() : "");

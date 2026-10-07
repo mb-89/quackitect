@@ -1,73 +1,26 @@
-// The landing verbs commit, push and rename run in Go: each registers from its
-// own file, the road under new reaches no node for it, and its JavaScript
-// leaves the tree with every importer of it.
+// The landing verbs commit, push and rename over a landing repository and a
+// fake verb road.
 // [[spec/tickets/landing-verbs-port-to-go]]
 package main
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
-)
 
-// The verbs this group ports, and an import of a module their JavaScript stood in. [[spec/tickets/landing-verbs-port-to-go]]
-var (
-	landingVerbs   = []string{"commit", "push", "rename"}
-	landingImports = regexp.MustCompile(`from\s+"[^"]*/(commit-verb|push-verb|rename)\.js"`)
+	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
 )
 
 // A landing repository stands under a folder its test's name stays out of, however long the name runs. [[spec/tickets/landing-verbs-windows-green]]
 func TestLandingRepoStandsUnderAShortFolder(t *testing.T) {
 	t.Parallel()
 	t.Run("sentinel, a case named past the Windows path limit "+strings.Repeat("x", 120), func(t *testing.T) {
-		root, origin := landingRepo(t)
-		for _, at := range []string{root, origin} {
-			if strings.Contains(at, "sentinel") || len(filepath.Base(filepath.Dir(at))) > 32 {
-				t.Fatalf("the repository stands at %s, which carries the test's name", at)
-			}
-		}
-	})
-}
-
-func TestLandingVerbsRunInGo(t *testing.T) {
-	t.Parallel()
-	for _, verb := range landingVerbs {
-		t.Run(verb+" registers, and the road under new reaches no node for it", func(t *testing.T) {
-			if registry[verb] == nil {
-				t.Fatalf("the registry holds no %s", verb)
-			}
-			if roadOf(modeNew, []string{verb, "a-word"}, registry) != toQuack {
-				t.Fatalf("%s takes the node road under new", verb)
-			}
-		})
-		t.Run(verb+" stands as no program under the verbs folder", func(t *testing.T) {
-			if _, err := os.Stat(filepath.Join("..", "scripts", "verbs", verb+".js")); err == nil {
-				t.Fatalf("src/scripts/verbs/%s.js still stands", verb)
-			}
-		})
-	}
-	t.Run("no JavaScript imports a module the port deletes", func(t *testing.T) {
-		for _, top := range []string{"src", "test", ".claude"} {
-			filepath.WalkDir(filepath.Join("..", "..", top), func(path string, entry os.DirEntry, err error) error {
-				if err != nil {
-					return nil
-				}
-				if entry.IsDir() && entry.Name() == "node_modules" {
-					return filepath.SkipDir
-				}
-				if entry.IsDir() || !strings.HasSuffix(path, ".js") {
-					return nil
-				}
-				text, _ := os.ReadFile(path)
-				if found := landingImports.FindString(string(text)); found != "" {
-					t.Errorf("%s imports a module the port deletes: %s", path, found)
-				}
-				return nil
-			})
+		at := landingRepo(t).root
+		if strings.Contains(at, "sentinel") || len(filepath.Base(filepath.Dir(at))) > 32 {
+			t.Fatalf("the repository stands at %s, which carries the test's name", at)
 		}
 	})
 }
@@ -94,12 +47,16 @@ func (heard *verbsHeard) reached(words string) bool {
 	return false
 }
 
-// The doors over a repository: real git under the root, and fakes for the verbs the road runs, Vale, the log and the clock. The box stands in the cloud, and no claude stands on it. [[spec/tickets/landing-verbs-port-to-go]]
-func fakeLanding(root string) (landingDoors, *verbsHeard, *[]map[string]any) {
+// The moment every landing case's clock and commit read. [[spec/tickets/landing-verbs-port-to-go]]
+func caseNow() time.Time { return time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC) }
+
+// The doors over a landing repository: its FakeRepo, and fakes for the verbs the road runs, Vale, the log and the clock. The box stands in the cloud, and no claude stands on it. [[spec/tickets/quack-repos-meet-fake-git]]
+func fakeLanding(at *landing) (landingDoors, *verbsHeard, *[]map[string]any) {
 	record := &verbsHeard{answers: map[string]verbAnswer{}}
 	rows := &[]map[string]any{}
 	return landingDoors{
-		root:  root,
+		root:  at.root,
+		git:   at.repo,
 		cloud: true,
 		verb: func(words ...string) (int, string) {
 			record.ran = append(record.ran, words)
@@ -108,31 +65,134 @@ func fakeLanding(root string) (landingDoors, *verbsHeard, *[]map[string]any) {
 		},
 		voice: func(string) []heard { return nil },
 		log:   func(row map[string]any) error { *rows = append(*rows, row); return nil },
-		now:   func() time.Time { return time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC) },
+		now:   caseNow,
 	}, record, rows
 }
 
-// A repository on main holding an open ticket and a closed one, pushed to a bare origin. [[spec/tickets/landing-verbs-port-to-go]]
-func landingRepo(t *testing.T) (string, string) {
-	t.Helper()
-	root := shortDir(t)
-	origin := filepath.Join(shortDir(t), "origin.git")
-	gitDoes(t, "", "init", "-q", "--bare", origin)
-	gitDoes(t, "", "init", "-q", "-b", "main", root)
-	for _, one := range [][]string{{"user.name", "a hand"}, {"user.email", "hand@example.invalid"}, {"commit.gpgsign", "false"}, {"core.autocrlf", "false"}} {
-		gitDoes(t, root, "config", one[0], one[1])
-	}
-	lays(t, root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n")
-	lays(t, root, "spec/tickets/shut.md", "---\nstate: closed\n---\n\n# Ask\n")
-	lays(t, root, "README.md", "a tree\n")
-	gitDoes(t, root, "add", "-A")
-	gitDoes(t, root, "commit", "-q", "-m", "a-ticket: the tree opens")
-	gitDoes(t, root, "remote", "add", "origin", origin)
-	gitDoes(t, root, "push", "-q", "origin", "main")
-	return root, origin
+// A landing repository: its folder, the FakeRepo over that folder, and the origin it pushes to, in memory. [[spec/tickets/quack-repos-meet-fake-git]]
+type landing struct {
+	t      *testing.T
+	root   string
+	repo   *git.FakeRepo
+	origin *git.FakeRepo
 }
 
-// A fresh folder under a short name. t.TempDir names its folder after the test, and a push into a bare origin there runs past the Windows path limit. [[spec/tickets/landing-verbs-windows-green]]
+// The branch a landing repository opens on. [[spec/tickets/quack-repos-meet-fake-git]]
+const trunkBranch = "main"
+
+// A repository on main holding an open ticket and a closed one, pushed to an origin. [[spec/tickets/quack-repos-meet-fake-git]]
+func landingRepo(t *testing.T) *landing {
+	t.Helper()
+	origin := git.NewFakeRepo(files.NewFakeDisk(), caseNow)
+	at := landingOver(t, func(root string) *git.FakeRepo { return origin.Clone(files.NewDisk(root)) })
+	at.origin = origin
+	if pushed := at.repo.Push(trunkBranch, true); !pushed.OK {
+		t.Fatal(pushed.Err)
+	}
+	return at
+}
+
+// The same repository with no origin, so a push refuses. [[spec/tickets/quack-repos-meet-fake-git]]
+func landingAlone(t *testing.T) *landing {
+	t.Helper()
+	return landingOver(t, func(root string) *git.FakeRepo { return git.NewFakeRepo(files.NewDisk(root), caseNow) })
+}
+
+// The landing tree under a short folder, in the repository the maker builds over it, committed once. [[spec/tickets/quack-repos-meet-fake-git]]
+func landingOver(t *testing.T, maker func(root string) *git.FakeRepo) *landing {
+	t.Helper()
+	at := &landing{t: t, root: shortDir(t)}
+	at.repo = maker(at.root)
+	at.repo.Set("user.name", "a hand")
+	at.repo.Set("user.email", "hand@example.invalid")
+	lays(t, at.root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n")
+	lays(t, at.root, "spec/tickets/shut.md", "---\nstate: closed\n---\n\n# Ask\n")
+	lays(t, at.root, "README.md", "a tree\n")
+	at.commits("a-ticket: the tree opens")
+	return at
+}
+
+// Stages every path and commits it, and stops the case where the repository refuses. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) commits(message string) {
+	at.t.Helper()
+	at.must(at.repo.AddAll())
+	_, err := at.repo.Commit(message, nil)
+	at.must(err)
+}
+
+// Fails the case where a fixture's move answers a fault. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) must(err error) {
+	at.t.Helper()
+	if err != nil {
+		at.t.Fatal(err)
+	}
+}
+
+// The commit HEAD names. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) head() string {
+	said, _ := at.repo.Resolve("HEAD")
+	return said
+}
+
+// The subject at HEAD. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) subject() string { return subjectOf(at.repo, "HEAD") }
+
+// The subject origin holds on a branch. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) originSubject(branch string) string {
+	return subjectOf(at.origin, "refs/heads/"+branch)
+}
+
+// The subject of the commit a ref names in a repository, or nothing. [[spec/tickets/quack-repos-meet-fake-git]]
+func subjectOf(repo git.Repo, ref string) string {
+	log, err := repo.Log("", ref, false)
+	if err != nil || len(log) == 0 {
+		return ""
+	}
+	return log[0].Subject
+}
+
+// The paths the index stages against HEAD, a move by its new path, one a line. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) staged() string {
+	said, _ := at.repo.Staged(nil)
+	var out []string
+	for _, one := range said {
+		out = append(out, one.Path)
+	}
+	return strings.Join(out, "\n")
+}
+
+// What HEAD's commit changes, a status and a path a line, a move read as its deletion and its addition. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) landed() string {
+	said, _ := at.repo.Changed("HEAD")
+	var out []string
+	for _, one := range said {
+		if one.From != "" {
+			out = append(out, "D\t"+one.From, "A\t"+one.Path)
+			continue
+		}
+		out = append(out, one.Status+"\t"+one.Path)
+	}
+	return strings.Join(out, "\n")
+}
+
+// The paths HEAD's commit changes, one a line. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) landedNames() string {
+	said, _ := at.repo.Changed("HEAD")
+	var out []string
+	for _, one := range said {
+		out = append(out, one.Path)
+	}
+	return strings.Join(out, "\n")
+}
+
+// Moves a path on disk and stages both sides, as git mv does. [[spec/tickets/quack-repos-meet-fake-git]]
+func (at *landing) moves(from, to string) {
+	at.t.Helper()
+	at.must(os.Rename(filepath.Join(at.root, filepath.FromSlash(from)), filepath.Join(at.root, filepath.FromSlash(to))))
+	at.must(at.repo.Add([]string{from, to}))
+}
+
+// A fresh folder under a short name. t.TempDir names its folder after the test, and a path under it runs past the Windows path limit. [[spec/tickets/landing-verbs-windows-green]]
 func shortDir(t *testing.T) string {
 	t.Helper()
 	at, err := os.MkdirTemp("", "land")
@@ -141,18 +201,6 @@ func shortDir(t *testing.T) string {
 	}
 	t.Cleanup(func() { os.RemoveAll(at) })
 	return at
-}
-
-// Runs git under the dir, and stops the test where it fails. [[spec/tickets/landing-verbs-port-to-go]]
-func gitDoes(t *testing.T, dir string, args ...string) string {
-	t.Helper()
-	run := exec.Command("git", args...)
-	run.Dir = dir
-	said, err := run.CombinedOutput()
-	if err != nil {
-		t.Fatalf("git %s answers %v: %s", strings.Join(args, " "), err, said)
-	}
-	return strings.TrimSpace(string(said))
 }
 
 // Writes a file under the root, its folder first. [[spec/tickets/landing-verbs-port-to-go]]

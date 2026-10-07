@@ -10,12 +10,13 @@ import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { RESUME } from "../../src/bridge/handover.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { coldTree } from "../../src/scripts/probe-cold.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
+import { coldTree } from "../../src/scripts/probe-cold.js";
 import {
   DRY,
   engineOf,
   harnessOf,
+  leaves,
   readsDry,
   SESSION_ENV,
   SMOKE,
@@ -50,7 +51,9 @@ function whole() {
       submitted: { text: "Answer first.\n\nprobe" },
       registered: ["pull", "find", "stop"],
       read: { passed: { tool: "Read" } },
-      guarded: { deny: "The door wants a ticket name opening the description." },
+      guarded: {
+        deny: "The door wants a ticket name opening the description.",
+      },
       posts: [{ url: "http://127.0.0.1:7001/hook", event: "session.start" }],
       said: [],
       cleared: {
@@ -98,7 +101,12 @@ test("the smoke stands the clone with the root's built tools and installs nothin
   });
   const proc = fakeProc({ git: { exitCode: 0 } });
   const it = { disk, proc, join: (...parts) => parts.join("/") };
-  const stood = smokeTree("/r", it, () => {}, { temp: "/t", tree: "/t/tree", port: 7001, delta: "" });
+  const stood = smokeTree("/r", it, () => {}, {
+    temp: "/t",
+    tree: "/t/tree",
+    port: 7001,
+    delta: "",
+  });
   assert.equal(stood, true);
   assert.deepEqual(
     proc.ran.map((one) => one.argv),
@@ -107,20 +115,36 @@ test("the smoke stands the clone with the root's built tools and installs nothin
   );
   assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
   assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
-  assert.equal(disk.exists("/t/tree/.se/.runtime/bin/se-index.old"), false, "a kept old build stays behind");
-  assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), { method: "/t/tree", port: 7001 });
+  assert.equal(
+    disk.exists("/t/tree/.se/.runtime/bin/se-index.old"),
+    false,
+    "a kept old build stays behind",
+  );
+  assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), {
+    method: "/t/tree",
+    port: 7001,
+  });
 });
 
 // [[spec/tickets/probe-at-revision-guards-merges]]
 test("the cold tree checks the clone out at the revision it names", () => {
   const proc = fakeProc({ git: { exitCode: 0 }, sh: { exitCode: 0 } });
   const it = { disk: fakeDisk({}), proc, join: (...parts) => parts.join("/") };
-  coldTree("/r", it, () => {}, { temp: "/t", tree: "/t/tree", port: 7001, delta: "", at: "abc123" });
+  coldTree("/r", it, () => {}, {
+    temp: "/t",
+    tree: "/t/tree",
+    port: 7001,
+    delta: "",
+    at: "abc123",
+  });
   const runs = proc.ran.map((one) => one.argv.slice(0, 5).join(" "));
   const at = runs.indexOf("git checkout --quiet --detach abc123");
   assert.ok(at > 0, `the clone checks out the revision: ${runs.join("; ")}`);
   assert.equal(proc.ran[at].init.cwd, "/t/tree");
-  assert.ok(at < runs.findIndex((one) => one.startsWith("sh ")), "the checkout comes before the install");
+  assert.ok(
+    at < runs.findIndex((one) => one.startsWith("sh ")),
+    "the checkout comes before the install",
+  );
 });
 
 // [[spec/tickets/level0-smoke-runs-in-seconds]]
@@ -132,7 +156,10 @@ test("the smoke reads every check but the clear", () => {
     checks.map((one) => one.check),
     DRY.checks.filter((one) => one !== "clear"),
   );
-  assert.deepEqual(checks.filter((one) => !one.pass), []);
+  assert.deepEqual(
+    checks.filter((one) => !one.pass),
+    [],
+  );
 });
 
 test("a context read handing no canary block fails the rules", () => {
@@ -174,7 +201,10 @@ test("a post past the hooks door, or a line saying level zero answers nothing, f
     ["quiet"],
   );
   assert.deepEqual(
-    failing(rows, { ...seen, said: ["LEVEL ZERO ANSWERS NOTHING. The server"] }),
+    failing(rows, {
+      ...seen,
+      said: ["LEVEL ZERO ANSWERS NOTHING. The server"],
+    }),
     ["quiet"],
   );
 });
@@ -286,9 +316,33 @@ test("the harness reads the clone's files, records each post and tool, and hands
   ]);
 });
 
-// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first. [[spec/tickets/program-of-drops-node]]
+// [[spec/tickets/program-of-drops-node]]
+// [[spec/tickets/the-doors-pr-goes-green]]
+test("a temp tree the box still holds stays named, and the probe's verdict stands", () => {
+  const said = [];
+  const busy = Object.assign(new Error("resource busy or locked"), {
+    code: "EBUSY",
+  });
+  const held = {
+    disk: {
+      remove: () => {
+        throw busy;
+      },
+    },
+  };
+  leaves(held, "/tmp/se-dry-1", (line) => said.push(line));
+  assert.deepEqual(said, ["the temp tree stays at /tmp/se-dry-1: EBUSY"]);
+  const gone = [];
+  leaves({ disk: { remove: (path) => gone.push(path) } }, "/tmp/se-dry-2", (line) =>
+    said.push(line),
+  );
+  assert.deepEqual(gone, ["/tmp/se-dry-2"]);
+  assert.equal(said.length, 1);
+});
+
 test("the probe's main runs nothing where another program is main", async () => {
   let ran = false;
+  // A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
   await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
     ran = true;
   });

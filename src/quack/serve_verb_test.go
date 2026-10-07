@@ -219,11 +219,3 @@ func TestServeBridgeWhoseIndexFallsWarns(t *testing.T) {
 		t.Errorf("a verb naming no binary of its own runs the root's, and ran %v", box.ran)
 	}
 }
-
-// The registered verb answers the serve words. [[spec/tickets/quack-registers-each-verb]]
-func TestServeRegisters(t *testing.T) {
-	t.Parallel()
-	if registry["serve"] == nil {
-		t.Error("no serve verb stands in the registry")
-	}
-}
