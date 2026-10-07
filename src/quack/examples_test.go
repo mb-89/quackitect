@@ -77,6 +77,25 @@ func TestAVerbOutsideTheTableMissesNamingIt(t *testing.T) {
 	}
 }
 
+// An example parking a note, and the one seeking it, each over its own copy. [[spec/design_output/examples#one-runner-two-drivers]]
+const (
+	noting  = "---\nkind: [[example]]\ntitle: A note parks a thought\nkeywords: [note]\ninterface: [ticket note]\n---\n\nA box parks a thought as a private note.\n\n```sh\n./RUNME.sh ticket note stray \"a thought for later\"\n# expect: exit 0\n# expect: stands .se/tickets/stray.md\n```\n"
+	seeking = "---\nkind: [[example]]\ntitle: A pull meets no stray note\nkeywords: [pull]\ninterface: [ticket pull]\n---\n\nA box pulls over a tree no other example wrote to.\n\n```sh\n./RUNME.sh ticket pull\n# expect: stands .se/tickets/stray.md\n```\n"
+)
+
+func TestEachExampleWritesOverItsOwnCopy(t *testing.T) {
+	t.Parallel()
+	if miss := runsExample("spec/examples/110_tickets/note.md", noting); miss != "" {
+		t.Fatalf("the noting example misses: %s", miss)
+	}
+	if miss := runsExample("spec/examples/110_tickets/seek.md", seeking); !strings.Contains(miss, ".se/tickets/stray.md") {
+		t.Fatalf("the note one example writes reaches another: the miss reads %q", miss)
+	}
+	if _, written := exampleFixture[".se/tickets/stray.md"]; written {
+		t.Fatal("an example writes into the fixture tree")
+	}
+}
+
 func TestTheVerdictsLandInTheRuntimeFile(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
