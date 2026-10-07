@@ -296,7 +296,7 @@ func TestPull(t *testing.T) {
 	})
 }
 
-// Each tool input reads into the words a person types, off the cases test/level0/level1.test.js and pull-gate.test.js held. [[spec/design_output/pull#the-hand-out]]
+// Each tool input reads into the words a person types. [[spec/design_output/pull#the-hand-out]]
 func TestPullArgvOf(t *testing.T) {
 	t.Parallel()
 	tool := func(said string) []string { return []string{"pull", "--tool", said} }

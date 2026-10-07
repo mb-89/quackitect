@@ -1,5 +1,5 @@
 // The guard ported from cage.ts: the guarded call, the recovering command, the
-// words a shell reads, and the refusal. The cases come from test/level0/cage.test.js.
+// words a shell reads, and the refusal.
 // [[spec/tickets/level0-hooks-hold-no-rule]]
 package hooks_test
 

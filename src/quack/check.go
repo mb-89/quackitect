@@ -308,6 +308,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},
 		{name: "plugin", run: func() int { return pluginHolds(d) }},
 		{name: "types", run: func() int { return typesHold(d) }},
+		{name: "plugin-tests", run: func() int { return pluginTestsHold(d) }},
 		{name: "server", run: func() int { return serverHolds(d) }},
 		{name: "rules", run: func() int { return d.verb(append([]string{"lint"}, where...), quiet) }},
 	}

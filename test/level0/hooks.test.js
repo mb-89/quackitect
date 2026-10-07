@@ -3,16 +3,20 @@
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { posix } from "node:path";
 import { test } from "node:test";
 import settings from "../../.claude/settings.json" with { type: "json" };
-import { STARTING } from "../../.claude/skills/level0/hooks/level0.ts";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { ASKING, boots, INSTALL_SKIP } from "../../src/scripts/boot.js";
 
 // The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the rest. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
+
+// The start road's allowance, read off the line of the hooks module that sets it, since a kit test reaches no file past the plugin. [[spec/tickets/level0-tests-move-to-plugin-test]]
+const LEVEL0 = readFileSync(new URL("../../.claude/skills/level0/hooks/level0.ts", import.meta.url), "utf8");
+const STARTING = Number(/^export const STARTING = ([\d_]+);$/m.exec(LEVEL0)[1].replaceAll("_", ""));
 const INSTALL = `${BOOT_ROOT}/src/scripts/install.sh`;
 const MANIFEST = `${BOOT_ROOT}/.claude/skills/level0/.claude-plugin/plugin.json`;
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
