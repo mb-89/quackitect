@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: cae73f308ee5debe
         size: 3833
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 5020756b3dd3 · claude-code-remote
+    hash_before: 91e5eba70066a8abc5f12340c3ae2e0c112a1580
+    hash_after: 91e5eba70066a8abc5f12340c3ae2e0c112a1580
+    inputs:
+      - name: design/draft
+        hash: cae73f308ee5debe
+        size: 3833
+      - name: design/tests-red
+        hash: 588124fc0ab64b08
+        size: 1071
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -309,8 +321,12 @@ the Go tests reach no door, and the caged-door cases fake the fetch, the disk an
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach moves guard, step, merge and the doored events to one Go owner each, and the hooks keep plumbing: done_when line one
+- guard_test.go, step_test.go, listen_test.go and verb_cage_test.go stand red on stubs and decide line one; caged-door.test.js stands red and decides line two; ./RUNME.sh check decides line three
+- the main merge removes cage.test.js cases that drove the deleted guidance door, and the Go tests keep every moved rule
 
 # implement
 
