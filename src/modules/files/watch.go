@@ -29,6 +29,9 @@ var skipped = map[string]bool{".git": true, "node_modules": true}
 
 const private = ".se"
 
+// The text bytes one seed commit carries at most: JSON escapes swell a text, and the bus caps a message at 64 MiB. [[spec/tickets/seed-splits-under-bus-cap]]
+const seedBatch = 8 << 20
+
 // The dot folders under the private one the watch adds by name, each with the extension of the files a module reads there: a loaded projection's JSON, and the session log's lines. Each stands alone, and no folder under it joins. [[spec/tickets/the-log-topic-lands]]
 // .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
 var named = map[string]string{".se/.runtime": ".json", ".se/.runtime/hold": ".json", ".se/.log": ".jsonl"}
@@ -241,16 +244,29 @@ func Start(from Watch, commit func(values map[string]any) error) (stop func(), e
 
 // Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. A change landing during the walk and committing before it loses to the walk's older read, until its next change sets it right. [[spec/tickets/tickets-becomes-a-module]]
 func Seeds(root string, from Watch, commit func(values map[string]any) error) (stop func(), err error) {
-	standing := map[string]any{}
+	return seedsIn(root, from, commit, seedBatch)
+}
+
+// The seed in commits of at most most text bytes each, the last one landing whatever stands, so one message stays under the bus cap. [[spec/tickets/seed-splits-under-bus-cap]]
+func seedsIn(root string, from Watch, commit func(values map[string]any) error, most int) (stop func(), err error) {
+	batch, size := map[string]any{}, 0
+	var failed error
 	err = Standing(root, func(path, text string, changed int64, _ bool) {
+		if size > 0 && size+len(text) > most && failed == nil {
+			failed = commit(batch)
+			batch, size = map[string]any{}, 0
+		}
 		value := ContentOf(text)
 		value.Changed = changed
-		standing[familyPrefix+path] = value
+		batch[familyPrefix+path], size = value, size+len(text)
 	})
 	if err != nil {
 		return func() {}, err
 	}
-	if err := commit(standing); err != nil {
+	if failed != nil {
+		return func() {}, failed
+	}
+	if err := commit(batch); err != nil {
 		return func() {}, err
 	}
 	return Start(from, commit)

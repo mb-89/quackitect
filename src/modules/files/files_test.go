@@ -99,6 +99,37 @@ func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 	}
 }
 
+// A seed past its cap commits in batches, and the family holds every file once they land. [[spec/tickets/seed-splits-under-bus-cap]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestASeedPastItsCapCommitsInBatches(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	paths := []string{"a.md", "b.md", "c.md"}
+	for _, path := range paths {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	commits := 0
+	stop, err := seedsIn(root, NewFakeWatch(), func(values map[string]any) error {
+		commits++
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, len("said")+1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for _, path := range paths {
+		if got, _ := s.Snapshot().Read("files/" + path).(q.Content); got.Text != "said" || commits != len(paths) {
+			t.Fatalf("files/%s reads %+v over %d commits", path, got, commits)
+		}
+	}
+}
+
 func TestTheDiskRefusesARequestToAnotherModule(t *testing.T) {
 	disk := NewFakeDisk()
 	if _, err := Accept(disk)(q.Request{Module: "git", Verb: "commit"}); err == nil {
