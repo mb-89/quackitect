@@ -202,7 +202,7 @@ family carries its fate:
 | the quack binary each case builds | `src/quack/manager_test.go`, `src/quack/box_doors_contract_test.go` | builds once a package run |
 | the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
 | the index and session suites running the fake beside the real door | `test/contract/index.test.js`, `test/contract/session.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
-| the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
+| the twins and goldens over the real tree | `src/quack/codec_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/index_contract_test.go` | door tests of the index door |
 | the index's own reads of git | `src/index/index_contract_test.go` | door tests of the index's git read |
 | a real file watch stopped mid-add | `src/modules/files/watch_contract_test.go` | door tests of the file watch |

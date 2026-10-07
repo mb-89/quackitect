@@ -82,6 +82,13 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 	}
 }
 
+func TestASpanMatchingNoFileIsNamed(t *testing.T) {
+	t.Parallel()
+	if said := StaleSpans(plantedAudit+"a suffix: `_contract_test.go`\n", []string{"a/listed_test.go", "c/other_test.go"}); !slices.Equal(said, []string{"b/*_test.go"}) {
+		t.Fatalf("the guard names %v, where b/*_test.go alone matches no file, and the bare suffix names no path", said)
+	}
+}
+
 func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	t.Parallel()
 	tree := files.NewDisk(filepath.Join("..", ".."))
@@ -110,6 +117,9 @@ func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	}
 	if !strings.Contains(note, "_test.go`") {
 		t.Fatalf("%s lists no test file", doorAudit)
+	}
+	for _, span := range StaleSpans(note, listed) {
+		t.Errorf("%s names %s, and no file the tree holds matches it", doorAudit, span)
 	}
 	for _, line := range UnauditedWaits(note, parsed) {
 		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)

@@ -76,3 +76,15 @@ func UnauditedWaits(audit string, files map[string]*ast.File) []string {
 	sort.Strings(named)
 	return named
 }
+
+// Each span of the audit naming a Go test file by its folder, or a glob of them, that matches no file the tree holds. A suffix the prose names stands in no folder. [[spec/tickets/family-rows-name-standing-files]]
+func StaleSpans(audit string, held []string) []string {
+	stale := []string{}
+	for _, span := range auditedTest.FindAllStringSubmatch(audit, -1) {
+		glob := span[1]
+		if strings.Contains(glob, "/") && !slices.Contains(stale, glob) && !slices.ContainsFunc(held, func(rel string) bool { ok, _ := path.Match(glob, rel); return ok }) {
+			stale = append(stale, glob)
+		}
+	}
+	return stale
+}
