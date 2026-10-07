@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -126,6 +126,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: split
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 12775477aff311fb507d2148b71ca0cf28aa98b9
+    hash_after: 12775477aff311fb507d2148b71ca0cf28aa98b9
+    inputs:
+      - name: ask
+        hash: b1429804df0c41dd
+        size: 958
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -175,15 +184,19 @@ The tree lints its prose and its code with its own Go rules, at commit and mint 
 [[spec/tickets/done-when-grep-meets-testdata]], trivial
 [[spec/tickets/vale-size-misses-files]], trivial
 [[spec/tickets/design-notes-name-no-vale]], trivial
+[[spec/tickets/vehicle-rules-come-down]], trivial
+[[spec/tickets/vale-comments-leave-the-code]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every child is small enough to review whole: each standard child landed in moves of its own commit, and each trivial child touches a file or a few
-the children add up to the goal: the Go engine, the compare, the check's lint in Go, the changed-file lint, the comment rules and the leaving of Vale each hold a child, and the design notes child closes what Vale left in prose
-no open child waits on another: the design notes child reads the tree the closed children left, so it names no depends_on
+every child is small enough to review whole: each standard child landed move by move in commits of its own, and each trivial child touches a few files
+the children add up to the goal: the engine, the compare, the check's lint in Go, the changed-file lint, the comment rules and the leaving of Vale each hold a child, and the last three close what Vale left in notes, vehicles and comments
+no child stands open, so none waits on another
+each child reads what its parent landed: the engine before the leaving of Vale, and the leaving before the notes and comments that describe it, and they landed in that order
+the diff stands past one review, and every child stands closed, so the group goes to its retro whole in place of a split it no longer needs
 
 # children
 
