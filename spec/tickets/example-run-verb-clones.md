@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: c228f0b29d9b35421dbc4e6e5e7380f2afefc34b
+    hash_after: c228f0b29d9b35421dbc4e6e5e7380f2afefc34b
+    inputs:
+      - name: ask
+        hash: 6c68752c49fe8075
+        size: 667
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +171,58 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb file `src/quack/example_verb.go` registers `example` whole, as `ticket` stands, so `wholeOf` routes it to Go under every mode. `example run <path>` takes these steps:
+
+1. It reads the file under the root, and `example.Read` parses it. A fault exits 1, naming the line.
+2. It clears `.se/.runtime/examples/<name>`, where the name is the file's base, and clones the tree there with `git clone --local` through the process door.
+3. Each step runs in its own process, `./RUNME.sh <words>` with the clone as its folder. The verb prints the step's prose, the call, the output and one line per expect line. The verdict comes from `example.Holds`, which reads files under the clone. That evaluator is the harness ticket's, so both drivers judge alike.
+4. The run exits 1 where any expect misses, and 0 otherwise. The clone stays for the user to read.
+
+The verb takes its root and its runner as arguments: `exampleVerb(index.Root, proc.Real)`. A case hands it a temporary root and a `FakeRunner` whose `git` copies the tree and whose `./RUNME.sh` answers by its words.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/registry.go register, which takes the verb at init
+- src/quack/verbs.go wholeOf and verbs, which route example to Go
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb_test.go TestARunPrintsEachStepAndItsVerdicts
+- src/quack/example_verb_test.go TestARunLeavesTheUsersTreeByteForByte
+- src/quack/example_verb_test.go TestAMissExitsOneAndASecondRunClearsTheClone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb.go
+- src/quack/example_verb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every function named stands opened: register and goAnswer in registry.go, twinOf, roadOf and wholeOf in verbs.go, ticketUsageVerb as the whole-word model, proc.Command, proc.Runner and proc.FakeRunner, and example.Read with the Holds the harness ticket adds
+- the callers list names the registry and the road, the one way a verb is reached
+- each done_when line names its test: the clone and the detached steps, the printed prose, call, output and verdicts, the tree left byte for byte, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
