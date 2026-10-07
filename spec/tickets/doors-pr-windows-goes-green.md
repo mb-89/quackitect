@@ -47,17 +47,23 @@ done_when:
 
 <!-- the tests that cover the change, or the check where it touches no code -->
 
+./RUNME.sh check
+
 <!-- the form is command -->
 
 ## check
 
 <!-- the check is green on the commit -->
 
+./RUNME.sh check
+
 <!-- the form is command -->
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
+
+The Windows runner hung `go test ./src/quack/` at its timeout in `TestAChildTheCheckGivesUpOnEndsWithItsTreeOnWindows`, blocked on reading the child's pipe. The case's cmd line ran two `waitfor` on one signal name. The second exits once the first holds the name, so cmd ends before the span cuts it, `taskkill /T` finds no tree, and the orphan grandchild holds the pipe open. Each process now waits on a signal name of its own with no timeout, so cmd stands until taskkill ends both. Main merges in. Its serve, cage and plugin-tests code reaches the box through the doors, and its scripts keep the http and clock doors.
 
 <!-- the form is text -->
 
