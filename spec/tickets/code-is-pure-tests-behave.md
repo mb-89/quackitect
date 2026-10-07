@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,6 +152,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 55abcb1f8a0e · claude-code-remote
+    hash_before: 60fb6975cd996b4e729e045b082171df82dda7b2
+    hash_after: 60fb6975cd996b4e729e045b082171df82dda7b2
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -249,38 +261,61 @@ accept: each of the seven rules stands in spec/guidance/code/code.md or testing.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- branch-take-tool-unwired closed done: the take tool runs the verb and prints the held group's ask.
+- fixture-guard-matches-by-bare closed done: the fixture guard skips a call naming a local, with a test beside it.
+- merge-brings-guard-offenders closed dropped: once this group merges, main carries the refuse-mode guards.
+- process-group-run-untested closed done: a contract case reads each run's process group through sh and ps.
+- take-hands-stale-branch-over closed done: the work skill's take names the group the prompt names.
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- Each note met its code before its verdict, so three of five closed with a fix and a test.
+- The commit verb ran the check per commit, so the ratio fault stopped at the rescue branch and never reached the work branch.
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 15:24 UTC: two Bash calls opened on no ticket, and then on the group in place of the leaf in hand, and the cage refused both.
+- 15:26 UTC: a commit carried a trailer naming a model, and the commit verb refused it.
+- 15:29 UTC: the process group case pushed src/proc one test line past its code, and the ratio guard sent the commit to the rescue branch.
+- 15:33 UTC: two code comments linked a private note under .se/tickets, which git never carries.
+- 15:36 UTC: retro notes counted a closed note open, since the index watcher missed the close, and a touch woke it.
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- Name the leaf in hand in every Bash description, as `spec/guidance/working.md` rule 13 says for writes.
+- Keep the commit trailer to the session line, as the commit verb in `src/quack` already enforces.
+- Run `./RUNME.sh guards` before the commit verb where a change adds a test, per `spec/guidance/code/testing.md`.
+- Link a code comment to a design anchor or a tracked ticket under `spec/tickets`, never to a private note.
+- The index watcher under `src/index` misses a write the pull verb lands on a private note; the next retro reads whether it recurs.
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The notes leaf works best as code: a verdict of done holds only where the fix and its test land in the same window. The dropped note rests on an assumption the merge proves: main carries the guards once this group lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- One place: the skill step points at the take verb, and each comment points at its anchor.
+- Numbers: the change adds none.
+- Headers: each new test and function carries a comment saying what it holds.
+- Prompts and errors: each error of the window stands under badly with its time, and the window held no owner prompt.
+- Role: the chapter names the box and the owner by role alone.
 
 ## cloud
 
