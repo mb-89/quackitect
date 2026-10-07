@@ -38,7 +38,6 @@ const (
 	jsKey       = "js"
 	filesKey    = "files"
 	contractKey = "contract"
-	reportKey   = "report"
 	outsideKey  = "outside"
 )
 
@@ -56,7 +55,7 @@ var (
 	markedAt = regexp.MustCompile(`(?://|/\*|#)\s*` + regexp.QuoteMeta(strings.TrimSpace(Marker)) + `(.*)$`)
 )
 
-// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, whether it stands at report, and whether it stands as its own outside. [[spec/design_output/doors#a-door-declares-its-names]]
+// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, and whether it stands as its own outside. [[spec/design_output/doors#a-door-declares-its-names]]
 type Door struct {
 	Name     string
 	At       string
@@ -65,7 +64,6 @@ type Door struct {
 	JS       []string
 	Files    []string
 	Contract []string
-	Report   bool
 	Outside  bool
 }
 
@@ -78,7 +76,6 @@ type Walk struct {
 	Doors  []string
 	Marked bool
 	Reason string
-	Report bool
 }
 
 // Whether a slash path names the agent's folder or stands under its skills folder, so the guard's walk reaches it. [[spec/design_output/doors#nothing-walks-around-a-door]]
@@ -214,13 +211,6 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 					open.Contract = append(open.Contract, name)
 				}
 			}
-		case reportKey:
-			flag, ok := value.(bool)
-			if !ok {
-				fault(line, rest+" reads as no flag: write true or false")
-				continue
-			}
-			open.Report = flag
 		case outsideKey:
 			flag, ok := value.(bool)
 			if !ok {
@@ -229,7 +219,7 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 			}
 			open.Outside = flag
 		default:
-			fault(line, key+" is no key a declaration takes: write go, js, files, contract, report or outside")
+			fault(line, key+" is no key a declaration takes: write go, js, files, contract or outside")
 		}
 	}
 	finish()
@@ -265,11 +255,10 @@ func (one Door) Holds(at string) bool {
 	return path.Dir(at) == one.At
 }
 
-// The doors owning one name, whether all stand at report, and whether one holds the file at hand. [[spec/design_output/doors#nothing-walks-around-a-door]]
+// The doors owning one name, and whether one holds the file at hand. [[spec/design_output/doors#nothing-walks-around-a-door]]
 type claim struct {
-	doors  []string
-	report bool
-	held   bool
+	doors []string
+	held  bool
 }
 
 // Every name the doors own in one language, against the file at hand. [[spec/design_output/doors#nothing-walks-around-a-door]]
@@ -282,13 +271,12 @@ func claims(at string, doors []Door, names func(Door) []string) map[string]*clai
 		for _, name := range names(door) {
 			one := out[name]
 			if one == nil {
-				one = &claim{report: true}
+				one = &claim{}
 				out[name] = one
 			}
 			if !slices.Contains(one.doors, door.Name) {
 				one.doors = append(one.doors, door.Name)
 			}
-			one.report = one.report && door.Report
 			one.held = one.held || door.Holds(at)
 		}
 	}
@@ -315,7 +303,7 @@ func Walks(at, text string, doors []Door) []Walk {
 
 // One walk at a place, marked where the line or the comment line above names why. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walkAt(at string, lines []string, line, column int, name string, owner *claim) Walk {
-	one := Walk{File: at, Line: line, Column: column, Name: name, Doors: slices.Clone(owner.doors), Report: owner.report}
+	one := Walk{File: at, Line: line, Column: column, Name: name, Doors: slices.Clone(owner.doors)}
 	one.Reason = markOf(lines, line)
 	one.Marked = one.Reason != ""
 	return one

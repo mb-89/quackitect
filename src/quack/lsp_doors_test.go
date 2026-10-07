@@ -1,6 +1,5 @@
 // The lsp IO module draws a walk-around as the check module finds it: at
-// error over a refusing door, and as a hint in an open buffer over a door at
-// report.
+// error.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
 package main // level0: InPackageTest - a main package admits no outside test package, and the case reaches the unexported lspChecks
 
@@ -22,7 +21,6 @@ const (
 	walkedText = "package engine\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) }\n"
 	// The levels a diagnostic carries, as the protocol numbers them. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
 	drawnError = 1
-	drawnHint  = 4
 )
 
 type drawnRow struct {
@@ -92,20 +90,5 @@ func TestAWalkAroundDrawsAsAnErrorDiagnostic(t *testing.T) {
 	rows := walkRows(server.SweepTools(), walkedURI)
 	if len(rows) != 1 || rows[0].Severity != drawnError || rows[0].Source != "tree" {
 		t.Fatalf("the closed file draws %+v, and wants one walk-around at error under the source tree", rows)
-	}
-}
-
-func TestAWalkAroundADoorAtReportDrawsAHintAsItIsTyped(t *testing.T) {
-	t.Parallel()
-	server, pushed := doorsServer(t, map[string]string{"src/modules/clock/owns.yaml": "clock:\n  go: [time.Sleep]\n  report: true\n", walkedAt: "package engine\n"})
-	if rows := walkRows(server.SweepTools(), walkedURI); len(rows) != 0 {
-		t.Fatalf("the closed file draws %+v, and wants nothing over a door at report", rows)
-	}
-	open, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": walkedURI, "version": 1, "text": walkedText}}})
-	server.Handle(open)
-	server.Settle()
-	rows := walkRows(pushed(), walkedURI)
-	if len(rows) != 1 || rows[0].Severity != drawnHint {
-		t.Fatalf("the typed buffer draws %+v, and wants one walk-around as a hint", rows)
 	}
 }

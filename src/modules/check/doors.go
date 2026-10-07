@@ -70,22 +70,18 @@ func doorsOf(tree *Tree) ([]owns.Door, []owns.Fault) {
 	return kept.doors, kept.faults
 }
 
-// Every walk-around the file makes: at error where a door owning the name refuses, and as a hint in an editor's buffer where every one stands at report. [[spec/design_output/doors#nothing-walks-around-a-door]]
+// Every walk-around the file makes, at error, past a marked line. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walkFaults(tree *Tree, at string) []Finding {
 	doors, _ := doorsOf(tree)
 	if len(doors) == 0 {
 		return nil
 	}
-	held := tree.Held(at)
 	out := []Finding{}
 	for _, one := range owns.Walks(at, tree.Read(at), doors) {
-		if one.Marked || (one.Report && !held) {
+		if one.Marked {
 			continue
 		}
 		said := fault(WalksAroundADoor, at, one.Line, fmt.Sprintf(walksSays, one.Says()))
-		if one.Report {
-			said.Severity = SeverityHint
-		}
 		said.Column = one.Column
 		out = append(out, said)
 	}

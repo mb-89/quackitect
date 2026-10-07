@@ -194,17 +194,6 @@ func TestTheProcessDoorOwnsTheRunsAndNamesItsContract(t *testing.T) {
 	t.Fatal("no door named proc stands in the tree")
 }
 
-// No door stands at report, so the guard refuses every walk-around the tree meets. [[spec/tickets/the-guard-refuses]]
-func TestNoDoorStandsAtReport(t *testing.T) {
-	t.Parallel()
-	doors, _ := doorsOf(t)
-	for _, one := range doors {
-		if one.Report {
-			t.Errorf("%s in %s stands at report, so its walk-arounds land unrefused", one.Name, one.At)
-		}
-	}
-}
-
 // The random door owns Math.random and holds no file, so every call walks around it. [[spec/tickets/the-guard-refuses]]
 func TestTheRandomDoorOwnsMathRandomAndHoldsNoFile(t *testing.T) {
 	t.Parallel()

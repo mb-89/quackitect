@@ -79,7 +79,7 @@ func ownFiles(door owns.Door) []string {
 	return []string{door.At}
 }
 
-// Every contract test a door names, then every walk-around and marked line of the files the lint's walk reaches: a door at report's walk-around and a marked line to out, a refusing door's to errs, and the count refused. [[spec/design_output/doors#nothing-walks-around-a-door]]
+// Every contract test a door names, then every walk-around and marked line of the files the lint's walk reaches: a marked line to out, every other walk-around to errs, and the count refused. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walksOver(root string, out, errs io.Writer) int {
 	disk := rootDisk{root}
 	declared, files := map[string]string{}, []string{}
@@ -130,8 +130,6 @@ func walksOver(root string, out, errs io.Writer) int {
 			switch {
 			case one.Marked:
 				fmt.Fprintf(out, markedWalk, rel, one.Line, one.Column, one.Name, one.Reason)
-			case one.Report:
-				fmt.Fprintf(out, walkLine, rel, one.Line, one.Column, one.Says())
 			default:
 				refused++
 				fmt.Fprintf(errs, walkLine, rel, one.Line, one.Column, one.Says())

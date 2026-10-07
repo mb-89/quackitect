@@ -22,7 +22,7 @@ var Walkaround = &analysis.Analyzer{
 	Run:  walkaround,
 }
 
-// Each walk-around of the pass's files, past a marked line and a door at report, which ./RUNME.sh doors lists. [[spec/design_output/doors#nothing-walks-around-a-door]]
+// Each walk-around of the pass's files, past a marked line, which ./RUNME.sh doors lists. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walkaround(pass *analysis.Pass) (any, error) {
 	root := rootOf(pass)
 	if root == "" || strings.HasSuffix(pass.Pkg.Path(), testMain) {
@@ -45,7 +45,7 @@ func (one WalkFault) String() string { return one.says }
 // Where the walk-around stands, which a test outside the package places in its file. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func (one WalkFault) At() token.Pos { return one.at }
 
-// Every walk-around the files make past the doors under the root, but a marked line and a door at report. [[spec/design_output/doors#nothing-walks-around-a-door]]
+// Every walk-around the files make past the doors under the root, but a marked line. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func WalkFaults(root string, fset *token.FileSet, files []*ast.File) []WalkFault {
 	doors := Doors(root)
 	var out []WalkFault
@@ -60,7 +60,7 @@ func WalkFaults(root string, fset *token.FileSet, files []*ast.File) []WalkFault
 			continue
 		}
 		for _, one := range owns.Walks(filepath.ToSlash(rel), string(text), doors) {
-			if one.Marked || one.Report || one.Line > at.LineCount() {
+			if one.Marked || one.Line > at.LineCount() {
 				continue
 			}
 			out = append(out, WalkFault{at.LineStart(one.Line) + token.Pos(one.Column-1), one.Says()})

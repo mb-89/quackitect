@@ -1,6 +1,5 @@
 // The doors' rules over planted trees: a walk-around stands at error in the
-// lint, a door at report draws a hint in a held buffer alone, and a door no
-// declaration holds is named.
+// lint, a marked line passes, and a door no declaration holds is named.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
 package check // level0: InPackageTest - reaches the unexported textFaults and walksSays
 
@@ -56,19 +55,6 @@ func TestAMarkedWalkAroundPassesTheLint(t *testing.T) {
 	tree := TreeOver("", Texts{clockAt: "clock:\n  go: [time.Sleep]\n", waitAt: marked})
 	if found := ruled(textFaults(tree, waitAt, 0, 0, "tree"), WalksAroundADoor); len(found) != 0 {
 		t.Fatalf("the marked line reads %+v", found)
-	}
-}
-
-func TestADoorAtReportDrawsAHintInAHeldBufferAlone(t *testing.T) {
-	t.Parallel()
-	tree := TreeOver("", Texts{clockAt: "clock:\n  go: [time.Sleep]\n  report: true\n", waitAt: waitText})
-	if found := ruled(textFaults(tree, waitAt, 0, 0, "tree"), WalksAroundADoor); len(found) != 0 {
-		t.Fatalf("the lint reads %+v over a door at report, and wants nothing", found)
-	}
-	tree.Holds(waitAt, waitText)
-	found := ruled(textFaults(tree, waitAt, 0, 0, "tree"), WalksAroundADoor)
-	if len(found) != 1 || found[0].Severity != SeverityHint {
-		t.Fatalf("the held buffer reads %+v, and wants one hint", found)
 	}
 }
 

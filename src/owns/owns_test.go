@@ -15,9 +15,9 @@ const (
 	clockAt  = "src/modules/clock/owns.yaml"
 	doorsAt  = "src/doors/owns.yaml"
 	clockGo  = "clock:\n  go: [time.Now, time.Sleep, context.WithTimeout, net/http.Get]\n"
-	doorsJS  = "clock:\n  js: [Date.now, new Date(), setTimeout]\n  files: [clock.js, fake/clock.js]\ndisk:\n  js: [node:fs]\n  files: [disk.js]\n  report: true\n"
+	doorsJS  = "clock:\n  js: [Date.now, new Date(), setTimeout]\n  files: [clock.js, fake/clock.js]\ndisk:\n  js: [node:fs]\n  files: [disk.js]\n"
 	diskAt   = "src/modules/files/owns.yaml"
-	diskGo   = "files:\n  go: [os, os/exec]\n  report: true\n"
+	diskGo   = "files:\n  go: [os, os/exec]\n"
 	outsider = "src/engine/wait.go"
 )
 
@@ -51,7 +51,7 @@ func TestADeclarationReadsItsDoors(t *testing.T) {
 	for _, one := range doors {
 		switch {
 		case one.At == "src/modules/clock" && one.Name == "clock":
-			if !slices.Equal(one.Go, []string{"time.Now", "time.Sleep", "context.WithTimeout", "net/http.Get"}) || one.Files != nil || one.Report {
+			if !slices.Equal(one.Go, []string{"time.Now", "time.Sleep", "context.WithTimeout", "net/http.Get"}) || one.Files != nil {
 				t.Errorf("the Go clock reads %+v", one)
 			}
 		case one.At == "src/doors" && one.Name == "clock":
@@ -59,11 +59,11 @@ func TestADeclarationReadsItsDoors(t *testing.T) {
 				t.Errorf("the JS clock reads %+v", one)
 			}
 		case one.At == "src/doors" && one.Name == "disk":
-			if !one.Report || !slices.Equal(one.JS, []string{"node:fs"}) {
+			if !slices.Equal(one.JS, []string{"node:fs"}) {
 				t.Errorf("the JS disk reads %+v", one)
 			}
 		case one.At == "src/modules/files" && one.Name == "files":
-			if !one.Report || !slices.Equal(one.Go, []string{"os", "os/exec"}) {
+			if !slices.Equal(one.Go, []string{"os", "os/exec"}) {
 				t.Errorf("the files door reads %+v", one)
 			}
 		default:
@@ -75,13 +75,13 @@ func TestADeclarationReadsItsDoors(t *testing.T) {
 func TestADeclarationOfNoFormIsAFault(t *testing.T) {
 	t.Parallel()
 	cases := map[string]string{
-		"a key no declaration takes":  "clock:\n  owner: me\n",
-		"a Go name of no form":        "clock:\n  go: [Time.Now!]\n",
-		"a JS name of no form":        "clock:\n  js: [\"set Timeout\"]\n",
-		"a file standing nowhere":     "clock:\n  js: [Date.now]\n  files: [gone.js]\n",
-		"a file outside its folder":   "clock:\n  js: [Date.now]\n  files: [../clock.js]\n",
-		"a door holding no entry":     "clock: now\n",
-		"a report reading as no flag": "clock:\n  js: [Date.now]\n  report: soon\n",
+		"a key no declaration takes": "clock:\n  owner: me\n",
+		"the report key":             "clock:\n  js: [Date.now]\n  report: true\n",
+		"a Go name of no form":       "clock:\n  go: [Time.Now!]\n",
+		"a JS name of no form":       "clock:\n  js: [\"set Timeout\"]\n",
+		"a file standing nowhere":    "clock:\n  js: [Date.now]\n  files: [gone.js]\n",
+		"a file outside its folder":  "clock:\n  js: [Date.now]\n  files: [../clock.js]\n",
+		"a door holding no entry":    "clock: now\n",
 	}
 	for name, text := range cases {
 		if _, faults := owns.Read(map[string]string{doorsAt: text}, exists); len(faults) == 0 || faults[0].File != doorsAt || faults[0].Line < 1 {
@@ -131,7 +131,7 @@ func TestAGoCallOutsideTheClockIsAWalk(t *testing.T) {
 	if got := named(walks); !slices.Equal(got, []string{"time.Sleep", "context.WithTimeout"}) {
 		t.Fatalf("the walks name %v, and want time.Sleep and context.WithTimeout", got)
 	}
-	if one := walks[0]; one.File != outsider || one.Line != 9 || one.Column != 2 || !slices.Equal(one.Doors, []string{"clock"}) || one.Marked || one.Report {
+	if one := walks[0]; one.File != outsider || one.Line != 9 || one.Column != 2 || !slices.Equal(one.Doors, []string{"clock"}) || one.Marked {
 		t.Fatalf("the first walk reads %+v", one)
 	}
 }
@@ -159,8 +159,8 @@ func TestAWholePackageImportIsAWalk(t *testing.T) {
 	if got := named(walks); !slices.Equal(got, []string{"os", "os/exec"}) {
 		t.Fatalf("the walks name %v, and want os and os/exec at their imports", got)
 	}
-	if walks[0].Line != 5 || !walks[0].Report {
-		t.Fatalf("the os walk reads %+v, and wants line 5 at report", walks[0])
+	if walks[0].Line != 5 {
+		t.Fatalf("the os walk reads %+v, and wants line 5", walks[0])
 	}
 }
 
@@ -177,7 +177,7 @@ func TestAnOutsideOwnsItsNamesInItsOwnFilesAlone(t *testing.T) {
 		t.Fatalf("the outside's own file reads as %v", walks)
 	}
 	walks := owns.Walks("src/scripts/run.js", text, doors)
-	if len(walks) != 1 || !slices.Equal(walks[0].Doors, []string{"clock"}) || walks[0].Report {
+	if len(walks) != 1 || !slices.Equal(walks[0].Doors, []string{"clock"}) {
 		t.Fatalf("a walk past the outside reads %+v, and wants the clock alone, refused", walks)
 	}
 }
@@ -243,7 +243,7 @@ func TestAScriptWalksAroundItsDoors(t *testing.T) {
 	for _, one := range walks {
 		lines = append(lines, one.Line)
 	}
-	if !slices.Equal(lines, []int{1, 3, 4, 5, 11, 12}) || walks[0].Column != 1 || !walks[0].Report || walks[1].Report {
+	if !slices.Equal(lines, []int{1, 3, 4, 5, 11, 12}) || walks[0].Column != 1 {
 		t.Fatalf("the walks read %+v", walks)
 	}
 }
@@ -256,7 +256,7 @@ func TestANodeModuleNoDoorDeclaresIsAWalk(t *testing.T) {
 		t.Fatalf("the walks name %v, and want both undeclared modules", got)
 	}
 	for _, one := range walks {
-		if len(one.Doors) != 0 || one.Report || one.Marked {
+		if len(one.Doors) != 0 || one.Marked {
 			t.Fatalf("an undeclared module reads %+v, and wants a walk around no door, refused", one)
 		}
 	}
