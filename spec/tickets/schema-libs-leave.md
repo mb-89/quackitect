@@ -118,7 +118,11 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["engine-and-doors-leave", "tree-libs-leave"]
-step: design/owner-read
+step: design/draft
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
