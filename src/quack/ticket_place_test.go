@@ -1,7 +1,7 @@
 // ticket place writes the override the work tab writes into the plan file,
 // off the rows the index answers, after test/level0/ticket-edit.test.js.
 // [[spec/tickets/view-actions-run-through-verbs]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

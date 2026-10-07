@@ -1,7 +1,7 @@
 // The final record a box leaves: the session its take names, and the model,
 // cost and final line its hand-back writes on the same entry.
 // [[spec/tickets/boxes-write-their-final-record]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported recordIn, entryField and sessionVar
 
 import "testing"
 

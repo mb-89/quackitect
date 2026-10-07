@@ -1,7 +1,7 @@
 // The stub verb over a temp method: the usage, a stub beside its vehicle, no
 // upstream, an empty brand and a written stub.
 // [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

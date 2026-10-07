@@ -1,7 +1,7 @@
 // The root the check's doors stand over: the tree the verb road names, past
 // the root the index reads.
 // [[spec/tickets/check-reads-the-road-root]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -27,6 +27,7 @@ func TestFakeGoRedProcess(t *testing.T) {
 }
 
 // A loud run prints the process's output and keeps it, so the Go gate writes the red case the report reads. [[spec/tickets/ci-reds-name-their-cases]]
+// level0: FixtureOutsideHome - the case runs a real process and writes its red cases under a root of its own
 func TestLoudRunKeepsAGoRedForTheReport(t *testing.T) {
 	t.Parallel()
 	var out, errs strings.Builder

@@ -24,8 +24,11 @@ var retroSources = []string{"log", "transcripts", "all"}
 // A disposition that joins no class opens on one of these, and a reason or a place follows. [[spec/guidance/retro/classify]]
 var retroKinds = []string{"dropped:", "done:", "ticket:"}
 
-// The input folders whose every file carries a disposition too: the collected notes and the memory. [[spec/guidance/retro/classify]]
-var retroDrainedFolders = []struct{ folder, prefix string }{{"tickets", "note"}, {"memory", "memory"}}
+// The input folders whose every file carries a disposition too: the collected notes, the memory and the scripts, where a script keeps its ending in its id. [[spec/guidance/retro/classify]] [[spec/design_output/model#the-guards-hold-a-baseline]]
+var retroDrainedFolders = []struct {
+	folder, prefix string
+	whole          bool
+}{{"tickets", "note", false}, {"memory", "memory", false}, {"scripts", "script", true}}
 
 // The memory's index, which carries no disposition. [[spec/guidance/retro/classify]]
 const retroMemoryIndex = "MEMORY.md"
@@ -82,22 +85,24 @@ func retroRecordOf(text string) *retroRecord {
 // Every collected note and memory, by id, so each one answers where it goes. Collect nests the memory under the project's folder name, so the walk reaches every level. [[spec/guidance/retro/classify]]
 func retroDrainedOf(home string) []retroItem {
 	out := []retroItem{}
-	var walk func(at, prefix string)
-	walk = func(at, prefix string) {
+	var walk func(at, prefix string, whole bool)
+	walk = func(at, prefix string, whole bool) {
 		entries, err := os.ReadDir(at)
 		if err != nil {
 			return
 		}
 		for _, entry := range entries {
 			if entry.IsDir() {
-				walk(filepath.Join(at, entry.Name()), prefix)
+				walk(filepath.Join(at, entry.Name()), prefix, whole)
+			} else if whole {
+				out = append(out, retroItem{id: prefix + ":" + entry.Name()})
 			} else if strings.HasSuffix(entry.Name(), ".md") && entry.Name() != retroMemoryIndex {
 				out = append(out, retroItem{id: prefix + ":" + strings.TrimSuffix(entry.Name(), ".md")})
 			}
 		}
 	}
 	for _, one := range retroDrainedFolders {
-		walk(filepath.Join(home, retroInput, one.folder), one.prefix)
+		walk(filepath.Join(home, retroInput, one.folder), one.prefix, one.whole)
 	}
 	return out
 }

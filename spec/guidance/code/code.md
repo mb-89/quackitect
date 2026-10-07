@@ -16,6 +16,8 @@ rationale: [[spec/rationales/code]]
 8. Keep the shebang on line one where a file runs as a program.
 9. Name a number that carries a meaning once. A number a person sets is a config key, and every other a constant at the top of its module. [[spec/design_output/config#the-magic-numbers-take-names]]
 10. Search for the function before you write it. Where one stands, call it, and where one stands close, take it further. *
+11. Write a function pure, and give each one reaching the outside a one-line reason: `// level0: Impure - <why>`. The `purity` guard names an unmarked one. A function reaching the outside in place takes the box into every test of it. [[spec/design_output/model#the-guards-hold-a-baseline]]
+12. Promote a step you repeat into a verb or an engine function, and leave no script beside the engine. The `script` guard names a script standing outside it. [[spec/design_output/model#the-guards-hold-a-baseline]]
 
 # Examples
 

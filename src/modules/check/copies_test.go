@@ -1,7 +1,7 @@
 // The check refuses a function body that stands in another package, renamed
 // or not, and passes a short body and a test file.
 // [[spec/tickets/shared-helpers-stand-once]]
-package check
+package check // level0: InPackageTest - reaches the in-package helpers sweepOver and holdsRule
 
 import (
 	"strings"

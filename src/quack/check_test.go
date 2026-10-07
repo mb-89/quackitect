@@ -2,7 +2,7 @@
 // gate, the test runner's files and the rows under --errors. The battery's
 // run stands in check_battery_test.go.
 // [[spec/design_output/work#the-battery-answers-first]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -98,7 +98,7 @@ func TestCheckParts(t *testing.T) {
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"changed", "tests", "level0", "go", "doors", "projections", "plugin", "server", "rules"}
+		want := []string{"changed", "tests", "level0", "go", "doors", "guards", "projections", "plugin", "server", "rules"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
@@ -180,6 +180,7 @@ func TestServerRead(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestGoGate(t *testing.T) {
 	t.Parallel()
 	read := func(path string) string {
@@ -266,6 +267,7 @@ func TestTestArgv(t *testing.T) {
 }
 
 // A red check ends by naming each red case with its file, and its line where the run names one. [[spec/tickets/ci-reds-name-their-cases]]
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestCheckEndsOnTheRedCases(t *testing.T) {
 	t.Parallel()
 	ends := func(t *testing.T, run func(doors *checkDoors, argv []string) (int, string)) []string {

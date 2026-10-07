@@ -1,6 +1,6 @@
 // The test verb: the package a changed Go test names.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported goPackagesOf, goSays and testSays
 
 import (
 	"slices"

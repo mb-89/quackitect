@@ -1,7 +1,7 @@
 // The order a press on a column name puts the rows in, driven through Update
 // the way the terminal drives it. Every model here reads memory and no file.
 
-package log
+package log // level0: InPackageTest - the cases build their rows through row, the helper the in-package detail tests share
 
 import (
 	"strings"
@@ -78,34 +78,22 @@ func TestAPressSortsThenFlipsThenPutsTheArrivalOrderBack(t *testing.T) {
 	}
 }
 
-func TestSortingByLevelReadsTheLadderAndNotTheLetters(t *testing.T) {
-	t.Parallel()
-	level := draw.GutterWide + StampWide + 1
-	m := click(threeLevels(), level, frame.NamesRow)
-	if saidIn(m) != "acb" {
-		t.Fatalf("debug, warn then error is the ladder's order, and the rows read %q", saidIn(m))
-	}
-	if saidIn(click(m, level, frame.NamesRow)) != "bca" {
-		t.Fatalf("a flipped sort runs the ladder down, and the rows read %q", saidIn(click(m, level, frame.NamesRow)))
-	}
-}
-
-func TestTheNamesRowLightsTheSortedColumnAndTheFooterNamesIt(t *testing.T) {
+func TestSortingByLevelReadsTheLadderAndTheFooterNamesIt(t *testing.T) {
 	t.Parallel()
 	m := threeLevels()
 	if logTab(m).SortSays() != "" {
 		t.Fatalf("no column sorts at the start, and the footer says %q", logTab(m).SortSays())
 	}
 	m = click(m, draw.GutterWide+StampWide+1, frame.NamesRow)
-	if logTab(m).SortSays() != "▲ level" {
-		t.Fatalf("the footer names the column and the direction, and says %q", logTab(m).SortSays())
+	if logTab(m).SortSays() != "▲ level" || saidIn(m) != "acb" {
+		t.Fatalf("debug, warn then error is the ladder's order under ▲ level, and the rows read %q under %q", saidIn(m), logTab(m).SortSays())
 	}
 	if !strings.Contains(logTab(m).RenderNames(m.W), draw.Bar.Render(draw.Pad("level", LevelWide))) {
 		t.Fatalf("the sorted column lights up, and the names read %q", logTab(m).RenderNames(m.W))
 	}
 	m = click(m, draw.GutterWide+StampWide+1, frame.NamesRow)
-	if logTab(m).SortSays() != "▼ level" {
-		t.Fatalf("a flipped sort turns the arrow over, and the footer says %q", logTab(m).SortSays())
+	if logTab(m).SortSays() != "▼ level" || saidIn(m) != "bca" {
+		t.Fatalf("a flipped sort runs the ladder down under ▼ level, and the rows read %q under %q", saidIn(m), logTab(m).SortSays())
 	}
 }
 

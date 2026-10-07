@@ -1,7 +1,7 @@
 // The survey's reads: the places a PATH names, the version a tool says, and
 // where a caller looks for a tool.
 // [[spec/design_output/tools#reading-the-path-variable]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

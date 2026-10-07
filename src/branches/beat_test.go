@@ -1,7 +1,7 @@
 // A hold that reads whether its box still beats: an ended beat frees the
 // branch at once under take --over, and a live beat keeps an old hold.
 // [[spec/tickets/holds-beat-with-the-session]]
-package branches
+package branches // level0: InPackageTest - it adds beat methods to the unexported tree fixture and reads beatPush, heldIn and the exit codes
 
 import (
 	"regexp"

@@ -2,7 +2,7 @@
 // off the roads test/level0/ticket-verb.test.js, ticket-todo.test.js and
 // roots.test.js cover.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

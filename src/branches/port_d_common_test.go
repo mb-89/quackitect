@@ -1,7 +1,7 @@
 // The fixtures the ported sync, switch, orphan, stands, list and desk cases
 // share: the JS group note, its child, and the git moves a case sets up.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pd helpers on the tree fixture that the port_d tests use
 
 import (
 	"fmt"

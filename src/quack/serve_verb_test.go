@@ -2,7 +2,7 @@
 // answering, and an index that falls, each with the line and the exit code
 // the JavaScript answers.
 // [[spec/design_output/level0#a-desk-serve-returns]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -28,7 +28,7 @@ type serveBox struct {
 
 func serveBoxAt(t *testing.T) *serveBox {
 	t.Helper()
-	return &serveBox{root: filepath.ToSlash(t.TempDir()), door: serveDoorText}
+	return &serveBox{root: filepath.ToSlash(t.TempDir()), door: serveDoorText} // level0: FixtureOutsideHome - each case stands its own door file under a root of its own
 }
 
 func (box *serveBox) hooks() string {

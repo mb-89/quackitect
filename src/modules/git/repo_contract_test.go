@@ -1,7 +1,7 @@
 // The git door's contract: each case runs against FakeRepo and a real
 // repository with a bare origin under a temporary folder, the one door test of
 // git's writes. [[spec/design_output/doors#the-git-door-carries-writes]]
-package git
+package git // level0: InPackageTest - the contract suite drives the unexported hooks preCommit and preReceive, the Repo's origin and shallow, and the in-package trees folderTree and newMemoryTree
 
 import (
 	"errors"
@@ -56,7 +56,7 @@ func worlds(t *testing.T) []world {
 	return []world{
 		realWorld(t),
 		fakeWorld(t, "fake", func() Tree { return newMemoryTree() }),
-		fakeWorld(t, "fake over a folder", func() Tree { return folderTree{t.TempDir()} }),
+		fakeWorld(t, "fake over a folder", func() Tree { return folderTree{t.TempDir()} }), // level0: FixtureOutsideHome - each case writes into a folder of its own
 	}
 }
 
@@ -64,14 +64,14 @@ func realWorld(t *testing.T) world {
 	t.Helper()
 	var clock atomic.Int64
 	clock.Store(seedSecond)
-	run := func(one proc.Command) proc.Said {
+	runs := func(one proc.Command) proc.Said {
 		stamp := "@" + strconv.FormatInt(clock.Load(), 10) + " +0000"
 		one.Env = append(one.Env, "GIT_CONFIG_GLOBAL="+os.DevNull, "GIT_CONFIG_NOSYSTEM=1", "GIT_AUTHOR_DATE="+stamp, "GIT_COMMITTER_DATE="+stamp)
 		return proc.Real(one)
 	}
 	raw := func(dir string, args ...string) string {
 		t.Helper()
-		said := run(proc.Command{Argv: append([]string{"git"}, args...), Dir: dir})
+		said := runs(proc.Command{Argv: append([]string{"git"}, args...), Dir: dir})
 		if said.Code != 0 {
 			t.Fatalf("git %v answers %d: %s", args, said.Code, said.Err)
 		}
@@ -80,7 +80,7 @@ func realWorld(t *testing.T) world {
 	open := func(root string) side {
 		at := func(path string) string { return filepath.Join(root, filepath.FromSlash(path)) }
 		return side{
-			Repo: NewRepo(root, run),
+			Repo: NewRepo(root, runs),
 			write: func(path, text string) {
 				if err := os.MkdirAll(filepath.Dir(at(path)), 0o755); err != nil {
 					t.Fatal(err)
@@ -113,11 +113,11 @@ func realWorld(t *testing.T) world {
 		raw(root, "config", "user.email", handMail)
 		return open(root)
 	}
-	origin, here, there := t.TempDir(), t.TempDir(), t.TempDir()
+	origin, here, there := t.TempDir(), t.TempDir(), t.TempDir() // level0: FixtureOutsideHome - each case commits into real repositories of its own
 	raw(origin, "init", "--quiet", "--bare", "--initial-branch=main")
 	raw(here, "init", "--quiet", "--initial-branch=main")
 	raw(here, "remote", "add", "origin", origin)
-	w := world{name: "real", origin: NewRepo(origin, run), here: clone(here), at: clock.Store}
+	w := world{name: "real", origin: NewRepo(origin, runs), here: clone(here), at: clock.Store}
 	w.here.write("README.md", seedText)
 	w.seed = w.here.commit("seed")
 	raw(here, "push", "--quiet", "-u", "origin", "main")
@@ -137,12 +137,12 @@ func realWorld(t *testing.T) world {
 	}
 	w.orphan = func(name string) { raw(here, "switch", "--quiet", "--orphan", name) }
 	w.shallow = func() Repo {
-		root := t.TempDir()
+		root := t.TempDir() // level0: FixtureOutsideHome - the case clones a real repository of its own
 		raw(root, "clone", "--quiet", "--depth", "1", "--no-single-branch", "file://"+origin, ".")
-		return NewRepo(root, run)
+		return NewRepo(root, runs)
 	}
 	w.lone = func(identity bool) side {
-		root := t.TempDir()
+		root := t.TempDir() // level0: FixtureOutsideHome - the case writes into a real repository of its own
 		raw(root, "init", "--quiet", "--initial-branch=main")
 		raw(root, "config", "user.useConfigOnly", "true")
 		if identity {

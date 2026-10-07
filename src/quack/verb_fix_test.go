@@ -1,7 +1,7 @@
 // The fix verb in Go: the flags it refuses, the rounds of the Go rules' swaps
 // and calms over the paths, and biome after them.
 // [[spec/tickets/config-verbs-port-to-go]] [[spec/tickets/vale-leaves-the-tree]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -40,7 +40,7 @@ func binNamed(name string) string {
 
 // A root holding the tree's rules and biome in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
 func fixRoot(t *testing.T) string {
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
 	seedsRules(t, root)
 	seedFile(t, root, ".se/.runtime/bin/"+binNamed("biome"), "")
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n")
@@ -50,7 +50,7 @@ func fixRoot(t *testing.T) string {
 // The fix swaps and calms through the Go rules, so a box with no Vale fixes. [[spec/tickets/vale-leaves-the-tree]]
 func TestFixSwapsAndCalmsThroughTheRulesWithNoVale(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the fix writes the files of a root of the case's own
 	seedsRules(t, root)
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and we can't go.\n")
 	code, out, errs, ran := fixRan(root, "a.md")

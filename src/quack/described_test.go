@@ -1,7 +1,7 @@
 // Every module the root loads describes each name and each field it exposes,
 // so the check refuses a missing description before a merge.
 // [[spec/design_output/model#a-module-is-one-file]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"testing"

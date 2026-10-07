@@ -1,7 +1,7 @@
 // The desk, ported off test/level0/work-desk.test.js: a desk takes a cloud
 // branch into trunk by a merge alone, so the take refuses and the merge lands.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs the desk verbs through the pd helpers and reads the unexported group editors
 
 import "testing"
 

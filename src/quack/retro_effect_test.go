@@ -1,7 +1,7 @@
 // The effect step: the last retro's class patterns counted again, each with
 // its verdict, and this retro's battery read against the last one's.
 // [[spec/guidance/retro/effect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -23,6 +23,7 @@ var retroEffectSecond = map[string]string{
 }
 
 // A fresh box finds the last retro's classes in the tracked folder, where no private folder holds them. [[spec/tickets/retro-read-reads-every-record]]
+// level0: FixtureOutsideHome - the case writes a retro's records into a tree of its own
 func TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

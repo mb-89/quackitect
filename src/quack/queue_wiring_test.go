@@ -2,7 +2,7 @@
 // second git says it came in, the way the verb's program does, so the verbs shadow reads
 // the same order on both paths.
 // [[spec/tickets/verbs-queue-order]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"

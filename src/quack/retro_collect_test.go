@@ -2,7 +2,7 @@
 // past its dot folders into the retro's input folder, copies the transcripts,
 // the memory and the scratchpads beside it, and leaves the folders behind.
 // [[spec/guidance/retro/collect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
