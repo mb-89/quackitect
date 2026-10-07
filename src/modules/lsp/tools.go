@@ -22,6 +22,9 @@ const (
 	valeSkips   = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
 	biomeConfig = "spec/config"
 	pastRule    = "PastTense"
+	// The code Vale names a script rule past its cap with, and the runs a sweep spends on it. [[spec/tickets/vale-retries-its-timeout]]
+	valeTimedOut = "E201"
+	valeTries    = 3
 	// The rule a Vale answering a fault draws, so a broken rule stands in the panel. [[spec/design_output/lsp#the-server-runs-the-tools]]
 	ValeRuns  = "ValeRuns"
 	fromVale  = "vale"
@@ -213,7 +216,18 @@ func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
 	return one.vetoes(tree, heard)
 }
 
+// Vale stops a script rule past its own cap and names it E201, which a loaded box trips on a sound tree, so the run goes again up to valeTries times. [[spec/tickets/vale-retries-its-timeout]]
 func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
+	for try := 1; ; try++ {
+		said, fault := one.valeOnce(input, argv)
+		if !strings.Contains(fault, valeTimedOut) || try >= valeTries {
+			return said, fault
+		}
+	}
+}
+
+// One Vale run through the process door, and its rows or its fault. [[spec/tickets/vale-retries-its-timeout]]
+func (one *Tools) valeOnce(input string, argv []string) ([]valeHeard, string) {
 	out, fault := one.runs(input, one.Vale, argv)
 	if fault != "" {
 		return nil, fault
