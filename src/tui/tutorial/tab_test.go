@@ -1,5 +1,6 @@
 // The tutorial tab draws the examples by chapter with a developer section, the
-// selected one's prose and calls, each row's verdict, and F5 posts its run.
+// selected one's prose and calls, each row's verdict, F5 posts its run, and the
+// search keeps and lights each match by title or by content.
 // [[spec/design_output/examples#the-tutorial-tab]]
 package tutorial
 

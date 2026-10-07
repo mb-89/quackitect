@@ -88,17 +88,6 @@ func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
 	}
 }
 
-// A branch level with origin releases. [[spec/tickets/work-verbs-port-to-go]]
-func TestPALevelBranchReleases(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
-	paOn(one, "one-group")
-	if code := one.branchSays("release"); code != codeOK {
-		t.Fatalf("release answers %d: %s", code, paSaid(one))
-	}
-}
-
 // Release refuses a branch already standing at done, and leaves the group untouched. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAReleaseRefusesDone(t *testing.T) {
 	t.Parallel()

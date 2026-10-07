@@ -64,16 +64,6 @@ func runsApart(t *testing.T, root string, dry bool, words ...string) (int, strin
 const aThing = "spec/tickets/a-thing.md"
 
 func TestTicketSet(t *testing.T) {
-	t.Run("set writes one field and says so", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "a-group")
-		if code != 0 || out != "spec/tickets/a-thing.md carries group: a-group.\n" || errs != "" {
-			t.Fatalf("set answers %d, %q, %q", code, out, errs)
-		}
-		if got, _ := readsBack(t, root, aThing); got != editCaseTicket("")[:strings.Index(editCaseTicket(""), "---\n\n")]+"group: a-group\n---\n\n# Ask\n\nA thing.\n" {
-			t.Fatalf("the ticket holds %q", got)
-		}
-	})
 	t.Run("set joins the words past the field into one value", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		code, out, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "a", "group")

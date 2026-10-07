@@ -80,9 +80,9 @@ type runSaid struct {
 
 // [[spec/design_output/examples#the-tutorial-tab]]
 type Tab struct {
-	From   Source
-	Rows   []Row
-	Notice string
+	From    Source
+	Rows    []Row
+	Notice  string
 	At      int
 	word    string
 	content bool

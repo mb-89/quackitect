@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -175,6 +175,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 2bd320220225d0f096578ac874a23bce8e24f40d
+    hash_after: 2bd320220225d0f096578ac874a23bce8e24f40d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   62.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: da38d90bf8f8bb8c
+        size: 1717
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -425,26 +448,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/examples_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The first chapters of examples now run as tests. Each verb they show takes a door the example harness can fake. `ticket set`, `todo` and `urgent` read the pull's disk. `branch` takes a doors constructor. `check` writes its runtime files through a disk on `checkDoors`, which falls back to the real disk under the root. The harness hands each verb fakes over one copy of the fixture, and origin main takes one commit past the seed, so a sync has something to take. Two tests the examples show again leave, and the Discussion lists every test cut or kept. This commit also carries the gofmt line of `src/tui/tutorial/tab.go` from example-tutorial-search-finds, with the tab test's header naming the search, since the check reads the whole tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus check.go from the gate, and the tab.go format line the check needs
+- each verb the examples reach runs over the harness fakes: the pull disk, the fake repo and runner, and a check disk over the copy
+- each new type and function links to spec/design_output/examples#one-runner-two-drivers
+- the harness table stands in exampleTable alone, and the cut list stands in the Discussion alone
 
 # accept
 
@@ -469,3 +499,29 @@ pass
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+## The cuts
+
+A test leaves where its example asserts every claim of its name, and stays where it asserts more.
+
+| test | verdict | why |
+|---|---|---|
+| `TestTicketSet`, the landing row | cut | `110_tickets/set.md` shows the field written and said |
+| `TestPALevelBranchReleases` | cut | `120_branches/release.md` shows the release exiting 0 |
+| `TestTicketSet`, the engine-field row | kept | it holds `step` and `steps` too, past the example's `state` |
+| `TestTicketNote`, the landing row | kept | it holds the note's whole front |
+| `TestTicketTodo`, the flag row | kept | it holds `--off` too |
+| `TestTicketTodo`, the grouped row | kept | it holds the ticket unwritten |
+| `TestTicketUrgent`, the mark row | kept | it holds the mark dropped on the second flip |
+| `TestPDTheListingShowsOpenWorkByDefault` | kept | it holds the closed and landed rows out |
+| `TestPDSyncOnAWorkBranchTakesMain` | kept | it holds the merge commit's subject |
+| `TestTheSyncRefusesAnyOtherBranch` | kept | no example switches branch |
+| `TestPAReleaseRefusesUnpushedCommits` | kept | no example shows the unpushed refusal |
+| `TestCheckVerb`, the green row | kept | it holds the stamp's commit, verdict and tally |
+| `TestCheckVerb`, the red rows | kept | no example plants a red part |
+
+## The gate's fixes
+
+- `check.go` joins the size and callers lists, since the change lands a disk on `checkDoors`.
+- `920_dev_branches/release-refuses-uncommitted.md` stands in place of the three files the chapter table names.
+- `TestTheFirstChaptersLeaveTheirVerbsUnreported` stands in `src/quack/examples_test.go`.
