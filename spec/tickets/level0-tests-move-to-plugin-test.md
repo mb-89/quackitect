@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 35102a24cf31d4c6
         size: 1150
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 4b3d2e24de3dee2929e35cf0d41a3b04fb2180c2
+    hash_after: 0a61ed2e218c054fefd8e294e9faccd1a41d3b09
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -323,14 +332,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint --errors
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the size list names, and beyond them src/imports/ratio.go and its test for the shared count, the ratio baseline, four comments naming deleted tests, a new check_plugin_tests.go since check.go stands near its ceiling, and test/contract/boot-span.test.js, since a unit test may drive no real door.
+The change reaches the disk and claude through the check doors, which the check fake stands for, and the contract case reads through the disk door, which src/doors/fake holds a fake of.
+Each new function and file carries a pointer to spec/tickets/level0-tests-move-to-plugin-test, whose approach it implements.
+Each fact stands in one place: imports owns the line count and the import reach, and the part and the guard both call them.
 
 ## tests-green
 
