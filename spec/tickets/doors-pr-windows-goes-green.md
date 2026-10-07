@@ -76,3 +76,5 @@ The Windows runner hung `go test ./src/quack/` at its timeout in `TestAChildTheC
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The fix stands in f9309d464 on work/doors-declare-what-they-own, and the main merge beside it in 2423ff8f7. The group stood closed when the box minted this ticket, so the branch pulls it nowhere. The first pull on main passes `do` once `check (windows-latest)` stands green on #131.
