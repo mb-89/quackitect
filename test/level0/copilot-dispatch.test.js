@@ -34,19 +34,17 @@ function fixture() {
     comments: [],
     claims: 0,
     fail: false,
-    work(root, args) {
-      assert.equal(root, it.root);
-      assert.deepEqual(args, ["take"]);
+  };
+  it.proc = fakeProc({
+    "/tree/RUNME.sh branch take": () => {
       assert.equal(it.branch, "main");
       assert.equal(it.disk.read(GROUP_AT), FREE);
       it.claims++;
       it.branch = "work/example";
       it.head = it.claims.toString(16).padStart(40, "0");
       it.disk.write(GROUP_AT, HELD);
-      return 0;
+      return {};
     },
-  };
-  it.proc = fakeProc({
     "git status --porcelain": {},
     "git rev-parse --abbrev-ref HEAD": () => ({ stdout: it.branch }),
     "git rev-parse HEAD": () => ({ stdout: it.head }),
@@ -73,10 +71,13 @@ function fixture() {
   return it;
 }
 
-test("dispatch claims once and requests work on the existing draft head", async () => {
+test("dispatch claims once through branch take and requests work on the existing draft head", async () => {
   const it = fixture();
   assert.match(await dispatch(it), /Verify that a Copilot job starts/);
   assert.equal(it.claims, 1);
+  const took = it.proc.ran.find(({ argv }) => argv.includes("take"));
+  assert.deepEqual(took.argv, ["/tree/RUNME.sh", "branch", "take"]);
+  assert.equal(took.init.cwd, "/tree");
   assert.match(it.comments[0].body, /@copilot/);
   assert.equal(
     it.proc.ran.some(({ argv }) => argv.includes("merge")),
@@ -116,4 +117,11 @@ test("a new claim on the same branch sends a distinct dispatch request", async (
   assert.ok(it.comments[1].body.includes(`:${it.head} -->`));
   await dispatch(it);
   assert.equal(it.comments.length, 2);
+});
+
+test("a take answering nonzero stops the dispatch before any request", async () => {
+  const it = fixture();
+  it.proc.teach(["/tree/RUNME.sh", "branch", "take"], { exitCode: 1 });
+  await assert.rejects(dispatch(it), /Work claiming or sync failed/);
+  assert.equal(it.comments.length, 0);
 });

@@ -21,7 +21,7 @@ func TestPEOpenMarksTrunkAfterTheBranchPush(t *testing.T) {
 	if fieldOf(one.read(ticketAt("g")), cloudMark) != "true" {
 		t.Fatal("the clone's ticket carries no marker")
 	}
-	if said := one.git("log", "-1", "--format=%s", "main"); said != "g: opens in the cloud" {
+	if said := one.subject("main"); said != "g: opens in the cloud" {
 		t.Fatalf("main's last commit reads %q", said)
 	}
 	if fieldOf(one.peOriginFile("main", ticketAt("g")), cloudMark) != "true" {
@@ -37,7 +37,7 @@ func TestPEOpenOffTrunkRefuses(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	tip := one.peOriginTip("main")
-	one.git("switch", "-q", "-c", "work/other")
+	one.cut("work/other", "")
 	if code := one.branchSays("open", "g"); code != codeRefused {
 		t.Fatalf("the open answers %d", code)
 	}
@@ -51,7 +51,7 @@ func TestPEOpenOffTrunkRefuses(t *testing.T) {
 func TestPERefusedBranchPushLeavesTrunkBare(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
-	one.peOriginRefuses(`case "$ref" in refs/heads/work/*) true;; *) false;; esac`)
+	one.peOriginRefuses(func(ref, _ string) bool { return strings.HasPrefix(ref, "refs/heads/work/") })
 	tip := one.peOriginTip("main")
 	if code := one.branchSays("open", "g"); code != codeRed {
 		t.Fatalf("the open answers %d", code)
@@ -92,10 +92,10 @@ func TestPEMergeDropsTheMarkerOnTheMergeCommit(t *testing.T) {
 	if fieldOf(one.read(ticketAt("g")), cloudMark) != "" {
 		t.Fatal("the clone's ticket keeps the marker")
 	}
-	if parents := strings.Fields(one.git("rev-list", "--parents", "-n", "1", "HEAD")); len(parents) != 3 {
-		t.Fatalf("HEAD is no merge commit: %v", parents)
+	if parents := one.parents("HEAD"); parents != 2 {
+		t.Fatalf("HEAD is no merge commit: it stands on %d", parents)
 	}
-	if fieldOf(one.git("show", "HEAD:"+ticketAt("g")), cloudMark) != "" {
+	if fieldOf(one.show("HEAD", ticketAt("g")), cloudMark) != "" {
 		t.Fatal("the merge commit keeps the marker")
 	}
 }
@@ -107,7 +107,7 @@ func TestPEConflictedMergeStagesTheMarkerDrop(t *testing.T) {
 		map[string]string{ticketAt("g"): peMarked, "src/a.txt": "one\n"},
 		map[string]string{ticketAt("g"): peMarkedDone, "src/a.txt": "two\n"})
 	one.peTrunkMoves(map[string]string{"src/a.txt": "three\n"})
-	was := one.git("rev-parse", "HEAD")
+	was := one.rev("HEAD")
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d: %s", code, one.errs.String())
 	}
@@ -115,10 +115,10 @@ func TestPEConflictedMergeStagesTheMarkerDrop(t *testing.T) {
 	if fieldOf(one.read(ticketAt("g")), cloudMark) != "" {
 		t.Fatal("the clone's ticket keeps the marker")
 	}
-	if fieldOf(one.git("show", ":"+ticketAt("g")), cloudMark) != "" {
+	if fieldOf(one.show("", ticketAt("g")), cloudMark) != "" {
 		t.Fatal("the index keeps the marker")
 	}
-	if one.git("rev-parse", "HEAD") != was {
+	if one.rev("HEAD") != was {
 		t.Fatal("the conflicted merge commits")
 	}
 }
@@ -127,7 +127,7 @@ func TestPEConflictedMergeStagesTheMarkerDrop(t *testing.T) {
 func TestPETicketConflictLeavesTheMarkerUnstaged(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, map[string]string{ticketAt("g"): ""}, map[string]string{ticketAt("g"): peMarkedDone})
-	one.git("rm", "-q", ticketAt("g"))
+	one.erase(ticketAt("g"))
 	one.peTrunkMoves(nil)
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -136,7 +136,7 @@ func TestPETicketConflictLeavesTheMarkerUnstaged(t *testing.T) {
 	if fieldOf(one.read(ticketAt("g")), cloudMark) != "true" {
 		t.Fatal("the clone's ticket loses the marker")
 	}
-	holds(t, one.git("diff", "--name-only", "--diff-filter=U"), ticketAt("g"))
+	holds(t, one.unmerged(), ticketAt("g"))
 }
 
 // Close drops the marker on trunk, pushes trunk, and then deletes the branch. [[spec/tickets/work-verbs-port-to-go]]
@@ -150,7 +150,7 @@ func TestPECloseDropsTheMarkerBeforeTheBranchGoes(t *testing.T) {
 	if fieldOf(one.read(ticketAt("g")), cloudMark) != "" {
 		t.Fatal("the clone's ticket keeps the marker")
 	}
-	if said := one.git("log", "-1", "--format=%s", "main"); said != "g: leaves the cloud" {
+	if said := one.subject("main"); said != "g: leaves the cloud" {
 		t.Fatalf("main's last commit reads %q", said)
 	}
 	if fieldOf(one.peOriginFile("main", ticketAt("g")), cloudMark) != "" {
@@ -166,7 +166,7 @@ func TestPECloseOffTrunkRefuses(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): peMarked}).desk()
 	one.branch("g", map[string]string{"src/one.txt": "one\n"})
-	one.git("switch", "-q", "-c", "work/other")
+	one.cut("work/other", "")
 	if code := one.branchSays("close", "g", "--force"); code != codeRefused {
 		t.Fatalf("the close answers %d", code)
 	}

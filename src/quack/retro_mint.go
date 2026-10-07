@@ -5,16 +5,16 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"maps"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The folder tickets stand in, the record of a retro's classes, the processes a ticket mints onto, the tree's own command line, and the status a class stands open at. [[spec/guidance/retro/check]]
@@ -70,30 +70,29 @@ type retroMintRecord struct {
 
 func init() { register("retro mint", retroMintVerb(retroRoot, retroMintRunme)) }
 
-// Runs a program under the root, with ./RUNME.sh read as the root's own, and the env added over the caller's. [[spec/design_output/vehicle#the-work-root-inherits]]
+// Runs a program under the root over the real process door. [[spec/design_output/vehicle#the-work-root-inherits]]
 func retroMintRunme(dir string, argv []string, env map[string]string) retroMintRan {
-	program := argv[0]
-	if program == retroMintRunmeAt {
-		program = filepath.Join(dir, "RUNME.sh")
+	return retroMintRunmeOver(proc.Real)(dir, argv, env)
+}
+
+// Runs a program under the root through the process door, with ./RUNME.sh read as the root's own, and the env added over the caller's in sorted order. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func retroMintRunmeOver(run proc.Runner) func(dir string, argv []string, env map[string]string) retroMintRan {
+	return func(dir string, argv []string, env map[string]string) retroMintRan {
+		program := argv[0]
+		if program == retroMintRunmeAt {
+			program = filepath.Join(dir, "RUNME.sh")
+		}
+		pairs := make([]string, 0, len(env))
+		for _, key := range slices.Sorted(maps.Keys(env)) {
+			pairs = append(pairs, key+"="+env[key])
+		}
+		said := run(proc.Command{Argv: append([]string{program}, argv[1:]...), Dir: dir, Env: pairs})
+		ran := retroMintRan{out: said.Out, errs: said.Err, code: said.Code}
+		if said.Code < 0 {
+			ran.code = exitFailed
+		}
+		return ran
 	}
-	cmd := exec.Command(program, argv[1:]...)
-	cmd.Dir = dir
-	cmd.Env = os.Environ()
-	for _, key := range slices.Sorted(maps.Keys(env)) {
-		cmd.Env = append(cmd.Env, key+"="+env[key])
-	}
-	var out, errs bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &errs
-	err := cmd.Run()
-	ran := retroMintRan{out: out.String(), errs: errs.String()}
-	var exit *exec.ExitError
-	switch {
-	case errors.As(err, &exit):
-		ran.code = exit.ExitCode()
-	case err != nil:
-		ran.code, ran.errs = exitFailed, ran.errs+err.Error()
-	}
-	return ran
 }
 
 // The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/check]]
@@ -256,7 +255,7 @@ func retroMintVerb(root func() string, run retroMintRun) twin {
 				return exitFailed
 			}
 		}
-		if !retroMintWrites(at, kept, errs) {
+		if !retroMintWrites(at, kept, errs) || !retroMintKeeps(home, argv[2], errs) {
 			return exitFailed
 		}
 		closed := 0
@@ -303,6 +302,37 @@ func retroMintWrites(at string, kept *retroMintNode, errs io.Writer) bool {
 	kept.write(&text, "")
 	text.WriteString("\n")
 	if err := os.WriteFile(at, []byte(text.String()), 0o644); err != nil {
+		fmt.Fprintln(errs, err)
+		return false
+	}
+	return true
+}
+
+// Copies the classes, the rates and the collect time into the tracked folder, so a fresh box's effect measures against them; the collect time keeps its time alone, and a missing file stays missing. [[spec/tickets/retro-read-reads-every-record]]
+func retroMintKeeps(root, name string, errs io.Writer) bool {
+	home, into := retroHome(root, name), filepath.Join(root, filepath.FromSlash(retroKept), name)
+	if err := os.MkdirAll(into, 0o777); err != nil {
+		fmt.Fprintln(errs, err)
+		return false
+	}
+	for _, file := range []string{retroClassesFile, retroRatesFile} {
+		text, err := os.ReadFile(filepath.Join(home, file))
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		if err == nil {
+			err = os.WriteFile(filepath.Join(into, file), text, 0o644)
+		}
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return false
+		}
+	}
+	read, ok := retroJSParse(retroFileText(filepath.Join(home, retroEffectCollected)))
+	if !ok {
+		return true
+	}
+	if err := retroJSWrite(filepath.Join(into, retroEffectCollected), retroJSObject("at", retroJSField(read, "at"))); err != nil {
 		fmt.Fprintln(errs, err)
 		return false
 	}

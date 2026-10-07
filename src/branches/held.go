@@ -82,17 +82,17 @@ func (d *Doors) letGo(branch, name, here string, final front.Ordered) int {
 		closed = withEveryTakeClosed(withFinal(base, tip, final), tip)
 	}
 	_ = d.write(at, closed)
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 	says := taken.Hand + " lets it go"
 	if from != "" {
 		says = role + " frees it from " + from
 	}
-	d.quiet("commit", "-m", branch+": "+says)
-	if !d.loud("push", "origin", branch).OK {
+	_, _ = d.Repo.Commit(branch+": "+says, nil)
+	if !d.push(branch) {
 		return codeRed
 	}
 	if here != branch {
-		d.quiet("switch", here)
+		_ = d.Repo.Switch(here, false)
 	}
 	d.say("%s stands at %s again, and is free for anybody.", branch, todo)
 	return codeOK

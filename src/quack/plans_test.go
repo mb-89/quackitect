@@ -92,25 +92,6 @@ func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/plan-writes-off-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
-func TestThePlansModuleStandsOnTheWiring(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := modules[plansModuleType]; !ok {
-		t.Errorf("the root loads no module type %s", plansModuleType)
-	}
-	if !wiresType(w, plansModuleType) {
-		t.Errorf("the wiring loads no %s", plansModuleType)
-	}
-}
-
 // The answer names the place the queue gives a new todo, off the ports the real wiring binds. [[spec/tickets/plan-writes-off-go]]
 func TestAPlanAnswerReadsThePlaceOffTheQueuesPorts(t *testing.T) {
 	t.Parallel()

@@ -8,16 +8,53 @@ import (
 	"testing"
 )
 
-// The file ceiling covers code files alone, so a long note or data file meets none. [[spec/design_output/level0#the-size-ceiling]]
-func TestTheFileCeilingReadsCodeFilesAlone(t *testing.T) {
-	long := strings.Repeat("x\n", 4)
-	if said := sizeFaults("a.go", long, 0, 2); len(said) != 1 || said[0].Rule != FileCeiling {
-		t.Fatalf("a Go file past its ceiling answers %v", said)
-	}
-	for _, path := range []string{"a.md", "a.json", "a.yml", "a.html"} {
-		if said := sizeFaults(path, long, 0, 2); len(said) != 0 {
-			t.Fatalf("%s answers %v, and holds no code", path, said)
+// The ceilings the size cases hold a file and a function to. [[spec/design_output/level0#the-size-ceiling]]
+const (
+	caseFileCeiling     = 10
+	caseFunctionCeiling = 4
+)
+
+// A text of the given count of plain lines. [[spec/design_output/level0#the-size-ceiling]]
+func linesOf(count int) string {
+	return strings.Repeat("x\n", count-1) + "x"
+}
+
+// The rules of the named kind the text rules answer for one file under the case ceilings. [[spec/design_output/level0#the-size-ceiling]]
+func sizeFound(path, text, rule string) []Finding {
+	tree := TreeOver("/tree", Texts{path: text})
+	out := []Finding{}
+	for _, one := range textFaults(tree, path, caseFunctionCeiling, caseFileCeiling, "") {
+		if one.Rule == rule {
+			out = append(out, one)
 		}
+	}
+	return out
+}
+
+func TestACodeFileOneLinePastTheCeilingMeetsFileCeilingAtItsFirstLine(t *testing.T) {
+	said := sizeFound("src/a.go", linesOf(caseFileCeiling+1), FileCeiling)
+	if len(said) != 1 || said[0].Line != 1 || said[0].File != "src/a.go" {
+		t.Fatalf("the file past the ceiling meets %v, and wants one FileCeiling at line 1", said)
+	}
+}
+
+func TestACodeFileAtTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("src/a.go", linesOf(caseFileCeiling), FileCeiling); len(said) != 0 {
+		t.Fatalf("the file at the ceiling meets %v, and wants nothing", said)
+	}
+}
+
+func TestAProseFilePastTheCeilingMeetsNoFileCeiling(t *testing.T) {
+	if said := sizeFound("spec/a.md", linesOf(caseFileCeiling+1), FileCeiling); len(said) != 0 {
+		t.Fatalf("the prose file meets %v, and the ceiling covers code files alone", said)
+	}
+}
+
+func TestAFunctionPastItsCeilingMeetsFunctionCeilingAtItsOpeningLine(t *testing.T) {
+	text := "package a\n\nfunc long() {\n" + linesOf(caseFunctionCeiling) + "\n}\n"
+	said := sizeFound("src/a.go", text, FunctionCeiling)
+	if len(said) != 1 || said[0].Line != 3 {
+		t.Fatalf("the long function meets %v, and wants one FunctionCeiling at line 3", said)
 	}
 }
 

@@ -108,7 +108,7 @@ type entry struct {
 	leaf               bool
 }
 
-// The drawing drawnOf in test/level0/drawn-twin.js answers, which the golden test holds equal. [[spec/tickets/the-lens-reads-v1]]
+// The drawing of a ticket: its graph, its route, and each leaf's fields. [[spec/tickets/the-lens-reads-v1]]
 func drawnOf(text string) Drawn {
 	read := note.Read(text)
 	// A text with no front reads whole as a route, and graphIn places its nodes under no chapter. [[spec/tickets/the-lens-reads-v1]]

@@ -74,7 +74,7 @@ func TestPCFreeChildrenTakesTheGroupOff(t *testing.T) {
 	}
 	pcField(one, "shut-one", "group", pcGroup)
 	pcField(one, "a-draft", "group", "")
-	holds(t, one.git("diff", "--cached", "--name-only"), ticketAt("a-draft"))
+	holds(t, one.staged(), ticketAt("a-draft"))
 }
 
 // done writes hash_after, and closes a group whose every ticket is closed. [[spec/tickets/work-verbs-port-to-go]]
@@ -84,7 +84,7 @@ func TestPCDoneClosesAFinishedGroup(t *testing.T) {
 		ticketAt(pcGroup):   pcAtChildren(),
 		ticketAt("a-child"): pcChild(pcGroup, "closed"),
 	})
-	head := one.git("rev-parse", "HEAD")
+	head := one.rev("HEAD")
 	if code := one.branchSays("done"); code != codeOK {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
 	}
@@ -94,7 +94,7 @@ func TestPCDoneClosesAFinishedGroup(t *testing.T) {
 	pcField(one, pcGroup, "state", closedState)
 	pcField(one, pcGroup, "reason", doneReason)
 	holds(t, one.pcSaid(), "every ticket in it is closed")
-	if one.pcTip(pcOrigin) != one.git("rev-parse", "HEAD") {
+	if one.pcTip(pcOrigin) != one.rev("HEAD") {
 		t.Fatal("the leave stays off origin")
 	}
 }
@@ -139,7 +139,7 @@ func TestPCDoneHandsThePersonRouteLoose(t *testing.T) {
 	pcField(one, "a-trial", "group", "")
 	pcField(one, "shut-one", "group", pcGroup)
 	holds(t, one.pcSaid(), "a-trial")
-	if fieldOf(one.git("show", pcOrigin+":"+ticketAt("a-trial")), groupField) != "" {
+	if fieldOf(one.show(pcOrigin, ticketAt("a-trial")), groupField) != "" {
 		t.Fatal("the loose trial stays off the pushed branch")
 	}
 }
@@ -180,12 +180,12 @@ func TestPCDoneWantsAGreenBattery(t *testing.T) {
 func TestPCDoneWantsTrunkIn(t *testing.T) {
 	t.Parallel()
 	one := pcOnGroup(newTree(t, nil).desk(), map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, "box 3f9a", "a1b2c3")})
-	one.git("switch", "-q", trunk)
+	one.switchTo(trunk)
 	for _, step := range []string{"one", "two", "three"} {
 		one.land("main moves "+step, map[string]string{"moves/" + step: step})
 	}
-	one.git("push", "-q", "origin", trunk)
-	one.git("switch", "-q", workBranch+pcGroup)
+	one.push(trunk)
+	one.switchTo(workBranch + pcGroup)
 	one.pcGreen()
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
@@ -249,7 +249,7 @@ func TestPCDoneLeavesOnceTheRetroStandsWritten(t *testing.T) {
 		ticketAt(pcGroup):    pcWritten(pcRetroGroup(), "notes", "write"),
 		ticketAt("shut-one"): pcChild(pcGroup, "closed"),
 	})
-	head := one.git("rev-parse", "HEAD")
+	head := one.rev("HEAD")
 	if code := one.branchSays("done"); code != codeOK {
 		t.Fatalf("done on a desk answers %d: %s", code, one.pcSaid())
 	}
@@ -353,10 +353,10 @@ func TestPCDoneClosesOnTheBranchAlone(t *testing.T) {
 	one := pcDone(t, pcNested(map[string]string{
 		ticketAt("a-child"): pcPersonChild(pcGroup),
 	}))
-	one.git("switch", "-q", workBranch+pcGroup)
+	one.switchTo(workBranch + pcGroup)
 	marked := withField(one.pcTicket(pcGroup), cloudMark, "true")
 	one.land("the group carries the marker", map[string]string{ticketAt(pcGroup): marked})
-	one.git("push", "-q", "origin", workBranch+pcGroup)
+	one.push(workBranch + pcGroup)
 	one.pcGreen()
 	trunkTip := one.pcTip("origin/" + trunk)
 	if code := one.branchSays("done"); code != codeOK {
@@ -365,11 +365,11 @@ func TestPCDoneClosesOnTheBranchAlone(t *testing.T) {
 	pcField(one, pcGroup, "state", closedState)
 	pcField(one, pcGroup, cloudMark, "")
 	pcField(one, "a-child", "group", "")
-	one.git("fetch", "-q", "origin")
+	one.fetch()
 	if one.pcTip("origin/"+trunk) != trunkTip {
 		t.Fatal("main takes a push")
 	}
-	if one.pcTip(pcOrigin) != one.git("rev-parse", "HEAD") {
+	if one.pcTip(pcOrigin) != one.rev("HEAD") {
 		t.Fatal("the branch stays unpushed")
 	}
 	holds(t, one.pcSaid(), "Open the pull request over work/one-group against main, with auto-merge on")

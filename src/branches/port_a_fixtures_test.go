@@ -70,13 +70,13 @@ func paTaken() string {
 // Moves the clone onto a local work branch at origin's tip. [[spec/tickets/work-verbs-port-to-go]]
 func paOn(one *tree, name string) {
 	one.t.Helper()
-	one.git("switch", "-q", "-c", workBranch+name, "origin/"+workBranch+name)
+	one.cut(workBranch+name, "origin/"+workBranch+name)
 }
 
 // Whether origin carries a branch. [[spec/tickets/work-verbs-port-to-go]]
 func paOriginHas(one *tree, branch string) bool {
 	one.t.Helper()
-	return one.git("ls-remote", "--heads", "origin", branch) != ""
+	return one.originHas(branch)
 }
 
 // Fails where the text matches no pattern. [[spec/tickets/work-verbs-port-to-go]]

@@ -121,7 +121,7 @@ func (it *It) commandsRun(path string, evidence []*yaml.Doc, chapter Chapter, fa
 		want := yaml.AsString(field.Get("expects"))
 		if number, err := strconv.Atoi(strings.TrimSpace(want)); err == nil && strings.TrimSpace(want) != "" {
 			if exit != number {
-				*faults = append(*faults, fmt.Sprintf("%s under %s expects exit %d, and %s answers %d: %s", name, path, number, line, exit, last))
+				*faults = append(*faults, fmt.Sprintf("%s under %s expects exit %d, and %s answers %d: %s", name, path, number, line, exit, last)+it.loggedRed(name, line, stdout))
 			}
 			continue
 		}
@@ -130,10 +130,22 @@ func (it *It) commandsRun(path string, evidence []*yaml.Doc, chapter Chapter, fa
 			if said == "" {
 				said = "nothing"
 			}
-			*faults = append(*faults, fmt.Sprintf("%s under %s expects %s, and %s answers %s", name, path, want, line, said))
+			*faults = append(*faults, fmt.Sprintf("%s under %s expects %s, and %s answers %s", name, path, want, line, said)+it.loggedRed(name, line, stdout))
 		}
 	}
 	return out
+}
+
+// The line a refusal adds where the log takes a red command's whole output. [[spec/tickets/red-commands-log-their-output]]
+const redLogged = " The session log holds its whole output."
+
+// Logs the whole output of a command that misses what its field expects, and answers the line its refusal adds, or nothing where no log stands. [[spec/tickets/red-commands-log-their-output]]
+func (it *It) loggedRed(name, line, stdout string) string {
+	if it.Log == nil {
+		return ""
+	}
+	it.Log("warn", "work", name+" misses what it expects", map[string]any{"command": line, "output": stdout})
+	return redLogged
 }
 
 // The first units of a text as slice counts them in JavaScript. [[spec/design_output/pull#the-commands-answer]]

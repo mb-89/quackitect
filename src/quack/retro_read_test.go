@@ -84,3 +84,42 @@ func TestRetroReadMarksAFaultAsTheTimelineCountsItAndALineOfNoJSONEarnsNone(t *t
 		t.Fatalf("a blank prompt earns %v", got)
 	}
 }
+
+// retro read counts a prompt the owner queues mid-turn and lists a refusal that carries no error mark; the queue's own line and a task's queued line earn none. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	retroReadingLay(t, root, retroReadingName, map[string]string{
+		"input/transcripts/one/a.jsonl": fmt.Sprintf(`{"type":"queue-operation","operation":"enqueue","timestamp":%q,"content":"stop and land it"}`, retroReaderWhen) + "\n" +
+			fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"stop and land it","origin":{"kind":"human"}}}`, retroReaderWhen) + "\n" +
+			fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"a task ends","origin":{"kind":"task-notification"}}}`, retroReaderWhen) + "\n" +
+			retroReaderSaid("user", `[{"type":"tool_result","content":"refused\n  the leaf holds no hand"}]`) + "\n" +
+			retroReaderSaid("user", `[{"type":"tool_result","content":"the leaf passes"}]`),
+		"chapters/c1.json": `{"id":"c1","lines":{"transcripts/one/a.jsonl":[[1,5]]}}`,
+	})
+
+	code, out, errs := retroReadingRun(retroReadVerb, root, "retro", "read", retroReadingName, "c1")
+
+	want := "transcripts/one/a.jsonl:2  prompt  stop and land it\n" +
+		"transcripts/one/a.jsonl:4  refusal  the leaf holds no hand\n"
+	if code != 0 || out != want {
+		t.Fatalf("read answers %d, %q, %q, want %q", code, out, errs, want)
+	}
+}
+
+// A queued prompt naming no origin earns a prompt row unless marked meta, and a helper's queued prompt earns none. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroReadCountsAQueuedPromptOfNoOriginAndNoneOfAHelper(t *testing.T) {
+	t.Parallel()
+	bare := fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it"}}`, retroReaderWhen)
+	meta := fmt.Sprintf(`{"type":"attachment","isMeta":true,"timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it"}}`, retroReaderWhen)
+	human := fmt.Sprintf(`{"type":"attachment","timestamp":%q,"attachment":{"type":"queued_command","prompt":"land it","origin":{"kind":"human"}}}`, retroReaderWhen)
+	if got := retroRowsOf("transcripts/one/a.jsonl", bare); len(got) != 1 || got[0] != (retroRow{kind: "prompt", text: "land it"}) {
+		t.Fatalf("a queued prompt of no origin earns %v", got)
+	}
+	if got := retroRowsOf("transcripts/one/a.jsonl", meta); len(got) != 0 {
+		t.Fatalf("a queued prompt marked meta earns %v", got)
+	}
+	if got := retroRowsOf("transcripts/one/a/subagents/b.jsonl", human); len(got) != 0 {
+		t.Fatalf("a helper's queued prompt earns %v", got)
+	}
+}

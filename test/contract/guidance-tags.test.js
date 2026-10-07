@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { listOf } from "../../.claude/skills/level0/lib/guidance.js";
 import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { disk } from "../../src/doors/disk.js";
 import { unreached } from "../../src/scripts/guidance-hand.js";
@@ -23,6 +24,12 @@ test("the ticket schema admits tags on a step, and the guidance schema admits ta
   const note = `---\nkind: [[guidance]]\nscope: ["a hand"]\ntags: [testing]\n---\n\n# Actionables\n\n1. Watch a test fail first.\n`;
   assert.deepEqual(tagFaults(checkNote(ticket, schemaOf("ticket"), "ticket")), []);
   assert.deepEqual(tagFaults(checkNote(note, schemaOf("guidance"), "note")), []);
+});
+
+// The mint tool writes a flow list quoted, and a quoted tag reaches the step its bare word reaches. [[spec/design_input/level-two#guidance]]
+test("a quoted tag reads as its bare word, and a bare tag reads as itself", () => {
+  assert.deepEqual(listOf('["testing", \'code\']'), ["testing", "code"]);
+  assert.deepEqual(listOf("[testing, code]"), ["testing", "code"]);
 });
 
 // The battery runs this, so the check refuses a note no step reaches. [[spec/design_input/level-two#guidance]]

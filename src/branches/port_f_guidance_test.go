@@ -62,9 +62,13 @@ func TestPFTheGuidanceVerbPrintsAStepsNotes(t *testing.T) {
 		t.Fatalf("a step standing nowhere answers %d", code)
 	}
 	holds(t, one.errs.String(), "fixture names no step nowhere")
+	if code := one.branchSays("guidance", "spec/guidance/voice"); code != 0 {
+		t.Fatalf("a named note answers %d: %s", code, one.errs.String())
+	}
+	holds(t, one.out.String(), "# Reads spec/guidance/voice\n\n1. Say what is.")
 }
 
-// The guidance verb refuses a step naming a process that stands nowhere. [[spec/tickets/work-verbs-port-to-go]]
+// The guidance verb refuses a step naming a process that stands nowhere, a note standing nowhere, and a hand holding nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheGuidanceVerbRefusesAProcessStandingNowhere(t *testing.T) {
 	t.Parallel()
 	one := pfGuidanceTree(t, pfNotes())
@@ -72,6 +76,13 @@ func TestPFTheGuidanceVerbRefusesAProcessStandingNowhere(t *testing.T) {
 		t.Fatalf("a process standing nowhere answers %d", code)
 	}
 	holds(t, one.errs.String(), "nowhere names no process")
+	if code := one.branchSays("guidance", "spec/guidance/none"); code != codeRed {
+		t.Fatalf("a missing note answers %d", code)
+	}
+	if code := one.branchSays("guidance"); code != codeRed {
+		t.Fatalf("an empty hand answers %d", code)
+	}
+	holds(t, one.errs.String(), "Nothing stands in your hand, so no step names a note.")
 }
 
 // The guidance verb prints the notes the guidance topic answers for a step, and no other. [[spec/tickets/work-verbs-port-to-go]]

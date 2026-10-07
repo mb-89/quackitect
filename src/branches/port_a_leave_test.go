@@ -21,7 +21,7 @@ func TestPADoneLogsOneLine(t *testing.T) {
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): withField(paTaken(), "state", closedState)})
 	paOn(one, "one-group")
-	head := one.git("rev-parse", "HEAD")
+	head := one.rev("HEAD")
 	one.write(map[string]string{checkStamp: fmt.Sprintf(`{"sha":%q,"ok":true,"clean":true,"at":"now"}`, head)})
 	var rows []paRow
 	one.d.Log = func(level, kind, said string, more map[string]any) {
@@ -43,12 +43,12 @@ func TestPADoneLogsOneLine(t *testing.T) {
 func TestPADoneOffAWorkBranchRefuses(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("one-group"): paGroupNote})
-	before := one.git("rev-parse", "HEAD")
+	before := one.rev("HEAD")
 	if code := one.branchSays("done"); code != codeRefused {
 		t.Fatalf("done on main answers %d", code)
 	}
 	holds(t, paSaid(one), "branch done runs on a work branch")
-	if one.git("rev-parse", "HEAD") != before || one.read(ticketAt("one-group")) != paGroupNote {
+	if one.rev("HEAD") != before || one.read(ticketAt("one-group")) != paGroupNote {
 		t.Fatal("the refused done moves the tree")
 	}
 }
@@ -73,14 +73,14 @@ func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
 	paOn(one, "one-group")
 	one.land("first", map[string]string{"a.md": "a\n"})
 	one.land("second", map[string]string{"b.md": "b\n"})
-	tip := one.git("rev-parse", "HEAD")
+	tip := one.rev("HEAD")
 	if code := one.branchSays("release"); code != codeRefused {
 		t.Fatalf("release answers %d: %s", code, paSaid(one))
 	}
 	said := paSaid(one)
 	holds(t, said, "holds 2 commit(s) origin lacks")
 	holds(t, said, "git push origin work/one-group")
-	if one.git("rev-parse", "HEAD") != tip {
+	if one.rev("HEAD") != tip {
 		t.Fatal("the release resets the commits away")
 	}
 	if one.read(ticketAt("one-group")) != paGroupNote {
@@ -106,12 +106,12 @@ func TestPAReleaseRefusesDone(t *testing.T) {
 	shut := withField(paGroupNote, "state", closedState)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): shut})
 	paOn(one, "one-group")
-	tip := one.git("rev-parse", "HEAD")
+	tip := one.rev("HEAD")
 	if code := one.branchSays("release"); code != codeRed {
 		t.Fatalf("release answers %d: %s", code, paSaid(one))
 	}
 	holds(t, paSaid(one), "Read it before you reopen it")
-	if one.read(ticketAt("one-group")) != shut || one.git("rev-parse", "HEAD") != tip {
+	if one.read(ticketAt("one-group")) != shut || one.rev("HEAD") != tip {
 		t.Fatal("the group on the tree moves")
 	}
 }

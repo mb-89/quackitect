@@ -18,10 +18,10 @@ func pdListing(t *testing.T, flags ...string) string {
 		ticketAt("a-done-child"): pdChild("one-group", "closed"),
 	})
 	one.branch("landed", map[string]string{ticketAt("landed"): pdGroupNote})
-	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/landed")
+	one.mergeIn("origin/work/landed", "")
 	one.land("landed closes", map[string]string{ticketAt("landed"): withField(pdGroupNote, "state", closedState)})
-	one.git("push", "-q", "origin", trunk)
-	one.git("fetch", "-q", "origin")
+	one.push(trunk)
+	one.fetch()
 	if code := one.branchSays(append([]string{"list"}, flags...)...); code != codeOK {
 		t.Fatalf("list answers %d: %s", code, one.errs.String())
 	}

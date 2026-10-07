@@ -6,26 +6,59 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"quackitect/src/index"
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/hooks"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
 
-// The wait action and its tool, the session the cases post in, a call wait shorter than any signal, and the span a case waits on an operation's end. [[spec/tickets/find-and-wait-in-go]]
+// The wait action and its tool, the session the cases post in, a call wait shorter than any signal, a call wait past every signal, and the saves a case's table holds unread. [[spec/tickets/find-and-wait-in-go]]
 const (
 	waitAction  = "waits/wait"
 	waitTool    = "mcp__level0__wait"
 	waitSession = "s1"
 	shortWait   = 50 * time.Millisecond
 	endsWithin  = 5 * time.Second
+	savesHeld   = 256
 )
+
+// An op table in memory that hands each saved row to the case, so a case waits on an op's end as it lands. A full hand drops the row, since the manager saves on its own path. [[spec/tickets/quack-waits-poll-on-a-fake-clock]]
+type savedTable struct {
+	mu    sync.Mutex
+	held  heldTable
+	saved chan []byte
+}
+
+func (one *savedTable) Save(id string, body []byte) error {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	select {
+	case one.saved <- body:
+	default:
+	}
+	return one.held.Save(id, body)
+}
+
+func (one *savedTable) Drop(id string) error {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	return one.held.Drop(id)
+}
+
+func (one *savedTable) All() ([]index.OpRow, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	return one.held.All()
+}
 
 // The config a wait reads in its tree: a cap far past every case, and a quiet span of a second. [[spec/tickets/find-and-wait-in-go]]
 const waitConfig = `{"wait":{"most":30,"quiet":1}}`
@@ -35,6 +68,7 @@ type waitWorld struct {
 	served manager.Served
 	door   *hooks.Door
 	root   string
+	saved  <-chan []byte
 }
 
 // [[spec/tickets/find-and-wait-in-go]]
@@ -64,8 +98,9 @@ func waitWorldOf(t *testing.T) waitWorld {
 	}
 	config.Registers(c)
 	store := q.NewStore(c)
+	table := &savedTable{held: heldTable{}, saved: make(chan []byte, savesHeld)}
 	served, err := manager.Serving(manager.Outside{
-		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
+		Root: root, Store: store, As: as, Rows: opRows{table},
 		Steps: func(func()) {}, Now: time.Now,
 		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
 		Accept: accepts(root, store, nil),
@@ -83,7 +118,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 		},
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 	})
-	return waitWorld{served: served, door: door, root: root}
+	return waitWorld{served: served, door: door, root: root, saved: table.saved}
 }
 
 // The hooks door lands a helper's stop, as the harness posts it. [[spec/tickets/find-and-wait-in-go]]
@@ -94,13 +129,12 @@ func (one waitWorld) reports(t *testing.T, agent string) {
 	}
 }
 
-// The operation of the action the session started, once it ends, or the zero op where none ends in the span. [[spec/tickets/find-and-wait-in-go]]
+// The operation of the action, read off the row its end saves, so the case waits on the save and on no clock. [[spec/tickets/quack-waits-poll-on-a-fake-clock]]
 func (one waitWorld) ended(action string) manager.Op {
-	for stop := time.Now().Add(endsWithin); time.Now().Before(stop); time.Sleep(shortWait) {
-		for _, op := range one.served.Of(waitSession) {
-			if op.Action == action && !op.Ended.IsZero() {
-				return op
-			}
+	for body := range one.saved {
+		var op manager.Op
+		if json.Unmarshal(body, &op) == nil && op.Action == action && !op.Ended.IsZero() {
+			return op
 		}
 	}
 	return manager.Op{}

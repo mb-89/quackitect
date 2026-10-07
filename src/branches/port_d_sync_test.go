@@ -37,13 +37,13 @@ func pdFrontConflict(t *testing.T, base, ours, theirs string) *tree {
 	one := newTree(t, map[string]string{pdTicket: base})
 	one.branch("g", map[string]string{pdTicket: ours})
 	if theirs == "" {
-		one.git("rm", "-q", pdTicket)
-		one.git("commit", "-q", "-m", "main retires g")
+		one.erase(pdTicket)
+		one.land("main retires g", nil)
 	} else {
 		one.land("main moves g", map[string]string{pdTicket: theirs})
 	}
 	one.land("main moves on", map[string]string{"other.txt": "x\n"})
-	one.git("push", "-q", "origin", trunk)
+	one.push(trunk)
 	pdOn(one, "g")
 	return one
 }
@@ -73,7 +73,7 @@ func TestPDSyncOnMainStopsOnAConflict(t *testing.T) {
 	}
 	holds(t, one.errs.String(), "origin/main conflicts with main")
 	holds(t, one.errs.String(), "  x.txt")
-	if !one.d.quiet("rev-parse", "-q", "--verify", "MERGE_HEAD").OK {
+	if one.rev("MERGE_HEAD") == "" {
 		t.Fatal("the merge stands closed")
 	}
 }
@@ -97,12 +97,16 @@ func TestPDSyncOnAWorkBranchTakesMain(t *testing.T) {
 	one := newTree(t, nil)
 	one.branch("g", nil)
 	pdOn(one, "g")
+	if code := one.branchSays("sync"); code != codeOK {
+		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
+	}
+	holds(t, one.out.String(), "work/g already carries every commit on main.")
 	pdMainMoves(one, 2)
 	if code := one.branchSays("sync"); code != codeOK {
 		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
 	}
 	holds(t, one.out.String(), "work/g took 2 commit(s) from main")
-	if said := one.git("log", "-1", "--format=%s"); said != "work/g: take main in" {
+	if said := one.subject("HEAD"); said != "work/g: take main in" {
 		t.Fatalf("the merge reads %q", said)
 	}
 }
@@ -115,8 +119,8 @@ func TestPDSyncMergesTheDivergedRemoteBranchFirst(t *testing.T) {
 	pdOn(one, "g")
 	pdRemoteAhead(one, nil, nil, nil)
 	one.land("this hand lands", map[string]string{"local.txt": "x\n"})
-	mine := one.git("rev-parse", "HEAD")
-	theirs := one.git("rev-parse", "origin/work/g")
+	mine := one.rev("HEAD")
+	theirs := one.rev("origin/work/g")
 	pdMainMoves(one, 2)
 	if code := one.branchSays("sync"); code != codeOK {
 		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
@@ -172,7 +176,7 @@ func TestPDSyncStopsOnTheRemoteBranchConflict(t *testing.T) {
 func TestPDSyncNamesWhereItRuns(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
-	one.git("switch", "-q", "-c", "claude/a-thing")
+	one.cut("claude/a-thing", "")
 	if code := one.branchSays("sync"); code != codeRefused {
 		t.Fatalf("the sync answers %d", code)
 	}
@@ -191,7 +195,7 @@ func TestPDSyncMergesAFrontConflict(t *testing.T) {
 	if said := one.read(pdTicket); said != want {
 		t.Fatalf("the ticket reads\n%s", said)
 	}
-	if said := one.git("log", "-1", "--format=%s"); said != "work/g: take main in" {
+	if said := one.subject("HEAD"); said != "work/g: take main in" {
 		t.Fatalf("the last commit reads %q", said)
 	}
 	holds(t, one.out.String(), "work/g took 2 commit(s) from main")
@@ -206,7 +210,7 @@ func TestPDSyncLeavesAClashingKeyForAHand(t *testing.T) {
 	if code := one.branchSays("sync"); code != codeRed {
 		t.Fatalf("the sync answers %d", code)
 	}
-	if !one.d.quiet("rev-parse", "-q", "--verify", "MERGE_HEAD").OK {
+	if one.rev("MERGE_HEAD") == "" {
 		t.Fatal("the merge commits")
 	}
 	holds(t, one.errs.String(), "These wait for a hand:\n  spec/tickets/g.md")
@@ -221,7 +225,7 @@ func TestPDSyncNamesATicketMainRetires(t *testing.T) {
 	if code := one.branchSays("sync"); code != codeRed {
 		t.Fatalf("the sync answers %d", code)
 	}
-	if !one.d.quiet("rev-parse", "-q", "--verify", "MERGE_HEAD").OK {
+	if one.rev("MERGE_HEAD") == "" {
 		t.Fatal("the merge commits")
 	}
 	holds(t, one.errs.String(), "g.md: main retires this ticket, and work/g changes it")

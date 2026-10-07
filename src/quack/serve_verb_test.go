@@ -170,11 +170,3 @@ func TestServeTakesNoDebuggerAndRunsTheIndexStandingAlone(t *testing.T) {
 		t.Errorf("ran %v", box.ran)
 	}
 }
-
-// The registered verb answers the serve words. [[spec/tickets/quack-registers-each-verb]]
-func TestServeRegisters(t *testing.T) {
-	t.Parallel()
-	if registry["serve"] == nil {
-		t.Error("no serve verb stands in the registry")
-	}
-}

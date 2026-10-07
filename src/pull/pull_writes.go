@@ -6,7 +6,6 @@ package pull
 
 import (
 	"fmt"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -417,30 +416,29 @@ func (it *It) refusedPush(why []string) int {
 }
 
 // The commit the work root stands on. [[spec/design_output/pull#the-pass]]
-func (it *It) tipOf() string { return it.Git.Run("rev-parse", "HEAD").Out }
+func (it *It) tipOf() string {
+	hash, _ := it.Git.Resolve("HEAD")
+	return hash
+}
 
 // The commits between a tip and the branch tip, split by the ticket each names. A log the door fails to read answers read false, which every caller takes as a move. [[spec/tickets/the-verdict-guard-reads-tips]]
 func (it *It) commitsFor(name, since string) (read bool, own, other []string) {
 	if since == "" {
 		return false, nil, nil
 	}
-	said := it.Git.Run("log", "--format=%H%x00%s", since+"..HEAD")
-	if !said.OK {
+	said, err := it.Git.Log(since, "HEAD", false)
+	if err != nil {
 		return false, nil, nil
 	}
-	for _, row := range strings.Split(said.Out, "\n") {
-		if strings.TrimSpace(row) == "" {
-			continue
-		}
-		sha, subject, _ := strings.Cut(row, "\x00")
+	for _, commit := range said {
 		ticket := ""
-		if at := strings.Index(subject, ":"); at >= 0 {
-			ticket = strings.TrimSpace(subject[:at])
+		if at := strings.Index(commit.Subject, ":"); at >= 0 {
+			ticket = strings.TrimSpace(commit.Subject[:at])
 		}
 		if ticket == name {
-			own = append(own, strings.TrimSpace(sha))
+			own = append(own, commit.Hash)
 		} else {
-			other = append(other, strings.TrimSpace(sha))
+			other = append(other, commit.Hash)
 		}
 	}
 	return true, own, other
@@ -461,11 +459,9 @@ func (it *It) changedSince(one *Held, held Hold) []string {
 	}
 	out := map[string]bool{}
 	for _, sha := range own {
-		if said := it.Git.Run("show", "--format=", "--name-only", sha); said.OK {
-			for _, row := range strings.Split(said.Out, "\n") {
-				if row = strings.TrimSpace(row); row != "" {
-					out[row] = true
-				}
+		if said, err := it.Git.Changed(sha); err == nil {
+			for _, row := range said {
+				out[row.Path] = true
 			}
 		}
 	}
@@ -480,41 +476,23 @@ func (it *It) changedSince(one *Held, held Hold) []string {
 // A deleted file runs no test, and an untracked folder names each file under it. [[spec/design_output/pull#the-test-verb]]
 func (it *It) treeFiles() []string {
 	out := []string{}
-	for _, row := range strings.Split(it.Git.Run("status", "--porcelain", "-uall").Out, "\n") {
-		if strings.TrimSpace(row) == "" {
-			continue
+	rows, _ := it.Git.Status(true)
+	for _, row := range rows {
+		if !strings.Contains(row.Status, gone) {
+			out = append(out, row.Path)
 		}
-		if status := statusAt.FindStringSubmatch(row); status != nil && strings.Contains(status[1], "D") {
-			continue
-		}
-		out = append(out, changedIn(row))
 	}
 	return out
 }
-
-// The path a porcelain row names, past the arrow of a rename. [[spec/design_output/pull#the-test-verb]]
-func changedIn(row string) string {
-	path := strings.TrimSpace(row)
-	if found := porcelainAt.FindStringSubmatch(row); found != nil {
-		path = strings.TrimSpace(found[1])
-	}
-	moved := strings.Split(path, " -> ")
-	return strings.TrimSuffix(strings.TrimPrefix(moved[len(moved)-1], `"`), `"`)
-}
-
-// A porcelain row's status letters, and the path after them. [[spec/design_output/pull#the-test-verb]]
-var (
-	statusAt    = regexp.MustCompile(`^\s*(\S{1,2})\s`)
-	porcelainAt = regexp.MustCompile(`^\s*\S{1,2}\s+(.*)$`)
-)
 
 // The files changed since the commit, and the working tree's. [[spec/design_output/pull#the-test-verb]]
 func (it *It) changedFiles(since string) []string {
 	out := map[string]bool{}
 	if since != "" {
-		for _, path := range strings.Split(it.Git.Run("diff", "--name-only", "--diff-filter=d", since+"..HEAD").Out, "\n") {
-			if path = strings.TrimSpace(path); path != "" {
-				out[path] = true
+		said, _ := it.Git.Diff(since, "HEAD")
+		for _, row := range said {
+			if row.Status != gone {
+				out[row.Path] = true
 			}
 		}
 	}

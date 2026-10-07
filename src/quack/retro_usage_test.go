@@ -47,7 +47,7 @@ func TestRetroUsageExitsTwoOnAWordNoVerbAnswers(t *testing.T) {
 		"  new              mints a retro off its route, opens it, and hands out its first leaf\n" +
 		"  timeline <retro> the hours holding work, per source, with the idle stretches between\n" +
 		"  chapters <retro> checks the cuts, and hands every chapter its lines\n" +
-		"  read <retro> <chapter>  every owner prompt, fault and command of the chapter, with its file and line\n" +
+		"  read <retro> <chapter>  every owner prompt, fault, refusal and command of the chapter, with its file and line\n" +
 		"  matrix <retro>   draws the report: the class fixes first, then the matrix\n" +
 		"  effect <retro>   counts the last retro's class patterns over this input\n" +
 		"  classes <retro>  counts each class's rate, and refuses a finding with no disposition\n" +

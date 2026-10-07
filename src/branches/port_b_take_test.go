@@ -1,11 +1,10 @@
-// The take over a real tree, ported from test/level0/work-group.test.js: the
+// The take over a fake tree, ported from test/level0/work-group.test.js: the
 // claim, a group no hand here takes, a named take, a refused push, a refused
 // commit and a sync conflict after the claim.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it reads the unexported heldIn, named and waitsAt after take runs
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,18 +14,18 @@ func TestPBTakeClaimsAGroupAndPushes(t *testing.T) {
 	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
-	before := one.git("rev-parse", "origin/work/one-group")
+	before := one.rev("origin/work/one-group")
 	if code := one.branchSays("take"); code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/one-group" {
+	if one.here() != "work/one-group" {
 		t.Fatal("the take leaves the box off the branch")
 	}
 	taken := heldIn(one.read(pbAt))
 	if taken == nil || taken.Step != "sync" || !strings.HasPrefix(taken.Hand, pbBox) || taken.HashBefore != before {
 		t.Fatalf("the claim reads %+v", taken)
 	}
-	if one.git("rev-parse", "HEAD") != one.git("rev-parse", "origin/work/one-group") || one.git("rev-parse", "HEAD^") != before {
+	if one.rev("HEAD") != one.rev("origin/work/one-group") || one.rev("HEAD^") != before {
 		t.Fatal("the claim stays off origin")
 	}
 	holds(t, pbSaid(one), "Two tickets that land as one")
@@ -37,16 +36,16 @@ func TestPBTakeLeavesAGroupNoHandTakes(t *testing.T) {
 	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: withField(pbGroupNote, "step", "children"), ticketAt("a-child"): pbNeeds()})
-	before := one.git("rev-parse", "origin/work/one-group")
+	before := one.rev("origin/work/one-group")
 	if code := one.branchSays("take"); code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
 	holds(t, pbSaid(one), "work/one-group stays at todo")
 	holds(t, pbSaid(one), "a-child needs nowhere here at do")
-	if one.git("rev-parse", "HEAD") != before || heldIn(one.read(pbAt)) != nil {
+	if one.rev("HEAD") != before || heldIn(one.read(pbAt)) != nil {
 		t.Fatal("the take writes a line")
 	}
-	if one.git("rev-parse", "origin/work/one-group") != before {
+	if one.rev("origin/work/one-group") != before {
 		t.Fatal("the take pushes a claim")
 	}
 }
@@ -93,7 +92,7 @@ func TestPBTakeWithANameTakesThatBranchAlone(t *testing.T) {
 	if code := one.branchSays("take", "one-group"); code != 0 {
 		t.Fatalf("the named take answers %d: %s", code, pbSaid(one))
 	}
-	if one.git("rev-parse", "--abbrev-ref", "HEAD") != "work/one-group" {
+	if one.here() != "work/one-group" {
 		t.Fatal("the named take leaves the box off the branch")
 	}
 	other := pbIdentify(newTree(t, nil))
@@ -102,7 +101,7 @@ func TestPBTakeWithANameTakesThatBranchAlone(t *testing.T) {
 		t.Fatalf("a take of nothing free answers %d", code)
 	}
 	holds(t, pbSaid(other), "work/nope stands at no free todo")
-	if other.git("rev-parse", "--abbrev-ref", "HEAD") != trunk {
+	if other.here() != trunk {
 		t.Fatal("the refused take switches")
 	}
 }
@@ -112,7 +111,7 @@ func TestPBTakeMeetingARejectedPushNamesBothRoads(t *testing.T) {
 	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
-	pbHook(one, filepath.Join(one.from, "hooks", "pre-receive"), "exit 1")
+	pbHook(one.origin, "pre-receive", "")
 	if code := one.branchSays("take"); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
@@ -120,7 +119,7 @@ func TestPBTakeMeetingARejectedPushNamesBothRoads(t *testing.T) {
 	holds(t, said, "The push of work/one-group came back refused")
 	holds(t, said, "Somebody taking it first is one road")
 	holds(t, said, "a push door turning it away is another")
-	if one.git("rev-parse", "work/one-group") != one.git("rev-parse", "origin/work/one-group") {
+	if one.rev("work/one-group") != one.rev("origin/work/one-group") {
 		t.Fatal("the refused claim leaves a commit origin lacks")
 	}
 }
@@ -130,8 +129,8 @@ func TestPBTakeWhoseClaimRefusesToCommitStops(t *testing.T) {
 	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
-	before := one.git("rev-parse", "origin/work/one-group")
-	pbHook(one, filepath.Join(one.root, ".git", "hooks", "pre-commit"), "echo 'the hook refuses' >&2\nexit 1")
+	before := one.rev("origin/work/one-group")
+	pbHook(one.repo, "pre-commit", "the hook refuses")
 	if code := one.branchSays("take"); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}
@@ -139,7 +138,7 @@ func TestPBTakeWhoseClaimRefusesToCommitStops(t *testing.T) {
 	if one.read(pbAt) != pbGroupNote {
 		t.Fatalf("the ticket reads %q", one.read(pbAt))
 	}
-	if one.git("rev-parse", "origin/work/one-group") != before {
+	if one.rev("origin/work/one-group") != before {
 		t.Fatal("the refused claim pushes")
 	}
 }
@@ -150,7 +149,7 @@ func TestPBTakeWhoseSyncConflictsStillHandsTheAsk(t *testing.T) {
 	one := pbIdentify(newTree(t, map[string]string{"x.txt": "base\n"}))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote, "x.txt": "branch\n"})
 	one.land("main moves", map[string]string{"x.txt": "main\n"})
-	one.git("push", "-q", "origin", "main")
+	one.push("main")
 	if code := one.branchSays("take"); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
 	}

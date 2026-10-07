@@ -17,7 +17,7 @@ import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
-import { heldTests } from "./guidance-hand.js";
+import { heldTests } from "./held-tests.js";
 
 export const STDIN = 0;
 export const HOOKS = ".githooks";

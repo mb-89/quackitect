@@ -8,7 +8,7 @@ rationale: [[spec/rationales/reading]]
 # Actionables
 
 1. Read your chapter's lines, the ones `chapters/<id>.json` names, and nothing past them but the one reach rule 10 names. A reader past its chapter reports what another reader reports, and the count doubles. *
-2. Run `./RUNME.sh retro read <retro> <chapter>` for the owner prompts, the faults and the commands. A parser each reader writes reads each chapter a different way. *
+2. Run `./RUNME.sh retro read <retro> <chapter>` for the owner prompts, the faults, the refusals and the commands. A parser each reader writes reads each chapter a different way. *
 3. Answer the five starfish questions: start, stop, keep, more, less. A reading that skips one leaves that side of the work unjudged. *
 4. Answer the five improvements: mechanize, guidance, process, code, tools. A finding with no home under one of them goes unbuilt. *
 5. Write `findings/<id>.md` with one section per question and per improvement, and leave a section empty where nothing stands.

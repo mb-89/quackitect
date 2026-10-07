@@ -38,7 +38,7 @@ func TestDoneWritesTheModelCostAndFinalLineToTheRecord(t *testing.T) {
 		ticketAt(pcGroup):   pcAtChildren(),
 		ticketAt("a-child"): pcChild(pcGroup, "closed"),
 	})
-	head := one.git("rev-parse", "HEAD")
+	head := one.rev("HEAD")
 	if code := one.branchSays("done", "--model", "claude-test", "--cost", "1.25", "--final", "The group lands: every child closed."); code != codeOK {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
 	}

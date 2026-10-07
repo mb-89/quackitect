@@ -94,7 +94,7 @@ func (b *Book) answerOf(one Op) Answer {
 
 // The operation once it ends, or as it stands when the span runs out. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (b *Book) Wait(id string, span time.Duration) (Op, bool) {
-	until := time.After(span)
+	until := b.after(span)
 	for {
 		b.mu.Lock()
 		one, ok := b.ops[id]
@@ -131,28 +131,4 @@ func (b *Book) Progress(id string, done, known int, step string) error {
 	}
 	one.Progress = Progress{Done: done, Known: known, Step: step}
 	return b.save(one)
-}
-
-// The session's operations standing queued or running. [[spec/design_output/model#the-agent-does-not-poll]]
-func (b *Book) Open(caller string) []string {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	ids := []string{}
-	for _, one := range b.inFlight() {
-		if one.Caller == caller {
-			ids = append(ids, one.ID)
-		}
-	}
-	return ids
-}
-
-// ops/wait with no handle: every open operation of the session, once each ends or the span runs out. [[spec/design_output/model#the-agent-does-not-poll]]
-func (b *Book) WaitCaller(caller string, span time.Duration) []Op {
-	until := time.Now().Add(span)
-	out := []Op{}
-	for _, id := range b.Open(caller) {
-		one, _ := b.Wait(id, time.Until(until))
-		out = append(out, one)
-	}
-	return out
 }

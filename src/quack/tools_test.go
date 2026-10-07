@@ -4,8 +4,11 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
+	"quackitect/src/index"
 	"quackitect/src/q"
 	"quackitect/src/q/tool"
 )
@@ -26,6 +29,57 @@ func wiresType(w q.Wiring, kind string) bool {
 		}
 	}
 	return false
+}
+
+// The names a caller reads off the wiring: an agent's topic call, a step's needs, the door's wait and the mcp instance's wait. [[spec/tickets/vehicle-verbs-become-actions]] [[spec/tickets/retro-verbs-become-actions]] [[spec/tickets/needs-wait-on-branch-topic]] [[spec/tickets/wait-key-meets-its-wiring]] [[spec/tickets/the-mcp-module-lands]]
+var wiredNames = []string{
+	"vehicle/produce", "stub/into",
+	"retro/collect",
+	"branch/take", "branch/open",
+	"mcp/config/wait",
+	index.WaitName,
+}
+
+// The module types the wiring loads that the root must know, and the instances it must start. [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/plan-writes-off-go]] [[spec/tickets/the-mcp-module-lands]]
+var (
+	wiredTypes     = []string{searchModuleType, waitsModuleType, plansModuleType}
+	wiredInstances = []string{"mcp"}
+)
+
+func TestTheWiringDeclaresEveryNameACallerReads(t *testing.T) {
+	t.Parallel()
+	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	_, hands, err := loaded(w, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := q.NewStore(c)
+	for _, name := range wiredNames {
+		if _, ok := store.Declared(name); !ok {
+			t.Errorf("the wiring declares no %s", name)
+		}
+	}
+	for _, kind := range wiredTypes {
+		if _, ok := modules[kind]; !ok {
+			t.Errorf("the root loads no module type %s", kind)
+		}
+		if !wiresType(w, kind) {
+			t.Errorf("the wiring loads no %s", kind)
+		}
+	}
+	for _, name := range wiredInstances {
+		if _, ok := hands[name]; !ok {
+			t.Errorf("the wiring loads %v, and wants an %s instance", w.Instances, name)
+		}
+	}
 }
 
 func calledNames(t *testing.T) map[string]bool {

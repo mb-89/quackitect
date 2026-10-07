@@ -1,23 +1,23 @@
-// A group reaching the cloud over a real tree: the open, and the reads that
+// A group reaching the cloud over a fake tree: the open, and the reads that
 // tell a fresh cut from a landed branch, as test/level0/work-open.test.js and
 // the take case of test/level0/roots.test.js hold.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches // level0: InPackageTest - it drives the unexported landedHere, mergedHere and refsIn
 
 import (
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 )
 
-// A ref reads merged where the merged set names it, and open where it does not. [[spec/tickets/work-verbs-port-to-go]]
-func TestPERefsReadMergedOffTheSet(t *testing.T) {
+// A ref reads merged where trunk carries its group closed, and open where it does not. [[spec/tickets/work-verbs-port-to-go]]
+func TestPERefsReadMergedOffTrunksClosedGroup(t *testing.T) {
 	t.Parallel()
-	said := refsIn("origin/work/fresh-cut aaa 0\norigin/work/landed bbb 0", map[string]bool{"work/landed": true})
+	one := newTree(t, map[string]string{ticketAt("landed"): withField(groupNote, "state", closedState)})
+	one.branch("fresh-cut", map[string]string{ticketAt("fresh-cut"): groupNote})
+	one.branch("landed", map[string]string{"x.md": "x\n"})
 	var got [][2]any
-	for _, one := range said {
-		got = append(got, [2]any{one.Branch, one.Merged})
+	for _, each := range one.d.refsHere() {
+		got = append(got, [2]any{each.Branch, each.Merged})
 	}
 	want := [][2]any{{"work/fresh-cut", false}, {"work/landed", true}}
 	if !reflect.DeepEqual(got, want) {
@@ -30,10 +30,10 @@ func TestPEMergedDropsACutAtTheTip(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("landed", map[string]string{"src/landed.txt": "x\n"})
-	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/landed")
-	one.git("push", "-q", "origin", "main")
-	one.git("push", "-q", "origin", "main:refs/heads/work/fresh-cut")
-	one.git("fetch", "-q", "origin")
+	one.mergeIn("origin/work/landed", "")
+	one.push("main")
+	one.pushAt("main", "refs/heads/work/fresh-cut")
+	one.fetch()
 	if got := one.d.mergedHere(); !reflect.DeepEqual(got, map[string]bool{"work/landed": true}) {
 		t.Fatalf("the merged set reads %v", got)
 	}
@@ -43,12 +43,12 @@ func TestPEMergedDropsACutAtTheTip(t *testing.T) {
 func TestPEMergedDropsACutOnTrunksLine(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
-	one.git("push", "-q", "origin", "main:refs/heads/work/fresh-cut")
+	one.pushAt("main", "refs/heads/work/fresh-cut")
 	one.peTrunkMoves(map[string]string{"src/moved.txt": "m\n"})
 	one.branch("landed", map[string]string{"src/landed.txt": "x\n"})
-	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/landed")
-	one.git("push", "-q", "origin", "main")
-	one.git("fetch", "-q", "origin")
+	one.mergeIn("origin/work/landed", "")
+	one.push("main")
+	one.fetch()
 	if got := one.d.mergedHere(); !reflect.DeepEqual(got, map[string]bool{"work/landed": true}) {
 		t.Fatalf("the merged set reads %v", got)
 	}
@@ -113,14 +113,15 @@ func TestPEOpenLeavesAStandingBranchAlone(t *testing.T) {
 func TestPETakeWritesTheRecordUnderTheWorkRoot(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
-	one.d.Method = t.TempDir()
+	method := newFakeDisk()
+	one.d.Method, one.d.Methods = "/fake/method", method
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
 	holds(t, one.out.String(), "holds it")
 	holds(t, one.read(ticketAt("g")), "hash_before:")
-	if _, err := os.Stat(filepath.Join(one.d.Method, filepath.FromSlash(ticketAt("g")))); err == nil {
+	if _, held, _ := method.Read(ticketAt("g")); held {
 		t.Fatal("the method root holds the ticket")
 	}
 }

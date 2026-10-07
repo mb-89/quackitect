@@ -129,20 +129,6 @@ func TestAMoveOffTheTableRefuses(t *testing.T) {
 	}
 }
 
-func TestACancelEndsAQueuedOrRunningOp(t *testing.T) {
-	b, _, _ := bookOf(t)
-	queued, _ := b.Start("t/pull", nil, "s1", writer)
-	running, _ := b.Start("t/read", nil, "s1", reader)
-	for _, id := range []string{queued, running} {
-		if err := b.Cancel(id, "the caller cancels"); err != nil {
-			t.Fatal(err)
-		}
-		if got := stateOf(t, b, id); got != Cancelled {
-			t.Fatalf("%s stands %s after the cancel", id, got)
-		}
-	}
-}
-
 func TestARestartFailsEveryOpInFlight(t *testing.T) {
 	b, _, m := bookOf(t,
 		Op{ID: "1-a", State: Queued},

@@ -46,22 +46,8 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	self, _ := os.Executable()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, now: time.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
-	d.run = func(argv, env []string, quiet bool) (int, string, error) {
-		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
-		child.Dir, child.Env = root, append(os.Environ(), env...)
-		var said bytes.Buffer
-		child.Stdout, child.Stderr = out, errs
-		if quiet {
-			child.Stdout, child.Stderr = &said, &said
-		}
-		err := child.Run()
-		var exited *exec.ExitError
-		if errors.As(err, &exited) {
-			return exited.ExitCode(), said.String(), nil
-		}
-		return 0, said.String(), err
-	}
+	d := checkDoors{root: root, self: self, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
+	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
@@ -79,11 +65,31 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		}
 		return said
 	}
+	d.indexUp = func() bool { return indexStands(d.text(indexFile)) }
 	d.git = func(args ...string) string {
 		said, _ := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
 		return strings.TrimSpace(string(said))
 	}
 	return d
+}
+
+// A process under the root. A quiet run keeps both streams, and a loud one prints them and keeps the standard output too, so a red Go run names its cases. [[spec/tickets/ci-reds-name-their-cases]]
+func runsUnder(root string, survey map[string]string, out, errs io.Writer) func(argv, env []string, quiet bool) (int, string, error) {
+	return func(argv, env []string, quiet bool) (int, string, error) {
+		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
+		child.Dir, child.Env = root, append(os.Environ(), env...)
+		var said bytes.Buffer
+		child.Stdout, child.Stderr = io.MultiWriter(out, &said), errs
+		if quiet {
+			child.Stdout, child.Stderr = &said, &said
+		}
+		err := child.Run()
+		var exited *exec.ExitError
+		if errors.As(err, &exited) {
+			return exited.ExitCode(), said.String(), nil
+		}
+		return 0, said.String(), err
+	}
 }
 
 // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
@@ -113,6 +119,14 @@ func toolOf(survey map[string]string, name string) string {
 		}
 	}
 	return name
+}
+
+// Whether the index's standing file names a process alive, so a door stands over the root. [[spec/tickets/the-check-runs-beside]]
+func indexStands(text string) bool {
+	var said struct {
+		Pid int `json:"pid"`
+	}
+	return json.Unmarshal([]byte(text), &said) == nil && said.Pid > 0 && alive(said.Pid)
 }
 
 // The tests the open tickets list as red, off the tracked tickets alone. [[spec/design_output/pull#the-gate]]

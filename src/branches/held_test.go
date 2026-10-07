@@ -16,7 +16,7 @@ func TestAReleaseFreesTheBranch(t *testing.T) {
 		t.Fatalf("the release answers %d: %s", code, one.errs.String())
 	}
 	holds(t, one.out.String(), "work/g stands at todo again, and is free for anybody.")
-	if groupStanding(one.git("show", "origin/work/g:"+ticketAt("g"))+"\n") != todo {
+	if groupStanding(one.show("origin/work/g", ticketAt("g"))+"\n") != todo {
 		t.Fatal("origin reads the group held")
 	}
 }

@@ -4,14 +4,12 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +17,7 @@ import (
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 )
 
@@ -150,20 +149,18 @@ const (
 	noValeWhy    = "no vale stands here"
 	valeQuietWhy = "vale answered nothing"
 	valeNoJSON   = "vale answered no JSON: "
+	exitStatus   = "exit status "
 )
 
-// Why a Vale answer reads as no JSON: its stderr where it exits on one, else the run's error, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
-func unreadWhy(said []byte, err error) string {
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		if stderr := strings.TrimSpace(string(exit.Stderr)); stderr != "" {
+// Why a Vale answer reads as no JSON: its stderr or the run's fault where it fails, else its exit, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
+func unreadWhy(said proc.Said) string {
+	if said.Code != 0 {
+		if stderr := strings.TrimSpace(said.Err); stderr != "" {
 			return stderr
 		}
+		return exitStatus + strconv.Itoa(said.Code)
 	}
-	if err != nil {
-		return err.Error()
-	}
-	if answer := strings.TrimSpace(string(said)); answer != "" {
+	if answer := strings.TrimSpace(said.Out); answer != "" {
 		return valeNoJSON + answer
 	}
 	return valeQuietWhy
@@ -172,8 +169,13 @@ func unreadWhy(said []byte, err error) string {
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
 func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
 
-// What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
+// What Vale answers over a text over the real process door. [[spec/tickets/prose-checks-run-in-go]]
 func heardIn(root, name, text, mode string) valeHeard {
+	return heardInOver(proc.Real, root, name, text, mode)
+}
+
+// What Vale answers over a text through the process door, kept through the Go prose vetoes the mode names. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func heardInOver(run proc.Runner, root, name, text, mode string) valeHeard {
 	vale := valeAt(root)
 	if vale == "" {
 		return valeHeard{why: noValeWhy}
@@ -182,11 +184,7 @@ func heardIn(root, name, text, mode string) valeHeard {
 	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
 		config = valeBuilt
 	}
-	span, stop := context.WithTimeout(context.Background(), valeSpan)
-	defer stop()
-	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
-	run.Dir, run.Stdin = root, strings.NewReader(text)
-	said, err := run.Output()
+	said := run(proc.Command{Argv: []string{vale, "--config=" + config, "--path=" + name, "--output=JSON", "--no-exit"}, Dir: root, Stdin: text, Wait: valeSpan})
 	var read map[string][]struct {
 		Check    string `json:"Check"`
 		Line     int    `json:"Line"`
@@ -195,8 +193,8 @@ func heardIn(root, name, text, mode string) valeHeard {
 		Message  string `json:"Message"`
 		Severity string `json:"Severity"`
 	}
-	if json.Unmarshal(said, &read) != nil {
-		return valeHeard{stands: true, why: unreadWhy(said, err)}
+	if json.Unmarshal([]byte(said.Out), &read) != nil {
+		return valeHeard{stands: true, why: unreadWhy(said)}
 	}
 	body := func(path string) string {
 		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
@@ -268,13 +266,9 @@ func textSetting(root, key string) string {
 
 // What a git read prints under the root, or nothing where it fails. [[spec/tickets/cage-command-rules-port]]
 func gitRead(root string, args ...string) string {
-	span, stop := context.WithTimeout(context.Background(), gitReadSpan)
-	defer stop()
-	run := exec.CommandContext(span, "git", args...)
-	run.Dir = root
-	said, err := run.Output()
-	if err != nil {
+	said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root, Wait: gitReadSpan})
+	if said.Code != 0 {
 		return ""
 	}
-	return strings.TrimSpace(string(said))
+	return strings.TrimSpace(said.Out)
 }

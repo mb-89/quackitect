@@ -1,5 +1,5 @@
-// The branch and cloud verbs stand registered in Go, so the road hands
-// neither to node.
+// The branch and cloud verbs print their usage, and run each other through
+// this binary's verb road.
 // [[spec/tickets/work-verbs-port-to-go]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
@@ -8,19 +8,6 @@ import (
 	"path/filepath"
 	"testing"
 )
-
-// branch and cloud take quack's road under the new mode, the queue twin standing beside branch. [[spec/tickets/work-verbs-port-to-go]]
-func TestTheBranchAndCloudVerbsRunInGo(t *testing.T) {
-	t.Parallel()
-	for _, argv := range [][]string{{"branch", "take"}, {"branch"}, {"cloud", "trigger"}, {"branch", "list", "--queue"}} {
-		if roadOf(modeNew, argv, registry) != toQuack {
-			t.Fatalf("%v reaches node", argv)
-		}
-	}
-	if key, _ := twinOf([]string{"branch", "list", "--queue"}, registry); key != "branch list --queue" {
-		t.Fatalf("the queue reads the %q twin", key)
-	}
-}
 
 // A bare branch and a bare cloud print their usage off the Go table. [[spec/tickets/work-verbs-port-to-go]]
 func TestTheGoVerbsPrintTheirUsage(t *testing.T) {

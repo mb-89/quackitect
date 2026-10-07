@@ -8,9 +8,10 @@ import (
 	"io"
 	"math"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"quackitect/src/proc"
 )
 
 // The cuts a hand writes, and the folder each chapter's lines land in. [[spec/guidance/retro/chapter]]
@@ -112,11 +113,9 @@ func retroPlaced(cuts []retroCut, files []retroTimedFile) (map[string]*retroHeld
 
 // The commits of a chapter's window, each as its short hash and subject. [[spec/guidance/retro/chapter]]
 func retroCommitsIn(root, from, to string) []any {
-	command := exec.Command("git", "log", "--format=%h %s", "--since="+from, "--until="+to)
-	command.Dir = root
-	said, _ := command.Output()
+	said := proc.Real(proc.Command{Argv: []string{"git", "log", "--format=%h %s", "--since=" + from, "--until=" + to}, Dir: root})
 	out := []any{}
-	for _, line := range strings.Split(retroJSTrim(string(said)), "\n") {
+	for _, line := range strings.Split(retroJSTrim(said.Out), "\n") {
 		if line != "" {
 			out = append(out, line)
 		}

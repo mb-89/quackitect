@@ -7,9 +7,11 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
 )
 
 // A tree the JS ran over, the words it ran, and what it answered: its exit code, what it printed on each stream, and each file it changed. [[spec/tickets/ticket-verbs-port-to-go]]
@@ -68,16 +70,15 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()
+			repo := standsInRepo(t, root)
 			history := one.History
 			if history == nil {
 				history = held.History
 			}
 			if history != nil && !one.Bare {
-				gitsIn(t, root, "init", "-q")
 				for _, text := range history.Texts {
 					seedsFile(t, root, history.Path, text)
-					gitsIn(t, root, "add", "-A")
-					gitsIn(t, root, "commit", "-q", "-m", "a version")
+					commitsAll(t, repo, "a version")
 				}
 			}
 			files := map[string]*string{}
@@ -126,13 +127,26 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	}
 }
 
-// One git call in the case's tree, as a person with no config of their own. [[spec/tickets/ticket-verbs-port-to-go]]
-func gitsIn(t *testing.T, root string, args ...string) {
+// A FakeRepo over the case's folder, holding no commit yet, which every registered verb reaches over the case's run. The case runs alone, since it swaps a package value. [[spec/tickets/route-cases-hand-their-repo]]
+func standsInRepo(t *testing.T, root string) *git.FakeRepo {
 	t.Helper()
-	run := exec.Command("git", append([]string{"-c", "user.name=case", "-c", "user.email=case@case", "-c", "commit.gpgsign=false"}, args...)...)
-	run.Dir = root
-	if said, err := run.CombinedOutput(); err != nil {
-		t.Fatalf("git %s: %v: %s", strings.Join(args, " "), err, said)
+	repo := git.NewFakeRepo(files.NewDisk(root), caseNow)
+	repo.Set("user.name", "case")
+	repo.Set("user.email", "case@case")
+	was := standingRepo
+	standingRepo = func(string) git.Repo { return repo }
+	t.Cleanup(func() { standingRepo = was })
+	return repo
+}
+
+// Stages every path of the folder and commits it, and stops the case where the repository refuses. [[spec/tickets/quack-repos-meet-fake-git]]
+func commitsAll(t *testing.T, repo *git.FakeRepo, message string) {
+	t.Helper()
+	if err := repo.AddAll(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.Commit(message, nil); err != nil {
+		t.Fatal(err)
 	}
 }
 

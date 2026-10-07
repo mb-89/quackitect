@@ -73,23 +73,3 @@ func TestRetroNotesPassesWhereNoNoteStandsOpen(t *testing.T) {
 		t.Fatalf("retro notes answers %d and prints %q, %q", code, out.String(), errs.String())
 	}
 }
-
-// The wiring loads the retro topic, so an agent calls retro/collect through the index. [[spec/tickets/retro-verbs-become-actions]]
-func TestTheWiringLoadsTheRetroTopic(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := q.NewStore(c).Declared("retro/collect"); !ok {
-		t.Fatal("the wiring declares no retro/collect")
-	}
-}

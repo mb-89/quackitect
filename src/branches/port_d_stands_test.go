@@ -74,7 +74,7 @@ func TestPDARefShortOfTheTrunkTipReadsBehind(t *testing.T) {
 	if len(refs) != 1 || !refs[0].Behind || refs[0].Orphan {
 		t.Fatalf("the refs read %+v", refs)
 	}
-	one.git("update-ref", "-d", "refs/remotes/origin/main")
+	one.must(one.repo.DeleteRef("refs/remotes/origin/main"))
 	refs = one.d.refsHere()
 	if len(refs) != 1 || refs[0].Behind {
 		t.Fatalf("with no trunk tip the refs read %+v", refs)
