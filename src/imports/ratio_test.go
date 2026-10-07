@@ -59,9 +59,9 @@ func TestAJavaScriptTestBelongsToTheFolderItImports(t *testing.T) {
 func TestTheReachedLinesCountEachFileTheEntriesImportOnce(t *testing.T) {
 	t.Parallel()
 	texts := map[string]string{
-		"p/hooks/a.ts":  "import { b } from \"./b.ts\";\nimport { c } from \"../lib/c.js\";\n\nx\n",
-		"p/hooks/b.ts":  "import { c } from \"../lib/c.js\";\ny\n",
-		"p/lib/c.js":    "z\n",
+		"p/hooks/a.ts":    "import { b } from \"./b.ts\";\nimport { c } from \"../lib/c.js\";\n\nx\n",
+		"p/hooks/b.ts":    "import { c } from \"../lib/c.js\";\ny\n",
+		"p/lib/c.js":      "z\n",
 		"p/hooks/lone.ts": "never reached\n",
 	}
 	if said := imports.ReachedLines([]string{"p/hooks/a.ts"}, func(path string) string { return texts[path] }); said != 6 {
