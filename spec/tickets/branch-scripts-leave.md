@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 45b32651036ec082
         size: 9100
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 4d005875ca8a096171b0918ef29b674eb85ce12d
+    hash_after: 4d005875ca8a096171b0918ef29b674eb85ce12d
+    inputs:
+      - name: design/draft
+        hash: 45b32651036ec082
+        size: 9100
+      - name: design/tests-red
+        hash: 8a3c23482b079c07
+        size: 886
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -389,8 +401,15 @@ What surprises me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask: the eight standing files git ls-files names leave with their tests, and serve, brand, cli-go, tui-build and battery already stand gone, so the first done_when line reads empty once implement lands.
+- Every importer git grep finds of the eight files stands in the callers list, the sibling imports of homeIn in browser.js, trust.js and vehicle.js among them, and no runner in RUNME.sh or CI calls a leaving script.
+- The behaviours the leaving tests held stand in Go: the home rule in RegisterDirs and browserCache tests, the stale-claim and dependency rules in the three new free_test.go cases, and the pull cap in TestThePullTakesItsCapAndMarginOffTheConfig.
+- TestEveryDrawnGoldenMatchesTheProjection fails on its own assertion while testdata/drawn.golden.json stands absent, and git ls-files, go test ./src/branches/... and ./RUNME.sh check decide the other lines as commands.
+- Implement names the source of the golden's ticket texts, so the -update writer draws every text v1Over gets asked; the draft leaves that source unnamed.
+- Implement declares the -update writer in the tickets test package, as tests-red found, in place of drawn.go as approach line 5 says.
 
 # implement
 
