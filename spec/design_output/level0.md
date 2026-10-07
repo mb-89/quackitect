@@ -407,6 +407,14 @@ and `./RUNME.sh serve`. These pass, and so does every other event:
 
 For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
 
+The door owns every other choice the bridgehead once made, and the hook does what it answers:
+
+| the choice | its Go owner | what the hook reads |
+|---|---|---|
+| the events the door decides | `Doored` in `src/modules/hooks/listen.go` | `events` in the standing file |
+| the step the effects answer | `StepOf` in `src/modules/hooks/step.go` | `step` beside the effects, where a back post asks no rows back |
+| the merge of an after into the harness answer | `Merged` in `src/modules/hooks/step.go` | the answer of `POST /merge` |
+
 The stub's bridgehead keeps its vehicle roads, the home order and the clone in TypeScript, because no index binary stands on a stub before its clone. [[spec/tickets/level0-hooks-hold-no-rule]]
 
 ## A session says its cage

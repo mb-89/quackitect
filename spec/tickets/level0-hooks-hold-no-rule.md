@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 588124fc0ab64b08
         size: 1071
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 5020756b3dd3 · claude-code-remote
+    hash_before: 3a29744c31f0a8c8bd5bc30de678c81ef46fdfac
+    hash_after: 3a29744c31f0a8c8bd5bc30de678c81ef46fdfac
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -337,14 +346,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, the hook tests the callers list names, and src/scripts/copilot.js, which hands the Copilot door its run
+the cage verb meets a stub in caged-door.test.js and copilot.test.js, and the door's post and merge meet a stub of http
+each Go function and each hook function names level0-hooks-hold-no-rule beside its approach
+the event list stands in Doored in listen.go, the step and the merge in step.go, and the design note points at them
 
 ## tests-green
 

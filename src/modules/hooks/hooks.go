@@ -66,6 +66,8 @@ type Post struct {
 	Old     any            `json:"old,omitempty"`
 	// The transcript's rows as the session hands them, newest last, which the door trims into the fields its folds read. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/level0-hooks-hold-no-rule]]
 	Messages []any `json:"messages,omitempty"`
+	// Says the post asks back for a step the first post answered, so its rows ask back no more. [[spec/tickets/level0-hooks-hold-no-rule]]
+	Back bool `json:"back,omitempty"`
 }
 
 // [[spec/design_output/model#the-effects]]

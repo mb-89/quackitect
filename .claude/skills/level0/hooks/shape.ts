@@ -21,17 +21,3 @@ export type Spawned = {
 export function failureOf(error: unknown): Failure | undefined {
   return error !== null && typeof error === "object" ? error : undefined;
 }
-
-// An answer with an after merged in: a list grows, a text takes the new one below it, and anything else stands replaced. [[spec/design_output/schema#the-verbs-own-their-fields]]
-export function merged(said: unknown, after: Readonly<Fields> | null | undefined): Fields {
-  const out: Fields = said && typeof said === "object" ? { ...said } : {};
-  for (const [key, value] of Object.entries(after ?? {})) {
-    const was = out[key];
-    if (Array.isArray(value) && Array.isArray(was))
-      out[key] = [...was, ...value];
-    else if (typeof value === "string" && typeof was === "string" && was)
-      out[key] = `${was}\n\n${value}`;
-    else out[key] = value;
-  }
-  return out;
-}

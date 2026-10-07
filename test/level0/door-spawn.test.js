@@ -43,11 +43,15 @@ function caged() {
       fetch: async (url, init) => {
         const body = JSON.parse(init.body);
         posts.push({ url, body });
-        const effects =
+        const answer =
           body.event === BACK.event
-            ? [{ kind: "result", result: { result: "the report" } }]
-            : [{ kind: "result", result: { spawn: SPAWN, back: BACK } }];
-        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+            ? { result: "the report" }
+            : { spawn: SPAWN, back: BACK };
+        return {
+          ok: true,
+          status: 200,
+          text: JSON.stringify({ effects: [], step: { answer } }),
+        };
       },
     },
   };
@@ -73,6 +77,7 @@ test("under new a door's spawn answer spawns the helper, and the back post goes 
   assert.equal(box.posts.length, 2);
   assert.equal(box.posts[1].url, HOOK, "the back post goes to the door");
   assert.equal(box.posts[1].body.event, BACK.event);
+  assert.equal(box.posts[1].body.back, true, "and asks no rows back");
   assert.equal(box.posts[1].body.e.token, BACK.token, "under the token the door named");
   assert.equal(box.posts[1].body.e.text, "the reader's answer");
   assert.deepEqual(

@@ -14,6 +14,10 @@ const DOOR = {
   [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
 };
 const LOG = `${STUB}/.se/.log/session.jsonl`;
+// What the cage verb prints over a guarded call, as RefusedText in src/modules/hooks/guard.go words it. [[spec/tickets/level0-hooks-hold-no-rule]]
+const REFUSAL = JSON.stringify({
+  deny: "Level zero refuses Bash: the index answers nothing. The index keeps the fault under session/alarms. Run ./RUNME.sh serve to bring it back.",
+});
 
 function caged(layers = DOOR) {
   const files = fakeDisk({ ...layers, [LOG]: "" });
@@ -63,6 +67,7 @@ function caged(layers = DOOR) {
 // [[spec/tickets/a-down-index-refuses-calls]]
 test("a stopped hooks door refuses a guarded call and names session/alarms", async () => {
   const box = caged();
+  cagedBy(box, REFUSAL);
 
   const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
   await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
@@ -79,8 +84,9 @@ test("a stopped hooks door refuses a guarded call and names session/alarms", asy
 });
 
 // [[spec/tickets/the-cage-survives-its-index]]
-test("a door dying mid-session starts once more, passes the recovery commands, and refuses the rest", async () => {
+test("a door dying mid-session starts once more, and the cage verb answers each call while it stays down", async () => {
   const box = caged();
+  const cages = cagedBy(box, REFUSAL);
   let up = true;
   box.$.http.fetch = async () => {
     if (!up) throw new Error("Unable to connect");
@@ -88,8 +94,7 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
   };
   const bash = (command) =>
     box.hooks["*"](box.$, { tool: "Bash", command }, box.handed);
-  const starts = () =>
-    box.runs.filter((argv) => argv.includes("--bridge")).length;
+  const starts = () => box.runs.filter((argv) => argv.includes("--bridge")).length;
 
   assert.equal(
     (await bash("ls"))?.handed?.command,
@@ -103,27 +108,12 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
     "the fall refuses it",
   );
   assert.equal(starts(), 1, "the fall starts the index once before it refuses");
-  for (const command of [
-    "./RUNME.sh serve",
-    "./RUNME.sh index standing",
-    "pkill -f .se/.runtime/bin/se-index",
-    "git add -A",
-    "git commit -m 'a-name: saves the work'",
-    "git push -u origin work/a-name",
-  ]) {
-    assert.equal((await bash(command))?.handed?.command, command, `${command} passes`);
-  }
-  for (const command of [
-    "rm -rf .",
-    "git push origin main",
-    "git push --force origin work/a-name",
-  ]) {
-    assert.match(
-      String((await bash(command))?.deny ?? ""),
-      /refuses Bash/,
-      `${command} stays refused`,
-    );
-  }
+  await bash("git status");
+  assert.deepEqual(
+    cages.map((one) => JSON.parse(one.init.stdin).e.command),
+    ["ls", "git status"],
+    "the cage verb reads each call while the door stays down",
+  );
   assert.equal(starts(), 1, "a door staying down takes no second start");
 
   up = true;
@@ -173,8 +163,8 @@ test("under new a tool call takes the hooks door effects, and a prompt reaches t
     fetch: async (url, init) => {
       posts.push({ url, init });
       if (url.endsWith("/hook")) {
-        const effects = [{ kind: "result", text: "the door refuses this call" }];
-        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+        const step = { answer: { deny: "the door refuses this call" } };
+        return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
       }
       return { ok: true, status: 200, text: "{}" };
     },
@@ -189,7 +179,7 @@ test("under new a tool call takes the hooks door effects, and a prompt reaches t
   assert.equal(
     said?.deny,
     "the door refuses this call",
-    "the result effect answers the call",
+    "the door's step answers the call",
   );
   assert.equal(
     posts[0].url,
@@ -221,11 +211,11 @@ test("under new a held call asks back on agent.spoke with the effect's call id, 
     fetch: async (url, init) => {
       const body = JSON.parse(init.body);
       posts.push({ url, body });
-      const effects =
+      const step =
         body.event === "agent.spoke"
-          ? [{ kind: "result", text: "the hold refuses" }]
-          : [{ kind: "rows", call: "s1.2" }];
-      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+          ? { answer: { deny: "the hold refuses" } }
+          : { rows: "s1.2" };
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
     },
   };
 
@@ -238,26 +228,37 @@ test("under new a held call asks back on agent.spoke with the effect's call id, 
     "the answer goes to the door",
   );
   assert.equal(posts[1].body.event, "agent.spoke");
+  assert.equal(posts[1].body.back, true, "the back post asks no more");
   assert.equal(posts[1].body.e.call, "s1.2", "and names the call it answers");
-  assert.equal(posts[1].body.e.text, "the reply");
+  assert.deepEqual(
+    posts[1].body.messages,
+    [{ role: "assistant", id: "a1", text: "the reply" }],
+    "and carries the raw rows the door reads the reply off",
+  );
 });
 
 // A door whose standing file names raw takes the transcript raw on the ask-back and on a prompt, and the fill rides every post. [[spec/tickets/level0-hooks-hold-no-rule]]
 test("under a raw door a held call and a prompt carry the raw rows, and every post carries the fill", async () => {
   const box = caged({
-    [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k", raw: true }),
+    [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({
+      port: 7001,
+      token: "t0k",
+      raw: true,
+    }),
   });
   const posts = [];
   box.$.session = {
-    messages: async () => [{ role: "assistant", id: "a1", text: "the reply", toolUses: [{}] }],
+    messages: async () => [
+      { role: "assistant", id: "a1", text: "the reply", toolUses: [{}] },
+    ],
     usage: async () => ({ context: { tokens: 1234 } }),
   };
   box.$.http = {
     fetch: async (_url, init) => {
       const body = JSON.parse(init.body);
       posts.push(body);
-      const effects = body.event === "tool.call" ? [{ kind: "rows", call: "s1.2" }] : [];
-      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+      const step = body.event === "tool.call" ? { rows: "s1.2" } : {};
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
     },
   };
   const submit = Object.assign(async (e) => e, { event: "prompt.submit" });
@@ -276,29 +277,33 @@ test("under a raw door a held call and a prompt carry the raw rows, and every po
   assert.equal("before" in prompt.e, false, "and no row id");
 });
 
-// A door answering every post, which records each address the hook reaches and hands the prompt context its named blocks. [[spec/tickets/level0-runs-on-the-door]]
-function answering(box, posts) {
+// A door answering every post, which records each address and body the hook reaches, hands the prompt context its named blocks, and answers a merge with the merged value the case names. [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/level0-hooks-hold-no-rule]]
+function answering(box, posts, merged = { merged: true }) {
   box.$.http = {
     fetch: async (url, init) => {
-      posts.push({ url, event: JSON.parse(String(init?.body ?? "{}")).event });
-      const event = JSON.parse(String(init?.body ?? "{}")).event;
-      const effects =
-        event === "prompt.context"
-          ? [
-              { kind: "after", name: "level0-tools", text: "the tools you hold" },
-              { kind: "after", name: "level0-canary", text: "Open your FIRST answer" },
-            ]
-          : [];
-      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+      const body = JSON.parse(String(init?.body ?? "{}"));
+      posts.push({ url, event: body.event, body });
+      if (url.endsWith("/merge"))
+        return { ok: true, status: 200, text: JSON.stringify(merged) };
+      const step =
+        body.event === "prompt.context"
+          ? {
+              blocks: [
+                { name: "level0-tools", text: "the tools you hold" },
+                { name: "level0-canary", text: "Open your FIRST answer" },
+              ],
+            }
+          : {};
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
     },
   };
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-test("under new the prompt context hands the session the door's named blocks", async () => {
+test("under new the prompt context hands the door's named blocks to its merge, and the merged value answers", async () => {
   const box = caged();
   const posts = [];
-  answering(box, posts);
+  answering(box, posts, { blocks: [{ name: "merged", text: "y" }] });
   const context = Object.assign(
     async () => ({ blocks: [{ name: "own", text: "x" }] }),
     {
@@ -308,10 +313,21 @@ test("under new the prompt context hands the session the door's named blocks", a
 
   const said = await box.hooks["*"](box.$, {}, context);
 
+  const merge = posts.find((one) => one.url.endsWith("/merge"));
   assert.deepEqual(
-    (said?.blocks ?? []).map((one) => one.name),
-    ["own", "level0-tools", "level0-canary"],
-    "the door's blocks ride after the session's own",
+    merge?.body.said,
+    { blocks: [{ name: "own", text: "x" }] },
+    "the merge takes the session's own",
+  );
+  assert.deepEqual(
+    merge.body.adds.blocks.map((one) => one.name),
+    ["level0-tools", "level0-canary"],
+    "and the door's blocks",
+  );
+  assert.deepEqual(
+    said,
+    { blocks: [{ name: "merged", text: "y" }] },
+    "and the merged value answers",
   );
 });
 
@@ -349,7 +365,7 @@ test("under new no event of a session reaches anything but the hooks door", asyn
   )) {
   }
 
-  const elsewhere = posts.filter((one) => !one.url.endsWith("/hook"));
+  const elsewhere = posts.filter((one) => !/\/(hook|merge)$/.test(one.url));
   assert.deepEqual(elsewhere, [], "every post goes to the hooks door");
   assert.ok(
     posts.some((one) => one.event === "turn.said"),
@@ -369,7 +385,7 @@ test("under new a prompt the door rewrites goes on to the harness rewritten", as
     fetch: async () => ({
       ok: true,
       status: 200,
-      text: JSON.stringify({ effects: [{ kind: "event", result: rewritten }] }),
+      text: JSON.stringify({ effects: [], step: { answer: { event: rewritten } } }),
     }),
   };
   const handed = [];
@@ -395,13 +411,16 @@ test("under new a prompt context finding the door down while the session start r
   box.$.http = {
     fetch: async (url, init) => {
       if (!standing) throw new Error("Unable to connect");
-      const event = JSON.parse(String(init?.body ?? "{}")).event;
-      posts.push({ url, event });
-      const effects =
-        event === "prompt.context"
-          ? [{ kind: "after", name: "level0-canary", text: "Open your FIRST answer" }]
-          : [];
-      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+      const body = JSON.parse(String(init?.body ?? "{}"));
+      posts.push({ url, event: body.event });
+      // The merge stub answers the adds, which the case reads the rules off. [[spec/tickets/level0-hooks-hold-no-rule]]
+      if (url.endsWith("/merge"))
+        return { ok: true, status: 200, text: JSON.stringify(body.adds) };
+      const step =
+        body.event === "prompt.context"
+          ? { blocks: [{ name: "level0-canary", text: "Open your FIRST answer" }] }
+          : {};
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
     },
   };
   const run = box.$.process.run;
@@ -435,7 +454,7 @@ test("under new a prompt context finding the door down while the session start r
 });
 
 // [[spec/tickets/level0-runs-on-the-door]]
-test("under new a prompt reaches the door with its origin and the newest row before it, and the harness reads it bare", async () => {
+test("under new a prompt reaches the door with its origin and the raw rows, and the harness reads it bare", async () => {
   const box = caged();
   const bodies = [];
   box.$.session = { messages: async () => [{ role: "assistant", id: "row-9" }] };
@@ -462,7 +481,11 @@ test("under new a prompt reaches the door with its origin and the newest row bef
     { kind: "composer" },
     "the door reads who sent it",
   );
-  assert.equal(posted?.e?.before, "row-9", "and the newest row before it");
+  assert.deepEqual(
+    posted?.messages,
+    [{ role: "assistant", id: "row-9" }],
+    "and the raw rows",
+  );
   assert.deepEqual(
     handed,
     [{ text: "the owner's prompt" }],
@@ -559,7 +582,11 @@ test("the hook reads the step the door answers", async () => {
 
   const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
 
-  assert.deepEqual(said, { deny: "door step" }, "the door's step answers, not the hook's reading of its effects");
+  assert.deepEqual(
+    said,
+    { deny: "door step" },
+    "the door's step answers, not the hook's reading of its effects",
+  );
 });
 
 // [[spec/tickets/level0-hooks-hold-no-rule]]

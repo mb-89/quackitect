@@ -3,7 +3,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { refusedText } from "../../.claude/skills/level0/hooks/cage.ts";
 import {
   callsOf,
   eventOf,
@@ -15,22 +14,35 @@ import { answers } from "../../src/scripts/copilot-door.js";
 const STANDING = ".se/.runtime/hooks.json";
 const HOOK = "http://127.0.0.1:7001/hook";
 
-// A box whose standing file names the door, and whose door answers the effects the case hands it, or falls. [[spec/tickets/copilot-answers-off-the-door]]
-function doored(effects, files = {}) {
+// What the cage verb prints over a guarded call. [[spec/tickets/level0-hooks-hold-no-rule]]
+const REFUSAL = "Level zero refuses Write: the index answers nothing.";
+
+// A box whose standing file names the door, whose door answers the step the case hands it or falls, and whose cage verb denies each call it reads. [[spec/tickets/copilot-answers-off-the-door]] [[spec/tickets/level0-hooks-hold-no-rule]]
+function doored(step, files = {}) {
   const posts = [];
+  const cages = [];
   const held = { [STANDING]: JSON.stringify({ port: 7001, token: "t0k" }), ...files };
   return {
     posts,
+    cages,
     it: {
       root: "/tree",
       read: (rel) => {
         if (!(rel in held)) throw new Error(`no file at ${rel}`);
         return held[rel];
       },
+      run: (argv, init) => {
+        cages.push({ argv, input: JSON.parse(init.stdin) });
+        return {
+          exitCode: 0,
+          stdout: `${JSON.stringify({ deny: REFUSAL })}\n`,
+          stderr: "",
+        };
+      },
       fetch: async (url, init) => {
         posts.push({ url, body: JSON.parse(init.body) });
-        if (!effects) throw new Error("Unable to connect");
-        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+        if (!step) throw new Error("Unable to connect");
+        return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
       },
     },
   };
@@ -135,13 +147,14 @@ test("an edit call posts one Write a changed file with its whole text", () => {
 
 // [[spec/tickets/copilot-answers-off-the-door]]
 test("a Copilot hook answers the door's deny as its result", async () => {
-  const box = doored([{ kind: "result", text: "the door refuses this call" }]);
+  const box = doored({ answer: { deny: "the door refuses this call" } });
 
   const said = await answers(pre("run_in_terminal", { command: "ls" }), box.it);
 
   assert.deepEqual(said, { deny: "the door refuses this call" });
   assert.equal(box.posts[0]?.url, HOOK, "the call goes to the hooks door");
   assert.equal(box.posts[0].body.event, "tool.call");
+  assert.equal(box.posts[0].body.back, true, "and asks no rows back");
   assert.deepEqual(box.posts[0].body.e, {
     tool: "Bash",
     command: "ls",
@@ -151,10 +164,7 @@ test("a Copilot hook answers the door's deny as its result", async () => {
 
 // [[spec/tickets/copilot-answers-off-the-door]]
 test("the door's afters answer as the result's context", async () => {
-  const box = doored([
-    { kind: "after", text: "one note" },
-    { kind: "after", text: "two note" },
-  ]);
+  const box = doored({ after: ["one note", "two note"] });
 
   const said = await answers(
     { event: "SessionStart", surface: "vscode", session: "s1", tool: "", args: {} },
@@ -166,11 +176,15 @@ test("the door's afters answer as the result's context", async () => {
 });
 
 // [[spec/tickets/copilot-answers-off-the-door]]
-test("a guarded call meets the refusal while the door stands down, and a session start passes", async () => {
+test("a call meets the cage verb while the door stands down, and a session start passes", async () => {
   const write = pre("create_file", { filePath: "spec/b.md", content: "New.\n" });
-  const said = await answers(write, doored(null).it);
-  assert.deepEqual(said, {
-    deny: refusedText({ tool: "Write", file_path: "spec/b.md", content: "New.\n" }),
+  const box = doored(null);
+  const said = await answers(write, box.it);
+  assert.deepEqual(said, { deny: REFUSAL });
+  assert.deepEqual(box.cages[0].argv.slice(-2), ["/tree/src/scripts", "cage"]);
+  assert.deepEqual(box.cages[0].input, {
+    event: "tool.call",
+    e: { tool: "Write", file_path: "spec/b.md", content: "New.\n", session_id: "s1" },
   });
 
   const start = {

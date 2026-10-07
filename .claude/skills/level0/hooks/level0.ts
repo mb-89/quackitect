@@ -15,26 +15,20 @@ import type {
   StarNext,
   StreamNext,
 } from "claude-code";
-import { binaryOf, windowsOf } from "../lib/index-tools.js";
 import { SESSION } from "../lib/log.js";
 import {
   type Answer,
-  doors,
-  guarded,
+  cageDeny,
+  cageInput,
   HOOKS_FILE,
+  hookOf,
   postOf,
-  refusedText,
-  stepOf,
+  type Said,
+  verbOf,
 } from "./cage.ts";
 import { CLEAR_FALLBACK_MS, holdsClear, takesClear } from "./clear.ts";
-import {
-  type Fields,
-  failureOf,
-  type Given,
-  merged,
-  type Spawned,
-} from "./shape.ts";
-import { beforeIn, rawRows, textOf, textsOf } from "./transcript.ts";
+import { type Fields, failureOf, type Given, type Spawned } from "./shape.ts";
+import { rawRows, textOf } from "./transcript.ts";
 
 // The span the start road takes. An index standing up runs past a spawn, and the road runs only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
@@ -65,13 +59,45 @@ export function register(on: On, options: PluginOptions): void {
   on("turn.step", streams);
 }
 
-// The door decides every event it names, and every other event passes untouched. [[spec/tickets/level0-runs-on-the-door]]
+// The door decides every event its standing file names, and every other event passes untouched. A standing file naming no list stands from an older door, which takes every event. With no standing file, the door road runs: the start road runs once, the fall says itself, and a call meets the cage verb. [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/level0-hooks-hold-no-rule]]
 async function seen($: EngineInterface, e: Given, next: StarNext): Promise<unknown> {
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
   // The session start names the root the door posts and the log writes under. [[spec/tickets/level0-runs-on-the-door]]
   if (event === "session.start" && e?.cwd) root = String(e.cwd);
-  return doors(event) ? door($, event, e, next) : next(e);
+  const events = await doored($);
+  return Array.isArray(events) && !events.includes(event)
+    ? next(e)
+    : door($, event, e, next);
+}
+
+// The events the standing file names, true where it names no list, or null where no door stands. [[spec/tickets/level0-hooks-hold-no-rule]]
+async function doored($: EngineInterface): Promise<readonly string[] | true | null> {
+  try {
+    const events = JSON.parse(String(await $.fs.read(HOOKS_FILE)))?.events;
+    return Array.isArray(events) ? events.map(String) : true;
+  } catch {
+    return null;
+  }
+}
+
+// A call meets the cage verb while no door answers, and the verb's deny answers it. A verb answering nothing passes the call, and the fall line says the cage stands down. [[spec/tickets/level0-hooks-hold-no-rule]] [[spec/tickets/a-down-index-refuses-calls]]
+async function caged(
+  $: EngineInterface,
+  event: string,
+  e: Given,
+  next: StarNext,
+): Promise<unknown> {
+  if (event !== "tool.call") return next(e);
+  try {
+    const ran = await $.process.run(verb("cage"), {
+      ...(root ? { cwd: root } : {}),
+      stdin: cageInput(event, e),
+    });
+    return cageDeny(ran?.stdout) ?? next(e);
+  } catch {
+    return next(e);
+  }
 }
 
 // The door answers, or the start road runs once and the door takes the post again. Still down, a guarded call meets the refusal, and every other event passes. [[spec/tickets/a-down-index-refuses-calls]]
@@ -81,29 +107,27 @@ async function door(
   e: Given,
   next: StarNext,
 ): Promise<unknown> {
-  const raw = event === "prompt.submit" && (await readsRaw($));
   const extra = {
     ...(await fillOf($)),
-    ...(raw ? { messages: rawRows(await messages($)) } : {}),
+    ...(event === "prompt.submit" ? { messages: rawRows(await messages($)) } : {}),
   };
-  const sent = await promptOf($, event, e, next, raw);
+  const sent = promptOf(event, e, next);
   // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-on-the-door]]
   let answer = await doorAsk($, event, sent, extra, { quiet: true });
   if (!answer) {
     await starts($);
     answer = await doorAsk($, event, sent, extra);
   }
-  if (!answer) return guarded(event, e) ? { deny: refusedText(e) } : next(e);
-  let step = stepOf(answer, event, { asks: true });
-  // A held call asks back for the newest rows on agent.spoke, with the effect's call id. [[spec/tickets/spoke-answer-reaches-the-door]]
+  if (!answer) return caged($, event, e, next);
+  let step = answer.step ?? {};
+  // A held call asks back for the newest rows on agent.spoke, with the effect's call id, and the back post asks no more. [[spec/tickets/spoke-answer-reaches-the-door]]
   if (step.rows !== undefined) {
-    const said = { tool: e?.tool, agentId: e?.agentId, call: step.rows };
-    const back = (await readsRaw($))
-      ? await doorAsk($, "agent.spoke", { ...said, text: stepText }, {
-          messages: rawRows(await messages($)),
-        })
-      : await doorAsk($, "agent.spoke", await trimmed($, said), {});
-    step = back ? stepOf(back, event, { asks: false }) : {};
+    const said = { tool: e?.tool, agentId: e?.agentId, call: step.rows, text: stepText };
+    const back = await doorAsk($, "agent.spoke", said, {
+      messages: rawRows(await messages($)),
+      back: true,
+    });
+    step = back?.step ?? {};
   }
   if (step.answer?.spawn) return doorSpawns($, step.answer, event);
   // [[spec/tickets/clear-answers-off-the-door]]
@@ -116,29 +140,31 @@ async function door(
     ...(step.blocks ? { blocks: step.blocks } : {}),
     ...(step.after ? { context: step.after } : {}),
   };
-  return Object.keys(adds).length ? merged(await next(e), adds) : next(e);
+  return Object.keys(adds).length ? mergedBy($, await next(e), adds) : next(e);
 }
 
-// A prompt reaches the door with who sent it and the newest row before it, which the door reads an owner's turn off. [[spec/tickets/level0-runs-on-the-door]]
-async function promptOf(
+// The door merges the adds into what the harness answered, which Merged in src/modules/hooks/step.go owns. A merge that falls leaves the answer as the harness gave it. [[spec/tickets/level0-hooks-hold-no-rule]]
+async function mergedBy(
   $: EngineInterface,
-  event: string,
-  e: Given,
-  next: StarNext,
-  raw: boolean,
-): Promise<Given> {
-  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  const said = raw ? e : await before($, event, e);
-  return next?.origin ? { ...said, origin: next.origin } : said;
+  said: unknown,
+  adds: Readonly<Fields>,
+): Promise<unknown> {
+  try {
+    const post = postOf(JSON.parse(String(await $.fs.read(HOOKS_FILE))), "merge", {
+      said: said ?? null,
+      adds,
+    });
+    const answered = await $.http.fetch(post.where, post.init);
+    return answered.ok ? JSON.parse(answered.text || "null") : said;
+  } catch {
+    return said;
+  }
 }
 
-// Whether the door standing trims the raw transcript itself, which Raw in src/modules/hooks/listen.go says. A door started before it reads the trimmed fields alone, so the bridgehead trims for it until it restarts. [[spec/tickets/level0-hooks-hold-no-rule]]
-async function readsRaw($: EngineInterface): Promise<boolean> {
-  try {
-    return JSON.parse(String(await $.fs.read(HOOKS_FILE)))?.raw === true;
-  } catch {
-    return false;
-  }
+// A prompt reaches the door with who sent it, which the door reads an owner's turn off. [[spec/tickets/level0-runs-on-the-door]]
+function promptOf(event: string, e: Given, next: StarNext): Given {
+  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
+  return next?.origin ? { ...e, origin: next.origin } : e;
 }
 
 // [[spec/tickets/a-reply-follows-its-prompt]]
@@ -156,10 +182,10 @@ async function doorAsk(
   e: unknown,
   extra: Readonly<Fields>,
   { quiet = false }: { quiet?: boolean } = {},
-): Promise<Answer | null> {
+): Promise<Said | null> {
   let where = HOOKS_FILE;
   try {
-    const post = postOf(
+    const post = hookOf(
       JSON.parse(String(await $.fs.read(HOOKS_FILE))),
       event,
       e,
@@ -181,19 +207,6 @@ async function doorAsk(
   }
 }
 
-// The spoke post an old door reads, trimmed here: the newest rows and the agent's last texts. Delete it with the trim in transcript.ts. [[spec/tickets/level0-hooks-hold-no-rule]]
-async function trimmed($: EngineInterface, said: Readonly<Fields>): Promise<Fields> {
-  const { texts, rows } = textsOf(await messages($));
-  return { ...said, text: stepText || texts.at(-1) || "", texts, rows };
-}
-
-// The newest row's id, which an old door keys a prompt on. Delete it with the trim in transcript.ts. [[spec/tickets/level0-hooks-hold-no-rule]]
-async function before($: EngineInterface, event: string, e: Given): Promise<Given> {
-  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  const rows = await messages($);
-  return beforeIn(e, Array.isArray(rows) ? rows : []);
-}
-
 // A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
 async function doorSpawns($: EngineInterface, answer: Answer, event: string): Promise<unknown> {
   const back = await helped($, answer);
@@ -201,10 +214,9 @@ async function doorSpawns($: EngineInterface, answer: Answer, event: string): Pr
     $,
     String(answer.back?.event ?? "agent.answered"),
     back,
-    {},
+    { back: true },
   );
-  const step = said ? stepOf(said, event, { asks: false }) : {};
-  return step.answer ?? { result: "the helper answered, and the door said nothing" };
+  return said?.step?.answer ?? { result: "the helper answered, and the door said nothing" };
 }
 
 // The helper the answer spawns, and what it says as the back post carries it. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -344,10 +356,9 @@ function starts($: EngineInterface): Promise<void> {
   return road;
 }
 
-// A verb of the index binary the method root carries, run in the work root, so Go answers what the hook hands it. A Windows box builds the binary with its suffix. [[spec/tickets/level0-hooks-hold-no-rule]] [[spec/tickets/level0-smoke-runs-in-seconds]]
+// A verb of the index binary the method root carries, run in the work root. [[spec/tickets/level0-hooks-hold-no-rule]]
 function verb(...words: string[]): string[] {
-  const at = method || root || ".";
-  return [binaryOf(at, windowsOf(at)), "verb", `${at}/src/scripts`, ...words];
+  return verbOf(method || root || ".", ...words);
 }
 
 // Go owns the road: the cloud guard, the standing and the row it prints. A desk prints nothing, and a binary standing nowhere or an answer carrying no row writes the one fall row. [[spec/tickets/level0-hooks-hold-no-rule]]

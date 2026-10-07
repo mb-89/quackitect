@@ -50,8 +50,8 @@ function caged() {
     clock: { after: (_ms, fn) => void timers.push(fn) },
     http: {
       fetch: async () => {
-        const effects = [{ kind: "clear", text: RESUME }];
-        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+        const step = { answer: { pass: true, clear: { prompt: RESUME } } };
+        return { ok: true, status: 200, text: JSON.stringify({ effects: [], step }) };
       },
     },
   };
