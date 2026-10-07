@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,18 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: e20a2068af3875998c2476044a1ed6f56f4fbda0
+    hash_after: e20a2068af3875998c2476044a1ed6f56f4fbda0
+    inputs:
+      - name: ask
+        hash: b32b5aa231316757
+        size: 777
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -160,38 +172,69 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The tab reads one index name, and F5 posts one action, so the window reads no file and runs no process of its own.
+
+- A module `src/modules/examples` registers in `projected` in `src/quack/main.go`, beside `holds` and `views`. Its derived name `examples/rows` reads `files/<path...>`. Each file under `spec/examples/<chapter>/` becomes one row through `example.Read`: the path, the chapter, the dev mark, the title, the keywords, the interface, the body, and the last verdict and miss off `.se/.runtime/examples.json`. A row the file holds no verdict for carries none.
+- The same module registers the action `examples/run`, taking a path. It answers one request to the node module, `run` with `example run <path>`, as `bless/set` does in `src/modules/holds`. So the run starts off the window, against the real tree, and the window holds no terminal of its own. The run verb sees no terminal on its input, so it runs straight through.
+- A package `src/tui/tutorial` holds the tab. `New(source)` takes the catalog and the caller, as the work tab does. The tab watches `examples/rows`, so a new verdict redraws the marks. `Left` draws the user chapters, then a `developer` heading over the `9xx_dev` chapters. Each chapter is a heading row, and each example a row under it, with a mark of pass, fail, or a blank before its first run. `Detail` draws the selected file: the title, then the body with the front cut off, each fenced block in the call style, headings bold, and the rest wrapped through `RenderParts`. F5 posts `examples/run` with the selected path, and the notice says the run starts and where its clone stands.
+- `tuiTabs` in `src/quack/tui_verb.go` gains `tutorial`, and `newModelOver` in `src/tui/main.go` adds the tab after `work`, so `./RUNME.sh tui tutorial` opens it. `ExampleCovers` then names `tui tutorial` until an example shows the tab.
+- `Narrow` stays a plain word match on the title here, and the search ticket owns the two modes and the highlight.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go projections, which registers every module in projected
+- src/tui/main.go newModelOver, which builds the tab list
+- src/quack/tui_verb.go tuiTabs and the TabNamed words, which open a tab by name
+- src/modules/check/coverage.go exampleCovers, which reads tuiTabs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/examples/examples_test.go TestTheRowsReadEachExampleWithItsChapterAndVerdict
+- src/modules/examples/examples_test.go TestRunAsksTheNodeModuleForTheExampleRun
+- src/tui/tutorial/tab_test.go TestTheTreeHoldsTheUserChaptersThenTheDeveloperSection
+- src/tui/tutorial/tab_test.go TestTheMainViewDrawsTheSelectedProseAndCalls
+- src/tui/tutorial/tab_test.go TestEachRowCarriesItsLastVerdict
+- src/tui/tutorial/tab_test.go TestF5PostsTheSelectedExampleRun
+- src/quack/tui_verb_test.go TestTuiNamesTheTutorialTab
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/examples/examples.go
+- src/modules/examples/examples_test.go
+- src/quack/main.go
+- src/quack/tui_verb.go
+- src/quack/tui_verb_test.go
+- src/tui/main.go
+- src/tui/tutorial/tab.go
+- src/tui/tutorial/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: frame.Tab in src/tui/frame/tabs.go, newModelOver in src/tui/main.go, work.Tab and its posts in src/tui/work/actions.go, registry.Catalog and Fake, holds.Registers with its node request, projected in src/quack/main.go, tuiTabs, RenderParts and draw.Wrap
+- the callers list names the module list, the tab list, the tab words and the coverage rule reading them
+- each done_when line names its test: the chapters and the developer section, the main view, the verdict marks, F5, the tab word, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
