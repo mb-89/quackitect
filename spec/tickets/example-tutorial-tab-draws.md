@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 79c62a96552a3aa8b541c7920f4804f383797e01
+    hash_after: 909c84573dd37806272e057e8dc280c61836bb25
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tutorial passes; green, src/modules/examples passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   88.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6e5266e5a67686d0
+        size: 997
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -346,26 +369,33 @@ go build ./... && go vet ./src/tui/... ./src/modules/examples/ ./src/quack/
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tutorial/tab_test.go src/modules/examples/examples_test.go src/quack/tui_verb_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window gains a tutorial tab, opened by ./RUNME.sh tui tutorial. A new module, src/modules/examples, reads every file under spec/examples into one row each under examples/rows. Each row holds its chapter, a developer mark, the title, the keywords, the interface, the body and the last verdict the harness wrote. Its action examples/run hands the node module the run verb, so a run starts off the window in a clone of its own. The tab in src/tui/tutorial watches the rows. It draws the user chapters, then a developer heading over the developer chapters, each row with a pass, a fail or a blank mark. The main view draws the selected title, its miss, then its prose and its calls with the front cut off. F5 posts the run of the selected example, and the answer stands as the notice. The window's import table and the design table of its packages gain the tutorial row. The strip case names the tab after work.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: past the draft's list, the change touches src/tui/window_test.go for the tab order, and src/imports with spec/design_output/tui.md for the import row
+- doors: the tab reads through registry.Fake in its cases, and the module through qtest
+- approach: each new function carries a pointer at spec/design_output/examples
+- one place: the names stand in the module, and the tab spells them again under a comment naming the owner
 
 # accept
 
