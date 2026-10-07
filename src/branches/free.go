@@ -23,7 +23,7 @@ func (d *Doors) staleSpan() int64 {
 	return int64(spanOf(staleSpan))
 }
 
-// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#the-session-beats-its-hold]]
 type claim struct {
 	Age   string
 	Stale bool

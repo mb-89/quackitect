@@ -121,7 +121,7 @@ A start waits on readiness, and on no fixed span:
 
 | the caller | it waits until |
 |---|---|
-| the one holding the claim | the door stands, or the index it spawned exits, and it renews the claim each poll |
+| the one holding the claim | the door stands, or the index it spawns exits, and it renews the claim each poll |
 | one meeting a fresh claim | the door stands, or the claim goes stale and it takes the claim itself |
 | either | the hang guard `startHang` passes, where the index neither stands nor exits |
 

@@ -319,7 +319,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person`, and the box is no cloud box |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `helpers-running` | the turn's end names a helper the harness still runs, or a helper spawned in the background sends no stop yet |
-| `ends-on-a-question` | the box is a cloud box, and the last prose paragraph of the answer, past the tables, the headings and the stop line, closes on a question mark |
+| `ends-on-a-question` | the box is a cloud box. The answer's last prose paragraph, past the tables, the headings and the stop line, closes on a question mark |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
@@ -374,7 +374,7 @@ the turn.
 | a cloud box | reads the last prose paragraph | holds, and the agent decides and carries on |
 
 The check reads the text alone at the turn's end, and stays out of
-`ReadsText`, so the stop call runs it with the rest of the vote. For why a box
+`ReadsText`. So the stop call runs it with the rest of the vote. For why a box
 decides, see [[spec/guidance/cloud/cloud]].
 
 ## A refusal names its check

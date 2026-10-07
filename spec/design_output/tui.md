@@ -364,7 +364,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 | a binary, and a source matching its stamp | runs the binary |
 | no binary, or a source moving on | runs `go build` into `logview.new`, swaps it in by rename, then runs the binary |
 | a build failing over an old binary | says why, and runs the old one |
-| a build landing that swaps not in | says why, and exits failed |
+| a build landing that swaps not in | says why, and exits with a failure |
 | no Go and no binary | prints the session as plain rows |
 
 The stamp is a hash of the `.go` files of the window and of every tree package

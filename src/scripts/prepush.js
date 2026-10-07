@@ -37,7 +37,7 @@ import { staleClaim } from "./work-free.js";
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
 const HEADS = /^refs\/heads\//;
-// A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#the-session-beats-its-hold]]
 const BEATS = "refs/heads/beats/";
 // A rescue carries a red commit off a dying box on purpose, so no stamp gates it. [[spec/tickets/rescue-passes-the-stamp-gate]]
 const RESCUE = "refs/heads/rescue/";
@@ -193,7 +193,7 @@ export function heldBy(repo) {
   };
 }
 
-// Whether the hold on origin stands dead, read the way the list reads a claim: an end at or past the tip, no beat inside its span, and the tip past the stale span. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Whether the hold on origin stands dead, read the way the list reads a claim: an end at or past the tip, no beat inside its span, and the tip past the stale span. [[spec/design_output/work#the-session-beats-its-hold]]
 export function staleBy(repo, span, now, beatSpan = "") {
   return (ref) => {
     const branch = String(ref?.remote ?? "").replace(HEADS, "");

@@ -246,10 +246,10 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	return 0
 }
 
-// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueBranch = "rescue/"
 
-// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) rescues(branch string, errs io.Writer) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !d.cloud || !onWork {
@@ -264,7 +264,7 @@ func (d landingDoors) rescues(branch string, errs io.Writer) {
 	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
 }
 
-// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) dropsRescue(branch string) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !onWork {
@@ -279,7 +279,7 @@ func (d landingDoors) dropsRescue(branch string) {
 	}
 }
 
-// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueRef = "refs/heads/"
 
 func orNothing(said, nothing string) string {
