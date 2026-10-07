@@ -6,6 +6,7 @@ package proc // level0: InPackageTest - the contract suite reads the unexported 
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -192,6 +193,23 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
 		}
+	}
+}
+
+// A run on the caller's terminal stays in the caller's process group, so its reads reach the terminal, and a run reading none stands in a group of its own. [[spec/tickets/process-group-run-untested]]
+func TestARunOnTheCallersStreamsStaysInTheCallersGroup(t *testing.T) {
+	t.Parallel()
+	if runtime.GOOS == "windows" {
+		t.Skip("a Windows box carries no process groups")
+	}
+	line := []string{"sh", "-c", "echo $(ps -o pgid= -p $$) $(ps -o pgid= -p $PPID)"}
+	var out strings.Builder
+	Real(Command{Argv: line, Streams: &Streams{Out: &out, Err: &out}})
+	if own, caller, _ := strings.Cut(strings.TrimSpace(out.String()), " "); own != caller {
+		t.Errorf("a streamed run stands in group %q, apart from the caller's %q", own, caller)
+	}
+	if own, caller, _ := strings.Cut(strings.TrimSpace(Real(Command{Argv: line}).Out), " "); own == caller {
+		t.Errorf("a run reading no streams shares the caller's group %q", caller)
 	}
 }
 
