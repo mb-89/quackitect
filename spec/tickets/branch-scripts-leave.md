@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 70e525892a4058f4abc2757a97651a8f9da9eb35
+    hash_after: 70e525892a4058f4abc2757a97651a8f9da9eb35
+    inputs:
+      - name: ask
+        hash: 13b6271a6373fb9e
+        size: 652
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,169 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. The eight standing files leave: cli-doors, cli-main, editor, go-source, graph, work-free, work-read and work-stands.
+2. `cli-doors.test.js`, `cli-exit.test.js`, `editor.test.js`, `stand.test.js` and `git-batch.test.js` leave with them.
+3. `browser.js`, `trust.js` and `vehicle.js` read `env.USERPROFILE || env.HOME || ""` in place.
+4. Each of those three lines carries a comment naming `HomeIn` in `src/vehicle/vehicle.go` as the owner.
+5. `drawnOf` in `src/modules/tickets/drawn.go` writes `testdata/drawn.golden.json` under an `-update` flag.
+6. Each golden entry holds a ticket text and the drawing Go answers for it.
+7. `v1Over` in `test/level0/v1-index.js` answers `tickets/drawn/<path>` from the golden entry whose text matches.
+8. `v1Over` throws on a text the golden lacks, so a new case names its missing fixture.
+9. `test/level0/drawn-twin.js` leaves, so `v1-index.js` no longer imports `graph.js`, `chapter.js` or `pull-route.js`.
+10. Every test whose ticket the fake index draws takes its text from the golden.
+11. `lens-v1.test.js` and `drawing-page.test.js` read the expected graph off the golden in place of `graphIn`.
+12. `drawing-edit.test.js` takes a literal graph marking the reached steps in place of `graphOf`.
+13. `lens-actions.test.js` drops the `graph.js` emitter and its `imports` fake, which the extension never calls.
+14. `lens-v1.test.js` and `sidebar-writes.test.js` run their source grep through `git(proc(), root)` from `src/doors`.
+15. `front.test.js` and `http.test.js` each drop their one case on the hand cli-doors builds.
+16. `outside-in-doors.test.js` drops the cli-doors root and the two cases reading `it`.
+17. `git.test.js` drops its two batch cases, since `framed` and `namesIn` leave with work-read.
+18. `batch` and `BATCH_ASKS` leave `src/doors/git.js` and the fake, since work-stands was their one caller.
+19. `go-stamp.test.js` drops its BUILDS case and keeps the fresh-and-stale case of `go-stamp.sh`.
+20. The `case` in `go-stamp.sh` becomes the package owner, and `.vale.ini` drops `go-source` from its glob.
+21. New Go tests hold what `stand.test.js` and `cli-doors.test.js` held and no Go test holds.
+22. `TestStaleSpanReadsTheConfigOrTheDefault` gains a row where an unreadable span falls to the default.
+23. A comment naming a leaving or gone file as an owner names the Go owner instead.
+24. Where the Go file itself owns the behaviour, the comment drops its clause naming the script.
+25. `work.md`, `review.md`, `level0.md`, `lsp.md`, `index.md`, `tui.md` and `migration.md` point at the Go owners.
+Weighed: a Go-written golden against a JavaScript drawing twin in the test helpers. The golden leaves no second drawing.
+Weighed: spawning `se-index` from the extension tests against the golden. A spawn puts a real door in every unit case.
+Weighed: a Go case running `go-stamp.sh` against keeping its JavaScript case. The script stays until scripts-folder-leaves, which ports both.
+Weighed: deleting the http, front and git contract tests as the inventory says. The check's doors part refuses a door with no contract test.
+Weighed: three scripts spelling the home rule in place against one shared home. The three leave under later tickets with no order between them.
+Assumed: the owner accepts edits to the lint group's `outside-in-doors.test.js` and `.vale.ini`.
+Assumed: engine-and-doors-leave deletes `src/doors/http.js` and the contract tests that stay here.
+Assumed: the extension tests that stay keep `v1-index.js`, since they are its only importers.
+Assumed: `design_input` notes and `spec/pages` stay untouched, since they hold the owner's input.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/browser.js: cacheOf, which reads homeIn off editor.js
+- src/scripts/trust.js: main, which reads homeIn off editor.js
+- src/scripts/vehicle.js: registerDirs, which reads homeIn off editor.js
+- src/scripts/work-free.js: freeIn, freeNow, staleClaim and staleSpan, which read work-stands.js
+- src/scripts/work-stands.js: the batch reads, which read framed, asText, namesIn, REF_FORMAT and refsIn off work-read.js
+- src/doors/git.js: batch, which only work-stands.js calls
+- src/doors/fake/git.js: the BATCH_ASKS re-export
+- test/contract/cli-doors.test.js: every case
+- test/contract/front.test.js: the case reading it.front
+- test/contract/http.test.js: the case reading it.http
+- test/contract/outside-in-doors.test.js: ROOTS, and the two cases reading it.pid, it.node and it.index
+- test/level0/lens-v1.test.js: the doors.git.run grep case, and the graph case reading graphIn
+- test/level0/sidebar-writes.test.js: the doors.git.run grep case
+- test/level0/cli-exit.test.js: every case, which reads exitsDrained
+- test/level0/editor.test.js: every case, which reads homeIn
+- test/contract/go-stamp.test.js: the case reading BUILDS
+- src/scripts/go-stamp.sh: the package case, whose comment names BUILDS
+- test/contract/drawing-page.test.js: the graph, press and pointer cases, which read graphIn
+- test/level0/drawing-edit.test.js: REACHED, which reads graphOf
+- test/level0/lens-actions.test.js: the fake door's imports, which hands the graph.js emitter
+- test/level0/drawn-twin.js: drawnOf, which reads graphIn and LEAF
+- test/level0/v1-index.js: v1Over, which answers tickets/drawn off drawnOf
+- test/level0/fields-to-fill.test.js: each case the fake index draws a ticket for
+- test/level0/lens.test.js: each case the fake index draws a ticket for
+- test/level0/route-host.test.js: each case the fake index draws a ticket for
+- test/level0/stand.test.js: every case, which reads work-free.js and work-stands.js
+- test/contract/git.test.js: the two batch cases, which read framed, asText and namesIn
+- test/level0/git-batch.test.js: every case, which reads framed and BATCH_ASKS
+- src/stub/.claude/skills/level0/hooks/bridgehead.js: the comment naming homeIn in editor.js
+- src/vehicle/vehicle.go: the HomeIn comment
+- src/pull/pull_doors.go: the It comments naming cli-doors.js
+- src/quack/hookprobe.go: healthWait, whose comment names HEALTH_WAIT in cli-doors.js
+- src/quack: stub_verb, vehicle_verb, verb_config, verb_doors, verb_rules and retro_collect, comments naming cli-doors.js
+- src/modules/tickets/drawn.go, graph.go and src/quack/verb_graph_test.go: comments naming graph.js
+- src/branches/free.go, stands.go, src/modules/git/git.go, src/modules/tickets/tickets.go, src/pull/pull_ready.go: comments naming the work scripts
+- src/branches, src/modules/work, src/modules/queue, src/modules/verbs, src/pull and src/quack: comments naming scripts already gone
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/drawn_test.go: TestEveryDrawnGoldenMatchesTheProjection
+- src/branches/free_test.go: TestAStaleClaimWaitingOnADependencyStaysOutOfTheTrigger
+- src/branches/free_test.go: TestATreeWithNoClockReadsNoClaimStale
+- src/branches/free_test.go: TestADependencyClosedOnItsBranchHoldsItsDependentUntilTrunkCarriesIt
+- src/quack/ticket_doors_test.go: TestThePullTakesItsCapAndMarginOffTheConfig
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/cli-doors.js
+- src/scripts/cli-main.js
+- src/scripts/editor.js
+- src/scripts/go-source.js
+- src/scripts/graph.js
+- src/scripts/work-free.js
+- src/scripts/work-read.js
+- src/scripts/work-stands.js
+- src/scripts/browser.js
+- src/scripts/trust.js
+- src/scripts/vehicle.js
+- src/scripts/go-stamp.sh
+- src/doors/git.js
+- src/doors/fake/git.js
+- .vale.ini
+- test/contract/cli-doors.test.js
+- test/contract/front.test.js
+- test/contract/http.test.js
+- test/contract/git.test.js
+- test/contract/outside-in-doors.test.js
+- test/contract/go-stamp.test.js
+- test/contract/drawing-page.test.js
+- test/level0/cli-exit.test.js
+- test/level0/editor.test.js
+- test/level0/stand.test.js
+- test/level0/git-batch.test.js
+- test/level0/drawn-twin.js
+- test/level0/v1-index.js
+- test/level0/drawing-edit.test.js
+- test/level0/lens-v1.test.js
+- test/level0/lens-actions.test.js
+- test/level0/lens.test.js
+- test/level0/fields-to-fill.test.js
+- test/level0/route-host.test.js
+- test/level0/sidebar-writes.test.js
+- src/modules/tickets/drawn.go
+- src/modules/tickets/drawn_test.go
+- src/modules/tickets/testdata/drawn.golden.json
+- src/branches/free_test.go
+- src/branches/hook_reads_test.go
+- src/quack/ticket_doors_test.go
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- src/vehicle/vehicle.go
+- the Go files whose comments name a leaving or gone script, as the callers list names them
+- spec/design_output/work.md
+- spec/design_output/review.md
+- spec/design_output/level0.md
+- spec/design_output/lsp.md
+- spec/design_output/index.md
+- spec/design_output/tui.md
+- spec/design_output/migration.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Every file, function and verb the approach names stands opened, and each claim checked there, among them `HomeIn`, `drawnOf`, `freeIn`, `staleClaim`, `StaleSpan` and `goGate`.
+- The callers list names every importer git grep finds of each of the eight files, the helper chain behind them, and every comment naming them as an owner.
+- `git ls-files` decides the first done_when line, the new branch tests the second, and `./RUNME.sh check` the third.
+- The approach adds no config key, so no default file changes.
 
 ## tests-red
 
