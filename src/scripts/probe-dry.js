@@ -97,7 +97,32 @@ export function deltaOf(here, at) {
   const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
     cwd: at,
   });
-  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+  if (ran.exitCode !== 0) return "";
+  return (ran.stdout ?? "") + untrackedDelta(here, at);
+}
+
+// Each untracked file the ignore rules let through, as a new-file patch, so a file the change adds before its commit reaches the clone. [[spec/tickets/every-named-path-resolves]]
+function untrackedDelta(here, at) {
+  const listed = here.proc.run(
+    ["git", "ls-files", "--others", "--exclude-standard", "-z"],
+    {
+      cwd: at,
+    },
+  );
+  if (listed.exitCode !== 0) return "";
+  return String(listed.stdout ?? "")
+    .split("\0")
+    .filter(Boolean)
+    .map(
+      (path) =>
+        here.proc.run(
+          ["git", "diff", "--no-index", "--binary", "--", "/dev/null", path],
+          {
+            cwd: at,
+          },
+        ).stdout ?? "",
+    )
+    .join("");
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]

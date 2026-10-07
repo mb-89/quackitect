@@ -83,6 +83,17 @@ func echoes(ran proc.Command) proc.Said {
 	return proc.Said{Out: strings.Join(ran.Argv[1:], " ") + "\n"}
 }
 
+// The span the fixture's claims go stale past, which the cases' clocks read against. [[spec/tickets/stale-span-reads-schema-unset]]
+const fixtureSpan = "12h"
+
+// The fixture's config door: the stale span, and nothing past it. [[spec/tickets/stale-span-reads-schema-unset]]
+func fixtureConfig(key string) any {
+	if key == staleKey {
+		return fixtureSpan
+	}
+	return nil
+}
+
 // A tree with main carrying the files, pushed to origin, on a cloud box. [[spec/tickets/work-verbs-port-to-go]]
 func newTree(t *testing.T, files map[string]string) *tree {
 	t.Helper()
@@ -103,15 +114,16 @@ func newTree(t *testing.T, files map[string]string) *tree {
 	}
 	one.run = &proc.FakeRunner{Programs: map[string]proc.Program{"false": exits(1), "true": exits(0), "sh": exits(0), "echo": echoes, "go": one.pfGo, "node": one.pfNode}}
 	one.d = &Doors{
-		Root:  testRoot,
-		Repo:  one.repo,
-		Run:   one.run.Run,
-		Disk:  one.disk,
-		Env:   map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_CLOUD": "", "CLAUDECODE": ""},
-		Now:   func() time.Time { return testNow },
-		Out:   &one.out,
-		Errs:  &one.errs,
-		Runme: []string{"false"},
+		Root:   testRoot,
+		Repo:   one.repo,
+		Run:    one.run.Run,
+		Disk:   one.disk,
+		Env:    map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_CLOUD": "", "CLAUDECODE": ""},
+		Now:    func() time.Time { return testNow },
+		Out:    &one.out,
+		Errs:   &one.errs,
+		Runme:  []string{"false"},
+		Config: fixtureConfig,
 	}
 	return one
 }

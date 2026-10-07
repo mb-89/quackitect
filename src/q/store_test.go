@@ -10,6 +10,13 @@ import (
 	"time"
 )
 
+// The names a set holds come back in sorted order. [[spec/design_output/model#snapshots-and-revisions]]
+func TestSortedKeysAnswerTheSetInOrder(t *testing.T) {
+	if got := fmt.Sprint(sortedKeys(map[string]bool{"t/b": true, "t/a": true})); got != "[t/a t/b]" {
+		t.Fatalf("sortedKeys answers %s", got)
+	}
+}
+
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
 	n := OutIn(c, "t/n", 0)

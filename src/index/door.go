@@ -74,6 +74,9 @@ type door struct {
 	dirty chan struct{}
 	eyes  *watcher.Watcher
 
+	// Whether a module answers a verb, which the tool list and the action routes read. [[spec/tickets/every-index-tool-answers]]
+	accepts func(module, verb string) bool
+
 	pending atomic.Bool
 	// The paths the watch names since the last settle, whether git's own index moved, and whether the plan moved. [[spec/design_output/index#a-change-moves-its-rows]]
 	heard   sync.Mutex
@@ -292,6 +295,7 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 		}
 	}
 	one.call = managed.Call
+	one.accepts = managed.Accepts
 	one.bus = managed.Bus
 	stops, err := one.starts(starts)
 	if err != nil {

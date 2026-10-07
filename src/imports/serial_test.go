@@ -29,6 +29,10 @@ func TestBarred(t *testing.T) {
 	setsHome(t)
 }
 
+func TestRegisters(t *testing.T) {
+	registersFor(t, "a verb", nil)
+}
+
 func TestAlone(t *testing.T) {
 	t.Run("a subtest", func(t *testing.T) { t.Parallel() })
 }

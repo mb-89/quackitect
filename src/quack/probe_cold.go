@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
 	"os"
@@ -90,7 +92,7 @@ func stepsOf(stream string) coldSteps {
 		if one.text("type") == "result" {
 			steps.result = one.text("result")
 		}
-		if one.text("type") != "assistant" || truthy(one["parent_tool_use_id"]) {
+		if one.text("type") != "assistant" || yaml.Truthy(one["parent_tool_use_id"]) {
 			continue
 		}
 		message, _ := one["message"].(map[string]any)
@@ -106,21 +108,6 @@ func stepsOf(stream string) coldSteps {
 		}
 	}
 	return steps
-}
-
-// Whether a JSON value reads as true in JavaScript. [[spec/design_output/level0#the-cold-probe]]
-func truthy(value any) bool {
-	switch one := value.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case string:
-		return one != ""
-	case float64:
-		return one != 0
-	}
-	return true
 }
 
 // One check of the cold probe, whether it passes, and what shows it. [[spec/design_output/level0#the-cold-probe]]

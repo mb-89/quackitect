@@ -1,6 +1,6 @@
 // The check verb: the tests, level zero, the Go tests, the doors, the
-// projections, the plugin, its types, the server, then the rules over the tree, each
-// part timed, and the stamp a door reads before a push.
+// projections, the plugin, its types, the server and the rules over the tree,
+// all at once and each timed, and the stamp a door reads before a push.
 // [[spec/design_output/work#the-battery-answers-first]]
 package main
 
@@ -28,8 +28,10 @@ const (
 	lintFile    = runtimeDir + "/lint-found.json"
 	goRedFile   = runtimeDir + "/go-red.json"
 	pointerFile = runtimeDir + "/vehicle.json"
+	indexFile   = runtimeDir + "/index.json"
 	reporter    = "src/scripts/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
+	installer   = "src/scripts/install.sh"
 )
 
 // The flags and variables the parts read: the quiet run, the working change the dry session clones, the tally the process door writes, the list the lint leaves, and Go with no C compiler. [[spec/tickets/the-verbs-need-no-wrapper]] [[spec/tickets/level0-runs-on-the-door]]
@@ -50,23 +52,28 @@ const (
 
 const noErrors = "The check names no red case and no finding at error."
 
+// The line a red part prints, while the parts beside it run on. [[spec/tickets/the-parts-start-at-once]]
+const redPart = "%s answers red, and the parts beside it ran on.\n"
+
 var (
 	goTestFunc = regexp.MustCompile(`(?m)^func (Test\w+)\(`)
 	goFailRow  = regexp.MustCompile(`^\s*--- FAIL`)
 )
 
-// One part of the battery: its name, its run, and whether it runs beside the parts after it. [[spec/design_output/work#the-battery-answers-first]]
+// One part of the battery: its name, its run, and whether it leads, running before the parts that load the box. [[spec/design_output/work#the-battery-answers-first]]
 type part struct {
-	name   string
-	run    func() int
-	beside bool
+	name string
+	run  func() int
+	lead bool
 }
 
-// What the check reaches: the root, a verb through quack's own road, a process, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
+	self      string
 	verb      func(words []string, quiet bool) int
 	run       func(argv, env []string, quiet bool) (int, string, error)
+	indexUp   func() bool
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
 	platform  string
@@ -123,7 +130,14 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		}
 		_ = os.Remove(d.at(lintFile))
 		_ = os.Remove(d.at(goRedFile))
-		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
+		owned := !d.indexUp()
+		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
+		if owned {
+			stopsOwnIndex(d)
+		}
+		for _, name := range red {
+			fmt.Fprintf(d.errs, redPart, name)
+		}
 		lines := d.text(timesFile)
 		var found lintFound
 		_ = json.Unmarshal([]byte(d.text(lintFile)), &found)
@@ -132,7 +146,7 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			one := spawnsIn(string(tally))
 			spawns = &one
 		}
-		report := batteryOf(times, lines, slowestKept, unrun, spawns, total)
+		report := batteryOf(times, lines, slowestKept, nil, spawns, total)
 		var goRed []redCase
 		if json.Unmarshal([]byte(d.text(goRedFile)), &goRed) == nil {
 			report.Red = append(report.Red, goRed...)
@@ -194,45 +208,87 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery in order, each part timed under its name, stopping at the first red and naming the parts it leaves unrun. A part marked beside starts where it stands, the run goes on, and the run waits for it before it answers, so the total is the battery's own span. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-takes-a-minute]]
-func batteryRun(parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
+// The battery: the ready step alone, then each lead part alone in part order, then every other part at once. The last wave reads every start of its parts, then starts them and waits for all of them, each part timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, every lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
+func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
-	times := map[string]float64{}
-	var held sync.Mutex
-	timed := func(one part) int {
-		start := now()
-		code := one.run()
-		took := float64(now().Sub(start).Milliseconds())
-		held.Lock()
-		times[one.name] = took
-		held.Unlock()
-		return code
+	readyCode := ready.run()
+	readyTook := float64(now().Sub(from).Milliseconds())
+	starts := make([]time.Time, len(parts))
+	codes := make([]int, len(parts))
+	took := make([]float64, len(parts))
+	for at, one := range parts {
+		if one.lead {
+			starts[at] = now()
+			codes[at] = one.run()
+			took[at] = float64(now().Sub(starts[at]).Milliseconds())
+		}
 	}
-	code := 0
-	unrun := []string{}
-	beside := []chan int{}
-	for _, one := range parts {
-		if code != 0 {
-			unrun = append(unrun, one.name)
+	for at, one := range parts {
+		if !one.lead {
+			starts[at] = now()
+		}
+	}
+	var all sync.WaitGroup
+	for at, one := range parts {
+		if one.lead {
 			continue
 		}
-		if !one.beside {
-			code = timed(one)
+		all.Add(1)
+		go func() {
+			defer all.Done()
+			codes[at] = one.run()
+			took[at] = float64(now().Sub(starts[at]).Milliseconds())
+		}()
+	}
+	all.Wait()
+	code := readyCode
+	times := map[string]float64{ready.name: readyTook}
+	red := []string{}
+	if readyCode != 0 {
+		red = append(red, ready.name)
+	}
+	for at, one := range parts {
+		times[one.name] = took[at]
+		if codes[at] == 0 {
 			continue
 		}
-		done := make(chan int, 1)
-		go func(one part) { done <- timed(one) }(one)
-		beside = append(beside, done)
-	}
-	for _, done := range beside {
-		if said := <-done; code == 0 {
-			code = said
+		red = append(red, one.name)
+		if code == 0 {
+			code = codes[at]
 		}
 	}
-	return code, times, unrun, float64(now().Sub(from).Milliseconds())
+	return code, times, red, float64(now().Sub(from).Milliseconds())
 }
 
-// The battery's parts in the order they start, and a red part leaves the rest unrun. Level zero waits on its processes, so it runs beside the parts after the tests. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
+// The step every part waits on: the install, which builds a stale binary and swaps it in, then one ask of the index, which stands a door on the build the disk holds. A part reading the index mid-swap or mid-restart reads a door going down, which halts its tools and fails its operations, so the parts start once both stand. [[spec/tickets/index-cases-wait-for-it]]
+func readyOf(d checkDoors, quiet bool) part {
+	return part{name: "ready", run: func() int {
+		code, said, err := d.run([]string{"sh", installer}, nil, quiet)
+		if err != nil || code != 0 {
+			fmt.Fprintln(d.errs, strings.TrimSpace(said))
+			fmt.Fprintf(d.errs, "The install answers %d, so the parts read the binaries as they stand. %v\n", code, err)
+		}
+		code, said, err = d.run([]string{d.self, "standing"}, nil, true)
+		if err != nil || code != 0 {
+			fmt.Fprintln(d.errs, strings.TrimSpace(said))
+			fmt.Fprintln(d.errs, "The index stands no door here, so every part reading it reads nothing.")
+			return max(code, 1)
+		}
+		return 0
+	}}
+}
+
+// The index door the run stood up stops once every part ends, through the process door, so the run leaves no process behind it. A door standing before the run is the desk's own, and stays. [[spec/tickets/the-check-runs-beside]]
+func stopsOwnIndex(d checkDoors) {
+	if !d.indexUp() {
+		return
+	}
+	if code, said, err := d.run([]string{d.self, "stop"}, nil, true); err != nil || code != 0 {
+		fmt.Fprintf(d.errs, "The index the check stood up answers %d to its stop, so its processes stand on. %v %s\n", code, err, strings.TrimSpace(said))
+	}
+}
+
+// The battery's parts, which all start at once once the ready step ends. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
 func partsOf(d checkDoors, words []string, quiet bool) []part {
 	where := []string{}
 	for _, one := range words {
@@ -244,8 +300,8 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		where = []string{"."}
 	}
 	return []part{
-		{name: "tests", run: func() int { return testsRun(d, quiet) }},
-		{name: "level0", run: func() int { return level0Runs(d, quiet) }, beside: true},
+		{name: "tests", run: func() int { return testsRun(d, quiet) }, lead: true},
+		{name: "level0", run: func() int { return level0Runs(d, quiet) }, lead: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},
@@ -259,7 +315,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 // The trial that runs the live client on the owner's Windows desk, which no box reaches. [[spec/tickets/level0-claims-name-the-platform]]
 const deskTrial = "spec/tickets/desk-probe-reply-trial"
 
-// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]]
+// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]] The smoke's door start waits a bounded window, so it runs at the priority the parts beside it take. [[spec/tickets/the-check-runs-beside]]
 func level0Runs(d checkDoors, quiet bool) int {
 	code := d.verb([]string{"probe", "smoke", workingFlag}, quiet)
 	if code != 0 {

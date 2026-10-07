@@ -741,16 +741,36 @@ So `done` stops meaning "the session believes this passes". It comes to mean
 reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
 the Bash door alike, so a warning holds every road off the box.
 
+The ready step runs alone before the parts, and every part waits on it:
+
+| the ready step | why a part waits on it |
+|---|---|
+| the install | a stale binary rebuilds and swaps in, so a part meets no binary mid-swap |
+| one ask of the index | a door stands on the build the disk holds, so a part meets no door going down |
+
+A door going down halts the tools it runs and fails the operations in flight,
+so a part reading it reads nothing. No part reads another part's output, so no
+part waits on another. `readyOf` in `src/quack/check.go` holds the step.
+[[spec/tickets/index-cases-wait-for-it]]
+
+The tests and the level zero smoke lead: each runs alone after the ready
+step, the tests first, and every other part starts once both end. Their cases bound the
+wall clock, a door start or a call's latency, and a box the go build and the
+whole-tree Vale load runs past them.
+Where no index door stands before the run, the check stops the one it stands
+up once every part ends, so a run leaves no process behind.
+[[spec/tickets/the-check-runs-beside]]
+
 The battery's report rides the stamp under `battery`, and a retro keeps one a
 retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 
 | field | holds |
 |---|---|
-| `parts` | a time a part, in the order each ends |
-| `total` | the battery's span, start to end, which counts a part running beside the rest once |
+| `parts` | a time a part, in the order each ends, the ready step among them |
+| `total` | the battery's span, start to end: the ready step, each lead part, then the slowest other part, since every other part starts at once |
 | `slowest` | the slowest cases, each with its file |
 | `files` | a time a test file, the slowest first |
-| `unrun` | the parts a red run leaves unrun |
+| `unrun` | the parts a red run leaves unrun on an older stamp, and nothing on a new one, since every part runs |
 | `red` | each red case, with the error line the runner writes under it |
 | `spawns` | the spawns the tests make, and how many of them are Vale |
 
@@ -758,8 +778,8 @@ The stamp keeps each run's `parts` under `runs`, newest first, up to the count
 `battery.runs` names in `spec/config/level0.json`. It keeps a run of the
 stamp's own `sha` alone, so a median reads one tree and no change of code
 reads as noise. Collect writes each part's median into the retro's report.
-It reads a part over the runs that reach it, because a red run leaves the parts
-past it unrun. The median covers `parts` and their `total` alone. The `slowest`
+It reads a part over the runs that reach it, because an older stamp leaves
+the parts past a red unrun. The median covers `parts` and their `total` alone. The `slowest`
 cases and the `files` stay off the last run.
 
 A first retro reads against nothing, so the effect step writes its battery

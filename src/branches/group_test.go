@@ -62,3 +62,12 @@ func TestADependencyReadsBare(t *testing.T) {
 		t.Fatalf("the listed waits read %v", got)
 	}
 }
+
+// A hash_after reading false leaves the take open, as JavaScript reads the field. [[spec/tickets/shared-helpers-stand-once]]
+func TestAHashAfterReadingFalseLeavesTheTakeOpen(t *testing.T) {
+	t.Parallel()
+	taken := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "abc"}, {Key: "hash_after", Value: "false"}})
+	if take := heldIn(taken); take == nil || take.HashBefore != "abc" {
+		t.Fatalf("the take holds %+v", take)
+	}
+}

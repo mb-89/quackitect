@@ -12,6 +12,7 @@ import (
 
 	"quackitect/src/q"
 	"quackitect/src/ticket"
+	"quackitect/src/yaml"
 )
 
 // The hold files, which .claude/skills/level0/lib/folders.js owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -114,7 +115,7 @@ func standingOf(in standingIn) []Standing {
 		if json.Unmarshal([]byte(in.Files[at].Text), &said) != nil {
 			continue
 		}
-		one := Standing{Ticket: text(said.Ticket), Path: strings.TrimSpace(text(said.Path)), Step: text(said.Step), Hand: strings.TrimSpace(text(said.Hand))}
+		one := Standing{Ticket: yaml.JSONText(said.Ticket), Path: strings.TrimSpace(yaml.JSONText(said.Path)), Step: yaml.JSONText(said.Step), Hand: strings.TrimSpace(yaml.JSONText(said.Hand))}
 		if one.Path != "" && closed[one.Path] {
 			continue
 		}
@@ -122,18 +123,6 @@ func standingOf(in standingIn) []Standing {
 		out = append(out, one)
 	}
 	return out
-}
-
-// A JSON field as the text String() makes of it, and empty where it stands absent. [[spec/tickets/the-lens-reads-v1]]
-func text(said any) string {
-	switch one := said.(type) {
-	case nil:
-		return ""
-	case string:
-		return one
-	}
-	body, _ := json.Marshal(said)
-	return string(body)
 }
 
 // The bless file's agent word, and false where the file stands absent or unread. [[spec/design_output/pull#the-bless]]

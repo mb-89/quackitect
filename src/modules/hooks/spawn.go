@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/yaml"
 )
 
 // The field a spawn the wrapper makes itself carries, which takes no tag. [[spec/design_output/pull#a-hand-of-its-own]]
@@ -22,7 +23,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
 	}
 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
 	tag := ""
-	if !truthy(post.E[ownField]) {
+	if !yaml.Truthy(post.E[ownField]) {
 		tag = spawnTagOf(disk{root})
 	}
 	if layer == "" && tag == "" {

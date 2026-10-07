@@ -8,6 +8,7 @@ import { register } from "../../.claude/skills/level0/hooks/pull-tool.ts";
 import {
   binaryOf,
   callsIndexTool,
+  RUNNING,
   registersIndexTools,
 } from "../../.claude/skills/level0/lib/index-tools.js";
 import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
@@ -85,4 +86,18 @@ test("a binary that answers nothing registers no tool", async () => {
     assert.deepEqual(await registersIndexTools($, BIN), []);
     assert.deepEqual(registered, []);
   }
+});
+
+test("a call of an index tool runs act under the pull's wait, and a run that rejects answers a line naming it", async () => {
+  const { $ } = engine();
+  const tools = await registersIndexTools($, BIN);
+  const waits = [];
+  $.process.run = async (argv, init) => {
+    waits.push(init?.timeoutMs);
+    throw new Error("the child outlasts its time");
+  };
+  const said = await callsIndexTool($, BIN, tools, { tool: "mcp__level0__index_t_add", a: 2, b: 3 });
+  assert.deepEqual(waits, [RUNNING]);
+  assert.match(said, /t\/add/);
+  assert.match(said, /the child outlasts its time/);
 });

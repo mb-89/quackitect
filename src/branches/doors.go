@@ -58,6 +58,8 @@ type Doors struct {
 	Value func(name string, into any) error
 	// Every leaf's notes, keyed process:path, off the Go guidance module. [[spec/tickets/the-guidance-topic-lands]]
 	Guidance func() (map[string][]string, error)
+	// The door every GitHub and routine request goes through. Nil sends nothing. [[spec/tickets/branch-done-opens-the-pr]]
+	Send Send
 }
 
 // Prints what git said on red, as a loud git run does, and answers whether it ran green. [[spec/design_output/doors#a-door-standing-on-another]]

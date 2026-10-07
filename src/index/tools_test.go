@@ -6,6 +6,7 @@ package index
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -85,6 +86,124 @@ func listedTools(t *testing.T) map[string]listedTool {
 		out[one.Name] = one
 	}
 	return out
+}
+
+// A door over t/add, which a module answers, and t/ghost, whose request no module accepts, and the tools it lists. [[spec/tickets/every-index-tool-answers]]
+func ghostTools(t *testing.T) (Standing, []listedTool) {
+	t.Helper()
+	c := q.New()
+	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
+	q.ActionIn(c, "t/add", func(in addIn) []q.Request {
+		return []q.Request{{Module: "t", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
+	}, q.Doc("adds two terms"), q.Answers[addOut]())
+	q.ActionIn(c, "t/ghost", func(in addIn) []q.Request {
+		return []q.Request{{Module: "ghost", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
+	}, q.Doc("asks a module nobody runs"), q.Answers[addOut]())
+	return toolsOver(t, c, ops)
+}
+
+// A door over the catalog, whose manager answers module t alone, and the tools it lists. [[spec/tickets/tool-list-keeps-unreadable-actions]]
+func toolsOver(t *testing.T, c *q.Catalog, ops q.Writer) (Standing, []listedTool) {
+	t.Helper()
+	root := tree(t)
+	answers := func(module, _ string) bool { return module == "t" }
+	accept := func(asked q.Request) (any, error) {
+		if !answers(asked.Module, asked.Verb) {
+			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
+		}
+		in, _ := asked.Args.(addIn)
+		return addOut{Sum: in.A + in.B}, nil
+	}
+	fake := fakeManager(ops, accept)
+	manage := func(root string, store *q.Store, rows OpRows, reads Reads, steps func(func())) (Managed, error) {
+		one, err := fake(root, store, rows, reads, steps)
+		one.Accepts = answers
+		return one, err
+	}
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(stop)
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, body := getV1(t, standing, "/v1/tools")
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil || said.StatusCode != http.StatusOK {
+		t.Fatalf("/v1/tools answers %d, %.300s: %v", said.StatusCode, body, err)
+	}
+	return standing, list
+}
+
+// Each tool the list names answers a call through the route act posts to. [[spec/tickets/every-index-tool-answers]]
+func TestEachListedToolAnswersACallThroughAct(t *testing.T) {
+	t.Parallel()
+	standing, list := ghostTools(t)
+	if len(list) == 0 {
+		t.Fatal("the list holds no tool, and wants t/add")
+	}
+	for _, one := range list {
+		said, body := postV1(t, standing, "/v1/actions/"+one.Action, "wait=5", `{"a":2,"b":3}`)
+		if out := postedOf(t, body); said.StatusCode != http.StatusOK || out.Result == nil || out.Result.Sum != 5 {
+			t.Errorf("%s answers %d: %s", one.Name, said.StatusCode, body)
+		}
+	}
+}
+
+// The list keeps an action whose zero input it cannot read: one that panics on it, one that opens no request on it, and one that asks a refused module only past it. [[spec/tickets/tool-list-keeps-unreadable-actions]]
+func TestTheToolListKeepsAnActionItsZeroInputCannotRead(t *testing.T) {
+	t.Parallel()
+	c := q.New()
+	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
+	q.ActionIn(c, "t/panics", func(in addIn) []q.Request {
+		return []q.Request{{Module: "ghost", Verb: "add", Args: []int{}[in.B]}}
+	}, q.Doc("panics on every input before it names its request"), q.Answers[addOut]())
+	q.ActionIn(c, "t/quiet", func(in addIn) []q.Request {
+		if in.A == 0 {
+			return nil
+		}
+		return []q.Request{{Module: "t", Verb: "add", Args: in}}
+	}, q.Doc("opens no request on a zero input"), q.Answers[addOut]())
+	q.ActionIn(c, "t/later", func(in addIn) []q.Request {
+		if in.A == 0 {
+			return []q.Request{{Module: "t", Verb: "add", Args: in}}
+		}
+		return []q.Request{{Module: "ghost", Verb: "add", Args: in}}
+	}, q.Doc("asks a refused module past a zero input"), q.Answers[addOut]())
+	_, list := toolsOver(t, c, ops)
+	names := map[string]bool{}
+	for _, one := range list {
+		names[one.Action] = true
+	}
+	for _, kept := range []string{"t/panics", "t/quiet", "t/later"} {
+		if !names[kept] {
+			t.Errorf("the list leaves out %s, and names %v", kept, names)
+		}
+	}
+}
+
+// The routes serve no action whose request no module accepts, so the route and the list agree. [[spec/tickets/accepts-reads-away-modules]]
+func TestTheRoutesServeNoActionNoModuleAccepts(t *testing.T) {
+	t.Parallel()
+	standing, _ := ghostTools(t)
+	if said, body := postV1(t, standing, "/v1/actions/t/ghost", "wait=5", `{"a":2,"b":3}`); said.StatusCode != http.StatusNotFound {
+		t.Errorf("t/ghost answers %d: %s", said.StatusCode, body)
+	}
+}
+
+// The list leaves out an action whose request no module accepts, and keeps the one a module answers. [[spec/tickets/every-index-tool-answers]]
+func TestTheToolListSkipsAnActionNoModuleAccepts(t *testing.T) {
+	t.Parallel()
+	_, list := ghostTools(t)
+	names := map[string]bool{}
+	for _, one := range list {
+		names[one.Action] = true
+	}
+	if !names["t/add"] || names["t/ghost"] {
+		t.Errorf("the list names %v, and wants t/add without t/ghost", names)
+	}
 }
 
 func TestV1ListsEachActionAsATool(t *testing.T) {

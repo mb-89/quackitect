@@ -5,9 +5,34 @@
 # the quackitect panel showing. With a verb, it hands the verb to the command
 # line.
 set -eu
-here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# The folder comes off $0 by the shell's own words, so a box whose dirname fails still finds it, and an absolute folder stands as given. [[spec/tickets/bare-runme-exits-clean]]
+dir=.
+case $0 in */*) dir=${0%/*} ;; esac
+case ${0##*/} in *\\*) dir=${0%\\*} ;; esac
+case $dir in
+'') here=/ ;;
+/* | [A-Za-z]:*) here=$dir ;;
+*) here=$(CDPATH= cd -- "$dir" && pwd) ;;
+esac
 
 sh "$here/src/scripts/install.sh"
+
+# A cloud box reads each variable as cloudVariables in src/quack/command.go does: trimmed, and empty, 0 or false names a desk. [[spec/tickets/bare-runme-exits-clean]]
+cloud_box() {
+  for name in CLAUDE_CODE_REMOTE SE_CLOUD; do
+    eval "said=\${$name:-}"
+    said=${said#"${said%%[![:space:]]*}"}
+    said=${said%"${said##*[![:space:]]}"}
+    case $said in
+    '' | 0 | [Ff][Aa][Ll][Ss][Ee]) ;;
+    *) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+# A bare call on a cloud box prints the verbs, since no editor opens there. [[spec/tickets/bare-runme-exits-clean]]
+[ "$#" -eq 0 ] && cloud_box && set -- help
 
 # [[spec/design_output/editor#one-command-opens-the-editor]]
 if [ "$#" -eq 0 ]; then

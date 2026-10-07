@@ -53,25 +53,11 @@ func RefusedTodo(names []string) string {
 
 // A tag is any value past false: a bare true, or the name of the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
 func isTagged(text string) bool {
-	said := frontOf(text).Get(todoKey)
+	said := yaml.FrontOf(text).Get(todoKey)
 	return said != nil && said != false && yaml.AsString(said) != "false"
 }
 
 // [[spec/tickets/gate-points-pass-the-push]]
 func isGatePoint(text string) bool {
-	return yaml.AsString(frontOf(text).Get(pointKey)) == gatePoint
-}
-
-// The front a note opens with, or none. [[spec/design_output/schema#what-a-note-reads-as]]
-func frontOf(text string) *yaml.Doc {
-	rows := lineEnd.Split(text, -1)
-	if strings.TrimSpace(rows[0]) != frontFence {
-		return nil
-	}
-	for at := 1; at < len(rows); at++ {
-		if strings.TrimSpace(rows[at]) == frontFence {
-			return yaml.AsDoc(yaml.Read(strings.Join(rows[1:at], "\n")))
-		}
-	}
-	return nil
+	return yaml.AsString(yaml.FrontOf(text).Get(pointKey)) == gatePoint
 }

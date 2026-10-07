@@ -6,6 +6,8 @@
 package hooks
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -135,7 +137,7 @@ func stepStops(state Stops, event q.Event) Stops {
 	case saidEvent:
 		state.Reported = state.Reported || stop.ReportStands(textOf(fields, "text"))
 	case spawnEvent:
-		if truthy(fields["background"]) {
+		if yaml.Truthy(fields["background"]) {
 			state.Helpers++
 		}
 	case measureEvent:
@@ -168,7 +170,7 @@ func (state Stops) copied() Stops {
 
 // A prompt from outside the plugin puts the run of holds back, an owner's prompt opens a turn no report answers yet, and the binding reads again. [[spec/design_output/stop#the-tooth-holds-its-state]]
 func (state *Stops) prompted(fields, held map[string]any, facts Stopped, at time.Time) {
-	if !truthy(fields["mine"]) {
+	if !yaml.Truthy(fields["mine"]) {
 		state.InARow = 0
 	}
 	origin, _ := fields["origin"].(map[string]any)
@@ -371,7 +373,7 @@ func (state Stops) factsOf(held map[string]any, facts Stopped, holds Holds, clai
 		hold = holds.Stood
 	}
 	return stop.Facts{
-		Off: facts.Off, Hold: hold, Claimed: claimed, Text: text, Cloud: truthy(held[heldCloud]), Binding: textOf(held, heldBinding),
+		Off: facts.Off, Hold: hold, Claimed: claimed, Text: text, Cloud: yaml.Truthy(held[heldCloud]), Binding: textOf(held, heldBinding),
 		Prompts: state.Prompts, Todos: state.standing(), Helpers: state.Helpers, Reported: state.Reported,
 		Group: facts.Group, Holds: facts.Holds, Private: facts.Private, Queue: facts.Queue, PersonStep: facts.PersonStep,
 		Working: facts.Working, Planned: facts.Planned, Rules: facts.Rules,

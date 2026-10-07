@@ -7,8 +7,19 @@ package proc
 import (
 	"context"
 	"os"
+	"os/exec"
 	"testing"
 )
+
+// A command a caller outside the door builds ends whole once Whole readies it. [[spec/tickets/the-check-ends-what-it-drops]]
+func TestWholeReadiesACallersCommandToEndItsGroup(t *testing.T) {
+	t.Parallel()
+	cmd := &exec.Cmd{}
+	Whole(cmd)
+	if cmd.SysProcAttr == nil || !cmd.SysProcAttr.Setpgid || cmd.Cancel == nil {
+		t.Fatal("Whole leaves the command in its caller's group, so its end leaves its children running")
+	}
+}
 
 // [[spec/tickets/the-check-ends-what-it-drops]]
 func TestARunOffTheCallersStreamsEndsWithEveryProcessItStarted(t *testing.T) {

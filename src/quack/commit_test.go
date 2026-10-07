@@ -267,6 +267,19 @@ func TestCommitVerbMoves(t *testing.T) {
 	})
 }
 
+// The commit verb refuses a message whose trailer names a model, before anything runs or lands. [[spec/tickets/commit-door-refuses-model-trailers]]
+func TestCommitVerbRefusesAModelTrailer(t *testing.T) {
+	t.Parallel()
+	at := landingRepo(t)
+	lays(t, at.root, "src/a.go", "package a\n")
+	d, heard, _ := fakeLanding(at)
+	line := "Co-Authored-By: Claude Opus 5.5"
+	code, _, errs := runsTwin(commitVerb(d), "commit", opens+"\n\n"+line)
+	if code != exitUsage || at.subject() == opens || len(heard.ran) != 0 || !strings.Contains(errs, line) {
+		t.Fatalf("commit answers %d, %q, HEAD %q, ran %v", code, errs, at.subject(), heard.ran)
+	}
+}
+
 // Whether origin carries the branch. [[spec/tickets/takeover-rescues-unpushed-commits]]
 func (at *landing) originHas(branch string) bool {
 	_, ok := at.origin.Resolve("refs/heads/" + branch)
@@ -342,6 +355,15 @@ func TestCommitVerbGates(t *testing.T) {
 		}
 		if heard.ran[0][0] != "test" || !strings.Contains(out, "The cold probe passes on the staged change to src/quack/a.go.") {
 			t.Fatalf("commit ran %v and said %q", heard.ran, out)
+		}
+	})
+	t.Run("a staged file entry of the pull's cold path runs the probe", func(t *testing.T) {
+		at := landingRepo(t)
+		lays(t, at.root, "src/scripts/install.sh", "#!/bin/sh\n")
+		d, heard, _ := fakeLanding(at)
+		d.claude = filepath.Join(at.root, "README.md")
+		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("probe cold") {
+			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
 	})
 	t.Run("a staged list off the cold path runs no probe", func(t *testing.T) {

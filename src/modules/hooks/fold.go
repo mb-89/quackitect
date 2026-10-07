@@ -5,6 +5,8 @@
 package hooks
 
 import (
+	"quackitect/src/yaml"
+
 	"math"
 	"regexp"
 	"strconv"
@@ -369,7 +371,7 @@ func (state *Holds) chain(tool string, held map[string]any) (string, string) {
 	if word, text, ok := state.holdsCall(tool, held); ok {
 		return word, text
 	}
-	if tool == askTool && truthy(held[heldCloud]) {
+	if tool == askTool && yaml.Truthy(held[heldCloud]) {
 		return RefuseWord, asksNobody
 	}
 	// ToolSearch loads a schema and changes nothing, so it passes the grace and the demand and spends neither, and a context the handover clears still loads the tool the grace asks for. [[spec/tickets/toolsearch-rides-the-plan-ask]]
@@ -488,7 +490,7 @@ func pastRow(rows []any, before string) []string {
 	}
 	owner := -1
 	for where := at + 1; where < len(rows); where++ {
-		if row, _ := rows[where].(map[string]any); textOf(row, "role") == "user" && !truthy(row["results"]) {
+		if row, _ := rows[where].(map[string]any); textOf(row, "role") == "user" && !yaml.Truthy(row["results"]) {
 			owner = where
 			break
 		}
