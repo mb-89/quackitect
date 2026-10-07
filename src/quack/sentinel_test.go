@@ -1,6 +1,6 @@
 // The sentinel the wiring builds, over the fake registry, clock and runner.
 // [[spec/tickets/the-hooks-feed-the-sentinel]]
-package main
+package main // level0: InPackageTest - no external test imports a main package, and the case reaches sentinelHere, sentinelOver, say and sessionLog
 
 import (
 	"bytes"
@@ -57,6 +57,7 @@ func TestSentinelOverSaysALostRow(t *testing.T) {
 }
 
 // The sentinel the wiring hands the hooks door reads the tree's nodes and writes a fired row into the session log. [[spec/tickets/wiring-names-listens-hooks]]
+// level0: FixtureOutsideHome - the sentinel reads its node and writes its session log under a root of the case's own
 func TestSentinelHereWritesTheSessionLog(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

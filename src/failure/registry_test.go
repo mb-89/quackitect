@@ -1,7 +1,7 @@
 // The registry keys every node by its id, off the folder or off the nodes a
 // case hands in.
 // [[spec/design_output/failures#the-registry-reads-the-nodes]]
-package failure
+package failure // level0: InPackageTest - declares heldNode, which the in-package check_test and schema_test read
 
 import (
 	"reflect"

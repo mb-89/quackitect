@@ -1,7 +1,7 @@
 // A node naming no remedy meets a fault of the failure schema, and a node
 // naming one meets none.
 // [[spec/design_output/failures#a-failure-is-a-node]]
-package failure
+package failure // level0: InPackageTest - reaches heldNode, which registry_test declares in-package
 
 import (
 	"os"

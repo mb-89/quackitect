@@ -1,7 +1,7 @@
 // The pull, the take and the mint raise every refusal through the failure
 // door, so no refusal text stands written past it in their files.
 // [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-package main
+package main // level0: InPackageTest - no external test imports a main package, and the case reaches treeRoot
 
 import (
 	"os"

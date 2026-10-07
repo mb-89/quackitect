@@ -1,7 +1,7 @@
 // The tree holds the registry: every node names a remedy, and every raised
 // id stands as a node. src/quack/refusals_test.go holds the moved files.
 // [[spec/design_output/failures#the-check-holds-the-registry]]
-package failure
+package failure // level0: InPackageTest - reaches treeRoot, the in-package root of the tree
 
 import (
 	"strings"

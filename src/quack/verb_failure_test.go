@@ -1,7 +1,7 @@
 // The failure verb raises a node's lines and writes its row, writes a node
 // and refuses one off its shape, and counts the failures the log holds.
 // [[spec/design_output/failures#an-agent-raises-by-verb]]
-package main
+package main // level0: InPackageTest - no external test imports a main package, and the cases reach failureVerb, failureDoors, twin, readIn and sessionLog
 
 import (
 	"bytes"
@@ -29,7 +29,7 @@ func failureOver(t *testing.T, files map[string]string) (string, twin) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the verb writes, stages and logs nodes under a root of the case's own
 	seeded := map[string]string{failureSchema: string(schema)}
 	for at, text := range files {
 		seeded[at] = text

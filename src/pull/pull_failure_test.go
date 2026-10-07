@@ -1,7 +1,7 @@
 // The pull raises each refusal through the failure door: the id, its level
 // and each remedy print beneath the message, and the log row carries the id.
 // [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-package pull
+package pull // level0: InPackageTest - reaches the in-package helpers cloudPull and must
 
 import (
 	"strings"

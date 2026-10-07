@@ -298,6 +298,7 @@ func TestAStringResultReachesTheHarnessUnderAResultKey(t *testing.T) {
 }
 
 // The sentinel hears each post as its event and its payload, so a watch matches a tool's command. [[spec/tickets/the-hooks-feed-the-sentinel]]
+// level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own
 func TestHookHandsEachPostToHear(t *testing.T) {
 	heard := []failure.Event{}
 	one := doorOver(t, &calls{}, &book{})
@@ -314,6 +315,7 @@ type stillTimer struct{}
 func (stillTimer) After(time.Duration, func(time.Time)) (stop func()) { return func() {} }
 
 // A post a watch matches fires its failure, and the row lands through the say the sentinel holds. [[spec/tickets/hooks-test-reads-fired-row]]
+// level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own
 func TestHookPostFiresTheWatchedRow(t *testing.T) {
 	rows := []map[string]any{}
 	say := func(row map[string]any) { rows = append(rows, row) }

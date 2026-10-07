@@ -1,7 +1,7 @@
 // The fault functions name each break of the registry off the texts a case
 // hands in.
 // [[spec/design_output/failures#the-check-holds-the-registry]]
-package failure
+package failure // level0: InPackageTest - reaches held and heldNode, which raise_test and registry_test declare in-package
 
 import (
 	"reflect"

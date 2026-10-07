@@ -1,7 +1,7 @@
 // The take and the branch guards raise each refusal through the failure door:
 // the id, its level and each remedy print beneath the message, and the log
 // row carries the id. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-package branches
+package branches // level0: InPackageTest - reaches the in-package tree fixture newTree and tree, and codeOK
 
 import (
 	"strings"

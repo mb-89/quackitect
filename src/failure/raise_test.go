@@ -1,7 +1,7 @@
 // The door answers the lines a refusal prints and the row the log takes,
 // off the registry a case hands in.
 // [[spec/design_output/failures#one-door-raises-a-failure]]
-package failure
+package failure // level0: InPackageTest - declares held, which the in-package check_test reads
 
 import (
 	"reflect"

@@ -1,11 +1,13 @@
 // The node reader names each field whose shape a node misses, which the
 // schema leaves unread.
 // [[spec/tickets/failure-watch-shape]]
-package failure
+package failure_test
 
 import (
 	"reflect"
 	"testing"
+
+	"quackitect/src/failure"
 )
 
 func TestNodeOfNamesEachMisshapenField(t *testing.T) {
@@ -24,7 +26,7 @@ func TestNodeOfNamesEachMisshapenField(t *testing.T) {
 		"a match off the syntax": {"remedies:\n  - Run it.\nwatch:\n  event: tool\n  match: \"(open\"\n", []string{"n names a watch match that reads as no pattern"}},
 	}
 	for name, one := range cases {
-		_, got := NodeOf("n", "---\nkind: [[failure]]\nlevel: error\n"+one.front+"---\n\n# When\n\nIt fails.\n")
+		_, got := failure.NodeOf("n", "---\nkind: [[failure]]\nlevel: error\n"+one.front+"---\n\n# When\n\nIt fails.\n")
 		if !reflect.DeepEqual(got, one.want) {
 			t.Errorf("%s: NodeOf names %q, want %q", name, got, one.want)
 		}

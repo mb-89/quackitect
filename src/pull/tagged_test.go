@@ -1,7 +1,7 @@
 // A tagged ticket stands first in the hand-out, and on a group's branch a
 // tagged ticket naming another group stays out.
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-package pull
+package pull // level0: InPackageTest - reaches the unexported taggedIn
 
 import (
 	"reflect"

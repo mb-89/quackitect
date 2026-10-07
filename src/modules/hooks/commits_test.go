@@ -66,6 +66,7 @@ func commitTableOf(t *testing.T) commitTable {
 
 // A git read answering each read the case teaches, and every other read empty, as the bridge's git reads a failing run. [[spec/tickets/cage-commit-guards-port]]
 // A desk commit on a work branch raises desk-works-on-trunk off the root's nodes, and an id the root carries no node for still prints, named unregistered. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+// level0: FixtureOutsideHome - the guard reads its node off a root of the case's own, and a bare root holding none
 func TestTheDeskGuardRaisesItsNodeThroughTheFailureDoor(t *testing.T) {
 	node := "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main.\"]\n---\n\n# When\n\nA desk lands work on a work branch.\n"
 	d := &Door{}

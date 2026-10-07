@@ -28,6 +28,7 @@ func TestTheGoVerbsPrintTheirUsage(t *testing.T) {
 }
 
 // The branch doors carry the failure nodes under the method root, so a take refusal names its remedies. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+// level0: FixtureOutsideHome - the doors load the nodes off a method root of the case's own
 func TestTheBranchDoorsLoadTheFailureNodes(t *testing.T) {
 	t.Parallel()
 	method := t.TempDir()
