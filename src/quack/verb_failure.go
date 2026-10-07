@@ -55,8 +55,7 @@ type failureDoors struct {
 func failureHere() (failureDoors, error) {
 	root, err := index.Root()
 	stage := func(path string) bool {
-		_, ok := gitIn(root, "add", "--", path)
-		return ok
+		return registeredRepo(root).Add([]string{path}) == nil
 	}
 	return failureDoors{root: root, now: time.Now, stage: stage}, err
 }

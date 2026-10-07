@@ -24,7 +24,10 @@ const (
 	callArgsWithParams = 3
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
-	postWait           = 30 * time.Second
+	// The span a start waits on an index that neither stands nor exits, past which it names the index hung. It stands under the five minutes a contract suite gives one run of the entry, so the start names the hang first. [[spec/design_output/index#a-door-comes-back]]
+	startHang = 4 * time.Minute
+	// A door's first answer on a cold box drains the whole tree, so a post waits on it up to the same guard. [[spec/tickets/cold-runner-waits-meet-readiness]]
+	postWait = startHang
 	// The span between two looks at the standing file, and the misses in a row that tell a door another stands in its place. [[spec/tickets/process-shadow-reads-clean]]
 	displacedEvery = 5 * time.Second
 	displacedLooks = 2
@@ -193,6 +196,10 @@ func asks(root string, argv []string) int {
 		fmt.Fprintln(stderr, said.Error)
 		return 1
 	}
+	// The stop returns once the door has exited. [[spec/tickets/smoke-waits-for-the-door]]
+	if argv[0] == "stop" {
+		awaitsStopped(said.Result)
+	}
 	// why prints the tree the design input draws. [[spec/design_output/model#quack-why]]
 	if found, ok := said.Result.(map[string]any); ok && argv[0] == "why" {
 		fmt.Println(found["text"])
@@ -210,10 +217,11 @@ func asks(root string, argv []string) int {
 
 // [[spec/design_output/index#a-door-comes-back]]
 func reaches(root string, argv []string) (answer, error) {
+	from := startNow()
 	for try := 0; try < reachTries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && stands(standing, root) {
-			said, posted := posts(standing, argv)
+			said, posted := postsWithin(standing, argv, postSpan(from))
 			if posted == nil {
 				return said, nil
 			}
@@ -267,7 +275,17 @@ func standingOf(root string) (Standing, error) {
 	return standing, nil
 }
 
+// The span a reach's post waits on its door: what the hang guard leaves since the reach began, and one poll pause at least, so a cold door's first answer meets the guard alone. [[spec/tickets/cold-runner-waits-meet-readiness]]
+func postSpan(from time.Time) time.Duration {
+	return max(min(postTimeout, startHang-startNow().Sub(from)), startPollPause)
+}
+
 func posts(standing Standing, argv []string) (answer, error) {
+	return postsWithin(standing, argv, postTimeout)
+}
+
+// A post that waits the span on its door's answer. [[spec/tickets/cold-runner-waits-meet-readiness]]
+func postsWithin(standing Standing, argv []string, span time.Duration) (answer, error) {
 	method, params := asked(argv)
 
 	body, err := json.Marshal(call{Method: method, Params: params, ID: 1})
@@ -275,7 +293,7 @@ func posts(standing Standing, argv []string) (answer, error) {
 		return answer{}, err
 	}
 
-	client := &http.Client{Timeout: postTimeout}
+	client := &http.Client{Timeout: span}
 	said, err := client.Post(
 		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
 	if err != nil {

@@ -47,6 +47,8 @@ steps:
     checklist:
       - the code the window lands follows [[spec/guidance/code/code]]
       - every change lands with a test that fails before it and passes after, as [[spec/guidance/code/testing]] asks
+      - every verb, tab and door-facing feature the window lands has an example, and no test it lands asserts again what an example shows, as [[spec/guidance/code/examples]] asks
+      - no module holds more test lines than code lines, and no test outlives its code or its phase, as [[spec/guidance/code/tests]] asks
       - every note the window writes holds the shape [[spec/guidance/guidance]] asks
       - the work follows [[spec/guidance/working]], a turn at a time
       - a change reaches every place holding the same thing, each writer, each copy and each name

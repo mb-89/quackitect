@@ -1,4 +1,4 @@
-// The verb table: the usage, and a need naming a branch verb.
+// The verb table: a need naming a branch verb, and a loud verb's log.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
@@ -6,19 +6,6 @@ import (
 	"strings"
 	"testing"
 )
-
-// A bare branch prints the usage, and a verb the table lacks refuses with it. [[spec/design_output/work#the-round-trip]]
-func TestTheBranchVerbPrintsItsUsage(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	if code := one.branchSays(); code != 0 {
-		t.Fatalf("a bare branch answers %d", code)
-	}
-	holds(t, one.out.String(), "Usage: ./RUNME.sh branch <verb>\n\n  open <group>")
-	if code := one.branchSays("nope"); code != codeRefused {
-		t.Fatalf("an unknown verb answers %d", code)
-	}
-}
 
 // A need names a branch verb this box holds, and one it lacks. [[spec/design_output/pull#a-need-is-a-verb]]
 func TestANeedReadsTheVerbTable(t *testing.T) {

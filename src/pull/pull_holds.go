@@ -89,7 +89,8 @@ func InCloud(env map[string]string) bool {
 func (it *It) HandOf() string {
 	if !it.Agent && AgentOf(it.Env) == "" {
 		it.boxOf()
-		who := strings.TrimSpace(it.Git.Run("config", "user.name").Out)
+		who, _ := it.Git.Config("user.name")
+		who = strings.TrimSpace(who)
 		if who == "" {
 			return Person
 		}

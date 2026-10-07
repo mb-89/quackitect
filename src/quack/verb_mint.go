@@ -15,11 +15,12 @@ import (
 	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
-func init() { register("mint", mintVerb(index.Root, time.Now)) }
+func init() { register("mint", mintVerb(index.Root, registeredRepo, time.Now)) }
 
 // The kind whose mint joins the box's group. [[spec/tickets/a-box-keeps-its-tickets]]
 const ticketKind = "ticket"
@@ -27,7 +28,7 @@ const ticketKind = "ticket"
 var fieldFlag = regexp.MustCompile(`(?s)^--([^=]+)=(.*)$`)
 
 // Each refusal raises its own node through the failure door, which prints its lines and logs its row; the usage text and an I/O fault print as they stand. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-func mintVerb(rootOf func() (string, error), now func() time.Time) twin {
+func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo, now func() time.Time) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		words := argv[1:]
 		places := []string{}
@@ -90,7 +91,7 @@ func mintVerb(rootOf func() (string, error), now func() time.Time) twin {
 		// A ticket on a closed group's branch stands free. [[spec/design_output/pull#a-closed-group-takes-no-child]]
 		freed := ""
 		if kind == ticketKind {
-			branch, _ := gitIn(work, "rev-parse", "--abbrev-ref", "HEAD")
+			branch, _ := repoAt(work).Head()
 			named := yaml.AsString(fields[pull.GroupField])
 			if group := pull.JoinsGroup(named, yaml.AsString(fields["process"]), branch, name); group != "" {
 				if named == "" && pull.GroupClosed(disk, group) {

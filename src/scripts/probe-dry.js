@@ -4,12 +4,25 @@
 // against the index the start road brings up. It asks whether level zero runs.
 // [[spec/tickets/level0-runs-on-the-door]]
 
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
 import { clearHeld, clearRun } from "./probe-clear.js";
-import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail } from "./probe-cold.js";
+import {
+	PLUGIN_FOLDER,
+	POINTER,
+} from "../../.claude/skills/level0/lib/vehicle.js";
+import {
+	COLD,
+	coldLines,
+	coldPort,
+	coldTree,
+	logRows,
+	stops,
+	tail,
+	takesDelta,
+} from "./probe-cold.js";
 import { verbMain } from "./cli-main.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
@@ -26,306 +39,483 @@ const OK_FROM = 200;
 const OK_PAST = 300;
 // The characters a line of evidence shows. [[spec/tickets/level0-runs-on-the-door]]
 const SHOWN = 160;
-const CANARY_LINE = /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
+const CANARY_LINE =
+	/level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
 // [[spec/tickets/level0-runs-on-the-door]]
 export const DRY = {
-  checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
+	checks: [
+		"door",
+		"rules",
+		"prompt",
+		"tools",
+		"guard",
+		"canary",
+		"quiet",
+		"clear",
+	],
 };
+
+// The smoke reads every check the dry probe reads but the clear, since it holds the clear road off. [[spec/tickets/level0-smoke-runs-in-seconds]]
+export const SMOKE = { checks: DRY.checks.filter((one) => one !== "clear") };
+
+// The folder of built tools the start road reads, and the suffix of the build an update keeps behind. [[spec/tickets/level0-smoke-runs-in-seconds]]
+const BIN = inRun("bin");
+const KEPT_OLD = ".old";
+
+// The tree as it stands, in seconds: a shared clone carrying the working change and the root's built tools, so the start road finds the index and installs nothing. [[spec/tickets/level0-smoke-runs-in-seconds]]
+export function smokeTree(root, it, say, { temp, tree, port, delta }) {
+	const cloned = it.proc.run(
+		["git", "clone", "--quiet", "--shared", root, tree],
+		{},
+	);
+	if (cloned.exitCode !== 0) {
+		say(`FAIL clone: ${tail(cloned.stderr)}`);
+		return false;
+	}
+	if (!takesDelta(it, temp, tree, delta, say)) return false;
+	const from = it.join(root, BIN);
+	const to = it.join(tree, BIN);
+	it.disk.makeDir(to);
+	for (const one of builtIn(it, from))
+		it.disk.copy(it.join(from, one), it.join(to, one));
+	it.disk.makeDir(it.join(tree, POINTER, ".."));
+	it.disk.write(
+		it.join(tree, POINTER),
+		`${JSON.stringify({ method: tree, port })}\n`,
+	);
+	return true;
+}
+
+function builtIn(it, from) {
+	try {
+		return it.disk
+			.list(from)
+			.filter((one) => one.kind === "file" && !one.name.endsWith(KEPT_OLD))
+			.map((one) => one.name);
+	} catch {
+		return [];
+	}
+}
 
 // The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
 export const WORKING = "--working";
+
+// The word naming the commit the dry road runs at, which the Go probe verb resolves first. [[spec/tickets/probe-at-revision-guards-merges]]
+const AT = "--at";
+
+// The word the Go probe verb hands the entry for the smoke road. [[spec/tickets/level0-smoke-runs-in-seconds]]
+const SMOKE_WORD = "smoke";
 
 // The dry probe's own program, which the Go probe verb and the check start, since its session loads the plugin's JavaScript hook module in process. [[spec/tickets/probe-dry-entry]]
 export const ENTRY = ["src", "scripts", "probe-dry.js"];
 
 // The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
 export function deltaOf(here, at) {
-  const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
-    cwd: at,
-  });
-  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+	const ran = here.proc.run(
+		["git", "diff", "HEAD", "--binary", "--no-renames"],
+		{
+			cwd: at,
+		},
+	);
+	return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-export async function probeDry(root, it, say = console.log, delta = "") {
-  const temp = it.disk.tempDir("se-dry-");
-  const tree = it.join(temp, "tree");
-  const port = coldPort(it.pid);
-  try {
-    if (!coldTree(root, it, say, { temp, tree, port, delta })) return 1;
-    const seen = await session(it, tree);
-    const checks = readsDry(logRows(it.disk, it.join(tree, SESSION)), seen);
-    for (const line of coldLines(checks)) say(line);
-    return checks.every((one) => one.pass) ? 0 : 1;
-  } finally {
-    stops(it, tree);
-    it.disk.remove(temp);
-  }
+export function probeDry(root, it, say = console.log, delta = "", at = "") {
+	const stands = (from, doors, said, where) =>
+		coldTree(from, doors, said, { ...where, at });
+	return probed(root, it, say, delta, {
+		stands,
+		clears: true,
+		checks: DRY.checks,
+	});
+}
+
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+export function probeSmoke(root, it, say = console.log, delta = "") {
+	return probed(root, it, say, delta, {
+		stands: smokeTree,
+		clears: false,
+		checks: SMOKE.checks,
+	});
+}
+
+async function probed(root, it, say, delta, { stands, clears, checks: names }) {
+	const temp = it.disk.tempDir("se-dry-");
+	const tree = it.join(temp, "tree");
+	const port = coldPort(it.pid);
+	try {
+		if (!stands(root, it, say, { temp, tree, port, delta })) return 1;
+		const seen = await session(it, tree, clears);
+		const checks = readsDry(
+			logRows(it.disk, it.join(tree, SESSION)),
+			seen,
+			names,
+		);
+		for (const line of coldLines(checks)) say(line);
+		return checks.every((one) => one.pass) ? 0 : 1;
+	} finally {
+		stops(it, tree);
+		leaves(it, temp, say);
+	}
+}
+
+// Removes the probe's temp tree, and names it where the box still holds it, since a folder a process lets go of a moment after its stop says nothing of level zero. [[spec/tickets/the-doors-pr-goes-green]]
+export function leaves(it, temp, say) {
+	try {
+		it.disk.remove(temp);
+	} catch (err) {
+		say(`the temp tree stays at ${temp}: ${err?.code ?? err?.message ?? err}`);
+	}
 }
 
 // The harness a client hands the hook, over the clone: its files, its processes, its posts, and what the hook says and registers. [[spec/tickets/level0-runs-on-the-door]]
 export function harnessOf(it, tree, env) {
-  const at = (rel) => (String(rel).startsWith("/") ? String(rel) : it.join(tree, rel));
-  const seen = { registered: [], said: [], posts: [], held: [], commands: [], prompts: [], depth: 0 };
-  // The client refuses a plugin's command and prompt inside a hook the turn waits on, and lets the turn's completion run them, as the live host says. [[spec/tickets/the-clear-runs-live-remote]]
-  const idle = (call) => {
-    if (seen.depth > 0) throw new Error(`${call} rejects inside a hook the turn is waiting on`);
-  };
-  const $ = {
-    fs: {
-      read: async (rel) => it.disk.read(at(rel)),
-      exists: async (rel) => it.disk.exists(at(rel)),
-      write: async (rel, text) => {
-        it.disk.makeDir(it.join(at(rel), ".."));
-        it.disk.write(at(rel), text);
-      },
-    },
-    process: {
-      run: (argv, init = {}) =>
-        bounded(
-          it.proc.start(argv, {
-            cwd: init.cwd ?? tree,
-            env: { ...env, ...(init.env ?? {}) },
-          }),
-          init.timeoutMs ?? EVENT_WAIT,
-        ),
-    },
-    http: {
-      fetch: async (url, init = {}) => {
-        seen.posts.push({ url: String(url), event: eventOf(init.body) });
-        const said = await it.http.send(String(url), init);
-        return {
-          ok: said.status >= OK_FROM && said.status < OK_PAST,
-          status: said.status,
-          text: said.text,
-        };
-      },
-    },
-    env: { get: async (key) => env[key] },
-    tool: { register: async (spec) => void seen.registered.push(String(spec?.name)) },
-    ui: { log: (line) => void seen.said.push(String(line)) },
-    session: {
-      messages: async () => seen.held,
-      usage: async () => ({ context: { tokens: 1000 } }),
-    },
-    agent: { spawn: async () => ({ text: "" }) },
-    command: {
-      run: async ({ command } = {}) => {
-        idle("command.run");
-        seen.commands.push(String(command));
-        return {};
-      },
-    },
-    prompt: {
-      submit: async ({ text } = {}) => {
-        idle("prompt.submit");
-        seen.prompts.push(String(text));
-        return {};
-      },
-    },
-    clock: {
-      after: (ms, fn) => {
-        const timer = setTimeout(fn, ms);
-        return { cancel: () => clearTimeout(timer) };
-      },
-    },
-  };
-  return { $, seen };
+	const at = (rel) =>
+		String(rel).startsWith("/") ? String(rel) : it.join(tree, rel);
+	const seen = {
+		registered: [],
+		said: [],
+		posts: [],
+		held: [],
+		commands: [],
+		prompts: [],
+		depth: 0,
+	};
+	// The client refuses a plugin's command and prompt inside a hook the turn waits on, and lets the turn's completion run them, as the live host says. [[spec/tickets/the-clear-runs-live-remote]]
+	const idle = (call) => {
+		if (seen.depth > 0)
+			throw new Error(`${call} rejects inside a hook the turn is waiting on`);
+	};
+	const $ = {
+		fs: {
+			read: async (rel) => it.disk.read(at(rel)),
+			exists: async (rel) => it.disk.exists(at(rel)),
+			write: async (rel, text) => {
+				it.disk.makeDir(it.join(at(rel), ".."));
+				it.disk.write(at(rel), text);
+			},
+		},
+		process: {
+			run: (argv, init = {}) =>
+				bounded(
+					it.proc.start(argv, {
+						cwd: init.cwd ?? tree,
+						env: { ...env, ...(init.env ?? {}) },
+					}),
+					init.timeoutMs ?? EVENT_WAIT,
+				),
+		},
+		http: {
+			fetch: async (url, init = {}) => {
+				seen.posts.push({ url: String(url), event: eventOf(init.body) });
+				const said = await it.http.send(String(url), init);
+				return {
+					ok: said.status >= OK_FROM && said.status < OK_PAST,
+					status: said.status,
+					text: said.text,
+				};
+			},
+		},
+		env: { get: async (key) => env[key] },
+		tool: {
+			register: async (spec) => void seen.registered.push(String(spec?.name)),
+		},
+		ui: { log: (line) => void seen.said.push(String(line)) },
+		session: {
+			messages: async () => seen.held,
+			usage: async () => ({ context: { tokens: 1000 } }),
+		},
+		agent: { spawn: async () => ({ text: "" }) },
+		command: {
+			run: async ({ command } = {}) => {
+				idle("command.run");
+				seen.commands.push(String(command));
+				return {};
+			},
+		},
+		prompt: {
+			submit: async ({ text } = {}) => {
+				idle("prompt.submit");
+				seen.prompts.push(String(text));
+				return {};
+			},
+		},
+		clock: {
+			after: (ms, fn) => {
+				const timer = setTimeout(fn, ms);
+				return { cancel: () => clearTimeout(timer) };
+			},
+		},
+	};
+	return { $, seen };
 }
 
 function eventOf(body) {
-  try {
-    return String(JSON.parse(String(body ?? "{}")).event ?? "");
-  } catch {
-    return "";
-  }
+	try {
+		return String(JSON.parse(String(body ?? "{}")).event ?? "");
+	} catch {
+		return "";
+	}
 }
 
 function bounded(promise, ms) {
-  let timer;
-  const cut = new Promise((_, fail) => {
-    timer = setTimeout(() => fail(new Error(`no answer in ${ms}ms`)), ms);
-  });
-  return Promise.race([promise, cut]).finally(() => clearTimeout(timer));
+	let timer;
+	const cut = new Promise((_, fail) => {
+		timer = setTimeout(() => fail(new Error(`no answer in ${ms}ms`)), ms);
+	});
+	return Promise.race([promise, cut]).finally(() => clearTimeout(timer));
 }
 
 // The engine the client runs: each registration wraps the ones after it, a filter names the fields an event must carry, and the client's own answer stands last. [[spec/tickets/level0-runs-on-the-door]]
 export function engineOf(register, options = {}) {
-  const held = [];
-  register((event, filter, made) => {
-    held.push({ event, filter: made ? filter : null, run: made ?? filter });
-  }, options);
-  // A stream event takes its own registrations alone, since the catch-all answers once and a stream yields many. [[spec/tickets/level0-runs-on-the-door]]
-  const takes = (one, event, e) =>
-    (one.event === event || (one.event === "*" && !STREAMS.has(event))) &&
-    Object.entries(one.filter ?? {}).every(([key, value]) => e?.[key] === value);
-  return {
-    raise($, event, e, last, origin) {
-      const chain = held.filter((one) => takes(one, event, e));
-      const step = (at) =>
-        Object.assign(
-          (said) => (at < chain.length ? chain[at].run($, said, step(at + 1)) : last(said)),
-          { event, ...(origin ? { origin } : {}) },
-        );
-      return step(0)(e);
-    },
-  };
+	const held = [];
+	register((event, filter, made) => {
+		held.push({ event, filter: made ? filter : null, run: made ?? filter });
+	}, options);
+	// A stream event takes its own registrations alone, since the catch-all answers once and a stream yields many. [[spec/tickets/level0-runs-on-the-door]]
+	const takes = (one, event, e) =>
+		(one.event === event || (one.event === "*" && !STREAMS.has(event))) &&
+		Object.entries(one.filter ?? {}).every(
+			([key, value]) => e?.[key] === value,
+		);
+	return {
+		raise($, event, e, last, origin) {
+			const chain = held.filter((one) => takes(one, event, e));
+			const step = (at) =>
+				Object.assign(
+					(said) =>
+						at < chain.length
+							? chain[at].run($, said, step(at + 1))
+							: last(said),
+					{ event, ...(origin ? { origin } : {}) },
+				);
+			return step(0)(e);
+		},
+	};
 }
 
 // The session a client runs on a cold box: it starts, the owner's prompt arrives while the start road stands the door, the context reads, the answer opens on the canary, a read and a guarded call run, and the turn stops. [[spec/tickets/level0-runs-on-the-door]]
-async function session(it, tree) {
-  const env = { CLAUDE_CODE_REMOTE: "true", CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" };
-  const { $, seen } = harnessOf(it, tree, env);
-  const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
-  const engine = engineOf(loaded.register, {});
-  const raise = async (event, e, last = async (said) => ({ passed: said }), origin) => {
-    const holds = event === TURN_END ? 0 : 1;
-    seen.depth += holds;
-    try {
-      return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
-    } finally {
-      seen.depth -= holds;
-    }
-  };
+async function session(it, tree, clears) {
+	const env = {
+		CLAUDE_CODE_REMOTE: "true",
+		CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1",
+	};
+	const { $, seen } = harnessOf(it, tree, env);
+	const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
+	const engine = engineOf(loaded.register, {});
+	const raise = async (
+		event,
+		e,
+		last = async (said) => ({ passed: said }),
+		origin,
+	) => {
+		const holds = event === TURN_END ? 0 : 1;
+		seen.depth += holds;
+		try {
+			return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
+		} finally {
+			seen.depth -= holds;
+		}
+	};
 
-  const opening = raise("session.start", { session_id: `dry-${it.pid}`, cwd: tree });
-  const prompt = { text: COLD.prompt };
-  const submitted = await raise("prompt.submit", prompt, async (said) => said, OWNER);
-  // The client's transcript keeps each row as the session runs, which the answer door reads the reply off. [[spec/tickets/a-reply-follows-its-prompt]]
-  seen.held.push({ role: "user", id: "u1", text: String(submitted?.text ?? "") });
-  const context = await raise("prompt.context", {}, async () => ({ blocks: [] }));
-  await opening;
-  const blocks = context?.blocks ?? [];
-  const sentence = CANARY_LINE.exec(blocks.map((one) => one.text).join("\n"))?.[0] ?? "";
-  const answer = `${sentence}\nThis session probes a fresh box, so it reads README.md and runs git log.`;
-  for await (const _ of engine.raise(
-    $,
-    "turn.step",
-    { turnId: "t1", index: 0 },
-    async function* () {
-      yield { kind: "text", text: answer };
-    },
-  )) {
-  }
-  seen.held.push({ role: "assistant", id: "a1", text: answer });
-  // The chat shows the text, which pays the answer the owner's prompt asks for. [[spec/design_output/level0#the-owners-prompt-comes-first]]
-  await raise("classic.MessageDisplay", { delta: answer });
-  const read = await raise("tool.call", { tool: "Read", file_path: it.join(tree, "README.md") });
-  const guarded = await raise("tool.call", {
-    tool: "Bash",
-    command: "git log -1 --oneline",
-    description: "show the newest commit",
-  });
-  await raise("classic.Stop", {}, async () => ({}));
-  const cleared = await clearRun(it, tree, raise, seen, env);
-  return {
-    cleared,
-    door: it.disk.exists(it.join(tree, HOOKS_FILE)),
-    blocks,
-    sentence,
-    prompt,
-    submitted,
-    read,
-    guarded,
-    ...seen,
-  };
+	const opening = raise("session.start", {
+		session_id: `dry-${it.pid}`,
+		cwd: tree,
+	});
+	const prompt = { text: COLD.prompt };
+	const submitted = await raise(
+		"prompt.submit",
+		prompt,
+		async (said) => said,
+		OWNER,
+	);
+	// The client's transcript keeps each row as the session runs, which the answer door reads the reply off. [[spec/tickets/a-reply-follows-its-prompt]]
+	seen.held.push({
+		role: "user",
+		id: "u1",
+		text: String(submitted?.text ?? ""),
+	});
+	const context = await raise("prompt.context", {}, async () => ({
+		blocks: [],
+	}));
+	await opening;
+	const blocks = context?.blocks ?? [];
+	const sentence =
+		CANARY_LINE.exec(blocks.map((one) => one.text).join("\n"))?.[0] ?? "";
+	const answer = `${sentence}\nThis session probes a fresh box, so it reads README.md and runs git log.`;
+	for await (const _ of engine.raise(
+		$,
+		"turn.step",
+		{ turnId: "t1", index: 0 },
+		async function* () {
+			yield { kind: "text", text: answer };
+		},
+	)) {
+	}
+	seen.held.push({ role: "assistant", id: "a1", text: answer });
+	// The chat shows the text, which pays the answer the owner's prompt asks for. [[spec/design_output/level0#the-owners-prompt-comes-first]]
+	await raise("classic.MessageDisplay", { delta: answer });
+	const read = await raise("tool.call", {
+		tool: "Read",
+		file_path: it.join(tree, "README.md"),
+	});
+	const guarded = await raise("tool.call", {
+		tool: "Bash",
+		command: "git log -1 --oneline",
+		description: "show the newest commit",
+	});
+	await raise("classic.Stop", {}, async () => ({}));
+	const cleared = clears
+		? await clearRun(it, tree, raise, seen, env)
+		: undefined;
+	return {
+		cleared,
+		door: it.disk.exists(it.join(tree, HOOKS_FILE)),
+		blocks,
+		sentence,
+		prompt,
+		submitted,
+		read,
+		guarded,
+		...seen,
+	};
 }
 
 function fileUrl(path) {
-  return `file://${path.startsWith("/") ? "" : "/"}${path.replaceAll("\\", "/")}`;
+	return `file://${path.startsWith("/") ? "" : "/"}${path.replaceAll("\\", "/")}`;
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-export function readsDry(rows, seen) {
-  return [
-    { check: "door", ...doorStood(seen) },
-    { check: "rules", ...rulesHanded(rows, seen) },
-    { check: "prompt", ...promptHeld(seen) },
-    { check: "tools", ...toolsHeld(seen) },
-    { check: "guard", ...guardHeld(seen) },
-    { check: "canary", ...canaryHeard(rows) },
-    { check: "quiet", ...quietRun(rows, seen) },
-    { check: "clear", ...clearHeld(rows, seen) },
-  ];
+export function readsDry(rows, seen, names = DRY.checks) {
+	const reads = {
+		door: () => doorStood(seen),
+		rules: () => rulesHanded(rows, seen),
+		prompt: () => promptHeld(seen),
+		tools: () => toolsHeld(seen),
+		guard: () => guardHeld(seen),
+		canary: () => canaryHeard(rows),
+		quiet: () => quietRun(rows, seen),
+		clear: () => clearHeld(rows, seen),
+	};
+	return names.map((check) => ({ check, ...reads[check]() }));
 }
 
 function doorStood(seen) {
-  return seen.door
-    ? { pass: true, evidence: `${HOOKS_FILE} stands` }
-    : { pass: false, evidence: `the start road left no ${HOOKS_FILE}` };
+	return seen.door
+		? { pass: true, evidence: `${HOOKS_FILE} stands` }
+		: { pass: false, evidence: `the start road left no ${HOOKS_FILE}` };
 }
 
 // The rules reach the session as the blocks the context read hands the client, which the client lays before the model. [[spec/design_output/level0#rules-ride-the-first-answer]]
 function rulesHanded(rows, seen) {
-  const names = (seen.blocks ?? []).map((one) => one.name);
-  if (!names.includes("level0-canary"))
-    return {
-      pass: false,
-      evidence: `the context read hands the client ${names.join(" ") || "no block"}`,
-    };
-  if (!seen.sentence)
-    return { pass: false, evidence: "the canary block holds no canary sentence" };
-  if (!rows.some((one) => one.kind === "context"))
-    return { pass: false, evidence: "no context row" };
-  return { pass: true, evidence: `the context read hands the client ${names.join(" ")}` };
+	const names = (seen.blocks ?? []).map((one) => one.name);
+	if (!names.includes("level0-canary"))
+		return {
+			pass: false,
+			evidence: `the context read hands the client ${names.join(" ") || "no block"}`,
+		};
+	if (!seen.sentence)
+		return {
+			pass: false,
+			evidence: "the canary block holds no canary sentence",
+		};
+	if (!rows.some((one) => one.kind === "context"))
+		return { pass: false, evidence: "no context row" };
+	return {
+		pass: true,
+		evidence: `the context read hands the client ${names.join(" ")}`,
+	};
 }
 
 // An owner's prompt reaches the model with the answer-first line before it. [[spec/design_output/level0#which-prompt-opens-a-turn]]
 function promptHeld(seen) {
-  const said = String(seen.submitted?.text ?? "");
-  const given = String(seen.prompt?.text ?? "");
-  if (said === given || !said.endsWith(given))
-    return { pass: false, evidence: `the client reads the prompt as given: ${firstOf(said)}` };
-  return { pass: true, evidence: `the prompt opens on: ${firstOf(said)}` };
+	const said = String(seen.submitted?.text ?? "");
+	const given = String(seen.prompt?.text ?? "");
+	if (said === given || !said.endsWith(given))
+		return {
+			pass: false,
+			evidence: `the client reads the prompt as given: ${firstOf(said)}`,
+		};
+	return { pass: true, evidence: `the prompt opens on: ${firstOf(said)}` };
 }
 
 // The hook registers the pull, so a name past it proves the index's tools reach the client. [[spec/tickets/level0-tools-leave-the-bridge]]
 function toolsHeld(seen) {
-  const names = seen.registered ?? [];
-  if (names.length < 2)
-    return { pass: false, evidence: `the hook registers ${names.join(", ") || "nothing"}` };
-  return { pass: true, evidence: `the hook registers ${names.length} tools` };
+	const names = seen.registered ?? [];
+	if (names.length < 2)
+		return {
+			pass: false,
+			evidence: `the hook registers ${names.join(", ") || "nothing"}`,
+		};
+	return { pass: true, evidence: `the hook registers ${names.length} tools` };
 }
 
 // A read passes to the client, and a call the rules refuse comes back refused. [[spec/rationales/the-cage-refuses-while-down]]
 function guardHeld(seen) {
-  if (seen.read?.passed === undefined)
-    return { pass: false, evidence: `the read never reaches the client: ${shown(seen.read)}` };
-  const deny = String(seen.guarded?.deny ?? "");
-  if (!deny || /answers nothing/.test(deny))
-    return { pass: false, evidence: `the guarded call comes back ${shown(seen.guarded)}` };
-  return { pass: true, evidence: `the read passes, and the door refuses: ${firstOf(deny)}` };
+	if (seen.read?.passed === undefined)
+		return {
+			pass: false,
+			evidence: `the read never reaches the client: ${shown(seen.read)}`,
+		};
+	const deny = String(seen.guarded?.deny ?? "");
+	if (!deny || /answers nothing/.test(deny))
+		return {
+			pass: false,
+			evidence: `the guarded call comes back ${shown(seen.guarded)}`,
+		};
+	return {
+		pass: true,
+		evidence: `the read passes, and the door refuses: ${firstOf(deny)}`,
+	};
 }
 
 // The door hears the canary off the answer's text. [[spec/design_output/level0#the-line-lands-once]]
 function canaryHeard(rows) {
-  const heard = rows.find((one) => one.kind === "level0");
-  if (!heard) return { pass: false, evidence: "no level0 row names the canary" };
-  if (heard.said !== HEARD.same) return { pass: false, evidence: `the door hears: ${heard.said}` };
-  return { pass: true, evidence: `the door hears: ${heard.said}` };
+	const heard = rows.find((one) => one.kind === "level0");
+	if (!heard)
+		return { pass: false, evidence: "no level0 row names the canary" };
+	if (heard.said !== HEARD.same)
+		return { pass: false, evidence: `the door hears: ${heard.said}` };
+	return { pass: true, evidence: `the door hears: ${heard.said}` };
 }
 
 // Nothing posts past the hooks door, and no line or row says level zero answers nothing. [[spec/tickets/level0-runs-on-the-door]]
 function quietRun(rows, seen) {
-  const astray = (seen.posts ?? []).filter((one) => !one.url.endsWith("/hook"));
-  if (astray.length)
-    return { pass: false, evidence: `${astray.length} post(s) go past the door, first ${astray[0].event} to ${astray[0].url}` };
-  const fell = (seen.said ?? []).find((one) => /ANSWERS NOTHING|STANDS DOWN/.test(one));
-  if (fell) return { pass: false, evidence: `the session reads: ${firstOf(fell)}` };
-  const ruled = rows.findIndex((one) => one.kind === "context");
-  const late = rows.find(
-    (one, at) => at > ruled && /answers nothing/.test(String(one.said ?? "")),
-  );
-  if (late) return { pass: false, evidence: `a row past the rules says: ${late.said}` };
-  return { pass: true, evidence: `${seen.posts.length} post(s), every one to the hooks door` };
+	const astray = (seen.posts ?? []).filter((one) => !one.url.endsWith("/hook"));
+	if (astray.length)
+		return {
+			pass: false,
+			evidence: `${astray.length} post(s) go past the door, first ${astray[0].event} to ${astray[0].url}`,
+		};
+	const fell = (seen.said ?? []).find((one) =>
+		/ANSWERS NOTHING|STANDS DOWN/.test(one),
+	);
+	if (fell)
+		return { pass: false, evidence: `the session reads: ${firstOf(fell)}` };
+	const ruled = rows.findIndex((one) => one.kind === "context");
+	const late = rows.find(
+		(one, at) => at > ruled && /answers nothing/.test(String(one.said ?? "")),
+	);
+	if (late)
+		return { pass: false, evidence: `a row past the rules says: ${late.said}` };
+	return {
+		pass: true,
+		evidence: `${seen.posts.length} post(s), every one to the hooks door`,
+	};
 }
 
-const firstOf = (text) => tail(String(text ?? "").split("\n")[0]).slice(0, SHOWN);
+const firstOf = (text) =>
+	tail(String(text ?? "").split("\n")[0]).slice(0, SHOWN);
 const shown = (said) => firstOf(JSON.stringify(said ?? null));
 
 // Run as its own program, the probe takes the working change where the words name it. [[spec/tickets/probe-dry-entry]]
 await verbMain(import.meta.url, async (words) => {
-  const { it, root } = await import("./cli-doors.js");
-  return probeDry(root, it, console.log, words.includes(WORKING) ? deltaOf(it, root) : "");
+	const { it, root } = await import("./cli-doors.js");
+	const delta = words.includes(WORKING) ? deltaOf(it, root) : "";
+	if (words.includes(SMOKE_WORD))
+		return probeSmoke(root, it, console.log, delta);
+	const at = words.includes(AT) ? (words[words.indexOf(AT) + 1] ?? "") : "";
+	return probeDry(root, it, console.log, at ? "" : delta, at);
 });

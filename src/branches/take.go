@@ -50,7 +50,7 @@ func openGroup(d *Doors, name string, _ []string) int {
 		d.raises(failure.Raise(d.Failures, "take-open-commit-refused", "The commit that opens "+branch+" came back refused, so nothing is pushed."))
 		return codeRed
 	}
-	if !d.loud("push", "origin", mark+":refs/heads/"+branch).OK {
+	if !d.pushTo(mark, branch) {
 		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(branch)))
 		return codeRed
 	}
@@ -64,15 +64,20 @@ func openGroup(d *Doors, name string, _ []string) int {
 
 // The commit a branch opens on, off trunk's tree, so trunk moving on leaves it unmerged. [[spec/design_output/work#a-merged-branch-closes]]
 func (d *Doors) markOff(branch string) string {
-	tree := d.quiet("rev-parse", "origin/"+trunk+"^{tree}")
-	if !tree.OK || tree.Out == "" {
+	said, err := d.Repo.CommitTree("origin/"+trunk, "origin/"+trunk, branch+" opens")
+	if err != nil {
 		return ""
 	}
-	said := d.quiet("commit-tree", tree.Out, "-p", "origin/"+trunk, "-m", branch+" opens")
-	if !said.OK {
-		return ""
+	return said
+}
+
+// Pushes a commit to origin as a branch, printing git's refusal. [[spec/design_output/work#a-merged-branch-closes]]
+func (d *Doors) pushTo(commit, branch string) bool {
+	pushed := d.Repo.PushTo(commit, branch)
+	if !pushed.OK && pushed.Err != "" {
+		fmt.Fprintln(d.Errs, strings.TrimSpace(pushed.Err))
 	}
-	return said.Out
+	return pushed.OK
 }
 
 // The message a desk refusal raises, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
@@ -252,12 +257,12 @@ func (d *Doors) standsOpen(name string) groupStands {
 func (d *Doors) onBranch(branch string) bool {
 	parked := d.parkedFiles()
 	for _, one := range parked {
-		d.quiet("checkout", "--", one.Name)
+		_ = d.Repo.Restore(one.Name)
 	}
-	if !d.quiet("switch", branch).OK && !d.loud("switch", "-c", branch, "origin/"+branch).OK {
+	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
-	d.quiet("reset", "--hard", "origin/"+branch)
+	_ = d.Repo.ResetTo("origin/"+branch, true)
 	for _, one := range parked {
 		_ = d.write(one.Name, one.Text)
 	}
@@ -293,24 +298,19 @@ func (d *Doors) claimGroup(one stand) int {
 	role := roleOf(hand)
 	from, base := handedOver(was, role, before)
 	_ = d.write(at, withEntry(base, front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}))
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 	says := role + " takes it"
 	if from != "" {
 		says = role + " takes it over from " + from
 	}
-	committed := d.quiet("commit", "-m", one.Branch+": "+says)
-	if !committed.OK {
-		d.quiet("reset", "--", at)
+	if _, err := d.Repo.Commit(one.Branch+": "+says, nil); err != nil {
+		_ = d.Repo.Reset([]string{at})
 		_ = d.write(at, was)
-		detail := committed.Err
-		if detail == "" {
-			detail = committed.Out
-		}
-		d.raises(failure.Raise(d.Failures, "take-claim-refused", "The claim on "+one.Branch+" would not commit, so the take stands undone.", detail))
+		d.raises(failure.Raise(d.Failures, "take-claim-refused", "The claim on "+one.Branch+" would not commit, so the take stands undone.", strings.TrimSpace(err.Error())))
 		return codeRed
 	}
-	if !d.loud("push", "origin", one.Branch).OK {
-		d.quiet("reset", "--keep", "origin/"+one.Branch)
+	if !d.push(one.Branch) {
+		_ = d.Repo.ResetTo("origin/"+one.Branch, false)
 		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(one.Branch)))
 		return codeRed
 	}

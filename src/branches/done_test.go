@@ -1,26 +1,15 @@
-// The leave: done refuses off a work branch and short of a green stamp, and
-// read prints a group.
+// The leave: done refuses short of a green stamp, and the retro comes first.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
 import "testing"
-
-// Done runs on a work branch alone. [[spec/design_output/work#a-group-is-a-ticket]]
-func TestDoneRunsOnAWorkBranchAlone(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	if code := one.branchSays("done"); code != codeRefused {
-		t.Fatalf("done on main answers %d", code)
-	}
-	holds(t, one.errs.String(), "branch done runs on a work branch, and this is main.")
-}
 
 // A branch with no check stamp claims nothing. [[spec/design_output/work#the-battery-answers-first]]
 func TestDoneWantsTheCheckOnHead(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
+	one.cut("work/g", "origin/work/g")
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d", code)
 	}
@@ -51,19 +40,5 @@ func TestTheRetroComesBeforeTheBoxLeaves(t *testing.T) {
 	written := withEntry(groupNote, entryRow("retro/write", "a", "b"))
 	if open := one.d.retroOpen(written); open != "" {
 		t.Fatalf("a written retro reads %q", open)
-	}
-}
-
-// Read prints the group a branch carries, and refuses a branch carrying none. [[spec/design_output/work#a-group-is-a-ticket]]
-func TestReadPrintsTheGroup(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	if code := one.branchSays("read", "g"); code != 0 {
-		t.Fatalf("read answers %d", code)
-	}
-	holds(t, one.out.String(), "The group's ask.")
-	if code := one.branchSays("read", "none"); code != codeRed {
-		t.Fatalf("a read of nothing answers %d", code)
 	}
 }

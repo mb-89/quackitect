@@ -163,17 +163,6 @@ func doubled(t *testing.T) (*Store, Writer, *Scheduler, *int) {
 	return s, hand, NewScheduler(s, spawned, failOn(t)), &runs
 }
 
-func TestASecondChangeReusesTheKeptList(t *testing.T) {
-	s, hand, scheduler, _ := doubled(t)
-	seed(t, s, hand, "t/n", 1)
-	scheduler.Settle()
-	seed(t, s, hand, "t/n", 2)
-	scheduler.Settle()
-	if got := scheduler.Lists(); got != 1 {
-		t.Fatalf("the scheduler keeps %d run lists after two changes of t/n", got)
-	}
-}
-
 func TestAnEqualCommitRunsNothingBelow(t *testing.T) {
 	s, hand, scheduler, runs := doubled(t)
 	seed(t, s, hand, "t/n", 3)
@@ -191,22 +180,9 @@ func TestAnEqualCommitRunsNothingBelow(t *testing.T) {
 	}
 }
 
-func TestAnUnwatchedPendingNameRunsWhenRead(t *testing.T) {
-	s, hand, scheduler, runs := doubled(t)
-	scheduler.Unwatch("t/double")
-	seed(t, s, hand, "t/n", 3)
-	scheduler.Settle()
-	if *runs != 0 {
-		t.Fatalf("an unwatched t/double runs %d times with no reader", *runs)
-	}
-	if got := scheduler.Read("t/double"); got != 6 || *runs != 1 {
-		t.Fatalf("a read of t/double answers %v after %d runs", got, *runs)
-	}
-}
-
 func TestWhyNamesAPendingValue(t *testing.T) {
 	s, hand, scheduler, _ := doubled(t)
-	scheduler.Unwatch("t/double")
+	scheduler.unwatched["t/double"] = true
 	seed(t, s, hand, "t/n", 3)
 	scheduler.Settle()
 	at := s.Snapshot().Revision

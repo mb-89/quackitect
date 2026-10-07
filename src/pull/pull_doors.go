@@ -10,18 +10,8 @@ import (
 	"time"
 
 	"quackitect/src/failure"
+	"quackitect/src/modules/git"
 )
-
-// One git call as the JS git door answers it: whether it ran clean, and its streams trimmed. [[spec/design_output/doors#a-door-standing-on-another]]
-type Ran struct {
-	OK       bool
-	Out, Err string
-}
-
-// Git under the work root. [[spec/design_output/doors#a-door-standing-on-another]]
-type Git interface {
-	Run(args ...string) Ran
-}
 
 // A command line a leaf's field names, run through sh under the root. [[spec/design_output/pull#the-commands-answer]]
 type Shell func(line string) (stdout string, exit int, err error)
@@ -39,7 +29,7 @@ type Weights struct{ Block, Day, Fail float64 }
 // Everything the pull reads and writes through. [[spec/design_output/pull#the-answers]]
 type It struct {
 	Disk         Disk
-	Git          Git
+	Git          git.Repo
 	Now          func() time.Time
 	Out, Err     io.Writer
 	Root, Method string

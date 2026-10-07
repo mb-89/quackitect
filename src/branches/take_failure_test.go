@@ -20,7 +20,7 @@ func TestTakeRefusalsNameTheirIds(t *testing.T) {
 	}{
 		{"an open naming no group", func(*tree) {}, []string{"open"}, "take-open-names-no-group"},
 		{"an open naming a group main lacks", func(*tree) {}, []string{"open", "ghost"}, "take-group-unpushed"},
-		{"an open off main", func(one *tree) { one.git("switch", "-q", "-c", "feature") }, []string{"open", "ghost"}, "branch-off-trunk"},
+		{"an open off main", func(one *tree) { one.must(one.repo.Switch("feature", true)) }, []string{"open", "ghost"}, "branch-off-trunk"},
 		{"a take on a desk", func(one *tree) { one.desk() }, []string{"take"}, "desk-works-on-trunk"},
 		{"a take over uncommitted work", func(one *tree) { one.write(map[string]string{"stray.md": "x\n"}) }, []string{"take"}, "branch-tree-dirty"},
 		{"a take naming a branch that stands nowhere free", func(*tree) {}, []string{"take", "ghost"}, "take-branch-not-free"},

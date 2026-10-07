@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"      // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
 	"os/exec" // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
-	"slices"
 	"sync"
 	"time"
 
@@ -57,8 +56,12 @@ type Placements struct {
 	// The wait before the first spawn, and the stop that ends it. [[spec/tickets/the-system-places-modules]]
 	after time.Duration
 	// The wait between two spawns. [[spec/tickets/the-modules-start-together]]
-	gap  time.Duration
-	quit chan struct{}
+	gap time.Duration
+	// The timer the spawner waits the start window and each gap on, which a case swaps for one it answers. [[spec/tickets/each-door-meets-one-test]]
+	timer func(time.Duration) <-chan time.Time
+	// Closes as the spawner returns, which the stop waits on. [[spec/tickets/stop-join-test-stands-red]]
+	spawned chan struct{}
+	quit    chan struct{}
 	// The instances a reader waits on: each until its first answer, and again from each run sent until the next. idle wakes the wait. [[spec/tickets/the-split-deployment-takes-over]]
 	pending map[string]bool
 	idle    *sync.Cond
@@ -109,9 +112,9 @@ func (p *Placements) After(span time.Duration) *Placements {
 	return p
 }
 
-// Names the gap between two spawns, so a case stops the placements between two. [[spec/tickets/the-modules-start-together]]
-func (p *Placements) Gap(span time.Duration) *Placements {
-	p.gap = span
+// Names the timer the spawner waits on, so a case answers each wait it asks and sleeps none. [[spec/tickets/each-door-meets-one-test]]
+func (p *Placements) Timer(timer func(time.Duration) <-chan time.Time) *Placements {
+	p.timer = timer
 	return p
 }
 
@@ -120,7 +123,7 @@ const spawnGap = 20 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, gap: spawnGap, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
+	p := &Placements{bus: bus, store: store, gap: spawnGap, timer: time.After, spawned: make(chan struct{}), moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {
@@ -146,6 +149,10 @@ func (p *Placements) Start() (func(), error) {
 		p.mu.Lock()
 		p.stopped = true
 		p.idle.Broadcast()
+		p.mu.Unlock()
+		// A spawn in flight lands its stop before the stop reads them. [[spec/tickets/stop-join-test-stands-red]]
+		<-p.spawned
+		p.mu.Lock()
 		stops := p.stops
 		p.stops = nil
 		p.mu.Unlock()
@@ -167,6 +174,7 @@ func (p *Placements) Start() (func(), error) {
 				return p.store.SaveNames(p.answer(instance, names, moved))
 			})
 			if err != nil {
+				close(p.spawned)
 				halt()
 				return nil, err
 			}
@@ -181,6 +189,7 @@ func (p *Placements) Start() (func(), error) {
 
 // Starts each placed process a gap after the last, and none past the stop. A start that fails stands as a stop that does nothing, so the restart of its topic tries again. [[spec/tickets/the-system-places-modules]]
 func (p *Placements) spawns() {
+	defer close(p.spawned)
 	for i, placed := range p.placed {
 		wait := p.gap
 		if i == 0 {
@@ -189,7 +198,7 @@ func (p *Placements) spawns() {
 		select {
 		case <-p.quit:
 			return
-		case <-time.After(wait):
+		case <-p.timer(wait):
 		}
 		p.mu.Lock()
 		if p.stopped {
@@ -268,28 +277,6 @@ func reads(inputs []string, values map[string]any) []string {
 		}
 	}
 	return out
-}
-
-// Restarts the processes holding an instance of the topic, and no other. [[spec/design_output/model#a-module-rebuilds-alone]]
-func (p *Placements) Restart(topic string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.stopped {
-		return nil
-	}
-	for i, placed := range p.placed {
-		if i >= len(p.stops) || !slices.Contains(placed.Topics, topic) {
-			continue
-		}
-		p.stops[i]()
-		stop, err := placed.Start(p.bus, p.store)
-		if err != nil {
-			p.stops[i] = func() {}
-			return fmt.Errorf("%s starts again nowhere: %w", placed.Name, err)
-		}
-		p.stops[i] = stop
-	}
-	return nil
 }
 
 // Spawns the process, lands what it commits, and spawns it again after its wait once it exits. [[spec/design_output/model#a-process-ends]]

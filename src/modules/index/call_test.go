@@ -1,14 +1,21 @@
 // A call answers its result within the wait, or still running past it with
-// the handle and the fraction done, and ops/wait waits on a session.
+// the handle and the fraction done.
 // [[spec/design_output/model#a-caller-sets-its-wait]]
 package index
 
 import (
 	"errors"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/config"
+	"quackitect/src/imports"
 	"quackitect/src/q"
 )
 
@@ -90,32 +97,37 @@ func TestAFailingCallAnswersItsReason(t *testing.T) {
 	}
 }
 
-func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
+// A wait arms its span through the timer the book holds, so a case reads when it waits. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestAWaitArmsItsSpanThroughTheBooksTimer(t *testing.T) {
+	t.Parallel()
 	b, _, _ := bookOf(t)
-	mine, other := make(chan struct{}), make(chan struct{})
-	defer close(other)
-	store := actions()
-	for range 2 {
-		if said, err := Call(b, store, "t/save", "a.md", "s1", slow, held(mine)); err != nil || !said.Running {
-			t.Fatalf("the call answers %+v, %v", said, err)
-		}
+	armed := []time.Duration{}
+	b.after = func(span time.Duration) <-chan time.Time {
+		armed = append(armed, span)
+		return make(chan time.Time)
 	}
-	if said, err := Call(b, store, "t/save", "b.md", "s2", slow, held(other)); err != nil || !said.Running {
-		t.Fatalf("the call of s2 answers %+v, %v", said, err)
+	b.Wait("no-such-handle", patience)
+	if !slices.Equal(armed, []time.Duration{patience}) {
+		t.Fatalf("the wait arms %v through the book's timer", armed)
 	}
-	if open := b.Open("s1"); len(open) != 2 {
-		t.Fatalf("s1 holds %v open", open)
+}
+
+// The wait cases sleep on nothing, and the doors chapter lists this file among no test reaching a real door. [[spec/tickets/caller-wait-meets-no-sleep]]
+func TestTheWaitCasesSleepOnNothingAndTheDoorsChapterListsThemNowhere(t *testing.T) {
+	t.Parallel()
+	file, err := parser.ParseFile(token.NewFileSet(), "call_test.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
 	}
-	waited := make(chan []Op)
-	go func() { waited <- b.WaitCaller("s1", patience) }()
-	time.Sleep(slow / 5)
-	close(mine)
-	ended := <-waited
-	if len(ended) != 2 || ended[0].State != Done || ended[1].State != Done || ended[0].Caller != "s1" {
-		t.Fatalf("the wait on s1 answers %+v", ended)
+	if waits := imports.RealWaits(file); len(waits) > 0 {
+		t.Errorf("call_test.go calls %v, where the wait cases run on a signal", waits)
 	}
-	if open := b.Open("s2"); len(open) != 1 {
-		t.Fatalf("s2 holds %v open", open)
+	note, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "design_output", "doors.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(note), "`src/modules/index/call_test.go`") {
+		t.Error("spec/design_output/doors.md still lists src/modules/index/call_test.go as a test reaching a real door")
 	}
 }
 

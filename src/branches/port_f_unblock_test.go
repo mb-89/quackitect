@@ -112,7 +112,7 @@ func pfUnblockTree(t *testing.T, child, successor string, onBranch bool) *tree {
 		ticketAt("a-successor"): successor,
 	}).desk()
 	if onBranch {
-		one.git("switch", "-q", "-c", workBranch+"one-group")
+		one.cut(workBranch+"one-group", "")
 	}
 	return one
 }
@@ -146,7 +146,7 @@ func TestPFUnblockRefusesACloudBox(t *testing.T) {
 	if code := pfUnblock(one); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
 	}
-	holds(t, one.errs.String(), "hands no question out")
+	holds(t, one.errs.String(), "A cloud box hands no question out.")
 	holds(t, one.errs.String(), "ticket pull a-child")
 	pfStaysOpen(t, one)
 }
@@ -170,13 +170,20 @@ func TestPFUnblockStagesTheTwoTicketsAlone(t *testing.T) {
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
 	}
-	landed := one.git("show", "--name-only", "--format=", "HEAD")
-	if landed != ticketAt("a-child")+"\n"+ticketAt("a-successor") {
+	changed, _ := one.repo.Changed("HEAD")
+	var landed []string
+	for _, each := range changed {
+		landed = append(landed, each.Path)
+	}
+	if strings.Join(landed, "\n") != ticketAt("a-child")+"\n"+ticketAt("a-successor") {
 		t.Fatalf("the commit carries %q", landed)
 	}
-	still := one.git("status", "--porcelain", "-uall")
-	holds(t, still, ticketAt("one-group"))
-	holds(t, still, "src/loose.txt")
+	var still []string
+	for _, each := range one.status() {
+		still = append(still, each.Path)
+	}
+	holds(t, strings.Join(still, "\n"), ticketAt("one-group"))
+	holds(t, strings.Join(still, "\n"), "src/loose.txt")
 }
 
 // The successor carries the question and the ticket it comes from under Discussion, the empty line gone. [[spec/tickets/work-verbs-port-to-go]]
@@ -188,11 +195,12 @@ func TestPFTheSuccessorCarriesTheQuestion(t *testing.T) {
 	}
 	next := one.read(ticketAt("a-successor"))
 	holds(t, next, "no test drives the hook")
-	holds(t, next, "[[spec/tickets/a-child]]")
+	holds(t, next, "[[spec/tickets/a-child]] hands this over at `implement/person-1`, which waits for a person.")
 	holds(t, next, "# Discussion")
 	if strings.Contains(next, "Nothing stands here yet") {
 		t.Fatal("the empty line stays")
 	}
+	holds(t, one.subject("HEAD"), "a-child: closes became a-successor")
 }
 
 // A question carrying a table lands as that table, and TL;DR stays whole. [[spec/tickets/work-verbs-port-to-go]]
@@ -232,7 +240,7 @@ func TestPFAFailedVerdictTableLandsAsATable(t *testing.T) {
 	t.Parallel()
 	reason := `the rows split:; | road | cost |\n| --- | --- |\n| one | two |; no test drives the hook`
 	one := pfUnblockTree(t, pfUChild("implement/change", ""), pfSuccessor, true)
-	one.d.Method = pfMethod(t)
+	one.pfMethodRoot()
 	text, path := one.d.withPersonStep(note{Name: "a-child", Text: pfUChild("implement/change", "")}, "implement/change", "implement/change fails back 2 times: "+reason, nil)
 	if path != "implement/person-2" {
 		t.Fatalf("the person step goes in at %q", path)
@@ -291,6 +299,7 @@ func TestPFASuccessorOffThePersonRouteNamesTheMint(t *testing.T) {
 	if code := pfUnblock(one); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
 	}
+	holds(t, one.errs.String(), "a-successor stands off the person route")
 	holds(t, one.errs.String(), "--process=person")
 	pfStaysOpen(t, one)
 }

@@ -5,12 +5,9 @@
 package branches
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 )
-
-var hunkAt = regexp.MustCompile(`^@@+ .*\+(\d+)(?:,\d+)? @@`)
 
 // A note to land: its name, its path under the work root, its text, and whether it stands private. [[spec/design_output/pull#the-refused-commit]]
 type note struct {
@@ -31,22 +28,27 @@ func (d *Doors) landedAlone(one note, changes []string, also ...string) string {
 		return ""
 	}
 	paths := append([]string{one.At}, also...)
-	d.quiet(append([]string{"add", "--"}, paths...)...)
-	only := append([]string{"--"}, paths...)
-	ran := Said{Err: d.stagedFault(only)}
-	if ran.Err == "" {
-		ran = d.quiet(append([]string{"commit", "-m", one.Name + ": " + strings.Join(changes, ", ")}, only...)...)
+	_ = d.Repo.Add(paths)
+	fault := d.stagedFault(paths)
+	if fault == "" {
+		fault = d.committed(one.Name+": "+strings.Join(changes, ", "), paths)
 	}
-	if ran.OK {
+	if fault == "" {
 		return ""
 	}
-	d.quiet(append([]string{"reset", "-q"}, only...)...)
+	_ = d.Repo.Reset(paths)
 	_ = d.write(one.At, stood)
+	return fault
+}
+
+// Commits the index, or the paths named alone, and answers what git refused it with. [[spec/design_output/pull#the-refused-commit]]
+func (d *Doors) committed(message string, only []string) string {
+	_, err := d.Repo.Commit(message, only)
 	switch {
-	case ran.Err != "":
-		return ran.Err
-	case ran.Out != "":
-		return ran.Out
+	case err == nil:
+		return ""
+	case strings.TrimSpace(err.Error()) != "":
+		return strings.TrimSpace(err.Error())
 	}
 	return "the commit answers nothing"
 }
@@ -59,7 +61,14 @@ func (d *Doors) unmergedFault() string {
 
 // The refusal a staged conflict marker answers before the commit. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) stagedFault(only []string) string {
-	return mergeRefusal(nil, markedIn(d.quiet(append([]string{"diff", "--cached", "--unified=0"}, only...)...).Out))
+	added, _ := d.Repo.StagedAdds(only)
+	var marked []string
+	for _, one := range added {
+		if markOpens.MatchString(one.Text) {
+			marked = append(marked, one.File+":"+strconv.Itoa(one.Line))
+		}
+	}
+	return mergeRefusal(nil, marked)
 }
 
 // The refusal every commit road answers, naming each file. [[spec/design_output/work#no-commit-carries-a-marker]]
@@ -76,35 +85,4 @@ func mergeRefusal(unmerged, marked []string) string {
 	}
 	rows = append(rows, "Resolve the merge first: write each file without its markers, then land the merge with ./RUNME.sh commit.")
 	return strings.Join(rows, "\n")
-}
-
-// The openers a staged delta adds, each as its file and line. [[spec/design_output/work#no-commit-carries-a-marker]]
-func markedIn(delta string) []string {
-	var out []string
-	file, at, binary := "", 0, false
-	for _, line := range splitRows(delta) {
-		switch {
-		case strings.HasPrefix(line, "diff --git "):
-			file, binary = "", false
-			continue
-		case strings.HasPrefix(line, "Binary files") || strings.HasPrefix(line, "GIT binary patch"):
-			binary = true
-			continue
-		case strings.HasPrefix(line, "+++ "):
-			file = strings.TrimPrefix(strings.TrimPrefix(line, "+++ "), "b/")
-			continue
-		}
-		if found := hunkAt.FindStringSubmatch(line); found != nil {
-			at, _ = strconv.Atoi(found[1])
-			continue
-		}
-		if !strings.HasPrefix(line, "+") || strings.HasPrefix(line, "+++") {
-			continue
-		}
-		if file != "" && !binary && markOpens.MatchString(line[1:]) {
-			out = append(out, file+":"+strconv.Itoa(at))
-		}
-		at++
-	}
-	return out
 }

@@ -6,7 +6,6 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -93,14 +92,12 @@ func mintTree(t *testing.T, branch string) string {
 	}
 	seedsFile(t, root, "spec/processes/small.yaml", mintProcess)
 	seedsFile(t, root, "spec/processes/group.yaml", mintProcess)
+	repo := standsInRepo(t, root)
 	if branch != "" {
-		for _, args := range [][]string{{"init", "-q"}, {"checkout", "-q", "-b", branch}, {"-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "first"}} {
-			run := exec.Command("git", args...)
-			run.Dir = root
-			if said, err := run.CombinedOutput(); err != nil {
-				t.Fatalf("git %v: %v %s", args, err, said)
-			}
+		if err := repo.Switch(branch, true); err != nil {
+			t.Fatal(err)
 		}
+		commitsAll(t, repo, "first")
 	}
 	return root
 }

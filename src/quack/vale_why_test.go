@@ -1,9 +1,9 @@
 package main
 
 import (
-	"errors"
-	"os/exec"
 	"testing"
+
+	"quackitect/src/proc"
 )
 
 // A root with no Vale answers the seam a lint that stands nowhere, with the reason the JS lint names. [[spec/tickets/drafts-lint-seam-carries-why]]
@@ -20,17 +20,17 @@ func TestTheValeReasonNamesWhyValeReadNothing(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		claim string
-		said  []byte
-		err   error
+		said  proc.Said
 		why   string
 	}{
-		{"stderr names the fault", nil, &exec.ExitError{Stderr: []byte(" E100 config broken \n")}, "E100 config broken"},
-		{"the run's error names it", nil, errors.New("signal: killed"), "signal: killed"},
-		{"an empty answer", nil, nil, "vale answered nothing"},
-		{"an answer past JSON", []byte("not json"), nil, "vale answered no JSON: not json"},
+		{"stderr names the fault", proc.Said{Err: " E100 config broken \n", Code: 2}, "E100 config broken"},
+		{"the run's fault names it", proc.Said{Err: "proc: the run passes its wait", Code: proc.NotStarted}, "proc: the run passes its wait"},
+		{"an exit with no stderr names its status", proc.Said{Code: 2}, "exit status 2"},
+		{"an empty answer", proc.Said{}, "vale answered nothing"},
+		{"an answer past JSON", proc.Said{Out: "not json"}, "vale answered no JSON: not json"},
 	}
 	for _, one := range cases {
-		if got := unreadWhy(one.said, one.err); got != one.why {
+		if got := unreadWhy(one.said); got != one.why {
 			t.Errorf("%s: unreadWhy answers %q, want %q", one.claim, got, one.why)
 		}
 	}

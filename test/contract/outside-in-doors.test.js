@@ -24,7 +24,6 @@ const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 // Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#a-door-reads-the-outside]]
 const ROOTS = [
   "src/scripts/cli-doors.js",
-  "src/scripts/cli-check.js",
   "src/scripts/precommit.js",
   "src/scripts/prepush.js",
   "src/scripts/trust.js",
@@ -42,7 +41,7 @@ const SPAWN = 'import "os/exec"\n';
 // The guard reads the raw line, so the fixture carries no import of its own. [[spec/design_output/private#a-fixture-carries-no-shape]]
 const NODE = ['import { readFileSync } from "node', ':fs";\n'].join("");
 
-const MODULE = "src/bridge/stop.js";
+const MODULE = "src/bridge/findings.js";
 const EXTENSION = "src/extension/extension.js";
 
 ifVale(

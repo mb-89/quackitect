@@ -67,6 +67,13 @@ export function index(disk, proc, clock, method, work = method) {
       const ran = run(["find", words], ASKING);
       return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "find");
     },
+    // The standing returns once the door over the root stands, so the caller waits on that event and on no span. [[spec/tickets/runme-road-waits-on-ready]]
+    ready: () => {
+      const ran = run(["standing"]);
+      if (ran.exitCode === 0) return { ready: true, dead: "" };
+      failed(ran, "standing");
+      return { ready: false, dead };
+    },
     // [[spec/design_output/index#a-dead-index-speaks]]
     warm: () => {
       const now = clock.now().getTime();

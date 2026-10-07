@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"testing"
 
 	"golang.org/x/tools/go/analysis/analysistest"
@@ -25,20 +26,67 @@ var planted = map[string]string{
 	"tui/frame/frame.go":       "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
+// The folders the planted trees stand in. They outlive every case, so TestMain removes them once the run ends. [[spec/tickets/shared-plant-outlives-each-case]]
+var plants struct {
+	sync.Mutex
+	dirs []string
+}
+
+// The clean tree, built once a run. [[spec/tickets/shared-plant-outlives-each-case]]
+var cleanTree = sync.OnceValues(func() (string, error) { return plantedTree(planted) })
+
+// A folder of its own holding every set of files, which no case writes to. [[spec/tickets/shared-plant-outlives-each-case]]
+func plantedTree(sets ...map[string]string) (string, error) {
+	dir, err := os.MkdirTemp("", "planted-")
+	if err != nil {
+		return "", err
+	}
+	plants.Lock()
+	plants.dirs = append(plants.dirs, dir)
+	plants.Unlock()
+	for _, set := range sets {
+		for rel, text := range set {
+			at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
+			if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+				return "", err
+			}
+			if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+				return "", err
+			}
+		}
+	}
+	return dir, nil
+}
+
+// Runs every case, then removes the planted trees. [[spec/tickets/shared-plant-outlives-each-case]]
+func TestMain(m *testing.M) {
+	code := m.Run()
+	for _, dir := range plants.dirs {
+		os.RemoveAll(dir)
+	}
+	os.Exit(code)
+}
+
 // [[spec/design_output/model#the-build-checks-imports]]
 func plant(t *testing.T) string {
 	t.Helper()
-	dir := t.TempDir()
-	for rel, text := range planted {
-		at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
+	dir, err := cleanTree()
+	if err != nil {
+		t.Fatal(err)
 	}
 	return dir
+}
+
+// The planted trees build once a run, and every case reads them, since no analyzer writes there. [[spec/tickets/each-door-meets-one-test]]
+func TestThePlantedTreeBuildsOnce(t *testing.T) {
+	t.Parallel()
+	if plant(t) != plant(t) || plantFlagged(t) != plantFlagged(t) {
+		t.Fatal("a planted tree builds again for each case, where one build serves every case")
+	}
+	// The flagged packages stand in a folder of their own, so none leaks into the clean cases.
+	if plant(t) == plantFlagged(t) {
+		t.Fatal("the flagged tree shares the clean tree's folder")
+	}
 }
 
 func TestADoorImportingAModuleIsNamed(t *testing.T) {
@@ -161,4 +209,31 @@ func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
 func TestAModuleImportingAModuleIsNamed(t *testing.T) {
 	t.Parallel()
 	analysistest.Run(t, plant(t), NoModule, "quackitect/src/modules/greedy")
+}
+
+// A window package importing past its row is named, and a package the table leaves out reads no fault. [[spec/design_output/tui#the-packages-the-window-holds]]
+func TestAWindowImportPastItsRowIsNamed(t *testing.T) {
+	t.Parallel()
+	if said := WindowFaults("quackitect/src/tui/tree", []string{"quackitect/src/tui/draw", "quackitect/src/tui/frame", "strings"}); len(said) != 1 || !strings.Contains(said[0], "src/tui/frame") {
+		t.Fatalf("tree importing frame reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui", []string{"quackitect/src/tui/frame", "quackitect/src/tui/tree"}); len(said) != 1 {
+		t.Fatalf("the root importing tree reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui/unnamed", []string{"quackitect/src/tui/frame"}); len(said) != 0 {
+		t.Fatalf("a package the table leaves out reads %v", said)
+	}
+}
+
+// A module the index reaches below its own imports is named. [[spec/tickets/tickets-becomes-a-module]]
+func TestAModuleTheIndexReachesBelowIsNamed(t *testing.T) {
+	t.Parallel()
+	graph := map[string][]string{
+		"quackitect/src/index":         {"quackitect/src/q", "strings"},
+		"quackitect/src/q":             {"quackitect/src/modules/work"},
+		"quackitect/src/modules/other": {},
+	}
+	if said := IndexFaults(graph); len(said) != 1 || !strings.Contains(said[0], "src/modules/work") {
+		t.Fatalf("the faults read %v", said)
+	}
 }

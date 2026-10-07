@@ -7,11 +7,11 @@ import (
 	"errors"
 	"io"
 	"os"
-	"os/exec"
-	"strings"
 	"time"
 
+	settingsreader "quackitect/src/config"
 	"quackitect/src/index"
+	"quackitect/src/proc"
 	"quackitect/src/voice"
 )
 
@@ -24,7 +24,7 @@ type voiceOutside struct {
 }
 
 func init() {
-	register("voice", voiceVerb(voiceOutside{root: index.Root, vale: valeAt, run: voiceRunsVale, now: time.Now}))
+	register("voice", voiceVerb(voiceOutside{root: index.Root, vale: valeAt, run: voiceRunsValeOver(proc.Real), now: time.Now}))
 }
 
 // The voice twin over the outside it binds, the root falling back to here as the road's does. [[spec/design_output/projection#the-second-target]]
@@ -63,17 +63,17 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		MakeDir: func(path string) error { return os.MkdirAll(path, 0o755) },
 		Vale:    outside.run,
 		Now:     outside.now,
+		Ceiling: settingsreader.Count(root, answerCeilingKey),
 	}
 }
 
-// Runs Vale in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/design_output/projection#the-second-target]]
-func voiceRunsVale(argv []string, cwd string) (string, error) {
-	run := exec.Command(argv[0], argv[1:]...)
-	run.Dir, run.Stdin = cwd, strings.NewReader("")
-	said, err := run.Output()
-	var exit *exec.ExitError
-	if err != nil && !errors.As(err, &exit) {
-		return "", err
+// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start or a signal ends answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
+func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
+	return func(argv []string, cwd string) (string, error) {
+		said := run(proc.Command{Argv: argv, Dir: cwd})
+		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
+			return "", errors.New(said.Err)
+		}
+		return said.Out, nil
 	}
-	return string(said), nil
 }

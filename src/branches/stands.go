@@ -6,6 +6,7 @@ package branches
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"slices"
 	"strings"
@@ -43,6 +44,9 @@ const (
 	routineName = "do_work"
 	routineID   = "trig_01EenLoDAB3NdmANnRM9mSh6"
 )
+
+// Where origin's branches stand as tracking refs. [[spec/design_output/work#the-listing-reads-git-once]]
+const remoteRefs = "refs/remotes/origin/"
 
 // The branches the close reads as this tree's own. [[spec/design_output/work#a-merged-branch-closes]]
 var ownBranch = regexp.MustCompile(`^(work|claude)/`)
@@ -205,29 +209,16 @@ func standingAll(stood []stand) map[string]string {
 
 // The branches inside trunk, past a cut standing on trunk's own line. [[spec/design_output/work#a-merged-branch-closes]]
 func (d *Doors) mergedHere() map[string]bool {
-	fresh := d.branchesIn("branch", "-r", "--points-at", "origin/"+trunk)
 	line := map[string]bool{}
-	for _, row := range strings.Split(d.quiet("rev-list", "--first-parent", "origin/"+trunk).Out, "\n") {
-		if row = strings.TrimSpace(row); row != "" {
-			line[row] = true
-		}
+	parents, _ := d.Repo.FirstParents("origin/" + trunk)
+	for _, one := range parents {
+		line[one] = true
 	}
+	inside, _ := d.Repo.Merged(remoteRefs, "origin/"+trunk)
 	out := map[string]bool{}
-	for row := range d.branchesIn("branch", "-r", "--merged", "origin/"+trunk) {
-		if !fresh[row] && !line[d.quiet("rev-parse", "origin/"+row).Out] {
-			out[row] = true
-		}
-	}
-	return out
-}
-
-// The branches of this tree's own a git listing names. [[spec/design_output/work#a-merged-branch-closes]]
-func (d *Doors) branchesIn(args ...string) map[string]bool {
-	out := map[string]bool{}
-	for _, row := range strings.Split(d.quiet(args...).Out, "\n") {
-		row = strings.Replace(strings.TrimSpace(row), "origin/", "", 1)
-		if ownBranch.MatchString(row) {
-			out[row] = true
+	for _, one := range inside {
+		if branch := strings.TrimPrefix(one.Name, remoteRefs); ownBranch.MatchString(branch) && !line[one.Hash] {
+			out[branch] = true
 		}
 	}
 	return out
@@ -252,38 +243,36 @@ type refRead struct {
 
 // The work refs on origin, each landed, orphaned or behind. [[spec/design_output/work#the-listing-reads-git-once]]
 func (d *Doors) refsHere() []refRead {
-	said := d.quiet("for-each-ref", "--format="+refFormat, "refs/remotes/origin/"+workBranch)
-	if !said.OK {
+	refs, err := d.Repo.Refs(remoteRefs + workBranch)
+	if err != nil {
 		return nil
 	}
 	var branches []string
-	for _, one := range refsIn(said.Out, nil) {
-		branches = append(branches, one.Branch)
+	for _, one := range refs {
+		branches = append(branches, strings.TrimPrefix(one.Name, remoteRefs))
 	}
-	tip := ""
-	if at := d.quiet("rev-parse", "origin/"+trunk); at.OK {
-		tip = at.Out
-	}
+	tip := d.rev("origin/" + trunk)
+	landed := d.landedHere(branches)
 	var out []refRead
-	for _, one := range refsIn(said.Out, d.landedHere(branches)) {
-		shares, base := d.baseOnTrunk(one.Branch)
-		out = append(out, refRead{ref: one, Orphan: !shares, Behind: shares && tip != "" && base != tip})
+	for at, one := range refs {
+		when, _ := d.Repo.When(one.Hash)
+		read := ref{Branch: branches[at], Tip: one.Hash, When: when, Merged: landed[branches[at]]}
+		shares, base := d.baseOnTrunk(read.Branch)
+		out = append(out, refRead{ref: read, Orphan: !shares, Behind: shares && tip != "" && base != tip})
 	}
 	return out
 }
 
 // The commit trunk and a branch share, fetching a shallow clone whole where it answers none. [[spec/design_output/work#the-listing-reads-git-once]]
 func (d *Doors) baseOnTrunk(branch string) (bool, string) {
-	ask := func() Said { return d.quiet("merge-base", "origin/"+trunk, "origin/"+branch) }
-	said := ask()
-	if !said.OK && d.quiet("rev-parse", "--is-shallow-repository").Out == "true" {
-		d.quiet("fetch", "--unshallow", "origin")
-		said = ask()
+	base, ok := d.Repo.MergeBase("origin/"+trunk, "origin/"+branch)
+	if !ok && d.Repo.Unshallow() {
+		base, ok = d.Repo.MergeBase("origin/"+trunk, "origin/"+branch)
 	}
-	if !said.OK {
+	if !ok {
 		return false, ""
 	}
-	return true, said.Out
+	return true, base
 }
 
 // The refs, then the paths, then the contents: every branch standing, and trunk's tickets where asked. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -303,7 +292,7 @@ func (d *Doors) readWork(withTrunk bool) ([]stand, []ticketFile) {
 			asks = append(asks, one+":"+ticketsFolder+"/"+name)
 		}
 	}
-	read := framed(d.batch(asks), asks)
+	read, _ := d.Repo.ShowMany(asks)
 	ticketsAt := func(at string) []ticketFile {
 		var out []ticketFile
 		for _, name := range paths[at] {
@@ -367,15 +356,11 @@ func flatten(said map[string]any, at string, out map[string]any) {
 
 // The ticket names each tree holds, by where it stands. [[spec/design_output/work#the-listing-reads-git-once]]
 func (d *Doors) pathsIn(where []string) map[string][]string {
-	var asks []string
-	for _, one := range where {
-		asks = append(asks, one+":"+ticketsFolder)
-	}
-	trees := framed(d.batch(asks), asks)
 	out := map[string][]string{}
 	for _, one := range where {
-		for _, name := range namesIn(trees[one+":"+ticketsFolder]) {
-			if strings.HasSuffix(name, noteEnd) {
+		under, _ := d.Repo.Files(one, ticketsFolder)
+		for _, path := range under {
+			if name := strings.TrimPrefix(path, ticketsFolder+"/"); !strings.Contains(name, "/") && strings.HasSuffix(name, noteEnd) {
 				out[one] = append(out[one], name)
 			}
 		}
@@ -391,11 +376,11 @@ func (d *Doors) standOf() []stand {
 
 // A file at a ref, with the newline the show trims put back, or nothing. [[spec/design_output/work#a-group-is-a-ticket]]
 func (d *Doors) textAt(at, path string) string {
-	said := d.quiet("show", at+":"+path)
-	if !said.OK {
+	said, ok := d.Repo.Show(at, path)
+	if !ok {
 		return ""
 	}
-	return said.Out + "\n"
+	return strings.TrimSpace(said) + "\n"
 }
 
 // The work branch HEAD stands on, or nothing with the refusal printed. [[spec/design_output/work#a-group-is-a-ticket]]
@@ -410,12 +395,12 @@ func (d *Doors) workBranchHere(verb string) string {
 
 // Every ticket a ref carries. [[spec/design_output/work#the-merge-frees-the-tickets]]
 func (d *Doors) ticketsOn(at string) []ticketFile {
-	said := d.quiet("ls-tree", "-r", "--name-only", at, ticketsFolder+"/")
-	if !said.OK {
+	under, err := d.Repo.Files(at, ticketsFolder)
+	if err != nil {
 		return nil
 	}
 	var out []ticketFile
-	for _, path := range strings.Split(said.Out, "\n") {
+	for _, path := range under {
 		if strings.HasSuffix(path, noteEnd) {
 			out = append(out, ticketFile{Path: path, Name: ticketNamed(path), Text: d.textAt(at, path)})
 		}
@@ -453,12 +438,12 @@ func (d *Doors) dirty(branch string) bool {
 
 // Whether a branch holds commits origin lacks, which a move drops. [[spec/design_output/work#a-branch-moves-clean]]
 func (d *Doors) unpushed(branch string) bool {
-	said := d.quiet("rev-list", "--count", "origin/"+branch+".."+branch)
-	if !said.OK || said.Out == "" || said.Out == "0" {
+	count := d.ahead("origin/"+branch, branch)
+	if count <= 0 {
 		return false
 	}
 	d.raises(failure.Raise(d.Failures, "branch-unpushed",
-		branch+" holds "+said.Out+" commit(s) origin lacks, so no branch may move.",
+		fmt.Sprintf("%s holds %d commit(s) origin lacks, so no branch may move.", branch, count),
 		"Run git push origin "+branch+", and run this again."))
 	return true
 }
@@ -466,27 +451,11 @@ func (d *Doors) unpushed(branch string) bool {
 // Every path git status names, an untracked folder's files each. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 func (d *Doors) standingIn() []change {
 	var out []change
-	for _, row := range strings.Split(d.quiet("status", "--porcelain", "-uall").Out, "\n") {
-		if row == "" {
-			continue
-		}
-		name := changedIn(row)
-		out = append(out, change{Name: name, Parked: d.parkedHere(name)})
+	standing, _ := d.Repo.Status(true)
+	for _, one := range standing {
+		out = append(out, change{Name: one.Path, Parked: d.parkedHere(one.Path)})
 	}
 	return out
-}
-
-var statusRow = regexp.MustCompile(`^\s*\S{1,2}\s+(.*)$`)
-
-// The path a status row names, past a rename's arrow and its quotes. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-func changedIn(row string) string {
-	said := row
-	if found := statusRow.FindStringSubmatch(row); found != nil {
-		said = found[1]
-	}
-	said = strings.TrimSpace(said)
-	moved := strings.Split(said, " -> ")
-	return strings.TrimSuffix(strings.TrimPrefix(moved[len(moved)-1], `"`), `"`)
 }
 
 // Whether a changed note carries the todo tag, which parks it on this box. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]

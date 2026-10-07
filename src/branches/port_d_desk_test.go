@@ -11,16 +11,16 @@ func TestPDADeskTakeRefusesAndNamesMain(t *testing.T) {
 	one := newTree(t, map[string]string{ticketAt("one-group"): pdGroupNote}).desk()
 	one.d.Failures = deskNodes()
 	one.branch("one-group", nil)
-	was := one.git("rev-parse", "HEAD")
+	was := one.rev("HEAD")
 	if code := one.branchSays("take", "one-group"); code != codeRefused {
 		t.Fatalf("a desk take answers %d", code)
 	}
 	holds(t, one.errs.String(), "A desk works on main alone")
 	holds(t, one.errs.String(), "git switch main")
-	if one.git("rev-parse", "HEAD") != was || one.git("rev-parse", "--abbrev-ref", "HEAD") != trunk {
+	if one.rev("HEAD") != was || one.here() != trunk {
 		t.Fatal("the refused take moves the box")
 	}
-	if one.d.quiet("rev-parse", "-q", "--verify", "refs/heads/work/one-group").OK {
+	if one.rev("refs/heads/work/one-group") != "" {
 		t.Fatal("the refused take makes a branch")
 	}
 }
@@ -32,17 +32,17 @@ func TestPDADeskMergesADoneCloudBranch(t *testing.T) {
 	one.d.Runme = []string{"true"}
 	done := withField(withEntry(pdGroupNote, entryRow("sync", "a1b2c3", "d4e5f6")), "state", closedState)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): done})
-	tip := one.git("rev-parse", "origin/work/one-group")
+	tip := one.rev("origin/work/one-group")
 	if code := one.branchSays("merge", "one-group"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
 	holds(t, one.out.String(), "work/one-group is merged, and the check passes on the merge commit")
 	holds(t, one.out.String(), "work/one-group is closed")
-	one.git("fetch", "-q", "--prune", "origin")
+	one.fetch()
 	if !pdInside(one, tip, "origin/main") {
 		t.Fatal("origin/main carries no merge")
 	}
-	if one.d.quiet("ls-remote", "--heads", "origin", "work/one-group").Out != "" {
+	if one.originHas("work/one-group") {
 		t.Fatal("the branch stands on origin")
 	}
 }

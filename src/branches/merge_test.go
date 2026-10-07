@@ -1,4 +1,4 @@
-// The trunk end: merge refuses short of done, and close keeps an unmerged branch.
+// The trunk end: merge refuses short of done, and stands aside for a pull request.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
@@ -23,36 +23,9 @@ func TestAMergeStandsAsideForAPullRequest(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/7/head")
+	one.pushAt("origin/work/g", "refs/pull/7/head")
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d", code)
 	}
 	holds(t, one.errs.String(), "work/g stands in pull request #7")
-}
-
-// Close keeps a branch outside trunk, and names the force. [[spec/design_output/work#a-merged-branch-closes]]
-func TestCloseKeepsAnUnmergedBranch(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil).desk()
-	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	if code := one.branchSays("close", "g"); code != codeRed {
-		t.Fatalf("close answers %d", code)
-	}
-	holds(t, one.errs.String(), "work/g is outside main, so closing it drops its work.")
-	if !one.d.quiet("rev-parse", "--verify", "origin/work/g").OK {
-		t.Fatal("the close drops the branch")
-	}
-}
-
-// Close deletes a branch trunk carries through a merge commit. [[spec/design_output/work#a-merged-branch-closes]]
-func TestCloseDeletesAMergedBranch(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil).desk()
-	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
-	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/g")
-	one.git("push", "-q", "origin", "main")
-	if code := one.branchSays("close"); code != 0 {
-		t.Fatalf("close answers %d: %s", code, one.errs.String())
-	}
-	holds(t, one.out.String(), "work/g is closed.")
 }

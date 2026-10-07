@@ -1,4 +1,4 @@
-// The test verb over a real clone, ported off test/level0/test-verb.test.js,
+// The test verb over a fake clone, its node and go runs off the fake disk, ported off test/level0/test-verb.test.js,
 // go-modules.test.js and pull-leaves.test.js: named files and folders, the
 // tests a branch changes, the red run over HEAD's text, and the words a run answers.
 // [[spec/tickets/work-verbs-port-to-go]]
@@ -147,10 +147,10 @@ func TestPFGoSaysItsWord(t *testing.T) {
 	if got := goSays(Said{OK: true}, "src/tui"); got != "green, src/tui passes" {
 		t.Fatalf("a green run reads %q", got)
 	}
-	if got := goSays(Said{Code: 1, Out: "--- FAIL: TestOne\nFAIL\n"}, "src/tui"); !strings.HasPrefix(got, "assertion, a test of src/tui fails") {
+	if got := goSays(Said{Code: 1, Out: "--- FAIL: TestOne\nFAIL\n"}, "src/tui"); got != "assertion, a test of src/tui fails" {
 		t.Fatalf("a failing run reads %q", got)
 	}
-	if got := goSays(Said{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"}, "src/tui"); !strings.HasPrefix(got, "build, because src/tui builds not: ./work.go") {
+	if got := goSays(Said{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"}, "src/tui"); got != "build, because src/tui builds not: ./work.go:9:2: undefined: nothing" {
 		t.Fatalf("a broken build reads %q", got)
 	}
 }
@@ -175,6 +175,10 @@ func TestPFTestSaysItsVerdict(t *testing.T) {
 		if last := rows[len(rows)-1]; !regexp.MustCompile("^" + strings.TrimPrefix(cases[at][0], "^")).MatchString(last) {
 			t.Fatalf("run %d reads %q", at, last)
 		}
+	}
+	red := testSays(Said{Out: "not ok 1 - it adds\n# tests 1\n# fail 1\nAssertionError\n"}, 1)
+	if red != "  not ok: it adds\nassertion, 1 test(s) fail on their own assertion" {
+		t.Fatalf("a red run reads %q", red)
 	}
 }
 
@@ -206,8 +210,8 @@ func TestPFARedRunNamesItsCasesAboveTheVerdict(t *testing.T) {
 func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
-	base := one.git("rev-parse", "HEAD")
-	one.git("switch", "-q", "-c", workBranch+"x")
+	base := one.rev("HEAD")
+	one.cut(workBranch+"x", "")
 	one.land("a source", map[string]string{"src/x.js": "x\n"})
 	if code := one.branchSays("test"); code != codeRed {
 		t.Fatalf("the test verb answers %d", code)
@@ -221,7 +225,7 @@ func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
 func TestPFABranchChangingATestRunsIt(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil).desk()
-	one.git("switch", "-q", "-c", workBranch+"x")
+	one.cut(workBranch+"x", "")
 	one.land("a test", map[string]string{"test/level0/x.test.js": pfNodeTests(3, ""), "src/x.js": "x\n"})
 	if code := one.branchSays("test"); code != 0 {
 		t.Fatalf("the test verb answers %d: %s", code, one.out.String())
@@ -235,7 +239,7 @@ func TestPFABranchChangingATestRunsIt(t *testing.T) {
 func TestPFADeletedTestStaysOutAndAnUntrackedFolderRuns(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, map[string]string{"test/level0/gone.test.js": "require(\"node:test\").test(\"gone\", () => { throw new Error(\"it ran\"); });\n"}).desk()
-	one.sh(one.root, "rm", "test/level0/gone.test.js")
+	one.erase("test/level0/gone.test.js")
 	one.write(map[string]string{"test/level0/fresh/new.test.js": pfNodeTests(1, "")})
 	if code := one.branchSays("test"); code != 0 {
 		t.Fatalf("the test verb answers %d: %s", code, one.out.String())

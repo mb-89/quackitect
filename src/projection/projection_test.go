@@ -206,6 +206,16 @@ func TestParagraphRulesTakeTheirSideAndTheBanner(t *testing.T) {
 	}
 }
 
+func TestRestatedTableLooksUpRunsOfTheLengthItsLayerNames(t *testing.T) {
+	schema := "rules:\n  RestatedTable: warning\nlayers:\n  restated:\n    table: 4\n"
+	rule := readOver(t, paragraphEntry, Texts{"p.yaml": schema}).Wanted["r/RestatedTable.yml"]
+	for _, want := range []string{"runsOf(wordsOf(one), 4)", "shares(mine, cell, 4)"} {
+		if !strings.Contains(rule, want) {
+			t.Errorf("the table rule carries no %s:\n%s", want, rule)
+		}
+	}
+}
+
 func TestParagraphFaultsNameAFieldOutsideTheShape(t *testing.T) {
 	said := readOver(t, paragraphEntry, Texts{
 		"p.yaml": "rules:\n  Markup: nonsense\n",

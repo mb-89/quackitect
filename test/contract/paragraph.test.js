@@ -354,6 +354,39 @@ ifVale(
   ),
 );
 
+// The rule refuses a run as long as its table setting, inside one cell, and nothing shorter. [[spec/tickets/the-parts-start-at-once]]
+const twoCells = (lead, left, right) =>
+  `${lead}\n\n| what stands | what it does |\n|---|---|\n| ${left} | ${right} |\n`;
+
+ifVale(
+  "a run of six words a cell holds is refused, and five pass, as does a run across two cells",
+  proves(
+    {
+      six: restated("Somewhere a box keeps every open ticket warm.", "each box keeps every open ticket warm today"),
+      five: restated("Somewhere the index keeps every open ticket warm.", "each box keeps every open ticket warm today"),
+      across: twoCells("Each box keeps every open ticket warm.", "each box keeps", "every open ticket warm"),
+    },
+    (said) => {
+      refuses(said, "RestatedTable", "six");
+      passes(said, "RestatedTable", "five");
+      passes(said, "RestatedTable", "across");
+    },
+  ),
+);
+
+// A long table beside a long paragraph stays inside the budget Vale gives a script. [[spec/tickets/restated-table-runs-in-time]]
+const wordy = (tag, n) => Array.from({ length: n }, (_, i) => `${tag}w${i}`).join(" ");
+const longTable = () => {
+  const lines = Array.from({ length: 40 }, (_, i) => wordy(`p${i}`, 12));
+  const rows = Array.from({ length: 200 }, (_, r) => `| ${wordy(`a${r}`, 30)} | ${wordy(`b${r}`, 30)} |`);
+  return `${lines.join("\n")}\n\n| one | two |\n|---|---|\n${rows.join("\n")}\n`;
+};
+
+ifVale(
+  "a long table beside a long paragraph finishes, and restates nothing",
+  proves({ long: longTable() }, (said) => passes(said, "RestatedTable", "long")),
+);
+
 // The tense reader stands over the rule, so a word this tree means in the present reads past it. [[spec/design_output/projection#the-grammar-rules]]
 ifVale(
   "the past tense is refused, and the words this tree means pass",

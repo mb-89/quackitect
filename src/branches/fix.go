@@ -21,11 +21,15 @@ func onPersonRoute(text string) bool {
 
 // The tickets this branch adds over trunk, as the disk holds them. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
 func (d *Doors) addedHere() []named {
-	said := d.quiet("diff", "--name-only", "--diff-filter=A", "origin/"+trunk+"...HEAD", "--", ticketsFolder)
 	var out []named
-	for _, row := range strings.Split(said.Out, "\n") {
-		row = strings.TrimSpace(row)
-		if !strings.HasSuffix(row, noteEnd) || !d.exists(row) {
+	base, ok := d.Repo.MergeBase("origin/"+trunk, "HEAD")
+	if !ok {
+		return nil
+	}
+	changes, _ := d.Repo.Diff(base, "HEAD")
+	for _, change := range changes {
+		row := change.Path
+		if change.Status != "A" || !strings.HasPrefix(row, ticketsFolder+"/") || !strings.HasSuffix(row, noteEnd) || !d.exists(row) {
 			continue
 		}
 		out = append(out, named{Name: ticketNamed(row), Text: d.read(row)})

@@ -43,15 +43,16 @@ type checked struct {
 
 // What a reader needs of a branch, as branch review --json prints it. [[spec/design_output/review#the-questions]]
 type material struct {
-	Branch   string  `json:"branch"`
-	Ref      string  `json:"ref"`
-	Trunk    string  `json:"trunk"`
-	Ask      string  `json:"ask"`
-	Handback string  `json:"handback"`
-	Retro    bool    `json:"retro"`
-	Stat     string  `json:"stat"`
-	Diff     string  `json:"diff"`
-	Check    checked `json:"check"`
+	Branch    string   `json:"branch"`
+	Ref       string   `json:"ref"`
+	Trunk     string   `json:"trunk"`
+	Ask       string   `json:"ask"`
+	Handback  string   `json:"handback"`
+	Retro     bool     `json:"retro"`
+	Stat      string   `json:"stat"`
+	Diff      string   `json:"diff"`
+	Check     checked  `json:"check"`
+	Unreached []string `json:"unreached,omitempty"`
 }
 
 // Gathers what a reader needs of a branch, and prints the report or the JSON. [[spec/design_output/review#what-the-verb-gathers]]
@@ -96,47 +97,57 @@ func review(d *Doors, name string, argv []string) int {
 // The group ticket is the handback, and its retro chapter the retro. [[spec/design_output/review#the-questions]]
 func (d *Doors) gather(branch, at, trunkRef, first string) material {
 	ticket := ticketAt(strings.TrimPrefix(branch, workBranch))
-	handback := d.show(at + ":" + ticket)
+	handback := d.show(at, ticket)
 	return material{
-		Branch:   branch,
-		Ref:      at,
-		Trunk:    trunkRef,
-		Ask:      d.show(first + ":" + ticket),
-		Handback: handback,
-		Retro:    retroOnTicket(handback),
-		Stat:     d.quiet("diff", "--stat", trunkRef+"..."+at).Out,
-		Diff:     capped(d.quiet("diff", trunkRef+"..."+at).Out),
-		Check:    d.checkOn(branch, at),
+		Branch:    branch,
+		Ref:       at,
+		Trunk:     trunkRef,
+		Ask:       d.show(first, ticket),
+		Handback:  handback,
+		Retro:     retroOnTicket(handback),
+		Stat:      strings.TrimSpace(d.patchSince(trunkRef, at, true)),
+		Diff:      capped(strings.TrimSpace(d.patchSince(trunkRef, at, false))),
+		Check:     d.checkOn(branch, at),
+		Unreached: d.unreached(trunkRef, at),
 	}
 }
 
 // The ref a name stands at, on origin first, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
 func (d *Doors) refFor(name string) string {
 	for _, one := range []string{"origin/" + name, name} {
-		if d.quiet("rev-parse", "--verify", "--quiet", one).OK {
+		if _, ok := d.Repo.Resolve(one); ok {
 			return one
 		}
 	}
 	return ""
 }
 
-// The first commit a ref carries past trunk. [[spec/design_output/review#what-the-verb-gathers]]
-func (d *Doors) firstCommit(trunkRef, at string) string {
-	for _, row := range strings.Split(d.quiet("rev-list", "--reverse", trunkRef+".."+at).Out, "\n") {
-		if row != "" {
-			return row
-		}
-	}
-	return ""
-}
-
-// What git shows at a ref, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
-func (d *Doors) show(at string) string {
-	said := d.quiet("show", at)
-	if !said.OK {
+// The patch or its stat from where a ref leaves trunk to the ref, as git diff trunk...ref reads it. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) patchSince(trunkRef, at string, stat bool) string {
+	base, ok := d.Repo.MergeBase(trunkRef, at)
+	if !ok {
 		return ""
 	}
-	return said.Out
+	said, _ := d.Repo.Patch(base, at, stat)
+	return said
+}
+
+// The first commit a ref carries past trunk. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) firstCommit(trunkRef, at string) string {
+	commits, _ := d.Repo.Log(trunkRef, at, false)
+	if len(commits) == 0 {
+		return ""
+	}
+	return commits[len(commits)-1].Hash
+}
+
+// A file at a ref, or nothing. [[spec/design_output/review#what-the-verb-gathers]]
+func (d *Doors) show(ref, path string) string {
+	said, ok := d.Repo.Show(ref, path)
+	if !ok {
+		return ""
+	}
+	return strings.TrimSpace(said)
 }
 
 // A diff cut at the cap, with a line saying it runs on. [[spec/design_output/review#what-the-verb-gathers]]
@@ -174,13 +185,16 @@ func retroOnTicket(text string) bool {
 	return false
 }
 
-// The report a reader reads: nothing to fix, or the rows naming what to. [[spec/design_output/review#what-the-report-looks-like]]
+// The report a reader reads: nothing to fix, or the rows naming what to. [[spec/design_output/review#what-the-report-looks-like]] [[spec/design_output/review#the-unreached-row]]
 func report(said material) string {
 	fix := 0
 	if !said.Check.OK {
 		fix++
 	}
 	if !said.Retro {
+		fix++
+	}
+	if len(said.Unreached) > 0 {
 		fix++
 	}
 	if fix == 0 {
@@ -196,6 +210,9 @@ func report(said material) string {
 		rows = append(rows, [2]string{"retro", "present"})
 	} else {
 		rows = append(rows, [2]string{"retro", "absent from the handback"})
+	}
+	if len(said.Unreached) > 0 {
+		rows = append(rows, [2]string{"unreached", strings.Join(said.Unreached, "\n")})
 	}
 	out := []string{said.Branch, ""}
 	for _, row := range rows {
@@ -229,8 +246,7 @@ func (d *Doors) checkOn(branch, at string) checked {
 	rel := reviewFolder + "/" + strings.Join(strings.Split(branch, "/"), "-")
 	where := d.at(rel)
 	d.remove(rel)
-	d.quiet("worktree", "prune")
-	if !d.quiet("worktree", "add", "--detach", where, at).OK {
+	if d.Repo.AddWorktree(rel, at) != nil {
 		return checked{Says: "no worktree opens on " + at}
 	}
 	survey := d.read(toolsFile)
@@ -251,18 +267,17 @@ func (d *Doors) checkOn(branch, at string) checked {
 		if !d.exists(one) {
 			continue
 		}
-		if to := filepath.Join(where, filepath.FromSlash(one)); d.link(one, to) {
+		if to := rel + "/" + one; d.link(one, to) {
 			linked = append(linked, to)
 		}
 	}
 	bin := filepath.Join(where, filepath.FromSlash(binFolder), "se-index"+exe())
 	ran := d.run(where, nil, "", bin, "verb", filepath.Join(where, "src", "scripts"), "check")
 	for _, one := range linked {
-		unlink(one)
+		d.unlink(one)
 	}
-	d.quiet("worktree", "remove", "--force", where)
+	_ = d.Repo.RemoveWorktree(rel)
 	d.remove(rel)
-	d.quiet("worktree", "prune")
 	code := ran.Code
 	if ran.OK {
 		return checked{OK: true, Code: &code}

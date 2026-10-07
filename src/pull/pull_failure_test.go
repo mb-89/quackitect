@@ -42,7 +42,7 @@ func TestAPullHoldingALeafRaisesPullHandHoldsWithItsRemedy(t *testing.T) {
 func TestAPullOffMainAndOffAWorkBranchRaisesPullBranchOffRoad(t *testing.T) {
 	t.Parallel()
 	it, errs, logged := raisingPull(t, failure.Node{ID: "pull-branch-off-road", Level: "warn", Remedies: []string{"Switch to main."}})
-	gitIn(t, it.Root, "switch", "-q", "-c", "feature")
+	must(t, it.Git.Switch("feature", true))
 	code := it.Pulling([]string{"pull"})
 	for _, want := range []string{"refused\n  ticket pull runs on main or a work branch, and this is feature.", "  failure pull-branch-off-road at warn", "  remedy: Switch to main."} {
 		if code != 2 || !strings.Contains(errs(), want) {

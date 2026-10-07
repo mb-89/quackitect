@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"quackitect/src/failure"
@@ -22,7 +21,6 @@ const (
 	Handover     = ".se/HANDOVER.md"
 	due          = runtimeFolder + "/due.json"
 	handoverTip  = runtimeFolder + "/handover-tip.json"
-	statusWidth  = 3
 	shortTip     = 9
 	privateTwigs = ".se/"
 )
@@ -129,22 +127,18 @@ func (it *It) localWorkFault() string {
 	if !it.Cloud {
 		return ""
 	}
-	branch := strings.TrimSpace(it.Git.Run("rev-parse", "--abbrev-ref", "HEAD").Out)
+	branch := it.branch()
 	dirty := 0
-	for _, row := range strings.Split(it.Git.Run("status", "--porcelain", "--untracked-files=no").Out, "\n") {
-		path := ""
-		if len(row) > statusWidth {
-			path = strings.TrimSpace(row[statusWidth:])
-		}
-		if path != "" && !strings.HasPrefix(path, privateTwigs) {
+	rows, _ := it.Git.Status(false)
+	for _, row := range rows {
+		if row.Path != "" && !strings.HasPrefix(row.Path, privateTwigs) {
 			dirty++
 		}
 	}
-	upstream := it.Git.Run("rev-list", "--count", "origin/"+branch+"..HEAD")
-	if !upstream.OK {
-		upstream = it.Git.Run("rev-list", "--count", "origin/"+Trunk+"..HEAD")
+	ahead, ok := it.Git.Count("origin/"+branch, "HEAD")
+	if !ok {
+		ahead, _ = it.Git.Count("origin/"+Trunk, "HEAD")
 	}
-	ahead, _ := strconv.Atoi(strings.TrimSpace(upstream.Out))
 	if dirty > 0 || ahead > 0 {
 		said := fmt.Sprintf("This box holds work origin lacks: %d commit(s) not pushed", ahead)
 		if dirty > 0 {
@@ -160,7 +154,7 @@ func (it *It) handedOverAt() string {
 	if !it.Cloud {
 		return ""
 	}
-	tip := strings.TrimSpace(it.Git.Run("rev-parse", "HEAD").Out)
+	tip := it.tipOf()
 	var last struct {
 		Tip string `json:"tip"`
 	}
@@ -178,7 +172,7 @@ func (it *It) marksHandoverTip() {
 	if !it.Cloud {
 		return
 	}
-	if tip := strings.TrimSpace(it.Git.Run("rev-parse", "HEAD").Out); tip != "" {
+	if tip := it.tipOf(); tip != "" {
 		_ = it.Disk.Write(handoverTip, `{"tip":`+jsQuote(tip)+`}`)
 	}
 }
