@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: d521b63d31f8a074
         size: 715
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 905a17180ff27c777798243b8ab7706ff68a6f3e
+    hash_after: 905a17180ff27c777798243b8ab7706ff68a6f3e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: bfe420c6747c2284
+        size: 3869
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -246,26 +259,32 @@ the approach adds no config key.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/owns_test.go
+src/owns/tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestANodeModuleNoDoorDeclaresIsAWalk fails because jsWalks names no module that no door owns. TestTheRandomDoorOwnsMathRandomAndHoldsNoFile fails because no random door stands. TestNoDoorStandsAtReport names every door, each of which holds report today. TestAPureNodeModuleIsNoWalk passes already, as it guards the exception the change keeps. The surprise: the watch and wall doors this group adds took report too, by the pattern of the doors beside them, and this change drops it with the rest.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a red test or a check: the first meets TestNoDoorStandsAtReport and the doors verb, the second the standing lint test and the check doors part, the third the module and random door tests, and the fourth ./RUNME.sh check with a read of the four notes.
+every door the tests reach has a fake: the owns tests read planted texts and the tree tests read the tree through the walk tests already use.
 
 # gate
 

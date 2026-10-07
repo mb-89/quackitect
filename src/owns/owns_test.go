@@ -246,6 +246,28 @@ func TestAScriptWalksAroundItsDoors(t *testing.T) {
 	}
 }
 
+func TestANodeModuleNoDoorDeclaresIsAWalk(t *testing.T) {
+	t.Parallel()
+	text := "import { spawn } from \"node:child_process\";\nconst net = require(\"node:net\");\n"
+	walks := Walks("src/scripts/run.js", text, planted(t))
+	if got := named(walks); !slices.Equal(got, []string{"node:child_process", "node:net"}) {
+		t.Fatalf("the walks name %v, and want both undeclared modules", got)
+	}
+	for _, one := range walks {
+		if len(one.Doors) != 0 || one.Report || one.Marked {
+			t.Fatalf("an undeclared module reads %+v, and wants a walk around no door, refused", one)
+		}
+	}
+}
+
+func TestAPureNodeModuleIsNoWalk(t *testing.T) {
+	t.Parallel()
+	text := "import { join } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { test } from \"node:test\";\nimport assert from \"node:assert\";\nimport strict from \"node:assert/strict\";\n"
+	if walks := Walks("src/scripts/pure.js", text, planted(t)); len(walks) != 0 {
+		t.Fatalf("the pure modules read as walks %+v", walks)
+	}
+}
+
 func TestAConstructorWithNoParenthesesIsAWalk(t *testing.T) {
 	t.Parallel()
 	text := "const now = new Date;\nconst then = new Date(at);\nconst there = new globalThis.Date();\n"
