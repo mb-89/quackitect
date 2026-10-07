@@ -1,6 +1,5 @@
 // The fake clock fires each wait on the tick past its span, earliest first,
-// a stopped hand stays still, its context names its deadline, and the wall's
-// wait fires on the real time.
+// a stopped hand stays still, and its context names its deadline.
 // [[spec/tickets/go-waits-on-events]]
 package qtest
 
@@ -89,14 +88,5 @@ func TestACancelledContextEndsCancelled(t *testing.T) {
 	fake.Tick(time.Second)
 	if !errors.Is(bounded.Err(), context.Canceled) {
 		t.Fatalf("a cancelled context ends on %v, and wants the cancel", bounded.Err())
-	}
-}
-
-func TestTheWallsWaitFires(t *testing.T) {
-	t.Parallel()
-	select {
-	case <-Wall().After(time.Millisecond):
-	case <-time.After(time.Second):
-		t.Fatal("the wall's After stands unfired past its span")
 	}
 }

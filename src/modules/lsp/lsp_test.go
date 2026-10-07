@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -120,11 +119,7 @@ func TestAnOpenAnswersWhileTheCommitRepublishes(t *testing.T) {
 		server.Handle(opened("file:///tree/spec/b.md", "# B\n"))
 		close(done)
 	}()
-	select {
-	case <-done:
-	case <-time.After(5 * time.Second):
-		t.Fatal("the open waits on the republish its own commit runs")
-	}
+	<-done
 }
 
 func TestAClosedBufferDropsItsName(t *testing.T) {
@@ -156,7 +151,6 @@ func asks(t *testing.T, root, token string) string {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	conn.SetDeadline(time.Now().Add(5 * time.Second))
 	asked := `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`
 	fmt.Fprintf(conn, "%s\nContent-Length: %d\r\n\r\n%s", token, len(asked), asked)
 	read := bufio.NewReader(conn)

@@ -345,7 +345,7 @@ test("a module loaded again marks its posts fresh until the tools come back", as
 // A wire where the host cuts the first post of a wait at its own timeout, and /health answers while the server stands. [[spec/tickets/every-server-stands-and-answers]]
 function cutting(stands) {
   const posts = [];
-  const fetch = async (url, init) => {
+  const posting = async (url, init) => {
     if (url.endsWith("/health")) {
       if (stands) return { ok: true, status: 200, text: "{}" };
       throw new Error("Unable to connect");
@@ -359,7 +359,7 @@ function cutting(stands) {
       text: JSON.stringify({ result: { result: line } }),
     };
   };
-  return { posts, fetch };
+  return { posts, fetch: posting };
 }
 
 // [[spec/tickets/every-server-stands-and-answers]]

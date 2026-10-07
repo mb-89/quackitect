@@ -32,7 +32,7 @@ function served() {
         const change = (value) =>
           `event: change\ndata: ${JSON.stringify({ name: "work/open-tasks", revision: value, value })}\n\n`;
         answer.write(change(3));
-        setTimeout(() => answer.end(change(4)), 20);
+        DOORS.clock.after(20, () => answer.end(change(4)));
         return undefined;
       }
       if (asked.method === "POST" && asked.url.startsWith("/v1/actions/ticket/")) {

@@ -4,8 +4,6 @@
 package imports
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"golang.org/x/tools/go/analysis/analysistest"
@@ -23,16 +21,11 @@ var walked = map[string]string{
 // Writes the files under a planted tree's source root, the way plant does. [[spec/design_output/model#the-build-checks-imports]]
 func plantOf(t *testing.T, files map[string]string) string {
 	t.Helper()
-	dir := t.TempDir()
-	for rel, text := range files {
-		at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
+	dir, removal, err := analysistest.WriteFiles(underModule(files))
+	if err != nil {
+		t.Fatal(err)
 	}
+	t.Cleanup(removal)
 	return dir
 }
 

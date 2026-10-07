@@ -6,7 +6,6 @@ package pull
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -21,30 +20,17 @@ import (
 // The tree this package stands in, whose processes and schemas the cases read. [[spec/design_output/pull#the-answers]]
 var method, _ = filepath.Abs(filepath.Join("..", ".."))
 
-// A source over a folder on this box, for the schema reads. [[spec/design_output/pull#the-checks]]
-type folderSource struct{ root string }
+// A source over a folder on this box, read through the pull's disk door, for the schema reads. [[spec/tickets/test-walks-move-onto-fakes]]
+type folderSource struct{ disk OSDisk }
 
-func (one folderSource) at(path string) string {
-	return filepath.Join(one.root, filepath.FromSlash(path))
-}
-func (one folderSource) Read(path string) (string, bool) {
-	said, err := os.ReadFile(one.at(path))
-	return string(said), err == nil
-}
-func (one folderSource) Exists(path string) bool { _, err := os.Stat(one.at(path)); return err == nil }
+func (one folderSource) Read(path string) (string, bool) { return one.disk.Read(path) }
+func (one folderSource) Exists(path string) bool         { return one.disk.Exists(path) }
 func (one folderSource) Folder(path string) bool {
-	said, err := os.Stat(one.at(path))
-	return err == nil && said.IsDir()
+	_, file := one.disk.Read(path)
+	return !file && one.disk.Exists(path)
 }
-func (one folderSource) Names(folder string) []string {
-	found, _ := os.ReadDir(one.at(folder))
-	out := []string{}
-	for _, each := range found {
-		out = append(out, each.Name())
-	}
-	return out
-}
-func (one folderSource) Paths() []string { return nil }
+func (one folderSource) Names(folder string) []string { return one.disk.Files(folder) }
+func (one folderSource) Paths() []string              { return nil }
 
 const groupTicket = `---
 kind: [[ticket]]
@@ -136,7 +122,9 @@ func cloudPull(t *testing.T) (*It, *bytes.Buffer, *bytes.Buffer) {
 		Disk: TreeDisk{Tree: tree}, Git: repo, Now: now,
 		Out: out, Err: errs, Root: workRoot, Method: method, Agent: true, Cloud: true,
 		Env: map[string]string{"CLAUDE_CODE_REMOTE": "true"}, Binding: bindQueue, Shell: ShellOver(box.Run, workRoot),
-		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, folderSource{method})) },
+		Schemas: func() *check.Kinds {
+			return check.SchemasIn(check.TreeOver(method, folderSource{OSDisk{Root: method}}))
+		},
 	}
 	_ = it.Disk.Write(boxFile, `{"id":"cafecafecafe"}`+"\n")
 	_ = it.Disk.Write("spec/processes/small.yaml", "steps: []\n")

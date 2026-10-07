@@ -390,13 +390,12 @@ test("under new a prompt context raised while another event reads the cage still
   });
 
   const slow = box.hooks["*"](box.$, {}, passing("env.get"));
-  const said = box.hooks["*"](box.$, {}, context);
-  await new Promise((done) => setTimeout(done, 10));
+  const said = await box.hooks["*"](box.$, {}, context);
   release();
   await slow;
 
   assert.deepEqual(
-    ((await said)?.blocks ?? []).map((one) => one.name),
+    (said?.blocks ?? []).map((one) => one.name),
     ["level0-tools", "level0-canary"],
     "the context takes the door's blocks while the other read stands open",
   );
@@ -407,10 +406,17 @@ test("under new a prompt context finding the door down while the session start r
   const box = caged();
   const posts = [];
   let standing = false;
+  let foundDown;
+  const down = new Promise((done) => {
+    foundDown = done;
+  });
   box.$.http = {
     fetch: async (url, init) => {
-      if (!standing) throw new Error("Unable to connect");
       const event = JSON.parse(String(init?.body ?? "{}")).event;
+      if (!standing) {
+        if (event === "prompt.context") foundDown();
+        throw new Error("Unable to connect");
+      }
       posts.push({ url, event });
       const effects =
         event === "prompt.context"
@@ -427,7 +433,7 @@ test("under new a prompt context finding the door down while the session start r
   box.$.process.run = async (argv, init) => {
     if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync")) {
       road();
-      await new Promise((done) => setTimeout(done, 20));
+      await down;
       standing = true;
     }
     return run(argv, init);

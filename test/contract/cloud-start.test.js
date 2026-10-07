@@ -12,6 +12,7 @@ import {
   START,
 } from "../../.claude/skills/level0/hooks/level0.js";
 import { disk } from "../../src/doors/disk.js";
+import { http } from "../../src/doors/http.js";
 import { proc } from "../../src/doors/proc.js";
 
 const files = disk();
@@ -180,10 +181,9 @@ test("a cold start on a cloud box reaches the hooks door", {
       "the hooks door writes its standing file",
     );
     const { port } = JSON.parse(String(files.read(join(where, HOOKS))));
-    const answer = await fetch(`http://127.0.0.1:${port}/`, {
+    const answer = await http().send(`http://127.0.0.1:${port}/`, {
       method: "POST",
       body: "{}",
-      signal: AbortSignal.timeout(5000),
     });
     assert.ok(answer.status > 0, "the hooks door answers over the wire");
   } finally {

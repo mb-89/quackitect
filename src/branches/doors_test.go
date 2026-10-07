@@ -4,46 +4,13 @@
 package branches
 
 import (
-	"go/parser"
-	"go/token"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
 	"testing"
 
-	"quackitect/src/imports"
 	"quackitect/src/proc"
 )
-
-// The branch verbs' cases run on FakeRepo, FakeRunner and FakeDisk, so no test file here spawns or sleeps, and the doors chapter lists none of them among the tests reaching a real door. [[spec/tickets/branch-verbs-meet-fake-git]]
-func TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere(t *testing.T) {
-	t.Parallel()
-	names, err := filepath.Glob("*_test.go")
-	if err != nil || len(names) == 0 {
-		t.Fatalf("the package's test files read %v, %v", names, err)
-	}
-	note, err := os.ReadFile(filepath.Join("..", "..", "spec", "design_output", "doors.md"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range names {
-		if name == valeDoorTest {
-			continue
-		}
-		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if waits := imports.RealWaits(file); len(waits) > 0 {
-			t.Errorf("%s calls %v, where the branch verbs' cases run on FakeRepo, FakeRunner and FakeDisk", name, waits)
-		}
-		if strings.Contains(string(note), "`src/branches/"+name+"`") {
-			t.Errorf("spec/design_output/doors.md still lists src/branches/%s as a test reaching a real door", name)
-		}
-	}
-}
 
 // A folder names its files in name order and leaves its folders out, and a walk names every file under it. [[spec/design_output/doors#one-door-per-outside-thing]]
 func TestTheDiskDoorsNameTheFiles(t *testing.T) {

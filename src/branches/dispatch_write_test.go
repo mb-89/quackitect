@@ -5,8 +5,6 @@
 package branches
 
 import (
-	"os"
-	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -280,9 +278,9 @@ func TestDispatchHashesARouteAsTheJavaScriptDoes(t *testing.T) {
 	if why != "" {
 		t.Fatal(why)
 	}
-	group, err := os.ReadFile(filepath.Join(one.d.Method, "spec", "tickets", "dispatch-verbs-run-in-go.md"))
-	if err == nil && fieldOf(string(group), "process_hash") != route.Hash {
-		t.Fatalf("the group route hashes %s, and the group ticket carries %s", route.Hash, fieldOf(string(group), "process_hash"))
+	group, found, _ := one.d.Methods.Read(ticketAt("dispatch-verbs-run-in-go"))
+	if found && fieldOf(group, "process_hash") != route.Hash {
+		t.Fatalf("the group route hashes %s, and the group ticket carries %s", route.Hash, fieldOf(group, "process_hash"))
 	}
 	if _, why := one.d.processAt("none-such"); why == "" {
 		t.Fatal("a missing route reads as standing")

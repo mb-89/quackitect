@@ -5,7 +5,6 @@ package branches
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -14,15 +13,12 @@ import (
 	"quackitect/src/proc"
 )
 
-// The file the doors chapter lists as the branch package's door test of vale. [[spec/tickets/branch-vale-case-runs-fake]]
-const valeDoorTest = "dispatch_vale_test.go"
-
 // The fix ask meets the voice rules Vale holds, as askFaults read them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]]
 func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	vale := filepath.Join(one.d.Method, filepath.FromSlash(runtimeFolder), "bin", "vale")
-	if _, err := os.Stat(vale); err != nil {
+	if listed, _ := one.d.Methods.List(runtimeFolder + "/bin"); !slices.Contains(listed, runtimeFolder+"/bin/vale") {
 		vale = "vale"
 	}
 	one.dpGreen()

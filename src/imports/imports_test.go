@@ -6,7 +6,6 @@ package imports
 
 import (
 	"go/build"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -30,45 +29,44 @@ var planted = map[string]string{
 	"tui/frame/frame.go":       "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
-// The folders the planted trees stand in. They outlive every case, so TestMain removes them once the run ends. [[spec/tickets/shared-plant-outlives-each-case]]
+// The removals of the folders the planted trees stand in. They outlive every case, so TestMain runs them once the run ends. [[spec/tickets/shared-plant-outlives-each-case]]
 var plants struct {
 	sync.Mutex
-	dirs []string
+	removals []func()
 }
 
 // The clean tree, built once a run. [[spec/tickets/shared-plant-outlives-each-case]]
 var cleanTree = sync.OnceValues(func() (string, error) { return plantedTree(planted) })
 
-// A folder of its own holding every set of files, which no case writes to. [[spec/tickets/shared-plant-outlives-each-case]]
+// A folder of its own holding every set of files, which no case writes to, written by the analysis test's own writer. [[spec/tickets/test-walks-move-onto-fakes]]
 func plantedTree(sets ...map[string]string) (string, error) {
-	dir, err := os.MkdirTemp("", "planted-")
+	dir, removal, err := analysistest.WriteFiles(underModule(sets...))
 	if err != nil {
 		return "", err
 	}
 	plants.Lock()
-	plants.dirs = append(plants.dirs, dir)
+	plants.removals = append(plants.removals, removal)
 	plants.Unlock()
+	return dir, nil
+}
+
+// Every set's files, keyed under the module's source root as the writer reads them. [[spec/tickets/test-walks-move-onto-fakes]]
+func underModule(sets ...map[string]string) map[string]string {
+	out := map[string]string{}
 	for _, set := range sets {
 		for rel, text := range set {
-			at := filepath.Join(dir, "src", "quackitect", "src", filepath.FromSlash(rel))
-			if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-				return "", err
-			}
-			if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-				return "", err
-			}
+			out["quackitect/src/"+rel] = text
 		}
 	}
-	return dir, nil
+	return out
 }
 
 // Runs every case, then removes the planted trees. [[spec/tickets/shared-plant-outlives-each-case]]
 func TestMain(m *testing.M) {
-	code := m.Run()
-	for _, dir := range plants.dirs {
-		os.RemoveAll(dir)
+	m.Run()
+	for _, removal := range plants.removals {
+		removal()
 	}
-	os.Exit(code)
 }
 
 // [[spec/design_output/model#the-build-checks-imports]]

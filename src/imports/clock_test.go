@@ -7,12 +7,12 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/files"
 )
 
 // The note whose tables list every test reaching a real door. [[spec/design_output/doors#one-contract-test-per-door]]
@@ -84,35 +84,34 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 
 func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	t.Parallel()
-	root := filepath.Join("..", "..")
-	note, err := os.ReadFile(filepath.Join(root, doorAudit))
+	tree := files.NewDisk(filepath.Join("..", ".."))
+	note, _, err := tree.Read(doorAudit)
 	if err != nil {
 		t.Fatal(err)
 	}
-	files := map[string]*ast.File{}
-	err = filepath.WalkDir(filepath.Join(root, "src"), func(at string, entry fs.DirEntry, err error) error {
-		if err != nil || entry.IsDir() || !strings.HasSuffix(at, "_test.go") {
-			return err
-		}
-		rel, err := filepath.Rel(root, at)
-		if err != nil {
-			return err
-		}
-		rel = filepath.ToSlash(rel)
-		file, err := parser.ParseFile(token.NewFileSet(), at, nil, 0)
-		if err != nil {
-			return err
-		}
-		files[rel] = file
-		return nil
-	})
+	listed, err := tree.List("src")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(note), "_test.go`") {
+	parsed := map[string]*ast.File{}
+	for _, rel := range listed {
+		if !strings.HasSuffix(rel, "_test.go") {
+			continue
+		}
+		text, _, err := tree.Read(rel)
+		if err != nil {
+			t.Fatal(err)
+		}
+		file, err := parser.ParseFile(token.NewFileSet(), rel, text, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		parsed[rel] = file
+	}
+	if !strings.Contains(note, "_test.go`") {
 		t.Fatalf("%s lists no test file", doorAudit)
 	}
-	for _, line := range UnauditedWaits(string(note), files) {
+	for _, line := range UnauditedWaits(note, parsed) {
 		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)
 	}
 }

@@ -22,9 +22,9 @@ test("the hook's fetch sends through the http door, and a status past 2xx reads 
     [`POST ${HOOK}`]: () => ({ status: 200, text: "{}" }),
     "POST http://127.0.0.1:7001/down": () => ({ status: 503, text: "down" }),
   });
-  const fetch = fetchThrough(web, new AbortController().signal);
-  assert.deepEqual(await fetch(HOOK, { method: "POST", body: "{}" }), { ok: true, status: 200, text: "{}" });
-  assert.deepEqual(await fetch("http://127.0.0.1:7001/down", { method: "POST" }), {
+  const sends = fetchThrough(web, new AbortController().signal);
+  assert.deepEqual(await sends(HOOK, { method: "POST", body: "{}" }), { ok: true, status: 200, text: "{}" });
+  assert.deepEqual(await sends("http://127.0.0.1:7001/down", { method: "POST" }), {
     ok: false,
     status: 503,
     text: "down",

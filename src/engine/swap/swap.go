@@ -24,11 +24,14 @@ func Watches(clock q.Clock, gone func()) {
 	if err != nil {
 		return
 	}
-	watchesAt(clock, path, first, gone)
+	watchesAt(clock, statOf, path, first, gone)
 }
 
-// Looks at the path each span, and calls gone once another file stands there. [[spec/tickets/go-waits-on-events]]
-func watchesAt(clock q.Clock, path string, first fs.FileInfo, gone func()) {
+// The door a look reads the path through. [[spec/tickets/test-walks-move-onto-fakes]]
+type stat func(path string) (fs.FileInfo, error)
+
+// Looks at the path through the door each span, and calls gone once another file stands there. [[spec/tickets/go-waits-on-events]]
+func watchesAt(clock q.Clock, door stat, path string, first fs.FileInfo, gone func()) {
 	looks := make(chan struct{}, 1)
 	stop := clock.Every(look, func(time.Time) {
 		select {
@@ -39,7 +42,7 @@ func watchesAt(clock q.Clock, path string, first fs.FileInfo, gone func()) {
 	go func() {
 		defer stop()
 		for range looks {
-			if Swapped(first, path) {
+			if swapped(door, first, path) {
 				gone()
 				return
 			}
@@ -47,9 +50,9 @@ func watchesAt(clock q.Clock, path string, first fs.FileInfo, gone func()) {
 	}()
 }
 
-// Swapped answers whether the file at the path differs from the one the server started from. [[spec/design_output/lsp]]
-func Swapped(first fs.FileInfo, path string) bool {
-	now, err := statOf(path)
+// Whether the file the door reads at the path differs from the one the server started from. [[spec/design_output/lsp]]
+func swapped(door stat, first fs.FileInfo, path string) bool {
+	now, err := door(path)
 	if err != nil {
 		return false
 	}

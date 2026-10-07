@@ -4,43 +4,25 @@
 package swap
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"quackitect/src/q/qtest"
 )
 
 func TestASwapCallsGoneOnceTheFakeTicksPastTheSpan(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "server")
-	if err := os.WriteFile(path, []byte("old build"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	first, err := os.Stat(path)
-	if err != nil {
-		t.Fatal(err)
-	}
+	disk, door, first := fakeServer(t, "old build")
 	fake := qtest.NewFake(time.Unix(0, 0))
 	gone := make(chan struct{}, 1)
-	watchesAt(fake, path, first, func() { gone <- struct{}{} })
-	if err := os.WriteFile(path, []byte("the new build"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	later := first.ModTime().Add(time.Second)
-	if err := os.Chtimes(path, later, later); err != nil {
-		t.Fatal(err)
-	}
+	watchesAt(fake, door, "server", first, func() { gone <- struct{}{} })
+	disk["server"] = &fstest.MapFile{Data: []byte("the new build"), Mode: 0o755, ModTime: first.ModTime().Add(time.Second)}
 	fake.Tick(look - time.Millisecond)
 	select {
 	case <-gone:
 		t.Fatal("gone runs before the look span passes")
-	case <-time.After(50 * time.Millisecond):
+	default:
 	}
 	fake.Tick(time.Millisecond)
-	select {
-	case <-gone:
-	case <-time.After(time.Second):
-		t.Fatal("gone stands uncalled once the span passes over a swapped file")
-	}
+	<-gone
 }

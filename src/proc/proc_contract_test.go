@@ -9,14 +9,16 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/q/qtest"
 )
 
-// The line a run that waits hands sh, the file it leaves once it stands, the span a case gives a run to end, and the wait a case arms. [[spec/tickets/lsp-tools-take-the-runner]]
+// The line a run that waits hands sh, the file it leaves once it stands, the span between two looks for it, and the wait a case arms. [[spec/tickets/test-walks-move-onto-fakes]]
 const (
-	waitsLine  = ": > ready; exec sleep 30"
-	readyFile  = "ready"
-	endsWithin = 5 * time.Second
-	shortWait  = 100 * time.Millisecond
+	waitsLine = ": > ready; exec sleep 30"
+	readyFile = "ready"
+	looks     = 10 * time.Millisecond
+	shortWait = 100 * time.Millisecond
 )
 
 // The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk and not in the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
@@ -63,30 +65,13 @@ func started(run Runner, one Command) <-chan Said {
 	return said
 }
 
-// The answer, or false where the run outlasts the span. [[spec/tickets/lsp-tools-take-the-runner]]
-func endsIn(said <-chan Said) (Said, bool) {
-	select {
-	case one := <-said:
-		return one, true
-	case <-time.After(endsWithin):
-		return Said{}, false
-	}
-}
-
-// Whether the run leaves its ready file within the span. [[spec/tickets/lsp-tools-take-the-runner]]
-func standsUp(folder string) bool {
-	tick := time.NewTicker(10 * time.Millisecond)
-	defer tick.Stop()
-	giveUp := time.After(endsWithin)
+// Returns once the run leaves its ready file, looking through the wall's clock; go test's timeout bounds a run that never stands. [[spec/tickets/test-walks-move-onto-fakes]]
+func standsUp(folder string) {
 	for {
 		if _, err := os.Stat(filepath.Join(folder, readyFile)); err == nil {
-			return true
+			return
 		}
-		select {
-		case <-tick.C:
-		case <-giveUp:
-			return false
-		}
+		<-qtest.Wall().After(looks)
 	}
 }
 
@@ -266,17 +251,9 @@ func TestAHaltEndsARunInFlight(t *testing.T) {
 	for name, one := range haltingRunners(t) {
 		folder := t.TempDir()
 		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: folder})
-		if !standsUp(folder) {
-			t.Errorf("the %s runner starts no run within %v", name, endsWithin)
-			continue
-		}
+		standsUp(folder)
 		one.halt()
-		answer, ended := endsIn(said)
-		if !ended {
-			t.Errorf("the %s runner's run outlasts the halt by %v", name, endsWithin)
-			continue
-		}
-		if answer.Code == 0 || answer.Err == "" {
+		if answer := <-said; answer.Code == 0 || answer.Err == "" {
 			t.Errorf("the %s runner's halted run answers %+v", name, answer)
 		}
 	}
@@ -286,9 +263,8 @@ func TestARunAfterTheHaltNeverStarts(t *testing.T) {
 	t.Parallel()
 	for name, one := range haltingRunners(t) {
 		one.halt()
-		answer, ended := endsIn(started(one.run, Command{Argv: []string{"sh", "-c", "cat"}, Stdin: "in"}))
-		if !ended || answer.Code != NotStarted || answer.Err == "" {
-			t.Errorf("the %s runner answers %+v after the halt, ended %v", name, answer, ended)
+		if answer := one.run(Command{Argv: []string{"sh", "-c", "cat"}, Stdin: "in"}); answer.Code != NotStarted || answer.Err == "" {
+			t.Errorf("the %s runner answers %+v after the halt", name, answer)
 		}
 	}
 }
@@ -296,13 +272,7 @@ func TestARunAfterTheHaltNeverStarts(t *testing.T) {
 func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 	t.Parallel()
 	for name, one := range haltingRunners(t) {
-		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait})
-		answer, ended := endsIn(said)
-		if !ended {
-			t.Errorf("the %s runner's run outlasts its wait by %v", name, endsWithin)
-			continue
-		}
-		if answer.Code == 0 || answer.Err == "" {
+		if answer := one.run(Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait}); answer.Code == 0 || answer.Err == "" {
 			t.Errorf("the %s runner's run past its wait answers %+v", name, answer)
 		}
 	}
