@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 1ac4750d62402a00
         size: 343
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 4057ff86a421428344c4ed2e00519af6701ac476
+    hash_after: f4dfde07a9feb9bca8e6ac7e9a89550b029bc9bd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 2ae87ba2c2fbedf5
+        size: 9770
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -322,26 +335,51 @@ Assumed: the review prompt example naming src/doors/git.js stays, since the git 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/engine_doors_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/engine_doors_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheEngineAndThePortedDoorsStandNowhere fails on its own assertion. It names all twenty-two leaving paths, src/engine/swap among them.
+TestTheEngineFolderHoldsToolsAlone fails on its assertion. It names front-merge.js, group.js, named.js and swap.
+The branch test verb exits 1 and ends on: assertion, a test of src/quack fails.
+Every new branches row passes now, since Go already holds each behavior. So src/branches stands green.
+TestTheFrontLeavesEachClashForAHand holds the key, record and body rows. The key row moves there from TestTheFrontMergesKeyByKey.
+The Go mergedFront answers a bool, not a clash list. So the rows assert the refusal and not the clashing key name.
+The table first asserts that its plain sides merge. That way each row fails for its clash and not for a bad fixture.
+The group.test.js map runs as follows, case by case.
+The isGroup and ticketAt case goes to the new TestAGroupIsTheTicketOnTheGroupRouteAlone, with TestAFieldReadsBareAndAGroupReadsOffItsRoute.
+The fieldOf and askOf case goes to TestAFieldReadsBare, and the new row covers the missing field.
+The firstLeaf and stepOf case goes to the new TestTheStepWithNoneIsTheFirstLeafOfTheRoute.
+The withEntry twice case goes to the entry row of TestEachOpKeepsTheBody in src/front/front_test.go.
+The heldIn, hand-back and skip-row cases go to the new TestAReleaseClosesTheOpenTakeAndLeavesTheRowsPastIt, with TestATakeHoldsUntilItsHashAfterLands.
+The second hash_after case goes to TestAfterOverwritesTheLastItemWhereNoneStandsOpen in front_test.go.
+The withField case goes to the set rows of TestEachOpKeepsTheBody.
+The withoutField case goes to the new TestAGroupDropLeavesTheRouteStanding.
+The spanOf and aged case goes to TestASpanAndAnAgeReadInTheirUnits.
+The todoOf case goes to the new TestATodoReadsAsNothingFirstOrTheRowItNames. Before it, no Go test read todoOf.
+The withEveryTakeClosed case goes to TestATakeHoldsUntilItsHashAfterLands and TestPBReleaseClosesEveryOpenTake.
+One surprise: the quack package already owns a func named standing in survey.go. The glob helper therefore takes the name globbedIn.
+No stub was needed, since every Go owner already exists.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestTheEngineFolderHoldsToolsAlone and TestTheEngineAndThePortedDoorsStandNowhere decide the first done_when line. ./RUNME.sh doors and ./RUNME.sh check at tests-green decide the rest.
+The tests reach no door. The quack cases glob the disk with no exec, and the branches rows run over strings in memory.
 
 # gate
 
