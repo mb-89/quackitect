@@ -294,3 +294,5 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The case `a stop file short of a field is refused` in `test/contract/tree.test.js` still runs `StopFolderIsData` once [[spec/tickets/bridge-library-leaves]] removes `findings.js`. Deleting the rule takes that case with it, or ports it to Go first.

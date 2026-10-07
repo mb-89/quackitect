@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: javascript-leaves
 parent: bridge-library-leaves
+record:
+  - step: do
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 645243b903fb8b9474afdb64fa9e902a25553ca1
+    hash_after: 645243b903fb8b9474afdb64fa9e902a25553ca1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 27 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   80.7  in all"
+    inputs:
+      - name: ask
+        hash: 082863dfb9dae4ba
+        size: 120
+    def: 752b392ff4b72b0a
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ test/contract/tree.test.js still runs StopFolderIsData, so the rule keeps a runn
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/tree.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+plugin-libs-leave names, under Discussion, the tree.test.js case that runs StopFolderIsData. The bridge draft said the rule lost its last runner once findings.js leaves, and that case still runs it. So the hand deleting the rule meets the case first.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the line names the case on plugin-libs-leave, as the ask says
+- the change reveals no cleanup
+- the line points at the case and at bridge-library-leaves, and copies neither
 
 # Discussion
 
