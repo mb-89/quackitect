@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,22 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: aeda7c6537da9a118877184cbaf270fba000ec9e
+    hash_after: aeda7c6537da9a118877184cbaf270fba000ec9e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: e074fbb1c5f328f8
+        size: 6616
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -309,26 +325,34 @@ Assumed: one example per verb family covers its registered name, since `ExampleC
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/examples_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/examples_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Ten new examples fail on the harness's own miss: each names a verb outside the harness table, so no fake answers it. The note example passes already, since ticket note stands in the table. The coverage case passes as soon as the example files stand, because the rule reads interface alone. So it guards the drop, and the red examples decide the chapters. Three surprises change the draft. First, the check verb removes, reads and writes its runtime files through os calls on its root, so implement routes those through a disk on checkDoors before check joins the table. Second, an example runs ./RUNME.sh calls alone, so no example switches branch or plants a red part: the sync edge on another branch and the red check edge stay in their Go tests, and TestCheckVerb keeps its red rows. Third, a release edge on unpushed commits needs a commit verb in the table, so the developer case shows the uncommitted refusal instead. The lint on this box reads no tracked file, so the coverage count comes from the Go case, not the Problems panel.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1: ten red examples under spec/examples, decided by TestEveryExampleHoldsItsSteps
+- done_when 2: the cuts land at tests-green and the Discussion lists them, a checkpoint the hand answers
+- done_when 3: TestTheFirstChaptersLeaveTheirVerbsUnreported holds the drop
+- done_when 4: ./RUNME.sh check at tests-green
+- fakes: the pull runs over the fake disk, git and process the harness builds; branch takes branches.Doors over the same fakes; check takes a checkDoors whose run, git, get and disk answer from fakes, the disk added at implement
 
 # gate
 

@@ -13,6 +13,7 @@ import (
 
 	"quackitect/src/example"
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 )
 
 const pullingPath = "spec/examples/110_tickets/pull.md"
@@ -120,5 +121,21 @@ func TestTheVerdictsLandInTheRuntimeFile(t *testing.T) {
 	}{}
 	if json.Unmarshal(text, &said) != nil || said["spec/examples/110_a/b.md"].Verdict != "pass" || said["spec/examples/110_a/c.md"].Verdict != "fail" || said["spec/examples/110_a/c.md"].Miss != "a miss" {
 		t.Fatalf("the verdicts read %s", text)
+	}
+}
+
+// The verbs the first chapters show, which the coverage report names no more. [[spec/tickets/example-first-chapters-stand]]
+var firstChapters = []string{"ticket pull", "ticket note", "ticket set", "ticket todo", "ticket urgent", "branch", "check"}
+
+func TestTheFirstChaptersLeaveTheirVerbsUnreported(t *testing.T) {
+	tree := check.TreeOver(exampleMethod, rootDisk{exampleMethod})
+	for _, rule := range check.Rules {
+		for _, one := range rule(tree) {
+			for _, verb := range firstChapters {
+				if one.Rule == "ExampleCovers" && strings.Contains(one.Message, "./RUNME.sh "+verb+" stands in no") {
+					t.Errorf("the coverage report names %s: %s", verb, one.Message)
+				}
+			}
+		}
 	}
 }
