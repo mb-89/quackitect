@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -166,6 +166,15 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 7a1a4d1bf7309615fead15a56044584a2ad92a4b
+    hash_after: 6a4fddece79902e55b70152b38b675b37f032438
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -316,14 +325,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/tui/tutorial/tab.go src/tui/tutorial/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/tutorial/tab.go and its test alone, the two files the size field names
+- the change reaches the registry door alone, through the window helper and registry.Fake
+- each new function and the alt+m key carry a link to spec/design_output/examples#the-search
+- the mode names and the match style stand once, as names at the top of tab.go
 
 ## tests-green
 

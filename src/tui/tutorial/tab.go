@@ -54,10 +54,17 @@ type Source interface {
 // The heading over the developer chapters. [[spec/design_output/examples#the-places]]
 const developer = "developer"
 
-// The styles of the tree and the main view: a heading, a title, and a call. [[spec/design_output/examples#the-tutorial-tab]]
+// The styles of the tree and the main view: a heading, a title, a call, and a match the content search lights. [[spec/design_output/examples#the-tutorial-tab]]
 var (
 	headingStyle = lipgloss.NewStyle().Bold(true)
 	callStyle    = lipgloss.NewStyle().Faint(true)
+	matchStyle   = lipgloss.NewStyle().Reverse(true)
+)
+
+// The line over the tree naming the mode while the search holds a word. [[spec/design_output/examples#the-search]]
+const (
+	titleMode   = "title search"
+	contentMode = "content search"
 )
 
 // The tab's own watch ending, and its call to watch again. [[spec/design_output/examples#the-tutorial-tab]]
@@ -76,9 +83,10 @@ type Tab struct {
 	From   Source
 	Rows   []Row
 	Notice string
-	At     int
-	word   string
-	stream <-chan tea.Msg
+	At      int
+	word    string
+	content bool
+	stream  <-chan tea.Msg
 }
 
 // The tab over its source. [[spec/design_output/examples#the-tutorial-tab]]
@@ -177,11 +185,27 @@ func (t *Tab) redraws(value json.RawMessage) {
 func (t *Tab) kept() []int {
 	out := []int{}
 	for at, one := range t.Rows {
-		if t.word == "" || strings.Contains(strings.ToLower(one.Title), t.word) {
+		if matches(one, t.word, t.content) {
 			out = append(out, at)
 		}
 	}
 	return out
+}
+
+// Title mode reads the title, and content mode the title, each keyword and the body, case-blind. [[spec/design_output/examples#the-search]]
+func matches(one Row, word string, content bool) bool {
+	if word == "" || strings.Contains(strings.ToLower(one.Title), word) {
+		return true
+	}
+	if !content {
+		return false
+	}
+	for _, said := range one.Keywords {
+		if strings.Contains(strings.ToLower(said), word) {
+			return true
+		}
+	}
+	return strings.Contains(strings.ToLower(one.Body), word)
 }
 
 // The mark a row wears for its last verdict. [[spec/design_output/examples#the-tutorial-tab]]
@@ -198,6 +222,13 @@ func markOf(one Row) string {
 // The tree: a heading a chapter, a row an example under it, the developer heading over the developer chapters, and the notice last. [[spec/design_output/examples#the-tutorial-tab]]
 func (t *Tab) Left(_ *frame.Model, width, _ int) string {
 	lines, chapter, dev := []string{}, "", false
+	if t.word != "" {
+		mode := titleMode
+		if t.content {
+			mode = contentMode
+		}
+		lines = append(lines, draw.Dim.Render(mode))
+	}
 	for _, at := range t.kept() {
 		one := t.Rows[at]
 		if one.Dev && !dev {
@@ -218,8 +249,8 @@ func (t *Tab) Left(_ *frame.Model, width, _ int) string {
 	return strings.Join(lines, "\n")
 }
 
-// The selected example: its title, its miss, then its body with the front cut off, each call in the call style, each heading bold. [[spec/design_output/examples#the-tutorial-tab]]
-func (t *Tab) Detail(_ *frame.Model, _ int) []frame.Part {
+// The selected example: its title, its miss, then its body with the front cut off, each call in the call style, each heading bold, and every match lit in content mode. [[spec/design_output/examples#the-tutorial-tab]]
+func (t *Tab) Detail(_ *frame.Model, width int) []frame.Part {
 	if t.At >= len(t.Rows) {
 		return nil
 	}
@@ -241,7 +272,43 @@ func (t *Tab) Detail(_ *frame.Model, _ int) []frame.Part {
 			parts = append(parts, frame.Part{Text: line})
 		}
 	}
-	return parts
+	if !t.content || t.word == "" {
+		return parts
+	}
+	return lit(parts, t.word, width)
+}
+
+// Each part wrapped as the pane wraps it, then drawn whole with every match in the match style. A match the wrap splits lights on each half apart. [[spec/design_output/examples#the-search]]
+func lit(parts []frame.Part, word string, width int) []frame.Part {
+	out := []frame.Part{}
+	for _, one := range parts {
+		for _, line := range strings.Split(draw.Wrap(one.Text, width), "\n") {
+			out = append(out, frame.Part{Text: litLine(line, word, one.Style), Drawn: true})
+		}
+	}
+	return out
+}
+
+func litLine(line, word string, style lipgloss.Style) string {
+	lower := strings.ToLower(line)
+	if len(lower) != len(line) {
+		return style.Render(line)
+	}
+	drawn := ""
+	for {
+		at := strings.Index(lower, word)
+		if at < 0 {
+			return drawn + style.Render(line)
+		}
+		if at > 0 {
+			drawn += style.Render(line[:at])
+		}
+		drawn += matchStyle.Render(line[at : at+len(word)])
+		line, lower = line[at+len(word):], lower[at+len(word):]
+		if line == "" {
+			return drawn
+		}
+	}
 }
 
 // The body past its front. [[spec/design_output/examples#the-format]]
@@ -263,7 +330,7 @@ func (t *Tab) Selected(_ *frame.Model) string {
 
 func (t *Tab) Narrowed(_ *frame.Model) bool { return t.word != "" }
 
-// The tab's keys: a step up and down the tree, and F5 running the selected example. [[spec/design_output/examples#the-tutorial-tab]]
+// The tab's keys: a step up and down the tree, F5 running the selected example, and alt+m turning the search over, under the filter pane too. [[spec/design_output/examples#the-tutorial-tab]]
 func (t *Tab) Keys(_ *frame.Model) frame.Band {
 	return frame.Band{Name: "THE TUTORIAL", Acts: []frame.Act{
 		{Key: frame.Bind("w s", "one example up, one example down", "w", "s", "W", "S"), Do: func(m *frame.Model, name string) tea.Cmd {
@@ -276,6 +343,11 @@ func (t *Tab) Keys(_ *frame.Model) frame.Band {
 		}},
 		{Key: frame.Bind("F5", "run the selected example in a clone of its own", "f5"), Do: func(m *frame.Model, _ string) tea.Cmd {
 			return t.runs(t.Selected(m))
+		}},
+		{Key: frame.Bind("alt+m", "turn the search over: title, then content", "alt+m"), Under: true, Do: func(m *frame.Model, _ string) tea.Cmd {
+			t.content = !t.content
+			t.Move(m, 0)
+			return nil
 		}},
 	}}
 }
@@ -310,7 +382,7 @@ func (t *Tab) jumps(path string) {
 
 func (t *Tab) Press(_ *frame.Model, _, _ int) {}
 
-// A plain word match on the title, and the search ticket owns the two modes. [[spec/design_output/examples#the-search]]
+// The word the search reads in the mode the tab holds, and an empty word keeps every row with the selection held. [[spec/design_output/examples#the-search]]
 func (t *Tab) Narrow(m *frame.Model, word string) error {
 	t.word = strings.ToLower(strings.TrimSpace(word))
 	t.Move(m, 0)

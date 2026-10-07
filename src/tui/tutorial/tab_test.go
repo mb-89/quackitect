@@ -128,7 +128,9 @@ func TestF5PostsTheSelectedExampleRun(t *testing.T) {
 
 // The window with the filter pane open and the line typed in, the alt keys pressed as they stand. [[spec/design_output/examples#the-search]]
 func searched(m frame.Model, said ...string) frame.Model {
-	m.OpenPane(frame.PaneFilter)
+	if m.Pane != frame.PaneFilter {
+		m.OpenPane(frame.PaneFilter)
+	}
 	for _, one := range said {
 		if key, isAlt := strings.CutPrefix(one, "alt+"); isAlt {
 			next, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(key), Alt: true})
