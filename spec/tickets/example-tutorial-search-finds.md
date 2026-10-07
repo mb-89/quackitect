@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/owner-read
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,10 +116,9 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-depends_on: [example-tutorial-tab-draws]
-step: design/owner-read
+depends_on: ["example-tutorial-tab-draws"]
 ---
 
 # Ask
