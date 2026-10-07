@@ -1,7 +1,7 @@
 // The step and the merge ported from cage.ts and shape.ts. The cases come from
 // test/level0/cage.test.js and test/level0/shape.test.js.
 // [[spec/tickets/level0-hooks-hold-no-rule]]
-package hooks
+package hooks // level0: InPackageTest - it holds jsonOf, which listen_test reads inside the package
 
 import (
 	"encoding/json"

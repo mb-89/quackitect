@@ -1,7 +1,7 @@
 // The cage verb: the event and its input on stdin, answered with a deny where
 // the call stays guarded while the hooks door stands down.
 // [[spec/tickets/level0-hooks-hold-no-rule]]
-package main
+package main // level0: InPackageTest - reaches the unexported cageVerb
 
 import (
 	"encoding/json"

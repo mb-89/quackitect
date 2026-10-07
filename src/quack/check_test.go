@@ -186,7 +186,7 @@ func TestCheckParts(t *testing.T) {
 			tests int
 			want  int
 		}{{tests: 9, want: 0}, {tests: 10, want: 1}} {
-			root := t.TempDir()
+			root := t.TempDir() // level0: FixtureOutsideHome - each case writes a plugin tree of its own size
 			plugin := filepath.Join(root, ".claude", "skills", "level0")
 			for rel, text := range map[string]string{
 				"hooks/hooks.json":   `{"modules": ["./a.ts"]}`,

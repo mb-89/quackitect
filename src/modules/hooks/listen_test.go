@@ -1,6 +1,6 @@
 // The standing file the listener writes names the events the door decides, so
 // the hook reads the list off it. [[spec/tickets/level0-hooks-hold-no-rule]]
-package hooks
+package hooks // level0: InPackageTest - reaches the unexported doorOver, calls, book, bearer and jsonNumber
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"testing"
 )
 
+// level0: FixtureOutsideHome - the listener writes the standing file into the case's own root.
 func TestStandingNamesEvents(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
@@ -83,6 +84,7 @@ func postedAt(t *testing.T, root, path, body string, token bool) (int, []byte) {
 }
 
 // The door answers each post with the step its effects answer, and a back post asks no rows back. [[spec/tickets/level0-hooks-hold-no-rule]]
+// level0: FixtureOutsideHome - the door writes its standing file into the case's own root.
 func TestTheDoorAnswersTheStepBesideItsEffects(t *testing.T) {
 	one := doorOver(t, &calls{}, &book{})
 	root := t.TempDir()
@@ -105,6 +107,7 @@ func TestTheDoorAnswersTheStepBesideItsEffects(t *testing.T) {
 }
 
 // The door merges the adds into what the harness answered, behind the token. [[spec/tickets/level0-hooks-hold-no-rule]]
+// level0: FixtureOutsideHome - the door writes its standing file into the case's own root.
 func TestTheDoorServesTheMerge(t *testing.T) {
 	root := t.TempDir()
 	stop, err := Listen(root, &Door{})

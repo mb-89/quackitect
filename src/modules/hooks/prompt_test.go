@@ -94,6 +94,7 @@ func TestAHelpersHandBackLandsAsAnAgentRowAndPasses(t *testing.T) {
 }
 
 // A marked prompt arms the main agent's next call, which lands in the log as a probe row carrying the call's own fields; a helper's call leaves it armed, and a call after an unmarked prompt lands none. [[spec/tickets/the-reply-probe-runs]] [[spec/tickets/level0-hooks-hold-no-rule]]
+// level0: FixtureOutsideHome - each case's door writes the probe row into a tree of its own.
 func TestAMarkedPromptWritesTheNextCallsProbeRow(t *testing.T) {
 	const says = "se-probe-reply writes this line"
 	for _, one := range []struct {

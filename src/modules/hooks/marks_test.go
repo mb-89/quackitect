@@ -130,6 +130,7 @@ func treeWrite(t *testing.T, root, path, text string) {
 }
 
 // The fill rides every post, and the door reads it on the main agent's call and Stop alone: a fill past the key there marks the session due, and anywhere else marks nothing. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+// level0: FixtureOutsideHome - each case's door writes the due mark into a tree of its own.
 func TestTheDoorReadsTheFillOnTheMainAgentsCallsAlone(t *testing.T) {
 	for _, one := range []struct {
 		event string

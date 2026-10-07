@@ -118,6 +118,7 @@ func TestASpawnOfAKindTakesThatKindsLayer(t *testing.T) {
 }
 
 // A helper's spawn opens on the hand of the session the session file names, and the wrapper's own spawn and a box naming no session take no line. [[spec/design_output/pull#a-hand-of-its-own]]
+// level0: FixtureOutsideHome - each case seeds the session file into a tree of its own.
 func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
 	const tag = "You are the hand of session s7 on this box, so you pull under no --as."
 	for _, one := range []struct {

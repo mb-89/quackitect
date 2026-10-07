@@ -1,12 +1,14 @@
 // The guard ported from cage.ts: the guarded call, the recovering command, the
 // words a shell reads, and the refusal. The cases come from test/level0/cage.test.js.
 // [[spec/tickets/level0-hooks-hold-no-rule]]
-package hooks
+package hooks_test
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks"
 )
 
 func TestGuarded(t *testing.T) {
@@ -35,7 +37,7 @@ func TestGuarded(t *testing.T) {
 		{"a bash naming no command stands guarded", "tool.call", map[string]any{"tool": "Bash"}, true},
 	}
 	for _, one := range cases {
-		if got := Guarded(one.event, one.e); got != one.guarded {
+		if got := hooks.Guarded(one.event, one.e); got != one.guarded {
 			t.Errorf("%s: Guarded(%q, %v) = %v, want %v", one.name, one.event, one.e, got, one.guarded)
 		}
 	}
@@ -90,12 +92,12 @@ func TestRecovers(t *testing.T) {
 		"",
 	}
 	for _, command := range passes {
-		if !Recovers(command) {
+		if !hooks.Recovers(command) {
 			t.Errorf("Recovers(%q) = false, want true", command)
 		}
 	}
 	for _, command := range refuses {
-		if Recovers(command) {
+		if hooks.Recovers(command) {
 			t.Errorf("Recovers(%q) = true, want false", command)
 		}
 	}
@@ -126,7 +128,7 @@ func TestWordsOf(t *testing.T) {
 		{"a\nb", nil},
 	}
 	for _, one := range cases {
-		got := WordsOf(one.command)
+		got := hooks.WordsOf(one.command)
 		if one.words == nil {
 			if got != nil {
 				t.Errorf("WordsOf(%q) = %q, want nil", one.command, got)
@@ -141,13 +143,13 @@ func TestWordsOf(t *testing.T) {
 
 func TestRefusedText(t *testing.T) {
 	t.Parallel()
-	text := RefusedText(map[string]any{"tool": "Bash"})
+	text := hooks.RefusedText(map[string]any{"tool": "Bash"})
 	for _, want := range []string{"Bash", "session/alarms", "./RUNME.sh serve", "./RUNME.sh doctor", "./RUNME.sh index standing", ".se/.runtime/", "git push origin work/<name>"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("the refusal reads %q, and wants %q", text, want)
 		}
 	}
-	if bare := RefusedText(map[string]any{}); !strings.Contains(bare, "this call") {
+	if bare := hooks.RefusedText(map[string]any{}); !strings.Contains(bare, "this call") {
 		t.Errorf("the refusal naming no tool reads %q, and wants this call", bare)
 	}
 }
