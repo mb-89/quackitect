@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: engine-verbs-hold
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 878ca7e20145adfd5655dda8dc72134d298f0206
+    hash_after: 878ca7e20145adfd5655dda8dc72134d298f0206
+    inputs:
+      - name: ask
+        hash: 9c802087afbe9acf
+        size: 496
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 193563a7e65c746b7bcce010b2cf11ffe8402924
+    hash_after: 193563a7e65c746b7bcce010b2cf11ffe8402924
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 7c74d3048b683e3c
+        size: 3365
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 439e2b7caac7bc18791dddcdec724085cd3bddcd
+    hash_after: 439e2b7caac7bc18791dddcdec724085cd3bddcd
+    inputs:
+      - name: design/draft
+        hash: 7c74d3048b683e3c
+        size: 3365
+      - name: design/tests-red
+        hash: 3b1ac24038e52881
+        size: 903
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 29576cea75c8c9bd40373c1b8f9655144d2f5cc2
+    hash_after: 29576cea75c8c9bd40373c1b8f9655144d2f5cc2
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: f449b0e5d26675acbc3fe8053ddf7eded18a472a
+    hash_after: 6a5605ca3b27d2f6e3e5266a638c46862dc908e4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    2.1  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: design/tests-red
+        hash: 3b1ac24038e52881
+        size: 903
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,67 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One function opens a pull request with auto-merge on, and both roads call it. pulled in src/branches/dispatch_fire.go splits into a new pullOpens(send Send, branch, title, body string, out *pullRow) int. pullOpens holds the list, the open and the auto-merge mutation that pulled holds today, on PULL_TOKEN through hubOf. pulled keeps its write-branch guard and calls pullOpens for the write branch.
+
+Done: Doors in src/branches/doors.go takes a field Send Send. branchDoors in src/quack/branch.go sets it to httpSend, the send door src/quack/dispatch.go holds. leaves in src/branches/done.go calls pullOpens for work/<group> right after the push. Where pullOpens answers opened or standing, done prints the pull request's address. Where the run holds no token or the hub refuses, done prints the reason and the existing line naming the work skill, and still answers codeOK. The push stands, and the dispatch picks the branch up on its next run.
+
+Dispatch: dispatchPlan in src/branches/dispatch.go takes Done []string, every work branch planned() reads at done. fire calls pullOpens once per branch in plan.Done, after the write branch, and fireRow gathers each answer under Hands []pullRow. pullRow takes a Branch field, so fireLines prints one row a branch. A branch whose pull request stands open reads standing, and the hub sees no second POST.
+
+The owner's question is decided here: a box with no token keeps done green and leaves the pull request to the dispatch, so no new secret is asked.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_fire.go (*Doors).fire, which calls pulled and then pullOpens a done branch
+src/branches/dispatch.go Dispatch, which calls planned and fire
+src/branches/done.go finish, which calls leaves
+src/branches/branch.go the done row of the verb table, which runs finish
+src/quack/branch.go branchVerb, through branchDoors
+src/quack/dispatch.go dispatchVerb, through branchDoors
+src/quack/cloud.go the cloud verb, through branchDoors
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/branches/port_c_done_test.go TestPCDoneOpensThePullRequestWithAutoMergeThroughItsDoor
+src/branches/port_c_done_test.go TestPCDoneWithNoTokenNamesTheWorkSkillAndLeaves
+src/branches/dispatch_fire_test.go TestDispatchOpensAPullRequestForADoneBranchHoldingNone
+src/branches/dispatch_fire_test.go TestDispatchOpensNoSecondPullRequestForADoneBranch
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_fire.go
+src/branches/dispatch.go
+src/branches/done.go
+src/branches/doors.go
+src/quack/branch.go
+src/branches/port_c_done_test.go
+src/branches/dispatch_fire_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened done.go (finish, leaves), dispatch_fire.go (fire, pulled, hubOf, sent, fireLines, autoMerge), dispatch.go (planned, Dispatch, carried, dispatchPlan), doors.go (Doors), branch.go (table), quack/branch.go (branchVerb, branchDoors), quack/dispatch.go (dispatchVerb, httpSend), dispatch_fire_test.go (dfHub, dfEnv, dfFired), port_c_done_test.go (TestPCDoneClosesAFinishedGroup) and .claude/skills/work/SKILL.md.
+Callers came from greps for pulled, fire, planned, leaves, finish and branchDoors, and a grep for .planned( and branchDoors( confirms the rest.
+The first done_when line meets TestPCDoneOpensThePullRequestWithAutoMergeThroughItsDoor, the second meets TestDispatchOpensAPullRequestForADoneBranchHoldingNone, both under go test ./src/branches/; ./RUNME.sh check stands as its own command.
 
 ## tests-red
 
@@ -189,26 +288,32 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_c_done_test.go src/branches/dispatch_fire_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/branches/port_c_done_test.go
+src/branches/dispatch_fire_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four new cases fail on their own assertions, and every other case of the package passes. The done cases reach the hub through a `Send` field the doors lack today. A helper finds that field by reflection, so the file compiles now. Tests-green swaps the helper for a plain assignment once the field stands. The dispatch case for a standing pull request expects a row naming the branch, which the draft's `Branch` field on the pull row carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each done_when line on `go test ./src/branches/` meets a red case, and the check line waits for tests-green.
+The hub fake `dfHub` stands for the send door in every case, and the done cases run on the real-git tree the package already tests against.
 
 # gate
 
@@ -217,8 +322,13 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- dispatch-skips-merged-done-branches: plan.Done takes every work branch at done, and origin holds many closed work branches with no commit main lacks (git rev-list --count origin/main..origin/work/<name> reads 0, e.g. work/phase2-switch-turns-on). The hub refuses a pull request over such a branch with 422, so fire answers codeRed on every run. Keep a branch in Done only where that count stands above zero, and add a dispatch case on a done branch level with main that sends no POST. The builder fixes it in place in planned or fire.
+- box-opens-its-pr: a cloud box holds GH_TOKEN and GITHUB_TOKEN but no PULL_TOKEN and no GITHUB_REPOSITORY, so done on a box always takes the no-token road and the pull request waits for the next dispatch run. Weigh a fallback onto GH_TOKEN with the repository read off the origin URL, so the box opens it in the same call as the ask's first line says.
+- one-send-door: the draft adds Doors.Send while Dispatch still takes send as a parameter, so two roads carry one door. Make fire read the one the doors carry, or name why both stand.
+- dispatch-update-collides: running-work-takes-main-fixes adds updated, updateRow and its cases to src/branches/dispatch_fire.go and Dispatch. Sync before implement, and keep pullOpens beside updated so both read hubOf the same way.
 
 # implement
 
@@ -229,14 +339,19 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, src/quack/branch_doors_test.go for the new door, and src/branches/dispatch_level_test.go for the child dispatch-skips-merged-done-branches.
+Every request goes through Doors.Send, which the tests fill with the fake hub, and branchDoors sets to httpSend.
+Comments on workPull, pullOpens and the done road link this ticket and name the approach.
+The pull road stands once, in pullOpens in src/branches/dispatch_fire.go, which done, the dispatch and the write branch call.
 
 ## tests-green
 
@@ -245,26 +360,33 @@ A box pushes and leaves, or meets the limit, and its branch waits with no pull r
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_c_done_test.go src/branches/dispatch_done_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+branch done now opens the work branch pull request against main with auto-merge on, in the same call as its push, and prints its address. A run with no token prints the reason and the work skill line, and still answers green. The dispatch opens the pull request of every done branch carrying a commit main lacks, and reads a standing one without a second post. Both roads run through pullOpens, on the one send door the doors carry. The dispatch cases moved to dispatch_done_test.go, apart from the update cases running-work-takes-main-fixes holds red in dispatch_fire_test.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, plus src/quack/branch_doors_test.go, src/branches/dispatch_done_test.go and src/branches/dispatch_level_test.go for its tests.
+Every request goes through Doors.Send, which the tests fill with the fake hub and branchDoors sets to httpSend.
+Comments on workPull, pullOpens and the done road link this ticket and name the approach.
+The pull road stands once, in pullOpens in src/branches/dispatch_fire.go.
 
 # accept
 

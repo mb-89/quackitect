@@ -163,7 +163,6 @@ src/quack/doctor_verb_test.go TestTheQuackLspRowProbesTheIndexBinary
 src/quack/doctor_verb_test.go TestTheSidebarRowReadsEveryShapeTheLinkStandsIn
 src/quack/doctor_verb_test.go TestTheSurveyRowNamesHowToWriteOne
 src/quack/doctor_verb_test.go TestTheValeRowCountsTheRulesOfEachFolder
-src/quack/drafts_test.go TestTheDraftCasesAnswerOffTheWiredModule
 src/quack/dump_test.go TestQuackDumpWritesWhatTheIndexAnswers
 src/quack/editdoor_test.go TestADraftPassesEveryRule
 src/quack/editdoor_test.go TestAProjectedFileTakesNoEdit
@@ -336,8 +335,6 @@ src/quack/verb_config_test.go TestConfigRefusesAKeyNoLayerAnswers
 src/quack/verb_config_test.go TestConfigWritesTheLocalLayerAndALogRow
 src/quack/verb_doors_test.go TestDoorsCountsWhereEveryDoorHoldsATest
 src/quack/verb_doors_test.go TestDoorsNamesADoorWithNoContract
-src/quack/verb_fix_test.go TestFixRefusesWhereNoValeStands
-src/quack/verb_fix_test.go TestTheCalmCalmsTheShoutRealValeNames
 src/quack/verb_graph_test.go TestGraphVerb
 src/quack/verb_log_test.go TestLogVerb
 src/quack/verb_log_test.go TestLogVerbSays

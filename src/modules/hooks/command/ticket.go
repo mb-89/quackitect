@@ -75,18 +75,16 @@ func TicketFault(name string, tree Tree, how string) string {
 	if len(hand.Tickets) > 0 || hand.Todo != "" {
 		return said + " stands outside what is in hand. " + handLine(hand) + " " + how
 	}
-	for _, folder := range []string{publicTickets, privateTickets} {
-		if text, ok := tree.Read(folder + "/" + said + noteEnd); ok {
-			if stateOf(text) == closed {
-				return said + " stands closed. " + how
-			}
-			return ""
+	if text, ok := ticketText(tree, said); ok {
+		if stateOf(text) == closed {
+			return said + " stands closed. " + how
 		}
+		return ""
 	}
 	return "No ticket named " + said + " stands under " + publicTickets + " or " + privateTickets + ". " + how
 }
 
-// What stands in hand on the box: every ticket a hold still names, and the plan's working todo. [[spec/tickets/the-hand-reads-plans-here]]
+// What stands in hand on the box: every ticket a hold still names, and the plan's working todo where it names no ticket. [[spec/tickets/the-hand-reads-plans-here]]
 func InHand(tree Tree) Hand {
 	var hand Hand
 	for _, name := range tree.List(holdFolder) {
@@ -101,8 +99,8 @@ func InHand(tree Tree) Hand {
 		if json.Unmarshal([]byte(text), &held) != nil {
 			continue
 		}
-		ticket := strings.TrimSpace(textOf(held.Ticket))
-		if ticket != "" && !holds(hand.Tickets, ticket) && stillHeld(tree, textOf(held.Path)) {
+		ticket := strings.TrimSpace(yaml.JSONText(held.Ticket))
+		if ticket != "" && !holds(hand.Tickets, ticket) && stillHeld(tree, yaml.JSONText(held.Path)) {
 			hand.Tickets = append(hand.Tickets, ticket)
 		}
 	}
@@ -110,9 +108,27 @@ func InHand(tree Tree) Hand {
 		Working any `json:"working"`
 	}
 	if text, ok := tree.Read(plans); ok && json.Unmarshal([]byte(text), &plan) == nil {
-		hand.Todo = strings.TrimSpace(textOf(plan.Working))
+		if working := strings.TrimSpace(yaml.JSONText(plan.Working)); !namesTicket(tree, working) {
+			hand.Todo = working
+		}
 	}
 	return hand
+}
+
+// The text of the ticket a name names, under the public folder or the private one. [[spec/design_output/level0#a-write-names-its-ticket]]
+func ticketText(tree Tree, name string) (string, bool) {
+	for _, folder := range []string{publicTickets, privateTickets} {
+		if text, ok := tree.Read(folder + "/" + name + noteEnd); ok {
+			return text, true
+		}
+	}
+	return "", false
+}
+
+// A plan's working line names a ticket where one stands under that name, and a todo otherwise. [[spec/tickets/inhand-skips-ticket-names]]
+func namesTicket(tree Tree, name string) bool {
+	_, ok := ticketText(tree, name)
+	return name != "" && ok
 }
 
 // A hold stands while its ticket does, and a hold naming no path or a file standing nowhere here stands. [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -151,16 +167,4 @@ func stateOf(text string) string {
 		}
 	}
 	return ""
-}
-
-// A JSON value as the bridge's String reads it, and nothing for null. [[spec/tickets/cage-command-rules-port]]
-func textOf(value any) string {
-	switch one := value.(type) {
-	case nil:
-		return ""
-	case string:
-		return one
-	}
-	body, _ := json.Marshal(value)
-	return string(body)
 }

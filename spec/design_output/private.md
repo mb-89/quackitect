@@ -326,7 +326,7 @@ no person: the nobody users, and the agent names a cloud box runs under.
 
 # The judged half
 
-`spec/config/styles/VoiceJudged/Role.yml` asks the judge one question per span,
+The judge takes one question per span,
 on the tracked notes alone: does this text name a role, or one person?
 
 | label | what the rule does |

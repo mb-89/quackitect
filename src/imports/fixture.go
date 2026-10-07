@@ -49,7 +49,7 @@ func homed(name string) bool {
 
 // The tests of one package that reach a build outside the home, through their own body or a helper of the package. [[spec/design_output/model#the-guards-hold-a-baseline]]
 func buildsIn(fset *token.FileSet, files []*ast.File) []string {
-	marked := map[int]bool{}
+	marked := map[token.Position]bool{}
 	helpers := map[string]*ast.FuncDecl{}
 	type test struct {
 		file string
@@ -60,7 +60,7 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 		name := fset.Position(file.Package).Filename
 		for _, group := range file.Comments {
 			if strings.Contains(group.Text(), fixtureMarker) {
-				marked[fset.Position(group.Pos()).Line] = true
+				marked[lineOf(fset, group.Pos())] = true
 			}
 		}
 		for _, decl := range file.Decls {
@@ -80,7 +80,7 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 	}
 	// A call on a marked line builds nothing, since its comment carries the reason. [[spec/design_output/model#the-guards-hold-a-baseline]]
 	builds := func(call *ast.CallExpr) bool {
-		return !marked[fset.Position(call.Pos()).Line] && buildsFixture(call)
+		return !marked[lineOf(fset, call.Pos())] && buildsFixture(call)
 	}
 	reaches := map[string]bool{}
 	var reach func(name string, seen map[string]bool) bool
@@ -119,6 +119,12 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 		}
 	}
 	return named
+}
+
+// The file and line a position stands on, so a marker spares its own file's line alone. [[spec/design_output/model#the-guards-hold-a-baseline]]
+func lineOf(fset *token.FileSet, at token.Pos) token.Position {
+	position := fset.Position(at)
+	return token.Position{Filename: position.Filename, Line: position.Line}
 }
 
 // Whether a call builds a fixture: a temporary folder, a process, or an index start. [[spec/design_output/model#the-guards-hold-a-baseline]]

@@ -628,8 +628,7 @@ context or override. So the whole project reads it alike. The `migration`
 switches are such keys: the `migration` module declares them, and the queue
 reads them off `main`, per [[spec/design_output/work#a-switch-holds-a-group]].
 
-Overrides replace the wipe of the local file when a new editor window opens,
-which `src/extension/lib/session.js` makes today.
+Overrides replace the wipe of the local file when a new editor window opens.
 
 ## A context holds a lease
 

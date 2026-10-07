@@ -1,6 +1,6 @@
 // The split verb cuts the ranges a caller names into targets, writes them
 // through one undo journal entry, and keeps the rest, off the roads
-// test/level0/split.test.js covered.
+// the JavaScript split cases covered.
 // [[spec/design_output/level0#a-verb-cuts-the-file]]
 package main // level0: InPackageTest - a main package admits no outside test package
 

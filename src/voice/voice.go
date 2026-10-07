@@ -7,6 +7,8 @@
 package voice
 
 import (
+	"quackitect/src/yaml"
+
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -398,10 +400,10 @@ func AnswersIn(text string) []string {
 
 // An owner row in the transcript: a user row carrying no tool result, and neither a meta row nor a compaction summary. [[spec/tickets/answers-read-the-last-text]]
 func opensTurn(row Row) bool {
-	if row["type"] != "user" || truthy(row["isMeta"]) || truthy(row["isCompactSummary"]) {
+	if row["type"] != "user" || yaml.Truthy(row["isMeta"]) || yaml.Truthy(row["isCompactSummary"]) {
 		return false
 	}
-	if truthy(row["isSidechain"]) || truthy(row["agentId"]) {
+	if yaml.Truthy(row["isSidechain"]) || yaml.Truthy(row["agentId"]) {
 		return false
 	}
 	message, _ := row["message"].(map[string]any)
@@ -419,7 +421,7 @@ func opensTurn(row Row) bool {
 
 // The text blocks of a main-line assistant row, joined by a blank line and trimmed. [[spec/design_output/projection#the-second-target]]
 func answerOf(row Row) string {
-	if row["type"] != "assistant" || truthy(row["isSidechain"]) || truthy(row["agentId"]) {
+	if row["type"] != "assistant" || yaml.Truthy(row["isSidechain"]) || yaml.Truthy(row["agentId"]) {
 		return ""
 	}
 	message, _ := row["message"].(map[string]any)
@@ -589,7 +591,7 @@ func numberText(n float64) string {
 func RefusalsIn(rows []Row, since string) []Row {
 	out := []Row{}
 	for _, one := range rows {
-		if one["level"] != "warn" || !truthy(one["rule"]) {
+		if one["level"] != "warn" || !yaml.Truthy(one["rule"]) {
 			continue
 		}
 		if since == "" || unitsCompare(jsString(one["at"]), since) >= 0 {
@@ -746,23 +748,8 @@ func findingOf(file string, row map[string]any) Finding {
 		one.Severity = jsString(row["Severity"])
 	}
 	action, _ := row["Action"].(map[string]any)
-	one.Fixable = truthy(action["Name"])
+	one.Fixable = yaml.Truthy(action["Name"])
 	return one
-}
-
-// Whether a JSON value reads as true in JavaScript. [[spec/design_output/projection#the-second-target]]
-func truthy(v any) bool {
-	switch one := v.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case string:
-		return one != ""
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	}
-	return true
 }
 
 // A JSON value as String writes it, a missing one as nothing. [[spec/design_output/projection#the-second-target]]

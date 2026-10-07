@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-// The calls that bar a test from running beside the others, and the call that runs it there. [[spec/guidance/code/testing]]
+// The calls that bar a test from running beside the others, each a write to state the whole process shares, and the call that runs it there. registersFor writes the verb registry quack's parallel cases read. [[spec/guidance/code/testing]]
 var (
-	barsParallel = []string{"Setenv", "Chdir"}
+	barsParallel = []string{"Setenv", "Chdir", "registersFor"}
 	parallelCall = "Parallel"
 	testPrefix   = "Test"
 	runsAlone    = "level0: RunsAlone - "

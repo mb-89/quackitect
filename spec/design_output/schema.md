@@ -13,7 +13,7 @@ reads one, how it weighs a note against one, and what it answers.
 | the ticket door | `.claude/skills/level0/lib/ticket.js` |
 | the sweep, beside the tree rules | `src/scripts/cli-read.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
-| the `mint` verb | `src/scripts/mint-verb.js` |
+| the `mint` verb | `src/quack/verb_mint.go` |
 | the `mint_note` tool | `.claude/skills/level0/hooks/level0.js` |
 
 # The reader and the checker

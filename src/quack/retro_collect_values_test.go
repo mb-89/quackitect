@@ -37,7 +37,7 @@ func TestRetroCollectReadsAStampFromBeforeTheRunsAsItsOneReportAndNoReportAsNoth
 	if !reflect.DeepEqual(said["parts"], last["parts"]) || said["runs"] != 1.0 {
 		t.Fatalf("a stamp from before the runs reads %v", said)
 	}
-	for _, stamp := range []string{`{}`, `null`} {
+	for _, stamp := range []string{`{}`, `null`, `{"battery":false}`, `{"battery":0}`, `{"battery":""}`} {
 		if got := retroKeptReport(stamp); got != "" {
 			t.Fatalf("%s keeps %q", stamp, got)
 		}

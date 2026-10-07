@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // The trunk, the head of a work branch, the ways a landing takes, and the letters a short sha keeps. [[spec/design_output/work#a-box-writes-its-branch]]
@@ -152,7 +154,7 @@ func Battery(stamp string, stands bool, sha string) (bool, string) {
 	if json.Unmarshal([]byte(stamp), &read) != nil {
 		return false, none
 	}
-	said := textOf(read.Sha)
+	said := yaml.JSONText(read.Sha)
 	switch {
 	case said == "":
 		return false, none
@@ -161,7 +163,7 @@ func Battery(stamp string, stands bool, sha string) (bool, string) {
 	case read.Clean != true:
 		return false, "the check ran over an unclean tree"
 	case read.Ok != true:
-		return false, "the check answered red at " + textOf(read.At)
+		return false, "the check answered red at " + yaml.JSONText(read.At)
 	}
 	if warned, _ := read.Warnings.(float64); warned > 0 {
 		return false, strconv.FormatFloat(warned, 'f', -1, floatBits) + " warning(s) stand in " + itoa(len(read.Files)) + " file(s), which ./RUNME.sh lint names"

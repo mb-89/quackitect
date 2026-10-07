@@ -113,15 +113,48 @@ func spansBlanked(row string) string {
 	})
 }
 
+// Where a row a file writes stands: a note's frontmatter, a note's body or a yaml file, or a comment of any other file. [[spec/tickets/every-named-path-resolves]]
+const (
+	inFront = iota
+	inBody
+	inComment
+)
+
+// A row's said part, its line, the column it opens at, and where it stands. [[spec/tickets/every-named-path-resolves]]
+type rowSaid struct {
+	row, said  string
+	line, base int
+	part       int
+}
+
 // The pointers a file writes as pointers: a note's frontmatter past its kind, its body outside a quoted shape, a yaml file whole, and the comments of any other file. [[spec/design_output/lsp#every-pointer-resolves]]
 func pointersIn(path string, rows []string) []pointerAtLine {
 	out := []pointerAtLine{}
+	for _, one := range rowsSaid(path, rows) {
+		said := one.said
+		if one.part != inComment {
+			said = spansBlanked(said)
+		}
+		for _, found := range bracketsAt.FindAllStringSubmatchIndex(said, -1) {
+			target := strings.TrimSpace(said[found[2]:found[3]])
+			if target == "" || guarded.MatchString(target) {
+				continue
+			}
+			out = append(out, pointerAtLine{target: target, line: one.line, start: one.base + found[0], end: one.base + found[1]})
+		}
+	}
+	return out
+}
+
+// The rows a file writes in words: a note's frontmatter past its kind, its body outside fences and indents, a yaml file whole, and the comments of any other file. [[spec/tickets/every-named-path-resolves]]
+func rowsSaid(path string, rows []string) []rowSaid {
+	out := []rowSaid{}
 	note := strings.HasSuffix(path, ".md")
 	data := strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml")
 	front := note && len(rows) > 0 && strings.TrimSpace(rows[0]) == "---"
 	fenced := false
 	for i, row := range rows {
-		said, base := row, 0
+		said, base, part := row, 0, inBody
 		switch {
 		case front && i == 0:
 			continue
@@ -133,28 +166,21 @@ func pointersIn(path string, rows []string) []pointerAtLine {
 			if strings.HasPrefix(strings.TrimSpace(row), "kind:") {
 				continue
 			}
-			said = spansBlanked(row)
+			part = inFront
 		case note && fenceAt.MatchString(row):
 			fenced = !fenced
 			continue
 		case note && (fenced || indentAt.MatchString(row)):
 			continue
 		case note, data:
-			said = spansBlanked(row)
 		default:
 			at := commentAt.FindStringIndex(row)
 			if at == nil {
 				continue
 			}
-			said, base = row[at[0]:], at[0]
+			said, base, part = row[at[0]:], at[0], inComment
 		}
-		for _, found := range bracketsAt.FindAllStringSubmatchIndex(said, -1) {
-			target := strings.TrimSpace(said[found[2]:found[3]])
-			if target == "" || guarded.MatchString(target) {
-				continue
-			}
-			out = append(out, pointerAtLine{target: target, line: i + 1, start: base + found[0], end: base + found[1]})
-		}
+		out = append(out, rowSaid{row: row, said: said, line: i + 1, base: base, part: part})
 	}
 	return out
 }

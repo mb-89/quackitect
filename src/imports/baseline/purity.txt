@@ -48,8 +48,8 @@ src/index/sweep.go touches
 src/index/v1.go door.servesV1
 src/index/watch.go folders
 src/proc/proc.go command
-src/proc/whole_unix.go whole
-src/proc/whole_windows.go whole
+src/proc/whole_unix.go Whole
+src/proc/whole_windows.go Whole
 src/pull/door.go OSDisk.Exists
 src/pull/door.go OSDisk.Files
 src/pull/door.go OSDisk.Read
@@ -93,8 +93,6 @@ src/quack/editorlink.go editorLinkAt
 src/quack/editorlink.go editorRegister
 src/quack/editorlink.go isLink
 src/quack/editorlink.go realOf
-src/quack/ending_unix.go whole
-src/quack/ending_windows.go whole
 src/quack/finds.go alive
 src/quack/guidance.go guidanceFiles
 src/quack/guidance.go guidances

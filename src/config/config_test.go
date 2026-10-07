@@ -193,6 +193,21 @@ func TestWhereAnswersTheBuiltIn(t *testing.T) {
 	}
 }
 
+// The default reads the schema alone, past a value the tracked and local files set. [[spec/tickets/stale-span-reads-schema-unset]]
+func TestDefaultReadsTheSchemaAlone(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Tracked: `{"work": {"staleAfter": "1h"}}`,
+		Local:   `{"work": {"staleAfter": "2h"}}`,
+		Schema:  `{"properties": {"work": {"properties": {"staleAfter": {"default": "30m"}}}}}`,
+	})
+	if said, held := Default(root, "work.staleAfter"); !held || said != "30m" {
+		t.Fatalf("the default reads %v, held %v, and wants 30m", said, held)
+	}
+	if _, held := Default(root, "work.unknown"); held {
+		t.Fatal("a key the schema leaves out holds a default")
+	}
+}
+
 // A key the schema leaves out, or names with no default, holds no built-in. [[spec/tickets/the-config-schema-gets-generated]]
 func TestAKeyTheSchemaLeavesOutHoldsNoBuiltIn(t *testing.T) {
 	root := rootWith(t, map[string]string{Schema: `{"properties": {"names": {"properties": {"words": {"type": "number"}}}}}`})

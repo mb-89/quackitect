@@ -14,6 +14,7 @@ import { coldTree } from "../../src/scripts/probe-cold.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
 import {
 	DRY,
+	deltaOf,
 	engineOf,
 	harnessOf,
 	leaves,
@@ -356,4 +357,22 @@ test("the probe's main runs nothing where another program is main", async () => 
 		ran = true;
 	});
 	assert.equal(ran, false);
+});
+
+// [[spec/tickets/every-named-path-resolves]]
+test("the delta carries each untracked file as a new-file patch after the tracked diff", () => {
+	const added =
+		"diff --git a/src/q/new.go b/src/q/new.go\nnew file mode 100644\n";
+	const proc = {
+		run: (args) => {
+			if (args[1] === "ls-files")
+				return { exitCode: 0, stdout: "src/q/new.go\0", stderr: "" };
+			if (args.includes("--no-index")) {
+				assert.deepEqual(args.slice(-2), ["/dev/null", "src/q/new.go"]);
+				return { exitCode: 1, stdout: added, stderr: "" };
+			}
+			return { exitCode: 0, stdout: "tracked\n", stderr: "" };
+		},
+	};
+	assert.equal(deltaOf({ proc }, "/tree"), `tracked\n${added}`);
 });

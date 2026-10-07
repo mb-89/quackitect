@@ -45,7 +45,7 @@ func TestTheSchemaPortAnswersWhatEveryWriteTableTeaches(t *testing.T) {
 
 func TestWriteProseReadsNothingWhereNoValeStands(t *testing.T) {
 	t.Parallel()
-	if found := writeProse(t.TempDir(), write.Handover, "# Where it stands\n"); found != nil {
+	if found := writeProse(t.TempDir(), write.Handover, "# Where it stands\n"); found != nil { // level0: FixtureOutsideHome - the door reads a root of the case's own where no Vale stands
 		t.Errorf("writeProse answers %v under a root with no Vale", found)
 	}
 }

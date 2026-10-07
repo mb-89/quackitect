@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // The runtime folder RUN in lib/folders.js names. [[spec/design_input/the-runtime-files-stand-apart]]
@@ -57,7 +59,7 @@ var StubInside = []string{"spec/tickets", "spec/guidance", "src"}
 // The identity a vehicle holds, or a fresh one where it holds none, and whether it is new. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 func IdentityOf(read, fresh, at string) (any, bool) {
 	held, _ := Parse(read)
-	if id, _ := Get(held, "id"); Truthy(id) {
+	if id, _ := Get(held, "id"); yaml.Truthy(id) {
 		return held, false
 	}
 	record := NewObject()
@@ -69,7 +71,7 @@ func IdentityOf(read, fresh, at string) (any, bool) {
 // The project's record where it names a driver, else nil. [[spec/design_output/vehicle#a-project-names-its-driver]]
 func DrivenOf(read string) *Object {
 	held, _ := Parse(read)
-	if driver, _ := Get(held, "driver"); Truthy(driver) {
+	if driver, _ := Get(held, "driver"); yaml.Truthy(driver) {
 		return held.(*Object)
 	}
 	return nil
@@ -124,7 +126,7 @@ func Resolves(list []*Object, driver any) string {
 	for _, one := range list {
 		id, _ := Get(one, "id")
 		root, _ := Get(one, "method_root")
-		if strictEqual(id, driver) && Truthy(root) {
+		if strictEqual(id, driver) && yaml.Truthy(root) {
 			return JSString(root)
 		}
 	}
@@ -136,7 +138,7 @@ func PortOf(list []*Object, method string) float64 {
 	for _, one := range list {
 		root, _ := Get(one, "method_root")
 		port, _ := Get(one, "port")
-		if Truthy(root) && Same(JSString(root), method) && Truthy(ToNumber(port)) {
+		if yaml.Truthy(root) && Same(JSString(root), method) && yaml.Truthy(ToNumber(port)) {
 			return ToNumber(port)
 		}
 	}
@@ -173,12 +175,12 @@ func WithPort(list []*Object, entry *Object) *Object {
 func PointerOf(read string) (string, float64, bool) {
 	held, _ := Parse(read)
 	method, _ := Get(held, "method")
-	if !Truthy(method) {
+	if !yaml.Truthy(method) {
 		return "", 0, false
 	}
 	port, _ := Get(held, "port")
 	number := ToNumber(port)
-	if !Truthy(number) {
+	if !yaml.Truthy(number) {
 		number = PortBase
 	}
 	return JSString(method), number, true
@@ -189,7 +191,7 @@ func OnlyVehicle(list []*Object) string {
 	roots := []any{}
 	for _, one := range list {
 		root, _ := Get(one, "method_root")
-		if Truthy(root) && !slices.ContainsFunc(roots, func(held any) bool { return strictEqual(held, root) }) {
+		if yaml.Truthy(root) && !slices.ContainsFunc(roots, func(held any) bool { return strictEqual(held, root) }) {
 			roots = append(roots, root)
 		}
 	}
@@ -307,7 +309,7 @@ func EmptyBrand(method string) string {
 func VersionedJSON(text string, version any) string {
 	held, _ := Parse(text)
 	object, ok := held.(*Object)
-	if !Truthy(version) || !ok {
+	if !yaml.Truthy(version) || !ok {
 		return text
 	}
 	out := object.Clone()

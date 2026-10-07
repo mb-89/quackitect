@@ -27,6 +27,33 @@ func TestWithoutTrailersDropsTheClosingTrailers(t *testing.T) {
 	}
 }
 
+// A trailer naming a model comes back as one refusing row carrying the line. [[spec/tickets/commit-door-refuses-model-trailers]]
+func TestModelTrailersRefusesATrailerNamingAModel(t *testing.T) {
+	for _, line := range []string{
+		"Co-Authored-By: Claude Opus 5.5",
+		"Co-Authored-By: Claude Sonnet",
+		"Assisted-By: claude-fable-5-1",
+		"Co-Authored-By: GPT-5",
+	} {
+		rows := ModelTrailers("the change\n\nthe body\n\n" + line + "\nClaude-Session: https://claude.ai/code/x\n")
+		if len(rows) != 1 || rows[0].Rule != "ModelTrailer" || rows[0].Said != line || !Refuses(rows[0].Rule) || rows[0].Message == "" {
+			t.Errorf("ModelTrailers over %q reads %v", line, rows)
+		}
+	}
+}
+
+// A session link, and a model named in the body alone, pass. [[spec/tickets/commit-door-refuses-model-trailers]]
+func TestModelTrailersPassesASessionLink(t *testing.T) {
+	for _, said := range []string{
+		"the change\n\nClaude-Session: https://claude.ai/code/session_x\n",
+		"the opus helper moves\n\nthe body names sonnet",
+	} {
+		if rows := ModelTrailers(said); len(rows) != 0 {
+			t.Errorf("ModelTrailers over %q reads %v", said, rows)
+		}
+	}
+}
+
 func TestRefusesReadsTheRuleNamePastItsLastDot(t *testing.T) {
 	for rule, want := range map[string]bool{"level0.Private": true, "VoiceRulesRan": true, "level0.Hedge": false, "PrivateLike": false} {
 		if got := Refuses(rule); got != want {

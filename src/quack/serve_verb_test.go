@@ -28,7 +28,7 @@ type serveBox struct {
 
 func serveBoxAt(t *testing.T) *serveBox {
 	t.Helper()
-	return &serveBox{root: filepath.ToSlash(t.TempDir()), door: serveDoorText}
+	return &serveBox{root: filepath.ToSlash(t.TempDir()), door: serveDoorText} // level0: FixtureOutsideHome - each case stands its own door file under a root of its own
 }
 
 func (box *serveBox) hooks() string {
