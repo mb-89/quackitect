@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ae0979cb246e72db8174e4183eb637a2d438a7c2
+    hash_after: ae0979cb246e72db8174e4183eb637a2d438a7c2
+    inputs:
+      - name: ask
+        hash: 1ac4750d62402a00
+        size: 343
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,153 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. A door leaves when nothing still standing reads it, apart from its own fake and contract test. A door whose last reader leaves in a later slice stays until that slice.
+2. src/engine/group.js, named.js and front-merge.js leave. src/branches/group.go, src/branches/sync.go and src/modules/hooks/command/ticket.go own their rules.
+3. src/engine/tools.js stays, since the lint group's src/doors/vale.js and test/contract/ruled.js read it.
+4. src/engine/swap moves by git mv to src/index/swap, and src/index/main.go imports it there, since only the index reads it.
+5. The clock, http, index and log doors leave with their fakes and contract tests, since no code that stays reads them.
+6. src/doors/fake/awake.js leaves, since nothing imports it and no awake door exists.
+7. disk and proc stay with their fakes, since the extension's contract tests and the lint group's tests read them.
+8. wire and wire.test.js stay. editor-index.test.js runs its server on the wire, and DoorsOnly refuses node:http in a test.
+9. vale stays for the lint group. fake/vscode.js and fake/behaves.js stay, since the extension tests load them.
+10. git stays with its fake, git.test.js and real-git.test.js. schema.test.js, ticket.test.js, folders.test.js and tree-of.js read them.
+11. front stays with its fake and front.test.js, since the schema-mint tests pass in the fake front.
+12. bridgehead.test.js uses fakeProc in place of fakeGit and calls outside.run, so no hook test depends on the git door.
+13. A Discussion line on schema-libs-leave hands it the front door. A line on plugin-libs-leave hands it the git door.
+14. test/level0 group.test.js, front-merge.test.js, quoted.test.js and ticket-folders.test.js leave whole, since each reads a leaving engine file.
+15. front-writer.test.js drops its group writer case and the group.js import. Its two refusal cases call the front door directly.
+16. test/contract/process.test.js writes firstLeaf inline, with a pointer at firstLeafOf in src/pull/pull_ticket.go.
+17. level0/log.test.js drops its cases over the log door and its fakeLog and fakeClock imports. Its lib/log.js cases stay.
+18. test/contract/compact.test.js leaves. The probe verb runs the live check, and probe_verb_test.go holds the reading.
+19. src/branches/sync_test.go gains, as a table, the record-rewrite and body clash rows that only front-merge.test.js held.
+20. The implementer maps each group.test.js case to a Go case in group_test.go, record_test.go, port_b_group_test.go or src/front/front_test.go.
+21. Where that map finds a gap, src/branches/group_test.go gains a row.
+22. Every Go comment and lib comment that names a leaving file names its Go owner instead.
+23. doors.md, log.md, work.md, level0.md and migration.md name the Go owner of each leaving file, or drop its row.
+24. The doors and tests rows of the javascript-leaves inventory name the fate this approach gives them.
+25. depends_on gains tree-libs-leave, since tested.test.js reads the fake clock until that slice deletes it.
+26. src/quack/engine_doors_test.go globs every leaving file and src/engine, and stays red until they leave.
+Weighed: deleting git and front here. Their readers are library tests that later slices delete whole, so rewriting them now pays for the same work twice.
+Weighed: moving the extension's fakes next to the extension tests. remaining-js-names-its-reason decides where each remaining file lives.
+Weighed: an http server inside editor-index.test.js. DoorsOnly refuses node:http outside a door, so wire stays.
+Weighed: keeping compact.test.js. It reads engine/tools.js only to run a Go verb, and the owner runs that verb directly.
+Weighed: swap at a top-level src/swap. Only src/index imports it, so it lives next to its reader.
+Weighed: Go cases for the log door's level and keep options. The door leaves, and Go writes the session log.
+Assumed: the fixture paths naming src/engine/swap in port_f_testverb_test.go and outside-in-doors.test.js stay, since each builds its own tree or reads a Vale glob.
+Assumed: the Go tests under src/index cover the glob, standing, hashes, changes and stop cases that index.test.js held.
+Assumed: the lint group accepts the edit to process.test.js.
+Assumed: FakeDoorsInTest keeps its pattern naming clock and log, since the name of a deleted door refuses nothing.
+Assumed: tree-libs-leave lands its tree.test.js, tested.test.js and real-git.test.js edits before this slice.
+Assumed: the review prompt example naming src/doors/git.js stays, since the git door stays.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/main.go: the swap import and stops(swap.Watches)
+- test/contract/process.test.js: the firstLeaf import from src/engine/group.js
+- test/level0/front-writer.test.js: the withField import and its three cases
+- test/level0/group.test.js: every case, which reads src/engine/group.js
+- test/level0/front-merge.test.js: every case, which reads mergedFront
+- test/level0/quoted.test.js: recordIn and withEntry from group.js, and quote from fake/front.js
+- test/level0/ticket-folders.test.js: NOTE_END and TICKETS from group.js, and FIELD_HOW from named.js
+- test/contract/index.test.js: index, clock and fakeIndex
+- test/contract/clock.test.js: clock and fakeClock
+- test/contract/log.test.js: log, fakeLog and fakeClock
+- test/contract/http.test.js: http and fakeHttp, over wire
+- test/contract/compact.test.js: readTools and whereIs over the probe verb
+- src/doors/fake/log.js: fakeLog, which reads log.js, fake/clock.js and fake/disk.js
+- test/level0/log.test.js: door, fakeLog and fakeClock
+- test/level0/tested.test.js: fakeClock, until tree-libs-leave deletes it
+- test/level0/bridgehead.test.js: fakeGit, outside.proc and outside.ran
+- src/branches/sync.go: the header comment naming front-merge.js
+- src/branches/group.go: the header comment naming group.js
+- src/modules/git/git.go: the TICKETS comment and the ticketAt comment
+- src/modules/hooks/stop/tickets.go: the fieldOf comment
+- src/modules/queue/places.go: the words comment naming group.js
+- src/modules/tickets/tickets.go: the todoOf, heldIn, dependsOn and stepOf comments
+- src/modules/tickets/tickets_test.go: the stepOf comment
+- src/pull/tickets.go: the header comment naming group.js
+- src/quack/retro_backlog.go: the askOf comment
+- src/quack/retro_collect_cloud.go: the fieldOf comment
+- src/quack/retro_score.go: the fieldOf comment
+- src/quack/ticket_note.go: the askOf comment
+- src/quack/twins.go: the OPEN comment
+- src/quack/verb_log.go: the spanOf comment
+- src/quack/retro_collect.go: the stillHeld comment naming named.js
+- src/modules/hooks/command/ticket.go: the header comment naming named.js
+- src/modules/hooks/cage.go: the row kinds comment naming src/doors/log.js
+- .claude/skills/level0/lib/apply.js: the TICKET_WHERE comment naming named.js
+- .claude/skills/level0/lib/folders.js: the public tickets comment naming group.js
+- spec/design_output/doors.md: the door, standing-on, fake and contract tables, and the families row naming index.test.js
+- spec/design_output/log.md: the opening line and the writer list naming src/doors/log.js
+- spec/design_output/work.md: the lines naming group.js, front-merge.js and work.js
+- spec/design_output/level0.md: the named.js lines and the compact.test.js paragraph
+- spec/design_output/migration.md: the swap row and the index client row
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/engine_doors_test.go: TestTheEngineAndThePortedDoorsStandNowhere
+- src/quack/engine_doors_test.go: TestTheEngineFolderHoldsToolsAlone
+- src/branches/sync_test.go: TestTheFrontLeavesEachClashForAHand, a table with the key, record and body rows
+- src/branches/group_test.go: TestAGroupDropLeavesTheRouteStanding, plus a row for each other gap the case map finds
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/engine/group.js
+- src/engine/named.js
+- src/engine/front-merge.js
+- src/engine/swap: swap.go, door.go, swap_test.go, moved to src/index/swap
+- src/index/main.go
+- src/doors: clock.js, http.js, index.js, log.js
+- src/doors/fake: clock.js, http.js, index.js, log.js, awake.js
+- test/contract: clock.test.js, http.test.js, index.test.js, log.test.js, compact.test.js
+- test/contract/process.test.js
+- test/level0: group.test.js, front-merge.test.js, quoted.test.js, ticket-folders.test.js
+- test/level0/front-writer.test.js
+- test/level0/log.test.js
+- test/level0/bridgehead.test.js
+- src/quack/engine_doors_test.go
+- src/branches/sync_test.go
+- src/branches/group_test.go
+- src/branches: sync.go, group.go
+- src/modules/git/git.go
+- src/modules/hooks/stop/tickets.go
+- src/modules/queue/places.go
+- src/modules/tickets: tickets.go, tickets_test.go
+- src/pull/tickets.go
+- src/quack: retro_backlog.go, retro_collect_cloud.go, retro_score.go, ticket_note.go, twins.go, verb_log.go, retro_collect.go
+- src/modules/hooks/command/ticket.go
+- src/modules/hooks/cage.go
+- .claude/skills/level0/lib: apply.js, folders.js
+- spec/design_output: doors.md, log.md, work.md, level0.md, migration.md
+- spec/tickets: engine-and-doors-leave.md depends_on, and Discussion lines on schema-libs-leave.md, plugin-libs-leave.md, javascript-leaves.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked: each door and fake, group.js, named.js, front-merge.js, tools.js, swap, doorsVerb, the Go group, sync, ticket and log owners, and every test importer
+- the callers come from git grep for each door, fake and engine file across hooks, lib, src with src/extension, test, RUNME.sh, package.json, .github, .vale.ini, Vale styles, Go comments and spec notes
+- TestTheEngineFolderHoldsToolsAlone and TestTheEngineAndThePortedDoorsStandNowhere decide the first line. ./RUNME.sh doors and ./RUNME.sh check at tests-green decide the second and third
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
