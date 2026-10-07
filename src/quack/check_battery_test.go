@@ -155,6 +155,28 @@ func TestBatteryRun(t *testing.T) {
 			t.Fatalf("the run answers %d, timed %v, and %v started before the lead part ended", code, times, early)
 		}
 	})
+	// [[spec/tickets/the-check-runs-beside]]
+	t.Run("the lead parts run one at a time, in part order", func(t *testing.T) {
+		var held sync.Mutex
+		busy, order, beside := false, []string{}, false
+		lead := func(name string) part {
+			return part{name: name, lead: true, run: func() int {
+				held.Lock()
+				beside = beside || busy
+				busy = true
+				order = append(order, name)
+				held.Unlock()
+				held.Lock()
+				busy = false
+				held.Unlock()
+				return 0
+			}}
+		}
+		batteryRun(part{name: "ready", run: func() int { return 0 }}, []part{lead("tests"), lead("level0"), {name: "go", run: func() int { return 0 }}}, ticking(time.Millisecond))
+		if beside || !reflect.DeepEqual(order, []string{"tests", "level0"}) {
+			t.Fatalf("the lead parts ran %v, one beside another %v", order, beside)
+		}
+	})
 	t.Run("level zero and the tests lead, and no other part does", func(t *testing.T) {
 		for _, one := range partsOf((&checkFake{}).doors(), nil, false) {
 			if one.lead != (one.name == "level0" || one.name == "tests") {

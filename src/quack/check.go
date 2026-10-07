@@ -208,7 +208,7 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery: the ready step alone, then the lead parts at once, then every other part at once. Each wave reads every start of its parts, then starts them and waits for all of them, each timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, the slowest lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
+// The battery: the ready step alone, then each lead part alone in part order, then every other part at once. The last wave reads every start of its parts, then starts them and waits for all of them, each part timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, every lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
 func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
 	readyCode := ready.run()
@@ -216,26 +216,31 @@ func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string
 	starts := make([]time.Time, len(parts))
 	codes := make([]int, len(parts))
 	took := make([]float64, len(parts))
-	for _, leads := range []bool{true, false} {
-		for at, one := range parts {
-			if one.lead == leads {
-				starts[at] = now()
-			}
+	for at, one := range parts {
+		if one.lead {
+			starts[at] = now()
+			codes[at] = one.run()
+			took[at] = float64(now().Sub(starts[at]).Milliseconds())
 		}
-		var all sync.WaitGroup
-		for at, one := range parts {
-			if one.lead != leads {
-				continue
-			}
-			all.Add(1)
-			go func() {
-				defer all.Done()
-				codes[at] = one.run()
-				took[at] = float64(now().Sub(starts[at]).Milliseconds())
-			}()
-		}
-		all.Wait()
 	}
+	for at, one := range parts {
+		if !one.lead {
+			starts[at] = now()
+		}
+	}
+	var all sync.WaitGroup
+	for at, one := range parts {
+		if one.lead {
+			continue
+		}
+		all.Add(1)
+		go func() {
+			defer all.Done()
+			codes[at] = one.run()
+			took[at] = float64(now().Sub(starts[at]).Milliseconds())
+		}()
+	}
+	all.Wait()
 	code := readyCode
 	times := map[string]float64{ready.name: readyTook}
 	red := []string{}
