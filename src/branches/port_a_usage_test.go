@@ -43,4 +43,9 @@ func TestPAUsageNamesTheVerbs(t *testing.T) {
 			t.Fatalf("%s stands nowhere in the usage %q", one, verbs)
 		}
 	}
+	bare := newTree(t, nil)
+	if code := bare.branchSays("nope"); code != codeRefused {
+		t.Fatalf("an unknown verb answers %d", code)
+	}
+	holds(t, bare.out.String()+bare.errs.String(), "Usage: ./RUNME.sh branch <verb>\n\n  open <group>")
 }

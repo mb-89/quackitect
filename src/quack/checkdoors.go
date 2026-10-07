@@ -45,7 +45,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	self, _ := selfPath()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, now: wall.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(realDisk(), root, wall.Now), out: out, errs: errs, disk: realDisk()}
+	d := checkDoors{root: root, self: self, now: wall.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(realDisk(), root, wall.Now), out: out, errs: errs, disk: realDisk()}
 	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
@@ -64,6 +64,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		}
 		return said
 	}
+	d.indexUp = func() bool { return indexStands(d.text(indexFile)) }
 	d.git = func(args ...string) string {
 		said, _ := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
 		return strings.TrimSpace(string(said))
@@ -117,6 +118,14 @@ func toolOf(survey map[string]string, name string) string {
 		}
 	}
 	return name
+}
+
+// Whether the index's standing file names a process alive, so a door stands over the root. [[spec/tickets/the-check-runs-beside]]
+func indexStands(text string) bool {
+	var said struct {
+		Pid int `json:"pid"`
+	}
+	return json.Unmarshal([]byte(text), &said) == nil && said.Pid > 0 && alive(said.Pid)
 }
 
 // The tests the open tickets list as red, off the tracked tickets alone. [[spec/design_output/pull#the-gate]]

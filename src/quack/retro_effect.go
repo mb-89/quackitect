@@ -4,7 +4,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -269,17 +268,6 @@ func retroBatteryValue(disk diskDoors, root, name, last string) *retroJSDict {
 	}
 	out.set("slowest", slowest)
 	return out
-}
-
-// The two batteries side by side, or nil where this retro holds none. [[spec/guidance/retro/effect]]
-func retroBatteryEffectOf(disk diskDoors, root, name, last string) *retroBatteryRecord {
-	value := retroBatteryValue(disk, root, name, last)
-	if value == nil {
-		return nil
-	}
-	var out retroBatteryRecord
-	_ = json.Unmarshal([]byte(retroJSStringify(value)), &out)
-	return &out
 }
 
 // A retro's file: in its private home where it stands there, and in the tracked folder otherwise. [[spec/tickets/retro-read-reads-every-record]]

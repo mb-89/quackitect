@@ -35,6 +35,20 @@ const module = "quackitect/"
 // The renderers, per [[spec/design_output/migration]].
 var renderers = []string{"src/tui/frame", "src/tui/tree"}
 
+// The window's packages by folder under src/tui, and what each imports of the window, per [[spec/design_output/tui#the-packages-the-window-holds]].
+var window = map[string][]string{
+	"draw":     {},
+	"tree":     {"draw"},
+	"frame":    {"draw", "tree"},
+	"log":      {"frame", "tree", "draw", "registry"},
+	"work":     {"frame", "tree", "draw", "registry"},
+	"registry": {"frame", "draw"},
+	".":        {"frame", "log", "work", "registry", "draw"},
+}
+
+// The package the index stands in, whose every import below it holds no module. [[spec/tickets/tickets-becomes-a-module]]
+const indexPath = module + "src/index"
+
 type rule struct {
 	from    func(string) bool
 	to      func(path string, owned []string) bool
@@ -158,6 +172,52 @@ func RendererFaults(pkg string, fset *token.FileSet, files []*ast.File, owned []
 					out = append(out, fault)
 				}
 			}
+		}
+	}
+	return out
+}
+
+// The window package's imports of the window that its row of the table leaves out, and none for a package the table names nowhere. [[spec/design_output/tui#the-packages-the-window-holds]]
+func WindowFaults(pkg string, imported []string) []string {
+	out := []string{}
+	folder, ok := windowFolder(pkg)
+	allowed, named := window[folder]
+	if !ok || !named {
+		return out
+	}
+	for _, path := range imported {
+		one, ok := strings.CutPrefix(path, module+"src/tui/")
+		if ok && !slices.Contains(allowed, one) {
+			out = append(out, fmt.Sprintf("%s imports %s, which the window's row for %s leaves out", pkg, path, folder))
+		}
+	}
+	return out
+}
+
+// The folder under src/tui a package stands in, the window's own root as ".". [[spec/design_output/tui#the-packages-the-window-holds]]
+func windowFolder(pkg string) (string, bool) {
+	if pkg == module+"src/tui" {
+		return ".", true
+	}
+	return strings.CutPrefix(pkg, module+"src/tui/")
+}
+
+// The modules the index reaches through any import below it, over the graph of every package by its imports. [[spec/tickets/tickets-becomes-a-module]]
+func IndexFaults(graph map[string][]string) []string {
+	out := []string{}
+	seen := map[string]bool{indexPath: true}
+	for next := []string{indexPath}; len(next) > 0; {
+		from := next[0]
+		next = next[1:]
+		for _, path := range graph[from] {
+			if seen[path] {
+				continue
+			}
+			seen[path] = true
+			if isModule(path) {
+				out = append(out, fmt.Sprintf("%s reaches %s through %s: the index holds no module's logic", indexPath, path, from))
+			}
+			next = append(next, path)
 		}
 	}
 	return out

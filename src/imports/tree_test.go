@@ -4,6 +4,7 @@
 package imports
 
 import (
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -64,6 +65,7 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		t.Fatal(err)
 	}
 	owned := Owned(root)
+	graph := map[string][]string{}
 	for _, one := range loaded {
 		if strings.HasSuffix(one.PkgPath, ".test") {
 			continue
@@ -71,6 +73,12 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		var imported []string
 		for path := range one.Imports {
 			imported = append(imported, path)
+		}
+		if one.ID == one.PkgPath {
+			graph[one.PkgPath] = imported
+			for _, fault := range WindowFaults(one.PkgPath, imported) {
+				t.Error(fault)
+			}
 		}
 		for _, fault := range FaultsIn(one.PkgPath, imported, owned, CarriesIO(one.Syntax)) {
 			t.Error(fault)
@@ -84,6 +92,17 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for _, fault := range WalkFaults(root, one.Fset, one.Syntax) {
 			t.Errorf("%s: %s", one.Fset.Position(fault.at), fault)
 		}
+	}
+	for folder := range window {
+		if _, ok := graph[path.Join(module+"src/tui", folder)]; !ok {
+			t.Errorf("the window's table names src/tui/%s, which holds no package", folder)
+		}
+	}
+	if _, ok := graph[indexPath]; !ok {
+		t.Errorf("the load answers no %s", indexPath)
+	}
+	for _, fault := range IndexFaults(graph) {
+		t.Error(fault)
 	}
 }
 

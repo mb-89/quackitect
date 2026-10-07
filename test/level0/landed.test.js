@@ -152,6 +152,36 @@ test("a pass stages the ticket and the hand's own paths, and leaves a sibling's 
   );
 });
 
+// Several hands hold on one box, and a pass reads the hold of its own ticket. [[spec/design_output/pull#the-refused-commit]]
+test("a pass reads the hold its own ticket stands under, past a sibling's later hold", () => {
+  const git = fakeGit({}, "/tree");
+  const disk = fakeDisk({
+    [AT]: WROTE,
+    "/tree/src/mine.js": "export const one = 1;\n",
+    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
+      ticket: "a-sibling",
+      taken: "2026-01-05T00:00:00.000Z",
+    }),
+    "/tree/.se/.runtime/hold/b-hand.json": JSON.stringify({
+      ticket: "a-child",
+      taken: "2026-01-02T00:00:00.000Z",
+    }),
+    "/tree/.se/.runtime/undo/20260103000000000000.json": `${JSON.stringify({
+      on: "",
+      by: "level0",
+      at: "2026-01-03T00:00:00.000Z",
+      ticket: "a-child",
+      files: [{ file: "src/mine.js" }],
+    })}\n`,
+  });
+
+  assert.equal(landed({ disk, git, root: "/tree", join }, one, ["passes design/draft"]), "");
+  assert.ok(
+    git.ran.some((it) => it.argv.join(" ") === `git add -- ${AT} /tree/src/mine.js`),
+    "the edit after its own hold stages",
+  );
+});
+
 // A journal names a file git ignores, such as the handover, and git refuses a commit naming it. [[spec/design_output/pull#the-refused-commit]]
 test("a pass leaves out a journaled path git ignores", () => {
   const IGNORED = "/tree/.se/HANDOVER.md";

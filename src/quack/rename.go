@@ -41,12 +41,6 @@ type renameEntry struct {
 	Moved journaledMove `json:"moved"`
 }
 
-// A line naming the old name, with the number a reader opens. [[spec/design_output/index#a-rename-reaches-a-name]]
-type reach struct {
-	line int
-	said string
-}
-
 // What a rename answers: the files it rewrote, the ones its reader left out, and why it stops. [[spec/design_output/index#a-rename-reaches-a-name]]
 type renamed struct {
 	wrote   []string
@@ -140,20 +134,6 @@ func renamedForms(text string, forms [][2]string) string {
 		at++
 	}
 	return out.String()
-}
-
-// [[spec/design_output/index#a-rename-reaches-a-name]]
-func reachesIn(text, from string) []reach {
-	var out []reach
-	for at, row := range strings.Split(text, "\n") {
-		for place := range row {
-			if _, ok := edgedAt(row, place, []string{from}); ok {
-				out = append(out, reach{line: at + 1, said: row})
-				break
-			}
-		}
-	}
-	return out
 }
 
 // A note reaches a reader two ways, as a path and as a link without its ending. [[spec/design_output/index#a-rename-reaches-a-name]]

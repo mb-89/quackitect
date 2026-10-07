@@ -1,97 +1,25 @@
-// The findings every front reads, driven through fake doors. The check and the
-// problems panel read this one list, so a rule reaches both or neither.
+// The findings every front reads, driven through fake doors.
 // [[spec/design_output/lsp]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import * as findingsModule from "../../src/bridge/findings.js";
-import { FROM, findingsOver, sameRoot } from "../../src/bridge/findings.js";
+import { findingsOver } from "../../src/bridge/findings.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
 const ROOT = "/tree";
-const LOOSE_NUMBER = "package main\n\nfunc one() int {\n\treturn 7\n}\n";
 
-function doors(answers = {}) {
-  return {
-    disk: fakeDisk({
-      [join(ROOT, "src/one/one.go")]: LOOSE_NUMBER,
-      [join(ROOT, "notes.md")]: "# One\n",
-    }),
-    proc: fakeProc({ vale: { stdout: "{}" }, biome: { stdout: "{}" }, ...answers }),
-    join,
-    root: ROOT,
-    method: ROOT,
-    work: ROOT,
-    vale: "vale",
-    biome: "biome",
-    ceilings: { function: 150, file: 600 },
-  };
-}
-
-// A tree reads as itself whichever slash spells its roots, so a Windows reading assembles nothing in place. [[spec/tickets/box-verbs-windows-fakes]]
-test("one root under either slash reads as one tree, and two roots read as two", () => {
-  assert.ok(sameRoot("D:\\a\\tree", "D:/a/tree"));
-  assert.ok(sameRoot("D:/a/tree/", "D:\\a\\tree"));
-  assert.ok(!sameRoot("/a/tree", "/a/stub"));
-});
-
-test("a rule written in JavaScript reaches the list, named by the front it comes from", async () => {
-  const got = await findingsOver(doors(), ["."]);
-
-  assert.equal(got.fault, "");
-  const loose = got.found.find((one) => one.rule === "MagicNumber");
-  assert.ok(loose, "the loose number stands in the list");
-  assert.equal(loose.file, "src/one/one.go");
-  assert.equal(loose.source, FROM.tree);
-});
-
-test("Vale reading nothing is the fault, and the list stays empty", async () => {
-  const got = await findingsOver(
-    doors({ vale: { exitCode: 2, stderr: "no config" } }),
-    ["."],
-  );
-
-  assert.equal(got.fault, "no config");
-  assert.deepEqual(got.found, []);
-});
-
-// [[spec/design_output/level0#a-crash-writes-its-error]]
-test("a path the disk no longer holds reads as no finding, and throws nothing", async () => {
-  const got = await findingsOver(doors(), ["HANDOVER.md"]);
-
-  assert.equal(got.fault, "");
-  assert.deepEqual(got.found, []);
-});
-
-// The lint and the pull open Vale on one argument list, and read one file's text one way. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-test("valeArgvOf opens Vale on the assembled config, and readsText names a marker carrying no reason", async () => {
-  const { valeArgvOf, readsText } = await import("../../src/bridge/findings.js");
+test("Vale runs through the process door where the hand carries a cache, and its fault comes back", async () => {
   const it = {
-    vale: "vale",
-    disk: fakeDisk({}),
+    disk: fakeDisk({ [join(ROOT, "notes.md")]: "# One\n" }),
+    proc: fakeProc({ vale: { exitCode: 2, stderr: "no config" } }),
+    join,
     root: ROOT,
     method: ROOT,
     work: ROOT,
-    join,
+    vale: "vale",
+    valeCache: {},
   };
-  const argv = valeArgvOf(it);
-  assert.equal(argv[0], "vale");
-  assert.ok(
-    argv.some((one) => one.startsWith("--config=")),
-    "the config the assembly writes",
-  );
-  assert.ok(argv.includes("--output=JSON") && argv.includes("--no-exit"));
-  const text = "# One\n\n<!-- vale VoiceParagraph.Characters = NO -->\n\nA line.\n";
-  const found = readsText(it, "notes/one.md", text, []);
-  assert.ok(
-    found.some((one) => /Exemption/.test(String(one.rule))),
-    "the marker with no reason stands named",
-  );
-});
-
-// The shadow's doors leave with the verbs shadow, their last reader. [[spec/tickets/agents-call-quack-directly]]
-test("findings hands no shadow doors, since no shadow reads them", () => {
-  assert.equal(findingsModule.shadowDoorsOf, undefined);
+  assert.deepEqual(await findingsOver(it, ["."]), { found: [], fault: "no config" });
 });

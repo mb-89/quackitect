@@ -1,6 +1,5 @@
-// The placements: each process restarts alone and the index stays warm, a
-// topic restarts its own processes, and the index answers the inputs and
-// publishes a run where a commit moves one.
+// The placements: each process restarts alone and the index stays warm, and
+// the index answers the inputs and publishes a run where a commit moves one.
 // [[spec/design_output/model#the-placements]]
 package index
 
@@ -70,13 +69,10 @@ func timerAsked(t *testing.T, asks <-chan time.Duration, span time.Duration) {
 	}
 }
 
-// The placements wait the gap they name between two spawns, and the default gap stays short. [[spec/tickets/the-modules-start-together]]
-func TestThePlacementsWaitTheGapTheyName(t *testing.T) {
+// New placements wait the default gap between two spawns, and it stays short. [[spec/tickets/the-modules-start-together]]
+func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
 	if got := NewPlacements(qtest.Wall(), nil, nil, nil).gap; got != spawnGap {
 		t.Fatalf("new placements wait %v between spawns, and want %v", got, spawnGap)
-	}
-	if got := NewPlacements(qtest.Wall(), nil, nil, nil).Gap(time.Hour).gap; got != time.Hour {
-		t.Fatalf("placements naming an hour wait %v", got)
 	}
 	if spawnGap > 50*time.Millisecond {
 		t.Fatalf("the spawn gap stands at %v, and a read waits on every spawn of a fresh index", spawnGap)
@@ -95,7 +91,9 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 	}
 	// The case names a gap past its stop, and the fake timer holds it, so the stop lands between the two spawns on any box. [[spec/tickets/the-modules-start-together]]
 	timer, asks := fakeTimer()
-	stop, err := NewPlacements(qtest.Wall(), bus, store, []Placed{one("fake"), one("other")}).Gap(time.Hour).Timer(timer).Start()
+	spawns := NewPlacements(qtest.Wall(), bus, store, []Placed{one("fake"), one("other")})
+	spawns.gap = time.Hour
+	stop, err := spawns.Timer(timer).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -348,21 +346,5 @@ func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
 		if gone := time.Since(began); gone > time.Second {
 			t.Fatalf("a settle of a millisecond on the silent doubler holds for %v", gone)
 		}
-	}
-}
-
-func TestAPlacementRestartsTheProcessesOfOneTopic(t *testing.T) {
-	store, placements, stop := placedTwo(t)
-	defer stop()
-	other, first := read(store, "other/pid"), read(store, "fake/pid")
-	if err := placements.Restart("fakeio"); err != nil {
-		t.Fatal(err)
-	}
-	until(t, store, "the fake restarted", func(snap q.Snapshot) bool {
-		pid := snap.Read("fake/pid")
-		return pid != first && pid != 0
-	})
-	if got := read(store, "other/pid"); got != other {
-		t.Fatalf("the other process runs as %v, where the restart of fakeio leaves it at %v", got, other)
 	}
 }

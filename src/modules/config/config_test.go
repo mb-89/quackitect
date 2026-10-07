@@ -206,6 +206,8 @@ func TestLayeredNamesTheLayer(t *testing.T) {
 	}{
 		{weight, nil, "2", Local},
 		{weight, map[string]string{"SE_QUEUE_WEIGHT": "3"}, "3", "SE_QUEUE_WEIGHT"},
+		{weight, map[string]string{"SE_QUEUE_WEIGHT": " "}, "2", Local},
+		{q.Key{Name: "migration/config/s", Instance: "migration", Local: "s", Shared: true}, map[string]string{"SE_MIGRATION_S": "new"}, `"old"`, Tracked},
 		{q.Key{Name: "migration/config/s", Instance: "migration", Local: "s", Shared: true}, nil, `"old"`, Tracked},
 	}
 	for _, one := range cases {

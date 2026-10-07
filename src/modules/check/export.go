@@ -9,7 +9,6 @@ var (
 	AnchorSweep              = anchorSweep
 	At                       = at
 	BiomeOnWindows           = biomeOnWindows
-	CarriesTheName           = carriesTheName
 	ChapterOf                = chapterOf
 	ChaptersWanted           = chaptersWanted
 	CheckNote                = checkNote
@@ -31,7 +30,6 @@ var (
 	KindOf                   = kindOf
 	Left                     = left
 	Listed                   = listed
-	MagicIn                  = magicIn
 	MarkerLines              = markerLines
 	Matches                  = matches
 	Minted                   = mintedNote
@@ -55,7 +53,6 @@ var (
 	SectionsOf               = sectionsOf
 	SettingsNameBinaries     = settingsNameBinaries
 	SharedRun                = sharedRun
-	SizeFaults               = sizeFaults
 	Slashed                  = slashed
 	SlugOf                   = slugOf
 	Sorted                   = sorted
@@ -64,7 +61,6 @@ var (
 	SurveyNamesInstalls      = surveyNamesInstalls
 	TextFaults               = textFaults
 	Textual                  = textual
-	TreeFaults               = treeFaults
 	UnreasonedIn             = unreasoned
 	Walked                   = walked
 	WordsIn                  = wordsIn

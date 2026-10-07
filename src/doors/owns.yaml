@@ -15,11 +15,6 @@ proc:
   files: [proc.js, fake/proc.js]
   contract: [test/contract/proc.test.js]
   report: true
-awake:
-  js: [node:child_process]
-  files: [awake.js, fake/awake.js]
-  contract: [test/contract/awake.test.js]
-  report: true
 http:
   js: [fetch]
   files: [http.js, fake/http.js]
@@ -51,10 +46,6 @@ index:
   js: []
   files: [index.js, fake/index.js]
   contract: [test/contract/index.test.js]
-biome:
-  js: []
-  files: [biome.js]
-  contract: [test/contract/biome.test.js]
 vale:
   js: []
   files: [vale.js]

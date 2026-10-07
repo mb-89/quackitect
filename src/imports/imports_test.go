@@ -221,3 +221,30 @@ func TestAModuleImportingAModuleIsNamed(t *testing.T) {
 	t.Parallel()
 	analysistest.Run(t, plant(t), NoModule, "quackitect/src/modules/greedy")
 }
+
+// A window package importing past its row is named, and a package the table leaves out reads no fault. [[spec/design_output/tui#the-packages-the-window-holds]]
+func TestAWindowImportPastItsRowIsNamed(t *testing.T) {
+	t.Parallel()
+	if said := WindowFaults("quackitect/src/tui/tree", []string{"quackitect/src/tui/draw", "quackitect/src/tui/frame", "strings"}); len(said) != 1 || !strings.Contains(said[0], "src/tui/frame") {
+		t.Fatalf("tree importing frame reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui", []string{"quackitect/src/tui/frame", "quackitect/src/tui/tree"}); len(said) != 1 {
+		t.Fatalf("the root importing tree reads %v", said)
+	}
+	if said := WindowFaults("quackitect/src/tui/unnamed", []string{"quackitect/src/tui/frame"}); len(said) != 0 {
+		t.Fatalf("a package the table leaves out reads %v", said)
+	}
+}
+
+// A module the index reaches below its own imports is named. [[spec/tickets/tickets-becomes-a-module]]
+func TestAModuleTheIndexReachesBelowIsNamed(t *testing.T) {
+	t.Parallel()
+	graph := map[string][]string{
+		"quackitect/src/index":         {"quackitect/src/q", "strings"},
+		"quackitect/src/q":             {"quackitect/src/modules/work"},
+		"quackitect/src/modules/other": {},
+	}
+	if said := IndexFaults(graph); len(said) != 1 || !strings.Contains(said[0], "src/modules/work") {
+		t.Fatalf("the faults read %v", said)
+	}
+}

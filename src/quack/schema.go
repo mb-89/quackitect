@@ -93,7 +93,7 @@ func schemaText(disk diskDoors, root string) ([]byte, error) {
 	return q.JSON.Serialize(schema)
 }
 
-// A key's members: its JSON type, its built-in value, its help, its unit and its options. [[spec/tickets/the-config-schema-gets-generated]]
+// A key's members: its JSON type, its built-in value, its help, its unit, its options, and whether the project shares it. [[spec/tickets/the-config-schema-gets-generated]]
 func keyEntry(key q.Key) q.Ordered {
 	entry := q.Ordered{Object: true}
 	set(&entry, "type", literal(key.Type))
@@ -108,6 +108,9 @@ func keyEntry(key q.Key) q.Ordered {
 			options.Items = append(options.Items, literal(one))
 		}
 		set(&entry, "enum", options)
+	}
+	if key.Shared {
+		set(&entry, "shared", q.Ordered{Literal: "true"})
 	}
 	return entry
 }

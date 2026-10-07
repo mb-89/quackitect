@@ -273,7 +273,7 @@
       "properties": {
         "budget": {
           "type": "number",
-          "default": 120000,
+          "default": 150000,
           "help": "The time the whole check takes at most. Past it, the check prints a warning naming its slowest part and its slowest cases. 0 switches it off.",
           "unit": "milliseconds"
         },
@@ -455,7 +455,8 @@
           "help": "The cage, switched over in phase 5. The hooks IO module answers each hook event.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "check": {
           "type": "string",
@@ -463,7 +464,8 @@
           "help": "The check twins, switched over in phase 4.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "config": {
           "type": "string",
@@ -471,7 +473,8 @@
           "help": "The config readers, switched over in phase 4.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "guidance": {
           "type": "string",
@@ -479,7 +482,8 @@
           "help": "The rules a step reads, switched over in phase 4.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "log": {
           "type": "string",
@@ -487,7 +491,8 @@
           "help": "The session log rows, switched over in phase 4.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "lsp": {
           "type": "string",
@@ -497,7 +502,8 @@
             "old",
             "shadow",
             "new"
-          ]
+          ],
+          "shared": true
         },
         "opentasks": {
           "type": "string",
@@ -505,112 +511,134 @@
           "help": "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "phase0": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
+          "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase1": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 1, the foundation. true in the tracked file on main lets a cloud box take the-foundation-lands-unchanged. A write on this box turns nothing on in the cloud."
+          "help": "Phase 1, the foundation. true in the tracked file on main lets a cloud box take the-foundation-lands-unchanged. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase10": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
+          "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase11": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 11, the verbs leaving Node. true in the tracked file on main lets a cloud box take the-verbs-run-in-go. A write on this box turns nothing on in the cloud."
+          "help": "Phase 11, the verbs leaving Node. true in the tracked file on main lets a cloud box take the-verbs-run-in-go. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase1gaps": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 1, its gaps. true in the tracked file on main lets a cloud box take the-foundation-closes-its-gaps. A write on this box turns nothing on in the cloud."
+          "help": "Phase 1, its gaps. true in the tracked file on main lets a cloud box take the-foundation-closes-its-gaps. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase2shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud."
+          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase2switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud."
+          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase3shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 3 in shadow. true in the tracked file on main lets a cloud box take read-topics-land-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 3 in shadow. true in the tracked file on main lets a cloud box take read-topics-land-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase3switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 3 switched over. true in the tracked file on main lets a cloud box take read-topics-switch-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 3 switched over. true in the tracked file on main lets a cloud box take read-topics-switch-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase4shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 4 in shadow. true in the tracked file on main lets a cloud box take quack-verbs-land-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 4 in shadow. true in the tracked file on main lets a cloud box take quack-verbs-land-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase4switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 4 switched over. true in the tracked file on main lets a cloud box take quack-verbs-switch-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 4 switched over. true in the tracked file on main lets a cloud box take quack-verbs-switch-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase5shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 5 in shadow. true in the tracked file on main lets a cloud box take go-cage-lands-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 5 in shadow. true in the tracked file on main lets a cloud box take go-cage-lands-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase5switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 5 switched over. true in the tracked file on main lets a cloud box take go-cage-switches-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 5 switched over. true in the tracked file on main lets a cloud box take go-cage-switches-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase6shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 6 in shadow. true in the tracked file on main lets a cloud box take tui-shell-lands-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 6 in shadow. true in the tracked file on main lets a cloud box take tui-shell-lands-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase6switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 6 switched over. true in the tracked file on main lets a cloud box take tui-shell-switches-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 6 switched over. true in the tracked file on main lets a cloud box take tui-shell-switches-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase7shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 7 in shadow. true in the tracked file on main lets a cloud box take lsp-door-lands-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 7 in shadow. true in the tracked file on main lets a cloud box take lsp-door-lands-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase7switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 7 switched over. true in the tracked file on main lets a cloud box take lsp-door-switches-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 7 switched over. true in the tracked file on main lets a cloud box take lsp-door-switches-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase8shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 8 in shadow. true in the tracked file on main lets a cloud box take sidebar-lands-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 8 in shadow. true in the tracked file on main lets a cloud box take sidebar-lands-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase8switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 8 switched over. true in the tracked file on main lets a cloud box take sidebar-switches-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 8 switched over. true in the tracked file on main lets a cloud box take sidebar-switches-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase9shadow": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 9 in shadow. true in the tracked file on main lets a cloud box take module-processes-land-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 9 in shadow. true in the tracked file on main lets a cloud box take module-processes-land-in-shadow. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "phase9switch": {
           "type": "boolean",
           "default": false,
-          "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud.",
+          "shared": true
         },
         "processes": {
           "type": "string",
@@ -618,7 +646,8 @@
           "help": "The processes, switched over in phase 9. The index spawns the IO process and one process a placement.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "prose": {
           "type": "string",
@@ -626,7 +655,8 @@
           "help": "The prose checks, switched over in phase 4.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "sidebar": {
           "type": "string",
@@ -636,7 +666,8 @@
             "old",
             "shadow",
             "new"
-          ]
+          ],
+          "shared": true
         },
         "verbs": {
           "type": "string",
@@ -644,7 +675,8 @@
           "help": "The road a verb runs, switched over in phase 4. Each verb quack answers runs alone.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         },
         "window": {
           "type": "string",
@@ -652,7 +684,8 @@
           "help": "The window, switched over in phase 6. It draws the index's reads alone.",
           "enum": [
             "new"
-          ]
+          ],
+          "shared": true
         }
       }
     },

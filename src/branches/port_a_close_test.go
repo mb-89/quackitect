@@ -31,8 +31,10 @@ func TestPACloseDeletesInsideTrunkAlone(t *testing.T) {
 	if paOriginHas(one, "work/landed") {
 		t.Fatal("origin still carries work/landed")
 	}
-	one.branchSays("close", "elsewhere")
-	holds(t, paSaid(one), "outside main")
+	if code := one.branchSays("close", "elsewhere"); code != codeRed {
+		t.Fatalf("close answers %d", code)
+	}
+	holds(t, paSaid(one), "work/elsewhere is outside main, so closing it drops its work.")
 	if !paOriginHas(one, "work/elsewhere") {
 		t.Fatal("the close deletes a branch outside trunk")
 	}

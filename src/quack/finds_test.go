@@ -8,8 +8,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -137,26 +135,5 @@ func TestAFindOverAFailingReadSaysTheIndexIsDead(t *testing.T) {
 	said := findCall(t, t.TempDir(), reads, map[string]any{"words": "one"})
 	if want := "The index is dead: the db is locked. Run ./RUNME.sh, which builds it, and Grep reads the disk until then."; said != want {
 		t.Errorf("the find answers %q, and wants the dead index line: %q", said, want)
-	}
-}
-
-// [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
-func TestTheFindAndWaitModulesStandOnTheWiring(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, kind := range []string{searchModuleType, waitsModuleType} {
-		if _, ok := modules[kind]; !ok {
-			t.Errorf("the root loads no module type %s", kind)
-		}
-		if !wiresType(w, kind) {
-			t.Errorf("the wiring loads no %s", kind)
-		}
 	}
 }

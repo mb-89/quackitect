@@ -132,27 +132,3 @@ func (b *Book) Progress(id string, done, known int, step string) error {
 	one.Progress = Progress{Done: done, Known: known, Step: step}
 	return b.save(one)
 }
-
-// The session's operations standing queued or running. [[spec/design_output/model#the-agent-does-not-poll]]
-func (b *Book) Open(caller string) []string {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	ids := []string{}
-	for _, one := range b.inFlight() {
-		if one.Caller == caller {
-			ids = append(ids, one.ID)
-		}
-	}
-	return ids
-}
-
-// ops/wait with no handle: every open operation of the session, once each ends or the span runs out. [[spec/design_output/model#the-agent-does-not-poll]]
-func (b *Book) WaitCaller(caller string, span time.Duration) []Op {
-	until := b.clock.Now().Add(span)
-	out := []Op{}
-	for _, id := range b.Open(caller) {
-		one, _ := b.Wait(id, until.Sub(b.clock.Now()))
-		out = append(out, one)
-	}
-	return out
-}

@@ -71,29 +71,6 @@ func TestBranchQueueSaysSoWhereNoRowStands(t *testing.T) {
 	}
 }
 
-// The wiring loads the branch topic, so an agent calls branch/take through the index. [[spec/tickets/work-verbs-become-actions]]
-func TestTheWiringLoadsTheBranchTopic(t *testing.T) {
-	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	// The live index answers branch/open, which a step names under needs. [[spec/tickets/needs-wait-on-branch-topic]]
-	for _, name := range []string{"branch/take", "branch/open"} {
-		if _, ok := q.NewStore(c).Declared(name); !ok {
-			t.Fatalf("the wiring declares no %s", name)
-		}
-	}
-}
-
 // A twin keyed on three words runs beside the verb's program for that spelling, and the two-word verb runs the verb's program alone. [[spec/tickets/work-verbs-become-actions]]
 func TestATwinKeysOnThreeWords(t *testing.T) {
 	t.Parallel()

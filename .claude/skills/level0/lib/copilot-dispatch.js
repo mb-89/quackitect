@@ -2,9 +2,10 @@
 // [[spec/design_output/copilot#dispatch-and-recovery]]
 
 import { ticketAt, ticketNamed } from "../../../../src/engine/group.js";
-import { groupStanding, work } from "../../../../src/scripts/work.js";
+import { groupStanding } from "../../../../src/scripts/work-stands.js";
 
 const GIT_WAIT = 30000;
+const TAKE_WAIT = 600000;
 
 export async function dispatch(it) {
   return it.session.withState("copilot-dispatch", async (state, save) => {
@@ -36,7 +37,10 @@ export async function dispatch(it) {
             "Publish setup and hook registrations to the default branch before dispatch.",
           );
       }
-      const code = await (it.work ?? work)(it.root, ["take"], it);
+      const { exitCode: code } = it.proc.run([it.join(it.root, "RUNME.sh"), "branch", "take"], {
+        cwd: it.root,
+        timeoutMs: TAKE_WAIT,
+      });
       const assigned = branch();
       if (assigned.startsWith("work/")) {
         state.branch = assigned;
