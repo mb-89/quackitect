@@ -30,7 +30,18 @@ type Placed struct {
 	answered func(instance string, up bool)
 	// The placements' clock, which the wait before a restart runs on. [[spec/tickets/go-waits-on-events]]
 	clock q.Clock
+	// The spawn the process runs through: a real process where it stands nil, and one in memory a case hands. [[spec/tickets/test-walks-move-onto-fakes]]
+	Spawn Spawner
 }
+
+// One process a spawn starts: the kill that ends it, and the channel its one exit lands on. [[spec/tickets/test-walks-move-onto-fakes]]
+type Process struct {
+	Kill   func()
+	Exited <-chan error
+}
+
+// Starts the command with the environment added to the index's own. [[spec/tickets/test-walks-move-onto-fakes]]
+type Spawner func(command, env []string) (Process, error)
 
 // What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
 type Leases interface {
@@ -364,12 +375,12 @@ func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map
 func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}) {
 	for {
 		p.holds(expired)
-		cmd, exited := p.spawn(bus)
+		kill, exited := p.spawn(bus)
 		var err error
 		select {
 		case <-stopping:
-			if cmd != nil {
-				_ = cmd.Process.Kill()
+			if kill != nil {
+				kill()
 				<-exited
 			}
 			return
@@ -377,8 +388,8 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}
 			fmt.Fprintln(stderr, p.Name, "exits:", err)
 		case <-expired:
 			fmt.Fprintln(stderr, p.Name, "exits:", errSilent)
-			if cmd != nil {
-				_ = cmd.Process.Kill()
+			if kill != nil {
+				kill()
 			}
 			<-exited
 			err = errSilent
@@ -413,17 +424,31 @@ func (p Placed) holds(expired <-chan struct{}) {
 }
 
 // A spawn that fails answers its fault as an exit, so the restart takes it. [[spec/design_output/model#a-process-ends]]
-func (p Placed) spawn(bus *Bus) (*exec.Cmd, <-chan error) {
-	exited := make(chan error, 1)
-	cmd := exec.Command(p.Command[0], p.Command[1:]...)
-	cmd.Env = append(os.Environ(), BusEnv+"="+bus.URL(), TokenEnv+"="+bus.Token())
+func (p Placed) spawn(bus *Bus) (func(), <-chan error) {
+	start := p.Spawn
+	if start == nil {
+		start = spawnsProcess
+	}
+	one, err := start(p.Command, []string{BusEnv + "=" + bus.URL(), TokenEnv + "=" + bus.Token()})
+	if err != nil {
+		failed := make(chan error, 1)
+		failed <- err
+		return nil, failed
+	}
+	return one.Kill, one.Exited
+}
+
+// The real spawn: the command runs as a process of its own, its fault on the index's. [[spec/tickets/test-walks-move-onto-fakes]]
+func spawnsProcess(command, env []string) (Process, error) {
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Env = append(os.Environ(), env...)
 	cmd.Stderr = stderr
 	if err := cmd.Start(); err != nil {
-		exited <- err
-		return nil, exited
+		return Process{}, err
 	}
+	exited := make(chan error, 1)
 	go func() { exited <- cmd.Wait() }()
-	return cmd, exited
+	return Process{Kill: func() { _ = cmd.Process.Kill() }, Exited: exited}, nil
 }
 
 func (p Placed) down(store *q.Store) {

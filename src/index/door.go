@@ -146,8 +146,7 @@ func starts(clock q.Clock, root string) error {
 				return errorOf(fmt.Sprintf("the index exits before its door stands: %v", said))
 			default:
 			}
-			now := clock.Now()
-			_ = os.Chtimes(marker, now, now)
+			_ = touchOf(marker, clock.Now())
 		}
 		if clock.Now().Sub(from) >= startHang {
 			return errorOf(fmt.Sprintf("the index neither stands its door nor exits within %v, so it hangs", startHang))
@@ -598,6 +597,10 @@ func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
 func lstatOf(path string) (fs.FileInfo, error)    { return os.Lstat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
+func touchOf(path string, at time.Time) error     { return os.Chtimes(path, at, at) }
+
+// The transport a client posts to the door over, the default where it stands nil, and a case swaps it for the fake network's. [[spec/tickets/test-walks-move-onto-fakes]]
+var doorTransport http.RoundTripper
 
 // The stop a person or a swapped binary sends, so main waits on one channel and names no signal. [[spec/design_output/doors#a-door-reads-the-outside]]
 func stops(swapped func(gone func())) <-chan struct{} {

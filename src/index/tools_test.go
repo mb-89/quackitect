@@ -6,11 +6,9 @@ package index
 import (
 	"encoding/json"
 	"flag"
-	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
+	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -46,7 +44,6 @@ func toolsBody(t *testing.T) []byte {
 // The same body over a catalog the case adds its own actions to. [[spec/tickets/tools-keep-their-own-names]]
 func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 	t.Helper()
-	root := tree(t)
 	c := q.New()
 	adds(c)
 	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
@@ -57,17 +54,10 @@ func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
 		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
 	}, q.Doc("echoes its input"))
 	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
-	_, stop, _, err := opens(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	clock := qtest.NewFake(time.Time{})
+	_, standing := served(t, clock, tree(t), c, fakeManager(clock, ops, accept))
 	said, body := getV1(t, standing, "/v1/tools")
-	if said.StatusCode != http.StatusOK {
+	if said.StatusCode != statusOK {
 		t.Fatalf("/v1/tools answers %d: %.300s", said.StatusCode, body)
 	}
 	return body
@@ -189,11 +179,11 @@ func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
+		if err := writeFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
-	body, err := os.ReadFile(toolsGoldenAt)
+	body, err := readFile(toolsGoldenAt)
 	if err != nil {
 		t.Fatalf("%v: run go test ./src/index -run TestTheToolListReadsAsItsGoldenFile -update", err)
 	}

@@ -6,8 +6,6 @@ package index
 import (
 	"bytes"
 	"database/sql"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -38,7 +36,7 @@ func TestASweepAfterOneChangeRewritesThatFileAloneAndDropsAGoneOne(t *testing.T)
 	kept := rowidOf(t, db, `SELECT rowid FROM link WHERE from_path = 'spec/one.md'`)
 
 	write(t, root, "spec/two.md", "---\nkind: note\nid: two\n---\n\nThe second note says marzipan now, and names [[one]].\n")
-	if err := os.Remove(filepath.Join(root, "src", "plain.js")); err != nil {
+	if err := removeFile(filepath.Join(root, "src", "plain.js")); err != nil {
 		t.Fatal(err)
 	}
 	count, moved, err := Sweep(db, root)
@@ -92,8 +90,10 @@ func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
 		t.Fatal("the fixture's link reaches nothing to begin with")
 	}
 
-	if err := os.RemoveAll(filepath.Join(root, "spec")); err != nil {
-		t.Fatal(err)
+	for _, rel := range []string{"spec/one.md", "spec/two.md", "spec"} {
+		if err := removeFile(filepath.Join(root, filepath.FromSlash(rel))); err != nil {
+			t.Fatal(err)
+		}
 	}
 	write(t, root, "notes/pointer.md", "---\nkind: note\nid: pointer\n---\n\nThis names [[two]].\n")
 	if _, err := Touches(db, root, []string{"spec", "notes/pointer.md"}); err != nil {
@@ -118,12 +118,7 @@ func doorOver(t *testing.T, root string, db *sql.DB) *door {
 // A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
 func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
 	root := tree(t)
-	made := exec.Command("git", "init", "-q")
-	made.Dir = root
-	if said, err := made.CombinedOutput(); err != nil {
-		t.Fatalf("git init: %s", said)
-	}
-	db := opened(t, root)
+	db := openedWith(t, root, func(string) bool { return false })
 	one := doorOver(t, root, db)
 
 	write(t, root, "spec/one.md", "---\nkind: note\nid: one\n---\n\nThe first note moves.\n")
@@ -153,30 +148,5 @@ func TestAFailedSettleKeepsThePathsItHeard(t *testing.T) {
 	}
 	if said.Len() == 0 {
 		t.Fatal("a failed settle says nothing")
-	}
-}
-
-func TestGitsOwnIndexTurnsTheTrackedFlags(t *testing.T) {
-	root := tree(t)
-	run := func(argv ...string) {
-		one := exec.Command("git", argv...)
-		one.Dir = root
-		if said, err := one.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %s", argv, said)
-		}
-	}
-	run("init", "-q")
-	db := opened(t, root)
-	if counted(t, db, `SELECT count(*) FROM file WHERE tracked = 1`) != 0 {
-		t.Fatal("a repository tracking nothing marks rows tracked")
-	}
-
-	run("add", "spec/one.md")
-	moved, err := Retracks(db, root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if moved != 1 || counted(t, db, `SELECT count(*) FROM file WHERE tracked = 1 AND path = 'spec/one.md'`) != 1 {
-		t.Fatalf("git's list turns one flag, and it turns %d", moved)
 	}
 }

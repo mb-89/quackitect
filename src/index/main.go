@@ -295,7 +295,7 @@ func postsWithin(standing Standing, argv []string, span time.Duration) (answer, 
 		return answer{}, err
 	}
 
-	client := &http.Client{Timeout: span}
+	client := &http.Client{Timeout: span, Transport: doorTransport}
 	said, err := client.Post(
 		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
 	if err != nil {

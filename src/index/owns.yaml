@@ -2,5 +2,6 @@
 # index serves on.
 index:
   go: [os, os/exec, os/signal, net, net/http, syscall]
-  files: [door.go]
+  files: [door.go, door_fake_test.go]
+  contract: [src/index/index_contract_test.go, src/index/detach_contract_test.go, src/index/detach_windows_contract_test.go]
   report: true

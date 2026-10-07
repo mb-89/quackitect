@@ -6,9 +6,6 @@ package index
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -20,39 +17,25 @@ import (
 
 func standingV1(t *testing.T) Standing {
 	t.Helper()
-	root := tree(t)
 	c := q.New()
 	hand := q.OutIn(c, "files/<path...>", q.Content{})
 	file := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
 	}
-	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), c, file)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	standing, err := standingOf(root)
-	if err != nil {
-		t.Fatal(err)
-	}
+	_, standing := served(t, qtest.Wall(), tree(t), c, nil, file)
 	if standing.V1 == 0 || standing.V1 == standing.Port {
 		t.Fatalf("the standing file says %+v", standing)
 	}
 	return standing
 }
 
-func getV1(t *testing.T, standing Standing, path string) (*http.Response, []byte) {
+func getV1(t *testing.T, standing Standing, path string) (reply, []byte) {
 	t.Helper()
-	said, err := http.Get(fmt.Sprintf("http://127.0.0.1:%d%s", standing.V1, path))
+	said, err := asksDoor("GET", fmt.Sprintf("http://127.0.0.1:%d%s", standing.V1, path), nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer said.Body.Close()
-	body, err := io.ReadAll(said.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return said, body
+	return said, said.Body
 }
 
 func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
@@ -62,7 +45,7 @@ func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
 		Name  string `json:"name"`
 		Value any    `json:"value"`
 	}
-	if said.StatusCode != http.StatusOK || json.Unmarshal(body, &found) != nil || found.Name != "files/spec/one.md" {
+	if said.StatusCode != statusOK || json.Unmarshal(body, &found) != nil || found.Name != "files/spec/one.md" {
 		t.Fatalf("/v1 answers %d: %s", said.StatusCode, body)
 	}
 	old, err := posts(standing, []string{"call", "read", `{"name":"files/spec/one.md"}`})
@@ -76,14 +59,14 @@ func TestOneIndexAnswersAFileOverV1AndTheOldAPI(t *testing.T) {
 
 func TestV1AnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 	said, body := getV1(t, standingV1(t), "/v1/values/t/none")
-	if said.StatusCode != http.StatusNotFound || !strings.Contains(said.Header.Get("Content-Type"), "problem+json") || !strings.Contains(string(body), "t/none") {
+	if said.StatusCode != statusNotFound || !strings.Contains(said.Header.Get("Content-Type"), "problem+json") || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("/v1 answers %d, %s: %s", said.StatusCode, said.Header.Get("Content-Type"), body)
 	}
 }
 
 func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 	said, body := getV1(t, standingV1(t), "/v1/openapi.json")
-	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "/values/") {
+	if said.StatusCode != statusOK || !strings.Contains(string(body), "/values/") {
 		t.Fatalf("the document answers %d: %.200s", said.StatusCode, body)
 	}
 }
@@ -121,7 +104,7 @@ func TestV1SettlesBeforeItReads(t *testing.T) {
 
 func TestV1DrawsItsDocs(t *testing.T) {
 	said, body := getV1(t, standingV1(t), "/v1/docs")
-	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "openapi") {
+	if said.StatusCode != statusOK || !strings.Contains(string(body), "openapi") {
 		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
 	}
 }

@@ -3,10 +3,7 @@
 // [[spec/design_output/index#a-reader-takes-the-tree]]
 package index
 
-import (
-	"os/exec"
-	"testing"
-)
+import "testing"
 
 func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(t *testing.T) {
 	root := tree(t)
@@ -33,15 +30,7 @@ func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(
 }
 
 func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
-	root := tree(t)
-	for _, argv := range [][]string{{"init", "-q"}, {"add", "spec/one.md"}} {
-		run := exec.Command("git", argv...)
-		run.Dir = root
-		if said, err := run.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %s", argv, said)
-		}
-	}
-	db := opened(t, root)
+	db := openedWith(t, tree(t), func(rel string) bool { return rel == "spec/one.md" })
 
 	held, err := Files(db)
 	if err != nil {

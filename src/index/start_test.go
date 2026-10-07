@@ -4,7 +4,6 @@
 package index
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -26,7 +25,7 @@ func TestABrokenCatalogRefusesTheStart(t *testing.T) {
 	if !strings.Contains(err.Error(), "t/n") || !strings.Contains(err.Error(), "start_test.go:") {
 		t.Fatalf("the refusal says %q", err)
 	}
-	if _, err := os.Stat(standingPath(root)); err == nil {
+	if _, err := statOf(standingPath(root)); err == nil {
 		t.Fatal("a standing file stands after the refusal")
 	}
 }

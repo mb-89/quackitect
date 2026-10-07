@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
@@ -38,13 +37,8 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 	if err := sender.Commit("fake", map[string]any{"fake/out": 7}); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case values := <-heard:
-		if string(values["fake/out"]) != "7" {
-			t.Fatalf("the commit arrives as %s", values)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("no commit arrives over the bus")
+	if values := <-heard; string(values["fake/out"]) != "7" {
+		t.Fatalf("the commit arrives as %s", values)
 	}
 }
 
@@ -73,13 +67,8 @@ func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
 	if err := sender.Beat("io"); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case part := <-heard:
-		if part != "io" {
-			t.Fatalf("the beat arrives under the part %q", part)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("no beat arrives over the bus")
+	if part := <-heard; part != "io" {
+		t.Fatalf("the beat arrives under the part %q", part)
 	}
 }
 
