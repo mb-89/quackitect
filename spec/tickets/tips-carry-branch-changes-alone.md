@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 859c485b642a949226a553f4bb7c4f5bd1e22cf1
+    hash_after: 859c485b642a949226a553f4bb7c4f5bd1e22cf1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/git passes; green, src/modules/tickets passes
+      - name: check
+        exit: 0
+        said: "   98.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 1caa5ffda3b7aa95
+        size: 875
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/git src/modules/tickets
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A work branch tip now carries only the ticket files its branch adds or changes against trunk, and lists the ones it drops under Gone. The git module reads that off one two-dot diff, and its fake answers the same. The tickets module lays each tip over trunk before it reads the branch, so a reader sees the same tickets with far fewer bytes on the bus, and the live tips land under the cap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches git.go and tickets.go alone
+- the git fake answers the same diff as the real repo, in one suite
+- each new function and constant points at this ticket
+- the tip-over-trunk rule stands once, in treeOf
 
 # accept
 
@@ -376,4 +406,4 @@ accept
 
 The red tests from tests-red prove the change:
 
-    go test -tags contract ./src/modules/git/ -run 'TestGit|TestTheLiveTipsLandUnderTheBusCap' src/modules/git/git_contract_test.go src/modules/tickets/branches_test.go
+    ./RUNME.sh test src/modules/git/git_contract_test.go src/modules/tickets/branches_test.go
