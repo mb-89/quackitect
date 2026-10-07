@@ -218,12 +218,15 @@ record:
   - step: retro/cloud
     hand: box bf9a9fb67fb5 · claude-code-remote
     hash_before: 252921bbf1b3b4ee4e756b031cc274d51a29dc45
-    hash_after: 252921bbf1b3b4ee4e756b031cc274d51a29dc45
+    hash_after: 9c1ed49e6710ab463f30f0a1f49cefc64a7543d3
     inputs:
       - name: retro/write
         hash: eafa7ee853223742
         size: 2745
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: work/failures-stand-registered stands at 9c1ed49e with the guards fix, and PR 128 merges by auto-merge.
 reason: done
 ---
 
