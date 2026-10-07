@@ -4,7 +4,7 @@
 package main
 
 import (
-	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -17,13 +17,18 @@ var pullScripts = []string{
 
 func TestThePullScriptsStandNowhere(t *testing.T) {
 	t.Parallel()
-	cmd := exec.Command("git", append([]string{"ls-files", "--"}, pullScripts...)...)
-	cmd.Dir = treeRoot
-	said, err := cmd.Output()
-	if err != nil {
-		t.Fatal(err)
+	left := []string{}
+	for _, pattern := range pullScripts {
+		found, err := filepath.Glob(filepath.Join(treeRoot, filepath.FromSlash(pattern)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, one := range found {
+			rel, _ := filepath.Rel(treeRoot, one)
+			left = append(left, filepath.ToSlash(rel))
+		}
 	}
-	if left := strings.TrimSpace(string(said)); left != "" {
-		t.Fatalf("git ls-files answers\n%s\nand wants no pull script, since the pull runs in Go", left)
+	if len(left) > 0 {
+		t.Fatalf("the tree holds\n%s\nand wants no pull script, since the pull runs in Go", strings.Join(left, "\n"))
 	}
 }
