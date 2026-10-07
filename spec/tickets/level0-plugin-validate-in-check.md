@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 745a1714cb407b2b
         size: 1713
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box eabbd46a6a23 · claude-code-remote · helper-4
+    hash_before: 29ff39f7314a166659b5972a2fc2b54c2c2048c6
+    hash_after: 29ff39f7314a166659b5972a2fc2b54c2c2048c6
+    inputs:
+      - name: design/draft
+        hash: 745a1714cb407b2b
+        size: 1713
+      - name: design/tests-red
+        hash: b8b7bace0d37b348
+        size: 636
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,9 @@ the plugin part case reaches claude through the check fake
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
