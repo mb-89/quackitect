@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -160,6 +160,15 @@ record:
         hash: 7cf4ffc5704f346f
         size: 588
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 6c1c44d3a2604e445243afce39d9a52c29fcd6f8
+    hash_after: 379dad0c67e5f27e4e8ffde3915246ec3d58432e
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/modules/check/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names: coverage.go, checker.go and example_test.go
+- the rules reach no door: they read the tree handed in, which the cases plant as texts
+- the comment on src/modules/check/coverage.go names the approach, and links the design
+- every fact stands once: the rule names stand in the constants block, and each message points at the design for the check
 
 ## tests-green
 
