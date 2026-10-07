@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 8ccf079c6ecfa0e9
         size: 776
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 85883c53e931ee0465a13344742e5f1f693c7b91
+    hash_after: 88781b3f5530db8890076b4c0491b60234d63a54
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/voice_verb.go:25:1: ExampleCovers: ./RUNME.sh voice stands in no example's interface. Write an example under s"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+files past the ask: three causes stood between the index and the sweep, the watcher seed, the git ports and the check module's writer, and the change fixes each; the restored sweep then showed the dead paths main left, which the check refuses, so their fixes ride along
+fakes: FakeWatch and FakeGit carry the new cases, and the store in memory carries the writer case
+comments: each change names its ticket in a pointer
+one place: seedBatch, textual and Reports each stand once
 
 ## tests-green
 
