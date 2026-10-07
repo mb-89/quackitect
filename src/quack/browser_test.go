@@ -42,4 +42,3 @@ func TestTheFolderTheDownloadWritesAnswersLast(t *testing.T) {
 		t.Errorf("a mac answers %s", at)
 	}
 }
-
