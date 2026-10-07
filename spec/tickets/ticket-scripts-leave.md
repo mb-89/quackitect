@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 4a043276ab03c8ce7c7b1e3fb73b4877b98c04b6
+    hash_after: 4a043276ab03c8ce7c7b1e3fb73b4877b98c04b6
+    inputs:
+      - name: ask
+        hash: a843dde77873d922
+        size: 420
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,101 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. ticket-route.js and vehicle.js leave. The git ls-files line names no other ticket, guidance, hold or vehicle script.
+2. test/contract/vehicle.test.js and test/level0/outside-hand.test.js leave whole, since every case reads vehicle.js.
+3. test/level0/vehicle.test.js drops each case reading vehicle.js, and keeps the cases over lib/vehicle.js alone.
+4. It drops the fakeClock and fakeDisk imports that only the leaving cases read.
+5. src/vehicle/vehicle_test.go already holds every leaving vehicle case, one Go case for each JS case.
+6. TestVehicleAProducedVehicleStandsAlone holds the contract cases for identity, roots and the travelling files.
+7. TestVehicleTheRegisterSplitsItsListTheWayTheCallerSays holds the outside-hand case and the USERPROFILE-before-HOME case.
+8. TestRouteAheadOnly and TestTicketRouteVerb already hold every road through ticket-route.js, the record-named leaves included.
+9. src/pull/testdata/drawing_edits.json holds the drawing's front, and the route each move and drop answers.
+10. route_test.go embeds that file and passes each route through RouteOf and RouteAheadOnly.
+11. drawing-edit.test.js asserts that moved and dropped answer the fixture's routes, in place of aheadOnly.
+12. drawing-page.test.js asserts the page posts what moved in edit.js answers, in place of aheadOnly.
+13. src/quack/ticket_scripts_test.go globs the done_when patterns and the two leaving tests, and stays red while any stands.
+14. Go comments name the Go owner: ReachedOf, RouteAheadOnly, MethodRootFrom, the vehicle package.
+15. vehicle.md points its scope, its stands-alone proof, rootsHere and filesOf at the Go owners and their tests.
+Weighed: dropping the aheadOnly asserts. The extension-to-verb interface then stands untested.
+Weighed: spawning the Go binary from the drawing tests. A spawn puts a real door in every unit case.
+Weighed: a literal route in both Go and JS. Two copies drift, and one fixture keeps one owner.
+Weighed: deleting the dead exports in lib/vehicle.js here. plugin-libs-leave owns lib/vehicle.js and its tests.
+Assumed: outside-in-doors.test.js keeps src/scripts/vehicle.js as a probe label, since Vale reads a temp folder.
+Assumed: the lib cases in test/level0/vehicle.test.js stay until plugin-libs-leave removes lib/vehicle.js.
+Assumed: the stale cli, vehicle-verb and mint-verb glob in .vale.ini waits for scripts-folder-leaves.
+Assumed: check.go names lib/vehicle.js, which stays, so its comment stays.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- test/level0/drawing-edit.test.js: the move and drop cases, which read aheadOnly
+- test/contract/drawing-page.test.js: the edit-ahead case, which reads aheadOnly
+- test/contract/vehicle.test.js: every case, which reads identityHere, produce and rootsHere
+- test/level0/outside-hand.test.js: its one case, which reads registerDirs
+- test/level0/vehicle.test.js: the cases reading attach, detach, identityHere, methodRootFrom, produce, readRegister, registerDirs, registerVehicle, rootsHere
+- test/contract/outside-in-doors.test.js: the pid probe labelled src/scripts/vehicle.js, which needs no file and stays
+- src/modules/tickets/drawn.go: reachedOf, whose comment names reachedOf in ticket-route.js
+- src/pull/route.go: the header naming ticket-route.js
+- src/pull/walk.go: the header naming reachedOf in ticket-route.js
+- src/pull/route_test.go: the header naming test/level0/ticket-route.test.js
+- src/quack/ticket_route.go: the header naming ticket.js and routed in ticket-route.js
+- src/quack/ticket_route_test.go: the header naming src/scripts/ticket.js
+- src/quack/vehicle_verb_test.go: TestVehicleVerbHereNamesTheRootsAndTheRegister, whose comment names methodRootFrom
+- src/vehicle/vehicle.go: the header naming src/scripts/vehicle.js
+- spec/design_output/vehicle.md: Scope, a-vehicle-stands-alone, two-roads-to-the-vehicle and the filesOf closure lines
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_scripts_test.go: TestTheTicketAndVehicleScriptsStandNowhere
+- src/pull/route_test.go: TestEveryRouteTheDrawingsEditsAnswerKeepsTheReachedLeaves
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/ticket-route.js
+- src/scripts/vehicle.js
+- test/contract/vehicle.test.js
+- test/level0/outside-hand.test.js
+- test/level0/vehicle.test.js
+- test/level0/drawing-edit.test.js
+- test/contract/drawing-page.test.js
+- src/pull/testdata/drawing_edits.json
+- src/pull/route_test.go
+- src/pull/route.go
+- src/pull/walk.go
+- src/quack/ticket_scripts_test.go
+- src/quack/ticket_route.go
+- src/quack/ticket_route_test.go
+- src/quack/vehicle_verb_test.go
+- src/modules/tickets/drawn.go
+- src/vehicle/vehicle.go
+- spec/design_output/vehicle.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked there: RouteAheadOnly, RouteOf, ReachedOf, RegisterDirs, the Go vehicle cases, edit.js
+- the callers list names every importer and comment git grep finds for both scripts and their exports, outside spec/tickets and spec/retros
+- TestTheTicketAndVehicleScriptsStandNowhere decides the first line, the go test line with the new route case the second, and the check at tests-green the third
+- the approach adds no config key
 
 ## tests-red
 
