@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "   79.6  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7fb98fec44ec599adf1edd01eaeff79afa68882d
+    hash_after: 7fb98fec44ec599adf1edd01eaeff79afa68882d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   84.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 96e40eead9875aa1
+        size: 987
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -371,26 +394,33 @@ accept. The approach answers the ask. git ls-files on the done_when patterns nam
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/ticket_scripts_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+ticket-route.js and vehicle.js leave the tree, with test/contract/vehicle.test.js and test/level0/outside-hand.test.js. Their verbs run in Go, and src/vehicle and src/pull hold a Go case for every behaviour those tests held. test/level0/vehicle.test.js keeps its cases over lib/vehicle.js alone. The drawing tests stop asking the old script whether the route verb takes an edit. drawing-edit.test.js checks edit.js against one fixture, and a Go test passes the same fixture through RouteAheadOnly, so one copy of the routes tests the link between the extension and the route verb. Go comments and spec/design_output/vehicle.md name the Go owners in place of the deleted scripts.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list
+- neither new test reaches a door: the red case reads the tree through filepath.Glob, and the route case reads an embedded fixture
+- the route headers point at RouteAheadOnly and RouteOf in src/pull/route.go and its testdata
+- the routes stand once in src/pull/testdata/drawing_edits.json, which Go and the drawing tests both read
 
 # accept
 
