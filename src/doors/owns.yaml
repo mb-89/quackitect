@@ -4,32 +4,26 @@ clock:
   js: [Date.now, new Date(), setTimeout, clearTimeout, setInterval, clearInterval, performance.now]
   files: [clock.js, fake/clock.js]
   contract: [test/contract/clock.test.js]
-  report: true
 disk:
   js: [node:fs, node:os, node:crypto]
   files: [disk.js, fake/disk.js]
   contract: [test/contract/disk.test.js]
-  report: true
 proc:
   js: [node:child_process, node:fs]
   files: [proc.js, fake/proc.js]
   contract: [test/contract/proc.test.js]
-  report: true
 http:
   js: [fetch]
   files: [http.js, fake/http.js]
   contract: [test/contract/http.test.js]
-  report: true
 wire:
   js: [node:http]
   files: [wire.js]
   contract: [test/contract/wire.test.js]
-  report: true
 session:
   js: [node:crypto, node:fs]
   files: [session.js, fake/session.js]
   contract: [test/contract/session.test.js]
-  report: true
 git:
   js: []
   files: [git.js, fake/git.js]
@@ -46,6 +40,9 @@ index:
   js: []
   files: [index.js, fake/index.js]
   contract: [test/contract/index.test.js]
+random:
+  js: [Math.random]
+  files: []
 vale:
   js: []
   files: [vale.js]

@@ -1,6 +1,5 @@
 # The process door: every run of a program, and the end of its whole tree.
 # [[spec/design_output/doors#the-process-door]]
 proc:
-  go: [os, os/exec, syscall]
+  go: [os, os/exec, syscall, context.WithTimeout, time.After]
   contract: [src/proc/proc_contract_test.go]
-  report: true

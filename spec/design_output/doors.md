@@ -25,9 +25,9 @@ Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands
 in something else.
 
-Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
-`new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
-nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
+The guard holds the line: a name a door owns, used outside it, and a `node:`
+module no door declares each fail the check. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
 
 # A door reads the outside
 
@@ -359,17 +359,9 @@ The guard reads every file the lint's walk reaches, and the scripts under
 `src/owns/owns.go` names that road. The other rules of the lint stay off the
 agent's folder.
 
-A door standing at `report` lists its walk-arounds through `./RUNME.sh doors`
-and refuses none, and the editor draws each as a hint in a file it holds
-open. A door drops `report` once its list reaches zero.
-
-`DoorsOnly` keeps refusing the JavaScript while the guard refuses none of it.
-It also refuses `Math.random` and every `node:` module, and no declaration
-owns those. It retires in the change that drops `report` from the last
-JavaScript door, once a declaration owns `Math.random` and the guard refuses
-a `node:` module no door declares.
-
-The one escape is the marker on the line or the line above:
+A walk around a door fails the check. A `node:` module no door declares walks
+around no door, past the modules `src/owns/script.go` names as reaching
+nothing. The one escape is the marker on the line or the line above:
 
     // level0: OutsideInDoors - <why the door cannot serve>
 

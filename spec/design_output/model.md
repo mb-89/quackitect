@@ -767,6 +767,8 @@ registration carries `q.IO()`. It is one file in a topic package under
 `src/modules/<topic>` beside the others, and no separate tree holds it. An IO
 module is a door, so its folder carries the `owns.yaml` naming what it owns.
 For details, see [[spec/design_output/doors#a-door-declares-what-it-owns]].
+A use of a name it owns outside its folder fails the check. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
 
 | what it does | such as |
 |---|---|
@@ -894,7 +896,7 @@ purpose. The index process,
 `src/index`, runs the server: it keeps the outside's own libraries, its store and
 the NATS server, and stands outside `ioonly`. The core, `src/q`, stays inside it.
 
-The analyzers replace `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` for
+The analyzers replace `FakeDoorsInTest` and `OutsideInDoors` for
 the Go code, and the Vale rules keep the JavaScript that stays. The code holds
 `nodoor` and `noname` today, and [[spec/tickets/analyzers-read-the-io-flag]]
 replaces them.

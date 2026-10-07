@@ -17,7 +17,6 @@ const files = disk();
 const { ifVale, proves } = rulesIn(root);
 
 const RULE = "OutsideInDoors";
-const GUARD = "DoorsOnly";
 
 const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 
@@ -38,11 +37,8 @@ const READS = "const here = process.env.HOME;\n";
 const ARGV = "const said = process.argv.slice(2);\n";
 const PLATFORM = 'const win = process.platform === "win32";\n';
 const SPAWN = 'import "os/exec"\n';
-// The guard reads the raw line, so the fixture carries no import of its own. [[spec/design_output/private#a-fixture-carries-no-shape]]
-const NODE = ['import { readFileSync } from "node', ':fs";\n'].join("");
 
 const MODULE = "src/bridge/findings.js";
-const EXTENSION = "src/extension/extension.js";
 
 ifVale(
   "the rule refuses a module past a root reading the environment, and a Go file importing the command package",
@@ -52,13 +48,10 @@ ifVale(
       argv: at(ARGV, MODULE),
       platform: at(PLATFORM, MODULE),
       spawn: at(SPAWN, "src/index/answers.go"),
-      node: at(NODE, EXTENSION),
     },
     (said) => {
       for (const key of ["reads", "argv", "platform", "spawn"])
         assert.ok(said.rules(key).includes(RULE), key);
-      // The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#a-door-reads-the-outside]]
-      assert.ok(said.rules("node").includes(GUARD));
     },
   ),
 );
@@ -70,7 +63,6 @@ const off = (path) => ruleAt(sections, `VoiceVale.${RULE}`, path) === "NO";
 test("the config holds the rule over a module and a Go file", () => {
   assert.equal(off(MODULE), false, MODULE);
   assert.equal(off("src/index/answers.go"), false, "src/index/answers.go");
-  assert.equal(ruleAt(sections, `VoiceVale.${GUARD}`, EXTENSION), "YES", EXTENSION);
 });
 
 test("the config stands the rule off every root the approach names", () => {

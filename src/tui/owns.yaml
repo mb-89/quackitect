@@ -2,4 +2,3 @@
 tui:
   go: [os]
   files: [door.go]
-  report: true

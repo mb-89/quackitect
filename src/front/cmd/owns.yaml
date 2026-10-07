@@ -2,4 +2,3 @@
 front:
   go: [os]
   files: [door.go]
-  report: true

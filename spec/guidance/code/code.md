@@ -16,6 +16,7 @@ rationale: [[spec/rationales/code]]
 8. Keep the shebang on line one where a file runs as a program.
 9. Name a number that carries a meaning once. A number a person sets is a config key, and every other a constant at the top of its module. [[spec/design_output/config#the-magic-numbers-take-names]]
 10. Search for the function before you write it. Where one stands, call it, and where one stands close, take it further. *
+11. Write code pure by default, and reach the outside through the door owning it. A walk around a door fails the check, and a marker naming why the door cannot serve is the one escape. [[spec/design_output/doors#nothing-walks-around-a-door]]
 
 # Examples
 

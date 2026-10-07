@@ -279,6 +279,14 @@ func TestTheGuardsWalkReachesTheSkillsAloneInTheAgentsFolder(t *testing.T) {
 	}
 }
 
+func TestAnUndeclaredModuleWalksWhereNoDoorStands(t *testing.T) {
+	t.Parallel()
+	walks := Walks("src/scripts/run.js", "import { pipeline } from \"node:stream/promises\";\n", nil)
+	if got := named(walks); !slices.Equal(got, []string{"node:stream/promises"}) || len(walks[0].Doors) != 0 {
+		t.Fatalf("a tree of no door reads %+v, and wants the undeclared module walking around no door", walks)
+	}
+}
+
 func TestAPureNodeModuleIsNoWalk(t *testing.T) {
 	t.Parallel()
 	text := "import { join } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { test } from \"node:test\";\nimport assert from \"node:assert\";\nimport strict from \"node:assert/strict\";\n"

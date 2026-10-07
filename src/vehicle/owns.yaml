@@ -3,4 +3,3 @@ vehicle:
   go: [os, os/exec]
   files: [disk.go]
   contract: [src/vehicle/shim_contract_test.go]
-  report: true

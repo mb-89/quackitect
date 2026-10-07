@@ -2,4 +2,3 @@
 swap:
   go: [os]
   files: [door.go]
-  report: true

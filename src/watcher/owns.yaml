@@ -4,4 +4,3 @@ watch:
   go: [os]
   files: [watchertest/door.go]
   contract: [src/modules/files/watch_contract_test.go]
-  report: true

@@ -26,6 +26,9 @@ const (
 // The words after which a slash opens a regular expression. [[spec/design_output/doors#nothing-walks-around-a-door]]
 var beforeRegex = map[string]bool{"return": true, "typeof": true, "instanceof": true, "in": true, "of": true, "new": true, "delete": true, "void": true, "throw": true, "case": true, "do": true, "else": true, "yield": true, "await": true}
 
+// The node: modules that reach nothing outside the process, which the guard passes with no door declaring them. [[spec/design_output/doors#nothing-walks-around-a-door]]
+var pureModules = map[string]bool{"node:path": true, "node:url": true, "node:test": true, "node:assert": true}
+
 // The globals naming the global object, through which a global is reached as a member. [[spec/design_output/doors#nothing-walks-around-a-door]]
 var globalObjects = map[string]bool{"globalThis": true, "window": true, "self": true, "global": true}
 
@@ -223,23 +226,23 @@ func tokAt(tokens []tok, k int) tok {
 func is(one tok, kind byte, text string) bool { return one.kind == kind && one.text == text }
 
 // The owned module a specifier names: the module itself, or a module below it. [[spec/design_output/doors#a-door-declares-what-it-owns]]
-func moduleOf(owned map[string]*claim, modules []string, specifier string) string {
-	if owned[specifier] != nil {
-		return specifier
+func moduleOf(owned map[string]*claim, modules []string, specifier string) (string, *claim) {
+	if one := owned[specifier]; one != nil {
+		return specifier, one
 	}
 	for _, one := range modules {
 		if strings.HasPrefix(specifier, one+"/") {
-			return one
+			return one, owned[one]
 		}
 	}
-	return ""
+	if base, _, _ := strings.Cut(specifier, "/"); strings.HasPrefix(specifier, nodeAt) && !pureModules[base] {
+		return specifier, &claim{}
+	}
+	return "", nil
 }
 
 // The walks of a script: a node: module it imports, a global or a member of one it reads, and a constructor it calls bare. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func jsWalks(at, text string, owned map[string]*claim) []Walk {
-	if len(owned) == 0 {
-		return nil
-	}
 	modules := []string{}
 	for name := range owned {
 		if strings.HasPrefix(name, nodeAt) {
@@ -250,27 +253,30 @@ func jsWalks(at, text string, owned map[string]*claim) []Walk {
 	lines := yaml.SplitLines(text)
 	tokens := scan(text)
 	var out []Walk
-	walk := func(where tok, name string) {
-		if one := owned[name]; one != nil && !one.held {
+	take := func(where tok, name string, one *claim) {
+		if one != nil && !one.held {
 			out = append(out, walkAt(at, lines, where.line, where.column, name, one))
 		}
+	}
+	walk := func(where tok, name string) {
+		take(where, name, owned[name])
 	}
 	statement := -1
 	for k, one := range tokens {
 		prev, next := tokAt(tokens, k-1), tokAt(tokens, k+1)
 		switch one.kind {
 		case quoted:
-			name := moduleOf(owned, modules, one.text)
-			if name == "" {
+			name, claimed := moduleOf(owned, modules, one.text)
+			if claimed == nil {
 				continue
 			}
 			switch {
 			case is(prev, word, "from") && statement >= 0:
-				walk(tokens[statement], name)
+				take(tokens[statement], name, claimed)
 			case is(prev, word, "from") || is(prev, word, "import"):
-				walk(tokAt(tokens, k-1), name)
+				take(tokAt(tokens, k-1), name, claimed)
 			case is(prev, mark, "(") && (is(tokAt(tokens, k-2), word, "import") || is(tokAt(tokens, k-2), word, "require")):
-				walk(tokAt(tokens, k-2), name)
+				take(tokAt(tokens, k-2), name, claimed)
 			}
 		case word:
 			if (one.text == "import" || one.text == "export") && !is(prev, mark, ".") {

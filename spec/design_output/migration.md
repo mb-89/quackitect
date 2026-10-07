@@ -114,7 +114,7 @@ already differ.
 | git hooks run with no index, a fresh clone carries no binary, and Copilot's command hooks time out | one `quack` binary, and `quack hook` starts the index where none answers | 1 |
 | frontmatter rewrites and the generated Vale rules must stay byte for byte | Go becomes the one writer after one commit rewriting every ticket, and CI compares the Vale output byte for byte | 1 |
 | twins differ in pointer resolution, env naming, skip lists and the schema subset | golden files per twin, and the owner reads each difference at the merge | 3 |
-| `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` scan JavaScript imports | the analyzers of [[spec/design_output/model#the-build-checks-imports]] | 1 |
+| `FakeDoorsInTest` and `OutsideInDoors` scan JavaScript imports | the analyzers of [[spec/design_output/model#the-build-checks-imports]] | 1 |
 
 # The bugs on the way
 

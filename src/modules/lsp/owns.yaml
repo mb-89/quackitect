@@ -1,4 +1,3 @@
 # The lsp IO module: the editor's socket, and the tools it runs.
 lsp:
   go: [os, os/exec, net]
-  report: true

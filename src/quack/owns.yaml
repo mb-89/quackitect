@@ -5,4 +5,3 @@ quack:
   go: [os, os/exec, net, net/http, syscall]
   files: [main.go, io.go, boxdoors.go, boxfiles.go, checkdoors.go, ticket_doors.go, writedoor.go, ending.go, ending_unix.go, ending_windows.go, vale_fake_test.go]
   contract: [src/quack/box_doors_contract_test.go, src/quack/ending_contract_test.go, src/quack/ending_windows_contract_test.go]
-  report: true
