@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -209,6 +209,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-12
+    hash_before: f127420729abd22112621f4f59fd6c7131273b15
+    hash_after: f127420729abd22112621f4f59fd6c7131273b15
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: ddbfeede31f2c80b
+        size: 23068
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -490,7 +505,7 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- the form is verdict -->
 
 accept with points
-- family-rows-name-standing-files: the family table of spec/design_output/doors.md names src/quack/check_twins_test.go and src/quack/golden_test.go in the twins and goldens row, and dead-go-goldens-leave deleted both in 09e8b38e2. The row names only files the tree holds, or leaves, and the check that reads these code spans refuses a name with no file behind it.
+- door-tables-name-standing-doors: spec/design_output/doors.md names JS doors the tree no longer holds. The stands-on table and the contract table name `awake` (src/doors/awake.js, src/doors/fake/awake.js, test/contract/awake.test.js) and `biome` (src/doors/biome.js, test/contract/biome.test.js), and the bridgehead chapter names src/doors/fake/bridgehead.js. dead-js-tests-leave removed them in 8094440a2, and the-bridge-server-leaves removed the bridgehead fake in 1e7ebd952. The rows name only doors src/doors and test/contract hold, and the check that reads the family row spans reads these tables too.
 
 # implement
 
