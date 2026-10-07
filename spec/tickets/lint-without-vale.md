@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -197,6 +197,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 11f2c09037d0041cb5250ade3d5b1f07c361b496
+    hash_after: 11f2c09037d0041cb5250ade3d5b1f07c361b496
+    inputs:
+      - name: retro/write
+        hash: 06136bf143995702
+        size: 2556
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -354,20 +364,26 @@ the chapter names the role and the box nowhere
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool the run called stood on the box, and the proxy refused no host
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 14:20 a conflict at the merge of main, over the check parts, the lsp tools and their test, and a paragraph contract case
+- 14:22 the index rebuilding after the merge held every write until it came back up
+- 14:35 the commit hook refusing code with no Go test beside it
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the handover asks for the pull request against main with auto-merge on, and this box opens it next
 
 # Discussion
 
