@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -186,7 +186,30 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 6425256c411c8d2edf16618945bd69d34bf6e399
+    hash_after: 6425256c411c8d2edf16618945bd69d34bf6e399
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/hooks passes; green, src/modules/hooks/write passes
+      - name: check
+        exit: 0
+        said: "   89.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 328419ff3ca12e91
+        size: 1002
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: javascript-leaves
+reason: done
 ---
 
 # Ask
@@ -415,26 +438,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/hook_verb_test.go src/quack/setup_verb_test.go src/modules/hooks/copilot_test.go src/modules/hooks/down_test.go src/modules/hooks/write/mutations_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Copilot hooks run `se-index verb src/scripts hook <Event>` and answer from Go. The hook verb reads the event, posts each call to the running hooks door, prints the reply Copilot reads, and writes one log row. A down door refuses a guarded call with the same table the Claude cage reads. The setup verb writes the binary line, and the cloud workflow sets up Go in place of Node. The JS dispatch mode, its libraries, the session door and their tests leave, since nothing ran them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, and the decoder stands in the write package.
+- Every door the hook reaches has a fake in the tests.
+- Each new function names this ticket.
+- Each fact stands once, and the design note points at the Go files.
 
 # accept
 
