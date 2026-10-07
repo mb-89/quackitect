@@ -8,12 +8,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 // The tools the bare branch of RUNME.sh calls past the shell's own words.
-var runmeTools = []string{"sh", "dirname", "mkdir"}
+var runmeTools = []string{"sh", "mkdir"}
 
 // A root holding the real RUNME.sh, an install that does nothing, and a binary printing its words.
 func runmeRoot(t *testing.T) string {
@@ -43,18 +44,26 @@ func runmeRoot(t *testing.T) string {
 	return root
 }
 
-// A PATH folder linking the tools RUNME.sh calls, and no editor.
+// A PATH folder linking the tools RUNME.sh calls, and no editor. Windows takes the tools' own folders, since a linked Git tool finds no msys DLL beside the link.
 func runmePath(t *testing.T) string {
 	t.Helper()
 	at := t.TempDir()
+	var folders []string
 	for _, name := range runmeTools {
 		found, err := exec.LookPath(name)
 		if err != nil {
 			t.Skipf("%s stands nowhere on this box", name)
 		}
+		if runtime.GOOS == "windows" {
+			folders = append(folders, filepath.Dir(found))
+			continue
+		}
 		if err := os.Symlink(found, filepath.Join(at, name)); err != nil {
 			t.Fatal(err)
 		}
+	}
+	if len(folders) > 0 {
+		return strings.Join(folders, string(os.PathListSeparator))
 	}
 	return at
 }
