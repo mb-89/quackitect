@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["tree-libs-leave"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 8c06217f9ef4272004e7960e0c9015664acb8076
+    hash_after: 8c06217f9ef4272004e7960e0c9015664acb8076
+    inputs:
+      - name: ask
+        hash: c28f6d7555e8edae
+        size: 369
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,123 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. config.js and layer.js leave the plugin library, with test/level0/config.test.js and test/level0/layer.test.js.
+2. No staying library or hook imports either file. Only config.js imports layer.js, and both leave.
+3. Go owns the layers already: q.AtRest and q.Settled in src/q/layers.go, and config.Rows in src/modules/config/keys.go.
+4. Go owns the verb rules: configFaults, coerced and settingAt in src/quack/verb_config.go. projection.Inherits owns the root join.
+5. q.EnvOf kebabs each segment before it shouts, so stop.mostInARow reads SE_STOP_MOST_IN_A_ROW as config.md says.
+6. Today q.EnvOf names SE_STOP_MOSTINAROW for the camel spelling and SE_STOP_MOST_IN_A_ROW for the kebab one, so one key names two variables.
+7. src/modules/config/env_test.go gains the camel rows. keys_test.go gains a Rows case over a key the local file alone names.
+8. configRows in src/quack/config.go reads a local file holding no JSON as empty, as orderedAt and src/config already do.
+9. verb_config_test.go gains a coerced table, a write of an undeclared key into a root with no .se folder, and two shipped-tree cases.
+10. The shipped cases read treeRoot. configFaults names nothing, no judge section stands, and every declared key names a variable of its own.
+11. projection_test.go gains a table over Inherits: either root answers Exists, a lone file comes down, and the union keeps the work entry.
+12. tree.test.js drops its schema-fault and variable cases and the config.js import. It spells TRACKED and SCHEMA with a pointer at src/q/layers.go.
+13. tree-extension.test.js reads TRACKED and valuesOf from src/extension/lib/widgets.js, and spells SCHEMA as test/level0/v1-index.js does.
+14. Its widget case checks each drawn key against valuesOf over the tracked file and the schema, in place of flatten and underBuiltIns.
+15. The comments naming the level0 lib or layer.js in verb_config.go, projection/tree.go and Layered in guidance.go name their Go owner.
+16. config.md names the Go owner in each section naming a config.js function, and drops the keyOf direction, since Go reads no variable back.
+17. extension.md drops its fold-together bullet. rationales/extension.md names settingAt, migration.md drops lib/config.js, and work.md names flatten in src/branches/stands.go.
+18. src/quack/config_libs_test.go globs both libraries and both leaving tests through filepath.Glob, and stays red until they leave.
+Weighed: keeping q.EnvOf and rewriting config.md to SE_STOP_MOSTINAROW. That breaks the documented name a person sets, and keeps two variables for one key.
+Weighed: porting the case where the local file beats the variable. Go and config.md put the variable first, so that JavaScript case leaves with no port.
+Weighed: porting the method root config join of configOf. No live caller hands it a stack, and no Go config reader joins the method root.
+Weighed: porting the editor schema case of tree.test.js to Go. It reads two constants alone, and the parent slice decides the rest of that file.
+Weighed: fixing the layer order line in src/projection/commands.go here. It says the local file beats the variable, and the fix regenerates every command file, so a note takes it.
+Weighed: renaming src/bridge/config.js in the Drop comment of src/config/config.go. That names no leaving library, so a note takes it.
+Assumed: keysOf, typeOf, builtInsOf and underBuiltIns take no port, since the catalog declares every key and Rows lays the built-ins.
+Assumed: layered and its layer field take no port, since no code reads the layer of a listed entry.
+Assumed: the same-root case of inherits takes no port, since verb_project.go skips Inherits where both roots match.
+Assumed: guidance-lib-leaves edits the comment at guidance.go line 37 and this ticket the one at line 54, so the two rebase over one file.
+Assumed: the parent last slice takes the session-file case and the count chain case left in tree.test.js.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- test/level0/config.test.js: every case, reading configOf, flatten, varOf, keyOf, keysOf, coerce, faultsIn, underBuiltIns, LOCAL and TRACKED
+- test/level0/layer.test.js: every case, reading configOf, deeply, inherits, layered and rooted
+- test/contract/tree.test.js: the schema-fault and variable cases, reading configOf, faultsIn, flatten, keyOf and varOf
+- test/contract/tree.test.js: the count chain and editor schema cases, reading SCHEMA and TRACKED
+- test/contract/tree-extension.test.js: the widget key case, reading flatten and underBuiltIns
+- test/contract/tree-extension.test.js: the grid, draw and command cases, reading SCHEMA and TRACKED
+- .claude/skills/level0/lib/config.js: configOf and underBuiltIns, which read deeply from layer.js
+- src/q/layers.go: EnvOf, called by AtRest in the same file
+- src/config/config.go: EnvOf and Where, which call q.EnvOf
+- src/modules/config/config.go: EnvOf, which calls q.EnvOf
+- src/quack/config.go: configRows, which configAt in src/quack/main.go calls
+- src/quack/main.go: configAt, read by configVerb and configLevel in src/quack/verb_config.go
+- src/quack/verb_config.go: the configFaults, settingAt and coerced comments naming the level0 lib
+- src/projection/tree.go: the header, Tree and layerParsed comments naming layer.js
+- src/modules/guidance/guidance.go: the Layered comment naming inherits in the level0 lib
+- spec/design_output/config.md: scope, a key names a path, a variable names a key, the schema says the type, the resolver holds the layers
+- spec/design_output/extension.md: the open bullet naming lib/config.js
+- spec/design_output/migration.md: the config resolution row naming lib/config.js
+- spec/design_output/work.md: the readWork line naming flatten in the one resolver
+- spec/rationales/extension.md: the folder-is-the-unit paragraph naming lib/config.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/config_libs_test.go: TestTheConfigLibrariesStandNowhere
+- src/modules/config/env_test.go: TestAKeyNamesOneVariableHoweverItsLeafIsSpelled
+- src/modules/config/keys_test.go: TestRowsReadEveryLeafOfBothFilesPastTheComment
+- src/quack/config_test.go: TestConfigRowsReadALocalFileHoldingNoJSONAsEmpty
+- src/quack/verb_config_test.go: TestCoercedTypesATextAsTheCatalogSays
+- src/quack/verb_config_test.go: TestConfigWritesAKeyTheCatalogLeavesOutAsItsText
+- src/quack/verb_config_test.go: TestTheShippedConfigCarriesNoTypeFaultAndNoJudge
+- src/quack/verb_config_test.go: TestEveryShippedKeyNamesAVariableOfItsOwn
+- src/projection/projection_test.go: TestInheritsReadsTheWorkRootOverTheMethodRoot
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib/config.js
+- .claude/skills/level0/lib/layer.js
+- test/level0/config.test.js
+- test/level0/layer.test.js
+- test/contract/tree.test.js
+- test/contract/tree-extension.test.js
+- src/q/layers.go
+- src/modules/config/env_test.go
+- src/modules/config/keys_test.go
+- src/quack/config.go
+- src/quack/config_test.go
+- src/quack/verb_config.go
+- src/quack/verb_config_test.go
+- src/quack/config_libs_test.go
+- src/projection/tree.go
+- src/projection/projection_test.go
+- src/modules/guidance/guidance.go
+- spec/design_output/config.md
+- spec/design_output/extension.md
+- spec/design_output/migration.md
+- spec/design_output/work.md
+- spec/rationales/extension.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked: config.js, layer.js, q.EnvOf, AtRest, Kebab, Rows, leavesOf, configRows, configAt, configFaults, coerced, settingAt, Inherits, valuesOf, Layered and the config verb
+- the callers come from git grep on both files and every export over hooks, lib, src, src/extension, test, RUNME.sh, package.json, .github, Go comments and notes
+- TestTheConfigLibrariesStandNowhere decides the git ls-files line, the env and keys tests decide go test ./src/modules/config, and ./RUNME.sh check at tests-green decides the third
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
