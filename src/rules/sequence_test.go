@@ -1,7 +1,7 @@
 // A sequence spans its tagged words and skips its exceptions, and a scope
 // reads a sentence block only where it asks for one.
 // [[spec/design_output/rules#the-token-kinds]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported scopeOf and sentenceScope
 
 import "testing"
 

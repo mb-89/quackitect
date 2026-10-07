@@ -1,7 +1,7 @@
 // Seeds into a test root every file the Go rules load off this tree, so a
 // case runs the real rules over its own root.
 // [[spec/tickets/go-rules-replace-vale]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os"
@@ -27,6 +27,7 @@ func seedsRules(t *testing.T, root string) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case seeds the rules into a root of its own
 func TestSeededRulesAnswerAsTheTreeDoes(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

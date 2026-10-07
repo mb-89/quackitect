@@ -158,6 +158,7 @@ func TestTicketNote(t *testing.T) {
 }
 
 // The note verb's guards: the name and the line it takes, the cap, the rules, a private name and the dry run. [[spec/tickets/rules-lint-changed-files-first]]
+// level0: FixtureOutsideHome - each case writes notes into a tree of its own
 func TestTicketNoteGuards(t *testing.T) {
 	t.Run("note takes a name and a line", func(t *testing.T) {
 		root := noteCaseTree(t)

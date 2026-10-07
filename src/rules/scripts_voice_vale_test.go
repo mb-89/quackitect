@@ -1,6 +1,6 @@
 // The VoiceVale branches the corpus misses, each answer settled on Vale.
 // [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases run through the in-package helpers voiceMeets and homeOf
 
 import "testing"
 

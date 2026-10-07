@@ -1,7 +1,7 @@
 // A code file hands its comments alone to the token rules, each placed at its
 // source column, past strings and regex literals.
 // [[spec/design_output/rules#the-text-model]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported commentBlocks and scopeLineComment
 
 import "testing"
 

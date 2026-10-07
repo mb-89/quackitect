@@ -1,6 +1,6 @@
 // The branches of the vocabulary script the corpus misses, each settled on
 // the real Vale. [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases run through the in-package helper paraBranchesMeetVale
 
 import "testing"
 

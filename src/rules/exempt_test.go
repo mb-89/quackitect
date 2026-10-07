@@ -1,6 +1,6 @@
 // A marker in an HTML comment quiets a rule over the stretch it opens, as
 // Vale reads it. [[spec/design_output/rules#a-marker-quiets-a-rule]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported quiet and quietOf
 
 import "testing"
 

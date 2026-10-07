@@ -1,7 +1,7 @@
 // A block places a match off its offset or its runs, a search falls back past
 // copies against inline code, and prose splits into placed sentences.
 // [[spec/design_output/rules#the-text-model]]
-package rules
+package rules // level0: InPackageTest - the cases drive the unexported run, proseBlocks, taggedWords, block and hit
 
 import "testing"
 

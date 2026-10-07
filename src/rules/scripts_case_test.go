@@ -1,7 +1,7 @@
 // The check each script half runs: a maker over its fixture places the match
 // Vale placed, and finds nothing in the plain twin.
 // [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases drive the unexported run, scriptIn, scriptMaker and scriptMatch
 
 import (
 	"encoding/json"

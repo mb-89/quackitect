@@ -1,6 +1,6 @@
 // The rule table holds every style file, and a rule file reads into the
 // fields its kind takes. [[spec/design_output/rules#load-reads-the-rule-files]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported parseRule, ruleFiles, swapRow, defaultLevel and defaultScope
 
 import (
 	"os"

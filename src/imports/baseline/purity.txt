@@ -30,7 +30,6 @@ src/index/door.go pidOf
 src/index/door.go readFile
 src/index/door.go removeFile
 src/index/door.go stampOf
-src/index/door.go starts
 src/index/door.go statOf
 src/index/door.go trackedIn
 src/index/door.go workDirOf
@@ -79,9 +78,7 @@ src/quack/cli.go posts
 src/quack/cli.go reads
 src/quack/command.go commandSettings
 src/quack/command.go firstSet
-src/quack/command.go heardInOver
 src/quack/command.go standsUnder
-src/quack/command.go valeAt
 src/quack/commit.go journaledMoves
 src/quack/commit.go landingDoors.markedUnmerged
 src/quack/commit.go landingHere
@@ -187,8 +184,6 @@ src/quack/vehicle_verb.go vehicleRootHere
 src/quack/verb_config.go configWrites
 src/quack/verb_config.go declaredAt
 src/quack/verb_config.go orderedAt
-src/quack/verb_fix.go calm
-src/quack/verb_fix.go stampOf
 src/quack/verb_fix.go standsHere
 src/quack/verb_fix.go toolHere
 src/quack/verb_fix.go writeCalmed

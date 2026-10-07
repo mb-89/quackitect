@@ -53,6 +53,7 @@ var sections = []section{
 	{glob: "**/spec/config/stop/*.yml", based: []string{"VoiceShape"}, turns: []turn{{"VoiceShape.GuidanceEnv", false}, {"VoiceShape.GuidanceChapter", false}, {"VoiceShape.GuidanceCap", false}, {"VoiceShape.VocabularyEntry", false}}},
 	{glob: "**/prototype/**/*.js", based: []string{}, turns: []turn{{"VoiceVale.CodeComment", false}, {"VoiceVale.CodeHeader", false}, {"VoiceVale.DoorsOnly", false}}},
 	{glob: "{_*,**/_*}", based: []string{}},
+	{glob: "**/src/imports/baseline/*.txt", based: []string{}},
 }
 
 var (

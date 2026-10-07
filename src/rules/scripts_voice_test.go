@@ -1,6 +1,6 @@
 // The voice scripts against Vale's answer over the corpus, and the shared
 // check of a hand-settled case. [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases drive the unexported run, scriptIn, scriptMatch and voiceScripts
 
 import (
 	"sort"

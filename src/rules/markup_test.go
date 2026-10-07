@@ -1,7 +1,7 @@
 // The markdown model reads front matter as text, keeps a list item out of the
 // paragraph rules, and masks the parts a match skips.
 // [[spec/design_output/rules#the-text-model]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported frontEnd and prepMarkdown
 
 import (
 	"strings"

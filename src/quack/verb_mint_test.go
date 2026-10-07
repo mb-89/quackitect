@@ -223,6 +223,7 @@ func TestMintVerb(t *testing.T) {
 	})
 }
 
+// level0: FixtureOutsideHome - each refusal reads back a tree of its own, so a stray write shows
 func TestMintVerbRefusals(t *testing.T) {
 	// [[spec/tickets/verbs-mint-tickets-and-keys]]
 	refusals := []struct {

@@ -1,6 +1,6 @@
 // The branches of the shape scripts the corpus misses, each settled on the
 // real Vale. [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported scriptIn and paraRestatedTable
 
 import "testing"
 

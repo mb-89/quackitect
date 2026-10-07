@@ -1,7 +1,7 @@
 // The rules-over verb answers Vale's JSON over the text on stdin, keyed by the
 // path it reads the text as, and names its usage where no path stands.
 // [[spec/tickets/go-rules-replace-vale]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -35,6 +35,7 @@ func TestTheRulesOverVerbAnswersValesJSON(t *testing.T) {
 }
 
 // A rules load that fails names its own rule, past Vale's name. [[spec/tickets/vale-leaves-the-tree]]
+// level0: FixtureOutsideHome - the case needs an empty root of its own, where the load fails
 func TestARulesLoadThatFailsNamesRulesLoad(t *testing.T) {
 	t.Parallel()
 	said := lspRules(t.TempDir())("a.md", "a line\n")
@@ -43,6 +44,7 @@ func TestARulesLoadThatFailsNamesRulesLoad(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case seeds a vehicle and a work root of its own
 func TestAVehicleLendsTheRulesTheWorkRootLacks(t *testing.T) {
 	t.Parallel()
 	method, work := t.TempDir(), t.TempDir()
@@ -55,6 +57,7 @@ func TestAVehicleLendsTheRulesTheWorkRootLacks(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case seeds a vehicle and a work root of its own
 func TestTheWorkRootsFileStandsOverTheVehicles(t *testing.T) {
 	t.Parallel()
 	method, work := t.TempDir(), t.TempDir()

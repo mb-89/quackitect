@@ -1,7 +1,7 @@
 // The git door's contract on amends, hard and keeping resets, the files and
 // patches a ref holds, worktrees, shallow clones and hooks, each case run in
 // the worlds repo_contract_test.go builds. [[spec/design_output/doors#the-git-door-carries-writes]]
-package git
+package git // level0: InPackageTest - the cases run in the worlds repo_contract_test.go builds, through its in-package helpers worlds, merging, status and subjects
 
 import (
 	"reflect"

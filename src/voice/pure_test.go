@@ -1,7 +1,7 @@
 // The pure half of the voice verbs, case by case: rows and texts go in, and
 // each case reads the rows, numbers and tables that come back.
 // [[spec/guidance/code/testing]]
-package voice
+package voice // level0: InPackageTest - the cases build their rows through the in-package helpers jsonOf, long, owner and spoke
 
 import (
 	"encoding/json"

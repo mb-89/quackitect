@@ -1,7 +1,7 @@
 // Each rule refuses the fixture Vale refused, and passes its plain twin. The
 // corpus under testdata came off the real Vale before it left the tree.
 // [[spec/tickets/go-rules-replace-vale]]
-package rules
+package rules // level0: InPackageTest - the cases read the unexported scriptMakers
 
 import (
 	_ "embed"
@@ -82,10 +82,11 @@ func TestAScopedRuleReadsItsPathsAlone(t *testing.T) {
 	const history = "VoiceVale.History"
 	text := "The door used to refuse the write.\n"
 	for path, wants := range map[string]bool{
-		"spec/design_output/a.md": true,
-		"spec/rationales/a.md":    false,
-		"spec/tickets/a.md":       false,
-		"spec/_draft.md":          false,
+		"spec/design_output/a.md":    true,
+		"spec/rationales/a.md":       false,
+		"spec/tickets/a.md":          false,
+		"spec/_draft.md":             false,
+		"src/imports/baseline/a.txt": false,
 	} {
 		if found := len(ofRule(set.Lint(path, text), history)) > 0; found != wants {
 			t.Errorf("%s under %s answers %v, and wants %v", history, path, found, wants)

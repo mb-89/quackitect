@@ -1,7 +1,7 @@
 // Each token kind answers as Vale answered: a substitution's offer and its
 // fix, an occurrence's first match past its cap, and a message's slots.
 // [[spec/design_output/rules#the-token-kinds]]
-package rules
+package rules // level0: InPackageTest - the cases drive the unexported run, ruleFile, ruleHead, optionsOf, occurrenceOf and formatMessage
 
 import (
 	"slices"

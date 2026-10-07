@@ -1,7 +1,7 @@
 // The VoiceParagraph scripts against the answers Vale gave over the corpus,
 // and the runner the branch cases beside each script file share.
 // [[spec/design_output/rules#a-script-answers-offsets]]
-package rules
+package rules // level0: InPackageTest - the cases drive the unexported run, scriptIn and paragraphScripts
 
 import "testing"
 

@@ -1,7 +1,7 @@
 // The changed door reads the files since the merge base with trunk and the
 // working tree, and a clone with no trunk ref reads HEAD's own commit.
 // [[spec/tickets/changed-lint-without-merge-base]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"

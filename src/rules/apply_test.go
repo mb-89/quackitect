@@ -1,6 +1,6 @@
 // Apply rewrites a text by the replace actions its findings carry.
 // [[spec/tickets/vale-leaves-the-tree]]
-package rules
+package rules // level0: InPackageTest - the cases build their actions through the unexported swap
 
 import "testing"
 

@@ -6,6 +6,7 @@ import (
 )
 
 // A root where no rules load reads no voice. [[spec/tickets/cage-commit-guards-port]]
+// level0: FixtureOutsideHome - the case needs an empty root of its own, where no rules load
 func TestCommitVoiceReadsNothingWhereNoRulesLoad(t *testing.T) {
 	t.Parallel()
 	if rows := commitVoice(t.TempDir(), "a commit message"); rows != nil {

@@ -1,6 +1,6 @@
 // The corpus under testdata pairs each fixture with Vale's answer over it,
 // so the span case meets one row a rule. [[spec/tickets/go-rules-span-parity]]
-package rules
+package rules // level0: InPackageTest - the cases read the tree's rules through the in-package helpers rule and ofRule
 
 import (
 	"encoding/json"
