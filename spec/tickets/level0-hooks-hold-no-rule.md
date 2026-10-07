@@ -160,7 +160,7 @@ record:
   - step: implement/change
     hand: box 5020756b3dd3 · claude-code-remote
     hash_before: 3a29744c31f0a8c8bd5bc30de678c81ef46fdfac
-    hash_after: 3a29744c31f0a8c8bd5bc30de678c81ef46fdfac
+    hash_after: e8043fe24e7a2f969889b0e83f1c5934da640bf7
     answered:
       - name: lint
         exit: 0
@@ -356,7 +356,7 @@ accept
 <!-- the form is checklist -->
 
 the change touches the files the size list names, the hook tests the callers list names, and src/scripts/copilot.js, which hands the Copilot door its run
-the cage verb meets a stub in caged-door.test.js and copilot.test.js, and the door's post and merge meet a stub of http
+the cage verb meets a stub in caged-door.test.js and copilot.test.js, and the door post and merge meet a stub of http
 each Go function and each hook function names level0-hooks-hold-no-rule beside its approach
 the event list stands in Doored in listen.go, the step and the merge in step.go, and the design note points at them
 
