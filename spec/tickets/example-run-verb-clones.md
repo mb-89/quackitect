@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,19 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: fb04502049b3d0cbb6984fcf94a934ee0106cb33
+    hash_after: fb04502049b3d0cbb6984fcf94a934ee0106cb33
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 38bc371b8dffa4b7
+        size: 2120
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -231,26 +244,31 @@ The verb takes its root and its runner as arguments: `exampleVerb(index.Root, pr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The byte-for-byte case passes over the stub, since a verb doing nothing leaves the tree whole. It holds the real verb once the change lands, and the two other cases stand red on their own assertions. The fake box clones by copying the tree, and its ./RUNME.sh writes a ticket into the folder it runs in, so a write landing outside the clone shows.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a case: the clone and the step in it, the printed prose, call, output and verdicts, the tree byte for byte, and the check at the end
+- every door the tests reach has a fake: the process through FakeRunner, and the disk is the case temporary folder, as the ticket verb cases hold it
 
 # gate
 
