@@ -92,7 +92,7 @@ test("a call of an index tool runs act under the pull's wait, and a run that rej
   const { $ } = engine();
   const tools = await registersIndexTools($, BIN);
   const waits = [];
-  $.process.run = async (argv, init) => {
+  $.process.run = async (_argv, init) => {
     waits.push(init?.timeoutMs);
     throw new Error("the child outlasts its time");
   };

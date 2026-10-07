@@ -13,10 +13,10 @@ import (
 	"testing"
 )
 
-// The tools the bare branch of RUNME.sh calls past the shell's own words.
+// The tools the bare branch of RUNME.sh calls past the shell's own words. [[spec/tickets/bare-runme-exits-clean]]
 var runmeTools = []string{"sh", "mkdir"}
 
-// A root holding the real RUNME.sh, an install that does nothing, and a binary printing its words.
+// A root holding the real RUNME.sh, an install that does nothing, and a binary printing its words. [[spec/tickets/bare-runme-exits-clean]]
 func runmeRoot(t *testing.T) string {
 	t.Helper()
 	root, err := filepath.EvalSymlinks(t.TempDir())
@@ -44,7 +44,7 @@ func runmeRoot(t *testing.T) string {
 	return root
 }
 
-// A PATH folder linking the tools RUNME.sh calls, and no editor. Windows takes the tools' own folders, since a linked Git tool finds no msys DLL beside the link.
+// A PATH folder linking the tools RUNME.sh calls, and no editor. Windows takes the tools' own folders, since a linked Git tool finds no msys DLL beside the link. [[spec/tickets/bare-runme-exits-clean]]
 func runmePath(t *testing.T) string {
 	t.Helper()
 	at := t.TempDir()
@@ -68,7 +68,7 @@ func runmePath(t *testing.T) string {
 	return at
 }
 
-// Runs RUNME.sh bare under the variables named, and answers its exit code, stdout and stderr.
+// Runs RUNME.sh bare under the variables named, and answers its exit code, stdout and stderr. [[spec/tickets/bare-runme-exits-clean]]
 func runBare(t *testing.T, env ...string) (int, string, string) {
 	t.Helper()
 	shell, err := exec.LookPath("sh")

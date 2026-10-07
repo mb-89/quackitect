@@ -221,6 +221,10 @@ func TestMintVerb(t *testing.T) {
 			t.Errorf("the mint says %q, and wants %q", said, line)
 		}
 	})
+}
+
+func TestMintVerbRefusals(t *testing.T) {
+	// [[spec/tickets/verbs-mint-tickets-and-keys]]
 	refusals := []struct {
 		name string
 		argv []string
