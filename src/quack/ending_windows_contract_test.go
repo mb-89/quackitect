@@ -14,13 +14,13 @@ import (
 	"testing"
 )
 
-// The child starts a grandchild holding its stdout, so the pipe reads to its end only once taskkill ends both. [[spec/tickets/ending-windows-tree-tested]]
+// The child starts a grandchild holding its stdout, so the pipe reads to its end only once taskkill ends both. Each waits on a signal name of its own, since a second waitfor on a name in use ends at once, and cmd ending first leaves taskkill no tree to reach. [[spec/tickets/doors-pr-windows-goes-green]]
 // level0: FixtureOutsideHome - the contract starts a real cmd child and grandchild, and only a real taskkill proves the tree ends
 func TestAChildTheCheckGivesUpOnEndsWithItsTreeOnWindows(t *testing.T) {
 	t.Parallel()
 	span, stop := context.WithCancel(context.Background())
 	defer stop()
-	run := endsWhole(exec.CommandContext(span, "cmd", "/c", "start /b waitfor /t 99999 hq1never & echo started & waitfor /t 99999 hq1never"))
+	run := endsWhole(exec.CommandContext(span, "cmd", "/c", "start /b waitfor hq1grandchild & echo started & waitfor hq1child"))
 	if run.Cancel == nil {
 		t.Fatal("the child carries no cancel, so its end leaves the grandchild running")
 	}
