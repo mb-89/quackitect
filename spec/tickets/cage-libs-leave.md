@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["level0-hooks-forward-to-go"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 59a99ef00dc8c07d
         size: 670
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 0099696b029efbb65f5b3a3bf8ca4e602a9a202a
+    hash_after: a4b8278e09a071cc4b7ac742b538ae6577b1cad9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: efa37dc7bbdc7e34
+        size: 7401
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -284,26 +297,33 @@ Assumed: src/pull and src/branches keep their own cloudVars, since the import ru
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/cage_libs_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/cage_libs_test.go
+- src/quack/verb_line_test.go
+- src/modules/hooks/command/cloud_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheCageLibrariesStandNowhere fails on its own assertion. It names the thirteen leaving libraries, trunk.test.js, markers.test.js and cloud-desk.test.js. TestEveryVerbTheBashLineNamesStandsRegistered fails on its assertion, since the LineVerbs stub answers nil. TestInCloudReadsEitherVariableAndAFlatValueReadsFalse fails on its true rows, since the InCloud stub answers false. The ported rows pass now, since Go already holds them: the trunk rows, the version guard, the desk guard, the lone-closer marker row and the MergeRefusal table. The version asserts leave findings_test.go, and its test reads TestTheBlessGuardReadsTheBlessAndTheHand.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- TestTheCageLibrariesStandNowhere fails on both git ls-files lines, the ported rows and the two red stubs decide the go test line, and the check at tests-green decides the fourth
+- no test reaches a door: the red case globs the disk with no exec, the desk guard reads a taught git func, and the rest run over strings in memory
 
 # gate
 
