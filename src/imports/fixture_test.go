@@ -70,6 +70,14 @@ func TestAnIndexStartOutsideTheHomeIsNamed(t *testing.T) {
 	}
 }
 
+func TestALocalClosureSharingAHelpersNameReachesNoHelper(t *testing.T) {
+	t.Parallel()
+	fset, files := parsed(t, map[string]string{"p/d_test.go": "package p_test\n\nimport (\n\t\"os/exec\"\n\t\"testing\"\n)\n\nfunc run() { _ = exec.Command(\"git\") }\n\nfunc TestLocal(t *testing.T) { run := func() {}; run() }\n\nfunc TestHelper(t *testing.T) { run() }\n"})
+	if said := imports.FixtureBuilds(fset, files); !slices.Equal(said, []string{"p/d_test.go TestHelper"}) {
+		t.Fatalf("the guard names %v, not the helper's caller alone", said)
+	}
+}
+
 func TestTheHomeAndAMarkedCallAreSpared(t *testing.T) {
 	t.Parallel()
 	fset, files := parsed(t, map[string]string{

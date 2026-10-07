@@ -94,6 +94,7 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 		}
 		seen[name] = true
 		found := false
+		local := locals(fn)
 		ast.Inspect(fn.Body, func(node ast.Node) bool {
 			call, ok := node.(*ast.CallExpr)
 			if found || !ok {
@@ -101,7 +102,7 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 			}
 			if builds(call) {
 				found = true
-			} else if ident, ok := call.Fun.(*ast.Ident); ok && reach(ident.Name, seen) {
+			} else if ident, ok := call.Fun.(*ast.Ident); ok && !local[ident.Name] && reach(ident.Name, seen) {
 				found = true
 			}
 			return !found
@@ -119,6 +120,34 @@ func buildsIn(fset *token.FileSet, files []*ast.File) []string {
 		}
 	}
 	return named
+}
+
+// The names a function binds itself, its parameters and its variables, so a call on one reaches no helper of the package. [[spec/tickets/fixture-guard-matches-by-bare]]
+func locals(fn *ast.FuncDecl) map[string]bool {
+	bound := map[string]bool{}
+	bind := func(names []*ast.Ident) {
+		for _, one := range names {
+			bound[one.Name] = true
+		}
+	}
+	ast.Inspect(fn, func(node ast.Node) bool {
+		switch it := node.(type) {
+		case *ast.Field:
+			bind(it.Names)
+		case *ast.ValueSpec:
+			bind(it.Names)
+		case *ast.AssignStmt:
+			if it.Tok == token.DEFINE {
+				for _, left := range it.Lhs {
+					if ident, ok := left.(*ast.Ident); ok {
+						bound[ident.Name] = true
+					}
+				}
+			}
+		}
+		return true
+	})
+	return bound
 }
 
 // The file and line a position stands on, so a marker spares its own file's line alone. [[spec/design_output/model#the-guards-hold-a-baseline]]
