@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: bf4f437b724149d3
         size: 9183
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 4057ff86a421428344c4ed2e00519af6701ac476
+    hash_after: 4057ff86a421428344c4ed2e00519af6701ac476
+    inputs:
+      - name: design/draft
+        hash: bf4f437b724149d3
+        size: 9183
+      - name: design/tests-red
+        hash: f7bb43589be3ad2b
+        size: 1450
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -361,8 +373,9 @@ Eleven cases fail on their own assertions. The scripts folder case names the six
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask. I opened every file, function and verb it names, and its claims hold there. TestTheScriptsFolderHoldsTheLintFilesAlone decides the first done_when line. Probe cold and the check stand as tests-green checkpoints. Eleven cases fail on their own assertions, as the seen field says. index.HashText matches hashText in lib/hash.js, so the shipped banner reads unchanged. The red list keeps session_start_test.go out of the check, and that cost stands. bootTree reads src/scripts/install.sh, so its boot cases break the moment install.sh moves, red list or not. Tests-green runs all of them before the ticket closes. Points the implementer fixes in place: (1) test/level0/caged-door.test.js line 82 asserts the old install path. Add it to the callers and size lists, and edit it beside the level0.js INSTALL edit. (2) The install case runs src/scripts/install.sh at its own exec line, outside bootTree. Point that line at the root install.sh too. (3) The fake index matches a word before stamp. So install.sh calls the index through its verb road, as the setup line does. (4) front_here asks se-index about the se-front stamp. Where se-index stands absent, front_here reads stale, and get_front skips the stamp write instead of failing. (5) Form: the old drawing-bundle case ran real esbuild. The Go case checks the argv alone, so run ./RUNME.sh bundle once and confirm the shipped test stays green.
 
 # implement
 
