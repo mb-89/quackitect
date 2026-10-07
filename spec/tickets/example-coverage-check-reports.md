@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 33351b0401b45ef90a1757fa6359049e6d3a2839
+    hash_after: 33351b0401b45ef90a1757fa6359049e6d3a2839
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   68.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7cf4ffc5704f346f
+        size: 588
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ go vet ./src/modules/check/
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/example_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two tree rules join the check module at warning, which is report mode. ExampleCovers names each verb registered in src/quack and each tab in tuiTabs that no example names under interface. ExampleProves names each open ticket on the standard route whose done_when names no file under spec/examples. Turning either to refuse changes its severity alone. Over the live tree they find the verbs and tickets still without an example. On this box the index answers an empty git/tracked list, so the sweep reads no file, and the note sweep-reads-no-tracked holds that.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names: coverage.go, checker.go and example_test.go
+- the rules reach no door: they read the tree handed in, which the cases plant as texts
+- the comment on src/modules/check/coverage.go names the approach, and links the design
+- every fact stands once: the rule names stand in the constants block, and each message points at the design for the check
 
 # accept
 
