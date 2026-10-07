@@ -72,7 +72,6 @@ above, and one file holds each pairing under one name.
 | `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
 | `log` | `disk` and `clock` | `src/doors/fake/log.js`, over the fake disk |
 | `proc` | `clock`, for a respawn's window | `src/doors/fake/proc.js` |
-| `awake` | `clock`, for a release's cap | `src/doors/fake/awake.js` |
 
 The fake git answers `ran`, the commands it takes, in order. The fake log
 answers `files`, the fake disk holding what it writes. For what one log line
@@ -107,12 +106,9 @@ driving a door through a fake asserts on something.
 
 # The bridgehead stands under hooks
 
-The bridgehead is a door: it sits in the agent's path, and it is the outside
-thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
-and in no `src/doors`, because the client loads a hooks module from that
-folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
-straight into `decide`, so a test drives the server with no client, no wire
-and no port. For details, see
+The bridgehead is a door: it sits in the agent's path. It stands under
+`.claude/skills/level0/hooks` and in no `src/doors`, because the client loads a
+hooks module from that folder alone. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # The folders, and their cost
@@ -131,7 +127,7 @@ A script that dispatches at import runs its main under the test importing it,
 and the exit there ends the run. The runner then reports the file as one
 passing case holding none, so the test-first door reads a pass that proves
 nothing. So a script with a main runs it behind `runsHere` in
-`lib/paths.js`, which answers true where node runs that file itself. The
+`.claude/skills/level0/lib/paths.js`, which answers true where node runs that file itself. The
 command line and the server read it there. A test importing the command
 line's verbs registers its cases, and a failing case turns the run red.
 
@@ -158,11 +154,9 @@ files this tree tracks.
 | `log` | `src/doors/log.js` | `src/doors/fake/log.js` | `test/contract/log.test.js` |
 | `http` | `src/doors/http.js` | `src/doors/fake/http.js` | `test/contract/http.test.js` |
 | `index` | `src/doors/index.js` | `src/doors/fake/index.js` | `test/contract/index.test.js` |
-| `awake` | `src/doors/awake.js` | `src/doors/fake/awake.js` | `test/contract/awake.test.js` |
 | `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
 | `session` | `src/doors/session.js` | `src/doors/fake/session.js` | `test/contract/session.test.js` |
 | `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
-| `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
 
 The contract suite is the one test that drives the real door, and every other
