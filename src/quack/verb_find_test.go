@@ -1,7 +1,7 @@
 // The find verb hands a log search to the log verb and every other search to
 // the index.
 // [[spec/design_output/log#one-verb-reads-the-log]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"io"

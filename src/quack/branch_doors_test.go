@@ -2,7 +2,7 @@
 // the root the method reads, and they carry the send door, so done opens its
 // pull request through it. [[spec/tickets/branch-verbs-meet-fake-git]]
 // [[spec/tickets/branch-done-opens-the-pr]]
-package main
+package main // level0: InPackageTest - the case reads the unexported branchDoors and workRootVar of the command
 
 import (
 	"io"
@@ -14,7 +14,7 @@ import (
 // The branch verbs' doors carry a send door. [[spec/tickets/branch-done-opens-the-pr]]
 func TestTheBranchDoorsCarryASendDoor(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the doors stand over a method root of the case's own
 	d := branchDoors(func() (string, error) { return root, nil }, nil, io.Discard, io.Discard)
 	if d.Send == nil {
 		t.Fatal("the branch doors carry no send door")
@@ -22,6 +22,7 @@ func TestTheBranchDoorsCarryASendDoor(t *testing.T) {
 }
 
 // The branch verbs' doors write the work root and read the method root. [[spec/tickets/branch-verbs-meet-fake-git]]
+// level0: FixtureOutsideHome - the case writes into a work root and a method root of its own
 func TestTheBranchDoorsWriteTheWorkRootAndReadTheMethodRoot(t *testing.T) {
 	work, method := t.TempDir(), t.TempDir()
 	t.Setenv(workRootVar, work)

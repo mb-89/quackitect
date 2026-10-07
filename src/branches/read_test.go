@@ -1,7 +1,7 @@
 // The listing's reads off the git door: the tickets a tip holds, read in one
 // ask, and the second each tip was made.
 // [[spec/design_output/work#the-listing-reads-git-once]]
-package branches
+package branches // level0: InPackageTest - the case builds on the in-package helpers newTree and groupNote, and reads the unexported readWork, refsHere and ticketsFolder
 
 import (
 	"slices"

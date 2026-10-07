@@ -1,7 +1,7 @@
 // The drafts module loads beside the others, and quack answers its checks
 // through the IO side, with Vale off heardOver.
 // [[spec/tickets/prose-tools-answer-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -28,7 +28,7 @@ func TestTheDraftsModuleLoads(t *testing.T) {
 // A tree with no Vale reads the draft nowhere, as the bridge says. [[spec/tickets/prose-tools-answer-in-go]]
 func TestQuackAnswersAnAnswerCheckWithNoValeAsTheBridgeDoes(t *testing.T) {
 	t.Parallel()
-	ask := accepts(t.TempDir(), nil, nil)
+	ask := accepts(t.TempDir(), nil, nil) // level0: FixtureOutsideHome - the check reads a root of the case's own where no Vale stands
 	said, err := ask(q.Request{Module: drafts.Module, Verb: drafts.AnswerVerb, Args: drafts.Answer{Text: "The door reads the note."}})
 	if err != nil {
 		t.Fatalf("quack refuses the drafts module: %v", err)
@@ -76,7 +76,7 @@ func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
 	}
 	for _, one := range table.Cases {
 		t.Run(one.Name, func(t *testing.T) {
-			root := t.TempDir()
+			root := t.TempDir() // level0: FixtureOutsideHome - each case writes its draft under a root of its own
 			c := q.New()
 			as := manager.Registers(c)
 			drafts.Registers(c)

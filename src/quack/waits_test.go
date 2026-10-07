@@ -3,7 +3,7 @@
 // result reaches the session later. Each case runs the real wiring over a
 // temp tree, with the waits module beside it.
 // [[spec/tickets/find-and-wait-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

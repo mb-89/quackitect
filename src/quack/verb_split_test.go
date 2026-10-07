@@ -2,7 +2,7 @@
 // through one undo journal entry, and keeps the rest, off the roads
 // the JavaScript split cases covered.
 // [[spec/design_output/level0#a-verb-cuts-the-file]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

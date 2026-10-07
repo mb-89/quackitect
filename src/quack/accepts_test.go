@@ -1,6 +1,6 @@
 // The accept table reads one answer for the tool list and for the route.
 // [[spec/tickets/every-index-tool-answers]]
-package main
+package main // level0: InPackageTest - reaches the unexported acceptsVerb and accepts, and a main package admits no outside test package
 
 import (
 	"strings"
@@ -43,7 +43,7 @@ func TestAcceptsVerbReadsTheTableAcceptsRoutes(t *testing.T) {
 // A request acceptsVerb refuses meets the route's refusal, so the list and the route read one table, whatever instance a placed process runs. [[spec/tickets/accepts-reads-away-modules]]
 func TestTheRouteRefusesWhatAcceptsVerbRefuses(t *testing.T) {
 	t.Parallel()
-	route := accepts(t.TempDir(), nil, nil)
+	route := accepts(sharedFolder(), nil, nil)
 	for _, asked := range []q.Request{
 		{Module: verbsmodule.NodeModule, Verb: "other"},
 		{Module: q.StoreModule, Verb: "other"},

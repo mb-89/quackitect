@@ -1,7 +1,7 @@
 // The check refuses a path a note or a comment names where the tree holds no
 // such file, and passes a shape, a standing path and an open ticket.
 // [[spec/tickets/every-named-path-resolves]]
-package check
+package check // level0: InPackageTest - reaches the in-package helpers sweepOver and holdsRule
 
 import "testing"
 

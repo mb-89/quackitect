@@ -1,7 +1,7 @@
 // The fixtures the port_f cases share: the method root carrying the ticket
 // schema, a hold a hand keeps, and a work branch the clone stands on.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pf helpers on the tree fixture and reads holdAt and ticketSchema
 
 import (
 	"encoding/json"

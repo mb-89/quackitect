@@ -1,7 +1,7 @@
 // A findings file read a section per row, whatever line ending its editor
 // writes.
 // [[spec/guidance/retro/read]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"

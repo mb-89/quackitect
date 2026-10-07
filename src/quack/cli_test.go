@@ -1,7 +1,7 @@
 // quack builds its command tree off the registry over /v1: the help reads
 // each q.Doc, run follows an action to its end, and --detach answers at once.
 // [[spec/tickets/the-quack-cli-gets-generated]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

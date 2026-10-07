@@ -1,10 +1,11 @@
 // The commit verb lands a message whose trailer links the session, since a
 // link names no model. [[spec/tickets/model-trailer-refuses-in-place]]
-package main
+package main // level0: InPackageTest - reaches the unexported commitVerb and the in-package helpers landingRepo, lays, fakeLanding and runsTwin, and a main package admits no outside test package
 
 import "testing"
 
 // A Claude-Session trailer passes the commit verb, and the commit lands. [[spec/tickets/model-trailer-refuses-in-place]]
+// level0: FixtureOutsideHome - the case commits into its own landing repository, which landingRepo builds per case.
 func TestCommitVerbLandsASessionTrailer(t *testing.T) {
 	t.Parallel()
 	at := landingRepo(t)

@@ -1,6 +1,6 @@
 // The token and the repository a pull request opens on where the run names
 // neither, as a cloud box holds them. [[spec/tickets/box-opens-its-pr]]
-package branches
+package branches // level0: InPackageTest - reaches the unexported originRepo and Doors.pullToken
 
 import "testing"
 

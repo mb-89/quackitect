@@ -2,7 +2,7 @@
 // a stuck hand-over, up to the cap, and the write branch's pull request on the
 // owner's token, ported off the JavaScript fire cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported fire step, its fireCap and fireVersion, and the plan rows of dispatchPlan
 
 import (
 	"encoding/json"
@@ -106,7 +106,7 @@ func (hub *dfHub) send(url string, request Request) (Reply, error) {
 	return Reply{Status: 404, Text: "no route"}, nil
 }
 
-// A hub holding two open work pull requests and one of another kind, and the doors an update runs behind, outside any git tree. [[spec/tickets/running-work-takes-main-fixes]]
+// A hub holding two open work pull requests and one of another kind, and the doors an update runs behind, over no folder, since the update reads the env and the hub alone. [[spec/tickets/running-work-takes-main-fixes]]
 func dfUpdating(t *testing.T) (*dfHub, *Doors, *strings.Builder) {
 	t.Helper()
 	hub := newHub()
@@ -114,7 +114,7 @@ func dfUpdating(t *testing.T) (*dfHub, *Doors, *strings.Builder) {
 		hub.pulls = append(hub.pulls, map[string]any{"number": number, "head": map[string]any{"ref": head}, "base": map[string]any{"ref": "main"}})
 	}
 	out := &strings.Builder{}
-	return hub, &Doors{Root: t.TempDir(), Method: t.TempDir(), Env: dfEnv(), Out: out, Errs: out}, out
+	return hub, &Doors{Env: dfEnv(), Out: out, Errs: out}, out
 }
 
 // The update-branch calls the hub heard, by their path past the repository. [[spec/tickets/running-work-takes-main-fixes]]

@@ -1,7 +1,7 @@
 // The retro's folder stands under the private folder, and each timed source
 // reads the time its lines carry.
 // [[spec/guidance/retro/chapter]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"
@@ -20,7 +20,7 @@ func TestARetroHomeStandsUnderTheRetroFolder(t *testing.T) {
 
 // A retro verb works under the work root SE_WORK_ROOT names. [[spec/design_output/vehicle#the-work-root-inherits]]
 func TestARetroHomeReadsTheWorkRoot(t *testing.T) {
-	work := t.TempDir()
+	work := t.TempDir() // level0: FixtureOutsideHome - the case points the work root at a folder of its own
 	t.Setenv(workRoot, work)
 	if got := retroRoot(); got != work {
 		t.Fatalf("retroRoot answers %q, want %q", got, work)

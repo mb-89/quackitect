@@ -2,7 +2,7 @@
 // commit on claude/dispatch-<commit> made off main's tree, and no push of
 // main, ported off the JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported write rows, cutTo and the fix helpers, and declares dpWriteBranch for the fire test
 
 import (
 	"os"

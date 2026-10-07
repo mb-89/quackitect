@@ -1,6 +1,6 @@
 // The quack verbs' git reads run through the process door, so no one of them
 // spawns git in place. [[spec/tickets/quack-git-reads-take-door]]
-package main
+package main_test
 
 import (
 	"go/ast"

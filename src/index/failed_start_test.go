@@ -1,6 +1,6 @@
 // A start that fails part way stops every part it reached.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package index
+package index // level0: InPackageTest - it drives the unexported opensOn
 
 import (
 	"errors"
@@ -19,7 +19,9 @@ const v1Listen = 2
 // How long the case waits on the close, which Serve's own goroutine makes where the server closes before it serves. [[spec/tickets/io-answers-take-result-shape]]
 const closeWait = 2 * time.Second
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestAFailedV1StartStopsThePartsItReached(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	var managed, started atomic.Bool
 	manage := func(string, *q.Store, OpRows, Reads, func(func())) (Managed, error) {

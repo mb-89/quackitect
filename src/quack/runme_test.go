@@ -1,7 +1,7 @@
 // The real RUNME.sh, run by sh in a root whose install does nothing and whose
 // binary says what reaches it, on a PATH carrying no editor.
 // [[spec/tickets/bare-runme-exits-clean]]
-package main
+package main // level0: InPackageTest - reaches the unexported cloudVariables, and a main package admits no outside test package
 
 import (
 	"errors"
@@ -19,7 +19,7 @@ var runmeTools = []string{"sh", "mkdir"}
 // A root holding the real RUNME.sh, an install that does nothing, and a binary printing its words.
 func runmeRoot(t *testing.T) string {
 	t.Helper()
-	root, err := filepath.EvalSymlinks(t.TempDir())
+	root, err := filepath.EvalSymlinks(t.TempDir()) // level0: FixtureOutsideHome - each run writes the shim's files into its own root.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func runmeRoot(t *testing.T) string {
 // A PATH folder linking the tools RUNME.sh calls, and no editor. Windows takes the tools' own folders, since a linked Git tool finds no msys DLL beside the link.
 func runmePath(t *testing.T) string {
 	t.Helper()
-	at := t.TempDir()
+	at := t.TempDir() // level0: FixtureOutsideHome - each run links its own PATH holding no editor.
 	var folders []string
 	for _, name := range runmeTools {
 		found, err := exec.LookPath(name)
@@ -76,9 +76,9 @@ func runBare(t *testing.T, env ...string) (int, string, string) {
 		t.Skip("sh stands nowhere on this box")
 	}
 	root := runmeRoot(t)
-	cmd := exec.Command(shell, filepath.Join(root, "RUNME.sh"))
+	cmd := exec.Command(shell, filepath.Join(root, "RUNME.sh")) // level0: FixtureOutsideHome - the case runs the real RUNME.sh under sh, as a box does.
 	cmd.Dir = root
-	cmd.Env = append([]string{"PATH=" + runmePath(t), "HOME=" + t.TempDir()}, env...)
+	cmd.Env = append([]string{"PATH=" + runmePath(t), "HOME=" + t.TempDir()}, env...) // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
 	var out, errs strings.Builder
 	cmd.Stdout, cmd.Stderr = &out, &errs
 	code := 0

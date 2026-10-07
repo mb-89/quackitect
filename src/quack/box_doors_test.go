@@ -1,7 +1,7 @@
 // The fake doors the box verbs run over in a test: a temporary tree, a PATH
 // of empty programs, a runner recording each run, and a GET that answers
 // nothing. [[spec/tickets/box-verbs-no-node-test]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -42,7 +42,7 @@ func (f *fakeRunner) run(argv []string, o runOpts) ranResult {
 // The fake doors over a temporary tree, with the named programs standing on its PATH. [[spec/tickets/box-verbs-no-node-test]]
 func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *strings.Builder, *strings.Builder) {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the doors stand over a root of the case's own, where it plants programs and logs
 	path := filepath.Join(root, "path")
 	if err := os.MkdirAll(path, 0o755); err != nil {
 		t.Fatal(err)

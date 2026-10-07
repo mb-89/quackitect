@@ -1,7 +1,7 @@
 // retro notes reads tickets/all off the index and prints what the verb's program prints,
 // and the wiring loads the retro topic.
 // [[spec/tickets/retro-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -1,7 +1,7 @@
 //go:build !windows
 
 // [[spec/tickets/the-index-outlives-the-check]] [[spec/tickets/platform-draft-names-checkdoors]]
-package index
+package index // level0: InPackageTest - the case reads the unexported exitEnds the door's wait reads
 
 import (
 	"os/exec"
@@ -12,7 +12,7 @@ import (
 // A merge, a switch or a check ends the command group that starts a door, so the door leads a session of its own. [[spec/tickets/the-index-outlives-the-check]]
 func TestADoorStandsInASessionOfItsOwn(t *testing.T) {
 	t.Parallel()
-	run := Detached(exec.Command("tail", "-f", "/dev/null"))
+	run := Detached(exec.Command("tail", "-f", "/dev/null")) // level0: FixtureOutsideHome - the case detaches a real process of its own and ends it
 	if err := run.Start(); err != nil {
 		t.Fatal(err)
 	}
