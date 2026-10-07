@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -148,6 +148,18 @@ record:
         hash: 42d25d2c30ab4573
         size: 3668
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: 67d1f2e61e5cae0c142da1788349a338c54ab371
+    hash_after: 67d1f2e61e5cae0c142da1788349a338c54ab371
+    inputs:
+      - name: design/draft
+        hash: 42d25d2c30ab4573
+        size: 3668
+      - name: design/tests-red
+        hash: 6e5266e5a67686d0
+        size: 997
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -291,8 +303,9 @@ The cases run over stubs: the module answers no row and no run, and the tab draw
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
