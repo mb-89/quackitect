@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: b6a6c61304229f75c584cc0fb9595299b1ce96d1
     hash_after: b6a6c61304229f75c584cc0fb9595299b1ce96d1
+  - step: accept
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: bb845dbb02d25c43e8eaffbb1f791004df1a0ffa
+    hash_after: 27f082fc607d330c9d434b48afbe73e44be48166
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/examples-run-as-tests already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 4df0b47ac1b5a066
+        size: 563
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_output/examples]]
+        hash: cbfcdb18dc87799c
+        size: 8264
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -177,8 +196,9 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
