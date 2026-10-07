@@ -15,10 +15,13 @@ import (
 	"quackitect/src/index"
 )
 
-// A user example pulling the planted child, whose expect line the case swaps. [[spec/design_output/examples#the-format]]
-const pulling = "---\nkind: [[example]]\ntitle: A pull hands out the next leaf\nkeywords: [pull]\ninterface: [ticket pull]\n---\n\nA box pulls, and the engine hands it the first leaf of its group.\n\n```sh\n./RUNME.sh ticket pull\n# expect: exit 0\n# expect: says \"alpha at do, leaf 1 of 1\"\n```\n"
-
 const pullingPath = "spec/examples/110_tickets/pull.md"
+
+// The first user example, pulling the planted child, whose lines the cases swap. [[spec/design_output/examples#the-format]]
+var pulling = func() string {
+	text, _ := os.ReadFile(filepath.Join("..", "..", pullingPath))
+	return string(text)
+}()
 
 func TestEveryExampleHoldsItsSteps(t *testing.T) {
 	t.Parallel()
@@ -49,11 +52,8 @@ func TestEveryExampleHoldsItsSteps(t *testing.T) {
 	}
 }
 
-func TestAPlantedExamplePullsOverTheFakes(t *testing.T) {
+func TestTheExamplesRunOverOneFixtureTree(t *testing.T) {
 	t.Parallel()
-	if miss := runsExample(pullingPath, pulling); miss != "" {
-		t.Fatalf("the planted example misses: %s", miss)
-	}
 	if len(exampleFixture) == 0 {
 		t.Fatal("TestMain builds no fixture tree")
 	}
