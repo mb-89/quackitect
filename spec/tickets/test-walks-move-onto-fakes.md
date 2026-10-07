@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -191,6 +191,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-10
+    hash_before: 0397ac5d1a338b29870b1706700ffa11c9500db9
+    hash_after: 0397ac5d1a338b29870b1706700ffa11c9500db9
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: 33ff99fb348a4b6f
+        size: 23129
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -472,9 +487,7 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- the form is verdict -->
 
 accept with points
-- quack-row-names-its-contracts: the door-audit row of spec/design_output/doors.md for the box and check doors of quack names none under contract suite, while src/quack/owns.yaml names src/quack/box_doors_contract_test.go, src/quack/ending_contract_test.go and src/quack/ending_windows_contract_test.go under contract. The row names those three, so the chapter and the declaration say one thing.
-- door-families-name-contracts-alone: the family table of spec/design_output/doors.md still names src/quack/cli_test.go, src/quack/dump_test.go, src/quack/main_test.go, src/quack/placements_test.go, src/quack/io_test.go, src/index/watch_test.go, src/watcher/watcher_test.go and src/watcher/watchertest/watchertest_test.go as door tests of a real thing, and after the moves none of them reaches one. The owner tests each door against the real thing once, so each row names its contract files alone.
-- watchertest-helper-meets-its-door: src/watcher/watchertest/watchertest.go carries an OutsideInDoors marker on os to make the folders a real watch hears. The last gate said to leave no marker on a fake or its helper, so the helper takes the disk door, or the file goes under the watch door's files key.
+- family-rows-name-standing-files: the family table of spec/design_output/doors.md names src/quack/check_twins_test.go and src/quack/golden_test.go in the twins and goldens row, and dead-go-goldens-leave deleted both in 09e8b38e2. The row names only files the tree holds, or leaves, and the check that reads these code spans refuses a name with no file behind it.
 
 # implement
 
