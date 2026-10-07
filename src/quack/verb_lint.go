@@ -230,10 +230,13 @@ func refuses(one check.Finding, strict bool) bool {
 	return !check.Reports(one.Rule) && (strict || one.Severity != check.SeverityWarning)
 }
 
-// A finding the lint refuses leaves as its line under erred, so --errors names it, and a warning it lets pass stands by its file and source. [[spec/tickets/lint-strict-leaves-erred]]
+// A finding the lint refuses leaves as its line under erred, so --errors names it, and a warning it lets pass stands by its file and source. A rule in report mode leaves under neither, so it holds no push. [[spec/tickets/lint-strict-leaves-erred]] [[spec/tickets/report-mode-holds-no-push]]
 func lintFoundOf(found []check.Finding, strict bool) lintFound {
 	out := lintFound{Stood: []finding{}, Erred: []string{}}
 	for _, one := range found {
+		if check.Reports(one.Rule) {
+			continue
+		}
 		if refuses(one, strict) {
 			out.Erred = append(out.Erred, lintLine(one))
 		} else {

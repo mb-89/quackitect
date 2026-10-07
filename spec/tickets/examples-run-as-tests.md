@@ -1,7 +1,8 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+reason: done
+step: person-1
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -26,12 +27,24 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: person-1
+    does: answers the question the engine asks
+    by: anyone
+    to: engine
+    asks: "accept rejects 2 times: report-mode-holds-no-push stands open: the check stamp counts report-mode findings as warnings, so branch done refuses"
+    evidence:
+      - name: answer
+        form: text
+        says: the answer, which the step behind this one reads
+  - name: children-3
+    by: children
+    on_fail: split
   - name: accept
     gate: does the work of every child add up to the goal, and does every command of the route pass
     final: true
     does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
     tags: ["review", "accept"]
-    input: ["ask", "children"]
+    input: ["ask", "children", "children-3"]
     evidence:
       - name: verdict
         form: verdict
@@ -49,7 +62,7 @@ steps:
             says: retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
-        input: ["children", "notes"]
+        input: ["children", "notes", "children-3"]
         checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing", "the chapter carries the run's owner prompts and errors off the transcript, each with its time", "the chapter says the role, and carries no name, address or path of the box"]
         evidence:
           - name: done
@@ -84,7 +97,6 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-cloud: true
 record:
   - step: sync
     hand: box 70672ee0ff0d · claude-code-remote
@@ -218,7 +230,17 @@ record:
     hash_after: 4f38d45710ca658674405db7ff55f959180481e9
     returns: 1
     why: the hand takes it back
-reason: done
+  - step: accept
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: bb2ef36677e65c1dc79f2aa784586d902ff92c99
+    hash_after: bb2ef36677e65c1dc79f2aa784586d902ff92c99
+    returns: 2
+    why: "report-mode-holds-no-push stands open: the check stamp counts report-mode findings as warnings, so branch done refuses"
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/examples-run-as-tests already carries every commit on main.
+cloud: true
 ---
 
 # Ask
@@ -279,6 +301,18 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 
 # children
 
+# person-1
+
+<!-- accept rejects 2 times: report-mode-holds-no-push stands open: the check stamp counts report-mode findings as warnings, so branch done refuses -->
+
+## answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+# children-3
+
 # accept
 
 <!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
@@ -288,7 +322,8 @@ A Tutorial tab explores them with a two-mode search. The coverage checks report 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept
+reject
+- report-mode-holds-no-push stands open: the check stamp counts report-mode findings as warnings, so branch done refuses
 
 # retro
 
