@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -180,6 +180,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: a61298549d794ef888df744372d97350eae1da0e
+    hash_after: a61298549d794ef888df744372d97350eae1da0e
+    inputs:
+      - name: retro/write
+        hash: b3f2b7c800a5e7ea
+        size: 5551
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -370,20 +380,30 @@ the chapter names roles and paths in the tree alone, and no name, address or box
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+17:24: a verb deleting a tracked file; level zero refuses git rm, so a plain rm ran and the commit verb staged the deletion
+17:24: no right missing on the platform, and no host the proxy refused
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+17:53: a conflict at sync, main bringing four groups and 64 conflicted files, which three helpers resolved by package
+17:56 to 18:05: the stop hook, which counted no Agent helper as running
+18:08: the go toolchain 1.25 that main's go.mod names, downloaded on first build
+18:10: the trailer hook refusing a model name in a commit trailer
+16:35 and 18:00: the shell guards ShellWritesNothing and LandingFollowsItsGate on compound commands
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked
+no ticket stands minted outside the group
+the handover names the branch at done and its pull request against main with auto-merge on
 
 # Discussion
 
