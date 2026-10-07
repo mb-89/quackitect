@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -269,6 +269,29 @@ record:
         exit: 0
         said: "   64.3  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: fc0a81407c13bc200e8c4ae98f004a41f245182c
+    hash_after: fc0a81407c13bc200e8c4ae98f004a41f245182c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes
+      - name: check
+        exit: 0
+        said: "   64.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -581,26 +604,33 @@ each contract file stands once in its owns.yaml, and the doors note names those 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every test file that reached the box outside its door now meets that door through its fake, stands as the door contract test, runs through the in-process entry runWith, or carries a marker naming why it reads the tree own source. TestNoTestFileWalksAroundADoor in src/owns reads every test file against the owns declarations, and it refuses an unmarked walk. The doors verb lists no walk in a test file, and the walks left stand in production code, which the-guard-refuses takes next. The gate rounds brought the doors note and the owns declarations into line. Every contract file stands declared, every span in the note names a standing file, and no fake or test helper carries a marker.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test files, their fakes and helpers, the owns declarations and the doors note, each of which the ask names or a gate point asks for.
+every door the change reaches has a fake or stands as its own contract test, and the owns guard and the audit guard hold both.
+the moved cases and helpers carry a comment linking spec/tickets/test-walks-move-onto-fakes, which names the approach.
+each contract file stands once in its owns.yaml, and the doors note names those files with no second list of its own.
 
 # accept
 
