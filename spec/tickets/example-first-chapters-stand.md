@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -151,6 +151,21 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: 7a1a4d1bf7309615fead15a56044584a2ad92a4b
+    hash_after: 7a1a4d1bf7309615fead15a56044584a2ad92a4b
+    inputs:
+      - name: design/draft
+        hash: e074fbb1c5f328f8
+        size: 6616
+      - name: design/tests-red
+        hash: da38d90bf8f8bb8c
+        size: 1717
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -361,8 +376,15 @@ Ten new examples fail on the harness's own miss: each names a verb outside the h
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: ten red examples under spec/examples decide the chapters, red on the harness's own miss (each verb stands outside exampleTable); note.md and pull.md pass already; the door claims hold (ticketSet, ticketTodo, ticketUrgent build pull.OSDisk through workDisk; ticketNote takes pullOver; branchVerb builds branchDoors inline; dispatch.go and cloud.go call branchDoors; fixtureFolders lacks spec/schemas)
+- size, fixed in place at implement: check.go and checkdoors.go join the size and callers lists, since check.go removes, reads and writes runtime files through os calls (lines 131-207, 460-479) and the disk lands on checkDoors before check joins the table
+- tables, fixed in place: the chapter table and the tests list still name 930_dev_check/check-red-exits-1.md, 920_dev_branches/sync-refuses-other-branch.md and release-refuses-unpushed.md; the tree holds release-refuses-uncommitted.md in their place, as tests-red says
+- cuts, fixed in place: TestTheSyncRefusesAnyOtherBranch, TestPAReleaseRefusesUnpushedCommits and the red rows of TestCheckVerb stay, since no example shows them, and the Discussion lists each as kept
+- tests list, fixed in place: TestTheFirstChaptersLeaveTheirVerbsUnreported stands in src/quack/examples_test.go, not src/modules/check/coverage_test.go; it passes already, so it guards the drop rather than deciding it red, which done_when 3 accepts since the example files already stand
+- done_when 4 rests on ./RUNME.sh check at tests-green, a checkpoint the hand answers
 
 # implement
 
