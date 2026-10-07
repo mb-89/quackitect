@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -203,6 +203,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 1fb91bdd8469 · claude-code-remote
+    hash_before: 7c2dd7dfd606f69b6ca565a3e41085daaf2ed24c
+    hash_after: 7c2dd7dfd606f69b6ca565a3e41085daaf2ed24c
+    inputs:
+      - name: retro/write
+        hash: 824af3ca2bbefe82
+        size: 2379
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -354,20 +364,24 @@ Most of the session went to taking main in, not to the group's own work. Main ca
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 21:15 the level0 tool server dropped right after the take, so every step ran through RUNME.sh in its place
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 21:15 a conflict at sync with main across eleven files
+- 21:52 the commit hook refusing a change whose tests landed a step earlier
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
 
 # Discussion
 
