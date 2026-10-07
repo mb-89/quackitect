@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 86b079a1ad244290
         size: 2598
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: cd2f6fe0d6def769cd5c5cd47a22f032dda66848
+    hash_after: 14567458af8234d88bb61e1519ad6ae37b223a5e
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -413,14 +422,19 @@ accept. The approach answers the ask, and a red test decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && go vet ./... && ./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the approach and the six gate points name, plus one stop case in src/index/door_test.go for the commit door.
+Every door the change reaches has a fake, since the tests run on fakeProc, fakeDisk and the fake front, and the Go rows run in memory.
+Each new comment and test names its Go owner or points at spec/tickets/engine-and-doors-leave.
+Each rule stands once in its Go owner, and every comment and note that named a leaving file now points at that owner.
 
 ## tests-green
 
