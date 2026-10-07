@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -148,6 +148,21 @@ record:
         hash: c954e18a8d392976
         size: 23272
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-4
+    hash_before: e48ab6d9a8fc1a3dbfedb66a776a2e9f023bccc7
+    hash_after: e48ab6d9a8fc1a3dbfedb66a776a2e9f023bccc7
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: c954e18a8d392976
+        size: 23272
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -426,8 +441,13 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- move 5 sends every case spawning quack into the one quack contract test, so the box still meets every such case and the door meets its real thing many times. main.go holds no in-process entry taking args and doors. The builder adds one, drives the command-line cases through it over newFakeDisk and the fake runner, and keeps one spawn in src/quack/box_doors_contract_test.go.
+- the six moves name no home for a fake's own file: src/quack/box_doors_test.go, src/quack/vale_fake_test.go, src/q/qtest/clock_test.go and src/watcher/watchertest/watchertest_test.go stand on the red list. The builder writes each fake over io/fs and its door's hands, or names the file under its door's files key, and leaves no marker on a fake.
+- move 1 drops a case; the commit names the case that covers its behaviour, so no behaviour leaves untested.
+Weighed: the size list matches the files the red case names, one for one, beside the case itself. The red case fails on its own assertion once a walk, and `./RUNME.sh doors` decides the first done_when line beside it. `./RUNME.sh check` decides the second. The callers of owns.Read, Door.Holds and TestEveryContractTestNamesItsDoor stand as the draft names them, and the contract key already stands in owns.go. Both dependencies stand closed.
 
 # implement
 
