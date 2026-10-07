@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["level0-hooks-forward-to-go"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: efa37dc7bbdc7e34
         size: 7401
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: f064b6b3e682e81935666eb1f4fad8f103ab2a45
+    hash_after: f064b6b3e682e81935666eb1f4fad8f103ab2a45
+    inputs:
+      - name: design/draft
+        hash: efa37dc7bbdc7e34
+        size: 7401
+      - name: design/tests-red
+        hash: 565ee4c834c9a880
+        size: 1177
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -332,8 +344,9 @@ TestTheCageLibrariesStandNowhere fails on its own assertion. It names the thirte
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line: TestTheCageLibrariesStandNowhere fails on its own assertion over both git ls-files lines, the InCloud and LineVerbs tests stand red on their stubs, and the ported Go rows hold the trunk, markers and cloud-desk cases. No staying library imports a leaving one, and every caller outside lib stands in the callers list. Points the implementer fixes in place: (1) describe.go spells lineVerbs once, so LineVerbs returns lineVerbs, or slices.Clone of it, and spells no second list, where approach line 10 says a copy. (2) src/pull/pull_landed_test.go names test/level0/cloud-desk.test.js in its header and stands outside the size list, so it takes the comment pass of approach line 17. (3) Form: approach line 2 counts group.js inside lib, and the leaving set reads it from src/engine/group.js.
 
 # implement
 
