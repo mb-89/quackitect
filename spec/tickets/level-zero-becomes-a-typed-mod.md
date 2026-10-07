@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -163,7 +163,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 72539c4372ee8b93125fa9894d23dfdb48ed63d0
+    hash_after: 72539c4372ee8b93125fa9894d23dfdb48ed63d0
+    inputs:
+      - name: retro/write
+        hash: 2589cc56f5b87ee3
+        size: 3974
+    def: 4da1ca5da87d5bbc
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -317,20 +327,28 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+the beat push met no git proxy from 17:28 onward, while the commit verb pushed through
+a wait that blocks inside a call: the wait tool and the plugin patch returned at once, with their result on the next turn
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the stop hook, which refuses a turn end while a helper runs on a cloud box
+the shell guard LandingFollowsItsGate, which refuses a landing verb after a pipe
+the commit door, which refuses a model trailer and a change with no test staged
+no conflict at sync, since the branch carries every commit on main
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked, and no ticket stands minted outside the group
+the handover names the pull request against main with auto-merge on, and the improve lines of the retro for the next retro to mint
 
 # Discussion
 
