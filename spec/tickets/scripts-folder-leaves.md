@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 963d0b4e76ada705d53744135d789de7b9e80535
+    hash_after: 963d0b4e76ada705d53744135d789de7b9e80535
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   81.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f7bb43589be3ad2b
+        size: 1450
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -416,26 +439,33 @@ The stamp hash lives in stamp_verb.go and the drawing stamp in bundle_verb.go, a
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/scripts_folder_test.go src/quack/stamp_verb_test.go src/quack/bundle_verb_test.go src/quack/check_browser_test.go src/quack/session_start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+src/scripts now holds the lint group file styles.js alone. install.sh moves to the root of the tree, and the session hook, the level0 forwarder, the copilot setup and the merge road call it there. The go stamp becomes the stamp verb and the bundle becomes the bundle verb, both in Go. The browser lookup moves into the check, and the test reporter moves under test. trust.js and the golden harnesses leave with their tests. A free ticket, cloud-setup-runs-root-install, asks the owner to point the cloud setup script at the root install.sh. The commit guard now reads an import carrying a query suffix, which the caged door test uses.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The tests-green leaf adds no edit past the landed change, whose files the size list and the gate points name.
+The green tests run on fakeBoxDoors, checkFake, a fake index and a fake go, and the cold probe runs the real install once.
+Each new Go function and the install.sh stamp helper point at this ticket.
+The stamp hash stands in stamp_verb.go and the drawing stamp in bundle_verb.go, and the notes point at those files.
 
 # accept
 
