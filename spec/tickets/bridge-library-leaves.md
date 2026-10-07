@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 619a2ce107374093
         size: 13619
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box fb4ccb7cacc7 · claude-code-remote · helper-4
+    hash_before: 3f555e2a91662afd36fd5507f4ff3397ee243fea
+    hash_after: 3f555e2a91662afd36fd5507f4ff3397ee243fea
+    inputs:
+      - name: design/draft
+        hash: 619a2ce107374093
+        size: 13619
+      - name: design/tests-red
+        hash: c4466ee89d0179fe
+        size: 1191
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -501,8 +513,11 @@ What surprises me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- lint-cut-on-group-ticket: The cli-read.js lint cut and the vale-rows.test.js deletion touch the lint group's scripts. Record both under Discussion on javascript-leaves for that group.
+- stop-folder-keeps-runner: test/contract/tree.test.js still runs StopFolderIsData, so the rule keeps a runner. Name that case on plugin-libs-leave.
 
 # implement
 
