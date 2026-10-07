@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -160,6 +160,15 @@ record:
         hash: 38211288a03a4098
         size: 763
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: a5e24345266e2fca8d4b4572312f700e5f5613b9
+    hash_after: fe1a5bddc28da44802095932a63755d1de3b31e3
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -303,14 +312,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names: example_verb.go and example_verb_test.go
+- every door has a fake: the process through FakeRunner, the disk a case temporary folder, and the pause an argument the case records
+- the comment on src/quack/example_verb.go names the approach, and links the design
+- every fact stands once: example.Holds judges each expect line, as the harness does
 
 ## tests-green
 
