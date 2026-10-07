@@ -33,18 +33,15 @@ Three checks hold the rules above:
 | `./RUNME.sh doors` | a door standing without a contract test | over both folders |
 
 The guard passes the `node:` modules that reach nothing outside, and
-`src/owns/script.go` lists them. The Vale rule reads the whole file, because a
-rule over code needs `scope: raw`: on a code file Vale otherwise sees comments
-alone.
+`src/owns/script.go` lists them. The `FakeDoorsInTest` rule reads the whole
+file, as a rule over code does. The third rule spans two folders, which no
+pattern holds, so the command line holds it and `check` runs it. The hooks
+module declares its own outside over the clock, because the engine hands it
+`$`, and `$` carries no clock.
 
 `DoorsOnly`, a Vale rule, held the JavaScript while every door in it stood at
 report. It retired once a declaration owned `Math.random` and the guard refused
-a `node:` module no door declared, since the guard then refused all it did. The third rule spans two folders, which no
-pattern holds, so the command line holds it and `check` runs it.
-
-The hooks module is exempt, because its environment carries no `node:` at all.
-The engine interface `$` is its door layer already, and a test drives it by
-handing in a `$` of its own.
+a `node:` module no door declared, since the guard then refused all it did.
 
 An earlier line wrote fifteen rules of testing craft as guidance and enforced
 none of them. The rules were right and the suite grew slow anyway, which is the
@@ -62,8 +59,8 @@ The owner ruled that this held over every door, the Go doors among them. A door
 driven from many tests paid the box in each, and a loaded box turned any of them
 red. The lease case went red that way under a parallel run, with nothing wrong
 in the code. The audit in [[spec/design_output/doors#one-contract-test-per-door]]
-listed the door tests and every family still reaching a real door, each with its
-fate, so one list let a program hold the rule.
+listed the door tests. It listed every family still reaching a real door too,
+each with its fate. So one list let a program hold the rule.
 
 ## 4. A fake behaves
 
@@ -99,15 +96,15 @@ somebody else would make differently, and skip it on a one-line fix.
 
 Three quack cases each ran `go build` over the same root, and two import cases
 each planted the same tree. One build a package run, copied where a case wrote
-into it, served every case, and the quack case alone dropped two builds of
+into it, served every case. The quack case alone dropped two builds of
 several seconds each.
 
 ## 8. No wall-clock wait
 
-The lease flake and the two cold-box waits each slept or polled on the wall
-clock, and each passed on a quiet box. A fake clock or a readiness signal gave
+The lease case, red at random, and the two cold-box waits each slept or polled on the wall
+clock. Each passed on a quiet box. A fake clock or a readiness signal gave
 the same case one answer on every box. A test file calling `time.Sleep` or a
-spawn was a thing a parser read, so `src/imports/clock.go` held the rule, and
+spawn was a thing a parser read. So `src/imports/clock.go` held the rule, and
 the check named a file doing either outside the audit.
 
 ## 10. A module holds no state
@@ -136,6 +133,12 @@ the `io` flag to that shape, so the rule named what the check enforced.
 A door fake in a module test made the module reach past the index. The fake
 index held it to the one peer the design gave it. For the harness, see
 [[spec/design_output/model#the-fake-index]].
+
+The owner ruled that a test met the code at its outermost door: the command
+line, `quack ...`. A module port took a test only for an edge the command line
+could not reach. A test at the command line held the behavior a person saw, so a
+refactor behind it kept it green. A test at an inner seam held the seam, and the
+next refactor turned it red with no behavior broken.
 
 ## 13. A fake keeps a contract
 

@@ -1,7 +1,7 @@
 // A registered verb an action runs through the node module reads the same
 // index over HTTP while that action stands in flight, and the read settles.
 // [[spec/tickets/twin-reads-inside-an-action]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"
@@ -34,7 +34,6 @@ func managesLive(as q.Writer) index.Manage {
 }
 
 func TestATwinReadsTheIndexBesideTheActionCallingIt(t *testing.T) {
-	t.Parallel()
 	root := t.TempDir()
 	c := q.New()
 	as := manager.Registers(c)

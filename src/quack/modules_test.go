@@ -1,7 +1,7 @@
 // Each module type names the folder under src/modules registering it, which a
 // placement restarts on, and a settings section alone names none.
 // [[spec/tickets/topic-folder-in-the-table]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os" // level0: OutsideInDoors - the case checks the module folders the tree holds, as a build check reads source

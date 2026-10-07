@@ -1,7 +1,7 @@
 // The rows move with the files and nothing clears them: a sweep rewrites what
 // moved alone, a change names its own paths, and git's list turns the flags.
 // [[spec/design_output/index#a-change-moves-its-rows]]
-package index
+package index // level0: InPackageTest - it drives the unexported door, and declares the counted helper other cases share
 
 import (
 	"bytes"
@@ -30,7 +30,9 @@ func counted(t *testing.T, db *sql.DB, query string, args ...any) int {
 	return n
 }
 
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestASweepAfterOneChangeRewritesThatFileAloneAndDropsAGoneOne(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	kept := rowidOf(t, db, `SELECT rowid FROM link WHERE from_path = 'spec/one.md'`)
@@ -60,7 +62,9 @@ func TestASweepAfterOneChangeRewritesThatFileAloneAndDropsAGoneOne(t *testing.T)
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAChangeMovesThePathsItNamesAlone(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	kept := rowidOf(t, db, `SELECT rowid FROM note WHERE path = 'spec/two.md'`)
@@ -83,7 +87,9 @@ func TestAChangeMovesThePathsItNamesAlone(t *testing.T) {
 }
 
 // A path standing nowhere takes every row under it along, and a link to it reaches nothing again. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := opened(t, root)
 	if counted(t, db, `SELECT count(*) FROM link WHERE from_path = 'spec/one.md' AND to_path = 'spec/two.md'`) != 1 {
@@ -116,7 +122,9 @@ func doorOver(t *testing.T, root string, db *sql.DB) *door {
 }
 
 // A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: FixtureOutsideHome - the case runs git in its own tree
 func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	db := openedWith(t, root, func(string) bool { return false })
 	one := doorOver(t, root, db)
@@ -130,6 +138,8 @@ func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
 }
 
 // A settle that fails keeps what it heard, and says so. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: RunsAlone - it swaps the package's stderr, which every settle beside it writes
+// level0: FixtureOutsideHome - the case closes its own index under its own door
 func TestAFailedSettleKeepsThePathsItHeard(t *testing.T) {
 	root := tree(t)
 	db := opened(t, root)

@@ -20,7 +20,6 @@ const WATCHES = [
   { scheme: "file", pattern: "**/.vscode/settings.json" },
   { scheme: "file", pattern: "**/.vscode/extensions.json" },
   { scheme: "file", pattern: "**/src/scripts/install.sh" },
-  { scheme: "file", pattern: "**/.vale.ini" },
 ];
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

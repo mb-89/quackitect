@@ -1,7 +1,7 @@
 // A take naming a branch on a box holding another, a take over a stale hold,
 // and a release of another box's hold, ported from test/level0/work-held.test.js.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported heldIn, recordIn and staleKey, and declares pcOther and pcClock
 
 import (
 	"strings"
@@ -92,7 +92,7 @@ func pcTakingPast(t *testing.T, past pcPast) *tree {
 		ahead = 48 * time.Hour
 	}
 	one.pcClock(ahead)
-	one.d.Config = nil
+	one.d.Config = fixtureConfig
 	return one
 }
 

@@ -1,7 +1,7 @@
 // The doctor's read of the hooks: the reader takes every address the settings
 // files name, and the probe says which one answers.
 // [[spec/design_output/level0#the-doctor-probes-every-hook]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

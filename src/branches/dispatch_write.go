@@ -14,6 +14,7 @@ import (
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
+	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
@@ -121,7 +122,7 @@ func fixName(words int, main, parent string) string {
 
 var nameJoins = regexp.MustCompile(`[-_.]+`)
 
-// A name past the words it may hold keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/tickets/prose-verbs-land-first-try]]
+// A name past its cap of words keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/tickets/prose-verbs-land-first-try]]
 func cutTo(name string, most int) string {
 	if most <= 0 || check.OverLong(name, most) == "" {
 		return name
@@ -168,7 +169,7 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 	return out, ""
 }
 
-// A fix group minted off the group route, marked fix and filed under its parent. The ask is this file's constant, and the check on the write branch's pull request lints every ticket it lands. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+// A fix group minted off the group route, marked fix, filed under its parent, and open at the route's first step, so its box pulls with no hand running ticket open. The ask is this file's constant, and the check on the write branch's pull request lints every ticket it lands. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
 func (d *Doors) fixGroup(name, parent string) (string, string) {
 	path := ticketAt(name)
 	route, why := d.processAt(groupRoute)
@@ -185,6 +186,7 @@ func (d *Doors) fixGroup(name, parent string) (string, string) {
 	if why != "" {
 		return "", why
 	}
+	text = withField(withField(text, "step", firstLeaf(route.Steps, "")), "state", openState)
 	text = withField(text, fixField, "true")
 	if parent != "" {
 		text = withField(text, groupField, parent)
@@ -219,7 +221,7 @@ func (d *Doors) processAt(name string) (processRoute, string) {
 // The hash over a route's ask and steps, as processHash in lib/schema-route.js writes it: keys sorted, every scalar a string. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func processHash(ask, steps []any) string {
 	said, _ := json.Marshal(map[string]any{"ask": canonicalOf(ask), "steps": canonicalOf(steps)})
-	return hashText(string(said))
+	return pull.HashText(string(said))
 }
 
 // A value as canonicalOf in lib/schema-route.js holds it. Go's encoder sorts a map's keys, as the JavaScript sorts them. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

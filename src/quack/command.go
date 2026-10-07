@@ -4,20 +4,18 @@
 package main
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
 	settingsreader "quackitect/src/config"
-	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/proc"
 	"quackitect/src/prose"
+	"quackitect/src/rules"
 )
 
 // The key capping a name's words, and the span a git read takes. [[spec/tickets/cage-command-rules-port]]
@@ -58,13 +56,8 @@ var (
 	homeVariables = []string{"HOME", "USERPROFILE"}
 )
 
-// The name Vale reads a commit message under, the configs it takes, the style a prose rule's name drops, and the span it takes, off src/bridge/bash.js and lib/vale.js. [[spec/tickets/cage-commit-guards-port]]
-const (
-	commitName = "level0-commit.md"
-	valeOwn    = ".vale.ini"
-	valeBuilt  = ".se/vale/.vale.ini"
-	valeSpan   = 30 * time.Second
-)
+// The name the rules read a commit message under. [[spec/tickets/cage-commit-guards-port]]
+const commitName = "level0-commit.md"
 
 // [[spec/tickets/cage-commit-guards-port]]
 var proseStyle = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
@@ -119,7 +112,7 @@ func firstSet(box boxDoors, names []string) string {
 	return ""
 }
 
-// The findings the voice keeps over a commit message: Vale over it as level0-commit.md, each past the Go prose vetoes. A box with no Vale, or a Vale answering no rows, reads none, as messageFaults does. [[spec/tickets/cage-commit-guards-port]]
+// The findings the voice keeps over a commit message: the Go rules over it as level0-commit.md, each past the Go prose vetoes. A root where no rules load, or rules answering no rows, reads none. [[spec/tickets/cage-commit-guards-port]]
 func commitVoice(box boxDoors, root, message string) []command.Row {
 	var out []command.Row
 	for _, one := range heardOver(box, root, commitName, message).rows {
@@ -128,76 +121,34 @@ func commitVoice(box boxDoors, root, message string) []command.Row {
 	return out
 }
 
-// One row Vale answers past the vetoes, with its message and severity. [[spec/tickets/cage-write-door-port]]
+// One row the Go rules answer past the vetoes, with its message and severity. [[spec/tickets/cage-write-door-port]]
 type heard struct {
 	found    prose.Finding
 	message  string
 	severity string
 }
 
-// What Vale answers over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether a Vale stands, whether it answered JSON, and why where it did not. [[spec/tickets/cage-write-door-port]] [[spec/tickets/drafts-lint-seam-carries-why]]
-type valeHeard struct {
+// What the Go rules answer over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether the rules load and run, and why where they do not. [[spec/tickets/cage-write-door-port]] [[spec/tickets/drafts-lint-seam-carries-why]]
+type rulesHeard struct {
 	rows   []heard
 	stands bool
 	ran    bool
 	why    string
 }
 
-// The reasons an unread Vale names, worded as lintText in .claude/skills/level0/lib/vale.js words them. [[spec/tickets/drafts-lint-seam-carries-why]]
-const (
-	noValeWhy    = "no vale stands here"
-	valeQuietWhy = "vale answered nothing"
-	valeNoJSON   = "vale answered no JSON: "
-	exitStatus   = "exit status "
-)
-
-// Why a Vale answer reads as no JSON: its stderr or the run's fault where it fails, else its exit, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
-func unreadWhy(said proc.Said) string {
-	if said.Code != 0 {
-		if stderr := strings.TrimSpace(said.Err); stderr != "" {
-			return stderr
-		}
-		return exitStatus + strconv.Itoa(said.Code)
-	}
-	if answer := strings.TrimSpace(said.Out); answer != "" {
-		return valeNoJSON + answer
-	}
-	return valeQuietWhy
-}
-
-// Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
-func heardOver(box boxDoors, root, name, text string) valeHeard {
+// The Go rules over a text as the named file, each row past every Go prose veto. A root where no rules load reads nothing. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
+func heardOver(box boxDoors, root, name, text string) rulesHeard {
 	return heardIn(box, root, name, text, prose.All)
 }
 
-// What Vale answers over a text over the real process door and the box's disk. [[spec/tickets/prose-checks-run-in-go]]
-func heardIn(box boxDoors, root, name, text, mode string) valeHeard {
-	return heardInOver(proc.Real, box.disk, root, name, text, mode)
-}
-
-// What Vale answers over a text through the process door, kept through the Go prose vetoes the mode names. [[spec/tickets/quack-spawns-all-take-the-runner]]
-func heardInOver(run proc.Runner, disk diskDoors, root, name, text, mode string) valeHeard {
-	vale := valeAt(disk, root)
-	if vale == "" {
-		return valeHeard{why: noValeWhy}
+// The Go rules over a text as the named file, kept through the Go prose vetoes the mode names, and the load error where no rules load. The schema and word lists read through the box's disk. [[spec/tickets/prose-checks-run-in-go]]
+func heardIn(box boxDoors, root, name, text, mode string) rulesHeard {
+	set, err := rulesAt(root)
+	if err != nil {
+		return rulesHeard{why: err.Error()}
 	}
-	config := valeOwn
-	if !standsUnder(disk, root, valeOwn) && standsUnder(disk, root, valeBuilt) {
-		config = valeBuilt
-	}
-	said := run(proc.Command{Argv: []string{vale, "--config=" + config, "--path=" + name, "--output=JSON", "--no-exit"}, Dir: root, Stdin: text, Wait: valeSpan})
-	var read map[string][]struct {
-		Check    string `json:"Check"`
-		Line     int    `json:"Line"`
-		Span     []int  `json:"Span"`
-		Match    string `json:"Match"`
-		Message  string `json:"Message"`
-		Severity string `json:"Severity"`
-	}
-	if json.Unmarshal([]byte(said.Out), &read) != nil {
-		return valeHeard{stands: true, why: unreadWhy(said)}
-	}
-	body := func(path string) string { return disk.text(filepath.Join(root, filepath.FromSlash(path))) }
+	read := map[string][]rules.Finding{name: set.Lint(name, text)}
+	body := func(path string) string { return box.disk.text(filepath.Join(root, filepath.FromSlash(path))) }
 	caps, paths := proseSchema([]byte(body(paragraphSchema)))
 	words := prose.Words(body(paths[0]), body(paths[1]), body(paths[2]))
 	var all []heard
@@ -216,31 +167,13 @@ func heardInOver(run proc.Runner, disk diskDoors, root, name, text, mode string)
 		}
 		return all[a].found.Column < all[b].found.Column
 	})
-	out := valeHeard{stands: true, ran: true}
+	out := rulesHeard{stands: true, ran: true}
 	for _, one := range all {
 		if len(prose.Kept(text, []prose.Finding{one.found}, caps, words, mode)) > 0 {
 			out.rows = append(out.rows, one)
 		}
 	}
 	return out
-}
-
-// The Vale the survey names where it stands, else the one in the runtime binary folder, else nothing. [[spec/tickets/cage-commit-guards-port]]
-func valeAt(disk diskDoors, root string) string {
-	var survey map[string]struct {
-		Path string `json:"path"`
-	}
-	if text, err := disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
-		if said := survey["vale"].Path; said != "" && standsUnder(disk, "", said) {
-			return said
-		}
-	}
-	for _, name := range []string{"vale", "vale.exe"} {
-		if guess := filepath.Join(root, filepath.FromSlash(check.Bin), name); standsUnder(disk, "", guess) {
-			return guess
-		}
-	}
-	return ""
 }
 
 // Whether a file stands at the path, under the root where one names it. [[spec/tickets/cage-commit-guards-port]]

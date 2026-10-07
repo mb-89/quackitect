@@ -1,0 +1,6 @@
+# The failure door: the folder of nodes under a root, and the run of a
+# reaction. [[spec/design_output/failures#the-registry-reads-the-nodes]]
+failure:
+  go: [os, os/exec]
+  files: [door.go, door_contract_test.go]
+  contract: [src/failure/door_contract_test.go]

@@ -75,7 +75,7 @@ func idOf(now Clock, pid int) string {
 	if len(digits) > stampTail {
 		digits = digits[len(digits)-stampTail:]
 	}
-	tail, _ := strconv.ParseInt(digits, 10, 64)
+	tail, _ := strconv.ParseInt(digits, decimalBase, bitSize)
 	return strconv.FormatInt(tail, hexBase) + strconv.FormatInt(int64(pid), hexBase)
 }
 

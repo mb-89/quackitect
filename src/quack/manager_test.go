@@ -1,12 +1,13 @@
 // The manager folds src/ops and src/watchdog into its module, and the root
 // loads it where the wiring loads nothing else.
 // [[spec/design_output/model#the-index-manager]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os/exec" // level0: OutsideInDoors - the case runs go list over the tree's own packages, as a build check reads source
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,6 +18,12 @@ import (
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
+
+// The folders the shared build and the shared folder write, which TestMain removes once the run ends. [[spec/tickets/each-door-meets-one-test]]
+var buildDirs struct {
+	sync.Mutex
+	dirs []string
+}
 
 // The real time and its waits, with a beat that stands still, so a case's manager renews nothing on its own. [[spec/tickets/go-waits-on-events]]
 type stillBeat struct{ q.Clock }

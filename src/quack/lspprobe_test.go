@@ -1,7 +1,7 @@
 // The probe behind the doctor's `quack lsp` row, over a runner that answers
 // each frame the way quack lsp does.
 // [[spec/design_output/lsp#the-doctor-probes-the-server]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

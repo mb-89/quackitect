@@ -36,7 +36,7 @@ func actionWindow(t *testing.T, results map[string]any) (frame.Model, *Tab, *[]r
 		t.Fatal(err)
 	}
 	rules := SchemaOf(string(schema))
-	tab := New(filepath.Join(t.TempDir(), ".se", ".log", "session.jsonl"))
+	tab := New(filepath.Join(t.TempDir(), ".se", ".log", "session.jsonl")) // level0: FixtureOutsideHome - the case reads that the tab writes nothing under a root of its own
 	tab.From, tab.rules = fake, &rules
 	m := frame.New(tab.Path, time.UTC, []frame.Tab{tab})
 	m.W, m.H = 120, 24

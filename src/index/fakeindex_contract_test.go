@@ -1,7 +1,7 @@
 // The real index keeps the contract the fake index stands for: each case
 // opens the door, and drives the store and the scheduler it builds.
 // [[spec/design_output/model#the-fake-keeps-a-contract]]
-package index
+package index // level0: InPackageTest - it drives the unexported opens and the door's store
 
 import (
 	"path/filepath"
@@ -29,5 +29,6 @@ func throughTheDoor(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 }
 
 func TestTheIndexKeepsTheContract(t *testing.T) {
+	t.Parallel()
 	qtest.Suite(t, throughTheDoor)
 }

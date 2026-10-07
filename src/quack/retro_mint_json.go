@@ -6,11 +6,12 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"math"
 	"strconv"
 	"strings"
+
+	"quackitect/src/pull"
 )
 
 // A JSON value with its keys in the order the text holds them, as JSON.parse keeps them. [[spec/guidance/retro/check]]
@@ -166,7 +167,7 @@ func (n *retroMintNode) write(b *strings.Builder, indent string) {
 		}
 		b.WriteString("{\n")
 		for place, key := range n.keys {
-			b.WriteString(inner + retroMintQuote(key) + ": ")
+			b.WriteString(inner + pull.JSQuote(key) + ": ")
 			n.vals[key].write(b, inner)
 			if place < len(n.keys)-1 {
 				b.WriteString(",")
@@ -190,7 +191,7 @@ func (n *retroMintNode) write(b *strings.Builder, indent string) {
 		}
 		b.WriteString(indent + "]")
 	case 's':
-		b.WriteString(retroMintQuote(n.text))
+		b.WriteString(pull.JSQuote(n.text))
 	case 'n':
 		if number, err := strconv.ParseFloat(n.text, numberBits); err != nil || math.IsInf(number, 0) {
 			b.WriteString("null")
@@ -202,38 +203,6 @@ func (n *retroMintNode) write(b *strings.Builder, indent string) {
 	default:
 		b.WriteString("null")
 	}
-}
-
-// A string as JSON.stringify quotes it. [[spec/guidance/retro/check]]
-func retroMintQuote(text string) string {
-	var b strings.Builder
-	b.WriteByte('"')
-	for _, one := range text {
-		switch one {
-		case '"':
-			b.WriteString(`\"`)
-		case '\\':
-			b.WriteString(`\\`)
-		case '\b':
-			b.WriteString(`\b`)
-		case '\f':
-			b.WriteString(`\f`)
-		case '\n':
-			b.WriteString(`\n`)
-		case '\r':
-			b.WriteString(`\r`)
-		case '\t':
-			b.WriteString(`\t`)
-		default:
-			if one < 0x20 {
-				fmt.Fprintf(&b, `\u%04x`, one)
-			} else {
-				b.WriteRune(one)
-			}
-		}
-	}
-	b.WriteByte('"')
-	return b.String()
 }
 
 // A JSON number as JavaScript prints it: no trailing zero, and an exponent past 1e21 or under 1e-6. [[spec/guidance/retro/check]]

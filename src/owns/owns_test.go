@@ -1,6 +1,6 @@
 // The declarations and the walks over planted texts: a use outside its door is
 // named, one inside is not, and the marker passes a line where it names why.
-// [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// [[spec/design_output/doors#a-door-declares-its-names]]
 package owns
 
 import (

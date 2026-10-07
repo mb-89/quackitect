@@ -2,7 +2,7 @@
 
 // The starter's exit reads apart from the door's end.
 // [[spec/tickets/door-outlives-taskkill-tree]]
-package index
+package index // level0: InPackageTest - the case reads the unexported exitEnds the door's wait reads
 
 import (
 	"errors"

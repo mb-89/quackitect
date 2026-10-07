@@ -44,6 +44,16 @@ func TestTheTreeVerbsListSetup(t *testing.T) {
 	t.Fatal("the tree verbs list no setup")
 }
 
+// The check runs the guards verb as a part, so the table lists it. [[spec/design_output/model#the-guards-hold-a-baseline]]
+func TestTheTreeVerbsListGuards(t *testing.T) {
+	for _, one := range TreeVerbs {
+		if one.Name == "guards" {
+			return
+		}
+	}
+	t.Fatal("the tree verbs list no guards")
+}
+
 // A tree verb names no topic, so no verb stands as two tools. [[spec/tickets/agents-call-quack-directly]]
 func TestNoTreeVerbNamesATopic(t *testing.T) {
 	for _, one := range TreeVerbs {
@@ -70,4 +80,14 @@ func TestTreeVerbsReadAsCommandsLessTheTopics(t *testing.T) {
 	if len(Commands) != len(TreeVerbs)+len(topics) || !reflect.DeepEqual(got, want) {
 		t.Fatalf("the tree verbs read %v, and the table less its topics reads %v", got, want)
 	}
+}
+
+// The failure verb stands in the table, so help and the agent's tools name it. [[spec/tickets/failure-verb-in-help]]
+func TestTheTreeVerbsListFailure(t *testing.T) {
+	for _, one := range TreeVerbs {
+		if one.Name == "failure" {
+			return
+		}
+	}
+	t.Fatal("the tree verbs list no failure")
 }

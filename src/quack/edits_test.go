@@ -2,7 +2,7 @@
 // journal an undo reads back, and a mint writes a note in its schema's shape.
 // Each case calls the action by name over a tree in a temp folder.
 // [[spec/tickets/edit-tools-answer-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -1,7 +1,7 @@
 // The retro's timeline over a seeded input, and the helpers every reading case
 // lays its tree with.
 // [[spec/guidance/retro/chapter]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

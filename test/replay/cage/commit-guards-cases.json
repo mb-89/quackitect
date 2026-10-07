@@ -1,6 +1,7 @@
 {
   "masks": { "{at}": "@", "{plus}": "+", "{home}": "/home/" },
   "tree": {
+    "spec/failures/desk-works-on-trunk.md": "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>.\"]\n---\n\n# When\n\nA desk lands work on a work branch.\n",
     "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
     "spec/config/level0.json": "{\"names\": {\"words\": 5}}\n"
   },
@@ -263,7 +264,7 @@
       "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
       "description": "a-ticket: land the change",
       "decision": "refuse",
-      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/some-group.\nRun git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/some-group.\nfailure desk-works-on-trunk at warn\nremedy: Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
     },
     {
       "name": "a desk push on a work branch refuses",
@@ -272,7 +273,7 @@
       "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
       "description": "a-ticket: land the change",
       "decision": "refuse",
-      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/some-group.\nRun git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/some-group.\nfailure desk-works-on-trunk at warn\nremedy: Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
     },
     {
       "name": "a desk commit on the trunk refuses through the verb",

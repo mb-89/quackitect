@@ -55,7 +55,7 @@ func (one *door) servesActions(api huma.API) {
 	registry := api.OpenAPI().Components.Schemas
 	for _, name := range one.store.Names() {
 		in, out, ok := one.store.Types(name)
-		if !ok {
+		if !ok || !one.accepted(name) {
 			continue
 		}
 		looks, _ := one.store.Presentation(name)

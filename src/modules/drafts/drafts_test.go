@@ -1,5 +1,5 @@
 // The prose check and the answer check answer every case of the table the bridge's own
-// answers fill, over a Vale that answers the case's rows.
+// answers fill, over a lint that answers the case's rows.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
 
@@ -20,7 +20,7 @@ const answerFile = "level0-answer.md"
 //go:embed testdata/draft-cases.json
 var draftCases []byte // The case table the bridge answers alike, riding in through embed so the module imports no os. [[spec/tickets/io-answers-take-result-shape]]
 
-// One case: the tool, its input, what Vale answers, the owner's question count, and the text the bridge answers. [[spec/tickets/prose-tools-answer-in-go]]
+// One case: the tool, its input, what the lint answers, the owner's question count, and the text the bridge answers. [[spec/tickets/prose-tools-answer-in-go]]
 type draftCase struct {
 	Name  string `json:"name"`
 	Tool  string `json:"tool"`
@@ -30,12 +30,12 @@ type draftCase struct {
 		Text string `json:"text"`
 		Stop bool   `json:"stop"`
 	} `json:"input"`
-	Vale struct {
+	Lint struct {
 		Stands bool      `json:"stands"`
 		Ran    bool      `json:"ran"`
 		Why    string    `json:"why"`
 		Found  []Finding `json:"found"`
-	} `json:"vale"`
+	} `json:"lint"`
 	Answer string `json:"answer"`
 }
 
@@ -54,12 +54,12 @@ func readTable(t *testing.T) draftTable {
 	return table
 }
 
-// An outside whose Vale answers the case's rows and keeps the names it lints as. [[spec/tickets/prose-tools-answer-in-go]]
+// An outside whose lint answers the case's rows and keeps the names it lints as. [[spec/tickets/prose-tools-answer-in-go]]
 func outsideOf(table draftTable, one draftCase, linted *[]string) Outside {
 	return Outside{
 		Lint: func(text, name string) Linted {
 			*linted = append(*linted, name)
-			return Linted{Found: one.Vale.Found, Stands: one.Vale.Stands, Ran: one.Vale.Ran, Why: one.Vale.Why}
+			return Linted{Found: one.Lint.Found, Stands: one.Lint.Stands, Ran: one.Lint.Ran, Why: one.Lint.Why}
 		},
 		Questions: func() int { return one.Asked },
 		Bands:     func() Bands { return table.Bands },
@@ -94,7 +94,7 @@ func TestTheDraftCasesAnswerOffTheModule(t *testing.T) {
 	}
 }
 
-// A prose check lints as its own path, and an answer check as the answer file, so Vale reads the kind each is. [[spec/tickets/prose-tools-answer-in-go]]
+// A prose check lints as its own path, and an answer check as the answer file, so the rules read the kind each is. [[spec/tickets/prose-tools-answer-in-go]]
 func TestEachCheckLintsAsTheFileItReads(t *testing.T) {
 	table := readTable(t)
 	for _, one := range []draftCase{table.Cases[2], table.Cases[12]} {

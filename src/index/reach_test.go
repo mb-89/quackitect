@@ -1,7 +1,7 @@
 // A caller from another build, the window among them, meets the door the
 // tree's index stands, and keeps it.
 // [[spec/design_output/index#a-door-comes-back]]
-package index
+package index // level0: InPackageTest - it drives the unexported stands, stampOf and startingPath
 
 import (
 	"encoding/json"
@@ -63,6 +63,7 @@ func standsAt(t *testing.T, root string, said Standing) {
 }
 
 // A spawn that names the binary it runs, and stands the door again where the case hands one. [[spec/design_output/index#a-door-comes-back]]
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func fakeSpawn(t *testing.T, again func(root string)) func() []string {
 	t.Helper()
 	var ran []string
@@ -78,7 +79,9 @@ func fakeSpawn(t *testing.T, again func(root string)) func() []string {
 	return func() []string { return ran }
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAClientKeepsTheDoorTheTreesIndexStands(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	self, _ := executableOf()
@@ -90,7 +93,9 @@ func TestAClientKeepsTheDoorTheTreesIndexStands(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestARebuiltIndexLeavesItsDoorStale(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the old build")
 	stamp := stampOf(bin)
@@ -100,6 +105,7 @@ func TestARebuiltIndexLeavesItsDoorStale(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStartRunsTheTreesIndexAndNeverTheCaller(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -114,6 +120,7 @@ func TestAStartRunsTheTreesIndexAndNeverTheCaller(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -134,7 +141,9 @@ func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 }
 
 // A serve meets the live door on its build and stands no second one, and a door on another build hears a stop and stands live no more. [[spec/tickets/process-shadow-reads-clean]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
 	port, heard := heardDoor(t, newMemNet(t))
@@ -156,6 +165,7 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 }
 
 // A stop returns once the door it stops has exited, so its caller removes a tree no running door holds. [[spec/tickets/smoke-waits-for-the-door]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -182,7 +192,9 @@ func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
 }
 
 // A door leaving drops the standing file while it names that door, and leaves another door's file standing. [[spec/tickets/process-shadow-reads-clean]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
 	dropsOwn(root, 3)
@@ -196,7 +208,9 @@ func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
 }
 
 // A door stays while the standing file names it, and leaves once the file names another door: the clock looks again on each tick. [[spec/tickets/process-shadow-reads-clean]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestADisplacedDoorLeaves(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
 	clock := qtest.NewFake(time.Time{})
@@ -222,7 +236,9 @@ func TestADisplacedDoorLeaves(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	built := filepath.Join(t.TempDir(), "another-index")
 	if err := writeFile(built, []byte("a build elsewhere"), 0o755); err != nil {
@@ -240,6 +256,7 @@ func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 	root := t.TempDir()
 	ran := fakeSpawn(t, nil)
@@ -251,7 +268,9 @@ func TestAStartWithNoIndexBuiltSaysSo(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	_, standing := served(t, qtest.Wall(), root, q.New(), nil)
 	self, _ := executableOf()
@@ -260,7 +279,9 @@ func TestTheStandingFileNamesTheBuildThatStandsIt(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	vehicle := t.TempDir()
 	self := filepath.Join(vehicle, "logview")
@@ -282,6 +303,7 @@ func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
 }
 
 // A door past its answer time is busy, and its process still runs, so a client answers the fault and starts no index beside it. [[spec/tickets/one-index-a-tree]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -302,6 +324,7 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 
 // A reach waits on its door's answer past the old thirty seconds, up to what the hang guard leaves of it. [[spec/tickets/cold-runner-waits-meet-readiness]]
 func TestAReachWaitsOnItsDoorUpToTheHangGuard(t *testing.T) {
+	t.Parallel()
 	clock, _ := fakeStartClock(t, time.Time{}, nil)
 	now := clock.Now()
 	if got := postSpan(clock, now); got != startHang || got <= 30*time.Second {
@@ -326,6 +349,7 @@ func claimedAt(t *testing.T, root string) time.Time {
 }
 
 // A caller meeting a fresh claim spawns nothing, and reads the door the claiming caller's index stands. [[spec/tickets/reaches-keeps-the-post-fault]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -347,6 +371,7 @@ func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
 }
 
 // A claim older than the start wait stands dead, so the next caller takes it and spawns. [[spec/tickets/reaches-keeps-the-post-fault]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStaleClaimGivesWay(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -394,6 +419,7 @@ func fakeStartClock(t *testing.T, from time.Time, each func(now time.Time, waite
 }
 
 // A spawn whose index answers the exit the case hands, and stands no door. [[spec/design_output/index#a-door-comes-back]]
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func exitingSpawn(t *testing.T, exits error) {
 	t.Helper()
 	was := spawns
@@ -408,6 +434,7 @@ func exitingSpawn(t *testing.T, exits error) {
 }
 
 // An index whose first build runs past the old thirty seconds still stands its door, and the start waits on it. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -426,6 +453,8 @@ func TestAStartWaitsOnItsIndexPastTheOldSpan(t *testing.T) {
 }
 
 // An index that exits before its door stands ends the wait at once, naming the exit. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
@@ -441,6 +470,8 @@ func TestAStartEndsWhenItsIndexExits(t *testing.T) {
 }
 
 // An index that neither stands nor exits meets the hang guard, and the start names it hung. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
+// level0: RunsAlone - it swaps the package's spawns, which every start beside it reads
 func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 	root := t.TempDir()
 	builtIndex(t, root, "the index build")
@@ -455,6 +486,7 @@ func TestAStartGivesUpOnAHungIndex(t *testing.T) {
 }
 
 // A caller meeting a claim its holder keeps fresh waits past the old thirty seconds, spawns nothing, and reads the door that index stands. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the case stands, claims or displaces its own door over its own root
 func TestAWaiterHoldsWhileTheClaimStaysFresh(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -463,7 +495,7 @@ func TestAWaiterHoldsWhileTheClaimStaysFresh(t *testing.T) {
 		t.Fatal("the first caller claims no start")
 	}
 	clock, _ := fakeStartClock(t, claimedAt(t, root), func(now time.Time, waited time.Duration) {
-		_ = touchOf(startingPath(root), now)
+		_ = chtimesOf(startingPath(root), now, now)
 		if waited == 2*startPolls*startPollPause {
 			standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
 		}

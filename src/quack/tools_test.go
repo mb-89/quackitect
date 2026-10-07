@@ -1,7 +1,7 @@
 // Every level zero tool the bridge's TOOLS table served stands in the tool
 // list the real wiring registers, under the name the agent calls.
 // [[spec/tickets/level0-tools-leave-the-bridge]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os" // level0: OutsideInDoors - the case reads the wiring the tree holds, as a build check reads source

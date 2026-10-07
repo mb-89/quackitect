@@ -1,7 +1,7 @@
 // The standing verb in Go: the layer level zero hands a session, and the
 // canary under it.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

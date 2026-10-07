@@ -15,6 +15,7 @@ import { coldTree } from "../../src/scripts/probe-cold.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
 import {
 	DRY,
+	deltaOf,
 	engineOf,
 	harnessOf,
 	leaves,
@@ -92,7 +93,7 @@ test("a whole run passes every check the dry probe names", () => {
 test("the smoke stands the clone with the root's built tools and installs nothing", () => {
 	const disk = fakeDisk({
 		"/r/.se/.runtime/bin/se-index": "index",
-		"/r/.se/.runtime/bin/vale": "vale",
+		"/r/.se/.runtime/bin/biome": "biome",
 		"/r/.se/.runtime/bin/se-index.old": "old",
 	});
 	const proc = fakeProc({ git: { exitCode: 0 } });
@@ -110,7 +111,7 @@ test("the smoke stands the clone with the root's built tools and installs nothin
 		"one shared clone, and no install",
 	);
 	assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
-	assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
+	assert.equal(disk.read("/t/tree/.se/.runtime/bin/biome"), "biome");
 	assert.equal(
 		disk.exists("/t/tree/.se/.runtime/bin/se-index.old"),
 		false,
@@ -364,9 +365,27 @@ test("a temp tree the box still holds stays named, and the probe's verdict stand
 
 test("the probe's main runs nothing where another program is main", async () => {
 	let ran = false;
-	// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
+	// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first. [[spec/tickets/the-doors-pr-goes-green]]
 	await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
 		ran = true;
 	});
 	assert.equal(ran, false);
+});
+
+// [[spec/tickets/every-named-path-resolves]]
+test("the delta carries each untracked file as a new-file patch after the tracked diff", () => {
+	const added =
+		"diff --git a/src/q/new.go b/src/q/new.go\nnew file mode 100644\n";
+	const proc = {
+		run: (args) => {
+			if (args[1] === "ls-files")
+				return { exitCode: 0, stdout: "src/q/new.go\0", stderr: "" };
+			if (args.includes("--no-index")) {
+				assert.deepEqual(args.slice(-2), ["/dev/null", "src/q/new.go"]);
+				return { exitCode: 1, stdout: added, stderr: "" };
+			}
+			return { exitCode: 0, stdout: "tracked\n", stderr: "" };
+		},
+	};
+	assert.equal(deltaOf({ proc }, "/tree"), `tracked\n${added}`);
 });

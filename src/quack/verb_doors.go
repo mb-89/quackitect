@@ -71,7 +71,7 @@ func doorsVerb(root func() (string, error)) twin {
 	}
 }
 
-// The files a declaration names, or its folder where it names none. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The files a declaration names, or its folder where it names none. [[spec/design_output/doors#a-door-declares-its-names]]
 func ownFiles(door owns.Door) []string {
 	if door.Files != nil {
 		return door.Files

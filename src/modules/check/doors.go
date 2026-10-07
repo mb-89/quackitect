@@ -23,7 +23,7 @@ const (
 	goDoor           = "door.go"
 )
 
-// The declarations a tree holds and the doors they read as, kept while the paths and the texts stand. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The declarations a tree holds and the doors they read as, kept while the paths and the texts stand. [[spec/design_output/doors#a-door-declares-its-names]]
 type declared struct {
 	from   []string
 	paths  []string
@@ -32,12 +32,12 @@ type declared struct {
 	faults []owns.Fault
 }
 
-// Whether two lists of paths are the one list the tree keeps. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether two lists of paths are the one list the tree keeps. [[spec/design_output/doors#a-door-declares-its-names]]
 func sameList(one, other []string) bool {
 	return len(one) == len(other) && (len(one) == 0 || &one[0] == &other[0])
 }
 
-// Every door the declarations the tree holds name, and each fault of their form, read again where a declaration's text changes. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every door the declarations the tree holds name, and each fault of their form, read again where a declaration's text changes. [[spec/design_output/doors#a-door-declares-its-names]]
 func doorsOf(tree *Tree) ([]owns.Door, []owns.Fault) {
 	all := tree.Paths()
 	tree.guard.Lock()
@@ -92,7 +92,7 @@ func walkFaults(tree *Tree, at string) []Finding {
 	return out
 }
 
-// Every declaration of no form, and every door no declaration holds. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every declaration of no form, and every door no declaration holds. [[spec/design_output/doors#a-door-declares-its-names]]
 func declaresFaults(tree *Tree) []Finding {
 	doors, faults := doorsOf(tree)
 	out := []Finding{}
@@ -108,7 +108,7 @@ func declaresFaults(tree *Tree) []Finding {
 	return out
 }
 
-// Whether a file is a door: a script under src/doors, a door.go, or a Go file whose code calls q.IO(). [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether a file is a door: a script under src/doors, a door.go, or a Go file whose code calls q.IO(). [[spec/design_output/doors#a-door-declares-its-names]]
 func isDoor(tree *Tree, at string) bool {
 	if path.Dir(at) == doorsFolder && path.Ext(at) == ".js" {
 		return true

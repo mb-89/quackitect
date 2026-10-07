@@ -58,3 +58,38 @@ func TestClockKeepsItsContract(t *testing.T) {
 	t.Run("wall", func(t *testing.T) { clockSuite(t, qtest.Wall(), func() { time.Sleep(time.Millisecond) }) })
 	t.Run("wall waits", func(t *testing.T) { afterSuite(t, qtest.Wall(), func() {}) })
 }
+
+// Whether a hand sent on the channel, read at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func took(ran <-chan struct{}) bool {
+	select {
+	case <-ran:
+		return true
+	default:
+		return false
+	}
+}
+
+// A hand runs once its span passes, once alone, and stays still after its stop. Await reads whether the hand ran, the real clock blocking on it and the fake reading it at once. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+func stopSuite(t *testing.T, one q.Clock, pass func(time.Duration), await func(<-chan struct{}) bool) {
+	ran := make(chan struct{}, 2)
+	one.AfterFunc(time.Millisecond, func() { ran <- struct{}{} })
+	pass(time.Millisecond)
+	if !await(ran) {
+		t.Fatal("the hand runs nowhere once its span passes")
+	}
+	stopped := make(chan struct{}, 1)
+	stop := one.AfterFunc(time.Hour, func() { stopped <- struct{}{} })
+	stop()
+	pass(2 * time.Hour)
+	if took(ran) || took(stopped) {
+		t.Fatal("the hand runs twice, or after its stop")
+	}
+}
+
+func TestAfterFuncKeepsItsContract(t *testing.T) {
+	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+	t.Run("fake", func(t *testing.T) { stopSuite(t, fake, fake.Tick, took) })
+	t.Run("real", func(t *testing.T) {
+		stopSuite(t, New(), func(time.Duration) {}, func(ran <-chan struct{}) bool { <-ran; return true })
+	})
+}

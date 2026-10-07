@@ -2,7 +2,7 @@
 // fake doors: the uncommitted check, the parked ticket, the unpushed branch,
 // and the stuck hand-over handed out first.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported staleKey and the group editors after take runs
 
 import (
 	"fmt"

@@ -30,7 +30,7 @@ func reached(rel string) bool {
 	return true
 }
 
-// Every file of the tree by its slash path, and the declarations among them. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every file of the tree by its slash path, and the declarations among them. [[spec/design_output/doors#a-door-declares-its-names]]
 func treeOf(t *testing.T) (map[string]bool, map[string]string) {
 	t.Helper()
 	files, declared := map[string]bool{}, map[string]string{}
@@ -75,7 +75,7 @@ func doorsOf(t *testing.T) ([]Door, map[string]bool) {
 	return doors, files
 }
 
-// A file that uses the owned name, in the language the name belongs to. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// A file that uses the owned name, in the language the name belongs to. [[spec/design_output/doors#a-door-declares-its-names]]
 func usesGo(name string) string {
 	pkg, member := name, ""
 	if cut := strings.LastIndex(name, "/"); strings.Contains(name[cut+1:], ".") {
@@ -122,7 +122,7 @@ func TestEveryDoorNamesAPlantedWalk(t *testing.T) {
 	}
 }
 
-// A file the door holds in the language, or nothing where it holds none. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// A file the door holds in the language, or nothing where it holds none. [[spec/design_output/doors#a-door-declares-its-names]]
 func insideOf(door Door, lang string) string {
 	if door.Files == nil {
 		return door.At + "/planted" + lang
@@ -145,7 +145,7 @@ func callsIO(text string) bool {
 	return false
 }
 
-// Every package carrying q.IO() and every door under src/doors stands in a declaration. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every package carrying q.IO() and every door under src/doors stands in a declaration. [[spec/design_output/doors#a-door-declares-its-names]]
 func TestEveryIOModuleAndDoorDeclares(t *testing.T) {
 	t.Parallel()
 	doors, files := doorsOf(t)

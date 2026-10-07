@@ -1,7 +1,7 @@
 // The setup verb over fake doors: every item, the skip list, the survey, the
 // Copilot setup, the brand and the Windows shims.
 // [[spec/tickets/install-drops-node]] [[spec/tickets/box-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

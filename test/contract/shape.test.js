@@ -1,6 +1,6 @@
-// The shape rules, through the real Vale. Each one draws in the editor, so a
-// case here feeds Vale a bad file and asserts the rule refuses it, off the one
-// run the helper makes for this file.
+// The shape rules, through the tree's rules. Each one draws in the editor, so
+// a case here feeds the rules a bad file and asserts the rule refuses it, off
+// the one settle the helper makes for this file.
 // [[spec/design_output/level0#where-a-rule-lives]]
 
 import assert from "node:assert/strict";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const { ifVale, proves } = rulesIn(root);
+const { ifRules, proves } = rulesIn(root);
 
 const NOTE = "spec/guidance/probe.md";
 const STOP = "spec/config/stop/probe.yml";
@@ -29,7 +29,7 @@ const refuses = (said, rule, key) =>
 const passes = (said, rule, key) =>
   assert.ok(!said.rules(key).includes(rule), `${rule} stays quiet on ${key}`);
 
-ifVale(
+ifRules(
   "a guidance note with no Actionables chapter is refused",
   proves(
     {
@@ -43,7 +43,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a guidance note past the rule cap is refused",
   proves(
     { over: note(front("") + chapter(16)), under: note(front("") + chapter(15)) },
@@ -54,7 +54,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a variable named in lower case is refused",
   proves(
     {
@@ -68,7 +68,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a stop rule missing a field, or naming no side, is refused",
   proves(
     {
@@ -91,7 +91,7 @@ ifVale(
 // [[spec/design_output/level0#the-rules-past-one-buffer]]
 const PATH_RULE = "VoiceScript.NoPathInScript";
 
-ifVale(
+ifRules(
   "an interpolated path in a shell script is refused",
   proves(
     {
@@ -105,7 +105,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "an interpolated path in a PowerShell script is refused",
   proves(
     {
@@ -119,7 +119,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "a commented path, and a plain copy, pass the script rule",
   proves(
     {
@@ -133,7 +133,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "no prose rule reaches a shell script",
   proves(
     { past: shell("#!/usr/bin/env sh\n# The tree was installed here.\n") },
@@ -150,7 +150,7 @@ ifVale(
 const marked = (rules) => `${front("")}# Actionables\n\n${rules.join("\n")}\n`;
 const MARKED_RULE = "VoiceShape.MarkedRuleNamesFailure";
 
-ifVale(
+ifRules(
   "a marked rule standing as one sentence is refused, and two sentences pass",
   proves(
     {
@@ -173,7 +173,7 @@ ifVale(
   ),
 );
 
-ifVale(
+ifRules(
   "an unmarked rule standing as one sentence passes the marked rule check",
   proves(
     { bare: note(marked(["1. Run the check before you hand the branch back."])) },
@@ -187,7 +187,7 @@ ifVale(
 const VOCABULARY = "spec/vocabulary/probe.yml";
 const ENTRY = "VoiceShape.VocabularyEntry";
 
-ifVale(
+ifRules(
   "a vocabulary entry off its shape is refused, and one in shape passes",
   proves(
     {

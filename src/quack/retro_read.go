@@ -62,7 +62,7 @@ func retroShortOf(text any) string {
 	return retroJSSlice(first, retroReadWidth)
 }
 
-// The prompt the owner queues mid-turn, where the line carries one from a human origin, or from no origin and not marked meta. [[spec/tickets/retro-read-reads-every-record]]
+// The prompt the owner queues mid-turn, where the line carries one from a human origin, or from no origin and unmarked as meta. [[spec/tickets/retro-read-reads-every-record]]
 func retroQueuedOf(read any) string {
 	attachment := retroJSField(read, "attachment")
 	if !retroJSSame(retroJSField(read, "type"), "attachment") || !retroJSSame(retroJSField(attachment, "type"), retroQueued) {

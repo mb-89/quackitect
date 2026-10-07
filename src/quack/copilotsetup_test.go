@@ -1,7 +1,7 @@
 // The Copilot registrations: they equal the files git tracks, a repeated setup
 // writes nothing, a file a person owns stands, and auto waits on Copilot.
 // [[spec/design_output/copilot#setup-and-discovery]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"

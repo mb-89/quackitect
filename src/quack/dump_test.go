@@ -1,6 +1,6 @@
 // A dump lands where no projection reads it back.
 // [[spec/design_output/model#everything-on-disk-mirrors]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source

@@ -1,16 +1,20 @@
 // The bus answers a peer on loopback that shows its token, and refuses one
 // that shows none.
 // [[spec/design_output/model#the-index-runs-nats]]
-package index
+package index_test
 
 import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"quackitect/src/index"
 )
 
+// level0: FixtureOutsideHome - the case starts its own bus
 func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
-	bus, err := StartBus()
+	t.Parallel()
+	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -18,7 +22,7 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 	if !strings.HasPrefix(bus.URL(), "nats://127.0.0.1:") || bus.Port() == 0 || bus.Token() == "" {
 		t.Fatalf("the bus stands at %q, port %d, with token %q", bus.URL(), bus.Port(), bus.Token())
 	}
-	listener, err := Dial(bus.URL(), bus.Token())
+	listener, err := index.Dial(bus.URL(), bus.Token())
 	if err != nil {
 		t.Fatalf("a peer showing the token meets %v", err)
 	}
@@ -29,7 +33,7 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stop()
-	sender, err := Dial(bus.URL(), bus.Token())
+	sender, err := index.Dial(bus.URL(), bus.Token())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,13 +46,15 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case starts its own bus
 func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
-	bus, err := StartBus()
+	t.Parallel()
+	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer bus.Close()
-	listener, err := Dial(bus.URL(), bus.Token())
+	listener, err := index.Dial(bus.URL(), bus.Token())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +65,7 @@ func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
 		t.Fatalf("the lease subject meets %v", err)
 	}
 	defer stop()
-	sender, err := Dial(bus.URL(), bus.Token())
+	sender, err := index.Dial(bus.URL(), bus.Token())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,8 +78,10 @@ func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case starts its own bus
 func TestTheBusRefusesAPeerWithoutTheToken(t *testing.T) {
-	bus, err := StartBus()
+	t.Parallel()
+	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +89,7 @@ func TestTheBusRefusesAPeerWithoutTheToken(t *testing.T) {
 	if bus.URL() == "" {
 		t.Fatal("the bus names no address")
 	}
-	if peer, err := Dial(bus.URL(), ""); err == nil {
+	if peer, err := index.Dial(bus.URL(), ""); err == nil {
 		peer.Close()
 		t.Fatal("a peer showing no token reaches the bus")
 	}

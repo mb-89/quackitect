@@ -28,6 +28,9 @@ const (
 // The log levels below info, which a row of info passes. [[spec/design_output/log#a-setting-writes-a-line]]
 var logsInfo = []string{"", "debug", "info"}
 
+// The flag a write takes to land in the tracked layer. [[spec/tickets/verbs-mint-tickets-and-keys]]
+const configTrackedFlag = "--tracked"
+
 func init() { register("config", configVerb(index.Root, wall.Now, realDisk())) }
 
 // config over the root: every row, one key's row, or a write of one key where a value follows it. [[spec/design_output/config#the-verb-names-the-layer]]
@@ -39,13 +42,17 @@ func configVerb(root func() (string, error), now func() time.Time, disk diskDoor
 			return exitFailed
 		}
 		var words []string
+		layer := config.Local
 		for _, one := range argv[1:] {
+			if one == configTrackedFlag {
+				layer = config.Tracked
+			}
 			if !strings.HasPrefix(one, "-") {
 				words = append(words, one)
 			}
 		}
 		if len(words) > 1 {
-			return configWrites(disk, at, words[0], strings.Join(words[1:], " "), dry, now, out, errs)
+			return configWrites(disk, at, layer, words[0], strings.Join(words[1:], " "), dry, now, out, errs)
 		}
 		rows, err := configOn(disk, at)
 		if err != nil {
@@ -77,7 +84,7 @@ func configVerb(root func() (string, error), now func() time.Time, disk diskDoor
 		for _, fault := range faults {
 			fmt.Fprintf(errs, "%s, and the code reading it finds nothing.\n", fault)
 		}
-		fmt.Fprintf(out, "\nWrite one: ./RUNME.sh config <key> <value>, which lands in %s.\n", config.Local)
+		fmt.Fprintf(out, "\nWrite one: ./RUNME.sh config <key> <value>, which lands in %s, or add %s to land it in %s.\n", config.Local, configTrackedFlag, config.Tracked)
 		return 0
 	}
 }
@@ -203,7 +210,7 @@ func coerced(said, kind string) string {
 	case "boolean":
 		return strconv.FormatBool(said == "true")
 	case "number":
-		if number, err := strconv.ParseFloat(strings.TrimSpace(said), 64); err == nil && !math.IsInf(number, 0) {
+		if number, err := strconv.ParseFloat(strings.TrimSpace(said), numberBits); err == nil && !math.IsInf(number, 0) {
 			body, _ := json.Marshal(number)
 			return string(body)
 		}
@@ -212,8 +219,8 @@ func coerced(said, kind string) string {
 	return string(body)
 }
 
-// Writes the key into the local layer, prints where it lands, and logs the setting. [[spec/design_output/config#the-verb-writes-one-layer]] [[spec/design_output/log#a-setting-writes-a-line]]
-func configWrites(disk diskDoors, root, key, said string, dry bool, now func() time.Time, out, errs io.Writer) int {
+// Writes the key into the layer named, the local one or the tracked one, prints where it lands, and logs the setting. [[spec/design_output/config#the-verb-writes-one-layer]] [[spec/design_output/log#a-setting-writes-a-line]] [[spec/tickets/verbs-mint-tickets-and-keys]]
+func configWrites(disk diskDoors, root, layer, key, said string, dry bool, now func() time.Time, out, errs io.Writer) int {
 	declared, err := declaredAt(disk, root)
 	if err != nil {
 		fmt.Fprintln(errs, err)
@@ -221,23 +228,23 @@ func configWrites(disk diskDoors, root, key, said string, dry bool, now func() t
 	}
 	literal := coerced(said, declared[key].Type)
 	if !dry {
-		local := filepath.Join(root, filepath.FromSlash(config.Local))
-		body, err := q.JSON.Serialize(settingAt(orderedAt(disk, local), strings.Split(key, "."), q.Ordered{Literal: literal}))
+		file := filepath.Join(root, filepath.FromSlash(layer))
+		body, err := q.JSON.Serialize(settingAt(orderedAt(disk, file), strings.Split(key, "."), q.Ordered{Literal: literal}))
 		if err == nil {
-			err = disk.makeAll(filepath.Dir(local), 0o755)
+			err = disk.makeAll(filepath.Dir(file), 0o755)
 		}
 		if err == nil {
-			err = disk.write(local, body, 0o644)
+			err = disk.write(file, body, 0o644)
 		}
 		if err == nil && slices.Contains(logsInfo, configLevel(disk, root)) {
-			err = appendsRow(disk, root, now)(map[string]any{"level": "info", "kind": "config", "said": key + " is " + shownValue(json.RawMessage(literal)), "detail": config.Local})
+			err = appendsRow(disk, root, now)(map[string]any{"level": "info", "kind": "config", "said": key + " is " + shownValue(json.RawMessage(literal)), "detail": layer})
 		}
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
 	}
-	fmt.Fprintf(out, "%s is %s in %s.\n", key, literal, config.Local)
+	fmt.Fprintf(out, "%s is %s in %s.\n", key, literal, layer)
 	return 0
 }
 

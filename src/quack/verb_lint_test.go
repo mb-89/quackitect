@@ -2,10 +2,11 @@
 // prints the count a rule first and the finding lines last, logs one row, and
 // exits 1 on a finding at error alone.
 // [[spec/tickets/read-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -23,6 +24,8 @@ func lintRow(file, rule, severity string) check.Finding {
 type lintFake struct {
 	tools, swept, box []check.Finding
 	sweepFault        error
+	changed           []string
+	left              []lintFound
 	asked             [][]string
 	rows              []map[string]any
 }
@@ -38,8 +41,13 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 				fake.asked = append(fake.asked, where)
 				return fake.tools
 			},
-			sweep: func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
-			box:   func() []check.Finding { return fake.box },
+			sweep:   func() ([]check.Finding, error) { return fake.swept, fake.sweepFault },
+			box:     func() []check.Finding { return fake.box },
+			changed: func(func(string)) []string { return fake.changed },
+			leave: func(found lintFound) error {
+				fake.left = append(fake.left, found)
+				return nil
+			},
 			log: func(row map[string]any) error {
 				fake.rows = append(fake.rows, row)
 				return nil
@@ -92,6 +100,53 @@ func TestLintVerb(t *testing.T) {
 			t.Fatalf("lint logs %v, and wants the warn row naming the first rows", row)
 		}
 	})
+	// The commit and the check read a warning as a refusal. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("a warning under --strict exits 1 and names no warning note", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)}}
+		code, out, _ := runsTwin(fake.verb(t, nil), "lint", "--strict")
+		if code != exitFailed || strings.Contains(out, "stand at warning") || !strings.HasSuffix(out, "a.md:2:3: Sentence: Sentence says\n") {
+			t.Fatalf("lint --strict answers %d, %q, and wants 1 ending on the finding", code, out)
+		}
+	})
+	// The engine writes the tickets and the retros, so a hand fixes no warning there. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("--changed reads the changed files past the tickets, the retros and the private folder", func(t *testing.T) {
+		fake := &lintFake{changed: []string{"spec/a.md", "spec/tickets/t.md", "spec/retros/r.md", ".se/tickets/n.md"}}
+		code, out, _ := runsTwin(fake.verb(t, map[string]string{"spec/a.md": "a\n", "spec/tickets/t.md": "t\n", "spec/retros/r.md": "r\n", ".se/tickets/n.md": "n\n"}), "lint", "--changed")
+		if code != 0 || len(fake.asked) != 1 || strings.Join(fake.asked[0], " ") != "spec/a.md" {
+			t.Fatalf("lint --changed answers %d, %q, asks the tools over %v, and wants spec/a.md alone", code, out, fake.asked)
+		}
+	})
+	t.Run("--changed over no changed file passes and asks no tool", func(t *testing.T) {
+		fake := &lintFake{}
+		if code, out, _ := runsTwin(fake.verb(t, nil), "lint", "--changed", "--strict"); code != 0 || len(fake.asked) != 0 || out != "The rules pass.\n" {
+			t.Fatalf("lint --changed answers %d, %q, asks %v", code, out, fake.asked)
+		}
+	})
+	// The check counts the warnings in its stamp and names the errors under --errors, off what the lint leaves. [[spec/tickets/the-check-lint-runs-in-go]]
+	t.Run("the lint leaves each warning by its file and source, and each error as its line", func(t *testing.T) {
+		warned := lintRow("a.md", "Sentence", check.SeverityWarning)
+		warned.Source = "rules"
+		fake := &lintFake{tools: []check.Finding{warned, lintRow("b.go", "FileCeiling", check.SeverityError)}}
+		runsTwin(fake.verb(t, nil), "lint")
+		want := lintFound{Stood: []finding{{File: "a.md", Source: "rules"}}, Erred: []string{"b.go:2:3: FileCeiling: FileCeiling says"}}
+		if len(fake.left) != 1 || !reflect.DeepEqual(fake.left[0], want) {
+			t.Fatalf("lint leaves %+v, and wants %+v", fake.left, want)
+		}
+		clean := &lintFake{}
+		runsTwin(clean.verb(t, nil), "lint")
+		if len(clean.left) != 1 || len(clean.left[0].Stood)+len(clean.left[0].Erred) != 0 {
+			t.Fatalf("a clean lint leaves %+v, and wants one empty list", clean.left)
+		}
+	})
+	// A red changed part names its warnings under --errors. [[spec/tickets/lint-strict-leaves-erred]]
+	t.Run("a warning under --strict leaves as an erred line, and stands under stood nowhere", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)}}
+		runsTwin(fake.verb(t, nil), "lint", "--strict")
+		want := lintFound{Stood: []finding{}, Erred: []string{"a.md:2:3: Sentence: Sentence says"}}
+		if len(fake.left) != 1 || !reflect.DeepEqual(fake.left[0], want) {
+			t.Fatalf("lint --strict leaves %+v, and wants %+v", fake.left, want)
+		}
+	})
 	t.Run("a finding at error exits 1 and names no warning note", func(t *testing.T) {
 		fake := &lintFake{tools: []check.Finding{lintRow("a.go", "FileCeiling", check.SeverityError)}}
 		code, out, _ := runsTwin(fake.verb(t, nil), "lint")
@@ -132,11 +187,11 @@ func TestLintVerb(t *testing.T) {
 			t.Fatalf("lint prints %q, and wants the open ticket's row alone", out)
 		}
 	})
-	t.Run("Vale failing stops the lint with its fault", func(t *testing.T) {
-		fake := &lintFake{tools: []check.Finding{{Rule: lsp.ValeRuns, Message: "Vale stands nowhere here."}}}
+	t.Run("a rules load that fails stops the lint with its fault", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{{Rule: lsp.RulesLoad, Message: "The rules load nothing, so every rule stands unchecked."}}}
 		code, out, errs := runsTwin(fake.verb(t, nil), "lint")
-		if code != exitFailed || out != "" || !strings.Contains(errs, "Vale stands nowhere here.\nVale read no file") {
-			t.Fatalf("lint answers %d, %q, %q, and wants the Vale fault", code, out, errs)
+		if code != exitFailed || out != "" || !strings.Contains(errs, "The rules load nothing") {
+			t.Fatalf("lint answers %d, %q, %q, and wants the rules load's fault", code, out, errs)
 		}
 	})
 	t.Run("no sweep stops the lint with its fault", func(t *testing.T) {

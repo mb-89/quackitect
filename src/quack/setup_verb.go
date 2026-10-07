@@ -19,7 +19,6 @@ var setupShims = []string{"npm", "npx", "code"}
 
 // The extensions the tracked settings point at, the list .claude/skills/level0/lib/servers.js owns as EXTENSIONS. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 var editorExtensions = []string{
-	"chrischinchilla.vale-vscode",
 	"biomejs.biome",
 	"bierner.markdown-mermaid",
 }
@@ -75,7 +74,7 @@ var setupItems = []setupItem{
 	},
 	{
 		want: "editor-extensions",
-		why:  "editor-extensions: the Vale, Biome and Mermaid extensions the tracked settings point at",
+		why:  "editor-extensions: the Biome and Mermaid extensions the tracked settings point at",
 		here: func(d boxDoors) bool {
 			listed, ok := listedExtensions(d)
 			if !ok {

@@ -30,9 +30,7 @@ type wantedTool struct {
 // The tools, in the order the survey writes them. [[spec/design_output/tools#what-the-survey-writes]]
 var wantedTools = []wantedTool{
 	{name: "node", asks: []string{"--version"}},
-	{name: "vale", asks: []string{"--version"}},
 	{name: "biome", asks: []string{"--version"}},
-	{name: "vale-ls", asks: []string{"--version"}},
 	{name: "go", asks: []string{"version"}},
 	{name: "git", asks: []string{"--version"}},
 	{name: "claude", asks: []string{"--version"}},

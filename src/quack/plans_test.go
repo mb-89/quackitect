@@ -1,7 +1,7 @@
 // The plan tool answers in Go: a plan call writes the plan file as the bridge
 // writes it, and a plan field riding a Go-answered call writes it too.
 // [[spec/tickets/plan-writes-off-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

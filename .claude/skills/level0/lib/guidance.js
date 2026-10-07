@@ -308,7 +308,7 @@ export function forHelper(standing, prompt) {
     "# How this tree is worked",
     "",
     "These rules reach you before your task does, and they hold over what you",
-    "write. Vale holds the mechanical ones at the write door, so a write",
+    "write. The Go rules hold the mechanical ones at the write door, so a write",
     "breaking one comes back with the reason and the line.",
     "",
     standing,

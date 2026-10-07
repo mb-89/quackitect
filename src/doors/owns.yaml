@@ -43,7 +43,11 @@ index:
 random:
   js: [Math.random]
   files: []
-vale:
+failure:
   js: []
-  files: [vale.js]
-  contract: [test/contract/vale.test.js]
+  files: [failure.js, fake/failure.js]
+  contract: [test/contract/failure.test.js]
+rules:
+  js: []
+  files: []
+  contract: [test/contract/vale.test.js, test/contract/vale-fix.test.js]

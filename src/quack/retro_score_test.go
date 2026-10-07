@@ -1,7 +1,7 @@
 // The score verb counts the improvements a retro mints, and names each with
 // its state and the retro it comes off.
 // [[spec/design_input/the-agent-pulls-tickets]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

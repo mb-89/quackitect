@@ -15,7 +15,7 @@ rationale: [[spec/rationales/working]]
 7. Name the assumption you take where the owner says to carry on, and take it. Read `spec/design_input`, then ask the owner a design question before you build your own answer.
 8. Put a script of your own under `.se/scripts`, which git ignores.
 9. Read `.se/.runtime/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
-10. Leave a line at warning as it stands, and carry on with the ask. The push waits until the Problems panel stands clear. A rewrite for form spends the turn the ask pays for. Fix any other fault you trip over where the fix is trivial. Write a deeper one down as a finding. *
+10. Carry on with the ask past a line at warning, and clear it before you commit its file. The commit refuses a staged file at warning, so one pass before it clears them all. Fix any other fault you trip over where the fix is trivial. Write a deeper one down as a finding. *
 11. Push when you want to, and ask nothing about it. Show a group's ask to the owner before it reaches the cloud. An unread ask builds the wrong thing on a cloud box. *
 12. Run `check_answer` over a draft answer past sixty words before you send it. A draft checked there meets the gate clean.
 13. Write every file through `mcp__level0__patch` or `mcp__level0__replace`, and name the ticket it serves in `ticket`. A write naming no ticket loses the ticket in hand, and the door refuses it. [[spec/design_output/level0#a-write-names-its-ticket]] *
@@ -32,7 +32,7 @@ rationale: [[spec/rationales/working]]
 | 4 | the next ticket, while a helper runs | a hold on every helper, then a wait for each reply |
 | 5 | a stop where a discussion opens | a stop to ask whether to run the tests |
 | 7 | the assumption named, then the work goes on | a design built with no read of the design input |
-| 10 | the write lands at warning, and the next step of the ask runs | a second write of the same file to clear its warning |
+| 10 | the write lands at warning, the ask runs on, and one pass clears the file before its commit | a commit refused on a warning the write door named |
 | 11 | a push when you want one | a question about a push |
 | 13 | a patch naming its ticket, with an `exact` op for one spot | an Edit, which names no ticket |
 | 14 | a pointer at the note owning the number | the number copied into a second note |

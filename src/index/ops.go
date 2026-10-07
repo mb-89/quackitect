@@ -24,6 +24,8 @@ type Managed struct {
 	// The instances a process of their own runs, whose providers the index's scheduler leaves, and the wait until those processes answer every run sent. A nil Settle waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
 	Away   []string
 	Settle func()
+	// Whether a module answers a verb, which the tool list reads, so it lists no action nobody answers. A nil Accepts accepts every request. [[spec/tickets/every-index-tool-answers]]
+	Accepts func(module, verb string) bool
 }
 
 // Calls an action within the wait its caller sets. [[spec/design_output/model#a-caller-sets-its-wait]]

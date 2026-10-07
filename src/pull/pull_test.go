@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
@@ -131,8 +132,51 @@ func cloudPull(t *testing.T) (*It, *bytes.Buffer, *bytes.Buffer) {
 	return it, out, errs
 }
 
+// A git door answering the paths main moves past HEAD, and the clone's own door for every other call. [[spec/tickets/running-work-takes-main-fixes]]
+type mainMoves struct {
+	git.Repo
+	paths string
+}
+
+func (one mainMoves) Diff(a, b string) ([]git.Change, error) {
+	if b != "origin/main" {
+		return one.Repo.Diff(a, b)
+	}
+	var out []git.Change
+	for _, path := range strings.Fields(one.paths) {
+		out = append(out, git.Change{Status: "M", Path: path})
+	}
+	return out, nil
+}
+
 func TestPull(t *testing.T) {
 	t.Parallel()
+	pullsOffTheQueue(t)
+	pullsWithATicketInHand(t)
+	pullsWhatThePlanNames(t)
+	pullsOnADeskAndOffTheTool(t)
+}
+
+// A pull off the queue: main moving, the child's leaf, a dependency, and another group's ticket. [[spec/design_output/pull#the-hand-out]]
+func pullsOffTheQueue(t *testing.T) {
+	t.Run("main moving the cold path asks a sync before any hand-out", func(t *testing.T) {
+		it, out, errs := cloudPull(t)
+		it.Git = mainMoves{it.Git, "spec/a.md\nsrc/modules/hooks/a.go"}
+		if code := it.Pulling([]string{"pull"}); code != 1 || strings.Contains(out.String(), "work  alpha") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+		said := errs.String()
+		if !strings.Contains(said, "src/modules/hooks/a.go") || !strings.Contains(said, "./RUNME.sh branch sync") {
+			t.Fatalf("the pull says:\n%s", said)
+		}
+	})
+	t.Run("main moving off the cold path hands the leaf out", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		it.Git = mainMoves{it.Git, "spec/a.md"}
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
 	t.Run("a bare pull hands the child's leaf, and the hold names it", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
@@ -170,6 +214,10 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the pull answers %d:\n%s", code, out)
 		}
 	})
+}
+
+// A pull while a ticket stands in hand: a second pull, a hand-back, a pass and a drop. [[spec/design_output/pull#the-hand-out]]
+func pullsWithATicketInHand(t *testing.T) {
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
 		it.Pulling([]string{"pull"})
@@ -219,7 +267,33 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the hold stands: %+v", held)
 		}
 	})
-	t.Run("a todo in hand holds the pull back", func(t *testing.T) {
+}
+
+// A pull the plan steers: a free ticket, the group ticket, a helper's --as, a todo, and a name past the queue. [[spec/design_output/pull#the-hand-out]]
+func pullsWhatThePlanNames(t *testing.T) {
+	t.Run("a plan naming a free ticket hands it out", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write(planFile, `{"working":"alpha"}`)
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
+	t.Run("a plan naming the group ticket hands its child", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write(planFile, `{"working":"g"}`)
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
+	t.Run("a helper's --as takes the ticket the plan names over the queue head", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write("spec/tickets/beta.md", childTicket)
+		_ = it.Disk.Write(planFile, `{"working":"beta"}`)
+		if code := it.Pulling([]string{"pull", "--as", "helper-1"}); code != 0 || !strings.HasPrefix(out.String(), "work  beta at do") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
+	t.Run("a working todo that is no ticket still holds the pull", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		_ = it.Disk.Write(planFile, `{"working":"mend the lint"}`)
 		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.Contains(out.String(), "the todo mend the lint stands in hand, so the pull hands nothing else out.") {
@@ -232,11 +306,25 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the pull answers %d:\n%s", code, errs)
 		}
 	})
+}
+
+// A pull on a desk, and the tool's input read as the words a person types. [[spec/design_output/pull#the-hand-out]]
+func pullsOnADeskAndOffTheTool(t *testing.T) {
 	t.Run("a desk pull on a work branch hands nothing out", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
 		it.Cloud = false
 		if code := it.Pulling([]string{"pull"}); code != 2 || !strings.Contains(errs.String(), "A desk works on main alone, and a cloud box works each work/ branch, so the pull hands nothing out on work/g.") {
 			t.Fatalf("the pull answers %d:\n%s", code, errs)
+		}
+	})
+	// The message carries no remedy, so the node's remedy prints once. [[spec/tickets/go-pull-desk-remedy-once]]
+	t.Run("a desk pull prints the node's remedy once", func(t *testing.T) {
+		it, _, errs := cloudPull(t)
+		it.Cloud = false
+		it.Failures = failure.Fake(failure.Node{ID: "desk-works-on-trunk", Level: "warn", Remedies: []string{"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."}})
+		it.Pulling([]string{"pull"})
+		if count := strings.Count(errs.String(), "git switch main"); count != 1 {
+			t.Fatalf("the pull prints the remedy %d times:\n%s", count, errs)
 		}
 	})
 	t.Run("the tool's input reads as the words a person types", func(t *testing.T) {
@@ -277,5 +365,16 @@ func TestHoldAt(t *testing.T) {
 	t.Parallel()
 	if got := holdAt("box cafe · claude-code"); got != ".se/.runtime/hold/box-cafe-claude-code.json" {
 		t.Fatalf("the hold stands at %s", got)
+	}
+}
+
+// A cloud variable reading false or zero leaves the box on the desk, and one reading on puts it on the cloud. [[spec/tickets/shared-helpers-stand-once]]
+func TestACloudFlagReadsOnOrOff(t *testing.T) {
+	t.Parallel()
+	if InCloud(map[string]string{"SE_CLOUD": " False "}) || InCloud(map[string]string{"SE_CLOUD": "0"}) || !InCloud(map[string]string{"SE_CLOUD": "1"}) {
+		t.Fatal("the cloud flag reads apart from flagOn")
+	}
+	if got := sortedKeys(map[string]bool{"b": true, "a": true}); len(got) != 2 || got[0] != "a" {
+		t.Fatalf("the keys read %v", got)
 	}
 }

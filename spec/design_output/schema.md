@@ -13,7 +13,7 @@ reads one, how it weighs a note against one, and what it answers.
 | the ticket door | `.claude/skills/level0/lib/ticket.js` |
 | the sweep, beside the tree rules | `src/scripts/cli-read.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
-| the `mint` verb | `src/scripts/mint-verb.js` |
+| the `mint` verb | `src/quack/verb_mint.go` |
 | the `mint_note` tool | `.claude/skills/level0/hooks/level0.js` |
 
 # The reader and the checker
@@ -392,9 +392,8 @@ kind settles.
 
 | the reader | how it skips |
 |---|---|
-| Vale, over the tree | `--glob=!{...,**/_*}` |
-| Vale, over one file | the last section of `.vale.ini` |
-| the language server | that same section |
+| the Go rules | the last row of `sections` in `src/rules/scope.go`, which bases the path on no style |
+| the language server | that same row |
 | the write door | `isDraft` before the code door and the prose door |
 | the rules over two files | `tree.paths()` drops one |
 | the standing layer | `readFolder` drops one |

@@ -1,7 +1,7 @@
 // The reply probe's reading over log rows and the client's answer, and the
 // verb over a fake client.
 // [[spec/tickets/the-reply-probe-runs]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

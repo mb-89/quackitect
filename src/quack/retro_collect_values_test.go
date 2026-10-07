@@ -1,7 +1,7 @@
 // The battery report collect keeps beside its record: each part read as its
 // median over the runs, and the last run's cases and files.
 // [[spec/guidance/retro/effect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"
@@ -37,7 +37,7 @@ func TestRetroCollectReadsAStampFromBeforeTheRunsAsItsOneReportAndNoReportAsNoth
 	if !reflect.DeepEqual(said["parts"], last["parts"]) || said["runs"] != 1.0 {
 		t.Fatalf("a stamp from before the runs reads %v", said)
 	}
-	for _, stamp := range []string{`{}`, `null`} {
+	for _, stamp := range []string{`{}`, `null`, `{"battery":false}`, `{"battery":0}`, `{"battery":""}`} {
 		if got := retroKeptReport(stamp); got != "" {
 			t.Fatalf("%s keeps %q", stamp, got)
 		}

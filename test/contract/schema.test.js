@@ -1,4 +1,4 @@
-// The schemas this tree ships, and the real Vale over a parked draft. Each
+// The schemas this tree ships, and the tree's rules over a parked draft. Each
 // case drives the thing itself: the schemas off disk, mint through the checker,
 // the sweep over a fake tree, and the write door's own linter over a name
 // opening with an underscore.
@@ -32,7 +32,7 @@ import { PROCESSES } from "../../src/scripts/process.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const { ifVale, proves } = rulesIn(root);
+const { ifRules, proves } = rulesIn(root);
 const FAKE = "/tree";
 const DEPARTS = "spec/tickets/departs.md";
 
@@ -165,7 +165,7 @@ test("the mint copies every process onto a ticket the checker passes", () => {
 });
 
 // [[spec/design_output/schema#the-underscore-parks-a-draft]]
-ifVale(
+ifRules(
   "a draft parked under an underscore breaks no rule the styles hold",
   proves(
     {

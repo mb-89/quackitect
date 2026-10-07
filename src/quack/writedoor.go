@@ -27,7 +27,7 @@ var (
 
 const (
 	unranRule  = "VoiceRulesRan"
-	unranSays  = "The voice rules did not run over this file: vale answered nothing. Mend the rule or the setup it names, and write again."
+	unranSays  = "The voice rules did not run over this file: the rules answered nothing. Mend the rule or the setup it names, and write again."
 	errorLevel = "error"
 )
 

@@ -24,8 +24,6 @@ import {
   TRUNK,
   VERSION,
 } from "../../.claude/skills/level0/lib/trunk.js";
-import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import { readThrough } from "../bridge/findings.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -39,7 +37,7 @@ import { staleClaim } from "./work-free.js";
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
 const HEADS = /^refs\/heads\//;
-// A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#the-session-beats-its-hold]]
 const BEATS = "refs/heads/beats/";
 // A rescue carries a red commit off a dying box on purpose, so no stamp gates it. [[spec/tickets/rescue-passes-the-stamp-gate]]
 const RESCUE = "refs/heads/rescue/";
@@ -195,7 +193,7 @@ export function heldBy(repo) {
   };
 }
 
-// Whether the hold on origin stands dead, read the way the list reads a claim: an end at or past the tip, no beat inside its span, and the tip past the stale span. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Whether the hold on origin stands dead, read the way the list reads a claim: an end at or past the tip, no beat inside its span, and the tip past the stale span. [[spec/design_output/work#the-session-beats-its-hold]]
 export function staleBy(repo, span, now, beatSpan = "") {
   return (ref) => {
     const branch = String(ref?.remote ?? "").replace(HEADS, "");
@@ -298,21 +296,6 @@ export function carriedBy(repo) {
       if (held.ok) out.push({ name, text: held.out });
     }
     return out;
-  };
-}
-
-// The lint over the names a push carries, read as rows through the tense reader, so this door and the check hold one list. [[spec/design_output/level0#the-tense-reader]]
-export function lintedBy(outside, root, vale, files = disk()) {
-  return (names) => {
-    const read = names.filter((one) => PROSE.test(one));
-    if (!read.length || !vale) return [];
-    const ran = outside.run(
-      [vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", ...read],
-      {
-        cwd: root,
-      },
-    );
-    return readThrough({ disk: files, proc: outside, join, root }, fromJson(ran.stdout));
   };
 }
 

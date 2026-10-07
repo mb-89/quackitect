@@ -1,7 +1,7 @@
 // Every rule over every package of the module, so a single import that
 // breaks one turns the battery red.
 // [[spec/design_output/model#the-build-checks-imports]]
-package imports
+package imports_test
 
 import (
 	"path"
@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"golang.org/x/tools/go/packages"
+
+	"quackitect/src/imports"
 )
 
 // Every package of the module and its test variants, loaded once a package run, since no case writes to it. [[spec/guidance/code/testing]]
@@ -64,7 +66,7 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	owned := Owned(root)
+	owned := imports.Owned(root)
 	graph := map[string][]string{}
 	for _, one := range loaded {
 		if strings.HasSuffix(one.PkgPath, ".test") {
@@ -76,42 +78,42 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		}
 		if one.ID == one.PkgPath {
 			graph[one.PkgPath] = imported
-			for _, fault := range WindowFaults(one.PkgPath, imported) {
+			for _, fault := range imports.WindowFaults(one.PkgPath, imported) {
 				t.Error(fault)
 			}
 		}
-		for _, fault := range FaultsIn(one.PkgPath, imported, owned, CarriesIO(one.Syntax)) {
+		for _, fault := range imports.FaultsIn(one.PkgPath, imported, owned, imports.CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
-		for _, fault := range RendererFaults(one.PkgPath, one.Fset, one.Syntax, owned) {
+		for _, fault := range imports.RendererFaults(one.PkgPath, one.Fset, one.Syntax, owned) {
 			t.Error(fault)
 		}
-		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
+		for _, fault := range imports.SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
 		}
-		for _, fault := range WalkFaults(root, one.Fset, one.Syntax) {
-			t.Errorf("%s: %s", one.Fset.Position(fault.at), fault)
+		for _, fault := range imports.WalkFaults(root, one.Fset, one.Syntax) {
+			t.Errorf("%s: %s", one.Fset.Position(fault.At()), fault)
 		}
 	}
-	for folder := range window {
-		if _, ok := graph[path.Join(module+"src/tui", folder)]; !ok {
+	for _, folder := range imports.WindowFolders() {
+		if _, ok := graph[path.Join("quackitect/src/tui", folder)]; !ok {
 			t.Errorf("the window's table names src/tui/%s, which holds no package", folder)
 		}
 	}
-	if _, ok := graph[indexPath]; !ok {
-		t.Errorf("the load answers no %s", indexPath)
+	if _, ok := graph[indexPackage]; !ok {
+		t.Errorf("the load answers no %s", indexPackage)
 	}
-	for _, fault := range IndexFaults(graph) {
+	for _, fault := range imports.IndexFaults(graph) {
 		t.Error(fault)
 	}
 }
 
 func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
 	t.Parallel()
-	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}, nil); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}, nil); len(said) != 0 {
 		t.Fatalf("src/modulesx reads as a module: %v", said)
 	}
-	if said := Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}, nil); len(said) != 0 {
+	if said := imports.Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}, nil); len(said) != 0 {
 		t.Fatalf("the q core reads as a door: %v", said)
 	}
 }

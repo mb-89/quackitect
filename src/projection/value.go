@@ -6,6 +6,8 @@
 package projection
 
 import (
+	"quackitect/src/yaml"
+
 	"math"
 	"regexp"
 	"sort"
@@ -35,6 +37,10 @@ const (
 	nibble     = 4
 	nibbleMask = 0xF
 	hexBase    = 16
+	// The other bases a number text names, and the bit size it parses in. [[spec/tickets/config-verbs-port-to-go]]
+	decimalBase = 10
+	octalBase   = 8
+	bitSize     = 64
 	// The length of a base prefix such as 0x. [[spec/tickets/config-verbs-port-to-go]]
 	prefixLength = 2
 )
@@ -81,8 +87,8 @@ func (one *Object) Keys() []string {
 		rest = append(rest, key)
 	}
 	sort.SliceStable(indices, func(a, b int) bool {
-		left, _ := strconv.ParseUint(indices[a], 10, 64)
-		right, _ := strconv.ParseUint(indices[b], 10, 64)
+		left, _ := strconv.ParseUint(indices[a], decimalBase, bitSize)
+		right, _ := strconv.ParseUint(indices[b], decimalBase, bitSize)
 		return left < right
 	})
 	return append(indices, rest...)
@@ -101,8 +107,8 @@ func (one *Object) spread(more ...*Object) *Object {
 
 // Whether a key reads as an array index, which an object lists first. [[spec/tickets/config-verbs-port-to-go]]
 func isIndex(key string) bool {
-	n, err := strconv.ParseUint(key, 10, 64)
-	return err == nil && n <= largestIndex && strconv.FormatUint(n, 10) == key
+	n, err := strconv.ParseUint(key, decimalBase, bitSize)
+	return err == nil && n <= largestIndex && strconv.FormatUint(n, decimalBase) == key
 }
 
 // The object a value holds, or nil where it holds another kind. [[spec/tickets/config-verbs-port-to-go]]
@@ -146,19 +152,9 @@ func absent(said any) bool {
 	return null
 }
 
-// Whether a value reads true in a condition. [[spec/tickets/config-verbs-port-to-go]]
-func truthy(said any) bool {
-	switch one := said.(type) {
-	case nil, Null:
-		return false
-	case bool:
-		return one
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	case string:
-		return one != ""
-	}
-	return true
+// Whether a value reads true in a condition: the Null mark reads false, and every other value as yaml.Truthy reads it. [[spec/tickets/shared-helpers-stand-once]]
+func holdsTrue(said any) bool {
+	return said != (Null{}) && yaml.Truthy(said)
 }
 
 // A value as String writes it. [[spec/tickets/config-verbs-port-to-go]]
@@ -206,17 +202,17 @@ func numberString(n float64) string {
 	}
 	size := math.Abs(n)
 	if size < exponentAbove && size >= exponentBelow {
-		return strconv.FormatFloat(n, 'f', -1, 64)
+		return strconv.FormatFloat(n, 'f', -1, bitSize)
 	}
-	said := strconv.FormatFloat(n, 'e', -1, 64)
+	said := strconv.FormatFloat(n, 'e', -1, bitSize)
 	mantissa, power, _ := strings.Cut(said, "e")
 	return mantissa + "e" + power[:1] + strings.TrimLeft(power[1:], "0")
 }
 
 var decimalAt = regexp.MustCompile(`^[+-]?(?:\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)$`)
 
-// The bases a JavaScript number text may name by its prefix. [[spec/tickets/config-verbs-port-to-go]]
-var prefixes = map[string]int{"0x": 16, "0X": 16, "0o": 8, "0O": 8, "0b": 2, "0B": 2}
+// The bases a JavaScript number text names by its prefix. [[spec/tickets/config-verbs-port-to-go]]
+var prefixes = map[string]int{"0x": hexBase, "0X": hexBase, "0o": octalBase, "0O": octalBase, "0b": 2, "0B": 2}
 
 // A value as Number converts it. [[spec/tickets/config-verbs-port-to-go]]
 func jsNumber(said any) float64 {
@@ -252,12 +248,12 @@ func numberOfText(said string) float64 {
 		return math.Inf(-1)
 	}
 	if decimalAt.MatchString(text) {
-		n, _ := strconv.ParseFloat(text, 64)
+		n, _ := strconv.ParseFloat(text, bitSize)
 		return n
 	}
 	if len(text) > prefixLength {
 		if base, held := prefixes[text[:prefixLength]]; held {
-			if n, err := strconv.ParseUint(text[prefixLength:], base, 64); err == nil {
+			if n, err := strconv.ParseUint(text[prefixLength:], base, bitSize); err == nil {
 				return float64(n)
 			}
 		}

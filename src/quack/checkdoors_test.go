@@ -1,7 +1,7 @@
 // The root the check's doors stand over: the tree the verb road names, past
 // the root the index reads.
 // [[spec/tickets/check-reads-the-road-root]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

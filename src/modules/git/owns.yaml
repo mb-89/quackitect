@@ -1,4 +1,4 @@
 # The git IO module: the repository, through the git program.
 git:
   go: [os, os/exec]
-  contract: [src/modules/git/git_contract_test.go, src/modules/git/repo_contract_test.go]
+  contract: [src/modules/git/git_contract_test.go, src/modules/git/repo_contract_test.go, src/modules/git/repo_history_contract_test.go, src/modules/git/repo_tree_contract_test.go, src/modules/git/repo_merge_contract_test.go]

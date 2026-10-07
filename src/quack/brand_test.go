@@ -1,7 +1,7 @@
 // The brand a vehicle stamps: the slug off its folder, the names the stamp
 // writes, and the targets it writes off the brand folder or the shapes.
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"

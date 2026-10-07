@@ -1,7 +1,7 @@
 // A verb registered from its own file runs in Go, and a verb nothing
 // registers reaches node, on the road and through the node module alike.
 // [[spec/tickets/quack-registers-each-verb]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ import (
 	"quackitect/src/q"
 )
 
-// Registers a twin under the words for one test, and drops it after. [[spec/tickets/quack-registers-each-verb]]
+// Registers a twin under the words for one test, and drops it after. Its caller runs without t.Parallel, so the write and the drop end before a parallel case reads the registry. [[spec/tickets/quack-registers-each-verb]]
 func registersFor(t *testing.T, words string, one twin) {
 	t.Helper()
 	register(words, one)
@@ -26,7 +26,6 @@ func registersFor(t *testing.T, words string, one twin) {
 }
 
 func TestVerbRegistry(t *testing.T) {
-	t.Parallel()
 	t.Run("a person's run drops the harness and names its root", aPersonRunDropsTheHarnessAndNamesItsRoot)
 	t.Run("a registered verb runs in Go", func(t *testing.T) {
 		registersFor(t, "registry probe", twinSaying("go\n", &[]bool{}))

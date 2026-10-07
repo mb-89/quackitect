@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 var (
@@ -98,7 +100,7 @@ func yamlList(rows []yamlRow, cursor *yamlCursor, indent int) any {
 			continue
 		}
 		var pair []string
-		if !quotedWhole(rest) {
+		if !yaml.QuotedWhole(rest) {
 			pair = yamlPair.FindStringSubmatch(rest)
 		}
 		if pair == nil {
@@ -119,29 +121,6 @@ func yamlList(rows []yamlRow, cursor *yamlCursor, indent int) any {
 		out = append(out, item)
 	}
 	return out
-}
-
-// Whether an item reads as quoted text, its closing quote standing last. [[spec/tickets/config-verbs-port-to-go]]
-func quotedWhole(said string) bool {
-	if said == "" || (said[0] != '"' && said[0] != '\'') {
-		return false
-	}
-	quote := said[0]
-	for at := 1; at < len(said); at++ {
-		if quote == '"' && said[at] == '\\' {
-			at++
-			continue
-		}
-		if said[at] != quote {
-			continue
-		}
-		if quote == '\'' && at+1 < len(said) && said[at+1] == '\'' {
-			at++
-			continue
-		}
-		return at == len(said)-1
-	}
-	return false
 }
 
 // The block under a key, or null where nothing stands under it. [[spec/tickets/config-verbs-port-to-go]]
@@ -170,7 +149,7 @@ func yamlScalar(said string) any {
 	}
 	if strings.HasPrefix(flat, "[") && strings.HasSuffix(flat, "]") && len(flat) > 1 {
 		out := []any{}
-		for _, one := range flowItems(flat[1 : len(flat)-1]) {
+		for _, one := range yaml.FlowItems(flat[1 : len(flat)-1]) {
 			if each := unquote(jsTrim(one)); each != "" {
 				out = append(out, each)
 			}
@@ -184,35 +163,10 @@ func yamlScalar(said string) any {
 		return false
 	}
 	if yamlWhole.MatchString(flat) {
-		n, _ := strconv.ParseFloat(flat, 64)
+		n, _ := strconv.ParseFloat(flat, bitSize)
 		return n
 	}
 	return flat
-}
-
-// The items of a flow list, split at a comma outside a quote. [[spec/tickets/config-verbs-port-to-go]]
-func flowItems(inside string) []string {
-	out := []string{}
-	var held strings.Builder
-	var quote rune
-	for _, char := range inside {
-		switch {
-		case quote != 0:
-			held.WriteRune(char)
-			if char == quote {
-				quote = 0
-			}
-		case char == '"' || char == '\'':
-			quote = char
-			held.WriteRune(char)
-		case char == ',':
-			out = append(out, held.String())
-			held.Reset()
-		default:
-			held.WriteRune(char)
-		}
-	}
-	return append(out, held.String())
 }
 
 // The pairs of a flow map. [[spec/tickets/config-verbs-port-to-go]]

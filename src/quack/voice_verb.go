@@ -1,38 +1,34 @@
 // The voice verb in Go: the words past voice handed to src/voice over the
-// real disk, the Vale the survey names, and the clock.
+// disk door, the Go rules as the lsp tools draw them, and the clock.
 // [[spec/design_output/projection#the-second-target]]
 package main
 
 import (
-	"errors"
 	"io"
 	"time"
 
 	settingsreader "quackitect/src/config"
 	"quackitect/src/index"
-	"quackitect/src/proc"
+	"quackitect/src/modules/lsp"
 	"quackitect/src/voice"
 )
 
-// What the voice verb reaches: the root, Vale's path under it, a Vale run, the clock and the disk. [[spec/design_output/doors#one-door-per-outside-thing]]
+// What the voice verb reaches: the root, the rules over a root, the clock and the disk. [[spec/design_output/doors#one-door-per-outside-thing]] [[spec/tickets/vale-leaves-the-tree]]
 type voiceOutside struct {
-	root func() (string, error)
-	vale func(root string) string
-	run  func(argv []string, cwd string) (string, error)
-	now  func() time.Time
-	disk diskDoors
+	root  func() (string, error)
+	rules func(root string) func(path, text string) []lsp.Finding
+	now   func() time.Time
+	disk  diskDoors
 	// The count a config key answers under the root. [[spec/tickets/test-walks-move-onto-fakes]]
 	count func(root, key string) int
 }
 
 func init() {
-	disk := realDisk()
 	register("voice", voiceVerb(voiceOutside{
 		root:  index.Root,
-		vale:  func(root string) string { return valeAt(disk, root) },
-		run:   voiceRunsValeOver(proc.Real),
+		rules: lspRules,
 		now:   wall.Now,
-		disk:  disk,
+		disk:  realDisk(),
 		count: settingsreader.Count,
 	}))
 }
@@ -48,12 +44,11 @@ func voiceVerb(outside voiceOutside) twin {
 	}
 }
 
-// The voice doors over the real disk under the root. [[spec/design_output/doors#one-door-per-outside-thing]]
+// The voice doors over the disk door under the root. [[spec/design_output/doors#one-door-per-outside-thing]]
 func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 	disk := outside.disk
 	return voice.Doors{
 		Root:   root,
-		Bin:    outside.vale(root),
 		Exists: disk.stands,
 		List: func(path string) ([]voice.Entry, error) {
 			found, err := disk.list(path)
@@ -69,7 +64,7 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		},
 		Write:   func(path, text string) error { return disk.write(path, []byte(text), voiceFileMode) },
 		MakeDir: func(path string) error { return disk.makeAll(path, voiceFolderMode) },
-		Vale:    outside.run,
+		Lint:    voiceLint(outside.rules(root)),
 		Now:     outside.now,
 		Ceiling: outside.count(root, answerCeilingKey),
 	}
@@ -81,13 +76,13 @@ const (
 	voiceFolderMode = 0o755
 )
 
-// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start or a signal ends answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
-func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
-	return func(argv []string, cwd string) (string, error) {
-		said := run(proc.Command{Argv: argv, Dir: cwd})
-		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
-			return "", errors.New(said.Err)
+// The rules' rows over one file as the voice module reads them. [[spec/tickets/vale-leaves-the-tree]]
+func voiceLint(rules func(path, text string) []lsp.Finding) func(path, text string) []voice.Finding {
+	return func(path, text string) []voice.Finding {
+		var out []voice.Finding
+		for _, one := range rules(path, text) {
+			out = append(out, voice.Finding{File: path, Rule: one.Rule, Line: one.Line, Column: one.Column, Message: one.Message, Severity: one.Severity})
 		}
-		return said.Out, nil
+		return out
 	}
 }

@@ -58,9 +58,12 @@ func ioMain() error {
 	return nil
 }
 
+// The vehicle the running binary stands in, and none where it stands in no vehicle's runtime folder. [[spec/tickets/vehicle-rules-come-down]]
+func ownVehicle() string { return vehicleOf(os.Executable()) }
+
 // The wiring a process the index spawns reads: the work root's, then its vehicle's, and none where neither stands. [[spec/design_output/model#the-wiring-file]]
 func spawnedWiring(root string) (q.Wiring, error) {
-	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	text, err := wiringOf(root, ownVehicle())
 	if err != nil || text == "" {
 		return q.Wiring{}, err
 	}

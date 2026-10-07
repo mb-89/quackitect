@@ -40,7 +40,7 @@ func doorsServer(t *testing.T, files map[string]string) (*lsp.Server, func() [][
 	q.OutIn(c, "tracked", []string{}, q.Doc("the paths git tracks, as the case seeds them"))
 	checks := lspChecks("/tree")
 	quiet := func(proc.Command) proc.Said { return proc.Said{Out: "{}"} }
-	tools := &lsp.Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: quiet, Check: checks}
+	tools := &lsp.Tools{Root: "/tree", Rules: func(string, string) []lsp.Finding { return nil }, Biome: "biome", Run: quiet, Check: checks}
 	server := lsp.New(lsp.Outside{
 		Root: "/tree", Store: qtest.Over(t, c, as).Store(), As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []lsp.Finding{} }, Tools: tools, Check: checks,

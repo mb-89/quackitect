@@ -1,56 +1,20 @@
-// The import rules over planted packages: each refused import carries a want
-// comment, and a clean one carries none. The test writes the packages to a
-// folder of its own, so no fixture stands in the tree.
+// The import rules over named imports, and the pure readers over their own
+// source. The analyzers over planted packages stand in analyzers_test.go.
 // [[spec/design_output/model#the-build-checks-imports]]
-package imports
+package imports // level0: InPackageTest - the pure reader test reaches the unexported pureTree, impure and module
 
 import (
 	"go/build"
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 	"testing"
-
-	"golang.org/x/tools/go/analysis/analysistest"
 )
 
 // The packages the planted disk door owns whole. [[spec/design_output/model#the-build-checks-imports]]
 var ownedOs = []string{"os"}
 
-var planted = map[string]string{
-	"doors/disk/owns.yaml":     "disk:\n  go: [os]\n",
-	"doors/disk/disk.go":       "package disk\n\nfunc Read() string { return \"\" }\n",
-	"doors/nosy/nosy.go":       "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
-	"modules/nosy/nosy.go":     "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
-	"modules/work/work.go":     "package work\n\nfunc Name() string { return \"work\" }\n",
-	"modules/names/names.go":   "package names\n\nfunc Of() string { return \"work\" }\n",
-	"modules/greedy/greedy.go": "package greedy\n\nimport \"quackitect/src/modules/names\" // want `quackitect/src/modules/greedy imports quackitect/src/modules/names`\n\nfunc Name() string { return names.Of() }\n",
-	"tui/frame/frame.go":       "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
-}
-
-// The removals of the folders the planted trees stand in. They outlive every case, so TestMain runs them once the run ends. [[spec/tickets/shared-plant-outlives-each-case]]
-var plants struct {
-	sync.Mutex
-	removals []func()
-}
-
-// The clean tree, built once a run. [[spec/tickets/shared-plant-outlives-each-case]]
-var cleanTree = sync.OnceValues(func() (string, error) { return plantedTree(planted) })
-
-// A folder of its own holding every set of files, which no case writes to, written by the analysis test's own writer. [[spec/tickets/test-walks-move-onto-fakes]]
-func plantedTree(sets ...map[string]string) (string, error) {
-	dir, removal, err := analysistest.WriteFiles(underModule(sets...))
-	if err != nil {
-		return "", err
-	}
-	plants.Lock()
-	plants.removals = append(plants.removals, removal)
-	plants.Unlock()
-	return dir, nil
-}
-
-// Every set's files, keyed under the module's source root as the writer reads them. [[spec/tickets/test-walks-move-onto-fakes]]
+// Every set's files, keyed under the module's source root as the analysis test's writer reads them. [[spec/tickets/test-walks-move-onto-fakes]]
 func underModule(sets ...map[string]string) map[string]string {
 	out := map[string]string{}
 	for _, set := range sets {
@@ -59,46 +23,6 @@ func underModule(sets ...map[string]string) map[string]string {
 		}
 	}
 	return out
-}
-
-// Runs every case, then removes the planted trees. [[spec/tickets/shared-plant-outlives-each-case]]
-func TestMain(m *testing.M) {
-	m.Run()
-	for _, removal := range plants.removals {
-		removal()
-	}
-}
-
-// [[spec/design_output/model#the-build-checks-imports]]
-func plant(t *testing.T) string {
-	t.Helper()
-	dir, err := cleanTree()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return dir
-}
-
-// The planted trees build once a run, and every case reads them, since no analyzer writes there. [[spec/tickets/each-door-meets-one-test]]
-func TestThePlantedTreeBuildsOnce(t *testing.T) {
-	t.Parallel()
-	if plant(t) != plant(t) || plantFlagged(t) != plantFlagged(t) {
-		t.Fatal("a planted tree builds again for each case, where one build serves every case")
-	}
-	// The flagged packages stand in a folder of their own, so none leaks into the clean cases.
-	if plant(t) == plantFlagged(t) {
-		t.Fatal("the flagged tree shares the clean tree's folder")
-	}
-}
-
-func TestADoorImportingAModuleIsNamed(t *testing.T) {
-	t.Parallel()
-	analysistest.Run(t, plant(t), NoModule, "quackitect/src/doors/nosy")
-}
-
-func TestARendererImportingAModuleIsNamed(t *testing.T) {
-	t.Parallel()
-	analysistest.Run(t, plant(t), NoModule, "quackitect/src/tui/frame")
 }
 
 // [[spec/tickets/the-wiring-file-binds-ports]]
@@ -115,12 +39,6 @@ func TestFaultsNameAModuleImportingAModuleOnce(t *testing.T) {
 	if said := Faults("quackitect/src/modules/greedy", []string{"quackitect/src/modules/names"}, nil); len(said) != 1 {
 		t.Fatalf("the faults read %v", said)
 	}
-}
-
-// [[spec/design_output/model#the-build-checks-imports]]
-func TestAModuleImportingOsIsNamed(t *testing.T) {
-	t.Parallel()
-	analysistest.Run(t, plant(t), OnlyQ, "quackitect/src/modules/nosy")
 }
 
 func TestFaultsNameAModuleImportingOs(t *testing.T) {
@@ -214,12 +132,6 @@ func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/model#the-build-checks-imports]]
-func TestAModuleImportingAModuleIsNamed(t *testing.T) {
-	t.Parallel()
-	analysistest.Run(t, plant(t), NoModule, "quackitect/src/modules/greedy")
-}
-
 // A window package importing past its row is named, and a package the table leaves out reads no fault. [[spec/design_output/tui#the-packages-the-window-holds]]
 func TestAWindowImportPastItsRowIsNamed(t *testing.T) {
 	t.Parallel()
@@ -245,4 +157,13 @@ func TestAModuleTheIndexReachesBelowIsNamed(t *testing.T) {
 	if said := IndexFaults(graph); len(said) != 1 || !strings.Contains(said[0], "src/modules/work") {
 		t.Fatalf("the faults read %v", said)
 	}
+}
+
+// The folders the window's table names, which the tree test outside the package holds to the packages it loads. [[spec/design_output/tui#the-packages-the-window-holds]]
+func WindowFolders() []string {
+	var out []string
+	for folder := range window {
+		out = append(out, folder)
+	}
+	return out
 }

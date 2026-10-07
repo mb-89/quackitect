@@ -38,8 +38,8 @@ under a millisecond. A session asking the index feels neither.
 The v3 finding that called the tree unusable at twenty thousand files measured
 `git add`, at twenty-six seconds, and left SQLite unmeasured. Its reads stayed under
 two hundred milliseconds. For details, see
-`spec/trace/raid/raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-repository.md`
-on the `v3` branch.
+`raid-asm-one-file-per-work-token-stays-workable-in-the-vault-and-the-repository.md`
+under `spec/trace/raid` on the `v3` branch.
 
 ## 3. What would make it wrong
 

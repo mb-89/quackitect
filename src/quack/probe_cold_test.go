@@ -1,7 +1,7 @@
 // The cold probe over fake doors: its reading of the log rows and the
 // client's stream, and the runner over the clone, the install and the client.
 // [[spec/design_output/level0#the-cold-probe]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"quackitect/src/pull"
 )
 
 const coldSentence = "level0 holds this session: 58 rules, 4 notes, the stop hook on."
@@ -351,5 +353,16 @@ func TestATailKeepsTheLastLinesOnOne(t *testing.T) {
 	t.Parallel()
 	if got := tail("\n1\n2\n3\n4\n5\n6\n7\n"); got != "2 | 3 | 4 | 5 | 6 | 7" {
 		t.Errorf("the tail reads %q", got)
+	}
+}
+
+// A retro value reads true as JavaScript reads it: none, a nil dict, a zero and NaN read false. [[spec/tickets/shared-helpers-stand-once]]
+func TestARetroValueReadsAsJavaScriptReadsIt(t *testing.T) {
+	t.Parallel()
+	if retroJSTruthy(retroJSNone{}) || retroJSTruthy((*retroJSDict)(nil)) || retroJSTruthy(0.0) || retroJSTruthy("") || !retroJSTruthy(&retroJSDict{}) || !retroJSTruthy("x") {
+		t.Fatal("a retro value reads otherwise than JavaScript reads it")
+	}
+	if pull.JSQuote("a\"b\n") != `"a\"b\n"` {
+		t.Fatalf("the quote reads %s", pull.JSQuote("a\"b\n"))
 	}
 }

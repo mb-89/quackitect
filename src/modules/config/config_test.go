@@ -12,7 +12,7 @@ import (
 
 func TestEachLayerParsesOffItsFile(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
-	for _, path := range []string{Tracked, Local} {
+	for _, path := range []string{Tracked, Local, Schema} {
 		index.Seed(map[string]any{"files/" + path: q.Content{Hash: "h", Text: "{\n  \"a\": 1\n}\n"}})
 		got, _ := index.Run("config/" + path).(q.Ordered)
 		if len(got.Keys) != 1 || got.Keys[0] != "a" || got.Fields[0].Literal != "1" {
@@ -125,6 +125,11 @@ func TestAnInnerContextWinsAndHandsBackOnExit(t *testing.T) {
 	if got := settles(t, ix, "queue/config/weight"); got != 5 {
 		t.Fatalf("queue/config/weight reads %v after the inner context closes", got)
 	}
+	// An override wins over a context. [[spec/design_output/model#a-keys-layers]]
+	lands(t, ix, Change{Kind: Overrides, Values: map[string]string{"queue/config/weight": "11"}})
+	if got := settles(t, ix, "queue/config/weight"); got != 11 {
+		t.Fatalf("queue/config/weight reads %v under an override over a context", got)
+	}
 }
 
 // [[spec/design_output/model#a-context-holds-a-lease]]
@@ -154,70 +159,12 @@ func nested(c *q.Catalog) {
 	q.CfgIn(c, "stop/after", 1, q.Doc("the seconds before a stop"))
 }
 
-// A key of two segments reads its nested member, and its variable spells the segments with dots. [[spec/design_output/model#config-comes-off-the-registrations]]
+// A key of two segments reads its nested member. [[spec/design_output/model#config-comes-off-the-registrations]]
 func TestANestedKeyReadsItsNestedMember(t *testing.T) {
 	ix := layered(t, "queue", nested)
 	ix.Seed(files(`{"queue": {"stop": {"after": 4}}}`, `{}`))
 	if got := settles(t, ix, "queue/config/stop/after"); got != 4 {
 		t.Fatalf("queue/config/stop/after reads %v off the nested file", got)
-	}
-	ix.Seed(map[string]any{"env/" + EnvOf("queue.stop.after"): "6"})
-	if got := settles(t, ix, "queue/config/stop/after"); got != 6 {
-		t.Fatalf("queue/config/stop/after reads %v, not the value %s carries", got, EnvOf("queue.stop.after"))
-	}
-}
-
-// [[spec/design_output/model#a-keys-layers]]
-func TestAnEnvValueBeatsTheLocalFile(t *testing.T) {
-	ix := layered(t, "queue", weighed)
-	ix.Seed(files(`{"queue": {"weight": 3}}`, `{"queue": {"weight": 5}}`))
-	ix.Seed(map[string]any{"env/" + EnvOf("queue.weight"): "8"})
-	if got := settles(t, ix, "queue/config/weight"); got != 8 {
-		t.Fatalf("queue/config/weight reads %v, not the value %s carries", got, EnvOf("queue.weight"))
-	}
-}
-
-// [[spec/design_output/model#a-keys-layers]]
-func TestAnOverrideWinsOverAContext(t *testing.T) {
-	ix := layered(t, "queue", weighed)
-	ix.Seed(files(`{}`, `{}`))
-	lands(t, ix, Change{Kind: Opens, Handle: "a", Holder: "s1", Values: map[string]string{"queue/config/weight": "9"}})
-	lands(t, ix, Change{Kind: Overrides, Values: map[string]string{"queue/config/weight": "11"}})
-	if got := settles(t, ix, "queue/config/weight"); got != 11 {
-		t.Fatalf("queue/config/weight reads %v under an override over a context", got)
-	}
-}
-
-// Layered names the layer answering a key: the variable over the local file over the default file, and the default file alone for a shared key. [[spec/tickets/cfg-topic-holds-one-resolver]]
-func TestLayeredNamesTheLayer(t *testing.T) {
-	tracked, err := q.JSON.Parse([]byte(`{"queue": {"weight": 1}, "migration": {"s": "old"}}`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	local, err := q.JSON.Parse([]byte(`{"queue": {"weight": 2}, "migration": {"s": "new"}}`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	weight := q.Key{Name: "queue/config/weight", Instance: "queue", Local: "weight"}
-	cases := []struct {
-		key          q.Key
-		env          map[string]string
-		value, layer string
-	}{
-		{weight, nil, "2", Local},
-		{weight, map[string]string{"SE_QUEUE_WEIGHT": "3"}, "3", "SE_QUEUE_WEIGHT"},
-		{weight, map[string]string{"SE_QUEUE_WEIGHT": " "}, "2", Local},
-		{q.Key{Name: "migration/config/s", Instance: "migration", Local: "s", Shared: true}, map[string]string{"SE_MIGRATION_S": "new"}, `"old"`, Tracked},
-		{q.Key{Name: "migration/config/s", Instance: "migration", Local: "s", Shared: true}, nil, `"old"`, Tracked},
-	}
-	for _, one := range cases {
-		value, layer, ok := Layered(one.key, tracked, local, one.env)
-		if !ok || value != one.value || layer != one.layer {
-			t.Fatalf("%s reads %s in %s, and wants %s in %s", one.key.Name, value, layer, one.value, one.layer)
-		}
-	}
-	if _, _, ok := Layered(q.Key{Name: "queue/config/none", Instance: "queue", Local: "none"}, tracked, local, nil); ok {
-		t.Fatal("a key no layer sets reads as set")
 	}
 }
 
@@ -227,34 +174,5 @@ func TestValuesReadTheTrackedFile(t *testing.T) {
 	ix.Seed(files(`{"migration": {"switch": 3}}`, `{}`))
 	if got := ix.Read("migration/config/switch"); got != 3 {
 		t.Fatalf("migration/config/switch reads %v, where the tracked file says 3", got)
-	}
-}
-
-// A kebab-case local name reads its camel-case member of the file. [[spec/tickets/the-config-schema-gets-generated]]
-func TestAKebabKeyReadsItsCamelCaseMember(t *testing.T) {
-	tracked, err := q.JSON.Parse([]byte(`{"stop": {"mostInARow": 4}}`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	key := q.Key{Name: "stop/config/most-in-a-row", Instance: "stop", Local: "most-in-a-row"}
-	if value, layer, ok := Layered(key, tracked, q.Ordered{}, map[string]string{EnvOf("stop.mostInARow"): "5"}); !ok || value != "5" || layer != EnvOf("stop.mostInARow") {
-		t.Fatalf("the key reads %s off %s, and wants 5 off its variable", value, layer)
-	}
-	if value, _, ok := Layered(key, tracked, q.Ordered{}, nil); !ok || value != "4" {
-		t.Fatalf("the key reads %s, and wants 4 off the file", value)
-	}
-}
-
-// The schema answers off the config projection, so the sidebar reads it over /v1. [[spec/tickets/the-sidebar-reads-v1]]
-func TestSchemaProjects(t *testing.T) {
-	const schema = "spec/config/level0.schema.json"
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
-	index.Seed(map[string]any{"files/" + schema: q.Content{Hash: "h", Text: "{\n  \"type\": \"object\"\n}\n"}})
-	if err := index.Store().Run("config/" + schema); err != nil {
-		t.Fatalf("config/%s runs nowhere: %v", schema, err)
-	}
-	got, _ := index.Read("config/" + schema).(q.Ordered)
-	if len(got.Keys) != 1 || got.Keys[0] != "type" || got.Fields[0].Literal != `"object"` {
-		t.Fatalf("config/%s reads %+v", schema, got)
 	}
 }

@@ -1,7 +1,7 @@
 // The standing file names the bus the manager runs and the token a peer
 // shows.
 // [[spec/design_output/model#the-standing-file]]
-package index
+package index // level0: InPackageTest - it reads the unexported standingOf
 
 import (
 	"path/filepath"
@@ -11,7 +11,9 @@ import (
 	"quackitect/src/q/qtest"
 )
 
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheStandingFileNamesTheBusAndItsToken(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	bus, err := StartBus()
 	if err != nil {

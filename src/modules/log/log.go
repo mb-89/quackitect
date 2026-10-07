@@ -5,10 +5,10 @@ package log
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"quackitect/src/q"
+	"quackitect/src/yaml"
 )
 
 // The ports, by their local names. [[spec/design_output/model#the-wiring-file]]
@@ -99,14 +99,14 @@ func RowOf(line string) Row {
 		return Row{Level: "error", Kind: "unparsed", Said: strings.TrimSpace(line), Broken: true}
 	}
 	r := Row{
-		At:    textOf(fields["at"]),
-		Level: Ladder[Rank(textOf(fields["level"]))],
-		Kind:  textOf(fields["kind"]),
-		Said:  textOf(fields["said"]),
-		Text:  textOf(fields["text"]),
+		At:    yaml.FieldText(fields["at"]),
+		Level: Ladder[Rank(yaml.FieldText(fields["level"]))],
+		Kind:  yaml.FieldText(fields["kind"]),
+		Said:  yaml.FieldText(fields["said"]),
+		Text:  yaml.FieldText(fields["text"]),
 	}
 	if r.Kind == "" {
-		r.Kind = textOf(fields["door"])
+		r.Kind = yaml.FieldText(fields["door"])
 	}
 	for key, value := range fields {
 		if own[key] {
@@ -115,23 +115,9 @@ func RowOf(line string) Row {
 		if r.Extra == nil {
 			r.Extra = map[string]string{}
 		}
-		r.Extra[key] = textOf(value)
+		r.Extra[key] = yaml.FieldText(value)
 	}
 	return r
-}
-
-// A field's value as text, a list or an object as its JSON. [[spec/design_output/tui#one-row]]
-func textOf(value any) string {
-	switch one := value.(type) {
-	case nil:
-		return ""
-	case string:
-		return one
-	case map[string]any, []any:
-		out, _ := json.Marshal(one)
-		return string(out)
-	}
-	return fmt.Sprint(value)
 }
 
 // A level's place on the ladder, and info's place for a level nobody knows. [[spec/design_output/log#what-a-box-writes]]

@@ -1,6 +1,6 @@
 // What each door owns, off the owns.yaml beside it, and every use of an owned
 // name standing outside the doors that own it.
-// [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// [[spec/design_output/doors#a-door-declares-its-names]]
 package owns
 
 import (
@@ -14,7 +14,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The declaration's file name, and the marker passing one line. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The declaration's file name, and the marker passing one line. [[spec/design_output/doors#a-door-declares-its-names]]
 const (
 	File   = "owns.yaml"
 	Marker = "level0: OutsideInDoors - "
@@ -32,7 +32,7 @@ const (
 	noDoorSays  = "%s is a module no door declares"
 )
 
-// The keys an entry takes. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The keys an entry takes. [[spec/design_output/doors#a-door-declares-its-names]]
 const (
 	goKey       = "go"
 	jsKey       = "js"
@@ -42,13 +42,13 @@ const (
 	outsideKey  = "outside"
 )
 
-// Where a contract test stands: a Go test file ending so, or a file of the contract run. [[spec/design_output/doors#a-door-names-its-contract-tests]]
+// Where a contract test stands: a Go test file ending so, or a file of the contract run. [[spec/design_output/doors#a-door-names-its-contracts]]
 const (
 	contractGo     = "_contract_test.go"
 	contractFolder = "test/contract/"
 )
 
-// The forms a door's name, a Go name, a JS name and the marker take. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The forms a door's name, a Go name, a JS name and the marker take. [[spec/design_output/doors#a-door-declares-its-names]]
 var (
 	doorName = regexp.MustCompile(`^[a-z][a-z0-9-]*$`)
 	goName   = regexp.MustCompile(`^[a-z][a-z0-9_]*(/[a-z0-9_]+)*(\.[A-Za-z_][A-Za-z0-9_]*)?$`)
@@ -56,7 +56,7 @@ var (
 	markedAt = regexp.MustCompile(`(?://|/\*|#)\s*` + regexp.QuoteMeta(strings.TrimSpace(Marker)) + `(.*)$`)
 )
 
-// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, whether it stands at report, and whether it stands as its own outside. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, whether it stands at report, and whether it stands as its own outside. [[spec/design_output/doors#a-door-declares-its-names]]
 type Door struct {
 	Name     string
 	At       string
@@ -100,14 +100,14 @@ func (w Walk) Says() string {
 	return fmt.Sprintf(walksAround, w.Name, strings.Join(w.Doors, ", "))
 }
 
-// A declaration that reads as none, and where. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// A declaration that reads as none, and where. [[spec/design_output/doors#a-door-declares-its-names]]
 type Fault struct {
 	File string
 	Line int
 	Says string
 }
 
-// Every door the declarations name, and each fault of their form. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every door the declarations name, and each fault of their form. [[spec/design_output/doors#a-door-declares-its-names]]
 func Read(declared map[string]string, exists func(string) bool) ([]Door, []Fault) {
 	paths := make([]string, 0, len(declared))
 	for at := range declared {
@@ -124,7 +124,7 @@ func Read(declared map[string]string, exists func(string) bool) ([]Door, []Fault
 	return doors, faults
 }
 
-// The doors one declaration names, line by line, so a fault names its line. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The doors one declaration names, line by line, so a fault names its line. [[spec/design_output/doors#a-door-declares-its-names]]
 func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 	folder := path.Dir(at)
 	var doors []Door
@@ -236,7 +236,7 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 	return doors, faults
 }
 
-// Whether a joined path stands under the folder. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether a joined path stands under the folder. [[spec/design_output/doors#a-door-declares-its-names]]
 func within(folder, joined string) bool {
 	if folder == "." {
 		return joined != ".." && !strings.HasPrefix(joined, "../")
@@ -244,17 +244,17 @@ func within(folder, joined string) bool {
 	return strings.HasPrefix(joined, folder+"/")
 }
 
-// Whether a path names a declaration. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether a path names a declaration. [[spec/design_output/doors#a-door-declares-its-names]]
 func Declares(at string) bool {
 	return path.Base(strings.ReplaceAll(at, "\\", "/")) == File
 }
 
-// Whether a path from the root names a contract test. [[spec/design_output/doors#a-door-names-its-contract-tests]]
+// Whether a path from the root names a contract test. [[spec/design_output/doors#a-door-names-its-contracts]]
 func IsContract(at string) bool {
 	return !path.IsAbs(at) && at == path.Clean(at) && (strings.HasSuffix(at, contractGo) || strings.HasPrefix(at, contractFolder))
 }
 
-// Whether the door's files hold the path: its contract tests, then the files it names, or every file standing in its folder. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Whether the door's files hold the path: its contract tests, then the files it names, or every file standing in its folder. [[spec/design_output/doors#a-door-declares-its-names]]
 func (one Door) Holds(at string) bool {
 	if slices.Contains(one.Contract, at) {
 		return true
@@ -349,7 +349,7 @@ func reasonIn(line string) string {
 	return strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(found[1]), "*/"))
 }
 
-// The package of a Go name and its member, empty where the name owns the package whole. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The package of a Go name and its member, empty where the name owns the package whole. [[spec/design_output/doors#a-door-declares-its-names]]
 func split(name string) (string, string) {
 	cut := strings.LastIndex(name, "/")
 	if dot := strings.Index(name[cut+1:], "."); dot >= 0 {

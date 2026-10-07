@@ -2,7 +2,7 @@
 // program stands nowhere under src/scripts/verbs, and no file under src
 // imports a JavaScript module the port deletes.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"

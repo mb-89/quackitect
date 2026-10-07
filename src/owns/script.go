@@ -225,7 +225,7 @@ func tokAt(tokens []tok, k int) tok {
 
 func is(one tok, kind byte, text string) bool { return one.kind == kind && one.text == text }
 
-// The owned module a specifier names: the module itself, or a module below it. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// The owned module a specifier names: the module itself, or a module below it. [[spec/design_output/doors#a-door-declares-its-names]]
 func moduleOf(owned map[string]*claim, modules []string, specifier string) (string, *claim) {
 	if one := owned[specifier]; one != nil {
 		return specifier, one

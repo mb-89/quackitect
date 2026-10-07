@@ -88,7 +88,7 @@ already differ.
 
 | the fact | the copies | what already differs |
 |---|---|---|
-| config resolution | `lib/config.js`, `src/config`, `src/bridge/config.js`, `src/extension/lib/widgets.js`, `src/lsp/config.go` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
+| config resolution | `lib/config.js`, `src/config`, `src/bridge/config.js`, `src/extension/lib/widgets.js` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
 | frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `schema-read.js` and `group.js`, and three writers | Go quotes a value, and JavaScript leaves it bare |
 | the Ask chapter | `group.js`, `pull-chapter.js`, `index/ticket.go` | `group.js` keeps comments and the other two drop them, so the queue's text and the index's differ |
 | held and group standing | `group.js`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |

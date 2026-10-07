@@ -3,7 +3,7 @@
 // Each case calls the action by name over a tree in a temp folder and a fake
 // of the reads the door hands the manager.
 // [[spec/tickets/find-and-wait-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

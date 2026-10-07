@@ -20,7 +20,7 @@ import (
 // The recording the replay drives, under the tree's root. [[spec/design_output/model#an-inbound-fake-replays]]
 const recording = "../../../test/replay/lsp/one-session.jsonl"
 
-// A sweep that behaves: an open buffer of spec/a.md carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
+// A sweep that behaves: an open buffer of a note carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
 func serverOver(t *testing.T) (*Server, *q.Store) {
 	t.Helper()
 	store, as := catalogOf(t)
@@ -66,7 +66,7 @@ func TestTheListenWritesTheDoorFile(t *testing.T) {
 }
 
 func TestTheListensStopHaltsTheTools(t *testing.T) {
-	fake := taughtTools(map[string]string{"vale": "{}"}, nil)
+	fake := taughtTools(nil, nil)
 	server, _ := toolsOver(t, map[string]string{}, fake)
 	halted := make(chan struct{})
 	server.from.Tools.Halt = func() { close(halted) }

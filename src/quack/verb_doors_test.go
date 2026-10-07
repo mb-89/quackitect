@@ -1,7 +1,7 @@
 // The doors verb in Go: every door under src/doors against the contract test
 // that holds it.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

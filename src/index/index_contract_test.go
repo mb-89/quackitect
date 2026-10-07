@@ -18,6 +18,7 @@ import (
 )
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	stop, _, err := Serve(qtest.Wall(), root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
@@ -62,6 +63,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 }
 
 func TestGitsOwnIndexTurnsTheTrackedFlags(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	run := func(argv ...string) {
 		one := exec.Command("git", argv...)

@@ -20,7 +20,6 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { session } from "../doors/session.js";
 import { answers, fetchThrough } from "./copilot-door.js";
-import { assemble } from "./styles.js";
 import { rootsHere } from "./vehicle.js";
 
 const DEADLINE = 20000;
@@ -35,7 +34,7 @@ const cloud =
   files.exists(join(root, inRun("copilot-cloud"))) ||
   Boolean(process.env.GITHUB_COPILOT_GIT_TOKEN && process.env.COPILOT_AGENT_PROMPT);
 const surface = cloud ? "cloud" : "vscode";
-// The pair of roots the door reads, so the copilot road assembles the same rule set. [[spec/design_output/vehicle#the-styles-assemble-once]]
+// The pair of roots the door reads, so the copilot road works where the verbs work. [[spec/design_output/vehicle#the-work-root-inherits]]
 const roots = rootsHere(files, process.env, root);
 let currentEvent = { surface, event: name, retry: false };
 const it = {
@@ -43,7 +42,6 @@ const it = {
   work: roots.work,
   // The tracked config stands under the root, where the config reader looks for it. [[spec/tickets/copilot-shadow-carries-method]]
   method: root,
-  styles: () => assemble(files, roots).config,
   disk: files,
   proc: outside,
   git: git(outside, root),

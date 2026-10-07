@@ -184,7 +184,7 @@ func manages(as q.Writer, open doors) index.Manage {
 			stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: func() { split.Stop(); stop() }, Bus: split.Bus, Away: split.Away, Settle: split.Settle, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		return index.Managed{Stop: func() { split.Stop(); stop() }, Bus: split.Bus, Away: split.Away, Settle: split.Settle, Accepts: acceptsVerb, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
@@ -269,6 +269,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Git:    func(root string, args ...string) string { return gitRead(root, args...) },
 		Voice:  func(root, message string) []command.Row { return commitVoice(box, root, message) },
 		Review: reviewOver(root),
+		// [[spec/tickets/wiring-names-listens-hooks]]
+		Hear: sentinelHere(root, os.Stderr),
 	})
 	return hooks.Listen(root, door)
 }

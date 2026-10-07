@@ -2,7 +2,7 @@
 // every target the tree holds byte for byte, and prints the line node prints.
 // A stale target goes, a file the owner keeps beside the targets stays.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"

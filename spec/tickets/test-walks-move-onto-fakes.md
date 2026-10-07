@@ -339,7 +339,7 @@ Each test file `./RUNME.sh doors` lists takes the first of six moves that fits i
 1. A case restating behaviour another case or a command-line case covers leaves.
 2. A fixture seeded on the real disk for code taking a disk door seeds the door's fake: `files.NewFakeDisk` in a module, `newFakeDisk` in the root. Code reaching the disk past a door takes the door as an argument first.
 3. A wait on the wall becomes a wait on `qtest.NewFake` or on the readiness event. A bound on a hang drops, since `go test -timeout` bounds the run. In JavaScript the clock and `fetch` come from `src/doors/fake`.
-4. A case meeting the real thing a door owns, a spawn, a socket or the disk under the door, moves into that door's one contract test, `_contract_test.go` or under `test/contract/`, and the door's `owns.yaml` names it under `contract`. [[spec/design_output/doors#a-door-names-its-contract-tests]]
+4. A case meeting the real thing a door owns, a spawn, a socket or the disk under the door, moves into that door's one contract test, `_contract_test.go` or under `test/contract/`, and the door's `owns.yaml` names it under `contract`. [[spec/design_output/doors#a-door-names-its-contracts]]
 5. A case spawning `quack` or the test binary meets the command line, and moves into the quack door's contract test.
 6. A case reading the tree's own source, as a build check reads it, keeps its import with the marker `level0: OutsideInDoors - <reason>`, as the cases under `src/owns/*_tree_test.go` do. The guard lists every marked line.
 

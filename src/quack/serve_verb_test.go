@@ -2,7 +2,7 @@
 // answering, and an index that falls, each with the line and the exit code
 // the JavaScript answers.
 // [[spec/design_output/level0#a-desk-serve-returns]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

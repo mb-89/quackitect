@@ -339,7 +339,7 @@ accept with points
 
 the change touches the files the draft sizes for part one, plus src/vehicle/owns.yaml, since the vehicle shim test is a contract test and its door stood undeclared
 every door the change reaches keeps its fake, and the vehicle door is its disk.go and its dry twin
-owns.go points each new name at spec/design_output/doors#a-door-names-its-contract-tests
+owns.go points each new name at spec/design_output/doors#a-door-names-its-contracts
 the contract key stands once in the doors note, and the key table points at its chapter
 
 ## tests-green

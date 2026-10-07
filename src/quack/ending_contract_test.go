@@ -4,7 +4,7 @@
 // they hold proves by reading to its end, and a door started apart stands
 // outside the group the end reaches. Each case meets a real process.
 // [[spec/tickets/the-check-ends-what-it-drops]]
-package main
+package main // level0: InPackageTest - the case calls the unexported endsWhole of the command
 
 import (
 	"bufio"
@@ -18,6 +18,7 @@ import (
 )
 
 // A check gives up on a child, and the group kill leaves a door started apart standing. [[spec/tickets/the-index-outlives-the-check]]
+// level0: FixtureOutsideHome - the case spawns its own door and child, then ends them
 func TestAServerStandingBeforeTheCheckAnswersAfterIt(t *testing.T) {
 	t.Parallel()
 	door := index.Detached(exec.Command("tail", "-f", "/dev/null"))
@@ -43,6 +44,7 @@ func TestAServerStandingBeforeTheCheckAnswersAfterIt(t *testing.T) {
 }
 
 // The child starts a grandchild holding its stdout, so the pipe reads to its end only once both have ended. [[spec/tickets/the-check-ends-what-it-drops]]
+// level0: FixtureOutsideHome - the case spawns its own child and grandchild, then ends them
 func TestAChildTheCheckGivesUpOnEndsWithEveryProcessItStarted(t *testing.T) {
 	t.Parallel()
 	span, stop := context.WithCancel(context.Background())

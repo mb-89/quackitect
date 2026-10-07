@@ -91,7 +91,7 @@ func Owned(root string) []string {
 	return owns.Whole(Doors(root))
 }
 
-// Every door the declarations under the root name, read once a root. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// Every door the declarations under the root name, read once a root. [[spec/design_output/doors#a-door-declares-its-names]]
 func Doors(root string) []owns.Door {
 	if held, ok := declared.Load(root); ok {
 		return held.([]owns.Door)

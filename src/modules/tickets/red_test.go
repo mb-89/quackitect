@@ -79,6 +79,12 @@ func TestRedList(t *testing.T) {
 			t.Fatalf("a closed ticket reads %v, and wants none", got)
 		}
 	})
+	t.Run("a tests-red whose skipped reads false names its files", func(t *testing.T) {
+		want := []string{"test/level0/one.test.js", "test/level0/two.test.js"}
+		if got := RedList(redOf("  - step: design/tests-red\n    skipped: false\n")); !reflect.DeepEqual(got, want) {
+			t.Fatalf("a tests-red skipped false reads %v, and wants %v", got, want)
+		}
+	})
 	t.Run("a skipped tests-red names none", func(t *testing.T) {
 		if got := RedList(redOf("  - step: design/tests-red\n    skipped: true\n")); len(got) != 0 {
 			t.Fatalf("a skipped tests-red reads %v, and wants none", got)
@@ -105,6 +111,13 @@ func TestRedRows(t *testing.T) {
 		}
 		if got := RedRows(text, "implement/change"); len(got) != 0 {
 			t.Fatalf("a leaf with no list reads %v, and wants none", got)
+		}
+	})
+	t.Run("a row naming its case after the path reads as the path", func(t *testing.T) {
+		text := "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\n- src/one/one_test.go TestOne\n- test/level0/a.test.js a case reads its words\n"
+		want := []string{"src/one/one_test.go", "test/level0/a.test.js"}
+		if got := RedRows(text, "design/tests-red"); !reflect.DeepEqual(got, want) {
+			t.Fatalf("the named rows read %v, and want %v", got, want)
 		}
 	})
 	t.Run("a comma-joined row reads one path each", func(t *testing.T) {

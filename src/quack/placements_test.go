@@ -2,7 +2,7 @@
 // list in one process. A module process commits its instance off the inputs
 // the index answers.
 // [[spec/design_output/model#the-placements]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

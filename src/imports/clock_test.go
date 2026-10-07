@@ -1,7 +1,7 @@
 // The real-wait guard, named over a planted file and over every test the tree
 // holds against the door audit.
 // [[spec/guidance/code/testing]]
-package imports
+package imports_test
 
 import (
 	"go/ast"
@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/src/imports"
 	"quackitect/src/modules/files"
 )
 
@@ -55,7 +56,7 @@ func TestASleepAndASpawnAreNamedThroughTheirImportNames(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess", "proc.Real"}
-	if said := RealWaits(file); !slices.Equal(said, want) {
+	if said := imports.RealWaits(file); !slices.Equal(said, want) {
 		t.Fatalf("the real waits read %v, where %v stand", said, want)
 	}
 }
@@ -77,14 +78,14 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 		"c/quiet_test.go":   parsed(plantedQuiet),
 	}
 	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess, proc.Real"}
-	if said := UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
+	if said := imports.UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
 		t.Fatalf("the guard names %v, where %v stands", said, want)
 	}
 }
 
 func TestASpanMatchingNoFileIsNamed(t *testing.T) {
 	t.Parallel()
-	if said := StaleSpans(plantedAudit+"a suffix: `_contract_test.go`, a door: `.d/gone.js`, `.d/here.js`\n", []string{"a/listed_test.go", "c/other_test.go", ".d/here.js"}); !slices.Equal(said, []string{"b/*_test.go", ".d/gone.js"}) {
+	if said := imports.StaleSpans(plantedAudit+"a suffix: `_contract_test.go`, a door: `.d/gone.js`, `.d/here.js`\n", []string{"a/listed_test.go", "c/other_test.go", ".d/here.js"}); !slices.Equal(said, []string{"b/*_test.go", ".d/gone.js"}) {
 		t.Fatalf("the guard names %v, where b/*_test.go and .d/gone.js alone match no file, and the bare suffix names no path", said)
 	}
 }
@@ -126,10 +127,10 @@ func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 		}
 		held = append(held, more...)
 	}
-	for _, span := range StaleSpans(note, held) {
+	for _, span := range imports.StaleSpans(note, held) {
 		t.Errorf("%s names %s, and no file the tree holds matches it", doorAudit, span)
 	}
-	for _, line := range UnauditedWaits(note, parsed) {
+	for _, line := range imports.UnauditedWaits(note, parsed) {
 		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)
 	}
 }

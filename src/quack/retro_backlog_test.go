@@ -1,7 +1,7 @@
 // The retro's backlog read: every prose criterion a ticket the window closes
 // carries, printed for a verdict, and the verb green once each holds one.
 // [[spec/tickets/the-retro-reads-the-backlog]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"path/filepath"

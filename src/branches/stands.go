@@ -6,10 +6,12 @@ package branches
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"slices"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -419,8 +421,7 @@ func (d *Doors) dirty(branch string) bool { return d.dirtyPast(branch, "") }
 func (d *Doors) dirtyPast(branch, keeps string) bool {
 	for _, one := range d.standingIn() {
 		if !one.Parked {
-			d.warn("This tree carries uncommitted changes, so no branch may move.")
-			d.warn("Commit them, or stash them, and run this again.")
+			d.raises(failure.Raise(d.Failures, "branch-tree-dirty", "This tree carries uncommitted changes, so no branch may move.", "Commit them, or stash them, and run this again."))
 			return true
 		}
 	}
@@ -455,8 +456,9 @@ func (d *Doors) unpushed(branch string) bool {
 	if count <= 0 {
 		return false
 	}
-	d.warn("%s holds %d commit(s) origin lacks, so no branch may move.", branch, count)
-	d.warn("Run git push origin %s, and run this again.", branch)
+	d.raises(failure.Raise(d.Failures, "branch-unpushed",
+		fmt.Sprintf("%s holds %d commit(s) origin lacks, so no branch may move.", branch, count),
+		"Run git push origin "+branch+", and run this again."))
 	return true
 }
 

@@ -1,6 +1,8 @@
 // The door's network in memory: a listen answers a port of its own, a dial
 // meets the listener on that port over a pipe, and a late port answers every
-// post past its time. The door's own owns.yaml holds this file.
+// post past its time. The cases share one port table, so they run beside each
+// other, and a post to a port outside the table reaches the real
+// loopback the contract cases stand on. The door's own owns.yaml holds this file.
 // [[spec/tickets/test-walks-move-onto-fakes]]
 package index
 
@@ -17,57 +19,52 @@ import (
 	"testing"
 )
 
-// The first port the fake network answers. [[spec/tickets/test-walks-move-onto-fakes]]
-const firstFakePort = 40000
+// The port the fake table counts up from, so every fake port stands below the ports a kernel hands a real listener. [[spec/tickets/test-walks-move-onto-fakes]]
+const firstFakePort = 0
 
-// The listeners standing, the ports marked late, and the listen whose turn fails. [[spec/tickets/test-walks-move-onto-fakes]]
-type memNet struct {
+// The ports the fake network handed, the listeners standing on them, and the ports marked late. [[spec/tickets/test-walks-move-onto-fakes]]
+type memPorts struct {
 	mu    sync.Mutex
 	ports map[int]*memListener
 	late  map[int]bool
 	next  int
-	calls int
-	// The listen, counted from one, that answers a taken port; none at zero.
-	failsAt int
-	// Every listener the network made, in order.
-	made []*memListener
 }
 
-// A network the door's clients post over until the case ends. [[spec/tickets/test-walks-move-onto-fakes]]
-func newMemNet(t *testing.T) *memNet {
-	t.Helper()
-	n := &memNet{ports: map[int]*memListener{}, late: map[int]bool{}, next: firstFakePort}
-	was := doorTransport
-	doorTransport = memTransport{from: n, inner: &http.Transport{DialContext: n.dial}}
-	t.Cleanup(func() { doorTransport = was })
-	return n
+// The one port table every case's network hands its ports from. [[spec/tickets/test-walks-move-onto-fakes]]
+var fakePorts = &memPorts{ports: map[int]*memListener{}, late: map[int]bool{}, next: firstFakePort}
+
+// The door's clients post over the fake network for the whole run, and the transport stays put. [[spec/tickets/test-walks-move-onto-fakes]]
+func init() {
+	doorTransport = memTransport{from: fakePorts, inner: &http.Transport{DialContext: fakePorts.dial}, real: http.DefaultTransport}
 }
 
-// [[spec/tickets/test-walks-move-onto-fakes]]
-func (n *memNet) listen(network, address string) (net.Listener, error) {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	n.calls++
-	if n.calls == n.failsAt {
-		return nil, errors.New("the port stands taken")
-	}
-	n.next++
-	one := &memListener{port: n.next, conns: make(chan net.Conn), closed: make(chan struct{}), from: n}
-	n.ports[one.port] = one
-	n.made = append(n.made, one)
-	return one, nil
+// A listener on the next port the table hands. [[spec/tickets/test-walks-move-onto-fakes]]
+func (table *memPorts) opens() *memListener {
+	table.mu.Lock()
+	defer table.mu.Unlock()
+	table.next++
+	one := &memListener{port: table.next, conns: make(chan net.Conn), closed: make(chan struct{}), from: table}
+	table.ports[one.port] = one
+	return one
+}
+
+// Whether the table handed the port, and whether it stands late. [[spec/tickets/test-walks-move-onto-fakes]]
+func (table *memPorts) handed(port int) (fake, late bool) {
+	table.mu.Lock()
+	defer table.mu.Unlock()
+	return port > firstFakePort && port <= table.next, table.late[port]
 }
 
 // A dial meets the listener on the port over a pipe, and a port nobody listens on refuses it. [[spec/tickets/test-walks-move-onto-fakes]]
-func (n *memNet) dial(ctx context.Context, network, address string) (net.Conn, error) {
+func (table *memPorts) dial(ctx context.Context, network, address string) (net.Conn, error) {
 	_, at, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
 	}
 	port, _ := strconv.Atoi(at)
-	n.mu.Lock()
-	one := n.ports[port]
-	n.mu.Unlock()
+	table.mu.Lock()
+	one := table.ports[port]
+	table.mu.Unlock()
 	refused := errors.New("nothing listens on " + address)
 	if one == nil {
 		return nil, refused
@@ -82,6 +79,33 @@ func (n *memNet) dial(ctx context.Context, network, address string) (net.Conn, e
 	server.Close()
 	client.Close()
 	return nil, refused
+}
+
+// One case's network over the shared table: the listens it counts, and the listen whose turn fails. [[spec/tickets/test-walks-move-onto-fakes]]
+type memNet struct {
+	mu      sync.Mutex
+	calls   int
+	failsAt int
+	made    []*memListener
+}
+
+// A network of the case's own, whose ports the door's clients reach. [[spec/tickets/test-walks-move-onto-fakes]]
+func newMemNet(t *testing.T) *memNet {
+	t.Helper()
+	return &memNet{}
+}
+
+// [[spec/tickets/test-walks-move-onto-fakes]]
+func (n *memNet) listen(network, address string) (net.Listener, error) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.calls++
+	if n.calls == n.failsAt {
+		return nil, errors.New("the port stands taken")
+	}
+	one := fakePorts.opens()
+	n.made = append(n.made, one)
+	return one, nil
 }
 
 // A door answering each call through the hand, on a port of its own. [[spec/tickets/test-walks-move-onto-fakes]]
@@ -102,11 +126,11 @@ func (n *memNet) serves(t *testing.T, hand func(said call) answer) int {
 
 // A port whose door is busy, so every post to it runs past its time. [[spec/tickets/test-walks-move-onto-fakes]]
 func (n *memNet) lates() int {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	n.next++
-	n.late[n.next] = true
-	return n.next
+	fakePorts.mu.Lock()
+	defer fakePorts.mu.Unlock()
+	fakePorts.next++
+	fakePorts.late[fakePorts.next] = true
+	return fakePorts.next
 }
 
 // [[spec/tickets/test-walks-move-onto-fakes]]
@@ -115,7 +139,7 @@ type memListener struct {
 	conns  chan net.Conn
 	closed chan struct{}
 	once   sync.Once
-	from   *memNet
+	from   *memPorts
 }
 
 func (one *memListener) Accept() (net.Conn, error) {
@@ -141,19 +165,21 @@ func (one *memListener) Addr() net.Addr {
 	return &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: one.port}
 }
 
-// The transport over the fake network, which answers a post to a late port with the timeout a busy door meets. [[spec/tickets/test-walks-move-onto-fakes]]
+// The transport over the fake network, which answers a post to a late port with the timeout a busy door meets, and hands a port outside the table to the real loopback. [[spec/tickets/test-walks-move-onto-fakes]]
 type memTransport struct {
-	from  *memNet
+	from  *memPorts
 	inner *http.Transport
+	real  http.RoundTripper
 }
 
 func (one memTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	port, _ := strconv.Atoi(r.URL.Port())
-	one.from.mu.Lock()
-	late := one.from.late[port]
-	one.from.mu.Unlock()
+	fake, late := one.from.handed(port)
 	if late {
 		return nil, os.ErrDeadlineExceeded
+	}
+	if !fake {
+		return one.real.RoundTrip(r)
 	}
 	return one.inner.RoundTrip(r)
 }

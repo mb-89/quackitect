@@ -1,7 +1,7 @@
 // The fake doors the box verbs run over in a test: a temporary tree, a PATH
 // of empty programs, a runner recording each run, and a GET that answers
 // nothing. [[spec/tickets/box-verbs-no-node-test]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -42,8 +42,17 @@ func fakeKey(at string) string {
 }
 
 func (f *fakeDisk) folder(key string) bool {
+	if held, ok := f.files[key]; ok && held.Mode&fs.ModeSymlink != 0 {
+		return false
+	}
 	said, err := fs.Stat(f.files, key)
 	return err == nil && said.IsDir()
+}
+
+// Whether a file, a link or a folder stands at the key, a link read as itself, unfollowed. [[spec/tickets/test-walks-move-onto-fakes]]
+func (f *fakeDisk) holds(key string) bool {
+	_, ok := f.files[key]
+	return ok || f.folder(key)
 }
 
 // The key a path reaches, each link it names followed as the box's own disk follows it. [[spec/tickets/test-walks-move-onto-fakes]]
@@ -97,7 +106,7 @@ func (f *fakeDisk) symlink(target, at string) error {
 	if !f.folder(path.Dir(key)) {
 		return &fs.PathError{Op: "symlink", Path: at, Err: fs.ErrNotExist}
 	}
-	if _, err := fs.Stat(f.files, key); err == nil {
+	if f.holds(key) {
 		return &fs.PathError{Op: "symlink", Path: at, Err: fs.ErrExist}
 	}
 	f.files[key] = &fstest.MapFile{Data: []byte(target), Mode: fs.ModeSymlink | 0o777, ModTime: time.Unix(0, 0)}
@@ -170,7 +179,7 @@ func (f *fakeDisk) remove(at string) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	key := fakeKey(at)
-	if _, err := fs.Stat(f.files, key); err != nil {
+	if !f.holds(key) {
 		return &fs.PathError{Op: "remove", Path: at, Err: fs.ErrNotExist}
 	}
 	if held := f.under(key); len(held) > 1 || (len(held) == 1 && held[0] != key) {
@@ -193,7 +202,7 @@ func (f *fakeDisk) rename(from, to string) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	was, now := fakeKey(from), fakeKey(to)
-	if _, err := fs.Stat(f.files, was); err != nil {
+	if !f.holds(was) {
 		return &fs.PathError{Op: "rename", Path: from, Err: fs.ErrNotExist}
 	}
 	if !f.folder(path.Dir(now)) {
@@ -273,7 +282,7 @@ func hq1SeedPrograms(t *testing.T, disk diskDoors, folder string, programs []str
 // The fake doors over a temporary tree, with the named programs standing on its PATH. [[spec/tickets/box-verbs-no-node-test]]
 func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *strings.Builder, *strings.Builder) {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - the doors stand over a root of the case's own, where it plants programs and logs
 	path := filepath.Join(root, "path")
 	disk := newFakeDisk()
 	hq1SeedPrograms(t, disk, path, programs)

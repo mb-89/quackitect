@@ -1,6 +1,6 @@
 // The review seam reads the verb's newest material line, or says why none stands.
 // [[spec/tickets/review-spawns-off-the-door]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

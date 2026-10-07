@@ -1,7 +1,7 @@
 // The watch over /v1 sends each named value once it opens, then each change
 // to one, and refuses a name the catalog lacks before it streams.
 // [[spec/tickets/v1-watch-streams-changes]]
-package index
+package index // level0: InPackageTest - it reads the unexported standingOf, and declares watchPatience other cases share
 
 import (
 	"bufio"
@@ -74,7 +74,9 @@ func nextEvent(t *testing.T, events <-chan watched) watched {
 	return one
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
+	t.Parallel()
 	standing, _ := watchingV1(t)
 	said, events := openWatch(t, standing, "files/spec/one.md")
 	if said.StatusCode != statusOK || !strings.HasPrefix(said.Header.Get("Content-Type"), "text/event-stream") {
@@ -86,7 +88,9 @@ func TestV1WatchSendsEachNamedValueOnConnect(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
+	t.Parallel()
 	standing, writes := watchingV1(t)
 	_, events := openWatch(t, standing, "files/spec/one.md")
 	first := nextEvent(t, events)
@@ -98,13 +102,16 @@ func TestV1WatchSendsAChangeToANamedValue(t *testing.T) {
 }
 
 func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
+	t.Parallel()
 	said, body := getV1(t, standingV1(t), "/v1/watch?names=t/none")
 	if said.StatusCode != statusNotFound || !strings.Contains(string(body), "t/none") {
 		t.Fatalf("the watch answers %d: %s", said.StatusCode, body)
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes to its own watched door
 func TestV1WatchSendsNothingWhereTheValueStands(t *testing.T) {
+	t.Parallel()
 	standing, writes := watchingV1(t)
 	_, events := openWatch(t, standing, "files/spec/one.md")
 	nextEvent(t, events)

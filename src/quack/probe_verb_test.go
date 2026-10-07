@@ -1,7 +1,7 @@
 // The probe verb over fake doors: the compaction probe's reading and its run,
 // the dry road handed to its JavaScript entry, and the usage.
 // [[spec/tickets/box-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

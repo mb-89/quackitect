@@ -2,7 +2,7 @@
 // them for the JS cases: the group with one sync step, a child, and the
 // helpers that move the clone onto a branch and read origin.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pa helpers on the tree fixture that the port_a tests use
 
 import (
 	"fmt"

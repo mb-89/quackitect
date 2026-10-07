@@ -370,7 +370,7 @@ pass with findings
 
 the change touches the files the ask names under src/extension, src/scripts and prototype, the doors they stand on, and the doors verb and owns parser the gate point doors-lists-declared-outsides asks for
 every door the change reaches has a fake: the clock fake gains after, wait and ms, the http fake takes the signal it ignores, and the vscode stand-in drops the extension modules an earlier fake bound
-a comment names the approach at each move: doors#time-is-a-door, doors#a-door-standing-on-another, and the outside key under doors#a-door-declares-what-it-owns
+a comment names the approach at each move: doors#time-is-a-door, doors#a-door-standing-on-another, and the outside key under doors#a-door-declares-its-names
 the clock timers, the outside key and the stacked doors each stand once in spec/design_output/doors.md, and the code points there
 
 ## tests-green

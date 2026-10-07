@@ -2,7 +2,7 @@
 // the edged rewrite, the move of a file, a folder and a note, the closed ticket
 // left alone, the text rename, the faults, and the journal entry.
 // [[spec/tickets/landing-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -42,6 +42,9 @@ type WalkFault struct {
 
 func (one WalkFault) String() string { return one.says }
 
+// Where the walk-around stands, which a test outside the package places in its file. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func (one WalkFault) At() token.Pos { return one.at }
+
 // Every walk-around the files make past the doors under the root, but a marked line and a door at report. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func WalkFaults(root string, fset *token.FileSet, files []*ast.File) []WalkFault {
 	doors := Doors(root)

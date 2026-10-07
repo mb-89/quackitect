@@ -2,7 +2,7 @@
 // the verb writes the reason into its ask, the open opens it and the pull hands
 // out its first leaf.
 // [[spec/design_input/the-agent-pulls-tickets]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

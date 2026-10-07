@@ -1,7 +1,7 @@
 // quack builds its command tree off the registry over /v1: the help reads
 // each q.Doc, run follows an action to its end, and --detach answers at once.
 // [[spec/tickets/the-quack-cli-gets-generated]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"
@@ -17,6 +17,46 @@ import (
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
+
+// Every action the wiring loads opens, on a zero input, with requests acceptsVerb accepts, so the list drops no tool the real wiring answers. An action that reads no request off a zero input stays out of the read. [[spec/tickets/real-catalog-reads-accepts]]
+func TestEveryWiredToolAnswersThroughAct(t *testing.T) {
+	t.Parallel()
+	c, err := catalogOf(realDisk(), treeRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := q.NewStore(c)
+	read := 0
+	for _, name := range store.Names() {
+		opens := zeroRequests(store, name)
+		if len(opens) > 0 {
+			read++
+		}
+		for _, asked := range opens {
+			if !acceptsVerb(asked.Module, asked.Verb) {
+				t.Errorf("%s opens with %s.%s, which no IO module accepts", name, asked.Module, asked.Verb)
+			}
+		}
+	}
+	if read == 0 {
+		t.Errorf("no action of %d opens with a request on a zero input", len(store.Names()))
+	}
+}
+
+// The requests an action opens with on a zero input, and none where it reads none. [[spec/tickets/real-catalog-reads-accepts]]
+func zeroRequests(store *q.Store, name string) (asked []q.Request) {
+	defer func() {
+		if recover() != nil {
+			asked = nil
+		}
+	}()
+	input, err := store.Input(name, nil)
+	if err != nil {
+		return nil
+	}
+	asked, _ = store.Act(name, input)
+	return asked
+}
 
 // The span t/slow waits on the fake clock, past the wait run posts with. [[spec/tickets/the-quack-cli-gets-generated]]
 const slowSpan = 1500 * time.Millisecond

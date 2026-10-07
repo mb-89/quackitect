@@ -303,10 +303,12 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		where = []string{"."}
 	}
 	return []part{
+		{name: "changed", run: func() int { return d.verb([]string{"lint", "--changed", "--strict"}, quiet) }},
 		{name: "tests", run: func() int { return testsRun(d, quiet) }, lead: true},
 		{name: "level0", run: func() int { return level0Runs(d, quiet) }, lead: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
+		{name: "guards", run: func() int { return d.verb([]string{"guards"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},
 		{name: "plugin", run: func() int { return pluginHolds(d) }},
 		{name: "server", run: func() int { return serverHolds(d) }},

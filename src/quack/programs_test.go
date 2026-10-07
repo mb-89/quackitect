@@ -1,7 +1,7 @@
 // The usage door answers help and an empty line with the usage, refuses a
 // word Go registers nowhere, and help prints the usage off the one table.
 // [[spec/tickets/program-of-drops-node]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"
