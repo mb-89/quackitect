@@ -158,3 +158,13 @@ func TestAnInteractiveRunPausesBetweenSteps(t *testing.T) {
 		t.Fatalf("the pause comes at the wrong place, after:\n%s", seen[0])
 	}
 }
+
+func TestAnExampleOutOfShapeRefusesBeforeAnyClone(t *testing.T) {
+	t.Parallel()
+	root := runRoot(t, strings.Replace(runnable, "./RUNME.sh ticket pull", "git status", 1))
+	calls := []proc.Command{}
+	code, said := runsOver(root, cloningBox(t, &calls))
+	if code != 1 || !strings.Contains(said, "line 11") || len(calls) != 0 {
+		t.Fatalf("the run exits %d after %d calls, and wants 1 naming line 11 before any:\n%s", code, len(calls), said)
+	}
+}
