@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: c4466ee89d0179fe
         size: 1191
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 81ada76d60b4ade1fa2eb744c65f802232f41b77
+    hash_after: 31df1c2c74dddb316756a8ed51fb6b53a373358d
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -528,14 +537,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, and none past them; most named scripts stand gone already, so fewer change.
+- No new door: the slice read goes through the disk door cli-doors.js already holds.
+- Each comment past a deleted bridge owner now names the Go owner, and src/scripts/cli-doors.js names the ticket over slicesIn.
+- REFUSES stands in quack-topic.js alone, and the walk and parked lists point at walkPasses and parkedFolders.
 
 ## tests-green
 
