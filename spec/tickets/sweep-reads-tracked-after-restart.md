@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 22e632e66f618699d63e518355b1c82a2aec8b3b
+    hash_after: 22e632e66f618699d63e518355b1c82a2aec8b3b
+    inputs:
+      - name: ask
+        hash: f241581ca84384d8
+        size: 425
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,53 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Cause, read on this box: the IO process runs every IO instance, git and watch among them, and exits on watch starts not: nats: maximum payload exceeded. The watcher's seed hands every file its folder filter lets through, and a git-ignored build binary at the root (quack, a Go executable) swells the seed's JSON past the bus cap of 64 MiB. The IO process dies at start, its restart meets the same seed, and git/tracked, git/tips, git/trunk and git/stood stay at their empty defaults, so check/sweep reads no file. Fix: a pure reader textual(body) in src/modules/files/watch.go answers whether a body holds no NUL byte. Standing and hears hand no body it refuses, and FakeWatch.Push skips one too, so the fake keeps the real watch's contract. A binary file reaches no rule, no reader and no search, so the family loses nothing a reader asks for.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go Seeds, through Standing
+- src/modules/files/watch.go watch.Changes, through hears
+- src/modules/files/watch.go FakeDisk listeners, through FakeWatch.Push
+- src/quack/modules.go the watch IO module start, through Seeds
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go TestTheSeedCommitsTheStandingTreeOnce: a binary file at the root reads empty in the family
+- src/modules/files/watch_contract_test.go TestWatchKeepsItsContract, the runtime JSON case: a binary write comes back nowhere, on the fake and the real watch alike
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go
+- src/modules/files/files_test.go
+- src/modules/files/watch_contract_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened: watch.go Standing, hears, heard, FakeWatch.Push and Seeds, io.go ioOver, procs.go spawn, and se-index io run by hand against the live bus
+callers: the four places a body reaches the family stand in the callers list
+done_when: the lint line stands, and the two cases name the cause under it
+config keys: the approach adds none
 
 ## tests-red
 
