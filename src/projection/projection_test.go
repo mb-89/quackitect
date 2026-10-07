@@ -273,3 +273,16 @@ func TestInheritsJoinsAJSONFileKeyByKey(t *testing.T) {
 		t.Errorf("the folder lists %v, and the union holds two", got)
 	}
 }
+
+// A number text reads in the base its prefix names, and a plain one in base ten, as Number reads it in JavaScript. [[spec/tickets/config-verbs-port-to-go]]
+func TestANumberTextReadsInTheBaseItsPrefixNames(t *testing.T) {
+	t.Parallel()
+	for text, want := range map[string]float64{"0x1F": 31, "0X1f": 31, "0o17": 15, "0O17": 15, "0b11": 3, "42": 42} {
+		if got := numberOfText(text); got != want {
+			t.Errorf("%s reads as %v, and wants %v", text, got, want)
+		}
+	}
+	if got := numberString(1e21); got != "1e+21" {
+		t.Errorf("1e21 prints as %s, and wants 1e+21", got)
+	}
+}

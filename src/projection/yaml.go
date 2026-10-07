@@ -184,7 +184,7 @@ func yamlScalar(said string) any {
 		return false
 	}
 	if yamlWhole.MatchString(flat) {
-		n, _ := strconv.ParseFloat(flat, 64)
+		n, _ := strconv.ParseFloat(flat, bitSize)
 		return n
 	}
 	return flat

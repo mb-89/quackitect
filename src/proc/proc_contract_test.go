@@ -19,7 +19,7 @@ const (
 	shortWait  = 100 * time.Millisecond
 )
 
-// The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk and not in the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
+// The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk in place of the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
 const (
 	hereLine = ": > here"
 	hereFile = "here"
@@ -219,7 +219,7 @@ func TestARunWithStreamsHandsThemItsInputAndOutput(t *testing.T) {
 	}
 }
 
-// A run a signal ends answers Signalled, apart from a program that never starts. [[spec/tickets/quack-spawns-all-take-the-runner]]
+// A run a signal ends answers Signalled, apart from a program that fails to start. [[spec/tickets/quack-spawns-all-take-the-runner]]
 func TestARunASignalEndsAnswersSignalled(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {
