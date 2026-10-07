@@ -77,6 +77,14 @@ func TestAVerbOutsideTheTableMissesNamingIt(t *testing.T) {
 	}
 }
 
+func TestAVerbReachingTheModelMissesOutsideTheTable(t *testing.T) {
+	t.Parallel()
+	miss := runsExample(pullingPath, strings.Replace(pulling, "./RUNME.sh ticket pull", "./RUNME.sh probe", 1))
+	if !strings.Contains(miss, "probe") || !strings.Contains(miss, "step 1") {
+		t.Fatalf("a call reaching the model runs past the table: the miss reads %q", miss)
+	}
+}
+
 // An example parking a note, and the one seeking it, each over its own copy. [[spec/design_output/examples#one-runner-two-drivers]]
 const (
 	noting  = "---\nkind: [[example]]\ntitle: A note parks a thought\nkeywords: [note]\ninterface: [ticket note]\n---\n\nA box parks a thought as a private note.\n\n```sh\n./RUNME.sh ticket note stray \"a thought for later\"\n# expect: exit 0\n# expect: stands .se/tickets/stray.md\n```\n"
