@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -114,6 +114,15 @@ record:
         exit: 0
         said: work/code-is-pure-tests-behave already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 55abcb1f8a0e · claude-code-remote
+    hash_before: a15bf7653a6492e15633d595bae50a3fb2d7f835
+    hash_after: a15bf7653a6492e15633d595bae50a3fb2d7f835
+    inputs:
+      - name: ask
+        hash: e76229b0876aa7d0
+        size: 2886
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -149,14 +158,34 @@ Each analyzer or measure lands in report mode first, listing offenders, then the
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/black-box-tests-guard-reports]], standard
+- [[spec/tickets/fixture-home-guard-reports]], standard
+- [[spec/tickets/test-ratio-measure-reports]], standard
+- [[spec/tickets/hand-script-guard-reports]], standard
+- [[spec/tickets/purity-guard-covers-every-outside]], standard
+- [[spec/tickets/code-and-test-rules-stand-in-guidance]], standard
+- [[spec/tickets/go-tests-go-black-box]], trivial
+- [[spec/tickets/go-fixtures-move-home]], trivial
+- [[spec/tickets/js-tests-cut-to-the-ratio]], trivial
+- [[spec/tickets/the-test-guards-refuse]], trivial
+- [[spec/tickets/door-once-meets-module-rules]], trivial
+- [[spec/tickets/imports-tests-load-the-tree-once]], trivial
+- [[spec/tickets/index-tests-run-beside-each-other]], trivial
+- [[spec/tickets/no-timer-joins-rule-eight]], trivial
+- [[spec/tickets/ratio-rule-carries-owner-words]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child moves one guard, one rule or one slice of tests, so a reviewer reads it whole
+- the five guards and the guidance child cover rules one to seven, and the refuse child turns every guard on
+- the guidance child, the move children and the refuse child each name what they wait on under depends_on
+- the guards land in report mode first, the migrations next, and the refuse switch last, in that order
+- the merges of main after the children closed carry only guard markers and cuts, so the diff stays one review
 
 # children
 
