@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,22 @@ record:
         hash: 84c390bc46122637
         size: 473
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box dcf1ea3c64fd · claude-code-remote
+    hash_before: 748d13e8baafa88ac31bff392bd568f85364615c
+    hash_after: 748d13e8baafa88ac31bff392bd568f85364615c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/owns fails
+    inputs:
+      - name: design/draft
+        hash: 77bec66c56f0fa62
+        size: 6751
+      - name: [[spec/design_output/doors]]
+        hash: c954e18a8d392976
+        size: 23272
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -377,26 +393,31 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/owns/tests_tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails once for each walk `./RUNME.sh doors` lists in a test file, and on no other line. Most walks are disk fixtures through os, then wall-clock waits. The marked lines in the guard's own tree cases already pass, so the marker reads as the approach expects.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets TestNoTestFileWalksAroundADoor, red on its own assertion, and the second meets `./RUNME.sh check`, which tests-green answers
+the case reads source alone, and every door the moves reach holds a fake: files.NewFakeDisk, the root's fake disk and runner, qtest's fake clock, and src/doors/fake
 
 # gate
 
