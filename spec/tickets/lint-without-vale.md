@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -160,6 +160,22 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 2c4eca542a42281601948a0a733da33efc40b24a
+    hash_after: 2c4eca542a42281601948a0a733da33efc40b24a
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lint-without-vale already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b1429804df0c41dd
+        size: 958
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -234,8 +250,7 @@ the diff stands past one review, and every child stands closed, so the group goe
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- drafts-name-no-vale: the drafts module still names Vale in what it answers (noVale and valeUnread in src/modules/drafts/answer.go, unranWhy in src/modules/drafts/prose.go) though the Go rules run the lint, and spec/design_output/level0.md and spec/design_output/pull.md still describe `vale fix --apply` and voiceOver handing Vale a file. Word each for the Go rules, and keep the VoiceVale style name and the marker spelling that go-rules-rename-voicevale keeps
+accept
 
 # retro
 
