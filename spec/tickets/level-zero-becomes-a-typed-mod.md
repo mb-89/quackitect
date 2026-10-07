@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -113,6 +113,15 @@ record:
         exit: 0
         said: work/level-zero-becomes-a-typed-mod already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 2fcc1070624c7a94866873f389f01f0fafa129d8
+    hash_after: 2fcc1070624c7a94866873f389f01f0fafa129d8
+    inputs:
+      - name: ask
+        hash: b061d8c7cb9abdac
+        size: 1329
+    def: 19b6849b1f151cd5
 cloud: true
 ---
 
@@ -140,14 +149,24 @@ goal: Level zero stands as a standard, typed Claude Code mod, tested with the te
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/level0-hooks-move-to-typescript]] standard
+[[spec/tickets/level0-hooks-hold-no-rule]] standard
+[[spec/tickets/level0-plugin-validate-in-check]] standard
+[[spec/tickets/level0-tests-move-to-plugin-test]] standard
+[[spec/tickets/level0-drops-what-standard-replaces]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child stands closed and reviewed whole through its own gate
+the children cover the goal: the typed module, the thin hooks, validate in the check, the plugin tests and the standard road with its reasons, and the battery lands in the retro
+no open child waits on another, since every child stands closed
+the children landed in the order they read each other, the typed module first
+the diff closes here, so no child splits into a group of its own
 
 # children
 
