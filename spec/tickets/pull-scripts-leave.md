@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: de7fcee9eddfa970
         size: 1238
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 233fe28d71544975bac38438f1e47f538793226e
+    hash_after: 2ed34d3d52c3d470c86c9018747599895505ad68
+    answered:
+      - name: lint
+        exit: 0
+        said: "   83.6  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -453,14 +462,19 @@ accept. The approach answers the ask: the nine scripts git ls-files names leave,
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past the test files tests-red landed
+- the new Go cases run on the in-memory FakeRepo and FakeDisk, the fake sh runner and a fixed clock
+- each touched Go header names the Go owner in place of the leaving script
+- the drawn filter moves into test/contract/ruled.js beside the Vale run it filters, and the other tests import it from there
 
 ## tests-green
 
