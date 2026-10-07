@@ -331,7 +331,7 @@ record:
   - step: retro/cloud
     hand: box 612227244607 · claude-code-remote
     hash_before: 8dd2b34ed0d9c93a7d11ba00fcfd6fe6efad4447
-    hash_after: 6c8d40c0e97d165255179edab36a36ccd0dd5e93
+    hash_after: e094921f4752169139788cd7eb0697a1ae0831f5
     inputs:
       - name: retro/write
         hash: 8328e03bfb21675b
@@ -340,6 +340,9 @@ record:
     model: claude-opus-5-5
     cost: 0
     final: "lint-without-vale lands: pull request 130 open with auto-merge, main merged in, the check green"
+    model: claude-opus-5-5
+    cost: 0
+    final: lint-without-vale lands
     model: claude-opus-5-5
     cost: 0
     final: lint-without-vale lands
