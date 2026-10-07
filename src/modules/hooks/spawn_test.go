@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
+
+	"quackitect/src/q"
 )
 
 // The case table the JavaScript builders write. [[spec/tickets/spawn-answers-off-the-door]]
@@ -125,12 +127,14 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
 		name    string
 		session string
 		own     bool
+		prompt  string
 		want    string
 	}{
-		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, tag + "\n\nwork one step"},
-		{"the wrapper's own spawn", `{"id":"s7"}`, true, ""},
-		{"a box carrying no session file", "", false, ""},
-		{"a session file naming no id", `{"harness":"claude-code"}`, false, ""},
+		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, "work one step", tag + "\n\nwork one step"},
+		{"the wrapper's own spawn", `{"id":"s7"}`, true, "work one step", ""},
+		{"the pull's hand, whose own field the kit drops", `{"id":"s7"}`, false, q.HandOfItsOwn + ", named helper-1", ""},
+		{"a box carrying no session file", "", false, "work one step", ""},
+		{"a session file naming no id", `{"harness":"claude-code"}`, false, "work one step", ""},
 	} {
 		t.Run(one.name, func(t *testing.T) {
 			files := map[string]string{}
@@ -140,7 +144,7 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
 			root := treeOf(t, files, "")
 			door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
 			said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: map[string]any{
-				"session_id": "s1", "prompt": "work one step", "own": one.own,
+				"session_id": "s1", "prompt": one.prompt, "own": one.own,
 			}})
 			if err != nil {
 				t.Fatal(err)

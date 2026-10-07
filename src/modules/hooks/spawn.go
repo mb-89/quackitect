@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/q"
 	"quackitect/src/yaml"
 )
 
@@ -23,7 +24,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
 	}
 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
 	tag := ""
-	if !yaml.Truthy(post.E[ownField]) {
+	if !yaml.Truthy(post.E[ownField]) && !strings.HasPrefix(textOf(post.E, "prompt"), q.HandOfItsOwn) {
 		tag = spawnTagOf(disk{root})
 	}
 	if layer == "" && tag == "" {

@@ -17,6 +17,7 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
 	"quackitect/src/proc"
+	"quackitect/src/q"
 )
 
 // The tree this package stands in, whose processes and schemas the cases read. [[spec/design_output/pull#the-answers]]
@@ -330,6 +331,14 @@ func TestPullArgvOf(t *testing.T) {
 		if got := strings.Join(PullArgvOf(one.argv), "|"); got != one.want {
 			t.Errorf("%s reads %s, and wants %s", one.name, got, one.want)
 		}
+	}
+}
+
+// The hand's prompt opens on the line the spawn answer reads to leave it untagged. [[spec/tickets/hand-spawn-skips-session-tag]]
+func TestTheHandPromptOpensOnTheHandLine(t *testing.T) {
+	t.Parallel()
+	if got := spawnPrompt("alpha", &Leaf{}, "helper-1"); !strings.HasPrefix(got, q.HandOfItsOwn+", named helper-1") {
+		t.Fatalf("the prompt opens on %q", strings.SplitN(got, "\n", 2)[0])
 	}
 }
 
