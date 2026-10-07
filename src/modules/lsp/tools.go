@@ -35,7 +35,7 @@ const (
 // The files the tools read beside the tree, so a change to one runs them over the whole tree again. A name closing on a slash names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
 var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
-// The folders Vale skips, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The folders Vale skips. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
 
 var (

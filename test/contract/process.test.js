@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
-import { REFUSES } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
@@ -17,7 +16,7 @@ import { proc } from "../../src/doors/proc.js";
 import { readsFor } from "../../src/scripts/guidance-hand.js";
 import { askRows, processAt, schemasHere } from "../../src/scripts/process.js";
 import { leafOf, leavesOf, stepPathOf, walkOf } from "../../src/scripts/pull-route.js";
-import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
+import { keptOf, PAST, REFUSES } from "../../src/scripts/quack-topic.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));

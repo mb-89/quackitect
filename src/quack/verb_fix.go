@@ -23,7 +23,7 @@ import (
 	"quackitect/src/proc"
 )
 
-// The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
+// The glob Vale reads past, over the folders parkedFolders in src/modules/lsp/tools.go names. [[spec/design_output/lsp]]
 const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
 
 // The usage, the rounds Vale fixes at most, Vale's config, biome's config folder, the rule the calm reads and the mode a calmed file keeps. [[spec/tickets/the-small-faults-land]]
@@ -39,7 +39,7 @@ const (
 // The flags that ask for the usage. [[spec/tickets/the-small-faults-land]]
 var fixHelp = []string{"--help", "-h"}
 
-// The folders the stamp's walk passes, as SKIP in src/bridge/findings.js names them; proseFile in writedoor.go names the files it reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+// The folders the stamp's walk passes, as walkPasses in src/modules/check/textfaults.go names them; proseFile in writedoor.go names the files it reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 var (
 	walkSkips   = map[string]bool{".git": true, "node_modules": true, ".se": true, ".claude": true, ".claude-plugin": true}
 	proseStyles = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)

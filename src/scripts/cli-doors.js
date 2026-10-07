@@ -15,7 +15,6 @@ import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
-import { SLICES } from "../bridge/config.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -39,6 +38,12 @@ export function configHere(files, pair) {
     readEnv: async (names) =>
       Object.fromEntries(names.map((name) => [name, process.env[name] ?? ""])),
   });
+}
+
+// The slices a reader takes a mode of: the migration keys the schema types as a string. [[spec/tickets/bridge-library-leaves]]
+export function slicesIn(schemaText) {
+  const keys = JSON.parse(schemaText)?.properties?.migration?.properties ?? {};
+  return Object.keys(keys).filter((one) => keys[one]?.type === "string");
 }
 
 // The verbs keep the files under the work root, and git runs there, because a stub is its own repository. [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -67,7 +72,10 @@ export async function doorsHere() {
     // The mode each migration slice reads, taken once at startup so a sync reader asks no door. [[spec/tickets/readers-name-one-mode-source]]
     slices: Object.fromEntries(
       await Promise.all(
-        SLICES.map(async (one) => [one, await said.ask(`migration.${one}`)]),
+        slicesIn(files.read(atRoot(join(roots.method ?? "", SCHEMA)))).map(async (one) => [
+          one,
+          await said.ask(`migration.${one}`),
+        ]),
       ),
     ),
     method: roots.method,
@@ -115,8 +123,6 @@ export const DOORS = join(root, "src", "doors");
 export const PLUGIN = join(".claude", "skills", "level0");
 export const CONTRACT = join(root, "test", "contract");
 export const settings = it.config;
-// The glob the rules read past, owned by the findings every front reads. [[spec/design_output/lsp]]
-export { OURS, PARKED } from "../bridge/findings.js";
 export const TESTS = "test/level0/*.test.js";
 export const CONTRACT_TESTS = "test/contract/*.test.js";
 export const COL = { verb: 8, count: 6, key: 22, value: 9, rule: 20, tool: 18 };

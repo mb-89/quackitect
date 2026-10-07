@@ -42,7 +42,9 @@ test("the doors carry the mode of each slice a reader takes a Go topic for", () 
 });
 
 // [[spec/tickets/readers-name-one-mode-source]]
-test("the doors name the slices the bridge config names", async () => {
-  const { SLICES } = await import("../../src/bridge/config.js");
-  assert.deepEqual(Object.keys(it.slices), SLICES);
+test("the doors name every migration key the schema types as a string, and no other", () => {
+  const keys = schema.properties.migration.properties;
+  const modes = Object.keys(keys).filter((one) => keys[one].type === "string");
+  assert.deepEqual(Object.keys(it.slices), modes);
+  assert.equal("phase0" in it.slices, false, "a boolean phase switch reads as no slice");
 });

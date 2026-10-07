@@ -156,8 +156,8 @@ rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
 
 `src/modules/check/textfaults.go` reads the code faults and the exemption markers the
-way the lint reads them, over the files the lint walks. `SKIP` in
-`src/bridge/findings.js` names the folders that walk passes.
+way the lint reads them, over the files the lint walks. `walkPasses` there
+names the folders that walk passes.
 
 Each row names its source, so the panel leaves an open file's Biome rows to the
 Biome extension:

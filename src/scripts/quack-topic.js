@@ -14,6 +14,9 @@ const NEW = "new";
 export const ALL = "all";
 export const PAST = "past";
 
+// The severities of a kept finding that refuse a line. [[spec/tickets/bridge-library-leaves]]
+export const REFUSES = new Set(["error", "warning"]);
+
 // The quack binary under a root, the way the index door finds it: the bare name, else its .exe. [[spec/design_output/index#the-door-owns-the-database]]
 export function quackAt(files, join, root) {
   const bare = join(root, BIN);

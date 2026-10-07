@@ -42,7 +42,7 @@ const (
 	allDigits    = -1
 )
 
-// The word the fold answers a turn's end with where the conversation clears, the kind the door answers it as, and the prompt the next conversation opens on. RESUME in src/bridge/handover.js owns the prompt, and the package spells it again. [[spec/tickets/clear-answers-off-the-door]]
+// The word the fold answers a turn's end with where the conversation clears, the kind the door answers it as, and the prompt the next conversation opens on. [[spec/tickets/clear-answers-off-the-door]]
 const (
 	ClearWord = "clear"
 	clearKind = "clear"
