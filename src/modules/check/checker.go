@@ -50,8 +50,14 @@ func (one *Checker) Over(path string) []Finding {
 		out = append(out, rule(one.tree)...)
 	}
 	out = append(out, syntaxFaults(one.tree, where)...)
+	// A Go body standing in another package too, read off the one pass over every Go text. [[spec/tickets/shared-helpers-stand-once]]
+	if strings.HasSuffix(where, ".go") {
+		out = append(out, copiesOver(one.tree, where)...)
+	}
 	// A pointer this file writes lands where it says, so the editor draws a dead one under the line. [[spec/design_output/lsp#every-pointer-resolves]]
 	out = append(out, pointerFaultsIn(one.tree, placesIn(one.tree), where)...)
+	// A path a span or a comment names stands in the tree. [[spec/tickets/every-named-path-resolves]]
+	out = append(out, namedPathFaultsIn(one.tree, placesIn(one.tree), where)...)
 	// And the anchor it names stands as a heading of the note it points at. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
 	out = append(out, anchorFaults(one.tree, where)...)
 	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
@@ -91,8 +97,10 @@ var Rules = []func(*Tree) []Finding{
 	surveyNamesInstalls,
 	surveyFindsNode,
 	everyPointerResolves,
+	everyNamedPathStands,
 	groupAsksNobody,
 	noConflictMarkers,
+	helperCopies,
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]

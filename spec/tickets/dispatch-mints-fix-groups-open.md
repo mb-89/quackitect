@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: engine-verbs-hold
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: ece7f09e348353050d0a96d02f0cfa4b3dc47eff
+    hash_after: ece7f09e348353050d0a96d02f0cfa4b3dc47eff
+    inputs:
+      - name: ask
+        hash: 74af97a0fdb11a41
+        size: 316
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 31c1db075cb7cc1dd08535902bc19a76c5b539ca
+    hash_after: 31c1db075cb7cc1dd08535902bc19a76c5b539ca
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: a9e49e10896a0dc7
+        size: 1733
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 424afe23ad3a2683a4c6b93662107215a6621c14
+    hash_after: 424afe23ad3a2683a4c6b93662107215a6621c14
+    inputs:
+      - name: design/draft
+        hash: a9e49e10896a0dc7
+        size: 1733
+      - name: design/tests-red
+        hash: 8532ce005e537ef8
+        size: 652
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: b5d743bbaaec42e0574c8b5f979b07b5477f57d9
+    hash_after: b5d743bbaaec42e0574c8b5f979b07b5477f57d9
+    answered:
+      - name: lint
+        exit: 0
+        said: "  118.0  in all"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 6082bfb1bc7885496bce20e9ed5a412a7b160034
+    hash_after: 6082bfb1bc7885496bce20e9ed5a412a7b160034
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: 8532ce005e537ef8
+        size: 652
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -148,38 +218,51 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+fixGroup in src/branches/dispatch_write.go writes the group at state open, with its step at the route's first leaf. After check.Minted and the fix mark, it sets withField(text, "state", openState) and withField(text, "step", firstLeaf(route.Steps, "")). This is the same pair escalate.go writes when it opens a ticket, and OpensDraft in src/pull/pull_ticket.go writes for ticket open. openState and firstLeaf stand in src/branches/group.go already, so the change adds no constant.
+
+The fix group then reads open on the write branch the dispatch lands. takeable in src/branches/route.go hands its children to the box the next dispatch opens, with no hand running ticket open. The comment above fixGroup names this ticket.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write.go (*Doors).writesOf
+src/branches/dispatch.go (*Doors).carried (calls writesOf)
+src/branches/dispatch.go Dispatch (calls carried)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write_test.go TestFixGroupWritesTheGroupOpenAtItsFirstStep
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write.go
+src/branches/dispatch_write_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened dispatch_write.go (fixGroup, writesOf, processAt, schemas), dispatch.go (carried, Dispatch, opensOf via dispatch_write.go, leftForPerson), group.go (openState, firstLeaf, withField), route.go takeable, escalate.go line writing step and state open, and pull_ticket.go OpensDraft.
+Callers came from a grep for fixGroup and writesOf across src; fixGroup has one caller, writesOf, and writesOf has one, carried.
+The done_when line 'go test ./src/branches/ passes a case where fixGroup writes the group at state open' meets TestFixGroupWritesTheGroupOpenAtItsFirstStep; ./RUNME.sh check stands as its own command.
 
 ## tests-red
 
@@ -188,26 +271,31 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/branches/dispatch_write_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The fix group comes back at state draft with no step, which is the stall the ask names. The case reads the real schema and the group process under the tree, and it needs no git, since fixGroup reads those two files alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The done_when line on `go test ./src/branches/` meets TestFixGroupWritesTheGroupOpenAtItsFirstStep, and the check line waits for tests-green.
+The case reaches no door: fixGroup reads two tracked files through readFile, and the dispatch case over a real origin already proves that door.
 
 # gate
 
@@ -216,8 +304,9 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -228,14 +317,19 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: it changes fixGroup in src/branches/dispatch_write.go alone, the file whose test the ask names.
+every door the change reaches has a fake: fixGroup reads the route through Doors.processAt, and the case drives it over the tree root with no network.
+a comment names the approach the change implements: the comment above fixGroup says the group lands open at its route first step, so its box pulls with no hand running ticket open.
+every fact the change adds stands in one place: the change calls firstLeaf and openState from src/branches/group.go, the same pair escalate.go writes.
 
 ## tests-green
 
@@ -244,26 +338,33 @@ Each loose-fixes group stands as a draft, and its box finds nothing to pull unti
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch now writes each fix group open at its route first step. Before, fixGroup minted the group as a draft, and leftForPerson kept that draft for a person, so the group box found nothing to pull. fixGroup in src/branches/dispatch_write.go now sets state and step with openState and firstLeaf, the same pair escalate.go writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: it changes fixGroup alone.
+every door the change reaches has a fake: the case drives fixGroup over the tree root through Doors, with no network.
+a comment names the approach the change implements: the comment above fixGroup names the open first step.
+every fact the change adds stands in one place: the change calls openState and firstLeaf from group.go.
 
 # accept
 

@@ -145,7 +145,7 @@ func builtInsOf(schema any, at string) *Object {
 		if at != "" {
 			key = at + "." + name
 		}
-		if one.Get("type") == "object" && truthy(one.Get("properties")) {
+		if one.Get("type") == "object" && holdsTrue(one.Get("properties")) {
 			deeper := builtInsOf(one, key)
 			for _, under := range deeper.order {
 				out.Set(under, deeper.Get(under))
@@ -183,7 +183,7 @@ func widgetsIn(schema any) []widget {
 		leaves := objectAt(sections.Get(section), "properties")
 		for _, leaf := range leaves.Keys() {
 			one := leaves.Get(leaf)
-			if !truthy(dig(one, "group")) || dig(one, "widget") != toggleWidget {
+			if !holdsTrue(dig(one, "group")) || dig(one, "widget") != toggleWidget {
 				continue
 			}
 			if _, listed := dig(one, "enum").([]any); !listed {
@@ -270,7 +270,7 @@ func commandsFor(key string, value any, said declared, entry Entry, path command
 	opens := "The line above runs before this turn opens, so `" + key + "` reads"
 	where := strings.Join(path.label, " / ")
 	help := ""
-	if truthy(said.help) {
+	if holdsTrue(said.help) {
 		help = " " + jsString(said.help)
 	}
 	if len(options) == 0 {

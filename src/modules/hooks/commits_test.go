@@ -113,6 +113,19 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 	}
 }
 
+// A commit whose trailer names a model meets a refusal at the door, with no Vale on the box. [[spec/tickets/commit-door-refuses-model-trailers]]
+func TestCommitVoiceRefusesAModelTrailerWithNoVale(t *testing.T) {
+	root := t.TempDir()
+	line := "Co-Authored-By: Claude Opus 5.5"
+	if err := os.WriteFile(root+"/message.txt", []byte("a-ticket: the change\n\n"+line+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	rows := (&Door{}).commitVoice("git commit -F message.txt", root, disk{root})
+	if len(rows) != 1 || rows[0].Rule != "ModelTrailer" || rows[0].Said != line {
+		t.Errorf("the door reads %v", rows)
+	}
+}
+
 // A door reaching no git and no voice reads neither, and its guards pass a commit. [[spec/tickets/cage-commit-guards-port]]
 func TestADoorWithNoGitOrVoiceReadsNeither(t *testing.T) {
 	root := t.TempDir()

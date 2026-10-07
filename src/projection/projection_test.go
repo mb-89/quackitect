@@ -11,6 +11,14 @@ import (
 	"testing"
 )
 
+// The paths of a map come back in sorted order, the same each call. [[spec/tickets/config-verbs-port-to-go]]
+func TestPathsAnswerTheKeysSorted(t *testing.T) {
+	t.Parallel()
+	if got := Paths(map[string]string{"b": "", "a": "", "c": ""}); !slices.Equal(got, []string{"a", "b", "c"}) {
+		t.Fatalf("Paths answers %v", got)
+	}
+}
+
 // The entries one or more entry texts name. [[spec/tickets/config-verbs-port-to-go]]
 func entries(t *testing.T, text string) []Entry {
 	t.Helper()
@@ -278,5 +286,12 @@ func TestInheritsJoinsAJSONFileKeyByKey(t *testing.T) {
 	}
 	if got := tree.List("f"); len(got) != 2 {
 		t.Errorf("the folder lists %v, and the union holds two", got)
+	}
+}
+
+// The Null mark, a zero and NaN read false in a condition, and a word reads true. [[spec/tickets/shared-helpers-stand-once]]
+func TestAConditionReadsAsJavaScriptReadsIt(t *testing.T) {
+	if holdsTrue(Null{}) || holdsTrue(nil) || holdsTrue(0.0) || holdsTrue(math.NaN()) || holdsTrue("") || !holdsTrue("x") || !holdsTrue(1.0) {
+		t.Fatal("a condition reads otherwise than JavaScript reads it")
 	}
 }

@@ -14,6 +14,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // An object JSON.parse reads, its keys in the order the text writes them. [[spec/guidance/retro/collect]]
@@ -26,7 +28,7 @@ type retroCollectObject struct {
 func retroKeptReport(stamp string) string {
 	parsed, _ := retroCollectParsed(stamp)
 	report := retroCollectGet(parsed, "battery")
-	if !retroCollectTruthy(report) {
+	if !yaml.Truthy(report) {
 		return ""
 	}
 	runs, _ := retroCollectGet(parsed, "runs").([]any)
@@ -171,21 +173,6 @@ func retroCollectGet(said any, key string) any {
 		return object.vals[key]
 	}
 	return nil
-}
-
-// Whether a value reads true, as JavaScript reads one. [[spec/guidance/retro/collect]]
-func retroCollectTruthy(said any) bool {
-	switch one := said.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	case string:
-		return one != ""
-	}
-	return true
 }
 
 // A value as String writes it, and nothing for null. [[spec/guidance/retro/collect]]

@@ -20,8 +20,7 @@ resolved them. An agent reads this note before it asks again.
 | a file that drifted nowhere unseen | `show` listed the file values under an override standing |
 | a switch every machine read alike | a shared key read the default file alone |
 
-Overrides replaced the wipe of the local file a new editor window made in
-`src/extension/lib/session.js`.
+Overrides replaced the wipe of the local file a new editor window made.
 
 ## 2. Why a module
 

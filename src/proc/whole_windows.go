@@ -9,8 +9,8 @@ import (
 	"strconv"
 )
 
-// [[spec/tickets/the-check-ends-what-it-drops]]
-func whole(run *exec.Cmd) {
+// Readies a run so the end of its context ends it with every process it started. [[spec/tickets/the-check-ends-what-it-drops]]
+func Whole(run *exec.Cmd) {
 	run.Cancel = func() error {
 		return exec.Command("taskkill", "/T", "/F", "/PID", strconv.Itoa(run.Process.Pid)).Run()
 	}

@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"regexp"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // The line a deleted file opens with, and the line a hunk opens with. [[spec/design_output/tree#the-rules-over-two-files]]
@@ -154,7 +156,7 @@ func HeldTests(tree Tree) []string {
 		if json.Unmarshal([]byte(text), &held) != nil {
 			continue
 		}
-		path := textOf(held.Path)
+		path := yaml.JSONText(held.Path)
 		if path == "" || !stillHeld(tree, path) {
 			continue
 		}

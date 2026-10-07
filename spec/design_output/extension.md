@@ -631,7 +631,7 @@ counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
 
 ## A button runs the pull
 
-Each button runs `pull` through `src/scripts/verbs/ticket.js` of the method, as a
+Each button runs `pull` through `src/quack/verb_ticket.go` of the method, as a
 child of the extension:
 
 | the button | the line |

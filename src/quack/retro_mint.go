@@ -15,6 +15,8 @@ import (
 	"strings"
 
 	"quackitect/src/proc"
+	"quackitect/src/pull"
+	"quackitect/src/yaml"
 )
 
 // The folder tickets stand in, the record of a retro's classes, the processes a ticket mints onto, the tree's own command line, and the status a class stands open at. [[spec/guidance/retro/check]]
@@ -97,11 +99,20 @@ func retroMintRunmeOver(run proc.Runner) func(dir string, argv []string, env map
 
 // The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/check]]
 func retroMintAskOf(ticket retroMintTicket) string {
-	lines := []string{strings.TrimSpace(ticket.Gain), "", strings.TrimSpace(ticket.Breaks), ""}
-	for _, one := range ticket.DoneWhen {
-		lines = append(lines, "- "+strings.TrimSpace(one))
+	said := map[string][]string{"gain": {ticket.Gain}, "breaks": {ticket.Breaks}, "done_when": ticket.DoneWhen}
+	return pull.AskFrom(retroMintAskShape(), said) + "\n"
+}
+
+// The ask fields a class's ticket carries, in the shape and order a process names them, so pull.AskFrom alone owns the layout. [[spec/tickets/verbs-mint-tickets-and-keys]]
+func retroMintAskShape() []any {
+	shape := []any{}
+	for _, one := range [][2]string{{"gain", "text"}, {"breaks", "text"}, {"done_when", "list"}} {
+		field := yaml.New()
+		field.Set("name", one[0])
+		field.Set("form", one[1])
+		shape = append(shape, field)
 	}
-	return strings.Join(lines, "\n") + "\n"
+	return shape
 }
 
 // The ask chapter, written where the mint leaves its placeholders. [[spec/guidance/retro/check]]
