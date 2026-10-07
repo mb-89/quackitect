@@ -4,6 +4,8 @@
 package pull
 
 import (
+	_ "embed"
+	"encoding/json"
 	"reflect"
 	"testing"
 
@@ -120,5 +122,42 @@ func TestRouteOf(t *testing.T) {
 	want := `[{"does":"c","name":"a","n":3,"f":1.5,"x":null,"l":[true,"<&>"]}]`
 	if got := RouteJSON(route); got != want {
 		t.Errorf("the route writes back as\n%s\nand JSON.stringify writes\n%s", got, want)
+	}
+}
+
+// The front the drawing edits, and the route each move and drop answers. test/level0/drawing-edit.test.js holds edit.js to the same routes. [[spec/tickets/ticket-scripts-leave]]
+//
+//go:embed testdata/drawing_edits.json
+var drawingEdits []byte
+
+func TestEveryRouteTheDrawingsEditsAnswerKeepsTheReachedLeaves(t *testing.T) {
+	t.Parallel()
+	var held struct {
+		Step  string          `json:"step"`
+		Steps json.RawMessage `json:"steps"`
+		Edits []struct {
+			Name  string          `json:"name"`
+			Steps json.RawMessage `json:"steps"`
+		} `json:"edits"`
+	}
+	if err := json.Unmarshal(drawingEdits, &held); err != nil || len(held.Edits) == 0 {
+		t.Fatalf("testdata/drawing_edits.json reads %v, and wants a front and its edits", err)
+	}
+	steps, ok := RouteOf(string(held.Steps))
+	if !ok {
+		t.Fatal("the fixture's steps read as no route")
+	}
+	front := yaml.New()
+	front.Set("step", held.Step)
+	front.Set("steps", steps)
+	for _, one := range held.Edits {
+		route, ok := RouteOf(string(one.Steps))
+		if !ok {
+			t.Errorf("%s reads as no route", one.Name)
+			continue
+		}
+		if why, at := RouteAheadOnly(front, route); why != "" || at != "" {
+			t.Errorf("%s is refused at %s: %s", one.Name, at, why)
+		}
 	}
 }

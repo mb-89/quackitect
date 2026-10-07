@@ -1,0 +1,25 @@
+{
+  "step": "design/draft",
+  "steps": [
+    { "name": "design", "steps": [{ "name": "draft" }, { "name": "review" }] },
+    { "name": "ship", "does": "lands it" },
+    { "name": "tell" }
+  ],
+  "edits": [
+    {
+      "name": "a move swaps ship with tell",
+      "steps": [
+        { "name": "design", "steps": [{ "name": "draft" }, { "name": "review" }] },
+        { "name": "tell" },
+        { "name": "ship", "does": "lands it" }
+      ]
+    },
+    {
+      "name": "a drop takes tell out",
+      "steps": [
+        { "name": "design", "steps": [{ "name": "draft" }, { "name": "review" }] },
+        { "name": "ship", "does": "lands it" }
+      ]
+    }
+  ]
+}
