@@ -54,6 +54,9 @@ func TestMutationsDecodeEachEditTool(t *testing.T) {
 	if _, err := Mutations("edit", map[string]any{"path": "x", "old_str": "x", "new_str": "y"}, readsFrom(map[string]string{"x": "xx"})); err == nil || !strings.Contains(err.Error(), "unique") {
 		t.Errorf("an ambiguous edit answers %v, and wants a refusal asking unique context", err)
 	}
+	if _, err := Mutations("edit", map[string]any{"path": "x", "old_str": "aa", "new_str": "b"}, readsFrom(map[string]string{"x": "aaa"})); err == nil || !strings.Contains(err.Error(), "unique") {
+		t.Errorf("an overlapping match answers %v, and wants a refusal asking unique context", err)
+	}
 }
 
 func TestAPatchDecodesAddUpdateAndDelete(t *testing.T) {
