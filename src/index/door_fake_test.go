@@ -4,7 +4,7 @@
 // other, and a post to a port outside the table reaches the real
 // loopback the contract cases stand on. The door's own owns.yaml holds this file.
 // [[spec/tickets/test-walks-move-onto-fakes]]
-package index
+package index // level0: InPackageTest - reaches the unexported doorTransport, which its init swaps for the fake network
 
 import (
 	"context"

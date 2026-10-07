@@ -3,4 +3,4 @@
 wall:
   go: [time.Now, time.NewTicker, time.After, time.AfterFunc, context.WithTimeout]
   files: [wall.go]
-  contract: [src/modules/clock/clock_contract_test.go]
+  contract: [src/q/qtest/wall_contract_test.go]

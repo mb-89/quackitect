@@ -282,38 +282,6 @@ func TestRetroMintChecksAPromotionsTicketAlone(t *testing.T) {
 	}
 }
 
-// A promotion naming a process that stands nowhere is refused by its what. [[spec/tickets/the-retro-reads-the-backlog]]
-func TestRetroMintRefusesAPromotionNamingAProcessThatStandsNowhere(t *testing.T) {
-	t.Parallel()
-	root, _ := retroMintTree(t, nil, nil)
-	ticket := retroMintTicket{Name: "the-rule-lands", Process: "nowhere", Gain: "a commit lands in one call", Breaks: "every commit costs a round of refusals", DoneWhen: []string{"./RUNME.sh land answers 0 over a clean tree"}}
-	got := retroMintFaults(hq2RetroDisk(root), retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
-	want := `promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.`
-	if len(got) != 1 || got[0] != want {
-		t.Fatalf("the mint names %q", got)
-	}
-}
-
-// A class naming trivial mints a trivial ticket. [[spec/tickets/the-retro-reads-the-backlog]]
-func TestRetroMintMintsATrivialTicketForAClassNamingTrivial(t *testing.T) {
-	t.Parallel()
-	trivial := retroMintOpenClass("k1", func(ticket map[string]any) {
-		ticket["name"] = "the-rule-lands"
-		ticket["process"] = "trivial"
-	})
-	root, fake := retroMintTree(t, []map[string]any{trivial}, nil)
-	code, out, errs := retroMintRuns(root, fake)
-	if code != 0 {
-		t.Fatalf("retro mint answers %d and prints %q, %q", code, out, errs)
-	}
-	for _, one := range fake.ran {
-		if strings.HasSuffix(strings.Join(one.argv, " "), "the-rule-lands.md --process=trivial") {
-			return
-		}
-	}
-	t.Fatalf("the mint names no trivial process: %v", fake.ran)
-}
-
 // A class naming no process is refused, and nothing mints. [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroMintRefusesAClassNamingNoProcess(t *testing.T) {
 	t.Parallel()

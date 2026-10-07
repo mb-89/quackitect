@@ -29,7 +29,6 @@ src/modules/files/disk_test.go
 src/modules/files/files_test.go
 src/modules/files/named_test.go
 src/modules/files/watch_contract_test.go
-src/modules/files/watch_stop_test.go
 src/modules/git/git_contract_test.go
 src/modules/git/git_test.go
 src/modules/guidance/guidance_test.go
@@ -156,7 +155,6 @@ src/ticket/place_test.go
 src/ticket/ticket_test.go
 src/tui/draw/colour_test.go
 src/tui/draw/table_test.go
-src/tui/frame/door_test.go
 src/tui/frame/part_test.go
 src/tui/frame_root_test.go
 src/tui/layout_test.go
@@ -168,8 +166,6 @@ src/tui/panes_test.go
 src/tui/registry/call_contract_test.go
 src/tui/registry/catalog_contract_test.go
 src/tui/registry/tab_test.go
-src/tui/registry/v1_test.go
-src/tui/registry/watch_test.go
 src/tui/tree/base_test.go
 src/tui/tree/palette_test.go
 src/tui/tree/preset_test.go

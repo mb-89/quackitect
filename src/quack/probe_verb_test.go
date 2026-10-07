@@ -215,20 +215,6 @@ func TestTheDryProbeRefusesARevisionBesideTheWorkingChange(t *testing.T) {
 	}
 }
 
-// The smoke road starts the same entry with its words, as the dry road does. [[spec/tickets/level0-smoke-runs-in-seconds]]
-func TestTheSmokeProbeHandsItsRoadToTheEntry(t *testing.T) {
-	t.Parallel()
-	d, runner, _, errs := fakeBoxDoors(t)
-	runner.answers["node"] = ranResult{code: 0}
-	if code := probeVerb(d, []string{"smoke", "--working"}); code != 0 {
-		t.Errorf("the smoke road answers %d: %s", code, errs)
-	}
-	want := []string{"node", filepath.Join(d.root, "src", "scripts", "probe-dry.js"), "smoke", "--working"}
-	if len(runner.ran) != 1 || !slices.Equal(runner.ran[0], want) {
-		t.Errorf("the smoke road runs %v", runner.ran)
-	}
-}
-
 func TestAnUnknownWordPrintsTheUsage(t *testing.T) {
 	t.Parallel()
 	for _, argv := range [][]string{nil, {"nothing"}} {

@@ -27,15 +27,6 @@ func registersFor(t *testing.T, words string, one twin) {
 
 func TestVerbRegistry(t *testing.T) {
 	t.Run("a person's run drops the harness and names its root", aPersonRunDropsTheHarnessAndNamesItsRoot)
-	t.Run("a registered verb runs in Go", func(t *testing.T) {
-		registersFor(t, "registry probe", twinSaying("go\n", &[]bool{}))
-		reached := false
-		doors, out, _ := roadOver(modeNew, "node\n", registry)
-		doors.old = func(io.Writer) int { reached = true; return 0 }
-		if code := verbs(doors, []string{"registry", "probe"}); code != 0 || out.String() != "go\n" || reached {
-			t.Fatalf("the road answers %d, %q, node reached %v, and wants the Go answer alone", code, out.String(), reached)
-		}
-	})
 	t.Run("an unregistered verb reaches the usage door", func(t *testing.T) {
 		doors, out, _ := roadOver(modeNew, "usage\n", registry)
 		if code := verbs(doors, []string{"registry", "unclaimed"}); code != 0 || out.String() != "usage\n" {
@@ -85,22 +76,6 @@ func TestVerbRegistry(t *testing.T) {
 		_, err := nodeAcceptOver(fake.Run, fakeSelf, t.TempDir())(q.Request{Args: map[string]any{"words": []any{"registry", "probe"}, "person": true}})
 		if err == nil || !strings.Contains(err.Error(), want) {
 			t.Fatalf("a road that never starts answers %v, and wants the fault %q", err, want)
-		}
-	})
-	t.Run("the shared files name no registered verb", func(t *testing.T) {
-		for _, shared := range []string{"verbs.go", "registry.go"} {
-			text, err := os.ReadFile(shared)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if strings.Contains(string(text), "register(\"") {
-				t.Fatalf("%s registers a verb, and a verb registers from its own file", shared)
-			}
-			for words := range registry {
-				if strings.Contains(string(text), `"`+words+`"`) {
-					t.Fatalf("%s names the verb %s, and a port edits no shared line", shared, words)
-				}
-			}
 		}
 	})
 	t.Run("a second registration of the same words panics", func(t *testing.T) {

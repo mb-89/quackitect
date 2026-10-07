@@ -1,7 +1,7 @@
 // The test files of the tree: none walks around a door, past a line marked
 // with its reason.
 // [[spec/tickets/test-walks-move-onto-fakes]]
-package owns
+package owns_test
 
 import (
 	"os" // level0: OutsideInDoors - the case reads the tests the tree holds, as a build check reads source
@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/src/owns"
 )
 
 // Whether the path names a Go test file or a script a test runs. [[spec/tickets/test-walks-move-onto-fakes]]
@@ -31,7 +33,7 @@ func TestNoTestFileWalksAroundADoor(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, one := range Walks(at, string(text), doors) {
+		for _, one := range owns.Walks(at, string(text), doors) {
 			if !one.Marked {
 				t.Errorf("%s:%d:%d: %s", at, one.Line, one.Column, one.Says())
 			}
@@ -56,7 +58,7 @@ func TestNoFakeOrTestHelperWalksAroundADoorMarkedOrNot(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, one := range Walks(at, string(text), doors) {
+		for _, one := range owns.Walks(at, string(text), doors) {
 			t.Errorf("%s:%d:%d: %s", at, one.Line, one.Column, one.Says())
 		}
 	}

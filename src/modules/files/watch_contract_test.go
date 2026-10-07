@@ -85,6 +85,7 @@ func TestWatchKeepsItsContract(t *testing.T) {
 }
 
 // The stop hung on Windows while the watch added a folder, so the real watch stops while folders appear, once the first stands. [[spec/tickets/a-watch-stops-mid-add]]
+// level0: FixtureOutsideHome - the contract runs the real watch over a real folder of its own, since the hang stood in the real watch alone
 func TestAStopReturnsWhileFoldersAppear(t *testing.T) {
 	for round := 0; round < 20; round++ {
 		root := t.TempDir()

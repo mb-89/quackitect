@@ -1,7 +1,7 @@
 // A swap at the path calls gone once the fake clock ticks past the look span,
 // and a tick short of the span leaves it waiting.
 // [[spec/tickets/go-waits-on-events]]
-package swap
+package swap // level0: InPackageTest - reaches the unexported watchesAt and look, and fakeServer of swap_test.go
 
 import (
 	"testing"

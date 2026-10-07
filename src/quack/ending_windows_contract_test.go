@@ -4,7 +4,7 @@
 // which a pipe they hold proves by reading to its end. The case meets a real
 // process tree.
 // [[spec/tickets/ending-windows-tree-tested]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package, and the contract reaches the unexported endsWhole
 
 import (
 	"bufio"
@@ -15,6 +15,7 @@ import (
 )
 
 // The child starts a grandchild holding its stdout, so the pipe reads to its end only once taskkill ends both. [[spec/tickets/ending-windows-tree-tested]]
+// level0: FixtureOutsideHome - the contract starts a real cmd child and grandchild, and only a real taskkill proves the tree ends
 func TestAChildTheCheckGivesUpOnEndsWithItsTreeOnWindows(t *testing.T) {
 	t.Parallel()
 	span, stop := context.WithCancel(context.Background())

@@ -2,7 +2,7 @@
 // lint, a door at report draws a hint in a held buffer alone, and a door no
 // declaration holds is named.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
-package check
+package check // level0: InPackageTest - reaches the unexported textFaults and walksSays
 
 import (
 	"fmt"

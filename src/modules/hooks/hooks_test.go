@@ -312,7 +312,9 @@ func TestHookHandsEachPostToHear(t *testing.T) {
 // A timer whose span stays open, since a module imports no other module's clock. [[spec/tickets/hooks-test-reads-fired-row]]
 type stillTimer struct{}
 
-func (stillTimer) AfterFunc(time.Duration, func()) (stop func() bool) { return func() bool { return true } }
+func (stillTimer) AfterFunc(time.Duration, func()) (stop func() bool) {
+	return func() bool { return true }
+}
 
 // A post a watch matches fires its failure, and the row lands through the say the sentinel holds. [[spec/tickets/hooks-test-reads-fired-row]]
 // level0: FixtureOutsideHome - the door doorOver builds stands over a root of the case's own

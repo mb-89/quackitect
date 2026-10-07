@@ -3,7 +3,7 @@
 // The contract of the box doors: one suite of cases a door, run against the
 // fake the box verbs take in a test and against the box itself.
 // [[spec/design_output/model#the-fake-keeps-a-contract]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package, and the contract reaches the unexported realDisk, quietBox, runsUnder and branchDoors
 
 import (
 	"errors"
@@ -18,6 +18,7 @@ import (
 )
 
 // The disk contract, one case a member, held by the fake and by the box's own disk under a temp folder. [[spec/tickets/quack-reaches-the-box-through-doors]]
+// level0: FixtureOutsideHome - the contract runs the box's real disk under a temp folder of its own, beside the fake it holds to the same cases
 func TestTheFakeDiskKeepsTheContractTheRealDiskKeeps(t *testing.T) {
 	t.Parallel()
 	disks := map[string]func(t *testing.T) (diskDoors, string){
@@ -251,6 +252,7 @@ func TestAStartFaultNamesAMissingRuntime(t *testing.T) {
 }
 
 // The check's runner meets a real process: a loud run prints what it says and keeps it, and a quiet run keeps it alone. [[spec/tickets/test-walks-move-onto-fakes]]
+// level0: FixtureOutsideHome - the contract runs a real go process in a folder of its own, the one case the check's runner meets a real child
 func TestTheCheckRunnerPrintsALoudRunAndKeepsEveryRun(t *testing.T) {
 	t.Parallel()
 	for _, quiet := range []bool{false, true} {
@@ -266,6 +268,7 @@ func TestTheCheckRunnerPrintsALoudRunAndKeepsEveryRun(t *testing.T) {
 }
 
 // The branch verbs' doors stand over the work root on the box's own disk, and their method disk over the root the method reads. [[spec/tickets/branch-verbs-meet-fake-git]]
+// level0: FixtureOutsideHome - the contract writes and reads through the branch doors on the box's real disk, under work and method roots of its own
 func TestTheBranchDoorsWriteTheWorkRootAndReadTheMethodRoot(t *testing.T) {
 	work, method := t.TempDir(), t.TempDir()
 	t.Setenv(workRootVar, work)

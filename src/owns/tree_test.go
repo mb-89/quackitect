@@ -2,7 +2,7 @@
 // src/doors stands in one, and each door names a walk planted outside it and
 // none planted inside it.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
-package owns
+package owns_test
 
 import (
 	"io/fs"
@@ -12,6 +12,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/owns"
 )
 
 const root = "../.."
@@ -21,9 +23,9 @@ var passed = map[string]bool{".git": true, "node_modules": true, ".se": true, ".
 
 // Whether the guard's walk reaches a path: no folder the lint passes, past the agent's folder on the road to its skills, and no draft. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func reached(rel string) bool {
-	skills := OnSkills(rel)
+	skills := owns.OnSkills(rel)
 	for _, part := range strings.Split(rel, "/") {
-		if (passed[part] && !(skills && part == AgentFolder)) || strings.HasPrefix(part, "_") {
+		if (passed[part] && !(skills && part == owns.AgentFolder)) || strings.HasPrefix(part, "_") {
 			return false
 		}
 	}
@@ -50,7 +52,7 @@ func treeOf(t *testing.T) (map[string]bool, map[string]string) {
 			return nil
 		}
 		files[rel] = true
-		if Declares(rel) {
+		if owns.Declares(rel) {
 			text, err := os.ReadFile(at)
 			if err != nil {
 				return err
@@ -65,10 +67,10 @@ func treeOf(t *testing.T) (map[string]bool, map[string]string) {
 	return files, declared
 }
 
-func doorsOf(t *testing.T) ([]Door, map[string]bool) {
+func doorsOf(t *testing.T) ([]owns.Door, map[string]bool) {
 	t.Helper()
 	files, declared := treeOf(t)
-	doors, faults := Read(declared, func(at string) bool { return files[at] })
+	doors, faults := owns.Read(declared, func(at string) bool { return files[at] })
 	for _, one := range faults {
 		t.Errorf("%s:%d: %s", one.File, one.Line, one.Says)
 	}
@@ -109,11 +111,11 @@ func TestEveryDoorNamesAPlantedWalk(t *testing.T) {
 					text = usesJS(name)
 				}
 				out := "src/planted/walk" + lang
-				if walks := Walks(out, text, doors); len(walks) != 1 || walks[0].Name != name {
+				if walks := owns.Walks(out, text, doors); len(walks) != 1 || walks[0].Name != name {
 					t.Errorf("%s at %s owns %s, and a use outside it reads %+v", door.Name, door.At, name, walks)
 				}
 				if in := insideOf(door, lang); in != "" {
-					if walks := Walks(in, text, doors); len(walks) != 0 {
+					if walks := owns.Walks(in, text, doors); len(walks) != 0 {
 						t.Errorf("%s at %s owns %s, and a use in %s reads %+v", door.Name, door.At, name, in, walks)
 					}
 				}
@@ -123,7 +125,7 @@ func TestEveryDoorNamesAPlantedWalk(t *testing.T) {
 }
 
 // A file the door holds in the language, or nothing where it holds none. [[spec/design_output/doors#a-door-declares-its-names]]
-func insideOf(door Door, lang string) string {
+func insideOf(door owns.Door, lang string) string {
 	if door.Files == nil {
 		return door.At + "/planted" + lang
 	}
@@ -172,7 +174,7 @@ func TestEveryIOModuleAndDoorDeclares(t *testing.T) {
 			continue
 		}
 		if !held(at) {
-			t.Errorf("%s is a door, and no %s holds it", at, File)
+			t.Errorf("%s is a door, and no %s holds it", at, owns.File)
 		}
 	}
 }

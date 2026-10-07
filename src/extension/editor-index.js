@@ -52,7 +52,7 @@ function indexDoor(root, doors) {
       const at = base();
       try {
         if (at) {
-          // level0: OutsideInDoors - the http door answers a whole body as text, and a watch reads an event stream that never ends
+          // level0: OutsideInDoors - the http door answers a whole body as text, and a watch reads an event stream that runs on
           const said = await fetch(`${at}/watch?names=${names.join(",")}`, {
             signal: aborts.signal,
           });

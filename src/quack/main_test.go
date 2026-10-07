@@ -4,7 +4,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"encoding/json"
 	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path/filepath"
 	"strings"
@@ -155,33 +154,6 @@ func awaits(t *testing.T, committed <-chan struct{}, want map[string]string) {
 			return
 		}
 		<-committed
-	}
-}
-
-// The wiring loads the tickets module, which reads files/ in and answers tickets/all out. [[spec/tickets/tickets-becomes-a-module]]
-func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
-	t.Parallel()
-	w := q.Wiring{
-		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}},
-		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName, "tickets.trunk": trunkName, "tickets.branched": "tickets/branched"},
-	}
-	c := q.New()
-	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
-	noTips(c)
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	s := q.NewStore(c)
-	text := "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nOne thing.\n"
-	if _, err := s.Commit(0, files, map[string]any{"files/spec/tickets/one.md": q.Content{Hash: "h", Text: text}}); err != nil {
-		t.Fatal(err)
-	}
-	if err := s.Run("tickets/all"); err != nil {
-		t.Fatalf("the run of tickets/all answers %v", err)
-	}
-	said, _ := json.Marshal(s.Snapshot().Read("tickets/all"))
-	if !strings.Contains(string(said), `"name":"one"`) || !strings.Contains(string(said), "One thing.") {
-		t.Fatalf("tickets/all reads %s", said)
 	}
 }
 

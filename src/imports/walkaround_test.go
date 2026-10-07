@@ -1,7 +1,7 @@
 // The walkaround analyzer over a planted tree: a use outside its door is named,
 // the door's own use is not, and neither is a marked line or a door at report.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
-package imports
+package imports // level0: InPackageTest - reaches underModule, the in-package helper imports_test.go holds
 
 import (
 	"testing"

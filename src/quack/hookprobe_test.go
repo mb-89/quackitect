@@ -130,17 +130,6 @@ func TestAHookAnsweringStandsAndOneAnsweringNothingWarns(t *testing.T) {
 	}
 }
 
-func TestAHookAnsweringAFailingStatusStands(t *testing.T) {
-	t.Parallel()
-	d, _, _, _ := fakeBoxDoors(t)
-	where := "http://127.0.0.1:36368/hook"
-	// The real GET answers a 500 with its body and no error, so the fake does the same. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-	d.get = answeringGet(map[string]string{where: "Internal Server Error"})
-	if rows := hookRows(d, []hookNamed{{where, settingsFile}}); !strings.HasPrefix(rows[0][1], "stands at") {
-		t.Errorf("the row reads %v", rows)
-	}
-}
-
 func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
 	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)

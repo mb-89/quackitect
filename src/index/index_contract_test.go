@@ -2,7 +2,7 @@
 // verb's question over both its ports, and git's own list turns the flags.
 // Every other case of the package runs on the door's fakes.
 // [[spec/tickets/test-walks-move-onto-fakes]]
-package index
+package index // level0: InPackageTest - reaches the unexported tree, opened, counted, standingOf and posts
 
 import (
 	"fmt"
@@ -17,6 +17,7 @@ import (
 	"quackitect/src/q/qtest"
 )
 
+// level0: FixtureOutsideHome - the contract serves a real door on loopback over a tree and an index file of its own, the one case the door meets the real network
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	t.Parallel()
 	root := tree(t)
@@ -62,6 +63,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the contract runs real git over a tree of its own, so the flags turn on git's own index
 func TestGitsOwnIndexTurnsTheTrackedFlags(t *testing.T) {
 	t.Parallel()
 	root := tree(t)

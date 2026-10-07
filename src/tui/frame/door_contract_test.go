@@ -3,7 +3,7 @@
 // stands nowhere, and a door holding its answer ends the tell on the clock.
 // [[spec/design_output/tui#a-second-launch-hands-over]]
 
-package frame
+package frame // level0: InPackageTest - reaches the unexported callWait
 
 import (
 	"net"
@@ -76,7 +76,7 @@ func TestTheDoorRefusesABodyThatNamesNoTab(t *testing.T) {
 	}
 }
 
-// The tell stands open while the call reaches a door that never answers, and ends once the clock passes the call wait. [[spec/tickets/go-waits-on-events]]
+// The tell stands open while the call reaches a door that stays silent, and ends once the clock passes the call wait. [[spec/tickets/go-waits-on-events]]
 func TestATellToADoorThatNeverAnswersEndsOnTheClock(t *testing.T) {
 	t.Parallel()
 	at, err := net.Listen("tcp", "127.0.0.1:0")

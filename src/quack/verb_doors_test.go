@@ -41,6 +41,7 @@ func walkedRoot(t *testing.T, report bool) string {
 	return root
 }
 
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
 func TestDoorsListsAWalkAroundADoorAtReport(t *testing.T) {
 	t.Parallel()
 	code, out, errs := doorsRan(walkedRoot(t, true))
@@ -58,6 +59,7 @@ func TestDoorsListsAWalkAroundADoorAtReport(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
 func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	t.Parallel()
 	code, out, errs := doorsRan(walkedRoot(t, false))
@@ -69,6 +71,7 @@ func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
 func TestDoorsListsAScriptWalkingAroundADoor(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
@@ -95,6 +98,7 @@ func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
 func TestDoorsListsADeclarationStandingAsItsOwnOutside(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
@@ -128,6 +132,7 @@ func TestDoorsReadsTheTreeWithNoMarkedLineOfItsOwn(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
 func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

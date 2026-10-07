@@ -2,7 +2,7 @@
 
 // The live split and the built root, meeting real processes: moved here off
 // split_test.go and manager_test.go. [[spec/tickets/test-walks-move-onto-fakes]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package, and the contract reaches the unexported ioProcesses, ioInstances, ioVerb and moduleVerb
 
 import (
 	"errors"
@@ -166,6 +166,7 @@ func listsTickets(snap q.Snapshot, names ...string) bool {
 	return !snap.NotProvided("tickets/all")
 }
 
+// level0: FixtureOutsideHome - the contract spawns the real module processes over a git tree of its own and kills one, which no fake process proves
 func TestAKilledModuleProcessUnderTheSplitLeavesTheOthersAnswering(t *testing.T) {
 	root, pids, store := splitRuns(t, nil)
 	ticketsPid := spawnedPid(t, pids, 0, moduleVerb, "tickets")
@@ -179,6 +180,7 @@ func TestAKilledModuleProcessUnderTheSplitLeavesTheOthersAnswering(t *testing.T)
 }
 
 // Each crash of a placed process hands the dog a fault, and a run of them raises the process's alarm. [[spec/tickets/live-split-raises-the-alarm]]
+// level0: FixtureOutsideHome - the contract spawns the real module processes over a git tree of its own and crashes them, so the dog hears real exits
 func TestACrashingModuleProcessUnderTheSplitRaisesItsAlarm(t *testing.T) {
 	_, pids, store := splitRuns(t, &manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
 	first := spawnedPid(t, pids, 0, moduleVerb, "guidance")
@@ -270,6 +272,7 @@ var quackBinary = sync.OnceValues(func() (string, error) {
 var quackBuilds atomic.Int32
 
 // Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
+// level0: FixtureOutsideHome - the contract asks for the real quack binary in two folders of its own, to prove one go build serves both
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 	t.Parallel()
 	built(t, t.TempDir())
@@ -280,6 +283,7 @@ func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 }
 
 // A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]
+// level0: FixtureOutsideHome - the contract runs the real quack binary as an index over a tree of its own with no wiring file
 func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 	t.Parallel()
 	bin := built(t, t.TempDir())
@@ -298,6 +302,7 @@ func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 }
 
 // A tree verb reaches /v1 before the index's own command line runs, and starts this binary where no door stands. [[spec/design_output/index#a-door-comes-back]]
+// level0: FixtureOutsideHome - the contract runs the real quack binary over a tree of its own where no door stands, so the verb starts a real index
 func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
 	t.Parallel()
 	bin := built(t, t.TempDir())
@@ -310,6 +315,7 @@ func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
 }
 
 // A driven tree carries no wiring file, so the index loads the wiring of the vehicle whose runtime folder holds the binary. [[spec/design_output/model#the-wiring-file]]
+// level0: FixtureOutsideHome - the contract runs the real quack binary from a vehicle runtime folder of its own over a tree with no wiring file
 func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
 	t.Parallel()
 	vehicle := t.TempDir()

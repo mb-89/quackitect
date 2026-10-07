@@ -3,7 +3,7 @@
 // The index door's spawn meets Windows once: a tree kill over the process
 // that started a door leaves the door answering, which its exit code proves.
 // [[spec/tickets/door-outlives-taskkill-tree]] [[spec/tickets/test-walks-move-onto-fakes]]
-package index
+package index_test
 
 import (
 	"bufio"
@@ -15,6 +15,8 @@ import (
 	"strings"
 	"syscall"
 	"testing"
+
+	"quackitect/src/index"
 )
 
 // The variable that turns the case below into the starter's caller, at 1, or the door, at 2. [[spec/tickets/door-outlives-taskkill-tree]]
@@ -35,11 +37,12 @@ func holdsForever() {
 }
 
 // [[spec/tickets/door-outlives-taskkill-tree]]
+// level0: FixtureOutsideHome - the contract spawns real processes and a real taskkill, the one case the door's spawn meets Windows
 func TestADoorOutlivesATreeKillOverWhatStartedIt(t *testing.T) {
 	self := "-test.run=^TestADoorOutlivesATreeKillOverWhatStartedIt$"
 	switch os.Getenv(doorRole) {
 	case "1":
-		door := Detached(exec.Command(os.Args[0], self))
+		door := index.Detached(exec.Command(os.Args[0], self))
 		door.Env = append(os.Environ(), doorRole+"=2")
 		door.Stdout = os.Stdout
 		if err := door.Run(); err != nil {

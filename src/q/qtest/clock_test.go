@@ -1,7 +1,7 @@
 // The fake clock fires each wait on the tick past its span, earliest first,
 // a stopped hand stays still, and its context names its deadline.
 // [[spec/tickets/go-waits-on-events]]
-package qtest
+package qtest_test
 
 import (
 	"context"
@@ -9,13 +9,15 @@ import (
 	"slices"
 	"testing"
 	"time"
+
+	"quackitect/src/q/qtest"
 )
 
 var startsAt = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 
 func TestTheFakeFiresEachWaitOnTheTickPastItsSpan(t *testing.T) {
 	t.Parallel()
-	fake := NewFake(startsAt)
+	fake := qtest.NewFake(startsAt)
 	fired := fake.After(2 * time.Second)
 	var ran []string
 	fake.AfterFunc(3*time.Second, func() { ran = append(ran, "late") })
@@ -48,7 +50,7 @@ func TestTheFakeFiresEachWaitOnTheTickPastItsSpan(t *testing.T) {
 
 func TestAStoppedHandNeverRuns(t *testing.T) {
 	t.Parallel()
-	fake := NewFake(startsAt)
+	fake := qtest.NewFake(startsAt)
 	ran := false
 	stop := fake.AfterFunc(time.Second, func() { ran = true })
 	if !stop() {
@@ -65,7 +67,7 @@ func TestAStoppedHandNeverRuns(t *testing.T) {
 
 func TestTheContextNamesItsDeadlineAndEndsOnIt(t *testing.T) {
 	t.Parallel()
-	fake := NewFake(startsAt)
+	fake := qtest.NewFake(startsAt)
 	bounded, cancel := fake.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	if at, ok := bounded.Deadline(); !ok || !at.Equal(startsAt.Add(time.Second)) {
@@ -82,7 +84,7 @@ func TestTheContextNamesItsDeadlineAndEndsOnIt(t *testing.T) {
 
 func TestACancelledContextEndsCancelled(t *testing.T) {
 	t.Parallel()
-	fake := NewFake(startsAt)
+	fake := qtest.NewFake(startsAt)
 	bounded, cancel := fake.WithTimeout(context.Background(), time.Second)
 	cancel()
 	fake.Tick(time.Second)

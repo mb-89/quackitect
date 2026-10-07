@@ -2,7 +2,7 @@
 // error over a refusing door, and as a hint in an open buffer over a door at
 // report.
 // [[spec/design_output/doors#nothing-walks-around-a-door]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package, and the case reaches the unexported lspChecks
 
 import (
 	"encoding/json"

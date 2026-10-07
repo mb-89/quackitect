@@ -1,7 +1,7 @@
 // A stop that hangs reads as hung once the wall passes the span, and a quick
 // stop answers its own error.
 // [[spec/tickets/go-waits-on-events]]
-package watchertest
+package watchertest // level0: InPackageTest - reaches the unexported stopsWithin
 
 import (
 	"errors"
