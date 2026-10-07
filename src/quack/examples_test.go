@@ -127,8 +127,34 @@ func TestTheVerdictsLandInTheRuntimeFile(t *testing.T) {
 // The verbs the first chapters show, which the coverage report names no more. [[spec/tickets/example-first-chapters-stand]]
 var firstChapters = []string{"ticket pull", "ticket note", "ticket set", "ticket todo", "ticket urgent", "branch", "check"}
 
+// The files the coverage rule reads off this tree: every example, and every source registering a verb. [[spec/design_output/examples#the-checks]]
+func coverageTexts(t *testing.T) check.Texts {
+	t.Helper()
+	out := check.Texts{}
+	for _, folder := range []string{"spec/examples", "src/quack"} {
+		err := filepath.WalkDir(filepath.Join(exampleMethod, folder), func(at string, one os.DirEntry, err error) error {
+			if err != nil || one.IsDir() || strings.HasSuffix(at, "_test.go") {
+				return err
+			}
+			text, err := os.ReadFile(at)
+			rel, _ := filepath.Rel(exampleMethod, at)
+			out[filepath.ToSlash(rel)] = string(text)
+			return err
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	return out
+}
+
 func TestTheFirstChaptersLeaveTheirVerbsUnreported(t *testing.T) {
-	tree := check.TreeOver(exampleMethod, rootDisk{exampleMethod})
+	t.Parallel()
+	texts := coverageTexts(t)
+	if _, ok := texts[pullingPath]; !ok {
+		t.Fatalf("the tree the rule reads holds no %s", pullingPath)
+	}
+	tree := check.TreeOver(exampleMethod, texts)
 	for _, rule := range check.Rules {
 		for _, one := range rule(tree) {
 			for _, verb := range firstChapters {

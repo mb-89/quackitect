@@ -23,7 +23,7 @@ func TestTheRowsReadEachExampleWithItsChapterAndVerdict(t *testing.T) {
 		"files/spec/examples/910_dev_pull/edge.md": q.Content{Hash: "e", Text: edgeText},
 		"files/spec/examples/110_tickets/pull.md":  q.Content{Hash: "p", Text: pullText},
 		"files/spec/tickets/one.md":                q.Content{Hash: "o", Text: "---\nkind: [[ticket]]\n---\n"},
-		"files/" + VerdictsAt:                      q.Content{Hash: "v", Text: `{"spec/examples/110_tickets/pull.md":{"verdict":"fail","miss":"a miss"}}`},
+		"files/.se/.runtime/examples.json": q.Content{Hash: "v", Text: `{"spec/examples/110_tickets/pull.md":{"verdict":"fail","miss":"a miss"}}`}, // .claude/skills/level0/lib/folders.js owns the runtime folder, and the harness writes the verdicts there.
 	})
 	if err := index.Store().Run(RowsName); err != nil {
 		t.Fatalf("%s runs nowhere: %v", RowsName, err)

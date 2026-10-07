@@ -9,7 +9,7 @@ import "quackitect/src/q"
 const (
 	RowsName   = "examples/rows"
 	RunName    = "examples/run"
-	VerdictsAt = ".se/.runtime/examples.json"
+	VerdictsAt = ".se/.runtime/examples.json" // .claude/skills/level0/lib/folders.js owns the runtime folder.
 )
 
 // One example as the tab reads it. [[spec/design_output/examples#the-tutorial-tab]]
