@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -245,6 +245,21 @@ record:
   - step: gate
     hand: the engine
     stale: design/draft, [[spec/design_output/doors]]
+  - step: gate
+    hand: box dcf1ea3c64fd · claude-code-remote · helper-16
+    hash_before: f39863b503e9fec7b95ddb148d1c0c35875b04db
+    hash_after: f39863b503e9fec7b95ddb148d1c0c35875b04db
+    inputs:
+      - name: design/draft
+        hash: caa6874d5e574192
+        size: 6760
+      - name: design/tests-red
+        hash: 6aadec6afa1cb638
+        size: 690
+      - name: [[spec/design_output/doors]]
+        hash: 58fd51bc5be6f489
+        size: 22757
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -525,8 +540,7 @@ the case reads source alone, and every door the moves reach holds a fake: files.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- go-rows-name-declared-contracts: the Go contract table in spec/design_output/doors.md names `src/index/fakeindex_contract_test.go`, `src/index/bus_contract_test.go` and `src/index/procs_test.go` as contract suites, but src/index/owns.yaml declares only index_contract_test.go, detach_contract_test.go and detach_windows_contract_test.go under contract, and none of the three ends `_contract_test.go` as the chapter A door names its contract tests asks. The rows name the suites the declaration holds, or say the fake-keeps-a-contract suite stands apart from the door's contract tests.
+accept
 
 # implement
 
