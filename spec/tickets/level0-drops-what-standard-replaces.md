@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 5087e2972354c89a
         size: 1091
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 104cd4382ed985a9fced58c23ccda0eea0ea00a9
+    hash_after: 104cd4382ed985a9fced58c23ccda0eea0ea00a9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 44f026d026534d58
+        size: 1925
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_start_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The start verb prints its stop for a desk session in default mode where the manifest stands and no switch is set, so the case fails on its own assertion. The cold probe passes whole on a fresh clone with client 2.1.292 and no switch, which the Discussion carries. What surprises me: main dropped the switch from the settings while the start verb still read it, so every desk session outside plan mode met the start refusal.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the probe line meets the cold probe output under Discussion, the boot hook line and the function hooks line meet a checkpoint the gate answers off the design note, the start verb fix meets the flipped case, and the check line meets the check
+the start test reaches the root, input, environment and disk through startFake, and the cold probe runs a real clone by design
 
 # gate
 
@@ -329,3 +347,13 @@ the approach adds no config key
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The cold probe, `./RUNME.sh probe cold`, clones the work branch fresh and runs client 2.1.292 headless once, with no `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` in its environment or in `.claude/settings.json`. The mod loads, so the switch stays nowhere. Its output, with the tool list cut to its first name:
+
+    The install answers 0.
+    PASS hook: bridge row, no index answered, so the bridgehead starts one
+    PASS server: context row, 2 block(s) reach the session
+    PASS rules: context row, level0-tools level0-canary
+    PASS tools: mcp__level0__check_answer, ...
+    PASS canary: the first text opens on it, once: level0 holds this session: 75 rules, 6 notes, the stop hook on.
+    PASS quiet: no row says the server answers nothing past the rules
