@@ -90,6 +90,10 @@ record:
     hash_before: 2ba744881bf0ea113d63802bef0a92f91232240c
     session: cse_019gdjBL3W2A1vtUVGZvVPNS
     hash_after: c71f687a2723640d85dfb22a66c5afb43e72e4a6
+  - step: sync
+    hand: box 49b3bfe9f7b0 · claude-code-remote
+    hash_before: c703cc21ccd8520657da66be83916676d1292e20
+    session: cse_01DyjMbZQSGv9pA5CSQStLWz
 ---
 
 # Ask
