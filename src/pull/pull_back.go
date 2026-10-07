@@ -34,7 +34,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	one := &Held{Name: held.Ticket, Path: held.Path, Text: text, Front: FrontOf(text), Private: strings.HasPrefix(held.Path, Notes)}
 	// The record holds this hand-back already, so the pull pushes it again. [[spec/design_output/pull#the-rejected-push]]
 	for _, entry := range recordIn(one.Text) {
-		if yaml.AsString(entry.Get("step")) == held.Step && !truthy(yaml.AsString(entry.Get("skipped"))) && yaml.AsString(entry.Get("hash_after")) != "" && yaml.AsString(entry.Get("hash_before")) == held.Hash {
+		if yaml.AsString(entry.Get("step")) == held.Step && !yaml.Truthy(entry.Get("skipped")) && yaml.AsString(entry.Get("hash_after")) != "" && yaml.AsString(entry.Get("hash_before")) == held.Hash {
 			ok, why := it.sentOut(one, who.Branch)
 			if !ok {
 				it.Say(Refused, append([]string{fmt.Sprintf("%s at %s answered, and the record holds this hand-back already. Its push reaches no origin.", held.Ticket, held.Step)}, why...)...)

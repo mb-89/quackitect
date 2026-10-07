@@ -117,7 +117,7 @@ func command(life context.Context, one Command) *exec.Cmd {
 	cmd.Dir = one.Dir
 	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
 	if one.Streams == nil {
-		whole(cmd)
+		Whole(cmd)
 	}
 	return cmd
 }

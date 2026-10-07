@@ -40,7 +40,7 @@ func (one *door) servesTools(api huma.API) {
 		}
 		for _, name := range one.store.Names() {
 			in, _, ok := one.store.Types(name)
-			if !ok {
+			if !ok || !one.accepted(name) {
 				continue
 			}
 			looks, _ := one.store.Presentation(name)
@@ -55,4 +55,30 @@ func (one *door) servesTools(api huma.API) {
 		}
 		return out, nil
 	})
+}
+
+// Whether a module accepts every request the action opens with on a zero input. An action that reads no request off a zero input stays listed, and so does every action under a nil Accepts. [[spec/tickets/every-index-tool-answers]]
+func (one *door) accepted(name string) (listed bool) {
+	if one.accepts == nil {
+		return true
+	}
+	defer func() {
+		if recover() != nil {
+			listed = true
+		}
+	}()
+	input, err := one.store.Input(name, nil)
+	if err != nil {
+		return true
+	}
+	asked, err := one.store.Act(name, input)
+	if err != nil {
+		return true
+	}
+	for _, each := range asked {
+		if !one.accepts(each.Module, each.Verb) {
+			return false
+		}
+	}
+	return true
 }

@@ -4,6 +4,8 @@
 package voice
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -58,10 +60,10 @@ func AnswersIn(text string) []string {
 
 // An owner row in the transcript: a user row carrying no tool result, and neither a meta row nor a compaction summary. [[spec/tickets/answers-read-the-last-text]]
 func opensTurn(row Row) bool {
-	if row["type"] != "user" || truthy(row["isMeta"]) || truthy(row["isCompactSummary"]) {
+	if row["type"] != "user" || yaml.Truthy(row["isMeta"]) || yaml.Truthy(row["isCompactSummary"]) {
 		return false
 	}
-	if truthy(row["isSidechain"]) || truthy(row["agentId"]) {
+	if yaml.Truthy(row["isSidechain"]) || yaml.Truthy(row["agentId"]) {
 		return false
 	}
 	message, _ := row["message"].(map[string]any)
@@ -79,7 +81,7 @@ func opensTurn(row Row) bool {
 
 // The text blocks of a main-line assistant row, joined by a blank line and trimmed. [[spec/design_output/projection#the-second-target]]
 func answerOf(row Row) string {
-	if row["type"] != "assistant" || truthy(row["isSidechain"]) || truthy(row["agentId"]) {
+	if row["type"] != "assistant" || yaml.Truthy(row["isSidechain"]) || yaml.Truthy(row["agentId"]) {
 		return ""
 	}
 	message, _ := row["message"].(map[string]any)

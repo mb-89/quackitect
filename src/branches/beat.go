@@ -117,7 +117,8 @@ func (d *Doors) staleClaim(one stand, now int64) claim {
 			return read
 		}
 	}
-	read.Stale = held > d.staleSpan()
+	span := d.staleSpan()
+	read.Stale = span > 0 && held > span
 	return read
 }
 

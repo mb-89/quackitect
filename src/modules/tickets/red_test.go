@@ -79,6 +79,12 @@ func TestRedList(t *testing.T) {
 			t.Fatalf("a closed ticket reads %v, and wants none", got)
 		}
 	})
+	t.Run("a tests-red whose skipped reads false names its files", func(t *testing.T) {
+		want := []string{"test/level0/one.test.js", "test/level0/two.test.js"}
+		if got := RedList(redOf("  - step: design/tests-red\n    skipped: false\n")); !reflect.DeepEqual(got, want) {
+			t.Fatalf("a tests-red skipped false reads %v, and wants %v", got, want)
+		}
+	})
 	t.Run("a skipped tests-red names none", func(t *testing.T) {
 		if got := RedList(redOf("  - step: design/tests-red\n    skipped: true\n")); len(got) != 0 {
 			t.Fatalf("a skipped tests-red reads %v, and wants none", got)

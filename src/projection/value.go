@@ -6,6 +6,8 @@
 package projection
 
 import (
+	"quackitect/src/yaml"
+
 	"math"
 	"regexp"
 	"sort"
@@ -150,19 +152,9 @@ func absent(said any) bool {
 	return null
 }
 
-// Whether a value reads true in a condition. [[spec/tickets/config-verbs-port-to-go]]
-func truthy(said any) bool {
-	switch one := said.(type) {
-	case nil, Null:
-		return false
-	case bool:
-		return one
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	case string:
-		return one != ""
-	}
-	return true
+// Whether a value reads true in a condition: the Null mark reads false, and every other value as yaml.Truthy reads it. [[spec/tickets/shared-helpers-stand-once]]
+func holdsTrue(said any) bool {
+	return said != (Null{}) && yaml.Truthy(said)
 }
 
 // A value as String writes it. [[spec/tickets/config-verbs-port-to-go]]

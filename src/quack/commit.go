@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/proc"
+	"quackitect/src/pull"
 )
 
 // The usage, the flag keeping a commit home, the name a finding of the message stands under, and the road the message names its ticket by. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -34,17 +35,6 @@ const (
 	movedStatus = "R"
 	every       = "."
 )
-
-// The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
-var coldPath = []string{
-	".claude/skills/level0/hooks/",
-	".claude/skills/level0/lib/guidance.js",
-	"src/modules/hooks/",
-	"src/quack/",
-	"src/scripts/go-stamp.sh",
-	"src/scripts/install.sh",
-	"src/scripts/probe-cold.js",
-}
 
 func init() {
 	register("commit", func(argv []string, dry bool, out, errs io.Writer) int {
@@ -100,6 +90,13 @@ func commitVerb(d landingDoors) twin {
 		// [[spec/design_output/level0#a-write-names-its-ticket]]
 		if fault := command.TicketFault(command.TicketOf(message), rootDisk{d.root}, messageHow); fault != "" {
 			fmt.Fprintln(errs, fault)
+			return exitUsage
+		}
+		// A trailer naming a model stops the commit before anything stages. [[spec/tickets/commit-door-refuses-model-trailers]]
+		if rows := command.ModelTrailers(message); len(rows) > 0 {
+			for _, one := range rows {
+				fmt.Fprintf(errs, "%s: %s\n", one.Said, one.Message)
+			}
 			return exitUsage
 		}
 		refused, form := messageFindings(d, message)
@@ -202,7 +199,7 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	cold := coldIn(d.stagedPaths(only))
+	cold := pull.ColdIn(d.stagedPaths(only))
 	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
 		d.unstages(only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
@@ -315,20 +312,6 @@ func (d landingDoors) stagedPaths(only []string) []string {
 			out = append(out, one.From)
 		}
 		out = append(out, one.Path)
-	}
-	return out
-}
-
-// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
-func coldIn(paths []string) []string {
-	var out []string
-	for _, path := range paths {
-		for _, cold := range coldPath {
-			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
-				out = append(out, path)
-				break
-			}
-		}
 	}
 	return out
 }

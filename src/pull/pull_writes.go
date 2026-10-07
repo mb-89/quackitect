@@ -6,7 +6,8 @@ package pull
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -503,10 +504,5 @@ func (it *It) changedFiles(since string) []string {
 }
 
 func sortedKeys(said map[string]bool) []string {
-	out := make([]string, 0, len(said))
-	for key := range said {
-		out = append(out, key)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(said))
 }

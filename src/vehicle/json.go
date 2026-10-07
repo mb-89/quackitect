@@ -310,21 +310,6 @@ func Shown(value any, held bool) string {
 	return JSString(value)
 }
 
-// Truthy reads a value as a JavaScript condition does. [[spec/design_output/vehicle#what-a-vehicle-needs]]
-func Truthy(value any) bool {
-	switch said := value.(type) {
-	case nil:
-		return false
-	case bool:
-		return said
-	case float64:
-		return said != 0 && !math.IsNaN(said)
-	case string:
-		return said != ""
-	}
-	return true
-}
-
 // ToNumber reads a value as JavaScript's Number does. [[spec/design_output/vehicle#the-register-holds-the-port]]
 func ToNumber(value any) float64 {
 	switch said := value.(type) {

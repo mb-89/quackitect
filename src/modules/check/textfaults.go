@@ -103,6 +103,10 @@ func unreasoned(path, text string) []Finding {
 
 // A file past its ceiling, and each function past its own, in lines. A ceiling of nothing holds its rule off. [[spec/design_output/level0#the-size-ceiling]]
 func sizeFaults(path, text string, function, file int) []Finding {
+	// A prose or data file draws no size row, as size.js reads code alone. [[spec/tickets/size-golden-drops-line-counts]]
+	if !sizedFile.MatchString(path) {
+		return nil
+	}
 	lines := lineBreak.Split(text, -1)
 	out := []Finding{}
 	if file > 0 && len(lines) > file {

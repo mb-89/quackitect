@@ -4,28 +4,12 @@
 package voice
 
 import (
-	"math"
 	"slices"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf16"
 )
-
-// Whether a JSON value reads as true in JavaScript. [[spec/design_output/projection#the-second-target]]
-func truthy(v any) bool {
-	switch one := v.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case string:
-		return one != ""
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	}
-	return true
-}
 
 // A JSON value as String writes it, a missing one as nothing. [[spec/design_output/projection#the-second-target]]
 func jsString(v any) string {

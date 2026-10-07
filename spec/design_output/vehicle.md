@@ -36,7 +36,7 @@ moved tree keeps the one it has.
 ## A marker names the root
 
 The walk goes up from the folder in hand, looking for the one file a method
-tree carries: `.claude/skills/level0/.claude-plugin/plugin.json`.
+tree carries: `plugin.json` under `.claude/skills/level0/.claude-plugin`.
 
 Deriving a root from where a program sits answers a folder with the same
 confidence whatever folder it is. A rule read out of that guess names files
@@ -232,7 +232,7 @@ ignores the targets alone:
 | source | target |
 |---|---|
 | `marketplace.json` | `.claude-plugin/marketplace.json` |
-| `plugin.json` | `.claude/skills/level0/.claude-plugin/plugin.json` |
+| `plugin.json` | `plugin.json` under `.claude/skills/level0/.claude-plugin` |
 | `icon.svg` | the path `src/extension/package.json` names |
 
 So a fresh clone carries no target, and the stamp writes each one on the first
@@ -278,9 +278,6 @@ line takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
 the vehicle as method and the stub as work. A shim finding none prints one
 line naming the vehicle, its upstream and the cloned road, and exits one.
 
-`test/contract/stub.test.js` drives the shim over a fixture: a fake vehicle
-whose `RUNME.sh` echoes its argv and its work root, a register naming it, and
-a stub. It reads both, then empties the register and reads the refusal line.
 The bridgehead takes the same roads and attaches through the vehicle's
 own verb. The next section says how.
 
@@ -330,9 +327,7 @@ command's last line.
 
 `test/level0/bridgehead.test.js` drives the hook over a fake git and a fake
 disk. The fakes behave: the clone writes the vehicle's RUNME, and the attach
-writes the driver. `test/contract/stub.test.js` clones this tree as the
-upstream into a temp home under `SE_SLOW`. It reads the register, the
-pointer, the driver and the hook back.
+writes the driver.
 
 One routine run against a stub repo proves the road on a cloud box, read off
 the run's log. It takes the following:
@@ -345,7 +340,5 @@ Nothing on a desk stands in for it.
 
 ## Nothing of the method travels
 
-`test/contract/stub.test.js` produces a stub into a folder it makes, reads
-every file back, and walks the whole folder. Every path it meets stands in
-the list the pure module names, and none of the method's files stands beside
+Every path a produced stub holds stands in the list the pure module names, and none of the method's files stands beside
 them. A refused vehicle leaves the folder as it stands.

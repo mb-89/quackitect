@@ -4,6 +4,8 @@
 package voice
 
 import (
+	"quackitect/src/yaml"
+
 	"errors"
 	"fmt"
 	"math"
@@ -87,7 +89,7 @@ func numberText(n float64) string {
 func RefusalsIn(rows []Row, since string) []Row {
 	out := []Row{}
 	for _, one := range rows {
-		if one["level"] != "warn" || !truthy(one["rule"]) {
+		if one["level"] != "warn" || !yaml.Truthy(one["rule"]) {
 			continue
 		}
 		if since == "" || unitsCompare(jsString(one["at"]), since) >= 0 {

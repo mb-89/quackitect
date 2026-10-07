@@ -364,3 +364,10 @@ func TestMeasuredStandsInTheRuntimeFolder(t *testing.T) {
 		t.Errorf("%s stands outside %s", Measured, path.Dir(brief.ToolsFile))
 	}
 }
+
+// A user row whose meta flag reads false opens a turn, and a sidechain row opens none. [[spec/tickets/shared-helpers-stand-once]]
+func TestAFalseFlagLeavesTheTurnOpen(t *testing.T) {
+	if !opensTurn(Row{"type": "user", "isMeta": false, "agentId": ""}) || opensTurn(Row{"type": "user", "isSidechain": true}) {
+		t.Fatal("a row opens a turn otherwise than its flags read")
+	}
+}

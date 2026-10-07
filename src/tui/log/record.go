@@ -6,10 +6,11 @@ package log
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 	"time"
+
+	"quackitect/src/yaml"
 )
 
 var own = map[string]bool{"at": true, "level": true, "kind": true, "door": true, "said": true, "text": true}
@@ -37,19 +38,19 @@ func ParseRecord(line string) Record {
 		r.Said = strings.TrimSpace(line)
 		return r
 	}
-	if at, err := time.Parse(time.RFC3339Nano, textOf(fields["at"])); err == nil {
+	if at, err := time.Parse(time.RFC3339Nano, yaml.FieldText(fields["at"])); err == nil {
 		r.At = at
 	}
-	r.Level = textOf(fields["level"])
+	r.Level = yaml.FieldText(fields["level"])
 	if r.Level == "" {
 		r.Level = "info"
 	}
-	r.Kind = textOf(fields["kind"])
+	r.Kind = yaml.FieldText(fields["kind"])
 	if r.Kind == "" {
-		r.Kind = textOf(fields["door"])
+		r.Kind = yaml.FieldText(fields["door"])
 	}
-	r.Said = textOf(fields["said"])
-	r.Text = textOf(fields["text"])
+	r.Said = yaml.FieldText(fields["said"])
+	r.Text = yaml.FieldText(fields["text"])
 	for key, value := range fields {
 		if own[key] {
 			continue
@@ -57,22 +58,9 @@ func ParseRecord(line string) Record {
 		if r.Extra == nil {
 			r.Extra = map[string]string{}
 		}
-		r.Extra[key] = textOf(value)
+		r.Extra[key] = yaml.FieldText(value)
 	}
 	return r
-}
-
-func textOf(value any) string {
-	switch one := value.(type) {
-	case nil:
-		return ""
-	case string:
-		return one
-	case map[string]any, []any:
-		out, _ := json.Marshal(one)
-		return string(out)
-	}
-	return fmt.Sprint(value)
 }
 
 // The ladder Python's logging climbs. A level nobody knows stands as info. [[spec/design_output/tui#alt-l-raises-the-floor]]

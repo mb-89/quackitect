@@ -563,6 +563,21 @@ func TestVehicleWithPortTakesTheFirstFreePort(t *testing.T) {
 	}
 }
 
+// A pointer naming no method names nothing, and a port of zero or none reads the base port, as JavaScript reads the condition. [[spec/tickets/vehicle-truthy-joins-yaml]]
+func TestPointerOfReadsTheMethodAndPortAsJavaScriptDoes(t *testing.T) {
+	t.Parallel()
+	for _, read := range []string{`{}`, `{"method":""}`, `{"method":null,"port":6512}`} {
+		if method, port, ok := PointerOf(read); ok {
+			t.Errorf("%s names %q at %v", read, method, port)
+		}
+	}
+	for read, want := range map[string]float64{`{"method":"/m","port":0}`: PortBase, `{"method":"/m","port":""}`: PortBase, `{"method":"/m","port":6512}`: 6512} {
+		if method, port, ok := PointerOf(read); !ok || method != "/m" || port != want {
+			t.Errorf("%s reads %q at %v, %v, and wants /m at %v", read, method, port, ok, want)
+		}
+	}
+}
+
 // The pointer stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
 func TestPointerStandsInTheRuntimeFolder(t *testing.T) {
 	if !strings.HasPrefix(Pointer, path.Dir(brief.ToolsFile)+"/") {

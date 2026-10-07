@@ -361,7 +361,7 @@ pause of a second. A server falling at its start then loops once a second.
 
 # The doctor probes the server
 
-`doctor` prints a `quack lsp` row off `lspProbe` in `src/scripts/lsp-probe.js`.
+`doctor` prints a `quack lsp` row off `lspProbe` in `src/quack/lspprobe.go`.
 The probe starts `quack lsp` off the index binary in the tree, writes `initialize`, a `didOpen` of
 a note under `spec/tickets` carrying no frontmatter, `shutdown` and `exit`, and
 reads what comes back.

@@ -71,3 +71,11 @@ func TestANestedFieldReadsAsItsJSON(t *testing.T) {
 		t.Fatalf("the rows read %+v, and want %+v", rows, want)
 	}
 }
+
+// A null field reads as nothing, and an object as its JSON. [[spec/tickets/shared-helpers-stand-once]]
+func TestARowReadsEachFieldAsText(t *testing.T) {
+	row := RowOf(`{"level":"warn","kind":null,"said":3,"text":{"a":1}}`)
+	if row.Kind != "" || row.Said != "3" || row.Text != `{"a":1}` {
+		t.Fatalf("the row reads %+v", row)
+	}
+}
