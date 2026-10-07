@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -21,21 +22,40 @@ import (
 // The index binary under the root, as BIN in .claude/skills/level0/lib/index.js names it. [[spec/design_output/level0#a-desk-serve-returns]]
 const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder .claude/skills/level0/lib/folders.js owns
 
-// What the serve verb reaches: the root, and a run that answers the exit code and the error stream. [[spec/design_output/level0#a-desk-serve-returns]]
+// What the serve verb reaches: the root, a run that answers the exit code and the error stream, the environment, the binary running the verb, and the index the standing runs, the root's own where none is named. [[spec/design_output/level0#a-desk-serve-returns]]
 type serveDoors struct {
-	root string
-	run  func(argv []string, cwd string) (int, string, error)
-	disk diskDoors
+	root  string
+	run   func(argv []string, cwd string) (int, string, error)
+	disk  diskDoors
+	env   func(string) string
+	self  string
+	index string
+}
+
+// The flag the bridgehead runs the verb under, and the variables that mark a cloud box, the pair the cloud guidance binds on. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const serveBridge = "--bridge"
+
+var serveCloudVars = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD"}
+
+// The row the bridgehead hands the log: a level, the words, the event the road runs under, and what the index said. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+type bridgeRow struct {
+	Level  string `json:"level"`
+	Said   string `json:"said"`
+	Event  string `json:"event"`
+	Detail string `json:"detail"`
 }
 
 func init() { register("serve", serveVerb(serveReal)) }
 
 // The serve verb over its doors: one line on the output, and 1 where the index falls. Dry runs no index, and reads the door as it stands. [[spec/design_output/level0#a-desk-serve-returns]]
 func serveVerb(doors func() serveDoors) twin {
-	return func(_ []string, dry bool, out, _ io.Writer) int {
+	return func(argv []string, dry bool, out, _ io.Writer) int {
 		d := doors()
 		if dry {
 			d.run = func([]string, string) (int, string, error) { return 0, "", nil }
+		}
+		if slices.Contains(argv, serveBridge) {
+			return serveBridges(d, out)
 		}
 		code, said := serveDetachedStart(d)
 		fmt.Fprintln(out, said)
@@ -43,10 +63,48 @@ func serveVerb(doors func() serveDoors) twin {
 	}
 }
 
+// The start road the bridgehead runs where no door answers: nothing off a cloud box, because a person starts the index there, and else the binary running this verb stands in the work root, and one row says how it went. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+func serveBridges(d serveDoors, out io.Writer) int {
+	if !serveOnCloud(d.env) {
+		return 0
+	}
+	if d.self != "" {
+		d.index = d.self
+	}
+	code, said := serveDetachedStart(d)
+	row := bridgeRow{Level: "info", Said: "no index answered, so the bridgehead starts one", Event: "session.start", Detail: said}
+	if code != 0 {
+		row.Level, row.Said = "warn", "the index fails its standing, so no door stands"
+	}
+	text, err := json.Marshal(row)
+	if err != nil {
+		return exitFailed
+	}
+	fmt.Fprintln(out, string(text))
+	return code
+}
+
+// Whether a cloud variable stands, so nobody is there to press the sidebar button. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+func serveOnCloud(env func(string) string) bool {
+	if env == nil {
+		return false
+	}
+	for _, name := range serveCloudVars {
+		if env(name) != "" {
+			return true
+		}
+	}
+	return false
+}
+
 // The index answers its standing by starting its door where none answers, so one run starts it and probes it. [[spec/design_output/level0#a-desk-serve-returns]]
 func serveDetachedStart(d serveDoors) (int, string) {
 	was := serveDoorOf(d.disk, d.root)
-	code, stderr, err := d.run([]string{d.root + "/" + serveIndexBin, "standing"}, d.root)
+	bin := d.index
+	if bin == "" {
+		bin = d.root + "/" + serveIndexBin
+	}
+	code, stderr, err := d.run([]string{bin, "standing"}, d.root)
 	if err != nil {
 		return 1, "The index falls: " + err.Error()
 	}
@@ -104,7 +162,11 @@ func serveReal() serveDoors {
 		root = "."
 	}
 	box := quietBox()
-	return serveDoors{root: filepath.ToSlash(root), run: serveRuns, disk: box.disk}
+	self, err := selfPath()
+	if err != nil {
+		self = ""
+	}
+	return serveDoors{root: filepath.ToSlash(root), run: serveRuns, disk: box.disk, env: box.env, self: self}
 }
 
 // Runs a program in a folder over the real process door. [[spec/design_output/level0#a-desk-serve-returns]]

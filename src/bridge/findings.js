@@ -7,7 +7,7 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
-  "{.se,node_modules,.git,.claude/types,.claude/worktrees}/**",
+  "{.se,node_modules,.git,.claude/types,.claude/skills/level0/.claude-plugin/types,.claude/worktrees}/**",
   "**/_*",
 ];
 export const OURS = `--glob=!{${PARKED.join(",")}}`;

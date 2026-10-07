@@ -65,6 +65,10 @@ type Post struct {
 	Harness string         `json:"harness,omitempty"`
 	Fill    any            `json:"fill,omitempty"`
 	Old     any            `json:"old,omitempty"`
+	// The transcript's rows as the session hands them, newest last, which the door trims into the fields its folds read. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/level0-hooks-hold-no-rule]]
+	Messages []any `json:"messages,omitempty"`
+	// Says the post asks back for a step the first post answered, so its rows ask back no more. [[spec/tickets/level0-hooks-hold-no-rule]]
+	Back bool `json:"back,omitempty"`
 }
 
 // [[spec/design_output/model#the-effects]]
@@ -220,6 +224,7 @@ func (d *Door) hears(post Post) {
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
+	post = transcribed(post)
 	root := post.Root
 	if root == "" {
 		root = d.from.Root

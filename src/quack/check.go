@@ -1,6 +1,6 @@
 // The check verb: the tests, level zero, the Go tests, the doors, the
-// projections, the plugin, the server and the rules over the tree, all at
-// once and each timed, and the stamp a door reads before a push.
+// projections, the plugin, its types, the server and the rules over the tree,
+// all at once and each timed, and the stamp a door reads before a push.
 // [[spec/design_output/work#the-battery-answers-first]]
 package main
 
@@ -311,6 +311,8 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		{name: "guards", run: func() int { return d.verb([]string{"guards"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},
 		{name: "plugin", run: func() int { return pluginHolds(d) }},
+		{name: "types", run: func() int { return typesHold(d) }},
+		{name: "plugin-tests", run: func() int { return pluginTestsHold(d) }},
 		{name: "server", run: func() int { return serverHolds(d) }},
 		{name: "rules", run: func() int { return d.verb(append([]string{"lint"}, where...), quiet) }},
 	}
@@ -333,9 +335,9 @@ func level0Runs(d checkDoors, quiet bool) int {
 	return code
 }
 
-// The plugin the engine reads validates, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]]
+// The plugin the engine reads validates strictly, so a warning fails the part, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]] [[spec/tickets/level0-plugin-validate-in-check]]
 func pluginHolds(d checkDoors) int {
-	code, said, err := d.run([]string{"claude", "plugin", "validate", filepath.FromSlash(pluginDir)}, nil, true)
+	code, said, err := d.run([]string{"claude", "plugin", "validate", "--strict", filepath.FromSlash(pluginDir)}, nil, true)
 	if err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so the plugin goes unvalidated here.")
 		return 0
@@ -345,6 +347,26 @@ func pluginHolds(d checkDoors) int {
 	}
 	fmt.Fprintln(d.errs, strings.TrimSpace(said))
 	fmt.Fprintln(d.errs, "The engine reads this module's source, and it refuses the above.")
+	return 1
+}
+
+// The hooks module types against the engine this box runs: claude lays the engine's types into the plugin as it loads it, and tsc reads the plugin against them. The print run asks for a prompt and exits before any model turn, once the load has laid the types. A box with no claude or no tsc says so and carries on. [[spec/tickets/level0-hooks-move-to-typescript]]
+func typesHold(d checkDoors) int {
+	plugin := filepath.FromSlash(pluginDir)
+	if _, _, err := d.run([]string{"claude", "--plugin-dir", plugin, "-p", ""}, nil, true); err != nil {
+		fmt.Fprintln(d.out, "claude stands nowhere, so no types are laid and the hooks go untyped here.")
+		return 0
+	}
+	code, said, err := d.run([]string{"tsc", "-p", plugin}, nil, true)
+	if err != nil {
+		fmt.Fprintln(d.out, "tsc stands nowhere, so the hooks go untyped here.")
+		return 0
+	}
+	if code == 0 {
+		return 0
+	}
+	fmt.Fprintln(d.errs, strings.TrimSpace(said))
+	fmt.Fprintln(d.errs, "The hooks module fails its types against the engine this box runs, as the above says.")
 	return 1
 }
 

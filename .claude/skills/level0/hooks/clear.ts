@@ -6,14 +6,14 @@
 // The span a clear the Stop answers waits for the turn's completion, before a timer runs it. [[spec/tickets/the-clear-runs-live-remote]]
 export const CLEAR_FALLBACK_MS = 2000;
 
-let waiting = null;
+let waiting: string | null = null;
 
-export function holdsClear(prompt) {
+export function holdsClear(prompt: string): void {
   waiting = prompt;
 }
 
 // The clear left waiting, taken once, or null where none waits. [[spec/tickets/the-clear-runs-live-remote]]
-export function takesClear() {
+export function takesClear(): string | null {
   const prompt = waiting;
   waiting = null;
   return prompt;

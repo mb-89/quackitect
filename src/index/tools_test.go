@@ -31,7 +31,7 @@ type listedTool struct {
 	} `json:"inputSchema"`
 }
 
-// The golden file test/level0/index-tools.test.js reads as the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
+// The golden file holding the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
 const toolsGoldenAt = "testdata/tools.golden.json"
 
 var update = flag.Bool("update", false, "write the golden file again off the index")

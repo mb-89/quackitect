@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,8 +116,78 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: level-zero-becomes-a-typed-mod
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 5090e9523847 · claude-code-remote · the owner says so
+    hash_before: 9d9c1d3e57117f88eb8a3acc9fe35f8ffd553eb3
+    hash_after: 9d9c1d3e57117f88eb8a3acc9fe35f8ffd553eb3
+    inputs:
+      - name: ask
+        hash: f98b8097d2cddb4b
+        size: 1084
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: af8428d3eff8468f195dd50ababcbaa48c3fdce6
+    hash_after: af8428d3eff8468f195dd50ababcbaa48c3fdce6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 15f1e97e971aae3f
+        size: 1820
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 86af6b65e745fd8a408e658dee628b9f91b7a00c
+    hash_after: 86af6b65e745fd8a408e658dee628b9f91b7a00c
+    inputs:
+      - name: design/draft
+        hash: 15f1e97e971aae3f
+        size: 1820
+      - name: design/tests-red
+        hash: e67ae0eb78415dd4
+        size: 657
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 6fe169e6045bcc8ebcde91dba692f351d60791e9
+    hash_after: 010e826fed476ed63fc75d240f6e77e980a33920
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 81571cd647f1c4b744c7df6203b339b43f004e74
+    hash_after: 81571cd647f1c4b744c7df6203b339b43f004e74
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "  103.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e67ae0eb78415dd4
+        size: 657
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -162,38 +233,59 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks module and its glue stand as .ts files under .claude/skills/level0/hooks, and hooks/hooks.json names ./pull-tool.ts. The plugin tsconfig extends the types claude lays under .claude-plugin/types. The check runs two parts in src/quack/check.go: plugin runs claude plugin validate over the plugin, and types lays the engine types through claude --plugin-dir and then runs tsc -p over the plugin. A box with no claude or no tsc says so and carries on. The rule logic the hooks still hold moves to Go under level0-hooks-hold-no-rule.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/hooks.json modules
+- .claude/skills/level0/hooks/pull-tool.ts register
+- src/scripts/probe-dry.js MODULE and session
+- src/quack/check.go partsOf, pluginHolds and typesHold
+- test/level0/hooks.test.js imports of level0.ts
+- src/vehicle vehicle ModulesOf, which reads the module list
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go the types part lays the engine types, then runs tsc over the plugin
+- src/quack/check_test.go the types part fails where tsc refuses the hooks
+- src/quack/check_test.go the plugin part runs claude plugin validate
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/*.ts
+- .claude/skills/level0/hooks/hooks.json
+- .claude/skills/level0/tsconfig.json
+- src/quack/check.go
+- src/quack/check_test.go
+- src/scripts/probe-dry.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+hooks.json, tsconfig.json, typesHold and pluginHolds in src/quack/check.go stand opened, and tsc -p and claude plugin validate both pass on this box
+the callers list names the manifest, the dry probe, the check and the tests importing level0.ts
+line one is decided by claude plugin validate in the plugin part, line two by tsc in the types part, line three by level0-hooks-hold-no-rule, line four by ./RUNME.sh check
+the approach adds no config key
 
 ## tests-red
 
@@ -202,26 +294,31 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/stub-typed.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/stub-typed.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The vehicle hooks, the plugin part and the types part landed before the route, and TestCheckParts in src/quack/check_test.go covers them. The stub still carries its hook as bridgehead.js, outside what tsc reads, so the glue stands untyped. These two cases decide that gap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the stub cases decide the glue half of the first done_when line, TestCheckParts decides the validate and tsc halves, level0-hooks-hold-no-rule decides the third line, and the check decides the fourth
+the cases read the tree files alone, and reach no door
 
 # gate
 
@@ -230,8 +327,9 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, TestCheckParts decides the validate and tsc parts, and the stub cases decide the glue. The points the implement step takes stand under Discussion.
 
 # implement
 
@@ -242,14 +340,19 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/stub/.claude/skills/level0/hooks/bridgehead.ts test/level0/stub-typed.test.js test/level0/bridgehead.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the stub bridgehead, its manifest, the plugin tsconfig, the vale section over it and the tests naming it, all glue the ask names
+the port reaches the engine through $ alone, and test/level0/bridgehead.test.js fakes every call
+the header of bridgehead.ts names the approach and links this ticket
+the include list in the plugin tsconfig holds the stub path once, and the test reads it there
 
 ## tests-green
 
@@ -258,26 +361,33 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/stub-typed.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The vehicle hooks already stood as TypeScript, with claude plugin validate and tsc as parts of the check. The stub carried the last hook still in JavaScript, so it moves to bridgehead.ts, typed against the engine, and the plugin tsconfig reaches it. Validate found the old file reaching $.ui through optional chaining, which the engine refuses, so the port spells the call whole.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the stub hook, its manifest, the tsconfig, the vale section and the tests naming the hook, and nothing past the glue the ask names
+the hook reaches the engine through $ alone, and the bridgehead tests fake it
+the header of bridgehead.ts names the approach and links this ticket
+the stub path stands once, in the include list, and the test reads it there
 
 # accept
 
@@ -302,3 +412,11 @@ The javascript-leaves group, on another box, ports the plugin's `lib/` logic to 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate's points, which the implement step takes:
+
+- the stub port reaches these callers: `test/level0/bridgehead.test.js`, `src/vehicle/stub_test.go`, `test/contract/outside-in-doors.test.js` and `.vale.ini`
+- the `.vale.ini` section over the stub hooks moves from `*.js` to `*.ts`
+- the case in `test/level0/tested.test.js` keeps a `.js` path under `src/stub`, because `lib/tested.js` reads JavaScript alone as source
+- the CI Linux job decides that `tsc` exits 0, because `TestCheckParts` fakes `tsc`
+- the rules the stub bridgehead holds go to [[spec/tickets/level0-hooks-hold-no-rule]]

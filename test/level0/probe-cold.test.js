@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { INSTALL_SKIP } from "../../src/scripts/boot.js";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowOf } from "../../.claude/skills/level0/lib/log.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -310,7 +310,7 @@ test("the runner clones, installs, runs the client, reads the log, and removes t
   const client = proc.ran.find((one) => one.argv[0] === "claude");
   assert.ok(client.argv.includes("--plugin-dir"));
   assert.equal(client.init.env.CLAUDE_CODE_REMOTE, "true");
-  assert.equal(client.init.env.CLAUDE_CODE_ENABLE_FUNCTION_HOOKS, "1");
+  assert.equal(client.init.env.CLAUDE_CODE_ENABLE_FUNCTION_HOOKS, undefined);
   assert.equal(client.init.env.CLAUDE_CONFIG_DIR, "/tmp/se-cold-1/config");
   assert.equal(client.init.env.SE_BRIDGE_PORT, String(coldPort(12345)));
   assert.equal(disk.exists("/tmp/se-cold-1"), false);
@@ -350,13 +350,13 @@ test("a client standing nowhere fails the probe, and the clone still goes", asyn
 test("a path under the hooks folder or a named cold file sits on the cold path", () => {
   assert.deepEqual(
     coldIn([
-      ".claude/skills/level0/hooks/level0.js",
+      ".claude/skills/level0/hooks/level0.ts",
       "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
     ]),
     [
-      ".claude/skills/level0/hooks/level0.js",
+      ".claude/skills/level0/hooks/level0.ts",
       "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
@@ -439,12 +439,23 @@ test("the cold path names neither the bridge server nor its self-test", () => {
 
 // [[spec/tickets/level0-runs-on-the-door]]
 test("a fall past the rules fails the quiet check, and a fall before them passes", () => {
-  const fall = { level: "warn", kind: "bridge", event: "env.get", said: "the server answers nothing at http://127.0.0.1:6510/event" };
+  const fall = {
+    level: "warn",
+    kind: "bridge",
+    event: "env.get",
+    said: "the server answers nothing at http://127.0.0.1:6510/event",
+  };
   const late = readsCold([...whole(), fall], clean());
-  const early = readsCold([{ ...fall, event: "classic.SessionStart" }, ...whole()], clean());
+  const early = readsCold(
+    [{ ...fall, event: "classic.SessionStart" }, ...whole()],
+    clean(),
+  );
 
   assert.equal(verdict(late, "quiet").pass, false);
-  assert.match(verdict(late, "quiet").evidence, /1 row\(s\) say the server answers nothing/);
+  assert.match(
+    verdict(late, "quiet").evidence,
+    /1 row\(s\) say the server answers nothing/,
+  );
   assert.equal(verdict(early, "quiet").pass, true);
 });
 
@@ -468,7 +479,10 @@ test("the fresh box clones, installs and points the hook at a port of its own, a
     ...refused.it,
     proc: { run: () => ({ exitCode: 128, stdout: "", stderr: "no such repo" }) },
   };
-  assert.equal(coldTree("/repo", bare, (one) => lines.push(one), box), "");
+  assert.equal(
+    coldTree("/repo", bare, (one) => lines.push(one), box),
+    "",
+  );
   assert.match(lines.join("\n"), /FAIL clone: no such repo/);
 });
 
@@ -476,7 +490,9 @@ test("the fresh box clones, installs and points the hook at a port of its own, a
 test("a torn line in the log drops alone, and a log standing nowhere reads as no row", () => {
   const one = rowOf("2026-09-12T08:00:00.000Z", "info", "context", "read");
   const two = rowOf("2026-09-12T08:00:01.000Z", "info", "compact", "ran");
-  const disk = fakeDisk({ log: `${JSON.stringify(one)}\n{"at":"2026\n${JSON.stringify(two)}\n` });
+  const disk = fakeDisk({
+    log: `${JSON.stringify(one)}\n{"at":"2026\n${JSON.stringify(two)}\n`,
+  });
   assert.deepEqual(
     logRows(disk, "log").map((row) => row.kind),
     ["context", "compact"],

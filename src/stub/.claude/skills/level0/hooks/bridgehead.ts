@@ -1,8 +1,33 @@
 // The bridgehead: the one plugin a stub carries. At session start it finds
 // the vehicle along its roads, clones the upstream where none stands, and
 // attaches through the vehicle's own verb. The hook the attach writes carries
-// the cage from the next session.
+// the cage from the next session. It types against the engine, as the
+// vehicle's hooks do, and the plugin's tsconfig reaches it.
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+// [[spec/tickets/level0-hooks-move-to-typescript]]
+
+import type { EngineInterface, On, PluginOptions } from "claude-code";
+
+// The stub's record of its vehicle, as vehicle.json writes it. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export type Link = {
+  readonly name?: string;
+  readonly upstream?: string;
+  readonly vehicle?: string;
+};
+
+// What the box says of itself: its home, the vehicle it names, and the work root. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export type Env = {
+  readonly home?: string;
+  readonly vehicle?: string;
+  readonly work?: string;
+};
+
+// One identity of the register. [[spec/design_output/vehicle#the-register-places-an-identity]]
+type Held = { readonly id?: string; readonly method_root?: string };
+
+type Ran = { exitCode: number; stdout: string; stderr: string };
+
+type Row = Readonly<Record<string, unknown>>;
 
 const LINK = "vehicle.json";
 const ASKING = 10000;
@@ -25,10 +50,10 @@ const ENV = [
   "}))",
 ].join("");
 
-export function register(on, _options) {
+export function register(on: On, _options: PluginOptions): void {
   let stood = "";
   on("session.start", async ($, e, next) => {
-    stood = await starts($);
+    stood = (await starts($)) ?? "";
     return next(e);
   });
   on("prompt.context", async (_$, e, next) => {
@@ -42,10 +67,10 @@ export function register(on, _options) {
   });
 }
 
-async function starts($) {
+async function starts($: EngineInterface): Promise<string | undefined> {
   if (await exists($, POINTER)) return;
-  const link = parsed(await readIf($, LINK)) ?? {};
-  const env = parsed(await asked($, ["node", "-e", ENV])) ?? {};
+  const link = (parsed(await readIf($, LINK)) ?? {}) as Link;
+  const env = (parsed(await asked($, ["node", "-e", ENV])) ?? {}) as Env;
   const held = parsed(await readIf($, `${env.home}/${REGISTER}`));
   let vehicle = await standingOf($, roadsOf(link, env, held));
   if (!vehicle) {
@@ -62,7 +87,8 @@ async function starts($) {
   }
   const attached = await run($, attachOf(vehicle, env.work), ATTACH_WAIT);
   if (attached.exitCode) return fails($, "attach", lastLine(attached));
-  const port = Number(parsed(await readIf($, POINTER))?.port) || PORT;
+  const pointer = parsed(await readIf($, POINTER)) as { port?: unknown } | null;
+  const port = Number(pointer?.port) || PORT;
   if (!(await answers($, port, env.work))) {
     const served = await run($, serveOf(vehicle), SERVE_WAIT);
     if (served.exitCode) return fails($, "serve", lastLine(served));
@@ -74,23 +100,27 @@ async function starts($) {
 }
 
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
-export function roadsOf(link, env, held = []) {
+export function roadsOf(
+  link: Link | null | undefined,
+  env: Env | null | undefined,
+  held: unknown = [],
+): string[] {
   const named = String(env?.vehicle ?? "").trim();
   const registered = registeredAt(held, String(link?.vehicle ?? "").trim());
   return [named, registered, clonedAt(link, env)].filter(Boolean);
 }
 
-export function clonedAt(link, env) {
+export function clonedAt(link: Link | null | undefined, env: Env | null | undefined): string {
   const home = String(env?.home ?? "").trim();
   const name = String(link?.name ?? "").trim();
   return home && name ? `${home}/.se/vehicles/${name}` : "";
 }
 
-export function cloneOf(link, env) {
+export function cloneOf(link: Link | null | undefined, env: Env | null | undefined): string[] {
   return ["git", "clone", String(link?.upstream ?? "").trim(), clonedAt(link, env)];
 }
 
-export function attachOf(vehicle, work) {
+export function attachOf(vehicle: string, work: string | undefined): string[] {
   return [
     "env",
     `SE_WORK_ROOT=${work}`,
@@ -102,7 +132,7 @@ export function attachOf(vehicle, work) {
 }
 
 // The vehicle's index answers its standing by starting its door over the stub's work root. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function serveOf(vehicle) {
+export function serveOf(vehicle: string): string[] {
   return [
     "sh",
     "-c",
@@ -112,25 +142,29 @@ export function serveOf(vehicle) {
   ];
 }
 
-function registeredAt(held, id) {
-  for (const one of Array.isArray(held) ? held : []) {
+function registeredAt(held: unknown, id: string): string {
+  for (const one of (Array.isArray(held) ? held : []) as Held[]) {
     if (id && one?.id === id && one?.method_root) return String(one.method_root);
   }
   return "";
 }
 
-function blockOf(line) {
+function blockOf(line: string): string {
   return `${line} Say in one line that the vehicle stands, and end the turn. The next session carries the cage.`;
 }
 
-async function standingOf($, roads) {
+async function standingOf($: EngineInterface, roads: readonly string[]): Promise<string> {
   for (const one of roads) {
     if (await exists($, `${one}/RUNME.sh`)) return one;
   }
   return "";
 }
 
-async function answers($, port, root) {
+async function answers(
+  $: EngineInterface,
+  port: number,
+  root: string | undefined,
+): Promise<boolean> {
   try {
     const said = await $.http.fetch(`http://127.0.0.1:${port}/event`, {
       method: "POST",
@@ -143,7 +177,7 @@ async function answers($, port, root) {
   }
 }
 
-async function fails($, step, detail) {
+async function fails($: EngineInterface, step: string, detail: string): Promise<undefined> {
   await logs($, {
     level: "warn",
     said: `the bridgehead stops at ${step}`,
@@ -151,9 +185,10 @@ async function fails($, step, detail) {
     detail,
   });
   say($, `The bridgehead stops at ${step}: ${detail}`);
+  return undefined;
 }
 
-async function run($, argv, wait) {
+async function run($: EngineInterface, argv: readonly string[], wait: number): Promise<Ran> {
   try {
     const ran = await $.process.run(argv, { timeoutMs: wait });
     return {
@@ -162,11 +197,11 @@ async function run($, argv, wait) {
       stderr: ran?.stderr ?? "",
     };
   } catch (bad) {
-    return { exitCode: 1, stdout: "", stderr: String(bad?.message ?? bad) };
+    return { exitCode: 1, stdout: "", stderr: String((bad as Error)?.message ?? bad) };
   }
 }
 
-function lastLine(ran) {
+function lastLine(ran: Ran): string {
   const lines = `${ran.stderr}\n${ran.stdout}`
     .split("\n")
     .map((one) => one.trim())
@@ -174,7 +209,7 @@ function lastLine(ran) {
   return lines.at(-1) ?? `exit ${ran.exitCode}`;
 }
 
-async function logs($, row) {
+async function logs($: EngineInterface, row: Row): Promise<void> {
   try {
     let held = String(await readIf($, SESSION));
     if (held && !held.endsWith("\n")) held += "\n";
@@ -188,7 +223,7 @@ async function logs($, row) {
   } catch {}
 }
 
-async function asked($, argv) {
+async function asked($: EngineInterface, argv: readonly string[]): Promise<string> {
   try {
     const ran = await $.process.run(argv, { timeoutMs: ASKING });
     return ran.stdout ?? "";
@@ -197,7 +232,7 @@ async function asked($, argv) {
   }
 }
 
-async function exists($, at) {
+async function exists($: EngineInterface, at: string): Promise<boolean> {
   try {
     return Boolean(await $.fs.exists(at));
   } catch {
@@ -205,7 +240,7 @@ async function exists($, at) {
   }
 }
 
-async function readIf($, at) {
+async function readIf($: EngineInterface, at: string): Promise<string> {
   try {
     return await $.fs.read(at);
   } catch {
@@ -213,13 +248,13 @@ async function readIf($, at) {
   }
 }
 
-function say($, text) {
+function say($: EngineInterface, text: string): void {
   try {
-    $.ui?.log?.(text);
+    $.ui.log(text);
   } catch {}
 }
 
-function parsed(text) {
+function parsed(text: unknown): unknown {
   try {
     return JSON.parse(String(text ?? "").trim() || "null");
   } catch {

@@ -41,7 +41,6 @@ func TestStartReadsItsInputEnvironmentAndDiskOffTheBox(t *testing.T) {
 
 func TestStartStopsADeskSessionWritingWithNoPlugin(t *testing.T) {
 	t.Parallel()
-	hooked := map[string]string{"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"}
 	cases := []struct {
 		name   string
 		input  string
@@ -49,11 +48,10 @@ func TestStartStopsADeskSessionWritingWithNoPlugin(t *testing.T) {
 		plugin bool
 		stops  bool
 	}{
-		{"a desk session in default mode with no manifest", `{"permission_mode":"default"}`, hooked, false, true},
-		{"a desk session naming no mode with no flag", `{}`, nil, true, true},
+		{"a desk session in default mode with no manifest", `{"permission_mode":"default"}`, nil, false, true},
 		{"a desk session sending no input", ``, nil, false, true},
 		{"a desk session in plan mode", `{"permission_mode":"plan"}`, nil, false, false},
-		{"a desk session where the plugin stands", `{"permission_mode":"default"}`, hooked, true, false},
+		{"a desk session where the manifest stands, with no switch for mods", `{"permission_mode":"default"}`, nil, true, false},
 		{"a cloud box with no plugin", `{}`, map[string]string{"CLAUDE_CODE_REMOTE": "true"}, false, false},
 	}
 	for _, one := range cases {

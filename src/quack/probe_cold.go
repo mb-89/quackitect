@@ -37,7 +37,7 @@ const (
 	vehiclePointer = runFolder + "/vehicle.json"
 	// The index binary the start road launches, as BIN in lib/index.js names it. [[spec/design_output/level0#the-cold-probe]]
 	indexBinary = binFolder + "/se-index"
-	// The install steps a cold clone skips, as INSTALL_SKIP in .claude/skills/level0/hooks/start.js names them. [[spec/design_output/level0#the-cold-probe]]
+	// The install steps a cold clone skips, as INSTALL_SKIP in src/scripts/boot.js names them. [[spec/design_output/level0#the-cold-probe]]
 	installSkip = "editor-link editor-extensions editor-client go"
 )
 
@@ -381,10 +381,9 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	ran := d.run(clientArgv(client, filepath.Join(box.tree, filepath.FromSlash(pluginFolder))), runOpts{
 		cwd: box.tree,
 		env: map[string]string{
-			"CLAUDE_CODE_REMOTE":                "true",
-			"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1",
-			"CLAUDE_CONFIG_DIR":                 config,
-			"SE_BRIDGE_PORT":                    strconv.Itoa(box.port),
+			"CLAUDE_CODE_REMOTE": "true",
+			"CLAUDE_CONFIG_DIR":  config,
+			"SE_BRIDGE_PORT":     strconv.Itoa(box.port),
 		},
 		timeout: probeWait,
 	})

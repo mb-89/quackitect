@@ -36,6 +36,11 @@ src/extension/icon.svg
 .claude-plugin/marketplace.json
 .claude/skills/level0/.claude-plugin/plugin.json
 
+# The engine lays its declarations here each time it loads the plugin, with a
+# .gitignore of its own, and the walks of this tree read this file alone.
+# [[spec/tickets/level0-hooks-move-to-typescript]]
+.claude/skills/level0/.claude-plugin/types/
+
 # The editor's command line writes its crash log into the folder it runs in,
 # and the install runs it here to link the sidebar. [[spec/design_output/editor#what-the-editor-runs]]
 debug.log

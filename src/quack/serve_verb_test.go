@@ -24,6 +24,8 @@ type serveBox struct {
 	said  string
 	fault error
 	door  string
+	env   map[string]string
+	self  string
 }
 
 func serveBoxAt(t *testing.T) *serveBox {
@@ -58,6 +60,8 @@ func (box *serveBox) runs(t *testing.T, argv ...string) (int, string, string) {
 				}
 				return box.code, box.said, nil
 			},
+			env:  func(name string) string { return box.env[name] },
+			self: box.self,
 		}
 	}
 	var out, errs strings.Builder
@@ -164,5 +168,50 @@ func TestServeTakesNoDebuggerAndRunsTheIndexStandingAlone(t *testing.T) {
 	want := [][]string{{box.root + "/.se/.runtime/bin/se-index", "standing"}}
 	if !slices.EqualFunc(box.ran, want, slices.Equal[[]string]) {
 		t.Errorf("ran %v", box.ran)
+	}
+}
+
+// A box no cloud variable marks runs nothing under the bridge flag and prints nothing, because a person starts the index there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+func TestServeBridgeOffTheCloudRunsNothing(t *testing.T) {
+	t.Parallel()
+	box := serveBoxAt(t)
+	box.self = "/method/.se/.runtime/bin/se-index"
+	if code, out, _ := box.runs(t, serveBridge); code != 0 || out != "" || len(box.ran) != 0 {
+		t.Fatalf("code %d, out %q, ran %v", code, out, box.ran)
+	}
+}
+
+// Either cloud variable starts the binary running the verb standing in the work root, and one info row names the port. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+func TestServeBridgeOnTheCloudStandsTheIndexAndSaysOneRow(t *testing.T) {
+	t.Parallel()
+	for _, name := range serveCloudVars {
+		box := serveBoxAt(t)
+		box.env = map[string]string{name: "1"}
+		box.self = "/method/.se/.runtime/bin/se-index"
+		code, out, _ := box.runs(t, serveBridge)
+		want := `{"level":"info","said":"no index answered, so the bridgehead starts one","event":"session.start","detail":"The index starts at port 7001, because no door stood."}` + "\n"
+		if code != 0 || out != want {
+			t.Fatalf("%s: code %d, out %q", name, code, out)
+		}
+		ran := [][]string{{box.self, "standing"}}
+		if !slices.EqualFunc(box.ran, ran, slices.Equal[[]string]) || box.cwds[0] != box.root {
+			t.Errorf("%s: ran %v in %v", name, box.ran, box.cwds)
+		}
+	}
+}
+
+// An index failing its standing reads as one warn row naming what it said, and the verb exits 1. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+func TestServeBridgeWhoseIndexFallsWarns(t *testing.T) {
+	t.Parallel()
+	box := serveBoxAt(t)
+	box.env = map[string]string{"CLAUDE_CODE_REMOTE": "true"}
+	box.code, box.said = 1, "the index door does not answer\n"
+	code, out, _ := box.runs(t, serveBridge)
+	want := `{"level":"warn","said":"the index fails its standing, so no door stands","event":"session.start","detail":"The index falls: the index door does not answer"}` + "\n"
+	if code != 1 || out != want {
+		t.Fatalf("code %d, out %q", code, out)
+	}
+	if box.ran[0][0] != box.root+"/.se/.runtime/bin/se-index" {
+		t.Errorf("a verb naming no binary of its own runs the root's, and ran %v", box.ran)
 	}
 }

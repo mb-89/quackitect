@@ -6,10 +6,9 @@ import assert from "node:assert/strict";
 import { posix } from "node:path";
 import { test } from "node:test";
 import settings from "../../.claude/settings.json" with { type: "json" };
-import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { ASKING, boots } from "../../src/scripts/boot.js";
+import { ASKING, boots, INSTALL_SKIP } from "../../src/scripts/boot.js";
 
 // The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the rest. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
@@ -85,21 +84,6 @@ test("the project settings carry a SessionStart hook running src/scripts/boot.js
     commands.some((one) => /^node \S*src\/scripts\/boot\.js\S*$/.test(one)),
     `a SessionStart hook runs node over src/scripts/boot.js, and these stand: ${JSON.stringify(commands)}`,
   );
-});
-
-// The hook takes its span in seconds, and the start road in milliseconds. [[spec/design_output/level0#the-boot-hook]]
-test("the boot hook waits out the span the start road allows the same install", () => {
-  const spans = (settings.hooks?.SessionStart ?? []).flatMap((one) =>
-    (one.hooks ?? [])
-      .filter((hook) => /src\/scripts\/boot\.js/.test(String(hook.command ?? "")))
-      .map((hook) => Number(hook.timeout ?? 0) * 1000),
-  );
-  assert.ok(spans.length > 0, "a SessionStart hook runs src/scripts/boot.js");
-  for (const span of spans)
-    assert.ok(
-      span >= STARTING,
-      `the boot hook waits ${span} ms, and the start road allows ${STARTING}`,
-    );
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]

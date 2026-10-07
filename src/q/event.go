@@ -5,6 +5,9 @@ package q
 
 import "time"
 
+// The words a prompt opens on where the pull spawns a hand of its own, which the spawn answer leaves untagged. [[spec/design_output/pull#a-hand-of-its-own]]
+const HandOfItsOwn = "You are a hand of your own on this box"
+
 // The box, the session and the agent, where the harness names one. [[spec/design_output/model#the-events-of-a-session]]
 type Hand struct {
 	Box     string `json:"box,omitempty"`

@@ -57,7 +57,7 @@ func startVerb(outside startOutside) twin {
 		if err != nil {
 			root = "."
 		}
-		plugin := outside.exists(filepath.Join(root, startManifest)) && outside.env("CLAUDE_CODE_ENABLE_FUNCTION_HOOKS") != ""
+		plugin := outside.exists(filepath.Join(root, startManifest))
 		cloud := outside.env("CLAUDE_CODE_REMOTE") != "" || outside.env("SE_CLOUD") != ""
 		reason := hooks.StartRefusal(root, plugin, cloud, heard.Mode)
 		if reason == "" {

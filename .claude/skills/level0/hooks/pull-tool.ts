@@ -3,6 +3,7 @@
 // here. The tool asks no model, so a hand-back answers the same way twice.
 // [[spec/tickets/the-judge-leaves-the-code]]
 
+import type { AgentSpawnArgs, EngineInterface, On, PluginOptions, ToolSpec } from "claude-code";
 import {
   binaryOf,
   callsIndexTool,
@@ -13,7 +14,8 @@ import {
 } from "../lib/index-tools.js";
 import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { register as bridgehead } from "./level0.js";
+import { register as bridgehead } from "./level0.ts";
+import { failureOf, type Spawned } from "./shape.ts";
 
 // The scripts folder the binary's verb road takes, as RUNME.sh hands it over. [[spec/tickets/cli-js-leaves]]
 const SCRIPTS = "src/scripts";
@@ -25,11 +27,11 @@ const TOOL = "--tool";
 const BACKGROUND =
   "The hand works in the background. Take the next item, and pull again once it answers.";
 
-export function register(on, options) {
+export function register(on: On, options: PluginOptions): void {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
   const bin = binaryOf(method || ".", windowsOf(method));
   cli = [bin, "verb", `${method || "."}/${SCRIPTS}`];
-  let indexTools = [];
+  let indexTools: Awaited<ReturnType<typeof registersIndexTools>> = [];
   // The index tools answer here, before the bridgehead routes a served tool to the server. [[spec/tickets/the-hook-registers-index-tools]]
   on("tool.call", async ($, e, next) =>
     isIndexTool(e?.tool)
@@ -59,15 +61,15 @@ export function register(on, options) {
 }
 
 // The process and tool doors the index tools read, since the engine follows $ across no import. [[spec/tickets/the-hook-registers-index-tools]]
-function doorsOf($) {
+function doorsOf($: EngineInterface) {
   return {
-    process: { run: (argv) => $.process.run(argv) },
-    tool: { register: (spec) => $.tool.register(spec) },
+    process: { run: (argv: readonly string[]) => $.process.run(argv) },
+    tool: { register: (spec: ToolSpec) => $.tool.register(spec) },
   };
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
-async function wrote($, held) {
+async function wrote($: EngineInterface, held: { readonly id?: unknown }): Promise<void> {
   if (!held.id)
     return says(
       $,
@@ -76,18 +78,18 @@ async function wrote($, held) {
   try {
     await $.fs.write(SESSION, `${JSON.stringify(held, null, 2)}\n`);
   } catch (bad) {
-    says($, `the session file stays unwritten: ${bad?.message ?? bad}`);
+    says($, `the session file stays unwritten: ${failureOf(bad)?.message ?? bad}`);
   }
 }
 
-function says($, line) {
+function says($: EngineInterface, line: string): void {
   try {
     $.ui.log(line);
   } catch {}
 }
 
 // The hook hands the raw input over, and the ticket pull verb reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
-function toolCall(e) {
+function toolCall(e: unknown): string[] {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
@@ -95,22 +97,26 @@ function toolCall(e) {
 // A copy of the keys `HARNESS` in src/scripts/pull-hand-of.js names, because a hook reaches no file past the plugin. The level1 case reads both. [[spec/tickets/pull-env-meets-the-engine]]
 export const HARNESS_KEYS = ["CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"];
 
-async function running($) {
+async function running(
+  $: EngineInterface,
+): Promise<{ timeoutMs: number; env?: Record<string, string> }> {
   // The engine reads each env call off the source, so every key stands spelled at its own call. [[spec/tickets/pull-env-meets-the-engine]]
   const said = [
     await envOf(() => $.env.get("CLAUDE_CODE_REMOTE")),
     await envOf(() => $.env.get("SE_CLOUD")),
     await envOf(() => $.env.get("CLAUDECODE")),
   ];
-  const env = {};
+  const env: Record<string, string> = {};
+  // A hook scope holding a process holds one no engine type names. [[spec/tickets/pull-env-meets-the-engine]]
+  const host = globalThis as { process?: { env?: Readonly<Record<string, string | undefined>> } };
   HARNESS_KEYS.forEach((key, at) => {
-    const value = said[at] ?? globalThis.process?.env?.[key];
+    const value = said[at] ?? host.process?.env?.[key];
     if (value) env[key] = String(value);
   });
   return Object.keys(env).length ? { timeoutMs: RUNNING, env } : { timeoutMs: RUNNING };
 }
 
-async function envOf(read) {
+async function envOf(read: () => Promise<string | undefined>): Promise<string | undefined> {
   try {
     return await read();
   } catch {
@@ -118,24 +124,26 @@ async function envOf(read) {
   }
 }
 
-async function pulled($, e) {
+async function pulled($: EngineInterface, e: unknown): Promise<string> {
   const ran = await $.process.run(toolCall(e), await running($));
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
-async function spawned($, prompt) {
-  let said;
+async function spawned($: EngineInterface, prompt: string): Promise<string> {
+  let said: Spawned;
+  // The hand runs as its own and in the background, two fields the engine's spawn type names nowhere. [[spec/design_output/pull#a-hand-of-its-own]]
+  const asked: AgentSpawnArgs & { own: boolean; background: boolean } = {
+    prompt,
+    own: true,
+    background: true,
+    description: "a hand of its own works one step",
+    subagentType: "general-purpose",
+  };
   try {
-    said = await $.agent.spawn({
-      prompt,
-      own: true,
-      background: true,
-      description: "a hand of its own works one step",
-      subagentType: "general-purpose",
-    });
+    said = await $.agent.spawn(asked);
   } catch (bad) {
-    return `no hand spawns here: ${bad?.message ?? bad}`;
+    return `no hand spawns here: ${failureOf(bad)?.message ?? bad}`;
   }
   if (said?.deny) return `the spawn is refused: ${said.deny}`;
   if (said?.isError) return `the hand failed: ${said.text ?? ""}`;

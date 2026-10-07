@@ -28,14 +28,14 @@ func RatioOffenders(tracked []string, read func(path string) string) []string {
 	for _, one := range tracked {
 		switch {
 		case strings.HasSuffix(one, "_test.go"):
-			count("go " + path.Dir(one)).tests += textLines(read(one))
+			count("go " + path.Dir(one)).tests += TextLines(read(one))
 		case strings.HasSuffix(one, ".go"):
-			count("go " + path.Dir(one)).code += textLines(read(one))
+			count("go " + path.Dir(one)).code += TextLines(read(one))
 		case strings.HasSuffix(one, ".test.js"):
 			text := read(one)
-			count("js " + jsModuleOf(one, text)).tests += textLines(text)
+			count("js " + jsModuleOf(one, text)).tests += TextLines(text)
 		case strings.HasSuffix(one, ".js"):
-			count("js " + path.Dir(one)).code += textLines(read(one))
+			count("js " + path.Dir(one)).code += TextLines(read(one))
 		}
 	}
 	named := []string{}
@@ -49,11 +49,30 @@ func RatioOffenders(tracked []string, read func(path string) string) []string {
 }
 
 // The lines holding text. [[spec/design_output/model#the-guards-hold-a-baseline]]
-func textLines(text string) int {
+func TextLines(text string) int {
 	lines := 0
 	for _, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) != "" {
 			lines++
+		}
+	}
+	return lines
+}
+
+// The lines of every file the entries reach through relative imports, each file counted once. [[spec/tickets/level0-tests-move-to-plugin-test]]
+func ReachedLines(entries []string, read func(path string) string) int {
+	seen := map[string]bool{}
+	lines := 0
+	for queue := slices.Clone(entries); len(queue) > 0; queue = queue[1:] {
+		one := path.Clean(queue[0])
+		if seen[one] {
+			continue
+		}
+		seen[one] = true
+		text := read(one)
+		lines += TextLines(text)
+		for _, match := range relativeImport.FindAllStringSubmatch(text, -1) {
+			queue = append(queue, path.Join(path.Dir(one), match[1]))
 		}
 	}
 	return lines

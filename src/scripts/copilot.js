@@ -92,6 +92,7 @@ try {
     const result = await answers(event, {
       root,
       read: (rel) => files.read(resolve(root, rel)),
+      run: (argv, init) => outside.run(argv, init),
       fetch: fetchThrough(http(), signal),
     });
     await book.say(
