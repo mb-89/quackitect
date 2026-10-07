@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: f7bb43589be3ad2b
         size: 1450
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: be4b9520d2b774d7439b37b8b02f800ab52a6fd4
+    hash_after: 1e1f74d7911f0b6732e5c0b8db2a75af0cb6b588
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -386,14 +395,19 @@ accept. The approach answers the ask. I opened every file, function and verb it 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && go vet ./... && ./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the size list names, plus caged-door.test.js from gate point one, tree_test.go and the tested guard row the commit door needs.
+The stamp and bundle verbs run on fakeBoxDoors, the browser case on checkFake, and the install case on a fake index and a fake go.
+Each new Go function and the stamp helper in install.sh carry a pointer to spec/tickets/scripts-folder-leaves.
+The stamp hash lives in stamp_verb.go and the drawing stamp in bundle_verb.go, and lsp.md and drawing.md point at those files. The free ticket cloud-setup-runs-root-install carries approach line 22.
 
 ## tests-green
 
