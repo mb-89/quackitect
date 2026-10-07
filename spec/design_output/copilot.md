@@ -6,8 +6,10 @@ refines:
 
 # Scope
 
-One level zero holds both surfaces. This note covers the runtime under
-`src/scripts/copilot.js` and the decisions it hands each surface.
+One level zero holds both surfaces. This note covers the Copilot hooks the
+Go engine answers, and the decisions they hand each surface.
+`hookVerb` in `src/quack/hook_verb.go` answers each event, and
+`src/modules/hooks/copilot.go` owns the events, the calls and the replies.
 
 # Events and feedback
 
@@ -39,7 +41,7 @@ Recover unfinished handovers from the record or claim before cleanup.
 
 # One runtime
 
-The runtime takes filesystem, process and session doors. It imports existing
+The runtime takes filesystem, process and hooks doors. It imports existing
 guidance and linter helpers. Claude neither imports nor calls this runtime.
 
 Startup counts the applicable numbered guidance and requests its first reply
@@ -61,9 +63,9 @@ Keep Claude's existing checker caller unchanged.
 
 # Setup and discovery
 
-Run `node src/scripts/copilot.js setup vscode` for local use.
-Use `setup cloud` in the ephemeral cloud setup job.
-Both installers run `setup auto`, including when every binary exists.
+The setup verb writes the registrations where Copilot runs here.
+The ephemeral cloud setup job runs `setup --cloud`.
+`src/quack/copilotsetup.go` owns the registrations and the hook command.
 The generator owns only its marked registrations. It preserves user files.
 
 Commit the hook and setup workflow to the default branch before cloud work.
@@ -78,33 +80,6 @@ level zero. Installed Claude keeps its existing validation command and result.
 Open a new Copilot chat and submit a prompt after setup. `SessionStart` supplies
 the guidance and receipt request. Check agent hook logs for actual activation.
 The model's acknowledgement alone is not an enforcement test.
-
-# Dispatch and recovery
-
-Run `node src/scripts/copilot.js dispatch` from a clean main checkout.
-Authenticate `gh` as the person dispatching work, outside the worker sandbox.
-The dispatcher calls the unchanged `branch take` command. It pushes the synced
-claim, creates or reuses a draft pull request, and posts an `@copilot` request.
-It checks existing comments before retrying an ambiguous network failure.
-
-Save the claim commit as the identity of the try before contacting GitHub.
-Include both branch and try in the comment marker. A checkpoint before
-a retry keeps that identity. A release and a new claim produce another one.
-
-Inspect the GitHub job to confirm acceptance and its assigned head branch.
-Repository policy or bot credentials can prevent a comment from starting work.
-Never pass the dispatcher's credentials to the worker to bypass that policy.
-
-# Recover a dispatch
-
-Keep the claimed branch after a failure. Resolve sync conflicts and rerun
-dispatch there. Inspect `.se/.runtime/copilot` if a process exits before recording the
-claim. Do not release a branch while its worker can still push to it.
-
-After a successful request, switch this checkout to main to dispatch another.
-A timeout leaves the remote group held. Inspect its commits and stop the job.
-Then use the existing branch release command before assigning it again.
-Only a person calls branch merge after reviewing the durable result and retro.
 
 # Verification record
 
@@ -122,23 +97,16 @@ Complete these host checks before claiming live compatibility:
 1. Open this checkout in VS Code and start a new Copilot chat.
 	Confirm hook discovery, the first receipt and a real edit refusal.
 2. Publish the registrations to the default branch after review.
-	Dispatch a draft work pull request with a person's GitHub credentials.
-3. Confirm the cloud job uses that head, pushes its result and retro,
-	and leaves the merge to a desk. Test job interruption and work recovery.
+3. Confirm the cloud job pushes its result and retro,
+	and leaves the merge to a desk.
 
 # Tests above the doors
 
 Test each outside boundary in its door contract. Test behavior above that
-boundary with the existing fakes. Keep real Git and real checker workflows
-out of the runtime and dispatch unit suites.
+boundary with the existing fakes.
 
-Run `node --test test/level0/copilot-runtime.test.js` for runtime decisions.
-Run `node --test test/level0/copilot-dispatch.test.js` for dispatch attempts.
-Use `fakeProc`, `fakeDisk` and `fakeSession`. Reject unexpected process commands.
-
-Model branch, claim SHA, checkpoint SHA and comments as in-memory state.
-Test a lost response with the same try and a new claim with another one.
-These tests check orchestration against door contracts, not Git or Biome again.
+Run `go test ./src/modules/hooks/ ./src/quack/` for the hook's decisions.
+`src/quack/hook_verb_test.go` fakes the hooks door and the log.
 Keep live host activation as an explicit acceptance exercise outside these suites.
 
 # Proposed acceptance gate
@@ -149,8 +117,6 @@ This proposal adds no rule category and changes no harness behavior yet.
 
 | Guarantee | Current owner | Recommendation |
 | --- | --- | --- |
-| Preserve the handover until a result exists | `session.withState` and `handle` | Keep the session door contract and mock-based handover tests. |
-| Request each work try once | `dispatch` | Keep mock-based retry tests, and check live job acceptance separately. |
 | Keep the worker on its work branch | Level-zero guards and host credentials | Retain branch-specific credentials, and use repository rules to reserve merging for a person. |
 | Accept only a commit whose checks pass | Human review, and hooks check selected writes | Add a required CI status for the exact candidate commit. |
 

@@ -129,7 +129,7 @@ func setupVerb(d boxDoors, argv []string) int {
 		}
 	}
 	// [[spec/design_output/copilot#setup-and-discovery]]
-	if !setupCopilot(d) {
+	if !setupCopilot(d, slices.Contains(argv, "--cloud")) {
 		say(d, "  the copilot setup stopped, so the files it writes stand as they stood.")
 	}
 	// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
@@ -178,9 +178,13 @@ func shimmed(d boxDoors, argv []string) []string {
 	return argv
 }
 
-// Writes the Copilot registrations where Copilot runs here, saying the files it writes, and answers whether it held. [[spec/design_output/copilot#setup-and-discovery]]
-func setupCopilot(d boxDoors) bool {
-	written, err := copilotSetup(d, "auto")
+// Writes the Copilot registrations where Copilot runs here, or with the cloud mark under cloud, saying the files it writes, and answers whether it held. [[spec/tickets/copilot-hooks-run-in-go]]
+func setupCopilot(d boxDoors, cloud bool) bool {
+	target := "auto"
+	if cloud {
+		target = "cloud"
+	}
+	written, err := copilotSetup(d, target)
 	if err != nil {
 		fmt.Fprintln(d.errs, "Level zero: "+err.Error())
 		return false

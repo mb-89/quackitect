@@ -8,10 +8,10 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: "22"
+          go-version-file: go.mod
       - name: Install level zero
         run: sh src/scripts/install.sh
       - name: Prepare cloud hooks
-        run: node src/scripts/copilot.js setup cloud
+        run: .se/.runtime/bin/se-index verb src/scripts setup --cloud

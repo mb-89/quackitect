@@ -25,7 +25,6 @@ const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 const ROOTS = [
   "src/scripts/cli-doors.js",
   "src/scripts/trust.js",
-  "src/scripts/copilot.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.js",
@@ -130,12 +129,8 @@ ifVale(
   ),
 );
 
-test("the config stands the rule off every Go door, a Go case, and every door reading the pid, the version or the exec path", () => {
-  for (const where of [
-    "src/engine/swap/door.go",
-    "src/front/front_test.go",
-    "src/doors/session.js",
-  ]) {
+test("the config stands the rule off every Go door and a Go case", () => {
+  for (const where of ["src/engine/swap/door.go", "src/front/front_test.go"]) {
     assert.ok(off(where), where);
   }
 });

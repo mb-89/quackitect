@@ -17,7 +17,7 @@ import (
 // The mark a registration carries, the entry its hooks run, their bound, the span a list ask takes, and the file marking a cloud box. [[spec/design_output/copilot#setup-and-discovery]]
 const (
 	copilotOwner       = "quackitect-level0"
-	copilotRunner      = "node src/scripts/copilot.js"
+	copilotRunner      = serveIndexBin + " verb src/scripts"
 	copilotHookSeconds = "60"
 	copilotListWait    = 5 * time.Second
 	copilotCloudMark   = runFolder + "/copilot-cloud"
@@ -60,22 +60,25 @@ func copilotRegistrations() []copilotFile {
 			"      contents: read",
 			"    steps:",
 			"      - uses: actions/checkout@v4",
-			"      - uses: actions/setup-node@v4",
+			"      - uses: actions/setup-go@v5",
 			"        with:",
-			`          node-version: "22"`,
+			"          go-version-file: go.mod",
 			"      - name: Install level zero",
 			"        run: sh src/scripts/install.sh",
 			"      - name: Prepare cloud hooks",
-			"        run: " + copilotRunner + " setup cloud",
+			"        run: " + copilotRunner + " setup --cloud",
 			"",
 		}, "\n")},
 	}
 }
 
 // Whether this box runs Copilot's cloud agent: the mark a cloud setup leaves, or the two variables the agent sets. [[spec/design_output/copilot#setup-and-discovery]]
-func copilotCloud(d boxDoors) bool {
-	return stands(filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))) ||
-		(d.env("GITHUB_COPILOT_GIT_TOKEN") != "" && d.env("COPILOT_AGENT_PROMPT") != "")
+func copilotCloud(d boxDoors) bool { return copilotCloudAt(d.root, d.env) }
+
+// Whether the box under the root runs Copilot's cloud agent, read off the mark and the environment. [[spec/tickets/copilot-hooks-run-in-go]]
+func copilotCloudAt(root string, env func(name string) string) bool {
+	return stands(filepath.Join(root, filepath.FromSlash(copilotCloudMark))) ||
+		(env("GITHUB_COPILOT_GIT_TOKEN") != "" && env("COPILOT_AGENT_PROMPT") != "")
 }
 
 // Whether this box runs Copilot: the cloud, the editor's terminal, a registration standing, or an editor listing the extension. [[spec/design_output/copilot#setup-and-discovery]]

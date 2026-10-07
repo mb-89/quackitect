@@ -5,7 +5,7 @@
     "sessionStart": [
       {
         "type": "command",
-        "command": "node src/scripts/copilot.js hook SessionStart",
+        "command": ".se/.runtime/bin/se-index verb src/scripts hook SessionStart",
         "timeout": 60,
         "timeoutSec": 60
       }
@@ -13,7 +13,7 @@
     "preToolUse": [
       {
         "type": "command",
-        "command": "node src/scripts/copilot.js hook PreToolUse",
+        "command": ".se/.runtime/bin/se-index verb src/scripts hook PreToolUse",
         "timeout": 60,
         "timeoutSec": 60
       }
@@ -21,7 +21,7 @@
     "postToolUse": [
       {
         "type": "command",
-        "command": "node src/scripts/copilot.js hook PostToolUse",
+        "command": ".se/.runtime/bin/se-index verb src/scripts hook PostToolUse",
         "timeout": 60,
         "timeoutSec": 60
       }
@@ -29,7 +29,7 @@
     "agentStop": [
       {
         "type": "command",
-        "command": "node src/scripts/copilot.js hook Stop",
+        "command": ".se/.runtime/bin/se-index verb src/scripts hook Stop",
         "timeout": 60,
         "timeoutSec": 60
       }
