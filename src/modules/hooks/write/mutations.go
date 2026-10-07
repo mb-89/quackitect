@@ -1,7 +1,7 @@
 // The file changes a Copilot edit call proposes, decoded before the call
 // reaches disk, so the hooks door judges each as one Write.
 // [[spec/tickets/copilot-hooks-run-in-go]]
-package edits
+package write
 
 import (
 	"errors"
@@ -9,8 +9,6 @@ import (
 	"slices"
 	"strings"
 	"unicode"
-
-	"quackitect/src/modules/hooks/write"
 )
 
 // One changed file: its path and its whole text, or gone where a patch deletes it. [[spec/tickets/copilot-hooks-run-in-go]]
@@ -31,8 +29,8 @@ const (
 
 // The tools writing a whole file, the tools replacing one string, the names a writing tool wears, and the head of a patch section. [[spec/tickets/copilot-hooks-run-in-go]]
 var (
-	createTools = map[string]bool{"create_file": true, "create": true, write.WriteTool: true}
-	editTools   = map[string]bool{"replace_string_in_file": true, "edit": true, write.EditTool: true, "str_replace_editor": true}
+	createTools = map[string]bool{"create_file": true, "create": true, WriteTool: true}
+	editTools   = map[string]bool{"replace_string_in_file": true, "edit": true, EditTool: true, "str_replace_editor": true}
 	writesLike  = regexp.MustCompile(`(?i)edit|replace|patch|notebook|rename|create.*file|delete.*file`)
 	patchHead   = regexp.MustCompile(`^\*\*\* (Add|Update|Delete) File: (.+)$`)
 )
@@ -54,7 +52,7 @@ func Mutations(tool string, args map[string]any, read func(path string) (string,
 		if !named || !held {
 			return nil, errors.New("The write needs a path and content.")
 		}
-		return []Mutation{{Path: path, Text: write.WholeAfter(map[string]any{"tool": write.WriteTool, "content": content}, "", false)}}, nil
+		return []Mutation{{Path: path, Text: WholeAfter(map[string]any{"tool": WriteTool, "content": content}, "", false)}}, nil
 	case editTools[tool]:
 		one, err := replacement(args, read)
 		if err != nil {
@@ -126,8 +124,8 @@ func replacement(args map[string]any, read func(path string) (string, error)) (M
 	if at < 0 || strings.Contains(text[at+1:], before) {
 		return Mutation{}, errors.New("The edit needs unique matching context. Read the file and retry.")
 	}
-	edit := map[string]any{"tool": write.EditTool, "old_string": before, "new_string": after}
-	return Mutation{Path: path, Text: write.WholeAfter(edit, text, true)}, nil
+	edit := map[string]any{"tool": EditTool, "old_string": before, "new_string": after}
+	return Mutation{Path: path, Text: WholeAfter(edit, text, true)}, nil
 }
 
 // The files a Begin Patch / End Patch envelope adds, updates and deletes, in the order it names them. [[spec/tickets/copilot-hooks-run-in-go]]

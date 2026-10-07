@@ -1,7 +1,7 @@
 // The mutations an edit call decodes to: each edit tool, the patch envelope,
 // and the ambiguous edits that refuse.
 // [[spec/tickets/copilot-hooks-run-in-go]]
-package edits
+package write
 
 import (
 	"errors"
