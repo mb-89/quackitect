@@ -118,7 +118,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-depends_on: ["level0-hooks-forward-to-go", "bridge-library-leaves", "ticket-scripts-leave", "extension-imports-stay-inside"]
+depends_on: ["level0-hooks-forward-to-go", "bridge-library-leaves", "ticket-scripts-leave", "extension-imports-stay-inside", "cage-libs-leave", "tree-libs-leave", "schema-libs-leave", "config-libs-leave", "stub-settings-shim-runs-in-go", "guidance-lib-leaves", "engine-and-doors-leave", "scripts-folder-leaves"]
 record:
   - step: design/owner-read
     skipped: true

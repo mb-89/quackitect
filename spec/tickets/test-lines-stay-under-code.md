@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-depends_on: ["engine-and-doors-leave", "scripts-folder-leaves"]
+depends_on: ["engine-and-doors-leave", "scripts-folder-leaves", "plugin-libs-leave"]
 step: design/owner-read
 ---
 

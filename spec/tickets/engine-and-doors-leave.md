@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-depends_on: ["plugin-libs-leave", "session-start-leaves-node"]
+depends_on: ["cage-libs-leave", "session-start-leaves-node"]
 step: design/owner-read
 ---
 
