@@ -1,7 +1,6 @@
 // What the pull reaches past the tree's text: git, the clock, the streams,
 // the log, the config it reads, and the verbs and topics other code answers.
-// Every one comes in on It, so a case hands in fakes, off doorsHere in
-// src/scripts/cli-doors.js.
+// Every one comes in on It, so a case hands in fakes.
 // [[spec/design_output/pull#the-answers]]
 package pull
 
@@ -34,7 +33,7 @@ type It struct {
 	Root, Method string
 	Env          map[string]string
 	Agent, Cloud bool
-	// The config the pull reads, as cli-doors.js hands it. [[spec/design_output/pull#the-answers]]
+	// The config the pull reads. [[spec/design_output/pull#the-answers]]
 	Words, Fails, Refusals, Splits int
 	PersonSigns                    bool
 	Weights                        Weights

@@ -10,7 +10,7 @@ import { disk } from "../../src/doors/disk.js";
 import { browserFrom } from "../../src/scripts/browser.js";
 import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { graphIn } from "../../src/scripts/graph.js";
+import { ticketDrawn, ticketText } from "../level0/v1-index.js";
 import { aheadOnly } from "../../src/scripts/ticket-route.js";
 
 const files = disk();
@@ -21,33 +21,8 @@ const why = !files.exists(DRIVER)
   : !browser && "no browser stands here, so run ./RUNME.sh";
 
 // A ticket carrying each mark the page draws. [[spec/design_output/drawing#the-layout-reads-the-graph]]
-const TICKET = `---
-steps:
-  - name: sync
-    when: cloud
-  - name: design
-    steps:
-      - name: draft
-      - name: review
-        on_fail: draft
-        by: person
-  - name: ship
-  - name: tell
-step: design/review
-record:
-  - step: sync
-    skipped: true
-    why: a desk box
-  - step: design/draft
-    returns: 2
----
-
-# design
-
-## draft
-
-## review
-`;
+const TICKET = ticketText("drawing-marks");
+const GRAPH = ticketDrawn("drawing-marks").graph;
 const FRONT = readNote(TICKET).front.said;
 
 // The page a webview carries, with the one call a webview carries faked. [[spec/design_output/drawing#a-fake-host-drives-it]]
@@ -82,7 +57,7 @@ test("the page posts ready once it mounts, and draws nothing before a graph", {
 test("a graph message draws every node and edge the graph carries", {
   skip: why,
 }, async () => {
-  const graph = graphIn(TICKET);
+  const graph = GRAPH;
   await page.evaluate(
     ([one, steps]) => window.postMessage({ kind: "graph", graph: one, steps }, "*"),
     [graph, FRONT.steps],
@@ -146,7 +121,7 @@ const node = (id) => page.locator(`.react-flow__node[data-id="${id}"]`);
 test("a press on a node posts jump with the place the engine names", {
   skip: why,
 }, async () => {
-  const want = graphIn(TICKET).nodes.find((one) => one.id === "design/draft");
+  const want = GRAPH.nodes.find((one) => one.id === "design/draft");
   const said = await postedAfter(() => node("design/draft").click());
   assert.deepEqual(said, [
     { kind: "jump", step: "design/draft", chapter: want.chapter, line: want.line },
@@ -161,7 +136,7 @@ test("a press on the pointer posts take, or handback where the person holds it",
   await page.evaluate(
     ([one, steps]) =>
       window.postMessage({ kind: "graph", graph: one, steps, held: true }, "*"),
-    [graphIn(TICKET), FRONT.steps],
+    [GRAPH, FRONT.steps],
   );
   const back = node("design/review").locator("button.handback");
   const gave = await postedAfter(() => back.click());

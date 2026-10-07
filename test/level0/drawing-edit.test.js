@@ -6,7 +6,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { dropped, moved, reachedIn } from "../../src/extension/webview/route/edit.js";
-import { graphOf } from "../../src/scripts/graph.js";
 import { aheadOnly } from "../../src/scripts/ticket-route.js";
 
 const FRONT = {
@@ -17,7 +16,17 @@ const FRONT = {
   ],
   step: "design/draft",
 };
-const REACHED = reachedIn(graphOf(FRONT));
+// The graph tickets/drawn hands for FRONT, reduced to the nodes and what reachedIn reads of them. [[spec/tickets/branch-scripts-leave]]
+const GRAPH = {
+  nodes: [
+    { id: "design", reached: true },
+    { id: "design/draft", reached: true },
+    { id: "design/review" },
+    { id: "ship" },
+    { id: "tell" },
+  ],
+};
+const REACHED = reachedIn(GRAPH);
 const names = (steps) => steps.map((one) => one.name);
 
 test("a move swaps a step ahead with its sibling, and ticket route takes the answer", () => {

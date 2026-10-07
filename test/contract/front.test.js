@@ -11,7 +11,6 @@ import { disk } from "../../src/doors/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { front } from "../../src/doors/front.js";
 import { proc } from "../../src/doors/proc.js";
-import { it } from "../../src/scripts/cli-doors.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -79,11 +78,4 @@ run("mint writes what se-front writes off the front each ticket reads as", () =>
     const said = readNote(text).front.said ?? {};
     assert.equal(fake.mint(said), real.mint(said));
   }
-});
-
-run("the verbs' doors hand every writer the front door over se-front", () => {
-  assert.equal(
-    it.front.set("---\nstate: open\n---\n", "state", "a: b"),
-    '---\nstate: "a: b"\n---\n',
-  );
 });

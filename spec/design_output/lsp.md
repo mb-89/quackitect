@@ -346,10 +346,10 @@ its own. A binary built off other source lints against rules the tree no longer
 carries.
 
 `index_here` and `front_here` in `src/scripts/install.sh` ask
-`src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
-its source. The hash reads the binary's folder, every tree package it imports
-and the root `go.mod` and `go.sum`, through `sourceHash` in
-`src/scripts/tui-build.js`. A test file moves nothing. The build writes the
+`src/scripts/go-stamp.sh` whether the stamp beside the binary holds the hash of
+its source. The hash reads every Go and embedded file of each tree package the
+binary imports, and the root `go.mod` and `go.sum`, through `hash_of` in that
+script. A test file moves nothing. The build writes the
 stamp.
 
 # The client starts it again

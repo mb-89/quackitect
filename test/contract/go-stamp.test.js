@@ -8,7 +8,6 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { BUILDS } from "../../src/scripts/go-source.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
@@ -19,14 +18,6 @@ const goHere = () => {
     return false;
   }
 };
-
-// The stamp script spells the packages BUILDS owns, because a shell script imports nothing. [[spec/tickets/install-callers-cover-the-tests]]
-test("the stamp script names the package each binary builds from", () => {
-  const said = disk().read(join(root, "src", "scripts", "go-stamp.sh"));
-  for (const [name, folder] of Object.entries(BUILDS)) {
-    assert.ok(said.includes(`  ${name}) package=./${folder} ;;`), name);
-  }
-});
 
 // A module carrying no go.sum and no git stamps too. [[spec/tickets/go-stamp-takes-bare-modules]]
 test("the source stamp reads fresh after a stamp, and stale once a source the build reads changes", { skip: !goHere() && "no go here" }, () => {

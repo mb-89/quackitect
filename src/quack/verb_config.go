@@ -20,7 +20,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The columns a row pads its key and its value to, as COL in src/scripts/cli-doors.js names them. [[spec/design_output/config#the-verb-names-the-layer]]
+// The columns a row pads its key and its value to. [[spec/design_output/config#the-verb-names-the-layer]]
 const (
 	configKeyColumn   = 22
 	configValueColumn = 9

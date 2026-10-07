@@ -152,7 +152,7 @@ func owned(tip ticket.Tip) []Ticket {
 	return out
 }
 
-// A branch landed once trunk carries its group ticket closed, the rule landedHere in src/scripts/work-stands.js holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+// A branch landed once trunk carries its group ticket closed, the rule landedHere in src/branches/stands.go reads. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 func merged(tip ticket.Tip) bool {
 	return tip.Trunk != "" && Of("", "", tip.Trunk, 0).State == closedState
 }

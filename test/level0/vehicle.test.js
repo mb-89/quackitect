@@ -28,6 +28,7 @@ import {
   methodRootFrom,
   produce,
   readRegister,
+  registerDirs,
   registerVehicle,
   rootsHere,
 } from "../../src/scripts/vehicle.js";
@@ -144,6 +145,14 @@ test("an entry naming a place nobody holds is skipped", () => {
     list.map((one) => one.id),
     ["abc123"],
   );
+});
+
+// The home folder reads USERPROFILE before HOME, the rule HomeIn in src/vehicle/vehicle.go owns. [[spec/tickets/branch-scripts-leave]]
+test("the register stands under USERPROFILE before HOME, and under no folder where neither stands", () => {
+  const [under] = registerDirs({ USERPROFILE: "/windows", HOME: "/posix" });
+  assert.ok(under.startsWith("/windows"), under);
+  assert.ok(registerDirs({ HOME: "/posix" })[0].startsWith("/posix"));
+  assert.deepEqual(registerDirs({}), []);
 });
 
 test("one vehicle is no question", () => {

@@ -10,7 +10,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { editorRequire } from "../../src/doors/fake/vscode.js";
 import { activate } from "../../src/extension/extension.js";
 import { fieldMarksOf } from "../../src/extension/lib/fields.js";
-import { v1Over } from "./v1-index.js";
+import { ticketText, v1Over } from "./v1-index.js";
 
 const HOLDS = ".se/.runtime/hold";
 const STANDING = "holds/standing";
@@ -20,58 +20,7 @@ const HOLD_FILE = `${HOLDS}/person-a-desk.json`;
 const FIRST = "every door has a fake";
 const SECOND = "a comment names the approach";
 
-const TEXT = [
-  "---",
-  "kind: [[ticket]]",
-  "state: open",
-  "steps:",
-  "  - name: implement",
-  `    checklist: ["${FIRST}", "${SECOND}"]`,
-  "    steps:",
-  "      - name: tests-red",
-  "        does: writes the tests the ask calls for",
-  "        evidence:",
-  "          - name: tests",
-  "            form: command",
-  "            expects: assertion",
-  "            says: the tests you write fail on their own assertion",
-  "          - name: seen",
-  "            form: text",
-  "            says: what you see, and what surprises you",
-  "      - name: change",
-  "        does: makes the change",
-  "        evidence:",
-  "          - name: lint",
-  "            form: command",
-  "            says: the tree builds and lints",
-  "step: implement/tests-red",
-  "---",
-  "",
-  "# Ask",
-  "",
-  "A person sees the fields.",
-  "",
-  "# implement",
-  "",
-  "## tests-red",
-  "",
-  "<!-- writes the tests the ask calls for -->",
-  "",
-  "### tests",
-  "",
-  "<!-- the tests you write fail on their own assertion -->",
-  "",
-  "### seen",
-  "",
-  "The marks stand.",
-  "",
-  "## change",
-  "",
-  "### lint",
-  "",
-  "<!-- the tree builds and lints -->",
-  "",
-].join("\n");
+const TEXT = ticketText("fields");
 
 const lineOf = (text, heading) => text.split("\n").indexOf(heading) + 1;
 
@@ -306,10 +255,7 @@ test("a field filled in loses its mark", async () => {
     ["tests", "checked"],
   );
 
-  const filled = TEXT.replace(
-    "<!-- the tests you write fail on their own assertion -->\n",
-    "<!-- the tests you write fail on their own assertion -->\n\n    node --test test/level0/fields-to-fill.test.js\n",
-  );
+  const filled = ticketText("fields-filled");
   door.files.write(PATH, filled);
   await host.sees(PATH, filled);
   assert.deepEqual(named(lastMarks(door)), [
@@ -365,7 +311,7 @@ test("a start hands the marks the ticket and the hold watch", async () => {
 
   await events.editors[0](PATH, TEXT);
   assert.equal(named(lastMarks(door)).length, 2, "an opened ticket takes its marks");
-  const renamed = TEXT.replace("### tests", "### tested");
+  const renamed = ticketText("fields-renamed");
   disk.write(PATH, renamed);
   await events.changes[0](PATH, renamed);
   assert.deepEqual(

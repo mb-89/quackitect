@@ -100,7 +100,7 @@ func RegisterDirs(env map[string]string, windows bool) []string {
 	return []string{}
 }
 
-// The home folder, as homeIn in src/scripts/editor.js reads it. [[spec/design_output/extension#the-link-stands]]
+// The home folder: USERPROFILE, else HOME. [[spec/design_output/extension#the-link-stands]]
 func HomeIn(env map[string]string) string {
 	if said := env["USERPROFILE"]; said != "" {
 		return said

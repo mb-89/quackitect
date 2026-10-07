@@ -9,7 +9,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { it } from "../../src/scripts/cli-doors.js";
 import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -23,7 +22,6 @@ const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 
 // Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#a-door-reads-the-outside]]
 const ROOTS = [
-  "src/scripts/cli-doors.js",
   "src/scripts/trust.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
@@ -133,17 +131,4 @@ test("the config stands the rule off every Go door and a Go case", () => {
   for (const where of ["src/engine/swap/door.go", "src/front/front_test.go"]) {
     assert.ok(off(where), where);
   }
-});
-
-// The hand the command root builds carries the pid and the node path, so a module past it reads neither in place. [[spec/design_output/doors#a-door-reads-the-outside]]
-test("the hand a root builds carries the pid and the node path", () => {
-  assert.equal(typeof it.pid, "number");
-  assert.equal(typeof it.node, "string");
-  assert.ok(it.node.length > 0);
-});
-
-// The stale read asks the index for the hash of a note, so the hand a root builds carries the index door. [[spec/design_output/pull#an-input-marks-its-steps]]
-test("the hand a root builds carries an index door that answers a question", () => {
-  assert.equal(typeof it.index?.ask, "function");
-  assert.equal(typeof it.index?.dead, "function");
 });

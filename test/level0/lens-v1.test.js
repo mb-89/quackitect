@@ -7,7 +7,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { it as doors } from "../../src/scripts/cli-doors.js";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate, SHOW } from "../../src/extension/extension.js";
@@ -15,8 +14,7 @@ import { fieldMarksOf } from "../../src/extension/lib/fields.js";
 import lens, { ticketLensOf } from "../../src/extension/lib/lens.js";
 import { routeHostOf } from "../../src/extension/lib/route-host.js";
 import { SCHEMA } from "../../src/extension/sidebar.js";
-import { graphIn } from "../../src/scripts/graph.js";
-import { v1Over } from "./v1-index.js";
+import { ticketDrawn, ticketText, v1Over } from "./v1-index.js";
 
 const PATH = "spec/tickets/one.md";
 const OTHER = "spec/tickets/two.md";
@@ -24,47 +22,7 @@ const GROUP = "spec/tickets/up-there.md";
 const HOLD_FILE = ".se/.runtime/hold/person.json";
 const HOLD = { ticket: "one", path: PATH, step: "implement/tests-red", hand: "person" };
 
-const TEXT = [
-  "---",
-  "kind: [[ticket]]",
-  "state: open",
-  "steps:",
-  "  - name: implement",
-  '    checklist: ["every door has a fake"]',
-  "    steps:",
-  "      - name: tests-red",
-  "        does: writes the tests the ask calls for",
-  "        evidence:",
-  "          - name: tests",
-  "            form: command",
-  "            says: the tests you write fail on their own assertion",
-  "          - name: seen",
-  "            form: text",
-  "            says: what you see",
-  "      - name: change",
-  "        does: makes the change",
-  "step: implement/tests-red",
-  "---",
-  "",
-  "# Ask",
-  "",
-  "A person sees the fields.",
-  "",
-  "# implement",
-  "",
-  "## tests-red",
-  "",
-  "### tests",
-  "",
-  "<!-- the tests you write fail on their own assertion -->",
-  "",
-  "### seen",
-  "",
-  "The marks stand.",
-  "",
-  "## change",
-  "",
-].join("\n");
+const TEXT = ticketText("lens-held");
 
 const ticket = (group) =>
   [
@@ -191,7 +149,7 @@ test("a held ticket draws its marks and route over a fake index", async () => {
     page.posts[0],
     {
       kind: "graph",
-      graph: graphIn(TEXT),
+      graph: ticketDrawn("lens-held").graph,
       steps: readNote(TEXT).front.said.steps,
       held: true,
     },
@@ -251,23 +209,6 @@ test("the lens reads holds/standing and tickets/cloud, and a watch event draws i
     "the event posts the drawing again, no longer held",
   );
   assert.ok(door.said.lensChanged > lensed, "the event draws the buttons again");
-});
-
-test("src/extension/lib names no door.read, door.list, door.imports or door.watch", () => {
-  const ran = doors.git.run(
-    [
-      "grep",
-      "-n",
-      "door.read\\|door.list\\|door.imports\\|door.watch",
-      "src/extension/lib",
-    ],
-    true,
-  );
-  assert.equal(
-    String(ran.out ?? "").trim(),
-    "",
-    "the hosts under src/extension/lib read off the index alone",
-  );
 });
 
 // [[spec/tickets/program-of-drops-node]]

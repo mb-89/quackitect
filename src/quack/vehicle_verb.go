@@ -52,7 +52,7 @@ func vehicleEnv(pairs []string) map[string]string {
 	return out
 }
 
-// The tree the verb runs from, as root in src/scripts/cli-doors.js names the tree holding the program: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The tree the verb runs from: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
 func vehicleRootHere() string {
 	if said := os.Getenv("QUACKITECT_ROOT"); said != "" {
 		if abs, err := filepath.Abs(said); err == nil {

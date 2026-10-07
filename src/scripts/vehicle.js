@@ -19,7 +19,6 @@ import {
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
-import { homeIn } from "./editor.js";
 
 // [[spec/design_output/vehicle#a-marker-names-the-root]]
 const STAMP_TAIL = 12;
@@ -59,7 +58,8 @@ function idOf(time, pid) {
 export function registerDirs(env, windows = false) {
   const said = env.SE_REGISTRY;
   if (said) return said.split(windows ? ";" : ":").filter(Boolean);
-  const home = homeIn(env);
+  // The home folder, the rule HomeIn in src/vehicle/vehicle.go owns. [[spec/design_output/extension#the-link-stands]]
+  const home = env.USERPROFILE || env.HOME || "";
   return home ? [join(home, ...RUN.split("/"))] : [];
 }
 

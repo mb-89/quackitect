@@ -25,11 +25,12 @@ const (
 
 var drawnFixtures = []string{"drawn-one.md", "drawn-two.md"}
 
-// The golden the JavaScript fakes read each drawing off. [[spec/tickets/branch-scripts-leave]]
+// The golden the JavaScript fakes read each ticket text and its drawing off. Its own texts are the source: go test ./src/quack -run TestTheDrawnGoldenRedrawsEveryText -update draws each again. [[spec/tickets/branch-scripts-leave]]
 const drawnGolden = "testdata/drawn.golden.json"
 
-// One golden entry: a ticket text and the drawing Go answers for it. [[spec/tickets/branch-scripts-leave]]
+// One golden entry: the name a test asks it by, a ticket text, and the drawing Go answers for it. [[spec/tickets/branch-scripts-leave]]
 type goldenDrawn struct {
+	Name  string          `json:"name"`
 	Text  string          `json:"text"`
 	Drawn json.RawMessage `json:"drawn"`
 }
@@ -131,9 +132,14 @@ func TestEveryDrawnGoldenMatchesTheProjection(t *testing.T) {
 	if err := json.Unmarshal(body, &entries); err != nil || len(entries) == 0 {
 		t.Fatalf("%s holds %d entries (%v), and wants one a drawn ticket", drawnGolden, len(entries), err)
 	}
+	named := map[string]bool{}
 	for at, one := range entries {
+		if one.Name == "" || named[one.Name] {
+			t.Errorf("entry %d carries the name %q, and wants a name no other entry carries", at, one.Name)
+		}
+		named[one.Name] = true
 		if got, _ := json.Marshal(drawnOf(one.Text)); !sameJSON(got, one.Drawn) {
-			t.Errorf("entry %d draws %s, and the golden holds %s", at, got, one.Drawn)
+			t.Errorf("%s draws %s, and the golden holds %s", one.Name, got, one.Drawn)
 		}
 	}
 }

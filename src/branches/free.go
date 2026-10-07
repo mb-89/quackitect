@@ -1,6 +1,6 @@
-// What stands free, and what a claim's age says, as src/scripts/work-free.js
-// reads them. A box that runs out of session hands back nothing, so its claim
-// goes stale and the branch comes back to the queue.
+// What stands free, and what a claim's age says. A box that runs out of
+// session hands back nothing, so its claim goes stale and the branch comes
+// back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 package branches
 

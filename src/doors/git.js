@@ -1,9 +1,6 @@
 // Git. Built on the process door, so a fake process fakes git too.
 // [[spec/design_output/doors#a-door-standing-on-another]]
 
-// The asks one `cat-file --batch` carries, so an answer stays inside the process door's buffer. [[spec/design_output/work#the-listing-reads-git-once]]
-export const BATCH_ASKS = 400;
-
 export function git(proc, root) {
   const run = (args, quiet) => {
     const ran = proc.run(["git", ...args], { cwd: root });
@@ -26,20 +23,6 @@ export function git(proc, root) {
         .split("\n")
         .filter(Boolean)
         .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
-    },
-    // [[spec/design_output/work#the-listing-reads-git-once]]
-    batch: (asks) => {
-      let out = "";
-      for (let at = 0; at < asks.length; at += BATCH_ASKS) {
-        const ran = proc.run(["git", "cat-file", "--batch"], {
-          cwd: root,
-          stdin: `${asks.slice(at, at + BATCH_ASKS).join("\n")}\n`,
-          raw: true,
-        });
-        if (ran.exitCode !== 0) return "";
-        out += ran.stdout ?? "";
-      }
-      return out;
     },
     show: (ref) => {
       const said = run(["show", ref], true);

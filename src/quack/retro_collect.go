@@ -82,7 +82,7 @@ type retroCollectDoors struct {
 
 func init() { register("retro collect", retroCollectVerb(retroCollectLive)) }
 
-// The doors collect runs on outside a test: the tree's root, home and temp as cli-doors.js reads them, the clock, git and the rename. [[spec/guidance/retro/collect]]
+// The doors collect runs on outside a test: the tree's root, home and temp, the clock, git and the rename. [[spec/guidance/retro/collect]]
 func retroCollectLive() retroCollectDoors {
 	root := retroRoot()
 	return retroCollectDoors{

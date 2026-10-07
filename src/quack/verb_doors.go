@@ -10,7 +10,7 @@ import (
 	"quackitect/src/index"
 )
 
-// Where the doors and their contract tests stand, as DOORS and CONTRACT in src/scripts/cli-doors.js name them. [[spec/design_output/doors#one-contract-test-per-door]]
+// Where the doors and their contract tests stand. [[spec/design_output/doors#one-contract-test-per-door]]
 const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"

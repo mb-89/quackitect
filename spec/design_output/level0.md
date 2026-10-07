@@ -404,8 +404,8 @@ first.
 
 A reply carrying a failing status stands, because a box answering a status
 listens there. `hookRows` runs the calls together, so a box naming several dead
-hooks answers inside the first minute. The wait is `HEALTH_WAIT` in
-`src/scripts/cli-doors.js`, which the server probe reads too.
+hooks answers inside the first minute. The wait is `healthWait` in
+`src/quack/hookprobe.go`, which the server probe reads too.
 
 The row's label reads `hook` beside the host of the address. A host carries its
 port, and leaves the one its scheme takes by default. `doctor` pads a label to

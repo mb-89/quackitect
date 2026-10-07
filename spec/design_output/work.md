@@ -73,8 +73,8 @@ reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
 | the rule | where it stands |
 |---|---|
 | a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
-| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/scripts/work-stands.js` |
-| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/branches/dispatch_write.go` |
+| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/branches/stands.go` |
+| a parent reaches no worker, and opens no branch | `freeIn` in `src/branches/free.go`, and `opensOf` in `src/branches/dispatch_write.go` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
 | each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/branches/dispatch.go` |
 | `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
@@ -180,7 +180,7 @@ A flag asks for that one reading in place of the rows.
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
+| the contents | `cat-file --batch`, in `src/modules/git/git.go` | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
 | the trunk tip | `rev-parse`, once a listing | the commit a base short of it reads `behind` against |
 
@@ -697,7 +697,7 @@ anything but `true`:
 The wait reads the tracked `spec/config/level0.json` on `origin/main`, the file
 every box shares. A per-box file, a variable and the sidebar each write this
 box alone, so none of them lets the cloud take the group. `readWork` in
-`src/scripts/work-stands.js` reads that file once, through `flatten` in the one
+`src/branches/stands.go` reads that file once, through `flatten` in the one
 resolver, where some group names the field.
 
 | the verb | what it does with a switched-off group |
@@ -889,7 +889,7 @@ origin. Naming no branch closes every one of them. It reaches the kinds below:
 
 A branch whose tip stands on trunk's own line is a cut waiting for a box, so
 it reads open while trunk moves on. A landed branch joins trunk through a
-merge commit, off that line, and `mergedHere` in `src/scripts/work-stands.js`
+merge commit, off that line, and `mergedHere` in `src/branches/stands.go`
 reads the two apart.
 
 | branch | cut by | throwaway once |

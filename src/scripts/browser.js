@@ -4,7 +4,6 @@
 
 import { join } from "node:path";
 import { disk } from "../doors/disk.js";
-import { homeIn } from "./editor.js";
 
 export const CALLS = ["chromium", "chromium-browser", "google-chrome", "chrome"];
 
@@ -20,7 +19,8 @@ const INSIDE = [
 // The folder `playwright install` writes where no variable names one. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
 export function cacheOf(env = {}, mac = false) {
   if (env.LOCALAPPDATA) return join(env.LOCALAPPDATA, "ms-playwright");
-  const home = homeIn(env);
+  // The home folder, the rule HomeIn in src/vehicle/vehicle.go owns. [[spec/design_output/extension#the-link-stands]]
+  const home = env.USERPROFILE || env.HOME || "";
   if (!home) return "";
   if (mac) return join(home, "Library", "Caches", "ms-playwright");
   return join(home, ".cache", "ms-playwright");

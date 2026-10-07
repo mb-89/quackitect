@@ -15,7 +15,7 @@ import (
 const (
 	settingsFile      = ".claude/settings.json"       // the file .claude/skills/level0/lib/vehicle.js owns, as SETTINGS
 	settingsLocalFile = ".claude/settings.local.json" // the file .claude/skills/level0/lib/vehicle.js owns, as SETTINGS_LOCAL
-	healthWait        = 2 * time.Second               // the span src/scripts/cli-doors.js owns, as HEALTH_WAIT
+	healthWait        = 2 * time.Second               // the span the server takes to answer its health
 )
 
 // One hook address, and the settings file naming it first. [[spec/design_output/level0#the-doctor-probes-every-hook]]

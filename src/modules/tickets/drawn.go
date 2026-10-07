@@ -1,5 +1,5 @@
-// The drawing of one ticket: the graph graphIn in src/scripts/graph.js draws,
-// the route the page edits, and each leaf's fields with the line a mark stands
+// The drawing of one ticket: the graph GraphIn in graph.go draws, the route
+// the page edits, and each leaf's fields with the line a mark stands
 // at and whether the chapter fills it. A read-only projection of the folders.
 // [[spec/tickets/the-lens-reads-v1]]
 package tickets
@@ -19,7 +19,7 @@ import (
 // The family the drawing stands under, by its local name. [[spec/tickets/the-lens-reads-v1]]
 const DrawnPort = "drawn"
 
-// The node and edge kinds graph.js names, the field the checklist answers under, which CHECKED in src/scripts/pull-route.js owns, and the line a mark falls to where its leaf stands as no heading. [[spec/tickets/the-lens-reads-v1]]
+// The node and edge kinds the drawing names, the field the checklist answers under, which CHECKED in src/scripts/pull-route.js owns, and the line a mark falls to where its leaf stands as no heading. [[spec/tickets/the-lens-reads-v1]]
 const (
 	phaseKind  = "phase"
 	leafKind   = "leaf"
@@ -50,7 +50,7 @@ type Graph struct {
 	Edges []Edge `json:"edges"`
 }
 
-// A node carries what nodeOf and placed in src/scripts/graph.js give it, and a key stands only where they set it. [[spec/tickets/the-lens-reads-v1]]
+// A node carries what nodeOf and placed give it, and a key stands only where they set it. [[spec/tickets/the-lens-reads-v1]]
 type Node struct {
 	ID      string  `json:"id"`
 	Name    string  `json:"name"`
@@ -111,7 +111,7 @@ type entry struct {
 // The drawing of a ticket: its graph, its route, and each leaf's fields. [[spec/tickets/the-lens-reads-v1]]
 func drawnOf(text string) Drawn {
 	read := note.Read(text)
-	// A text with no front reads whole as a route, and graphIn places its nodes under no chapter. [[spec/tickets/the-lens-reads-v1]]
+	// A text with no front reads whole as a route, and graphOf places its nodes under no chapter. [[spec/tickets/the-lens-reads-v1]]
 	front, placing := read.Front.Said, read.Sections
 	if !strings.HasPrefix(text, frontFence) {
 		if front = yaml.AsDoc(yaml.Read(text)); front == nil {

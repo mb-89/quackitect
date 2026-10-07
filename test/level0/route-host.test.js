@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { FLIP, routeHostOf } from "../../src/extension/lib/route-host.js";
-import { v1Over } from "./v1-index.js";
+import { ticketText, v1Over } from "./v1-index.js";
 
 const HOLDS = ".se/.runtime/hold";
 const PATH = "spec/tickets/one.md";
@@ -29,36 +29,10 @@ function hostOf(door) {
   };
 }
 
-const ticket = (state, names) =>
-  [
-    "---",
-    "kind: [[ticket]]",
-    `state: ${state}`,
-    `step: ${names[0]}`,
-    "steps:",
-    ...names.flatMap((name) => [
-      `  - name: ${name}`,
-      `    does: works ${name}`,
-      "    evidence:",
-      "      - name: says",
-      "        form: text",
-    ]),
-    "---",
-    "",
-    "# Ask",
-    "",
-  ].join("\n");
-
-const SHORT = ticket("open", ["draft"]);
-const LONG = ticket("open", [
-  "draft",
-  "review",
-  "change",
-  "test",
-  "ship",
-  "land",
-  "tell",
-]);
+const SHORT = ticketText("route-short");
+const CLOSED = ticketText("route-closed");
+const TWO = ticketText("route-two");
+const LONG = ticketText("route-long");
 
 function doorOf({
   files = {},
@@ -176,13 +150,12 @@ test("a ticket draws its route over the folded frontmatter, and ready answers th
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a person's hold on a ticket that reads closed draws the page unheld", async () => {
-  const closed = ticket("closed", ["draft"]);
   const hold = { ticket: "one", step: "draft", hand: "person a-desk", path: PATH };
   const door = doorOf({
-    files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold), [PATH]: closed },
+    files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold), [PATH]: CLOSED },
   });
   const host = hostOf(door);
-  await host.opened(PATH, closed);
+  await host.opened(PATH, CLOSED);
   const page = door.said.pages[0];
   await page.hears({ kind: "ready" });
 
@@ -232,7 +205,7 @@ test("the flip shows the YAML and back, and the lens title follows", async () =>
 test("a closed ticket carries the flip", async () => {
   const door = doorOf();
   const host = hostOf(door);
-  await host.opened(PATH, ticket("closed", ["draft"]));
+  await host.opened(PATH, CLOSED);
   assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
   assert.deepEqual(host.lenses("spec/guidance/working.md"), []);
 });
@@ -242,7 +215,7 @@ test("a change redraws the drawing with the new route", async () => {
   const host = hostOf(door);
   await host.opened(PATH, SHORT);
   const page = door.said.pages[0];
-  await host.changed(PATH, ticket("open", ["draft", "review"]));
+  await host.changed(PATH, TWO);
 
   const last = page.posts.at(-1);
   assert.equal(last.kind, "graph");
@@ -297,28 +270,14 @@ test("a page the person closes leaves the host, so a change posts nothing", asyn
   const page = door.said.panels[0];
   page.gone();
 
-  await host.changed(PATH, ticket("open", ["draft", "review"]));
+  await host.changed(PATH, TWO);
   host.themed();
   assert.deepEqual(page.posts, []);
   assert.deepEqual(host.lenses(PATH), []);
 });
 
 // [[spec/tickets/the-host-runs-the-verbs]]
-const VERDICT = [
-  "---",
-  "kind: [[ticket]]",
-  "state: open",
-  "step: review",
-  "steps:",
-  "  - name: review",
-  "    evidence:",
-  "      - name: verdict",
-  "        form: verdict",
-  "---",
-  "",
-  "# Ask",
-  "",
-].join("\n");
+const VERDICT = ticketText("route-verdict");
 
 async function pressed(message, options = {}, text = SHORT) {
   const door = doorOf(options);

@@ -154,3 +154,37 @@ test("no manifest source git holds names a version of its own", () => {
     assert.equal(read(one).version, undefined, one);
   }
 });
+
+// Each line under a path of the tree that matches the pattern. [[spec/tickets/branch-scripts-leave]]
+function naming(pattern, ...paths) {
+  const out = [];
+  const walk = (path) => {
+    if (path.endsWith(".js")) {
+      for (const line of files.read(join(root, path)).split("\n"))
+        if (pattern.test(line)) out.push(`${path}: ${line.trim()}`);
+      return;
+    }
+    for (const one of files.list(join(root, path)))
+      if (one.kind === "dir" || one.name.endsWith(".js")) walk(join(path, one.name));
+  };
+  for (const path of paths) walk(path);
+  return out;
+}
+
+// [[spec/tickets/the-lens-reads-v1]]
+test("src/extension/lib names no door.read, door.list, door.imports or door.watch", () => {
+  assert.deepEqual(
+    naming(/door\.(read|list|imports|watch)/, "src/extension/lib"),
+    [],
+    "the hosts under src/extension/lib read off the index alone",
+  );
+});
+
+// [[spec/tickets/the-sidebar-writes-through-actions]]
+test("sidebar.js and lib name no door.write or door.append", () => {
+  assert.deepEqual(
+    naming(/door\.(write|append)/, "src/extension/sidebar.js", "src/extension/lib"),
+    [],
+    "the sidebar and its hosts write through the index alone",
+  );
+});

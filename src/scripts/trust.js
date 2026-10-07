@@ -8,7 +8,6 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { disk } from "../doors/disk.js";
-import { homeIn } from "./editor.js";
 
 export const FLAG = "hasTrustDialogAccepted";
 export const CONFIG = ".claude.json";
@@ -39,7 +38,8 @@ export function accept(files, home, folder) {
 
 // The home folder comes off the one reader, so a Windows box naming `USERPROFILE` alone lands the flag too. [[spec/design_output/extension#a-box-names-its-home]]
 export function main(argv, env, files = disk()) {
-  const home = homeIn(env);
+  // The home folder, the rule HomeIn in src/vehicle/vehicle.go owns. [[spec/design_output/extension#the-link-stands]]
+  const home = env.USERPROFILE || env.HOME || "";
   if (!home) {
     console.error("This box names no home folder, so the trust flag has no file.");
     return 1;

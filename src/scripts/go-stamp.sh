@@ -12,7 +12,7 @@ root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 # imports nothing.
 bin="$root/.se/.runtime/bin"
 
-# The package each binary builds from, which BUILDS in go-source.js owns.
+# The package each binary builds from.
 case "${2:-}" in
   se-index) package=./src/quack ;;
   se-front) package=./src/front/cmd ;;

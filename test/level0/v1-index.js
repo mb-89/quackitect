@@ -7,7 +7,7 @@ import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema-yaml.js";
 import { parsed } from "../../src/extension/lib/values.js";
 import { LOCAL, TRACKED, valuesOf } from "../../src/extension/lib/widgets.js";
-import { drawnOf } from "./drawn-twin.js";
+import DRAWN_GOLDEN from "../../src/modules/tickets/testdata/drawn.golden.json" with { type: "json" };
 
 const SCHEMA = "spec/config/level0.schema.json";
 const BLESS = ".se/.runtime/bless.json";
@@ -35,6 +35,32 @@ function literalOf(text) {
   } catch {
     return String(text);
   }
+}
+
+// A ticket text the drawn golden holds, by its name, so the fake index draws every text a case seeds. [[spec/tickets/branch-scripts-leave]]
+export function ticketText(name) {
+  return goldenNamed(name).text;
+}
+
+// The drawing Go answers for the text of that name. [[spec/tickets/branch-scripts-leave]]
+export function ticketDrawn(name) {
+  return structuredClone(goldenNamed(name).drawn);
+}
+
+function goldenNamed(name) {
+  const one = DRAWN_GOLDEN.find((entry) => entry.name === name);
+  if (!one) throw new Error(`the drawn golden holds no text named ${name}`);
+  return one;
+}
+
+// The drawing Go answers for a text, off the golden TestEveryDrawnGoldenMatchesTheProjection holds. [[spec/tickets/branch-scripts-leave]]
+function drawnOf(text) {
+  const one = DRAWN_GOLDEN.find((entry) => entry.text === text);
+  if (!one)
+    throw new Error(
+      `the drawn golden holds no entry for this text; add it to src/modules/tickets/testdata/drawn.golden.json and run go test ./src/quack -run TestTheDrawnGoldenRedrawsEveryText -update:\n${text}`,
+    );
+  return structuredClone(one.drawn);
 }
 
 // The front of a note, as the Go note reader hands it. [[spec/tickets/the-lens-reads-v1]]

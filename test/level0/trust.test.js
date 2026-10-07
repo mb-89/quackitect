@@ -82,6 +82,16 @@ test("a Windows box naming USERPROFILE and no HOME lands the flag in that folder
   assert.equal(JSON.parse(files.read(where)).projects[resolve("/tree")][FLAG], true);
 });
 
+// [[spec/tickets/branch-scripts-leave]]
+test("a box naming USERPROFILE and HOME lands the flag under USERPROFILE", () => {
+  const files = fakeDisk();
+  const home = "C:\\Users\\one";
+  main(["node", "trust.js", "/tree"], { USERPROFILE: home, HOME: "/home/user" }, files);
+
+  assert.equal(files.exists(join(home, CONFIG)), true);
+  assert.equal(files.exists(join("/home/user", CONFIG)), false);
+});
+
 test("a box naming no home folder writes no flag", () => {
   const files = fakeDisk();
 

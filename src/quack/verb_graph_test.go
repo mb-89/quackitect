@@ -1,5 +1,5 @@
 // The graph verb answers a process or a ticket as the nodes and the edges
-// graphIn in src/scripts/graph.js draws, as indented JSON.
+// GraphIn in src/modules/tickets draws, as indented JSON.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 package main
 
@@ -20,7 +20,7 @@ const graphProcess = `steps:
     when: cloud
 `
 
-// What graphIn answers for graphProcess, as JSON.stringify writes it indented by two. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+// What GraphIn answers for graphProcess, indented by two. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 const graphDrawn = `{
   "nodes": [
     {

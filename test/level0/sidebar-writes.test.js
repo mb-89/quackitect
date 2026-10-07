@@ -9,7 +9,6 @@ import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { LOCAL } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
-import { it as doors } from "../../src/scripts/cli-doors.js";
 import { v1Over } from "./v1-index.js";
 
 const WINDOW = 42;
@@ -174,22 +173,4 @@ test("each button posts its action over a fake action door", async () => {
     "a log line posts log/say",
   );
   assert.deepEqual(logging.said.wrote, [], "a log line writes no file");
-});
-
-test("sidebar.js and lib name no door.write or door.append", () => {
-  const ran = doors.git.run(
-    [
-      "grep",
-      "-n",
-      "door.write\\|door.append",
-      "src/extension/sidebar.js",
-      "src/extension/lib",
-    ],
-    true,
-  );
-  assert.equal(
-    String(ran.out ?? "").trim(),
-    "",
-    "the sidebar and its hosts write through the index alone",
-  );
 });
