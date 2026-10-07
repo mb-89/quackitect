@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/notes
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -144,6 +144,9 @@ record:
     hand: box 1fb91bdd8469 · claude-code-remote
     hash_before: c9fd5e7400242e54f5f107e50ad3950f004c7271
     session: cse_01P536X1u8Aahi2wtLPf8JB9
+  - step: split
+    hand: the engine
+    stale: [[spec/design_output/examples]]
 ---
 
 # Ask
