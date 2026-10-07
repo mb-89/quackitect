@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: examples-run-as-tests
 parent: example-harness-runs-on-fakes
+record:
+  - step: do
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: cafc57d9ee0f3a751abaf5338ecb6178ff5c23d8
+    hash_after: 5aad193b091ff449216f13d99bba1feed7ff43df
+reason: became
+successors: [example-harness-runs-on-fakes]
 ---
 
 # Ask
