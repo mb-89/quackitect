@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -116,6 +116,10 @@ record:
     hand: box 23ee163eaf36 · claude-code-remote
     hash_before: b3a71e59f78677e453d134e3c75d47d0460d12d6
     session: cse_01Dx32SEhQn8DWKT3wqYqKkH
+  - step: children
+    hand: the engine
+    hash_before: b6a6c61304229f75c584cc0fb9595299b1ce96d1
+    hash_after: b6a6c61304229f75c584cc0fb9595299b1ce96d1
 ---
 
 # Ask
