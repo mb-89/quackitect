@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -163,6 +163,12 @@ record:
         hash: c954e18a8d392976
         size: 23272
     def: dc4904ab364efa10
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/doors]]
 ---
 
 # Ask
