@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -164,6 +164,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 55abcb1f8a0e · claude-code-remote
+    hash_before: 189dfc63a7541db4a9e1e73a784189334983e041
+    hash_after: 189dfc63a7541db4a9e1e73a784189334983e041
+    inputs:
+      - name: retro/write
+        hash: ab5f68d3b7557f16
+        size: 2564
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -324,20 +334,27 @@ The notes leaf works best as code: a verdict of done holds only where the fix an
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- Nothing: every tool the window called stood installed, and no host or right was refused.
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 15:24 UTC: the tool.call cage refused a Bash call naming no ticket, and one naming the group in place of the leaf in hand.
+- 15:26 UTC: the commit verb refused a trailer naming a model.
+- 15:29 UTC: the ratio guard sent a commit to the rescue branch, and the next commit landed green.
+- 15:36 UTC: the index watcher missed a closed note, and a touch woke it.
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- No person step stands parked, and the window minted no ticket.
+- The handover names the pull request against main, auto-merge on with the method MERGE, and the subscription to its activity.
 
 # Discussion
 
