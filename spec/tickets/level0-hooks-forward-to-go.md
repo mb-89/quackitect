@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: a87b1f36ee56086b
         size: 1329
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: b4f5135f01e7473eed1326b99a819f454982f0d6
+    hash_after: bf1700defcb99cd53661330dcdd5e16470725f1c
+    answered:
+      - name: lint
+        exit: 0
+        said: "   87.9  in all"
+    def: f150b8c0dc20fe45
 group: javascript-leaves
 ---
 
@@ -431,14 +440,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change keeps to the size list, past the stub Go files the red tests call, hook_verb.go for the down word, three comment lines naming the deleted scripts, and drawn_test.go, whose os read broke the import rule and the check
+- the down word reaches the run door, and the door tests run on the fake disk, post, process and clock
+- each new Go file opens on a header pointing at spec/design_output/level0.md, which names the forwarder
+- the event list, the probe marker and the start reasons stand in Go alone, and level0.md points at the files
 
 ## tests-green
 
