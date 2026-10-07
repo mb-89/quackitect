@@ -20,6 +20,12 @@ const (
 	Marker = "level0: OutsideInDoors - "
 )
 
+// How a walk reads: around the doors owning its name, or past every door where none declares it. [[spec/design_output/doors#nothing-walks-around-a-door]]
+const (
+	walksAround = "%s walks around %s"
+	noDoorSays  = "%s is a module no door declares"
+)
+
 // The keys an entry takes. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 const (
 	goKey       = "go"
@@ -67,6 +73,14 @@ type Walk struct {
 	Marked bool
 	Reason string
 	Report bool
+}
+
+// The walk in words, naming its doors, or the module no door declares. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func (w Walk) Says() string {
+	if len(w.Doors) == 0 {
+		return fmt.Sprintf(noDoorSays, w.Name)
+	}
+	return fmt.Sprintf(walksAround, w.Name, strings.Join(w.Doors, ", "))
 }
 
 // A declaration that reads as none, and where. [[spec/design_output/doors#a-door-declares-what-it-owns]]

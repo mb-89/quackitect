@@ -5,6 +5,7 @@
 package check
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -32,7 +33,7 @@ func TestAWalkAroundStandsAtErrorInTheLint(t *testing.T) {
 	if len(found) != 1 {
 		t.Fatalf("the lint reads %+v, and wants one walk-around", found)
 	}
-	if one := found[0]; one.File != waitAt || one.Line != 5 || one.Column != 14 || one.Severity != SeverityError || one.Source != "tree" || !strings.Contains(one.Message, "time.Sleep") || !strings.Contains(one.Message, "clock") {
+	if one := found[0]; one.File != waitAt || one.Line != 5 || one.Column != 14 || one.Severity != SeverityError || one.Source != "tree" || one.Message != fmt.Sprintf(walksSays, "time.Sleep walks around clock") {
 		t.Fatalf("the walk-around reads %+v", one)
 	}
 }

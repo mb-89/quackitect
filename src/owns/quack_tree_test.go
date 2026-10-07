@@ -27,7 +27,7 @@ func TestNoRootFileReachesTheBoxPastItsDoors(t *testing.T) {
 		}
 		for _, one := range Walks(at, string(text), doors) {
 			if !one.Marked && slices.Contains(boxPackages, one.Name) {
-				t.Errorf("%s:%d:%d: %s walks around %s", at, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+				t.Errorf("%s:%d:%d: %s", at, one.Line, one.Column, one.Says())
 			}
 		}
 	}

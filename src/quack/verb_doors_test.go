@@ -59,7 +59,7 @@ func TestDoorsListsAWalkAroundADoorAtReport(t *testing.T) {
 func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	t.Parallel()
 	code, out, errs := doorsRan(walkedRoot(t, false))
-	if code != exitFailed || !strings.Contains(errs, "src/engine/wait.go:5:14: time.Sleep walks around clock\n") {
+	if code != exitFailed || errs != "src/engine/wait.go:5:14: time.Sleep walks around clock\n"+walksRefused+"\n" {
 		t.Fatalf("doors answers %d, %q and %q, and wants the walk-around refused", code, out, errs)
 	}
 	if !strings.Contains(out, "src/engine/hung.go:6:2: time.Sleep stands marked: a hung child needs a deadline\n") {

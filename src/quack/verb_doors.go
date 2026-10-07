@@ -20,7 +20,7 @@ import (
 const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"
-	walkLine       = "%s:%d:%d: %s walks around %s\n"
+	walkLine       = "%s:%d:%d: %s\n"
 	markedWalk     = "%s:%d:%d: %s stands marked: %s\n"
 	contractLine   = "%s keeps the contract of %s\n"
 	outsideLine    = "%s stands inside %s, its own outside\n"
@@ -131,10 +131,10 @@ func walksOver(root string, out, errs io.Writer) int {
 			case one.Marked:
 				fmt.Fprintf(out, markedWalk, rel, one.Line, one.Column, one.Name, one.Reason)
 			case one.Report:
-				fmt.Fprintf(out, walkLine, rel, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+				fmt.Fprintf(out, walkLine, rel, one.Line, one.Column, one.Says())
 			default:
 				refused++
-				fmt.Fprintf(errs, walkLine, rel, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+				fmt.Fprintf(errs, walkLine, rel, one.Line, one.Column, one.Says())
 			}
 		}
 	}

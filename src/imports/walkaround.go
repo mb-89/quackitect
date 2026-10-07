@@ -4,7 +4,6 @@
 package imports
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 	"os" // level0: OutsideInDoors - the analyzer reads the source it checks, as a build check reads source
@@ -61,8 +60,7 @@ func WalkFaults(root string, fset *token.FileSet, files []*ast.File) []WalkFault
 			if one.Marked || one.Report || one.Line > at.LineCount() {
 				continue
 			}
-			says := fmt.Sprintf("%s walks around %s", one.Name, strings.Join(one.Doors, ", "))
-			out = append(out, WalkFault{at.LineStart(one.Line) + token.Pos(one.Column-1), says})
+			out = append(out, WalkFault{at.LineStart(one.Line) + token.Pos(one.Column-1), one.Says()})
 		}
 	}
 	return out

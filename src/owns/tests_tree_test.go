@@ -33,7 +33,7 @@ func TestNoTestFileWalksAroundADoor(t *testing.T) {
 		}
 		for _, one := range Walks(at, string(text), doors) {
 			if !one.Marked {
-				t.Errorf("%s:%d:%d: %s walks around %s", at, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+				t.Errorf("%s:%d:%d: %s", at, one.Line, one.Column, one.Says())
 			}
 		}
 	}
@@ -57,7 +57,7 @@ func TestNoFakeOrTestHelperWalksAroundADoorMarkedOrNot(t *testing.T) {
 			t.Fatal(err)
 		}
 		for _, one := range Walks(at, string(text), doors) {
-			t.Errorf("%s:%d:%d: %s walks around %s", at, one.Line, one.Column, one.Name, strings.Join(one.Doors, ", "))
+			t.Errorf("%s:%d:%d: %s", at, one.Line, one.Column, one.Says())
 		}
 	}
 }

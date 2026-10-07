@@ -260,6 +260,16 @@ func TestANodeModuleNoDoorDeclaresIsAWalk(t *testing.T) {
 	}
 }
 
+func TestAWalkSaysTheDoorsItWalksAroundOrThatNoDoorDeclaresIt(t *testing.T) {
+	t.Parallel()
+	if got := (Walk{Name: "time.Now", Doors: []string{"clock", "process"}}).Says(); got != "time.Now walks around clock, process" {
+		t.Fatalf("a walk around two doors says %q", got)
+	}
+	if got := (Walk{Name: "node:net"}).Says(); got != "node:net is a module no door declares" {
+		t.Fatalf("a walk around no door says %q", got)
+	}
+}
+
 func TestAPureNodeModuleIsNoWalk(t *testing.T) {
 	t.Parallel()
 	text := "import { join } from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { test } from \"node:test\";\nimport assert from \"node:assert\";\nimport strict from \"node:assert/strict\";\n"

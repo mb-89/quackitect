@@ -13,7 +13,7 @@ var walked = map[string]string{
 	"modules/clock/owns.yaml": "clock:\n  go: [time.Sleep]\n",
 	"modules/clock/clock.go":  "package clock\n\nimport \"time\"\n\nfunc Wait() { time.Sleep(1) }\n",
 	"modules/disk/owns.yaml":  "disk:\n  go: [os]\n  report: true\n",
-	"engine/wait/wait.go":     "package wait\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) } // want `time.Sleep walks around clock`\n",
+	"engine/wait/wait.go":     "package wait\n\nimport \"time\"\n\nfunc For() { time.Sleep(1) } // want `^time.Sleep walks around clock$`\n",
 	"engine/wait/marked.go":   "package wait\n\nimport \"time\"\n\n// level0: OutsideInDoors - a hung child needs a deadline\nfunc Hung() { time.Sleep(1) }\n",
 	"engine/wait/disk.go":     "package wait\n\nimport \"os\"\n\nvar Args = os.Args\n",
 }

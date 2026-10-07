@@ -15,7 +15,7 @@ import (
 const (
 	WalksAroundADoor = "WalksAroundADoor"
 	DoorDeclares     = "DoorDeclares"
-	walksSays        = "%s walks around %s. Reach it through the door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"
+	walksSays        = "%s. Reach it through a door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"
 	undeclaredSays   = "%s is a door, and no " + owns.File + " holds it. Declare what it owns in one beside it."
 	doorsFolder      = "src/doors"
 	sourceFolder     = "src/"
@@ -82,7 +82,7 @@ func walkFaults(tree *Tree, at string) []Finding {
 		if one.Marked || (one.Report && !held) {
 			continue
 		}
-		said := fault(WalksAroundADoor, at, one.Line, fmt.Sprintf(walksSays, one.Name, strings.Join(one.Doors, ", ")))
+		said := fault(WalksAroundADoor, at, one.Line, fmt.Sprintf(walksSays, one.Says()))
 		if one.Report {
 			said.Severity = SeverityHint
 		}
