@@ -226,7 +226,11 @@ export function listOf(said) {
           .replace(/^\[|\]$/g, "")
           .split(",")
   )
-    .map((one) => String(one).trim())
+    .map((one) =>
+      String(one)
+        .trim()
+        .replace(/^(["'])(.*)\1$/, "$2"),
+    )
     .filter(Boolean);
 }
 

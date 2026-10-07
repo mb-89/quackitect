@@ -41,6 +41,10 @@ func TestPFADeskEscalationInsertsAPersonStep(t *testing.T) {
 	if !shape.MatchString(now) {
 		t.Fatalf("the person step reads apart:\n%s", now)
 	}
+	at := leafOf(frontOf(now), "design/person-1")
+	if at == nil || at.By != byPerson || at.Leaves[at.At+1].Path != "design/draft" {
+		t.Fatalf("the person step stands %+v", at)
+	}
 	if held := one.d.holdOf(hand); held != nil && held.Step == "design/draft" {
 		t.Fatal("the hold on the escalated leaf stands")
 	}
@@ -122,6 +126,7 @@ func TestPFEscalationWithNoHoldNamesThePull(t *testing.T) {
 	if !regexp.MustCompile(`(?m)^refused`).MatchString(one.errs.String()) {
 		t.Fatalf("the refusal reads %q", one.errs.String())
 	}
+	holds(t, one.errs.String(), "no ticket file stands in your hand")
 	holds(t, one.errs.String(), "ticket pull")
 }
 
@@ -156,5 +161,9 @@ func TestPFTheEscalationReadsItsWords(t *testing.T) {
 	}
 	if got := wordsIn(""); len(got) != 0 {
 		t.Fatalf("an empty list reads %v", got)
+	}
+	rest := []string{"which", "--options", "a, b", "one", "--as", "helper-1"}
+	if askedIn(rest) != "which one" || !slices.Equal(wordsIn(flagIn(rest, optionsFlag)), []string{"a", "b"}) {
+		t.Fatalf("the question past the flags reads %q", askedIn(rest))
 	}
 }

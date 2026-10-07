@@ -8,9 +8,13 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/registry"
 	"quackitect/src/tui/tree"
@@ -65,6 +69,64 @@ func TestTheWorkTabDrawsOffWorkRowsAlone(t *testing.T) {
 	}
 	if grid.LinkOf == nil || grid.LinkOf(ticket) == "" || grid.LinkOf(todo) != "" {
 		t.Fatal("the ticket links to its note, and the todo links nowhere")
+	}
+	if rows := grid.Rows(120, 4); !strings.Contains(rows, draw.LinkOpen+"file://") || !strings.Contains(rows, "a-ticket.md") {
+		t.Fatalf("a name carries the link to its note, and the rows read %q", rows)
+	}
+	if bare := tree.NewTree(grid.Cols, grid.Items, true); strings.Contains(bare.Rows(120, 4), draw.LinkOpen) {
+		t.Fatal("a tree naming no addresses draws no link")
+	}
+	// The table draws the name, the flags and the queue alone: the nesting says the group, and the details draw the rest. [[spec/design_output/tui#the-work-tab]]
+	head := grid.Header(120)
+	for _, one := range []string{"name", "flags", "queue"} {
+		if !strings.Contains(head, one) {
+			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
+		}
+	}
+	for _, gone := range []string{"says", "state", "kind", "standing", "step", "group"} {
+		if strings.Contains(head, gone) {
+			t.Fatalf("the column %s stands off the table, and the names read %q", gone, head)
+		}
+	}
+}
+
+// A press on the mark before a group closes it, and a press again opens it. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func TestAPressOnTheMarkClosesTheGroupAndOpensItAgain(t *testing.T) {
+	t.Parallel()
+	fake := v1Fake(t)
+	fake.Values[rowsName] = []map[string]any{
+		{"name": "one-group", "kind": "group", "route": "group", "state": "open", "path": "spec/tickets/one-group.md", "queue": "1"},
+		{"name": "a-child", "kind": "ticket", "route": "trivial", "state": "open", "path": "spec/tickets/a-child.md", "queue": "1.1", "group": "one-group"},
+		{"name": "a-loose-one", "kind": "ticket", "route": "trivial", "state": "open", "path": "spec/tickets/a-loose-one.md", "queue": "2"},
+	}
+	tab := New(filepath.Join(t.TempDir(), ".se", ".log", "session.jsonl"))
+	tab.From = fake
+	m := frame.New(tab.Path, time.UTC, []frame.Tab{tab})
+	m.W, m.H = 120, 24
+	value, _ := json.Marshal(fake.Values[rowsName])
+	tab.Update(&m, registry.Change{Name: rowsName, Revision: 1, Value: value})
+	click := func(x int) {
+		next, _ := m.Update(tea.MouseMsg{X: x, Y: frame.FirstRow(), Button: tea.MouseButtonLeft, Action: tea.MouseActionPress})
+		m = next.(frame.Model)
+	}
+	if tab.Tree == nil || tab.Tree.Len() != 3 {
+		t.Fatalf("the group opens with its ticket under it, and the tab holds %v", tab.Tree)
+	}
+	// The mark stands past the gutter, the way every column does. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	if click(draw.GutterWide); tab.Tree.Len() != 2 || tab.Tree.At() != 0 {
+		t.Fatalf("a press on the mark closes the group, and %d rows stand", tab.Tree.Len())
+	}
+	if click(draw.GutterWide + 1); tab.Tree.Len() != 3 {
+		t.Fatalf("a press on the mark again opens it, and %d rows stand", tab.Tree.Len())
+	}
+	if click(6); tab.Tree.Len() != 3 {
+		t.Fatalf("a press on the name selects and toggles nothing, and %d rows stand", tab.Tree.Len())
+	}
+	if tab.Tree.OnMark(0) || !tab.Tree.OnMark(draw.GutterWide) || tab.Tree.OnMark(draw.GutterWide+tree.MarkWide) {
+		t.Fatal("the mark takes the two columns past the gutter on a group's row")
+	}
+	if rows := tab.Tree.Rows(120, 2); !strings.Contains(rows, "▌") {
+		t.Fatalf("the selected row wears the bar in the gutter, and the rows read %q", rows)
 	}
 }
 

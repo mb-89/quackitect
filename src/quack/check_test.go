@@ -292,9 +292,9 @@ func TestTestArgv(t *testing.T) {
 	if len(testParts) != 2 || !testParts[0].shared || testParts[1].shared {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
-	red := "test/level0/battery.test.js"
+	red := "test/level0/trust.test.js"
 	argv := testArgv(root, []string{red}, testParts[0])
-	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/pull-gate.test.js") {
+	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/chapter.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
 	for _, one := range argv {
@@ -554,13 +554,4 @@ func TestTestVerb(t *testing.T) {
 			t.Fatalf("the verb ran %v", fake.runs)
 		}
 	})
-}
-
-func TestCheckRegisters(t *testing.T) {
-	t.Parallel()
-	for _, words := range []string{"check", "test"} {
-		if registry[words] == nil {
-			t.Fatalf("the registry holds no %s, so quack hands it to node", words)
-		}
-	}
 }

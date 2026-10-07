@@ -21,13 +21,6 @@ const WANTS = [
     .matchAll(/^\s*want:\s+"([\w-]+)",$/gm),
 ].map((one) => one[1]);
 
-// The setup stamps through src/quack/brand.go, so brand.js stands as the review's module alone. [[spec/tickets/box-verbs-brand-caller]]
-test("brand.js carries no program entry of its own", () => {
-  const source = String(disk().read(join(root, "src", "scripts", "brand.js")));
-  assert.doesNotMatch(source, /^#!/);
-  assert.doesNotMatch(source, /process\.argv/);
-});
-
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
   for (const one of ["front", "index"]) {

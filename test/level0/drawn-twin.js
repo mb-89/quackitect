@@ -6,7 +6,7 @@
 
 import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
 import { graphIn, LEAF } from "../../src/scripts/graph.js";
-import { chapterOf } from "../../src/scripts/pull-chapter.js";
+import { chapterOf } from "../../src/scripts/chapter.js";
 import { CHECKED, leafOf } from "../../src/scripts/pull-route.js";
 
 const CHECKLIST = "checklist";
@@ -60,25 +60,4 @@ function headingLines(sections, path) {
     }
     return sections[at].line;
   };
-}
-
-// The fixtures the Go golden test seeds, and the file it holds the Go answer equal to. Run it with node from the root where a fixture or the emitter moves. [[spec/tickets/the-lens-reads-v1]]
-const TESTDATA = ["src", "modules", "tickets", "testdata"];
-const GOLDEN = "drawn.golden.json";
-const FIXTURE = /^drawn-.*\.md$/;
-const SEEDED = "spec/tickets/";
-
-if (process.argv[1]?.endsWith("drawn-twin.js")) {
-  const { readdirSync, readFileSync, writeFileSync } = await import("node:fs");
-  const { join } = await import("node:path");
-  const folder = join(...TESTDATA);
-  const said = {};
-  for (const name of readdirSync(folder)
-    .filter((one) => FIXTURE.test(one))
-    .sort())
-    said[`${SEEDED}${name}`] = drawnOf(readFileSync(join(folder, name), "utf8"));
-  writeFileSync(join(folder, GOLDEN), `${JSON.stringify(said, null, 2)}\n`);
-  console.log(
-    `${[...TESTDATA, GOLDEN].join("/")} holds ${Object.keys(said).length} tickets.`,
-  );
 }

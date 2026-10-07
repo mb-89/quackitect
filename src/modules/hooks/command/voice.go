@@ -29,17 +29,6 @@ func RefusesIn(found []Row) []Row {
 	return out
 }
 
-// The findings that break form alone, which the commit lands over. [[spec/tickets/cage-commit-guards-port]]
-func FormIn(found []Row) []Row {
-	var out []Row
-	for _, one := range found {
-		if !Refuses(one.Rule) {
-			out = append(out, one)
-		}
-	}
-	return out
-}
-
 // A message with its closing paragraph of trailers off, where every line of it reads as one. [[spec/tickets/cage-commit-guards-port]]
 func WithoutTrailers(text string) string {
 	paragraphs := paragraphBreak.Split(strings.TrimRightFunc(text, isSpace), -1)

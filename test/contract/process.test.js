@@ -15,11 +15,9 @@ import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
 import { proc } from "../../src/doors/proc.js";
 import { readsFor } from "../../src/scripts/guidance-hand.js";
-import { askRows, processAt } from "../../src/scripts/process.js";
-import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
-import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
+import { askRows, processAt, schemasHere } from "../../src/scripts/process.js";
+import { leafOf, leavesOf, stepPathOf, walkOf } from "../../src/scripts/pull-route.js";
 import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
-import { schemasHere } from "../../src/scripts/ticket.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));

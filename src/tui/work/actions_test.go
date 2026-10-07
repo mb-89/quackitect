@@ -67,6 +67,8 @@ func keyed(t *testing.T, m frame.Model, keys ...string) frame.Model {
 			msg = tea.KeyMsg{Type: tea.KeyEnter, Alt: true}
 		case "backspace":
 			msg = tea.KeyMsg{Type: tea.KeyBackspace}
+		case "tab":
+			msg = tea.KeyMsg{Type: tea.KeyTab}
 		}
 		for msg != nil {
 			next, cmd := m.Update(msg)
@@ -141,10 +143,19 @@ func TestThePlaceChordPostsWorkPlace(t *testing.T) {
 	t.Parallel()
 	m, tab, posted := actionWindow(t, everyResult)
 	selectRow(t, tab, "two-ticket")
-	keyed(t, m, "p", "1")
+	m = keyed(t, m, "p")
+	if !tab.Placing || !strings.Contains(tab.Notice, "1 to 9") {
+		t.Fatalf("p opens the chord and says what it waits for, and the tab says %q", tab.Notice)
+	}
+	m = keyed(t, m, "1")
 	posts := postsOf(t, *posted)
-	if len(posts) != 1 || posts[0]["action"] != "work/place" || posts[0]["name"] != "two-ticket" || posts[0]["n"] != float64(1) {
+	if tab.Placing || len(posts) != 1 || posts[0]["action"] != "work/place" || posts[0]["name"] != "two-ticket" || posts[0]["n"] != float64(1) {
 		t.Fatalf("p then 1 posts %v, and wants work/place with two-ticket at 1", posts)
+	}
+	selectRow(t, tab, "one-ticket")
+	keyed(t, m, "p", "x")
+	if tab.Placing || tab.Notice != "" || len(*posted) != 1 {
+		t.Fatalf("a key that is no digit drops the chord and posts nothing, and the tab says %q", tab.Notice)
 	}
 	wroteNothing(t, tab)
 }
@@ -156,13 +167,17 @@ func TestTheUrgentKeyPostsFlipUrgentForEveryMarkedRow(t *testing.T) {
 	tab.Tree.Mark()
 	selectRow(t, tab, "two-ticket")
 	tab.Tree.Mark()
-	keyed(t, m, "u")
+	m = keyed(t, m, "u")
 	posts := postsOf(t, *posted)
 	if len(posts) != 2 || posts[0]["action"] != "tickets/flip-urgent" || posts[1]["action"] != "tickets/flip-urgent" {
 		t.Fatalf("u over two marked rows posts %v, and wants tickets/flip-urgent twice", posts)
 	}
 	if names := []any{posts[0]["name"], posts[1]["name"]}; !(names[0] == "one-ticket" && names[1] == "two-ticket" || names[0] == "two-ticket" && names[1] == "one-ticket") {
 		t.Fatalf("u posts for %v, and wants both marked rows", names)
+	}
+	// The todo takes no key of its own, because a place is the todo. [[spec/design_output/pull#a-todo-forces-a-place]]
+	if keyed(t, m, "t"); len(*posted) != 2 {
+		t.Fatal("t posts nothing")
 	}
 	wroteNothing(t, tab)
 }
@@ -173,10 +188,13 @@ func TestAnEditPostsSetFieldForEveryRowItWrites(t *testing.T) {
 	selectRow(t, tab, "one-ticket")
 	tab.Tree.CursorTo(len(tab.Tree.Cols) - 1)
 	m = keyed(t, m, "e")
-	if !tab.Tree.Editing() {
-		t.Fatalf("e opens no edit on the group, and the tab says %q", tab.Notice)
+	if !tab.Tree.Editing() || tab.Tree.Typed() != "a-group" {
+		t.Fatalf("e opens the edit on the group the cell holds, and the edit holds %q and the tab says %q", tab.Tree.Typed(), tab.Notice)
 	}
 	keyed(t, m, "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "b", "enter")
+	if tab.Tree.Editing() {
+		t.Fatal("enter closes the edit")
+	}
 	posts := postsOf(t, *posted)
 	if len(posts) != 1 || posts[0]["action"] != "tickets/set-field" || posts[0]["name"] != "one-ticket" || posts[0]["field"] != "group" || posts[0]["value"] != "b" {
 		t.Fatalf("an edit of the group posts %v, and wants tickets/set-field on one-ticket with group b", posts)
@@ -214,8 +232,52 @@ func TestAValueTheSchemaRefusesPostsNothing(t *testing.T) {
 	selectRow(t, tab, "one-ticket")
 	tab.Tree.Cols = append(tab.Tree.Cols, tree.Column{Name: "step", Key: "step", Wide: tree.ColumnWide})
 	tab.Tree.CursorTo(len(tab.Tree.Cols) - 1)
-	keyed(t, m, "e")
+	m = keyed(t, m, "e")
 	if len(*posted) != 0 || !strings.Contains(tab.Notice, "the verbs' to write") {
 		t.Fatalf("an edit of the step posts %d times, and the tab says %q, and wants no post and the schema's reason", len(*posted), tab.Notice)
 	}
+	tab.Tree.Cols = append(tab.Tree.Cols, reasonAndUrgent...)
+	tab.Tree.CursorTo(len(tab.Tree.Cols) - 2)
+	m = keyed(t, m, "e", "l", "a", "t", "e", "r", "enter")
+	if len(*posted) != 0 || !strings.Contains(tab.Notice, "reason takes done, dropped, became, answered alone") || !strings.Contains(tab.Notice, "one-ticket keeps the value") {
+		t.Fatalf("a refused value posts %d times, and the tab says %q, and wants no post and the schema's reason naming the row", len(*posted), tab.Notice)
+	}
+	if !strings.Contains(m.View(), "reason takes done") {
+		t.Fatal("the reason draws in the tab")
+	}
+	tab.Tree.CursorTo(len(tab.Tree.Cols) - 1)
+	keyed(t, m, "e", "backspace", "backspace", "backspace", "backspace", "backspace", "m", "alt+enter")
+	if len(*posted) != 0 || !strings.Contains(tab.Notice, "urgent takes a boolean") || !strings.Contains(tab.Notice, "one-ticket, two-ticket") {
+		t.Fatalf("a refused fill posts %d times, and the tab says %q, and wants no post and every row it leaves named", len(*posted), tab.Notice)
+	}
+	wroteNothing(t, tab)
+}
+
+var reasonAndUrgent = []tree.Column{{Name: "reason", Key: "reason", Wide: tree.ColumnWide}, {Name: "urgent", Key: "urgent", Wide: tree.ColumnWide}}
+
+// [[spec/design_output/tree-view#the-completion-knows-the-field]]
+func TestTabTakesTheOfferTheSchemaNamesAndEnterPostsIt(t *testing.T) {
+	t.Parallel()
+	m, tab, posted := actionWindow(t, everyResult)
+	selectRow(t, tab, "one-ticket")
+	tab.Tree.Cols = append(tab.Tree.Cols, reasonAndUrgent...)
+	tab.Tree.CursorTo(len(tab.Tree.Cols) - 2)
+	m = keyed(t, m, "e")
+	if got := strings.Join(tab.Tree.Offer(), " "); got != "done dropped became answered" {
+		t.Fatalf("the reason offers the four the schema names, and offers %q", got)
+	}
+	if !strings.Contains(m.View(), "tab takes done · dropped") {
+		t.Fatal("the offer draws on the tab's last line")
+	}
+	m = keyed(t, m, "d", "r", "tab", "enter")
+	posts := postsOf(t, *posted)
+	if len(posts) != 1 || posts[0]["name"] != "one-ticket" || posts[0]["field"] != "reason" || posts[0]["value"] != "dropped" {
+		t.Fatalf("tab takes the offer and enter posts it, and the fake keeps %v", posts)
+	}
+	tab.Tree.CursorTo(len(tab.Tree.Cols) - 1)
+	keyed(t, m, "e", "backspace", "backspace", "backspace", "backspace", "backspace")
+	if got := strings.Join(tab.Tree.Offer(), " "); got != "true false" {
+		t.Fatalf("a flag offers the two it takes, and offers %q", got)
+	}
+	wroteNothing(t, tab)
 }
