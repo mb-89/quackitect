@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["level0-hooks-forward-to-go"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ece632a1d59398afb06e28d4eb3429c4ed450c79
+    hash_after: ece632a1d59398afb06e28d4eb3429c4ed450c79
+    inputs:
+      - name: ask
+        hash: 59a99ef00dc8c07d
+        size: 670
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +168,114 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. The thirteen cage libraries leave: bash, bash-test, code, commit-reads, git-writes, pulled, scripted, shell-values, tokens, verb-line, trunk, cloud, markers.
+2. No staying library imports a leaving one. Inside lib, the leaving set imports only itself, names.js, private.js, vale.js, folders.js and group.js.
+3. test/level0/trunk.test.js and markers.test.js leave whole, since each reads a leaving library alone.
+4. test/level0/cloud-desk.test.js drops its three cloud cases and moves by git mv to test/level0/ticket-folders.test.js.
+5. Its two folder cases stay, since they read apply.js, folders.js and named.js, which later slices take.
+6. writes-here.test.js drops the inCloud import and its cloud case. Its writesHere cases stay with ticket.js.
+7. fixtures.js drops OPENS, PARTS, SHUTS and conflicted, since markers.test.js alone reads them.
+8. src/doors/fake/git.js spells const TRUNK = main, with a pointer at Trunk in src/modules/hooks/command/trunk.go.
+9. tree.test.js drops the VERBS case and its bash.js import. src/quack/verb_line_test.go holds that case in Go.
+10. describe.go exports LineVerbs, a copy of lineVerbs, so the quack test reads the line verbs through the interface.
+11. New command/cloud.go holds CloudVariables and InCloud(get func(string) string). quack commandSettings calls it, and its own cloudVariables leave.
+12. trunk_test.go gains the missing trunk.test.js rows in its two existing table tests.
+13. New command/guards_test.go holds one VersionGuard table over every delete, force and plain-push row.
+14. findings_test.go drops its two VersionGuard asserts, and its test becomes TestTheBlessGuardReadsTheBlessAndTheHand.
+15. commits_test.go gains a desk guard table over cloud and branch: work, main, claude/a-thing, cloud on work.
+16. check/markers_test.go turns into a table and gains the lone-closer row. branches/hook_reads_test.go gains the unmerged and empty rows.
+17. Every Go comment naming a leaving file drops the off-lib clause, since the Go file now owns the rule.
+18. bash.md, level0.md, lsp.md, migration.md, private.md and work.md name the Go owner in place of each leaving file.
+19. src/quack/cage_libs_test.go globs the leaving libraries and the two leaving tests, plus cloud-desk.test.js, and stays red until they leave.
+Weighed: adding cloud rows to src/quack/hooks_test.go alone. done_when names go test ./src/modules/hooks, so the rule moves under command.
+Weighed: keeping a JS VERBS copy in tree.test.js with a pointer. That keeps a twin the owner asks gone.
+Weighed: driving the wired door describe from quack. The world store may list verb tools, so the line names tools, not verbs.
+Weighed: keeping cloud-desk.test.js by name. Its cases then hold no cloud and no desk, which misleads a reader.
+Assumed: the markers cases count by their Go owners in src/modules/check, src/branches and src/pull, which ./RUNME.sh check runs.
+Assumed: the stagesIn case takes no port. Go reads stages through Repo.Show in branches/sync.go, and repo_contract_test holds Unmerged.
+Assumed: the named merge in deskRefusal belongs to the pull, and port_d_desk_test.go and deskRefused in src/pull hold it.
+Assumed: the cloudHere flag-first case stands held by TestADeskPassStandsOnThisBoxWhateverTheEnvironmentSays in src/pull.
+Assumed: src/pull and src/branches keep their own cloudVars, since the import rule refuses one module importing another.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/doors/fake/git.js: refOf behind fakeTrunk, which reads TRUNK from lib/trunk.js
+- test/contract/tree.test.js: the verb case, which reads VERBS from lib/bash.js
+- test/level0/cloud-desk.test.js: onDesk, cloudHere and deskRefusal cases reading lib/cloud.js
+- test/level0/writes-here.test.js: the cloud test case, which reads inCloud from lib/cloud.js
+- test/level0/trunk.test.js: every case, reading landsOnTrunk, touchesGit, versionRefs and refusedVersion
+- test/level0/markers.test.js: every case, reading markersIn, markedIn, stagesIn, mergeRefusal and unmergedFault
+- test/level0/fixtures.js: OPENS, PARTS, SHUTS and conflicted, read by markers.test.js alone
+- src/quack/command.go: commandSettings, which reads cloudVariables, and the comment naming lib/cloud.js
+- src/quack/hooks_test.go: TestTheCommandSettingsReadTheRootAndTheBox, which reads cloudVariables
+- src/modules/hooks/describe.go: lineVerbs, which gains the exported LineVerbs
+- src/modules/hooks/command: findings.go, gitwrites.go, pulled.go, scripts.go, reads.go, tokens.go, writes.go, voice.go, trunk.go, guards.go headers
+- src/modules/hooks/command/trunk_test.go: header comment naming lib/trunk.js
+- src/modules/hooks/command/findings_test.go: TestTheGuardsReadTheBlessAndTheVersions, whose version asserts move to guards_test.go
+- src/modules/lsp/tools.go: the two comments naming lib/code.js
+- spec/design_output: bash.md, level0.md, lsp.md, migration.md, private.md and work.md lines naming leaving files
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/cage_libs_test.go: TestTheCageLibrariesStandNowhere
+- src/quack/verb_line_test.go: TestEveryVerbTheBashLineNamesStandsRegistered
+- src/modules/hooks/command/cloud_test.go: TestInCloudReadsEitherVariableAndAFlatValueReadsFalse
+- src/modules/hooks/command/guards_test.go: TestTheVersionGuardReadsEveryVersionWrite
+- src/modules/hooks/command/trunk_test.go: TestTouchesGitReadsNestedGit, gaining the read-only and quoted rows
+- src/modules/hooks/command/trunk_test.go: TestLandsOnTrunkReadsTheBridgesLanding, gaining the nested, flag, verb and bare-push rows
+- src/modules/hooks/commits_test.go: TestTheDeskGuardRefusesAWorkBranchOffTheCloudAlone
+- src/modules/check/markers_test.go: TestMarkerLinesNameEachMarkOfAMerge, as a table gaining the lone-closer row
+- src/branches/hook_reads_test.go: TestMergeRefusalNamesEachUnmergedPathAndMarker, as a table gaining the unmerged and empty rows
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib: bash, bash-test, code, commit-reads, git-writes, pulled, scripted, shell-values, tokens, verb-line, trunk, cloud, markers
+- test/level0/trunk.test.js
+- test/level0/markers.test.js
+- test/level0/cloud-desk.test.js, moved to test/level0/ticket-folders.test.js
+- test/level0/writes-here.test.js
+- test/level0/fixtures.js
+- test/contract/tree.test.js
+- src/doors/fake/git.js
+- src/modules/hooks/command: cloud.go, cloud_test.go, guards.go, guards_test.go, findings.go, findings_test.go, gitwrites.go, pulled.go, reads.go, scripts.go, tokens.go, trunk.go, trunk_test.go, voice.go, writes.go
+- src/modules/hooks/describe.go
+- src/modules/hooks/commits_test.go
+- src/modules/check/markers_test.go
+- src/branches/hook_reads_test.go
+- src/modules/lsp/tools.go
+- src/quack/command.go
+- src/quack/hooks_test.go
+- src/quack/verb_line_test.go
+- src/quack/cage_libs_test.go
+- spec/design_output: bash.md, level0.md, lsp.md, migration.md, private.md, work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened and checked: each lib import, the Go guards, deskGuard, MergeRefusal, markerLines, describe.go, registry
+- the callers come from git grep on each leaving file over hooks, src, test, RUNME.sh, .github, package.json, .vale.ini, Go comments and notes
+- TestTheCageLibrariesStandNowhere decides the first two lines, go test ./src/modules/hooks/... with the new rows the third, and ./RUNME.sh check at tests-green the fourth
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
