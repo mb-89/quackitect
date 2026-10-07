@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: level-zero-becomes-a-typed-mod
 parent: level0-tests-move-to-plugin-test
+record:
+  - step: do
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: e0042338e53dcd4d4843b88b2bb6ca18a0006414
+    hash_after: abc6b43d7961f79ad7dfb627788fbacb1b27fb8d
+reason: became
+successors: [level0-tests-move-to-plugin-test]
 ---
 
 # Ask
