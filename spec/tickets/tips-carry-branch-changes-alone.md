@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c15bc62210a85ef6
         size: 431
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 93833b9ab510cea3e362c42bd278b42cb2a0604e
+    hash_after: 93833b9ab510cea3e362c42bd278b42cb2a0604e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/tickets fails
+    inputs:
+      - name: design/draft
+        hash: 59055ecaa00ed26d
+        size: 2620
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -227,26 +240,32 @@ A tip carries its ticket-folder diff against trunk, and the tickets module lays 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/git src/modules/tickets
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_contract_test.go
+- src/modules/tickets/branches_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each fails on its own assertion: the suite answers every branch file with no Gone, the live tips carry 205077886 bytes over 32 branches against the 64 MiB cap, and the branch reads no child off trunk. Surprise: the pull judges the last output line, so a bare go test reads as no assertion, and the tree's runner prints it. The Gone field lands with the tests and its JSON round trip, so they compile and fail on the assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when's first half meets the suite's rewritten want on the fake and the real repo, and its second half meets TestTheLiveTipsLandUnderTheBusCap
+- git reaches the fake through FakeGit and the real repo in one suite, and the tickets case reaches only the fake index
 
 # gate
 

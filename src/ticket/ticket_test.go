@@ -27,7 +27,7 @@ func TestABareTicketWritesNoneOfTheQueuesFields(t *testing.T) {
 
 // A tip and a branch round-trip through JSON whole, since the index hands them to a reader over the wire. [[spec/tickets/the-index-reads-standing-branches]]
 func TestATipAndABranchRoundTripThroughJSON(t *testing.T) {
-	tip := Tip{Name: "a-group", Trunk: "trunk's copy", Files: []File{{Path: "spec/tickets/a-group.md", Text: "the tip's copy"}}}
+	tip := Tip{Name: "a-group", Trunk: "trunk's copy", Files: []File{{Path: "spec/tickets/a-group.md", Text: "the tip's copy"}}, Gone: []string{"spec/tickets/dropped.md"}}
 	branch := Branch{Name: "a-group", Merged: true, Ticket: Ticket{Name: "a-group"}, Children: []Ticket{{Name: "a-child", Group: "a-group"}}}
 	for _, one := range []any{tip, branch} {
 		text, err := json.Marshal(one)
