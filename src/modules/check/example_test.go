@@ -75,6 +75,7 @@ func TestAStandardTicketNamingNoExampleTakesAWarning(t *testing.T) {
 		"spec/tickets/proved.md":  ticket("open", "standard", "spec/examples/110_tickets/pull.md holds"),
 		"spec/tickets/closed.md":  ticket("closed", "standard", "the verb answers"),
 		"spec/tickets/trivial.md": ticket("open", "trivial", "the verb answers"),
+		"spec/tickets/later.md":   strings.Replace(ticket("open", "standard", "the verb answers"), "exits 0\n", "exits 0\n- spec/examples/110_tickets/pull.md holds\n", 1),
 	})
 	got := warned(t, exampleProves(tree), "ExampleProves")
 	if len(got) != 1 || got["spec/tickets/bare.md"] != 13 {
