@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -135,6 +135,19 @@ record:
         hash: 5245c4fe35ade37e
         size: 8237
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: cbbdee33ce96b27a9bddf985588bd876735d0e71
+    hash_after: cbbdee33ce96b27a9bddf985588bd876735d0e71
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 83dc7b7ceca2dc35
+        size: 2113
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -230,26 +243,31 @@ The door-facing features take no list of their own here. A feature a user reache
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/check/example_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cases plant a tree of texts: two verbs registered in quack, one registered in a test file the rule skips, two tabs, one example naming one verb and one tab, and four tickets on the two routes and states. The rules stand as stubs answering nothing, so each case fails on its own assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the verb, the tab and the standard ticket, each on a planted tree, and the check at the end
+- the cases reach no door: the tree is texts in memory
 
 # gate
 
