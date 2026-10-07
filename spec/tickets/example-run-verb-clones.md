@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -148,6 +148,18 @@ record:
         hash: 38bc371b8dffa4b7
         size: 2120
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 1e361f08e8892feef759ea2a9838c12fde27746b
+    hash_after: 1e361f08e8892feef759ea2a9838c12fde27746b
+    inputs:
+      - name: design/draft
+        hash: 38bc371b8dffa4b7
+        size: 2120
+      - name: design/tests-red
+        hash: 38211288a03a4098
+        size: 763
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -277,8 +289,10 @@ The byte-for-byte case passes over the stub, since a verb doing nothing leaves t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- example-run-pauses-between-steps: the owner says an interactive run shows each command before it runs and pauses between steps until the user presses Enter, and the approach runs every step straight through; the builder prints the call before it runs, waits on a line of input between steps, runs straight through where the input is no terminal, and adds a case feeding the input
 
 # implement
 
