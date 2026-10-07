@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
+state: open
 step: retro/cloud
 steps:
   - name: sync
@@ -271,6 +271,12 @@ record:
         hash: 4625134cbd0d0ff1
         size: 2010
     def: 4da1ca5da87d5bbc
+  - step: retro/cloud
+    hand: box 612227244607 · claude-code-remote
+    hash_before: e73e7d66b102f21c014c332b538c7ad0d506a85e
+    hash_after: e73e7d66b102f21c014c332b538c7ad0d506a85e
+    returns: 2
+    why: the hand takes it back
 reason: done
 ---
 
