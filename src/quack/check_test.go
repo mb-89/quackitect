@@ -132,12 +132,12 @@ func TestCheckParts(t *testing.T) {
 			}
 		}
 	})
-	t.Run("the plugin part validates the plugin, and passes where claude stands nowhere", func(t *testing.T) {
+	t.Run("the plugin part validates the plugin strictly, and passes where claude stands nowhere", func(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"claude": 1}}
 		if code := partNamed(partsOf(fake.doors(), nil, false), "plugin").run(); code != 1 {
 			t.Fatalf("a refused plugin answers %d", code)
 		}
-		if !reflect.DeepEqual(fake.runs, [][]string{{"claude", "plugin", "validate", filepath.Join(".claude", "skills", "level0")}}) {
+		if !reflect.DeepEqual(fake.runs, [][]string{{"claude", "plugin", "validate", "--strict", filepath.Join(".claude", "skills", "level0")}}) {
 			t.Fatalf("the plugin part ran %v", fake.runs)
 		}
 		gone := &checkFake{gone: map[string]bool{"claude": true}}

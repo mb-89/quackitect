@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: b1fcb495716c6933
         size: 915
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box eabbd46a6a23 · claude-code-remote
+    hash_before: 44102444e963f14a35b1a844dfcf1245c2d72291
+    hash_after: 44102444e963f14a35b1a844dfcf1245c2d72291
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 745a1714cb407b2b
+        size: 1713
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +241,31 @@ the approach adds no config key
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The plugin part case fails on its argv: the part runs validate without --strict. On this box validate --strict already passes over the plugin, so the switch costs nothing today. No smoke check repeats a proof validate gives, and the table under Discussion says so check by check.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the strict line and the refusing validate line meet the plugin part case, the smoke line meets the table under Discussion, which the gate answers, and the check line meets the check
+the plugin part case reaches claude through the check fake
 
 # gate
 
@@ -328,3 +346,17 @@ the approach adds no config key
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+What `claude plugin validate --strict` reads stands apart from what each smoke check reads, so the smoke drops none:
+
+| smoke check | what it reads | validate reads it |
+|---|---|---|
+| door | the standing file the Go door writes at start | no, the door is Go at runtime |
+| rules | the context row carrying the named blocks | no, the rules come off the Go door |
+| prompt | an owner prompt rewritten with the answer-first line | no, the door rewrites it at runtime |
+| tools | the tools the hook registers off the door | no, validate names the noun and registers nothing |
+| guard | a read passing and a guarded call refused | no, the refusal comes off the door |
+| canary | the door hearing the canary off the answer text | no, the stream reaches the door at runtime |
+| quiet | every post reaching the hooks door | no, validate posts nothing |
+
+Validate reads the manifest, `hooks/hooks.json`, the module parse, the hooks it names, the nouns its source touches and the env it reads.
