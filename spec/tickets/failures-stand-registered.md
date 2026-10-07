@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -161,6 +161,15 @@ record:
     hand: box bf9a9fb67fb5 · claude-code-remote
     hash_before: 5caf10b9ac63f668859492a1201fbfe1cea274d4
     session: cse_01JR49WAMwFsp1GuB8FX2Gz2
+  - step: split
+    hand: box bf9a9fb67fb5 · claude-code-remote
+    hash_before: 20abc40a6547556f62ae0f6a57a19a7baffbe6b5
+    hash_after: 20abc40a6547556f62ae0f6a57a19a7baffbe6b5
+    inputs:
+      - name: ask
+        hash: 8602fdf90b84396a
+        size: 1198
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -197,6 +206,9 @@ Every failure the tree raises takes its registered name, the way a log call take
 <!-- the form is list -->
 
 - [[spec/tickets/check-skips-named-red-tests]] trivial
+- [[spec/tickets/desk-refusal-test-follows]] trivial
+- [[spec/tickets/desk-remedy-names-the-group]] trivial
+- [[spec/tickets/desk-size-names-the-door]] trivial
 - [[spec/tickets/failure-check-refuses]] standard
 - [[spec/tickets/failure-count-skips-no-id]] trivial
 - [[spec/tickets/failure-door-raises]] standard
@@ -210,6 +222,9 @@ Every failure the tree raises takes its registered name, the way a log call take
 - [[spec/tickets/failure-verbs-raise-and-register]] standard
 - [[spec/tickets/failure-watch-shape]] trivial
 - [[spec/tickets/failures-and-the-sentinel]] standard
+- [[spec/tickets/go-pull-desk-remedy-once]] trivial
+- [[spec/tickets/hooks-test-reads-fired-row]] trivial
+- [[spec/tickets/index-survives-a-long-call]] standard
 - [[spec/tickets/js-refusals-move]] trivial
 - [[spec/tickets/mint-refusals-keep-ids]] trivial
 - [[spec/tickets/moved-owns-the-files]] trivial
@@ -219,16 +234,23 @@ Every failure the tree raises takes its registered name, the way a log call take
 - [[spec/tickets/sentinel-callers-list-whole]] trivial
 - [[spec/tickets/sentinel-fires-watches]] standard
 - [[spec/tickets/sentinel-note-names-the-runner]] trivial
+- [[spec/tickets/sentinel-say-error-lands]] trivial
 - [[spec/tickets/take-moves-stands-refusals]] trivial
+- [[spec/tickets/the-hooks-feed-the-sentinel]] standard
+- [[spec/tickets/the-twins-leave-whole]] standard
+- [[spec/tickets/the-twins-retire]] trivial
+- [[spec/tickets/wiring-names-listens-hooks]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every child is small enough to review whole: each standard child is one slice of the split's order, and each trivial child one fix a review named
-- the children add up to the goal: the node shape, the door and its twin, the check, the sentinel, the verbs and the move of the pull, take and mint refusals each close under a child
-- a child that waits names it under depends_on: the check, the verbs and the sentinel name the nodes and the door, and failures-and-the-sentinel names the five slices
+- Each standard child carries one slice of the split, and each trivial child carries one finding a review met, so a reviewer reads each whole.
+- The slices cover the goal in its order: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register, then js-refusals-move, take-moves-stands-refusals and the-twins-leave-whole for the pull, take and mint refusals.
+- failure-door-raises, failure-check-refuses, sentinel-fires-watches and failure-verbs-raise-and-register name failure-nodes-stand and failure-door-raises under depends_on.
+- Each child reads the node shape and the door its depends_on names, and the closes landed in that order on this branch.
+- The group stays one branch: every child stands closed, and no new slice grows the diff, so no further split is needed.
 
 # children
 
