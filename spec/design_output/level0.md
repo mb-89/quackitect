@@ -982,11 +982,18 @@ the language server. Those stay wants, and every rule holds without them.
 ## The boot hook
 
 A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
-through node. On a cloud box lacking the plugin manifest, it runs
-`src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
-off a cloud box, it runs nothing. A failed install holds no session up. The
-hook's `timeout` waits out `STARTING`, the span the start road allows the same
-install, so the client cuts no install short before the manifest lands.
+through node. Where the session starts decides its road:
+
+| where the session starts | what the hook does | why it stays a settings hook |
+|---|---|---|
+| a cloud box lacking the plugin manifest | runs `src/scripts/install.sh` under `INSTALL_SKIP` | the client scans plugins before any hook of a mod runs |
+| a cloud box where the manifest stands | runs nothing | |
+| a desk | hands its hook input to the start verb, and prints the stop the verb answers | a session loading no plugin holds no mod hook to refuse it |
+
+A failed install holds no session up, and neither does a start verb that
+fails, stands missing or outlives `ASKING`. The hook's `timeout` waits out
+`STARTING`, the span the start road allows the same install, so the client cuts
+no install short before the manifest lands.
 
 Where the manifest stands the plugin loads. The start road of
 [[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the
@@ -1017,7 +1024,7 @@ each for its reason:
 
 | piece | why it stays |
 |---|---|
-| the boot hook in `.claude/settings.json` | it installs the plugin manifest, which git ignores since each box stamps its brand into it. The client scans plugins before any hook of a mod runs |
+| the boot hook in `.claude/settings.json` | it installs the plugin manifest on a cloud box, and it asks the start verb at a desk. Git ignores the manifest, since each box stamps its brand into it. [[spec/design_output/level0#the-boot-hook]] names each road and why it stays |
 | function hooks over settings command hooks alone | the handover clears its own session: `$.command.run` runs `/clear`, then `$.prompt.submit` hands the resume prompt, and a settings command hook answers the client and runs neither |
 
 The cold probe of [[spec/design_output/level0#the-cold-probe]] runs a fresh
