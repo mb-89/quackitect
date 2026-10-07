@@ -25,7 +25,7 @@ export type World = {
   registered: string[];
 };
 
-// The events a test raises, whole as the engine raises them.
+// The events a test raises, whole as the engine raises them. [[spec/tickets/level0-tests-move-to-plugin-test]]
 export const START = { cwd: "/tree", surface: null } as never;
 export const DONE = { answer: "", durationMs: 1, isAborted: false, reason: "answer" } as never;
 export const STEP = { turnId: "t1", index: 0, model: "m", messageCount: 1 } as never;
@@ -109,7 +109,7 @@ export function world(on: On, given: Partial<World> = {}): World {
   return w;
 }
 
-// A run whose argv names the word answers what the table gives it, and every other run answers empty.
+// A run whose argv names the word answers what the table gives it, and every other run answers empty. [[spec/tickets/level0-tests-move-to-plugin-test]]
 export function answering(table: Record<string, Partial<Ran> | null>): World["run"] {
   return (argv) => {
     const word = Object.keys(table).find((one) => argv.includes(one));
@@ -119,7 +119,7 @@ export function answering(table: Record<string, Partial<Ran> | null>): World["ru
   };
 }
 
-// The step the door answers an event with, by event, and an empty step for the rest.
+// The step the door answers an event with, by event, and an empty step for the rest. [[spec/tickets/level0-tests-move-to-plugin-test]]
 export function stepping(table: Record<string, unknown>): World["door"] {
   return (path, body) => (path === "hook" ? { step: table[body.event] ?? {} } : (table[path] ?? null));
 }
