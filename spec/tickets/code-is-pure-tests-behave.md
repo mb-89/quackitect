@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -105,6 +105,15 @@ record:
     hand: box 55abcb1f8a0e · claude-code-remote
     hash_before: 3ea213a055681ddee87983cff28a0f40c6867b1e
     session: cse_014fS4XHZJWsqGUfiSfzs8zR
+  - step: sync
+    hand: box 55abcb1f8a0e · claude-code-remote
+    hash_before: 369b780e400fbe7d3dc12b34530dbadec0749394
+    hash_after: 9e2137fb2735aa96afb5ef9322293ab1749ba730
+    answered:
+      - name: sync
+        exit: 0
+        said: work/code-is-pure-tests-behave already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -129,8 +138,9 @@ Each analyzer or measure lands in report mode first, listing offenders, then the
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
