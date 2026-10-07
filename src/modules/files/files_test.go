@@ -57,7 +57,10 @@ func TestAPushedChangeReachesTheFamily(t *testing.T) {
 	}
 }
 
-// The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder. [[spec/tickets/tickets-becomes-a-module]]
+// A built program's first bytes, which a text file never holds. [[spec/tickets/sweep-reads-tracked-after-restart]]
+const binaryBody = "\x7fELF\x02\x01\x01\x00"
+
+// The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder, and no binary file. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 	root := t.TempDir()
 	disk := NewDisk(root)
@@ -65,6 +68,9 @@ func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 		if err := disk.Write(path, "said"); err != nil {
 			t.Fatal(err)
 		}
+	}
+	if err := disk.Write("quack", binaryBody); err != nil {
+		t.Fatal(err)
 	}
 	c := q.New()
 	hand := Registers(c)
@@ -86,7 +92,7 @@ func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 	if got, _ := read.Read("files/.se/.runtime/plan.json").(q.Content); got.Text != "said" {
 		t.Fatalf("the plan reads %+v", got)
 	}
-	for _, path := range []string{"files/.se/.runtime/bin/tool.json", "files/.git/HEAD"} {
+	for _, path := range []string{"files/.se/.runtime/bin/tool.json", "files/.git/HEAD", "files/quack"} {
 		if got := read.Read(path); got != (q.Content{}) {
 			t.Fatalf("%s reads %+v", path, got)
 		}

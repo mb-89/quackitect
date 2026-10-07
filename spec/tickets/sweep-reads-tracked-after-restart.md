@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: f241581ca84384d8
         size: 425
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 3dbf4cb9b3dbd60e2fdd0d770cee8ac987fec046
+    hash_after: 3dbf4cb9b3dbd60e2fdd0d770cee8ac987fec046
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/files fails
+    inputs:
+      - name: design/draft
+        hash: ec101ae395b95f41
+        size: 1914
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,32 @@ config keys: the approach adds none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go
+- src/modules/files/watch_contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The seed case reads files/quack holding the binary, and the contract case hears the watch hand quack, on the fake and the real watch alike. The surprise: the IO process exits whole on one instance's start, so a seed past the bus cap takes git down beside the watch. Its stderr reaches /dev/null once the index runs as a daemon, so the fault shows nowhere but the empty ports.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+done_when: the lint line meets the seed case, which fails on the binary the seed carries, and the hand reads the lint once the fix lands
+fakes: the tests reach the disk and the watch, and FakeDisk and FakeWatch stand for both under one contract suite
 
 # gate
 
