@@ -144,6 +144,22 @@ record:
     hand: the engine
     hash_before: a31b6f23641c85d19924a2d6e7c39467e0d09fd2
     hash_after: a31b6f23641c85d19924a2d6e7c39467e0d09fd2
+  - step: accept
+    hand: box 612227244607 · claude-code-remote
+    hash_before: 6040751f7693a724e04dd5feea1d4c2345651e9c
+    hash_after: 6040751f7693a724e04dd5feea1d4c2345651e9c
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lint-without-vale already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b1429804df0c41dd
+        size: 958
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -219,7 +235,7 @@ the diff stands past one review, and every child stands closed, so the group goe
 <!-- the form is verdict -->
 
 accept with points
-- vale-comments-leave-the-code: comments and names still describe Vale where the Go rules run. These are the doc comments of commitVoice, heard, valeHeard, heardOver and heardIn in src/quack/command.go, with valeHeard renamed. They also take the header and the faultIn message of .claude/skills/level0/lib/vale.js, and TestCommitVoiceReadsNothingWhereNoValeStands in src/quack/commit_voice_test.go. The layer's opening says Vale holds the mechanical rules, in src/modules/hooks/brief/layer.go, src/projection/style.go and lib/guidance.js, and the projection writes it again. Since main took the readers out, src/doors/vale.js and teachRules in test/level0/quack-doors.js stand with no caller past their own contract tests, so they leave too.
+- drafts-name-no-vale: the drafts module still names Vale in what it answers (noVale and valeUnread in src/modules/drafts/answer.go, unranWhy in src/modules/drafts/prose.go) though the Go rules run the lint, and spec/design_output/level0.md and spec/design_output/pull.md still describe `vale fix --apply` and voiceOver handing Vale a file. Word each for the Go rules, and keep the VoiceVale style name and the marker spelling that go-rules-rename-voicevale keeps
 
 # retro
 
