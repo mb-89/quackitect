@@ -1,5 +1,4 @@
-// Whether a hand works a leaf: one answer for the pull and the write door,
-// off the cases test/level0/writes-here.test.js held.
+// Whether a hand works a leaf: one answer for the pull and the write door.
 // [[spec/tickets/the-one-answer-takes-shape]]
 package pull
 

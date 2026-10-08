@@ -1,6 +1,5 @@
 // A new route lands on a ticket: the front in the schema's order, and each
-// chapter keeping what a hand wrote under it, each want what reRouted in
-// lib/schema-mint.js writes over the same text.
+// chapter keeping what a hand wrote under it.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package check
 

@@ -209,7 +209,7 @@ where the leak starts.
 | a person, in a terminal | `.githooks/pre-commit`, which git runs |
 
 Both call `privateNow` over the same delta, so the two refuse the same thing in
-the same words, and `refusedDelta` in `lib/refuse.js` writes those words once.
+the same words, and `RefusedDelta` in `src/modules/hooks/command/private.go` writes those words once.
 
 `privateNow` takes a reach the table below names, and each caller builds its
 own:

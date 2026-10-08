@@ -114,16 +114,6 @@ and no port. For details, see
 `FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
 
-# A script guards its main
-
-A script that dispatches at import runs its main under the test importing it,
-and the exit there ends the run. The runner then reports the file as one
-passing case holding none, so the test-first door reads a pass that proves
-nothing. So a script with a main runs it behind `runsHere` in
-`lib/paths.js`, which answers true where node runs that file itself. The
-command line and the server read it there. A test importing the command
-line's verbs registers its cases, and a failing case turns the run red.
-
 # One contract test per door
 
 A fake with nothing behind it drifts from the thing it stands for. So each door
@@ -143,7 +133,6 @@ config and the session file this tree tracks.
 | `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
 | `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
 | `git` | `src/doors/git.js` | `src/doors/fake/git.js` | `test/contract/git.test.js` |
-| `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
 | `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
 | `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |

@@ -101,7 +101,7 @@ func (DrawnCodec) Serialize(Drawn) ([]byte, error) {
 	return nil, errors.New("the drawing of a ticket reads its file and writes none")
 }
 
-// A step of the route as entriesIn in .claude/skills/level0/lib/schema-route.js walks it. [[spec/tickets/the-lens-reads-v1]]
+// A step of the route as entriesIn in src/modules/check/route.go walks it. [[spec/tickets/the-lens-reads-v1]]
 type entry struct {
 	name, path, parent string
 	said               *yaml.Doc
@@ -246,7 +246,7 @@ func placed(node Node, sections []note.Section) Node {
 	return node
 }
 
-// The step a keyword names: a path, a sibling, then a top-level step, as entryNamed in .claude/skills/level0/lib/schema-route.js finds it. [[spec/design_output/schema#keywords-that-name-a-step]]
+// The step a keyword names: a path, a sibling, then a top-level step, as entryNamed in src/modules/check/route.go finds it. [[spec/design_output/schema#keywords-that-name-a-step]]
 func entryNamed(walk []entry, want string, holder entry) (entry, bool) {
 	if want == "" {
 		return entry{}, false

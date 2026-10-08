@@ -125,7 +125,7 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) 
 // The chapter a ticket's ask stands under. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const askField = "Ask"
 
-// The fields the --field=value words name, each under the key its schema spells, or why one names none, off fieldsIn in lib/schema-mint.js. [[spec/design_output/schema#the-fields-a-caller-names]]
+// The fields the --field=value words name, each under the key its schema spells, or why one names none. [[spec/design_output/schema#the-fields-a-caller-names]]
 func fieldsIn(words []string, schema *yaml.Doc) (map[string]any, string) {
 	named, order := map[string]string{}, []string{}
 	names := func(key string) {

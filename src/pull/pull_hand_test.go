@@ -1,7 +1,6 @@
 // The hand a step stands in: the box file under the work root, the identity
 // under the method root where none stands, the owner's word, and the cloud
-// variables, off the cases test/level0/pull-hand-of.test.js and
-// test/contract/schema-bless.test.js held.
+// variables.
 // [[spec/tickets/pull-scripts-leave]]
 package pull
 

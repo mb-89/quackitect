@@ -78,7 +78,13 @@ func FrontOf(rows []string) Front {
 		lines[key] = i + 2
 	}
 
-	said := yaml.AsDoc(yaml.Read(strings.Join(held, "\n")))
+	read, nested := yaml.ReadLines(strings.Join(held, "\n"))
+	for path, line := range nested {
+		if _, top := lines[path]; !top {
+			lines[path] = line + 1
+		}
+	}
+	said := yaml.AsDoc(read)
 	if said == nil {
 		said = yaml.New()
 	}
@@ -108,7 +114,7 @@ func SectionsOf(rows []string) []Section {
 	return out
 }
 
-// The section a step's chapter opens on, one heading level a step deep, or -1, the rule sectionAt in .claude/skills/level0/lib/schema-read.js holds. [[spec/tickets/the-lens-reads-v1]]
+// The section a step's chapter opens on, one heading level a step deep, or -1. [[spec/tickets/the-lens-reads-v1]]
 func SectionAt(sections []Section, path string) int {
 	parts := strings.Split(path, "/")
 	from, found := 0, -1

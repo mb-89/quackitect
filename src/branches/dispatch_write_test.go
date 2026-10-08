@@ -269,7 +269,7 @@ func TestDispatchBundlesEachParentsLooseTicketsIntoAFixGroupUnderIt(t *testing.T
 	}
 }
 
-// The route copy hashes a route as processHash in lib/schema-route.js does, over a sample and over the tree's group route. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The route copy hashes a route as ProcessHash in src/pull/hash.go does, over a sample and over the tree's group route. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func TestDispatchHashesARouteAsTheJavaScriptDoes(t *testing.T) {
 	t.Parallel()
 	const sample = "for: a test\nask:\n  - name: goal\n    form: text\n    says: what it adds up to\nsteps:\n  - name: sync\n    when: cloud\n    needs: [branch sync]\n    evidence:\n      - name: sync\n        form: command\n        expects: 0\n  - name: children\n    by: children\n    on_fail: split\n    final: true\n"

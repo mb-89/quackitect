@@ -6,6 +6,9 @@
 package yaml
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -51,6 +54,30 @@ func (one *Doc) Keys() []string {
 	return one.order
 }
 
+// [[spec/design_output/schema#the-yaml-a-schema-reads]]
+func (one *Doc) MarshalJSON() ([]byte, error) {
+	var out bytes.Buffer
+	out.WriteByte('{')
+	for at, key := range one.Keys() {
+		if at > 0 {
+			out.WriteByte(',')
+		}
+		writes := json.NewEncoder(&out)
+		writes.SetEscapeHTML(false)
+		if err := writes.Encode(key); err != nil {
+			return nil, err
+		}
+		out.Truncate(out.Len() - 1)
+		out.WriteByte(':')
+		if err := writes.Encode(one.at[key]); err != nil {
+			return nil, err
+		}
+		out.Truncate(out.Len() - 1)
+	}
+	out.WriteByte('}')
+	return out.Bytes(), nil
+}
+
 var (
 	PairAt    = regexp.MustCompile(`^([^:\s][^:]*):\s*(.*)$`)
 	LinkAt    = regexp.MustCompile(`^\[\[(.+)\]\]$`)
@@ -62,41 +89,68 @@ var (
 type row struct {
 	indent int
 	said   string
+	line   int
 }
 
-type cursor struct{ at int }
+type cursor struct {
+	at    int
+	lines map[string]int
+}
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
 func Read(text string) any {
+	said, _ := readWith(text, nil)
+	return said
+}
+
+// [[spec/design_output/schema#a-line-per-nested-key]]
+func ReadLines(text string) (any, map[string]int) {
+	return readWith(text, map[string]int{})
+}
+
+func readWith(text string, lines map[string]int) (any, map[string]int) {
 	rows := []row{}
-	for _, raw := range SplitLines(text) {
+	for at, raw := range SplitLines(text) {
 		line := strings.TrimRight(raw, " \t")
 		if strings.TrimSpace(line) == "" || commentAt.MatchString(line) {
 			continue
 		}
 		where := FirstWord.FindStringIndex(line)
-		rows = append(rows, row{indent: where[0], said: strings.TrimSpace(line)})
+		rows = append(rows, row{indent: where[0], said: strings.TrimSpace(line), line: at + 1})
 	}
 	if len(rows) == 0 {
-		return New()
+		return New(), lines
 	}
-	one := &cursor{}
-	return block(rows, one, rows[0].indent)
+	one := &cursor{lines: lines}
+	return block(rows, one, rows[0].indent, ""), lines
 }
 
 // [[spec/design_output/schema#a-line-per-nested-key]]
-func ReadLines(text string) (any, map[string]int) {
-	return nil, nil
-}
-
-func block(rows []row, one *cursor, indent int) any {
-	if strings.HasPrefix(rows[one.at].said, "- ") {
-		return listAt(rows, one, indent)
+func (one *cursor) mark(path string, line int) {
+	if one.lines == nil || path == "" {
+		return
 	}
-	return mapAt(rows, one, indent)
+	if _, held := one.lines[path]; !held {
+		one.lines[path] = line
+	}
 }
 
-func mapAt(rows []row, one *cursor, indent int) any {
+// [[spec/design_output/schema#a-line-per-nested-key]]
+func Keyed(path, key string) string {
+	if path == "" {
+		return key
+	}
+	return path + "." + key
+}
+
+func block(rows []row, one *cursor, indent int, path string) any {
+	if strings.HasPrefix(rows[one.at].said, "- ") {
+		return listAt(rows, one, indent, path)
+	}
+	return mapAt(rows, one, indent, path)
+}
+
+func mapAt(rows []row, one *cursor, indent int, path string) any {
 	out := New()
 	for one.at < len(rows) {
 		held := rows[one.at]
@@ -109,16 +163,18 @@ func mapAt(rows []row, one *cursor, indent int) any {
 		}
 		one.at++
 		key := strings.TrimSpace(pair[1])
+		at := Keyed(path, key)
+		one.mark(at, held.line)
 		if rest := strings.TrimSpace(pair[2]); rest != "" {
 			out.Set(key, scalar(rest))
 			continue
 		}
-		out.Set(key, under(rows, one, held.indent))
+		out.Set(key, under(rows, one, held.indent, at))
 	}
 	return out
 }
 
-func listAt(rows []row, one *cursor, indent int) any {
+func listAt(rows []row, one *cursor, indent int, path string) any {
 	out := []any{}
 	for one.at < len(rows) {
 		held := rows[one.at]
@@ -127,6 +183,8 @@ func listAt(rows []row, one *cursor, indent int) any {
 		}
 		one.at++
 
+		at := fmt.Sprintf("%s[%d]", path, len(out))
+		one.mark(at, held.line)
 		rest := strings.TrimSpace(held.said[2:])
 		var pair []string
 		if !QuotedWhole(rest) {
@@ -139,10 +197,12 @@ func listAt(rows []row, one *cursor, indent int) any {
 
 		item := New()
 		key := strings.TrimSpace(pair[1])
+		first := Keyed(at, key)
+		one.mark(first, held.line)
 		if said := strings.TrimSpace(pair[2]); said != "" {
 			item.Set(key, scalar(said))
 		} else {
-			item.Set(key, under(rows, one, held.indent+2))
+			item.Set(key, under(rows, one, held.indent+2, first))
 		}
 		for one.at < len(rows) && rows[one.at].indent > held.indent {
 			next := rows[one.at]
@@ -152,27 +212,29 @@ func listAt(rows []row, one *cursor, indent int) any {
 			}
 			one.at++
 			deeper := strings.TrimSpace(more[1])
+			deeperAt := Keyed(at, deeper)
+			one.mark(deeperAt, next.line)
 			if said := strings.TrimSpace(more[2]); said != "" {
 				item.Set(deeper, scalar(said))
 				continue
 			}
-			item.Set(deeper, under(rows, one, next.indent))
+			item.Set(deeper, under(rows, one, next.indent, deeperAt))
 		}
 		out = append(out, item)
 	}
 	return out
 }
 
-func under(rows []row, one *cursor, indent int) any {
+func under(rows []row, one *cursor, indent int, path string) any {
 	if one.at >= len(rows) {
 		return nil
 	}
 	next := rows[one.at]
 	if next.indent > indent {
-		return block(rows, one, next.indent)
+		return block(rows, one, next.indent, path)
 	}
 	if next.indent == indent && strings.HasPrefix(next.said, "- ") {
-		return listAt(rows, one, indent)
+		return listAt(rows, one, indent, path)
 	}
 	return nil
 }
@@ -205,7 +267,7 @@ func scalar(said string) any {
 	return bare
 }
 
-// An item reads as quoted text where its closing quote stands last, so a colon inside stays text, and "a": "b" stays a pair, as quotedWhole in lib/schema-yaml.js reads it. [[spec/tickets/the-quoted-pair-stays-paired]]
+// An item reads as quoted text where its closing quote stands last, so a colon inside stays text, and "a": "b" stays a pair. [[spec/tickets/the-quoted-pair-stays-paired]]
 func QuotedWhole(said string) bool {
 	if said == "" || (said[0] != '"' && said[0] != '\'') {
 		return false
@@ -228,7 +290,7 @@ func QuotedWhole(said string) bool {
 	return false
 }
 
-// The items of a flow list, split at each comma outside a quote, as flowItems in lib/schema-yaml.js splits them. [[spec/design_output/pull#the-fields-hold-their-forms]]
+// The items of a flow list, split at each comma outside a quote. [[spec/design_output/pull#the-fields-hold-their-forms]]
 func flowItems(inside string) []string {
 	out := []string{}
 	var held strings.Builder

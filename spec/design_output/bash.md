@@ -267,8 +267,8 @@ name costs a silent hook and no error.
 
 # What every refusal owes
 
-A refusal that only says no teaches nothing. `refusedCommand` in
-`lib/refuse.js` writes each one, and every finding names what stands below:
+A refusal that only says no teaches nothing. `RefusedCommand` in
+`src/modules/hooks/command/refuse.go` writes each one, and every finding names what stands below:
 
 - the rule, by the name a person greps for
 - what the door reads, as the path, the name or the command

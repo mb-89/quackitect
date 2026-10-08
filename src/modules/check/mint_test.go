@@ -79,7 +79,7 @@ body:
       x-one-per: steps
 `
 
-// The body mintNote in lib/schema-mint.js writes over the same route. [[spec/tickets/mint-keeps-nested-steps]]
+// The body mintNote writes over the same route. [[spec/tickets/mint-keeps-nested-steps]]
 const routedBody = "\n# Ask\n\nA thing.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n### approach\n\n<!-- the approach -->\n\n<!-- the form is text -->\n\n### checked\n\n<!-- one line per item of the checklist, on how you take it into account -->\n\n<!-- the form is checklist -->\n\n## owner-read\n\n<!-- does the ask say what the owner said -> -->\n\n# gate\n\n<!-- reads the design -->\n\n## verdict\n\n<!-- accept or reject -->\n\n<!-- the form is verdict -->\n"
 
 // [[spec/tickets/mint-keeps-nested-steps]]

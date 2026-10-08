@@ -393,3 +393,7 @@ Assumed: no route reaches the archive and naming cases of log.test.js, so they l
 The case `a stop file short of a field is refused` in `test/contract/tree.test.js` still runs `StopFolderIsData` once [[spec/tickets/bridge-library-leaves]] removes `findings.js`. Deleting the rule takes that case with it, or ports it to Go first.
 
 The row naming `src/doors/front.js` as gone with [[spec/tickets/engine-and-doors-leave]] reads wrong. The front door, its fake and `front.test.js` stay there, since the schema-mint tests pass in the fake front, and [[spec/tickets/schema-libs-leave]] takes the front door. The git door, its fake, `git.test.js` and `real-git.test.js` stay too, and this ticket takes them once its library tests leave.
+
+[[spec/tickets/schema-libs-leave]] deletes `test/contract/ticket.test.js`, and cuts `test/contract/schema.test.js` to its underscore draft case. Neither reads the git door any more, and `real-git.test.js` keeps no entry for either.
+
+Once `schema-route.js` leaves, `.claude/skills/level0/lib/hash.js` stands orphaned: no JavaScript file imports it. Delete it here, and point the Go comments naming `hashText` in it at `src/pull/hash.go`.

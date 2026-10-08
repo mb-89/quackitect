@@ -1,6 +1,5 @@
 // The prose check, off readsDraft in src/bridge/prose.js and proseFaults in
-// src/bridge/write.js, and the wording both checks answer in, off
-// answerFindings in lib/refuse.js.
+// src/bridge/write.js, and the wording both checks answer in.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
 
@@ -107,7 +106,7 @@ func answerFindings(where string, found []prose.Refused, rewrite bool) string {
 	return said
 }
 
-// The two roads a word off the list has, off grown in lib/refuse.js. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+// The two roads a word off the list has. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 func grown(found []prose.Refused) string {
 	var words []string
 	seen := map[string]bool{}
@@ -133,7 +132,7 @@ func grown(found []prose.Refused) string {
 	}, "\n")
 }
 
-// A text flattened to one line, cut at a count of letters, off cut in lib/refuse.js. [[spec/tickets/prose-tools-answer-in-go]]
+// A text flattened to one line, cut at a count of letters. [[spec/tickets/prose-tools-answer-in-go]]
 func cutOf(said string) string {
 	letters := []rune(strings.Join(strings.Fields(said), " "))
 	if len(letters) > saidCut {

@@ -6,7 +6,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate, SHOW } from "../../src/extension/extension.js";
@@ -150,7 +149,7 @@ test("a held ticket draws its marks and route over a fake index", async () => {
     {
       kind: "graph",
       graph: ticketDrawn("lens-held").graph,
-      steps: readNote(TEXT).front.said.steps,
+      steps: ticketDrawn("lens-held").steps,
       held: true,
     },
     "the page draws the graph and route tickets/drawn hands, held by the person",

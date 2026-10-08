@@ -1,6 +1,6 @@
 // The schema checker's words over a note missing a field and a chapter, which
-// read as the bridge's lib/schema.js and lib/schema-body.js say them, and the
-// chapter each nested step and field wants.
+// schema.go and schema-body.go say, and the chapter each nested step and
+// field wants.
 // [[spec/tickets/cage-write-door-port]]
 package check
 

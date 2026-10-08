@@ -18,7 +18,7 @@ const CONFIG = ".vale.ini";
 // A text under the path Vale reads it at, because the path picks the section. [[spec/design_output/doors#a-door-reads-the-outside]]
 export const at = (text, where) => ({ text, where });
 
-// Vale's own glob over a section head, where a star spans a slash and braces name alternatives. The matcher in lib/paths.js reads a schema's globs, where a star stops at a slash, so this one stands beside it. [[spec/design_output/doors#a-door-reads-the-outside]]
+// Vale's own glob over a section head, where a star spans a slash and braces name alternatives. The matcher in src/modules/check/paths.go reads a schema's globs, where a star stops at a slash, so this one stands beside it. [[spec/design_output/doors#a-door-reads-the-outside]]
 export function sectionMatches(head, path) {
   const said = new RegExp(`^${patternOf(head)}$`);
   return said.test(

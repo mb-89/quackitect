@@ -1,4 +1,4 @@
-// The todo tag a push carries, off the bridge's lib/todo.js.
+// The todo tag a push carries, which todo.go in this folder owns.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 

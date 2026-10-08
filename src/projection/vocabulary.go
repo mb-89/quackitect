@@ -1,6 +1,5 @@
 // The word lists, read into the set a paragraph writes and the swaps a refusal
-// teaches, and inlined into one Vale rule. A port of the half of
-// vocabulary.js the projection reads.
+// teaches, and inlined into one Vale rule.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]] [[spec/tickets/config-verbs-port-to-go]]
 package projection
 

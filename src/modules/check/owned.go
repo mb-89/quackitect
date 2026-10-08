@@ -66,9 +66,9 @@ func blockOf(rows []string, front Front, key string) string {
 			break
 		}
 	}
-	for _, line := range front.Lines {
-		if line > start && line < end {
-			end = line
+	for _, top := range front.LineKeys {
+		if line := front.Lines[top]; line > start && line < end {
+			end = front.Lines[top]
 		}
 	}
 	held := []string{}

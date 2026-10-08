@@ -13,20 +13,18 @@ import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import cases from "../../src/tui/work/testdata/badges.json" with { type: "json" };
 import { v1Over } from "./v1-index.js";
 
-const BASE = [
-  "reads: work/rows",
-  "badge: work/open-tasks",
-  "actions:",
-  "  - button: pull",
-  "    label: Written by the view",
-  "    calls: work/pull",
-  "  - button: new",
-  "    edits: form",
-  "    calls: tickets/open",
-  "",
-].join("\n");
+// The base the view names, as views/bases hands it, as sidebar-v1.test.js hands one. [[spec/tickets/schema-libs-leave]]
+const BASE = {
+  reads: "work/rows",
+  badge: "work/open-tasks",
+  actions: [
+    { button: "pull", label: "Written by the view", calls: "work/pull" },
+    { button: "new", edits: "form", calls: "tickets/open" },
+  ],
+};
 
 const CATALOG = {
+  "views/bases": [{ name: "work", said: BASE }],
   "index/names": [
     { name: "work/open-tasks", label: "work", icon: "💼", looks: "count", value: 3 },
   ],
@@ -48,7 +46,7 @@ const CATALOG = {
   ],
 };
 
-function doorOf(files = fakeDisk({ "spec/views/work.base": BASE }), given = CATALOG) {
+function doorOf(files = fakeDisk({}), given = CATALOG) {
   const index = v1Over(files, given);
   return {
     called: index.called,
@@ -118,7 +116,6 @@ function shadowDoorOf(mode) {
   const files = fakeDisk({
     [SCHEMA]: JSON.stringify(schema),
     [TRACKED]: JSON.stringify({ migration: { sidebar: mode } }),
-    "spec/views/work.base": BASE,
   });
   return {
     ...doorOf(files, { ...CATALOG, "work/open-tasks": 2 }),

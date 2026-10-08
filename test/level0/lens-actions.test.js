@@ -5,7 +5,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
-import * as noteSchema from "../../.claude/skills/level0/lib/schema.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { ticketLensOf } from "../../src/extension/lib/lens.js";
 import { routeHostOf } from "../../src/extension/lib/route-host.js";
@@ -35,7 +34,6 @@ function doorOf({
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
     write: async (path, text) => files.write(path, text),
     list: async () => [],
-    imports: async () => noteSchema,
     page: () => null,
     panel: () => null,
     folds: () => {},

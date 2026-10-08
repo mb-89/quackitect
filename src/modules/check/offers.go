@@ -275,13 +275,12 @@ func (one typing) chapterOffers() []Completion {
 			held[section.Header] = true
 		}
 	}
-	for _, each := range ChaptersWanted(yaml.AsList(body.Get("sections")), one.front) {
-		rule := yaml.AsDoc(each)
-		header := yaml.AsString(rule.Get("header"))
-		if header == "" || held[header] {
+	for _, each := range chaptersWanted(yaml.AsList(body.Get("sections")), one.front, level) {
+		header := each.header
+		if header == "" || held[header] || each.level != level {
 			continue
 		}
-		out = append(out, one.over(hashes, header, itemChapter, yaml.AsString(rule.Get("description")), " "+header))
+		out = append(out, one.over(hashes, header, itemChapter, yaml.AsString(each.rule.Get("description")), " "+header))
 	}
 	return out
 }

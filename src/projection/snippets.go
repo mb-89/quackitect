@@ -1,6 +1,6 @@
 // The shape every projected rule wears, and the Tengo a script rule shares:
 // the head of a rule file, the helpers its script opens with, and the small
-// quoting a rule needs. A port of snippets.js and the frontless helper.
+// quoting a rule needs.
 // [[spec/design_output/projection#a-layer-writes-two-files]] [[spec/tickets/config-verbs-port-to-go]]
 package projection
 

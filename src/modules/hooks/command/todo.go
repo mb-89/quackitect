@@ -1,4 +1,4 @@
-// The todo tag on a push, off lib/todo.js: a note a push carries holding the
+// The todo tag on a push: a note a push carries holding the
 // tag parks work on this box, and a gate's point passes.
 // [[spec/tickets/cage-commit-guards-port]]
 package command

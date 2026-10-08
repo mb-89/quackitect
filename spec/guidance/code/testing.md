@@ -30,7 +30,7 @@ rationale: [[spec/rationales/testing]]
 | 4 | a fake disk that reads what it writes | a double answering a scripted string |
 | 5 | a red test before the code | code first, a test after |
 | 5 | a contract case red on the live fault, then the fix | a fix to the code a guess names, green on the fake |
-| 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |
-| 13 | one suite of cases run over `FakeGit` and a real repository | a fake no suite holds to the real thing |
 | 7 | one go build of the binary, copied into each case's folder | a go build in each case |
 | 8 | a case waiting on the fake timer's ask | a case sleeping a second to see no spawn |
+| 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |
+| 13 | one suite of cases run over `FakeGit` and a real repository | a fake no suite holds to the real thing |

@@ -57,7 +57,7 @@ func Judge(where string, schema func() write.Judged, voice func() []write.Findin
 	return RefusedVoice(where, found)
 }
 
-// The refusal of a write the voice refuses, naming each finding and the rules to hold, off refusal in lib/refuse.js. [[spec/design_output/level0#the-write-door]]
+// The refusal of a write the voice refuses, naming each finding and the rules to hold. [[spec/design_output/level0#the-write-door]]
 func RefusedVoice(where string, found []write.Finding) string {
 	refused := make([]prose.Refused, 0, len(found))
 	for _, one := range found {

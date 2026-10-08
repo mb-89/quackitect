@@ -66,6 +66,10 @@ func TestTheFrontHoldsTheLineOfEveryNestedKey(t *testing.T) {
 	if !slices.Equal(front.LineKeys, []string{"kind", "steps"}) {
 		t.Errorf("the line keys read %v, and want the top keys alone", front.LineKeys)
 	}
+	spaced := Read("---\nkind: ticket\n\nsteps:\n  - name: do\n---\n").Front
+	if got := spaced.Lines["steps[0].name"]; got != 5 || spaced.Lines["steps"] != 4 {
+		t.Errorf("a front with a blank row reads %v, and wants steps at 4 and steps[0].name at 5", spaced.Lines)
+	}
 }
 
 // [[spec/tickets/schema-libs-leave]]

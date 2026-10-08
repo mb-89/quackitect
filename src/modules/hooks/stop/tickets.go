@@ -1,5 +1,5 @@
-// What the stop checks read off a ticket's front, off leafBy, heldGroup,
-// openPrivate and queueHolds in .claude/skills/level0/lib/ticket.js.
+// What the stop checks read off a ticket's front: the leaf a hand stands on,
+// the group it holds, the private tickets it opens, and the holds it queues.
 // [[spec/tickets/cage-stop-rules-port]]
 package stop
 

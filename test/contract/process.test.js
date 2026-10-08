@@ -4,73 +4,20 @@
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { processHash, readYaml, schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
-import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { disk } from "../../src/doors/disk.js";
-import { fakeFront } from "../../src/doors/fake/front.js";
 import { proc } from "../../src/doors/proc.js";
+import MINTED_GOLDEN from "../../src/quack/testdata/minted.golden.json" with { type: "json" };
 import { at, keptOf, PAST, REFUSES, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const ruled = rulesIn(root);
-const CLEAN = "A line the voice passes.";
-const folder = (...parts) => join(root, "spec", ...parts);
 
-// Every schema the tree ships, by the kind each governs. [[spec/design_output/schema]]
-const schemas = schemasFrom(
-  files
-    .list(folder("schemas"))
-    .filter((one) => one.kind === "file" && one.name.endsWith(".yaml"))
-    .map((one) => ({ text: files.read(folder("schemas", one.name)) })),
-);
-
-// The ask rows a mint writes, one comment a field, as AskRows in src/pull/process.go writes them. [[spec/design_input/the-agent-pulls-tickets#evidence-has-a-form]]
-const askRows = (ask) =>
-  [ask ?? []]
-    .flat()
-    .filter((one) => one?.name)
-    .map((one) => `<!-- ${one.name}, as ${one.form ?? "text"}: ${one.says ?? ""} -->`)
-    .join("\n");
-
-// The first leaf of a route, as firstLeafOf in src/pull/pull_ticket.go reads it. [[spec/design_output/pull#a-draft-opens]]
-const firstLeaf = (steps, path = "") => {
-  const one = [steps ?? []].flat()[0];
-  if (!one?.name) return path;
-  const deeper = path ? `${path}/${one.name}` : String(one.name);
-  return one.steps ? firstLeaf(one.steps, deeper) : deeper;
-};
-
-// Every route's minted ticket, declared up front, so one Vale run reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
-const routes = files
-  .list(folder("processes"))
-  .filter((one) => one.name.endsWith(".yaml"))
-  .map((one) => one.name.replace(/\.yaml$/, ""));
-const minted = new Map(
-  routes.map((name) => {
-    const held = readYaml(files.read(folder("processes", `${name}.yaml`)));
-    const route = [held.steps ?? []].flat();
-    const made = mintedNote(
-      schemas,
-      {
-        kind: "ticket",
-        path: `spec/tickets/${name}-rendered.md`,
-        fields: {
-          state: "open",
-          process: `spec/processes/${name}`,
-          process_hash: processHash(held),
-          steps: route,
-          step: firstLeaf(route),
-          Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
-        },
-      },
-      fakeFront(),
-    );
-    return [name, made];
-  }),
-);
+// Every route's minted ticket, as the Go mint writes it into the golden TestEveryShippedRouteMintsItsGolden holds, so one Vale run reads them all. [[spec/tickets/schema-libs-leave]]
+const routes = MINTED_GOLDEN.map((one) => one.route);
+const minted = new Map(MINTED_GOLDEN.map((one) => [one.route, one.text]));
 
 // Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask: the rows past the tense reader, at a severity that refuses. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 ruled.ifVale(
@@ -79,15 +26,13 @@ ruled.ifVale(
     Object.fromEntries(
       routes.map((name) => [
         name,
-        at(minted.get(name).text ?? "", `spec/tickets/${name}-rendered.md`),
+        at(minted.get(name), `spec/tickets/${name}-rendered.md`),
       ]),
     ),
     ({ found, text }) => {
       assert.ok(routes.length > 1, "the tree ships its routes");
       const faults = [];
       for (const name of routes) {
-        const made = minted.get(name);
-        assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
         const rows = text(name).split("\n");
         const past = keptOf({ disk: files, proc: proc(), root }, text(name), found(name), PAST);
         for (const one of past) {

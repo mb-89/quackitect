@@ -60,7 +60,7 @@ func PathOf(e map[string]any) string {
 	return textIn(e["notebook_path"])
 }
 
-// A path under the root, relative to it, and any other path as it stands, off relativeTo in lib/paths.js. [[spec/design_output/level0#the-write-door]]
+// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. [[spec/design_output/level0#the-write-door]]
 func RelativeTo(root, path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	at := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")

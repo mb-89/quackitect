@@ -1,5 +1,5 @@
 // A mint the schema refuses names each fault and closes on the road to the
-// shape, as refusedNote in lib/schema.js writes it.
+// shape, as mintedNote in mint.go writes it.
 // [[spec/design_output/schema#the-tool-writes-the-note]]
 package check
 

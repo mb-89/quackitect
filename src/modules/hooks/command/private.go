@@ -1,5 +1,4 @@
-// The private delta, off refusedDelta in lib/refuse.js:
-// the lines a staged delta adds, read for a private shape, a name the box
+// The private delta: the lines a staged delta adds, read for a private shape, a name the box
 // answers, and a run or a token out of a raw note under .se/notes.
 // [[spec/tickets/cage-commit-guards-port]]
 package command

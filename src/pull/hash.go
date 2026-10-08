@@ -1,6 +1,5 @@
 // The hash a process carries onto a ticket: hashText over the canonical JSON
-// of its ask and its steps, off .claude/skills/level0/lib/hash.js and
-// canonicalOf in lib/schema-route.js.
+// of its ask and its steps, keys sorted and every scalar a string.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package pull
 

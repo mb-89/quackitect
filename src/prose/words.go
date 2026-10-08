@@ -1,5 +1,4 @@
-// The domain words: the core and the terms, less every swapped word, read the
-// way wordsOf in .claude/skills/level0/lib/vocabulary.js reads them.
+// The domain words: the core and the terms, less every swapped word.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 package prose
 

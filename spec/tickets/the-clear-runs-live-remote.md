@@ -70,9 +70,7 @@ Without the trial, a box past the key may still stand idle, and nobody reads why
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-## The first trial, on a cloud box
-
-A cloud session ran the trial with `context.handoverAt` at 1000. The door ran the fold of [[spec/tickets/the-clear-continues-the-session]], and the plugin ran the module the session loaded at its start, which awaited `/clear` inside the hook. The pull handed `handover`, then `clear`, and the turn ended. The session log read:
+The first trial ran on a cloud box. A cloud session ran the trial with `context.handoverAt` at 1000. The door ran the fold of [[spec/tickets/the-clear-continues-the-session]], and the plugin ran the module the session loaded at its start, which awaited `/clear` inside the hook. The pull handed `handover`, then `clear`, and the turn ended. The session log read:
 
     {"kind":"bridge","level":"warn","said":"the clear the handover asks for fails","event":"turn.complete","detail":"level0: command.run: called from a classic.Stop hook, it would wait on the turn this hook is holding; run it from a later event (turn.complete) (host check)"}
 

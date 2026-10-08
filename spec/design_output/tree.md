@@ -78,7 +78,7 @@ door in this tree already answers:
 
     { file, rule, line, column, message, severity }
 
-`line()` in `lib/refuse.js` prints one. `pathInScript` in `lib/scripts.js`
+`src/quack/verb_lint.go` prints one. `pathInScript` in `lib/scripts.js`
 answers the same shape.
 
 `sorted` in `src/modules/check/finding.go` puts every list in one order: the file, the

@@ -28,6 +28,13 @@ var schemaLibs = []string{
 // [[spec/tickets/schema-libs-leave]]
 var leavingImport = regexp.MustCompile(`["'][^"']*/(lib/(schema[a-z-]*|ticket|todo|slug|paths|vocabulary|snippets|helpers|refuse)|doors/front|doors/fake/front|tree-of)\.js["']`)
 
+// Every file that could import a leaving one: the tests, the extension, the scripts, the stub and the hooks. [[spec/tickets/schema-libs-leave]]
+var schemaReaders = []string{
+	"test/*.js", "test/*/*.js", "test/*/*/*.js",
+	"src/extension/*.js", "src/extension/*/*.js", "src/extension/*/*/*.js",
+	"src/scripts/*.js", "src/stub/RUNME.sh", "src/stub/.claude/skills/level0/hooks/*.js", ".claude/skills/level0/hooks/*.js",
+}
+
 // [[spec/tickets/schema-libs-leave]]
 func TestTheSchemaLibrariesStandNowhere(t *testing.T) {
 	t.Parallel()
@@ -41,8 +48,8 @@ func TestNoTestImportsALeavingSchemaFile(t *testing.T) {
 	t.Parallel()
 	leaving := globbedIn(t, schemaLibs...)
 	found := []string{}
-	for _, one := range globbedIn(t, "test/*.js", "test/*/*.js", "test/*/*/*.js") {
-		if slices.Contains(leaving, one) {
+	for _, one := range globbedIn(t, schemaReaders...) {
+		if slices.Contains(leaving, one) || strings.Contains(one, "node_modules/") {
 			continue
 		}
 		body, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(one)))
@@ -54,6 +61,6 @@ func TestNoTestImportsALeavingSchemaFile(t *testing.T) {
 		}
 	}
 	if len(found) > 0 {
-		t.Fatalf("%s\nand wants no test reading a leaving file", strings.Join(found, "\n"))
+		t.Fatalf("%s\nand wants no test, extension file, script, stub or hook reading a leaving file", strings.Join(found, "\n"))
 	}
 }

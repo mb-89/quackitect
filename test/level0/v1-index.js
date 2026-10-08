@@ -3,16 +3,14 @@
 // fire sends one event to every watch.
 // [[spec/tickets/the-sidebar-reads-v1]]
 
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { readYaml } from "../../.claude/skills/level0/lib/schema-yaml.js";
 import { parsed } from "../../src/extension/lib/values.js";
 import { LOCAL, TRACKED, valuesOf } from "../../src/extension/lib/widgets.js";
 import DRAWN_GOLDEN from "../../src/modules/tickets/testdata/drawn.golden.json" with { type: "json" };
+import FRONTS_GOLDEN from "../../src/note/testdata/fronts.golden.json" with { type: "json" };
 
 const SCHEMA = "spec/config/level0.schema.json";
 const BLESS = ".se/.runtime/bless.json";
 export const LOG = ".se/.log/session.jsonl";
-const BASE = /^spec\/views\/([^/]+)\.base$/;
 const OWN = ["at", "level", "kind", "said"];
 const HOLDS = ".se/.runtime/hold/";
 const TICKETS = ["spec/tickets/", ".se/tickets/"];
@@ -63,8 +61,16 @@ function drawnOf(text) {
   return structuredClone(one.drawn);
 }
 
-// The front of a note, as the Go note reader hands it. [[spec/tickets/the-lens-reads-v1]]
-const frontOf = (text) => (text ? (readNote(text).front.said ?? {}) : {});
+// The front of a note, off the golden TestEveryFrontGoldenMatchesTheReader holds, as the Go note reader hands it. [[spec/tickets/schema-libs-leave]]
+function frontOf(text) {
+  if (!text) return {};
+  const one = FRONTS_GOLDEN.find((entry) => entry.text === text);
+  if (!one)
+    throw new Error(
+      `the fronts golden holds no entry for this text; add it to src/note/testdata/fronts.golden.json and run go test ./src/quack -run TestTheFrontGoldenReadsEveryTextAgain -update:\n${text}`,
+    );
+  return structuredClone(one.front);
+}
 const word = (said) =>
   String(said ?? "")
     .trim()
@@ -196,12 +202,6 @@ export function v1Over(files, given = {}) {
     [`config/${LOCAL}`]: () => orderedOf(file(LOCAL)),
     "migration/config/sidebar": () => keys().get("migration.sidebar")?.value ?? "old",
     "bless/agent": () => file(BLESS)?.agent === true,
-    "views/bases": () =>
-      [...files.files.keys()]
-        .map((path) => [path, BASE.exec(path)?.[1]])
-        .filter(([, name]) => name)
-        .sort((a, b) => a[1].localeCompare(b[1]))
-        .map(([path, name]) => ({ name, said: readYaml(text(path)) })),
     "holds/standing": () => standingOf(files, text),
     "tickets/cloud": () => cloudOf(files, text),
     "log/rows": () =>

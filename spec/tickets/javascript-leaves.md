@@ -230,9 +230,7 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-## Inventory
-
-Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file that goes names its Go home, the Go code already holding its job or taking it, and the child that deletes it.
+The inventory follows. Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file that goes names its Go home, the Go code already holding its job or taking it, and the child that deletes it.
 
 | fate | why |
 |---|---|
@@ -242,7 +240,7 @@ Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file
 | stays, prototype | a browser prototype outside the product, which a funnel note points at |
 | other group | the lint-without-vale group takes it |
 
-### The code
+The code:
 
 | file | fate | Go home | child |
 |---|---|---|---|
@@ -270,7 +268,7 @@ Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file
 | `.claude/skills/level0/lib/git-writes.js` | goes | `src/modules/hooks/command/gitwrites.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/guidance.js` | goes | `src/modules/hooks/brief.go` | [[spec/tickets/guidance-lib-leaves]] |
 | `.claude/skills/level0/lib/hash.js` | goes | `src/pull/hash.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/helpers.js` | goes | `src/projection/snippets.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/helpers.js` | goes | `src/projection/snippets.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/index-tools.js` | goes | `src/index/tools.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/index.js` | goes | `src/index/binary.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/layer.js` | goes | `src/modules/config` | [[spec/tickets/plugin-libs-leave]] |
@@ -281,36 +279,36 @@ Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file
 | `.claude/skills/level0/lib/names.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/paragraph-rules.js` | goes | `src/projection/rules.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/paragraph.js` | goes | `src/projection` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/paths.js` | goes | `src/modules/hooks/write/door.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/paths.js` | goes | `src/modules/check/paths.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/plugin-check.js` | goes | `src/quack/check.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/private.js` | goes | `src/modules/hooks/command/findings.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/projection-owner.js` | goes | `src/projection/entries.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/projection.js` | goes | `src/projection` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/pull.js` | goes | `src/pull/pull.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/pulled.js` | goes | `src/modules/hooks/command/pulled.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/refuse.js` | goes | `src/prose/finding.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/refuse.js` | goes | `src/modules/hooks/command/refuse.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/review.js` | goes | `src/quack/review.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/rulefile.js` | goes | `src/modules/hooks/stop/rules.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/runs.js` | goes | `src/quack/check.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-body.js` | goes | `src/modules/check/mint.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-fault.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-mint.js` | goes | `src/quack/verb_mint.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-read.js` | goes | `src/note/note.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-route.js` | goes | `src/pull/walk.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-table.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema-yaml.js` | goes | `src/yaml/yaml.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/schema.js` | goes | `src/modules/check/schema.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/schema-body.js` | goes | `src/modules/check/schema-body.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-fault.js` | goes | `src/modules/check` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-mint.js` | goes | `src/modules/check/mint.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-read.js` | goes | `src/note/note.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-route.js` | goes | `src/modules/check/route.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-table.js` | goes | `src/modules/check/table.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema-yaml.js` | goes | `src/yaml/yaml.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/schema.js` | goes | `src/modules/check/schema.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/scripted.js` | goes | `src/modules/hooks/command/scripts.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/search.js` | goes | `src/modules/hooks/search.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/servers.js` | goes | `src/quack/doctor_verb.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/shell-values.js` | goes | `src/modules/hooks/command/tokens.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/size.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/slug.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/snippets.js` | goes | `src/projection/snippets.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/slug.js` | goes | `src/modules/check/restated.go` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/snippets.js` | goes | `src/projection/snippets.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/stop.js` | goes | `src/modules/drafts/answer.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/tested.js` | goes | `src/modules/hooks/command/tested.go` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/ticket.js` | goes | `src/pull` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/todo.js` | goes | `src/quack/ticket_todo.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/ticket.js` | goes | `src/pull` | [[spec/tickets/schema-libs-leave]] |
+| `.claude/skills/level0/lib/todo.js` | goes | `src/quack/ticket_todo.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/tokens.js` | goes | `src/modules/hooks/command/tokens.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/tools.js` | goes | `src/quack/survey.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/tree.js` | goes | `src/modules/check` | [[spec/tickets/plugin-libs-leave]] |
@@ -319,7 +317,7 @@ Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file
 | `.claude/skills/level0/lib/vale.js` | other group | | |
 | `.claude/skills/level0/lib/vehicle.js` | goes | `src/vehicle` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/verb-line.js` | goes | `src/modules/hooks/command` | [[spec/tickets/plugin-libs-leave]] |
-| `.claude/skills/level0/lib/vocabulary.js` | goes | `src/projection/vocabulary.go` | [[spec/tickets/plugin-libs-leave]] |
+| `.claude/skills/level0/lib/vocabulary.js` | goes | `src/projection/vocabulary.go` | [[spec/tickets/schema-libs-leave]] |
 | `.claude/skills/level0/lib/voice.js` | goes | `src/voice/voice.go` | [[spec/tickets/plugin-libs-leave]] |
 | `.claude/skills/level0/lib/warnings.js` | goes | `src/modules/hooks/command/voice.go` | [[spec/tickets/plugin-libs-leave]] |
 | every file under `prototype/trace-view` | stays, prototype | | [[spec/tickets/remaining-js-names-its-reason]] |
@@ -465,7 +463,7 @@ Every JavaScript file the tree tracks, off `git ls-files`, with its fate. A file
 | `src/stub/.claude/skills/level0/hooks/bridgehead.js` | stays thin | `src/vehicle/pure.go` | [[spec/tickets/level0-hooks-forward-to-go]] |
 | every file under `src/extension` | stays | | |
 
-### The tests
+The tests:
 
 A test that goes leaves with the first child deleting code it reads. The child writes a Go test of the same behaviour in the code's Go home, where no Go test holds it yet. A test that stays and reads code that leaves drops that import in the child named.
 
@@ -477,17 +475,19 @@ A test that goes leaves with the first child deleting code it reads. The child w
 - [[spec/tickets/session-start-leaves-node]], stays and drops its imports: `level0/hooks.test.js`
 - [[spec/tickets/bridge-library-leaves]], goes: `contract/cli-doors.test.js`, `contract/cli-mint-callers.test.js`, `contract/one-config.test.js`, `contract/one-reading.test.js`, `contract/stop-rules.test.js`, `contract/write-door-cases.test.js`, `level0/agent.test.js`, `level0/answer-door.test.js`, `level0/answer-origin.test.js`, `level0/answer-read.test.js`, `level0/answer.test.js`, `level0/apply-door.test.js`, `level0/ask-door.test.js`, `level0/bash-bless.test.js`, `level0/bash-commit.test.js`, `level0/bash-desk.test.js`, `level0/bash-engine.test.js`, `level0/bash-ticket.test.js`, `level0/binding.test.js`, `level0/brief-cases.test.js`, `level0/canary-debt.test.js`, `level0/cloud-ask.test.js`, `level0/code-door.test.js`, `level0/command-cases.test.js`, `level0/commit-guards-cases.test.js`, `level0/config-door.test.js`, `level0/context-handover.test.js`, `level0/findings.test.js`, `level0/grace-asks.test.js`, `level0/grace.test.js`, `level0/guidance.test.js`, `level0/hand-tools.test.js`, `level0/handover-door.test.js`, `level0/holds-leave.test.js`, `level0/named.test.js`, `level0/note-answer.test.js`, `level0/one-reader.test.js`, `level0/outside-hand.test.js`, `level0/plan-queue.test.js`, `level0/plan.test.js`, `level0/projection.test.js`, `level0/prose.test.js`, `level0/pulled.test.js`, `level0/review-cases.test.js`, `level0/review-door.test.js`, `level0/search-door.test.js`, `level0/serve-port.test.js`, `level0/session-layer.test.js`, `level0/stop-binding.test.js`, `level0/stop-door.test.js`, `level0/stop-helper.test.js`, `level0/stop-hold.test.js`, `level0/style-top.test.js`, `level0/tools-door.test.js`, `level0/topic-readers.test.js`, `level0/trunk-door.test.js`, `level0/vehicle.test.js`, `level0/wait.test.js`, `level0/write-bless.test.js`, `level0/write.test.js`
 - [[spec/tickets/bridge-library-leaves]], stays and drops its imports: `level0/cage.test.js`
-- [[spec/tickets/branch-scripts-leave]], goes: `contract/drawing-page.test.js`, `contract/front.test.js`, `contract/git.test.js`, `contract/go-stamp.test.js`, `contract/pull-payload.test.js`, `level0/battery.test.js`, `level0/branch-needs.test.js`, `level0/brand.test.js`, `level0/budget.test.js`, `level0/check-server.test.js`, `level0/check-twins.js`, `level0/cli-exit.test.js`, `level0/config-golden.js`, `level0/drawing-edit.test.js`, `level0/drawn-twin.js`, `level0/editor.test.js`, `level0/git-batch.test.js`, `level0/go-modules.test.js`, `level0/go-source.test.js`, `level0/go-tests.test.js`, `level0/graph.test.js`, `level0/guidance-golden.js`, `level0/guidance-golden.test.js`, `level0/guidance-hand.test.js`, `level0/guidance-tags.test.js`, `level0/log-golden.js`, `level0/log-golden.test.js`, `level0/person-step.test.js`, `level0/pull-accept.test.js`, `level0/pull-bare.test.js`, `level0/pull-bless.test.js`, `level0/pull-cap.test.js`, `level0/pull-ephemeral.test.js`, `level0/pull-escalate.test.js`, `level0/pull-fail-verdict.test.js`, `level0/pull-fails.test.js`, `level0/pull-fields.test.js`, `level0/pull-findings.test.js`, `level0/pull-format.test.js`, `level0/pull-gate.test.js`, `level0/pull-hand-desk.test.js`, `level0/pull-hand.test.js`, `level0/pull-leaves.test.js`, `level0/pull-person.test.js`, `level0/pull-push.test.js`, `level0/pull-stale.test.js`, `level0/pull-steps.test.js`, `level0/pull-todo.test.js`, `level0/pull-unbound.test.js`, `level0/pull-writes-view.test.js`, `level0/pull-writes.test.js`, `level0/pull.test.js`, `level0/queue-cloud.test.js`, `level0/queue-golden.js`, `level0/ready.test.js`, `level0/retro-notes-pull.test.js`, `level0/review.test.js`, `level0/roots.test.js`, `level0/sidebar-writes.test.js`, `level0/stand.test.js`, `level0/test-verb.test.js`, `level0/ticket-edit.test.js`, `level0/ticket-yours.test.js`, `level0/unblock.test.js`, `level0/v1-index.js`, `level0/viewer.test.js`, `level0/work-answer-cloud.test.js`, `level0/work-answer.test.js`, `level0/work-chain.test.js`, `level0/work-cloud-marker.test.js`, `level0/work-desk.test.js`, `level0/work-done.test.js`, `level0/work-doors.js`, `level0/work-fix.test.js`, `level0/work-gate.test.js`, `level0/work-group.test.js`, `level0/work-held.test.js`, `level0/work-list.test.js`, `level0/work-marked.test.js`, `level0/work-merge-cloud.test.js`, `level0/work-open.test.js`, `level0/work-orphan.test.js`, `level0/work-rows.test.js`, `level0/work-stands.test.js`, `level0/work-switch.test.js`, `level0/work-sync.test.js`, `level0/work-usage.test.js`, `level0/work.test.js`
+- [[spec/tickets/branch-scripts-leave]], goes: `contract/drawing-page.test.js`, `contract/git.test.js`, `contract/go-stamp.test.js`, `contract/pull-payload.test.js`, `level0/battery.test.js`, `level0/branch-needs.test.js`, `level0/brand.test.js`, `level0/budget.test.js`, `level0/check-server.test.js`, `level0/check-twins.js`, `level0/cli-exit.test.js`, `level0/config-golden.js`, `level0/drawing-edit.test.js`, `level0/drawn-twin.js`, `level0/editor.test.js`, `level0/git-batch.test.js`, `level0/go-modules.test.js`, `level0/go-source.test.js`, `level0/go-tests.test.js`, `level0/graph.test.js`, `level0/guidance-golden.js`, `level0/guidance-golden.test.js`, `level0/guidance-hand.test.js`, `level0/guidance-tags.test.js`, `level0/log-golden.js`, `level0/log-golden.test.js`, `level0/person-step.test.js`, `level0/pull-accept.test.js`, `level0/pull-bare.test.js`, `level0/pull-bless.test.js`, `level0/pull-cap.test.js`, `level0/pull-ephemeral.test.js`, `level0/pull-escalate.test.js`, `level0/pull-fail-verdict.test.js`, `level0/pull-fails.test.js`, `level0/pull-fields.test.js`, `level0/pull-findings.test.js`, `level0/pull-format.test.js`, `level0/pull-gate.test.js`, `level0/pull-hand-desk.test.js`, `level0/pull-hand.test.js`, `level0/pull-leaves.test.js`, `level0/pull-person.test.js`, `level0/pull-push.test.js`, `level0/pull-stale.test.js`, `level0/pull-steps.test.js`, `level0/pull-todo.test.js`, `level0/pull-unbound.test.js`, `level0/pull-writes-view.test.js`, `level0/pull-writes.test.js`, `level0/pull.test.js`, `level0/queue-cloud.test.js`, `level0/queue-golden.js`, `level0/ready.test.js`, `level0/retro-notes-pull.test.js`, `level0/review.test.js`, `level0/roots.test.js`, `level0/sidebar-writes.test.js`, `level0/stand.test.js`, `level0/test-verb.test.js`, `level0/ticket-edit.test.js`, `level0/ticket-yours.test.js`, `level0/unblock.test.js`, `level0/v1-index.js`, `level0/viewer.test.js`, `level0/work-answer-cloud.test.js`, `level0/work-answer.test.js`, `level0/work-chain.test.js`, `level0/work-cloud-marker.test.js`, `level0/work-desk.test.js`, `level0/work-done.test.js`, `level0/work-doors.js`, `level0/work-fix.test.js`, `level0/work-gate.test.js`, `level0/work-group.test.js`, `level0/work-held.test.js`, `level0/work-list.test.js`, `level0/work-marked.test.js`, `level0/work-merge-cloud.test.js`, `level0/work-open.test.js`, `level0/work-orphan.test.js`, `level0/work-rows.test.js`, `level0/work-stands.test.js`, `level0/work-switch.test.js`, `level0/work-sync.test.js`, `level0/work-usage.test.js`, `level0/work.test.js`
 - [[spec/tickets/branch-scripts-leave]], stays and drops its imports: `level0/fields-to-fill.test.js`, `level0/lens-actions.test.js`, `level0/lens-v1.test.js`, `level0/lens.test.js`, `level0/logbook.test.js`, `level0/route-host.test.js`, `level0/serve.test.js`, `level0/sidebar-v1.test.js`, `level0/sidebar-views.test.js`, `level0/sidebar-work.test.js`, `level0/sidebar.test.js`
-- [[spec/tickets/pull-scripts-leave]], goes: `contract/schema-bless.test.js`, `contract/tree.test.js`, `level0/bless-desk.test.js`, `level0/cloud-desk.test.js`, `level0/folders.test.js`, `level0/landed.test.js`, `level0/lint-sweep.test.js`, `level0/process.test.js`, `level0/pull-chapter.test.js`, `level0/pull-children.test.js`, `level0/pull-cleanup.test.js`, `level0/pull-hand-front.test.js`, `level0/pull-hand-of.test.js`, `level0/pull-kept.test.js`, `level0/pull-outline.test.js`, `level0/pull-spawn.test.js`, `level0/pull-when.test.js`, `level0/queue.test.js`, `level0/spawn-answer.test.js`, `level0/ticket-verb.test.js`, `level0/tool-call.test.js`, `level0/verdict-guard.test.js`
+- [[spec/tickets/pull-scripts-leave]], goes: `contract/tree.test.js`, `level0/bless-desk.test.js`, `level0/cloud-desk.test.js`, `level0/folders.test.js`, `level0/landed.test.js`, `level0/lint-sweep.test.js`, `level0/process.test.js`, `level0/pull-chapter.test.js`, `level0/pull-children.test.js`, `level0/pull-cleanup.test.js`, `level0/pull-hand-front.test.js`, `level0/pull-hand-of.test.js`, `level0/pull-kept.test.js`, `level0/pull-outline.test.js`, `level0/pull-spawn.test.js`, `level0/pull-when.test.js`, `level0/queue.test.js`, `level0/spawn-answer.test.js`, `level0/ticket-verb.test.js`, `level0/tool-call.test.js`, `level0/verdict-guard.test.js`
 - [[spec/tickets/pull-scripts-leave]], stays and drops its imports: `level0/hand.test.js`, `level0/level1.test.js`, `level0/route-fixture.test.js`
 - [[spec/tickets/ticket-scripts-leave]], goes: `contract/vehicle.test.js`, `level0/ask-lint.test.js`, `level0/ticket-drift.test.js`, `level0/ticket-fill.test.js`, `level0/ticket-new.test.js`, `level0/ticket-route.test.js`, `level0/ticket-todo.test.js`
 - [[spec/tickets/ticket-scripts-leave]], stays and drops its imports: `level0/save-fills.test.js`
 - [[spec/tickets/guidance-lib-leaves]], goes: `contract/guidance-rules.test.js`, `contract/guidance-tags.test.js`, `contract/question-grades.test.js`
-- [[spec/tickets/plugin-libs-leave]], goes: `contract/biome.test.js`, `contract/candidate-check.test.js`, `contract/folders.test.js`, `contract/handover-words.test.js`, `contract/install.test.js`, `contract/lint-twins.test.js`, `contract/retro-route.test.js`, `contract/ticket.test.js`, `contract/topic-keys.test.js`, `contract/vocabulary.test.js`, `level0/apply.test.js`, `level0/bash-test-run.test.js`, `level0/bash.test.js`, `level0/check-twins.test.js`, `level0/config.test.js`, `level0/controls.test.js`, `level0/front-writer.test.js`, `level0/index-tools.test.js`, `level0/index.test.js`, `level0/layer.test.js`, `level0/log-serve.test.js`, `level0/log.test.js`, `level0/magic.test.js`, `level0/markers.test.js`, `level0/mutations.test.js`, `level0/names.test.js`, `level0/paths.test.js`, `level0/plugin-check.test.js`, `level0/private.test.js`, `level0/projection-builtin.test.js`, `level0/pull-doors.js`, `level0/quack-doors.js`, `level0/reply-hook.test.js`, `level0/schema-notes.js`, `level0/schema-route.test.js`, `level0/schema-slots.test.js`, `level0/schema-sweep.test.js`, `level0/schema.test.js`, `level0/servers.test.js`, `level0/shell-values.test.js`, `level0/size.test.js`, `level0/stop.test.js`, `level0/tested.test.js`, `level0/ticket.test.js`, `level0/todo.test.js`, `level0/tools.test.js`, `level0/trunk.test.js`, `level0/verb-line.test.js`, `level0/verbs.test.js`, `level0/vocabulary.test.js`, `level0/writes-here.test.js`
+- [[spec/tickets/plugin-libs-leave]], goes: `contract/biome.test.js`, `contract/candidate-check.test.js`, `contract/folders.test.js`, `contract/install.test.js`, `contract/lint-twins.test.js`, `contract/topic-keys.test.js`, `level0/apply.test.js`, `level0/bash-test-run.test.js`, `level0/bash.test.js`, `level0/check-twins.test.js`, `level0/config.test.js`, `level0/controls.test.js`, `level0/index-tools.test.js`, `level0/index.test.js`, `level0/layer.test.js`, `level0/log-serve.test.js`, `level0/log.test.js`, `level0/magic.test.js`, `level0/markers.test.js`, `level0/mutations.test.js`, `level0/names.test.js`, `level0/plugin-check.test.js`, `level0/private.test.js`, `level0/projection-builtin.test.js`, `level0/pull-doors.js`, `level0/quack-doors.js`, `level0/reply-hook.test.js`, `level0/schema-notes.js`, `level0/schema-route.test.js`, `level0/schema-slots.test.js`, `level0/schema-sweep.test.js`, `level0/schema.test.js`, `level0/servers.test.js`, `level0/shell-values.test.js`, `level0/size.test.js`, `level0/stop.test.js`, `level0/tested.test.js`, `level0/ticket.test.js`, `level0/tools.test.js`, `level0/trunk.test.js`, `level0/verb-line.test.js`, `level0/verbs.test.js`, `level0/vocabulary.test.js`
 - [[spec/tickets/plugin-libs-leave]], stays and drops its imports: `contract/cloud-start.test.js`, `contract/tree-extension.test.js`, `level0/caged-door.test.js`, `level0/door-clear.test.js`, `level0/door-spawn.test.js`, `level0/lsp.test.js`, `level0/pull-spawn-hook.test.js`, `level0/read-tools.test.js`, `level0/start-constants.test.js`
+- [[spec/tickets/schema-libs-leave]], goes: `contract/front.test.js`, `contract/handover-words.test.js`, `contract/retro-route.test.js`, `contract/schema-bless.test.js`, `contract/ticket.test.js`, `contract/tree-of.js`, `contract/vocabulary.test.js`, `level0/front-writer.test.js`, `level0/paths.test.js`, `level0/todo.test.js`, `level0/writes-here.test.js`
+- [[spec/tickets/schema-libs-leave]], stays and drops its imports: `contract/drawing-page.test.js`, `contract/process.test.js`, `contract/schema.test.js`, `level0/lens-actions.test.js`, `level0/lens-v1.test.js`, `level0/sidebar-views.test.js`, `level0/v1-index.js`
 - [[spec/tickets/engine-and-doors-leave]], goes: `contract/awake.test.js`, `contract/clock.test.js`, `contract/compact.test.js`, `contract/http.test.js`, `contract/index.test.js`, `contract/log.test.js`, `level0/front-merge.test.js`, `level0/group.test.js`, `level0/quoted.test.js`, `level0/status.test.js`, `level0/ticket-folders.test.js`
-- [[spec/tickets/engine-and-doors-leave]], stays and drops its imports: `contract/process.test.js`, `level0/bridgehead.test.js`, `level0/front-writer.test.js`, `level0/log.test.js`
+- [[spec/tickets/engine-and-doors-leave]], stays and drops its imports: `contract/process.test.js`, `level0/bridgehead.test.js`, `level0/log.test.js`
 - [[spec/tickets/plugin-libs-leave]], goes with the git door: `contract/real-git.test.js`
 - [[spec/tickets/remaining-js-names-its-reason]], stays beside the wire door: `contract/editor-index.test.js`, `contract/wire.test.js`
 - [[spec/tickets/scripts-folder-leaves]], goes: `level0/trust.test.js`

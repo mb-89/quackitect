@@ -37,8 +37,13 @@ func (one *Checker) Over(path string) []Finding {
 	}
 
 	out := []Finding{}
+	schemas := schemasIn(one.tree)
+	if !strings.HasSuffix(where, ".md") {
+		// A file a data schema governs reads under it. [[spec/design_output/schema#a-data-schema-holds-yaml]]
+		out = append(out, fileFaults(schemas, where, one.tree.Read)...)
+	}
 	if strings.HasSuffix(where, ".md") {
-		out = append(out, noteFaults(one.tree, schemasIn(one.tree), where, one.tree.Read(where))...)
+		out = append(out, noteFaults(one.tree, schemas, where, one.tree.Read(where))...)
 		// An open buffer writing a field the verbs own warns, and a file no editor holds draws nothing here. [[spec/design_output/lsp#an-engine-field-warns]]
 		out = append(out, engineFaults(one.tree, where)...)
 	}

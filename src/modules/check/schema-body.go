@@ -8,8 +8,8 @@ import (
 	"quackitect/src/yaml"
 
 	"fmt"
+	"slices"
 	"strconv"
-	"strings"
 )
 
 type standingAt struct {
@@ -17,43 +17,46 @@ type standingAt struct {
 	at int
 }
 
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 func bodyFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	level := 1
 	if spec.Has("headingLevel") {
 		level = yaml.AsInt(spec.Get("headingLevel"))
 	}
-	wanted := chaptersWanted(yaml.AsList(spec.Get("sections")), note.Front.Said)
-
-	standing := []standingAt{}
-	for i, one := range note.Sections {
-		if one.Level == level {
-			standing = append(standing, standingAt{Section: one, at: i})
+	wanted := chaptersWanted(yaml.AsList(spec.Get("sections")), note.Front.Said, level)
+	levels, nested := map[int]bool{level: true}, false
+	named := map[string]mintChapter{}
+	once := []mintChapter{}
+	for _, one := range wanted {
+		levels[one.level] = true
+		nested = nested || one.level > level
+		named[chapterKey(one.level, one.header)] = one
+		if one.level == level {
+			once = append(once, one)
 		}
 	}
 
-	named := map[string]*yaml.Doc{}
-	for _, one := range wanted {
-		if rule := yaml.AsDoc(one); rule != nil {
-			named[yaml.AsString(rule.Get("header"))] = rule
+	standing, top := []standingAt{}, []standingAt{}
+	for i, one := range note.Sections {
+		if (nested && one.Level >= level) || (!nested && levels[one.Level]) {
+			standing = append(standing, standingAt{Section: one, at: i})
+		}
+		if one.Level == level {
+			top = append(top, standingAt{Section: one, at: i})
 		}
 	}
 
 	out := []Finding{}
 	for _, one := range wanted {
-		rule := yaml.AsDoc(one)
-		if rule == nil || !yaml.AsBool(rule.Get("required")) {
+		if !one.required || slices.ContainsFunc(standing, func(held standingAt) bool { return held.Header == one.header && held.Level == one.level }) {
 			continue
 		}
-		header := yaml.AsString(rule.Get("header"))
-		if headed(standing, header) >= 0 {
-			continue
-		}
-		out = append(out, schemaFault(header, where, 1,
-			fmt.Sprintf("A %s carries a %s chapter.", kind, header)))
+		out = append(out, schemaFault(one.header, where, 1,
+			fmt.Sprintf("A %s carries a %s chapter.", kind, one.header)))
 	}
 
 	for _, held := range standing {
-		if _, ours := named[held.Header]; ours {
+		if _, ours := named[chapterKey(held.Level, held.Header)]; ours {
 			continue
 		}
 		if spec.Get("extraSections") == false {
@@ -63,58 +66,26 @@ func bodyFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	}
 
 	if yaml.AsString(spec.Get("order")) == "strict" {
-		out = append(out, orderFaults(standing, wanted, kind, where)...)
+		out = append(out, orderFaults(top, once, kind, where)...)
 	}
-	out = append(out, lastFaults(standing, wanted, where)...)
+	out = append(out, lastFaults(top, once, where)...)
 
 	for _, held := range standing {
-		if rule, ours := named[held.Header]; ours {
-			out = append(out, sectionFaults(held, rule, note, where)...)
+		if one, ours := named[chapterKey(held.Level, held.Header)]; ours {
+			out = append(out, sectionFaults(held, one.rule, note, where)...)
 		}
 	}
 	return out
 }
 
-// [[spec/design_output/schema#keywords-that-name-a-step]]
-func chaptersWanted(sections []any, front *yaml.Doc) []any {
-	out := []any{}
-	for _, one := range sections {
-		rule := yaml.AsDoc(one)
-		list := ""
-		if rule != nil {
-			list = yaml.AsString(rule.Get("x-one-per"))
-		}
-		if list == "" {
-			out = append(out, one)
-			continue
-		}
-		if front == nil {
-			continue
-		}
-		for _, step := range yaml.AsList(front.Get(list)) {
-			said := yaml.AsDoc(step)
-			if said == nil {
-				continue
-			}
-			header := strings.TrimSpace(yaml.AsString(said.Get("name")))
-			if header == "" {
-				continue
-			}
-			chapter := yaml.New()
-			chapter.Set("header", header)
-			chapter.Set("required", true)
-			out = append(out, chapter)
-		}
-	}
-	return out
+func chapterKey(level int, header string) string {
+	return strconv.Itoa(level) + " " + header
 }
 
-func orderFaults(standing []standingAt, wanted []any, kind, where string) []Finding {
+func orderFaults(standing []standingAt, wanted []mintChapter, kind, where string) []Finding {
 	order := []string{}
 	for _, one := range wanted {
-		if rule := yaml.AsDoc(one); rule != nil {
-			order = append(order, yaml.AsString(rule.Get("header")))
-		}
+		order = append(order, one.header)
 	}
 
 	held := []standingAt{}
@@ -135,14 +106,13 @@ func orderFaults(standing []standingAt, wanted []any, kind, where string) []Find
 	return out
 }
 
-func lastFaults(standing []standingAt, wanted []any, where string) []Finding {
+func lastFaults(standing []standingAt, wanted []mintChapter, where string) []Finding {
 	out := []Finding{}
 	for _, one := range wanted {
-		rule := yaml.AsDoc(one)
-		if rule == nil || yaml.AsString(rule.Get("position")) != "last" {
+		if yaml.AsString(one.rule.Get("position")) != "last" || one.rule.Has("x-one-per") {
 			continue
 		}
-		header := yaml.AsString(rule.Get("header"))
+		header := one.header
 		found := headed(standing, header)
 		if found < 0 || found == len(standing)-1 {
 			continue
@@ -171,6 +141,9 @@ func sectionFaults(held standingAt, rule *yaml.Doc, note Note, where string) []F
 	}
 	if spec := yaml.AsDoc(rule.Get("subsections")); spec != nil {
 		out = append(out, underFaults(held, spec, note, where)...)
+	}
+	if spec := yaml.AsDoc(rule.Get("table")); spec != nil {
+		out = append(out, tableFaults(held, spec, note, where)...)
 	}
 	return out
 }

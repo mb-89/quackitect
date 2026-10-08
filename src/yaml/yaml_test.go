@@ -3,6 +3,7 @@ package yaml
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -101,6 +102,13 @@ func TestADocMarshalsItsKeysInOrder(t *testing.T) {
 	got, err := json.Marshal(said)
 	if want := `{"b":1,"a":["x",{"c":true,"d":["one","two"]}]}`; err != nil || string(got) != want {
 		t.Errorf("the doc marshals %s (%v), and wants %s", got, err, want)
+	}
+	var out strings.Builder
+	writes := json.NewEncoder(&out)
+	writes.SetEscapeHTML(false)
+	err = writes.Encode(AsDoc(Read("said: a <b> & c\n")))
+	if want := "{\"said\":\"a <b> & c\"}\n"; err != nil || out.String() != want {
+		t.Errorf("the doc encodes %s (%v), and wants the text unescaped as %s", out.String(), err, want)
 	}
 }
 

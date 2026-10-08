@@ -1,5 +1,5 @@
-// The wording of the write door's schema refusals, off refusedKind and
-// refusedNote in lib/schema.js.
+// The wording of the write door's schema refusals: a kind another schema
+// governs, and a note its own schema refuses.
 // [[spec/tickets/cage-write-door-port]]
 package write
 

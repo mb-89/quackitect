@@ -1,0 +1,186 @@
+[
+  {
+    "name": "fields-closed",
+    "text": "---\nkind: [[ticket]]\nstate: closed\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\", \"a comment names the approach\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            expects: assertion\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see, and what surprises you\n      - name: change\n        does: makes the change\n        evidence:\n          - name: lint\n            form: command\n            says: the tree builds and lints\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n<!-- writes the tests the ask calls for -->\n\n### tests\n\n<!-- the tests you write fail on their own assertion -->\n\n### seen\n\nThe marks stand.\n\n## change\n\n### lint\n\n<!-- the tree builds and lints -->\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "state": "closed",
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake",
+            "a comment names the approach"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "expects": "assertion",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see, and what surprises you"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change",
+              "evidence": [
+                {
+                  "name": "lint",
+                  "form": "command",
+                  "says": "the tree builds and lints"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "step": "implement/tests-red"
+    }
+  },
+  {
+    "name": "lens-grouped",
+    "text": "---\nkind: [[ticket]]\ngroup: a-group\nstate: open\nstep: design/draft\nsteps:\n  - name: design\n    steps:\n      - name: draft\n        by: anyone\n        evidence:\n          - name: approach\n            form: text\n      - name: review\n        evidence:\n          - name: verdict\n            form: verdict\n  - name: ship\n    by: agent\n    steps:\n      - name: push\n        evidence:\n          - name: pushed\n            form: command\n---\n\n# Ask\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "group": "a-group",
+      "state": "open",
+      "step": "design/draft",
+      "steps": [
+        {
+          "name": "design",
+          "steps": [
+            {
+              "name": "draft",
+              "by": "anyone",
+              "evidence": [
+                {
+                  "name": "approach",
+                  "form": "text"
+                }
+              ]
+            },
+            {
+              "name": "review",
+              "evidence": [
+                {
+                  "name": "verdict",
+                  "form": "verdict"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "ship",
+          "by": "agent",
+          "steps": [
+            {
+              "name": "push",
+              "evidence": [
+                {
+                  "name": "pushed",
+                  "form": "command"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "lens-held",
+    "text": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see\n      - name: change\n        does: makes the change\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n### tests\n\n<!-- the tests you write fail on their own assertion -->\n\n### seen\n\nThe marks stand.\n\n## change\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "state": "open",
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change"
+            }
+          ]
+        }
+      ],
+      "step": "implement/tests-red"
+    }
+  },
+  {
+    "name": "lens-v1-cloud",
+    "text": "---\nkind: [[ticket]]\nstate: open\ncloud: true\n---\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "state": "open",
+      "cloud": true
+    }
+  },
+  {
+    "name": "lens-v1-up-there",
+    "text": "---\nkind: [[ticket]]\nstate: open\ngroup: up-there\nsteps:\n  - name: draft\n    does: writes the approach\nstep: draft\n---\n\n# Ask\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "state": "open",
+      "group": "up-there",
+      "steps": [
+        {
+          "name": "draft",
+          "does": "writes the approach"
+        }
+      ],
+      "step": "draft"
+    }
+  },
+  {
+    "name": "route-closed",
+    "text": "---\nkind: [[ticket]]\nstate: closed\nstep: draft\nsteps:\n  - name: draft\n    does: works draft\n    evidence:\n      - name: says\n        form: text\n---\n\n# Ask\n",
+    "front": {
+      "kind": "[[ticket]]",
+      "state": "closed",
+      "step": "draft",
+      "steps": [
+        {
+          "name": "draft",
+          "does": "works draft",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

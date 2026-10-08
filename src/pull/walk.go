@@ -1,6 +1,6 @@
 // The walk of a route: every step with its path and its parent, a leaf where
-// it holds no named step, off entriesIn and entryNamed in
-// .claude/skills/level0/lib/schema-route.js, and the leaves a ticket reached.
+// it holds no named step, as entriesIn and entryNamed in
+// src/modules/check/route.go walk it, and the leaves a ticket reached.
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
 package pull
 

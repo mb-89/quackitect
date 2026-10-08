@@ -7,8 +7,7 @@ import { dirname, join } from "node:path";
 import { after, before, test } from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { ticketDrawn, ticketText } from "../level0/v1-index.js";
+import { ticketDrawn } from "../level0/v1-index.js";
 import { moved, reachedIn } from "../../src/extension/webview/route/edit.js";
 
 // The webview and the shipped script, which drawingWebview and drawingOut in src/quack/bundle_verb.go name, and the browser the check hands node. [[spec/tickets/scripts-folder-leaves]]
@@ -23,9 +22,8 @@ const why = !files.exists(DRIVER)
   : !browser && "no browser stands here, so run ./RUNME.sh";
 
 // A ticket carrying each mark the page draws. [[spec/design_output/drawing#the-layout-reads-the-graph]]
-const TICKET = ticketText("drawing-marks");
 const GRAPH = ticketDrawn("drawing-marks").graph;
-const FRONT = readNote(TICKET).front.said;
+const FRONT = { steps: ticketDrawn("drawing-marks").steps };
 
 // The page a webview carries, with the one call a webview carries faked. [[spec/design_output/drawing#a-fake-host-drives-it]]
 const PAGE = `<!doctype html><html><head><style>html,body{width:900px;height:700px}</style>
