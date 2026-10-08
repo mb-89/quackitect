@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -188,6 +188,15 @@ record:
     hash_after: 412a5a004f08b7a3e880d53be9132112a1477031
     returns: 1
     why: Move each stands and readText reach onto d.disk. These are stands on the esbuild check in src/quack/bundle_verb.go, unparked and keyed in src/quack/probe_clear.go, and drySession in src/quack/probe_dry.go. Each one reaches the real disk with no marker today.; Seed bundleTree, TestBundleHereAnswersWhetherTheBannerNamesTheStamp, TestTheBundleNamesTheInstallWhereEsbuildStandsNowhere and TestTheProbeDropsEveryParkInItsCloneAndCommitsIt on d.disk. They seed the real disk through seedTree today, so they must fail by assertion before the change.; Name git grep -n OutsideInDoors over the five files as the checkpoint of the done_when line. go test ./src/owns/ ./src/imports/ passes today with the markers standing, so it decides nothing.; hookHere still reaches the real box past quietBox through configAt(root), logsRow(root, ...) and the realPost of hookAsk. The approach must hand all three from the box doors.
+  - step: design/draft-2
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 8d5638118133e040279f6213796ff8088729e118
+    hash_after: 8d5638118133e040279f6213796ff8088729e118
+    inputs:
+      - name: ask
+        hash: 965aca16ed5ff388
+        size: 494
+    def: 05d09c51410ea2a3
 group: javascript-leaves
 ---
 
@@ -322,38 +331,83 @@ The stamp cases now seed and read the fake disk the box doors hand. Two cases fa
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each reach moves onto the doors its function holds or takes. Each file then drops os and net/http with their markers. The registered twins hand the real doors, so a real run changes nothing.
+
+- bundle_verb.go: drawingStamp takes a diskDoors, walks the entry's folder through walkFiles and reads each source through read. bundleVerb reads the shipped script and checks esbuild through d.disk.
+- stamp_verb.go: it already reaches through d.disk, and it stays as it stands.
+- hook_verb.go: hookOn takes one boxDoors and builds the hand off it, and hookHere answers hookOn(quietBox()). Root, env, input, clock, disk and post come from the box doors.
+- hook_verb.go: the config reads through configOn(box.disk, root). The log writes through logsRowOn(disk, now, work, floor), which logsRow in ticket_doors.go calls.
+- hook_verb.go: hookAsk takes the disk and the post, and copilotReader takes the disk. Two named constants hold the bounds of a 2xx reply, so net/http leaves.
+- probe_clear.go: clearRun, grouped and unparked read and write through d.disk, and keyed takes the diskDoors.
+- probe_dry.go: probed makes its temp tree through d.disk.makeTemp and removes it through d.disk.removeAll. drySession reads the standing file through d.disk.read.
+- The purity baseline rows these functions hold leave through ./RUNME.sh guards --update.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb.go bundleVerb, which calls drawingStamp
+- src/quack/bundle_verb_test.go stampHere, which calls drawingStamp
+- src/quack/hook_verb.go init, which calls hookHere
+- src/quack/hook_verb.go hookHere, which calls hookOn
+- src/quack/hook_verb.go copilotAnswer, which calls copilotReader
+- src/quack/hook_verb_test.go TestHookAsksTheDoorTheStandingFileNames, which calls hookAsk
+- src/quack/ticket_doors.go pullLog, which calls logsRow
+- src/quack/probe_clear.go dryRun.clearRun, which calls keyed and grouped
+- src/quack/probe_clear.go grouped, which calls unparked
+- src/quack/probe_dry_test.go TestTheProbeDropsEveryParkInItsCloneAndCommitsIt, which calls unparked
+- src/quack/probe_dry.go probeDry and probeSmoke, which call probed
+- src/quack/probe_dry.go probed, which calls drySession
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go bundleTree, TestBundleHereAnswersWhetherTheBannerNamesTheStamp and TestTheBundleNamesTheInstallWhereEsbuildStandsNowhere, seeded on d.disk through hq1SeedDisk, red while the verb reads the real disk
+- src/quack/bundle_verb_test.go TestTheDrawingStampMovesWithASourceUnderTheWebviewAndHoldsOtherwise, seeded on newFakeDisk, red while drawingStamp walks the real disk
+- src/quack/probe_dry_test.go TestTheProbeDropsEveryParkInItsCloneAndCommitsIt, seeded and read on d.disk, red while unparked reads the real disk
+- src/quack/hook_verb_test.go TestTheHookHandReadsTheBoxDoors, new: hookOn over fakeBoxDoors with a log.level and a standing file on the fake disk, so its log row and its ask land on the fakes
+- src/quack/hook_verb_test.go TestHookAsksTheDoorTheStandingFileNames, its standing file on a fake disk and its post a fake, so no real server stands
+- the checkpoint of the done_when line: git grep -n OutsideInDoors over src/quack/bundle_verb.go, hook_verb.go, probe_clear.go, probe_dry.go and stamp_verb.go answers nothing, and go test ./src/owns/ ./src/imports/ passes
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- move each stands and readText reach onto d.disk: bundleVerb checks esbuild through d.disk.stands, unparked and keyed read through the disk door, and drySession reads through d.disk.read
+- seed the bundle and probe cases on d.disk: bundleTree, the two bundle cases and the unpark case seed through hq1SeedDisk on d.disk, so they fail by assertion before the change
+- name git grep -n OutsideInDoors over the five files as the checkpoint: the tests list names it beside go test over src/owns and src/imports
+- hookHere reaches past quietBox: hookOn builds the hand off one boxDoors, and configOn, logsRowOn and the post all take its doors
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb.go
+- src/quack/hook_verb.go
+- src/quack/probe_clear.go
+- src/quack/probe_dry.go
+- src/quack/ticket_doors.go
+- src/quack/bundle_verb_test.go
+- src/quack/hook_verb_test.go
+- src/quack/probe_dry_test.go
+- src/imports/baseline/purity.txt
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened bundle_verb.go, hook_verb.go, probe_clear.go, probe_dry.go, stamp_verb.go, boxdoors.go, boxfiles.go, configOn in main.go and logsRow in ticket_doors.go, and checked each reach there
+- the callers list names every caller of drawingStamp, hookHere, hookAsk, copilotReader, logsRow, keyed, unparked, grouped, probed and drySession, off a grep of src
+- the done_when line is decided by git grep -n OutsideInDoors over the five files, beside go test over src/owns and src/imports
+- the approach adds no config key
 
 ## tests-red-2
 
