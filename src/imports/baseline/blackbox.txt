@@ -1,5 +1,4 @@
 src/config/config_test.go
-src/engine/swap/swap_test.go
 src/front/cmd/main_test.go
 src/front/front_test.go
 src/modules/check/buffers_test.go
