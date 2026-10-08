@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -62,7 +63,8 @@ steps:
             says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
-            says: how each bad line stops happening, named by its home
+            home: true
+            says: how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks
           - name: thoughts
             form: text
             says: what the thoughts say that the actions do not, off the transcript
@@ -81,8 +83,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 5d4a884bfb2491ff
-step: split
+process_hash: d9f9539fef3ec913
 record:
   - step: sync
     hand: box fb4ccb7cacc7 · claude-code-remote
