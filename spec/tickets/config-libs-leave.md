@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "   77.9  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 9f512980b8b75a01ec4b5c67e24c21ae096979d9
+    hash_after: 9f512980b8b75a01ec4b5c67e24c21ae096979d9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/config passes; green, src/q passes
+      - name: check
+        exit: 0
+        said: "   74.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 072aee76580238c8
+        size: 1680
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -408,26 +431,33 @@ The variable rule stands once, in q.EnvOf. config.md points at it, and its EnvOf
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/config_libs_test.go src/quack/config_test.go src/quack/verb_config_test.go src/modules/config/env_test.go src/q/layers_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The config reader and its layers leave the plugin library, and Go answers every key alone. The layers stand in src/q/layers.go, and src/modules/config lays the rows. The variable a key names now kebabs each segment before it shouts, so stop.mostInARow reads SE_STOP_MOST_IN_A_ROW as config.md says. The undocumented SE_STOP_MOSTINAROW spelling stops working. configRows reads a local file holding no JSON as empty. The comments and notes that named config.js or layer.js name their Go owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every touched file stands in the draft size or a gate point, and src/q/layers_test.go joins them for the EnvOf case the commit door asks beside layers.go.
+The change reaches no door. EnvOf and configRows are pure, and the quack cases run on temp roots.
+Code comments point at spec/design_output/config: the-go-reader on EnvOf, and the-layers on configRows.
+The variable rule stands once, in q.EnvOf, and config.md points at it.
 
 # accept
 
