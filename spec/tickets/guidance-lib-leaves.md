@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: acd1a3fd713bb611
         size: 6831
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 4fc58196bc53b49a8f256910974bc808a9ad2041
+    hash_after: 4fc58196bc53b49a8f256910974bc808a9ad2041
+    inputs:
+      - name: design/draft
+        hash: acd1a3fd713bb611
+        size: 6831
+      - name: design/tests-red
+        hash: 70d2653b2e1c9134
+        size: 1252
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -337,8 +349,9 @@ The tests reach no door. The quack cases glob the disk with no exec, and the mod
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line. TestTheGuidanceParserStandsNowhere decides the git ls-files line. The brief and guidance suites decide the go test line, and the check at tests-green decides the third. No hook, library, extension file, stub, RUNME.sh, package.json or workflow imports lib/guidance.js. Its only importers are the three leaving contract tests. Every Go function the approach names stands at HEAD. That covers actionables, RulesOf, LayerFor, ForHelper, Canary, CanaryText, Owes, CanaryIn, frontOf and words. The level0.md lines 646, 717, 1129, 1178, 1196 and 1277 match. Dropping question-grades.test.js loses no code behavior, since it pins the wording of shipped notes alone. The code-span star row and the quoted-tag case port the two live JS cases as behavior over seeded text. config-libs-leave takes the inherits comment, and the gate there agrees. Points the implementer fixes in place: (1) Approach line 7 overclaims. frontFaults in src/modules/check/schema.go reads top keys alone, so no Go check holds tags on a step today. Rewrite line 7 to hand the schema case to schema-libs-leave approach line 19, which ports nested keys. (2) Add an Assumed line saying that whichever of this ticket and schema-libs-leave lands second deletes guidance-tags.test.js, as schema-libs-leave assumes. (3) Approach line 15 also catches the src/bridge/guidance.js pointers in brief.go, brief/brief.go, spawn.go and spawn_test.go. Either limit line 15 to the lib file or add spawn.go and spawn_test.go to size. (4) spec/tickets/javascript-leaves.md row 271 names plugin-libs-leave for guidance.js. Its goes lines name plugin-libs-leave and ticket-scripts-leave for the three tests. Point these rows at guidance-lib-leaves, and add the file to size. (5) The callers list omits the test readers of the heard constants: probe_cold_test.go, probe_dry_test.go and probe_verb_test.go. Name them, since their values now come from brief. (6) Approach line 8 and its Weighed line cite tests.md rule 5, which governs golden files. Ground the drop on the owner word that tests test behavior and interfaces instead.
 
 # implement
 
