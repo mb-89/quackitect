@@ -7,8 +7,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"encoding/json"
 	"fmt"
-	// level0: OutsideInDoors - the case stands the clone's files in a temp root, the probe's door test
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -60,8 +58,8 @@ func dryBox(t *testing.T, answer func(hooks.Post) hooks.Answer) (boxDoors, *fake
 	d.run = func(argv []string, o runOpts) ranResult {
 		if filepath.Base(argv[0]) == "se-index" && len(argv) > 1 && argv[1] == "standing" {
 			at := filepath.Join(o.cwd, filepath.FromSlash(hooks.StandingFile))
-			_ = os.MkdirAll(filepath.Dir(at), 0o755)
-			_ = os.WriteFile(at, []byte(fmt.Sprintf(`{"port":%d,"token":%q}`, dryPort, dryToken)), 0o600)
+			_ = d.disk.makeAll(filepath.Dir(at), 0o755)
+			_ = d.disk.write(at, []byte(fmt.Sprintf(`{"port":%d,"token":%q}`, dryPort, dryToken)), 0o600)
 		}
 		return inner(argv, o)
 	}
@@ -447,17 +445,12 @@ func TestATempTreeTheBoxStillHoldsStaysNamedAndTheVerdictStands(t *testing.T) {
 func TestTheProbeDropsEveryParkInItsCloneAndCommitsIt(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
-	tree := t.TempDir() // level0: FixtureOutsideHome - the unpark rewrites a ticket in a tree of the case's own
+	tree := d.root
 	parked := filepath.Join(tree, "spec", "tickets", "a.md")
-	if err := os.MkdirAll(filepath.Dir(parked), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(parked, []byte("---\ntodo: true\nstate: open\n---\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq1SeedDisk(t, d.disk, tree, map[string]string{"spec/tickets/a.md": "---\ntodo: true\nstate: open\n---\n"})
 	runner.answers["git grep"] = ranResult{stdout: "spec/tickets/a.md\n"}
 	unparked(d, tree)
-	if text, _ := os.ReadFile(parked); string(text) != "---\nstate: open\n---\n" {
+	if text, _ := d.disk.read(parked); string(text) != "---\nstate: open\n---\n" {
 		t.Errorf("the parked ticket reads %q", text)
 	}
 	committed := slices.IndexFunc(runner.ran, func(one []string) bool { return slices.Contains(one, "commit") })

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -197,6 +197,19 @@ record:
         hash: 965aca16ed5ff388
         size: 494
     def: 05d09c51410ea2a3
+  - step: design/tests-red-2
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: e834572f4cce8c48b74ef453b5993ad2c956a87f
+    hash_after: e834572f4cce8c48b74ef453b5993ad2c956a87f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft-2
+        hash: 3d4f484e875cdf25
+        size: 4751
+    def: 9c7cd4dd4a2dadb8
 group: javascript-leaves
 ---
 
@@ -416,26 +429,32 @@ Each reach moves onto the doors its function holds or takes. Each file then drop
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/bundle_verb_test.go src/quack/probe_dry_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go
+- src/quack/probe_dry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The bundle cases, the drawing stamp case, the unpark case and the dry probe's standing file now seed the disk door. Each fails by its own check: the bundle and stamp cases find no source on the real disk, the unpark case reads the park still standing, and the dry probe hears no door. The hook cases wait for the change step, since hookOn and the new hookAsk do not compile before it. The grep checkpoint holds the hook markers until then. Nothing else surprised me.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when line meets the grep checkpoint over the five files, beside go test over src/owns and src/imports, and these cases fail until the verbs read through the doors
+- the tests reach the disk, the runner and the post, and each has a fake: newFakeDisk, fakeRunner and the dry door's post
 
 # gate
 

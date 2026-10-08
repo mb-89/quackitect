@@ -23,15 +23,16 @@ const (
 // A tree holding the entry, the lock and esbuild, so a bundle runs. [[spec/tickets/scripts-folder-leaves]]
 func bundleTree(t *testing.T, d boxDoors, entry string) {
 	t.Helper()
-	seedTree(t, d.root, map[string]string{
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{
 		bundleWebview + "/route/drawing.js":                  entry,
 		bundleWebview + "/package-lock.json":                 "{}",
 		bundleWebview + "/node_modules/esbuild/package.json": "{}",
 	})
 }
 
-func stampHere(t *testing.T, root string) string {
+func stampHere(t *testing.T, disk diskDoors, root string) string {
 	t.Helper()
+	_ = disk
 	stamp, err := drawingStamp(root)
 	if err != nil {
 		t.Fatal(err)
@@ -49,21 +50,22 @@ func TestTheShippedDrawingNamesTheStampItsSourcesGive(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first, want := strings.SplitN(string(text), "\n", 2)[0], "// sources "+stampHere(t, root); first != want || want == "// sources " {
+	if first, want := strings.SplitN(string(text), "\n", 2)[0], "// sources "+stampHere(t, realDisk(), root); first != want || want == "// sources " {
 		t.Fatalf("the shipped drawing opens on %q, and wants %q, so run ./RUNME.sh bundle", first, want)
 	}
 }
 
 func TestTheDrawingStampMovesWithASourceUnderTheWebviewAndHoldsOtherwise(t *testing.T) {
 	t.Parallel()
-	one, other, again := t.TempDir(), t.TempDir(), t.TempDir() // level0: FixtureOutsideHome - each stamp reads the sources planted in a root of its own
+	disk := newFakeDisk()
+	one, other, again := filepath.Join("trees", "one"), filepath.Join("trees", "other"), filepath.Join("trees", "again")
 	for root, entry := range map[string]string{one: "one", other: "two", again: "one"} {
-		seedTree(t, root, map[string]string{bundleWebview + "/route/drawing.js": entry, bundleWebview + "/package-lock.json": "{}"})
+		hq1SeedDisk(t, disk, root, map[string]string{bundleWebview + "/route/drawing.js": entry, bundleWebview + "/package-lock.json": "{}"})
 	}
-	if stampHere(t, one) == stampHere(t, other) {
+	if stampHere(t, disk, one) == stampHere(t, disk, other) {
 		t.Error("a moved source keeps the stamp")
 	}
-	if stampHere(t, one) != stampHere(t, again) || stampHere(t, one) == "" {
+	if stampHere(t, disk, one) != stampHere(t, disk, again) || stampHere(t, disk, one) == "" {
 		t.Error("the same sources give another stamp, or none")
 	}
 }
@@ -82,7 +84,7 @@ func TestTheBundleRunsEsbuildOverTheEntryWithTheStampAsItsBanner(t *testing.T) {
 		}
 		want := append(slices.Clone(one.lead), "npx", "--no-install", "esbuild", "route/drawing.js",
 			"--bundle", "--minify", "--format=iife", "--jsx=automatic",
-			`--define:process.env.NODE_ENV="production"`, "--banner:js=// sources "+stampHere(t, d.root),
+			`--define:process.env.NODE_ENV="production"`, "--banner:js=// sources "+stampHere(t, d.disk, d.root),
 			"--log-level=warning", "--outfile=../drawing/route.mjs")
 		if len(runner.ran) != 1 || !reflect.DeepEqual(runner.ran[0], want) || runner.opts[0].cwd != filepath.Join(d.root, filepath.FromSlash(bundleWebview)) {
 			t.Errorf("%s: the bundle ran %v under %v, and wants %v under the webview", one.goos, runner.ran, runner.opts, want)
@@ -104,7 +106,7 @@ func TestBundleHereAnswersWhetherTheBannerNamesTheStamp(t *testing.T) {
 		d, runner, _, _ := fakeBoxDoors(t)
 		bundleTree(t, d, "globalThis.drawn = 1\n")
 		if one.banner != nil {
-			seedTree(t, d.root, map[string]string{bundleShipped: one.banner(stampHere(t, d.root))})
+			hq1SeedDisk(t, d.disk, d.root, map[string]string{bundleShipped: one.banner(stampHere(t, d.disk, d.root))})
 		}
 		if code := bundleVerb(d, []string{"here"}); code != one.want || len(runner.ran) != 0 {
 			t.Errorf("%s: bundle here answers %d after %v, and wants %d with no run", one.name, code, runner.ran, one.want)
@@ -115,7 +117,7 @@ func TestBundleHereAnswersWhetherTheBannerNamesTheStamp(t *testing.T) {
 func TestTheBundleNamesTheInstallWhereEsbuildStandsNowhere(t *testing.T) {
 	t.Parallel()
 	d, runner, out, errs := fakeBoxDoors(t)
-	seedTree(t, d.root, map[string]string{bundleWebview + "/route/drawing.js": "", bundleWebview + "/package-lock.json": "{}"})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{bundleWebview + "/route/drawing.js": "", bundleWebview + "/package-lock.json": "{}"})
 	if code := bundleVerb(d, nil); code != 1 || len(runner.ran) != 0 || !strings.Contains(out.String()+errs.String(), "./RUNME.sh") {
 		t.Errorf("the bundle answers %d after %v, saying %q, and wants 1, no run and the install named", code, runner.ran, out.String()+errs.String())
 	}
