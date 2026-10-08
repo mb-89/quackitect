@@ -233,6 +233,10 @@ func TestVehicleVerbEnableNamesTheVehicleAMarketplaceAndEnablesTheBrand(t *testi
 	kept := func(method string) string {
 		return "{\n  \"$comment\": \"x\",\n  \"enabledPlugins\": [\n    \"other@x\",\n    \"level0@acme\"\n  ],\n  \"env\": {\n    \"A\": \"1\"\n  },\n  \"extraKnownMarketplaces\": {\n    \"other\": {\n      \"source\": {\n        \"source\": \"github\",\n        \"repo\": \"o/r\"\n      }\n    },\n    \"acme\": {\n      \"source\": {\n        \"source\": \"directory\",\n        \"path\": \"" + method + "\"\n      }\n    }\n  }\n}\n"
 	}
+	const stale = `{"enabledPlugins":["other@x"],"extraKnownMarketplaces":{"acme":{"source":{"source":"directory","path":"/stale/path"}}}}`
+	moved := func(method string) string {
+		return "{\n  \"enabledPlugins\": [\n    \"other@x\",\n    \"level0@acme\"\n  ],\n  \"extraKnownMarketplaces\": {\n    \"acme\": {\n      \"source\": {\n        \"source\": \"directory\",\n        \"path\": \"" + method + "\"\n      }\n    }\n  }\n}\n"
+	}
 	local := ".claude/settings.local.json"
 	cases := []struct {
 		name    string
@@ -243,6 +247,7 @@ func TestVehicleVerbEnableNamesTheVehicleAMarketplaceAndEnablesTheBrand(t *testi
 	}{
 		{name: "no settings file", files: map[string]string{"vehicle.json": record}, runs: 1, want: vehicleEnabled},
 		{name: "other keys and a standing entry", files: map[string]string{"vehicle.json": record, local: standing}, runs: 1, want: kept},
+		{name: "another plugin and a stale acme path", files: map[string]string{"vehicle.json": record, local: stale}, runs: 1, want: moved},
 		{name: "a broken file", files: map[string]string{"vehicle.json": record, local: "{not json"}, runs: 1, want: vehicleEnabled},
 		{name: "a second run", files: map[string]string{"vehicle.json": record}, runs: 2, want: vehicleEnabled},
 		{name: "a stub with no record", files: map[string]string{}, runs: 1, refused: true},

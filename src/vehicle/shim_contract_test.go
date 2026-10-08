@@ -151,6 +151,28 @@ func TestTheShimEnablesThePluginThroughTheVehicleBinary(t *testing.T) {
 	}
 }
 
+// Where the vehicle binary fails, the shim prints the standing fallback line and still hands every argument on. [[spec/tickets/stub-settings-shim-runs-in-go]]
+func TestTheShimPrintsTheFallbackAndStillHandsOnWhereTheVehicleBinaryFails(t *testing.T) {
+	const fallback = "The marketplace reached no settings, so this session loads the plugin from wherever it already stands."
+	where, stub := shimStub(t)
+	vehicle := shimVehicle(t, filepath.Join(where, "vehicle"))
+	bin := filepath.Join(vehicle, ".se", ".runtime", "bin", "se-index")
+	seed(t, vehicle, map[string]string{
+		".se/.runtime/bin/se-index": "#!/usr/bin/env sh\nprintf 'the binary fails\\n' >&2\nexit 1\n",
+	})
+	if err := os.Chmod(bin, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := runShim(t, stub, map[string]string{"SE_VEHICLE": vehicle, "SE_REGISTRY": filepath.Join(where, "empty"), "HOME": where}, "check", "one")
+	if code != 0 {
+		t.Fatalf("the shim exits %d: %s", code, errs)
+	}
+	handsOver(t, out, stub, "check one")
+	if !strings.Contains(errs, fallback) {
+		t.Fatalf("the shim says %q on stderr, and wants the fallback line %q", errs, fallback)
+	}
+}
+
 func TestAShimFindingNoVehicleExitsOneOnALineNamingTheUpstreamAndTheCloneFolder(t *testing.T) {
 	where, stub := shimStub(t)
 	code, out, errs := runShim(t, stub, map[string]string{"SE_VEHICLE": filepath.Join(where, "nowhere"), "SE_REGISTRY": filepath.Join(where, "empty"), "HOME": where}, "vehicle")

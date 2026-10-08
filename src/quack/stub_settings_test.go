@@ -4,6 +4,7 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,11 +23,25 @@ func TestTheStubRunsNoNodeAndTheVehicleLibraryStandsNowhere(t *testing.T) {
 			t.Errorf("%s stands, where the Go verb owns the settings shim", gone)
 		}
 	}
-	shim, err := os.ReadFile(filepath.Join(root, "src", "stub", "RUNME.sh"))
+	stub := filepath.Join(root, "src", "stub")
+	err := filepath.WalkDir(stub, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return err
+		}
+		text, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		if strings.Contains(string(text), "node -e") {
+			named, err := filepath.Rel(root, path)
+			if err != nil {
+				return err
+			}
+			t.Errorf("%s runs node -e, where the stub calls vehicle enable", filepath.ToSlash(named))
+		}
+		return nil
+	})
 	if err != nil {
 		t.Fatal(err)
-	}
-	if strings.Contains(string(shim), "node -e") {
-		t.Error("src/stub/RUNME.sh runs node -e, where the stub calls vehicle enable")
 	}
 }
