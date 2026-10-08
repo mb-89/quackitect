@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: d6da24a88bf0ad7e
         size: 3927
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: d93f667087750d0ec8148d5660eb98ea32eadd56
+    hash_after: d93f667087750d0ec8148d5660eb98ea32eadd56
+    inputs:
+      - name: design/draft
+        hash: d6da24a88bf0ad7e
+        size: 3927
+      - name: design/tests-red
+        hash: feffe0d6fd4febe4
+        size: 774
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,11 @@ The tests reach the git and root doors through linesDoors, which fakes git ls-fi
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- doors-move-beside-their-users: the group inventory in spec/tickets/javascript-leaves.md marks src/doors/disk.js, proc.js, wire.js and fake/behaves.js, fake/disk.js, fake/proc.js, fake/vscode.js as moves under this ticket, each leaving src/doors for a home beside its user, and the approach keeps src/doors/ standing instead. git grep finds no product file importing disk.js, proc.js or wire.js, only their own tests under test/contract, so the reason "the doors the extension's tests, the hooks' tests and the Vale scripts drive" holds for vale.js and the fakes alone. Move or delete each and point its inventory row at the result.
+- javascript-rows-name-each-file: the src/doors/ and test/ rows cover a folder, so a new JavaScript file there passes the part with no reason of its own, which is the regrowth the ask names. The builder narrows those two rows to one file a row, or one reason a test subfolder that holds only tests of code that stays, while it writes the table. The rows otherwise cover every file git ls-files lists today, and the reasons for src/extension/, both hook folders, the Vale scripts and prototype/trace-view/ match the group ask and its inventory.
 
 # implement
 
