@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote · helper-5
+    hash_before: a128adb602a6ce7e64a7caf8913f606cd9caa06c
+    hash_after: a128adb602a6ce7e64a7caf8913f606cd9caa06c
+    inputs:
+      - name: ask
+        hash: caadc88f131860c5
+        size: 493
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,107 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+1. src/vehicle/pure.go gains ShimSettings(text, vehicle, brand) as the Go port of shimSettings, and SettingsLocal beside Settings.
+2. ShimSettings keeps every standing key, adds the directory marketplace under the brand, and appends level0@brand once.
+3. src/vehicle/stub.go gains EnablePlugin(disk, work, method), which reads the name field of vehicle.json in the work root as the brand.
+4. EnablePlugin makes the .claude folder and writes .claude/settings.local.json in the work root only where the text changes.
+5. EnablePlugin refuses a work root whose record names no brand, and writes nothing.
+6. vehicleTwin in src/quack/vehicle_verb.go gains the enable word, which calls EnablePlugin over pair.Work and pair.Method.
+7. The verb writes the method root with forward slashes, as the register spells a path.
+8. src/stub/RUNME.sh drops the node block and runs the vehicle binary with verb, its scripts folder, vehicle and enable.
+9. The shim sets SE_WORK_ROOT to the stub for that call, takes se-index.exe where it stands, and discards the output.
+10. A missing binary or a failed call prints the standing fallback line, and the shim still hands every argument on.
+11. .claude/skills/level0/lib/vehicle.js leaves, since only test/level0/vehicle.test.js and the shim read it.
+12. test/level0/vehicle.test.js leaves whole, since src/vehicle/vehicle_test.go already holds a Go case for each of its seven cases.
+13. hookprobe.go reads vehicle.Settings and vehicle.SettingsLocal in place of its own two spellings.
+14. probe_cold.go takes vehicle.PortBase and vehicle.Pointer in place of its twins naming the library.
+15. probe_verb.go takes vehicle.PluginFolder in place of its twin naming the library.
+16. pure.go drops the two comment clauses naming lib/vehicle.js, since the Go file now owns each rule.
+17. level0.md names src/vehicle/pure.go and hooksNamed in src/quack/hookprobe.go as owners of the settings names.
+18. level0.md under a-stub-names-its-vehicle says the shim runs vehicle enable, which writes settings.local.json.
+19. vehicle.md names PortBase in src/vehicle/pure.go, and names src/vehicle/shim_contract_test.go in place of the gone stub.test.js.
+20. Red: src/quack/stub_settings_test.go globs lib/vehicle.js and the JS test through filepath.Glob.
+21. The same test reads src/stub/RUNME.sh and refuses node -e. It decides done_when lines one and two.
+22. Red: a table test in src/quack/vehicle_verb_test.go drives vehicle enable through vehicleRun. It decides line three.
+23. Its rows: no settings file, a file with other keys and a standing entry, a broken file, a second run, and a stub with no record.
+24. Edge: a contract case seeds a fake binary that records its argv and work root, then runs the real shim.
+25. ./RUNME.sh check at tests-green decides line four.
+Weighed: the shim calling sh RUNME.sh vehicle enable first. Each stub command then runs install.sh twice, so the shim calls the binary as editor-process.js does.
+Weighed: folding the enable into every verb the binary runs from a stub. The write then hides behind every verb, and no verb names it.
+Weighed: a pure ShimSettings test in src/vehicle beside the verb table. tests.md asks one test a behavior, and the verb reaches every edge.
+Weighed: comment-only pointers in probe_cold.go and probe_verb.go. The Go constants already stand, so a second spelling only drifts.
+Assumed: a vehicle found on a road mostly holds a built binary. Where it holds none, the fallback line prints and the exec builds it.
+Assumed: enabledPlugins keeps the list shape the JS writes. The client may read an object there, so the session parks that doubt as a note.
+Assumed: SELF_TEST and TESTING leave with the library, since no file reads either.
+Assumed: probe_cold_test.go keeps lib/vehicle.js as a path off the cold path, since the case reads a string and no file.
+Assumed: a stub made earlier keeps its node shim until the vehicle updates it, which the ask leaves out.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/stub/RUNME.sh: the node -e block, which imports shimSettings from lib/vehicle.js
+- test/level0/vehicle.test.js: every case, reading entryOf, identityOf, importsOf, modulesOf, onlyVehicle, portOf, registers, resolves, rootKey and same
+- src/quack/vehicle_verb.go: vehicleTwin, which gains the enable word
+- src/vehicle/shim_contract_test.go: shimStub and runShim, which run the real src/stub/RUNME.sh
+- src/vehicle/stub.go: StubInto, which copies the src/stub template into each new stub
+- src/quack/hookprobe.go: settingsFile and settingsLocalFile, read by settingsFiles
+- src/quack/probe_cold.go: portBase and vehiclePointer, whose comments name lib/vehicle.js
+- src/quack/probe_verb.go: pluginFolder, whose comment names lib/vehicle.js
+- src/vehicle/pure.go: the file header and the relative regexp comment naming lib/vehicle.js
+- src/quack/probe_cold_test.go: TestAPathElsewhereSitsOffTheColdPath, which holds the path as a string
+- src/quack/check.go: the test/level0/*.test.js glob, which drops the deleted test
+- spec/design_output/level0.md: the settings table paragraph and a-stub-names-its-vehicle
+- spec/design_output/vehicle.md: the-register-holds-the-port and two-roads-to-the-vehicle
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/stub_settings_test.go: TestTheStubRunsNoNodeAndTheVehicleLibraryStandsNowhere
+- src/quack/vehicle_verb_test.go: TestVehicleVerbEnableNamesTheVehicleAMarketplaceAndEnablesTheBrand
+- src/vehicle/shim_contract_test.go: TestTheShimEnablesThePluginThroughTheVehicleBinary
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first: no review has read this draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/lib/vehicle.js
+- test/level0/vehicle.test.js
+- src/stub/RUNME.sh
+- src/vehicle/pure.go
+- src/vehicle/stub.go
+- src/vehicle/shim_contract_test.go
+- src/quack/vehicle_verb.go
+- src/quack/vehicle_verb_test.go
+- src/quack/stub_settings_test.go
+- src/quack/hookprobe.go
+- src/quack/probe_cold.go
+- src/quack/probe_verb.go
+- spec/design_output/level0.md
+- spec/design_output/vehicle.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened: vehicle.js, the stub shim, pure.go, stub.go, RootsHere, vehicleTwin, vehicleRootHere, verbRoad, hookprobe.go, probe_cold.go and probe_verb.go
+- the callers come from git grep on vehicle.js, lib/vehicle, shimSettings and node -e over hooks, lib, src, test, RUNME.sh, install.sh, package.json, .github and notes
+- the stub settings test decides lines one and two, the enable verb table line three, and ./RUNME.sh check at tests-green line four
+- the approach adds no config key, so no default file changes
 
 ## tests-red
 
