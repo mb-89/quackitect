@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: 6092e512593690f5
         size: 2467
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box ba1101ec7b2d · claude-code-remote · helper-4
+    hash_before: 85fc99670705797ec5c50eda11cbf3a874a1113f
+    hash_after: 85fc99670705797ec5c50eda11cbf3a874a1113f
+    inputs:
+      - name: design/draft
+        hash: 6092e512593690f5
+        size: 2467
+      - name: design/tests-red
+        hash: 7527fa3724b4672b
+        size: 600
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -293,8 +305,15 @@ The stamp verb answers fresh se-front by running go list over src/front/cmd, whe
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+The approach answers the ask. The red case in TestTheStampVerbRefusesAWordOrBinaryItKnowsNot refuses stamp fresh se-front. git ls-files and git grep decide the first two done_when lines as checkpoints, and git grep -n se-front over the three files already answers nothing. The check decides the third. The src/front package stays, since src/pull/edit.go calls front.Set. The builder fixes each row below in place:
+- spec/design_output/lsp.md, under The build beside the index, still names front_here and says a box with no index reads the front writer stale. Neither size nor callers names the note. It should name index_here alone.
+- src/branches/port_f_review_test.go in the working tree fails gofmt -l, since the map in pfReviewTree mixes two key widths.
+- The tree deletes the se-front row of spec/design_output/review.md where the approach rewords it. The deletion reads right, since no check mints through a binary of its own.
+- src/imports/baseline/blackbox.txt and purity.txt still hold the src/front/cmd rows, and git ls-files src/front/cmd lists the four files until the deletion stages. Run ./RUNME.sh guards --update and stage the deletion before the check.
+- The tree rewrites the install.sh comment above stamp(), which the approach does not name.
 
 # implement
 

@@ -17,7 +17,7 @@ import (
 func init() { registerBox("stamp", stampVerb) }
 
 // The package each binary the install builds reads. [[spec/design_output/lsp#the-build-beside-the-index]]
-var stampPackages = map[string]string{"se-index": "./src/quack", "se-front": "./src/front/cmd"}
+var stampPackages = map[string]string{"se-index": "./src/quack"}
 
 // The Go and embedded files of every package of this module the build imports, each under its import path. [[spec/design_output/lsp#the-build-beside-the-index]]
 const stampFiles = `{{if and .Module .Module.Main}}{{$p := .ImportPath}}{{range .GoFiles}}{{$p}}/{{.}}
@@ -27,7 +27,7 @@ const stampFiles = `{{if and .Module .Module.Main}}{{$p := .ImportPath}}{{range 
 // Answers fresh with 0 where the stamp holds the hash the source gives now, and write lands that hash. [[spec/tickets/scripts-folder-leaves]]
 func stampVerb(d boxDoors, argv []string) int {
 	if len(argv) != 2 || (argv[0] != "fresh" && argv[0] != "write") || stampPackages[argv[1]] == "" {
-		fmt.Fprintln(d.errs, "stamp answers fresh or write, over se-index or se-front.")
+		fmt.Fprintln(d.errs, "stamp answers fresh or write, over se-index.")
 		return 2
 	}
 	at := filepath.Join(d.root, filepath.FromSlash(binFolder), "."+argv[1]+"-source")

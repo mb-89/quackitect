@@ -193,7 +193,7 @@ func TestTheSourceStampReadsFreshAfterAWriteAndStaleOnceASourceMoves(t *testing.
 
 func TestTheStampReadsTheFilesGoListsForTheBinaryNamed(t *testing.T) {
 	t.Parallel()
-	for _, one := range []struct{ binary, pkg string }{{"se-index", "./src/quack"}, {"se-front", "./src/front/cmd"}} {
+	for _, one := range []struct{ binary, pkg string }{{"se-index", "./src/quack"}} {
 		d, runner := stampBox(t)
 		stampVerb(d, []string{"write", one.binary})
 		at := slices.IndexFunc(runner.ran, func(argv []string) bool { return slices.Contains(argv, "-deps") })

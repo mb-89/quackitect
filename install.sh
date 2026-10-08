@@ -190,30 +190,14 @@ swap_in() {
   mv -f "$1" "$2"
 }
 
-# The one writer of frontmatter, which every ticket write reaches. A binary
-# built off other source lints against rules the tree no longer carries, so a
-# hash of its folder, of each tree package it imports and of the root go.mod
+# A binary built off other source lints against rules the tree no longer
+# carries, so a hash of its folder, of each tree package it imports and of the root go.mod
 # and go.sum stands beside it, and a hash that moves asks for the build again.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
 # [[spec/tickets/scripts-folder-leaves]]
 stamp() {
   [ -x "$bin/se-index${exe}" ] || return 1
   (cd "$root" && "$bin/se-index${exe}" verb "$root/src/scripts" stamp "$@")
-}
-
-front_here() {
-  if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
-  have go || return 0
-  stamp fresh se-front 2>/dev/null
-}
-
-get_front() {
-  say "  building the front writer"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-front${exe}.new" ./src/front/cmd) || return 1
-  swap_in "$bin/se-front${exe}.new" "$bin/se-front${exe}" || return 1
-  [ -x "$bin/se-index${exe}" ] || return 0
-  stamp write se-front || return 1
-  front_here
 }
 
 # THE MODULES LAND AT THE INSTALL, SO THE FIRST CHECK FETCHES NOTHING. A stamp
@@ -276,7 +260,7 @@ set_hooks() {
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
   [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-front" ]
+    [ "$1" = "index" ]
 }
 
 missed() {
@@ -284,7 +268,6 @@ missed() {
     go)      say "  go stays missing, so ./RUNME.sh tui prints plain rows." >&2 ;;
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
-    se-front) say "  the front writer stays unbuilt, so every ticket write refuses until Go stands here." >&2 ;;
     git-hooks) say "  git reads its own hooks here, so a hand commit meets no privacy check." >&2 ;;
   esac
 }
@@ -295,7 +278,6 @@ here() {
     go)      have go ;;
     go-modules) modules_here ;;
     index) index_here ;;
-    se-front) front_here || ! have go ;;
     git-hooks) hooks_here ;;
   esac
 }
@@ -306,7 +288,6 @@ why() {
     go) say "go: it builds the viewer ./RUNME.sh tui opens the door log in, and the index" ;;
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
-    se-front) say "se-front: the one writer of frontmatter, which every ticket write reaches" ;;
     git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
   esac
 }
@@ -317,7 +298,6 @@ get() {
     go) get_go ;;
     go-modules) get_modules ;;
     index) get_index ;;
-    se-front) get_front ;;
     git-hooks) set_hooks ;;
   esac
 }
@@ -326,7 +306,7 @@ get() {
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
 for one in biome go go-modules \
-  index se-front git-hooks; do
+  index git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
 done

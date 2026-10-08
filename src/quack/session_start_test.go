@@ -19,7 +19,7 @@ import (
 )
 
 // Every want install.sh names, so a boot in a test tree fetches and builds nothing. [[spec/tickets/session-start-leaves-node]]
-const bootSkipAll = "vale biome vale-ls go go-modules index se-front git-hooks"
+const bootSkipAll = "vale biome vale-ls go go-modules index git-hooks"
 
 // The hook line that runs the boot word of install.sh under the project folder. [[spec/tickets/session-start-leaves-node]]
 var bootHookLine = regexp.MustCompile(`^sh "?\S*install\.sh"? boot$`)
@@ -261,7 +261,7 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		run.Dir = tree
 		run.Env = []string{
 			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,
-			"SE_INSTALL_SKIP=vale biome vale-ls go-modules se-front git-hooks",
+			"SE_INSTALL_SKIP=vale biome vale-ls go-modules git-hooks",
 			"STAMP_INDEX=" + filepath.Join(tree, "index-copy"), "STAMP_BUILT=" + filepath.Join(tree, "built"),
 		}
 		said, err := run.CombinedOutput()
