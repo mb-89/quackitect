@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["tree-libs-leave"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: f5412ff3e27f4a4a
         size: 7883
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 7af54ed788b68eac17d57d5a4a76fe138f158fb1
+    hash_after: 7af54ed788b68eac17d57d5a4a76fe138f158fb1
+    inputs:
+      - name: design/draft
+        hash: f5412ff3e27f4a4a
+        size: 7883
+      - name: design/tests-red
+        hash: 072aee76580238c8
+        size: 1680
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -353,8 +365,9 @@ The tests reach no door. Module rows run in memory, and the quack cases use temp
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line. TestTheConfigLibrariesStandNowhere decides the git ls-files line, and env_test decides the go test line. The check at tests-green decides the third. No staying library or hook imports config.js or layer.js, since only the four leaving or edited test files and config.js itself import them. Lines 5 and 6 hold. q.EnvOf answers SE_STOP_MOSTINAROW today, while config.md and varOf say SE_STOP_MOST_IN_A_ROW. Kebab matches varOf on every shipped camel key, mostInARow included. No tracked script, workflow, settings file or golden sets an old spelling, so no variable a person sets by the documented rule changes name. A person who set the undocumented Go spelling loses it, and config.md already names the new one. No sibling ticket takes EnvOf, layers.go or these tests. Points the implementer fixes in place: (1) src/modules/index/manager_test.go line 237 sets SE_OPS_KEEPFAILED. Rename it to SE_OPS_KEEP_FAILED, and add the file to callers and size. (2) The callers list omits the config.Count readers of camel keys. Name lease.go and ops.go under src/modules/index, and src/modules/lsp/door.go, since their variables change name. (3) src/modules/hooks/brief/brief.go line 92 names inherits in the level0 lib. guidance-lib-leaves assigns that comment here, so approach line 15 and size take it. (4) The EnvOf row of the Go reader table in config.md says the key upper-cases. Approach line 16 rewrites that row to say each segment kebabs first. (5) TestEveryShippedKeyNamesAVariableOfItsOwn rebuilds the EnvOf rule inside the test. Keep its uniqueness check, and assert literal names for a few shipped keys instead.
 
 # implement
 
