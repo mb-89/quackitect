@@ -6,17 +6,18 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import {
-  flatten,
-  SCHEMA,
-  TRACKED,
-  underBuiltIns,
-} from "../../.claude/skills/level0/lib/config.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
 import { commandsOf } from "../../src/extension/lib/panel.js";
-import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
+import {
+  drawnIn,
+  entriesIn,
+  TRACKED,
+  valuesOf,
+} from "../../src/extension/lib/widgets.js";
+
+const SCHEMA = "spec/config/level0.schema.json";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -52,11 +53,11 @@ test("every control the schema declares draws, the work buttons among them", () 
 
 // [[spec/design_output/extension#a-click-writes-the-file]]
 test("every widget writing a key names one the declaration carries", () => {
-  const said = flatten(underBuiltIns(read(SCHEMA), read(TRACKED)));
+  const said = valuesOf(read(TRACKED), {}, read(SCHEMA));
   for (const one of drawnIn(read(SCHEMA))) {
     if (one.widget === "action" || one.widget === "process") continue;
     assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
-    assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
+    assert.ok(one.options.includes(said.get(one.key).value), `${one.key} rests on an option`);
   }
 });
 

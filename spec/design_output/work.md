@@ -697,8 +697,8 @@ anything but `true`:
 The wait reads the tracked `spec/config/level0.json` on `origin/main`, the file
 every box shares. A per-box file, a variable and the sidebar each write this
 box alone, so none of them lets the cloud take the group. `readWork` in
-`src/branches/stands.go` reads that file once, through `flatten` in the one
-resolver, where some group names the field.
+`src/branches/stands.go` reads that file once, through `flatten` in the same
+file, where some group names the field.
 
 | the verb | what it does with a switched-off group |
 |---|---|

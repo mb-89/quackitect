@@ -234,7 +234,7 @@ func TestATickFailsAnOperationPastItsDeadline(t *testing.T) {
 
 // [[spec/design_output/model#what-stays-how-long]]
 func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
-	t.Setenv("SE_OPS_KEEPFAILED", "60")
+	t.Setenv("SE_OPS_KEEP_FAILED", "60")
 	s, l, from, rows := manager(t)
 	starts(t, from)
 	if held, _ := s.Snapshot().Read("ops/1").(Op); held.ID != "1" {

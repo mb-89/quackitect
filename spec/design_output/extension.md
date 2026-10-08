@@ -697,9 +697,6 @@ alone, so it lists no mark, and a mark blocks no check, commit or push.
 
 # What stands open
 
-- The extension holds its own reader of a key, because `lib/config.js` in the
-  plugin is a module and VS Code loads a script. Fold the two together where
-  the extension takes a build.
 - The sidebar reads both files and leaves the environment layer to
   `./RUNME.sh config`, which names the layer answering each key.
 - A projection writing `src/extension/package.json` from the declaration waits,

@@ -7,27 +7,17 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import {
-  configOf,
-  faultsIn,
-  flatten,
-  keyOf,
-  SCHEMA,
-  TRACKED,
-  varOf,
-} from "../../.claude/skills/level0/lib/config.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const EDITOR_SETTINGS = ".vscode/settings.json";
+// TrackedConfig and SchemaConfig in src/q/layers.go own the two names. [[spec/design_output/config#the-layers]]
+const TRACKED = "spec/config/level0.json";
+const SCHEMA = "spec/config/level0.schema.json";
 
 const read = (where) => JSON.parse(files.read(join(root, where)));
 const text = (where) => files.read(join(root, where));
-const settings = configOf({
-  read: async (where) => files.read(join(root, where)),
-  readEnv: async () => ({}),
-});
 
 // The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
 test("no count chain stands in the verb, the viewer or the badge line", () => {
@@ -62,23 +52,3 @@ test("the editor draws the schema over the config, with no extension", () => {
   assert.equal(files.exists(join(root, SCHEMA)), true, "the schema stands there");
 });
 
-// [[spec/design_output/config#the-schema-says-the-type]]
-test("the schema passes the config this tree ships, and refuses a field of the wrong type", async () => {
-  assert.deepEqual(await settings.faults(), []);
-
-  const wrong = flatten(read(TRACKED));
-  wrong.set("stop.mostInARow", "three");
-  assert.deepEqual(faultsIn(read(SCHEMA), wrong), [
-    "stop.mostInARow carries a string, and the schema says number",
-  ]);
-});
-
-// [[spec/design_output/config#a-variable-names-a-key]]
-test("every key this tree ships names one variable, and it names the key back", () => {
-  const keys = [...flatten(read(TRACKED)).keys()];
-  assert.ok(keys.length, "the tracked file carries a key");
-
-  for (const key of keys) {
-    assert.equal(keyOf(varOf(key)), key, `${varOf(key)} names ${key}`);
-  }
-});

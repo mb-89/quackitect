@@ -4,8 +4,8 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/config.js` answers every number and switch this tree
-holds. This note covers the layers it reads and the verb over them.
+`src/q/layers.go` and `src/modules/config` answer every number and switch this
+tree holds. This note covers the layers they read and the verb over them.
 
 # What the resolver is
 
@@ -63,25 +63,21 @@ Measure again where the per-box file grows past a few keys.
 
 # A key names a path
 
-`flatten` reads the nested JSON into `stop.mostInARow` and its value. A key
-named `comment` carries the words a person reads, so the flattening drops it
-and no verb lists it.
+`leavesOf` in `src/modules/config/keys.go` reads the nested JSON into
+`stop.mostInARow` and its value. A key named `comment` carries the words a
+person reads, so the reading drops it and no verb lists it.
 
-`nest` writes the path back, which is how a write lands in the per-box file as
-the same shape the tracked file holds.
+`settingAt` in `src/quack/verb_config.go` writes the path back, which is how a
+write lands in the per-box file as the same shape the tracked file holds.
 
 # A variable names a key
 
-One rule, both ways. `stop.mostInARow` reads `SE_STOP_MOST_IN_A_ROW`:
-
-- `varOf` cuts the camel case at each boundary, joins the parts with `_`, and
-  shouts the result behind `SE_`.
-- `keyOf` drops `SE_`, takes the first part as the section, and camel cases the
-  rest into the leaf.
-
-A key holds one section and one leaf, which is what makes the second direction
-answer one key. A contract test reads every key this tree ships and holds both
-directions over it.
+`stop.mostInARow` reads `SE_STOP_MOST_IN_A_ROW`. `q.EnvOf` in
+`src/q/layers.go` kebabs each segment, joins the parts with `_`, and shouts the
+result behind `SE_`. So the camel and the kebab spelling of a leaf name one
+variable. `TestEveryShippedKeyNamesAVariableOfItsOwn` in
+`src/quack/verb_config_test.go` holds every shipped key to a variable of its
+own.
 
 # The schema says the type
 
@@ -92,8 +88,8 @@ schema says what the code declares, and nobody edits it by hand.
 `src/modules/settings/settings.go` declares each section no module of its own
 owns.
 
-`keysOf` reads the schema, `typeOf` answers one key, `builtInsOf` answers each
-`default`, and `faultsIn` names a key carrying another type. A session start
+`q.Settled` answers each `default`, and `configFaults` in
+`src/quack/verb_config.go` names a key carrying another type. A session start
 writes one `warn` line per fault, door `config`, and `./RUNME.sh config` says
 the same on the way out.
 
@@ -104,8 +100,7 @@ and prints the other. The generator lays `spec/config/draws.json` over each
 entry it names, drawn sections first in its order. A key drawing as a control
 carries more:
 [[spec/design_output/extension#one-declaration-draws-it]] names every field.
-`keysOf` answers the type alone, and `entriesIn` in the extension answers the
-whole entry.
+`entriesIn` in the extension answers the whole entry.
 
 ## The editor draws the schema
 
@@ -116,15 +111,10 @@ and `.vscode/extensions.json` names the extensions this tree recommends.
 
 # The resolver holds the layers
 
-`configOf` takes the reads it needs and hands back the asks:
-
-| the caller gives | the caller gets |
-|---|---|
-| `read`, `write`, `makeDir`, `readEnv` | `ask`, `layerOf`, `all`, `faults`, `write` |
-
-Every ask answers a promise, because the hooks module reaches the disk through
-`$.fs` and that door is asynchronous. The command line wraps its own disk door
-the same way, and both take the tree root off the caller's hands.
+`Rows` in `src/modules/config/keys.go` takes the declared keys, both files and
+the environment, and answers each key with its value and its layer.
+`q.Settled` answers one key the same way. `projection.Inherits` in
+`src/projection/tree.go` lays the work root over the method root.
 
 ## A caller hands it in
 
@@ -141,16 +131,15 @@ mid-session reaches the turn after it.
 
 ## The Go reader
 
-A Go package imports no JavaScript, so the resolver above reaches it nowhere.
-`src/config` is the shared package answering the same layers, and every Go
-program in the tree calls it:
+`src/config` is the shared package answering the same layers off the disk, and
+every Go program in the tree calls it:
 
 | what it answers | what it reads |
 |---|---|
 | `Value(root, key)` | the layers at rest through `q.Settled`, with the built-in and the shared mark off the schema |
 | `Map(root, path, key)` | the map a named file holds at a key, off that file alone |
 | `List(root, path, key)` | the list a named file holds at a key, in the file's own order |
-| `EnvOf(key)` | the variable a key reads, as the key upper-cased under `SE_` |
+| `EnvOf(key)` | the variable a key reads: each segment kebabs first, then the key upper-cases under `SE_` |
 
 `Value` walks a key written with dots, so `names.words` reads the `words` of
 the `names` object. A named file takes no layer, because a person setting a

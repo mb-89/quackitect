@@ -112,7 +112,7 @@ func shownValue(literal json.RawMessage) string {
 	return string(literal)
 }
 
-// Each key the tracked file sets with a type apart from the one the catalog declares, as faultsIn in the level0 lib names it. [[spec/design_output/config#the-schema-says-the-type]]
+// Each key the tracked file sets with a type apart from the one the catalog declares. [[spec/design_output/config#the-schema-says-the-type]]
 func configFaults(root string) ([]string, error) {
 	declared, err := declaredAt(root)
 	if err != nil {
@@ -181,7 +181,7 @@ func memberAt(value q.Ordered, path []string) (q.Ordered, bool) {
 	return value, true
 }
 
-// The value set under a path, each object on the way made where it stands nowhere, as deeply over nest in the level0 lib writes it. [[spec/design_output/config#the-verb-writes-one-layer]]
+// The value set under a path, each object on the way made where it stands nowhere. [[spec/design_output/config#the-verb-writes-one-layer]]
 func settingAt(value q.Ordered, path []string, leaf q.Ordered) q.Ordered {
 	if len(path) == 0 {
 		return leaf
@@ -199,7 +199,7 @@ func settingAt(value q.Ordered, path []string, leaf q.Ordered) q.Ordered {
 	return value
 }
 
-// The literal a typed text lands as, as coerce in the level0 lib reads it: a boolean where it reads true, a number where it reads as a finite one, and a string otherwise. [[spec/design_output/config#the-schema-says-the-type]]
+// The literal a typed text lands as: a boolean where it reads true, a number where it reads as a finite one, and a string otherwise. [[spec/design_output/config#the-schema-says-the-type]]
 func coerced(said, kind string) string {
 	switch kind {
 	case "boolean":

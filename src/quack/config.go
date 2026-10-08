@@ -22,24 +22,29 @@ type configRow struct {
 	Layer string          `json:"layer"`
 }
 
-// Every leaf key either file holds and every key the catalog declares, dotted, and the answer the config module resolves for each. A key the catalog shares reads the default file alone, and a declared key no layer sets reads its built-in. [[spec/tickets/the-config-schema-gets-generated]]
+// Every leaf key either file holds and every key the catalog declares, dotted, and the answer the config module resolves for each. A key the catalog shares reads the default file alone, a declared key no layer sets reads its built-in, and a local file holding no JSON reads as empty. [[spec/design_output/config#the-layers]]
 func configRows(tracked, local []byte, env map[string]string, declared map[string]q.Key) (map[string]configRow, error) {
-	files := make([]q.Ordered, 0, 2)
-	for _, body := range [][]byte{tracked, local} {
-		parsed := q.Ordered{}
-		if strings.TrimSpace(string(body)) != "" {
-			var err error
-			if parsed, err = q.JSON.Parse(body); err != nil {
-				return nil, err
-			}
-		}
-		files = append(files, parsed)
+	trackedFile, err := configParsed(tracked)
+	if err != nil {
+		return nil, err
+	}
+	localFile, err := configParsed(local)
+	if err != nil {
+		localFile = q.Ordered{}
 	}
 	out := map[string]configRow{}
-	for _, row := range config.Rows(declared, files[0], files[1], env) {
+	for _, row := range config.Rows(declared, trackedFile, localFile, env) {
 		out[row.Key] = configRow{Value: row.Value, Layer: row.Layer}
 	}
 	return out, nil
+}
+
+// A config file as the layers read it, where a blank file reads as empty. [[spec/design_output/config#the-layers]]
+func configParsed(body []byte) (q.Ordered, error) {
+	if strings.TrimSpace(string(body)) == "" {
+		return q.Ordered{}, nil
+	}
+	return q.JSON.Parse(body)
 }
 
 // A dotted key as the catalog names it, as the config module reads it. [[spec/design_output/model#config-comes-off-the-registrations]]

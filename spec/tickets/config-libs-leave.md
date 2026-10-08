@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["tree-libs-leave"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 072aee76580238c8
         size: 1680
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 449fba70cebace9f538e2941db414d732d3e8e2f
+    hash_after: 449fba70cebace9f538e2941db414d732d3e8e2f
+    answered:
+      - name: lint
+        exit: 0
+        said: "   77.9  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -378,14 +387,19 @@ accept. The approach answers the ask, and a red test decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every touched file stands in the draft size or a gate point: manager_test.go under point one, brief.go under point three. lease.go, ops.go and lsp/door.go read through config.Count, which reads q.EnvOf, so they take no edit. keys_test.go and projection_test.go already held their cases and take no edit.
+The change reaches no door. q.EnvOf and configRows are pure, the quack cases run on temp roots and treeRoot reads, and the contract tests keep src/doors/disk.js.
+Code comments point at spec/design_output/config: the-go-reader on EnvOf, and the-layers on configRows and configParsed. The Layered and inherits comments in guidance.go and brief.go name projection.Inherits.
+The variable rule stands once, in q.EnvOf. config.md points at it, and its EnvOf row says each segment kebabs first. TestEveryShippedKeyNamesAVariableOfItsOwn asserts literal names and keeps its uniqueness check. tree.test.js points at src/q/layers.go, and tree-extension.test.js takes TRACKED and valuesOf from widgets.js.
 
 ## tests-green
 

@@ -135,16 +135,22 @@ func TestEveryShippedKeyNamesAVariableOfItsOwn(t *testing.T) {
 	if err != nil || len(declared) == 0 {
 		t.Fatalf("the shipped wiring declares %d keys and answers %v", len(declared), err)
 	}
+	for dotted, want := range map[string]string{
+		"stop.mostInARow":       "SE_STOP_MOST_IN_A_ROW",
+		"plan.everyCalls":       "SE_PLAN_EVERY_CALLS",
+		"ops.keepFailed":        "SE_OPS_KEEP_FAILED",
+		"watchdog.backoffFirst": "SE_WATCHDOG_BACKOFF_FIRST",
+	} {
+		if _, held := declared[dotted]; !held {
+			t.Errorf("the shipped wiring declares no %s", dotted)
+		}
+		if name := q.EnvOf(dotted); name != want {
+			t.Errorf("%s names %s, and wants %s", dotted, name, want)
+		}
+	}
 	owner := map[string]string{}
 	for dotted := range declared {
 		name := q.EnvOf(dotted)
-		segments := strings.Split(dotted, ".")
-		for i, one := range segments {
-			segments[i] = strings.ReplaceAll(q.Kebab(one), "-", "_")
-		}
-		if want := "SE_" + strings.ToUpper(strings.Join(segments, "_")); name != want {
-			t.Errorf("%s names %s, and wants %s, each segment kebabbed", dotted, name, want)
-		}
 		if other, held := owner[name]; held {
 			t.Errorf("%s and %s both name %s", other, dotted, name)
 		}

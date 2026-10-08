@@ -19,7 +19,11 @@ const (
 
 // The variable the environment layer reads for a dotted key. [[spec/design_output/config#the-go-reader]]
 func EnvOf(dotted string) string {
-	return "SE_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(dotted))
+	segments := strings.Split(dotted, ".")
+	for i, one := range segments {
+		segments[i] = strings.ReplaceAll(Kebab(one), "-", "_")
+	}
+	return "SE_" + strings.ToUpper(strings.Join(segments, "_"))
 }
 
 // A dotted key as the catalog names it: its first segment the instance, the rest its local name. [[spec/design_output/model#config-comes-off-the-registrations]]

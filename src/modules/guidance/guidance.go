@@ -51,7 +51,7 @@ func StepsOf(in filesIn) map[string][]Read {
 	return Resolve(Layered(in.Files, nil))
 }
 
-// The text of every file standing, the work root's over the method root's of the same path, as inherits in the level0 lib reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The text of every file standing, the work root's over the method root's of the same path, as projection.Inherits reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
 func Layered(method, work map[string]q.Content) map[string]string {
 	out := map[string]string{}
 	for _, layer := range []map[string]q.Content{method, work} {

@@ -89,7 +89,7 @@ type Block struct {
 	Text string
 }
 
-// The work root's file over the method root's, and the names of both folders, as inherits in the level0 lib reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The work root's file over the method root's, and the names of both folders, as projection.Inherits reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
 func Layered(method, work Tree) Tree { return layered{method, work} }
 
 type layered struct{ under, over Tree }

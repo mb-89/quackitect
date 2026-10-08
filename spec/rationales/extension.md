@@ -77,8 +77,8 @@ first dependency this tree carries and buys one shape.
 
 `src/extension` imports nothing outside itself, so a person installs the folder
 and every path inside it resolves. That costs one small overlap. The extension
-reads and writes a dotted key with its own six lines, where `lib/config.js` in
-the plugin holds `nest` and a merge.
+reads and writes a dotted key with its own six lines, where `settingAt` in
+`src/quack/verb_config.go` holds the write and `src/modules/config` the merge.
 
 Folding the two together wants the extension to reach the plugin folder, which
 wants a build. The overlap is six lines and the build is a dependency. So the
