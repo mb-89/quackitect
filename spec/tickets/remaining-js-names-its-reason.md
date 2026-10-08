@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 6bdac60bf84e4f30
         size: 320
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 468891e6441505ac30fda7fe5ffbdb7605532e6c
+    hash_after: 468891e6441505ac30fda7fe5ffbdb7605532e6c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: d6da24a88bf0ad7e
+        size: 3927
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,31 @@ The approach adds no config key.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_javascript_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three cases fail on their own assertion: a file no row covers, a row covering no file, and a note with no list. Each one answers 0 where it wants 1. The passing case passes on the stub. The draft named three test functions, and they stand here as cases of one table test, so the test lines stay low.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The first done_when line meets the case a JavaScript file no row covers refuses, which fails now. The second, the check exiting 0, is a checkpoint the check run answers once tests-green lands the list in the doors note.
+The tests reach the git and root doors through linesDoors, which fakes git ls-files and writes a temp root, so every door they reach has a fake.
 
 # gate
 
