@@ -311,6 +311,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		{name: "server", run: func() int { return serverHolds(d) }},
 		{name: "rules", run: func() int { return d.verb(append([]string{"lint"}, where...), quiet) }},
 		{name: "lines", run: func() int { return linesHold(d) }},
+		{name: "javascript", run: func() int { return javascriptListed(d) }},
 	}
 }
 

@@ -99,6 +99,28 @@ straight into `decide`, so a test drives the server with no client, no wire
 and no port. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
+# The JavaScript that stays
+
+JavaScript stands where nothing else runs. Each tracked JavaScript file sits
+under a row below, and the `javascript` part of `./RUNME.sh check` refuses a
+file no row covers and a row covering no file. A row ending in `/` covers its
+folder.
+
+| files | reason |
+|---|---|
+| `src/extension/` | the VS Code extension, which VS Code loads as JavaScript |
+| `.claude/skills/level0/hooks/` | the level zero function hooks, which Claude Code loads as JavaScript modules |
+| `src/stub/.claude/skills/level0/hooks/` | the same hooks, in the stub a project takes |
+| `.claude/skills/level0/lib/vale.js` | a Vale script, which the lint-without-vale group owns |
+| `src/scripts/styles.js` | a Vale script, which the lint-without-vale group owns |
+| `src/engine/tools.js` | the survey reader the Vale door takes, which the lint-without-vale group owns |
+| `src/doors/` | the doors and fakes the tests of the extension, the hooks and the Vale scripts drive |
+| `test/` | the tests of the JavaScript that stays, and the reporter the check runs them under |
+| `prototype/trace-view/` | the prototype a funnel note cites as evidence, which runs in no product |
+
+To add JavaScript, add its row with its reason. To delete the last file under
+a row, delete the row in the same change.
+
 # The folders, and their cost
 
 | folder | what stands there | what it touches |

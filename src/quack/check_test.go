@@ -91,14 +91,14 @@ func partNamed(parts []part, name string) part {
 
 func TestCheckParts(t *testing.T) {
 	t.Parallel()
-	t.Run("the battery holds its nine parts", func(t *testing.T) {
+	t.Run("the battery holds its parts in order", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
 		names := []string{}
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules", "lines"}
+		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules", "lines", "javascript"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
