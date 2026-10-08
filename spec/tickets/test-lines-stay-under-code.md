@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: a26473f140d6ac61
         size: 381
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 8a10018275c66eb9d580fd6ea39971fb3230dacf
+    hash_after: 037fca2393284a75d5d5a30dc260e3734a84665a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: f851464d50688d2a
+        size: 9882
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -322,26 +335,35 @@ Assumed: the Vale rule cases move to a Go table, since the owner says JavaScript
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_lines_test.go src/modules/lsp/rules_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_lines_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheLinesPartRefusesALanguageWhoseTestsOutgrowItsCode fails on its assertion in all seven rows, since no part answers to the name lines.
+TestEachProseRuleFiresOnItsProbeAndStaysQuietOnItsTwin passes today over the real Vale, with the rule cases of the seven JavaScript test files in one table.
+The door case and the no-binary case stay in the JavaScript Vale test, as the draft says.
+Surprise one: a shape case filtered on a rule prefix the Vale reader strips, so it could never fail. The Go row holds every rule quiet there.
+Surprise two: the table holds firing alone, so exact counts, severities and line numbers stay unported.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- check_lines_test.go decides done_when line one, and ./RUNME.sh check at tests-green line two.
+- The lines test runs on the check's fake doors over a temp root, and the rule table on a temp root over the real Vale under the contract tag.
 
 # gate
 
