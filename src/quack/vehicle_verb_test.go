@@ -219,3 +219,83 @@ func TestVehicleVerbAnswersThroughTheNodeModule(t *testing.T) {
 		t.Fatal(said, err)
 	}
 }
+
+// The settings enable writes where none stood: the method root as a directory marketplace under the brand, and the plugin enabled under it, as shimSettings wrote them. [[spec/tickets/stub-settings-shim-runs-in-go]]
+func vehicleEnabled(method string) string {
+	return "{\n  \"extraKnownMarketplaces\": {\n    \"acme\": {\n      \"source\": {\n        \"source\": \"directory\",\n        \"path\": \"" + method + "\"\n      }\n    }\n  },\n  \"enabledPlugins\": [\n    \"level0@acme\"\n  ]\n}\n"
+}
+
+// Enable reads the brand off the work root's record and writes settings.local.json there, keeping what stands. [[spec/tickets/stub-settings-shim-runs-in-go]]
+func TestVehicleVerbEnableNamesTheVehicleAMarketplaceAndEnablesTheBrand(t *testing.T) {
+	t.Parallel()
+	const record = `{"vehicle": "abc123", "name": "acme", "upstream": "https://host/a/b.git"}`
+	const standing = `{"$comment":"x","enabledPlugins":["other@x","level0@acme"],"env":{"A":"1"},"extraKnownMarketplaces":{"other":{"source":{"source":"github","repo":"o/r"}}}}`
+	kept := func(method string) string {
+		return "{\n  \"$comment\": \"x\",\n  \"enabledPlugins\": [\n    \"other@x\",\n    \"level0@acme\"\n  ],\n  \"env\": {\n    \"A\": \"1\"\n  },\n  \"extraKnownMarketplaces\": {\n    \"other\": {\n      \"source\": {\n        \"source\": \"github\",\n        \"repo\": \"o/r\"\n      }\n    },\n    \"acme\": {\n      \"source\": {\n        \"source\": \"directory\",\n        \"path\": \"" + method + "\"\n      }\n    }\n  }\n}\n"
+	}
+	local := ".claude/settings.local.json"
+	cases := []struct {
+		name    string
+		files   map[string]string
+		runs    int
+		refused bool
+		want    func(method string) string
+	}{
+		{name: "no settings file", files: map[string]string{"vehicle.json": record}, runs: 1, want: vehicleEnabled},
+		{name: "other keys and a standing entry", files: map[string]string{"vehicle.json": record, local: standing}, runs: 1, want: kept},
+		{name: "a broken file", files: map[string]string{"vehicle.json": record, local: "{not json"}, runs: 1, want: vehicleEnabled},
+		{name: "a second run", files: map[string]string{"vehicle.json": record}, runs: 2, want: vehicleEnabled},
+		{name: "a stub with no record", files: map[string]string{}, runs: 1, refused: true},
+		{name: "a record naming no brand", files: map[string]string{"vehicle.json": `{"vehicle": "abc123"}`}, runs: 1, refused: true},
+	}
+	for _, one := range cases {
+		t.Run(one.name, func(t *testing.T) {
+			t.Parallel()
+			where, doors := vehicleFixture(t)
+			work := filepath.Join(where, "work")
+			if err := os.MkdirAll(work, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			vehicleSeed(t, work, one.files)
+			doors.env["SE_WORK_ROOT"] = work
+			at := filepath.Join(work, filepath.FromSlash(local))
+			// A fixed past stamp on the file before each later run, which a rewrite moves. [[spec/guidance/code/testing]]
+			past := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+			for run := 1; run <= one.runs; run++ {
+				if run > 1 {
+					if err := os.Chtimes(at, past, past); err != nil {
+						t.Fatal(err)
+					}
+				}
+				code, out, errs := vehicleRun(doors, false, "enable")
+				if one.refused {
+					if code == 0 || errs == "" {
+						t.Fatalf("enable answers %d %q %q, and wants a refusal naming why", code, out, errs)
+					}
+					if vehicleExists(at) {
+						t.Fatalf("a refused enable writes %s", at)
+					}
+					return
+				}
+				if code != 0 {
+					t.Fatalf("enable run %d answers %d %q %q", run, code, out, errs)
+				}
+				if !vehicleExists(at) {
+					t.Fatalf("enable run %d writes no %s", run, local)
+				}
+				if said, want := vehicleRead(t, at), one.want(filepath.ToSlash(doors.root)); said != want {
+					t.Fatalf("enable run %d writes\n%s\nand wants\n%s", run, said, want)
+				}
+				if run > 1 {
+					stat, err := os.Stat(at)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if !stat.ModTime().Equal(past) {
+						t.Fatalf("enable run %d rewrites a file whose text stands", run)
+					}
+				}
+			}
+		})
+	}
+}
