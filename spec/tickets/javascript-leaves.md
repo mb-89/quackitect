@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -194,6 +194,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 7ab598871c4ace7e15bc64f3dade9ca3c56c9af4
+    hash_after: 7ab598871c4ace7e15bc64f3dade9ca3c56c9af4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -306,38 +318,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- unloaded-js-readers-leave: the vale and survey readers no road loads left with their tests and their doors rows
+- level0-note-drops-faultin: the broken-rule section of the level0 note names lspRules in place of the deleted faultIn
+- javascript-leaves: accept passed twice, the second on the one-line fix
+- four private notes decided: two dropped, two carried on as retro findings
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the accept read the tree past the diff, and a search for the deleted file names found the stale note line before the merge
+- the handover named the index and push workarounds, so no hand-back stalled on them
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 10:12 the canary gate logged that the canary opens no answer, on an answer that opened with it, and the tool.call hook asked for it a second time
+- 10:17 the tests field of a prose leaf refused ./RUNME.sh check, whose last line prints timings and never green
+- 10:20 the push refused, since the check ran against the commit before the hand-back
+- 10:24 the notes step refused a bare pass, since its drained field wants a command
+- standing: the index process pushes through a proxy port the box no longer serves, so every MCP hand-back needs a shell push after it
+- standing: a go test over src/quack stops the live index, seen four times on this box
+- standing: ExampleCovers warns on the stamp, bundle and hook verbs among others
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the canary gate reads the first text block of the answer the tool call stands in: `.claude/skills/level0/hooks/`
+- the trivial process names `./RUNME.sh check > /dev/null 2>&1 && echo green` under tests for a change that touches no code: `spec/processes/trivial.yaml`
+- the hand-back runs the check on the commit it lands, so the push takes it: `src/quack/check.go`
+- the notes step prints its drained command in the pull answer: `spec/processes/group.yaml`
+- the index reads the proxy from the box at each push, not from its start: `src/quack/main.go`
+- the src/quack test that stops the index runs against a temp root: `src/quack/check.go` holds stopsOwnIndex, which spares an index the check found standing
+- an example per verb, starting with a fake go list runner for stamp: `src/quack/examples_harness_test.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The group's ask was met before this box took it. What remained was proof that nothing still points at the deleted files, and one stale line was the whole gap. The refusals this run cost were all of one kind: a field or a step wanting a form the pull answer never showed. A pull that prints the expected form beside each field removes that class.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each improve line points at the file that owns the fix, and repeats none of its logic
+- numbers: the chapter adds none
+- headers: the change writes no file header
+- prompts and errors: the errors carry their times off the session log, and the owner wrote no prompt this run past the fire's prompt the handover quotes
+- role: the chapter names the box and the owner by role alone
 
 ## cloud
 
