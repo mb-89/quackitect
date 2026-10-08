@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 07b7e015895bd976
         size: 1052
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: ba0ad20d92d953b67f864505bfe046898b4e5135
+    hash_after: 1d875b96ef3c11695b99d391264b96620b8cd8be
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -363,14 +372,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft and the gate name, plus the git door the Discussion hands this ticket.
+- The JavaScript tests that stay run on their fakes, and the Go rule tests take their fixtures.
+- Each changed comment points at its Go owner.
+- folders.go owns the folder names, and every copy points there.
 
 ## tests-green
 
