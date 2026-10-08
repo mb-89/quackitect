@@ -420,7 +420,6 @@ The gate accepts, and implement carries these points. The gate verdict holds the
 - `src/engine/tools.js` takes `surveyOf`, `pathOf`, `guesses` and `TOOLS` beside `readTools` and `whereIs`, and nothing more. `survey`, `writeSurvey`, `installedTools` and `rebuilt` leave with their `tools.test.js` cases, since Go owns each.
 - `tree.test.js` keeps the half of its session case that holds `pull-tool.js` to no session file.
 - Items twelve, sixteen and seventeen, and the callers row naming the door files, read stale: those landed in the children.
-- The gate rewrote the red test on `git ls-files`, as done_when line one reads.
 
 The case `a stop file short of a field is refused` in `test/contract/tree.test.js` still runs `StopFolderIsData` once [[spec/tickets/bridge-library-leaves]] removes `findings.js`. Deleting the rule takes that case with it, or ports it to Go first.
 

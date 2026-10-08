@@ -4,24 +4,22 @@
 package main
 
 import (
-	"os/exec"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestThePluginLibrariesHoldTheValeLibraryAlone(t *testing.T) {
 	t.Parallel()
-	cmd := exec.Command("git", "ls-files", ".claude/skills/level0/lib")
-	cmd.Dir = treeRoot
-	said, err := cmd.Output()
+	found, err := filepath.Glob(filepath.Join(treeRoot, ".claude", "skills", "level0", "lib", "*.js"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	left := []string{}
-	for _, one := range strings.Fields(string(said)) {
-		if path.Base(one) != "vale.js" {
-			left = append(left, one)
+	for _, one := range found {
+		if filepath.Base(one) != "vale.js" {
+			rel, _ := filepath.Rel(treeRoot, one)
+			left = append(left, filepath.ToSlash(rel))
 		}
 	}
 	if len(left) > 0 {
