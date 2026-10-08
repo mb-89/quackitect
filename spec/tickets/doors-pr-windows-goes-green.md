@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
 group: loose-fixes-911f4ea
+record:
+  - step: do
+    hand: box f9a347032e0b · claude-code-remote
+    hash_before: 611e492549d77e36953f6c012cf2531ff5ef8e5a
+    hash_after: 611e492549d77e36953f6c012cf2531ff5ef8e5a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   86.9  in all"
+    inputs:
+      - name: ask
+        hash: c580237091756e63
+        size: 359
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -47,18 +65,16 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
-./RUNME.sh check
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/ending_windows_contract_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
+<!-- the form is command -->
 
 ./RUNME.sh check
-
-<!-- the form is command -->
 
 ## says
 
@@ -71,8 +87,11 @@ The Windows runner hung `go test ./src/quack/` at its timeout in `TestAChildTheC
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the fix landed in f9309d464 on work/doors-declare-what-they-own, and #131 merged with check (ubuntu-latest) and check (windows-latest) green; the tests field names the case file, which runs on Windows alone, so the Windows run on #131 carries the case
+- the change reveals one cleanup: the trivial route names the check for tests, and the check answers no green word; a private note carries it
+- the change adds no fact here; the says field points at the commits holding it
 
 # Discussion
 
