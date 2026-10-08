@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: d12e682d5468fd5d
         size: 531
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 9e35639b532f125fb243f0097e5b8f335cbbc2b0
+    hash_after: 9e35639b532f125fb243f0097e5b8f335cbbc2b0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 6092e512593690f5
+        size: 2467
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -247,26 +260,31 @@ The src/front package stays, since src/pull and src/quack call it as a library. 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/bundle_verb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The stamp verb answers fresh se-front by running go list over src/front/cmd, where the case wants a refusal with exit 2 and no run. The first two done_when lines stand as git commands the hand reads after the change, and the check decides the third.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the third done_when line meets the check, the first two meet git ls-files and git grep, and this case fails until se-front leaves the stamp verb
+- the case reaches the runner and the disk through fakeBoxDoors, both fakes
 
 # gate
 

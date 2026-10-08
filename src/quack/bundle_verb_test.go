@@ -208,7 +208,7 @@ func TestTheStampReadsTheFilesGoListsForTheBinaryNamed(t *testing.T) {
 
 func TestTheStampVerbRefusesAWordOrBinaryItKnowsNot(t *testing.T) {
 	t.Parallel()
-	for _, argv := range [][]string{nil, {"fresh"}, {"fresh", "se-nothing"}, {"keep", "se-index"}} {
+	for _, argv := range [][]string{nil, {"fresh"}, {"fresh", "se-nothing"}, {"fresh", "se-front"}, {"keep", "se-index"}} {
 		d, runner := stampBox(t)
 		if code := stampVerb(d, argv); code != 2 || len(runner.ran) != 0 {
 			t.Errorf("stamp %v answers %d after %v, and wants 2 with no run", argv, code, runner.ran)
