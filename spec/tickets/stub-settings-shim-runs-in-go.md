@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: caadc88f131860c5
         size: 493
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7a8761b9636601f1c076754f1c469b74c3be32fd
+    hash_after: ebdc029dd93de8b65de3735063332fe27e498bd2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: d17ce41170ddc790
+        size: 6505
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -276,26 +289,41 @@ Assumed: a stub made earlier keeps its node shim until the vehicle updates it, w
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/stub_settings_test.go src/quack/vehicle_verb_test.go src/vehicle/shim_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/stub_settings_test.go
+- src/quack/vehicle_verb_test.go
+- src/vehicle/shim_contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheStubRunsNoNodeAndTheVehicleLibraryStandsNowhere fails on its assertion, naming lib/vehicle.js, the JS test and the node -e block in the shim.
+TestVehicleVerbEnableNamesTheVehicleAMarketplaceAndEnablesTheBrand fails on every row: the fresh rows find no settings file, the seeded rows find their seed text unchanged, and the refusal rows find a zero exit.
+Its expected text comes from a run of the real shimSettings under node: two-space indent, a trailing newline, standing keys in their order, the marketplace merged or added last, and level0@brand once.
+The second run row pins the file's mtime with os.Chtimes and asserts it stands, so the no-rewrite case takes no timer.
+The draft's no-record row splits in two: a stub with no vehicle.json, and a record naming no brand, for approach item five.
+TestTheShimEnablesThePluginThroughTheVehicleBinary fails on its assertion: the fake binary at .se/.runtime/bin/se-index never hears the call.
+Surprise one: the shim test sits under the contract build tag, so a bare go test answers no tests to run, and the check passes the tag.
+Surprise two: vehicle enable falls through to vehicleHere today and exits zero, so the refusal rows fail on their assertion and not on usage.
+Surprise three: the standing contract tests pass with the node block in place, since their vehicles hold no lib/vehicle.js, so no test ever ran the node path.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red test: the stub settings test decides lines one and two, the enable verb table line three, and ./RUNME.sh check at tests-green line four
+- every door the tests reach has a fake: temp work and method roots, a temp stub, and a fake se-index script recording its argv and SE_WORK_ROOT
 
 # gate
 
