@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -210,6 +210,24 @@ record:
         hash: 3d4f484e875cdf25
         size: 4751
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box ba1101ec7b2d · claude-code-remote · helper-7
+    hash_before: db5201d2ef1413cbfe91f3867489960b9028b2de
+    hash_after: db5201d2ef1413cbfe91f3867489960b9028b2de
+    inputs:
+      - name: design/draft
+        hash: 445d03daa0755edf
+        size: 2849
+      - name: design/tests-red
+        hash: c7000c127af4f1d1
+        size: 762
+      - name: design/draft-2
+        hash: 3d4f484e875cdf25
+        size: 4751
+      - name: design/tests-red-2
+        hash: e8c2e2eb7be289ba
+        size: 948
+    def: 01417e29801ecc2f
 group: javascript-leaves
 ---
 
@@ -465,11 +483,11 @@ The bundle cases, the drawing stamp case, the unpark case and the dry probe's st
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- Move each stands and readText reach onto d.disk. These are stands on the esbuild check in src/quack/bundle_verb.go, unparked and keyed in src/quack/probe_clear.go, and drySession in src/quack/probe_dry.go. Each one reaches the real disk with no marker today.
-- Seed bundleTree, TestBundleHereAnswersWhetherTheBannerNamesTheStamp, TestTheBundleNamesTheInstallWhereEsbuildStandsNowhere and TestTheProbeDropsEveryParkInItsCloneAndCommitsIt on d.disk. They seed the real disk through seedTree today, so they must fail by assertion before the change.
-- Name git grep -n OutsideInDoors over the five files as the checkpoint of the done_when line. go test ./src/owns/ ./src/imports/ passes today with the markers standing, so it decides nothing.
-- hookHere still reaches the real box past quietBox through configAt(root), logsRow(root, ...) and the realPost of hookAsk. The approach must hand all three from the box doors.
+accept
+- bundle-esbuild-reads-disk-stat: diskDoors holds no stands method, yet the answers line names d.disk.stands. Check esbuild through d.disk.stat, or add stands on diskDoors in boxfiles.go, in place of the global stands.
+- hook-config-reads-box-env: configOn in main.go still reads os.Environ, so the hook hand's config reads the real environment past box.environ. Hand the box's environ through, or name the reach out of this ask.
+- hook-cases-written-red: TestTheHookHandReadsTheBoxDoors and the fake-disk, fake-post TestHookAsksTheDoorTheStandingFileNames stand unwritten. Write them in implement/change, and keep hook_verb_test.go red until tests-green.
+- stamp-here-takes-the-disk: stampHere in bundle_verb_test.go holds _ = disk. Pass the disk to drawingStamp once it takes a diskDoors.
 
 # implement
 
