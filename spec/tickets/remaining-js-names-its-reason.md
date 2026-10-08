@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: feffe0d6fd4febe4
         size: 774
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 391861b9a3c4fe2b219a8c953d25ad9a46a503b4
+    hash_after: 391861b9a3c4fe2b219a8c953d25ad9a46a503b4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/check_javascript.go src/quack/check.go spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size field names, and its cases moved into check_lines_test.go, which the Discussion says
+- the part reaches git and the disk through checkDoors, whose fake the cases drive
+- the file header of check_javascript.go points at the doors note section the approach implements
+- the list of JavaScript stands once, in the doors note, and the check reads it there
 
 ## tests-green
 
@@ -359,3 +373,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The cases the draft names under `check_javascript_test.go` stand in `src/quack/check_lines_test.go`, under `TestTheJavaScriptPartRefusesAFileTheListLeavesOut`. The group folded the small test files of `src/quack` into their siblings to hold the package's test lines under its code.
