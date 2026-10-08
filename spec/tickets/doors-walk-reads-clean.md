@@ -130,7 +130,7 @@ breaks: the doors walk prints each marked line as `file.go:line:col: ...`, the s
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 done_when:
 
-- `go test ./src/quack/ -run TestDoors` passes, with a marked line the matcher's pattern refuses and a refused walk it reads
+- `go test ./src/quack/ -run TestDoors` passes, with every marked line refused by setup-go's matcher pattern
 - `./RUNME.sh check` answers 0 on this box
 
 <!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->

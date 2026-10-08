@@ -125,12 +125,12 @@ group: windows-check-holds
 gain: `check (windows-latest)` stands green on main and on every pull request, so auto-merge lands work again.
 
 <!-- breaks, as text: what breaks if it is never done -->
-breaks: `built` hard-links one shared build into each case's folder. On Windows a running image denies delete on every name of its file, so `TestTheQuackBinaryBuildsOnce` fails its TempDir cleanup with Access is denied whenever a parallel case runs an index from its own link.
+breaks: `built` hard-links one shared build into each case's folder. On Windows a running image denies delete on every name of its file. A parallel case's index then locks the folder of `TestTheQuackBinaryBuildsOnce`, and Windows refuses its TempDir cleanup.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 done_when:
 
-- `go test -tags contract ./src/quack/ -run TestACaseRemovesItsBinaryWhileAnotherRunsItsOwn` passes on the Ubuntu and the Windows runner of the group's pull request
+- `go test -tags contract ./src/quack/ -run TestTheQuackBinaryBuildsOnce` passes on the Ubuntu and the Windows runner of the group's pull request
 - `check (windows-latest)` stands green on the group's pull request
 - `./RUNME.sh check` answers 0 on this box
 

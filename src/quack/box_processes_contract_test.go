@@ -232,8 +232,7 @@ func stopped(t *testing.T, bin, root string) {
 	}
 }
 
-// The root built into a folder, as the install builds it, off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
-// Windows takes a copy: a running image there denies delete on every name of its file, so a link leaves each case's folder locked by any other case's index. Its exec inherits no handle the copy holds. [[spec/tickets/quack-build-copies-on-windows]]
+// The root built into a folder, as the install builds it, off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]] Windows takes a copy: a running image there denies delete on every name of its file, so a link leaves each case's folder locked by any other case's index. [[spec/tickets/quack-build-copies-on-windows]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
 	built, err := quackBinary()
@@ -244,14 +243,12 @@ func built(t *testing.T, folder string) string {
 	if err := os.MkdirAll(folder, 0o755); err != nil {
 		t.Fatal(err)
 	}
+	place := os.Link
 	if runtime.GOOS == "windows" {
-		if err := copied(built, bin); err != nil {
-			t.Fatalf("the build does not copy into %s: %v", folder, err)
-		}
-		return bin
+		place = copied
 	}
-	if err := os.Link(built, bin); err != nil {
-		t.Fatalf("the build does not link into %s: %v", folder, err)
+	if err := place(built, bin); err != nil {
+		t.Fatalf("the build does not reach %s: %v", folder, err)
 	}
 	return bin
 }
@@ -287,24 +284,16 @@ var quackBinary = sync.OnceValues(func() (string, error) {
 // The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
 var quackBuilds atomic.Int32
 
-// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]]
-// level0: FixtureOutsideHome - the contract asks for the real quack binary in two folders of its own, to prove one go build serves both
+// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]] One folder then leaves while an index runs from the other, as TempDir's cleanup removes it. [[spec/tickets/quack-build-copies-on-windows]]
+// level0: FixtureOutsideHome - the contract asks for the real quack binary in two folders of its own, to prove one go build serves both, and runs one as an index
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
-	t.Parallel()
-	built(t, t.TempDir())
-	built(t, t.TempDir())
-	if got := quackBuilds.Load(); got != 1 {
-		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
-	}
-}
-
-// A case's binary leaves its folder while another case's index runs from a binary of its own, as TempDir's cleanup removes it. [[spec/tickets/quack-build-copies-on-windows]]
-// level0: FixtureOutsideHome - the contract runs the real quack binary as an index in one folder, and removes the binary of another
-func TestACaseRemovesItsBinaryWhileAnotherRunsItsOwn(t *testing.T) {
 	t.Parallel()
 	idle := t.TempDir()
 	built(t, idle)
 	bin := built(t, t.TempDir())
+	if got := quackBuilds.Load(); got != 1 {
+		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
+	}
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "help")
 	t.Cleanup(func() { stopped(t, bin, root) })

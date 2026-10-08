@@ -48,6 +48,11 @@ func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	if !strings.Contains(out, "src/engine/hung.go:6:2 time.Sleep stands marked: a hung child needs a deadline\n") {
 		t.Fatalf("doors prints %q, and wants the marked line listed", out)
 	}
+	for _, line := range strings.Split(out, "\n") {
+		if goMatcher.MatchString(line) {
+			t.Errorf("doors prints %q, which setup-go's problem matcher reads as an error", line)
+		}
+	}
 }
 
 // level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
@@ -64,23 +69,8 @@ func TestDoorsListsAScriptWalkingAroundADoor(t *testing.T) {
 	}
 }
 
-// The pattern of setup-go's problem matcher, which turns a line it reads into an error annotation. [[spec/tickets/doors-walk-reads-as-no-error]]
+// The pattern of setup-go's problem matcher, which turns a line it reads into an error annotation. [[spec/tickets/doors-walk-reads-clean]]
 var goMatcher = regexp.MustCompile(`^\s*(.+\.go):(?:(\d+):(\d+):)? (.*)`)
-
-// A marked line reads as no error to CI, and a refused walk reads as one. [[spec/tickets/doors-walk-reads-as-no-error]]
-// level0: FixtureOutsideHome - the doors verb walks a planted tree of the case's own on disk, as it walks the real tree
-func TestDoorsMarkedLineReadsAsNoErrorToCI(t *testing.T) {
-	t.Parallel()
-	_, out, errs := doorsRan(walkedRoot(t))
-	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
-		if goMatcher.MatchString(line) {
-			t.Errorf("doors prints %q, which the Go problem matcher reads as an error", line)
-		}
-	}
-	if !goMatcher.MatchString("src/engine/wait.go:5:14: time.Sleep walks around clock") || !strings.Contains(errs, "src/engine/wait.go:5:14: time.Sleep walks around clock\n") {
-		t.Fatalf("doors prints %q, and wants the refused walk in the shape the matcher reads", errs)
-	}
-}
 
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	t.Parallel()
