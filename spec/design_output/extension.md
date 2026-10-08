@@ -283,8 +283,8 @@ Every press that writes, every run and every edit in the config tree writes a
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
 A window appends each line to the one file its first line names, through the
-editor door. The row shape comes from `lib/log.js`, the module every writer
-reads. The line honours `log.level`, the same as every other door. For details,
+editor door. The row shape comes from `sayLine` in `src/quack/verb_log.go`, which every
+writer follows. The line honours `log.level`, the same as every other door. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
 ## A button names its commands
@@ -474,8 +474,7 @@ wants: a box carrying no editor answers them and prints nothing.
 | `editor-extensions` | installs the two ids the settings point at | no `code` on the PATH |
 
 The link points at the tree, so an edit draws on the next window and no second
-install stands between them. `servers.js` holds both ids, so the shell names
-none of its own.
+install stands between them. `Extensions` in `src/modules/check/tree.go` holds the ids, and the setup verb reads it.
 
 ## The link stands
 
@@ -688,7 +687,7 @@ the marks, and `editor-fields.js` draws them:
 | a hold standing as the editor starts | the marks, and the cursor stays |
 | no person's hold names the ticket | nothing |
 
-The leaf and its fields come from `leafOf` in `src/scripts/pull-route.js`,
+The leaf and its fields come from `LeafOf` in `src/pull/pull_route.go`,
 and the lines each field holds from `ChapterOf` in `src/pull/pull_chapter.go`.
 The hover over a mark shows the leaf's path and `does`, then the field's
 name, `form` and `says`. On `checked` it lists the checklist.
@@ -698,9 +697,6 @@ alone, so it lists no mark, and a mark blocks no check, commit or push.
 
 # What stands open
 
-- The extension holds its own reader of a key, because `lib/config.js` in the
-  plugin is a module and VS Code loads a script. Fold the two together where
-  the extension takes a build.
 - The sidebar reads both files and leaves the environment layer to
   `./RUNME.sh config`, which names the layer answering each key.
 - A projection writing `src/extension/package.json` from the declaration waits,

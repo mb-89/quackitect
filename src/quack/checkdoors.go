@@ -21,7 +21,7 @@ import (
 	"quackitect/src/modules/tickets"
 )
 
-// The survey of the tools this box holds, which tools.js owns, and the folder of tickets the red list reads. [[spec/design_output/tools#where-a-caller-looks]] [[spec/design_output/pull#the-gate]]
+// The survey of the tools this box holds, which toolsFile in src/quack/survey.go names, and the folder of tickets the red list reads. [[spec/design_output/tools#where-a-caller-looks]] [[spec/design_output/pull#the-gate]]
 const (
 	surveyFile    = runtimeDir + "/tools.json"
 	publicTickets = "spec/tickets"
@@ -46,6 +46,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
 	d := checkDoors{root: root, self: self, now: wall.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(realDisk(), root, wall.Now), out: out, errs: errs, disk: realDisk()}
+	d.browser, _ = browserFrom(d.disk, os.Getenv, runtime.GOOS == "darwin")
 	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {

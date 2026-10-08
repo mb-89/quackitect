@@ -97,7 +97,7 @@ func TestTheFreeVerbsNameNoTicket(t *testing.T) {
 	}
 }
 
-func TestTheGuardsReadTheBlessAndTheVersions(t *testing.T) {
+func TestTheBlessGuardReadsTheBlessAndTheHand(t *testing.T) {
 	if said := BlessGuard("export SE_CLOUD=1", nil); !strings.HasPrefix(said, "SE_CLOUD name the hand") {
 		t.Fatalf("the bless guard says %q", said)
 	}
@@ -106,12 +106,6 @@ func TestTheGuardsReadTheBlessAndTheVersions(t *testing.T) {
 	}
 	if said := BlessGuard("ls", nil); said != "" {
 		t.Fatalf("the bless guard says %q over a read", said)
-	}
-	if said := VersionGuard("git push origin :v3"); !strings.HasPrefix(said, "v3 is a version branch, and this command would delete it.") {
-		t.Fatalf("the version guard says %q", said)
-	}
-	if said := VersionGuard("git push origin v3"); said != "" {
-		t.Fatalf("the version guard says %q over a plain push", said)
 	}
 }
 

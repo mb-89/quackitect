@@ -1,6 +1,6 @@
 // The size cap. One answer of the pull reaches the model whole, so a hand-out
 // past the cap less its margin splits at a line, the hold carries the rest,
-// and the next pull on the same step prints it, off src/scripts/pull-cap.js.
+// and the next pull on the same step prints it.
 // [[spec/design_input/level-two#the-size-cap]]
 package pull
 

@@ -9,9 +9,9 @@ const DRAWS = ["action", "toggle", "status", "count", "table", "process"];
 const TRACKED = "spec/config/level0.json";
 // [[spec/design_output/extension#the-tree-holds-config-alone]]
 const MACHINERY = ["session"];
-// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
+// The local layer, owned by Local in src/modules/config/config.go, in the runtime folder src/modules/check/folders.go owns, and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
 const LOCAL = ".se/.runtime/config.json";
-// The layer of a key no file sets, owned by BUILT_IN in .claude/skills/level0/lib/config.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
+// The layer of a key no file sets, owned by BuiltIn in src/modules/config/keys.go and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
 const BUILT_IN = "built-in";
 
 function entriesIn(schema) {

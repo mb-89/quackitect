@@ -1,5 +1,5 @@
 {
-  "description": "Level zero: one closure on every door, which logs what it gets at debug and hands the event on, and the pull as a tool.",
+  "description": "Level zero: one forwarder posting every event to the hooks door, and the pull as a tool.",
   "modules": [
     "./pull-tool.ts"
   ]

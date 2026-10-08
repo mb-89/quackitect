@@ -1,5 +1,4 @@
-// The desk guard and the trunk guard, off lib/trunk.js and lib/cloud.js:
-// whether a command commits or pushes, whether it lands
+// The desk guard and the trunk guard: whether a command commits or pushes, whether it lands
 // on the trunk, and the text each guard answers.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
@@ -131,7 +130,7 @@ func DeskSaid(what string) string {
 	return "A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + "."
 }
 
-// Whether the check's stamp answers green on the sha, and what it says, off stampOf and saysGreen in lib/runs.js. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
+// Whether the check's stamp answers green on the sha, and what it says, off the stamp stampFile in src/quack/check.go names. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
 func Battery(stamp string, stands bool, sha string) (bool, string) {
 	const none = "no check has run here"
 	if !stands {
@@ -175,6 +174,40 @@ func RedBattery(says string) string {
 		"",
 		"Run `./RUNME.sh check` last, after your final commit. The stamp names",
 		"the commit it ran against, so a commit after it reads stale.",
+	}, "\n")
+}
+
+// A cloud box pushes its own work branch alone, and trunk stands for the desk. [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+func CloudLeavesTrunk() string {
+	return strings.Join([]string{
+		"A cloud box pushes its own work branch alone, and " + Trunk + " stands for the desk.",
+		"",
+		"Push your work branch. " + Trunk + " takes its work through",
+		"`./RUNME.sh branch merge <name>` on a desk, where the owner reads it first.",
+	}, "\n")
+}
+
+// The sha the check's stamp names, or nothing where it names none. [[spec/tickets/git-hooks-run-in-go]]
+func StampSha(stamp string) string {
+	var read struct {
+		Sha any `json:"sha"`
+	}
+	if json.Unmarshal([]byte(stamp), &read) != nil {
+		return ""
+	}
+	return yaml.JSONText(read.Sha)
+}
+
+// The refusal a push past the check meets. [[spec/tickets/level0-runs-on-the-door]]
+func Unchecked(branch, says string) string {
+	if says == "" {
+		says = "the green check ran on no commit this tip stands on, or code changed since"
+	}
+	return strings.Join([]string{
+		branch + " takes a push the check has passed, and " + says + ".",
+		"",
+		"Run `./RUNME.sh check` after your last code commit. It runs level zero on a",
+		"fresh box beside the tests, and a red check pushes nothing.",
 	}, "\n")
 }
 

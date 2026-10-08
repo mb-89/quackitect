@@ -16,7 +16,7 @@ import (
 	"quackitect/src/owns"
 )
 
-// Where the doors and their contract tests stand, as DOORS and CONTRACT in src/scripts/cli-doors.js name them. A marked line carries no colon past its column, so setup-go's problem matcher reads it as no error and leaves the step's annotations to the failing case. [[spec/tickets/doors-walk-reads-clean]]
+// Where the doors and their contract tests stand. A marked line carries no colon past its column, so setup-go's problem matcher reads it as no error and leaves the step's annotations to the failing case. [[spec/design_output/doors#one-contract-test-per-door]] [[spec/tickets/doors-walk-reads-clean]]
 const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"

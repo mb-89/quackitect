@@ -19,7 +19,7 @@ const (
 	planTodos   = "todos"
 )
 
-// .claude/skills/level0/lib/folders.js owns the runtime folder and runs.js the plan's file, and the package spells them again. [[spec/tickets/cage-call-holds-port]]
+// src/modules/check/folders.go owns the runtime folder and Plan in src/modules/queue/queue.go the plan's file, and the package spells them again. [[spec/tickets/cage-call-holds-port]]
 const planFile = ".se/.runtime/plan.json"
 
 // The config words each hold reads, and the plan's work in hand and its open todos. [[spec/tickets/cage-call-holds-port]]

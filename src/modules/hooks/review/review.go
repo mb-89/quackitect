@@ -1,5 +1,5 @@
 // Package review frames a review: the reader's prompt, the reading of its
-// answer, and the report, off .claude/skills/level0/lib/review.js.
+// answer, and the report.
 // [[spec/tickets/review-spawns-off-the-door]]
 package review
 

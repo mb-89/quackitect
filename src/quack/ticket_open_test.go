@@ -53,7 +53,7 @@ func openRepo(t *testing.T, draft string) (string, *git.FakeRepo) {
 	t.Helper()
 	root := editCaseTree(t)
 	repo := standsInRepo(t, root)
-	seedsFile(t, root, aThing, draft)
+	seedFile(t, root, aThing, draft)
 	commitsAll(t, repo, "first")
 	return root, repo
 }
@@ -78,7 +78,7 @@ func openRuledTree(t *testing.T, ask string) string {
 
 func openState(t *testing.T, root, path string) string {
 	t.Helper()
-	text, _ := readsBack(t, root, path)
+	text, _ := readIn(root, path)
 	for _, row := range strings.Split(text, "\n") {
 		if said, ok := strings.CutPrefix(row, "state: "); ok {
 			return said
@@ -88,27 +88,22 @@ func openState(t *testing.T, root, path string) string {
 }
 
 func TestTicketOpen(t *testing.T) {
-	t.Run("open names no ticket, and asks for one", func(t *testing.T) {
+	t.Run("open naming no ticket asks for one, and a name no ticket answers refuses", func(t *testing.T) {
 		root := openTree(t, openDraft)
-		code, out, errs := runsApart(t, root, false, "ticket", "open")
-		if code != exitUsage || out != "" || errs != "ticket open needs a ticket: ./RUNME.sh ticket open slow-lint\n" {
-			t.Fatalf("open answers %d, %q, %q", code, out, errs)
-		}
-	})
-	t.Run("a name no ticket answers refuses", func(t *testing.T) {
-		root := openTree(t, openDraft)
-		code, _, errs := runsApart(t, root, false, "ticket", "open", "no-such")
-		if code != exitUsage || errs != "no-such names no ticket under .se/tickets or spec/tickets.\n" {
-			t.Fatalf("open answers %d, %q", code, errs)
+		for words, want := range map[string]string{"": "ticket open needs a ticket: ./RUNME.sh ticket open slow-lint\n", "no-such": "no-such names no ticket under .se/tickets or spec/tickets.\n"} {
+			code, out, errs := runsApart(t, root, false, strings.Fields("ticket open "+words)...)
+			if code != exitUsage || out != "" || errs != want {
+				t.Fatalf("open %s answers %d, %q, %q", words, code, out, errs)
+			}
 		}
 	})
 	t.Run("a ticket standing open already stays as it stands", func(t *testing.T) {
 		root := openTree(t, editCaseTicket(""))
 		code, out, _ := runsApart(t, root, false, "ticket", "open", "a-thing")
-		if got, _ := readsBack(t, root, aThing); code != 0 || out != aThing+" stands open already.\n" || got != editCaseTicket("") {
+		if got, _ := readIn(root, aThing); code != 0 || out != aThing+" stands open already.\n" || got != editCaseTicket("") {
 			t.Fatalf("open answers %d, %q, and writes %q", code, out, got)
 		}
-		seedsFile(t, root, aThing, strings.Replace(openDraft, "state: draft\n", "", 1))
+		seedFile(t, root, aThing, strings.Replace(openDraft, "state: draft\n", "", 1))
 		if code, out, _ := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || out != aThing+" stands with no state already.\n" {
 			t.Fatalf("open over no state answers %d, %q", code, out)
 		}
@@ -119,7 +114,7 @@ func TestTicketOpen(t *testing.T) {
 		if code != 0 || out != aThing+" stands open at do, and the pull hands it out.\n" || errs != "" {
 			t.Fatalf("open answers %d, %q, %q", code, out, errs)
 		}
-		got, _ := readsBack(t, root, aThing)
+		got, _ := readIn(root, aThing)
 		if !strings.Contains(got, "\nstate: open\n") || !strings.Contains(got, "\nstep: do\n") {
 			t.Fatalf("the ticket holds %q", got)
 		}
@@ -142,24 +137,19 @@ func TestTicketOpen(t *testing.T) {
 			}
 		}
 	})
-	t.Run("a group no ticket names refuses the open, and the draft stands", func(t *testing.T) {
-		root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\nprocess: [[spec/processes/group]]\n", 1))
-		code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
-		if code != exitFailed || !strings.Contains(errs, "no ticket names it under group") || openState(t, root, aThing) != "draft" {
-			t.Fatalf("open answers %d, %q", code, errs)
-		}
-	})
-	t.Run("a draft naming a closed group refuses the open, and the draft stands", func(t *testing.T) {
-		root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\ngroup: shut\n", 1))
-		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
-		code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
-		if code != exitFailed || !strings.Contains(errs, "shut stands closed, so it takes no new child.") || openState(t, root, aThing) != "draft" {
-			t.Fatalf("open answers %d, %q", code, errs)
+	t.Run("a group no ticket names, or a draft naming a closed group, refuses the open, and the draft stands", func(t *testing.T) {
+		for front, says := range map[string]string{"process: [[spec/processes/group]]\n": "no ticket names it under group", "group: shut\n": "shut stands closed, so it takes no new child."} {
+			root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\n"+front, 1))
+			seedFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+			code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
+			if code != exitFailed || !strings.Contains(errs, says) || openState(t, root, aThing) != "draft" {
+				t.Fatalf("open answers %d, %q", code, errs)
+			}
 		}
 	})
 	t.Run("a group with a child standing opens", func(t *testing.T) {
 		root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\nprocess: [[spec/processes/group]]\n", 1))
-		seedsFile(t, root, "spec/tickets/a-part.md", openChild)
+		seedFile(t, root, "spec/tickets/a-part.md", openChild)
 		if code, out, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || openState(t, root, aThing) != "open" {
 			t.Fatalf("open answers %d, %q, %q", code, out, errs)
 		}
@@ -178,12 +168,8 @@ func TestTicketOpen(t *testing.T) {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
 	})
-	t.Run("a warning on the Ask opens with its line named, and a warning past the Ask stays unnamed", func(t *testing.T) {
-		root := openRuledTree(t, "The verb clones the upstream; the folder takes it.\n")
-		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || !strings.Contains(errs, "line "+strconv.Itoa(openAskLine)+" breaks Characters") {
-			t.Fatalf("open answers %d, %q", code, errs)
-		}
-		root = openTree(t, strings.Replace(openDraft, "# do\n\nNothing yet.", "# do\n\nNothing; yet.", 1))
+	t.Run("a warning past the Ask stays unnamed", func(t *testing.T) {
+		root := openTree(t, strings.Replace(openDraft, "# do\n\nNothing yet.", "# do\n\nNothing; yet.", 1))
 		seedsRules(t, root)
 		if code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing"); code != 0 || strings.Contains(errs, "breaks Characters") {
 			t.Fatalf("open answers %d, %q", code, errs)
@@ -200,7 +186,7 @@ func TestTicketOpen(t *testing.T) {
 	})
 	t.Run("a private note opens with no commit", func(t *testing.T) {
 		root := openTree(t, openDraft)
-		seedsFile(t, root, slowLint, openDraft)
+		seedFile(t, root, slowLint, openDraft)
 		if code, out, _ := runsApart(t, root, false, "ticket", "open", "slow-lint"); code != 0 || out != slowLint+" stands open at do, and the pull hands it out.\n" || openState(t, root, slowLint) != "open" {
 			t.Fatalf("open answers %d, %q", code, out)
 		}

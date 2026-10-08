@@ -4,8 +4,16 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { behaves } from "../../src/doors/fake/behaves.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
+
+test("a fake throws on the call it lacks, and answers the one it holds", () => {
+  const fake = behaves({ read: () => "a line" }, "disk");
+
+  assert.equal(fake.read("one.md"), "a line");
+  assert.throws(() => fake.write("one.md", "said"), /disk/);
+});
 
 test("the disk's maps find a Windows path under its posix key", () => {
   const disk = fakeDisk({ "\\tree\\a.md": "a" });

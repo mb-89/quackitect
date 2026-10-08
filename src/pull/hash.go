@@ -1,6 +1,5 @@
 // The hash a process carries onto a ticket: hashText over the canonical JSON
-// of its ask and its steps, off .claude/skills/level0/lib/hash.js and
-// canonicalOf in lib/schema-route.js.
+// of its ask and its steps, keys sorted and every scalar a string.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package pull
 
@@ -14,7 +13,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The constants of hashText in .claude/skills/level0/lib/hash.js, which src/index/files.go spells again. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The constants of HashText, which src/index/files.go spells again. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const (
 	fnvOffset = 0x811c9dc5
 	fnvPrime  = 0x01000193

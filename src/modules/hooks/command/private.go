@@ -1,5 +1,4 @@
-// The private delta, off lib/private.js and refusedDelta in lib/refuse.js:
-// the lines a staged delta adds, read for a private shape, a name the box
+// The private delta: the lines a staged delta adds, read for a private shape, a name the box
 // answers, and a run or a token out of a raw note under .se/notes.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
@@ -26,8 +25,8 @@ const (
 	firstColumn = 1
 )
 
-// The users naming nobody. [[spec/design_output/private#the-box-names-the-owner]]
-var nobody = []string{"user", "root", "one", "somebody", "nobody", "agent", "claude", "runner", "ubuntu", "vscode"}
+// The users naming nobody, which the shapes rule under spec/config/styles/VoiceVale/Private.yml spells again. [[spec/design_output/private#the-box-names-the-owner]]
+var Nobody = []string{"user", "root", "one", "somebody", "nobody", "agent", "claude", "runner", "ubuntu", "vscode"}
 
 // The shapes a line carries a person in, and the paths the delta leaves home. [[spec/design_output/private#the-delta-a-commit-carries]]
 var (
@@ -187,7 +186,7 @@ func shapesIn(added []Added) []Leak {
 		}
 		for _, said := range homed(one.Text) {
 			out = append(out, leak(ShapeHome, one.File, one.Line, said,
-				"A home path names the person owning the box, and "+strings.Join(nobody, ", "),
+				"A home path names the person owning the box, and "+strings.Join(Nobody, ", "),
 				"are the users naming nobody. Write the path under one of those, or say $HOME."))
 		}
 	}
@@ -289,7 +288,7 @@ func namesOf(box Box) [][2]string {
 // [[spec/design_output/private#the-box-names-the-owner]]
 func namesAPerson(said string) bool {
 	name := strings.TrimSpace(said)
-	return name != "" && !holds(nobody, strings.ToLower(name))
+	return name != "" && !holds(Nobody, strings.ToLower(name))
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]
@@ -410,7 +409,7 @@ func homed(text string) []string {
 	var out []string
 	for _, one := range homes.FindAllStringSubmatch(text, -1) {
 		who := strings.TrimRight(one[1], ".")
-		if who == "" || holds(nobody, strings.ToLower(who)) {
+		if who == "" || holds(Nobody, strings.ToLower(who)) {
 			continue
 		}
 		out = append(out, strings.TrimRight(one[0], "."))
@@ -456,7 +455,7 @@ type Carried struct {
 	Note  string
 }
 
-// The first token a note carries, then the first run of words long enough to copy, off carriedFrom in lib/private.js. [[spec/design_output/private#the-door-reads-the-notes]]
+// The first token a note carries, then the first run of words long enough to copy. [[spec/design_output/private#the-door-reads-the-notes]]
 func CarriedFrom(text string, held []Note) (Carried, bool) {
 	mine := privateTokens(text)
 	for _, note := range held {
@@ -480,7 +479,7 @@ func CarriedFrom(text string, held []Note) (Carried, bool) {
 	return Carried{}, false
 }
 
-// The refusal of a write carrying a note's text, off refusedPrivate in lib/private.js. [[spec/design_output/private#what-the-refusal-says]]
+// The refusal of a write carrying a note's text. [[spec/design_output/private#what-the-refusal-says]]
 func RefusedPrivate(where string, carried Carried) string {
 	head := where + " carries " + strconv.Itoa(len(strings.Fields(carried.Said))) + " words straight from a note under " + notes + ": \"" + carried.Said + "\"."
 	why := "A note is a dump and carries anything private. The rewrite is what makes a line safe to commit."

@@ -47,9 +47,6 @@ const (
 // The helper tiers the Agent door reads, off Tiers in src/modules/hooks/brief/brief.go. [[spec/design_output/level0#a-spawn-names-its-tier]]
 var helperTiers = []string{"find", "change", "decide"}
 
-// The variables saying the box stands in the cloud, off .claude/skills/level0/lib/cloud.js. [[spec/guidance/cloud/cloud]]
-var cloudVariables = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD"}
-
 // The variables naming the box's user and its home folder, first set first. [[spec/tickets/cage-commit-guards-port]]
 var (
 	userVariables = []string{"USER", "USERNAME", "LOGNAME"}
@@ -64,11 +61,7 @@ var proseStyle = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
 
 // The words a name holds under the root, and whether a cloud variable reads true. [[spec/tickets/cage-command-rules-port]]
 func commandSettings(box boxDoors, root string) hooks.Settings {
-	cloud := false
-	for _, name := range cloudVariables {
-		said := strings.ToLower(strings.TrimSpace(box.env(name)))
-		cloud = cloud || (said != "" && said != "0" && said != "false")
-	}
+	cloud := command.InCloud(box.env)
 	helpers := map[string]string{}
 	for _, tier := range helperTiers {
 		if model := textSetting(root, helperKey+tier); model != "" {

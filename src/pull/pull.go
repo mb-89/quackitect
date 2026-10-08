@@ -5,6 +5,7 @@
 package pull
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -20,6 +21,8 @@ var takes = []string{"--as", "--fail", "--became", "--answered", "--back", "--fi
 const (
 	shortSha = 8
 	toolFlag = "--tool"
+	specFlag = "--spec"
+	pullTool = "pull"
 )
 
 var verdictAt = regexp.MustCompile(`^--(pass|fail|became|answered|back)(=)?(.*)$`)
@@ -136,6 +139,59 @@ func PullArgvOf(argv []string) []string {
 	return out
 }
 
+// The pull tool's answer: the text the lead reads, and the prompt of the hand it spawns apart. [[spec/tickets/level0-hooks-forward-to-go]]
+type ToolAnswer struct {
+	Result string `json:"result"`
+	Spawn  string `json:"spawn,omitempty"`
+}
+
+// The tool's answer off the pull's text: a spawn answer hands the rows past its first blank row as the hand's prompt. [[spec/design_output/pull#a-hand-of-its-own]]
+func ToolAnswerOf(text string) ToolAnswer {
+	said := ToolAnswer{Result: text}
+	rows := strings.Split(text, "\n")
+	if strings.TrimSpace(rows[0]) != spawn {
+		return said
+	}
+	for at, row := range rows {
+		if row == "" {
+			said.Spawn = strings.TrimSpace(strings.Join(rows[at+1:], "\n"))
+			break
+		}
+	}
+	return said
+}
+
+// The spec the pull tool registers. [[spec/design_output/pull#the-checks]]
+func PullSpec() map[string]any {
+	text := func(description string) map[string]any {
+		return map[string]any{"type": "string", "description": description}
+	}
+	verdict := text("pass, fail with a reason, became with the successor, or answered with the ticket answering the ask")
+	verdict["enum"] = []string{"pass", "fail", "became", "answered"}
+	return map[string]any{
+		"name": pullTool,
+		"description": strings.Join([]string{
+			"Pulls the next leaf of a ticket, or hands the leaf in hand back with a",
+			"verdict. Call it with nothing to take a leaf: the answer says work, refused",
+			"or wait, and a work answer names the ticket, the step, the fields to write",
+			"and the guidance. Write the fields into the ticket, then call it again",
+			"naming the ticket and the verdict.",
+		}, " "),
+		"inputSchema": map[string]any{
+			"type": "object",
+			"properties": map[string]any{
+				"ticket":  text("the ticket in hand, on a hand-back"),
+				"verdict": verdict,
+				"reason":  text("the reason on a fail, the successor on a became, or the answering ticket on an answered"),
+				"fields": map[string]any{
+					"type":        "object",
+					"description": "the text of each field of the leaf in hand, keyed by field name, which the engine writes into the ticket before it checks",
+				},
+			},
+		},
+	}
+}
+
 // JSON as JSON.stringify writes it: no space between the parts. [[spec/design_output/pull#the-hand-out]]
 func compactJSON(raw json.RawMessage) string {
 	var out strings.Builder
@@ -159,6 +215,12 @@ func compactJSON(raw json.RawMessage) string {
 
 // The pull a ticket verb answers: the next leaf of the group, or a hand back, and a log row saying what it answered. [[spec/design_output/pull#the-hand-out]]
 func (it *It) Pulling(argv []string) int {
+	if contains(argv, specFlag) {
+		return it.printsJSON(PullSpec())
+	}
+	if contains(argv, toolFlag) {
+		return it.toolPull(argv)
+	}
 	code := it.Pull(PullArgvOf(argv))
 	if it.Log != nil {
 		level := "warn"
@@ -168,6 +230,35 @@ func (it *It) Pulling(argv []string) int {
 		it.Log(level, "work", fmt.Sprintf("pull answered %d", code), map[string]any{"branch": it.branch()})
 	}
 	return code
+}
+
+// The pull a tool call makes: what it says on both streams, or its exit where it says nothing, as one JSON answer the hook hands on. [[spec/design_output/pull#the-hand-out]]
+func (it *It) toolPull(argv []string) int {
+	out, errs := it.Out, it.Err
+	var said bytes.Buffer
+	it.Out, it.Err = &said, &said
+	code := it.Pull(PullArgvOf(argv))
+	it.Out, it.Err = out, errs
+	if it.Log != nil {
+		it.Log("debug", "work", fmt.Sprintf("the pull tool answered %d", code), map[string]any{"branch": it.branch()})
+	}
+	text := strings.TrimSpace(said.String())
+	if text == "" {
+		text = fmt.Sprintf("exit %d", code)
+	}
+	it.printsJSON(ToolAnswerOf(text))
+	return code
+}
+
+// Prints the value as one line of JSON, its markup unescaped. [[spec/design_output/pull#the-hand-out]]
+func (it *It) printsJSON(value any) int {
+	prints := json.NewEncoder(it.Out)
+	prints.SetEscapeHTML(false)
+	if err := prints.Encode(value); err != nil {
+		it.Errorln(err.Error())
+		return 1
+	}
+	return 0
 }
 
 // The branch HEAD stands on, and nothing before the first commit. [[spec/design_output/pull#the-answers]]

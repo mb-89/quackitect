@@ -1,9 +1,11 @@
 // The graph verb answers a process or a ticket as the nodes and the edges
-// graphIn in src/scripts/graph.js draws, as indented JSON.
+// GraphIn in src/modules/tickets draws, as indented JSON.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -20,85 +22,22 @@ const graphProcess = `steps:
     when: cloud
 `
 
-// What graphIn answers for graphProcess, as JSON.stringify writes it indented by two. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-const graphDrawn = `{
-  "nodes": [
-    {
-      "id": "design",
-      "name": "design",
-      "kind": "phase",
-      "parent": ""
-    },
-    {
-      "id": "design/draft",
-      "name": "draft",
-      "kind": "leaf",
-      "parent": "design",
-      "does": "writes the approach"
-    },
-    {
-      "id": "design/review",
-      "name": "review",
-      "kind": "leaf",
-      "parent": "design",
-      "person": true
-    },
-    {
-      "id": "build",
-      "name": "build",
-      "kind": "leaf",
-      "parent": "",
-      "when": "cloud",
-      "dotted": true
-    }
-  ],
-  "edges": [
-    {
-      "from": "design",
-      "to": "design/draft",
-      "kind": "holds",
-      "label": "holds"
-    },
-    {
-      "from": "design",
-      "to": "design/review",
-      "kind": "holds",
-      "label": "holds"
-    },
-    {
-      "from": "design",
-      "to": "build",
-      "kind": "pass",
-      "label": "pass"
-    },
-    {
-      "from": "design/draft",
-      "to": "design/review",
-      "kind": "pass",
-      "label": "pass"
-    },
-    {
-      "from": "design/review",
-      "to": "design/draft",
-      "kind": "fail",
-      "label": "fail"
-    }
-  ]
-}
-`
+// What GraphIn answers for graphProcess, held compact; the verb prints it indented by two. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+const graphDrawn = `{"nodes":[{"id":"design","name":"design","kind":"phase","parent":""},{"id":"design/draft","name":"draft","kind":"leaf","parent":"design","does":"writes the approach"},{"id":"design/review","name":"review","kind":"leaf","parent":"design","person":true},{"id":"build","name":"build","kind":"leaf","parent":"","when":"cloud","dotted":true}],"edges":[{"from":"design","to":"design/draft","kind":"holds","label":"holds"},{"from":"design","to":"design/review","kind":"holds","label":"holds"},{"from":"design","to":"build","kind":"pass","label":"pass"},{"from":"design/draft","to":"design/review","kind":"pass","label":"pass"},{"from":"design/review","to":"design/draft","kind":"fail","label":"fail"}]}`
 
 func TestGraphVerb(t *testing.T) {
 	t.Run("a process answers its graph as JSON indented by two", func(t *testing.T) {
 		root := t.TempDir()
-		seedsFile(t, root, "spec/processes/small.yaml", graphProcess)
+		seedFile(t, root, "spec/processes/small.yaml", graphProcess)
 		code, said := runsVerb(t, root, "graph", "spec/processes/small.yaml")
-		if code != 0 || said != graphDrawn {
-			t.Fatalf("the graph answers %d:\n%s\nand wants:\n%s", code, said, graphDrawn)
+		var drawn bytes.Buffer
+		if err := json.Indent(&drawn, []byte(graphDrawn), "", "  "); err != nil || code != 0 || said != drawn.String()+"\n" {
+			t.Fatalf("the graph answers %d:\n%s\nand wants:\n%s", code, said, drawn.String())
 		}
 	})
 	t.Run("a ticket reads through its front, and each node names its chapter and its line", func(t *testing.T) {
 		root := t.TempDir()
-		seedsFile(t, root, "spec/tickets/small.md", "---\nkind: [[ticket]]\nstep: design/draft\nsteps:\n  - name: design\n    steps:\n      - name: draft\n---\n\n# Ask\n\nsome ask\n\n# design\n\n## draft\n")
+		seedFile(t, root, "spec/tickets/small.md", "---\nkind: [[ticket]]\nstep: design/draft\nsteps:\n  - name: design\n    steps:\n      - name: draft\n---\n\n# Ask\n\nsome ask\n\n# design\n\n## draft\n")
 		code, said := runsVerb(t, root, "graph", "spec/tickets/small.md")
 		for _, want := range []string{`"chapter": "## draft"`, `"line": 16`, `"at": true`, `"reached": true`, `"chapter": "# design"`} {
 			if code != 0 || !strings.Contains(said, want) {

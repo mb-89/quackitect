@@ -118,6 +118,8 @@ func everyVerb() []spelled {
 		spelled{[]string{"branch", "list", "--queue"}, "branch list --queue"},
 		spelled{[]string{"voice", "measure"}, "voice"},
 		spelled{[]string{"start"}, "start"},
+		spelled{[]string{"stamp"}, "stamp"},
+		spelled{[]string{"bundle"}, "bundle"},
 	)
 }
 

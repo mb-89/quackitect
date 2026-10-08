@@ -9,20 +9,22 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"quackitect/src/modules/hooks"
 )
 
-// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, and the warning the prompt opens on. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's words, the marker and the event off the door's probe, and the warning promptWhy in src/modules/hooks/fold.go opens on. [[spec/tickets/the-reply-probe-runs]]
 const (
-	replyMarker = "se-probe-reply"
-	replyEvent  = "probe.reply"
-	replySays   = "se-probe-reply writes this line"
+	replyMarker = hooks.ReplyMarker
+	replyEvent  = hooks.ReplyEvent
+	replySays   = hooks.ReplySays
 	promptWhy   = "The owner sent a prompt"
 	// The width a field's name pads to, and the characters of its value the verb shows. [[spec/tickets/the-reply-probe-runs]]
 	replyKeyWidth = 12
 	replyShown    = 80
 )
 
-// The prompt the reply probe runs, as REPLY_PROBE.opens says it. [[spec/tickets/the-reply-probe-runs]]
+// The prompt the reply probe runs. [[spec/tickets/the-reply-probe-runs]]
 var replyOpens = strings.Join([]string{
 	replyMarker + ".",
 	"In one message, write the line `" + replySays + "` as text, then call Read on README.md.",

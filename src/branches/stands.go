@@ -1,6 +1,5 @@
 // What every work verb reads before it moves a thing: the standing a group
-// ticket carries, the branches standing, and the trunk coming in, as
-// src/scripts/work-stands.js reads them.
+// ticket carries, the branches standing, and the trunk coming in.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 package branches
 

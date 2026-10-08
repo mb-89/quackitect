@@ -1,6 +1,6 @@
 // A process is a route the mint copies onto a ticket. This reads one off the
 // tree and answers its route and its hash, so the mint, ticket update and
-// ticket note copy the same thing, off src/scripts/process.js.
+// ticket note copy the same thing.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package pull
 

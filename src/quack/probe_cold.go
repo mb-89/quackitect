@@ -16,16 +16,18 @@ import (
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/pull"
+	"quackitect/src/vehicle"
 )
 
-// The cold probe's numbers and names, each as probe-cold.js and the level0 lib name it. [[spec/design_output/level0#the-cold-probe]]
+// The cold probe's numbers and names. A line naming a level0 lib names the twin it keeps in step with. [[spec/design_output/level0#the-cold-probe]]
 const (
 	// The tools the index serves start here. [[spec/design_output/level0#the-cold-probe]]
 	servedTools = "mcp__level0__"
-	// The one tool the hook registers itself, beside the index's, as PULL_CALL in lib/pull.js names it. [[spec/tickets/level0-tools-leave-the-bridge]]
+	// The one tool the hook registers itself, beside the index's, as PullSpec in src/pull/pull.go names it. [[spec/tickets/level0-tools-leave-the-bridge]]
 	pullCall = servedTools + "pull"
-	// The port base the vehicle reads, as PORT_BASE in lib/vehicle.js names it, and the spread past it a cold server takes. [[spec/design_output/level0#the-cold-probe]]
-	portBase   = 6510
+	// The port base PortBase in src/vehicle/pure.go names, and the spread past it a cold server takes. [[spec/design_output/level0#the-cold-probe]]
+	portBase   = vehicle.PortBase
 	portPast   = 200
 	portSpread = 200
 	// The lines a tail keeps. [[spec/design_output/level0#the-cold-probe]]
@@ -33,18 +35,24 @@ const (
 	// The file a desk's client keeps its login in, under the config folder the client reads. [[spec/design_output/level0#the-cold-probe]]
 	loginFile    = ".credentials.json"
 	configFolder = ".claude"
-	// The pointer the clone's hook reads its port off, as POINTER in lib/vehicle.js names it. [[spec/design_output/level0#the-cold-probe]]
-	vehiclePointer = runFolder + "/vehicle.json"
-	// The index binary the start road launches, as BIN in lib/index.js names it. [[spec/design_output/level0#the-cold-probe]]
+	// The pointer the clone's hook reads its port off, which Pointer in src/vehicle/pure.go names. [[spec/design_output/level0#the-cold-probe]]
+	vehiclePointer = vehicle.Pointer
+	// The index binary the start road launches, as indexBinary in src/index/binary.go builds it. [[spec/design_output/level0#the-cold-probe]]
 	indexBinary = binFolder + "/se-index"
-	// The install steps a cold clone skips, as INSTALL_SKIP in src/scripts/boot.js names them. [[spec/design_output/level0#the-cold-probe]]
+	// The install steps a cold clone skips, as the background install in install.sh names them. [[spec/design_output/level0#the-cold-probe]]
 	installSkip = "editor-link editor-extensions editor-client go"
 )
 
 // The checks the cold probe reads, in order. [[spec/design_output/level0#the-cold-probe]]
 var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 
-// The prompt the cold client runs, as COLD.prompt in src/scripts/probe-cold.js says it. [[spec/design_output/level0#the-cold-probe]]
+// The cold path, which ColdPath and ColdIn in src/pull/cold.go own. [[spec/design_output/level0#the-cold-probe]]
+var (
+	coldPath = pull.ColdPath
+	coldIn   = pull.ColdIn
+)
+
+// The prompt the cold client runs. [[spec/design_output/level0#the-cold-probe]]
 var coldPrompt = strings.Join([]string{
 	"This session probes a fresh box. Make two tool calls, one after the other.",
 	"First read README.md with the Read tool.",
@@ -317,7 +325,7 @@ const (
 type coldBox struct {
 	temp, tree string
 	port       int
-	delta      string
+	delta, at  string
 }
 
 // Clones the commit into a fresh folder, runs the client there, and removes the folder, stopping the index the run started. A delta is the staged change as a patch, so the clone runs the commit about to land. [[spec/design_output/level0#the-cold-probe]]
@@ -342,10 +350,17 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 		say("FAIL clone: " + tail(orElse(cloned.stderr, cloned.fault)))
 		return ""
 	}
+	if box.at != "" {
+		checked := d.run([]string{"git", "checkout", "--quiet", "--detach", box.at}, runOpts{cwd: box.tree, timeout: probeWait})
+		if checked.code != 0 {
+			say("FAIL checkout: " + tail(orElse(checked.stderr, checked.fault)))
+			return ""
+		}
+	}
 	if !takesDelta(d, box, say) {
 		return ""
 	}
-	installed := d.run([]string{"sh", filepath.Join(box.tree, "src", "scripts", "install.sh")}, runOpts{
+	installed := d.run([]string{"sh", filepath.Join(box.tree, "install.sh")}, runOpts{
 		cwd:     box.tree,
 		env:     map[string]string{"SE_INSTALL_SKIP": installSkip},
 		timeout: probeWait,
@@ -354,13 +369,17 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 	if installed.code != 0 {
 		say(tail(orElse(installed.stderr, installed.stdout)))
 	}
-	// A desk runs a server at the base port, so the clone's hook reads its own port off the pointer. [[spec/design_output/level0#the-cold-probe]]
-	pointer := filepath.Join(box.tree, filepath.FromSlash(vehiclePointer))
-	_ = d.disk.makeAll(filepath.Dir(pointer), coldFolderMode)
-	_ = d.disk.write(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), coldFileMode)
+	points(d.disk, box)
 	config := filepath.Join(box.temp, "config")
 	_ = d.disk.makeAll(config, coldFolderMode)
 	return config
+}
+
+// A desk runs a server at the base port, so the clone's hook reads its own port off the pointer. [[spec/design_output/level0#the-cold-probe]]
+func points(disk diskDoors, box coldBox) {
+	pointer := filepath.Join(box.tree, filepath.FromSlash(vehiclePointer))
+	_ = disk.makeAll(filepath.Dir(pointer), coldFolderMode)
+	_ = disk.write(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), coldFileMode)
 }
 
 // The first text, or the second where the first is empty, as || reads them. [[spec/design_output/level0#the-cold-probe]]

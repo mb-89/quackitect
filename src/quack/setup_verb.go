@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/modules/check"
 )
 
 // The exit cmd answers where the command it runs stands nowhere. [[spec/tickets/windows-missing-code-reads-absent]]
@@ -17,11 +19,8 @@ const cmdMissing = 9009
 // The programs Windows ships as cmd shims. [[spec/tickets/setup-reaches-windows-shims]]
 var setupShims = []string{"npm", "npx", "code"}
 
-// The extensions the tracked settings point at, the list .claude/skills/level0/lib/servers.js owns as EXTENSIONS. [[spec/design_output/lsp#the-panel-reads-the-battery]]
-var editorExtensions = []string{
-	"biomejs.biome",
-	"bierner.markdown-mermaid",
-}
+// The extensions the tracked settings point at. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+var editorExtensions = check.Extensions
 
 // One want of the setup: its name, why a box wants it, whether it stands, how to get it, and what a miss costs. [[spec/tickets/install-drops-node]]
 type setupItem struct {
@@ -128,7 +127,7 @@ func setupVerb(d boxDoors, argv []string) int {
 		}
 	}
 	// [[spec/design_output/copilot#setup-and-discovery]]
-	if !setupCopilot(d) {
+	if !setupCopilot(d, slices.Contains(argv, "--cloud")) {
 		say(d, "  the copilot setup stopped, so the files it writes stand as they stood.")
 	}
 	// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
@@ -177,9 +176,13 @@ func shimmed(d boxDoors, argv []string) []string {
 	return argv
 }
 
-// Writes the Copilot registrations where Copilot runs here, saying the files it writes, and answers whether it held. [[spec/design_output/copilot#setup-and-discovery]]
-func setupCopilot(d boxDoors) bool {
-	written, err := copilotSetup(d, "auto")
+// Writes the Copilot registrations where Copilot runs here, or with the cloud mark under cloud, saying the files it writes, and answers whether it held. [[spec/tickets/copilot-hooks-run-in-go]]
+func setupCopilot(d boxDoors, cloud bool) bool {
+	target := "auto"
+	if cloud {
+		target = "cloud"
+	}
+	written, err := copilotSetup(d, target)
 	if err != nil {
 		fmt.Fprintln(d.errs, "Level zero: "+err.Error())
 		return false

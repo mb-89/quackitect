@@ -22,7 +22,7 @@ const (
 	HoldWord   = "hold"
 )
 
-// The row kinds the replay and the lease read write, the slice the replay names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and the shadow row stands in [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]].
+// The row kinds the replay and the lease read write, the slice the replay names, the level a shadow row takes, and the stamp the JS clock writes. rowOf in src/modules/hooks/rows.go owns the hook row, and the shadow row stands in [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]].
 const (
 	shadowKind   = "shadow"
 	blockKind    = "block"

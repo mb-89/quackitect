@@ -1,0 +1,1248 @@
+[
+  {
+    "name": "lens-held",
+    "text": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see\n      - name: change\n        does: makes the change\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n### tests\n\n<!-- the tests you write fail on their own assertion -->\n\n### seen\n\nThe marks stand.\n\n## change\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "implement",
+            "name": "implement",
+            "kind": "phase",
+            "parent": "",
+            "reached": true,
+            "chapter": "# implement",
+            "line": 26
+          },
+          {
+            "id": "implement/tests-red",
+            "name": "tests-red",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "writes the tests the ask calls for",
+            "at": true,
+            "reached": true,
+            "chapter": "## tests-red",
+            "line": 28
+          },
+          {
+            "id": "implement/change",
+            "name": "change",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "makes the change",
+            "chapter": "## change",
+            "line": 38
+          }
+        ],
+        "edges": [
+          {
+            "from": "implement",
+            "to": "implement/tests-red",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement",
+            "to": "implement/change",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement/tests-red",
+            "to": "implement/change",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "implement/change": {
+          "does": "makes the change",
+          "fields": [
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake"
+              ],
+              "line": 38,
+              "filled": false
+            }
+          ]
+        },
+        "implement/tests-red": {
+          "does": "writes the tests the ask calls for",
+          "fields": [
+            {
+              "name": "tests",
+              "form": "command",
+              "says": "the tests you write fail on their own assertion",
+              "items": [],
+              "line": 30,
+              "filled": false
+            },
+            {
+              "name": "seen",
+              "form": "text",
+              "says": "what you see",
+              "items": [],
+              "line": 34,
+              "filled": true
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake"
+              ],
+              "line": 28,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "fields",
+    "text": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\", \"a comment names the approach\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            expects: assertion\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see, and what surprises you\n      - name: change\n        does: makes the change\n        evidence:\n          - name: lint\n            form: command\n            says: the tree builds and lints\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n<!-- writes the tests the ask calls for -->\n\n### tests\n\n<!-- the tests you write fail on their own assertion -->\n\n### seen\n\nThe marks stand.\n\n## change\n\n### lint\n\n<!-- the tree builds and lints -->\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "implement",
+            "name": "implement",
+            "kind": "phase",
+            "parent": "",
+            "reached": true,
+            "chapter": "# implement",
+            "line": 31
+          },
+          {
+            "id": "implement/tests-red",
+            "name": "tests-red",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "writes the tests the ask calls for",
+            "at": true,
+            "reached": true,
+            "chapter": "## tests-red",
+            "line": 33
+          },
+          {
+            "id": "implement/change",
+            "name": "change",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "makes the change",
+            "chapter": "## change",
+            "line": 45
+          }
+        ],
+        "edges": [
+          {
+            "from": "implement",
+            "to": "implement/tests-red",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement",
+            "to": "implement/change",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement/tests-red",
+            "to": "implement/change",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake",
+            "a comment names the approach"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "expects": "assertion",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see, and what surprises you"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change",
+              "evidence": [
+                {
+                  "name": "lint",
+                  "form": "command",
+                  "says": "the tree builds and lints"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "implement/change": {
+          "does": "makes the change",
+          "fields": [
+            {
+              "name": "lint",
+              "form": "command",
+              "says": "the tree builds and lints",
+              "items": [],
+              "line": 47,
+              "filled": false
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 45,
+              "filled": false
+            }
+          ]
+        },
+        "implement/tests-red": {
+          "does": "writes the tests the ask calls for",
+          "fields": [
+            {
+              "name": "tests",
+              "form": "command",
+              "says": "the tests you write fail on their own assertion",
+              "items": [],
+              "line": 37,
+              "filled": false
+            },
+            {
+              "name": "seen",
+              "form": "text",
+              "says": "what you see, and what surprises you",
+              "items": [],
+              "line": 41,
+              "filled": true
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 33,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "fields-filled",
+    "text": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\", \"a comment names the approach\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            expects: assertion\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see, and what surprises you\n      - name: change\n        does: makes the change\n        evidence:\n          - name: lint\n            form: command\n            says: the tree builds and lints\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n<!-- writes the tests the ask calls for -->\n\n### tests\n\n<!-- the tests you write fail on their own assertion -->\n\n    node --test test/level0/fields-to-fill.test.js\n\n### seen\n\nThe marks stand.\n\n## change\n\n### lint\n\n<!-- the tree builds and lints -->\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "implement",
+            "name": "implement",
+            "kind": "phase",
+            "parent": "",
+            "reached": true,
+            "chapter": "# implement",
+            "line": 31
+          },
+          {
+            "id": "implement/tests-red",
+            "name": "tests-red",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "writes the tests the ask calls for",
+            "at": true,
+            "reached": true,
+            "chapter": "## tests-red",
+            "line": 33
+          },
+          {
+            "id": "implement/change",
+            "name": "change",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "makes the change",
+            "chapter": "## change",
+            "line": 47
+          }
+        ],
+        "edges": [
+          {
+            "from": "implement",
+            "to": "implement/tests-red",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement",
+            "to": "implement/change",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement/tests-red",
+            "to": "implement/change",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake",
+            "a comment names the approach"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "expects": "assertion",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see, and what surprises you"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change",
+              "evidence": [
+                {
+                  "name": "lint",
+                  "form": "command",
+                  "says": "the tree builds and lints"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "implement/change": {
+          "does": "makes the change",
+          "fields": [
+            {
+              "name": "lint",
+              "form": "command",
+              "says": "the tree builds and lints",
+              "items": [],
+              "line": 49,
+              "filled": false
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 47,
+              "filled": false
+            }
+          ]
+        },
+        "implement/tests-red": {
+          "does": "writes the tests the ask calls for",
+          "fields": [
+            {
+              "name": "tests",
+              "form": "command",
+              "says": "the tests you write fail on their own assertion",
+              "items": [],
+              "line": 37,
+              "filled": true
+            },
+            {
+              "name": "seen",
+              "form": "text",
+              "says": "what you see, and what surprises you",
+              "items": [],
+              "line": 43,
+              "filled": true
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 33,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "fields-renamed",
+    "text": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    checklist: [\"every door has a fake\", \"a comment names the approach\"]\n    steps:\n      - name: tests-red\n        does: writes the tests the ask calls for\n        evidence:\n          - name: tests\n            form: command\n            expects: assertion\n            says: the tests you write fail on their own assertion\n          - name: seen\n            form: text\n            says: what you see, and what surprises you\n      - name: change\n        does: makes the change\n        evidence:\n          - name: lint\n            form: command\n            says: the tree builds and lints\nstep: implement/tests-red\n---\n\n# Ask\n\nA person sees the fields.\n\n# implement\n\n## tests-red\n\n<!-- writes the tests the ask calls for -->\n\n### tested\n\n<!-- the tests you write fail on their own assertion -->\n\n### seen\n\nThe marks stand.\n\n## change\n\n### lint\n\n<!-- the tree builds and lints -->\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "implement",
+            "name": "implement",
+            "kind": "phase",
+            "parent": "",
+            "reached": true,
+            "chapter": "# implement",
+            "line": 31
+          },
+          {
+            "id": "implement/tests-red",
+            "name": "tests-red",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "writes the tests the ask calls for",
+            "at": true,
+            "reached": true,
+            "chapter": "## tests-red",
+            "line": 33
+          },
+          {
+            "id": "implement/change",
+            "name": "change",
+            "kind": "leaf",
+            "parent": "implement",
+            "does": "makes the change",
+            "chapter": "## change",
+            "line": 45
+          }
+        ],
+        "edges": [
+          {
+            "from": "implement",
+            "to": "implement/tests-red",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement",
+            "to": "implement/change",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "implement/tests-red",
+            "to": "implement/change",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "implement",
+          "checklist": [
+            "every door has a fake",
+            "a comment names the approach"
+          ],
+          "steps": [
+            {
+              "name": "tests-red",
+              "does": "writes the tests the ask calls for",
+              "evidence": [
+                {
+                  "name": "tests",
+                  "form": "command",
+                  "expects": "assertion",
+                  "says": "the tests you write fail on their own assertion"
+                },
+                {
+                  "name": "seen",
+                  "form": "text",
+                  "says": "what you see, and what surprises you"
+                }
+              ]
+            },
+            {
+              "name": "change",
+              "does": "makes the change",
+              "evidence": [
+                {
+                  "name": "lint",
+                  "form": "command",
+                  "says": "the tree builds and lints"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "implement/change": {
+          "does": "makes the change",
+          "fields": [
+            {
+              "name": "lint",
+              "form": "command",
+              "says": "the tree builds and lints",
+              "items": [],
+              "line": 47,
+              "filled": false
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 45,
+              "filled": false
+            }
+          ]
+        },
+        "implement/tests-red": {
+          "does": "writes the tests the ask calls for",
+          "fields": [
+            {
+              "name": "tests",
+              "form": "command",
+              "says": "the tests you write fail on their own assertion",
+              "items": [],
+              "line": 33,
+              "filled": false
+            },
+            {
+              "name": "seen",
+              "form": "text",
+              "says": "what you see, and what surprises you",
+              "items": [],
+              "line": 41,
+              "filled": true
+            },
+            {
+              "name": "checked",
+              "form": "checklist",
+              "says": "",
+              "items": [
+                "every door has a fake",
+                "a comment names the approach"
+              ],
+              "line": 33,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "route-short",
+    "text": "---\nkind: [[ticket]]\nstate: open\nstep: draft\nsteps:\n  - name: draft\n    does: works draft\n    evidence:\n      - name: says\n        form: text\n---\n\n# Ask\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "draft",
+            "name": "draft",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works draft",
+            "at": true,
+            "reached": true
+          }
+        ],
+        "edges": []
+      },
+      "steps": [
+        {
+          "name": "draft",
+          "does": "works draft",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "draft": {
+          "does": "works draft",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "route-closed",
+    "text": "---\nkind: [[ticket]]\nstate: closed\nstep: draft\nsteps:\n  - name: draft\n    does: works draft\n    evidence:\n      - name: says\n        form: text\n---\n\n# Ask\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "draft",
+            "name": "draft",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works draft",
+            "at": true,
+            "reached": true
+          }
+        ],
+        "edges": []
+      },
+      "steps": [
+        {
+          "name": "draft",
+          "does": "works draft",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "draft": {
+          "does": "works draft",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "route-two",
+    "text": "---\nkind: [[ticket]]\nstate: open\nstep: draft\nsteps:\n  - name: draft\n    does: works draft\n    evidence:\n      - name: says\n        form: text\n  - name: review\n    does: works review\n    evidence:\n      - name: says\n        form: text\n---\n\n# Ask\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "draft",
+            "name": "draft",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works draft",
+            "at": true,
+            "reached": true
+          },
+          {
+            "id": "review",
+            "name": "review",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works review"
+          }
+        ],
+        "edges": [
+          {
+            "from": "draft",
+            "to": "review",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "draft",
+          "does": "works draft",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "review",
+          "does": "works review",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "draft": {
+          "does": "works draft",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "review": {
+          "does": "works review",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "route-long",
+    "text": "---\nkind: [[ticket]]\nstate: open\nstep: draft\nsteps:\n  - name: draft\n    does: works draft\n    evidence:\n      - name: says\n        form: text\n  - name: review\n    does: works review\n    evidence:\n      - name: says\n        form: text\n  - name: change\n    does: works change\n    evidence:\n      - name: says\n        form: text\n  - name: test\n    does: works test\n    evidence:\n      - name: says\n        form: text\n  - name: ship\n    does: works ship\n    evidence:\n      - name: says\n        form: text\n  - name: land\n    does: works land\n    evidence:\n      - name: says\n        form: text\n  - name: tell\n    does: works tell\n    evidence:\n      - name: says\n        form: text\n---\n\n# Ask\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "draft",
+            "name": "draft",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works draft",
+            "at": true,
+            "reached": true
+          },
+          {
+            "id": "review",
+            "name": "review",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works review"
+          },
+          {
+            "id": "change",
+            "name": "change",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works change"
+          },
+          {
+            "id": "test",
+            "name": "test",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works test"
+          },
+          {
+            "id": "ship",
+            "name": "ship",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works ship"
+          },
+          {
+            "id": "land",
+            "name": "land",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works land"
+          },
+          {
+            "id": "tell",
+            "name": "tell",
+            "kind": "leaf",
+            "parent": "",
+            "does": "works tell"
+          }
+        ],
+        "edges": [
+          {
+            "from": "draft",
+            "to": "review",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "review",
+            "to": "change",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "change",
+            "to": "test",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "test",
+            "to": "ship",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "ship",
+            "to": "land",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "land",
+            "to": "tell",
+            "kind": "pass",
+            "label": "pass"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "draft",
+          "does": "works draft",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "review",
+          "does": "works review",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "change",
+          "does": "works change",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "test",
+          "does": "works test",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "ship",
+          "does": "works ship",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "land",
+          "does": "works land",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        },
+        {
+          "name": "tell",
+          "does": "works tell",
+          "evidence": [
+            {
+              "name": "says",
+              "form": "text"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "change": {
+          "does": "works change",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "draft": {
+          "does": "works draft",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "land": {
+          "does": "works land",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "review": {
+          "does": "works review",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "ship": {
+          "does": "works ship",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "tell": {
+          "does": "works tell",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        },
+        "test": {
+          "does": "works test",
+          "fields": [
+            {
+              "name": "says",
+              "form": "text",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "route-verdict",
+    "text": "---\nkind: [[ticket]]\nstate: open\nstep: review\nsteps:\n  - name: review\n    evidence:\n      - name: verdict\n        form: verdict\n---\n\n# Ask\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "review",
+            "name": "review",
+            "kind": "leaf",
+            "parent": "",
+            "at": true,
+            "reached": true
+          }
+        ],
+        "edges": []
+      },
+      "steps": [
+        {
+          "name": "review",
+          "evidence": [
+            {
+              "name": "verdict",
+              "form": "verdict"
+            }
+          ]
+        }
+      ],
+      "leaves": {
+        "review": {
+          "does": "",
+          "fields": [
+            {
+              "name": "verdict",
+              "form": "verdict",
+              "says": "",
+              "items": [],
+              "line": 1,
+              "filled": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "drawing-marks",
+    "text": "---\nsteps:\n  - name: sync\n    when: cloud\n  - name: design\n    steps:\n      - name: draft\n      - name: review\n        on_fail: draft\n        by: person\n  - name: ship\n  - name: tell\nstep: design/review\nrecord:\n  - step: sync\n    skipped: true\n    why: a desk box\n  - step: design/draft\n    returns: 2\n---\n\n# design\n\n## draft\n\n## review\n",
+    "drawn": {
+      "graph": {
+        "nodes": [
+          {
+            "id": "sync",
+            "name": "sync",
+            "kind": "leaf",
+            "parent": "",
+            "when": "cloud",
+            "dotted": true,
+            "skipped": true,
+            "why": "a desk box",
+            "reached": true
+          },
+          {
+            "id": "design",
+            "name": "design",
+            "kind": "phase",
+            "parent": "",
+            "reached": true,
+            "chapter": "# design",
+            "line": 22
+          },
+          {
+            "id": "design/draft",
+            "name": "draft",
+            "kind": "leaf",
+            "parent": "design",
+            "returns": 2,
+            "reached": true,
+            "chapter": "## draft",
+            "line": 24
+          },
+          {
+            "id": "design/review",
+            "name": "review",
+            "kind": "leaf",
+            "parent": "design",
+            "person": true,
+            "at": true,
+            "reached": true,
+            "chapter": "## review",
+            "line": 26
+          },
+          {
+            "id": "ship",
+            "name": "ship",
+            "kind": "leaf",
+            "parent": ""
+          },
+          {
+            "id": "tell",
+            "name": "tell",
+            "kind": "leaf",
+            "parent": ""
+          }
+        ],
+        "edges": [
+          {
+            "from": "design",
+            "to": "design/draft",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "design",
+            "to": "design/review",
+            "kind": "holds",
+            "label": "holds"
+          },
+          {
+            "from": "sync",
+            "to": "design",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "design",
+            "to": "ship",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "design/draft",
+            "to": "design/review",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "ship",
+            "to": "tell",
+            "kind": "pass",
+            "label": "pass"
+          },
+          {
+            "from": "design/review",
+            "to": "design/draft",
+            "kind": "fail",
+            "label": "fail"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "name": "sync",
+          "when": "cloud"
+        },
+        {
+          "name": "design",
+          "steps": [
+            {
+              "name": "draft"
+            },
+            {
+              "name": "review",
+              "on_fail": "draft",
+              "by": "person"
+            }
+          ]
+        },
+        {
+          "name": "ship"
+        },
+        {
+          "name": "tell"
+        }
+      ],
+      "leaves": {
+        "design/draft": {
+          "does": "",
+          "fields": []
+        },
+        "design/review": {
+          "does": "",
+          "fields": []
+        },
+        "ship": {
+          "does": "",
+          "fields": []
+        },
+        "sync": {
+          "does": "",
+          "fields": []
+        },
+        "tell": {
+          "does": "",
+          "fields": []
+        }
+      }
+    }
+  }
+]

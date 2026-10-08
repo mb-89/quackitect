@@ -19,8 +19,8 @@ import (
 	"quackitect/src/proc"
 )
 
-// The index binary under the root, as BIN in .claude/skills/level0/lib/index.js names it. [[spec/design_output/level0#a-desk-serve-returns]]
-const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder .claude/skills/level0/lib/folders.js owns
+// The index binary under the root, as indexBinary in src/index/binary.go builds it. [[spec/design_output/level0#a-desk-serve-returns]]
+const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder src/modules/check/folders.go owns
 
 // What the serve verb reaches: the root, a run that answers the exit code and the error stream, the environment, the binary running the verb, and the index the standing runs, the root's own where none is named. [[spec/design_output/level0#a-desk-serve-returns]]
 type serveDoors struct {

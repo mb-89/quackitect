@@ -29,13 +29,13 @@ const (
 	TrackedPort = "tracked"
 )
 
-// The folder a public ticket stands directly under, and the ending it carries, which TICKETS in src/engine/group.js names and a Go module spells again. [[spec/tickets/the-index-reads-standing-branches]]
+// The folder a public ticket stands directly under, and the ending it carries, which ticketsFolder in src/branches/group.go names and this module spells again. [[spec/tickets/the-index-reads-standing-branches]]
 const (
 	ticketsFolder = "spec/tickets/"
 	noteExt       = ".md"
 )
 
-// The refs the reader reads, as a fetch leaves them: every work branch, and trunk, which the listing in src/scripts/work-stands.js reads the same way. [[spec/design_output/work#the-listing-reads-git-once]]
+// The refs the reader reads, as a fetch leaves them: every work branch, and trunk, which the listing in src/branches/stands.go reads the same way. [[spec/design_output/work#the-listing-reads-git-once]]
 const (
 	workRefs = "refs/remotes/origin/work/"
 	trunkRef = "refs/remotes/origin/main"
@@ -278,7 +278,7 @@ func (one *repo) textsAt(commit string, paths, more []string) ([]ticket.File, []
 	return files, texts[len(files):], nil
 }
 
-// The payload a batch answers each ask, and nothing for a missing object, the reading framed in src/scripts/work-read.js holds. [[spec/design_output/work#the-listing-reads-git-once]]
+// The payload a batch answers each ask, and nothing for a missing object. [[spec/design_output/work#the-listing-reads-git-once]]
 func framed(said []byte, count int) []string {
 	out := make([]string, count)
 	for at := 0; at < count; at++ {
@@ -432,7 +432,7 @@ func copied(files map[string]string) map[string]string {
 	return out
 }
 
-// The path of a group's ticket, the one ticketAt in src/engine/group.js names. [[spec/tickets/the-index-reads-standing-branches]]
+// The path of a group's ticket, the one ticketAt in src/branches/group.go names. [[spec/tickets/the-index-reads-standing-branches]]
 func ticketAt(name string) string { return ticketsFolder + name + noteExt }
 
 // Whether a path stands directly under the ticket folder as a note. [[spec/tickets/the-index-reads-standing-branches]]

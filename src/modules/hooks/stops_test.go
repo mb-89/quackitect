@@ -239,7 +239,7 @@ func TestTheStopsFoldKeepsWhatTheBoxKeeps(t *testing.T) {
 	}
 	cleared := facts
 	cleared.Clear = true
-	if state = land(stopEvent, "", map[string]any{"last_assistant_message": "done", heldField: queue, stoppedField: cleared}, Holds{}); state.Said.Word != ClearWord || state.Handover != nil {
-		t.Fatalf("a held clear leaves %+v, and wants the turn to end on the clear with the mark off", state)
+	if state = land(stopEvent, "", map[string]any{"last_assistant_message": "done", heldField: queue, stoppedField: cleared}, Holds{}); state.Said.Word != ClearWord || state.Said.Text != ResumePrompt || state.Handover != nil {
+		t.Fatalf("a held clear leaves %+v, and wants the turn to end on the clear with the resume prompt and the mark off", state)
 	}
 }

@@ -2,8 +2,7 @@
 // [[spec/tickets/level0-tests-to-plugin-test]] [[spec/tickets/a-down-index-refuses-calls]]
 
 import { expect, test } from "claude-code/testing";
-import { STARTING } from "../hooks/level0.ts";
-import { SESSION } from "../lib/log.js";
+import { SESSION, STARTING } from "../hooks/level0.ts";
 import { answering, START, world } from "./world.ts";
 
 const CALL = { tool: "Bash", input: { command: "ls" } } as never;

@@ -14,7 +14,7 @@ import (
 	"quackitect/src/proc"
 )
 
-// The names the tools draw under, and the Biome config .claude/skills/level0/lib/code.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The names the tools draw under, and the config folder Biome reads. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	biomeConfig = "spec/config"
 	// The rule a rules load that fails draws, so a broken rule stands in the panel. [[spec/tickets/vale-leaves-the-tree]]
@@ -27,7 +27,7 @@ const (
 // The files the tools read beside the tree, so a change to one runs them over the whole tree again. A name closing on a slash names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
 var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
-// The folders the rules skip, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The folders the rules skip. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/skills/level0/.claude-plugin/types", ".claude/worktrees"}
 
 var proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
@@ -214,7 +214,7 @@ func (one *Tools) runs(input, name string, argv []string) (string, string) {
 	return said.Out, ""
 }
 
-// Biome's answer as rows, the way fromJson in .claude/skills/level0/lib/code.js reads it. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// Biome's answer as rows. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func (one *Tools) biomeRowsOf(stdout, where string) []Finding {
 	var read struct {
 		Diagnostics []struct {

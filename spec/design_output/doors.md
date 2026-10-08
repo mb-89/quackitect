@@ -16,9 +16,7 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 |---|---|---|
 | `proc` | a program | `src/doors/proc.js` |
 | `disk` | the filesystem | `src/doors/disk.js` |
-| `git` | a repository | `src/doors/git.js` |
 | `clock` | the time now | `src/doors/clock.js` |
-| `log` | the log every door writes | `src/doors/log.js` |
 | `http` | a server over the network | `src/doors/http.js` |
 
 Everything above a door takes it as an argument. The command line builds every
@@ -48,8 +46,9 @@ reads. `sections` in `src/rules/scope.go` names each one in a row, beside the
 doors and their fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`test/contract/outside-in-doors.test.js` drives the tree's rules over the name
-of each file, so a row a hand writes meets its case.
+`TestAScopedRuleReadsItsPathsAlone` in `src/rules/rules_test.go` drives a
+scoped rule over a path inside its scope and paths outside it, so a row a hand
+writes meets its case.
 
 # A raw run keeps bytes
 
@@ -63,19 +62,15 @@ nothing.
 
 # A door standing on another
 
-Git runs a program, and the log writes a file, so each takes the door beneath it
-and builds on that. A fake of the door beneath then stands in for the one
-above, and one file holds each pairing under one name.
+Git runs a program, so it takes the door beneath it and builds on that. A fake
+of the door beneath then stands in for the one above, and one file holds the
+pairing under one name.
+
+The git door stands in `src/modules/git/git.go` with `FakeGit`, and the table of Go doors names its contract suite.
 
 | door | stands on | its fake |
 |---|---|---|
-| `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
-| `log` | `disk` and `clock` | `src/doors/fake/log.js`, over the fake disk |
 | `proc` | `clock`, for a respawn's window | `src/doors/fake/proc.js` |
-
-The fake git answers `ran`, the commands it takes, in order. The fake log
-answers `files`, the fake disk holding what it writes. For what one log line
-holds, see [[spec/design_output/log]].
 
 # A fake behaves
 
@@ -112,6 +107,38 @@ and in no `src/doors`, because the client loads a hooks module from that
 folder alone. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
+# The JavaScript that stays
+
+JavaScript stands where nothing else runs. Each JavaScript file git tracks sits
+under a row below. The `javascript` part of `./RUNME.sh check` refuses a
+file no row covers and a row covering no file. A row ending in `/` covers its
+folder.
+
+| files | reason |
+|---|---|
+| `src/extension/` | the VS Code extension, which VS Code loads as JavaScript |
+| `.claude/skills/level0/hooks/` | the level zero function hooks, which Claude Code loads as TypeScript modules |
+| `.claude/skills/level0/tests/` | the tests of those hooks, in TypeScript beside them |
+| `src/stub/.claude/skills/level0/hooks/` | the stub's bridgehead, in TypeScript, in the stub a project takes |
+| `src/doors/clock.js` | the clock door the extension loads, which the process door stands on |
+| `src/doors/disk.js` | the disk door the extension loads |
+| `src/doors/http.js` | the http door the extension's index door posts through |
+| `src/doors/proc.js` | the process door the extension loads |
+| `src/doors/wire.js` | the server the http and editor index contract tests stand up |
+| `src/doors/fake/behaves.js` | the guard every fake shares |
+| `src/doors/fake/clock.js` | the clock door's fake, which the extension's tests drive |
+| `src/doors/fake/disk.js` | the disk door's fake, which the extension's tests drive |
+| `src/doors/fake/http.js` | the http door's fake, which the extension's tests drive |
+| `src/doors/fake/proc.js` | the process door's fake, which the extension's tests drive |
+| `src/doors/fake/vscode.js` | the fake editor the extension's tests load |
+| `test/battery-reporter.js` | the reporter the check runs the JavaScript tests under |
+| `test/contract/` | the contract tests of the doors, the extension and the hooks' settings |
+| `test/level0/` | the tests of the extension, the hooks and the Vale scripts that stay |
+| `prototype/trace-view/` | the prototype a funnel note cites as evidence, which runs in no product |
+
+To add JavaScript, add its row with its reason. To delete the last file under
+a row, delete the row in the same change.
+
 # The folders, and their cost
 
 | folder | what stands there | what it touches |
@@ -121,16 +148,6 @@ folder alone. For details, see
 
 `FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
-
-# A script guards its main
-
-A script that dispatches at import runs its main under the test importing it,
-and the exit there ends the run. The runner then reports the file as one
-passing case holding none, so the test-first door reads a pass that proves
-nothing. So a script with a main runs it behind `runsHere` in
-`.claude/skills/level0/lib/paths.js`, which answers true where node runs that file itself. The
-command line and the server read it there. A test importing the command
-line's verbs registers its cases, and a failing case turns the run red.
 
 # One contract test per door
 
@@ -143,22 +160,14 @@ one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 
 Other contract tests stand there too, because they drive a real thing as well.
-`vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
-files this tree tracks.
+The prose rules run in Go, and `src/rules` holds their cases.
 
 | door | real | fake | contract suite |
 |---|---|---|---|
 | `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
 | `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
-| `git` | `src/doors/git.js` | `src/doors/fake/git.js` | `test/contract/git.test.js` |
 | `clock` | `src/doors/clock.js` | `src/doors/fake/clock.js` | `test/contract/clock.test.js` |
-| `log` | `src/doors/log.js` | `src/doors/fake/log.js` | `test/contract/log.test.js` |
-| `http` | `src/doors/http.js` | `src/doors/fake/http.js` | `test/contract/http.test.js` |
-| `index` | `src/doors/index.js` | `src/doors/fake/index.js` | `test/contract/index.test.js` |
-| `front` | `src/doors/front.js` | `src/doors/fake/front.js` | `test/contract/front.test.js` |
-| `session` | `src/doors/session.js` | `src/doors/fake/session.js` | `test/contract/session.test.js` |
-| `failure` | `src/doors/failure.js` | `src/doors/fake/failure.js` | `test/contract/failure.test.js` |
-| `rules` | none: the proc door runs the rules verb | none | `test/contract/vale.test.js`, `test/contract/vale-fix.test.js` |
+| `http` | `src/doors/http.js` | none | `test/contract/http.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
 
 The contract suite is the one test that drives the real door, and every other
@@ -197,13 +206,13 @@ family carries its fate:
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go`, `src/quack/box_processes_contract_test.go` | builds once a package run |
 | the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
-| the index and session suites running the fake beside the real door | `test/contract/index.test.js`, `test/contract/session.test.js` | door tests, each case run on the fake and the real door wherever the fake gives that answer |
 | the twins and goldens over the real tree | `src/quack/codec_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/index_contract_test.go` | door tests of the index door |
 | the index's own reads of git | `src/index/index_contract_test.go` | door tests of the index's git read |
 | a real file watch that stops mid-add | `src/modules/files/watch_contract_test.go` | door tests of the file watch |
 | a child ended whole, and a door standing apart from its starter | `src/quack/ending_contract_test.go`, `src/quack/ending_windows_contract_test.go`, `src/index/detach_contract_test.go`, `src/index/detach_windows_contract_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
 | a bare RUNME.sh under sh | `src/quack/runme_test.go` | door test of the road's shell entry, over a planted path of real tools |
+| the git hooks and the boot word over real git and sh | `src/quack/githooks_exe_test.go`, `src/quack/hook_verb_test.go`, `src/quack/hooks_folder_test.go`, `src/quack/session_start_test.go` | door tests of the shell entry points, each over a real repository or a copy of the script under a temporary folder |
 
 The check reads every code span naming a test file in these tables. It names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
 
@@ -296,24 +305,10 @@ The lsp move touches no git, so it stands apart from that order.
 
 # A rule test spawns once
 
-A rule asserted against a stub is a rule nobody runs, so a case proving a
-rule reaches Vale. A case spawning the binary a line costs the battery a
-minute under load, and a red under that load names no cause. So one helper,
-`test/contract/ruled.js`, is the one place a rule test reaches Vale:
-
-| what a file does | what the helper does |
-|---|---|
-| hands the runner a case body the helper builds over the case's texts, at the top | writes every text under the path it names, each in a folder of its own |
-| reads the findings a text by key inside the case | runs Vale once over the folder, on the first case |
-| asks for the fixer | runs the fixer twice more over the folder, and reads each text back after each round |
-
-So a file spawns Vale once, and again for each round where it proves the
-fixer. A case proves its rule off findings in memory. A text declared inside a case
-comes after that run, so the helper runs again for it.
-
-The helper reads the config's own sections too, with Vale's glob, where a star
-spans a slash. So a case proving a path stands off a rule reads the section
-that switches it off, and spawns nothing.
+A rule asserted against a stub is a rule nobody runs. So one table,
+`src/rules/testdata/cases.json`, holds a fixture each rule refuses and a twin it
+passes, and `TestEachRuleRefusesItsFixtureAndPassesItsTwin` in
+`src/rules/rules_test.go` runs the loaded rules over both, in process.
 
 # A door declares its names
 

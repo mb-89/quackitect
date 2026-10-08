@@ -1,6 +1,5 @@
 // A hand-back lands: the ticket goes to disk, the tree stages, and one commit
-// names the ticket and what changes, then the push, off pull-landed.js,
-// pull-push.js and the marker reads in lib/markers.js.
+// names the ticket and what changes, then the push.
 // [[spec/design_output/pull#the-refused-commit]]
 package pull
 

@@ -31,7 +31,7 @@ var borrowed = []string{"node_modules", "src/extension/webview/node_modules"}
 var stamped = []string{".claude-plugin/marketplace.json", ".claude/skills/level0/.claude-plugin/plugin.json", "src/extension/package.json", "src/extension/icon.svg"}
 
 // The binaries a worktree builds of its own, by the package each builds off. [[spec/design_output/review#a-worktree-runs-the-check]]
-var builds = [][2]string{{"se-front", "src/front/cmd"}, {"se-index", "src/quack"}}
+var builds = [][2]string{{"se-index", "src/quack"}}
 
 // What the check on the worktree answers. [[spec/design_output/review#a-worktree-runs-the-check]]
 type checked struct {

@@ -50,7 +50,7 @@ func vehicleEnv(pairs []string) map[string]string {
 	return out
 }
 
-// The tree the verb runs from, as root in src/scripts/cli-doors.js names the tree holding the program: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The tree the verb runs from: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
 func vehicleRootHere(box boxDoors) string {
 	if said := box.env("QUACKITECT_ROOT"); said != "" {
 		if abs, err := filepath.Abs(said); err == nil {
@@ -62,7 +62,7 @@ func vehicleRootHere(box boxDoors) string {
 			bin = real
 		}
 		root := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(bin))))
-		if filepath.Join(root, ".se", ".runtime", "bin") == filepath.Dir(bin) { // the runtime folder .claude/skills/level0/lib/folders.js owns
+		if filepath.Join(root, ".se", ".runtime", "bin") == filepath.Dir(bin) { // the runtime folder src/modules/check/folders.go owns
 			return root
 		}
 	}
@@ -83,7 +83,7 @@ func vehicleDisk(dry bool) vehicle.Disk {
 	return vehicle.OS()
 }
 
-// The vehicle verb: here, produce, into, attach, detach and register, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
+// The vehicle verb: here, produce, into, attach, detach, register, settle and enable, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 func vehicleTwin(doorsOf func() vehicleDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		doors := doorsOf()
@@ -110,6 +110,10 @@ func vehicleTwin(doorsOf func() vehicleDoors) twin {
 			}
 			fmt.Fprintf(out, "%s names %s as the vehicle driving it, at port %s.\n", pair.Work, id, vehicle.Number(settled.Port))
 			return 0
+		case "settle":
+			return vehicleSettle(disk, doors, pair, out, errs)
+		case "enable":
+			return vehicleEnable(disk, pair, out, errs)
 		case "detach":
 			if err := vehicle.Detach(disk, pair.Work); err != nil {
 				fmt.Fprintln(errs, err)
@@ -127,6 +131,32 @@ func vehicleTwin(doorsOf func() vehicleDoors) twin {
 		}
 		return vehicleHere(disk, doors, pair, id, out)
 	}
+}
+
+// Names the method root the work reaches, making the work a project of this vehicle where it reaches none. [[spec/tickets/extension-imports-stay-inside]]
+func vehicleSettle(disk vehicle.Disk, doors vehicleDoors, pair vehicle.Pair, out, errs io.Writer) int {
+	settled, err := vehicle.Settles(disk, doors.env, doors.now, pair.Work, pair.Method, doors.pid, doors.windows)
+	if err != nil {
+		fmt.Fprintln(errs, err)
+		return exitFailed
+	}
+	fmt.Fprintf(out, "method %s\n", settled.Method)
+	return 0
+}
+
+// Enables the plugin in the work root, the method its marketplace, so the stub shim runs no Node. [[spec/design_output/level0#a-stub-names-its-vehicle]]
+func vehicleEnable(disk vehicle.Disk, pair vehicle.Pair, out, errs io.Writer) int {
+	enabled, err := vehicle.EnablePlugin(disk, pair.Work, pair.Method)
+	if err != nil {
+		fmt.Fprintln(errs, err)
+		return exitFailed
+	}
+	if !enabled.OK {
+		fmt.Fprintln(errs, enabled.Why)
+		return exitFailed
+	}
+	fmt.Fprintf(out, "%s enables level0 from %s.\n", strings.ReplaceAll(pair.Work, `\`, "/"), pair.Method)
+	return 0
 }
 
 // Copies the method where the words say, a folder standing there refused unless into says so. [[spec/design_output/vehicle#what-travels-into-a-vehicle]]

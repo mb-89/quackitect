@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-// The event the prompt arrives on, the effect a rewrite answers with, the answer-first line's opening off warns in lib/answer.js, and the session log lib/folders.js owns. [[spec/tickets/prompt-answers-off-the-door]]
+// The event the prompt arrives on, the effect a rewrite answers with, the answer-first line's opening off warns in lib/answer.js, and the session log src/modules/check/folders.go owns. [[spec/tickets/prompt-answers-off-the-door]]
 const (
 	submitEvent  = "prompt.submit"
 	eventEffect  = "event"

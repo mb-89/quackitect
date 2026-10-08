@@ -35,7 +35,7 @@ func isDraft(path string) bool {
 	return false
 }
 
-var globParts = regexp.MustCompile(`(\*\*|\*|\?)`)
+var globParts = regexp.MustCompile(`(\*\*/|\*\*|\*|\?)`)
 
 func matches(glob, path string) bool {
 	return globOf(glob).MatchString(slashed(path))
@@ -46,6 +46,8 @@ func globOf(glob string) *regexp.Regexp {
 	said.WriteString("^")
 	for _, part := range splitKeeping(glob) {
 		switch part {
+		case "**/":
+			said.WriteString("(?:.*/)?")
 		case "**":
 			said.WriteString(".*")
 		case "*":

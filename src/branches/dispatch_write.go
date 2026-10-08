@@ -206,7 +206,7 @@ type processRoute struct {
 	Ask, Steps []any
 }
 
-// The route a process file holds, as processAt in src/scripts/process.js reads it. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The route a process file holds, as ProcessAt in src/pull/process.go reads it. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func (d *Doors) processAt(name string) (processRoute, string) {
 	text := d.methodRead(processFolder + "/" + name + processEnd)
 	if text == "" {
@@ -218,13 +218,13 @@ func (d *Doors) processAt(name string) (processRoute, string) {
 	return route, ""
 }
 
-// The hash over a route's ask and steps, as processHash in lib/schema-route.js writes it: keys sorted, every scalar a string. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The hash over a route's ask and steps, as ProcessHash in src/pull/hash.go writes it: keys sorted, every scalar a string. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func processHash(ask, steps []any) string {
 	said, _ := json.Marshal(map[string]any{"ask": canonicalOf(ask), "steps": canonicalOf(steps)})
 	return pull.HashText(string(said))
 }
 
-// A value as canonicalOf in lib/schema-route.js holds it. Go's encoder sorts a map's keys, as the JavaScript sorts them. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// A value as the canonical JSON in src/pull/hash.go holds it. Go's encoder sorts a map's keys. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func canonicalOf(said any) any {
 	switch one := said.(type) {
 	case []any:

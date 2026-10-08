@@ -17,62 +17,34 @@ its first session with nothing typed.
 
 # The bridgehead and the server
 
-Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.ts`, is the module the
-client loads, and the one hook a project carries: one door for every event,
-`*`, and one function behind it. It posts each event to the server at the
-port, with the root the session works in, and does what the answer says. It
-imports its own folder alone, so a project carries that folder and nothing
-past it. The project knows nothing of where the method stands on the disk.
-
-Those imports buy the read tools their registration:
-
-- the hook names each spec at the session's start, so a box whose server answers nothing carries them
-- a file under `lib` failing to load blocks the hook, which is the cost
+The forwarder, `hooks/level0.ts`, is the module the client loads, and the one
+hook a project carries: one door for every event, `*`, and one function behind
+it. It posts each event to the hooks door at the port and token
+`.se/.runtime/hooks.json` names, with the root the session works in. It then
+does what the effects say. It imports its own folder alone, so a project carries
+that folder and nothing past it. It holds no rule: the door holds every rule,
+and the event list it decides.
 
 A second hook stands beside the door, on `turn.step`, because a stream reaches
 a generator alone. It keeps the step's text as the chunks arrive, and posts it
-whole as `turn.said` at the stream's end. The compaction goes over the wire
-with its flat fields alone. The client hands the whole transcript as that
-event, and the server reads no line of it.
+whole as `turn.said` at the stream's end. A prompt and a spoke post carry the
+newest transcript rows, cut to the role, the id, the text and a results flag.
+The door picks what it reads off them.
 
-The server runs from the method root and keeps one box a work root. The
-rules, the schemas, the index binary and Vale come from the method root. The
-log, the notes and the files come from the work root. This tree is the case
-where both roots are one folder.
-
-| the answer | the bridgehead does |
+| the effect | the forwarder does |
 |---|---|
-| `{ pass: true }` | hands the event on |
-| `{ result }` | returns the result to the client |
-| `{ event }` | hands the changed event on |
-| `{ after }` | hands the event on, and adds to what comes back |
-| `{ register }` | registers the tools it names, one by one |
-| `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
-| `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
-| nothing, the server down | hands the event on, writes one `warn` line, and says it once in the chat |
+| `pass` | hands the event on |
+| `result` | answers the call, with its text as a deny |
+| `block` | holds the Stop |
+| `event` | hands the changed event on |
+| `after` | hands the event on, and adds to what comes back, a named one on a context read as a block |
+| `rows` | posts the step's text and the newest rows as `agent.spoke`, and does what that answer says |
+| `clear` | hands the event on, and clears the conversation at the turn's end |
+| a `result` carrying a `spawn` | spawns the helper, and posts what it says under the event `back` names |
+| nothing, the door down | runs the hook verb's down word, and does what its answer says |
 
-The server is plain node under `src/bridge`, one file a topic, and the header
-of each file says which door it holds. `server.js` holds the doors, god mode
-and the switch in `decide`. The server holds every door of this note, and the
-module before the bridgehead stands nowhere.
-
-The log, the index and Vale stand behind doors under `src/doors`. The server
-logs every event at `debug`, whole, so a box set to `debug` carries it, and
-holds the state in one box a work root. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it to
-the debugger. The launch config `the server` starts it under the editor's
-debugger, so a break in `decide` binds, pauses, and takes new breaks while
-the agent runs.
-
-A server killed and running again takes the next event as its own, because
-the bridgehead holds no state and no connection. So the session goes on across
-every restart of the server, and the client reloads the bridgehead for no
-change of a door. Headless turns say so, against client 2.1.269:
-
-| turn | what it shows |
-|---|---|
-| the first | posts 186 events |
-| the second | completes with the server down |
-| the third | lands on the server running again |
+The forwarder's own engine calls raise events of their own, and those pass by it
+while the calls run.
 
 ## The cloud starts the server
 
@@ -91,9 +63,10 @@ stands:
 
 A desk pull starts nothing, and a take that fails starts nothing.
 
-The line it runs is the bridgehead's own, imported from the hook. So one text
-starts the server on both roads, and one table names what each code says. The
-stub's bridgehead keeps a copy, because that file imports nothing at all.
+`serveDetachedStart` in `src/quack/serve_verb.go` runs the standing on both
+roads, and `startReasonOf` in `src/quack/hook_down.go` names what each code
+says. The stub's bridgehead keeps its own line, because that file imports
+nothing at all.
 
 ## A desk serve returns
 
@@ -106,50 +79,34 @@ stream. `serveDetachedStart` in `src/quack/serve_verb.go` holds it.
 
 ## The bridgehead starts it too
 
-The take verb reaches a cloud box that pulls work. A cloud session opening on
-a prompt reaches no verb at all, so the bridgehead carries the same start. The
-session's first event answers nothing, the `warn` line lands, and the start
-road runs once. That silence says nothing to the person, because the road runs
-under it. For details, see
-[[spec/design_output/level0#the-bridge-says-it-falls]].
+A cloud session opening on a prompt reaches no verb, so the forwarder carries
+the start. Where a post to the door fails, the forwarder runs
+`se-index verb src/scripts hook down <event>` once, with the event's fields on
+its input, and hands its answer on. `hookDown` in `src/quack/hook_down.go`
+holds the word:
 
-The road is one node script, because a Windows box carries no shell. It reads
-the environment itself, and installs where the index stands nowhere. It then runs the index with `standing` in the work root, and answers
-a code:
+| what stands | what the down word does |
+|---|---|
+| a desk | starts nothing, since a person starts the index there |
+| a cloud box | runs the index with `standing` in the work root, and asks the door again |
+| the door answers | prints the door's answer |
+| the door stays down | writes the fall's row, prints the fall line on its error stream, and answers the refusal, the cage block or a pass |
+
+`CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
+cloud guidance binds on. The start answers a code, and the log carries a row
+for each code `startReasonOf` gives a level:
 
 | the code | what stands | what the log carries |
 |---|---|---|
 | 3 | no cloud variable, so a person starts it | nothing |
-| 4 | the method root stands nowhere | one `warn` line |
-| 5 | the box carries no node | one `warn` line |
-| 7 | the road installs the tree, then starts the index | one `info` line |
 | 8 | the index fails its standing, so no door stands | one `warn` line naming the fault |
-| 9 | the install builds no index | one `warn` line |
 | 0 | the index stands behind the session | one `info` line |
 
-`CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
-cloud guidance binds on. The operating system decides nothing here, because a
-person at a local box wants the button and a cloud box wants the server.
-
-The call comes back in milliseconds where the index stands. The line
-backgrounds the server and sends its output to `.se/.log/serve.log`, so a
-session start waits for nothing. The rules ride the first event the server
-answers, and nothing waits for it to stand. For details, see
-[[spec/design_output/level0#rules-ride-the-first-answer]].
-
-The road builds the index where it stands nowhere. A cloud box clones the
-repository fresh when the container starts. The half of the setup writing into
-the tree goes with the old one:
-
-| what the setup writes | where it lands | what the clone does |
-|---|---|---|
-| the trust flag and the mode | the home of the box | leaves them standing |
-| the installed binaries | the tree | replaces the tree |
-
-So the road runs `src/scripts/install.sh` itself, under the skip list the setup
-names, and answers `7` where it does. That install waits, because a session
-holding no cage reads no rule at all. A session start pays it once, and on a
-box whose first event finds no server alone.
+A cloud box clones the repository fresh when the container starts, and git
+tracks no binary. So where no binary stands on a cloud box, the forwarder runs
+`install.sh` under the skip list the setup names, and then the down
+word. A box where neither runs passes the event with no cage, and the forwarder says
+so in the chat.
 
 ### Rules ride the first answer
 
@@ -174,22 +131,8 @@ A server restarting under a session builds the mark off the log. A `context`
 row there says the session holds the layer. A server the start road launched
 late meets no such row, so its first answer hands the layer over.
 
-The bridgehead holds no wait either:
-
-| the event, no server answering | what the bridgehead does |
-|---|---|
-| `session.start` or `prompt.context` | runs the start road once, and hands the event on |
-| a read tool | answers the starting line at once |
-| the stop on a cloud box, a launch standing, no answer yet | holds the turn with one line: level zero starts, and the next event carries its rules |
-| the stop where the road stands down, or on a desk | hands the stop on |
-
-The road answering `0` or `7` launches a server, and it exits `3` off a cloud
-box. So a launch says the box is a cloud box. A road standing down sets the
-cage and launches nothing, so a box that starts no server loops nowhere.
-
-The stop holds `HOLDS` times at most before a server answers. So a launched
-server that stays down frees the turn after the last hold. The count reads
-events alone.
+The forwarder holds no wait either. A door the down word starts answers the
+event that starts it, and the rules ride that answer.
 
 ### The first call pays
 
@@ -200,16 +143,8 @@ anyway. [[spec/tickets/level0-tools-leave-the-bridge]]
 
 A level zero call takes the hooks door, which runs the action its name
 resolves to. While the door stands down, the call meets the refusal naming
-the command that brings the index back. Where the cage stands off, the call
-posts once to the server, and a dead server answers one line:
-
-| what stands | the line says |
-|---|---|
-| a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
-| no launch stands, or a server answers once and then falls | the port and the log |
-
-For the rules riding the first answer, see
-[[spec/design_output/level0#rules-ride-the-first-answer]].
+the command that brings the index back. For the rules riding the first answer,
+see [[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
 
@@ -301,7 +236,7 @@ Then the old server writes
 one `fatal` line naming the exit and the line the child writes, and exits
 with one. A child standing past the window is the server, and the old one
 exits clean. `RESPAWN_WAIT` holds the window, and
-`SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
+the file is `.se/.log/serve.log`. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
 `restarts` ends the listen and starts the child on
@@ -337,70 +272,36 @@ timeout, so a caller awaiting the release gets its answer on every box.
 
 ## The bridge says it falls
 
-A server falling under a running session leaves the doors passing quietly. The
-row naming the fall sits in a file nobody opens, and the check finds it minutes
-later. So the bridgehead says it where a person stands.
+A door falling under a running session leaves the doors passing quietly. The
+row naming the fall sits in a file nobody opens. So the down word says it where
+a person stands.
 
-| what the bridgehead does | when |
+| what the down word does | when |
 |---|---|
-| writes one `warn` row naming the event route | the first event the server answers nothing for |
-| says one line in the chat, through `$.ui.log` | the first such event past the session start |
-| drops both marks | the server answers again |
-| answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
-| answers the starting line to a level zero tool | a tool call before the server its start road brings up answers, per [[spec/design_output/level0#rules-ride-the-first-answer]] |
+| writes one `warn` row naming the event | each event the door answers nothing for |
+| prints the fall line on its error stream, which the forwarder says through `$.ui.log` | each such event past the session start |
 
-A post nobody takes reads the port pointer first, because a server restarting
-on another port writes it again. Where the pointer names another port, the
-bridgehead posts there once more before the server reads as down.
-
-The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
-`mcp__level0__wait` post falling with no status after `CUT` or more in
-`.claude/skills/level0/hooks/level0.ts` asks `/health` once.
-
-| the health | the wait |
-|---|---|
-| answers | goes again as the same post, and its answer stands in place of the `no server answers` line |
-| answers nothing | reads as down, as above |
-
-The route both name is the one the bridgehead posts to, which `url()` answers.
-The line names it, what the wire says, and the commands a person runs:
+The line names what the wire says, and the commands a person runs:
 `./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
 
-The session start says nothing to the person. `seen` posts every event to the
-server first, and runs the start road under a `session.start` the server
-answers nothing for. So that silence is the road standing ready, and a line
-there reads false on every healthy cloud start.
-
-| the mark | what it holds |
-|---|---|
-| the row's mark | one row a fall |
-| the chat's mark | one line a fall, standing apart so a session start keeps the line unsaid |
-
-The marks stand apart, because a session start writes the row and leaves
-the line. A harness offering no `$.ui` leaves the row alone, and nothing
-throws. `./RUNME.sh doctor` names the server under `server`, where a person
-asks after it later.
+The session start says nothing to the person. The start runs under it, so that
+silence is the door standing ready, and a line there reads false on every
+healthy cloud start.
 
 ## The cage refuses while down
 
-Under `migration.cage` at `new`, the hooks door decides the events it ports,
-and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
-moves them. `src/modules/hooks/guard.go` holds the rule, and the hook reaches it through the `cage` verb of the index binary, which stands while the server is down. A verb that answers nothing passes the call, and the fall line says the cage stands down.
+The hooks door decides every event. Where it answers nothing and the down
+word's start leaves it down, a guarded call meets a deny naming
+`session/alarms` and `./RUNME.sh serve`. `Guarded` and `RefusedText` in
+`src/modules/hooks` hold the road, and the hook reaches them through the `cage`
+verb of the index binary, which stands while the door is down. A verb that
+answers nothing passes the call, and the fall line says the cage stands down.
+These pass, and so does every other event:
 
-| the event | who answers |
-|---|---|
-| `tool.call`, `classic.Stop` | the hooks door, at the port and token `.se/.runtime/hooks.json` names |
-| `agent.spoke`, where the door asks back for rows | the hooks door |
-| a level zero tool the door passes | the bridge |
-| every other event | the bridge |
-
-Where the door answers nothing, the bridgehead runs its start road once and
-posts again. Still down, a guarded call meets a deny naming `session/alarms`
-and `./RUNME.sh serve`. These pass, and so does every other event:
-
-- Read, Grep, Glob and the level zero read tools
+- Read, Grep and Glob
 - `./RUNME.sh serve` and `./RUNME.sh doctor`, each run alone, so a box whose
   index stands unbuilt brings the door back
+- the commands that save the work, which `Recovers` names
 
 For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
 
@@ -431,8 +332,8 @@ carries one block, `level0-cage`:
 | what the road itself says | the error under the code |
 | `./RUNME.sh`, then `./RUNME.sh serve` | what a person runs to fix it |
 
-`cageText` in `hooks/level0.ts` builds the block. The hook holds that code until
-a server answers. The block asks the agent to open its first answer with one
+`cageText` in `src/quack/hook_down.go` builds the block, on a `prompt.context`
+the door answers nothing for after a start at a `warn` code. The block asks the agent to open its first answer with one
 line saying level zero stands down. A person then tells a caged session from
 an uncaged one at a glance.
 
@@ -497,9 +398,9 @@ name, and says which one answers.
 | `settings.local.json` under `.claude` | the box | no |
 | the settings under the home of the box | the box | no |
 
-`SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
-those names, and the home file takes the first of them under the home path.
-`hooksNamed` in `src/quack/hookprobe.go` reads them in that order, and takes
+`Settings` and `SettingsLocal` in `src/vehicle/pure.go` own those names, and
+the home file takes the first of them under the home path. `hooksNamed` in
+`src/quack/hookprobe.go` reads them in that order, and takes
 every string under `hooks`. It keeps the ones a URL parses as `http:` or
 `https:`.
 
@@ -515,8 +416,8 @@ first.
 
 A reply carrying a failing status stands, because a box answering a status
 listens there. `hookRows` runs the calls together, so a box naming several dead
-hooks answers inside the first minute. The wait is `HEALTH_WAIT` in
-`src/scripts/cli-doors.js`, which the server probe reads too.
+hooks answers inside the first minute. The wait is `healthWait` in
+`src/quack/hookprobe.go`, which the server probe reads too.
 
 The row's label reads `hook` beside the host of the address. A host carries its
 port, and leaves the one its scheme takes by default. `doctor` pads a label to
@@ -680,8 +581,9 @@ name `level0`.
 
 The client keeps a cache of the plugin folder under the user's home, one per
 version, off every tree. `claude plugin update` refreshes it. The path to the
-vehicle differs per box, so the shim writes it into `settings.local.json` under `.claude`,
-which git ignores.
+vehicle differs per box, so the shim runs `vehicle enable` through the
+vehicle's binary, which writes it into `settings.local.json` under `.claude`,
+which git ignores. For the settings it writes, see `ShimSettings` in `src/vehicle/pure.go`.
 
 Every road that runs the vehicle's code inside a plugin of the stub's own fails.
 One headless turn a road says so:
@@ -760,7 +662,7 @@ The numbers come out of the standing block alone. So an answer carrying them
 proves the block stands in front of the model past the compaction.
 
 `./RUNME.sh probe reply` runs the client headless on the prompt
-`REPLY_PROBE.opens` in `.claude/skills/level0/lib/guidance.js` names:
+`replyOpens` in `src/quack/probe_reply.go` names:
 
 1. The prompt's marker arms the bridgehead at `prompt.submit`.
 2. The next `tool.call` writes one `probe.reply` row, whose detail holds the
@@ -784,15 +686,14 @@ proves the block stands in front of the model past the compaction.
 
 The verb exits `0` on `survives` and `1` on anything else.
 
-`test/contract/compact.test.js` drives the verb against the real client. One
-run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
-`./RUNME.sh check` stays fast without it.
+The owner runs the verb against the real client, and
+`src/quack/probe_verb_test.go` holds its reading of the rows.
 
 ## The cold probe
 
 A unit test passes on each part, and a real box still breaks where the parts
 meet. So the commit verb runs the cold probe on every commit touching the cold
-path, and no hand remembers it. `COLD_PATH` in `src/scripts/probe-cold.js`
+path, and no hand remembers it. `coldPath` in `src/quack/probe_cold.go`
 names the path: the bridgehead, the start road, the guidance delivery and the
 probe itself.
 
@@ -811,7 +712,7 @@ The probe runs one cold box from start to end:
 
 1. It clones the commit this tree stands on into a fresh temp folder.
    It applies the delta the commit verb hands it.
-2. It runs `src/scripts/install.sh` under the skip list the setup names, so
+2. It runs `install.sh` under the skip list the setup names, so
    the plugin manifest lands.
 3. It writes the clone's pointer at a port of its own, so a desk server keeps
    its port.
@@ -821,7 +722,7 @@ The probe runs one cold box from start to end:
 5. It reads the clone's session log and the client's stream.
 6. It stops the server the clone launched, and removes the folder.
 
-`readsCold` in `src/scripts/probe-cold.js` answers each check from the rows
+`readsCold` in `src/quack/probe_cold.go` answers each check from the rows
 and the stream:
 
 | the check | it passes where |
@@ -832,7 +733,7 @@ and the stream:
 | tools | a `mcp__level0__` name past the read tools reaches the session |
 | canary | the first text opens on the sentence, and no later text repeats it |
 
-The canary check also fails on a `HEARD.again` row, and on a `gate` row asking
+The canary check also fails on a `HeardAgain` row, and on a `gate` row asking
 for the canary after the payment. The probe prints one line a check, and exits
 `0` where every check passes.
 
@@ -912,10 +813,9 @@ door it takes.
 
 ## The setup writes the flag
 
-`src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
-A cloud environment carries neither at setup time. Measured against client
-2.1.267: a
-setup naming `node src/scripts/trust.js` fails, and the session ends at
+The setup below writes it. A cloud environment carries neither the tree nor
+`node` at setup time. Measured against client 2.1.267: a
+setup naming a `node` script fails, and the session ends at
 `init_script` with no first turn. A failing setup takes the session with it, so
 the one an environment carries leans on nothing:
 
@@ -951,7 +851,7 @@ the one an environment carries leans on nothing:
     print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
     SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index" \
-      sh "$repo/src/scripts/install.sh" || true
+      sh "$repo/install.sh" || true
     exit 0
 
 Both readers mark this folder one the client trusts, and both leave every other
@@ -962,7 +862,7 @@ holds the file.
 ## The setup installs the cage
 
 The install line is what makes the trust worth anything: a trusted tree whose
-server cannot boot holds nobody. `src/scripts/install.sh` is `sh` and installs
+server cannot boot holds nobody. `install.sh` is `sh` and installs
 node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
@@ -980,19 +880,20 @@ the language server. Those stay wants, and every rule holds without them.
 
 ## The boot hook
 
-A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
-through node. Where the session starts decides its road:
+A `SessionStart` hook in `.claude/settings.json` runs the boot word of
+`install.sh` through sh. Where the session starts decides its road:
 
 | where the session starts | what the hook does | why it stays a settings hook |
 |---|---|---|
-| a cloud box lacking the plugin manifest | runs `src/scripts/install.sh` under `INSTALL_SKIP` | the client scans plugins before any hook of a mod runs |
+| a cloud box lacking the plugin manifest | runs `install.sh` under the skip list that `installSkip` in `src/quack/probe_cold.go` pins | the client scans plugins before any hook of a mod runs |
 | a cloud box where the manifest stands | runs nothing | |
 | a desk | hands its hook input to the start verb, and prints the stop the verb answers | a session loading no plugin holds no mod hook to refuse it |
 
 A failed install holds no session up, and neither does a start verb that
-fails, stands missing or outlives `ASKING`. The hook's `timeout` waits out
-`STARTING`, the span the start road allows the same install, so the client cuts
-no install short before the manifest lands.
+fails, stands missing or outlives the cap the boot word sets. The hook's
+`timeout` waits out `startSpan` in `src/quack/hook_down.go`, the span the start
+road allows the same install. So the client cuts no install short before the
+manifest lands.
 
 Where the manifest stands the plugin loads. The start road of
 [[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the
@@ -1095,7 +996,7 @@ forgets to take a ticket up and to put it down.
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `writeDoor` in `src/modules/hooks/writes.go`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `TicketDoor` in `src/modules/hooks/command/ticket.go` |
 
-`ticketFault` in `src/engine/named.js` reads the name against what stands in
+`TicketFault` in `src/modules/hooks/command/ticket.go` reads the name against what stands in
 hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
 `working` todo. Every hand writes through the same door, so a helper's hold
 passes its own ticket.
@@ -1132,12 +1033,12 @@ These write with no ticket named:
 A Bash or PowerShell call names the open ticket it serves at the head of its
 `description`, the way a patch names it in its `ticket` field. `TicketDoor`
 in `src/modules/hooks/command/ticket.go` reads the description through
-`TicketOf` and `TicketFault`, and `DESCRIPTION_HOW` in `src/engine/named.js` says how to
+`TicketOf` and `TicketFault`, and `DescriptionHow` in the same file says how to
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
-A session holds no ticket before its first take or pull, so `freeOfTicket` in
-`.claude/skills/level0/lib/bash.js` reads these forms as needing none:
+A session holds no ticket before its first take or pull, so `FreeOfTicket` in
+`src/modules/hooks/command/findings.go` reads these forms as needing none:
 
 - `./RUNME.sh branch take`
 - `./RUNME.sh branch list`
@@ -1190,7 +1091,7 @@ way a save-time formatter works for a person.
 ## The size ceiling
 
 A function holds one thing and a file one topic, and `spec/config/level0.json`
-names the ceiling of each in lines under `code`. `lib/size.js` counts both over
+names the ceiling of each in lines under `code`. `sizeFaults` in `src/modules/check/textfaults.go` counts both over
 a brace language. A function opens where a line names one and a brace opens,
 and it closes where the brace depth comes back. A brace in a string or a
 comment counts none.
@@ -1267,8 +1168,9 @@ work stands.
 
 A guidance note's `Examples` table follows its rules into every block the
 rules reach. That is the standing layer, a helper's prompt, a kind's layer and
-the output style. `rulesOf` in `lib/guidance.js` writes the numbered rules and
-the table under them, so every reader carries one shape. The canary counts the
+the output style. `RulesOf` in `src/modules/hooks/brief/rules.go` writes the
+numbered rules and the table under them, and `rulesOf` in
+`src/projection/style.go` writes the style's, so every reader carries one shape. The canary counts the
 rules alone, because a row shows a rule and adds none.
 [[spec/guidance/guidance]]
 
@@ -1316,7 +1218,8 @@ line for that sentence:
 
 So the log carries the canary as well, and a person reads it later without
 watching the session run. `./RUNME.sh standing` ends with the same sentence,
-because `canary` builds it in `lib/guidance.js` and both callers read it there.
+because `Canary` builds it in `src/modules/hooks/brief/brief.go` and both
+callers read it there.
 
 ## The canary opens an answer
 
@@ -1334,7 +1237,7 @@ and the owner reads the failure long afterwards. So the sentence carries a
 debt, and the cage holds the session to it.
 
 The debt opens where the first `turn.complete` carries an answer the canary
-opens no line of. `canaryIn` reads the first line and answers `same`, `other`
+opens no line of. `CanaryIn` reads the first line and answers `same`, `other`
 or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
@@ -1414,7 +1317,7 @@ The hook prepends the session's own standing text to the spawn's prompt, under
 the heading the session reads, and puts the task under `# Your task`.
 
 One guidance file then binds every agent in the tree, and no helper reads a
-second copy. `forHelper` in `lib/guidance.js` builds the text, and the log
+second copy. `ForHelper` in `src/modules/hooks/brief/layer.go` builds the text, and the log
 writes one `agent` line naming the type it reaches.
 
 The rules a helper writes under are the rules the write door holds it to, so
@@ -1796,7 +1699,7 @@ takes its row, and the answer cell says what blocks it. The finding reads
 
 - Outcome: a numbered needs table closes every answer ending on a stop call.
 - Finding: `NeedsTable`.
-- Teacher: the stop texts in `lib/stop.js`.
+- Teacher: the stop texts in `src/modules/hooks/stop/vote.go`.
 
 | the check reads | what it demands |
 |---|---|
@@ -1829,7 +1732,7 @@ Both kinds reach a person the same way, through the command line and the panel:
 
 | the rule | where it lives |
 |---|---|
-| a rule weighing two files | `.claude/skills/level0/lib/tree.js` |
+| a rule weighing two files | `src/modules/check` |
 | a rule over a shell script | `spec/config/styles/VoiceScript` |
 
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
@@ -1849,7 +1752,7 @@ A heading, a file name, a folder name and a branch name each hold the words
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. The mint refuses a
+`overLong` in `src/modules/check/names.go` counts a name instead. The mint refuses a
 long ticket name, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
@@ -1864,7 +1767,7 @@ error, leaves standard output empty, and exits non-zero. A reader parsing JSON
 alone then finds no breach. So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
-`faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
+`lspRules` in `src/quack/rules.go` turns a failed load into a `RulesLoad` error, and `./RUNME.sh lint` stops on it.
 The write door reads a lint that runs nowhere the same way, whatever the fault:
 
 | what stands | what the door does |
@@ -1957,8 +1860,7 @@ the same package. `quack prose` answers them, and every reader asks there.
 | the reader | the vetoes it asks |
 |---|---|
 | the write door, the draft check and the commit message, through `prose.Kept` | all |
-| `readsText` in `src/bridge/findings.js`: the pull and the lint, one file a request | past |
-| `readThrough` in `src/bridge/findings.js`: the check and the terminal push door, every file in one request | past |
+| `lspRules` in `src/quack/rules.go`: the lint and the check, through the lsp module's tools | past |
 | the LSP module, through `prose.ReadsAsPast` | past |
 
 | Vale finds | the reader says |
@@ -2039,10 +1941,7 @@ the span counts from the last change the wait sees. The process door's
 
 `wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
 looks at its signals once a second, and the clock decides the rest, so a case
-drives it on the fake clock. The bridgehead stamps a wait with `since`, the moment of its first post, and
-posts it again under the same stamp where the host cuts it. The box keeps the
-watch a stamp begins, so a post again carries on its signals, and the cap
-counts from `since`. The older loop ends once a later post takes the watch.
+drives it on the fake clock.
 
 The Go twin in `src/modules/waits` stands off the wiring until the flip:
 

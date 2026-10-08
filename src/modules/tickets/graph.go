@@ -1,5 +1,5 @@
 // The graph of one file alone, which the graph verb prints: the drawing's
-// nodes and edges, off graphIn in src/scripts/graph.js.
+// nodes and edges.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 package tickets
 

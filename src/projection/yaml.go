@@ -1,4 +1,4 @@
-// The YAML a schema file holds, read as schema-yaml.js reads it: a map, a
+// The YAML a schema file holds: a map, a
 // list, a flow list, a flow map and a scalar, each at the line it stands on.
 // The shared reader under src/yaml leaves out the flow map the word lists
 // write, so the projection keeps this copy.

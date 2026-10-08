@@ -3,52 +3,27 @@
 // [[spec/design_output/drawing#a-fake-host-drives-it]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { after, before, test } from "node:test";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { browserFrom } from "../../src/scripts/browser.js";
-import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { graphIn } from "../../src/scripts/graph.js";
-import { aheadOnly } from "../../src/scripts/ticket-route.js";
+import { ticketDrawn } from "../level0/v1-index.js";
+import { moved, reachedIn } from "../../src/extension/webview/route/edit.js";
 
+// The webview and the shipped script, which drawingWebview and drawingOut in src/quack/bundle_verb.go name, and the browser the check hands node. [[spec/tickets/scripts-folder-leaves]]
+const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const WEBVIEW = join(root, "src", "extension", "webview");
+const OUT = join(root, "src", "extension", "drawing", "route.mjs");
 const files = disk();
 const DRIVER = join(WEBVIEW, "node_modules", "playwright-core", "index.mjs");
-const browser = browserFrom(process.env).path;
+const browser = process.env.PLAYWRIGHT_CHROMIUM;
 const why = !files.exists(DRIVER)
   ? "the drawing's modules stand uninstalled, so run ./RUNME.sh"
   : !browser && "no browser stands here, so run ./RUNME.sh";
 
 // A ticket carrying each mark the page draws. [[spec/design_output/drawing#the-layout-reads-the-graph]]
-const TICKET = `---
-steps:
-  - name: sync
-    when: cloud
-  - name: design
-    steps:
-      - name: draft
-      - name: review
-        on_fail: draft
-        by: person
-  - name: ship
-  - name: tell
-step: design/review
-record:
-  - step: sync
-    skipped: true
-    why: a desk box
-  - step: design/draft
-    returns: 2
----
-
-# design
-
-## draft
-
-## review
-`;
-const FRONT = readNote(TICKET).front.said;
+const GRAPH = ticketDrawn("drawing-marks").graph;
+const FRONT = { steps: ticketDrawn("drawing-marks").steps };
 
 // The page a webview carries, with the one call a webview carries faked. [[spec/design_output/drawing#a-fake-host-drives-it]]
 const PAGE = `<!doctype html><html><head><style>html,body{width:900px;height:700px}</style>
@@ -82,7 +57,7 @@ test("the page posts ready once it mounts, and draws nothing before a graph", {
 test("a graph message draws every node and edge the graph carries", {
   skip: why,
 }, async () => {
-  const graph = graphIn(TICKET);
+  const graph = GRAPH;
   await page.evaluate(
     ([one, steps]) => window.postMessage({ kind: "graph", graph: one, steps }, "*"),
     [graph, FRONT.steps],
@@ -146,7 +121,7 @@ const node = (id) => page.locator(`.react-flow__node[data-id="${id}"]`);
 test("a press on a node posts jump with the place the engine names", {
   skip: why,
 }, async () => {
-  const want = graphIn(TICKET).nodes.find((one) => one.id === "design/draft");
+  const want = GRAPH.nodes.find((one) => one.id === "design/draft");
   const said = await postedAfter(() => node("design/draft").click());
   assert.deepEqual(said, [
     { kind: "jump", step: "design/draft", chapter: want.chapter, line: want.line },
@@ -161,7 +136,7 @@ test("a press on the pointer posts take, or handback where the person holds it",
   await page.evaluate(
     ([one, steps]) =>
       window.postMessage({ kind: "graph", graph: one, steps, held: true }, "*"),
-    [graphIn(TICKET), FRONT.steps],
+    [GRAPH, FRONT.steps],
   );
   const back = node("design/review").locator("button.handback");
   const gave = await postedAfter(() => back.click());
@@ -178,7 +153,8 @@ test("an edit to a step ahead posts the whole route ticket route takes", {
     said[0].steps.map((one) => one.name),
     ["sync", "design", "tell", "ship"],
   );
-  assert.deepEqual(aheadOnly(FRONT, said[0].steps), { steps: said[0].steps });
+  // The page posts what edit.js answers, which drawing-edit.test.js holds to the route the verb takes. [[spec/tickets/ticket-scripts-leave]]
+  assert.deepEqual(said[0].steps, moved(FRONT.steps, "ship", 1, reachedIn(GRAPH)));
   const gone = await postedAfter(() => node("tell").locator("button.drop").click());
   assert.deepEqual(
     gone[0].steps.map((one) => one.name),

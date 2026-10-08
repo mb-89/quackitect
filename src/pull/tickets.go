@@ -1,5 +1,6 @@
 // The tickets the tree holds, public and private, and the reads of one
-// ticket's front every verb shares, off src/engine/group.js.
+// ticket's front every verb shares, as src/branches/group.go and
+// pull_hand.go read them.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 package pull
 

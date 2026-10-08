@@ -108,7 +108,7 @@ func retroCriteriaOf(text string) []string {
 	return out
 }
 
-// The rows of a note's Ask chapter, as askOf in src/engine/group.js reads them. [[spec/design_output/work#a-group-is-a-ticket]]
+// The rows of a note's Ask chapter, as askOf in src/branches/group.go reads them. [[spec/design_output/work#a-group-is-a-ticket]]
 func retroBacklogAskOf(text string) string {
 	for _, one := range note.Read(text).Sections {
 		if strings.ToLower(one.Header) == "ask" {

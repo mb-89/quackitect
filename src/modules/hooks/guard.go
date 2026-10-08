@@ -14,7 +14,7 @@ import (
 
 // The runtime folder a pkill names and the alarm the index keeps its fault under, which index.Runtime and index.AlarmsName own, spelled again here because the hooks module imports no index. [[spec/rationales/the-cage-refuses-while-down]]
 const (
-	// The folder name itself stands in .claude/skills/level0/lib/folders.js. [[spec/rationales/the-cage-refuses-while-down]]
+	// The folder name itself stands in src/modules/check/folders.go. [[spec/rationales/the-cage-refuses-while-down]]
 	guardRuntime = ".se/.runtime"
 	guardAlarms  = "session/alarms"
 	guardRunme   = "./RUNME.sh"

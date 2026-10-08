@@ -1,6 +1,5 @@
-// A vehicle, made and placed: the roads src/scripts/vehicle.js walks. The pure
-// half decides, the disk door writes, and a project keeps the identity of
-// whatever drives it.
+// A vehicle, made and placed. The pure half decides, the disk door writes, and
+// a project keeps the identity of whatever drives it.
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]
 package vehicle
 
@@ -100,7 +99,7 @@ func RegisterDirs(env map[string]string, windows bool) []string {
 	return []string{}
 }
 
-// The home folder, as homeIn in src/scripts/editor.js reads it. [[spec/design_output/extension#the-link-stands]]
+// The home folder: USERPROFILE, else HOME. [[spec/design_output/extension#the-link-stands]]
 func HomeIn(env map[string]string) string {
 	if said := env["USERPROFILE"]; said != "" {
 		return said

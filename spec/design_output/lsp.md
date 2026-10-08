@@ -48,7 +48,7 @@ The fronts below ask for a reading, and each reaches one rule set:
 |---|---|
 | the editor's panel | the check module's sweep, and the Go rules and Biome beside it |
 | a person, at `quack sweep` | the same sweep, once the index settles |
-| `./RUNME.sh lint` | `quack sweep`, and `findingsOver` in `src/bridge/findings.js` beside it |
+| `./RUNME.sh lint` | `quack sweep`, and `toolsOver` in `src/quack/verb_lint.go` beside it |
 
 `Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
 own rules, and the tools beside them. A box whose quack answers no sweep names
@@ -136,22 +136,22 @@ come from:
 
 # The server runs the tools
 
-The server runs the Go rules and Biome the way `findingsOver` in
-`src/bridge/findings.js` runs them for the lint, so both lists name the same
+The server runs the Go rules and Biome the way `toolsOver` in
+`src/quack/verb_lint.go` runs them for the lint, so both lists name the same
 rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 
 | what | where the server reads it |
 |---|---|
 | the Biome binary | `.se/.runtime/tools.json`, else the runtime binary folder |
 | the Go rules | `rules.Load` over `spec/config/styles` at the root, handed in as `Tools.Rules` |
-| the folders the rules skip | `PARKED` in `src/bridge/findings.js` |
-| the Biome config | `CONFIG_DIR` in `.claude/skills/level0/lib/code.js` |
+| the folders the rules skip | `parkedFolders` in `src/modules/lsp/tools.go` |
+| the Biome config | `biomeConfig` in `src/modules/lsp/tools.go` |
 | a past tense row | `prose.ReadsAsPast` in `src/prose` |
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
 
 `src/modules/check/textfaults.go` reads the code faults and the exemption markers the
-way the lint reads them, over the files the lint walks. `SKIP` in
-`src/bridge/findings.js` names the folders that walk passes.
+way the lint reads them, over the files the lint walks. `walkPasses` there
+names the folders that walk passes.
 
 Each row names its source, so the panel leaves an open file's Biome rows to the
 Biome extension:
@@ -168,8 +168,9 @@ Biome extension:
 | the rules load nothing | `RulesLoad` on each file, naming the load's fault, so a broken rule stands in the panel |
 | no Biome | no Biome row |
 
-`StopFolderIsData` and `GridHolds` read JavaScript modules, so this server
-draws neither.
+`GridHolds` reads JavaScript modules, so this server draws none of it.
+`TestEveryStopFileReadsWhole` in `src/quack/stop_rules_test.go` holds the stop
+folder to the pool.
 
 # The scope reads root paths
 
@@ -309,7 +310,7 @@ as it stops.
 # The sweep serves the lint
 
 `quack sweep` prints the check module's sweep as JSON once the index settles,
-and `sweepRowsOf` in `src/scripts/quack-topic.js` reads it for the lint:
+and the lint reads it:
 
 | the lint asks | the rows it keeps |
 |---|---|
@@ -330,7 +331,7 @@ under `spec/tickets` whose frontmatter says `state: closed`:
 | the front | where it drops the rows |
 |---|---|
 | the server | `isHistory` in `src/modules/check/history.go`, in the checker's four entry points |
-| the lint | `pastHistory` in `src/bridge/findings.js` |
+| the lint | `pastHistory` in `src/modules/check/history.go`, through `src/quack/verb_lint.go` |
 
 An open ticket keeps every row.
 
@@ -340,12 +341,12 @@ The server builds into the index binary, `se-index`, so it takes no build of
 its own. A binary built off other source lints against rules the tree no longer
 carries.
 
-`index_here` and `front_here` in `src/scripts/install.sh` ask
-`src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
-its source. The hash reads the binary's folder, every tree package it imports
-and the root `go.mod` and `go.sum`, through `tuiSourceText` in
-`src/quack/tui_verb.go`. A test file moves nothing. The build writes the
-stamp.
+`index_here` in `install.sh` asks `stamp fresh`, the box verb
+in `src/quack/stamp_verb.go`, whether the stamp beside the binary holds the hash
+of its source. The hash reads every Go file of each tree package the binary
+imports, and each file a `//go:embed` line there names. It reads the root
+`go.mod` and `go.sum` too, through `sourceStamp` in that file. A test file moves nothing. The build runs `stamp write`. A box
+with no index binary reads it stale.
 
 # The client starts it again
 

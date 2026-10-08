@@ -21,7 +21,7 @@ import (
 	logmodule "quackitect/src/modules/log"
 )
 
-// The folder a session rotates its file into and the end each file carries, as OLD in .claude/skills/level0/lib/log.js names them, and the line a reader meets where no file stands. [[spec/design_output/log#a-session-rotates-its-file]]
+// The folder a session rotates its file into and the end each file carries, under the log folder src/modules/check/folders.go owns, and the line a reader meets where no file stands. [[spec/design_output/log#a-session-rotates-its-file]]
 const (
 	logOld = ".se/.log/old"
 	logEnd = ".jsonl"
@@ -42,7 +42,7 @@ const (
 	logCount = "--count"
 )
 
-// The row's shape as rowOf and asRow in .claude/skills/level0/lib/log.js write it: the longest words, the longest detail, the kind keeping its whole text, the stamp's slice, and the widths of the level and the kind. [[spec/design_output/log#what-one-line-looks-like]]
+// The row's shape as sayLine and asRow write it: the longest words, the longest detail, the kind keeping its whole text, the stamp's slice, and the widths of the level and the kind. [[spec/design_output/log#what-one-line-looks-like]]
 const (
 	logSaidCap   = 80
 	logDetailCap = 120
@@ -80,7 +80,7 @@ const (
 // The fields a row holds by name, which the extra line leaves out. [[spec/design_output/log#what-one-line-looks-like]]
 var logOwn = []string{"at", "level", "kind", "said"}
 
-// A rotated file's name, which carries its first stamp, and a span as spanOf in src/engine/group.js reads it. [[spec/design_output/log#a-session-rotates-its-file]]
+// A rotated file's name, which carries its first stamp, and a span as spanOf in src/branches/group.go reads it. [[spec/design_output/log#a-session-rotates-its-file]]
 var (
 	rotatedName = regexp.MustCompile(`^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$`)
 	spanText    = regexp.MustCompile(`^(\d+)\s*([mhd])$`)

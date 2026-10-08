@@ -452,11 +452,11 @@ func (one *door) StagedAdds(only []string) ([]Line, error) {
 	if err != nil {
 		return nil, err
 	}
-	return addsIn(said), nil
+	return AddsIn(said), nil
 }
 
 // The added lines of a diff with no context, by file and line, a binary file skipped. [[spec/design_output/work#no-commit-carries-a-marker]]
-func addsIn(said string) []Line {
+func AddsIn(said string) []Line {
 	out := []Line{}
 	file, at, binary, hunk := "", 0, false, false
 	for _, row := range strings.Split(said, "\n") {

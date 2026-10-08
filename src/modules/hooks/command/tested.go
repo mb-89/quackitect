@@ -1,4 +1,4 @@
-// The tested delta, off lib/tested.js: the code files a staged delta changes
+// The tested delta: the code files a staged delta changes
 // with no test beside them, and the tests a held ticket's command lines carry.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
@@ -142,7 +142,7 @@ func CarriedIn(text string) []string {
 	return out
 }
 
-// The tests every held ticket's command lines carry, off the holds whose ticket still stands, as heldTests in src/scripts/guidance-hand.js. [[spec/tickets/cage-commit-guards-port]]
+// The tests every held ticket's command lines carry, off the holds whose ticket still stands. [[spec/tickets/cage-commit-guards-port]]
 func HeldTests(tree Tree) []string {
 	var out []string
 	for _, name := range tree.List(holdFolder) {
@@ -316,7 +316,7 @@ func folderOf(path string) string {
 
 // Whether a text imports the path, since a path inside a string reads as prose. [[spec/design_output/tree#the-rules-over-two-files]]
 func importsIt(said, path string) bool {
-	return regexp.MustCompile(`(?:from|import)\s*\(?\s*["'][^"']*` + regexp.QuoteMeta(path) + `["']`).MatchString(said)
+	return regexp.MustCompile(`(?:from|import)\s*\(?\s*["'][^"']*` + regexp.QuoteMeta(path) + `(?:\?[^"']*)?["']`).MatchString(said)
 }
 
 // [[spec/tickets/cage-commit-guards-port]]

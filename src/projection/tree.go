@@ -1,4 +1,4 @@
-// The tree a projection reads, as layer.js hands it: one root, or the work
+// The tree a projection reads: one root, or the work
 // root laid over the method root. The package reads no disk itself, so a
 // caller hands in the tree and a test hands in a map.
 // [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -15,7 +15,7 @@ type Listed struct {
 	Dir  bool
 }
 
-// A tree answering relative paths, as the rooted reader in layer.js does. [[spec/design_output/vehicle#the-work-root-inherits]]
+// A tree answering relative paths. [[spec/design_output/vehicle#the-work-root-inherits]]
 type Tree interface {
 	Exists(path string) bool
 	Read(path string) string
@@ -60,7 +60,7 @@ func (one inherited) List(folder string) []Listed {
 	return out
 }
 
-// A JSON text as layer.js parsed reads it: an empty object where it fails. [[spec/design_output/vehicle#the-work-root-inherits]]
+// A JSON text as the layers read it: an empty object where it fails. [[spec/design_output/vehicle#the-work-root-inherits]]
 func layerParsed(text string) any {
 	said, err := parseJSON(text)
 	if err != nil {

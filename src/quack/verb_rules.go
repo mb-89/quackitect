@@ -12,10 +12,10 @@ import (
 	"quackitect/src/index"
 )
 
-// The column a rule's name pads to, as COL in src/scripts/cli-doors.js names it. [[spec/tickets/config-verbs-port-to-go]]
+// The column a rule's name pads to. [[spec/tickets/config-verbs-port-to-go]]
 const ruleColumn = 20
 
-// The styles the verb lists, the first of which stands or the verb refuses, as STYLES, SHAPE and SCRIPTED in src/scripts/cli-doors.js name them. [[spec/tickets/config-verbs-port-to-go]]
+// The styles the verb lists, the first of which stands or the verb refuses. [[spec/tickets/config-verbs-port-to-go]]
 var ruleStyles = []string{"spec/config/styles/VoiceVale", "spec/config/styles/VoiceShape", "spec/config/styles/VoiceScript"}
 
 // A rule's message line, its quotes left off. [[spec/tickets/config-verbs-port-to-go]]

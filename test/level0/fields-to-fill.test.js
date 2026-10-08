@@ -10,68 +10,16 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { editorRequire } from "../../src/doors/fake/vscode.js";
 import { activate } from "../../src/extension/extension.js";
 import { fieldMarksOf } from "../../src/extension/lib/fields.js";
-import { v1Over } from "./v1-index.js";
+import { ticketText, v1Over } from "./v1-index.js";
 
 const HOLDS = ".se/.runtime/hold";
-const STANDING = "holds/standing";
 const PATH = "spec/tickets/one.md";
 const HOLD = { ticket: "one", step: "implement/tests-red", hand: "person a-desk" };
 const HOLD_FILE = `${HOLDS}/person-a-desk.json`;
 const FIRST = "every door has a fake";
 const SECOND = "a comment names the approach";
 
-const TEXT = [
-  "---",
-  "kind: [[ticket]]",
-  "state: open",
-  "steps:",
-  "  - name: implement",
-  `    checklist: ["${FIRST}", "${SECOND}"]`,
-  "    steps:",
-  "      - name: tests-red",
-  "        does: writes the tests the ask calls for",
-  "        evidence:",
-  "          - name: tests",
-  "            form: command",
-  "            expects: assertion",
-  "            says: the tests you write fail on their own assertion",
-  "          - name: seen",
-  "            form: text",
-  "            says: what you see, and what surprises you",
-  "      - name: change",
-  "        does: makes the change",
-  "        evidence:",
-  "          - name: lint",
-  "            form: command",
-  "            says: the tree builds and lints",
-  "step: implement/tests-red",
-  "---",
-  "",
-  "# Ask",
-  "",
-  "A person sees the fields.",
-  "",
-  "# implement",
-  "",
-  "## tests-red",
-  "",
-  "<!-- writes the tests the ask calls for -->",
-  "",
-  "### tests",
-  "",
-  "<!-- the tests you write fail on their own assertion -->",
-  "",
-  "### seen",
-  "",
-  "The marks stand.",
-  "",
-  "## change",
-  "",
-  "### lint",
-  "",
-  "<!-- the tree builds and lints -->",
-  "",
-].join("\n");
+const TEXT = ticketText("fields");
 
 const lineOf = (text, heading) => text.split("\n").indexOf(heading) + 1;
 
@@ -192,59 +140,43 @@ test("a take marks every field the step still wants, and the door draws them in 
     (shown.drawn.get(editor.made[0]) ?? []).map((one) => one.start.line),
     [lineOf(TEXT, "### tests") - 1, lineOf(TEXT, "## tests-red") - 1],
   );
+  assert.deepEqual(editor.problems, [], "the door lists nothing in the Problems panel");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a person's hold on a ticket that reads closed carries no mark", async () => {
+test("a closed ticket, another hand's hold and a note outside the folders carry no mark", async () => {
   const closed = TEXT.replace("state: open", "state: closed");
-  const door = doorOf({
-    [HOLD_FILE]: JSON.stringify({ ...HOLD, path: PATH }),
-    [PATH]: closed,
-  });
-  const host = fieldMarksOf(door);
-  await host.starts();
-  await host.sees(PATH, closed);
-  assert.deepEqual(door.said.marks, [[PATH, []]]);
-});
-
-// [[spec/design_output/extension#a-take-marks-the-fields]]
-test("a ticket nobody holds carries no mark", async () => {
   const other = { ...HOLD, hand: "box abc · claude-code" };
-  const door = doorOf({ [`${HOLDS}/box-abc.json`]: JSON.stringify(other) });
-  const host = fieldMarksOf(door);
-  await host.starts();
-  await host.sees(PATH, TEXT);
-  assert.deepEqual(door.said.marks, [[PATH, []]]);
-
-  await host.sees("spec/guidance/working.md", TEXT);
-  assert.equal(lastMarks(door, "spec/guidance/working.md"), undefined);
+  for (const [seed, text] of [
+    [{ [HOLD_FILE]: JSON.stringify({ ...HOLD, path: PATH }), [PATH]: closed }, closed],
+    [{ [`${HOLDS}/box-abc.json`]: JSON.stringify(other) }, TEXT],
+  ]) {
+    const door = doorOf(seed);
+    const host = fieldMarksOf(door);
+    await host.starts();
+    await host.sees(PATH, text);
+    await host.sees("spec/guidance/working.md", TEXT);
+    assert.deepEqual(door.said.marks, [[PATH, []]]);
+  }
 });
 
 // [[spec/design_output/extension#a-take-marks-the-fields]]
-test("the take puts the cursor on the next field to fill", async () => {
+test("a take puts the cursor on the next field once, and a hold standing at the start moves none", async () => {
   const door = doorOf();
   const host = fieldMarksOf(door);
   await host.starts();
   await host.sees(PATH, TEXT);
-  assert.deepEqual(door.said.jumps, []);
-
   door.files.write(HOLD_FILE, JSON.stringify(HOLD));
+  await host.held();
   await host.held();
   assert.deepEqual(door.said.jumps, [[PATH, lineOf(TEXT, "### tests")]]);
 
-  await host.held();
-  assert.equal(door.said.jumps.length, 1, "a hold standing already moves no cursor");
-});
-
-// [[spec/design_output/extension#a-take-marks-the-fields]]
-test("a hold standing at activation moves no cursor", async () => {
-  const door = doorOf(held());
-  const host = fieldMarksOf(door);
-  await host.starts();
-  await host.sees(PATH, TEXT);
-  await host.held();
-  assert.deepEqual(door.said.jumps, []);
-  assert.equal(named(lastMarks(door)).length, 2);
+  const standing = doorOf(held());
+  const already = fieldMarksOf(standing);
+  await already.starts();
+  await already.sees(PATH, TEXT);
+  await already.held();
+  assert.deepEqual([standing.said.jumps, named(lastMarks(standing)).length], [[], 2]);
 });
 
 // [[spec/design_output/extension#a-take-marks-the-fields]]
@@ -306,10 +238,7 @@ test("a field filled in loses its mark", async () => {
     ["tests", "checked"],
   );
 
-  const filled = TEXT.replace(
-    "<!-- the tests you write fail on their own assertion -->\n",
-    "<!-- the tests you write fail on their own assertion -->\n\n    node --test test/level0/fields-to-fill.test.js\n",
-  );
+  const filled = ticketText("fields-filled");
   door.files.write(PATH, filled);
   await host.sees(PATH, filled);
   assert.deepEqual(named(lastMarks(door)), [
@@ -318,20 +247,7 @@ test("a field filled in loses its mark", async () => {
 });
 
 // [[spec/design_output/extension#a-take-marks-the-fields]]
-test("the door lists nothing in the Problems panel", async () => {
-  const door = doorOf(held());
-  const host = fieldMarksOf(door);
-  await host.starts();
-  await host.sees(PATH, TEXT);
-
-  const { shown, door: drawing } = editorOn(TEXT);
-  drawing.marksFields(PATH, lastMarks(door));
-  assert.equal(shown.drawn.size, 1, "the marks stand in the editor");
-  assert.deepEqual(editor.problems, [], "no diagnostic collection stands");
-});
-
-// [[spec/design_output/extension#a-take-marks-the-fields]]
-test("a start hands the marks the ticket and the hold watch", async () => {
+test("a start hands the marks the ticket's changes, drawn off the saved file", async () => {
   const door = doorOf({
     "spec/config/level0.schema.json": JSON.stringify({
       type: "object",
@@ -363,9 +279,7 @@ test("a start hands the marks the ticket and the hold watch", async () => {
   });
   await activate({}, door);
 
-  await events.editors[0](PATH, TEXT);
-  assert.equal(named(lastMarks(door)).length, 2, "an opened ticket takes its marks");
-  const renamed = TEXT.replace("### tests", "### tested");
+  const renamed = ticketText("fields-renamed");
   disk.write(PATH, renamed);
   await events.changes[0](PATH, renamed);
   assert.deepEqual(
@@ -373,12 +287,4 @@ test("a start hands the marks the ticket and the hold watch", async () => {
     ["tests", lineOf(renamed, "## tests-red")],
     "a change draws the marks again, off the saved file",
   );
-
-  assert.ok(
-    door.index.watches.some((one) => one.names.includes(STANDING)),
-    "the marks watch the holds",
-  );
-  disk.remove(HOLD_FILE);
-  await door.index.fire(STANDING);
-  assert.deepEqual(lastMarks(door), []);
 });

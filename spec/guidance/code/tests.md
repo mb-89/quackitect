@@ -12,7 +12,7 @@ rationale: [[spec/rationales/tests]]
 3. Delete a test in the change that deletes the code it tests. A test over a removed path fails for nothing or passes over nothing. *
 4. Delete each twin, parity case, shadow row, old golden section and removal guard in the change switching its migration phase. A comparison past its switch holds the live code to code nobody runs. *
 5. Pin a behavior in a golden file. Keep out of it a line count, a size, an unread order, a wording, a hash and the tree's content. A golden file holding incidental output fails on an unrelated edit, and a hand counts it again. *
-6. Keep the test lines of a module, its fixtures counted, at or under its code lines. A module past that holds copies of one behavior, and every change pays for each copy. *
+6. Hold a module's test lines and fixtures at or under its code lines per language, as `src/quack/check_lines.go` counts them. A module past that holds copies of one behavior, and every change pays for each copy. *
 
 # Examples
 

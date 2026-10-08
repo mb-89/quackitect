@@ -57,15 +57,15 @@ resource roots hold the extension alone. `.gitattributes` marks the folder as
 generated, so a diff view folds it.
 
 The hash covers every file under `src/extension/webview/route` and the
-webview's lock file. `stampOf` in `src/scripts/bundle.js` computes it, and
-`fresh` answers whether the banner names it.
+webview's lock file. `drawingStamp` in `src/quack/bundle_verb.go` computes it,
+and `./RUNME.sh bundle here` answers whether the banner names it.
 
 1. Change a source under the webview.
-2. Run `node src/scripts/bundle.js` where the webview's modules stand.
+2. Run `./RUNME.sh bundle` where the webview's modules stand.
 3. Commit the pair beside the change.
 
-`test/contract/drawing-shipped.test.js` reads the banner against the sources
-on every box, so a stale bundle meets the check.
+`src/quack/bundle_verb_test.go` reads the banner against the sources on every
+box, so a stale bundle meets the check.
 
 # The page speaks in messages
 

@@ -68,6 +68,13 @@ func TestAVariableReadsAsAStringWhereItHoldsNoJSON(t *testing.T) {
 	}
 }
 
+func TestACamelLeafReadsTheVariableItsKebabSpellingNames(t *testing.T) {
+	env := map[string]string{"SE_STOP_MOSTINAROW": "9", "SE_STOP_MOST_IN_A_ROW": "4"}
+	if value, layer, ok := q.AtRest(q.KeyOfDotted("stop.mostInARow"), q.Ordered{}, q.Ordered{}, env); !ok || value != "4" || layer != "SE_STOP_MOST_IN_A_ROW" {
+		t.Fatalf("stop.mostInARow reads %s off %q, not 4 off SE_STOP_MOST_IN_A_ROW", value, layer)
+	}
+}
+
 func TestADottedKeyRoundTrips(t *testing.T) {
 	key := q.KeyOfDotted("watchdog.backoffFirst")
 	if key.Name != "watchdog/config/backoff-first" || key.Dotted() != "watchdog.backoffFirst" {

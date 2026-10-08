@@ -229,7 +229,12 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
 		return exitFailed
 	}
-	if _, err := d.git.Commit(message, only); err != nil {
+	// Git takes no partial commit during a merge, so a merge lands the whole index the staging fed. [[spec/design_output/work#no-commit-carries-a-marker]]
+	pathspec := only
+	if _, merging := d.git.Resolve(mergeHeadRef); merging {
+		pathspec = nil
+	}
+	if _, err := d.git.Commit(message, pathspec); err != nil {
 		d.unstages(only)
 		fmt.Fprintln(errs, "The commit comes back refused, so nothing lands:")
 		fmt.Fprintln(errs, err)

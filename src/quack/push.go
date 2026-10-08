@@ -10,7 +10,7 @@ import (
 	"quackitect/src/modules/hooks/command"
 )
 
-// The check's stamp. .claude/skills/level0/lib/folders.js owns the runtime folder and runs.js the stamp, and the verb spells them again as the hooks module does. [[spec/design_output/work#the-battery-answers-first]]
+// The check's stamp. src/modules/check/folders.go owns the runtime folder and stampFile in src/quack/check.go the stamp, and the verb spells them again as the hooks module does. [[spec/design_output/work#the-battery-answers-first]]
 const checkStampAt = ".se/.runtime/check.json"
 
 func init() {

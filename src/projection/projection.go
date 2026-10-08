@@ -175,7 +175,7 @@ func saysGenerated(from string) string {
 // A text wrapped at a width, a word at a time. [[spec/design_output/projection#each-file-says-so]]
 func wrapped(said string, at int) string { return strings.Join(grouped(jsFields(said), at), "\n") }
 
-// Words gathered into rows no longer than a width, as snippets.js grouped does. [[spec/design_output/projection#the-second-target]]
+// Words gathered into rows no longer than a width. [[spec/design_output/projection#the-second-target]]
 func grouped(said []string, at int) []string {
 	out := []string{}
 	row := ""

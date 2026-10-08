@@ -37,21 +37,6 @@ func listOf(t *testing.T, disk diskDoors, folder string) []map[string]any {
 	return said
 }
 
-func TestACopyStandingWhereTheLinkBelongsGoesAndTheLinkTakesItsPlace(t *testing.T) {
-	t.Parallel()
-	disk, source, _, dest := editorBox(t)
-	hq1SeedDisk(t, disk, dest, map[string]string{"stale.js": "old"})
-	if editorLinkedAt(disk, dest, source) {
-		t.Fatal("a copy reads as the link")
-	}
-	if linked, why := editorLinkAt(disk, dest, source, disk.symlink); !linked || why != "the link went in" {
-		t.Errorf("the link answers %v, %s", linked, why)
-	}
-	if !editorLinkedAt(disk, dest, source) || disk.stands(filepath.Join(source, "stale.js")) {
-		t.Error("the link stands not, or the copy reached the source")
-	}
-}
-
 func TestALinkStandingAlreadyStays(t *testing.T) {
 	t.Parallel()
 	disk, source, _, dest := editorBox(t)
@@ -63,39 +48,26 @@ func TestALinkStandingAlreadyStays(t *testing.T) {
 	}
 }
 
-func TestALinkPointingAtAnotherTreeGoesAndThisTreesLinkGoesIn(t *testing.T) {
+// A copy standing where the link belongs, a link into another tree, and a link pointing nowhere each read as no link, and this tree's link takes the place. [[spec/design_output/extension#a-file-another-program-owns]]
+func TestACopyStandingWhereTheLinkBelongsGoesAndTheLinkTakesItsPlace(t *testing.T) {
 	t.Parallel()
-	disk, source, _, dest := editorBox(t)
-	other := "/other"
-	hq1SeedDisk(t, disk, other, map[string]string{"package.json": "{}"})
-	if err := disk.symlink(other, dest); err != nil {
-		t.Fatal(err)
-	}
-	if editorLinkedAt(disk, dest, source) {
-		t.Fatal("another tree's link reads as ours")
-	}
-	if linked, why := editorLinkAt(disk, dest, source, disk.symlink); !linked || why != "the link went in" {
-		t.Errorf("the link answers %v, %s", linked, why)
-	}
-	if !editorLinkedAt(disk, dest, source) || !disk.stands(filepath.Join(other, "package.json")) {
-		t.Error("the link stands not, or the other tree lost a file")
-	}
-}
-
-func TestALinkPointingNowhereReadsAsNoLinkAndThisTreesLinkTakesItsPlace(t *testing.T) {
-	t.Parallel()
-	disk, source, _, dest := editorBox(t)
-	if err := disk.symlink("/gone", dest); err != nil {
-		t.Fatal(err)
-	}
-	if !isLink(disk, dest) || disk.stands(dest) || editorLinkedAt(disk, dest, source) {
-		t.Fatal("a link pointing nowhere reads as standing")
-	}
-	if linked, why := editorLinkAt(disk, dest, source, disk.symlink); !linked || why != "a link pointing nowhere went, and the link went in" {
-		t.Errorf("the link answers %v, %s", linked, why)
-	}
-	if !editorLinkedAt(disk, dest, source) {
-		t.Error("the link stands not")
+	for _, one := range []struct{ stands, why string }{{"copy", "the link went in"}, {"/other", "the link went in"}, {"/gone", "a link pointing nowhere went, and the link went in"}} {
+		disk, source, _, dest := editorBox(t)
+		hq1SeedDisk(t, disk, "/other", map[string]string{"package.json": "{}"})
+		if one.stands == "copy" {
+			hq1SeedDisk(t, disk, dest, map[string]string{"stale.js": "old"})
+		} else if err := disk.symlink(one.stands, dest); err != nil {
+			t.Fatal(err)
+		}
+		if editorLinkedAt(disk, dest, source) || (one.stands == "/gone" && (!isLink(disk, dest) || disk.stands(dest))) {
+			t.Fatalf("a %s reads as the link", one.stands)
+		}
+		if linked, why := editorLinkAt(disk, dest, source, disk.symlink); !linked || why != one.why {
+			t.Errorf("over a %s the link answers %v, %s", one.stands, linked, why)
+		}
+		if !editorLinkedAt(disk, dest, source) || disk.stands(filepath.Join(source, "stale.js")) || !disk.stands("/other/package.json") {
+			t.Errorf("over a %s the link stands not, or a copy reached the source, or the other tree lost a file", one.stands)
+		}
 	}
 }
 
@@ -126,17 +98,14 @@ func TestTheListNamesTheIdOrTheExtensionStandsUnregistered(t *testing.T) {
 	}
 }
 
+// An element nothing can identify drops out of the read, and entries nested under a wrapper come back out of it. [[spec/design_output/extension#a-file-another-program-owns]]
 func TestAnElementNothingCanIdentifyIsDroppedNeverCarried(t *testing.T) {
 	t.Parallel()
 	said := editorEntriesOf(`[{"identifier":{"id":"a.b"}},{"version":"2"},null]`)
 	if len(said.entries) != 1 || said.dropped != 2 || entryID(said.entries[0]) != "a.b" {
 		t.Errorf("the read answers %d entries, %d dropped", len(said.entries), said.dropped)
 	}
-}
-
-func TestEntriesNestedUnderAWrapperComeBackOutOfIt(t *testing.T) {
-	t.Parallel()
-	said := editorEntriesOf(`{"value":[{"identifier":{"id":"a.b"}},{"identifier":{"id":"c.d"}}]}`)
+	said = editorEntriesOf(`{"value":[{"identifier":{"id":"a.b"}},{"identifier":{"id":"c.d"}}]}`)
 	if said.unwrapped != 1 || len(said.entries) != 2 || entryID(said.entries[1]) != "c.d" {
 		t.Errorf("the read answers %d entries, %d unwrapped", len(said.entries), said.unwrapped)
 	}

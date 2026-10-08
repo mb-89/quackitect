@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks/command"
 )
 
 // The tools the bare branch of RUNME.sh calls past the shell's own words. [[spec/tickets/bare-runme-exits-clean]]
@@ -29,7 +31,7 @@ func runmeRoot(t *testing.T) string {
 	}
 	files := map[string]string{
 		"RUNME.sh":                  string(shim),
-		"src/scripts/install.sh":    "#!/usr/bin/env sh\n",
+		"install.sh":                "#!/usr/bin/env sh\n",
 		".se/.runtime/bin/se-index": "#!/bin/sh\nprintf '%s\\n' \"$*\"\n",
 	}
 	for name, text := range files {
@@ -95,7 +97,7 @@ func runBare(t *testing.T, env ...string) (int, string, string) {
 // A bare RUNME.sh on a cloud box with no editor hands help to the binary and exits 0. [[spec/tickets/bare-runme-exits-clean]]
 func TestABareRunmeOnACloudBoxPrintsTheVerbs(t *testing.T) {
 	t.Parallel()
-	for _, flag := range cloudVariables {
+	for _, flag := range command.CloudVariables {
 		code, out, errs := runBare(t, flag+"=true")
 		if code != 0 || out != "verb <root>/src/scripts help\n" || errs != "" {
 			t.Errorf("under %s the bare call answers %d, %q, %q", flag, code, out, errs)

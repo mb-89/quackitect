@@ -106,3 +106,13 @@ func TestOpenedDropsTheOverridesOfOtherWindows(t *testing.T) {
 		t.Fatalf("%s holds %+v after a third window opens", HeldName, held)
 	}
 }
+
+func TestRowsReadEveryLeafOfBothFilesPastTheComment(t *testing.T) {
+	tracked, _ := q.JSON.Parse([]byte(`{"comment": "what the team ships", "stop": {"comment": "the tooth", "enabled": true}}`))
+	local, _ := q.JSON.Parse([]byte(`{"later": {"key": 4}}`))
+	rows := Rows(map[string]q.Key{}, tracked, local, map[string]string{})
+	want := []Row{{Key: "later.key", Value: json.RawMessage(`4`), Layer: Local}, {Key: "stop.enabled", Value: json.RawMessage(`true`), Layer: Tracked}}
+	if fmt.Sprint(rows) != fmt.Sprint(want) {
+		t.Fatalf("the rows read %+v, and want %+v, a key the local file alone names among them and no comment", rows, want)
+	}
+}

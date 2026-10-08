@@ -14,40 +14,12 @@ proc:
   contract: [test/contract/proc.test.js]
 http:
   js: [fetch]
-  files: [http.js, fake/http.js]
+  files: [http.js]
   contract: [test/contract/http.test.js]
 wire:
   js: [node:http]
   files: [wire.js]
   contract: [test/contract/wire.test.js]
-session:
-  js: [node:crypto, node:fs]
-  files: [session.js, fake/session.js]
-  contract: [test/contract/session.test.js]
-git:
-  js: []
-  files: [git.js, fake/git.js]
-  contract: [test/contract/git.test.js]
-log:
-  js: []
-  files: [log.js, fake/log.js]
-  contract: [test/contract/log.test.js]
-front:
-  js: []
-  files: [front.js, fake/front.js]
-  contract: [test/contract/front.test.js]
-index:
-  js: []
-  files: [index.js, fake/index.js]
-  contract: [test/contract/index.test.js]
 random:
   js: [Math.random]
   files: []
-failure:
-  js: []
-  files: [failure.js, fake/failure.js]
-  contract: [test/contract/failure.test.js]
-rules:
-  js: []
-  files: []
-  contract: [test/contract/vale.test.js, test/contract/vale-fix.test.js]

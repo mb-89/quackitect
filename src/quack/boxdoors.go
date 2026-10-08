@@ -48,13 +48,15 @@ type ranResult struct {
 
 // The doors a box verb reaches. [[spec/tickets/box-verbs-port-to-go]]
 type boxDoors struct {
-	root      string
-	env       func(key string) string
-	environ   func() []string
-	goos      string
-	pid       int
-	run       func(argv []string, o runOpts) ranResult
-	get       func(url string, wait time.Duration) (string, error)
+	root    string
+	env     func(key string) string
+	environ func() []string
+	goos    string
+	pid     int
+	run     func(argv []string, o runOpts) ranResult
+	get     func(url string, wait time.Duration) (string, error)
+	// A POST of the body to the address under the bearer token, answering the status and the text. [[spec/tickets/probes-leave-node]]
+	post      func(url, token, body string, wait time.Duration) (int, string, error)
 	clock     q.Clock
 	disk      diskDoors
 	input     io.Reader
@@ -89,6 +91,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		pid:     os.Getpid(),
 		run:     realRun(out, errs),
 		get:     realGet,
+		post:    realPost,
 		clock:   wall,
 		disk:    realDisk(),
 		input:   stdin,
@@ -162,6 +165,23 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		}
 		return ran
 	}
+}
+
+// Posts the JSON body to the address under the bearer token, and answers the status and the text. [[spec/tickets/probes-leave-node]]
+func realPost(url, token, body string, wait time.Duration) (int, string, error) {
+	asked, err := http.NewRequest(http.MethodPost, url, strings.NewReader(body))
+	if err != nil {
+		return 0, "", err
+	}
+	asked.Header.Set("Content-Type", "application/json")
+	asked.Header.Set("Authorization", "Bearer "+token)
+	said, err := (&http.Client{Timeout: wait}).Do(asked)
+	if err != nil {
+		return 0, "", err
+	}
+	defer said.Body.Close()
+	text, err := io.ReadAll(said.Body)
+	return said.StatusCode, string(text), err
 }
 
 // The binary this process runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]

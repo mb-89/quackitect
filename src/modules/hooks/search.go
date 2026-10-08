@@ -1,6 +1,6 @@
 // Grep and Glob answer off the index through the door, in the shapes the
-// bridge's answersFromIndex hands the harness, off
-// .claude/skills/level0/lib/index.js. Every other case passes to the disk.
+// bridge's answersFromIndex hands the harness. Every other case passes to the
+// disk.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 package hooks
 

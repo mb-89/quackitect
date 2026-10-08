@@ -1,5 +1,4 @@
-// The door's reads of a commit, a branch, a staging and a test run, off
-// lib/commit-reads.js and lib/bash-test.js.
+// The door's reads of a commit, a branch, a staging and a test run.
 // [[spec/tickets/cage-command-rules-port]]
 package command
 

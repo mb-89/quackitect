@@ -1,5 +1,5 @@
-// What the stop checks read off a ticket's front, off leafBy, heldGroup,
-// openPrivate and queueHolds in .claude/skills/level0/lib/ticket.js.
+// What the stop checks read off a ticket's front: the leaf a hand stands on,
+// the group it holds, the private tickets it opens, and the holds it queues.
 // [[spec/tickets/cage-stop-rules-port]]
 package stop
 
@@ -30,7 +30,7 @@ func field(front *yaml.Doc, key string) string {
 	return yaml.AsString(front.Get(key))
 }
 
-// A field with its link brackets off, as fieldOf in src/engine/group.js reads it. [[spec/design_output/work#a-group-is-a-ticket]]
+// A field with its link brackets off, as fieldOf in src/branches/group.go reads it. [[spec/design_output/work#a-group-is-a-ticket]]
 func bare(said string) string {
 	return strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(said), "[["), "]]"))
 }

@@ -41,10 +41,10 @@ const (
 	retroCollectISO       = "2006-01-02T15:04:05.000Z"
 )
 
-// The stamp the last check writes, as STAMP in .claude/skills/level0/lib/runs.js names it under RUN in folders.js. [[spec/guidance/retro/collect]]
+// The stamp the last check writes, as stampFile in src/quack/check.go names it under Run in src/modules/check/folders.go. [[spec/guidance/retro/collect]]
 var retroCollectStamp = filepath.Join(".se", ".runtime", "check.json")
 
-// The folder the holds stand in, as HOLDS in .claude/skills/level0/lib/folders.js names it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// The folder the holds stand in, as Holds in src/modules/check/folders.go names it. [[spec/design_output/pull#the-hand-and-the-hold]]
 var retroCollectHolds = filepath.Join(".se", ".runtime", "hold")
 
 // A manifest row: a file with its size and source, or a path refused with its code. [[spec/guidance/retro/collect]]
@@ -72,7 +72,7 @@ type retroCollectDoors struct {
 
 func init() { register("retro collect", retroCollectVerb(retroCollectLive)) }
 
-// The doors collect runs on outside a test: the tree's root, home and temp as cli-doors.js reads them, the clock, git and the rename. [[spec/guidance/retro/collect]]
+// The doors collect runs on outside a test: the tree's root, home and temp, the clock, git and the rename. [[spec/guidance/retro/collect]]
 func retroCollectLive() retroCollectDoors {
 	d := quietBox()
 	root := retroRootOf(d)
@@ -97,7 +97,7 @@ func retroCollectFirst(said ...string) string {
 	return ""
 }
 
-// Git run in the root, its output and its error trimmed, as src/doors/git.js runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
+// Git run in the root, its output and its error trimmed, as src/modules/git/git.go runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
 func retroCollectGitIn(root string) func(args ...string) retroRan {
 	return func(args ...string) retroRan {
 		said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root})
@@ -222,7 +222,7 @@ func retroCollectAgain(disk diskDoors, home, into, name string, out, errs io.Wri
 	return exitFailed
 }
 
-// The first hold on this box whose ticket stands, as holdsAnywhere in src/scripts/guidance-hand.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// The first hold on this box whose ticket stands, as EveryHold in src/pull/pull_holds.go reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
 func retroCollectHolding(disk diskDoors, root string) (string, any, bool) {
 	folder := filepath.Join(root, retroCollectHolds)
 	for _, one := range disk.listed(folder) {
@@ -242,7 +242,7 @@ func retroCollectHolding(disk diskDoors, root string) (string, any, bool) {
 	return "", nil, false
 }
 
-// A hold stands while its ticket stands nowhere or reads open, as stillHeld in src/engine/named.js reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// A hold stands while its ticket stands nowhere or reads open, as stillHeld in src/modules/hooks/command/ticket.go reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
 func retroCollectStillHeld(disk diskDoors, root string, held any) bool {
 	path := strings.TrimSpace(retroCollectText(retroCollectGet(held, "path")))
 	if path == "" {

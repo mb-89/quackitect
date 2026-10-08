@@ -1,5 +1,5 @@
 // A new route over a ticket: the front takes the steps and the hash, and each
-// chapter keeps what a hand wrote under it, off reRouted in lib/schema-mint.js.
+// chapter keeps what a hand wrote under it.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package check
 
@@ -28,7 +28,7 @@ func ReRouted(text string, schema *yaml.Doc, route []any, hash string) string {
 	if said, ok := body.Get("headingLevel").(int); ok {
 		level = said
 	}
-	wanted := mintChapters(yaml.AsList(body.Get("sections")), held, level)
+	wanted := chaptersWanted(yaml.AsList(body.Get("sections")), held, level)
 	for i, one := range wanted {
 		if deep, ok := one.rule.Get("level").(int); ok && yaml.AsString(one.rule.Get("x-one-per")) == "" {
 			wanted[i].level = deep

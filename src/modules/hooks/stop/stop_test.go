@@ -1,4 +1,4 @@
-// The stop package against lib/stop.js: the rule reader, the vote, the tooth
+// The stop package: the rule reader, the vote, the tooth
 // and each check, over rules written inline.
 // [[spec/tickets/cage-stop-rules-port]]
 package stop

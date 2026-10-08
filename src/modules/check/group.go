@@ -61,7 +61,7 @@ func skipsHanded(when, text string) bool {
 	return !fromHandover.MatchString(ask)
 }
 
-// The leaf the ticket's `step` names, or the first leaf where it names none, the nearest `by` on its path, and the leaf's own `when`, as `leafOf` and `stepPathOf` in src/scripts/pull-route.js read them. [[spec/design_output/work#a-person-step-leaves]]
+// The leaf the ticket's `step` names, or the first leaf where it names none, the nearest `by` on its path, and the leaf's own `when`, as `LeafOf` and `StepPathOf` in src/pull/pull_route.go read them. [[spec/design_output/work#a-person-step-leaves]]
 func leafBy(front *yaml.Doc) (string, string, string) {
 	wanted := strings.Split(yaml.AsString(front.Get("step")), "/")
 	steps := yaml.AsList(front.Get("steps"))

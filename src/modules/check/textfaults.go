@@ -12,7 +12,7 @@ import (
 	"quackitect/src/owns"
 )
 
-// The rule names and the words the lint writes, the ceilings and the magic numbers spelled as size.js and magic.js under .claude/skills/level0/lib write them, again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The rule names and the words this module owns, with the exemption rule unreasoned. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	Unreasoned      = "ExemptionCarriesAReason"
 	FileCeiling     = "FileCeiling"
@@ -25,7 +25,7 @@ const (
 	someFunction    = "a function"
 )
 
-// The folders the lint's walk passes at any depth, owned by SKIP in src/bridge/findings.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The folders the lint's walk passes at any depth. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var walkPasses = map[string]bool{".git": true, "node_modules": true, ".se": true, ".claude": true, ".claude-plugin": true}
 
 // The numbers a line carries with no meaning to name. [[spec/design_output/config#the-magic-numbers-take-names]]

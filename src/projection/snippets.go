@@ -1,6 +1,6 @@
 // The shape every projected rule wears: the head of a rule file, and the
 // small quoting a rule needs. A script rule carries its head alone, because
-// src/rules runs each script by its check id. A port of snippets.js.
+// src/rules runs each script by its check id.
 // [[spec/design_output/projection#a-layer-writes-two-files]] [[spec/tickets/config-verbs-port-to-go]]
 package projection
 

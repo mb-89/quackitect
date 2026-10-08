@@ -7,7 +7,6 @@ import { test } from "node:test";
 import { fakeHttp } from "../../src/doors/fake/http.js";
 import { http } from "../../src/doors/http.js";
 import { wire } from "../../src/doors/wire.js";
-import { it } from "../../src/scripts/cli-doors.js";
 
 const BODY = JSON.stringify({ said: "hello" });
 
@@ -107,10 +106,4 @@ test("the fake keeps each request, reads a route past its query, and throws on a
     door.send("https://x.example/other", { method: "POST" }),
     /POST https:\/\/x\.example\/other/,
   );
-});
-
-// The dispatch fires through the door the command line builds. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
-test("the command line hands every verb the http door", () => {
-  assert.equal(typeof it.http?.send, "function");
-  assert.deepEqual(Object.keys(it.http), Object.keys(http()));
 });

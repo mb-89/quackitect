@@ -15,18 +15,18 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The hold files, which .claude/skills/level0/lib/folders.js owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
+// The hold files, which src/modules/check/folders.go owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
 const Glob = ".se/.runtime/hold/*.json"
 
 // The bless file, which BlessFile in src/pull/pull_bless.go owns and a module spells again, and the name its word answers at. [[spec/design_output/pull#the-bless]]
 const (
-	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/pull#the-bless]]
+	// src/modules/check/folders.go owns this name. [[spec/design_output/pull#the-bless]]
 	Bless     = ".se/.runtime/bless.json"
 	BlessName = "bless/agent"
 )
 
 type blessIn struct {
-	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/pull#the-bless]]
+	// src/modules/check/folders.go owns this name. [[spec/design_output/pull#the-bless]]
 	File q.Content `q:"files/.se/.runtime/bless.json"`
 }
 

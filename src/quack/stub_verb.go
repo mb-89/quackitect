@@ -59,7 +59,7 @@ func stubTwin(doorsOf func() vehicleDoors) twin {
 	}
 }
 
-// A path under the root, as atRoot in src/scripts/cli-doors.js places it. [[spec/design_output/vehicle#the-work-root-inherits]]
+// A path under the root, or the path itself where it stands absolute. [[spec/design_output/vehicle#the-work-root-inherits]]
 func stubAtRoot(root, path string) string {
 	if stubAbsolute.MatchString(path) {
 		return path

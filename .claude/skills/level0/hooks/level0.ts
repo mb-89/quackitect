@@ -15,7 +15,6 @@ import type {
   StarNext,
   StreamNext,
 } from "claude-code";
-import { SESSION } from "../lib/log.js";
 import {
   type Answer,
   cageDeny,
@@ -32,6 +31,8 @@ import { rawRows, textOf } from "./transcript.ts";
 
 // The span the start road takes. An index standing up runs past a spawn, and the road runs only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
+// The session log a fall row lands in where the log verb runs nowhere, which sessionLog in src/modules/hooks/rows.go owns, spelled again here because the hooks import their own folder alone. [[spec/design_output/log#every-writer-appends]]
+export const SESSION = ".se/.log/session.jsonl";
 
 let root = "";
 let method = "";

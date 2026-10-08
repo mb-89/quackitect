@@ -6,57 +6,44 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import {
-  flatten,
-  SCHEMA,
-  TRACKED,
-  underBuiltIns,
-} from "../../.claude/skills/level0/lib/config.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
 import { commandsOf } from "../../src/extension/lib/panel.js";
-import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
+import {
+  drawnIn,
+  entriesIn,
+  TRACKED,
+  valuesOf,
+} from "../../src/extension/lib/widgets.js";
+
+const SCHEMA = "spec/config/level0.schema.json";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const read = (where) => JSON.parse(files.read(join(root, where)));
 
 // [[spec/design_output/extension#the-grid-check]]
-test("the schema this tree ships places every widget in a cell of its own", () => {
-  assert.deepEqual(gridFaults(read(SCHEMA)), []);
-});
-
 // [[spec/design_output/extension#one-declaration-draws-it]]
-test("every control the schema declares draws, the work buttons among them", () => {
+test("the schema this tree ships places every widget in a cell of its own", () => {
   const schema = read(SCHEMA);
+  assert.deepEqual(gridFaults(schema), []);
   assert.deepEqual(
-    drawnIn(schema).map((one) => one.key),
-    [
-      "stop.hold",
-      "ask.wanted",
-      "bridge.hook",
-      "log.open",
-      "work.editor",
-      "work.pull",
-      "work.new",
-      "engine.vehicle",
-      "engine.stub",
-      "engine.binding",
-    ],
+    entriesIn(schema).filter((one) => one.widget && !one.group),
+    [],
   );
-
-  const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
-  assert.deepEqual(waiting, []);
 });
 
 // [[spec/design_output/extension#a-click-writes-the-file]]
 test("every widget writing a key names one the declaration carries", () => {
-  const said = flatten(underBuiltIns(read(SCHEMA), read(TRACKED)));
+  const said = valuesOf(read(TRACKED), {}, read(SCHEMA));
   for (const one of drawnIn(read(SCHEMA))) {
     if (one.widget === "action" || one.widget === "process") continue;
     assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
-    assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
+    assert.ok(
+      one.options.includes(said.get(one.key).value),
+      `${one.key} rests on an option`,
+    );
   }
 });
 

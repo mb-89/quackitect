@@ -167,12 +167,12 @@ func (one *Tree) Forgets() {
 }
 
 const (
-	Install  = "src/scripts/install.sh"
+	Install  = "install.sh"
 	Settings = ".vscode/settings.json"
 	Offered  = ".vscode/extensions.json"
-	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
+	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.go beside this file.
 	ToolsAt = ".se/.runtime/tools.json"
-	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
+	// The runtime folder Run in folders.go owns, spelled whole here. [[spec/design_input/the-runtime-files-stand-apart]]
 	Bin = ".se/.runtime/bin"
 )
 
@@ -408,7 +408,7 @@ func surveyNamesInstalls(tree *Tree) []Finding {
 			continue
 		}
 		out = append(out, fault(rule, Install, lineOf(text, name+")"),
-			"The survey names no "+name+", so every caller guesses its path. Add it to WANTED."))
+			"The survey names no "+name+", so every caller guesses its path. Add it to Wanted here and to wantedTools in src/quack/survey.go."))
 	}
 	return out
 }

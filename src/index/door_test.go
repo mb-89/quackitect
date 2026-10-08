@@ -324,3 +324,17 @@ func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
 		t.Fatalf("the dump of t/ answers %#v, %q", said.Result, said.Error)
 	}
 }
+
+// The swap watcher's gone hand asks main for the stop, the way swap.Watches calls it once the binary moves. [[spec/tickets/engine-and-doors-leave]]
+func TestASwappedBinaryAsksMainForTheStop(t *testing.T) {
+	t.Parallel()
+	var gone func()
+	asked := stops(func(said func()) { gone = said })
+	select {
+	case <-asked:
+		t.Fatal("the stop fires before the swap")
+	default:
+	}
+	gone()
+	<-asked
+}

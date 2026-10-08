@@ -1,5 +1,5 @@
-// The answer check, with the shape rules of lib/answer.js and the stop line of
-// lib/stop.js.
+// The answer check, with the shape rules this file holds and the stop line
+// src/modules/hooks/stop owns.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package drafts
 

@@ -42,7 +42,7 @@ relative to the workspace folder:
 
 `.vscode/extensions.json` offers the Biome extension, and
 `bierner.markdown-mermaid`, which draws the Mermaid diagrams of the design notes
-in the Markdown preview. `EXTENSIONS` in `.claude/skills/level0/lib/servers.js`
+in the Markdown preview. `Extensions` in `src/modules/check/tree.go`
 names the list, and the install takes it.
 
 `SettingsNameBinaries`, `BiomeOnWindows` and `ExtensionsOnOffer` weigh both files and hold every row above, so the settings

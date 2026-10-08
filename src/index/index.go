@@ -60,13 +60,13 @@ var skipped = map[string]bool{
 	".git": true, "node_modules": true,
 }
 
-// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
+// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by src/modules/check/folders.go and spelled again here because the index imports no check.
 const Runtime = ".se/.runtime"
 
-// The plan file `PLANS` in runs.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-index-fires-on-change]]
+// The plan file Plan in src/modules/queue/queue.go owns, spelled again here because the index imports no queue. [[spec/design_output/index#the-index-fires-on-change]]
 const Plan = Runtime + "/plan.json"
 
-// The private folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-rows-the-walk-writes]]
+// The private folder src/modules/check/folders.go owns, spelled again here because the index imports no check. [[spec/design_output/index#the-rows-the-walk-writes]]
 const Private = ".se"
 
 func skips(root, abs string, info fs.FileInfo) bool {

@@ -1,6 +1,6 @@
-// What stands free, and what a claim's age says, as src/scripts/work-free.js
-// reads them. A box that runs out of session hands back nothing, so its claim
-// goes stale and the branch comes back to the queue.
+// What stands free, and what a claim's age says. A box that runs out of
+// session hands back nothing, so its claim goes stale and the branch comes
+// back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 package branches
 
@@ -23,10 +23,15 @@ func tipAge(one stand, now int64) int64 {
 
 // The span a claim goes stale past: the config door's, or the schema default at the method root where the door answers nothing. No span reads no claim as stale. [[spec/design_output/work#a-stale-group-is-yours]] [[spec/tickets/stale-span-reads-schema-unset]]
 func (d *Doors) staleSpan() int64 {
-	if said := spanOf(d.config(staleKey)); said > 0 {
-		return int64(said)
+	return StaleSpan(d.Method, d.config(staleKey))
+}
+
+// The seconds a claim goes stale past, off the config's work.staleAfter or the schema default at the root where it says nothing. [[spec/tickets/git-hooks-run-in-go]] [[spec/tickets/stale-span-reads-schema-unset]]
+func StaleSpan(root, said string) int64 {
+	if span := spanOf(said); span > 0 {
+		return int64(span)
 	}
-	if said, held := config.Default(d.Method, staleKey); held {
+	if said, held := config.Default(root, staleKey); held {
 		return int64(spanOf(fmt.Sprint(said)))
 	}
 	return 0

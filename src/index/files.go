@@ -37,7 +37,7 @@ func Files(db *sql.DB) ([]Held, error) {
 	return out, rows.Err()
 }
 
-// The constants of hashText in .claude/skills/level0/lib/hash.js, which the two sides share. [[spec/design_output/pull#an-input-marks-its-steps]]
+// The constants of HashText in src/pull/hash.go, spelled again here because the index imports no pull. [[spec/design_output/pull#an-input-marks-its-steps]]
 const (
 	fnvOffset = 0x811c9dc5
 	fnvPrime  = 0x01000193
@@ -85,7 +85,7 @@ func Hashes(db *sql.DB, asks []HashAsk) (map[string]Hash, error) {
 	return out, nil
 }
 
-// The hash hashText in .claude/skills/level0/lib/hash.js answers, over the UTF-16 units JavaScript reads. [[spec/design_output/pull#an-input-marks-its-steps]]
+// The hash HashText in src/pull/hash.go answers, over the UTF-16 units JavaScript reads. [[spec/design_output/pull#an-input-marks-its-steps]]
 func hashUnits(units []uint16) string {
 	low, high := uint32(fnvOffset), uint32(mixSeed)
 	for _, code := range units {
@@ -96,7 +96,7 @@ func hashUnits(units []uint16) string {
 	return fmt.Sprintf("%08x%08x", low, high)
 }
 
-// The hash hashText in .claude/skills/level0/lib/hash.js answers over a text. [[spec/design_output/tui#the-verb-builds-it]]
+// The hash HashText in src/pull/hash.go answers over a text. [[spec/design_output/tui#the-verb-builds-it]]
 func HashText(text string) string { return hashUnits(utf16.Encode([]rune(text))) }
 
 // The text of each path named, or of every path where none is named. A binary file answers the empty text. [[spec/design_output/index#a-reader-takes-the-tree]]

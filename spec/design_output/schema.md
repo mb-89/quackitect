@@ -9,28 +9,27 @@ reads one, how it weighs a note against one, and what it answers.
 
 | the piece | where |
 |---|---|
-| the reader and the checker | `.claude/skills/level0/lib/schema*.js`, one module a topic |
-| the ticket door | `.claude/skills/level0/lib/ticket.js` |
-| the sweep, beside the tree rules | `src/modules/check/checker.go` |
-| the underscore skip | `lib/paths.js`, and every caller of it |
+| the reader and the checker | `src/note`, `src/yaml` and `src/modules/check`, one file a topic |
+| the ticket door | `src/modules/hooks/write` |
+| the sweep, beside the tree rules | `src/modules/check/sweep.go`, run by `Sweep` in `src/modules/check/checker.go` |
+| the underscore skip | `isDraft` in `src/modules/check/paths.go`, and every caller of it |
 | the `mint` verb | `src/quack/verb_mint.go` |
-| the `mint_note` tool | `src/modules/check/mint.go` |
+| the `mint_note` tool | `src/modules/edits/edits.go`, and the note it shapes in `src/modules/check/mint.go` |
 
 # The reader and the checker
 
-The reader and the checker stand in one folder, one module a topic. The
-`schema.js` module re-exports what the checker reads, so a caller names one file:
+The reader and the checker stand in Go, one file a topic:
 
-| the module | what it holds |
+| the file | what it holds |
 |---|---|
-| `schema.js` | the checker over the frontmatter, the sweep, and the refusals |
-| `schema-read.js` | the note reader |
-| `schema-yaml.js` | the YAML reader |
-| `schema-fault.js` | the finding, the small readers of a value, and the pointer to another shape |
-| `schema-route.js` | the route checks and the hash |
-| `schema-body.js` | the body checks and the placeholder |
-| `schema-table.js` | the table under a chapter |
-| `schema-mint.js` | the mint and its tool, which a caller imports on its own |
+| `src/modules/check/schema.go` | the checker over the frontmatter and a data file, the `$ref`, and the sweep |
+| `src/note/note.go` | the note reader |
+| `src/yaml/yaml.go` | the YAML reader, and the line of each key path |
+| `src/modules/check/route.go` | the keywords naming a step, and the slots a route feeds |
+| `src/pull/hash.go` | the hash a process carries |
+| `src/modules/check/schema-body.go` | the body checks and the placeholder |
+| `src/modules/check/table.go` | the table under a chapter |
+| `src/modules/check/mint.go` | the mint |
 
 | it takes | it answers |
 |---|---|
@@ -301,7 +300,7 @@ over every kind a schema describes.
 
 # A chapter holds a table
 
-A chapter naming `table` holds one, and `lib/schema-table.js` reads it:
+A chapter naming `table` holds one, and `src/modules/check/table.go` reads it:
 
 | the key | what the checker asks |
 |---|---|
@@ -386,7 +385,7 @@ while a session fills it in.
 
 # The underscore parks a draft
 
-`isDraft(path)` in `lib/paths.js` answers whether any part of a path opens with
+`isDraft(path)` in `src/modules/check/paths.go` answers whether any part of a path opens with
 an underscore. Park a draft as `_note.md`, and the tree stays green while a
 kind settles.
 
@@ -434,7 +433,7 @@ beside it. These carry it on a ticket:
 | `steps` | the mint, `ticket update`, and a person |
 | `record` | the pull, at the hand-back |
 
-`restoredFields` in `.claude/skills/level0/lib/ticket.js` swaps the rows of
+`RestoredFields` in `src/modules/hooks/write/rules.go` swaps the rows of
 each field the write moves for the disk's. The write door hands that write on,
 with a note naming each field. An edit moving these fields alone lands nothing and comes
 back refused, naming them. `verbFaults` compares the old value against the new

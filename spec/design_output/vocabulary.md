@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `spec/vocabulary` holds the words a paragraph writes, and
-`.claude/skills/level0/lib/vocabulary.js` reads them into the one rule the
+`src/projection/vocabulary.go` reads them into the one rule the
 projection writes. This note covers the lists, the rule, the refusal and
 the retro's part.
 
@@ -66,9 +66,9 @@ this order:
 - every other run turns into one dash
 - a dash at each end goes
 
-The one this tree writes in JavaScript stands in
-`.claude/skills/level0/lib/slug.js`, and the cases in
-`test/contract/vocabulary.test.js` drive it. A tool chain importing none of that
+The one this tree writes stands in `slugOf` in
+`src/modules/check/restated.go`, and the cases in
+`src/quack/vocabulary_lists_test.go` drive it. A tool chain importing none of that
 carries a copy of the function, with its reason beside it, and drives the same
 cases. So a drift turns a suite red where it stands.
 

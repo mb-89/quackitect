@@ -1,6 +1,6 @@
 // The tickets the engine mints at a pull. Each stands in the hold alone,
 // carries no file, and dies at its hand-back. The clear runs as a run of
-// them, off src/scripts/ephemeral.js and ephemeral-pull.js.
+// them.
 // [[spec/design_input/the-clear-hands-ephemeral-tickets]]
 package pull
 

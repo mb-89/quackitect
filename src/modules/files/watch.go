@@ -33,7 +33,7 @@ const private = ".se"
 const seedBatch = 8 << 20
 
 // The dot folders under the private one the watch adds by name, each with the extension of the files a module reads there: a loaded projection's JSON, and the session log's lines. Each stands alone, and no folder under it joins. [[spec/tickets/the-log-topic-lands]]
-// .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
+// src/modules/check/folders.go owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
 var named = map[string]string{".se/.runtime": ".json", ".se/.runtime/hold": ".json", ".se/.log": ".jsonl"}
 
 // Whether a body reads as text: a built program or an image holds a NUL byte, and no text file does. A binary file reaches no rule, reader or search, and its bytes swell a seed past the bus cap. [[spec/tickets/sweep-reads-tracked-after-restart]]

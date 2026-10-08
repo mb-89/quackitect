@@ -164,14 +164,14 @@ func retroCollectChapterOf(text string) string {
 	return strings.TrimSpace(strings.Join(kept, "\n")) + "\n"
 }
 
-// Whether a section's own rows carry a line of text, past the comments, the answered rows and the fences. [[spec/design_output/pull#the-fields-hold-their-forms]]
+// Whether a section's own rows carry a line of text, past the comments, the answered rows and the fences, as chapterLines in src/pull/pull_chapter.go reads them. [[spec/design_output/pull#the-fields-hold-their-forms]]
 func retroCollectHoldsText(own []string) bool {
 	return slices.ContainsFunc(own, func(row string) bool {
 		return strings.TrimSpace(row) != "" && !retroCollectComment.MatchString(row) && !retroCollectAnswered.MatchString(row) && !retroCollectFence.MatchString(row)
 	})
 }
 
-// A field of a note's front, bare of its link marks, as fieldOf in src/engine/group.js reads it. [[spec/design_output/work#a-group-is-a-ticket]]
+// A field of a note's front, bare of its link marks, as fieldOf in src/branches/group.go reads it. [[spec/design_output/work#a-group-is-a-ticket]]
 func retroCollectFieldOf(text, key string) string {
 	said := note.Read(text).Front.Said.Get(key)
 	if said == nil {

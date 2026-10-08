@@ -1,6 +1,5 @@
 // The route a ticket walks: its steps, the leaf it stands at, and what that
-// leaf inherits from the steps above it, with the words a pull answers in,
-// off src/scripts/pull-route.js.
+// leaf inherits from the steps above it, with the words a pull answers in.
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 package pull
 

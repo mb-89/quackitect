@@ -142,9 +142,9 @@ on nothing.
 
 | child | what it adds |
 |---|---|
-| each node names its place | each graph node carries its chapter and its line, from `src/scripts/graph.js` |
+| each node names its place | each graph node carries its chapter and its line, from `src/modules/tickets/graph.go` |
 | `ticket route` | edits the steps ahead of the pointer, and leaves the record alone |
-| `ticket fill <path> --stdout` | answers the filled ticket the mint writes, through `mintNote` in `.claude/skills/level0/lib/schema-mint.js` |
+| `ticket fill <path> --stdout` | answers the filled ticket the mint writes, through `mintNote` in `src/modules/check/mint.go` |
 | `ticket yours --count` and `--next` | the count waiting on a person, and the ticket the queue hands them |
 | the config schema | `engine.state` and `engine.beat` leave `spec/config/level0.schema.json`, and the work group declares its buttons |
 | the language server | completes `process`, folds the frontmatter, and raises no missing `steps` while `process` stands empty |

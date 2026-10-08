@@ -1,9 +1,12 @@
 // The schema checker's words over a note missing a field and a chapter, which
-// read as the bridge's lib/schema.js and lib/schema-body.js say them.
+// schema.go and schema-body.go say, and the chapter each nested step and
+// field wants.
 // [[spec/tickets/cage-write-door-port]]
 package check
 
 import (
+	"slices"
+	"strings"
 	"testing"
 
 	"quackitect/src/yaml"
@@ -53,5 +56,18 @@ func TestAStrangerNamesTheKindItReadsAs(t *testing.T) {
 	found, ok := StrangerFault("---\nkind: [[rationale]]\n---\n", schema, ".se/HANDOVER.md")
 	if want := ".se/HANDOVER.md reads as a rationale, and the handover schema governs this path."; !ok || found.Message != want {
 		t.Errorf("StrangerFault answers %+v, %v, want %q", found, ok, want)
+	}
+}
+
+// [[spec/design_output/schema#keywords-that-name-a-step]]
+func TestAChapterMissingForAnEvidenceFieldIsRefused(t *testing.T) {
+	t.Parallel()
+	found := refused(routedAt, strings.Replace(routed, "### lint\n", "", 1))
+	if got := rulesOf(found); !slices.Equal(got, []string{"Schema.lint"}) {
+		t.Fatalf("a route missing the lint chapter answers %+v, and wants Schema.lint alone", found)
+	}
+	found = refused(routedAt, strings.Replace(routed, "## review\n", "", 1))
+	if !slices.Contains(rulesOf(found), "Schema.review") {
+		t.Fatalf("a route missing the review chapter answers %+v, and wants Schema.review", found)
 	}
 }

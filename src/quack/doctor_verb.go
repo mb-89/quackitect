@@ -10,12 +10,14 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/src/modules/check"
 )
 
 // The files and folders the doctor reads under the root. The pointer, the port base and the index binary stand in probe_cold.go. [[spec/tickets/box-verbs-port-to-go]]
 const (
-	editorSettings = ".vscode/settings.json" // the file .claude/skills/level0/lib/servers.js owns, as EDITOR_SETTINGS
-	hooksFolder    = ".githooks"             // the folder src/scripts/precommit.js owns, as HOOKS
+	editorSettings = check.Settings
+	hooksFolder    = ".githooks" // the folder core.hooksPath names, whose hooks run the hook verb
 )
 
 // The three rule folders under spec/config/styles, in the order the vale row names them. [[spec/tickets/box-verbs-port-to-go]]

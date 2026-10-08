@@ -4,6 +4,7 @@
 package hooks
 
 import (
+	"slices"
 	"strings"
 
 	"quackitect/src/q/tool"
@@ -21,6 +22,9 @@ var (
 	lineVerbs = []string{"check", "branch", "tui", "doctor"}
 	toolVerbs = []string{"check", "branch", "doctor"}
 )
+
+// The verbs the line names where the store lists no verb tool. [[spec/design_output/bash#the-description-names-verbs]]
+func LineVerbs() []string { return slices.Clone(lineVerbs) }
 
 // The refusals the shell door makes, which close the line. [[spec/design_output/bash#the-description-names-verbs]]
 const refusals = "Level zero refuses a shell write to a file the rules reach, a commit carrying " +

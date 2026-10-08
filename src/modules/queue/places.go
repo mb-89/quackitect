@@ -13,7 +13,7 @@ import (
 	"quackitect/src/ticket"
 )
 
-// The words a ticket's front and route carry that the split reads, which src/engine/group.js names and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+// The words a ticket's front and route carry that the split reads, which src/branches/group.go names and this module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
 const (
 	closedState  = "closed"
 	openState    = "open"

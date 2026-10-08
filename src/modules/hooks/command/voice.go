@@ -1,5 +1,4 @@
-// The voice over a commit message, off refusesIn and formIn in
-// lib/warnings.js and withoutTrailers in lib/commit-reads.js: a finding naming
+// The voice over a commit message: a finding naming
 // a refusing rule refuses, and every other one is a break of form.
 // [[spec/tickets/cage-commit-guards-port]]
 package command

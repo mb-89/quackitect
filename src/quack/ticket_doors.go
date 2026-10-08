@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"quackitect/src/failure"
 	"quackitect/src/index"
@@ -128,9 +129,20 @@ const (
 	logSaid  = 80
 )
 
-// The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as rowOf in lib/log.js shapes it. [[spec/design_output/log#what-one-line-looks-like]]
+// The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as sayLine in src/quack/verb_log.go shapes it. [[spec/design_output/log#what-one-line-looks-like]]
 func pullLog(work, floor string) func(level, kind, said string, extra map[string]any) {
-	write := appendsRow(realDisk(), work, wall.Now)
+	says := logsRow(work, floor)
+	return func(level, kind, said string, extra map[string]any) { _ = says(level, kind, said, extra) }
+}
+
+// The session log's row writer under the work root, which answers the fault a write meets. [[spec/tickets/copilot-hooks-run-in-go]]
+func logsRow(work, floor string) func(level, kind, said string, extra map[string]any) error {
+	return logsRowOn(realDisk(), wall.Now, work, floor)
+}
+
+// The session log's row writer under the work root, over the disk and the clock it takes. [[spec/tickets/quack-reaches-through-box-doors]]
+func logsRowOn(disk diskDoors, now func() time.Time, work, floor string) func(level, kind, said string, extra map[string]any) error {
+	write := appendsRow(disk, work, now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {
@@ -142,9 +154,9 @@ func pullLog(work, floor string) func(level, kind, said string, extra map[string
 	if floor == "" {
 		floor = logFloor
 	}
-	return func(level, kind, said string, extra map[string]any) {
+	return func(level, kind, said string, extra map[string]any) error {
 		if rank(level) < rank(floor) {
-			return
+			return nil
 		}
 		said = strings.Join(strings.Fields(said), " ")
 		if runes := []rune(said); len(runes) > logSaid {
@@ -155,7 +167,7 @@ func pullLog(work, floor string) func(level, kind, said string, extra map[string
 			row[key] = value
 		}
 		row["level"], row["kind"], row["said"] = level, kind, said
-		_ = write(row)
+		return write(row)
 	}
 }
 

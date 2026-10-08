@@ -18,4 +18,3 @@ js spec/config	687 test lines, 0 code lines
 js src/doors	2757 test lines, 708 code lines
 js src/doors/fake	13651 test lines, 681 code lines
 js src/extension/webview	224 test lines, 131 code lines
-js test/contract	369 test lines, 202 code lines

@@ -65,7 +65,7 @@ type Held struct {
 // The layers config/values reads: both files, the SE_ variables, the live leases and the held contexts and overrides. [[spec/design_output/model#a-keys-layers]]
 type layersIn struct {
 	Tracked q.Ordered `q:"config/spec/config/level0.json"`
-	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/config#the-layers]]
+	// src/modules/check/folders.go owns this name. [[spec/design_output/config#the-layers]]
 	Local  q.Ordered         `q:"config/.se/.runtime/config.json"`
 	Env    map[string]string `q:"env/<name>,optional"`
 	Leases []string          `q:"index/leases,optional"`

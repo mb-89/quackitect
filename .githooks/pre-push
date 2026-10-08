@@ -5,6 +5,8 @@ set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
 cd "$here" || exit 0
-command -v node >/dev/null 2>&1 || exit 0
+bin="$here/.se/.runtime/bin/se-index"
+[ -x "$bin.exe" ] && bin="$bin.exe"
+[ -x "$bin" ] || exit 0
 
-node src/scripts/prepush.js
+exec "$bin" verb "$here/src/scripts" hook pre-push

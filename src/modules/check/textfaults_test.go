@@ -4,6 +4,7 @@
 package check
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -98,6 +99,68 @@ func TestPlainCodeCutsAsThePatternsCut(t *testing.T) {
 	for _, line := range codeLines {
 		if got, want := plainCode(line), codeCut(line); got != want {
 			t.Errorf("plainCode(%q) answers %q, and the patterns %q", line, got, want)
+		}
+	}
+}
+
+// The lint's walk passes every parked folder at any depth and a draft, and reads every other path, as the bridge's findings reader walks. [[spec/tickets/bridge-library-leaves]]
+func TestTheLintWalkPassesEveryParkedFolderAndADraft(t *testing.T) {
+	t.Parallel()
+	marker := "<!-- vale Quack.Rule = NO -->\n"
+	passed := []string{
+		".git/a.md", "node_modules/a/b.md", ".se/a.md", ".claude/a.md", ".claude-plugin/a.md",
+		".claude/types/a.md", ".claude/worktrees/w/a.md", "spec/.se/a.md", "src/node_modules/a.md",
+		"spec/_draft/a.md", "spec/notes/_a.md", "_a.md",
+	}
+	read := []string{"README.md", "spec/notes/a.md", "spec/a_b.md", ".sex/a.md", "claude/a.md"}
+	texts := Texts{}
+	for _, path := range append(append([]string{}, passed...), read...) {
+		texts[path] = marker
+	}
+	tree := TreeOver("/tree", texts)
+	for _, path := range passed {
+		if walked(path) {
+			t.Errorf("the walk reaches %s", path)
+		}
+		if got := textFaults(tree, path, 0, 0, "tree"); len(got) != 0 {
+			t.Errorf("%s draws %+v", path, got)
+		}
+	}
+	for _, path := range read {
+		if !walked(path) {
+			t.Errorf("the walk passes %s", path)
+		}
+		got := textFaults(tree, path, 0, 0, "tree")
+		if len(got) != 1 || got[0].File != path || got[0].Rule != Unreasoned || got[0].Line != 1 || got[0].Source != "tree" {
+			t.Errorf("%s draws %+v", path, got)
+		}
+	}
+}
+
+// An exemption naming no reason draws one row, in the bridge's words, and a reason on its line or the line above clears it. [[spec/tickets/bridge-library-leaves]]
+func TestAnExemptionNamingNoReasonDrawsARowAndAReasonClearsIt(t *testing.T) {
+	t.Parallel()
+	says := "An exemption names why the rule is off. Write <!-- because: why --> above it."
+	drawn := map[string]string{
+		"a marker alone":                      "# A note\n\n<!-- vale Quack.Rule = NO -->\nText.\n",
+		"a marker turning the rule off":       "# A note\n\n<!-- vale Quack.Rule = off -->\nText.\n",
+		"a reason two lines above the marker": "<!-- because: a quote -->\n\n<!-- vale Quack.Rule = NO -->\n",
+	}
+	for name, text := range drawn {
+		want := []Finding{{File: "spec/notes/a.md", Rule: Unreasoned, Line: 3, Column: 1, Message: says, Severity: SeverityError}}
+		if got := unreasoned("spec/notes/a.md", text); !reflect.DeepEqual(got, want) {
+			t.Errorf("%s draws %+v, and wants %+v", name, got, want)
+		}
+	}
+	cleared := map[string]string{
+		"a reason on its line":        "<!-- because: a quote --> <!-- vale Quack.Rule = NO -->\n",
+		"a reason on the line above":  "<!-- because: a quote -->\n<!-- vale Quack.Rule = off -->\n",
+		"a marker inside a fence":     "```\n<!-- vale Quack.Rule = NO -->\n```\n",
+		"a marker inside a code span": "Write `<!-- vale Quack.Rule = NO -->` to hold it off.\n",
+	}
+	for name, text := range cleared {
+		if got := unreasoned("spec/notes/a.md", text); len(got) != 0 {
+			t.Errorf("%s draws %+v", name, got)
 		}
 	}
 }

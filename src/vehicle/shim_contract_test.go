@@ -117,6 +117,64 @@ func TestTheShimFindsTheCloneUnderHomeWhereNeitherRoadAnswers(t *testing.T) {
 	handsOver(t, out, stub, "vehicle")
 }
 
+// The shim calls the vehicle's binary with vehicle enable, the stub as the work root, discards what it says, and still hands every argument on. [[spec/tickets/stub-settings-shim-runs-in-go]]
+// level0: FixtureOutsideHome - the contract runs the real shim under sh in a stub of its own, the road it proves
+func TestTheShimEnablesThePluginThroughTheVehicleBinary(t *testing.T) {
+	where, stub := shimStub(t)
+	vehicle := shimVehicle(t, filepath.Join(where, "vehicle"))
+	said := filepath.Join(where, "enabled")
+	bin := filepath.Join(vehicle, ".se", ".runtime", "bin", "se-index")
+	seed(t, vehicle, map[string]string{
+		".se/.runtime/bin/se-index": "#!/usr/bin/env sh\nprintf 'argv=%s\\nwork=%s\\n' \"$*\" \"$SE_WORK_ROOT\" > '" + said + "'\nprintf 'the binary speaks\\n'\n",
+	})
+	if err := os.Chmod(bin, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := runShim(t, stub, map[string]string{"SE_VEHICLE": vehicle, "SE_REGISTRY": filepath.Join(where, "empty"), "HOME": where}, "check", "one")
+	if code != 0 {
+		t.Fatalf("the shim exits %d: %s", code, errs)
+	}
+	handsOver(t, out, stub, "check one")
+	recorded, err := os.ReadFile(said)
+	if err != nil {
+		t.Fatalf("the shim never calls the vehicle binary: %v", err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(recorded)), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("the binary records %q", recorded)
+	}
+	argv := strings.Fields(strings.TrimPrefix(lines[0], "argv="))
+	if len(argv) != 4 || argv[0] != "verb" || !samePath(argv[1], filepath.Join(vehicle, "src", "scripts")) || argv[2] != "vehicle" || argv[3] != "enable" {
+		t.Fatalf("the binary hears %q, and wants verb %s vehicle enable", lines[0], filepath.Join(vehicle, "src", "scripts"))
+	}
+	if !samePath(strings.TrimPrefix(lines[1], "work="), stub) {
+		t.Fatalf("the binary runs with %q, and wants work=%s", lines[1], stub)
+	}
+}
+
+// Where the vehicle binary fails, the shim prints the standing fallback line and still hands every argument on. [[spec/tickets/stub-settings-shim-runs-in-go]]
+// level0: FixtureOutsideHome - the contract runs the real shim under sh in a stub of its own, the road it proves
+func TestTheShimPrintsTheFallbackAndStillHandsOnWhereTheVehicleBinaryFails(t *testing.T) {
+	const fallback = "The marketplace reached no settings, so this session loads the plugin from wherever it already stands."
+	where, stub := shimStub(t)
+	vehicle := shimVehicle(t, filepath.Join(where, "vehicle"))
+	bin := filepath.Join(vehicle, ".se", ".runtime", "bin", "se-index")
+	seed(t, vehicle, map[string]string{
+		".se/.runtime/bin/se-index": "#!/usr/bin/env sh\nprintf 'the binary fails\\n' >&2\nexit 1\n",
+	})
+	if err := os.Chmod(bin, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	code, out, errs := runShim(t, stub, map[string]string{"SE_VEHICLE": vehicle, "SE_REGISTRY": filepath.Join(where, "empty"), "HOME": where}, "check", "one")
+	if code != 0 {
+		t.Fatalf("the shim exits %d: %s", code, errs)
+	}
+	handsOver(t, out, stub, "check one")
+	if !strings.Contains(errs, fallback) {
+		t.Fatalf("the shim says %q on stderr, and wants the fallback line %q", errs, fallback)
+	}
+}
+
 func TestAShimFindingNoVehicleExitsOneOnALineNamingTheUpstreamAndTheCloneFolder(t *testing.T) {
 	where, stub := shimStub(t)
 	code, out, errs := runShim(t, stub, map[string]string{"SE_VEHICLE": filepath.Join(where, "nowhere"), "SE_REGISTRY": filepath.Join(where, "empty"), "HOME": where}, "vehicle")

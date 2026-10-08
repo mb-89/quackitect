@@ -1,4 +1,4 @@
-// A revert or a reset over a pull commit, off lib/pulled.js. The take-back
+// A revert or a reset over a pull commit. The take-back
 // verb restores a ticket's step, state and evidence in one move, so the shell
 // undo refuses.
 // [[spec/tickets/cage-command-rules-port]]

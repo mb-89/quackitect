@@ -48,20 +48,21 @@ A box reads the argument here before it asks about a ruling:
 | `src/q` | the model's core: names, providers, the store and the catalog check, which the index and every module import | new |
 | `src/lsp` | the `lsp` IO module keeps the protocol, and the checks and schema rules become the check module | splits |
 | `src/tui` | `quack tui`: `frame` becomes the generic shell and `tree` the base-view renderer, and the log and the work become declared views | reshaped |
-| `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the config module and every `<instance>/config/` subtopic, and the index manager's supervision | merged |
+| `src/config`, `src/yaml`, `src/pointer`, `src/index/swap` | the config module and every `<instance>/config/` subtopic, and the index manager's supervision | merged |
 | `src/scripts` | the module processes, such as work, pull, retro and vehicle, and a Go command line in place of `cli.js` | ported, topic by topic |
 | `src/bridge` | the `hooks` IO module, and modules for the write, bash, stop, answer and handover rules | ported |
 | `src/engine`, `src/doors` | modules, such as retro, projection and group, and the outbound IO modules | ported |
 | `.claude/skills/level0/lib` | modules, apart from what the hook module imports itself | ported |
 | `src/extension` | a generic renderer for the sidebar and its forms, beside the route drawing, the lens and the inset | shrinks |
 | the level zero hook module | forwards events, registers the tools the index lists, and spawns agents | shrinks |
-| `copilot.js`, `precommit.js`, `prepush.js` | calls into the `hooks` IO module, `quack hook <event>` | ported |
+| `copilot.js` | calls into the `hooks` IO module, `quack hook <event>` | ported |
+| the git hooks | `quack hook pre-commit` and `quack hook pre-push`, over the `hooks` IO module | ported |
 | `spec/config/level0.schema.json` | generated from the `q.Cfg` and `q.Show` declarations | generated |
 
 | area | what goes with no successor | what moves to Go | what stays |
 |---|---|---|---|
 | `src/scripts`: work, pull, ticket | the JSON hops over standard output, the check spawns in `cli.js`, the git read on every call, the dispatch and the usage | the pull, the queue and the outline, `work-answer.js`, the branch standing, the route walk, the ticket writes | nothing |
-| `src/scripts`: the command line, check, retro, install | the verb routing in `cli.js`, `cli-doors.js`, `cli-served.js`, `serve.js` and `tui-build.js`, and most of `install.sh` | the battery and the stamp, the commit and the push, the log read, the retro, the vehicle and the stub, the styles | the editor link, trust, brand, browser and bundle |
+| `src/scripts`: the command line, check, retro, install | the verb routing in `cli.js`, `cli-doors.js`, `cli-served.js`, `serve.js` and `tui-build.js`, and most of `install.sh` | the battery, stamp, commit and push, the log read, the retro, the vehicle and stub, the styles, the browser and bundle | the editor link, brand, and the battery's reporter under `test` |
 | `src/bridge`, `src/doors`, `src/engine` | the server's lifecycle, reload and self-test. The caches, the index spawn per search, and the state a restart carries over | every cage rule, the tools as actions, the doors as Go IO modules with fakes, the retro | nothing |
 | `.claude/skills/level0` | the start road, the pull's process hop and the search relay. The Copilot copy of the cage, the standing files, and the JavaScript twins of Go checks | config layering, guidance, the answer gate, voice, the bash guard, tickets, apply and undo, projections | the hook module, cut to a thin forwarder |
 | `src/index`, `src/lsp`, config, yaml, pointer | the standing-file protocol, written twice, three self-spawn loops, the LSP's index client, the findings port, the long poll and the hash caches | the LSP rules and the schema checker, tickets, config | the index core, the LSP protocol and features, yaml |
@@ -88,15 +89,15 @@ already differ.
 
 | the fact | the copies | what already differs |
 |---|---|---|
-| config resolution | `lib/config.js`, `src/config`, `src/bridge/config.js`, `src/extension/lib/widgets.js` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
-| frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `schema-read.js` and `group.js`, and three writers | Go quotes a value, and JavaScript leaves it bare |
-| the Ask chapter | `group.js`, `pull-chapter.js`, `index/ticket.go` | `group.js` keeps comments and the other two drop them, so the queue's text and the index's differ |
-| held and group standing | `group.js`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
-| the current leaf of a route | `group.js`, `pull-route.js`, `ticket.js`, `lsp/group.go`, the extension's `lens.js` | a fixture test exists only to keep two of them in step |
-| the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `named.js`, `lens.js` | `folders.test.js` checks only that the copies agree |
-| session log rows | `lib/log.js`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
-| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `src/doors/index.js`, `lib/index.js` | each asks its own way |
-| cloud detection | `cloud.js`, the hook's start script, `copilot.js`, the Copilot runtime | `cloud.js` reads `0` as off, and the start script reads any value as on |
+| config resolution | `src/config`, `src/extension/lib/widgets.js` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
+| frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `note/note.go` and `branches/group.go`, and three writers | Go quotes a value, and JavaScript leaves it bare |
+| the Ask chapter | `branches/group.go`, `pull-chapter.js`, `index/ticket.go` | `branches/group.go` keeps comments and the other two drop them, so the queue's text and the index's differ |
+| held and group standing | `branches/group.go`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
+| the current leaf of a route | `branches/group.go`, `pull-route.js`, `lsp/group.go`, the extension's `lens.js` | a fixture test exists only to keep two of them in step |
+| the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `command/ticket.go`, `lens.js` | `folders.test.js` checks only that the copies agree |
+| session log rows | `src/quack/verb_log.go`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
+| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `src/modules/hooks/search.go` | each asks its own way |
+| cloud detection | `InCloud` in `src/modules/hooks/command/cloud.go`, the hook's start script, `copilot.js`, the Copilot runtime | `InCloud` reads `0` as off, and the start script reads any value as on |
 | walk skip lists and globs | four skip lists, three glob translators | the two Go translators take different features |
 | runtime paths, the port, `se-index`, `plan.json`, `tools.json` | Go, JavaScript, shell, and the stub hook | each spells them again |
 

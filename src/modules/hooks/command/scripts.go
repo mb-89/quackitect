@@ -1,4 +1,4 @@
-// The script file a command runs, off lib/scripted.js. A write inside it
+// The script file a command runs. A write inside it
 // reaches the tree the same way a redirection does, so the door reads the
 // file the line names.
 // [[spec/tickets/cage-command-rules-port]]

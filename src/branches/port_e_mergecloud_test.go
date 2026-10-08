@@ -71,7 +71,7 @@ func TestPEMergeInstallsBeforeTheCheck(t *testing.T) {
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
 	one.teach("sh", func(ran proc.Command) proc.Said {
-		if len(ran.Argv) == 2 && ran.Argv[1] == one.d.at("src/scripts/install.sh") && ran.Dir == one.root {
+		if len(ran.Argv) == 2 && ran.Argv[1] == one.d.at("install.sh") && ran.Dir == one.root {
 			one.write(map[string]string{".se/installed": "ok\n"})
 			return proc.Said{}
 		}

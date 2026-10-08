@@ -140,7 +140,7 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 // The chapter a ticket's ask stands under. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const askField = "Ask"
 
-// The fields the --field=value words name, each under the key its schema spells, or why one names none, off fieldsIn in lib/schema-mint.js. [[spec/design_output/schema#the-fields-a-caller-names]]
+// The fields the --field=value words name, each under the key its schema spells, or why one names none. [[spec/design_output/schema#the-fields-a-caller-names]]
 func fieldsIn(words []string, schema *yaml.Doc) (map[string]any, string) {
 	named, order := map[string]string{}, []string{}
 	names := func(key string) {
@@ -213,7 +213,7 @@ func askFlags(disk pull.Disk, words []string) ([]string, map[string][]string, []
 	return rest, said, held.Ask
 }
 
-// Copies the route, its hash and the process's ask in where the fields name a process and the schema takes steps, off withRoute in src/scripts/process.js. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// Copies the route, its hash and the process's ask in where the fields name a process and the schema takes steps, off ProcessAt in src/pull/process.go. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func withRoute(disk pull.Disk, schema *yaml.Doc, fields map[string]any) string {
 	props := yaml.AsDoc(yaml.AsDoc(schema.Get("frontmatter")).Get("properties"))
 	if yaml.AsString(fields["process"]) == "" || !props.Has("steps") {

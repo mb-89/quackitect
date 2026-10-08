@@ -23,6 +23,15 @@ func voiceSaying(rule string) func(string) []heard {
 // The message the commit cases open with, naming the open ticket a-ticket. [[spec/tickets/landing-verbs-port-to-go]]
 const opens = "a-ticket: the change lands"
 
+// A landing repository with one file laid in its tree, and the fake doors over it. [[spec/tickets/quack-repos-meet-fake-git]]
+func laidLanding(t *testing.T, path, text string) (*landing, landingDoors, *verbsHeard, *[]map[string]any) {
+	t.Helper()
+	at := landingRepo(t)
+	seedFile(t, at.root, path, text)
+	d, heard, rows := fakeLanding(at)
+	return at, d, heard, rows
+}
+
 // The commit verb over its message, its check and its tests. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerb(t *testing.T) {
 	t.Parallel()
@@ -37,7 +46,7 @@ func TestCommitVerb(t *testing.T) {
 	t.Run("a message opening with no ticket, an unknown one or a closed one stages nothing", func(t *testing.T) {
 		for _, message := range []string{"the change lands", "nobody: the change lands", "shut: the change lands"} {
 			at := landingRepo(t)
-			lays(t, at.root, "src/a.go", "package a\n")
+			seedFile(t, at.root, "src/a.go", "package a\n")
 			d, heard, _ := fakeLanding(at)
 			code, _, errs := runsTwin(commitVerb(d), "commit", message)
 			if code != exitUsage || !strings.Contains(errs, "Open the message with <ticket>:") || at.staged() != "" || len(heard.ran) != 0 {
@@ -46,9 +55,7 @@ func TestCommitVerb(t *testing.T) {
 		}
 	})
 	t.Run("a clean message lands, runs the check, and pushes on green", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		code, out, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != 0 || at.subject() != opens || at.originSubject("main") != opens {
 			t.Fatalf("commit answers %d, %q, %q, and HEAD reads %q", code, out, errs, at.subject())
@@ -58,9 +65,7 @@ func TestCommitVerb(t *testing.T) {
 		}
 	})
 	t.Run("a message breaking a rule of form names every finding, logs it, and the commit lands", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, _, rows := fakeLanding(at)
+		at, d, _, rows := laidLanding(t, "src/a.go", "package a\n")
 		d.voice = voiceSaying("Sentence")
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != 0 || at.subject() != opens || !strings.Contains(errs, "the message:1 Sentence: the rule Sentence names this") {
@@ -71,9 +76,7 @@ func TestCommitVerb(t *testing.T) {
 		}
 	})
 	t.Run("a message carrying a private name is refused, and stages nothing", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		d.voice = voiceSaying("Private")
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != exitUsage || !strings.Contains(errs, "The voice rules refuse this message.") || !strings.Contains(errs, "the message:1:4: Private:") || at.staged() != "" || len(heard.ran) != 0 {
@@ -81,9 +84,7 @@ func TestCommitVerb(t *testing.T) {
 		}
 	})
 	t.Run("a red check holds the push back, and names what the check refuses", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != exitFailed || at.subject() != opens || at.originSubject("main") == opens {
@@ -93,23 +94,8 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("commit says %q", errs)
 		}
 	})
-	t.Run("a red test run commits nothing, stages nothing, and names what the run says", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
-		heard.answers["test"] = verbAnswer{exitFailed, "--- FAIL: TestA"}
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitFailed || at.subject() == opens || at.staged() != "" || heard.reached("check") {
-			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
-		}
-		if !strings.Contains(errs, "The tests answer red, so nothing stages and nothing lands:") || !strings.Contains(errs, "--- FAIL: TestA") {
-			t.Fatalf("commit says %q", errs)
-		}
-	})
 	t.Run("the rules and the tests run before the staging, and the check after the commit", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, _, _ := fakeLanding(at)
+		at, d, _, _ := laidLanding(t, "src/a.go", "package a\n")
 		var seen []string
 		d.verb = func(words ...string) (int, string) {
 			seen = append(seen, words[0]+" staged="+at.staged()+" head="+at.subject())
@@ -129,51 +115,35 @@ func TestCommitVerb(t *testing.T) {
 func TestCommitVerbDesk(t *testing.T) {
 	t.Parallel()
 	t.Run("a desk lands and checks the commit on main, and pushes nothing", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		d.cloud = false
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != 0 || at.subject() != opens || !heard.reached("check") || at.originSubject("main") == opens {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
 	})
-	t.Run("a desk's commit on a work branch refuses, names main, and runs no test and stages nothing", func(t *testing.T) {
+	// The desk refusal raises its node through the failure door. [[spec/tickets/the-twins-leave-whole]]
+	t.Run("a desk's commit on a work branch refuses, raises desk-works-on-trunk with its remedy once, and runs no test and stages nothing", func(t *testing.T) {
 		at := landingRepo(t)
+		seedFile(t, at.root, "spec/failures/desk-works-on-trunk.md", "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>.\"]\n---\n\n# When\n\nA desk works a work branch.\n")
 		at.must(at.repo.Switch("work/a-group", true))
-		lays(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
 		d, heard, _ := fakeLanding(at)
 		d.cloud = false
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitUsage || !strings.Contains(errs, "A desk works on main alone") || at.staged() != "" || len(heard.ran) != 0 {
+		if code != exitUsage || !strings.Contains(errs, "A desk works on main alone") || !strings.Contains(errs, "failure desk-works-on-trunk at warn") || strings.Count(errs, "git switch main") != 1 || at.staged() != "" || len(heard.ran) != 0 {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
 	})
-	// The desk refusal raises its node through the failure door. [[spec/tickets/the-twins-leave-whole]]
-	t.Run("a desk's commit on a work branch raises desk-works-on-trunk, and prints its remedy once", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "spec/failures/desk-works-on-trunk.md", "---\nkind: [[failure]]\nlevel: warn\nremedies: [\"Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>.\"]\n---\n\n# When\n\nA desk works a work branch.\n")
-		at.must(at.repo.Switch("work/a-group", true))
-		d, _, _ := fakeLanding(at)
-		d.cloud = false
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitUsage || !strings.Contains(errs, "failure desk-works-on-trunk at warn") || strings.Count(errs, "git switch main") != 1 {
-			t.Fatalf("commit answers %d, %q", code, errs)
-		}
-	})
 	t.Run("the no-push flag leaves the branch where it stands", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, _, _ := fakeLanding(at)
+		at, d, _, _ := laidLanding(t, "src/a.go", "package a\n")
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens, "--no-push")
 		if code != 0 || at.subject() != opens || at.originSubject("main") == opens {
 			t.Fatalf("commit answers %d, %q", code, errs)
 		}
 	})
 	t.Run("a path git cannot stage names what git says, and commits nothing", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, _, _ := fakeLanding(at)
+		at, d, _, _ := laidLanding(t, "src/a.go", "package a\n")
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens, "src/nowhere.go")
 		if code != exitFailed || at.subject() == opens || !strings.Contains(errs, "The staging comes back refused") || !strings.Contains(errs, "src/nowhere.go") {
 			t.Fatalf("commit answers %d, %q", code, errs)
@@ -181,7 +151,7 @@ func TestCommitVerbDesk(t *testing.T) {
 	})
 	t.Run("a commit git refuses lands nothing, and the staging comes back", func(t *testing.T) {
 		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
 		at.repo.Set("user.useConfigOnly", "true")
 		at.repo.Set("user.email", "")
 		d, _, _ := fakeLanding(at)
@@ -192,8 +162,8 @@ func TestCommitVerbDesk(t *testing.T) {
 	})
 	t.Run("a call naming paths lands those paths alone", func(t *testing.T) {
 		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		lays(t, at.root, "src/b.go", "package b\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/b.go", "package b\n")
 		d, _, _ := fakeLanding(at)
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "src/a.go"); code != 0 {
 			t.Fatalf("commit answers %d, %q", code, errs)
@@ -211,35 +181,26 @@ func TestCommitVerbDesk(t *testing.T) {
 // The commit verb over a moved path, which the rename journal names. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerbMoves(t *testing.T) {
 	t.Parallel()
-	t.Run("a commit naming a renamed ticket lands the old path's deletion with it", func(t *testing.T) {
-		at := landingRepo(t)
-		at.moves("spec/tickets/a-ticket.md", "spec/tickets/b-ticket.md")
-		d, _, _ := fakeLanding(at)
-		if code, _, errs := runsTwin(commitVerb(d), "commit", "b-ticket: the ticket moves", "spec/tickets/b-ticket.md"); code != 0 {
-			t.Fatalf("commit answers %d, %q", code, errs)
-		}
-		landed := at.landed()
-		if !strings.Contains(landed, "D\tspec/tickets/a-ticket.md") || !strings.Contains(landed, "A\tspec/tickets/b-ticket.md") {
-			t.Fatalf("the commit lands %q", landed)
-		}
-	})
-	t.Run("a commit naming a renamed path lands the old path the rename journal names, where git reads no rename", func(t *testing.T) {
-		at := landingRepo(t)
-		at.moves("README.md", "GUIDE.md")
-		lays(t, at.root, "GUIDE.md", "a text written over whole, so git reads no rename here\n")
-		journals(t, at.root, "README.md", "GUIDE.md")
-		d, _, _ := fakeLanding(at)
-		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "GUIDE.md"); code != 0 {
-			t.Fatalf("commit answers %d, %q", code, errs)
-		}
-		landed := at.landed()
-		if !strings.Contains(landed, "D\tREADME.md") || !strings.Contains(landed, "A\tGUIDE.md") {
-			t.Fatalf("the commit lands %q", landed)
+	t.Run("a commit naming a renamed ticket, or a renamed path the rename journal names where git reads no rename, lands the old path's deletion with it", func(t *testing.T) {
+		for _, one := range [][3]string{{"spec/tickets/a-ticket.md", "spec/tickets/b-ticket.md", "b-ticket: the ticket moves"}, {"README.md", "GUIDE.md", opens}} {
+			at := landingRepo(t)
+			at.moves(one[0], one[1])
+			if one[0] == "README.md" {
+				seedFile(t, at.root, "GUIDE.md", "a text written over whole, so git reads no rename here\n")
+				journals(t, at.root, "README.md", "GUIDE.md")
+			}
+			d, _, _ := fakeLanding(at)
+			if code, _, errs := runsTwin(commitVerb(d), "commit", one[2], one[1]); code != 0 {
+				t.Fatalf("commit answers %d, %q", code, errs)
+			}
+			if landed := at.landed(); !strings.Contains(landed, "D\t"+one[0]) || !strings.Contains(landed, "A\t"+one[1]) {
+				t.Fatalf("the commit lands %q", landed)
+			}
 		}
 	})
 	t.Run("a journaled old path the index still holds stages with the new path", func(t *testing.T) {
 		at := landingRepo(t)
-		lays(t, at.root, "GUIDE.md", "a text written over whole\n")
+		seedFile(t, at.root, "GUIDE.md", "a text written over whole\n")
 		if err := realDisk().remove(filepath.Join(at.root, "README.md")); err != nil {
 			t.Fatal(err)
 		}
@@ -252,43 +213,34 @@ func TestCommitVerbMoves(t *testing.T) {
 			t.Fatalf("the commit lands %q", landed)
 		}
 	})
-	t.Run("a journaled old path standing nowhere stays out of the commit", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "GUIDE.md", "a guide\n")
-		journals(t, at.root, "OLD.md", "GUIDE.md")
-		d, _, _ := fakeLanding(at)
-		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "GUIDE.md"); code != 0 {
-			t.Fatalf("commit answers %d, %q", code, errs)
-		}
-		if landed := at.landedNames(); landed != "GUIDE.md" {
-			t.Fatalf("the commit lands %q", landed)
-		}
-	})
-	t.Run("a path under a journaled folder move standing nowhere stays out of the commit", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "docs/new/a.md", "a note\n")
-		journals(t, at.root, "docs/old", "docs/new")
-		d, _, _ := fakeLanding(at)
-		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "docs/new/a.md"); code != 0 {
-			t.Fatalf("commit answers %d, %q", code, errs)
-		}
-		if landed := at.landedNames(); landed != "docs/new/a.md" {
-			t.Fatalf("the commit lands %q", landed)
+	t.Run("a journaled old path or folder move standing nowhere stays out of the commit", func(t *testing.T) {
+		for _, one := range [][3]string{{"GUIDE.md", "OLD.md", "GUIDE.md"}, {"docs/new/a.md", "docs/old", "docs/new"}} {
+			at := landingRepo(t)
+			seedFile(t, at.root, one[0], "a note\n")
+			journals(t, at.root, one[1], one[2])
+			d, _, _ := fakeLanding(at)
+			if code, _, errs := runsTwin(commitVerb(d), "commit", opens, one[0]); code != 0 {
+				t.Fatalf("commit answers %d, %q", code, errs)
+			}
+			if landed := at.landedNames(); landed != one[0] {
+				t.Fatalf("the commit lands %q", landed)
+			}
 		}
 	})
 }
 
-// The commit verb refuses a message whose trailer names a model, before anything runs or lands. [[spec/tickets/commit-door-refuses-model-trailers]]
-// level0: FixtureOutsideHome - the case lays a file into its own landing repository, which landingRepo builds per case.
-func TestCommitVerbRefusesAModelTrailer(t *testing.T) {
+// The commit verb refuses a message whose trailer names a model, before anything runs or lands, and lands a session trailer, since a link names no model. [[spec/tickets/commit-door-refuses-model-trailers]] [[spec/tickets/model-trailer-refuses-in-place]]
+func TestCommitVerbReadsItsTrailers(t *testing.T) {
 	t.Parallel()
-	at := landingRepo(t)
-	lays(t, at.root, "src/a.go", "package a\n")
-	d, heard, _ := fakeLanding(at)
+	at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 	line := "Co-Authored-By: Claude Opus 5.5"
 	code, _, errs := runsTwin(commitVerb(d), "commit", opens+"\n\n"+line)
 	if code != exitUsage || at.subject() == opens || len(heard.ran) != 0 || !strings.Contains(errs, line) {
 		t.Fatalf("commit answers %d, %q, HEAD %q, ran %v", code, errs, at.subject(), heard.ran)
+	}
+	at, d, _, _ = laidLanding(t, "src/a.go", "package a\n")
+	if code, _, errs := runsTwin(commitVerb(d), "commit", opens+"\n\nClaude-Session: https://claude.ai/code/session_x"); code != 0 || at.subject() != opens {
+		t.Fatalf("commit answers %d, %q, HEAD %q, and wants a session trailer through", code, errs, at.subject())
 	}
 }
 
@@ -316,7 +268,7 @@ func TestCommitVerbRescue(t *testing.T) {
 	t.Parallel()
 	t.Run("a red cloud commit lands on rescue/<group> on origin, and the work branch there moves nowhere", func(t *testing.T) {
 		at := onWorkBranch(t)
-		lays(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
 		d, heard, _ := fakeLanding(at)
 		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
@@ -328,9 +280,7 @@ func TestCommitVerbRescue(t *testing.T) {
 		}
 	})
 	t.Run("a red commit off a work branch writes no rescue", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != exitFailed {
 			t.Fatalf("commit answers %d, %q", code, errs)
@@ -341,12 +291,12 @@ func TestCommitVerbRescue(t *testing.T) {
 	})
 	t.Run("a green push on the work branch drops the rescue it carries", func(t *testing.T) {
 		at := onWorkBranch(t)
-		lays(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
 		d, heard, _ := fakeLanding(at)
 		heard.answers["check"] = verbAnswer{exitFailed, "src/a.go:1 a rule breaks"}
 		runsTwin(commitVerb(d), "commit", opens)
 		delete(heard.answers, "check")
-		lays(t, at.root, "src/b.go", "package a\n")
+		seedFile(t, at.root, "src/b.go", "package a\n")
 		if code, _, errs := runsTwin(commitVerb(d), "commit", "a-ticket: the fix lands"); code != 0 || at.originHas("rescue/one-group") {
 			t.Fatalf("commit answers %d, %q, and the rescue stands: %v", code, errs, at.originHas("rescue/one-group"))
 		}
@@ -357,47 +307,59 @@ func TestCommitVerbRescue(t *testing.T) {
 func TestCommitVerbGates(t *testing.T) {
 	t.Parallel()
 	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
-	t.Run("a staged file the rules refuse stops the commit before the tests, and stages nothing", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "spec/a.md", "a note\n")
-		d, heard, _ := fakeLanding(at)
-		heard.answers["lint --strict spec/a.md"] = verbAnswer{exitFailed, "spec/a.md:1:1: Sentence: A sentence holds 25 words."}
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitFailed || at.subject() == opens || at.staged() != "" || at.originSubject("main") == opens {
-			t.Fatalf("commit answers %d, %q, HEAD %q, staged %q", code, errs, at.subject(), at.staged())
-		}
-		if heard.reached("test") || heard.reached("check") || !strings.Contains(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:") || !strings.Contains(errs, "spec/a.md:1:1: Sentence") {
-			t.Fatalf("commit ran %v and said %q", heard.ran, errs)
+	t.Run("a red test run, a file the rules refuse, a failing cold probe, a cold path with no claude, and a staged marker each land and stage nothing, and name why", func(t *testing.T) {
+		for _, one := range []struct {
+			path, text, key, said string
+			claude                bool
+			skips, says           []string
+		}{
+			{"src/a.go", "package a\n", "test", "--- FAIL: TestA", false, []string{"check"}, []string{"The tests answer red, so nothing stages and nothing lands:", "--- FAIL: TestA"}},
+			{"spec/a.md", "a note\n", "lint --strict spec/a.md", "spec/a.md:1:1: Sentence: A sentence holds 25 words.", false, []string{"test", "check"}, []string{"The rules refuse a file this commit stages, so nothing stages and nothing lands:", "spec/a.md:1:1: Sentence"}},
+			{"src/quack/a.go", "package main\n", "probe cold", "FAIL hook: no line", true, []string{"check"}, []string{"The cold probe answers FAIL on the staged change, so nothing lands:", "FAIL hook: no line"}},
+			{"src/quack/a.go", "package main\n", "", "", false, []string{"probe cold"}, []string{"claude stands nowhere on this box, so src/quack/a.go lands only where the cold probe runs"}},
+			{"src/a.go", "<<<<<<< ours\npackage a\n=======\npackage b\n>>>>>>> theirs\n", "", "", false, nil, []string{"src/a.go:1  a conflict marker"}},
+		} {
+			at, d, heard, _ := laidLanding(t, one.path, one.text)
+			heard.answers[one.key] = verbAnswer{exitFailed, one.said}
+			if one.claude {
+				d.claude = filepath.Join(at.root, "README.md")
+			}
+			code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+			if code != exitFailed || at.subject() == opens || at.staged() != "" || at.originSubject("main") == opens || (one.skips != nil && one.key == "" && strings.Contains(strings.TrimSpace(errs), "\n")) {
+				t.Fatalf("commit over %s answers %d, %q, HEAD %q, staged %q", one.path, code, errs, at.subject(), at.staged())
+			}
+			for _, verb := range one.skips {
+				if heard.reached(verb) {
+					t.Fatalf("commit over %s ran %v past %s", one.path, heard.ran, verb)
+				}
+			}
+			for _, want := range one.says {
+				if !strings.Contains(errs, want) {
+					t.Fatalf("commit over %s says %q, and wants %q", one.path, errs, want)
+				}
+			}
 		}
 	})
-	t.Run("a merge in progress lints the hand's files, and passes a file standing as the merged commit holds it", func(t *testing.T) {
-		at := landingRepo(t)
-		at.must(at.repo.Switch("side", true))
-		lays(t, at.root, "spec/trunk.md", "trunk's note\n")
-		at.commits("side: trunk's note")
-		side := at.head()
-		at.must(at.repo.Switch(trunkBranch, false))
-		lays(t, at.root, "spec/trunk.md", "trunk's note\n")
-		lays(t, at.root, "spec/a.md", "a note\n")
-		at.must(at.repo.UpdateRef(mergeHeadRef, side))
-		d, heard, _ := fakeLanding(at)
-		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("lint --strict spec/a.md") {
-			t.Fatalf("commit answers %d, %q, ran %v, and wants the strict lint over spec/a.md alone", code, errs, heard.ran)
+	t.Run("a merge in progress lints the hand's files alone, and a named path lands the whole index, since git takes no partial merge commit", func(t *testing.T) {
+		for _, named := range [][]string{nil, {"spec/a.md"}} {
+			at := midMerge(t)
+			d, heard, _ := fakeLanding(at)
+			if code, _, errs := runsTwin(commitVerb(d), append([]string{"commit", opens}, named...)...); code != 0 || at.subject() != opens || !heard.reached("lint --strict spec/a.md") {
+				t.Fatalf("commit %v answers %d, %q, HEAD %q, ran %v, and wants the strict lint over spec/a.md alone", named, code, errs, at.subject(), heard.ran)
+			}
 		}
 	})
 	t.Run("the rules read the staged files past the tickets", func(t *testing.T) {
 		at := landingRepo(t)
-		lays(t, at.root, "spec/a.md", "a note\n")
-		lays(t, at.root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n\nmore\n")
+		seedFile(t, at.root, "spec/a.md", "a note\n")
+		seedFile(t, at.root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n\nmore\n")
 		d, heard, _ := fakeLanding(at)
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("lint --strict spec/a.md") {
 			t.Fatalf("commit answers %d, %q, ran %v, and wants the strict lint over spec/a.md alone", code, errs, heard.ran)
 		}
 	})
 	t.Run("a staged file on the cold path runs the probe after the tests, and the commit stands on its pass", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/quack/a.go", "package main\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/quack/a.go", "package main\n")
 		d.claude = filepath.Join(at.root, "README.md")
 		code, out, errs := runsTwin(commitVerb(d), "commit", opens)
 		if code != 0 || at.subject() != opens || !heard.reached("probe cold") {
@@ -407,66 +369,20 @@ func TestCommitVerbGates(t *testing.T) {
 			t.Fatalf("commit ran %v and said %q", heard.ran, out)
 		}
 	})
-	t.Run("a staged file entry of the pull's cold path runs the probe", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/scripts/install.sh", "#!/bin/sh\n")
-		d, heard, _ := fakeLanding(at)
-		d.claude = filepath.Join(at.root, "README.md")
-		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || !heard.reached("probe cold") {
-			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
-		}
-	})
 	t.Run("a staged list off the cold path runs no probe", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "package a\n")
-		d, heard, _ := fakeLanding(at)
+		at, d, heard, _ := laidLanding(t, "src/a.go", "package a\n")
 		d.claude = filepath.Join(at.root, "README.md")
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens); code != 0 || heard.reached("probe cold") {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
 		}
 	})
-	t.Run("a failing cold probe refuses the commit, prints its lines, and unstages", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/quack/a.go", "package main\n")
-		d, heard, _ := fakeLanding(at)
-		d.claude = filepath.Join(at.root, "README.md")
-		heard.answers["probe cold"] = verbAnswer{exitFailed, "FAIL hook: no line"}
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitFailed || at.subject() == opens || at.staged() != "" || heard.reached("check") || at.originSubject("main") == opens {
-			t.Fatalf("commit answers %d, %q, HEAD %q, staged %q, ran %v", code, errs, at.subject(), at.staged(), heard.ran)
-		}
-		if !strings.Contains(errs, "The cold probe answers FAIL on the staged change, so nothing lands:") || !strings.Contains(errs, "FAIL hook: no line") {
-			t.Fatalf("commit says %q", errs)
-		}
-	})
-	t.Run("a cold-path commit on a box holding no claude refuses in one line", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/quack/a.go", "package main\n")
-		d, heard, _ := fakeLanding(at)
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitFailed || at.subject() == opens || at.staged() != "" || heard.reached("probe cold") {
-			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
-		}
-		if lines := strings.Split(strings.TrimSpace(errs), "\n"); len(lines) != 1 || !strings.HasPrefix(lines[0], "claude stands nowhere on this box, so src/quack/a.go lands only where the cold probe runs") {
-			t.Fatalf("commit says %q", errs)
-		}
-	})
 	t.Run("a call naming paths gates on the paths it lands alone", func(t *testing.T) {
 		at := landingRepo(t)
-		lays(t, at.root, "src/quack/a.go", "package main\n")
-		lays(t, at.root, "src/a.go", "package a\n")
+		seedFile(t, at.root, "src/quack/a.go", "package main\n")
+		seedFile(t, at.root, "src/a.go", "package a\n")
 		d, heard, _ := fakeLanding(at)
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "src/a.go"); code != 0 || heard.reached("probe cold") {
 			t.Fatalf("commit answers %d, %q, ran %v", code, errs, heard.ran)
-		}
-	})
-	t.Run("a staged conflict marker refuses the commit, and the staging comes back", func(t *testing.T) {
-		at := landingRepo(t)
-		lays(t, at.root, "src/a.go", "<<<<<<< ours\npackage a\n=======\npackage b\n>>>>>>> theirs\n")
-		d, _, _ := fakeLanding(at)
-		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
-		if code != exitFailed || at.subject() == opens || at.staged() != "" || !strings.Contains(errs, "src/a.go:1  a conflict marker") {
-			t.Fatalf("commit answers %d, %q, staged %q", code, errs, at.staged())
 		}
 	})
 	t.Run("an unmerged file still carrying a marker refuses the commit and stages nothing", func(t *testing.T) {
@@ -479,7 +395,7 @@ func TestCommitVerbGates(t *testing.T) {
 	})
 	t.Run("an unmerged file written clean lands the merge through the verb", func(t *testing.T) {
 		at := conflicted(t)
-		lays(t, at.root, "README.md", "a tree, merged\n")
+		seedFile(t, at.root, "README.md", "a tree, merged\n")
 		d, _, _ := fakeLanding(at)
 		if code, _, errs := runsTwin(commitVerb(d), "commit", opens, "--no-push"); code != 0 {
 			t.Fatalf("commit answers %d, %q", code, errs)
@@ -490,15 +406,30 @@ func TestCommitVerbGates(t *testing.T) {
 	})
 }
 
+// A repository merging a side branch whose note main already holds, with a note of the hand laid beside it. [[spec/tickets/rules-lint-changed-files-first]]
+func midMerge(t *testing.T) *landing {
+	t.Helper()
+	at := landingRepo(t)
+	at.must(at.repo.Switch("side", true))
+	seedFile(t, at.root, "spec/trunk.md", "trunk's note\n")
+	at.commits("side: trunk's note")
+	side := at.head()
+	at.must(at.repo.Switch(trunkBranch, false))
+	seedFile(t, at.root, "spec/trunk.md", "trunk's note\n")
+	seedFile(t, at.root, "spec/a.md", "a note\n")
+	at.must(at.repo.UpdateRef(mergeHeadRef, side))
+	return at
+}
+
 // A repository standing mid-merge, README.md conflicted between main and a side branch. [[spec/tickets/quack-repos-meet-fake-git]]
 func conflicted(t *testing.T) *landing {
 	t.Helper()
 	at := landingRepo(t)
 	at.must(at.repo.Switch("side", true))
-	lays(t, at.root, "README.md", "a tree on the side\n")
+	seedFile(t, at.root, "README.md", "a tree on the side\n")
 	at.commits("a-ticket: the side")
 	at.must(at.repo.Switch(trunkBranch, false))
-	lays(t, at.root, "README.md", "a tree on main\n")
+	seedFile(t, at.root, "README.md", "a tree on main\n")
 	at.commits("a-ticket: the main")
 	if conflicts, _ := at.repo.Merge("side", "", false); len(conflicts) == 0 {
 		t.Fatal("the merge lands clean, and wants a conflict")
@@ -513,5 +444,75 @@ func journals(t *testing.T, root, from, to string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	lays(t, root, ".se/.runtime/undo/20260102030405000000.json", string(text))
+	seedFile(t, root, ".se/.runtime/undo/20260102030405000000.json", string(text))
+}
+
+// A root where no rules load reads no voice. [[spec/tickets/cage-commit-guards-port]]
+// level0: FixtureOutsideHome - the case needs an empty root of its own, where no rules load
+func TestCommitVoiceReadsNothingWhereNoRulesLoad(t *testing.T) {
+	t.Parallel()
+	if rows := commitVoice(quietBox(), t.TempDir(), "a commit message"); rows != nil {
+		t.Errorf("commitVoice answers %v under a root where no rules load", rows)
+	}
+}
+
+// The rules over the message answer the kept findings, and a private shape refuses. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/vale-leaves-the-tree]]
+func TestCommitVoiceRefusesAPrivateShape(t *testing.T) {
+	t.Parallel()
+	root := filepath.Join("..", "..")
+	rows := commitVoice(quietBox(), root, "cage-commit-guards-port: the guard lands\n\nmail somebody at someone"+"@"+"somewhere.net\n")
+	for _, one := range rows {
+		if one.Rule == "Private" {
+			return
+		}
+	}
+	t.Errorf("commitVoice answers %v, and the message carries an address", rows)
+}
+
+// A check stamp naming the sha, green and clean. [[spec/tickets/landing-verbs-port-to-go]]
+func stampsGreen(t *testing.T, root, sha string) {
+	t.Helper()
+	seedFile(t, root, ".se/.runtime/check.json", `{"sha":"`+sha+`","ok":true,"clean":true,"at":"2026-01-02T03:04:05.000Z","warnings":0,"files":[]}`)
+}
+
+func TestPushVerb(t *testing.T) {
+	t.Parallel()
+	t.Run("a green stamp on the commit pushes the branch", func(t *testing.T) {
+		at := landingRepo(t)
+		seedFile(t, at.root, "src/a.go", "package a\n")
+		at.commits("a-ticket: one more")
+		stampsGreen(t, at.root, at.head())
+		d, _, _ := fakeLanding(at)
+		code, out, errs := runsTwin(pushVerb(d), "push")
+		if code != 0 || out != "main stands pushed.\n" || at.originSubject("main") != "a-ticket: one more" {
+			t.Fatalf("push answers %d, %q, %q", code, out, errs)
+		}
+	})
+	t.Run("no stamp, or a stamp on another commit, pushes nothing", func(t *testing.T) {
+		for _, stale := range []bool{false, true} {
+			at := landingRepo(t)
+			if stale {
+				stampsGreen(t, at.root, at.head())
+			}
+			seedFile(t, at.root, "src/a.go", "package a\n")
+			at.commits("a-ticket: one more")
+			d, _, _ := fakeLanding(at)
+			code, _, errs := runsTwin(pushVerb(d), "push")
+			if code != exitFailed || at.originSubject("main") == "a-ticket: one more" {
+				t.Fatalf("push answers %d, %q", code, errs)
+			}
+			if !strings.HasPrefix(errs, "The push takes a green check, and ") || !strings.Contains(errs, "Run `./RUNME.sh check` on the commit you stand on, then push again.") {
+				t.Fatalf("push says %q", errs)
+			}
+		}
+	})
+	t.Run("a push from a repository with no origin names what git says", func(t *testing.T) {
+		at := landingAlone(t)
+		stampsGreen(t, at.root, at.head())
+		d, _, _ := fakeLanding(at)
+		code, _, errs := runsTwin(pushVerb(d), "push")
+		if code != exitFailed || !strings.HasPrefix(errs, "The push of main comes back refused:\n") || len(strings.Split(strings.TrimSpace(errs), "\n")) < 2 {
+			t.Fatalf("push answers %d, %q", code, errs)
+		}
+	})
 }

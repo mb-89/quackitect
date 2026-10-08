@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // Git runs git in the method root, and answers its trimmed output and whether it exited zero. [[spec/design_output/doors#a-door-standing-on-another]]
@@ -92,6 +94,36 @@ func StubInto(d Disk, git Git, now Clock, method, dest string, pid int, named st
 		}
 	}
 	return Stubbed{OK: true, Files: StubFiles(files, dest)}, nil
+}
+
+// Enabled is what an enable answers: whether the settings stand, why not, and whether this run wrote them. [[spec/design_output/level0#a-stub-names-its-vehicle]]
+type Enabled struct {
+	OK    bool
+	Why   string
+	Wrote bool
+}
+
+// Names the method a directory marketplace in the work root's settings.local.json, under the brand its record names, and enables the plugin there. The file changes only where its text does. [[spec/design_output/level0#a-stub-names-its-vehicle]]
+func EnablePlugin(d Disk, work, method string) (Enabled, error) {
+	record, _ := Parse(readIf(d, under(work, Link)))
+	name, _ := Get(record, "name")
+	if !yaml.Truthy(name) {
+		return Enabled{Why: work + " holds no " + Link + " naming a brand, so no marketplace takes the vehicle."}, nil
+	}
+	at := under(work, SettingsLocal)
+	was := readIf(d, at)
+	// The register spells a path with forward slashes, so the marketplace does too. [[spec/design_output/vehicle#the-register-holds-the-port]]
+	made := ShimSettings(was, slashed(method), JSString(name))
+	if made == was {
+		return Enabled{OK: true}, nil
+	}
+	if err := d.MakeDir(filepath.Dir(at)); err != nil {
+		return Enabled{}, err
+	}
+	if err := d.Write(at, made); err != nil {
+		return Enabled{}, err
+	}
+	return Enabled{OK: true, Wrote: true}, nil
 }
 
 // Every file under a folder, slashed and sorted, or none where the folder stands nowhere. [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]

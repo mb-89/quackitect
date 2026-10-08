@@ -185,3 +185,24 @@ func TestEveryScriptRuleHasItsFunction(t *testing.T) {
 		}
 	}
 }
+
+// Each route's minted ticket off the Go mint's golden carries no finding at warning or error, so a verb minting off a route meets no refusal over the route's own words. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+func TestEveryRoutesMintedTicketPassesTheRules(t *testing.T) {
+	t.Parallel()
+	body, err := os.ReadFile(filepath.Join("..", "quack", "testdata", "minted.golden.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var minted []struct{ Route, Text string }
+	if err := json.Unmarshal(body, &minted); err != nil || len(minted) == 0 {
+		t.Fatalf("the golden reads as %d route(s): %v", len(minted), err)
+	}
+	set := loaded(t)
+	for _, one := range minted {
+		for _, found := range set.Lint("spec/tickets/"+one.Route+"-rendered.md", one.Text) {
+			if found.Severity != defaultLevel {
+				t.Errorf("%s's minted ticket carries %s at %s on line %d", one.Route, found.Check, found.Severity, found.Line)
+			}
+		}
+	}
+}

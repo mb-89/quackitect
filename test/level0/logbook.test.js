@@ -5,15 +5,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { logbookOf } from "../../src/extension/lib/logbook.js";
-import { v1Over } from "./v1-index.js";
+import { LOG as SESSION, memoryFiles, v1Over } from "./v1-index.js";
 
 const OTHER = `${JSON.stringify({ at: "x", level: "info", kind: "cli", said: "the other writer" })}\n`;
 
 function doorOf(seed = {}) {
-  const files = fakeDisk(seed);
+  const files = memoryFiles(seed);
   let landed = false;
   const lands = (path) => {
     if (landed || path !== SESSION) return;
@@ -59,4 +57,22 @@ test("a logbook line lands after every line the session holds", async () => {
     "one press",
     "two presses",
   ]);
+});
+
+test("a line below the level now posts nothing", async () => {
+  const door = doorOf();
+  const row = await logbookOf(door, async () => "warn").say("info", "sidebar", "a quiet press");
+  assert.equal(row, undefined);
+  assert.equal(door.files.exists(SESSION), false);
+});
+
+test("a line's extra fields ride its row, and its own fields stand over them", async () => {
+  const door = doorOf();
+  const row = await logbookOf(door, async () => "info").say("info", "sidebar", "a press", {
+    detail: "on",
+    said: "not this",
+  });
+  assert.equal(row.detail, "on");
+  assert.equal(row.said, "a press");
+  assert.equal(row.kind, "sidebar");
 });

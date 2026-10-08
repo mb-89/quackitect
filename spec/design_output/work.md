@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/branches/branch.go` holds every verb over a work branch, and
-`src/engine/group.js` holds what a group's ticket reads and writes. This note
+`src/branches/group.go` holds what a group's ticket reads and writes. This note
 covers the branch, the group on it, and the round trip.
 
 # What a work branch is
@@ -34,7 +34,7 @@ So both push doors refuse the command before git runs it:
 | `--force`, `-f`, `--force-with-lease`, or a ref pair opening with a plus | refused, as a rewrite |
 | a push that moves the branch forward | nothing, and it stands |
 
-`VERSION` in `.claude/skills/level0/lib/trunk.js` says what a version branch
+`version` in `src/modules/hooks/command/guards.go` says what a version branch
 is, and both doors read that one name. A branch merely opening with `v` stands
 outside it, so `v4-recovered` pushes and deletes the way any branch does.
 
@@ -68,13 +68,13 @@ naming one of them. The ask says what the group adds up to.
 
 A child group names its parent under `group`, per
 [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]. Each rule
-reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
+reads the chain `ancestorsOf` in `src/branches/group.go` walks off trunk:
 
 | the rule | where it stands |
 |---|---|
-| a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
-| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/scripts/work-stands.js` |
-| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/branches/dispatch_write.go` |
+| a parent is a group some group names | `parentsIn` in `src/branches/group.go` |
+| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/branches/stands.go` |
+| a parent reaches no worker, and opens no branch | `freeIn` in `src/branches/free.go`, and `opensOf` in `src/branches/dispatch_write.go` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
 | each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/branches/dispatch.go` |
 | `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/branches/merge.go` |
@@ -128,7 +128,7 @@ and the frontmatter then reads as broken. Vale reads no line of such a file,
 and the lint over the tree exits one. The ticket door refuses the hand that
 repairs it, because the record is the engine's.
 
-So `quoted` in `src/engine/group.js` wraps a value in double quotes where
+So `Quote` in `src/front/front.go` wraps a value in double quotes where
 it carries any of these, and escapes the backslash and the quote inside:
 
 | what | why a reader trips |
@@ -180,7 +180,7 @@ A flag asks for that one reading in place of the rows.
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
+| the contents | `cat-file --batch`, in `src/modules/git/git.go` | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
 | the trunk tip | `rev-parse`, once a listing | the commit a base short of it reads `behind` against |
 
@@ -401,7 +401,7 @@ the verb refuses it. So a desk mints the successor off this route:
 
     ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
-`test/contract/process.test.js` reads that route off disk and holds it open, and
+`TestThePersonRouteOpensAtAPersonStepAndAnyHandCarriesOn` in `src/pull/routes_test.go` reads that route off disk and holds it open, and
 `src/branches/port_f_unblock_test.go` runs the verb.
 
 # One handover stands
@@ -518,7 +518,7 @@ committing on `main` pushes after another box pushes first.
 A group ticket conflicts on nearly every sync. The branch appends to `record`,
 and `main` adds a key such as `cloud` or `depends_on`. So `branch sync` reads
 each unmerged ticket under `spec/tickets` through its stages, the base, the
-branch and `main`, and `mergedFront` in `src/engine/front-merge.js` merges
+branch and `main`, and `mergedFront` in `src/branches/sync.go` merges
 the front key by key:
 
 | what the two sides do to a key | what the merge takes |
@@ -541,11 +541,11 @@ the merge commits. For details, see [[spec/design_output/pull#a-merge-opens-the-
 
 A merge conflict leaves marker lines in a file, and a verb staging the whole
 tree stages them as resolved. A step verb running past a stopped sync
-commits them into the merge. So each commit road reads the marks in `.claude/skills/level0/lib/markers.js`:
+commits them into the merge. So each commit road reads the marks before it lands:
 
 | the road | what it refuses |
 |---|---|
-| a step verb's landing, in `src/scripts/pull-landed.js` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
+| a step verb's landing, in `src/pull/pull_landed.go` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
 | `./RUNME.sh commit` | an unmerged file carrying a marker on disk, before the tests run, and a marker the index carries |
 | the pre-commit hook | a marker line the staged delta adds |
 | the sweep, as `NoConflictMarkers` in `src/modules/check/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |
@@ -629,10 +629,10 @@ A desk works on `main` alone, and takes a cloud branch into `main` through
 `branch merge` alone. A cloud box owns its branch, and the owner reads a desk's
 work on `main`.
 
-`cloudHere` in `.claude/skills/level0/lib/cloud.js` is the one read of the
-cloud, for the Bash door and the verbs alike. The doors' own `cloud` flag
-answers first, and the cloud variables answer where it stands unset. `onDesk`
-beside it answers where a box off the cloud stands on a `work/` branch.
+`InCloud` in `src/modules/hooks/command/cloud.go` reads the cloud variables
+for the Bash door, which carries its answer as `Settings.Cloud`. `deskGuard`
+in `src/modules/hooks/commits.go` refuses where a box off the cloud lands on a
+`work/` branch.
 
 Each road below refuses on a desk, and the refusal names `git switch main` and
 `branch merge`:
@@ -699,8 +699,8 @@ anything but `true`:
 The wait reads the tracked `spec/config/level0.json` on `origin/main`, the file
 every box shares. A per-box file, a variable and the sidebar each write this
 box alone, so none of them lets the cloud take the group. `readWork` in
-`src/scripts/work-stands.js` reads that file once, through `flatten` in the one
-resolver, where some group names the field.
+`src/branches/stands.go` reads that file once, through `flatten` in the same
+file, where some group names the field.
 
 | the verb | what it does with a switched-off group |
 |---|---|
@@ -740,7 +740,7 @@ reads that, and every other warning holds the push.
 
 So `done` stops meaning "the session believes this passes". It comes to mean
 "a program runs on this commit, and it passes with no warning standing". One
-reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
+reading, `saysGreen` in `src/branches/done.go`, answers `done`, the pre-push hook and
 the Bash door alike, so a warning holds every road off the box.
 
 The ready step runs alone before the parts, and every part waits on it:
@@ -792,7 +792,7 @@ The report fills while the tests run:
 
 | writer | writes |
 |---|---|
-| `src/scripts/battery-reporter.js`, the runner's reporter the check names beside the spec one | a line a case: its file, its time, and the error's first line where it is red |
+| `test/battery-reporter.js`, the runner's reporter the check names beside the spec one | a line a case: its file, its time, and the error's first line where it is red |
 | the process door, where `SE_SPAWNS` names the tally file | a line a spawn, the program's name, in every process the run starts |
 
 So a shell a test starts counts its spawns too, where that shell runs this
@@ -891,7 +891,7 @@ origin. Naming no branch closes every one of them. It reaches the kinds below:
 
 A branch whose tip stands on trunk's own line is a cut waiting for a box, so
 it reads open while trunk moves on. A landed branch joins trunk through a
-merge commit, off that line, and `mergedHere` in `src/scripts/work-stands.js`
+merge commit, off that line, and `mergedHere` in `src/branches/stands.go`
 reads the two apart.
 
 | branch | cut by | throwaway once |

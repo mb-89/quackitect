@@ -4,32 +4,12 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
-	"quackitect/src/index"
 	"quackitect/src/modules/work"
 	"quackitect/src/q"
 )
-
-// A door holding work/rows as the case seeds it, and the V1 answering its base. [[spec/tickets/view-actions-run-through-verbs]]
-func rowsIndex(t *testing.T, rows []work.Row) func() (string, error) {
-	t.Helper()
-	root := t.TempDir()
-	c := q.New()
-	hand := q.OutIn(c, placeRows, []work.Row{}, q.Doc("the rows as the case seeds them"))
-	seeds := func(_ string, commit index.Commit) (func(), error) {
-		return func() {}, commit(hand, map[string]any{placeRows: rows})
-	}
-	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	base := hq3V1Of(t, root)
-	return func() (string, error) { return base, nil }
-}
 
 // Three loose tickets, a todo row past them, and a standing branch with two children. [[spec/tickets/view-actions-run-through-verbs]]
 var placeCaseRows = []work.Row{
@@ -54,27 +34,32 @@ func runsPlace(t *testing.T, root string, v1 func() (string, error), dry bool, w
 }
 
 func TestTicketPlace(t *testing.T) {
-	v1 := rowsIndex(t, placeCaseRows)
-	t.Run("place writes the value into the plan file, off the siblings the queue answers", func(t *testing.T) {
-		root := t.TempDir()
-		code, out, errs := runsPlace(t, root, v1, false, "b", "1")
-		if got, _ := readsBack(t, root, planCase); code != 0 || out != "b takes place 1 once the queue reads it.\n" || errs != "" || got != "{\n  \"places\": {\n    \"b\": \"true\"\n  }\n}\n" {
-			t.Fatalf("place answers %d, %q, %q, and writes %q", code, out, errs, got)
+	v1 := seededTree(t, placeRows, []work.Row{}, placeCaseRows)
+	t.Run("place writes the value into the plan file, off the siblings the queue answers, a place reads as Number reads it, and a dry run writes nothing", func(t *testing.T) {
+		for _, one := range []struct {
+			dry         bool
+			place, want string
+		}{{false, "1", "{\n  \"places\": {\n    \"b\": \"true\"\n  }\n}\n"}, {false, "01", "{\n  \"places\": {\n    \"b\": \"true\"\n  }\n}\n"}, {true, "1", ""}} {
+			root := t.TempDir()
+			code, out, errs := runsPlace(t, root, v1, one.dry, "b", one.place)
+			if got, _ := readIn(root, planCase); code != 0 || out != "b takes place 1 once the queue reads it.\n" || errs != "" || got != one.want {
+				t.Fatalf("place %s answers %d, %q, %q, and writes %q", one.place, code, out, errs, got)
+			}
 		}
 	})
 	t.Run("a loose ticket's level holds every root, its group's children among them", func(t *testing.T) {
 		root := t.TempDir()
-		seedsFile(t, root, planCase, `{"working":"w","places":{"x":"last"}}`)
+		seedFile(t, root, planCase, `{"working":"w","places":{"x":"last"}}`)
 		code, out, _ := runsPlace(t, root, v1, false, "a", "4")
 		want := "{\n  \"working\": \"w\",\n  \"places\": {\n    \"x\": \"last\",\n    \"a\": \"last\"\n  }\n}\n"
-		if got, _ := readsBack(t, root, planCase); code != 0 || out != "a takes place 4 once the queue reads it.\n" || got != want {
+		if got, _ := readIn(root, planCase); code != 0 || out != "a takes place 4 once the queue reads it.\n" || got != want {
 			t.Fatalf("place answers %d, %q, and writes %q", code, out, got)
 		}
 	})
 	t.Run("a branch's child places among its siblings", func(t *testing.T) {
 		root := t.TempDir()
 		code, _, errs := runsPlace(t, root, v1, false, "k1", "2")
-		if got, _ := readsBack(t, root, planCase); code != 0 || !strings.Contains(got, `"k1": "last"`) {
+		if got, _ := readIn(root, planCase); code != 0 || !strings.Contains(got, `"k1": "last"`) {
 			t.Fatalf("place answers %d, %q, and writes %q", code, errs, got)
 		}
 		code, _, errsOut := runsPlace(t, root, v1, false, "k1", "3")
@@ -84,9 +69,9 @@ func TestTicketPlace(t *testing.T) {
 	})
 	t.Run("the same place again takes a todo off", func(t *testing.T) {
 		root := t.TempDir()
-		seedsFile(t, root, planCase, `{"places":{"d":"true"}}`)
+		seedFile(t, root, planCase, `{"places":{"d":"true"}}`)
 		code, _, _ := runsPlace(t, root, v1, false, "d", "4")
-		if got, _ := readsBack(t, root, planCase); code != 0 || got != "{\n  \"places\": {}\n}\n" {
+		if got, _ := readIn(root, planCase); code != 0 || got != "{\n  \"places\": {}\n}\n" {
 			t.Fatalf("place answers %d, and writes %q", code, got)
 		}
 	})
@@ -107,22 +92,9 @@ func TestTicketPlace(t *testing.T) {
 		} {
 			root := t.TempDir()
 			code, out, errs := runsPlace(t, root, v1, false, one.argv...)
-			if _, stands := readsBack(t, root, planCase); code != 2 || out != "" || errs != one.want+"\n" || stands {
+			if _, stands := readIn(root, planCase); code != 2 || out != "" || errs != one.want+"\n" || stands {
 				t.Errorf("%v answers %d, %q, %q", one.argv, code, out, errs)
 			}
-		}
-	})
-	t.Run("a place reads as Number reads it", func(t *testing.T) {
-		code, out, _ := runsPlace(t, t.TempDir(), v1, false, "b", "01")
-		if code != 0 || out != "b takes place 1 once the queue reads it.\n" {
-			t.Fatalf("place 01 answers %d, %q", code, out)
-		}
-	})
-	t.Run("a dry run says so, and writes nothing", func(t *testing.T) {
-		root := t.TempDir()
-		code, out, _ := runsPlace(t, root, v1, true, "b", "1")
-		if _, stands := readsBack(t, root, planCase); code != 0 || out != "b takes place 1 once the queue reads it.\n" || stands {
-			t.Fatalf("the dry place answers %d, %q, and writes", code, out)
 		}
 	})
 	t.Run("the registry refuses a place out of range before it asks the index", func(t *testing.T) {
@@ -131,4 +103,55 @@ func TestTicketPlace(t *testing.T) {
 			t.Fatalf("place 12 answers %d, %q, %q", code, out, errs)
 		}
 	})
+}
+
+// The minute the case stands at, and the seconds of a day. [[spec/design_output/pull#the-queue-is-a-score]]
+const (
+	caseMinute = int64(29_000_000)
+	aDay       = int64(86400)
+)
+
+// Two open tickets tie on every term but their age. The name puts a-new first, and the day it stood puts b-old first, as the verb's program orders them. [[spec/design_output/pull#the-queue-is-a-score]]
+func TestTheWiredQueueWeighsTheDaysATicketStood(t *testing.T) {
+	t.Parallel()
+	all := treeWiring(t)
+	w := q.Wiring{Wires: all.Wires}
+	for _, one := range all.Instances {
+		if one.Module == "tickets" || one.Module == "queue" || one.Module == "work" {
+			w.Instances = append(w.Instances, one)
+		}
+	}
+	c := q.New()
+	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	minute := q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
+	resolved := q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	stood := q.OutIn(c, stoodName, map[string]int64{}, q.Doc("the second each ticket path came in"))
+	noTips(c)
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	s := q.NewStore(c)
+	now := caseMinute * 60
+	open := q.Content{Hash: "open", Text: "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA thing.\n"}
+	for _, seed := range []struct {
+		hand   q.Writer
+		values map[string]any
+	}{
+		{files, map[string]any{"files/spec/tickets/a-new.md": open, "files/spec/tickets/b-old.md": open}},
+		{minute, map[string]any{"clock/minute": caseMinute}},
+		{resolved, map[string]any{q.ResolvedName: q.Resolved{"queue/config/block": "10", "queue/config/day": "1", "queue/config/fail": "5"}}},
+		{stood, map[string]any{stoodName: map[string]int64{"spec/tickets/a-new.md": now - 60, "spec/tickets/b-old.md": now - 3*aDay}}},
+	} {
+		if _, err := s.Commit(0, seed.hand, seed.values); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, name := range []string{"tickets/all", "tickets/branched", "tickets/branches", "tickets/cloud", "queue/config/block", "queue/config/day", "queue/config/fail", "queue/places"} {
+		if err := s.Run(name); err != nil {
+			t.Fatalf("the run of %s answers %v", name, err)
+		}
+	}
+	if said, _ := s.Snapshot().Read("queue/places").(map[string]string); said["b-old"] != "1" || said["a-new"] != "2" {
+		t.Fatalf("queue/places reads %v, and wants b-old at 1 and a-new at 2", said)
+	}
 }

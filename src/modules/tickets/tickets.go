@@ -172,7 +172,7 @@ func treeOf(tip ticket.Tip, trunk []ticket.File) []ticket.File {
 	return out
 }
 
-// A branch landed once trunk carries its group ticket closed, the rule landedHere in src/scripts/work-stands.js holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+// A branch landed once trunk carries its group ticket closed, the rule landedHere in src/branches/stands.go reads. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 func merged(tip ticket.Tip) bool {
 	return tip.Trunk != "" && Of("", "", tip.Trunk, 0).State == closedState
 }
@@ -201,7 +201,7 @@ const cloudMark = "cloud"
 // The hand a leaf names where a person takes it. [[spec/design_output/pull#the-queue-is-a-score]]
 const personHand = "person"
 
-// The anchor a todo names: nothing where the front reads none or false, first for a bare true, and the word itself otherwise, the rule todoOf in src/engine/group.js holds. [[spec/design_output/pull#a-todo-forces-a-place]]
+// The anchor a todo names: nothing where the front reads none or false, first for a bare true, and the word itself otherwise, the rule todoOf in src/branches/group.go holds. [[spec/design_output/pull#a-todo-forces-a-place]]
 func todoAt(said string) string {
 	switch said {
 	case "", "false":
@@ -349,7 +349,7 @@ func standingOf(state string, front *yaml.Doc) string {
 	return StandingTodo
 }
 
-// Whether any record item carries hash_before and no hash_after, which is the claim a take pushes, the rule heldIn in src/engine/group.js holds. [[spec/design_output/work#held-derives-from-the-record]]
+// Whether any record item carries hash_before and no hash_after, which is the claim a take pushes, the rule heldIn in src/branches/group.go holds. [[spec/design_output/work#held-derives-from-the-record]]
 func heldIn(front *yaml.Doc) bool {
 	for _, item := range yaml.AsList(front.Get("record")) {
 		entry := yaml.AsDoc(item)
@@ -360,7 +360,7 @@ func heldIn(front *yaml.Doc) bool {
 	return false
 }
 
-// The tickets one waits on, a list or one line split at each comma, the rule dependsOn in src/engine/group.js holds. [[spec/tickets/the-queue-moves-to-plan]]
+// The tickets one waits on, a list or one line split at each comma, the rule dependsOn in src/branches/group.go holds. [[spec/tickets/the-queue-moves-to-plan]]
 func dependsOnIn(front *yaml.Doc) []string {
 	var out []string
 	for _, line := range yaml.StringsOf(front.Get("depends_on")) {
@@ -401,7 +401,7 @@ func failsIn(front *yaml.Doc) int {
 	return count
 }
 
-// The step the front names, and the first leaf of its steps where none stands, as stepOf in src/engine/group.js reads it. [[spec/tickets/fix-verbs-shadow-yours]]
+// The step the front names, and the first leaf of its steps where none stands, as stepOf in src/branches/group.go reads it. [[spec/tickets/fix-verbs-shadow-yours]]
 func stepIn(front *yaml.Doc) string {
 	if said := word(front.Get("step")); said != "" {
 		return said

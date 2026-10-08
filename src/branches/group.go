@@ -1,4 +1,4 @@
-// A group, read off its ticket, as src/engine/group.js reads it: the front,
+// A group, read off its ticket: the front,
 // the record, the step and the ask, and the writes through the Go front
 // writer. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]
@@ -18,7 +18,7 @@ import (
 // The folders, the branch prefix, the fields and the states the engine reads. [[spec/design_output/level0#a-write-names-its-ticket]]
 const (
 	ticketsFolder = "spec/tickets"
-	// .claude/skills/level0/lib/folders.js owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
+	// src/modules/check/folders.go owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
 	notesFolder  = ".se/tickets"
 	noteEnd      = ".md"
 	workBranch   = "work/"
@@ -247,6 +247,14 @@ func heldIn(text string) *hold {
 		Hand:       bare(yaml.AsString(held.Get("hand"))),
 		HashBefore: bare(yaml.AsString(held.Get("hash_before"))),
 	}
+}
+
+// The hand of the open take, or nothing where every take stands closed. [[spec/tickets/git-hooks-run-in-go]]
+func HandIn(text string) string {
+	if held := heldIn(text); held != nil {
+		return held.Hand
+	}
+	return ""
 }
 
 // The first leaf of a route, its path joined by slashes. [[spec/design_output/work#a-group-is-a-ticket]]

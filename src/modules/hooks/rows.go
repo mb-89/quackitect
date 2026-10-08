@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// .claude/skills/level0/lib/folders.js owns the session log's folder, and the package spells it again. [[spec/tickets/prompt-answers-off-the-door]]
+// src/modules/check/folders.go owns the session log's folder, and the package spells it again. [[spec/tickets/prompt-answers-off-the-door]]
 const sessionLog = ".se/.log/session.jsonl"
 
 // The level and kinds a prompt's row carries, the stamp toISOString writes, and the flags an append opens the log with. [[spec/tickets/prompt-answers-off-the-door]]
@@ -24,7 +24,7 @@ const (
 	appendFlags = os.O_APPEND | os.O_CREATE | os.O_WRONLY
 )
 
-// One row of the session log, field for field as rowOf in .claude/skills/level0/lib/log.js writes it. [[spec/tickets/prompt-answers-off-the-door]]
+// One row of the session log, field for field as sayLine in src/quack/verb_log.go writes it. [[spec/tickets/prompt-answers-off-the-door]]
 type LogRow struct {
 	At     string `json:"at"`
 	Level  string `json:"level"`
@@ -35,11 +35,10 @@ type LogRow struct {
 	Text   string `json:"text,omitempty"`
 }
 
-// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, which the package spells again, the kind its row carries, and the cap on a string the row keeps. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's words, which ReplyMarker and ReplyEvent in probe.go own, and the cap on a string the row keeps. [[spec/tickets/the-reply-probe-runs]]
 const (
-	replyMarker = "se-probe-reply"
-	replyEvent  = "probe.reply"
-	probeKind   = "probe"
+	replyMarker = ReplyMarker
+	replyEvent  = ReplyEvent
 	probeShort  = 4000
 )
 

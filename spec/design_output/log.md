@@ -4,8 +4,9 @@ kind: [[design_output]]
 
 # Scope
 
-`src/doors/log.js` writes one line for each thing a door does. This note covers
-the shape of a line, who says what, and who reads it back.
+The session log holds one line for each thing a hook, a verb or the sidebar
+does. This note covers the shape of a line, who says what, and who reads it
+back.
 
 # What one line looks like
 
@@ -141,17 +142,12 @@ The viewer holds a floor of its own over what the disk carries. For details, see
 
 # Where the writer stands
 
-`.claude/skills/level0/lib/log.js` shapes a line and reaches nothing. The
-writers below read it, one for each runtime:
+`sayLine` in `src/quack/verb_log.go` shapes a line. The writers below follow
+it, one for each runtime:
 
-- `logHere` in `hooks/level0.ts`, through `$.fs`
-- `src/doors/log.js`, through the disk door, for the command line
+- `wrote` in `hooks/level0.ts`, through the `log` verb, and through `$.fs` where the verb fails
+- `appendRows` in `src/modules/hooks/rows.go`, for the Go hooks and verbs
 - `src/extension/lib/logbook.js`, through the editor door, for the sidebar
-
-The door takes the disk and the clock as arguments, the way the git door takes
-the process door. The door writes a row and forgets it. `src/doors/fake/log.js`
-pairs it with the fake disk and asks it to keep its rows, so a test reads back
-what a door says and touches nothing.
 
 # Every writer appends
 
@@ -177,8 +173,7 @@ that.
 
 A door counting rows of a kind reads the session file past the offset it holds,
 through the disk door's `readFrom`. It folds the new whole rows into what it
-holds on the box. `tallied` in `.claude/skills/level0/lib/log.js` does
-the reading. A fresh box reads the file once from the start, and a file shorter
+holds on the box. A fresh box reads the file once from the start, and a file shorter
 than the offset reads as a new session. Other writers land rows in the same
 file, so the door reads the file and counts no row in memory.
 

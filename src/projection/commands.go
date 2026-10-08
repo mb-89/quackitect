@@ -19,7 +19,7 @@ const (
 	commentKey = "comment"
 	// The tracked file a command names. [[spec/design_output/config#the-layers]]
 	trackedConfig = "spec/config/level0.json"
-	// The local file a command names, in the runtime folder .claude/skills/level0/lib/folders.js owns, spelled again because a Go package imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
+	// The local file a command names, in the runtime folder src/modules/check/folders.go owns, spelled again because a Go package imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
 	localConfig = ".se/.runtime/config.json"
 	// The line that keeps a command off the model's skill listing. [[spec/design_output/projection#how-a-command-sets-it]]
 	hidden    = "disable-model-invocation: true"

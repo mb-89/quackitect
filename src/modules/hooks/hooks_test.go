@@ -275,6 +275,67 @@ func TestTheListenAnswersAPostAndStandsItsPort(t *testing.T) {
 	}
 }
 
+// The events the door decides, as the old cage listed them. [[spec/tickets/level0-hooks-forward-to-go]]
+var doored = []string{
+	"session.start", "prompt.context", "prompt.submit", "classic.MessageDisplay", "agent.spoke",
+	"session.compact", "session.end", "session.measure", "turn.said", "turn.complete",
+	"classic.Stop", "agent.spawn", "tool.describe", "tool.call", "agent.answered",
+}
+
+// The place of the newest event of s1, or 0 where none landed. [[spec/tickets/level0-hooks-forward-to-go]]
+func seqOf(one over) int64 {
+	event, _ := one.ix.Read("events/s1").(q.Event)
+	return event.Seq
+}
+
+func TestTheDoorWritesNoEventOutsideItsList(t *testing.T) {
+	one := doorOver(t, &calls{}, &book{})
+	for _, event := range doored {
+		before := seqOf(one)
+		hooks(t, one.door, Post{Event: event, E: map[string]any{"session_id": "s1", "tool": "Read"}})
+		if seqOf(one) != before+1 {
+			t.Fatalf("%s lands at %d after %d, and wants its event written", event, seqOf(one), before)
+		}
+	}
+	for _, event := range []string{"engine.create", "turn.step", "tool.result"} {
+		before := seqOf(one)
+		said := hooks(t, one.door, Post{Event: event, E: map[string]any{"session_id": "s1"}})
+		if seqOf(one) != before {
+			t.Errorf("%s lands at %d, and wants no event written outside the list", event, seqOf(one))
+		}
+		if len(said.Effects) != 1 || said.Effects[0].Kind != passKind {
+			t.Errorf("%s answers %+v, and wants a pass", event, said)
+		}
+	}
+}
+
+func TestTheFillRidesTheMainAgentsCallAndStopAlone(t *testing.T) {
+	const fill = 123456.0
+	for _, one := range []struct {
+		name  string
+		post  Post
+		fills bool
+	}{
+		{"the main agent's call", Post{Event: toolEvent, E: map[string]any{"session_id": "s1", "tool": "Read"}}, true},
+		{"the turn's end", Post{Event: stopEvent, E: map[string]any{"session_id": "s1"}}, true},
+		{"a helper's call", Post{Event: toolEvent, E: map[string]any{"session_id": "s1", "tool": "Read", "agentId": "h1"}}, false},
+		{"a prompt", Post{Event: promptEvent, E: map[string]any{"session_id": "s1", "text": "go"}}, false},
+		{"a context read", Post{Event: contextEvent, E: map[string]any{"session_id": "s1"}}, false},
+	} {
+		door := doorOver(t, &calls{}, &book{})
+		one.post.Fill = fill
+		hooks(t, door.door, one.post)
+		event, _ := door.ix.Read("events/s1").(q.Event)
+		got, carries := event.Fields["fill"]
+		if one.fills && got != fill {
+			t.Errorf("%s lands the fill %v, and wants %v", one.name, got, fill)
+		}
+		if !one.fills && carries {
+			t.Errorf("%s lands the fill %v, and wants none", one.name, got)
+		}
+	}
+}
+
 func jsonNumber(n int) string {
 	text, _ := json.Marshal(n)
 	return string(text)

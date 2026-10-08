@@ -3,15 +3,10 @@ src/config/door.go envOf
 src/config/door.go makeDir
 src/config/door.go readFile
 src/config/door.go writeFile
-src/engine/swap/door.go executableOf
-src/engine/swap/door.go statOf
 src/failure/door.go Dir.Files
 src/failure/door.go Dir.Read
 src/failure/door.go Dir.Walk
 src/failure/door.go Shell.Run
-src/front/cmd/door.go files.read
-src/front/cmd/door.go files.write
-src/front/cmd/door.go main
 src/imports/imports.go Doors
 src/imports/imports.go SuiteFaults
 src/imports/imports.go suiteIn
@@ -40,6 +35,8 @@ src/index/index.go Open
 src/index/main.go rootHere
 src/index/procs.go spawnsProcess
 src/index/stop_windows.go awaitsExit
+src/index/swap/door.go executableOf
+src/index/swap/door.go statOf
 src/index/sweep.go sweep
 src/index/sweep.go touches
 src/index/v1.go door.servesV1
@@ -62,10 +59,12 @@ src/quack/boxdoors.go httpSend
 src/quack/boxdoors.go posts
 src/quack/boxdoors.go reads
 src/quack/boxdoors.go realBoxDoors
+src/quack/boxdoors.go realPost
 src/quack/boxdoors.go realRun
 src/quack/boxfiles.go readText
 src/quack/boxfiles.go realAppend
 src/quack/boxfiles.go stands
+src/quack/bundle_verb.go drawingStamp
 src/quack/checkdoors.go checkDoorsOf
 src/quack/checkdoors.go redHere
 src/quack/checkdoors.go runsUnder
@@ -81,7 +80,6 @@ src/quack/io.go runsIO
 src/quack/lsp.go lspVerb
 src/quack/lspprobe.go fileURL
 src/quack/main.go askIndex
-src/quack/main.go configOn
 src/quack/main.go dumps
 src/quack/main.go main
 src/quack/main.go manages
@@ -92,6 +90,7 @@ src/quack/placements.go moduleMain
 src/quack/placements.go runsModule
 src/quack/rules.go treeRules
 src/quack/serve_verb.go serveReal
+src/quack/stamp_verb.go sourceStamp
 src/quack/ticket_doors.go pullHere
 src/quack/ticket_doors.go rootsOf
 src/quack/ticket_doors.go servesHere

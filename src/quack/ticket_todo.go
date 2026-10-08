@@ -14,7 +14,7 @@ import (
 
 func init() { register("ticket todo", ticketTodo(pullingHere(index.Root, registeredRepo))) }
 
-// The tag the pull hands back first, which TODO in .claude/skills/level0/lib/todo.js names. [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+// The tag the pull hands back first. [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 const todoKey = "todo"
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

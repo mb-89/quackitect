@@ -23,6 +23,9 @@ const (
 type Kinds struct {
 	order []string
 	at    map[string]*yaml.Doc
+	// Every schema by its kind, which a $ref names, and the schemas governing a data file. [[spec/design_output/schema#one-home-for-a-shape]]
+	every map[string]*yaml.Doc
+	data  *Kinds
 }
 
 func (one *Kinds) set(kind string, said *yaml.Doc) {
@@ -64,13 +67,26 @@ func isNoteSchema(said *yaml.Doc) bool {
 	return body != nil && (len(yaml.AsList(body.Get("sections"))) > 0 || yaml.AsString(body.Get("x-steps")) != "")
 }
 
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+func isDataSchema(said *yaml.Doc) bool {
+	return said != nil && yaml.AsString(said.Get("kind")) != "" && yaml.AsDoc(said.Get("data")) != nil
+}
+
 // [[spec/design_output/schema#the-schemas-read-once]]
 func schemasIn(tree *Tree) *Kinds {
-	out := &Kinds{}
+	out := &Kinds{every: map[string]*yaml.Doc{}, data: &Kinds{}}
 	for _, name := range tree.Names(Schemas, SchemaEnd) {
 		said := yaml.AsDoc(yaml.Read(tree.Read(Schemas + "/" + name)))
+		kind := yaml.AsString(said.Get("kind"))
+		if kind == "" {
+			continue
+		}
+		out.every[kind] = said
 		if isNoteSchema(said) {
-			out.set(yaml.AsString(said.Get("kind")), said)
+			out.set(kind, said)
+		}
+		if isDataSchema(said) {
+			out.data.set(kind, said)
 		}
 	}
 	return out
@@ -78,6 +94,9 @@ func schemasIn(tree *Tree) *Kinds {
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
 func governorOf(schemas *Kinds, path string) *yaml.Doc {
+	if schemas == nil {
+		return nil
+	}
 	where := slashed(path)
 	for _, kind := range schemas.order {
 		schema := schemas.at[kind]
@@ -107,16 +126,21 @@ func strangerFault(text string, schema *yaml.Doc, where string) (Finding, bool) 
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
 // A reading past one buffer wants the tree, and the write door holds none. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
-func checkNoteIn(tree *Tree, text string, schema *yaml.Doc, where string) []Finding {
-	out := checkNote(text, schema, where)
+func checkNoteIn(tree *Tree, text string, schema *yaml.Doc, where string, schemas *Kinds) []Finding {
+	out := checkNoteWith(text, schema, where, schemas)
 	return append(out, markedFaults(tree, readNote(text), schema, where)...)
 }
 
 func checkNote(text string, schema *yaml.Doc, where string) []Finding {
+	return checkNoteWith(text, schema, where, nil)
+}
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+func checkNoteWith(text string, schema *yaml.Doc, where string, schemas *Kinds) []Finding {
 	note := readNote(text)
 	kind := yaml.AsString(schema.Get("kind"))
 	front, body := yaml.AsDoc(schema.Get("frontmatter")), yaml.AsDoc(schema.Get("body"))
-	out := frontFaults(note, front, kind, where)
+	out := frontFaults(note, schema, kind, where, schemas)
 	if note.Front.Stands {
 		out = append(out, edgeFaults(note, yaml.AsDoc(front.Get("properties")), kind, where)...)
 	}
@@ -124,44 +148,147 @@ func checkNote(text string, schema *yaml.Doc, where string) []Finding {
 	return append(out, stepFaults(text, body, where)...)
 }
 
-func frontFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
+// What a walk over one note's keys holds: the kind, the file, the line of each key path, the root a keyword names a step in, and the schemas a $ref reads. [[spec/design_output/schema#the-checker-walks-every-key]]
+type keyWalk struct {
+	kind, where, calls string
+	lines              map[string]int
+	root, schema       *yaml.Doc
+	schemas            *Kinds
+}
+
+func (one keyWalk) lineOf(path string) int {
+	if line := one.lines[path]; line > 0 {
+		return line
+	}
+	return 1
+}
+
+func frontFaults(note Note, schema *yaml.Doc, kind, where string, schemas *Kinds) []Finding {
 	if !note.Front.Stands {
 		return []Finding{schemaFault("Frontmatter", where, 1,
 			fmt.Sprintf("A %s note opens with frontmatter.", kind))}
 	}
-
-	out := []Finding{}
 	said := note.Front.Said
-	props := yaml.AsDoc(spec.Get("properties"))
+	held := keyWalk{kind: kind, where: where, calls: "frontmatter", lines: note.Front.Lines, root: said, schema: schema, schemas: schemas}
+	out := mapFaults(said, yaml.AsDoc(schema.Get("frontmatter")), held, "")
+	return append(out, slotFaults(said, where, note.Front.Lines)...)
+}
 
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+func checkData(text string, schema *yaml.Doc, where string, schemas *Kinds) []Finding {
+	read, lines := yaml.ReadLines(text)
+	said := yaml.AsDoc(read)
+	if said == nil {
+		said = yaml.New()
+	}
+	held := keyWalk{kind: yaml.AsString(schema.Get("kind")), where: where, calls: "file", lines: lines, root: said, schema: schema, schemas: schemas}
+	out := mapFaults(said, yaml.AsDoc(schema.Get("data")), held, "")
+	return append(out, slotFaults(said, where, lines)...)
+}
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+func mapFaults(said, spec *yaml.Doc, held keyWalk, path string) []Finding {
+	out := []Finding{}
+	props := yaml.AsDoc(spec.Get("properties"))
 	for _, key := range yaml.StringsOf(spec.Get("required")) {
 		if !yaml.Empty(said.Get(key)) || waitsForFill(said, yaml.AsDoc(props.Get(key))) {
 			continue
 		}
-		out = append(out, schemaFault(key, where, 1,
-			fmt.Sprintf("A %s names %s in its frontmatter.", kind, key)))
+		message := fmt.Sprintf("A %s names %s in its %s.", held.kind, key, held.calls)
+		if path != "" {
+			message = fmt.Sprintf("%s names %s, and a %s names it on every entry.", path, key, held.kind)
+		}
+		out = append(out, schemaFault(key, held.where, held.lineOf(path), message))
 	}
 
 	for _, key := range said.Keys() {
-		value := said.Get(key)
+		at := yaml.Keyed(path, key)
 		rule := yaml.AsDoc(props.Get(key))
-		line := note.Front.Lines[key]
-		if line == 0 {
-			line = 1
-		}
+		line := held.lineOf(at)
 		if rule == nil {
-			if spec.Get("additionalProperties") == false {
-				out = append(out, schemaFault(key, where, line,
-					fmt.Sprintf("The %s schema names no %s.", kind, key)))
+			if spec.Get("additionalProperties") != false {
+				continue
 			}
+			message := fmt.Sprintf("The %s schema names no %s.", held.kind, key)
+			if path != "" {
+				message = fmt.Sprintf("The %s schema names no %s under %s.", held.kind, key, path)
+			}
+			out = append(out, schemaFault(key, held.where, line, message))
 			continue
 		}
-		out = append(out, fieldFaults(key, value, rule, kind, where, line)...)
+		out = append(out, fieldFaults(key, said.Get(key), solved(rule, held), held, at, line)...)
 	}
 	return out
 }
 
-func fieldFaults(key string, value any, rule *yaml.Doc, kind, where string, line int) []Finding {
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+func deeperFaults(value any, rule *yaml.Doc, held keyWalk, at string) []Finding {
+	out := []Finding{}
+	if items := solved(yaml.AsDoc(rule.Get("items")), held); items.Has("properties") {
+		if list, isList := value.([]any); isList {
+			for i, each := range list {
+				if one := yaml.AsDoc(each); one != nil {
+					out = append(out, mapFaults(one, items, held, fmt.Sprintf("%s[%d]", at, i))...)
+				}
+			}
+		}
+	}
+	if one := yaml.AsDoc(value); one != nil && rule.Has("properties") {
+		out = append(out, mapFaults(one, rule, held, at)...)
+	}
+	return out
+}
+
+// A rule naming a $ref reads the shape it points at, under the keys standing beside it. [[spec/design_output/schema#one-home-for-a-shape]]
+func solved(rule *yaml.Doc, held keyWalk) *yaml.Doc {
+	if !rule.Has("$ref") {
+		return rule
+	}
+	out := yaml.New()
+	base := refOf(yaml.AsString(rule.Get("$ref")), held.schema, held.schemas)
+	for _, key := range base.Keys() {
+		out.Set(key, base.Get(key))
+	}
+	for _, key := range rule.Keys() {
+		if key != "$ref" {
+			out.Set(key, rule.Get(key))
+		}
+	}
+	return out
+}
+
+// [[spec/design_output/schema#one-home-for-a-shape]]
+func refOf(said string, schema *yaml.Doc, schemas *Kinds) *yaml.Doc {
+	name, pointer, _ := strings.Cut(said, "#")
+	root := schema
+	if name != "" {
+		root = nil
+		if schemas != nil {
+			root = schemas.every[name]
+		}
+	}
+	if root == nil {
+		return yaml.New()
+	}
+	var at any = root
+	for _, part := range strings.Split(strings.TrimPrefix(pointer, "/"), "/") {
+		if part == "" {
+			continue
+		}
+		one := yaml.AsDoc(at)
+		if one == nil {
+			return yaml.New()
+		}
+		at = one.Get(strings.ReplaceAll(strings.ReplaceAll(part, "~1", "/"), "~0", "~"))
+	}
+	if one := yaml.AsDoc(at); one != nil {
+		return one
+	}
+	return yaml.New()
+}
+
+func fieldFaults(key string, value any, rule *yaml.Doc, held keyWalk, at string, line int) []Finding {
+	kind, where := held.kind, held.where
 	out := []Finding{}
 	isLink := yaml.AsBool(rule.Get("x-link"))
 	said := value
@@ -187,7 +314,8 @@ func fieldFaults(key string, value any, rule *yaml.Doc, kind, where string, line
 		out = append(out, schemaFault(key, where, line,
 			fmt.Sprintf("%s takes %s, and this reads %s.", key, joined(yaml.Flat(rule.Get("type")), " or "), typeOf(value))))
 	}
-	return out
+	out = append(out, refersFaults(key, value, rule, held, at, line)...)
+	return append(out, deeperFaults(value, rule, held, at)...)
 }
 
 // [[spec/design_output/schema#a-placeholder-stands-at-warning]]
@@ -242,7 +370,7 @@ func placeholderFaults(text string, schema *yaml.Doc, where string) []Finding {
 	return out
 }
 
-// A governed folder holds its own kind alone, in the words folderFault in .claude/skills/level0/lib/schema.js answers. [[spec/tickets/each-folder-holds-its-kind]]
+// A governed folder holds its own kind alone, so a page or a picture there stands at warning until the owner moves it. [[spec/tickets/each-folder-holds-its-kind]]
 func folderFault(where string, schema *yaml.Doc) Finding {
 	kind := yaml.AsString(schema.Get("kind"))
 	found := schemaFault("Folder", where, 1,
@@ -272,9 +400,7 @@ func schemaFaults(tree *Tree) []Finding {
 
 	for _, path := range tree.Paths() {
 		if !strings.HasSuffix(path, ".md") {
-			if governor := governorOf(schemas, path); governor != nil {
-				out = append(out, folderFault(path, governor))
-			}
+			out = append(out, fileFaults(schemas, path, tree.Read)...)
 			continue
 		}
 		text := tree.Read(path)
@@ -304,8 +430,19 @@ func noteFaults(tree *Tree, schemas *Kinds, path, text string) []Finding {
 		return append(out, schemaFault("Kind", path, 1,
 			fmt.Sprintf("%s names no schema, and %s holds %s.", kind, Schemas, strings.Join(schemas.Names(), ", "))))
 	}
-	out = append(out, checkNoteIn(tree, text, schema, path)...)
+	out = append(out, checkNoteIn(tree, text, schema, path, schemas)...)
 	return append(out, placeholderFaults(text, schema, path)...)
+}
+
+// A file past markdown: a data schema weighs the file it governs, and a note schema warns that its folder holds notes alone. [[spec/design_output/schema#a-data-schema-holds-yaml]]
+func fileFaults(schemas *Kinds, path string, read func(string) string) []Finding {
+	if governor := governorOf(schemas.data, path); governor != nil {
+		return checkData(read(path), governor, path, schemas)
+	}
+	if governor := governorOf(schemas, path); governor != nil {
+		return []Finding{folderFault(path, governor)}
+	}
+	return nil
 }
 
 func minted(rule *yaml.Doc) string {
@@ -353,129 +490,4 @@ func nameOf(said string) string {
 		out.WriteString(strings.ToUpper(one[:1]) + one[1:])
 	}
 	return out.String()
-}
-
-func headed(standing []standingAt, header string) int {
-	for i, one := range standing {
-		if one.Header == header {
-			return i
-		}
-	}
-	return -1
-}
-
-func at(order []string, said string) int {
-	for i, one := range order {
-		if one == said {
-			return i
-		}
-	}
-	return -1
-}
-
-func someUnnumbered(items []item) bool {
-	for _, one := range items {
-		if !numberedAt.MatchString(one.said) {
-			return true
-		}
-	}
-	return false
-}
-
-func holds(allowed []any, said any) bool {
-	for _, one := range allowed {
-		if same(one, said) {
-			return true
-		}
-	}
-	return false
-}
-
-// [[spec/design_output/schema#a-finding-names-the-section]]
-func same(a, b any) bool {
-	one, ours := a.([]any)
-	two, theirs := b.([]any)
-	if ours || theirs {
-		if !ours || !theirs || len(one) != len(two) {
-			return false
-		}
-		for i := range one {
-			if !same(one[i], two[i]) {
-				return false
-			}
-		}
-		return true
-	}
-	if yaml.AsDoc(a) != nil || yaml.AsDoc(b) != nil {
-		return false
-	}
-	return fmt.Sprintf("%T:%v", a, a) == fmt.Sprintf("%T:%v", b, b)
-}
-
-func typed(value any, said any) bool {
-	for _, one := range yaml.Flat(said) {
-		switch yaml.AsString(one) {
-		case "array":
-			if _, held := value.([]any); held {
-				return true
-			}
-		case "object":
-			if yaml.AsDoc(value) != nil {
-				return true
-			}
-		case "string":
-			if _, held := value.(string); held {
-				return true
-			}
-		case "integer", "number":
-			if _, held := value.(int); held {
-				return true
-			}
-		case "boolean":
-			if _, held := value.(bool); held {
-				return true
-			}
-		default:
-			return true
-		}
-	}
-	return false
-}
-
-func typeOf(value any) string {
-	if _, held := value.([]any); held {
-		return "a list"
-	}
-	if yaml.AsDoc(value) != nil {
-		return "a map"
-	}
-	return "one line"
-}
-
-func show(said any) string {
-	flatSaid := yaml.AsString(said)
-	if one, held := said.([]any); held {
-		flatSaid = joined(one, ", ")
-	}
-	if len(flatSaid) > shown {
-		return flatSaid[:shown-len(ellipsis)] + ellipsis
-	}
-	return flatSaid
-}
-
-func joined(said []any, with string) string {
-	parts := make([]string, 0, len(said))
-	for _, one := range said {
-		parts = append(parts, yaml.AsString(one))
-	}
-	return strings.Join(parts, with)
-}
-
-// [[spec/design_output/schema#a-finding-names-the-section]]
-func waitsForFill(said, rule *yaml.Doc) bool {
-	if rule == nil {
-		return false
-	}
-	from := yaml.AsString(rule.Get("x-filled-by"))
-	return from != "" && said.Has(from) && yaml.Empty(said.Get(from))
 }

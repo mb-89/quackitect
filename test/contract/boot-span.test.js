@@ -15,10 +15,10 @@ const STARTING = Number(/^export const STARTING = ([\d_]+);$/m.exec(LEVEL0)[1].r
 test("the boot hook waits out the span the start road allows the same install", () => {
   const spans = (settings.hooks?.SessionStart ?? []).flatMap((one) =>
     (one.hooks ?? [])
-      .filter((hook) => /src\/scripts\/boot\.js/.test(String(hook.command ?? "")))
+      .filter((hook) => /install\.sh" boot$/.test(String(hook.command ?? "")))
       .map((hook) => Number(hook.timeout ?? 0) * 1000),
   );
-  assert.ok(spans.length > 0, "a SessionStart hook runs src/scripts/boot.js");
+  assert.ok(spans.length > 0, "a SessionStart hook runs install.sh boot");
   for (const span of spans)
     assert.ok(
       span >= STARTING,

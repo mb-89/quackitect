@@ -1,6 +1,6 @@
-// A vehicle, and the project it drives: the pure half lib/vehicle.js holds. A
-// vehicle carries an identity, a project names the vehicle driving it, and a
-// register turns an identity into a place.
+// A vehicle, and the project it drives: the pure half. A vehicle carries an
+// identity, a project names the vehicle driving it, and a register turns an
+// identity into a place.
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]
 package vehicle
 
@@ -13,7 +13,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The runtime folder RUN in lib/folders.js names. [[spec/design_input/the-runtime-files-stand-apart]]
+// The runtime folder Run in src/modules/check/folders.go names. [[spec/design_input/the-runtime-files-stand-apart]]
 const Run = ".se/.runtime"
 
 // The files a vehicle and a project keep, and the register's name. [[spec/design_output/vehicle#what-a-vehicle-needs]]
@@ -37,7 +37,7 @@ var Left = []string{".git", ".se", "node_modules", "_to_delete"}
 const PortBase = 6510
 
 // The pointer a project keeps to its vehicle and port. [[spec/design_input/the-runtime-files-stand-apart]]
-const Pointer = ".se/.runtime/vehicle.json" // the runtime folder .claude/skills/level0/lib/folders.js owns
+const Pointer = ".se/.runtime/vehicle.json" // the runtime folder src/modules/check/folders.go owns
 
 // The hooks manifest, and the two manifests a stub takes beside the modules. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 const Hooks = "hooks/hooks.json"
@@ -52,6 +52,9 @@ const (
 	Settings = ".claude/settings.json"
 	Keep     = ".gitkeep"
 )
+
+// The file the box writes beside the tree's own, which git leaves alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+const SettingsLocal = ".claude/settings.local.json"
 
 // The folders a stub opens with, under the name the stub itself carries. [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
 var StubInside = []string{"spec/tickets", "spec/guidance", "src"}
@@ -201,7 +204,7 @@ func OnlyVehicle(list []*Object) string {
 	return ""
 }
 
-// The relative import or export a line opens with, as RELATIVE in lib/vehicle.js reads it. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+// The relative import or export a line opens with. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 var relative = regexp.MustCompile(`(?m)^\s*(?:import|export)\b[^;'"]*?(?:\bfrom\s*)?["'](\.{1,2}/[^"']+)["']`)
 
 // The relative imports a module names, read off its source. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
@@ -334,6 +337,40 @@ func LinkOf(id, name, upstream string, version any, at string) *Object {
 	out.Set("version", JSString(version))
 	out.Set("made", at)
 	return out
+}
+
+// The settings a stub enables the plugin by: every standing key kept, the vehicle a directory marketplace under the brand, and level0@brand enabled once. [[spec/design_output/level0#a-stub-names-its-vehicle]]
+func ShimSettings(text, vehicle, brand string) string {
+	held, _ := Parse(text)
+	out := NewObject()
+	if object, ok := held.(*Object); ok {
+		out = object.Clone()
+	}
+	markets := NewObject()
+	if standing, ok := Get(out, "extraKnownMarketplaces"); ok {
+		if object, ok := standing.(*Object); ok {
+			markets = object.Clone()
+		}
+	}
+	source := NewObject()
+	source.Set("source", "directory")
+	source.Set("path", vehicle)
+	entry := NewObject()
+	entry.Set("source", source)
+	markets.Set(brand, entry)
+	out.Set("extraKnownMarketplaces", markets)
+	id := "level0@" + brand
+	enabled := []any{}
+	if standing, ok := Get(out, "enabledPlugins"); ok {
+		if list, ok := standing.([]any); ok {
+			enabled = list
+		}
+	}
+	if !slices.ContainsFunc(enabled, func(one any) bool { return strictEqual(one, id) }) {
+		enabled = append(slices.Clone(enabled), id)
+	}
+	out.Set("enabledPlugins", enabled)
+	return Doc(out)
 }
 
 // The vehicle's settings past every key opening on $. [[spec/design_output/vehicle#the-record-names-the-vehicle]]

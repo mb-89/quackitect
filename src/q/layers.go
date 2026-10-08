@@ -12,14 +12,18 @@ import (
 // The files the layers stand in, and the layer a key no file sets reads. [[spec/design_output/config#the-layers]]
 const (
 	TrackedConfig = "spec/config/level0.json"
-	LocalConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
+	LocalConfig   = ".se/.runtime/config.json" // src/modules/check/folders.go owns this name
 	SchemaConfig  = "spec/config/level0.schema.json"
 	BuiltInLayer  = "built-in"
 )
 
 // The variable the environment layer reads for a dotted key. [[spec/design_output/config#the-go-reader]]
 func EnvOf(dotted string) string {
-	return "SE_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(dotted))
+	segments := strings.Split(dotted, ".")
+	for i, one := range segments {
+		segments[i] = strings.ReplaceAll(Kebab(one), "-", "_")
+	}
+	return "SE_" + strings.ToUpper(strings.Join(segments, "_"))
 }
 
 // A dotted key as the catalog names it: its first segment the instance, the rest its local name. [[spec/design_output/model#config-comes-off-the-registrations]]

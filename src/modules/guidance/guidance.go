@@ -1,6 +1,5 @@
 // The guidance module: the notes each leaf of each process reads, resolved
-// off the files the watch mirrors, the rule readsFor in
-// src/scripts/guidance-hand.js holds.
+// off the files the watch mirrors.
 // [[spec/tickets/the-guidance-topic-lands]]
 package guidance
 
@@ -19,7 +18,7 @@ const (
 	StepsPort = "steps"
 )
 
-// The folders the notes and the processes stand in, as guidance-hand.js names them. [[spec/design_input/level-two#guidance]]
+// The folders the notes and the processes stand in. [[spec/design_input/level-two#guidance]]
 const (
 	Guidance  = "spec/guidance"
 	Processes = "spec/processes"
@@ -35,7 +34,7 @@ type filesIn struct {
 	Files map[string]q.Content `q:"files/<path...>"`
 }
 
-// The frontmatter block, a list item and a pair, the way the frontmatter reader in the level0 lib reads them. [[spec/design_input/level-two#guidance]]
+// The frontmatter block, a list item and a pair, which frontOf and words read. [[spec/design_input/level-two#guidance]] [[spec/tickets/guidance-lib-leaves]]
 var (
 	frontAt = regexp.MustCompile(`^---\r?\n((?s:.*?))\r?\n---`)
 	itemAt  = regexp.MustCompile(`^\s*-\s+(.*)$`)
@@ -52,7 +51,7 @@ func StepsOf(in filesIn) map[string][]Read {
 	return Resolve(Layered(in.Files, nil))
 }
 
-// The text of every file standing, the work root's over the method root's of the same path, as inherits in the level0 lib reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The text of every file standing, the work root's over the method root's of the same path, as projection.Inherits reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
 func Layered(method, work map[string]q.Content) map[string]string {
 	out := map[string]string{}
 	for _, layer := range []map[string]q.Content{method, work} {
@@ -232,7 +231,7 @@ func processName(at string) (string, bool) {
 	return strings.TrimSuffix(rest, ".yaml"), true
 }
 
-// Every leaf under steps, its tags and reads summed down its chain, the way leafOf in src/scripts/pull-route.js sums them. [[spec/design_input/the-agent-pulls-tickets#the-route]]
+// Every leaf under steps, its tags and reads summed down its chain, the way LeafOf in src/pull/pull_route.go sums them. [[spec/design_input/the-agent-pulls-tickets#the-route]]
 func leavesOf(steps any, parent string, tags, reads []string) []leaf {
 	out := []leaf{}
 	for _, each := range yaml.AsList(steps) {

@@ -201,7 +201,7 @@ func TestPersonReadsANestedLeaf(t *testing.T) {
 	}
 }
 
-// A ticket carrying no step reads the first leaf of its steps, as stepOf in src/engine/group.js does. [[spec/tickets/fix-verbs-shadow-yours]]
+// A ticket carrying no step reads the first leaf of its steps, as stepOf in src/branches/group.go does. [[spec/tickets/fix-verbs-shadow-yours]]
 func TestStepFallsToTheFirstLeaf(t *testing.T) {
 	nested := strings.Replace(forPerson, "  - name: ask\n    does: asks the owner a question\n    by: person\n", "  - name: design\n    steps:\n      - name: ask\n        by: person\n", 1)
 	cases := map[string]string{

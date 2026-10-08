@@ -6,7 +6,9 @@ package pull
 
 import (
 	"bytes"
+	"encoding/json"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -51,6 +53,7 @@ state: open
 steps:
   - name: do
     does: makes the change
+    to: retro
     evidence:
       - name: tests
         form: command
@@ -318,6 +321,23 @@ func pullsOnADeskAndOffTheTool(t *testing.T) {
 			t.Fatalf("the pull answers %d:\n%s", code, errs)
 		}
 	})
+	t.Run("a tool's pull prints both streams as one JSON answer", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		it.Pulling([]string{"pull", "--tool", "{}"})
+		out.Reset()
+		code := it.Pulling([]string{"pull", "--tool", "{}"})
+		var said ToolAnswer
+		if err := json.Unmarshal(out.Bytes(), &said); err != nil || code != 1 || !strings.Contains(said.Result, "alpha stands in your hand at do") || said.Spawn != "" {
+			t.Fatalf("the tool's second pull answers %d, %q, and wants the refusal off the error stream as one JSON answer", code, out)
+		}
+	})
+	t.Run("the spec flag prints the tool's spec as JSON", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		var spec map[string]any
+		if code := it.Pulling([]string{"pull", "--spec"}); code != 0 || json.Unmarshal(out.Bytes(), &spec) != nil || spec["name"] != "pull" {
+			t.Fatalf("the spec answers %d, %q, and wants the spec named pull", code, out)
+		}
+	})
 	// The message carries no remedy, so the node's remedy prints once. [[spec/tickets/go-pull-desk-remedy-once]]
 	t.Run("a desk pull prints the node's remedy once", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
@@ -362,6 +382,43 @@ func TestPullArgvOf(t *testing.T) {
 	}
 }
 
+// A spawn answer as the pull prints it. [[spec/tickets/level0-hooks-forward-to-go]]
+const spawnAnswer = "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it."
+
+func TestThePullToolAnswersItsSpawnApart(t *testing.T) {
+	t.Parallel()
+	said := ToolAnswerOf(spawnAnswer)
+	if said.Result != spawnAnswer || said.Spawn != "You are a hand of your own, named helper-2.\n1. Run it." {
+		t.Fatalf("a spawn answer reads %+v, and wants the whole text and the hand's prompt apart", said)
+	}
+	body, _ := json.Marshal(ToolAnswerOf("work\n  a-child at design/draft"))
+	if string(body) != `{"result":"work\n  a-child at design/draft"}` {
+		t.Fatalf("a work answer prints %s, and wants its text alone", body)
+	}
+	if said := ToolAnswerOf("spawn\n  no blank row"); said.Spawn != "" {
+		t.Fatalf("a spawn answer with no prompt reads %+v, and wants no spawn", said)
+	}
+}
+
+func TestThePullSpecTakesTheFourVerdicts(t *testing.T) {
+	t.Parallel()
+	spec := PullSpec()
+	schema, _ := spec["inputSchema"].(map[string]any)
+	properties, _ := schema["properties"].(map[string]any)
+	verdict, _ := properties["verdict"].(map[string]any)
+	if spec["name"] != "pull" || spec["description"] == "" || spec["description"] == nil {
+		t.Fatalf("the spec reads %v, and wants the tool named pull with a description", spec)
+	}
+	if got := verdict["enum"]; !reflect.DeepEqual(got, []string{"pass", "fail", "became", "answered"}) {
+		t.Fatalf("the verdict takes %#v, and wants pass, fail, became and answered", got)
+	}
+	for _, key := range []string{"ticket", "reason", "fields"} {
+		if _, ok := properties[key]; !ok {
+			t.Errorf("the spec's input holds %v, and wants %s", properties, key)
+		}
+	}
+}
+
 // The hand's prompt opens on the line the spawn answer reads to leave it untagged. [[spec/tickets/hand-spawn-skips-session-tag]]
 func TestTheHandPromptOpensOnTheHandLine(t *testing.T) {
 	t.Parallel()
@@ -374,6 +431,61 @@ func TestHoldAt(t *testing.T) {
 	t.Parallel()
 	if got := holdAt("box cafe · claude-code"); got != ".se/.runtime/hold/box-cafe-claude-code.json" {
 		t.Fatalf("the hold stands at %s", got)
+	}
+}
+
+// A verb renders as the index tool standing for it, with its words as the args array. [[spec/tickets/verb-outputs-name-index-tools]]
+func TestASecondPullNamesTheHandBackAsAToolCallWithItsWords(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	pulled(t, it)
+	code, said := pulled(t, it)
+	for _, want := range []string{
+		`Hand it back: mcp__level0__index_ticket_pull with args ["alpha","--pass"], or --fail "why" in place of --pass.`,
+		"mcp__level0__index_branch_guidance.",
+	} {
+		if code != 1 || !strings.Contains(said, want) {
+			t.Fatalf("the second pull answers %d, and wants %q:\n%s", code, want, said)
+		}
+	}
+	if strings.Contains(said, "./RUNME.sh") {
+		t.Fatalf("the refusal names a shell verb:\n%s", said)
+	}
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+func TestASpawnPromptNamesTheToolCallsAndNoShellVerb(t *testing.T) {
+	t.Parallel()
+	said := spawnPrompt("a-ticket", &Leaf{Entry: Entry{Path: "gate"}}, "helper-1")
+	if !strings.Contains(said, `mcp__level0__index_ticket_pull with args ["--as","helper-1"]`) || strings.Contains(said, "./RUNME.sh") {
+		t.Fatalf("the spawn prompt reads\n%s\nand wants the tool calls and no shell verb", said)
+	}
+}
+
+// A field's chapter counts no comment and no fenced block. [[spec/design_output/pull#the-fields-hold-their-forms]]
+func TestAHandBackCountsNoFencedRowAsText(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	pulled(t, it)
+	text, _ := it.Disk.Read("spec/tickets/alpha.md")
+	must(t, it.Disk.Write("spec/tickets/alpha.md", strings.Replace(text, "## says\n\n<!-- what changes -->", "## says\n\n```\na fenced line\n```", 1)))
+	code, said := pulled(t, it, "alpha", "--pass", "--fields", `{"tests":"echo green"}`)
+	if code != 1 || !strings.Contains(said, "says under do holds no text.") {
+		t.Fatalf("the hand-back answers %d, and wants a fenced block to count as no text:\n%s", code, said)
+	}
+}
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+func TestAHandBackOnATicketWithNoChapterForItsLeafStandsRefused(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	pulled(t, it)
+	text, _ := it.Disk.Read("spec/tickets/alpha.md")
+	bare, _, _ := strings.Cut(text, "# do\n")
+	must(t, it.Disk.Write("spec/tickets/alpha.md", bare+"# Discussion\n"))
+	code, said := pulled(t, it, "alpha", "--pass")
+	if code != 1 || !strings.Contains(said, "spec/tickets/alpha.md holds no chapter for do.") {
+		t.Fatalf("the hand-back answers %d, and wants the missing chapter named:\n%s", code, said)
 	}
 }
 

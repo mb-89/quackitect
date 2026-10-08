@@ -1,6 +1,5 @@
 // The word lists, read into the set a paragraph writes and the swaps a refusal
-// teaches. A list holding a word writes the vocabulary rule's head. A port of
-// the half of vocabulary.js the projection reads.
+// teaches. A list holding a word writes the vocabulary rule's head.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]] [[spec/tickets/config-verbs-port-to-go]]
 package projection
 

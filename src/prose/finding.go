@@ -19,7 +19,7 @@ type Refused struct {
 	Context string
 }
 
-// The lines each finding takes, then the Hold line naming each rule once, off bodyOf and taught in lib/refuse.js. [[spec/tickets/prose-tools-answer-in-go]]
+// The lines each finding takes, then the Hold line naming each rule once. [[spec/tickets/prose-tools-answer-in-go]]
 func Body(where string, found []Refused) string {
 	var lines, names []string
 	seen := map[string]bool{}

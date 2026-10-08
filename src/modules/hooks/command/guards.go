@@ -1,5 +1,4 @@
-// The bless guard, and the version guard off
-// lib/trunk.js: a command reaches neither the bless file nor a variable naming
+// The bless guard and the version guard: a command reaches neither the bless file nor a variable naming
 // the hand, and rewrites or deletes no version branch.
 // [[spec/tickets/cage-command-rules-port]]
 package command
@@ -9,7 +8,7 @@ import (
 	"strings"
 )
 
-// The bless file, off src/pull/pull_bless.go, under the folder .claude/skills/level0/lib/folders.js owns, and the variables naming the hand and the box, off src/scripts/pull-hand-of.js and lib/cloud.js. [[spec/design_output/pull#the-bless]]
+// The bless file, off src/pull/pull_bless.go, under the folder src/modules/check/folders.go owns, and the variables naming the hand and the box, off harness and cloudVars in src/pull/pull_holds.go. [[spec/design_output/pull#the-bless]]
 const blessFile = ".se/.runtime/bless.json"
 
 // [[spec/design_output/pull#the-bless]]
@@ -103,15 +102,22 @@ func VersionGuard(command string) string {
 	}
 	var names []string
 	seen := map[string]bool{}
-	how := "rewrite"
+	drops := false
 	for _, one := range found {
 		if !seen[one.name] {
 			seen[one.name] = true
 			names = append(names, one.name)
 		}
-		if one.drop {
-			how = "delete"
-		}
+		drops = drops || one.drop
+	}
+	return VersionRefusal(names, drops)
+}
+
+// The refusal naming each version branch a command or a pushed ref rewrites, or deletes where drops holds. [[spec/tickets/git-hooks-run-in-go]]
+func VersionRefusal(names []string, drops bool) string {
+	how := "rewrite"
+	if drops {
+		how = "delete"
 	}
 	return strings.Join([]string{
 		strings.Join(names, ", ") + " is a version branch, and this command would " + how + " it.",
@@ -122,6 +128,9 @@ func VersionGuard(command string) string {
 		"The owner takes it off, in the repository's own branch rules.",
 	}, "\n")
 }
+
+// Whether a branch name is a version branch. [[spec/tickets/git-hooks-run-in-go]]
+func IsVersion(name string) bool { return version.MatchString(name) }
 
 // [[spec/design_output/work#a-version-branch-stands]]
 func versionsIn(rest []string) []versionRef {

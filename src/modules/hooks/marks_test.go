@@ -1,6 +1,5 @@
-// The handover marks the door writes, off marksDue, dropsDue and dropsClear in
-// src/bridge/handover.js, and the retro hold it reads by its hand, off
-// retroInHand there.
+// The handover marks the door writes, off src/modules/hooks/marks.go, and the
+// retro hold it reads by its hand.
 // [[spec/tickets/cage-stop-marks-port]]
 package hooks
 

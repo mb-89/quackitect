@@ -30,7 +30,7 @@ const (
 	defaultWait = 1
 )
 
-// The file the listen writes its port to, under the root, which the bridge reads in shadow. .claude/skills/level0/lib/folders.js owns the folder, and a module spells it again. [[spec/tickets/the-hooks-door-lands]]
+// The file the listen writes its port to, under the root, which the bridge reads in shadow. src/modules/check/folders.go owns the folder, and a module spells it again. [[spec/tickets/the-hooks-door-lands]]
 const StandingFile = ".se/.runtime/hooks.json"
 
 // The protocol's words: the events the door reads, the effects it answers, the harness a post naming none comes from, and the tool prefix and arguments /v1/tools writes. [[spec/design_output/model#the-hook-protocol]]
@@ -166,6 +166,18 @@ type Settings struct {
 	BindingLayer string
 }
 
+// The events the door decides, which the forwarder posts every one of. [[spec/tickets/level0-hooks-forward-to-go]]
+var decided = map[string]bool{
+	startEvent: true, contextEvent: true, promptEvent: true, "classic.MessageDisplay": true, spokeEvent: true,
+	"session.compact": true, "session.end": true, "session.measure": true, "turn.said": true, "turn.complete": true,
+	stopEvent: true, spawnEvent: true, "tool.describe": true, toolEvent: true, answerEvent: true,
+}
+
+// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. [[spec/design_output/stop#the-context-hands-over]]
+func fills(post Post) bool {
+	return post.Event == stopEvent || post.Event == toolEvent && textOf(post.E, "agentId", "agent_id") == ""
+}
+
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
 type Door struct {
 	from Outside
@@ -224,6 +236,12 @@ func (d *Door) hears(post Post) {
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
+	if !decided[post.Event] {
+		return Answer{Effects: []Effect{{Kind: passKind}}}, nil
+	}
+	if !fills(post) {
+		post.Fill = nil
+	}
 	post = transcribed(post)
 	root := post.Root
 	if root == "" {
@@ -233,7 +251,9 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if d.from.Config != nil {
 		settings = d.from.Config(root)
 	}
+	post = picks(post)
 	session := d.sessionFor(post, root)
+	d.writesSession(post, root)
 	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}

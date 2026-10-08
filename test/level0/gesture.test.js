@@ -1,16 +1,14 @@
 // The gesture, replayed. Each case hands the press times in, so the burst that
-// a person makes with a mouse runs here with no clock at all.
-// [[spec/guidance/code/testing]]
+// a person makes with a mouse runs here with no clock at all. How each write
+// names the press stands in the sidebar test, which writes it to the log.
+// [[spec/guidance/code/testing]] [[spec/design_output/extension#a-gesture-picks-a-state]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { BURST, DEAD, fresh, pressed } from "../../src/extension/lib/gesture.js";
 
-const HOLD = {
-  options: ["off", "finish", "stop"],
-  gesture: 5,
-  value: "off",
-};
+const HOLD = { options: ["off", "finish", "stop"], gesture: 5, value: "off" };
+const FAR = ["finish", "stop"];
 
 function burst(times, one = HOLD) {
   let state = fresh();
@@ -23,57 +21,34 @@ function burst(times, one = HOLD) {
   return wrote;
 }
 
-test("the first press of a burst climbs one rung, and the next two stand by", () => {
-  assert.deepEqual(burst([0]), ["finish"]);
-  assert.deepEqual(burst([0, 100, 200]), ["finish"]);
-});
-
-test("a press past the burst starts a new one, and acts again", () => {
-  assert.deepEqual(burst([0, BURST + 1]), ["finish", "finish"]);
-  assert.deepEqual(burst([0, BURST]), ["finish"]);
-});
-
-test("the fifth press of a burst sends the far value", () => {
-  assert.deepEqual(burst([0, 200, 400, 600, 800]), ["finish", "stop"]);
-});
-
-// [[spec/design_output/extension#a-gesture-picks-a-state]]
-test("a person clicking fast reaches the far value, at any speed they hold", () => {
-  assert.deepEqual(burst([0, 100, 200, 300, 400]), ["finish", "stop"]);
-  assert.deepEqual(burst([0, 700, 1400, 2100, 2800]), ["finish", "stop"]);
-});
-
-test("the window runs from the last press, so a slow hand still counts", () => {
-  assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), ["finish", "finish"]);
-});
-
-test("a sixth press inside the dead moment undoes nothing, and one after it acts", () => {
-  assert.deepEqual(burst([0, 100, 200, 300, 400, 500]), ["finish", "stop"]);
-  assert.deepEqual(burst([0, 100, 200, 300, 400, 400 + DEAD]), [
-    "finish",
-    "stop",
-    "finish",
-  ]);
-});
-
-test("a press away from rest falls back to rest, however far it stands", () => {
-  assert.deepEqual(burst([0], { ...HOLD, value: "finish" }), ["off"]);
-  assert.deepEqual(burst([0], { ...HOLD, value: "stop" }), ["off"]);
-});
-
-test("a control holding two options answers one press and never the fifth", () => {
-  const two = { options: ["true", "false"], gesture: 5, value: true };
-  assert.deepEqual(burst([0, 200, 400, 600, 800], two), ["false"]);
-});
-
-test("a widget naming no options writes nothing", () => {
-  assert.deepEqual(burst([0, 200, 400, 600, 800], { options: [] }), []);
-});
-
-test("each write names how the press reached it", () => {
-  const first = pressed(fresh(), 0, HOLD);
-  assert.equal(first.how, "one press");
-  let state = first.state;
-  for (const at of [100, 200, 300]) state = pressed(state, at, HOLD).state;
-  assert.equal(pressed(state, 400, HOLD).how, "5 presses");
+test("a burst climbs one rung, its fifth press sends the far value, and a press past it acts again", () => {
+  for (const [says, times, want, one = HOLD] of [
+    ["the first press climbs one rung", [0], ["finish"]],
+    ["the next two stand by", [0, 100, 200], ["finish"]],
+    ["a press past the burst starts a new one", [0, BURST + 1], ["finish", "finish"]],
+    ["a press at the burst's edge stands by", [0, BURST], ["finish"]],
+    ["a fast hand reaches the far value", [0, 100, 200, 300, 400], FAR],
+    ["a slow hand inside the window too", [0, 700, 1400, 2100, 2800], FAR],
+    [
+      "the window runs from the last press",
+      [0, 700, 1400, 2100, 2800 + BURST + 1],
+      ["finish", "finish"],
+    ],
+    [
+      "a sixth press inside the dead moment undoes nothing",
+      [0, 100, 200, 300, 400, 500],
+      FAR,
+    ],
+    ["one after it acts", [0, 100, 200, 300, 400, 400 + DEAD], [...FAR, "finish"]],
+    ["a press away from rest falls back", [0], ["off"], { ...HOLD, value: "finish" }],
+    ["however far it stands", [0], ["off"], { ...HOLD, value: "stop" }],
+    [
+      "two options answer one press and never the fifth",
+      [0, 200, 400, 600, 800],
+      ["false"],
+      { options: ["true", "false"], gesture: 5, value: true },
+    ],
+    ["no options write nothing", [0, 200, 400, 600, 800], [], { options: [] }],
+  ])
+    assert.deepEqual(burst(times, one), want, says);
 });

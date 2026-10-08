@@ -1,0 +1,430 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: c671f20a6ae2a4a6
+group: javascript-leaves
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 3d97752189303e3ba25f1ecb2e0265b4ea773fde
+    hash_after: 3d97752189303e3ba25f1ecb2e0265b4ea773fde
+    inputs:
+      - name: ask
+        hash: 437e98549d4660fd
+        size: 570
+      - name: [[spec/tickets/schema-libs-leave]]
+        hash: d12e682d5468fd5d
+        size: 531
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 9e35639b532f125fb243f0097e5b8f335cbbc2b0
+    hash_after: 9e35639b532f125fb243f0097e5b8f335cbbc2b0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 6092e512593690f5
+        size: 2467
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box ba1101ec7b2d · claude-code-remote · helper-4
+    hash_before: 85fc99670705797ec5c50eda11cbf3a874a1113f
+    hash_after: 85fc99670705797ec5c50eda11cbf3a874a1113f
+    inputs:
+      - name: design/draft
+        hash: 6092e512593690f5
+        size: 2467
+      - name: design/tests-red
+        hash: 7527fa3724b4672b
+        size: 600
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: bcb2924c11da126ec667fd59a6eb18e9d70b8581
+    hash_after: dd3f2dbb983ee1d4742405ec8550b29f3160e9a6
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/stamp_verb.go:15:1 ExampleCovers: ./RUNME.sh stamp stands in no example's interface. Write an example under sp"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 9370892f0534c82b24de9adbd5a7994bf9036864
+    hash_after: 9370892f0534c82b24de9adbd5a7994bf9036864
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   80.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7527fa3724b4672b
+        size: 600
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+The se-front binary leaves, since the front door it served left with [[spec/tickets/schema-libs-leave]]. The install, the stamp verb and the review worktree then build one binary less, and the `src/front` package stays as the library Go code reads.
+
+A binary no road runs costs every fresh box its build, and `install.sh` names it as the one writer of a front, which reads wrong.
+
+- `git ls-files src/front/cmd` answers nothing
+- `git grep -n se-front -- install.sh src/quack/stamp_verb.go src/branches/review.go` answers nothing
+- `./RUNME.sh check` exits 0
+
+none
+
+none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+Delete src/front/cmd, and every builder of the binary drops it:
+
+- install.sh: front_here, get_front and the se-front arm of wanted, missed, here, why, get and the install loop leave.
+- src/quack/stamp_verb.go: stampPackages holds se-index alone, and its usage line names se-index alone.
+- src/branches/review.go: builds holds se-index alone.
+- spec/design_output/review.md: the row on the worktree's se-front build names the se-index build alone.
+- src/pull/edit.go: the comment naming se-front names the front package.
+- src/imports/baseline: the blackbox and purity rows of src/front/cmd leave through ./RUNME.sh guards --update.
+
+The src/front package stays, since src/pull and src/quack call it as a library. A box that already holds the old binary keeps a stray file under .se/.runtime/bin, which nothing runs.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- install.sh here, get, why, missed and wanted, which call front_here and get_front
+- src/quack/stamp_verb.go stampVerb, which reads stampPackages
+- src/quack/bundle_verb_test.go TestEveryBuiltBinaryRebuildsWhenItsSourceMovesAhead and TestTheStampReadsTheFilesGoListsForTheBinaryNamed, which read stampPackages
+- src/branches/review.go the worktree build, which reads builds
+- src/branches/port_f_review_test.go, which asserts the worktree's se-front
+- src/quack/session_start_test.go, whose skip lists name se-front
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- src/quack/bundle_verb_test.go TestTheStampVerbRefusesAWordOrBinaryItKnowsNot, which takes a case refusing stamp fresh se-front
+- git ls-files src/front/cmd and git grep -n se-front over install.sh, stamp_verb.go and review.go decide the first two done_when lines
+- ./RUNME.sh check decides the third
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- install.sh
+- src/front/cmd/door.go
+- src/front/cmd/main.go
+- src/front/cmd/main_test.go
+- src/front/cmd/owns.yaml
+- src/quack/stamp_verb.go
+- src/quack/bundle_verb_test.go
+- src/quack/session_start_test.go
+- src/branches/review.go
+- src/branches/port_f_review_test.go
+- src/pull/edit.go
+- spec/design_output/review.md
+- src/imports/baseline/blackbox.txt
+- src/imports/baseline/purity.txt
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- opened install.sh, stamp_verb.go, review.go, edit.go, the review design note and each test naming se-front, and a git grep finds no road running the binary
+- the callers list names every reader of stampPackages, builds and the install's front functions
+- each done_when line names the command or test deciding it
+- the approach adds no config key
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh test src/quack/bundle_verb_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/quack/bundle_verb_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+The stamp verb answers fresh se-front by running go list over src/front/cmd, where the case wants a refusal with exit 2 and no run. The first two done_when lines stand as git commands the hand reads after the change, and the check decides the third.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the third done_when line meets the check, the first two meet git ls-files and git grep, and this case fails until se-front leaves the stamp verb
+- the case reaches the runner and the disk through fakeBoxDoors, both fakes
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+pass
+The approach answers the ask. The red case in TestTheStampVerbRefusesAWordOrBinaryItKnowsNot refuses stamp fresh se-front. git ls-files and git grep decide the first two done_when lines as checkpoints, and git grep -n se-front over the three files already answers nothing. The check decides the third. The src/front package stays, since src/pull/edit.go calls front.Set. The builder fixes each row below in place:
+- spec/design_output/lsp.md, under The build beside the index, still names front_here and says a box with no index reads the front writer stale. Neither size nor callers names the note. It should name index_here alone.
+- src/branches/port_f_review_test.go in the working tree fails gofmt -l, since the map in pfReviewTree mixes two key widths.
+- The tree deletes the se-front row of spec/design_output/review.md where the approach rewords it. The deletion reads right, since no check mints through a binary of its own.
+- src/imports/baseline/blackbox.txt and purity.txt still hold the src/front/cmd rows, and git ls-files src/front/cmd lists the four files until the deletion stages. Run ./RUNME.sh guards --update and stage the deletion before the check.
+- The tree rewrites the install.sh comment above stamp(), which the approach does not name.
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint install.sh src/quack/stamp_verb.go src/branches/review.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+The change touches the files the ask names: src/front/cmd leaves, install.sh, the stamp verb, the review worktree, the guard baselines, and spec/design_output/lsp.md, whose build chapter now names index_here alone.
+The change reaches the disk door and the process door, and the stamp verb's cases run on the box's fake disk.
+The stamp verb's header points at spec/design_output/lsp#the-build-beside-the-index, which names the approach.
+The stamp fact stands in lsp.md alone, and install.sh points at that section.
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh test src/quack src/branches
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The se-front binary leaves: src/front/cmd goes, and install.sh, the stamp verb and the review worktree build the index binary alone. The src/front package stays as the library Go code reads. The guard baselines drop the rows of the deleted files, and the build chapter of the lsp design note names index_here alone. A binary no road ran cost every fresh box a build.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+The change touches the files the ask names, the guard baselines its deletion moves, and the lsp note naming the install's stamp.
+The stamp verb reaches the disk and the process through the box doors, and its cases run on their fakes.
+The stamp verb's header points at spec/design_output/lsp#the-build-beside-the-index.
+The stamp fact stands in lsp.md alone, and install.sh points at that section.
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

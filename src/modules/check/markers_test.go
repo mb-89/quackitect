@@ -9,8 +9,15 @@ import (
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestMarkerLinesNameEachMarkOfAMerge(t *testing.T) {
-	text := "A title\n=======\n<<<<<<< ours\none\n=======\ntwo\n>>>>>>> theirs\n"
-	if got := MarkerLines(text); !reflect.DeepEqual(got, []int{3, 5, 7}) {
-		t.Errorf("the marks read at %v, and want 3, 5 and 7 past the underline", got)
+	for _, one := range []struct {
+		text string
+		want []int
+	}{
+		{"A title\n=======\n<<<<<<< ours\none\n=======\ntwo\n>>>>>>> theirs\n", []int{3, 5, 7}},
+		{"A heading\n=======\n\n>>>>>>> origin/main\n", []int{}},
+	} {
+		if got := MarkerLines(one.text); !reflect.DeepEqual(got, one.want) {
+			t.Errorf("the marks over %q read at %v, and want %v", one.text, got, one.want)
+		}
 	}
 }

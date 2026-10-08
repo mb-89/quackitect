@@ -47,7 +47,7 @@ func NewTicketPath(path string) bool {
 	return (folder == Notes || folder == Tickets) && newTicketName.MatchString(parts[len(parts)-1])
 }
 
-// One field written through the front writer, and a note with no front comes back as it stands, as se-front answers it. [[spec/tickets/go-writes-the-frontmatter]]
+// One field written through the front writer, and a note with no front comes back as it stands. [[spec/tickets/go-writes-the-frontmatter]]
 func WithField(text, key, value string) (string, error) {
 	return noFrontStands(front.Set(text, key, value))
 }

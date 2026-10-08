@@ -1,5 +1,4 @@
-// quack tui: the log rows the plain road prints, each one as asRow in
-// .claude/skills/level0/lib/log.js prints it, the JSON values read in the
+// quack tui: the log rows the plain road prints, the JSON values read in the
 // order JavaScript enumerates them.
 // [[spec/design_output/log#what-one-line-looks-like]]
 package main
@@ -16,7 +15,7 @@ import (
 	"unicode/utf16"
 )
 
-// The fields asRow in .claude/skills/level0/lib/log.js prints first, its column widths, and the indent of the rest. [[spec/design_output/log#what-one-line-looks-like]]
+// The fields a row prints first, its column widths, and the indent of the rest. [[spec/design_output/log#what-one-line-looks-like]]
 const (
 	tuiStampFrom  = 11
 	tuiStampTo    = 23

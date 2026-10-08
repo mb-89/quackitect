@@ -31,17 +31,17 @@ type Row = Readonly<Record<string, unknown>>;
 
 const LINK = "vehicle.json";
 const ASKING = 10000;
-// The pointer in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+// The pointer in the runtime folder folders.go owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 const POINTER = ".se/.runtime/vehicle.json";
-// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
+// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by sessionLog in src/quack/log.go and spelled again here because this hook imports nothing.
 const SESSION = ".se/.log/session.jsonl";
-// The register in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-register-places-an-identity]]
+// The register in the runtime folder folders.go owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-register-places-an-identity]]
 const REGISTER = ".se/.runtime/registry.json";
 const PORT = 6510;
 const CLONE_WAIT = 600000;
 const ATTACH_WAIT = 1800000;
 const SERVE_WAIT = 30000;
-// The home folder in the order `homeIn` in src/scripts/editor.js reads it, spelled again here because this hook imports nothing. [[spec/design_output/extension#a-box-names-its-home]]
+// The home folder in the order `HomeIn` in src/vehicle/vehicle.go reads it, spelled again here because this hook imports nothing. [[spec/design_output/extension#a-box-names-its-home]]
 const ENV = [
   "console.log(JSON.stringify({",
   'home: process.env.USERPROFILE || process.env.HOME || "",',
@@ -89,10 +89,9 @@ async function starts($: EngineInterface): Promise<string | undefined> {
   if (attached.exitCode) return fails($, "attach", lastLine(attached));
   const pointer = parsed(await readIf($, POINTER)) as { port?: unknown } | null;
   const port = Number(pointer?.port) || PORT;
-  if (!(await answers($, port, env.work))) {
-    const served = await run($, serveOf(vehicle), SERVE_WAIT);
-    if (served.exitCode) return fails($, "serve", lastLine(served));
-  }
+  // The standing answers at once where a door stands, and starts one where none does. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  const served = await run($, serveOf(vehicle), SERVE_WAIT);
+  if (served.exitCode) return fails($, "serve", lastLine(served));
   const line = `The vehicle ${link.name} stands at ${vehicle}, attached to this stub at port ${port}. The cage holds from the next session.`;
   await logs($, { level: "info", said: line, vehicle, port });
   say($, line);
@@ -136,7 +135,7 @@ export function serveOf(vehicle: string): string[] {
   return [
     "sh",
     "-c",
-    'nohup "$1/.se/.runtime/bin/se-index" standing >/dev/null 2>&1 &', // a copy of BIN, which .claude/skills/level0/lib/folders.js roots
+    'nohup "$1/.se/.runtime/bin/se-index" standing >/dev/null 2>&1 &', // a copy of the binary indexBinary in src/index/binary.go builds, under the folder src/modules/check/folders.go owns
     "sh",
     vehicle,
   ];
@@ -158,23 +157,6 @@ async function standingOf($: EngineInterface, roads: readonly string[]): Promise
     if (await exists($, `${one}/RUNME.sh`)) return one;
   }
   return "";
-}
-
-async function answers(
-  $: EngineInterface,
-  port: number,
-  root: string | undefined,
-): Promise<boolean> {
-  try {
-    const said = await $.http.fetch(`http://127.0.0.1:${port}/event`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ event: "bridgehead.probe", e: {}, root }),
-    });
-    return Boolean(said?.ok);
-  } catch {
-    return false;
-  }
 }
 
 async function fails($: EngineInterface, step: string, detail: string): Promise<undefined> {

@@ -269,8 +269,8 @@ An ephemeral ticket carries no file. The pull mints it into the hold, with
 the next. It takes `--pass` alone. The work answer draws it as a held row at
 `0`, the way it draws a plan todo.
 
-`src/scripts/ephemeral.js` names the tickets and their asks, and
-`src/pull/pull_ephemeral.go` hands them out and takes them back. The clear
+`src/pull/pull_ephemeral.go` names the tickets and their asks, hands them
+out and takes them back. The clear
 runs as three of them. For details, see
 [[spec/design_output/stop#the-context-hands-over]].
 
@@ -516,10 +516,10 @@ word outside the vocabulary where it judges the finding false. The lint keeps
 those findings, so a verb reading through `prose.Kept` lets a line through that
 the lint names later.
 
-A contract case in `test/contract/process.test.js` mints a ticket off every
-route under `spec/processes`, and real Vale reads it. A line a route writes
-carries no finding there, so a verb minting off a route meets no refusal over
-the route's own words.
+`TestEveryRoutesMintedTicketPassesTheRules` in `src/rules/rules_test.go`
+reads the ticket the mint writes off every route under `spec/processes`. The
+rules read it. A line a route writes carries no warning there, so a verb
+minting off a route meets no refusal over its words.
 
 ## The commands answer
 
@@ -570,8 +570,8 @@ one level deeper, which is how `answered` lands.
 
 ## The rejected push
 
-`pushed` in `src/scripts/pull-push.js` lands a hand-back on origin, and it
-answers `{ ok, local, why }`. Each caller prints `why`, so the hand reads the
+`pushed` in `src/pull/pull_landed.go` lands a hand-back on origin, and it
+answers whether it stands and why. Each caller prints `why`, so the hand reads the
 real cause. The hold drops before the push, because the hand-back stands by
 then. A hold past that point stands on a closed ticket, and the stop hook holds
 the turn open for a hand-back nobody owes.
@@ -601,7 +601,7 @@ in the tree refuses it. Then nothing lands. The ticket file goes back to
 what the hand writes, the index empties, and the hold stays. The pull answers
 `refused` with the hook's finding, so the hand fixes the line and hands back
 again. So a record's `hash_after` names a commit the branch holds, and a
-refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
+refused commit writes no record. `src/pull/pull_landed.go` holds the landing.
 
 A hand-back stages the ticket, the children it mints, and the files its hand's
 journals name. The apply door writes the ticket a call serves into its undo
@@ -744,7 +744,7 @@ A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design
 - The sidebar button writes it through a `bless` message in `src/extension/sidebar.js`.
 - The write door refuses an agent's write to the bless file.
 - The shell door refuses a command naming the bless file.
-- `HARNESS` in `src/scripts/pull-hand-of.js` names the variables naming the hand and the box.
+- `harness` in `src/pull/pull_holds.go` names the variables naming the hand and the box.
 - The shell door refuses a command that sets, exports, unsets or clears one of them, off that one list.
 
 # A leaf comes back
@@ -878,7 +878,7 @@ The cost: a draft whose Ask carries a warning stops opening until a hand
 rewrites its Ask. The refusal names each line, so the rewrite takes minutes.
 
 The open lands in one commit naming the ticket, through `landedAlone` in
-`pull-landed.js`. A commit the hook refuses puts the draft back, and the verb
+`src/pull/pull_landed.go`. A commit the hook refuses puts the draft back, and the verb
 exits with a fault.
 
 ## The blank lines stand

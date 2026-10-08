@@ -1,4 +1,4 @@
-// The todo tag a push carries, off the bridge's lib/todo.js.
+// The todo tag a push carries, which todo.go in this folder owns.
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 
@@ -17,9 +17,14 @@ func TestTaggedInReadsTheTodoTag(t *testing.T) {
 		{Name: "spec/tickets/bare.md", Text: note("")},
 		{Name: "spec/tickets/point.md", Text: note("todo: true\npoint: gate\n")},
 		{Name: "src/a.js", Text: note("todo: true\n")},
+		{Name: "spec/tickets/code.md", Text: "// todo: true\n"},
+		{Name: "spec/tickets/empty.md", Text: ""},
 	}
 	if got, want := TaggedIn(files), []string{"spec/tickets/tagged.md", "spec/tickets/before.md"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("TaggedIn reads %q, want %q", got, want)
+	}
+	if got := TaggedIn(nil); len(got) > 0 {
+		t.Fatalf("TaggedIn over nothing reads %q, want nothing", got)
 	}
 }
 
@@ -33,6 +38,12 @@ func TestRefusedTodoCountsTheNotes(t *testing.T) {
 	said := RefusedTodo([]string{"spec/a.md"})
 	if !strings.HasPrefix(said, "A tagged note parks work on this box, and this push carries 1.\n\n  spec/a.md\n") {
 		t.Fatalf("the refusal reads\n%s", said)
+	}
+	said = RefusedTodo([]string{".se/tickets/slow-lint.md", "spec/tickets/x.md"})
+	for _, part := range []string{"this push carries 2", "\n  .se/tickets/slow-lint.md\n", "\n  spec/tickets/x.md\n", "ticket todo <name> --off", "the push is the one gate"} {
+		if !strings.Contains(said, part) {
+			t.Errorf("the refusal reads\n%s\nand wants %q", said, part)
+		}
 	}
 }
 

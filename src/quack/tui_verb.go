@@ -1,7 +1,8 @@
 // quack tui: the window this tree builds, on the tab the caller names. A
 // window already standing takes the tab over its own port and the second
 // launch ends, so one window stands at a time. A tree carrying no Go prints
-// the rows plain instead.
+// the rows plain instead. tuiViewerOf owns the stamp of the viewer build, so
+// the check and the verb share one stamp.
 // [[spec/design_output/tui#the-verb-builds-it]]
 package main
 
@@ -27,7 +28,7 @@ import (
 // The tabs a caller names, the first one a handover opens where none is named. [[spec/design_output/tui#a-tab-the-caller-names]]
 var tuiTabs = []string{"log", "work", "tutorial"}
 
-// The log's folders, as FOLDER and OLD in .claude/skills/level0/lib/log.js name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
+// The log's folders, as Log in src/modules/check/folders.go and logOld in src/quack/verb_log.go name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (
 	tuiLogFolder = ".se/.log"
 	tuiNoLog     = "No log stands yet. A writer starts one the next time it says a line."
@@ -37,7 +38,7 @@ const (
 // The viewer's source folder, the binaries' folder, the stamp beside the binary, the module files every stamp reads, the mark a key joins on, and the names an old binary tries. [[spec/design_output/tui#the-verb-builds-it]]
 const (
 	tuiSource = "src/tui"
-	tuiBin    = ".se/.runtime/bin" // the runtime folder .claude/skills/level0/lib/folders.js owns
+	tuiBin    = ".se/.runtime/bin" // the runtime folder src/modules/check/folders.go owns
 	tuiStamp  = tuiBin + "/.logview-source"
 	tuiJoin   = "\x1f"
 	tuiAside  = 9
@@ -165,7 +166,7 @@ func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, er
 	return 0
 }
 
-// A path as the reader names it, under the root, as showOf in src/bridge/findings.js answers. [[spec/design_output/log#one-verb-reads-the-log]]
+// A path as the reader names it, under the root. [[spec/design_output/log#one-verb-reads-the-log]]
 func tuiShow(root, path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	base := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")
@@ -390,7 +391,7 @@ func tuiReal() tuiDoors {
 	}
 }
 
-// The go program the tools file names, else one under the binaries' folder, else go off the path, as whereIs in src/engine/tools.js answers. [[spec/design_output/tui#the-verb-builds-it]]
+// The go program the tools file names, else one under the binaries' folder, else go off the path. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiGoOf(disk diskDoors, root string) string {
 	var known map[string]struct {
 		Path string `json:"path"`

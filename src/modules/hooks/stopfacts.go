@@ -1,5 +1,5 @@
 // What the door reads off the tree for the stops fold, off the reads behind
-// holdsIn in src/scripts/ephemeral.js: the
+// EveryHold in src/pull/pull_holds.go: the
 // rules, the plan, the holds, the tickets, and the branches git names.
 // [[spec/tickets/cage-stop-rules-port]]
 package hooks
@@ -14,9 +14,9 @@ import (
 
 // The folders the checks read, the branches they name, and the tickets and steps the handover reads. [[spec/tickets/the-stop-reads-the-state]]
 const (
-	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// src/modules/check/folders.go owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	holdsFolder = ".se/.runtime/hold"
-	// .claude/skills/level0/lib/folders.js owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
+	// src/modules/check/folders.go owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
 	privateTickets = ".se/tickets"
 	publicTickets  = "spec/tickets"
 	heldSuffix     = ".json"

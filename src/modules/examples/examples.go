@@ -16,7 +16,7 @@ import (
 const (
 	RowsName   = "examples/rows"
 	RunName    = "examples/run"
-	VerdictsAt = ".se/.runtime/examples.json" // .claude/skills/level0/lib/folders.js owns the runtime folder.
+	VerdictsAt = ".se/.runtime/examples.json" // src/modules/check/folders.go owns the runtime folder.
 )
 
 // The node module's name and its verb, which src/modules/verbs owns, spelled again because a module imports q alone. [[spec/tickets/the-lens-calls-actions]]

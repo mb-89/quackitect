@@ -55,11 +55,10 @@ func pfReviewTree(t *testing.T, check pfCheck, handback string) *tree {
 	one.cut(workBranch+pfName, "main")
 	one.land("the ask", map[string]string{ticketAt(pfName): pfAsk})
 	one.land("the work", map[string]string{
-		ticketAt(pfName):        handback,
-		"go.mod":                "module pfreview\n\ngo 1.24\n",
-		"src/quack/main.go":     "package main\n\nfunc main() {}\n",
-		"src/front/cmd/main.go": "package main\n\nfunc main() {}\n",
-		"src/a.js":              "export const a = 1;\n",
+		ticketAt(pfName):    handback,
+		"go.mod":            "module pfreview\n\ngo 1.24\n",
+		"src/quack/main.go": "package main\n\nfunc main() {}\n",
+		"src/a.js":          "export const a = 1;\n",
 	})
 	one.push(workBranch + pfName)
 	one.switchTo("main")
@@ -218,12 +217,12 @@ func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
 	pfGreenCheck(t, pfMaterial(t, one))
 }
 
-// The worktree builds the branch's own se-front into its own bin before the check. [[spec/tickets/work-verbs-port-to-go]]
-func TestPFTheWorktreeBuildsItsOwnFront(t *testing.T) {
+// The worktree builds the branch's own se-index into its own bin before the check. [[spec/tickets/se-front-leaves]]
+func TestPFTheWorktreeBuildsItsOwnIndex(t *testing.T) {
 	t.Parallel()
 	one := pfReviewTree(t, pfProbe(func(one *tree, at string) string {
-		if !one.stands(at + "/" + binFolder + "/se-front" + exe()) {
-			return "no se-front stands in the worktree's bin"
+		if !one.stands(at + "/" + binFolder + "/se-index" + exe()) {
+			return "no se-index stands in the worktree's bin"
 		}
 		return ""
 	}), pfHandback)

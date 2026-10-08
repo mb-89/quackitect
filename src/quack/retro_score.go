@@ -78,7 +78,7 @@ func retroScoreNotes(disk diskDoors, root string) []retroScoreNote {
 	return out
 }
 
-// A frontmatter field as fieldOf in src/engine/group.js reads it: trimmed, its link brackets off, and empty where it stands nowhere. [[spec/design_output/work#a-group-is-a-ticket]]
+// A frontmatter field as fieldOf in src/branches/group.go reads it: trimmed, its link brackets off, and empty where it stands nowhere. [[spec/design_output/work#a-group-is-a-ticket]]
 func retroScoreField(text, key string) string {
 	said := note.FrontOf(yaml.SplitLines(text)).Said.Get(key)
 	if said == nil {

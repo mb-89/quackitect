@@ -1,12 +1,14 @@
 // A hand-back lands: the ticket goes to disk, the named paths stage, and one
 // commit names the ticket and what changes, as landedAlone in
-// src/scripts/pull-landed.js lands it. A commit the hook refuses lands nothing.
+// src/pull/pull_landed.go lands it. A commit the hook refuses lands nothing.
 // [[spec/design_output/pull#the-refused-commit]]
 package branches
 
 import (
 	"strconv"
 	"strings"
+
+	"quackitect/src/modules/git"
 )
 
 // A note to land: its name, its path under the work root, its text, and whether it stands private. [[spec/design_output/pull#the-refused-commit]]
@@ -56,23 +58,17 @@ func (d *Doors) committed(message string, only []string) string {
 // The refusal a merge standing unresolved answers before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) unmergedFault() string {
 	_, order := d.unmerged()
-	return mergeRefusal(order, nil)
+	return MergeRefusal(order, nil)
 }
 
 // The refusal a staged conflict marker answers before the commit. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) stagedFault(only []string) string {
 	added, _ := d.Repo.StagedAdds(only)
-	var marked []string
-	for _, one := range added {
-		if markOpens.MatchString(one.Text) {
-			marked = append(marked, one.File+":"+strconv.Itoa(one.Line))
-		}
-	}
-	return mergeRefusal(nil, marked)
+	return MergeRefusal(nil, MarkedIn(added))
 }
 
 // The refusal every commit road answers, naming each file. [[spec/design_output/work#no-commit-carries-a-marker]]
-func mergeRefusal(unmerged, marked []string) string {
+func MergeRefusal(unmerged, marked []string) string {
 	if len(unmerged) == 0 && len(marked) == 0 {
 		return ""
 	}
@@ -85,4 +81,18 @@ func mergeRefusal(unmerged, marked []string) string {
 	}
 	rows = append(rows, "Resolve the merge first: write each file without its markers, then land the merge with ./RUNME.sh commit.")
 	return strings.Join(rows, "\n")
+}
+
+// The conflict openers a staged delta with no context adds, each as its file and line, for a caller holding the diff's text. [[spec/design_output/work#no-commit-carries-a-marker]]
+func MarkersIn(delta string) []string { return MarkedIn(git.AddsIn(delta)) }
+
+// The conflict openers among the lines a delta adds, each as its file and line. [[spec/design_output/work#no-commit-carries-a-marker]]
+func MarkedIn(added []git.Line) []string {
+	var out []string
+	for _, one := range added {
+		if markOpens.MatchString(one.Text) {
+			out = append(out, one.File+":"+strconv.Itoa(one.Line))
+		}
+	}
+	return out
 }

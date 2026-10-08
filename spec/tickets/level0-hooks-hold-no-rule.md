@@ -442,4 +442,5 @@ the door paths name postOf in cage.ts as their owner, and guard.go names folders
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The gate of [[spec/tickets/level0-hooks-move-to-typescript]] hands this ticket the rules the stub bridgehead holds: the vehicle roads, the home order and the clone, in `src/stub/.claude/skills/level0/hooks/bridgehead.ts`.
+- level0-hooks-forward-to-go lands first and moves the cage, start, clear, shape and transcript rules into Go. Draft this ticket against what that change leaves under `.claude/skills/level0/hooks/`, and keep the TypeScript move to the typed-mod group.
+- The gate of [[spec/tickets/level0-hooks-move-to-typescript]] hands this ticket the rules the stub bridgehead holds: the vehicle roads, the home order and the clone, in `src/stub/.claude/skills/level0/hooks/bridgehead.ts`.

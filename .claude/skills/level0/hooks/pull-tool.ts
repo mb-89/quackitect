@@ -1,100 +1,85 @@
-// The plugin's one hook module: the bridgehead, then the pull as a tool. A
+// The plugin's one hook module: the bridgehead, then the tools and the pull. A
 // shell verb reaches no agent, and the hook process does, so the spawn runs
-// here. The tool asks no model, so a hand-back answers the same way twice.
-// [[spec/tickets/the-judge-leaves-the-code]]
+// here. The binary prints every tool spec and the pull's answer, so this
+// module holds none of them. [[spec/tickets/the-judge-leaves-the-code]]
 
-import type { AgentSpawnArgs, EngineInterface, On, PluginOptions, ToolSpec } from "claude-code";
-import {
-  binaryOf,
-  callsIndexTool,
-  isIndexTool,
-  RUNNING,
-  registersIndexTools,
-  windowsOf,
-} from "../lib/index-tools.js";
-import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
+import type { AgentSpawnArgs, EngineInterface, On, PluginOptions } from "claude-code";
+import { binaryOf, windowsOf } from "./cage.ts";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
 import { register as bridgehead } from "./level0.ts";
-import { failureOf, type Spawned } from "./shape.ts";
+import { type Fields, failureOf, type Spawned } from "./shape.ts";
 
 // The scripts folder the binary's verb road takes, as RUNME.sh hands it over. [[spec/tickets/cli-js-leaves]]
 const SCRIPTS = "src/scripts";
-// The binary stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
-let cli = [binaryOf(".", false), "verb", `./${SCRIPTS}`];
-// The verb and the flag `PullArgvOf` in src/pull/pull.go reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
+// The tool the pull registers, as PullSpec in src/pull/pull.go names it, under the prefix every level zero tool carries. [[spec/design_output/pull#the-checks]]
+const PULL_CALL = "mcp__level0__pull";
+// The verb and the flags `Pulling` in src/pull/pull.go reads. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
+const SPEC = "--spec";
+// The longest run the pull takes, past the engine's own cap of thirty seconds, since a hand-back runs the check. [[spec/tickets/tool-call-hook-answers]]
+const RUNNING = 600_000;
 const BACKGROUND =
   "The hand works in the background. Take the next item, and pull again once it answers.";
 
+// The answer `ToolAnswerOf` in src/pull/pull.go prints: the text the lead reads, and the hand's prompt apart. [[spec/tickets/level0-hooks-forward-to-go]]
+type Pulled = { readonly result?: unknown; readonly spawn?: unknown };
+
 export function register(on: On, options: PluginOptions): void {
-  const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
-  const bin = binaryOf(method || ".", windowsOf(method));
-  cli = [bin, "verb", `${method || "."}/${SCRIPTS}`];
-  let indexTools: Awaited<ReturnType<typeof registersIndexTools>> = [];
-  // The index tools answer here, before the bridgehead routes a served tool to the server. [[spec/tickets/the-hook-registers-index-tools]]
-  on("tool.call", async ($, e, next) =>
-    isIndexTool(e?.tool)
-      ? { result: await callsIndexTool(doorsOf($), bin, indexTools, e) }
-      : next(e),
-  );
-  // The engine takes one session start a module, so the bridgehead registers none and this one registers the pull beside the index tools. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-tools-leave-the-bridge]]
+  const method = String(options?.method ?? "").replace(/[\\/]+$/, "") || ".";
+  const bin = binaryOf(method, windowsOf(method));
+  const cli = [bin, "verb", `${method}/${SCRIPTS}`];
+  // The hooks door answers an index tool's call and writes the session file, so this module registers the tools and the pull alone. [[spec/tickets/level0-hooks-forward-to-go]]
   bridgehead(on, options);
+  // The engine takes one session start a module, so the bridgehead registers none, and this one registers every tool the binary lists. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/design_output/level0#the-first-call-pays]]
   on("session.start", async ($, e, next) => {
-    try {
-      await $.tool.register(pullSpec());
-    } catch {}
-    indexTools = await registersIndexTools(doorsOf($), bin);
-    // [[spec/design_output/pull#the-hand-and-the-hold]]
-    await wrote($, sessionOf(e));
+    const listed = await printed($, [bin, "tools"], []);
+    const specs = [...(Array.isArray(listed) ? listed : []), await printed($, [...cli, ...PULL, SPEC], null)];
+    for (const spec of specs as (Fields | null)[]) {
+      if (!spec?.name) continue;
+      try {
+        await $.tool.register({
+          name: String(spec.name),
+          description: String(spec.description ?? ""),
+          inputSchema: spec.inputSchema as never,
+        });
+      } catch {}
+    }
     return next(e);
   });
 
   on("tool.call", { tool: PULL_CALL }, async ($, e, _next) => {
-    const answer = await pulled($, e);
+    const ran = await $.process.run([...cli, ...PULL, TOOL, JSON.stringify(e ?? {})], await running($));
+    const answer = (parsed(ran?.stdout) as Pulled | null) ?? {
+      result: `${ran?.stdout ?? ""}${ran?.stderr ?? ""}`.trim() || `exit ${ran?.exitCode}`,
+    };
     // The hand works in the background, and the lead takes the next item. [[spec/tickets/the-hook-awaits-the-spawn]]
-    const prompt = spawnPromptIn(answer);
-    if (!prompt) return { result: answer };
-    const said = (await spawned($, prompt)) || BACKGROUND;
-    return { result: `${answer}\n\n${said}` };
+    if (!answer.spawn) return { result: answer.result };
+    const said = (await spawned($, String(answer.spawn))) || BACKGROUND;
+    return { result: `${answer.result}\n\n${said}` };
   });
 }
 
-// The process and tool doors the index tools read, since the engine follows $ across no import. [[spec/tickets/the-hook-registers-index-tools]]
-function doorsOf($: EngineInterface) {
-  return {
-    process: { run: (argv: readonly string[]) => $.process.run(argv) },
-    tool: { register: (spec: ToolSpec) => $.tool.register(spec) },
-  };
-}
-
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-async function wrote($: EngineInterface, held: { readonly id?: unknown }): Promise<void> {
-  if (!held.id)
-    return says(
-      $,
-      "the session start names no session id, so the hand stands at the box",
-    );
+// What the binary prints as JSON, or the value given where it fails. [[spec/design_output/level0#the-first-call-pays]]
+async function printed($: EngineInterface, argv: readonly string[], otherwise: unknown): Promise<unknown> {
   try {
-    await $.fs.write(SESSION, `${JSON.stringify(held, null, 2)}\n`);
-  } catch (bad) {
-    says($, `the session file stays unwritten: ${failureOf(bad)?.message ?? bad}`);
+    const ran = await $.process.run(argv);
+    if (ran.exitCode !== 0) return otherwise;
+    return parsed(ran.stdout) ?? otherwise;
+  } catch {
+    return otherwise;
   }
 }
 
-function says($: EngineInterface, line: string): void {
+function parsed(text: unknown): unknown {
   try {
-    $.ui.log(line);
-  } catch {}
-}
-
-// The hook hands the raw input over, and the ticket pull verb reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
-function toolCall(e: unknown): string[] {
-  return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
+    return JSON.parse(String(text ?? "").trim());
+  } catch {
+    return null;
+  }
 }
 
 // The verb runs under the harness keys the session carries, so it reads the hand the shell verb reads. The engine merges this env over its own, and `$.env.get` reads a key where the hook scope holds no process. [[spec/tickets/pull-env-meets-the-engine]]
-// A copy of the keys `HARNESS` in src/scripts/pull-hand-of.js names, because a hook reaches no file past the plugin. The level1 case reads both. [[spec/tickets/pull-env-meets-the-engine]]
 export const HARNESS_KEYS = ["CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"];
 
 async function running(
@@ -122,11 +107,6 @@ async function envOf(read: () => Promise<string | undefined>): Promise<string | 
   } catch {
     return undefined;
   }
-}
-
-async function pulled($: EngineInterface, e: unknown): Promise<string> {
-  const ran = await $.process.run(toolCall(e), await running($));
-  return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

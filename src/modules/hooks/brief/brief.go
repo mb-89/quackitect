@@ -1,6 +1,6 @@
 // The brief a session reads: the canary counts off the top guidance notes, the
-// canary and debt wording, the tools block and the handover block, off
-// guidance.js in the level0 lib and in src/bridge. It reads a tree it is handed.
+// canary and debt wording, the tools block and the handover block. It reads a
+// tree it is handed.
 // [[spec/tickets/brief-answers-off-the-door]]
 package brief
 
@@ -14,9 +14,9 @@ import (
 // The folder the notes stand in, the files the blocks read, and the names each block rides under. [[spec/tickets/brief-answers-off-the-door]]
 const (
 	Guidance = "spec/guidance"
-	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
+	// src/modules/check/folders.go owns the runtime folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
 	ToolsFile = ".se/.runtime/tools.json"
-	// .claude/skills/level0/lib/folders.js owns the handover's folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
+	// src/modules/check/folders.go owns the handover's folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
 	HandoverFile  = ".se/HANDOVER.md"
 	ToolsBlock    = "level0-tools"
 	CanaryBlock   = "level0-canary"
@@ -27,14 +27,22 @@ const (
 	setIn         = "    "
 )
 
-// What CanaryIn finds on an answer's first line, off HEARD in the level0 lib. [[spec/tickets/brief-answers-off-the-door]]
+// What CanaryIn finds on an answer's first line. [[spec/tickets/brief-answers-off-the-door]]
 const (
 	Same  = "same"
 	Other = "other"
 	None  = "none"
 )
 
-// The tools the survey names, in the order the block lists them, off WANTED in .claude/skills/level0/lib/tools.js. [[spec/tickets/brief-answers-off-the-door]]
+// What each canary row says, which the door and the probe both read here. [[spec/design_output/level0#the-canary]] [[spec/tickets/guidance-lib-leaves]]
+const (
+	HeardSame  = "the canary opens the answer whole"
+	HeardOther = "the canary opens the answer with other counts"
+	HeardNone  = "the canary opens no answer"
+	HeardAgain = "the canary opens a second answer in one context"
+)
+
+// The tools the survey names, in the order wantedTools in src/quack/survey.go lists them, each with what to reach for it for. [[spec/tickets/brief-answers-off-the-door]]
 var wanted = [][2]string{
 	{"node", "a helper script"},
 	{"biome", "formatting and linting the JavaScript"},
@@ -87,7 +95,7 @@ type Block struct {
 	Text string
 }
 
-// The work root's file over the method root's, and the names of both folders, as inherits in the level0 lib reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The work root's file over the method root's, and the names of both folders, as projection.Inherits reads them. [[spec/design_output/vehicle#the-work-root-inherits]]
 func Layered(method, work Tree) Tree { return layered{method, work} }
 
 type layered struct{ under, over Tree }
@@ -147,7 +155,7 @@ func CanaryText(sentence string) string {
 		"It says out loud that level zero holds this session, and the numbers come from what it loaded. Write this line once and never again. The line opens an answer and ends no turn: a turn ends on the stop line, last and alone, and the two stand at opposite ends of the same answer.")
 }
 
-// The line an open debt rides a call with, off OWES.warns in the level0 lib. [[spec/design_output/level0#the-canary-owes-a-debt]]
+// The line an open debt rides a call with. [[spec/design_output/level0#the-canary-owes-a-debt]]
 func Owes(sentence string) string {
 	return around("This session owes the canary. Open your answer with this line, first and alone, word for word:", sentence,
 		"The numbers come from what level zero loaded. Level zero refuses the next tool call until that line opens an answer. The line ends no turn, so say what you do next under it and carry on.")

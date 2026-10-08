@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// The handover, the one path inside the tree a harness write reaches past the no-ticket refusal. .claude/skills/level0/lib/folders.js owns it. [[spec/design_output/level0#a-write-names-its-ticket]]
+// The handover, the one path inside the tree a harness write reaches past the no-ticket refusal. src/modules/check/folders.go owns it. [[spec/design_output/level0#a-write-names-its-ticket]]
 const Handover = ".se/HANDOVER.md"
 
 // The tools the harness writes a file through, none carrying a ticket field, and the one of them no rule past the no-ticket refusal reads. [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -59,7 +59,7 @@ func PathOf(e map[string]any) string {
 	return textIn(e["notebook_path"])
 }
 
-// A path under the root, relative to it, and any other path as it stands, off relativeTo in lib/paths.js. [[spec/design_output/level0#the-write-door]]
+// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. [[spec/design_output/level0#the-write-door]]
 func RelativeTo(root, path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	at := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")

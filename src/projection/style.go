@@ -1,6 +1,6 @@
 // The output style: every guidance note's Actionables, numbered, with its
 // Examples table under them, in one file the client sends with every request.
-// The guidance reading ports the part of guidance.js the style reads.
+// rulesOf reads the notes here, beside brief.RulesOf in src/modules/hooks/brief.
 // [[spec/design_output/projection#the-third-target]] [[spec/tickets/config-verbs-port-to-go]]
 package projection
 

@@ -1,6 +1,5 @@
 // The layer a spawned helper reads before its task: the notes binding its kind
-// beside the notes binding none, as layersOf, standingLayer and forHelper in
-// .claude/skills/level0/lib/guidance.js build it.
+// beside the notes binding none, as LayerFor and ForHelper build it.
 // [[spec/tickets/spawn-answers-off-the-door]]
 package brief
 

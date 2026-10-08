@@ -1,5 +1,5 @@
 // The mint: a note off a schema and the fields a caller names, in the shape
-// the schema asks, off mintNote and mintedNote in lib/schema-mint.js.
+// the schema asks.
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 package check
 
@@ -79,7 +79,7 @@ func mintNote(schema *yaml.Doc, fields map[string]any) string {
 	if said, ok := body.Get("headingLevel").(int); ok && said > 0 {
 		level = said
 	}
-	for _, one := range mintChapters(yaml.AsList(body.Get("sections")), held, level) {
+	for _, one := range chaptersWanted(yaml.AsList(body.Get("sections")), held, level) {
 		rows = append(rows, strings.Repeat("#", one.level)+" "+one.header, "")
 		if said := strings.TrimSpace(textOf(given[slugOf(one.header)])); said != "" {
 			rows = append(rows, said, "")
@@ -105,15 +105,16 @@ func mintNote(schema *yaml.Doc, fields map[string]any) string {
 	return strings.TrimRight(strings.Join(rows, "\n"), " \n") + "\n"
 }
 
-// One chapter a mint writes: its header, its depth, what it asks, its form, and the section rule it stands under. [[spec/design_output/schema#keywords-that-name-a-step]]
+// One chapter a note wants and a mint writes: its header, its depth, whether it stands required, what it asks, its form, and the section rule it stands under. [[spec/design_output/schema#keywords-that-name-a-step]]
 type mintChapter struct {
 	header, description, form string
 	level                     int
+	required                  bool
 	rule                      *yaml.Doc
 }
 
-// The chapters a mint writes, a step of a listed route nesting one level under the step holding it, off chaptersWanted in lib/schema-body.js. [[spec/design_output/schema#keywords-that-name-a-step]]
-func mintChapters(sections []any, front *yaml.Doc, level int) []mintChapter {
+// The chapters a note wants, a step of a listed route nesting one level under the step holding it. [[spec/design_output/schema#keywords-that-name-a-step]]
+func chaptersWanted(sections []any, front *yaml.Doc, level int) []mintChapter {
 	var out []mintChapter
 	for _, each := range sections {
 		rule := yaml.AsDoc(each)
@@ -122,7 +123,11 @@ func mintChapters(sections []any, front *yaml.Doc, level int) []mintChapter {
 		}
 		list := yaml.AsString(rule.Get("x-one-per"))
 		if list == "" {
-			out = append(out, mintChapter{header: yaml.AsString(rule.Get("header")), description: yaml.AsString(rule.Get("description")), form: yaml.AsString(rule.Get("form")), level: level, rule: rule})
+			deep := level
+			if said, set := rule.Get("level").(int); set {
+				deep = said
+			}
+			out = append(out, mintChapter{header: yaml.AsString(rule.Get("header")), description: yaml.AsString(rule.Get("description")), form: yaml.AsString(rule.Get("form")), level: deep, required: yaml.AsBool(rule.Get("required")), rule: rule})
 			continue
 		}
 		out = append(out, stepChapters(docOf(front.Get(list)), level, rule, false)...)
@@ -142,7 +147,7 @@ func stepChapters(list any, level int, rule *yaml.Doc, listed bool) []mintChapte
 		if header == "" {
 			continue
 		}
-		out = append(out, mintChapter{header: header, description: askedOrSaid(one), form: yaml.AsString(one.Get("form")), level: level, rule: rule})
+		out = append(out, mintChapter{header: header, description: askedOrSaid(one), form: yaml.AsString(one.Get("form")), level: level, required: true, rule: rule})
 		asks := listed
 		for _, item := range yaml.Flat(one.Get("checklist")) {
 			asks = asks || strings.TrimSpace(textOf(item)) != ""
@@ -165,7 +170,7 @@ func stepChapters(list any, level int, rule *yaml.Doc, listed bool) []mintChapte
 	return out
 }
 
-// The chapter a leaf answering a checklist takes, and what it asks, which CHECKED in lib/schema-body.js names. [[spec/design_output/pull#the-fields-hold-their-forms]]
+// The chapter a leaf answering a checklist takes, and what it asks. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const (
 	checkedChapter = "checked"
 	checkedAsks    = "one line per item of the checklist, on how you take it into account"
@@ -360,12 +365,4 @@ func tableRows(table *yaml.Doc) []string {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
-func textOf(said any) string {
-	if said == nil {
-		return ""
-	}
-	if text, ok := said.(string); ok {
-		return text
-	}
-	return fmt.Sprint(said)
-}
+func textOf(said any) string { return yaml.ScalarText(said) }

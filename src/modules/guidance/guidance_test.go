@@ -1,5 +1,5 @@
-// The module resolves a leaf's notes the way readsFor in
-// src/scripts/guidance-hand.js resolves them.
+// The module resolves a leaf's notes off their tags, their envs and the
+// leaf's own reads.
 // [[spec/tickets/the-guidance-topic-lands]]
 package guidance
 
@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"quackitect/src/q"
-	"quackitect/src/q/qtest"
 )
 
 const process = `steps:
@@ -23,19 +22,6 @@ const process = `steps:
   - name: gate
     tags: ["review"]
 `
-
-// What the module answers over the files a case seeds. [[spec/design_output/model#the-fake-index]]
-func stepsOver(t *testing.T, files map[string]string) map[string][]Read {
-	t.Helper()
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
-	seeds := map[string]any{}
-	for at, text := range files {
-		seeds["files/"+at] = q.Content{Hash: "h", Text: text}
-	}
-	index.Seed(seeds)
-	said, _ := index.Run(StepsPort).(map[string][]Read)
-	return said
-}
 
 func notesOf(reads []Read) []string {
 	out := []string{}
@@ -134,6 +120,24 @@ func TestAWorkRootNoteStandsOverTheMethodRootNote(t *testing.T) {
 	want := []string{"spec/guidance/code/testing"}
 	if got := notesOf(steps["standard:design/draft"]); !reflect.DeepEqual(got, want) {
 		t.Errorf("design/draft reads %v, and wants the work root's note, which names no testing tag", got)
+	}
+}
+
+// The mint tool writes a flow list quoted, and a quoted tag reaches the leaf its bare word reaches. [[spec/design_input/level-two#guidance]]
+func TestAQuotedTagReachesTheLeafItsBareWordReaches(t *testing.T) {
+	steps := stepsOver(t, map[string]string{
+		"spec/processes/standard.yaml": process,
+		"spec/guidance/code/bare.md":   "---\ntags: [testing, code]\n---\n# Bare\n",
+		"spec/guidance/code/flow.md":   "---\ntags: [\"testing\", 'code']\n---\n# Flow\n",
+		"spec/guidance/code/block.md":  "---\ntags:\n  - \"testing\"\n  - 'code'\n---\n# Block\n",
+		"spec/guidance/code/spaced.md": "---\ntags: [ \"testing\" , 'code' ]\n---\n# Spaced\n",
+	})
+	want := []string{"spec/guidance/code/bare", "spec/guidance/code/block", "spec/guidance/code/flow", "spec/guidance/code/spaced", "spec/guidance/own"}
+	if got := notesOf(steps["standard:design/tests-red"]); !reflect.DeepEqual(got, want) {
+		t.Errorf("design/tests-red reads %v, and wants %v", got, want)
+	}
+	if got := notesOf(steps["standard:design/draft"]); len(got) != 0 {
+		t.Errorf("design/draft reads %v, and wants none, since it holds no testing tag", got)
 	}
 }
 

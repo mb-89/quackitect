@@ -91,14 +91,14 @@ func partNamed(parts []part, name string) part {
 
 func TestCheckParts(t *testing.T) {
 	t.Parallel()
-	t.Run("the battery holds its parts, in order", func(t *testing.T) {
+	t.Run("the battery holds its parts in order", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
 		names := []string{}
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"changed", "tests", "level0", "go", "doors", "guards", "projections", "plugin", "types", "plugin-tests", "server", "rules"}
+		want := []string{"changed", "tests", "level0", "go", "doors", "guards", "projections", "plugin", "types", "plugin-tests", "server", "rules", "lines", "javascript"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
@@ -115,18 +115,13 @@ func TestCheckParts(t *testing.T) {
 		}
 	})
 	// A warning in a file the branch changes turns the check red, before the tests run. [[spec/tickets/rules-lint-changed-files-first]]
-	t.Run("the changed part runs the strict lint over the changed files", func(t *testing.T) {
-		fake := &checkFake{}
-		partNamed(partsOf(fake.doors(), nil, false), "changed").run()
-		if !reflect.DeepEqual(fake.verbs, [][]string{{"lint", "--changed", "--strict"}}) {
-			t.Fatalf("the changed part ran %v", fake.verbs)
-		}
-	})
-	t.Run("the rules read the root where the words name no path", func(t *testing.T) {
-		fake := &checkFake{}
-		partNamed(partsOf(fake.doors(), nil, false), "rules").run()
-		if !reflect.DeepEqual(fake.verbs, [][]string{{"lint", "."}}) {
-			t.Fatalf("the rules ran %v", fake.verbs)
+	t.Run("the changed part runs the strict lint over the changed files, and the rules read the root where the words name no path", func(t *testing.T) {
+		for name, want := range map[string][]string{"changed": {"lint", "--changed", "--strict"}, "rules": {"lint", "."}} {
+			fake := &checkFake{}
+			partNamed(partsOf(fake.doors(), nil, false), name).run()
+			if !reflect.DeepEqual(fake.verbs, [][]string{want}) {
+				t.Fatalf("the %s part ran %v", name, fake.verbs)
+			}
 		}
 	})
 	// [[spec/tickets/level0-smoke-runs-in-seconds]]
@@ -140,17 +135,18 @@ func TestCheckParts(t *testing.T) {
 			}
 		}
 	})
-	t.Run("the plugin part validates the plugin strictly, and passes where claude stands nowhere", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"claude": 1}}
-		if code := partNamed(partsOf(fake.doors(), nil, false), "plugin").run(); code != 1 {
-			t.Fatalf("a refused plugin answers %d", code)
-		}
-		if !reflect.DeepEqual(fake.runs, [][]string{{"claude", "plugin", "validate", "--strict", filepath.Join(".claude", "skills", "level0")}}) {
-			t.Fatalf("the plugin part ran %v", fake.runs)
-		}
-		gone := &checkFake{gone: map[string]bool{"claude": true}}
-		if code := partNamed(partsOf(gone.doors(), nil, false), "plugin").run(); code != 0 {
-			t.Fatalf("no claude answers %d", code)
+	// [[spec/tickets/level0-tests-to-plugin-test]]
+	t.Run("the plugin part validates the plugin strictly, the plugin-tests part runs the kit over it, and each passes where claude stands nowhere", func(t *testing.T) {
+		plugin := filepath.Join(".claude", "skills", "level0")
+		for name, want := range map[string][]string{"plugin": {"claude", "plugin", "validate", "--strict", plugin}, "plugin-tests": {"claude", "plugin", "test", plugin}} {
+			fake := &checkFake{codes: map[string]int{"claude": 1}}
+			if code := partNamed(partsOf(fake.doors(), nil, false), name).run(); code != 1 || !reflect.DeepEqual(fake.runs, [][]string{want}) {
+				t.Fatalf("a refused %s part answers %d, and ran %v", name, code, fake.runs)
+			}
+			gone := &checkFake{gone: map[string]bool{"claude": true}}
+			if code := partNamed(partsOf(gone.doors(), nil, false), name).run(); code != 0 {
+				t.Fatalf("no claude answers %d", code)
+			}
 		}
 	})
 	t.Run("the types part lays the engine's types, then runs tsc over the plugin", func(t *testing.T) {
@@ -276,9 +272,9 @@ func TestTestArgv(t *testing.T) {
 	if len(testParts) != 2 || !testParts[0].shared || testParts[1].shared {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
-	red := "test/level0/trust.test.js"
+	red := "test/level0/lens.test.js"
 	argv := testArgv(realDisk(), root, []string{red}, testParts[0])
-	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/chapter.test.js") {
+	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/logbook.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
 	for _, one := range argv {
@@ -366,32 +362,28 @@ func TestCheckReads(t *testing.T) {
 		}
 	})
 	// [[spec/tickets/platform-red-line-tested]]
-	t.Run("level zero going red says the tree is red on the platform it ran on", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"probe smoke --working": 1}}
-		doors := fake.doors()
-		var said strings.Builder
-		doors.errs = &said
-		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") || !strings.Contains(said.String(), "on linux") {
-			t.Fatalf("a red dry session answers %d, %q", code, said.String())
-		}
-	})
 	// [[spec/tickets/level0-claims-name-the-platform]]
-	t.Run("a green level zero names the platform it ran on", func(t *testing.T) {
-		doors := (&checkFake{}).doors()
-		var said strings.Builder
-		doors.out = &said
-		if code := level0Runs(doors, false); code != 0 || !strings.Contains(said.String(), "on linux") {
-			t.Fatalf("a green run on linux answers %d, %q", code, said.String())
-		}
-	})
-	t.Run("a Windows box names the desk trial covering it", func(t *testing.T) {
-		doors := (&checkFake{}).doors()
-		doors.platform = "windows"
-		var said strings.Builder
-		doors.out = &said
-		level0Runs(doors, false)
-		if !strings.Contains(said.String(), "on windows") || !strings.Contains(said.String(), deskTrial) {
-			t.Fatalf("a Windows box says %q", said.String())
+	t.Run("level zero names the platform it ran on, red or green, and a Windows box names the desk trial covering it", func(t *testing.T) {
+		for _, one := range []struct {
+			platform string
+			code     int
+			says     []string
+		}{
+			{"linux", 1, []string{"so this tree is red", "on linux"}},
+			{"linux", 0, []string{"on linux"}},
+			{"windows", 0, []string{"on windows", deskTrial}},
+		} {
+			fake := &checkFake{codes: map[string]int{"probe smoke --working": one.code}}
+			doors := fake.doors()
+			doors.platform = one.platform
+			var said strings.Builder
+			doors.out, doors.errs = &said, &said
+			code := level0Runs(doors, false)
+			for _, want := range one.says {
+				if code != one.code || !strings.Contains(said.String(), want) {
+					t.Fatalf("on %s level zero answers %d, %q, and wants %q", one.platform, code, said.String(), want)
+				}
+			}
 		}
 	})
 }
@@ -579,4 +571,29 @@ func TestTestVerb(t *testing.T) {
 			t.Fatalf("the verb ran %v", fake.runs)
 		}
 	})
+}
+
+func TestTheTestRunHandsNodeTheBrowserTheBoxHolds(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		name, browser, want string
+	}{
+		{"a browser the box holds rides every run", "/b/chrome", "PLAYWRIGHT_CHROMIUM=/b/chrome"},
+		{"no browser names no variable", "", ""},
+	} {
+		fake := &checkFake{}
+		doors := fake.doors()
+		doors.root = sharedFolder()
+		doors.browser = one.browser
+		testsRun(doors, true)
+		if len(fake.envs) != len(testParts) {
+			t.Fatalf("%s: the run started %v", one.name, fake.runs)
+		}
+		for _, env := range fake.envs {
+			named := slices.ContainsFunc(env, func(v string) bool { return strings.HasPrefix(v, "PLAYWRIGHT_CHROMIUM=") })
+			if (one.want == "" && named) || (one.want != "" && !slices.Contains(env, one.want)) {
+				t.Errorf("%s: node runs under %v, and wants %q", one.name, env, one.want)
+			}
+		}
+	}
 }

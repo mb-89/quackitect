@@ -1,6 +1,6 @@
-// The stop rules, read off the files under spec/config/stop the way
-// .claude/skills/level0/lib/rulefile.js and pool in lib/stop.js read them: a
-// rule it cannot read stands out of the vote.
+// The stop rules, read off the files under spec/config/stop and pooled, a
+// later file's rule taking the place of an earlier one's: a rule it cannot
+// read stands out of the vote.
 // [[spec/tickets/cage-stop-rules-port]]
 package stop
 

@@ -11,7 +11,7 @@ rationale: [[spec/rationales/testing]]
 2. In that JavaScript, write a normal test against a fake from `src/doors/fake`. It touches memory and nothing else. *
 3. Give each door one door test against the real thing, and list it in the door audit. Run every other test on the door's fake. A door driven from many tests waits on the box in each of them. One nobody drives fails on the first box its fake misses. In the JavaScript the door test stands in `test/contract`. [[spec/design_output/doors#one-contract-test-per-door]] *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
-5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. For a defect, that failing case is a `./RUNME.sh probe` run or a contract case. It shows the live fault through the real door. A fix against a guess lands green while the fault stands. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
+5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. For a defect, that failing case is a `./RUNME.sh probe` run or a contract case. It shows the live fault through the real door. A fix against a guess lands green while the fault stands. The commit door refuses a change standing with no test. *
 6. Name a test as the claim it makes, and assert every word of that claim. Test behavior through an interface, and leave the implementation detail untested. A test of a detail turns red on a refactor that breaks nothing. Read the rules on behavior tests in [[spec/guidance/code/examples]].
 7. Build a shared fixture once a package run, in the package's one home `main_test.go`. Copy it into the case where a case writes to it. The `fixture` guard names a build outside the home. Fixtures count toward the test-to-code ratio, which is about 1:1 at most per package. The `ratio` guard names a package past it. [[spec/design_output/model#the-guards-hold-a-baseline]]
 8. Take the clock and the random source as arguments, so a failing case replays. Wait on readiness or a fake clock outside a door test. The `purity` guard names a function reaching the clock in place. The check names a test waiting on the wall clock outside the audit. [[spec/design_output/model#the-guards-hold-a-baseline]]
@@ -30,7 +30,7 @@ rationale: [[spec/rationales/testing]]
 | 4 | a fake disk that reads what it writes | a double answering a scripted string |
 | 5 | a red test before the code | code first, a test after |
 | 5 | a contract case red on the live fault, then the fix | a fix to the code a guess names, green on the fake |
-| 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |
-| 13 | one suite of cases run over `FakeGit` and a real repository | a fake no suite holds to the real thing |
 | 7 | one go build of the binary, copied into each case's folder | a go build in each case |
 | 8 | a case waiting on the fake timer's ask | a case sleeping a second to see no spawn |
+| 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |
+| 13 | one suite of cases run over `FakeGit` and a real repository | a fake no suite holds to the real thing |

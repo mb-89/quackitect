@@ -1,6 +1,6 @@
 // The sync: a work branch takes trunk in, and another hand's push on it, and a
-// ticket whose front alone conflicts merges key by key, as sync, settles and
-// src/engine/front-merge.js answer it.
+// ticket whose front alone conflicts merges key by key, as sync and settles
+// answer it.
 // [[spec/design_output/work#trunk-comes-in-first]]
 package branches
 

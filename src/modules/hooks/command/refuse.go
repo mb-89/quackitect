@@ -1,5 +1,4 @@
-// The wording of a command's refusal, off refusedCommand in lib/refuse.js:
-// the command, each rule with the words it reads, and the rules to hold.
+// The wording of a command's refusal: the command, each rule with the words it reads, and the rules to hold.
 // [[spec/tickets/cage-command-rules-port]]
 package command
 

@@ -22,6 +22,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
 	if post.Event != spawnEvent || root == "" {
 		return Effect{}, false
 	}
+	prompt := textOf(post.E, "prompt")
 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
 	tag := ""
 	if !yaml.Truthy(post.E[ownField]) && !strings.HasPrefix(textOf(post.E, "prompt"), q.HandOfItsOwn) {
@@ -34,7 +35,9 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
 	for key, value := range post.E {
 		event[key] = value
 	}
-	prompt := brief.ForHelper(layer, textOf(post.E, "prompt"))
+	if layer != "" {
+		prompt = brief.ForHelper(layer, prompt)
+	}
 	if tag != "" {
 		prompt = tag + "\n\n" + prompt
 	}

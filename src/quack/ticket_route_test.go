@@ -1,5 +1,6 @@
 // The route verb writes the steps past the pointer and answers JSON on both
-// roads, each case kept in testdata/ticket_route.json.
+// roads, each case a tree, the words it runs and what the verb answers, kept
+// in testdata/ticket_route.json.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
@@ -76,7 +77,7 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 			}
 			if history != nil && !one.Bare {
 				for _, text := range history.Texts {
-					seedsFile(t, root, history.Path, text)
+					seedFile(t, root, history.Path, text)
 					commitsAll(t, repo, "a version")
 				}
 			}
@@ -89,7 +90,7 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 			}
 			for path, text := range files {
 				if text != nil {
-					seedsFile(t, root, path, *text)
+					seedFile(t, root, path, *text)
 				}
 			}
 			t.Setenv("QUACKITECT_ROOT", root)
@@ -114,7 +115,7 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 				if !changed {
 					want = was
 				}
-				got, stands := readsBack(t, root, path)
+				got, stands := readIn(root, path)
 				switch {
 				case want == nil && stands:
 					t.Errorf("%s stands, and the JS leaves none", path)

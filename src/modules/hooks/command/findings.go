@@ -1,5 +1,4 @@
-// The rules over a shell command, off lib/bash.js and the names, code, vale
-// and private libraries it reads: each finding names its rule, the words it
+// The rules over a shell command: each finding names its rule, the words it
 // reads, and the road the agent takes instead.
 // [[spec/tickets/cage-command-rules-port]]
 package command
@@ -24,7 +23,7 @@ const (
 	PullCommitStand = "PullCommitStands"
 )
 
-// The private half and its notes, off lib/private.js, and the prose and code a rule reads, off lib/vale.js and lib/code.js. [[spec/design_output/private#the-second-door]]
+// The private half and its notes, which private.go owns, and the prose and code a rule reads. [[spec/design_output/private#the-second-door]]
 const (
 	home  = ".se"
 	notes = ".se/notes"
@@ -405,7 +404,7 @@ func steps(args []string) bool {
 	return false
 }
 
-// The part of a path holding more words than the cap, off lib/names.js. [[spec/design_output/level0#a-name-meets-the-cap]]
+// The part of a path holding more words than the cap, which src/modules/check/names.go also reads. [[spec/design_output/level0#a-name-meets-the-cap]]
 func overLong(path string, most int) string {
 	if most == 0 {
 		return ""

@@ -88,7 +88,7 @@ func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
 	}
 }
 
-// The hashes hashText in .claude/skills/level0/lib/hash.js answers, which the viewer's stamp reads. [[spec/design_output/tui#the-verb-builds-it]]
+// The hashes HashText in src/pull/hash.go answers, which the viewer's stamp reads. [[spec/design_output/tui#the-verb-builds-it]]
 func TestHashTextMatchesJavaScript(t *testing.T) {
 	t.Parallel()
 	for text, want := range map[string]string{

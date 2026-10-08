@@ -14,7 +14,7 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-//go:embed testdata/drawn-one.md testdata/drawn-two.md
+//go:embed testdata
 var drawnData embed.FS
 
 // The family the drawing stands under, by its local name, and the folder a fixture seeds into. [[spec/tickets/the-lens-reads-v1]]
@@ -24,6 +24,22 @@ const (
 )
 
 var drawnFixtures = []string{"drawn-one.md", "drawn-two.md"}
+
+// The golden the JavaScript fakes read each ticket text and its drawing off. Its own texts are the source: go test ./src/quack -run TestTheDrawnGoldenRedrawsEveryText -update draws each again. [[spec/tickets/branch-scripts-leave]]
+const drawnGolden = "testdata/drawn.golden.json"
+
+// One golden entry: the name a test asks it by, a ticket text, and the drawing Go answers for it. [[spec/tickets/branch-scripts-leave]]
+type goldenDrawn struct {
+	Name  string          `json:"name"`
+	Text  string          `json:"text"`
+	Drawn json.RawMessage `json:"drawn"`
+}
+
+// Whether two JSON bodies hold the same value, whatever their key order and spacing. [[spec/tickets/branch-scripts-leave]]
+func sameJSON(a, b []byte) bool {
+	var left, right any
+	return json.Unmarshal(a, &left) == nil && json.Unmarshal(b, &right) == nil && reflect.DeepEqual(left, right)
+}
 
 type drawnField struct {
 	Name   string   `json:"name"`
@@ -103,6 +119,28 @@ func TestDrawnMarksTheOpenFields(t *testing.T) {
 	}
 	if !reflect.DeepEqual(leaf.Fields, want) {
 		t.Fatalf("design/draft draws the fields %+v, and wants %+v", leaf.Fields, want)
+	}
+}
+
+// [[spec/tickets/branch-scripts-leave]]
+func TestEveryDrawnGoldenMatchesTheProjection(t *testing.T) {
+	body, err := drawnData.ReadFile(drawnGolden)
+	if err != nil {
+		t.Fatalf("%s reads %v, and wants the entries go test -update writes", drawnGolden, err)
+	}
+	var entries []goldenDrawn
+	if err := json.Unmarshal(body, &entries); err != nil || len(entries) == 0 {
+		t.Fatalf("%s holds %d entries (%v), and wants one a drawn ticket", drawnGolden, len(entries), err)
+	}
+	named := map[string]bool{}
+	for at, one := range entries {
+		if one.Name == "" || named[one.Name] {
+			t.Errorf("entry %d carries the name %q, and wants a name no other entry carries", at, one.Name)
+		}
+		named[one.Name] = true
+		if got, _ := json.Marshal(drawnOf(one.Text)); !sameJSON(got, one.Drawn) {
+			t.Errorf("%s draws %s, and the golden holds %s", one.Name, got, one.Drawn)
+		}
 	}
 }
 

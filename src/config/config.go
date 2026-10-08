@@ -28,7 +28,7 @@ const (
 	indent     = "  "
 )
 
-// Writes one key into the local layer under the work root and keeps every other key it holds, as writes in src/bridge/config.js does. It makes the layer's whole folder where none stands. [[spec/tickets/cage-hold-drops-port]]
+// Writes one key into the local layer under the work root and keeps every other key it holds. It makes the layer's whole folder where none stands. [[spec/tickets/cage-hold-drops-port]]
 func Drop(root, key, value string) error {
 	at := filepath.Join(root, filepath.FromSlash(Local))
 	held := read(root, Local)

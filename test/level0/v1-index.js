@@ -3,16 +3,14 @@
 // fire sends one event to every watch.
 // [[spec/tickets/the-sidebar-reads-v1]]
 
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { readYaml } from "../../.claude/skills/level0/lib/schema-yaml.js";
 import { parsed } from "../../src/extension/lib/values.js";
 import { LOCAL, TRACKED, valuesOf } from "../../src/extension/lib/widgets.js";
-import { drawnOf } from "./drawn-twin.js";
+import DRAWN_GOLDEN from "../../src/modules/tickets/testdata/drawn.golden.json" with { type: "json" };
+import FRONTS_GOLDEN from "../../src/note/testdata/fronts.golden.json" with { type: "json" };
 
 const SCHEMA = "spec/config/level0.schema.json";
 const BLESS = ".se/.runtime/bless.json";
-const LOG = ".se/.log/session.jsonl";
-const BASE = /^spec\/views\/([^/]+)\.base$/;
+export const LOG = ".se/.log/session.jsonl";
 const OWN = ["at", "level", "kind", "said"];
 const HOLDS = ".se/.runtime/hold/";
 const TICKETS = ["spec/tickets/", ".se/tickets/"];
@@ -37,8 +35,42 @@ function literalOf(text) {
   }
 }
 
-// The front of a note, as the Go note reader hands it. [[spec/tickets/the-lens-reads-v1]]
-const frontOf = (text) => (text ? (readNote(text).front.said ?? {}) : {});
+// A ticket text the drawn golden holds, by its name, so the fake index draws every text a case seeds. [[spec/tickets/branch-scripts-leave]]
+export function ticketText(name) {
+  return goldenNamed(name).text;
+}
+
+// The drawing Go answers for the text of that name. [[spec/tickets/branch-scripts-leave]]
+export function ticketDrawn(name) {
+  return structuredClone(goldenNamed(name).drawn);
+}
+
+function goldenNamed(name) {
+  const one = DRAWN_GOLDEN.find((entry) => entry.name === name);
+  if (!one) throw new Error(`the drawn golden holds no text named ${name}`);
+  return one;
+}
+
+// The drawing Go answers for a text, off the golden TestEveryDrawnGoldenMatchesTheProjection holds. [[spec/tickets/branch-scripts-leave]]
+function drawnOf(text) {
+  const one = DRAWN_GOLDEN.find((entry) => entry.text === text);
+  if (!one)
+    throw new Error(
+      `the drawn golden holds no entry for this text; add it to src/modules/tickets/testdata/drawn.golden.json and run go test ./src/quack -run TestTheDrawnGoldenRedrawsEveryText -update:\n${text}`,
+    );
+  return structuredClone(one.drawn);
+}
+
+// The front of a note, off the golden TestEveryFrontGoldenMatchesTheReader holds, as the Go note reader hands it. [[spec/tickets/schema-libs-leave]]
+function frontOf(text) {
+  if (!text) return {};
+  const one = FRONTS_GOLDEN.find((entry) => entry.text === text);
+  if (!one)
+    throw new Error(
+      `the fronts golden holds no entry for this text; add it to src/note/testdata/fronts.golden.json and run go test ./src/quack -run TestTheFrontGoldenReadsEveryTextAgain -update:\n${text}`,
+    );
+  return structuredClone(one.front);
+}
 const word = (said) =>
   String(said ?? "")
     .trim()
@@ -114,6 +146,18 @@ export function orderedOf(value) {
 }
 
 // [[spec/tickets/the-sidebar-reads-v1]]
+// The files the fake index reads, held in memory, so a test reaches no door. [[spec/tickets/logbook-test-leaves-level0-lib]]
+export function memoryFiles(seed = {}) {
+  const files = new Map(Object.entries(seed));
+  return {
+    files,
+    exists: (path) => files.has(path),
+    read: (path) => files.get(path),
+    write: (path, text) => files.set(path, String(text)),
+    append: (path, text) => files.set(path, `${files.get(path) ?? ""}${text}`),
+  };
+}
+
 export function v1Over(files, given = {}) {
   const text = (path) => (files.exists(path) ? String(files.read(path)) : "");
   const file = (path) => (files.exists(path) ? parsed(text(path)) : undefined);
@@ -158,12 +202,6 @@ export function v1Over(files, given = {}) {
     [`config/${LOCAL}`]: () => orderedOf(file(LOCAL)),
     "migration/config/sidebar": () => keys().get("migration.sidebar")?.value ?? "old",
     "bless/agent": () => file(BLESS)?.agent === true,
-    "views/bases": () =>
-      [...files.files.keys()]
-        .map((path) => [path, BASE.exec(path)?.[1]])
-        .filter(([, name]) => name)
-        .sort((a, b) => a[1].localeCompare(b[1]))
-        .map(([path, name]) => ({ name, said: readYaml(text(path)) })),
     "holds/standing": () => standingOf(files, text),
     "tickets/cloud": () => cloudOf(files, text),
     "log/rows": () =>

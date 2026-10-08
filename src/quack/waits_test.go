@@ -7,8 +7,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"os" // level0: OutsideInDoors - the case reads the wiring the tree holds, as a build check reads source
-	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -77,14 +75,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 	t.Helper()
 	root := t.TempDir()
 	seedFile(t, root, "spec/config/level0.json", waitConfig)
-	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	c := q.New()
 	as := manager.Registers(c)
 	_, hands, err := loaded(w, c)

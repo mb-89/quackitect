@@ -5,6 +5,7 @@ package branches
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -19,6 +20,12 @@ const (
 	endsWord  = "ends"
 	endFlag   = "--end"
 	overFlag  = "--over"
+)
+
+// The base and the width a beat's commit time reads in. [[spec/design_output/work#the-session-beats-its-hold]]
+const (
+	timeBase = 10
+	timeBits = 64
 )
 
 // A beat: when its commit was written, by which hand, and whether it ends the hold. [[spec/design_output/work#the-session-beats-its-hold]]
@@ -72,10 +79,50 @@ func (d *Doors) beatFails(group, why string) bool {
 
 // The span a beat stays live for, the config's or the default. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Doors) beatSpanSeconds() int64 {
-	if said := spanOf(d.config(beatKey)); said > 0 {
+	return BeatSpan(d.config(beatKey))
+}
+
+// The span a beat stays live for, off the config's text, or the default where it answers nothing. [[spec/design_output/work#the-session-beats-its-hold]]
+func BeatSpan(config string) int64 {
+	if said := spanOf(config); said > 0 {
 		return int64(said)
 	}
 	return int64(spanOf(beatSpan))
+}
+
+// A beat off its commit's time and subject. [[spec/design_output/work#the-session-beats-its-hold]]
+func beatOf(when int64, subject string) beat {
+	ended := strings.HasSuffix(subject, " "+endsWord)
+	hand := strings.TrimSuffix(strings.TrimSuffix(subject, " "+endsWord), " "+beatsWord)
+	return beat{When: when, Hand: hand, Ended: ended}
+}
+
+// What a beat says of a hold whose tip stands at the time given: dead on an end at or past the tip, live inside the span, and nothing otherwise. [[spec/design_output/work#the-session-beats-its-hold]]
+func beatVerdict(last beat, tip, now, span int64) (dead, live bool) {
+	if last.Ended {
+		return last.When >= tip, false
+	}
+	return false, now-last.When < span
+}
+
+// Whether a hold stands dead, off its tip's time, the beat row of %ct and %s its branch carries, and the stale and beat spans: the beat decides where it says anything, and the tip's age otherwise. [[spec/design_output/work#the-session-beats-its-hold]]
+func HoldStale(tip int64, beatRow string, now, stale, span int64) bool {
+	if at, subject, ok := strings.Cut(strings.TrimSpace(beatRow), " "); ok {
+		if when, err := strconv.ParseInt(at, timeBase, timeBits); err == nil {
+			if dead, live := beatVerdict(beatOf(when, subject), tip, now, span); dead || live {
+				return dead
+			}
+		}
+	}
+	return now-tip > stale
+}
+
+// The branch a beat stands on. [[spec/design_output/work#the-session-beats-its-hold]]
+func BeatBranch(group string) string { return beatsOn + group }
+
+// Whether a pushed branch carries no work the stamp gates: a beat names its box alive, and a rescue carries red work off a dying box on purpose. [[spec/tickets/rescue-passes-the-stamp-gate]]
+func PassesTheStamp(branch string) bool {
+	return strings.HasPrefix(branch, beatsOn) || strings.HasPrefix(branch, rescueBranch)
 }
 
 // The last beat on each group, off the refs the fetch brings, read once a run. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -91,10 +138,7 @@ func (d *Doors) beatsSeen() map[string]beat {
 		if !ok || err != nil || len(commits) == 0 {
 			continue
 		}
-		subject := commits[0].Subject
-		ended := strings.HasSuffix(subject, " "+endsWord)
-		hand := strings.TrimSuffix(strings.TrimSuffix(subject, " "+endsWord), " "+beatsWord)
-		d.beats[strings.TrimPrefix(one.Name, beatRefs)] = beat{When: when, Hand: hand, Ended: ended}
+		d.beats[strings.TrimPrefix(one.Name, beatRefs)] = beatOf(when, commits[0].Subject)
 	}
 	return d.beats
 }
@@ -107,13 +151,11 @@ func (d *Doors) staleClaim(one stand, now int64) claim {
 	}
 	read := claim{Age: aged(held)}
 	if last, ok := d.beatsSeen()[one.Name]; ok {
-		switch {
-		case last.Ended && last.When >= one.When:
-			read.Stale = true
-			return read
-		case !last.Ended && now-last.When < d.beatSpanSeconds():
-			read.Live = true
-			read.Beat = aged(now - last.When)
+		if dead, live := beatVerdict(last, one.When, now, d.beatSpanSeconds()); dead || live {
+			read.Stale, read.Live = dead, live
+			if live {
+				read.Beat = aged(now - last.When)
+			}
 			return read
 		}
 	}

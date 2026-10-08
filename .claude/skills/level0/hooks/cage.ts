@@ -1,9 +1,22 @@
 // THE CAGE UNDER NEW. The hooks door decides the events it names, and Go holds every rule: the door answers the step, and the cage verb answers a guarded call while the door stands down. The loader follows $ into no import, so the bridgehead makes every call on $, and this file holds the post and the verb road. [[spec/tickets/a-down-index-refuses-calls]] [[spec/tickets/level0-hooks-hold-no-rule]] [[spec/rationales/the-cage-refuses-while-down]]
 
 import type { AgentSpawnArgs, HttpInit } from "claude-code";
-import { RUN } from "../lib/folders.js";
-import { binaryOf, windowsOf } from "../lib/index-tools.js";
 import type { Fields } from "./shape.ts";
+
+// The runtime folder, which src/modules/check/folders.go owns, spelled again here because the hooks import their own folder alone. [[spec/tickets/plugin-libs-leave]]
+const RUN = ".se/.runtime";
+// The binary under the method root, which serveIndexBin in src/quack/serve_verb.go names. [[spec/tickets/cli-js-leaves]]
+const BINARY = `${RUN}/bin/se-index`;
+
+// The binary under the method root, with the suffix a Windows box builds it with. [[spec/tickets/the-hook-registers-index-tools]]
+export function binaryOf(method: string, windows: boolean): string {
+  return `${method}/${BINARY}${windows ? ".exe" : ""}`;
+}
+
+// Whether the method root reads as a Windows path, since the hook reaches no platform of its own. [[spec/tickets/the-hook-registers-index-tools]]
+export function windowsOf(method: string): boolean {
+  return /^[A-Za-z]:/.test(method) || method.includes("\\");
+}
 
 // What the step answers a call with, read off the door's JSON, which Step in src/modules/hooks/step.go owns. [[spec/design_output/model#the-effects]]
 export type Answer = {

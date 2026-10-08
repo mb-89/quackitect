@@ -18,7 +18,7 @@ import (
 
 // The plan file the queue reads, and the module type whose ports the places read. The most open todos read off planMostOpenKey in command.go. [[spec/design_output/stop#the-plan]]
 const (
-	// .claude/skills/level0/lib/folders.js owns the plan file's folder, and the package spells it again. [[spec/design_output/stop#the-plan]]
+	// src/modules/check/folders.go owns the plan file's folder, and the package spells it again. [[spec/design_output/stop#the-plan]]
 	planPath        = ".se/.runtime/plan.json"
 	queueModuleType = "queue"
 )

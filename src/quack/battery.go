@@ -26,7 +26,7 @@ const (
 	tenthsInSecond = 10
 )
 
-// The source whose warnings a ticket's prose holds, which fromRules in src/modules/lsp/tools.go names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
+// The source whose warnings a ticket's prose holds, which fromRules in src/modules/lsp/tools.go names, and the folders a ticket stands in, which src/modules/check/folders.go owns. [[spec/design_output/work#the-battery-answers-first]]
 const proseSource = "rules"
 
 var ticketFolders = []string{"spec/tickets", ".se/tickets"}

@@ -1,6 +1,6 @@
-// The handover marks the door writes off the stops fold's answer, off marksDue,
-// dropsDue and dropsClear in src/bridge/handover.js, and the hand a retro hold
-// meets, off handOf in src/scripts/pull-hand-of.js.
+// The handover marks the door writes off the stops fold's answer: the due
+// mark, its drops and the clear. The hand a retro hold meets reads off HandOf
+// in src/pull/pull_holds.go.
 // [[spec/tickets/cage-stop-marks-port]]
 package hooks
 
@@ -13,11 +13,11 @@ import (
 
 // The runtime files the handover reads, which the package spells again. [[spec/tickets/cage-stop-marks-port]]
 const (
-	// .claude/skills/level0/lib/folders.js owns the due mark's folder, and the package spells it again. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
+	// src/modules/check/folders.go owns the due mark's folder, and the package spells it again. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 	dueFile = ".se/.runtime/due.json"
-	// .claude/skills/level0/lib/folders.js owns the box file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// src/modules/check/folders.go owns the box file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	boxFile = ".se/.runtime/box.json"
-	// .claude/skills/level0/lib/folders.js owns the session file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// src/modules/check/folders.go owns the session file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	sessionFile = ".se/.runtime/session.json"
 )
 
@@ -29,7 +29,7 @@ const (
 	fileMode   = 0o644
 )
 
-// The variables naming the harness, and the name each gives, off HARNESS in src/scripts/pull-hand-of.js. [[spec/design_output/pull#the-hand-rule]]
+// The variables naming the harness, and the name each gives, off harness in src/pull/pull_holds.go. [[spec/design_output/pull#the-hand-rule]]
 var harnesses = [][2]string{
 	{"CLAUDE_CODE_REMOTE", "claude-code-remote"},
 	{"SE_CLOUD", "se-cloud"},
@@ -90,7 +90,7 @@ func (d *Door) marks(session, root string) {
 	}
 }
 
-// Each clear held turns into the read, keeping every other field, as readsNext in src/bridge/handover.js wrote it. [[spec/tickets/the-clear-hands-back-the-leaf]]
+// Each clear held turns into the read, keeping every other field. [[spec/tickets/the-clear-hands-back-the-leaf]]
 func readsNext(tree disk) {
 	for _, name := range tree.List(holdsFolder) {
 		at := holdsFolder + "/" + name
@@ -126,10 +126,9 @@ func handIn(tree disk) string {
 			break
 		}
 	}
-	var box, held map[string]any
-	_ = json.Unmarshal([]byte(tree.text(boxFile)), &box)
+	var held map[string]any
 	_ = json.Unmarshal([]byte(tree.text(sessionFile)), &held)
-	id := textOf(box, "id")
+	id := boxIDIn(tree)
 	if agent == "" || id == "" {
 		return ""
 	}
@@ -141,6 +140,13 @@ func handIn(tree disk) string {
 		parts = append(parts, "session "+session)
 	}
 	return strings.Join(append(parts, agent), handJoin)
+}
+
+// The id the box file under the tree names, or nothing. [[spec/tickets/git-hooks-run-in-go]]
+func boxIDIn(tree disk) string {
+	var box map[string]any
+	_ = json.Unmarshal([]byte(tree.text(boxFile)), &box)
+	return textOf(box, "id")
 }
 
 // A hold stands in the session's own hand where its hand matches, and every hold does where the session's hand reads empty. [[spec/tickets/the-retro-reads-its-hand]]

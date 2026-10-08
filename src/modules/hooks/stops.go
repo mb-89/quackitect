@@ -24,7 +24,7 @@ const (
 	holdsField   = "holds"
 )
 
-// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off src/bridge/handover.js and lib/stop.js. [[spec/tickets/cage-stop-rules-port]]
+// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off the stop package. [[spec/tickets/cage-stop-rules-port]]
 const (
 	startEvent   = "session.start"
 	endEvent     = "session.end"
@@ -44,11 +44,12 @@ const (
 	allDigits    = -1
 )
 
-// The word the fold answers a turn's end with where the conversation clears, the kind the door answers it as, and the prompt the next conversation opens on. RESUME in src/bridge/handover.js owns the prompt, and the package spells it again. [[spec/tickets/clear-answers-off-the-door]]
+// The word the fold answers a turn's end with where the conversation clears, the kind the door answers it as, and the prompt the next conversation opens on. [[spec/tickets/clear-answers-off-the-door]]
 const (
-	ClearWord    = "clear"
-	clearKind    = "clear"
-	resumePrompt = "Level zero cleared the conversation, because the context passed `" + handoverKey + "`. Run `./RUNME.sh ticket pull`: `read-handover` stands in your hand, and the handover block says where the work stands."
+	ClearWord = "clear"
+	clearKind = "clear"
+	// The prompt the clear resumes on, which the dry probe reads too. [[spec/tickets/probes-leave-node]]
+	ResumePrompt = "Level zero cleared the conversation, because the context passed `" + handoverKey + "`. Run `./RUNME.sh ticket pull`: `read-handover` stands in your hand, and the handover block says where the work stands."
 )
 
 // The statuses a todo ends under. [[spec/design_output/stop#what-the-todo-list-says]]
@@ -329,7 +330,7 @@ func (state *Stops) holdsForHandover(text string, held map[string]any, facts Sto
 		}
 		// The Stop answers the clear, since `turn.complete` lands before it or after it, and the plugin runs it once the session stands idle. [[spec/tickets/the-clear-continues-the-session]]
 		state.Handover = nil
-		state.Said.Word, state.Said.Text = ClearWord, resumePrompt
+		state.Said.Word, state.Said.Text = ClearWord, ResumePrompt
 		// The read takes the clear's place as the clear is answered, so the pull after it hands the next leaf. [[spec/tickets/the-clear-hands-back-the-leaf]]
 		state.marks().ReadNext = true
 		return true, ""
