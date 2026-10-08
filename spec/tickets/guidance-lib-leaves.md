@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   76.8  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: b078ec8296e2c87dccb38070438d7d0b8f46137a
+    hash_after: b078ec8296e2c87dccb38070438d7d0b8f46137a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/hooks/brief passes; green, src/modules/guidance passes; green, src/projectio
+      - name: check
+        exit: 0
+        said: "   78.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 70d2653b2e1c9134
+        size: 1252
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -397,26 +420,33 @@ Gate point six: line eight rests on the owner's word that tests test behavior an
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/guidance_lib_test.go src/quack/probe_cold_test.go src/quack/probe_reply_test.go src/modules/hooks/brief/brief_test.go src/modules/guidance/guidance_test.go src/projection/projection_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The guidance library leaves the plugin, and Go reads every rule, tag and grade alone. The heard rows stand once in brief, and the reply line once in hooks, so the probe reads them where the hooks keep them. The three contract tests over guidance.js leave with it. The comments and the level0 design note name the Go owners in place of the library.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the size list, the group's inventory row for gate point four, and one test case in each touched Go folder.
+The change reaches no door, and the new cases run in memory.
+Every new constant and case names this ticket or a level0 design section.
+The heard rows and the reply line each stand once, and every reader points at them.
 
 # accept
 
