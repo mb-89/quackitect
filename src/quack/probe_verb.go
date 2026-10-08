@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/vehicle"
 )
 
 // The words the probe answers, and the line an unknown word prints. [[spec/tickets/box-verbs-port-to-go]]
@@ -25,8 +26,8 @@ const jsonFloatBits = 64
 // The span each outside run gets, the bound the compaction probe takes. [[spec/design_output/level0#what-the-probe-does]]
 const probeWait = 900 * time.Second
 
-// The plugin folder the client loads, as PLUGIN_FOLDER in .claude/skills/level0/lib/vehicle.js names it. [[spec/design_output/level0#the-cold-probe]]
-const pluginFolder = ".claude/skills/level0"
+// The plugin folder the client loads, which PluginFolder in src/vehicle/pure.go names. [[spec/design_output/level0#the-cold-probe]]
+const pluginFolder = vehicle.PluginFolder
 
 // The word naming the revision the dry road runs at. [[spec/tickets/probe-at-revision-guards-merges]]
 const atFlag = "--at"

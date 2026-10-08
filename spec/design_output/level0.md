@@ -386,9 +386,9 @@ name, and says which one answers.
 | `.claude/settings.local.json` | the box | no |
 | the settings under the home of the box | the box | no |
 
-`SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
-those names, and the home file takes the first of them under the home path.
-`hooksNamed` in `src/scripts/cli-check.js` reads them in that order, and takes
+`Settings` and `SettingsLocal` in `src/vehicle/pure.go` own those names, and
+the home file takes the first of them under the home path. `hooksNamed` in
+`src/quack/hookprobe.go` reads them in that order, and takes
 every string under `hooks`. It keeps the ones a URL parses as `http:` or
 `https:`.
 
@@ -563,8 +563,9 @@ name `level0`.
 
 The client keeps a cache of the plugin folder under the user's home, one per
 version, off every tree. `claude plugin update` refreshes it. The path to the
-vehicle differs per box, so the shim writes it into `.claude/settings.local.json`,
-which git ignores.
+vehicle differs per box, so the shim runs `vehicle enable` through the
+vehicle's binary, which writes it into `.claude/settings.local.json`, which git
+ignores. For the settings it writes, see `ShimSettings` in `src/vehicle/pure.go`.
 
 Every road that runs the vehicle's code inside a plugin of the stub's own fails.
 One headless turn a road says so:

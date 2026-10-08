@@ -88,7 +88,7 @@ func vehicleDisk(dry bool) vehicle.Disk {
 	return vehicle.OS()
 }
 
-// The vehicle verb: here, produce, into, attach, detach, register and settle, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
+// The vehicle verb: here, produce, into, attach, detach, register, settle and enable, over the doors. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 func vehicleTwin(doorsOf func() vehicleDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		doors := doorsOf()
@@ -117,6 +117,8 @@ func vehicleTwin(doorsOf func() vehicleDoors) twin {
 			return 0
 		case "settle":
 			return vehicleSettle(disk, doors, pair, out, errs)
+		case "enable":
+			return vehicleEnable(disk, pair, out, errs)
 		case "detach":
 			if err := vehicle.Detach(disk, pair.Work); err != nil {
 				fmt.Fprintln(errs, err)
@@ -144,6 +146,21 @@ func vehicleSettle(disk vehicle.Disk, doors vehicleDoors, pair vehicle.Pair, out
 		return exitFailed
 	}
 	fmt.Fprintf(out, "method %s\n", settled.Method)
+	return 0
+}
+
+// Enables the plugin in the work root, the method its marketplace, so the stub shim runs no Node. [[spec/design_output/level0#a-stub-names-its-vehicle]]
+func vehicleEnable(disk vehicle.Disk, pair vehicle.Pair, out, errs io.Writer) int {
+	enabled, err := vehicle.EnablePlugin(disk, pair.Work, pair.Method)
+	if err != nil {
+		fmt.Fprintln(errs, err)
+		return exitFailed
+	}
+	if !enabled.OK {
+		fmt.Fprintln(errs, enabled.Why)
+		return exitFailed
+	}
+	fmt.Fprintf(out, "%s enables level0 from %s.\n", strings.ReplaceAll(pair.Work, `\`, "/"), pair.Method)
 	return 0
 }
 

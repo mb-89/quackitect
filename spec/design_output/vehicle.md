@@ -145,8 +145,8 @@ private folder meets the move in `install.sh`.
 ## The register holds the port
 
 One vehicle, one port. The register's entry for a vehicle carries the port
-it blocks. A vehicle with none takes the lowest free one from `PORT_BASE` in
-`lib/vehicle.js` up on its first start. So each vehicle on a box stands on its
+it blocks. A vehicle with none takes the lowest free one from `PortBase` in
+`src/vehicle/pure.go` up on its first start. So each vehicle on a box stands on its
 own port, and a project reaches the right one.
 
 A project points at its vehicle in `.se/.runtime/vehicle.json`: the method root and
@@ -286,7 +286,7 @@ takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
 the vehicle as method and the stub as work. A shim finding none prints one
 line naming the vehicle, its upstream and the cloned road, and exits one.
 
-`test/contract/stub.test.js` drives the shim over a fixture: a fake vehicle
+`src/vehicle/shim_contract_test.go` drives the shim over a fixture: a fake vehicle
 whose `RUNME.sh` echoes its argv and its work root, a register naming it, and
 a stub. It reads both, then empties the register and reads the refusal line.
 The bridgehead takes the same roads and attaches through the vehicle's

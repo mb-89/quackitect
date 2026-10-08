@@ -20,7 +20,7 @@ import (
 // The runtime folder .claude/skills/level0/lib/folders.js owns, spelled again here because Go imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
 const runtimeDir = ".se/.runtime"
 
-// The runtime files the check reads and writes, which runs.js and vehicle.js name. [[spec/design_output/work#the-battery-answers-first]]
+// The runtime files the check reads and writes, which runs.js names, and the pointer Pointer in src/vehicle/pure.go names. [[spec/design_output/work#the-battery-answers-first]]
 const (
 	timesFile   = runtimeDir + "/tests.jsonl"
 	spawnsFile  = runtimeDir + "/spawns.txt"

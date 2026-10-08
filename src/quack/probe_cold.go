@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/vehicle"
 )
 
 // The cold probe's numbers and names. A line naming a level0 lib names the twin it keeps in step with. [[spec/design_output/level0#the-cold-probe]]
@@ -23,8 +24,8 @@ const (
 	servedTools = "mcp__level0__"
 	// The one tool the hook registers itself, beside the index's, as PULL_CALL in lib/pull.js names it. [[spec/tickets/level0-tools-leave-the-bridge]]
 	pullCall = servedTools + "pull"
-	// The port base the vehicle reads, as PORT_BASE in lib/vehicle.js names it, and the spread past it a cold server takes. [[spec/design_output/level0#the-cold-probe]]
-	portBase   = 6510
+	// The port base PortBase in src/vehicle/pure.go names, and the spread past it a cold server takes. [[spec/design_output/level0#the-cold-probe]]
+	portBase   = vehicle.PortBase
 	portPast   = 200
 	portSpread = 200
 	// The lines a tail keeps. [[spec/design_output/level0#the-cold-probe]]
@@ -32,8 +33,8 @@ const (
 	// The file a desk's client keeps its login in, under the config folder the client reads. [[spec/design_output/level0#the-cold-probe]]
 	loginFile    = ".credentials.json"
 	configFolder = ".claude"
-	// The pointer the clone's hook reads its port off, as POINTER in lib/vehicle.js names it. [[spec/design_output/level0#the-cold-probe]]
-	vehiclePointer = runFolder + "/vehicle.json"
+	// The pointer the clone's hook reads its port off, which Pointer in src/vehicle/pure.go names. [[spec/design_output/level0#the-cold-probe]]
+	vehiclePointer = vehicle.Pointer
 	// The index binary the start road launches, as BIN in lib/index.js names it. [[spec/design_output/level0#the-cold-probe]]
 	indexBinary = binFolder + "/se-index"
 	// The install steps a cold clone skips, as INSTALL_SKIP in .claude/skills/level0/hooks/level0.js names them. [[spec/design_output/level0#the-cold-probe]]
