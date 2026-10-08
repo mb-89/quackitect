@@ -7,9 +7,6 @@ src/failure/door.go Dir.Files
 src/failure/door.go Dir.Read
 src/failure/door.go Dir.Walk
 src/failure/door.go Shell.Run
-src/front/cmd/door.go files.read
-src/front/cmd/door.go files.write
-src/front/cmd/door.go main
 src/imports/imports.go Doors
 src/imports/imports.go SuiteFaults
 src/imports/imports.go suiteIn
