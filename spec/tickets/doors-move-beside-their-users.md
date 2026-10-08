@@ -50,6 +50,8 @@ the group inventory in spec/tickets/javascript-leaves.md marks src/doors/disk.js
 
 <!-- the form is command -->
 
+./RUNME.sh test test/contract/disk.test.js test/contract/proc.test.js test/contract/wire.test.js src/modules/examples/examples_test.go
+
 ## check
 
 <!-- the check is green on the commit -->
