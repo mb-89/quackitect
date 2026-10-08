@@ -28,12 +28,7 @@ func hq2RetroDisk(root string) diskDoors {
 // Writes a file on a disk door, its folders made, and the case stops where the door refuses. [[spec/tickets/test-walks-move-onto-fakes]]
 func hq2Seed(t *testing.T, disk diskDoors, at, text string) {
 	t.Helper()
-	if err := disk.makeAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := disk.write(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq1SeedDisk(t, disk, filepath.Dir(at), map[string]string{filepath.Base(at): text})
 }
 
 // The retro every reading case names. [[spec/guidance/retro/chapter]]

@@ -2,7 +2,7 @@
 // to it, the rows ask answered with the transcript, the clear road, the working
 // delta, and the checks read off the door's answers and the log.
 // [[spec/tickets/probes-leave-node]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -366,7 +366,7 @@ func TestTheSmokeStandsTheCloneWithTheRootsBuiltToolsAndInstallsNothing(t *testi
 			t.Fatal(err)
 		}
 	}
-	temp := t.TempDir()
+	temp := t.TempDir() // level0: FixtureOutsideHome - the smoke writes its clone's pointer under a root of the case's own
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 7001}
 	if !smokeTree(d, func(string) {}, box) {
 		t.Fatalf("the smoke stands no tree: %v", ranWords(runner))
@@ -410,7 +410,7 @@ func TestTheSmokeReadsEveryCheckButTheClear(t *testing.T) {
 func TestTheColdTreeChecksTheCloneOutAtTheRevisionItNames(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
-	temp := t.TempDir()
+	temp := t.TempDir() // level0: FixtureOutsideHome - the cold tree stands its clone under a root of the case's own
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 7002, at: "abc123"}
 	coldTree(d, func(string) {}, box)
 	ran := ranWords(runner)
@@ -447,7 +447,7 @@ func TestATempTreeTheBoxStillHoldsStaysNamedAndTheVerdictStands(t *testing.T) {
 func TestTheProbeDropsEveryParkInItsCloneAndCommitsIt(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
-	tree := t.TempDir()
+	tree := t.TempDir() // level0: FixtureOutsideHome - the unpark rewrites a ticket in a tree of the case's own
 	parked := filepath.Join(tree, "spec", "tickets", "a.md")
 	if err := os.MkdirAll(filepath.Dir(parked), 0o755); err != nil {
 		t.Fatal(err)

@@ -10,10 +10,11 @@ import (
 	"strings"
 )
 
-// The note holding the list, and the heading over it. [[spec/design_output/doors#the-javascript-that-stays]]
+// The note holding the list, the heading over it, and the cells a row splits into on its pipes. [[spec/design_output/doors#the-javascript-that-stays]]
 const (
 	javascriptNote    = "spec/design_output/doors.md"
 	javascriptHeading = "# The JavaScript that stays"
+	rowCells          = 3
 )
 
 // The javascript part, answering 1 where the list and the tree part. [[spec/design_output/doors#the-javascript-that-stays]]
@@ -64,7 +65,7 @@ func javascriptRows(note string) []string {
 			break
 		}
 		cells := strings.Split(line, "|")
-		if len(cells) < 3 {
+		if len(cells) < rowCells {
 			continue
 		}
 		cell := strings.TrimSpace(cells[1])

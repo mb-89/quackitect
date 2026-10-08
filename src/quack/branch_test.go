@@ -5,6 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"bytes"
+	"io"
 	"path/filepath"
 	"testing"
 
@@ -52,5 +53,15 @@ func TestTheSelfRoadNamesTheScripts(t *testing.T) {
 	road := selfRoad("/m")
 	if len(road) != 3 || road[1] != "verb" || road[2] != filepath.Join("/m", "src", "scripts") {
 		t.Fatalf("the road reads %v", road)
+	}
+}
+
+// The branch verbs' doors carry a send door. [[spec/tickets/branch-done-opens-the-pr]]
+func TestTheBranchDoorsCarryASendDoor(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir() // level0: FixtureOutsideHome - the doors stand over a method root of the case's own
+	d := branchDoors(func() (string, error) { return root, nil }, nil, io.Discard, io.Discard)
+	if d.Send == nil {
+		t.Fatal("the branch doors carry no send door")
 	}
 }

@@ -5,6 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
+	"os" // level0: OutsideInDoors - the case reads the tracked settings file the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strings"
@@ -35,18 +36,12 @@ func setupBox(t *testing.T, env map[string]string) (boxDoors, *fakeRunner, *stri
 }
 
 // A tree holding the client, a browser and the survey, so no item but the ones a case drops stands missing. [[spec/tickets/install-drops-node]]
-func heldTree(t *testing.T, d boxDoors) map[string]string {
+func heldTree(t *testing.T, d *boxDoors) map[string]string {
 	t.Helper()
-	hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}", "chrome": ""})
-	return map[string]string{"PLAYWRIGHT_CHROMIUM": filepath.Join(d.root, "chrome")}
-}
-
-// Writes each file under the root on a disk door. [[spec/tickets/test-walks-move-onto-fakes]]
-func hq2SeedTree(t *testing.T, disk diskDoors, root string, files map[string]string) {
-	t.Helper()
-	for rel, text := range files {
-		hq2Seed(t, disk, filepath.Join(root, filepath.FromSlash(rel)), text)
-	}
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}", "chrome": ""})
+	env := map[string]string{"PLAYWRIGHT_CHROMIUM": filepath.Join(d.root, "chrome")}
+	d.env = func(key string) string { return env[key] }
+	return env
 }
 
 func saidLine(out *strings.Builder, start string) bool {
@@ -57,13 +52,13 @@ func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T
 	t.Parallel()
 	home := "/home"
 	d, runner, out, lines := setupBox(t, map[string]string{"HOME": home, "SE_INSTALL_SKIP": "browser editor-link"})
-	hq2SeedTree(t, d.disk, home, map[string]string{".vscode/extensions/extensions.json": "[]"})
-	hq2SeedTree(t, d.disk, d.root, map[string]string{toolsFile: "{}"})
+	hq1SeedDisk(t, d.disk, home, map[string]string{".vscode/extensions/extensions.json": "[]"})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{toolsFile: "{}"})
 	runner.answers["code --list-extensions"] = ranResult{}
 	fake := d.run
 	d.run = func(argv []string, o runOpts) ranResult {
 		if argv[0] == "npm" {
-			hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}"})
+			hq1SeedDisk(t, d.disk, d.root, map[string]string{setupClient: "{}"})
 		}
 		return fake(argv, o)
 	}
@@ -99,9 +94,8 @@ func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T
 func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := setupBox(t, nil)
-	env := heldTree(t, d)
+	env := heldTree(t, &d)
 	env["TERM_PROGRAM"] = "vscode"
-	d.env = func(key string) string { return env[key] }
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
 
 	if code := setupVerb(d, []string{"--landed"}); code != 0 {
@@ -128,16 +122,14 @@ func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 	}
 
 	quiet, quietRunner, _, _ := setupBox(t, nil)
-	quietEnv := heldTree(t, quiet)
-	quiet.env = func(key string) string { return quietEnv[key] }
+	heldTree(t, &quiet)
 	quietRunner.answers["code --list-extensions"] = runner.answers["code --list-extensions"]
 	setupVerb(quiet, nil)
 	if survey := quiet.disk.text(filepath.Join(quiet.root, filepath.FromSlash(toolsFile))); survey != "{}" {
 		t.Error("a survey standing, with nothing landed, takes a write")
 	}
 	missing, _, _, _ := setupBox(t, nil)
-	missingEnv := heldTree(t, missing)
-	missing.env = func(key string) string { return missingEnv[key] }
+	heldTree(t, &missing)
 	_ = missing.disk.remove(filepath.Join(missing.root, filepath.FromSlash(toolsFile)))
 	setupVerb(missing, nil)
 	if !missing.disk.stands(filepath.Join(missing.root, filepath.FromSlash(toolsFile))) {
@@ -149,8 +141,7 @@ func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 func TestACodeListExitingPastZeroReadsAsMissingAndTheSetupInstallsTheExtensions(t *testing.T) {
 	t.Parallel()
 	d, runner, _, lines := setupBox(t, nil)
-	env := heldTree(t, d)
-	d.env = func(key string) string { return env[key] }
+	heldTree(t, &d)
 	runner.answers["code --list-extensions"] = ranResult{code: 1}
 	setupVerb(d, nil)
 	for _, id := range editorExtensions {
@@ -160,8 +151,7 @@ func TestACodeListExitingPastZeroReadsAsMissingAndTheSetupInstallsTheExtensions(
 	}
 
 	d, runner, out, lines := setupBox(t, nil)
-	env = heldTree(t, d)
-	d.env = func(key string) string { return env[key] }
+	heldTree(t, &d)
 	runner.answers["code"] = ranResult{code: exitFailed, missing: true}
 	setupVerb(d, nil)
 	if slices.ContainsFunc(lines(), func(one string) bool { return strings.Contains(one, "--install-extension") }) || saidLine(out, "editor-extensions:") {
@@ -192,8 +182,7 @@ func TestOnWindowsTheSetupReachesNpmNpxAndCodeThroughCmd(t *testing.T) {
 func TestOnWindowsACmdAnsweringNoSuchCommandReadsAsNoCode(t *testing.T) {
 	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
-	env := heldTree(t, d)
-	d.env = func(key string) string { return env[key] }
+	heldTree(t, &d)
 	d.goos = "windows"
 	runner.answers["cmd /c"] = ranResult{code: cmdMissing}
 	setupVerb(d, nil)
@@ -209,11 +198,10 @@ func TestOnWindowsACmdAnsweringNoSuchCommandReadsAsNoCode(t *testing.T) {
 func TestACopilotSetupThatStopsSaysAWarningAndTheBrandStillRuns(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := setupBox(t, nil)
-	env := heldTree(t, d)
+	env := heldTree(t, &d)
 	env["TERM_PROGRAM"] = "vscode"
-	d.env = func(key string) string { return env[key] }
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
-	hq2SeedTree(t, d.disk, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
 	if code := setupVerb(d, nil); code != 0 {
 		t.Fatalf("the setup answers %d", code)
 	}
@@ -230,8 +218,7 @@ func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := setupBox(t, nil)
 	d.root = filepath.Join(d.root, "___")
-	env := heldTree(t, d)
-	d.env = func(key string) string { return env[key] }
+	heldTree(t, &d)
 	if code := setupVerb(d, nil); code != 0 {
 		t.Fatalf("the setup answers %d", code)
 	}
@@ -244,7 +231,7 @@ func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
-	hq2SeedTree(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
 	runner.answers["npx"] = ranResult{code: 1}
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
 	if code := setupVerb(d, nil); code != 0 {
@@ -269,12 +256,11 @@ func TestTheSetupLinksTheSidebarWhereTheEditorStands(t *testing.T) {
 	t.Parallel()
 	home := "/home"
 	d, runner, out, _ := setupBox(t, map[string]string{"HOME": home})
-	hq2SeedTree(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
-	env := heldTree(t, d)
+	hq1SeedDisk(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
+	env := heldTree(t, &d)
 	env["HOME"] = home
-	d.env = func(key string) string { return env[key] }
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
-	hq2SeedTree(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
 	setupVerb(d, nil)
 	if !saidLine(out, "editor-link:") || !saidLine(out, "quackitect.quackitect: the entry went in.") || saidLine(out, "  the sidebar stays unlinked") {
 		t.Errorf("the link says\n%s", out)
@@ -303,8 +289,7 @@ func TestTheExtensionsAreTheOnesTheTrackedSettingsRecommend(t *testing.T) {
 func TestTheSetupVerbWritesTheCloudMarkUnderCloud(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := setupBox(t, nil)
-	env := heldTree(t, d)
-	d.env = func(key string) string { return env[key] }
+	heldTree(t, &d)
 	runner.answers["code"] = ranResult{missing: true}
 	runner.answers["code-insiders"] = ranResult{missing: true}
 	if code := setupVerb(d, []string{"--cloud"}); code != 0 {
@@ -316,6 +301,143 @@ func TestTheSetupVerbWritesTheCloudMarkUnderCloud(t *testing.T) {
 	for _, one := range copilotRegistrations() {
 		if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(one.name))) {
 			t.Errorf("%s stands not under --cloud", one.name)
+		}
+	}
+}
+
+func TestTheRegistrationsEqualTheTrackedFiles(t *testing.T) {
+	t.Parallel()
+	for _, one := range copilotRegistrations() {
+		tracked, ok := readText(filepath.Join("..", "..", filepath.FromSlash(one.name)))
+		if !ok {
+			t.Errorf("%s stands untracked", one.name)
+			continue
+		}
+		if tracked != one.content {
+			t.Errorf("%s reads\n%s\nand the setup writes\n%s", one.name, tracked, one.content)
+		}
+	}
+}
+
+// The copilot road assembles no Vale styles, since the Go rules read their own. [[spec/tickets/vale-leaves-the-tree]]
+func TestTheCopilotRoadAssemblesNoStyles(t *testing.T) {
+	t.Parallel()
+	for _, one := range copilotRegistrations() {
+		if strings.Contains(one.name, "styles") || strings.Contains(one.content, "styles") {
+			t.Errorf("%s assembles styles", one.name)
+		}
+	}
+}
+
+func TestTheSetupWritesOnceAndLeavesTheClaudeSettings(t *testing.T) {
+	t.Parallel()
+	d, _, _, _ := boxDoorsOnDisk(t)
+	seedTree(t, d.root, map[string]string{".claude/settings.json": "original"})
+	written, err := copilotSetup(d, "vscode")
+	if err != nil || len(written) != 2 {
+		t.Fatalf("the setup writes %v, %v", written, err)
+	}
+	if again, err := copilotSetup(d, "vscode"); err != nil || len(again) != 0 {
+		t.Errorf("a second setup writes %v, %v", again, err)
+	}
+	if text, _ := readText(filepath.Join(d.root, ".claude", "settings.json")); text != "original" {
+		t.Error("the Claude settings moved")
+	}
+}
+
+func TestTheSetupRefusesAFileAPersonOwns(t *testing.T) {
+	t.Parallel()
+	d, _, _, _ := boxDoorsOnDisk(t)
+	seedTree(t, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
+	if _, err := copilotSetup(d, "vscode"); err == nil || err.Error() != "Keep .github/workflows/copilot-setup-steps.yml: it belongs to you. Merge the generated registration manually." {
+		t.Errorf("the setup answers %v", err)
+	}
+	if text, _ := readText(filepath.Join(d.root, ".github", "workflows", "copilot-setup-steps.yml")); text != "user workflow" {
+		t.Error("the person's workflow moved")
+	}
+	if stands(filepath.Join(d.root, ".github", "hooks", "level0.json")) {
+		t.Error("the refusal still wrote the hooks")
+	}
+	if _, err := copilotSetup(d, "desk"); err == nil {
+		t.Error("an unknown target reads as one")
+	}
+}
+
+func TestAutoWaitsOnCopilotAndCloudWritesItsMark(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := boxDoorsOnDisk(t)
+	if written, err := copilotSetup(d, "auto"); err != nil || len(written) != 0 {
+		t.Errorf("auto with no Copilot writes %v, %v", written, err)
+	}
+	if !slices.ContainsFunc(runner.ran, func(argv []string) bool { return slices.Equal(argv, []string{"code-insiders", "--list-extensions"}) }) {
+		t.Errorf("auto asks no editor: %v", runner.ran)
+	}
+	if written, err := copilotSetup(d, "cloud"); err != nil || len(written) != 2 {
+		t.Errorf("cloud writes %v, %v", written, err)
+	}
+	if text, _ := readText(filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))); text != "cloud\n" {
+		t.Errorf("the mark reads %q", text)
+	}
+}
+
+func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := boxDoorsOnDisk(t)
+	runner.answers["code --list-extensions"] = ranResult{stdout: "GitHub.copilot-chat\n"}
+	if !copilotDetected(d) {
+		t.Error("an editor listing Copilot reads as none")
+	}
+	d, _, _, _ = boxDoorsOnDisk(t)
+	d.env = func(key string) string { return map[string]string{"TERM_PROGRAM": "vscode"}[key] }
+	if !copilotDetected(d) {
+		t.Error("the editor's terminal reads as no Copilot")
+	}
+	d.env = func(key string) string {
+		return map[string]string{"GITHUB_COPILOT_GIT_TOKEN": "t", "COPILOT_AGENT_PROMPT": "p"}[key]
+	}
+	if !copilotCloud(d) {
+		t.Error("the cloud agent's variables read as no cloud")
+	}
+	d, runner, _, _ = boxDoorsOnDisk(t)
+	d.goos = "windows"
+	copilotDetected(d)
+	if len(runner.ran) == 0 || runner.ran[0][0] != "cmd" {
+		t.Errorf("Windows asks the editor past cmd: %v", runner.ran)
+	}
+}
+
+// The roads a session merges a pull request by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]]
+var (
+	mergeRoads = []string{
+		"mcp__github__merge_pull_request",
+		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
+		"Bash(gh pr merge:*)",
+	}
+	autoMerge = "enable_pr_auto_merge"
+)
+
+func TestTheSettingsDenyTheMergeToolUnderEveryConnectorAndLeaveAutoMergeOpen(t *testing.T) {
+	t.Parallel()
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(settingsFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var read struct {
+		Permissions struct {
+			Deny []string `json:"deny"`
+		} `json:"permissions"`
+	}
+	if err := json.Unmarshal(text, &read); err != nil {
+		t.Fatal(err)
+	}
+	for _, road := range mergeRoads {
+		if !slices.Contains(read.Permissions.Deny, road) {
+			t.Errorf("the settings deny %v, and no %s", read.Permissions.Deny, road)
+		}
+	}
+	for _, one := range read.Permissions.Deny {
+		if strings.Contains(one, autoMerge) {
+			t.Errorf("the settings deny %s, which the work skill turns auto-merge on with", one)
 		}
 	}
 }

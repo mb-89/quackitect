@@ -1,13 +1,14 @@
 // The bundle verb over fake doors, and the shipped drawing read against the
 // stamp its sources give.
 // [[spec/tickets/scripts-folder-leaves]] [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	// level0: OutsideInDoors - the case reads the shipped drawing and its sources, as a build check reads source
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -55,7 +56,7 @@ func TestTheShippedDrawingNamesTheStampItsSourcesGive(t *testing.T) {
 
 func TestTheDrawingStampMovesWithASourceUnderTheWebviewAndHoldsOtherwise(t *testing.T) {
 	t.Parallel()
-	one, other, again := t.TempDir(), t.TempDir(), t.TempDir()
+	one, other, again := t.TempDir(), t.TempDir(), t.TempDir() // level0: FixtureOutsideHome - each stamp reads the sources planted in a root of its own
 	for root, entry := range map[string]string{one: "one", other: "two", again: "one"} {
 		seedTree(t, root, map[string]string{bundleWebview + "/route/drawing.js": entry, bundleWebview + "/package-lock.json": "{}"})
 	}
@@ -139,5 +140,111 @@ func TestTheInsetLoadsTheDrawingFromInsideTheExtension(t *testing.T) {
 	}
 	if !strings.Contains(string(inset), `"route.mjs"`) || !strings.Contains(string(inset), "context.extensionUri") {
 		t.Error("the inset names no script it reads off the extension")
+	}
+}
+
+// Fake doors whose go list names the module and the files the package reads, over a tree holding them. [[spec/tickets/scripts-folder-leaves]]
+func stampBox(t *testing.T) (boxDoors, *fakeRunner) {
+	t.Helper()
+	d, runner, _, _ := fakeBoxDoors(t)
+	seedTree(t, d.root, map[string]string{
+		"go.mod":         "module quackitect\n\ngo 1.24\n",
+		"go.sum":         "",
+		"src/quack/m.go": "package main\n",
+		"src/q/q.go":     "package q\n",
+	})
+	fake := runner.run
+	d.run = func(argv []string, o runOpts) ranResult {
+		if len(argv) > 2 && argv[0] == "go" && argv[1] == "list" {
+			fake(argv, o)
+			if argv[2] == "-m" {
+				return ranResult{stdout: "quackitect\n"}
+			}
+			return ranResult{stdout: "quackitect/src/quack/m.go\nquackitect/src/q/q.go\n"}
+		}
+		return fake(argv, o)
+	}
+	return d, runner
+}
+
+func TestTheSourceStampReadsFreshAfterAWriteAndStaleOnceASourceMoves(t *testing.T) {
+	t.Parallel()
+	d, _ := stampBox(t)
+	steps := []struct {
+		name  string
+		moves map[string]string
+		argv  []string
+		want  int
+	}{
+		{"no stamp reads stale", nil, []string{"fresh", "se-index"}, 1},
+		{"the stamp lands", nil, []string{"write", "se-index"}, 0},
+		{"the stamp reads fresh", nil, []string{"fresh", "se-index"}, 0},
+		{"a move in an imported package reads stale", map[string]string{"src/q/q.go": "package q\n\nvar _ = 1\n"}, []string{"fresh", "se-index"}, 1},
+		{"a second write lands", nil, []string{"write", "se-index"}, 0},
+		{"a move in go.sum reads stale", map[string]string{"go.sum": "a v1 h1:x\n"}, []string{"fresh", "se-index"}, 1},
+	}
+	for _, one := range steps {
+		seedTree(t, d.root, one.moves)
+		if code := stampVerb(d, one.argv); code != one.want {
+			t.Fatalf("%s: stamp %s answers %d, and wants %d", one.name, strings.Join(one.argv, " "), code, one.want)
+		}
+	}
+}
+
+func TestTheStampReadsTheFilesGoListsForTheBinaryNamed(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct{ binary, pkg string }{{"se-index", "./src/quack"}, {"se-front", "./src/front/cmd"}} {
+		d, runner := stampBox(t)
+		stampVerb(d, []string{"write", one.binary})
+		at := slices.IndexFunc(runner.ran, func(argv []string) bool { return slices.Contains(argv, "-deps") })
+		if at < 0 || runner.ran[at][len(runner.ran[at])-1] != one.pkg || runner.opts[at].cwd != d.root {
+			t.Errorf("%s: the stamp ran %v, and wants go list -deps over %s under the root", one.binary, runner.ran, one.pkg)
+		}
+		if !stands(filepath.Join(d.root, ".se", ".runtime", "bin", "."+one.binary+"-source")) {
+			t.Errorf("%s: no stamp stands beside the binary", one.binary)
+		}
+	}
+}
+
+func TestTheStampVerbRefusesAWordOrBinaryItKnowsNot(t *testing.T) {
+	t.Parallel()
+	for _, argv := range [][]string{nil, {"fresh"}, {"fresh", "se-nothing"}, {"keep", "se-index"}} {
+		d, runner := stampBox(t)
+		if code := stampVerb(d, argv); code != 2 || len(runner.ran) != 0 {
+			t.Errorf("stamp %v answers %d after %v, and wants 2 with no run", argv, code, runner.ran)
+		}
+	}
+}
+
+// The body of each sh function the install names, under its name. [[spec/tickets/plugin-libs-leave]]
+func installFunctions(t *testing.T) map[string]string {
+	t.Helper()
+	said, err := os.ReadFile(filepath.Join(treeRoot, "install.sh"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := map[string]string{}
+	for _, found := range regexp.MustCompile(`(?ms)^(\w+)\(\)\s*\{(.*?)^\}`).FindAllStringSubmatch(string(said), -1) {
+		out[found[1]] = found[2]
+	}
+	return out
+}
+
+func TestEveryBuiltBinaryRebuildsWhenItsSourceMovesAhead(t *testing.T) {
+	t.Parallel()
+	bodies := installFunctions(t)
+	if !regexp.MustCompile(`verb \S+ stamp "\$@"`).MatchString(bodies["stamp"]) {
+		t.Errorf("the install's stamp function reads\n%s\nand wants a hand-off to the stamp verb", bodies["stamp"])
+	}
+	for binary := range stampPackages {
+		here := strings.TrimPrefix(binary, "se-") + "_here"
+		body, ok := bodies[here]
+		if !ok {
+			t.Errorf("the install names no %s, so %s never rebuilds when its source moves", here, binary)
+			continue
+		}
+		if !strings.Contains(body, "stamp fresh "+binary) {
+			t.Errorf("%s reads\n%s\nand never asks stamp fresh %s, so the binary never rebuilds when its source moves", here, body, binary)
+		}
 	}
 }

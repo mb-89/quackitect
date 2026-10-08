@@ -143,22 +143,6 @@ func (w *retroCollectWorld) modified(key string) time.Time {
 	return said.ModTime()
 }
 
-// Runs the verb over the world, and answers its code and everything it says, out and error interleaved. [[spec/guidance/retro/collect]]
-func (w *retroCollectWorld) run(argv ...string) (int, string) {
-	doors := retroCollectDoors{
-		root: w.root,
-		home: w.home,
-		temp: w.temp,
-		now:  func() time.Time { return retroWhen(retroCollectNow) },
-		git:  w.trunk.run,
-		disk: w.disk,
-		move: w.move,
-	}
-	var said strings.Builder
-	code := retroCollectVerb(func() retroCollectDoors { return doors })(argv, false, &said, &said)
-	return code, said.String()
-}
-
 // Runs collect for the retro, with any more words. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) collect(more ...string) (int, string) {
 	return w.run(append([]string{"retro", "collect", retroCollectName}, more...)...)
@@ -224,38 +208,16 @@ func TestRetroCollectRefusesABatteryHoldingAWarningAndOneRanAgainstAnotherCommit
 	}
 }
 
-// A move while a hand works takes the file it reads. [[spec/guidance/retro/collect]]
+// A move while a hand works takes the file it reads, so a hold on another ticket refuses the collect. The retro's own hold passes. [[spec/guidance/retro/collect]]
 func TestRetroCollectRefusesWhileAnotherHandHoldsATicketAndMovesNothing(t *testing.T) {
 	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.write("tree:.se/.runtime/hold/box-one.json", `{"ticket":"a-child"}`+"\n")
-
-	code, said := w.collect()
-
-	if code != 1 {
-		t.Fatalf("collect answers %d, want 1", code)
-	}
-	if !strings.Contains(said, "a hand holds a ticket") {
-		t.Fatalf("collect says %q", said)
-	}
-	if !w.exists("tree:.se/.log/one.jsonl") {
-		t.Fatal("the log stays where it stands")
-	}
-}
-
-// [[spec/guidance/retro/collect]]
-func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.write("tree:.se/.runtime/hold/box-one.json", `{"ticket":"`+retroCollectName+`"}`+"\n")
-
-	code, said := w.collect()
-
-	if code != 0 {
-		t.Fatalf("collect answers %d, want 0: %s", code, said)
-	}
-	if !w.exists(retroInputKey("manifest.jsonl")) {
-		t.Fatal("collect writes its manifest")
+	for held, code := range map[string]int{"a-child": 1, retroCollectName: 0} {
+		w := retroNewCollectWorld(t, retroFakeTrunk())
+		w.write("tree:.se/.runtime/hold/box-one.json", `{"ticket":"`+held+`"}`+"\n")
+		got, said := w.collect()
+		if got != code || (code == 1 && (!strings.Contains(said, "a hand holds a ticket") || !w.exists("tree:.se/.log/one.jsonl"))) || (code == 0 && !w.exists(retroInputKey("manifest.jsonl"))) {
+			t.Fatalf("a hold on %s answers %d, want %d: %s", held, got, code, said)
+		}
 	}
 }
 
@@ -389,4 +351,129 @@ func TestRetroCollectKeepsTheBatteryReportBesideTheRecordOneARetro(t *testing.T)
 	if bare.exists("tree:.se/.retro/" + retroCollectName + "/battery.json") {
 		t.Fatal("a stamp carrying no report leaves none behind")
 	}
+}
+
+// [[spec/guidance/retro/collect]]
+func TestRetroOutsideFolderBelongsToTheTreeByItsNameWhateverTheCaseOfTheDriveLetter(t *testing.T) {
+	t.Parallel()
+	if got := retroSlugOf(`c:\work\tree\quackitect-v5`); got != "c--work-tree-quackitect-v5" {
+		t.Fatalf("the slug reads %q", got)
+	}
+	const slug = "c--work-tree-quackitect-v5"
+	for _, one := range []struct {
+		name   string
+		inside []string
+		want   bool
+		why    string
+	}{
+		{"C--work-tree-quackitect-v5", nil, true, "the tree's own folder belongs"},
+		{"C--Temp-c--work-tree-quackitect-v5-stub", nil, true, "a scratch folder named off the tree belongs"},
+		{"c--work-tree-quackitect-v50", nil, false, "a longer name is another tree"},
+		{"c--work-tree-quackitect-v4", nil, false, "another name is another tree"},
+		{"c--work-tree-quackitect-v5-old", []string{"src"}, false, "a sibling tree names a folder the tree holds nowhere"},
+		{"c--work-tree-quackitect-v5-src-bridge", []string{"src"}, true, "a session run from a folder inside the tree belongs"},
+		{"c--work-tree-quackitect-v5--claude-worktrees-a", nil, true, "a worktree under a dot folder belongs"},
+		{"c--other-c--work-tree-quackitect-v5x", nil, false, "a name running past the slug is another tree"},
+	} {
+		if got := retroBelongs(one.name, slug, one.inside); got != one.want {
+			t.Fatalf("%s belongs %v, want %v: %s", one.name, got, one.want, one.why)
+		}
+	}
+}
+
+// A retro's home stands at .se/.retro/<name> under the root. [[spec/guidance/retro/chapter]]
+func TestARetroHomeStandsUnderTheRetroFolder(t *testing.T) {
+	t.Parallel()
+	got := retroHome("/tree", "retro-abc")
+	want := filepath.Join("/tree", ".se", ".retro", "retro-abc")
+	if got != want {
+		t.Fatalf("retroHome answers %q, want %q", got, want)
+	}
+}
+
+// A retro verb works under the work root SE_WORK_ROOT names, and under the box's root where it names none. [[spec/design_output/vehicle#the-work-root-inherits]]
+func TestARetroHomeReadsTheWorkRoot(t *testing.T) {
+	t.Parallel()
+	env := map[string]string{workRoot: " /work "}
+	d := boxDoors{root: "/tree", env: func(key string) string { return env[key] }}
+	if got := retroRootOf(d); got != "/work" {
+		t.Fatalf("retroRootOf answers %q, want /work", got)
+	}
+	delete(env, workRoot)
+	if got := retroRootOf(d); got != "/tree" {
+		t.Fatalf("retroRootOf answers %q, want /tree", got)
+	}
+}
+
+// The box doors a retro case runs on: the tree in a temp folder on the box's disk, no environment, and a runner that answers nothing. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func retroBoxAt(root string) func() boxDoors {
+	return func() boxDoors {
+		return boxDoors{
+			root: root,
+			env:  func(string) string { return "" },
+			disk: hq2RetroDisk(root),
+			run:  func([]string, runOpts) ranResult { return ranResult{code: exitFailed} },
+		}
+	}
+}
+
+// The transcripts read their time off timestamp, and the log off at. [[spec/guidance/retro/chapter]]
+func TestEachTimedSourceReadsItsTime(t *testing.T) {
+	t.Parallel()
+	lines := map[string]string{
+		"transcripts": `{"type":"user","timestamp":"2026-01-02T03:04:05Z"}`,
+		"log":         `{"level":"info","at":"2026-01-02T03:04:05Z"}`,
+	}
+	for _, source := range retroTimed {
+		found := source.field.FindStringSubmatch(lines[source.top])
+		if len(found) < 2 || found[1] != "2026-01-02T03:04:05Z" {
+			t.Fatalf("%s reads %v", source.top, found)
+		}
+	}
+}
+
+// The last report a stamp keeps, with its cases and its files. [[spec/guidance/retro/effect]]
+const retroMedianLast = `{"parts":{"tests":300,"rules":30},"total":330,"slowest":[{"name":"a slow case","ms":90,"file":"a.js"}],"files":[{"name":"a.js","ms":90}]}`
+
+// [[spec/guidance/retro/effect]]
+func TestRetroCollectKeepsEachPartsMedianOverTheRunsAndTheLastRunsCasesAndFiles(t *testing.T) {
+	t.Parallel()
+	said, _ := retroJSON(retroKeptReport(`{"battery":` + retroMedianLast + `,"runs":[{"tests":300,"rules":30},{"tests":100},{"tests":200,"rules":10}]}`)).(map[string]any)
+	last, _ := retroJSON(retroMedianLast).(map[string]any)
+
+	if !reflect.DeepEqual(said["parts"], retroJSON(`{"tests":200,"rules":20}`)) {
+		t.Fatalf("the parts read %v", said["parts"])
+	}
+	if said["total"] != 220.0 || said["runs"] != 3.0 {
+		t.Fatalf("the report totals %v over %v runs", said["total"], said["runs"])
+	}
+	if !reflect.DeepEqual(said["slowest"], last["slowest"]) || !reflect.DeepEqual(said["files"], last["files"]) {
+		t.Fatalf("the cases and the files stay off the last run: %v", said)
+	}
+}
+
+// A stamp carrying no report keeps none, whatever stands in its place. [[spec/guidance/retro/effect]]
+func TestRetroCollectReadsAStampFromBeforeTheRunsAsItsOneReportAndNoReportAsNothing(t *testing.T) {
+	t.Parallel()
+	for _, stamp := range []string{`{}`, `null`, `{"battery":false}`, `{"battery":0}`, `{"battery":""}`} {
+		if got := retroKeptReport(stamp); got != "" {
+			t.Fatalf("%s keeps %q", stamp, got)
+		}
+	}
+}
+
+// Runs the verb over the world, and answers its code and everything it says, out and error interleaved. [[spec/guidance/retro/collect]]
+func (w *retroCollectWorld) run(argv ...string) (int, string) {
+	doors := retroCollectDoors{
+		root: w.root,
+		home: w.home,
+		temp: w.temp,
+		now:  func() time.Time { return retroWhen(retroCollectNow) },
+		git:  w.trunk.run,
+		disk: w.disk,
+		move: w.move,
+	}
+	var said strings.Builder
+	code := retroCollectVerb(func() retroCollectDoors { return doors })(argv, false, &said, &said)
+	return code, said.String()
 }

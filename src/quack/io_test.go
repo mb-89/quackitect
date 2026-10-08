@@ -6,8 +6,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"encoding/json"
 	"errors"
-	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
-	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -180,14 +178,7 @@ func TestTheSplitRefusesAnIOInstanceOnAWire(t *testing.T) {
 // The tracked wiring places no IO instance on a wire, so quack io holds no reader. [[spec/tickets/quack-io-answers-no-run]]
 func TestTheTrackedWiringWiresNoIOInstance(t *testing.T) {
 	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	c := q.New()
 	manager.Registers(c)
 	if _, _, err := loaded(w, c); err != nil {

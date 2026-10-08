@@ -371,3 +371,40 @@ func readIn(root, path string) (string, bool) {
 	body, err := realDisk().read(filepath.Join(root, filepath.FromSlash(path)))
 	return string(body), err == nil
 }
+
+// The words each box verb runs under in the case. [[spec/tickets/box-verbs-no-node-test]]
+var noNodeWords = map[string][][]string{
+	"probe": {{"compact"}, {"cold"}, {"reply"}, {"nothing"}},
+}
+
+func startsNode(argv []string) bool {
+	for _, one := range argv {
+		base := strings.TrimSuffix(filepath.Base(one), ".exe")
+		if base == "node" && !slices.Equal(argv[len(argv)-1:], []string{"--version"}) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestEveryBoxVerbStartsNoNode(t *testing.T) {
+	t.Parallel()
+	if len(boxAnswers) == 0 {
+		t.Fatal("no box verb registers")
+	}
+	for verb, answer := range boxAnswers {
+		words := noNodeWords[verb]
+		if words == nil {
+			words = [][]string{nil}
+		}
+		for _, argv := range words {
+			d, runner, _, _ := fakeBoxDoors(t, "node", "git", "code", "npm", "claude")
+			answer(d, argv)
+			for _, one := range runner.ran {
+				if startsNode(one) {
+					t.Errorf("%s %v starts node: %v", verb, argv, one)
+				}
+			}
+		}
+	}
+}

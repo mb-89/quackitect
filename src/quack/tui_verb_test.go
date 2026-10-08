@@ -16,7 +16,9 @@ import (
 	"testing"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/modules/lsp"
 	"quackitect/src/tui/frame"
 	"quackitect/src/vehicle"
 )
@@ -87,13 +89,6 @@ func (box *tuiBox) doors() tuiDoors {
 
 func (box *tuiBox) exe() string { return box.root + "/.se/.runtime/bin/logview" }
 
-// Runs the verb over the box, and answers its code, its output and its error stream. [[spec/design_output/tui#the-verb-builds-it]]
-func (box *tuiBox) runs(argv ...string) (int, string, string) {
-	var out, errs strings.Builder
-	code := tuiVerb(box.doors)(append([]string{"tui"}, argv...), false, &out, &errs)
-	return code, out.String(), errs.String()
-}
-
 const tuiRowText = `{"at":"2026-01-02T03:04:05.678Z","level":"warn","kind":"note","said":"hello","2":"two","detail":"d","1":1.50,"list":[1,null,[2,3]],"obj":{"a":1},"n":null,"b":true,"big":1e21,"small":0.0000001}
 {torn
 {"at":"2026-01-02T03:04:05.678Z","level":"info","kind":"status","said":"plain"}
@@ -147,18 +142,22 @@ func TestTuiWorkCountPrintsNoCountAndLaunchesNothing(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/tui#the-verb-builds-it]]
+// A plain run prints the session rows and builds nothing, and a box with no Go prints them and asks for Go. [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiPlainPrintsTheSessionRows(t *testing.T) {
 	t.Parallel()
-	box := tuiBoxAt(t)
-	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
-	code, out, errs := box.runs("--plain")
-	want := ".se/.log/session.jsonl\n" + strings.Join(tuiRowsSaid, "\n") + "\n"
-	if code != 0 || out != want || errs != "" {
-		t.Fatalf("code %d\nout %q\nwant %q\nerrs %q", code, out, want, errs)
-	}
-	if len(box.builds) != 0 {
-		t.Errorf("a plain run builds %v", box.builds)
+	rows := ".se/.log/session.jsonl\n" + strings.Join(tuiRowsSaid, "\n") + "\n"
+	for _, plain := range []bool{true, false} {
+		box := tuiBoxAt(t)
+		hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
+		argv, want, wantErrs := []string{"--plain"}, rows, ""
+		if !plain {
+			box.build = func([]string) (int, string, error) { return 0, "", errors.New("no go here") }
+			argv, want, wantErrs = nil, rows+"\nGo builds the viewer these rows open in. Install Go, and run this again.\n", "no go here\n"
+		}
+		code, out, errs := box.runs(argv...)
+		if code != 0 || out != want || errs != wantErrs || (plain && len(box.builds) != 0) {
+			t.Fatalf("code %d\nout %q\nwant %q\nerrs %q\nbuilds %v", code, out, want, errs, box.builds)
+		}
 	}
 }
 
@@ -183,20 +182,6 @@ func TestTuiPlainAllReadsTheRotatedFilesFirst(t *testing.T) {
 		".se/.log/session.jsonl\n" + line("now")
 	if code != 0 || out != want {
 		t.Fatalf("code %d\nout %q\nwant %q", code, out, want)
-	}
-}
-
-// [[spec/design_output/tui#the-verb-builds-it]]
-func TestTuiNoGoPrintsTheRowsAndAsksForGo(t *testing.T) {
-	t.Parallel()
-	box := tuiBoxAt(t)
-	box.build = func([]string) (int, string, error) { return 0, "", errors.New("no go here") }
-	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
-	code, out, errs := box.runs()
-	want := ".se/.log/session.jsonl\n" + strings.Join(tuiRowsSaid, "\n") +
-		"\n\nGo builds the viewer these rows open in. Install Go, and run this again.\n"
-	if code != 0 || out != want || errs != "no go here\n" {
-		t.Fatalf("code %d\nout %q\nwant %q\nerrs %q", code, out, want, errs)
 	}
 }
 
@@ -369,16 +354,6 @@ func TestTuiFailedBuildSaysWhy(t *testing.T) {
 }
 
 // [[spec/design_output/tui#the-verb-builds-it]]
-func TestTuiNoGoAnswersNoViewerAndNamesTheFault(t *testing.T) {
-	t.Parallel()
-	box := tuiBoxAt(t)
-	box.build = func([]string) (int, string, error) { return 0, "", errors.New("exec: go: not found") }
-	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "exec: go: not found" {
-		t.Errorf("exe %q, why %q", exe, why)
-	}
-}
-
-// [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiWindowsBuildsTheExe(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
@@ -388,11 +363,11 @@ func TestTuiWindowsBuildsTheExe(t *testing.T) {
 	}
 }
 
-// The order localeCompare in Node answers, which the stamp walks its folders in. [[spec/design_output/tui#the-verb-builds-it]]
+// The order localeCompare in Node answers, which the stamp walks its folders in. Punctuation leads, then digits, letters and any other rune. [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiCollatesAsLocaleCompare(t *testing.T) {
 	t.Parallel()
-	names := []string{"model_view.go", "model.go", "Model2.go", "a-b.go", "a.go", "a_b.go", "B.go", "b.go", "frame", "frame.go", "x1.go", "x10.go", "x2.go"}
-	want := []string{"a_b.go", "a-b.go", "a.go", "b.go", "B.go", "frame", "frame.go", "model_view.go", "model.go", "Model2.go", "x1.go", "x10.go", "x2.go"}
+	names := []string{"é", "model_view.go", "model.go", "Model2.go", "a-b.go", "a.go", "a_b.go", "B.go", "b.go", "frame", "frame.go", "x1.go", "x10.go", "x2.go", "9", "0", "_"}
+	want := []string{"_", "0", "9", "a_b.go", "a-b.go", "a.go", "b.go", "B.go", "frame", "frame.go", "model_view.go", "model.go", "Model2.go", "x1.go", "x10.go", "x2.go", "é"}
 	slices.SortFunc(names, tuiCollate)
 	if !slices.Equal(names, want) {
 		t.Errorf("order %v, want %v", names, want)
@@ -442,12 +417,19 @@ func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
 	}
 }
 
-// The collation puts punctuation first, then digits, then letters in either case with lower case first on a tie, then any other rune. [[spec/design_output/tui#the-verb-builds-it]]
-func TestTuiCollateOrdersEachClassOfRune(t *testing.T) {
+func TestTheLspDoorFileStandsAmongTheRuntimeNames(t *testing.T) {
 	t.Parallel()
-	names := []string{"é", "b", "B", "a", "9", "0", "_"}
-	slices.SortFunc(names, tuiCollate)
-	if want := []string{"_", "0", "9", "a", "b", "B", "é"}; !slices.Equal(names, want) {
-		t.Errorf("the collation orders %q, and wants %q", names, want)
+	if got, want := path.Dir(lsp.StandingFile), path.Dir(check.ToolsAt); got != want {
+		t.Fatalf("%s stands under %s, and wants the runtime folder %s", lsp.StandingFile, got, want)
 	}
+	if name := path.Base(lsp.StandingFile); !slices.Contains(check.Moved, name) {
+		t.Fatalf("check.Moved reads %q, and wants %s among the runtime names", check.Moved, name)
+	}
+}
+
+// Runs the verb over the box, and answers its code, its output and its error stream. [[spec/design_output/tui#the-verb-builds-it]]
+func (box *tuiBox) runs(argv ...string) (int, string, string) {
+	var out, errs strings.Builder
+	code := tuiVerb(box.doors)(append([]string{"tui"}, argv...), false, &out, &errs)
+	return code, out.String(), errs.String()
 }

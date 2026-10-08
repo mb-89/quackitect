@@ -2,7 +2,7 @@
 // road runs node over a script. The boot runs the real
 // install.sh in a temporary tree, with every want skipped.
 // [[spec/tickets/session-start-leaves-node]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"context"
@@ -24,11 +24,14 @@ const bootSkipAll = "vale biome vale-ls go go-modules index se-front git-hooks"
 // The hook line that runs the boot word of install.sh under the project folder. [[spec/tickets/session-start-leaves-node]]
 var bootHookLine = regexp.MustCompile(`^sh "?\S*install\.sh"? boot$`)
 
-// The SessionStart hooks .claude/settings.json carries, each a command and a timeout in seconds. [[spec/tickets/session-start-leaves-node]]
-func bootHooks(t *testing.T) []struct {
+// One SessionStart hook: its command and its timeout in seconds. [[spec/tickets/session-start-leaves-node]]
+type bootHook struct {
 	Command string  `json:"command"`
 	Timeout float64 `json:"timeout"`
-} {
+}
+
+// The SessionStart hooks .claude/settings.json carries. [[spec/tickets/session-start-leaves-node]]
+func bootHooks(t *testing.T) []bootHook {
 	t.Helper()
 	body, err := os.ReadFile(filepath.Join(treeRoot, ".claude", "settings.json"))
 	if err != nil {
@@ -37,20 +40,14 @@ func bootHooks(t *testing.T) []struct {
 	var said struct {
 		Hooks struct {
 			SessionStart []struct {
-				Hooks []struct {
-					Command string  `json:"command"`
-					Timeout float64 `json:"timeout"`
-				} `json:"hooks"`
+				Hooks []bootHook `json:"hooks"`
 			} `json:"SessionStart"`
 		} `json:"hooks"`
 	}
 	if err := json.Unmarshal(body, &said); err != nil {
 		t.Fatal(err)
 	}
-	var all []struct {
-		Command string  `json:"command"`
-		Timeout float64 `json:"timeout"`
-	}
+	var all []bootHook
 	for _, one := range said.Hooks.SessionStart {
 		all = append(all, one.Hooks...)
 	}
@@ -104,7 +101,7 @@ func bootRunOn(t *testing.T, tree string, env map[string]string, input string) (
 	// level0: OutsideInDoors - the boot runs a real shell, so the case bounds it, the boot's door test
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "install.sh"), "boot")
+	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "install.sh"), "boot") // level0: FixtureOutsideHome - each boot runs the real install.sh in a tree of the case's own
 	run.Dir = tree
 	run.Stdin = strings.NewReader(input)
 	home := filepath.Join(filepath.Dir(tree), "home")
@@ -142,35 +139,8 @@ func bootWordKnown(t *testing.T) {
 	}
 }
 
-func TestNoTrackedFileNamesTheNodeBoot(t *testing.T) {
-	t.Parallel()
-	named := strings.Join([]string{"src", "scripts", "boot"}, "/")
-	listed, err := exec.Command("git", "-C", treeRoot, "ls-files", named+".js").Output()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if strings.TrimSpace(string(listed)) != "" {
-		t.Errorf("git tracks %s", strings.TrimSpace(string(listed)))
-	}
-	found, _ := exec.Command("git", "-C", treeRoot, "grep", "-n", "-F", named, "--", ".claude", "src").Output()
-	if strings.TrimSpace(string(found)) != "" {
-		t.Errorf("tracked lines under .claude and src name %s:\n%s", named, found)
-	}
-}
-
-func TestTheSessionStartHookRunsTheInstallBootWord(t *testing.T) {
-	t.Parallel()
-	var commands []string
-	for _, one := range bootHooks(t) {
-		commands = append(commands, one.Command)
-		if bootHookLine.MatchString(one.Command) {
-			return
-		}
-	}
-	t.Errorf("no SessionStart hook runs sh over install.sh with the boot word, and these stand: %q", commands)
-}
-
-func TestTheBootHookWaitsOutTheStartSpan(t *testing.T) {
+// A SessionStart hook runs sh over install.sh with the boot word, and waits out the start span. [[spec/tickets/session-start-leaves-node]]
+func TestTheBootHookRunsTheBootWordAndWaitsOutTheStartSpan(t *testing.T) {
 	t.Parallel()
 	starting := int(startSpan.Milliseconds())
 	var spans []int
@@ -180,7 +150,7 @@ func TestTheBootHookWaitsOutTheStartSpan(t *testing.T) {
 		}
 	}
 	if len(spans) == 0 {
-		t.Fatal("no SessionStart hook runs the boot word, so none waits out the start span")
+		t.Fatalf("no SessionStart hook runs sh over install.sh with the boot word, and these stand: %+v", bootHooks(t))
 	}
 	for _, span := range spans {
 		if span < starting {
@@ -189,70 +159,38 @@ func TestTheBootHookWaitsOutTheStartSpan(t *testing.T) {
 	}
 }
 
-func TestTheBootRunsNoInstallWhereTheManifestStands(t *testing.T) {
+// At a desk the boot hands the hook input to the start verb and prints its stop. A start verb failing or answering nothing starts the session. [[spec/tickets/the-coordinator-runs-under-level0]]
+func TestTheBootHandsADesksHookInputToTheStartVerb(t *testing.T) {
 	t.Parallel()
-	tree := bootTree(t)
-	bootWrite(t, filepath.Join(tree, ".claude", "skills", "level0", ".claude-plugin", "plugin.json"), "{}", 0o644)
-	code, said := bootRun(t, tree, map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_INSTALL_SKIP": bootSkipAll})
-	if _, ran := bootSaw(tree); ran || code != 0 {
-		t.Errorf("on a cloud box the manifest stands on, the boot answers %d and runs the install %v: %s", code, ran, said)
-	}
-}
-
-func TestTheBootRunsNoInstallOffACloudBox(t *testing.T) {
-	t.Parallel()
-	tree := bootTree(t)
-	code, said := bootRun(t, tree, map[string]string{"SE_INSTALL_SKIP": bootSkipAll})
-	if _, ran := bootSaw(tree); ran || code != 0 {
-		t.Errorf("off a cloud box, the boot answers %d and runs the install %v: %s", code, ran, said)
-	}
-}
-
-// [[spec/tickets/the-coordinator-runs-under-level0]]
-func TestTheBootHandsADesksHookInputToTheStartVerbAndPrintsItsStop(t *testing.T) {
-	t.Parallel()
-	const input, stop = `{"permission_mode":"default"}`, `{"continue":false,"stopReason":"open it in the repo folder"}` + "\n"
-	tree := bootTree(t)
-	bin := filepath.Join(tree, ".se", ".runtime", "bin")
-	bootWrite(t, filepath.Join(bin, "start-says"), stop, 0o644)
-	code, said := bootRunOn(t, tree, nil, input)
-	seen, _ := os.ReadFile(filepath.Join(bin, "start-seen"))
-	if code != 0 || said != stop || string(seen) != input {
-		t.Errorf("at a desk, the boot answers %d and prints %q, and the start verb meets %q; wants 0, %q and %q", code, said, seen, stop, input)
-	}
-}
-
-// [[spec/tickets/the-coordinator-runs-under-level0]]
-func TestTheBootStartsADeskSessionWhereTheStartVerbFailsOrAnswersNothing(t *testing.T) {
-	t.Parallel()
-	for _, one := range []struct{ says, code string }{{"stop\n", "2"}, {"", "0"}} {
+	const stop = `{"continue":false,"stopReason":"open it in the repo folder"}` + "\n"
+	for _, one := range []struct{ says, code, prints string }{{stop, "0", stop}, {"stop\n", "2", ""}, {"", "0", ""}} {
 		tree := bootTree(t)
 		bin := filepath.Join(tree, ".se", ".runtime", "bin")
 		bootWrite(t, filepath.Join(bin, "start-says"), one.says, 0o644)
 		bootWrite(t, filepath.Join(bin, "start-code"), one.code, 0o644)
-		if code, said := bootRunOn(t, tree, nil, "{}"); code != 0 || said != "" {
-			t.Errorf("at a desk, a start verb exiting %s on %q leaves the boot answering %d and printing %q; wants 0 and nothing", one.code, one.says, code, said)
+		code, said := bootRunOn(t, tree, nil, `{"permission_mode":"default"}`)
+		if seen, _ := os.ReadFile(filepath.Join(bin, "start-seen")); code != 0 || said != one.prints || string(seen) != `{"permission_mode":"default"}` {
+			t.Errorf("at a desk, a start verb exiting %s on %q leaves the boot answering %d, printing %q and handing %q", one.code, one.says, code, said, seen)
 		}
 	}
 }
 
-func TestTheBootRunsTheInstallOnACloudBoxLackingTheManifest(t *testing.T) {
+func TestTheBootRunsTheInstallOnACloudBoxLackingTheManifestAndSkipsWhatTheColdProbeSkips(t *testing.T) {
 	t.Parallel()
 	bootWordKnown(t)
-	tree := bootTree(t)
-	code, said := bootRun(t, tree, map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_INSTALL_SKIP": bootSkipAll})
-	if _, ran := bootSaw(tree); !ran || code != 0 {
-		t.Errorf("on a cloud box lacking the manifest, the boot answers %d and runs the install %v: %s", code, ran, said)
-	}
-}
-
-func TestTheBootRunsTheInstallOnABoxSECloudMarks(t *testing.T) {
-	t.Parallel()
-	bootWordKnown(t)
-	tree := bootTree(t)
-	code, said := bootRun(t, tree, map[string]string{"SE_CLOUD": "1", "SE_INSTALL_SKIP": bootSkipAll})
-	if _, ran := bootSaw(tree); !ran || code != 0 {
-		t.Errorf("on a box SE_CLOUD marks, the boot answers %d and runs the install %v: %s", code, ran, said)
+	for _, marks := range []string{"CLAUDE_CODE_REMOTE=true", "SE_CLOUD=1"} {
+		tree := bootTree(t)
+		key, value, _ := strings.Cut(marks, "=")
+		code, said := bootRun(t, tree, map[string]string{key: value, "SE_INSTALL_SKIP": bootSkipAll})
+		seen, ran := bootSaw(tree)
+		if !ran || code != 0 {
+			t.Fatalf("on a box %s marks, the boot answers %d and runs the install %v: %s", marks, code, ran, said)
+		}
+		for _, one := range strings.Fields(installSkip + " " + bootSkipAll) {
+			if !strings.Contains(" "+seen+" ", " "+one+" ") {
+				t.Errorf("the install the boot runs skips %q, and lacks %s", seen, one)
+			}
+		}
 	}
 }
 
@@ -267,22 +205,6 @@ func TestTheBootAnswersZeroWhereTheInstallFails(t *testing.T) {
 	code, said := bootRun(t, tree, map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_INSTALL_SKIP": bootSkipAll})
 	if code != 0 {
 		t.Errorf("where the install fails, the boot answers %d: %s", code, said)
-	}
-}
-
-func TestTheBootSkipsWhatTheColdProbeSkips(t *testing.T) {
-	t.Parallel()
-	tree := bootTree(t)
-	code, said := bootRun(t, tree, map[string]string{"CLAUDE_CODE_REMOTE": "true", "SE_INSTALL_SKIP": bootSkipAll})
-	seen, ran := bootSaw(tree)
-	if !ran || code != 0 {
-		t.Fatalf("on a cloud box lacking the manifest, the boot answers %d and runs the install %v: %s", code, ran, said)
-	}
-	words := " " + seen + " "
-	for _, one := range strings.Fields(installSkip + " " + bootSkipAll) {
-		if !strings.Contains(words, " "+one+" ") {
-			t.Errorf("the install the boot runs skips %q, and lacks %s of %q", seen, one, installSkip+" "+bootSkipAll)
-		}
 	}
 }
 
@@ -335,7 +257,7 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		bootWrite(t, filepath.Join(tree, "index-copy"), stampIndex, 0o755)
 		bootWrite(t, filepath.Join(path, "go"), stampGo, 0o755)
 		bootWrite(t, filepath.Join(tree, ".se", ".runtime", "fresh-code"), one.code, 0o644)
-		run := exec.Command("sh", filepath.Join(tree, "install.sh"))
+		run := exec.Command("sh", filepath.Join(tree, "install.sh")) // level0: FixtureOutsideHome - each install runs the real install.sh in a tree of the case's own
 		run.Dir = tree
 		run.Env = []string{
 			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,

@@ -8,6 +8,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -59,12 +60,12 @@ func (one fakeReads) Find(words string, _ int) ([]index.Hit, error) {
 	return one.hits, nil
 }
 
-// Calls the find by name through the manager over the root and the reads, and answers what the caller reads: the result, the error, or the refusal of the call. [[spec/tickets/find-and-wait-in-go]]
-func findCall(t *testing.T, root string, reads index.Reads, input any) string {
+// Calls an action by name through the manager over the root and the reads, as the index does, and answers what the caller reads: the result, the error, or the refusal of the call. [[spec/tickets/find-and-wait-in-go]]
+func servedCall(t *testing.T, root, kind string, reads index.Reads, name string, input any) string {
 	t.Helper()
 	c := q.New()
 	as := manager.Registers(c)
-	if one, ok := modules[searchModuleType]; ok {
+	if one, ok := modules[kind]; ok {
 		one.registers(c)
 	}
 	store := q.NewStore(c)
@@ -77,7 +78,7 @@ func findCall(t *testing.T, root string, reads index.Reads, input any) string {
 		t.Fatal(err)
 	}
 	defer served.Stop()
-	said, err := served.Call(findAction, input, "s1", findWait)
+	said, err := served.Call(name, input, "s1", findWait)
 	if err != nil {
 		return err.Error()
 	}
@@ -85,6 +86,12 @@ func findCall(t *testing.T, root string, reads index.Reads, input any) string {
 		return said.Error
 	}
 	return fmt.Sprint(said.Result)
+}
+
+// Calls the find over the root and the reads. [[spec/tickets/find-and-wait-in-go]]
+func findCall(t *testing.T, root string, reads index.Reads, input any) string {
+	t.Helper()
+	return servedCall(t, root, searchModuleType, reads, findAction, input)
 }
 
 // [[spec/tickets/find-and-wait-in-go]]
@@ -135,5 +142,42 @@ func TestAFindOverAFailingReadSaysTheIndexIsDead(t *testing.T) {
 	said := findCall(t, t.TempDir(), reads, map[string]any{"words": "one"})
 	if want := "The index is dead: the db is locked. Run ./RUNME.sh, which builds it, and Grep reads the disk until then."; said != want {
 		t.Errorf("the find answers %q, and wants the dead index line: %q", said, want)
+	}
+}
+
+// [[spec/tickets/grep-glob-answer-off-index]]
+func TestTheIndexAskCarriesTheAskAndTheAnswer(t *testing.T) {
+	t.Parallel()
+	var grepAsks []index.GrepAsk
+	var globAsks []index.GlobAsk
+	reads := fakeReads{
+		grepAsks: &grepAsks, globAsks: &globAsks,
+		grep: index.GrepSaid{Files: []index.FileHits{{Path: "src/a.go", Count: 1, Lines: []index.Found{{Line: 2, Text: "func One() {}", Match: true}}}}, Total: 1},
+		glob: index.GlobSaid{Paths: []string{"src/a.go"}, Cut: true},
+	}
+	ask := indexAsk(reads)
+	said, err := ask("grep", map[string]any{"pattern": "One", "glob": "*.go", "insensitive": true, "before": 2, "limit": 250})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []index.GrepAsk{{Pattern: "One", Glob: "*.go", Insensitive: true, Before: 2, Limit: 250}}; !reflect.DeepEqual(grepAsks, want) {
+		t.Errorf("the grep asks the index %+v, and wants %+v", grepAsks, want)
+	}
+	files, _ := said["files"].([]any)
+	if len(files) != 1 || said["total"] != float64(1) {
+		t.Errorf("the grep answers %v, and wants one file and a total of 1, as se-index prints them", said)
+	}
+	said, err = ask("glob", map[string]any{"pattern": "**/*.go", "path": "src"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []index.GlobAsk{{Pattern: "**/*.go", Path: "src"}}; !reflect.DeepEqual(globAsks, want) {
+		t.Errorf("the glob asks the index %+v, and wants %+v", globAsks, want)
+	}
+	if paths, _ := said["paths"].([]any); len(paths) != 1 || paths[0] != "src/a.go" || said["cut"] != true {
+		t.Errorf("the glob answers %v, and wants src/a.go, cut", said)
+	}
+	if _, err := ask("find", map[string]any{}); err == nil {
+		t.Errorf("the index ask takes the method find, and wants a refusal naming grep and glob alone")
 	}
 }

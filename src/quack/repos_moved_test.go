@@ -1,46 +1,16 @@
-// The quack verbs' repository cases run on FakeRepo, so they spawn no git, and
-// the doors chapter lists them among no test reaching a real door.
-// [[spec/tickets/quack-repos-meet-fake-git]]
+// The quack verbs reach git through Repo, and read it through the process door,
+// so no one of them spawns git in place.
+// [[spec/tickets/repo-guard-reads-the-verbs]]
 package main_test
 
 import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os" // level0: OutsideInDoors - the case reads the doors chapter the tree holds, as a build check reads source
-	"path/filepath"
 	"slices"
 	"strconv"
-	"strings"
 	"testing"
-
-	"quackitect/src/imports"
 )
-
-// The quack test files building a repository a case, each moving onto FakeRepo. [[spec/tickets/quack-repos-meet-fake-git]]
-var repoCases = []string{"commit_test.go", "landing_test.go", "ticket_bless_test.go", "ticket_open_test.go", "ticket_route_test.go", "verb_mint_test.go"}
-
-func TestTheQuackRepositoryCasesSpawnNothingAndTheDoorsChapterListsThemNowhere(t *testing.T) {
-	t.Parallel()
-	for _, name := range repoCases {
-		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if waits := imports.RealWaits(file); len(waits) > 0 {
-			t.Errorf("%s calls %v, where the quack repository cases run on FakeRepo", name, waits)
-		}
-	}
-	note, err := os.ReadFile(filepath.Join("..", "..", "spec", "design_output", "doors.md"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range repoCases {
-		if strings.Contains(string(note), "`src/quack/"+name+"`") {
-			t.Errorf("spec/design_output/doors.md still lists src/quack/%s as a test reaching a real door", name)
-		}
-	}
-}
 
 // The commit and ticket verbs moving onto Repo, and the seams alone that build the real one. [[spec/tickets/repo-guard-reads-the-verbs]]
 var (
@@ -75,6 +45,44 @@ func TestTheQuackRepositoryVerbsReachGitThroughRepoAndBuildTheRealOneInTheirSeam
 				}
 				return true
 			})
+		}
+	}
+}
+
+// Each git read, by the file it stands in. [[spec/tickets/quack-git-reads-take-door]]
+var gitReads = map[string]string{
+	"command.go":        "gitRead",
+	"vehicle_verb.go":   "vehicleGit",
+	"retro_chapters.go": "retroCommitsIn",
+	"verb_lint.go":      "Paths",
+	"retro_collect.go":  "retroCollectGitIn",
+}
+
+func TestTheQuackGitReadsSpawnThroughTheProcessDoor(t *testing.T) {
+	t.Parallel()
+	for name, read := range gitReads {
+		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, decl := range file.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if !ok || fn.Name.Name != read {
+				continue
+			}
+			found = true
+			ast.Inspect(fn, func(node ast.Node) bool {
+				if sel, ok := node.(*ast.SelectorExpr); ok {
+					if pkg, ok := sel.X.(*ast.Ident); ok && pkg.Name == "exec" {
+						t.Errorf("%s names exec.%s in %s, where a git read runs through proc", name, sel.Sel.Name, read)
+					}
+				}
+				return true
+			})
+		}
+		if !found {
+			t.Errorf("%s holds no %s", name, read)
 		}
 	}
 }

@@ -6,15 +6,10 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
-	"fmt"
 	"os" // level0: OutsideInDoors - the case copies the tree's own schemas and reads its wiring, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
-
-	manager "quackitect/src/modules/index"
-	"quackitect/src/q"
 )
 
 // The module type the edit actions stand in, and the actions each case calls by name. [[spec/tickets/edit-tools-answer-in-go]]
@@ -25,7 +20,6 @@ const (
 	mintAction     = "edits/mint"
 	editTicket     = "a-thing"
 	editOn         = "a-case"
-	editWait       = 10 * time.Second
 )
 
 // src/modules/check/folders.go owns the undo journal folder, and the package spells it again. [[spec/tickets/edit-tools-answer-in-go]]
@@ -57,32 +51,10 @@ func journalsIn(root string) []string {
 	return found
 }
 
-// Calls an action by name through the manager over the root, as the index does, and answers what the caller reads: the result, the error, or the refusal of the call. [[spec/tickets/edit-tools-answer-in-go]]
+// Calls an edit action by name over the root. [[spec/tickets/edit-tools-answer-in-go]]
 func editCall(t *testing.T, root, name string, input any) string {
 	t.Helper()
-	c := q.New()
-	as := manager.Registers(c)
-	if one, ok := modules[editModuleType]; ok {
-		one.registers(c)
-	}
-	store := q.NewStore(c)
-	served, err := manager.Serving(manager.Outside{
-		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Clock: stillClock(),
-		Accept: accepts(root, store, nil),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer served.Stop()
-	said, err := served.Call(name, input, "s1", editWait)
-	if err != nil {
-		return err.Error()
-	}
-	if said.Error != "" {
-		return said.Error
-	}
-	return fmt.Sprint(said.Result)
+	return servedCall(t, root, editModuleType, nil, name, input)
 }
 
 // A patch serving the open ticket, as the bridge's tool takes it. [[spec/tickets/edit-tools-answer-in-go]]
@@ -282,14 +254,7 @@ func TestTheEditModuleStandsOnTheWiring(t *testing.T) {
 	if _, ok := modules[editModuleType]; !ok {
 		t.Errorf("the root loads no module type %s", editModuleType)
 	}
-	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	if !wiresType(w, editModuleType) {
 		t.Errorf("the wiring loads no %s", editModuleType)
 	}

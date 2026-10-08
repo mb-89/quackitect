@@ -3,9 +3,12 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"errors"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -87,12 +90,8 @@ func TestTheDoctorReadsTheSurveyThatStandsAndWritesOneWhereNoneDoes(t *testing.T
 	if text := d.disk.text(filepath.Join(d.root, toolsFile)); !strings.Contains(text, `"node": null`) {
 		t.Errorf("the survey written reads %s", text)
 	}
-}
-
-func TestTheSurveyRowNamesHowToWriteOne(t *testing.T) {
-	t.Parallel()
 	if got := surveyRow(newFakeDisk(), "/tree"); got != "absent, run ./RUNME.sh tools" {
-		t.Errorf("the row reads %q", got)
+		t.Errorf("a survey standing nowhere reads %q, and wants the way to write one", got)
 	}
 }
 
@@ -362,5 +361,183 @@ func hq1Relink(t *testing.T, disk diskDoors, target, dest string) {
 	}
 	if err := disk.symlink(target, dest); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// A settings file naming one address, in the shape the client reads. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+func hookSettings(url string) string {
+	return `{"hooks":{"PreToolUse":[{"matcher":"*","hooks":[{"type":"http","url":"` + url + `"}]}]}}`
+}
+
+// A GET answering the addresses a case names, and standing dead for the rest. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+func answeringGet(answers map[string]string) func(string, time.Duration) (string, error) {
+	return func(where string, _ time.Duration) (string, error) {
+		if said, ok := answers[where]; ok {
+			return said, nil
+		}
+		return "", errors.New("fetch failed")
+	}
+}
+
+// The addresses the reader found, in its order. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+func wheres(found []hookNamed) []string {
+	var out []string
+	for _, one := range found {
+		out = append(out, one.where)
+	}
+	return out
+}
+
+func TestTheHookReaderTakesAnAddressOutOfEachOfTheThreeSettingsFiles(t *testing.T) {
+	t.Parallel()
+	root, home, disk := "/tree", "/home/one", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
+		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
+		settingsLocalFile: hookSettings("http://127.0.0.1:2/b"),
+	})
+	hq1SeedDisk(t, disk, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:3/c")})
+	found := hooksNamed(disk, root, home)
+	if got := wheres(found); !reflect.DeepEqual(got, []string{"http://127.0.0.1:1/a", "http://127.0.0.1:2/b", "http://127.0.0.1:3/c"}) {
+		t.Errorf("the addresses read %v", got)
+	}
+	var files []string
+	for _, one := range found {
+		files = append(files, one.file)
+	}
+	if want := []string{settingsFile, settingsLocalFile, home + "/" + settingsFile}; !reflect.DeepEqual(files, want) {
+		t.Errorf("the files read %v, want %v", files, want)
+	}
+}
+
+func TestASettingsFileHoldingNoHooksStandingNowhereOrTornNamesNoAddress(t *testing.T) {
+	t.Parallel()
+	for name, files := range map[string]map[string]string{
+		"no hooks": {settingsFile: `{"permissions":{"allow":[]}}`},
+		"nowhere":  {},
+		"torn":     {settingsFile: "{"},
+	} {
+		disk := newFakeDisk()
+		hq1SeedDisk(t, disk, "/tree", files)
+		if found := hooksNamed(disk, "/tree", ""); len(found) != 0 {
+			t.Errorf("%s names %v", name, found)
+		}
+	}
+}
+
+func TestACommandHookStandsOutsideTheAddresses(t *testing.T) {
+	t.Parallel()
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{settingsFile: `{"hooks":{"PreToolUse":[
+		{"hooks":[{"type":"command","command":"C:\\hook.exe"}]},
+		{"hooks":[{"type":"command","command":"/usr/bin/hook"}]},
+		{"hooks":[{"type":"http","url":"http://127.0.0.1:1/a"}]}]}}`})
+	if got := wheres(hooksNamed(disk, root, "")); !reflect.DeepEqual(got, []string{"http://127.0.0.1:1/a"}) {
+		t.Errorf("the addresses read %v", got)
+	}
+}
+
+func TestTwoFilesNamingOneAddressNameItOnceOffTheFileReadingFirst(t *testing.T) {
+	t.Parallel()
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
+		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
+		settingsLocalFile: hookSettings("http://127.0.0.1:1/a"),
+	})
+	found := hooksNamed(disk, root, "")
+	if len(found) != 1 || found[0].file != settingsFile {
+		t.Errorf("the reader finds %v", found)
+	}
+}
+
+func TestTheAddressReadsAsABrowserWritesIt(t *testing.T) {
+	t.Parallel()
+	for said, want := range map[string]string{
+		"http://127.0.0.1:1/a":  "http://127.0.0.1:1/a",
+		"HTTP://Host:80":        "http://host/",
+		"https://host:443/x":    "https://host/x",
+		"ftp://host/x":          "",
+		"/usr/bin/hook":         "",
+		"C:\\hook.exe":          "",
+		"just words, no scheme": "",
+	} {
+		if got := addressOf(said); got != want {
+			t.Errorf("addressOf(%q) = %q, want %q", said, got, want)
+		}
+	}
+}
+
+func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
+	t.Parallel()
+	d, _, _, _ := fakeBoxDoors(t)
+	var mu sync.Mutex
+	var asked []string
+	second := make(chan struct{})
+	d.get = func(where string, _ time.Duration) (string, error) {
+		mu.Lock()
+		asked = append(asked, where)
+		count := len(asked)
+		mu.Unlock()
+		if count == 2 {
+			close(second)
+		} else {
+			<-second
+		}
+		return "", errors.New("fetch failed")
+	}
+	rows := hookRows(d, []hookNamed{{"http://127.0.0.1:1/a", "a"}, {"http://127.0.0.1:2/b", "b"}})
+	if len(rows) != 2 || len(asked) != 2 {
+		t.Fatalf("the probe asks %v and answers %v", asked, rows)
+	}
+	for _, row := range rows {
+		if !strings.HasPrefix(row[1], "warn") {
+			t.Errorf("a call waited alone: %v", row)
+		}
+	}
+}
+
+// A hook answering stands and one answering nothing warns, each row in the order the reader names them. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+func TestTheHookRowsComeBackInTheOrderTheReaderNamesThem(t *testing.T) {
+	t.Parallel()
+	d, _, _, _ := fakeBoxDoors(t)
+	d.get = answeringGet(map[string]string{"http://127.0.0.1:2/b": ""})
+	rows := hookRows(d, []hookNamed{{"http://127.0.0.1:1/a", "a"}, {"http://127.0.0.1:2/b", "b"}})
+	if rows[0][0] != "hook 127.0.0.1:1" || rows[1][0] != "hook 127.0.0.1:2" || !strings.HasPrefix(rows[0][1], "warn") || rows[1][1] != "stands at http://127.0.0.1:2/b, off b" {
+		t.Errorf("the rows read %v", rows)
+	}
+	if rows := hookRows(d, nil); len(rows) != 0 {
+		t.Errorf("a box naming no hook reads %v", rows)
+	}
+}
+
+// A fake disk holding an empty file at each path under the tree, and the env a case names, each path under the tree. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
+func browserBox(t *testing.T, paths []string, env map[string]string) (string, func(string) string, diskDoors) {
+	t.Helper()
+	root, disk := "/tree", newFakeDisk()
+	files := map[string]string{}
+	for _, one := range paths {
+		files[one] = ""
+	}
+	hq1SeedDisk(t, disk, root, files)
+	at := map[string]string{}
+	for key, value := range env {
+		at[key] = value
+		if value != "" && key != "PATHEXT" {
+			at[key] = filepath.Join(root, value)
+		}
+	}
+	return root, func(key string) string { return at[key] }, disk
+}
+
+// A Windows path splits on semicolons and tries the exe ending, and the folder the download writes answers last. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
+func TestAWindowsPathSplitsOnSemicolonsAndTriesTheExeEnding(t *testing.T) {
+	t.Parallel()
+	root, env, disk := browserBox(t, []string{"w/chrome.exe"}, map[string]string{"Path": "w", "PATHEXT": ".EXE"})
+	if at, from := browserFrom(disk, env, false); at != filepath.Join(root, "w", "chrome.exe") || from != "PATH" {
+		t.Errorf("the order answers %s off %s", at, from)
+	}
+	mac := "home/Library/Caches/ms-playwright/chromium-3/chrome-mac/Chromium.app/Contents/MacOS/Chromium"
+	root, env, disk = browserBox(t, []string{mac}, map[string]string{"HOME": "home"})
+	if at, _ := browserFrom(disk, env, true); at != filepath.Join(root, filepath.FromSlash(mac)) {
+		t.Errorf("a mac answers %s", at)
 	}
 }

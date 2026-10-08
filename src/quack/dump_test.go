@@ -3,7 +3,6 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path"
 	"path/filepath"
 	"strings"
@@ -15,14 +14,7 @@ import (
 
 // quack dump asks the served index for a prefix, and writes the answer under the root where dumpPath names it. [[spec/design_output/model#everything-on-disk-mirrors]]
 func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
-	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	root := t.TempDir()
 	if err := realDisk().write(filepath.Join(root, "seen.md"), []byte("a dumped line\n"), 0o644); err != nil {
 		t.Fatal(err)

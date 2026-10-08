@@ -1,6 +1,6 @@
 // Each git hook runs se-index.exe where it stands alone, as RUNME.sh does.
 // [[spec/tickets/hook-finds-the-exe-binary]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	// level0: OutsideInDoors - the case stands a hook beside a binary in a temp root, the hook's door test
@@ -15,7 +15,7 @@ import (
 func TestGitHooksTakeTheExeWhereItStandsAlone(t *testing.T) {
 	t.Parallel()
 	for _, name := range []string{"pre-commit", "pre-push"} {
-		tree := t.TempDir()
+		tree := t.TempDir() // level0: FixtureOutsideHome - each hook stands beside its own stub binary in a root of the case's own
 		text, err := os.ReadFile(filepath.Join(treeRoot, ".githooks", name))
 		if err != nil {
 			t.Fatal(err)
@@ -30,7 +30,7 @@ func TestGitHooksTakeTheExeWhereItStandsAlone(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		said, err := exec.Command("sh", hook).CombinedOutput()
+		said, err := exec.Command("sh", hook).CombinedOutput() // level0: FixtureOutsideHome - the case runs the real hook script, as git runs it
 		line := strings.TrimSpace(string(said))
 		if err != nil || !strings.HasPrefix(line, "exe verb ") || !strings.HasSuffix(line, "/src/scripts hook "+name) {
 			t.Fatalf(".githooks/%s answers %q, %v, and wants se-index.exe run with hook %s", name, said, err, name)

@@ -41,9 +41,9 @@ func editCaseTree(t *testing.T, names ...string) string {
 	t.Helper()
 	root := t.TempDir()
 	t.Setenv(workRootVar, "")
-	seedsFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+	seedFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
 	for _, name := range names {
-		seedsFile(t, root, "spec/tickets/"+name+".md", editCaseTicket(""))
+		seedFile(t, root, "spec/tickets/"+name+".md", editCaseTicket(""))
 	}
 	return root
 }
@@ -64,22 +64,24 @@ func runsApart(t *testing.T, root string, dry bool, words ...string) (int, strin
 const aThing = "spec/tickets/a-thing.md"
 
 func TestTicketSet(t *testing.T) {
-	t.Run("set joins the words past the field into one value", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		code, out, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "a", "group")
-		if got, _ := readsBack(t, root, aThing); code != 0 || out != "spec/tickets/a-thing.md carries group: a group.\n" || !strings.Contains(got, "\ngroup: a group\n") {
-			t.Fatalf("set answers %d, %q, and writes %q", code, out, got)
+	t.Run("set joins the words past the field into one value, and a dry run says what it writes and writes nothing", func(t *testing.T) {
+		for _, dry := range []bool{false, true} {
+			root := editCaseTree(t, "a-thing")
+			code, out, _ := runsApart(t, root, dry, "ticket", "set", "a-thing", "group", "a", "group")
+			if got, _ := readIn(root, aThing); code != 0 || out != "spec/tickets/a-thing.md carries group: a group.\n" || strings.Contains(got, "\ngroup: a group\n") == dry {
+				t.Fatalf("set, dry %v, answers %d, %q, and writes %q", dry, code, out, got)
+			}
 		}
 	})
 	t.Run("an empty value and a flag standing off drop the field", func(t *testing.T) {
 		for _, value := range [][]string{{}, {"false"}} {
 			root := t.TempDir()
 			t.Setenv(workRootVar, "")
-			seedsFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
-			seedsFile(t, root, aThing, editCaseTicket("todo: true\n"))
+			seedFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+			seedFile(t, root, aThing, editCaseTicket("todo: true\n"))
 			code, out, _ := runsApart(t, root, false, append([]string{"ticket", "set", "a-thing", "todo"}, value...)...)
 			want := "spec/tickets/a-thing.md carries todo: " + map[int]string{0: "nothing", 1: "false"}[len(value)] + ".\n"
-			if got, _ := readsBack(t, root, aThing); code != 0 || out != want || got != editCaseTicket("") {
+			if got, _ := readIn(root, aThing); code != 0 || out != want || got != editCaseTicket("") {
 				t.Fatalf("set %v answers %d, %q, and writes %q", value, code, out, got)
 			}
 		}
@@ -87,15 +89,15 @@ func TestTicketSet(t *testing.T) {
 	t.Run("set weighs the value against the schema, as the tab does", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		code, _, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "urgent", "maybe")
-		if got, _ := readsBack(t, root, aThing); code != 2 || errs != "urgent takes a boolean, and \"maybe\" reads as none.\n" || got != editCaseTicket("") {
+		if got, _ := readIn(root, aThing); code != 2 || errs != "urgent takes a boolean, and \"maybe\" reads as none.\n" || got != editCaseTicket("") {
 			t.Fatalf("set urgent maybe answers %d, %q, and writes %q", code, errs, got)
 		}
 	})
 	t.Run("set refuses a group that stands closed, and writes nothing", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
-		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		seedFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
 		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "shut")
-		if got, _ := readsBack(t, root, aThing); code != 2 || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") || got != editCaseTicket("") {
+		if got, _ := readIn(root, aThing); code != 2 || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") || got != editCaseTicket("") {
 			t.Fatalf("set group shut answers %d, %q, %q, and writes %q", code, out, errs, got)
 		}
 	})
@@ -114,13 +116,6 @@ func TestTicketSet(t *testing.T) {
 			if code != 2 || out != "" || errs != want {
 				t.Errorf("%v answers %d, %q, %q", one.argv, code, out, errs)
 			}
-		}
-	})
-	t.Run("a dry run says what it writes, and writes nothing", func(t *testing.T) {
-		root := editCaseTree(t, "a-thing")
-		code, out, _ := runsApart(t, root, true, "ticket", "set", "a-thing", "group", "a-group")
-		if got, _ := readsBack(t, root, aThing); code != 0 || out != "spec/tickets/a-thing.md carries group: a-group.\n" || got != editCaseTicket("") {
-			t.Fatalf("the dry set answers %d, %q, and writes %q", code, out, got)
 		}
 	})
 }

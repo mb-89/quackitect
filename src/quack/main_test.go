@@ -29,6 +29,25 @@ var sharedFolder = qtest.Shared(func() string {
 	return dir
 })
 
+// The tree's own wiring file, read once a package run. [[spec/design_output/model#the-wiring-file]]
+var wiringText = qtest.Shared(func() string {
+	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		panic(err)
+	}
+	return string(text)
+})
+
+// The tree's own wiring, parsed fresh for the case, so no case writes into another's. [[spec/design_output/model#the-wiring-file]]
+func treeWiring(t *testing.T) q.Wiring {
+	t.Helper()
+	w, err := q.ReadWiring(wiringText())
+	if err != nil {
+		t.Fatal(err)
+	}
+	return w
+}
+
 // The git module's tips, which a case wiring the tickets module and no git feeds empty. [[spec/tickets/the-index-reads-standing-branches]]
 const (
 	tipsName  = "git/tips"
@@ -42,14 +61,7 @@ func noTips(c *q.Catalog) {
 }
 
 func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	t.Setenv("SE_QUACK", "held")
 	c := q.New()
 	starts, err := load(w, c)
@@ -87,14 +99,7 @@ func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 
 // The served index answers the tickets the wiring's module reads off the watch, the private ones and one written after the start among them. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheServedIndexAnswersItsTickets(t *testing.T) {
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	w := treeWiring(t)
 	root := t.TempDir()
 	ticket := func(path, ask string) {
 		seedTree(t, root, map[string]string{path: "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\n" + ask + "\n"})
@@ -194,14 +199,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 // The wiring loads tickets, the queue and the work module, and work/open-tasks counts a fake tree of tickets: a marked group and its child stand on the cloud, a closed ticket takes no place, and the free one counts. [[spec/tickets/open-tasks-come-from-work]]
 func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	all, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
+	all := treeWiring(t)
 	w := q.Wiring{Wires: all.Wires}
 	for _, one := range all.Instances {
 		if one.Module == "tickets" || one.Module == "queue" || one.Module == "work" {

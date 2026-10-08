@@ -1,7 +1,7 @@
 // The shapes rule and the commit door pass one list of users naming nobody,
 // since the Vale script reads no Go and the door reads no Vale.
 // [[spec/design_output/private#the-box-names-the-owner]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	// level0: OutsideInDoors - the case reads the tree's own rule script, as a build check reads source

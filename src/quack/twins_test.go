@@ -15,14 +15,14 @@ import (
 	"quackitect/src/q"
 )
 
-// A door holding work/yours as the case seeds it, and the V1 answering its base. [[spec/tickets/ticket-verbs-become-actions]]
-func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
+// A door holding the name as the case seeds it, and the V1 answering its base. [[spec/tickets/view-actions-run-through-verbs]]
+func seededTree[T any](t *testing.T, name string, empty, rows T) func() (string, error) {
 	t.Helper()
 	root := t.TempDir()
 	c := q.New()
-	hand := q.OutIn(c, "work/yours", []work.YoursRow{}, q.Doc("the rows as the case seeds them"))
+	hand := q.OutIn(c, name, empty, q.Doc("the rows as the case seeds them"))
 	seeds := func(_ string, commit index.Commit) (func(), error) {
-		return func() {}, commit(hand, map[string]any{"work/yours": rows})
+		return func() {}, commit(hand, map[string]any{name: rows})
 	}
 	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
 	if err != nil {
@@ -31,6 +31,11 @@ func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
 	t.Cleanup(stop)
 	base := hq3V1Of(t, root)
 	return func() (string, error) { return base, nil }
+}
+
+// A door holding work/yours as the case seeds it. [[spec/tickets/ticket-verbs-become-actions]]
+func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
+	return seededTree(t, "work/yours", []work.YoursRow{}, rows)
 }
 
 // The V1 base the index serving under the root names in the standing file it writes on the box's disk. [[spec/tickets/test-walks-move-onto-fakes]]

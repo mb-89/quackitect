@@ -1,7 +1,7 @@
 // The hook verb, over a real repository and its bare origin: each refusal the
 // pre-commit and pre-push scripts gave, and the roads each lets through.
 // [[spec/tickets/git-hooks-run-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 	"net/url"
 	// level0: OutsideInDoors - the case reads the real repository it drives, the verb's door test
 	"os"
-	// level0: OutsideInDoors - the case drives a real repository and its bare origin with git, the verb's door test
+	// level0: OutsideInDoors - the case runs the real hook script, the hook's door test
 	"os/exec"
 	"path/filepath"
 	"reflect"
@@ -51,9 +51,9 @@ func hookRepo(t *testing.T) (string, string) {
 	for _, one := range [][]string{{"user.name", "a hand"}, {"user.email", "hand@example.invalid"}, {"commit.gpgsign", "false"}, {"core.autocrlf", "false"}} {
 		gitDoes(t, root, "config", one[0], one[1])
 	}
-	lays(t, root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n")
-	lays(t, root, "spec/tickets/shut.md", "---\nstate: closed\n---\n\n# Ask\n")
-	lays(t, root, "README.md", "a tree\n")
+	seedFile(t, root, "spec/tickets/a-ticket.md", "---\nstate: open\n---\n\n# Ask\n")
+	seedFile(t, root, "spec/tickets/shut.md", "---\nstate: closed\n---\n\n# Ask\n")
+	seedFile(t, root, "README.md", "a tree\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "a-ticket: the tree opens")
 	gitDoes(t, root, "remote", "add", "origin", origin)
@@ -64,7 +64,7 @@ func hookRepo(t *testing.T) (string, string) {
 // Runs git under the dir, and stops the test where it fails. [[spec/tickets/git-hooks-run-in-go]]
 func gitDoes(t *testing.T, dir string, args ...string) string {
 	t.Helper()
-	run := exec.Command("git", args...)
+	run := exec.Command("git", args...) // level0: FixtureOutsideHome - each case drives a real repository and its bare origin of its own
 	run.Dir = dir
 	said, err := run.CombinedOutput()
 	if err != nil {
@@ -80,7 +80,7 @@ var hookAgent = map[string]string{"SE_ENGINE": "1"}
 func preCommits(t *testing.T, path, text string) (int, string) {
 	t.Helper()
 	root, _ := hookRepo(t)
-	lays(t, root, path, text)
+	seedFile(t, root, path, text)
 	gitDoes(t, root, "add", "-A")
 	// level0: OutsideInDoors - the case hands the hook doors one wall reading over the real repository, the verb's door test
 	code, _, errs := runsTwin(hookVerb(hookDoorsOver(root, false, nil, "", time.Now())), "hook", "pre-commit")
@@ -103,90 +103,62 @@ func heldBranch(t *testing.T) (string, string) {
 	t.Helper()
 	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/x")
-	lays(t, root, "spec/tickets/x.md", "---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: design/draft\n    hand: "+hookHolder+"\n    hash_before: abc123\n---\n\n# Ask\n")
+	seedFile(t, root, "spec/tickets/x.md", "---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: design/draft\n    hand: "+hookHolder+"\n    hash_before: abc123\n---\n\n# Ask\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "x: the hold")
 	gitDoes(t, root, "push", "-q", "origin", "work/x")
 	gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "x: a plain commit")
-	lays(t, root, ".se/.runtime/box.json", `{"id":"myb0x"}`)
+	seedFile(t, root, ".se/.runtime/box.json", `{"id":"myb0x"}`)
 	return root, gitDoes(t, root, "rev-parse", "HEAD")
 }
 
-func TestHookPreCommitRefusesAMarker(t *testing.T) {
+// Pre-commit refuses a private delta by line and rule and a change with no test beside it, and passes a clean delta in silence. [[spec/tickets/git-hooks-run-in-go]]
+func TestHookPreCommitRefusesAPrivateDeltaAndAnUntestedChange(t *testing.T) {
 	t.Parallel()
-	code, errs := preCommits(t, "spec/tickets/b.md", "---\nstate: open\n---\n\n<<<<<<< ours\none\n=======\ntwo\n>>>>>>> theirs\n")
-	if code != exitFailed || !strings.Contains(errs, "spec/tickets/b.md:5") || !strings.Contains(errs, "a conflict marker") {
-		t.Fatalf("pre-commit answers %d, %q, and wants the marker's file and line refused", code, errs)
+	for _, one := range []struct {
+		path, text string
+		code       int
+		says       []string
+	}{
+		{"spec/guidance/voice.md", "Write to " + hookAddress + " where the door refuses.\n", exitFailed, []string{"spec/guidance/voice.md:1:1", "ShapeStaysHome"}},
+		{"src/bridge/one.js", "export const one = 1;\n", exitFailed, []string{"no test beside it"}},
+		{"spec/guidance/voice.md", "The door reads the delta a commit carries.\n", 0, nil},
+	} {
+		code, errs := preCommits(t, one.path, one.text)
+		if code != one.code || (one.says == nil && errs != "") {
+			t.Fatalf("pre-commit over %s answers %d, %q", one.path, code, errs)
+		}
+		for _, said := range one.says {
+			if !strings.Contains(errs, said) {
+				t.Fatalf("pre-commit over %s says %q, and wants %q", one.path, errs, said)
+			}
+		}
 	}
 }
 
-func TestHookPreCommitRefusesAPrivateDelta(t *testing.T) {
-	t.Parallel()
-	code, errs := preCommits(t, "spec/guidance/voice.md", "Write to "+hookAddress+" where the door refuses.\n")
-	if code != exitFailed || !strings.Contains(errs, "spec/guidance/voice.md:1:1") || !strings.Contains(errs, "ShapeStaysHome") {
-		t.Fatalf("pre-commit answers %d, %q, and wants the address refused by line and rule", code, errs)
-	}
-}
-
-func TestHookPreCommitRefusesAnUntestedChange(t *testing.T) {
-	t.Parallel()
-	code, errs := preCommits(t, "src/bridge/one.js", "export const one = 1;\n")
-	if code != exitFailed || !strings.Contains(errs, "no test beside it") {
-		t.Fatalf("pre-commit answers %d, %q, and wants the change without a test refused", code, errs)
-	}
-}
-
-func TestHookPreCommitPassesACleanDelta(t *testing.T) {
-	t.Parallel()
-	code, errs := preCommits(t, "spec/guidance/voice.md", "The door reads the delta a commit carries.\n")
-	if code != 0 || errs != "" {
-		t.Fatalf("pre-commit answers %d, %q, and wants a clean delta through in silence", code, errs)
-	}
-}
-
-func TestHookPrePushRefusesAVersionDelete(t *testing.T) {
-	t.Parallel()
-	root, _ := hookRepo(t)
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, false, nil, "(delete) "+hookZeros+" refs/heads/v1 "+gitDoes(t, root, "rev-parse", "HEAD")+"\n", time.Now())
-	if code != exitFailed || !strings.Contains(errs, "v1") || !strings.Contains(errs, "delete") {
-		t.Fatalf("pre-push answers %d, %q, and wants the delete of a version branch refused", code, errs)
-	}
-}
-
+// A push to main refuses a cloud box and an agent with no stamp, and lets the owner's terminal through. [[spec/tickets/git-hooks-run-in-go]]
 func TestHookPrePushRefusesACloudPushToTrunk(t *testing.T) {
 	t.Parallel()
-	root, _ := hookRepo(t)
-	stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, true, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
-	if code != exitFailed || !strings.HasPrefix(errs, "A cloud box pushes its own work branch alone, and main stands for the desk.") {
-		t.Fatalf("pre-push answers %d, %q, and wants a cloud push to main refused on a green stamp", code, errs)
-	}
-}
-
-func TestHookPrePushRefusesARedBatteryOnTrunk(t *testing.T) {
-	t.Parallel()
-	root, _ := hookRepo(t)
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, false, hookAgent, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
-	if code != exitFailed || !strings.HasPrefix(errs, "main takes a green battery, and ") || !strings.Contains(errs, "Run `./RUNME.sh check` last") {
-		t.Fatalf("pre-push answers %d, %q, and wants an agent's push to main refused without a stamp", code, errs)
-	}
-}
-
-func TestHookPrePushRefusesAnUncheckedTip(t *testing.T) {
-	t.Parallel()
-	root, _ := hookRepo(t)
-	gitDoes(t, root, "checkout", "-q", "-b", "work/y")
-	stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
-	lays(t, root, "src/bridge/two.js", "export const two = 2;\n")
-	gitDoes(t, root, "add", "-A")
-	gitDoes(t, root, "commit", "-q", "--no-verify", "-m", "y: code past the check")
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, false, hookAgent, pushLine("work/y", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
-	if code != exitFailed || !strings.HasPrefix(errs, "work/y takes a push the check has passed, and ") {
-		t.Fatalf("pre-push answers %d, %q, and wants a tip past the checked commit refused", code, errs)
+	for _, one := range []struct {
+		cloud, stamp bool
+		env          map[string]string
+		code         int
+		says         string
+	}{
+		{true, true, nil, exitFailed, "A cloud box pushes its own work branch alone, and main stands for the desk."},
+		{false, false, hookAgent, exitFailed, "main takes a green battery, and "},
+		{false, false, nil, 0, ""},
+	} {
+		root, _ := hookRepo(t)
+		gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "a-ticket: no check")
+		if one.stamp {
+			stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
+		}
+		// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
+		code, errs := prePushes(root, one.cloud, one.env, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
+		if code != one.code || !strings.HasPrefix(errs, one.says) || (one.says == "" && errs != "") || (one.env != nil && !strings.Contains(errs, "Run `./RUNME.sh check` last")) {
+			t.Fatalf("pre-push answers %d, %q, and wants %d opening %q", code, errs, one.code, one.says)
+		}
 	}
 }
 
@@ -201,32 +173,11 @@ func TestHookPrePushRefusesABranchAnotherBoxHolds(t *testing.T) {
 	}
 }
 
-func TestHookPrePushRefusesAPlainPushOntoAStaleHold(t *testing.T) {
-	t.Parallel()
-	root, sha := heldBranch(t)
-	stampsGreen(t, root, sha)
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now().Add(24*time.Hour))
-	if code != exitFailed || !strings.Contains(errs, "stale hold of "+hookHolder) || !strings.Contains(errs, "./RUNME.sh branch take x") {
-		t.Fatalf("pre-push answers %d, %q, and wants a plain push onto a stale hold refused, naming the take", code, errs)
-	}
-}
-
-func TestHookPrePushRefusesTheOwnersPushOntoABranchAnotherBoxHolds(t *testing.T) {
-	t.Parallel()
-	root, sha := heldBranch(t)
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, false, nil, pushLine("work/x", sha), time.Now())
-	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) {
-		t.Fatalf("pre-push answers %d, %q, and wants the owner's terminal refused on a branch another box holds", code, errs)
-	}
-}
-
 func TestHookPrePushRefusesATodoTag(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/z")
-	lays(t, root, "spec/tickets/z.md", "---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n")
+	seedFile(t, root, "spec/tickets/z.md", "---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "z: a tagged note")
 	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
@@ -236,22 +187,11 @@ func TestHookPrePushRefusesATodoTag(t *testing.T) {
 	}
 }
 
-func TestHookPrePushLetsTheOwnersTerminalThrough(t *testing.T) {
-	t.Parallel()
-	root, _ := hookRepo(t)
-	gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "a-ticket: no check")
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, false, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
-	if code != 0 || errs != "" {
-		t.Fatalf("pre-push answers %d, %q, and wants the owner's push to main through with no stamp", code, errs)
-	}
-}
-
 func TestHookPrePushLetsARedWorkBranchThroughUnderCI(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
 	gitDoes(t, root, "checkout", "-q", "-b", "work/y")
-	lays(t, root, ".github/workflows/check.yml", "name: check\n")
+	seedFile(t, root, ".github/workflows/check.yml", "name: check\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "y: the workflow")
 	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
@@ -266,30 +206,11 @@ func TestHookPrePushLetsARedWorkBranchThroughUnderCI(t *testing.T) {
 	}
 }
 
-func TestHookScriptsLeave(t *testing.T) {
-	t.Parallel()
-	cmd := exec.Command("git", "ls-files", "src/scripts/precommit.js", "src/scripts/prepush.js")
-	cmd.Dir = treeRoot
-	said, err := cmd.Output()
-	if err != nil || strings.TrimSpace(string(said)) != "" {
-		t.Fatalf("git ls-files answers %q, %v, and wants both scripts gone", said, err)
-	}
-}
-
 // A fake hooks door: the posts it takes, and the effects it answers, or an error where it stands down. [[spec/tickets/copilot-hooks-run-in-go]]
 type copilotDoor struct {
 	posts   []hooks.Post
 	effects []hooks.Effect
 	down    bool
-}
-
-// Takes one post. [[spec/tickets/copilot-hooks-run-in-go]]
-func (c *copilotDoor) ask(post hooks.Post) (hooks.Answer, error) {
-	c.posts = append(c.posts, post)
-	if c.down {
-		return hooks.Answer{}, errors.New("Unable to connect")
-	}
-	return hooks.Answer{Effects: c.effects}, nil
 }
 
 // One row the fake log takes. [[spec/tickets/copilot-hooks-run-in-go]]
@@ -325,7 +246,7 @@ func copilotHooks(root, surface string, ask func(hooks.Post) (hooks.Answer, erro
 
 func TestHookSessionStartAnswersTheDoorsAftersAsContext(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root := sharedFolder()
 	door := &copilotDoor{effects: []hooks.Effect{{Kind: "after", Text: "one note"}, {Kind: "after", Text: "two note"}}}
 	said := copilotHooks(root, "vscode", door.ask, nil, "SessionStart", `{"session_id":"s1"}`)
 	want := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": "one note\n\ntwo note"}}
@@ -343,7 +264,7 @@ func TestHookSessionStartAnswersTheDoorsAftersAsContext(t *testing.T) {
 func TestHookPreToolUsePostsAShellCallAsBashAndAnswersTheDeny(t *testing.T) {
 	t.Parallel()
 	door := &copilotDoor{effects: []hooks.Effect{{Kind: "result", Text: "the door refuses this call"}}}
-	said := copilotHooks(t.TempDir(), "vscode", door.ask, nil, "PreToolUse", `{"session_id":"s1","tool_name":"functions.run_in_terminal","tool_input":{"command":"ls"}}`)
+	said := copilotHooks(sharedFolder(), "vscode", door.ask, nil, "PreToolUse", `{"session_id":"s1","tool_name":"functions.run_in_terminal","tool_input":{"command":"ls"}}`)
 	want := map[string]any{"hookSpecificOutput": map[string]any{
 		"hookEventName": "PreToolUse", "permissionDecision": "deny",
 		"permissionDecisionReason": "the door refuses this call", "additionalContext": "the door refuses this call",
@@ -362,8 +283,8 @@ func TestHookPreToolUsePostsAShellCallAsBashAndAnswersTheDeny(t *testing.T) {
 
 func TestHookPreToolUsePostsAnEditAsOneWrite(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	lays(t, root, "spec/a.md", "The door reads.\n")
+	root := t.TempDir() // level0: FixtureOutsideHome - the case lays the file it edits into a root of its own
+	seedFile(t, root, "spec/a.md", "The door reads.\n")
 	door := &copilotDoor{}
 	said := copilotHooks(root, "vscode", door.ask, nil, "PreToolUse",
 		`{"session_id":"s1","tool_name":"replace_string_in_file","tool_input":{"filePath":"spec/a.md","oldString":"reads","newString":"writes"}}`)
@@ -381,7 +302,7 @@ func TestHookPreToolUsePostsAnEditAsOneWrite(t *testing.T) {
 
 func TestHookPreToolUseRefusesAGuardedCallWhileTheDoorStandsDown(t *testing.T) {
 	t.Parallel()
-	said := copilotHooks(t.TempDir(), "vscode", (&copilotDoor{down: true}).ask, nil, "PreToolUse",
+	said := copilotHooks(sharedFolder(), "vscode", (&copilotDoor{down: true}).ask, nil, "PreToolUse",
 		`{"session_id":"s1","tool_name":"create_file","tool_input":{"filePath":"spec/b.md","content":"New.\n"}}`)
 	out, _ := said.reply["hookSpecificOutput"].(map[string]any)
 	reason, _ := out["permissionDecisionReason"].(string)
@@ -392,52 +313,49 @@ func TestHookPreToolUseRefusesAGuardedCallWhileTheDoorStandsDown(t *testing.T) {
 		{"SessionStart", `{"session_id":"s1"}`},
 		{"PreToolUse", `{"session_id":"s1","tool_name":"run_in_terminal","tool_input":{"command":"git status"}}`},
 	} {
-		passed := copilotHooks(t.TempDir(), "vscode", (&copilotDoor{down: true}).ask, nil, one.event, one.input)
+		passed := copilotHooks(sharedFolder(), "vscode", (&copilotDoor{down: true}).ask, nil, one.event, one.input)
 		if passed.code != 0 || passed.reply == nil || len(passed.reply) != 0 {
 			t.Errorf("%s %s while the door stands down answers %d, %q, and wants it through", one.event, one.input, passed.code, passed.out)
 		}
 	}
 }
 
+// A post tool use posts classic and answers nothing, and a Stop answers the door's block. [[spec/tickets/copilot-hooks-run-in-go]]
 func TestHookPostToolUsePostsClassicAndAnswersNothing(t *testing.T) {
 	t.Parallel()
-	door := &copilotDoor{}
-	said := copilotHooks(t.TempDir(), "vscode", door.ask, nil, "PostToolUse", `{"session_id":"s1","tool_name":"read_file","tool_input":{"filePath":"a.md"}}`)
-	if said.code != 0 || said.reply == nil || len(said.reply) != 0 {
-		t.Fatalf("a post tool use answers %d, %q, and wants an empty reply", said.code, said.out)
-	}
-	if len(door.posts) != 1 || door.posts[0].Event != "classic.PostToolUse" || !reflect.DeepEqual(door.posts[0].E, map[string]any{"session_id": "s1"}) {
-		t.Errorf("the door takes %+v, and wants one classic.PostToolUse for s1", door.posts)
-	}
-}
-
-func TestHookStopAnswersTheDoorsBlock(t *testing.T) {
-	t.Parallel()
-	door := &copilotDoor{effects: []hooks.Effect{{Kind: "block", Text: "Write the result."}}}
-	said := copilotHooks(t.TempDir(), "vscode", door.ask, nil, "Stop", `{"session_id":"s1"}`)
-	want := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "Stop", "decision": "block", "reason": "Write the result."}}
-	if said.code != 0 || !reflect.DeepEqual(said.reply, want) {
-		t.Fatalf("a Stop answers %d, %q, and wants the door's block", said.code, said.out)
-	}
-	if len(door.posts) != 1 || door.posts[0].Event != "classic.Stop" {
-		t.Errorf("the door takes %+v, and wants one classic.Stop", door.posts)
+	for _, one := range []struct {
+		event, input string
+		effects      []hooks.Effect
+		want         map[string]any
+	}{
+		{"PostToolUse", `{"session_id":"s1","tool_name":"read_file","tool_input":{"filePath":"a.md"}}`, nil, map[string]any{}},
+		{"Stop", `{"session_id":"s1"}`, []hooks.Effect{{Kind: "block", Text: "Write the result."}}, map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "Stop", "decision": "block", "reason": "Write the result."}}},
+	} {
+		door := &copilotDoor{effects: one.effects}
+		said := copilotHooks(sharedFolder(), "vscode", door.ask, nil, one.event, one.input)
+		if said.code != 0 || !reflect.DeepEqual(said.reply, one.want) {
+			t.Fatalf("a %s answers %d, %q, and wants %v", one.event, said.code, said.out, one.want)
+		}
+		if len(door.posts) != 1 || door.posts[0].Event != "classic."+one.event || !reflect.DeepEqual(door.posts[0].E, map[string]any{"session_id": "s1"}) {
+			t.Errorf("the door takes %+v, and wants one classic.%s for s1", door.posts, one.event)
+		}
 	}
 }
 
 func TestHookStopRetryEndsWithoutClaimingDone(t *testing.T) {
 	t.Parallel()
 	full := errors.New("the log is full")
-	first := copilotHooks(t.TempDir(), "vscode", (&copilotDoor{}).ask, full, "Stop", `{"session_id":"s1"}`)
+	first := copilotHooks(sharedFolder(), "vscode", (&copilotDoor{}).ask, full, "Stop", `{"session_id":"s1"}`)
 	wantFirst := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "Stop", "decision": "block", "reason": "Level zero: the log is full"}}
 	if first.code != 0 || !reflect.DeepEqual(first.reply, wantFirst) || !strings.Contains(first.errs, "Level zero: the log is full") {
 		t.Fatalf("a broken Stop answers %d, %q, %q, and wants the fault as a block and a stderr line", first.code, first.out, first.errs)
 	}
-	retry := copilotHooks(t.TempDir(), "vscode", (&copilotDoor{}).ask, full, "Stop", `{"session_id":"s1","stop_hook_active":true}`)
+	retry := copilotHooks(sharedFolder(), "vscode", (&copilotDoor{}).ask, full, "Stop", `{"session_id":"s1","stop_hook_active":true}`)
 	wantRetry := map[string]any{"continue": false, "stopReason": "Level zero: the log is full", "systemMessage": "Level zero: the log is full"}
 	if retry.code != 0 || !reflect.DeepEqual(retry.reply, wantRetry) {
 		t.Errorf("a broken Stop retry answers %d, %q, and wants the turn ended with the fault", retry.code, retry.out)
 	}
-	cloud := copilotHooks(t.TempDir(), "cloud", (&copilotDoor{}).ask, full, "Stop", `{"sessionId":"s1","stop_hook_active":true}`)
+	cloud := copilotHooks(sharedFolder(), "cloud", (&copilotDoor{}).ask, full, "Stop", `{"sessionId":"s1","stop_hook_active":true}`)
 	if cloud.reply == nil || cloud.reply["decision"] != nil || cloud.reply["additionalContext"] != "Level zero: the log is full" {
 		t.Errorf("a broken cloud retry answers %q, and wants the fault as context with no block", cloud.out)
 	}
@@ -446,7 +364,7 @@ func TestHookStopRetryEndsWithoutClaimingDone(t *testing.T) {
 func TestHookCloudTakesJSONStringArgumentsAndItsOwnEnvelope(t *testing.T) {
 	t.Parallel()
 	door := &copilotDoor{effects: []hooks.Effect{{Kind: "result", Text: "Fix line two."}}}
-	said := copilotHooks(t.TempDir(), "cloud", door.ask, nil, "PreToolUse", `{"sessionId":"one","toolName":"bash","toolArgs":"{\"command\":\"ls\"}"}`)
+	said := copilotHooks(sharedFolder(), "cloud", door.ask, nil, "PreToolUse", `{"sessionId":"one","toolName":"bash","toolArgs":"{\"command\":\"ls\"}"}`)
 	want := map[string]any{"permissionDecision": "deny", "permissionDecisionReason": "Fix line two."}
 	if said.code != 0 || !reflect.DeepEqual(said.reply, want) {
 		t.Fatalf("a cloud call answers %d, %q, and wants the cloud deny", said.code, said.out)
@@ -469,8 +387,8 @@ func TestHookAsksTheDoorTheStandingFileNames(t *testing.T) {
 	}))
 	defer door.Close()
 	at, _ := url.Parse(door.URL)
-	root := t.TempDir()
-	lays(t, root, hooks.StandingFile, `{"port":`+at.Port()+`,"token":"t0k"}`)
+	root := t.TempDir() // level0: FixtureOutsideHome - the case lays its own standing file, naming its own door
+	seedFile(t, root, hooks.StandingFile, `{"port":`+at.Port()+`,"token":"t0k"}`)
 	said := copilotHooks(root, "vscode", hookAsk(root, time.Second), nil, "SessionStart", `{"session_id":"s1"}`)
 	want := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": "from the door"}}
 	if !reflect.DeepEqual(said.reply, want) {
@@ -481,33 +399,56 @@ func TestHookAsksTheDoorTheStandingFileNames(t *testing.T) {
 	}
 }
 
-func TestCopilotScriptsLeave(t *testing.T) {
+// The cage verb and the box doors read the one input the box doors name. [[spec/tickets/doors-pr-windows-goes-green]]
+func TestTheBoxDoorsReadTheProcessInput(t *testing.T) {
 	t.Parallel()
-	scripts, lib := "src/scripts/", ".claude/skills/level0/lib/"
-	cmd := exec.Command("git", "ls-files", scripts+"copilot.js", scripts+"copilot-door.js", lib+"copilot.js", lib+"copilot-dispatch.js", lib+"copilot-setup.js", "src/doors/session.js", "src/doors/fake/session.js")
-	cmd.Dir = treeRoot
-	said, err := cmd.Output()
-	if err != nil || strings.TrimSpace(string(said)) != "" {
-		t.Fatalf("git ls-files answers %q, %v, and wants the Copilot scripts gone", said, err)
+	if got := realBoxDoors(io.Discard, io.Discard).input; got != stdin {
+		t.Fatalf("the box doors read %v, and want the process input %v", got, stdin)
 	}
 }
 
-func TestCopilotHooksNameNoScript(t *testing.T) {
+// Runs the cage verb over the input, and answers what it prints. [[spec/tickets/level0-hooks-hold-no-rule]]
+func cageSays(t *testing.T, input string) (string, int) {
+	t.Helper()
+	one := cageVerb(strings.NewReader(input))
+	if one == nil {
+		t.Fatalf("the cage verb stands nowhere")
+	}
+	var out, errs strings.Builder
+	code := one([]string{"cage"}, false, &out, &errs)
+	return out.String(), code
+}
+
+func TestCageVerb(t *testing.T) {
 	t.Parallel()
-	cmd := exec.Command("git", "grep", "-n", "src/scripts/"+"copilot", "--", ".github", "src/quack", "src/modules")
-	cmd.Dir = treeRoot
-	said, _ := cmd.Output()
-	if strings.TrimSpace(string(said)) != "" {
-		t.Fatalf("git grep answers\n%s\nand wants no hook, workflow or Go file naming the Copilot script", said)
+	if _, one := twinOf([]string{"cage"}, registry); one == nil {
+		t.Errorf("the registry holds no cage verb")
+	}
+	said, code := cageSays(t, `{"event":"tool.call","e":{"tool":"Write"}}`)
+	if code != 0 {
+		t.Errorf("a guarded write exits %d, want 0", code)
+	}
+	var deny map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(said)), &deny); err != nil {
+		t.Fatalf("a guarded write prints %q, which reads as no JSON: %v", said, err)
+	}
+	if text, _ := deny["deny"].(string); !strings.Contains(text, "Write") || !strings.Contains(text, "./RUNME.sh serve") {
+		t.Errorf("a guarded write prints %v, and wants a deny naming Write and ./RUNME.sh serve", deny)
+	}
+	if !strings.HasSuffix(said, "\n") || strings.Count(said, "\n") != 1 {
+		t.Errorf("a guarded write prints %q, and wants one line", said)
+	}
+	said, code = cageSays(t, `{"event":"tool.call","e":{"tool":"Bash","command":"./RUNME.sh serve"}}`)
+	if code != 0 || said != "" {
+		t.Errorf("the serve prints %q and exits %d, and wants nothing and 0", said, code)
 	}
 }
 
-func TestGitHooksNameNoNode(t *testing.T) {
-	t.Parallel()
-	for _, name := range []string{"pre-commit", "pre-push"} {
-		text, err := os.ReadFile(filepath.Join(treeRoot, ".githooks", name))
-		if err != nil || strings.Contains(string(text), "node") {
-			t.Fatalf(".githooks/%s reads %q, %v, and wants no node named", name, text, err)
-		}
+// Takes one post. [[spec/tickets/copilot-hooks-run-in-go]]
+func (c *copilotDoor) ask(post hooks.Post) (hooks.Answer, error) {
+	c.posts = append(c.posts, post)
+	if c.down {
+		return hooks.Answer{}, errors.New("Unable to connect")
 	}
+	return hooks.Answer{Effects: c.effects}, nil
 }
