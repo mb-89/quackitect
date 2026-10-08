@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -237,7 +237,33 @@ record:
         exit: 0
         said: "src/quack/hook_verb.go:47:1 ExampleCovers: ./RUNME.sh hook stands in no example's interface. Write an example under spec"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: f1cf922beca0d5072c8b9a088c2dfe2c21b735c3
+    hash_after: f1cf922beca0d5072c8b9a088c2dfe2c21b735c3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   76.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c7000c127af4f1d1
+        size: 762
+      - name: design/tests-red-2
+        hash: e8c2e2eb7be289ba
+        size: 948
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: javascript-leaves
+reason: done
 ---
 
 # Ask
@@ -528,26 +554,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The bundle, hook and dry probe verbs reach the box through its doors, so their cases run on fakes and the door audit sees every reach. The hook verb builds its hand off one set of box doors, and its config, log and post come from them. The drawing stamp walks the disk door. The clear road and the dry probe read and write the clone through the disk door. No OutsideInDoors marker stands in the five files any more.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-2 names, and main.go for the gate point on the environment the config reads
+- each reach goes through the box doors, and each door has its fake: the fake disk, post, clock and environment
+- hookOn, configOver and logsRowOn each point at this ticket, which names the approach
+- the status bounds stand once as constants, and each door stands once in boxdoors.go
 
 # accept
 
