@@ -1,7 +1,7 @@
 // A closed ticket is history, the way standsClosed and pastHistory in the
 // bridge's findings reader read it, so the rows past it read here alone.
 // [[spec/tickets/bridge-library-leaves]]
-package check
+package check // level0: InPackageTest - reaches the unexported fault, conflictMarkers and pastHistory
 
 import (
 	"reflect"
@@ -19,7 +19,7 @@ func TestAClosedTicketKeepsNoRowButItsConflictMarker(t *testing.T) {
 		"spec/notes/done.md":    closedTicket,
 		"spec/tickets/done.txt": closedTicket,
 	})
-	// A buffer writing the close keeps its rows, because the disk decides.
+	// A buffer writing the close keeps its rows, because the disk decides. [[spec/tickets/bridge-library-leaves]]
 	tree.Holds("spec/tickets/open.md", closedTicket)
 	found := []Finding{
 		fault("SomeRule", "spec/tickets/done.md", 1, "a row on the closed ticket"),

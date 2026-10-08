@@ -1,7 +1,7 @@
 // The reads the git hooks take off this package: the hand of the open take,
 // the stale span, and the marker scan.
 // [[spec/tickets/git-hooks-run-in-go]]
-package branches
+package branches // level0: InPackageTest - reaches the in-package helper staleDefault and the unexported hour
 
 import (
 	"path/filepath"

@@ -1,7 +1,7 @@
 // The route a ticket and a process carry, weighed through the sweep: each nested
 // key, each keyword naming a step, each slot, and the data schema's $ref.
 // [[spec/tickets/schema-libs-leave]]
-package check
+package check // level0: InPackageTest - reaches the unexported schemaFaults and sorted, and holds the helpers schema_test reads
 
 import (
 	"slices"

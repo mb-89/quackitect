@@ -21,21 +21,10 @@ test("fromJson reads the rows the rules-over verb writes, in place order", () =>
       { ...shouted, Message: "s", Severity: "error", Action: { Name: "edit" } },
     ],
   });
-  const read = lib.fromJson(said);
-  assert.deepEqual(
-    read.map((one) => [one.rule, one.line, one.column, one.said]),
-    [
-      ["VoiceShape.Shout", 1, 1, "THIS"],
-      ["Passive", 2, 4, "was"],
-    ],
-  );
-  assert.deepEqual(
-    read.map((one) => [one.file, one.message, one.severity, one.fixable]),
-    [
-      ["notes.md", "s", "error", true],
-      ["notes.md", "m", "warning", false],
-    ],
-  );
+  assert.deepEqual(lib.fromJson(said).map(Object.values), [
+    ["notes.md", "VoiceShape.Shout", 1, 1, "THIS", "s", "error", true],
+    ["notes.md", "Passive", 2, 4, "was", "m", "warning", false],
+  ]);
   assert.deepEqual(lib.fromJson("not json"), []);
 });
 

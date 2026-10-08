@@ -1,7 +1,7 @@
 // The routes this tree ships hold the shape the verbs read: where each opens,
 // who passes each leaf, and what the gates and the asks name.
 // [[spec/tickets/pull-scripts-leave]]
-package pull
+package pull_test
 
 import (
 	"os" // level0: OutsideInDoors - the case reads the retro guidance this tree ships
@@ -10,13 +10,17 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
+// The method root this tree ships, two folders up from the package. [[spec/tickets/pull-scripts-leave]]
+var root, _ = filepath.Abs(filepath.Join("..", ".."))
+
 // The process the tree ships under the name. [[spec/tickets/pull-scripts-leave]]
-func shipped(t *testing.T, name string) Process {
+func shipped(t *testing.T, name string) pull.Process {
 	t.Helper()
-	held, why := ProcessAt(OSDisk{Root: method}, name)
+	held, why := pull.ProcessAt(pull.OSDisk{Root: root}, name)
 	if why != "" {
 		t.Fatalf("the %s route reads no process: %s", name, why)
 	}
@@ -41,7 +45,7 @@ func evidenceNamed(step *yaml.Doc, name string) *yaml.Doc {
 // The retro note under spec/guidance/retro. [[spec/tickets/pull-scripts-leave]]
 func retroNote(t *testing.T, name string) string {
 	t.Helper()
-	said, err := os.ReadFile(filepath.Join(method, "spec", "guidance", "retro", name+".md"))
+	said, err := os.ReadFile(filepath.Join(root, "spec", "guidance", "retro", name+".md"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,8 +55,8 @@ func retroNote(t *testing.T, name string) string {
 func TestTheQuestionRouteOpensAtAStepWaitingForAPerson(t *testing.T) {
 	t.Parallel()
 	front := shipped(t, "question").Said
-	path := StepPathOf(front)
-	if leaf := LeafOf(front, path); path != "answer" || leaf == nil || leaf.By != Person {
+	path := pull.StepPathOf(front)
+	if leaf := pull.LeafOf(front, path); path != "answer" || leaf == nil || leaf.By != pull.Person {
 		t.Fatalf("the question route opens at %q, read %+v, and wants its answer step waiting for a person", path, leaf)
 	}
 }
@@ -60,11 +64,11 @@ func TestTheQuestionRouteOpensAtAStepWaitingForAPerson(t *testing.T) {
 func TestThePersonRouteOpensAtAPersonStepAndAnyHandCarriesOn(t *testing.T) {
 	t.Parallel()
 	front := shipped(t, "person").Said
-	path := StepPathOf(front)
-	if leaf := LeafOf(front, path); path != "do" || leaf == nil || leaf.By != Person {
+	path := pull.StepPathOf(front)
+	if leaf := pull.LeafOf(front, path); path != "do" || leaf == nil || leaf.By != pull.Person {
 		t.Fatalf("the person route opens at %q, read %+v, and wants its do step waiting for a person", path, leaf)
 	}
-	if follow := LeafOf(front, "follow"); follow == nil || follow.By != "anyone" {
+	if follow := pull.LeafOf(front, "follow"); follow == nil || follow.By != "anyone" {
 		t.Fatalf("the follow step reads %+v, and wants any hand to carry the result on", follow)
 	}
 }
@@ -90,30 +94,30 @@ func TestTheStandardRouteGatesTheDesignOnceAndHandsOnToTheRetro(t *testing.T) {
 	t.Parallel()
 	front := shipped(t, "standard").Said
 	paths := []string{}
-	for _, one := range LeavesOf(front) {
+	for _, one := range pull.LeavesOf(front) {
 		paths = append(paths, one.Path)
 	}
 	want := "design/owner-read design/draft design/tests-red gate implement/change implement/tests-green accept view"
 	if got := strings.Join(paths, " "); got != want {
 		t.Fatalf("the standard leaves read %s, and want %s: one gate on the design, then the acceptance and the owner's view", got, want)
 	}
-	gate := LeafOf(front, "gate")
+	gate := pull.LeafOf(front, "gate")
 	if gate.Gate == "" || gate.Not != "design/draft" {
 		t.Fatalf("the gate reads %+v, and wants its question and no review by the draft's author", gate)
 	}
-	draft := LeafOf(front, "design/draft")
+	draft := pull.LeafOf(front, "design/draft")
 	for _, name := range []string{"tests", "size"} {
-		if field := draft.holdsField(name); field == nil || yaml.AsString(field.Get("form")) != "list" {
+		if field := fieldOf(draft, name); field == nil || yaml.AsString(field.Get("form")) != "list" {
 			t.Fatalf("the draft's %s field reads %v, and wants a list, one a line", name, field)
 		}
 	}
 	if len(yaml.Flat(draft.Said.Get("checklist"))) == 0 {
 		t.Fatalf("the draft leaf holds no checklist of its own")
 	}
-	if to := yaml.AsString(LeafOf(front, "implement/tests-green").Said.Get("to")); to != "retro" {
+	if to := yaml.AsString(pull.LeafOf(front, "implement/tests-green").Said.Get("to")); to != "retro" {
 		t.Fatalf("the tests-green leaf hands on to %q, and wants the retro", to)
 	}
-	for _, one := range WalkOf(front) {
+	for _, one := range pull.WalkOf(front) {
 		if one.Path == "implement" {
 			if got := strings.Join(yaml.StringsOf(one.Said.Get("input")), " "); got != "design/draft gate" {
 				t.Fatalf("the code reads %s, and wants the draft and the gate's verdict", got)
@@ -123,7 +127,7 @@ func TestTheStandardRouteGatesTheDesignOnceAndHandsOnToTheRetro(t *testing.T) {
 }
 
 // The evidence field of a leaf under the name, or nil. [[spec/tickets/pull-scripts-leave]]
-func (leaf *Leaf) holdsField(name string) *yaml.Doc {
+func fieldOf(leaf *pull.Leaf, name string) *yaml.Doc {
 	for _, one := range leaf.Evidence {
 		if yaml.AsString(one.Get("name")) == name {
 			return one
@@ -161,7 +165,7 @@ func TestTheRetroRouteEndsOnTheReportThenTheMint(t *testing.T) {
 		t.Fatalf("the retro route ends on %s, and wants check, report and mint", got)
 	}
 	report := stepNamed(steps, "report")
-	if yaml.AsString(report.Get("by")) != Person || yaml.AsString(report.Get("on_fail")) != "check" || yaml.AsString(yaml.AsDoc(yaml.Flat(report.Get("evidence"))[0]).Get("form")) != "verdict" {
+	if yaml.AsString(report.Get("by")) != pull.Person || yaml.AsString(report.Get("on_fail")) != "check" || yaml.AsString(yaml.AsDoc(yaml.Flat(report.Get("evidence"))[0]).Get("form")) != "verdict" {
 		t.Fatalf("the report reads %v, and wants a person's verdict that fails back to the check", report)
 	}
 	if says := yaml.AsString(yaml.AsDoc(yaml.Flat(stepNamed(steps, "check").Get("evidence"))[0]).Get("says")); !strings.Contains(says, "retro matrix") {
@@ -242,7 +246,7 @@ func TestTheStandardRouteAsksForTheViewInTheOwnersWords(t *testing.T) {
 		t.Fatalf("the view ask reads %v, and wants text in the owner's words", view)
 	}
 	last := yaml.AsDoc(held.Route[len(held.Route)-1])
-	if yaml.AsString(last.Get("name")) != "view" || yaml.AsString(last.Get("by")) != Person || yaml.AsString(last.Get("when")) != "view" || yaml.AsString(last.Get("on_fail")) != "implement" {
+	if yaml.AsString(last.Get("name")) != "view" || yaml.AsString(last.Get("by")) != pull.Person || yaml.AsString(last.Get("when")) != "view" || yaml.AsString(last.Get("on_fail")) != "implement" {
 		t.Fatalf("the last step reads %v, and wants the person's view, where the ask names one, failing back to the code", last)
 	}
 }
@@ -261,10 +265,10 @@ func TestTheStandardRouteOpensOnTheOwnersReadOffAHandover(t *testing.T) {
 	if from := stepNamed(held.Ask, "from"); from == nil || yaml.AsString(from.Get("form")) != "text" {
 		t.Fatalf("the from ask reads %v, and wants text", from)
 	}
-	if first := LeavesOf(held.Said)[0].Path; first != "design/owner-read" {
+	if first := pull.LeavesOf(held.Said)[0].Path; first != "design/owner-read" {
 		t.Fatalf("the standard route opens at %s, and wants the owner's read", first)
 	}
-	if read := LeafOf(held.Said, "design/owner-read"); read.By != Person || read.When != "handed" {
+	if read := pull.LeafOf(held.Said, "design/owner-read"); read.By != pull.Person || read.When != "handed" {
 		t.Fatalf("the owner's read reads %+v, and wants a person's step where the ask comes off a handover", read)
 	}
 }

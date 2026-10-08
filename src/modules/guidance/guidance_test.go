@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"quackitect/src/q"
-	"quackitect/src/q/qtest"
 )
 
 const process = `steps:
@@ -23,19 +22,6 @@ const process = `steps:
   - name: gate
     tags: ["review"]
 `
-
-// What the module answers over the files a case seeds. [[spec/design_output/model#the-fake-index]]
-func stepsOver(t *testing.T, files map[string]string) map[string][]Read {
-	t.Helper()
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
-	seeds := map[string]any{}
-	for at, text := range files {
-		seeds["files/"+at] = q.Content{Hash: "h", Text: text}
-	}
-	index.Seed(seeds)
-	said, _ := index.Run(StepsPort).(map[string][]Read)
-	return said
-}
 
 func notesOf(reads []Read) []string {
 	out := []string{}

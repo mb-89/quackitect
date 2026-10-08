@@ -120,7 +120,7 @@ func TestTheClearsTicketsHoldNoPullBackAsATodo(t *testing.T) {
 	}
 }
 
-// The clear's tickets hand back through the tool, off test/level0/tool-call.test.js. [[spec/tickets/verb-outputs-name-index-tools]]
+// The clear's tickets hand back through the tool, and name no shell verb. [[spec/tickets/verb-outputs-name-index-tools]]
 func TestTheClearsTicketsHandBackThroughTheToolAndNameNoShellVerb(t *testing.T) {
 	t.Parallel()
 	it := twoChildren(t)

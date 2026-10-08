@@ -1,7 +1,7 @@
 // A server reads a swap at the path it runs from, and reads the same file as
 // no swap.
 // [[spec/design_output/lsp]]
-package swap
+package swap // level0: InPackageTest - reaches the unexported stat and swapped, and holds fakeServer, which watches_test reads
 
 import (
 	"io/fs"

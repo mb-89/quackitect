@@ -1,7 +1,7 @@
 // The rules over the names the private folder holds, each broken on a tree a case
 // seeds: a spelling names its owner, and the installer moves what the lists say.
 // [[spec/design_input/the-runtime-files-stand-apart]]
-package check
+package check // level0: InPackageTest - reaches the unexported treeFaults, itoa and loopNames
 
 import (
 	"reflect"

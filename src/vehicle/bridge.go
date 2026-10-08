@@ -1,5 +1,5 @@
 // The vehicle a project carries, and the port the register hands it: the
-// roads src/bridge/vehicle.js walks.
+// roads a project takes to reach its vehicle.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 package vehicle
 

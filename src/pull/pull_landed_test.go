@@ -3,7 +3,7 @@
 // refuses the landing, a skip commits the ticket alone, a private note commits
 // nothing, and a desk pushes nothing.
 // [[spec/tickets/pull-scripts-leave]]
-package pull
+package pull // level0: InPackageTest - reaches the in-package helpers cloudPull, pulled and must, and the unexported childTicket
 
 import (
 	"encoding/json"

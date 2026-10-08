@@ -1,7 +1,7 @@
 // The rules weighing one file against another, each broken on a tree a case seeds, then handed the
 // whole seed and read clean. The seed stands for the tracked settings and installer.
 // [[spec/design_output/tree#the-rules-over-two-files]]
-package check
+package check // level0: InPackageTest - reaches the unexported rules it breaks, such as biomeOnWindows and settingsNameBinaries
 
 import (
 	"path/filepath"

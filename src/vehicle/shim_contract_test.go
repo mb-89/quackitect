@@ -7,65 +7,16 @@ package vehicle
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 )
-
-const (
-	shimName     = "acme"
-	shimID       = "abc123"
-	shimUpstream = "https://host/a/b.git"
-	shimSays     = "#!/usr/bin/env sh\nprintf \"argv=%s\\n\" \"$*\"\nprintf \"work=%s\\n\" \"$SE_WORK_ROOT\"\n"
-)
-
-// A stub holding the real shim and its record, and a home with no vehicle in it. [[spec/design_output/vehicle#the-record-names-the-vehicle]]
-func shimStub(t *testing.T) (where, stub string) {
-	t.Helper()
-	where, err := filepath.EvalSymlinks(t.TempDir())
-	if err != nil {
-		t.Fatal(err)
-	}
-	shim, err := os.ReadFile(filepath.Join("..", "stub", "RUNME.sh"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	stub = filepath.Join(where, "stub")
-	seed(t, stub, map[string]string{
-		"RUNME.sh":     string(shim),
-		"vehicle.json": `{"vehicle": "` + shimID + `", "name": "` + shimName + `", "upstream": "` + shimUpstream + `"}`,
-	})
-	return where, stub
-}
 
 // A vehicle of one script at the folder named. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 func shimVehicle(t *testing.T, at string) string {
 	t.Helper()
 	seed(t, at, map[string]string{"RUNME.sh": shimSays})
 	return at
-}
-
-// Runs the shim in the stub with the variables named over the box's own, and answers its exit code, stdout and stderr. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
-func runShim(t *testing.T, stub string, env map[string]string, argv ...string) (int, string, string) {
-	t.Helper()
-	cmd := exec.Command("sh", append([]string{"RUNME.sh"}, argv...)...)
-	cmd.Dir = stub
-	cmd.Env = os.Environ()
-	for key, value := range env {
-		cmd.Env = append(cmd.Env, key+"="+value)
-	}
-	var out, errs strings.Builder
-	cmd.Stdout, cmd.Stderr = &out, &errs
-	code := 0
-	if err := cmd.Run(); err != nil {
-		failed, ok := err.(*exec.ExitError)
-		if !ok {
-			t.Fatal(err)
-		}
-		code = failed.ExitCode()
-	}
-	return code, out.String(), errs.String()
 }
 
 // A path as sh prints it, in either slash, read without case, since pwd -W answers a drive letter on Windows. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]

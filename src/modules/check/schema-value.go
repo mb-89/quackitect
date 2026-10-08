@@ -51,7 +51,7 @@ func holds(allowed []any, said any) bool {
 	return false
 }
 
-// Whether two values match, a list item by item and a map never. [[spec/design_output/schema#a-finding-names-the-section]]
+// Whether two values match: two lists item by item, two scalars by type and value, and a map reads as false. [[spec/design_output/schema#a-finding-names-the-section]]
 func same(a, b any) bool {
 	one, ours := a.([]any)
 	two, theirs := b.([]any)

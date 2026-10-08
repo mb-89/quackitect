@@ -19,24 +19,19 @@ func TestEachLayerParsesOffItsFile(t *testing.T) {
 			t.Fatalf("config/%s reads %+v", path, got)
 		}
 	}
-}
-
-func TestAFilePastBothLayersRunsNothing(t *testing.T) {
-	c := q.New()
-	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
-	Registers(c)
-	if err := q.NewStore(c).Run("config/spec/other.json"); err == nil {
-		t.Fatal("config/spec/other.json runs")
+	if err := index.Store().Run("config/spec/other.json"); err == nil {
+		t.Fatal("config/spec/other.json runs, though it stands past both layers")
 	}
 }
 
-// A module declaring weight, and reading it as the input of its score. [[spec/design_output/model#config-comes-off-the-registrations]]
+// A module declaring weight and a nested key, and reading weight as the input of its score. [[spec/design_output/model#config-comes-off-the-registrations]]
 type weightIn struct {
 	Weight int `q:"config/weight"`
 }
 
 func weighed(c *q.Catalog) {
 	q.CfgIn(c, "weight", 1, q.Doc("how much a ticket weighs"))
+	q.CfgIn(c, "stop/after", 1, q.Doc("the seconds before a stop"))
 	q.DerivedIn(c, "score", 0, func(in weightIn) int { return in.Weight }, q.Doc("the weight a ticket scores"))
 }
 
@@ -91,9 +86,13 @@ func lands(t *testing.T, ix *qtest.Index, change Change) {
 // [[spec/design_output/model#the-config-module]]
 func TestADeclaredKeyReadsItsInstanceConfigAsInput(t *testing.T) {
 	ix := layered(t, "queue", weighed)
-	ix.Seed(files(`{"queue": {"weight": 3}}`, `{}`))
+	ix.Seed(files(`{"queue": {"weight": 3, "stop": {"after": 4}}}`, `{}`))
 	if got := settles(t, ix, "queue/config/weight", "queue/score"); got != 3 {
 		t.Fatalf("queue/score reads %v off queue/config/weight", got)
+	}
+	// A key of two segments reads its nested member. [[spec/design_output/model#config-comes-off-the-registrations]]
+	if got := settles(t, ix, "queue/config/stop/after"); got != 4 {
+		t.Fatalf("queue/config/stop/after reads %v off the nested file", got)
 	}
 }
 
@@ -147,32 +146,13 @@ func TestASharedKeyReadsTheDefaultFileAlone(t *testing.T) {
 	ix := layered(t, "migration", switched)
 	ix.Seed(files(`{"migration": {"switch": 1}}`, `{"migration": {"switch": 2}}`))
 	ix.Seed(map[string]any{"env/SE_MIGRATION_SWITCH": "4"})
+	// The tracked file reaches a shared key through the waves alone, with no run a case names. [[spec/tickets/index-reads-loaded-projections]]
+	if got := ix.Read("migration/config/switch"); got != 1 {
+		t.Fatalf("migration/config/switch reads %v before any run, where the tracked file says 1", got)
+	}
 	lands(t, ix, Change{Kind: Opens, Handle: "a", Holder: "s1", Values: map[string]string{"migration/config/switch": "5"}})
 	lands(t, ix, Change{Kind: Overrides, Values: map[string]string{"migration/config/switch": "6"}})
 	if got := settles(t, ix, "migration/config/switch"); got != 1 {
 		t.Fatalf("migration/config/switch reads %v, not the default file's value", got)
-	}
-}
-
-// A module declaring a key of two segments, which a layer file nests. [[spec/design_output/model#config-comes-off-the-registrations]]
-func nested(c *q.Catalog) {
-	q.CfgIn(c, "stop/after", 1, q.Doc("the seconds before a stop"))
-}
-
-// A key of two segments reads its nested member. [[spec/design_output/model#config-comes-off-the-registrations]]
-func TestANestedKeyReadsItsNestedMember(t *testing.T) {
-	ix := layered(t, "queue", nested)
-	ix.Seed(files(`{"queue": {"stop": {"after": 4}}}`, `{}`))
-	if got := settles(t, ix, "queue/config/stop/after"); got != 4 {
-		t.Fatalf("queue/config/stop/after reads %v off the nested file", got)
-	}
-}
-
-// The tracked file reaches a shared key through the waves alone, with no run a case names. [[spec/tickets/index-reads-loaded-projections]]
-func TestValuesReadTheTrackedFile(t *testing.T) {
-	ix := layered(t, "migration", switched)
-	ix.Seed(files(`{"migration": {"switch": 3}}`, `{}`))
-	if got := ix.Read("migration/config/switch"); got != 3 {
-		t.Fatalf("migration/config/switch reads %v, where the tracked file says 3", got)
 	}
 }

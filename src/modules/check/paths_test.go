@@ -1,7 +1,7 @@
 // The path a rule scopes on: a glob one folder deep, a double star reading
 // past it, and the underscore parking a draft.
 // [[spec/design_output/level0#the-path-a-rule-reads]]
-package check
+package check // level0: InPackageTest - reaches the unexported matches and isDraft
 
 import "testing"
 

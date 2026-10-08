@@ -1,7 +1,7 @@
 // The table a chapter holds where its schema names one: the heads it opens
 // with, and each row naming an item of the chapter it follows, in order.
 // [[spec/tickets/schema-libs-leave]]
-package check
+package check // level0: InPackageTest - reaches the unexported checkNote and mintSchema
 
 import (
 	"strings"

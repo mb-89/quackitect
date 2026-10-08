@@ -2,23 +2,9 @@
 // under the method root where none stands, the owner's word, and the cloud
 // variables.
 // [[spec/tickets/pull-scripts-leave]]
-package pull
+package pull // level0: InPackageTest - reaches the unexported boxFile, sessionFile, cloudVars and workRoot, and the home's methodHolding
 
-import (
-	"os" // level0: OutsideInDoors - the case seeds a method root of its own on disk, as the hand reads it
-	"path/filepath"
-	"testing"
-)
-
-// A method root on this box holding the identity. [[spec/tickets/pull-scripts-leave]]
-func methodHolding(t *testing.T, id string) string {
-	t.Helper()
-	root := t.TempDir()
-	at := filepath.Join(root, filepath.FromSlash(identity))
-	must(t, os.MkdirAll(filepath.Dir(at), 0o755))
-	must(t, os.WriteFile(at, []byte(`{"id":"`+id+`"}`), 0o644))
-	return root
-}
+import "testing"
 
 func TestAWorkRootWithNoBoxFileTakesTheIdentityUnderTheMethodRoot(t *testing.T) {
 	t.Parallel()
@@ -42,7 +28,7 @@ func TestTheBoxIDReadsTheBoxFileThenTheIdentityAndWritesNothing(t *testing.T) {
 		t.Fatalf("the box id reads %q, and wants the identity where no box file stands", got)
 	}
 	bare := FakeDisk{}
-	if got := (&It{Disk: bare, Root: workRoot, Method: t.TempDir()}).BoxIDHere(); got != "" || bare.Exists(boxFile) {
+	if got := (&It{Disk: bare, Root: workRoot, Method: bareMethod(t)}).BoxIDHere(); got != "" || bare.Exists(boxFile) {
 		t.Fatalf("the box id reads %q, and wants nothing read and no box file written", got)
 	}
 }

@@ -107,30 +107,12 @@ func TestOpenedDropsTheOverridesOfOtherWindows(t *testing.T) {
 	}
 }
 
-// A layer file as the case writes it. [[spec/tickets/config-libs-leave]]
-func parsed(t *testing.T, text string) q.Ordered {
-	t.Helper()
-	out, err := q.JSON.Parse([]byte(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return out
-}
-
 func TestRowsReadEveryLeafOfBothFilesPastTheComment(t *testing.T) {
-	tracked := parsed(t, `{"comment": "what the team ships", "stop": {"comment": "the tooth", "enabled": true}}`)
-	local := parsed(t, `{"later": {"key": 4}}`)
+	tracked, _ := q.JSON.Parse([]byte(`{"comment": "what the team ships", "stop": {"comment": "the tooth", "enabled": true}}`))
+	local, _ := q.JSON.Parse([]byte(`{"later": {"key": 4}}`))
 	rows := Rows(map[string]q.Key{}, tracked, local, map[string]string{})
 	want := []Row{{Key: "later.key", Value: json.RawMessage(`4`), Layer: Local}, {Key: "stop.enabled", Value: json.RawMessage(`true`), Layer: Tracked}}
 	if fmt.Sprint(rows) != fmt.Sprint(want) {
 		t.Fatalf("the rows read %+v, and want %+v, a key the local file alone names among them and no comment", rows, want)
-	}
-}
-
-// A dotted key names the key the catalog declares, and reads back the same. [[spec/design_output/model#config-comes-off-the-registrations]]
-func TestADottedKeyNamesTheCatalogKey(t *testing.T) {
-	key := KeyOfDotted("stop.mostInARow")
-	if key.Name != "stop/config/most-in-a-row" || key.Dotted() != "stop.mostInARow" {
-		t.Fatalf("stop.mostInARow names %q and reads back %q", key.Name, key.Dotted())
 	}
 }

@@ -1,6 +1,6 @@
 // Whether a hand works a leaf: one answer for the pull and the write door.
 // [[spec/tickets/the-one-answer-takes-shape]]
-package pull
+package pull // level0: InPackageTest - reaches the unexported handRule, writesHere and helper
 
 import (
 	"strings"

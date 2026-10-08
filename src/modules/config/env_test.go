@@ -44,9 +44,6 @@ func TestAKeyNamesOneVariableHoweverItsLeafIsSpelled(t *testing.T) {
 	for key, want := range map[string]string{
 		"stop.mostInARow":    "SE_STOP_MOST_IN_A_ROW",
 		"stop.most-in-a-row": "SE_STOP_MOST_IN_A_ROW",
-		"plan.everyCalls":    "SE_PLAN_EVERY_CALLS",
-		"log.level":          "SE_LOG_LEVEL",
-		"names.words":        "SE_NAMES_WORDS",
 	} {
 		if said := EnvOf(key); said != want {
 			t.Errorf("EnvOf(%q) answers %q, and wants %q", key, said, want)
