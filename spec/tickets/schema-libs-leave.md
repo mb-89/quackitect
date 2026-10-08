@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["engine-and-doors-leave", "tree-libs-leave"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: d12e682d5468fd5d
         size: 531
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7af54ed788b68eac17d57d5a4a76fe138f158fb1
+    hash_after: 1d9c5c4800a04afd48df32e1915cc19aa337c1e9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: c70846da0c1716dc
+        size: 15506
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -376,26 +389,55 @@ Assumed: TestATodoStandsBeforeTheRowItNames in src/modules/queue holds the order
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/schema_libs_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/schema_libs_test.go
+- src/quack/minted_golden_test.go
+- src/quack/shipped_schemas_test.go
+- src/modules/check/route_test.go
+- src/modules/check/schema_test.go
+- src/modules/check/table_test.go
+- src/modules/check/paths_test.go
+- src/yaml/yaml_test.go
+- src/note/note_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestTheSchemaLibrariesStandNowhere fails on its assertion and names every leaving library, door and test.
+TestNoTestImportsALeavingSchemaFile names drawing-page, guidance-tags, process, schema, lens-actions, lens-v1 and v1-index.
+Every new check case fails on its assertion, since the sweep answers nothing past the top keys. These are the nested keys, the step paths, the record, the slots, the ref, the data schema, the nested chapters and the table.
+In paths_test, the zero-folder double star row fails, and the other glob rows pass.
+TestReadLinesNamesEveryKeyByItsPath fails against the ReadLines stub, which answers nil.
+TestADocMarshalsItsKeysInOrder fails because a Doc marshals as an empty object today.
+TestTheFrontHoldsTheLineOfEveryNestedKey fails on its assertion.
+TestEveryFrontGoldenMatchesTheReader and TestEveryShippedRouteMintsItsGolden stay red, since neither golden file exists yet.
+The two golden writers skip unless the update flag is set, as their drawn twin does. One update run of the minted writer turned its checker green, and the file left again afterwards.
+TestTheTicketSchemaTakesFixAndBlessAsBooleans fails on the nested bless row alone.
+These ported rows pass now because Go already holds them: the departure shape, the underscore, the write door RelativeTo, the todo rows, writesHere and the retro backlog.
+The shipped schema cases also pass, other than bless, and so do all six word list cases.
+Surprise one: check.SlugOf already stands exported, so approach line 15 has no work left.
+Surprise two: the write door holds a second RelativeTo beside the one in check.
+Surprise three: the note test reads its golden through os.ReadFile, since an embed of a missing file breaks the build.
+Surprise four: routeSchema and routedSchema already exist in check tests, so the new schema takes the name ticketRouteSchema.
+The ReadLines stub is the only production change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+TestTheSchemaLibrariesStandNowhere decides both git ls-files lines. The new check, note and yaml tests decide the go test line, and the check at tests-green decides the last.
+The tests reach no door. Check cases seed Texts in memory, and quack cases read the tree through Glob and ReadFile with no exec.
 
 # gate
 

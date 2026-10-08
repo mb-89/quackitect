@@ -133,6 +133,24 @@ func (leaf *Leaf) holdsField(name string) *yaml.Doc {
 	return nil
 }
 
+// [[spec/tickets/the-retro-reads-the-backlog]]
+func TestTheRetroRouteHoldsBacklogAfterAudit(t *testing.T) {
+	t.Parallel()
+	steps := shipped(t, "retro").Route
+	names := []string{}
+	for _, one := range steps {
+		names = append(names, yaml.AsString(yaml.AsDoc(one).Get("name")))
+	}
+	at := strings.Index(strings.Join(names, " "), "audit backlog")
+	backlog := stepNamed(steps, "backlog")
+	if at < 0 || yaml.AsString(backlog.Get("input")) != "audit" || yaml.AsString(stepNamed(steps, "chapter").Get("input")) != "backlog" {
+		t.Fatalf("the retro route reads %v, and wants backlog after audit, reading it, and feeding the chapter", names)
+	}
+	if says := yaml.AsString(yaml.AsDoc(yaml.Flat(backlog.Get("evidence"))[0]).Get("says")); !strings.Contains(says, "retro backlog") {
+		t.Fatalf("the backlog says %q, and wants it to name the retro backlog", says)
+	}
+}
+
 func TestTheRetroRouteEndsOnTheReportThenTheMint(t *testing.T) {
 	t.Parallel()
 	steps := shipped(t, "retro").Route

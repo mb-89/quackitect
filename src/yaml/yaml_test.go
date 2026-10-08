@@ -1,6 +1,10 @@
 package yaml
 
-import "testing"
+import (
+	"encoding/json"
+	"reflect"
+	"testing"
+)
 
 const schemaYaml = `# a comment the reader skips
 kind: handover
@@ -76,6 +80,27 @@ func TestReadYamlKeepsTheOrder(t *testing.T) {
 		if key != want[i] {
 			t.Fatalf("the keys read %v", said.Keys())
 		}
+	}
+}
+
+// [[spec/design_output/schema#a-line-per-nested-key]]
+func TestReadLinesNamesEveryKeyByItsPath(t *testing.T) {
+	said, lines := ReadLines("steps:\n  - name: do\n    evidence:\n      - name: lint\n\n        form: command\nstate: open\n")
+	want := map[string]int{"steps": 1, "steps[0]": 2, "steps[0].name": 2, "steps[0].evidence": 3, "steps[0].evidence[0]": 4, "steps[0].evidence[0].name": 4, "steps[0].evidence[0].form": 6, "state": 7}
+	if !reflect.DeepEqual(lines, want) {
+		t.Errorf("the lines read %v, and want %v", lines, want)
+	}
+	if AsString(AsDoc(said).Get("state")) != "open" || len(AsList(AsDoc(said).Get("steps"))) != 1 {
+		t.Errorf("the line reader answers %#v, and wants the map Read answers", said)
+	}
+}
+
+// [[spec/tickets/schema-libs-leave]]
+func TestADocMarshalsItsKeysInOrder(t *testing.T) {
+	said := AsDoc(Read("b: 1\na:\n  - x\n  - c: true\n    d: [one, two]\n"))
+	got, err := json.Marshal(said)
+	if want := `{"b":1,"a":["x",{"c":true,"d":["one","two"]}]}`; err != nil || string(got) != want {
+		t.Errorf("the doc marshals %s (%v), and wants %s", got, err, want)
 	}
 }
 

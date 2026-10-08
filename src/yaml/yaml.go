@@ -84,6 +84,11 @@ func Read(text string) any {
 	return block(rows, one, rows[0].indent)
 }
 
+// [[spec/design_output/schema#a-line-per-nested-key]]
+func ReadLines(text string) (any, map[string]int) {
+	return nil, nil
+}
+
 func block(rows []row, one *cursor, indent int) any {
 	if strings.HasPrefix(rows[one.at].said, "- ") {
 		return listAt(rows, one, indent)
