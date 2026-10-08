@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 908215df2f5f3c67
         size: 1972
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 2f461e12905976e9633716f41a6b96449c8422ce
+    hash_after: 6e95814eb1e9f821195fdb7d3c9f5502713fafdf
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -357,14 +366,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, plus the check.go comment the gate named.
+- EnablePlugin reads and writes through the vehicle disk door, and the verb table runs it on temp roots, and the contract case on a fake binary.
+- Each new Go function points at a-stub-names-its-vehicle in the level zero design note.
+- The settings names stand in src/vehicle/pure.go alone, the quack names alias them, and each design note points at the Go owner.
 
 ## tests-green
 
