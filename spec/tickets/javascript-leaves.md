@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,18 @@ record:
     hand: box ba1101ec7b2d · claude-code-remote
     hash_before: 6874c8da30449f545047f80ea571f5e52d68741c
     session: cse_01Vzgwb5Dc586imx6m8Gnoyt
+  - step: split
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: e28e0354facf6833323ec9cc2e0dbb351328bf8c
+    hash_after: e28e0354facf6833323ec9cc2e0dbb351328bf8c
+    inputs:
+      - name: ask
+        hash: 232bc1595e9752ed
+        size: 1445
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -142,14 +154,54 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/boot-span-outlives-start-js]] trivial
+- [[spec/tickets/branch-scripts-leave]] standard
+- [[spec/tickets/bridge-library-leaves]] standard
+- [[spec/tickets/cage-libs-leave]] standard
+- [[spec/tickets/cold-comments-name-go-owner]] trivial
+- [[spec/tickets/config-libs-leave]] standard
+- [[spec/tickets/copilot-hooks-run-in-go]] standard
+- [[spec/tickets/copilot-mutations-take-wholeafter]] trivial
+- [[spec/tickets/doors-move-beside-their-users]] trivial
+- [[spec/tickets/engine-and-doors-leave]] standard
+- [[spec/tickets/extension-imports-stay-inside]] standard
+- [[spec/tickets/git-hooks-run-in-go]] standard
+- [[spec/tickets/guidance-lib-leaves]] standard
+- [[spec/tickets/hook-finds-the-exe-binary]] trivial
+- [[spec/tickets/hook-holds-gate-every-push]] trivial
+- [[spec/tickets/hook-markers-reuse-land-check]] trivial
+- [[spec/tickets/javascript-rows-name-each-file]] trivial
+- [[spec/tickets/level0-hooks-forward-to-go]] standard
+- [[spec/tickets/lint-cut-on-group-ticket]] trivial
+- [[spec/tickets/logbook-test-leaves-level0-lib]] trivial
+- [[spec/tickets/plugin-libs-leave]] standard
+- [[spec/tickets/probe-verb-drops-script-comments]] trivial
+- [[spec/tickets/probes-leave-node]] standard
+- [[spec/tickets/pull-scripts-leave]] standard
+- [[spec/tickets/quack-reaches-through-box-doors]] standard
+- [[spec/tickets/recovers-cases-share-one-table]] trivial
+- [[spec/tickets/remaining-js-names-its-reason]] standard
+- [[spec/tickets/schema-libs-leave]] standard
+- [[spec/tickets/scripts-folder-leaves]] standard
+- [[spec/tickets/se-front-leaves]] standard
+- [[spec/tickets/session-start-leaves-node]] standard
+- [[spec/tickets/stop-folder-keeps-runner]] trivial
+- [[spec/tickets/stub-settings-shim-runs-in-go]] standard
+- [[spec/tickets/test-lines-stay-under-code]] standard
+- [[spec/tickets/ticket-scripts-leave]] standard
+- [[spec/tickets/tree-libs-leave]] standard
+- [[spec/tickets/vale-drops-hook-scripts]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is one slice or one fix, small enough to review whole
+- the children cover every inventory row under Discussion, and the two drafts take the dead se-front binary and the quack verbs past their doors
+- no open child waits on another: both drafts stand on code the closed children already switched
 
 # children
 
