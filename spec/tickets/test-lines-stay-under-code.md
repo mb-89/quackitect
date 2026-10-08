@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -157,6 +157,15 @@ record:
         hash: 6568a71d0caae0ac
         size: 1045
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 17491c0187fda9a98b16c2c0617742318889430e
+    hash_after: 7c3bdb74bdb0656804a1cf83605f0fc67538c873
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -397,14 +406,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, plus contract/sidebar.test.js and pull.md, which pinned or named files that leave.
+- The lines part runs on the check's doors, and its test on their fakes.
+- check_lines.go points at rule six of the test guidance.
+- One table in check_lines.go owns the languages, and tests.md points there.
 
 ## tests-green
 
