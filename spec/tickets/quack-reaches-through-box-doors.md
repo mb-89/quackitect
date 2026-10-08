@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 965aca16ed5ff388
         size: 494
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 225da84707812ee47a8d19295e33b5ef00cf993c
+    hash_after: 225da84707812ee47a8d19295e33b5ef00cf993c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 445d03daa0755edf
+        size: 2849
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -231,26 +244,31 @@ The registered twins still hand the real doors through realBoxDoors, so nothing 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/bundle_verb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The stamp cases now seed and read the fake disk the box doors hand. Two cases fail on their assertions: a move in an imported package reads fresh, since the verb hashes the real disk, and no stamp stands beside the binary on the fake disk, since the verb writes the real one. Nothing surprised me: the bundle and stamp cases already held fake doors, and only their seeding reached the real disk.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when line meets go test over src/owns and src/imports with the markers gone, and these cases fail until the verbs read through the doors
+- the tests reach the disk and the runner, and both have fakes: newFakeDisk and fakeRunner
 
 # gate
 

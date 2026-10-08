@@ -147,7 +147,7 @@ func TestTheInsetLoadsTheDrawingFromInsideTheExtension(t *testing.T) {
 func stampBox(t *testing.T) (boxDoors, *fakeRunner) {
 	t.Helper()
 	d, runner, _, _ := fakeBoxDoors(t)
-	seedTree(t, d.root, map[string]string{
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{
 		"go.mod":         "module quackitect\n\ngo 1.24\n",
 		"go.sum":         "",
 		"src/quack/m.go": "package main\n",
@@ -184,7 +184,7 @@ func TestTheSourceStampReadsFreshAfterAWriteAndStaleOnceASourceMoves(t *testing.
 		{"a move in go.sum reads stale", map[string]string{"go.sum": "a v1 h1:x\n"}, []string{"fresh", "se-index"}, 1},
 	}
 	for _, one := range steps {
-		seedTree(t, d.root, one.moves)
+		hq1SeedDisk(t, d.disk, d.root, one.moves)
 		if code := stampVerb(d, one.argv); code != one.want {
 			t.Fatalf("%s: stamp %s answers %d, and wants %d", one.name, strings.Join(one.argv, " "), code, one.want)
 		}
@@ -200,7 +200,7 @@ func TestTheStampReadsTheFilesGoListsForTheBinaryNamed(t *testing.T) {
 		if at < 0 || runner.ran[at][len(runner.ran[at])-1] != one.pkg || runner.opts[at].cwd != d.root {
 			t.Errorf("%s: the stamp ran %v, and wants go list -deps over %s under the root", one.binary, runner.ran, one.pkg)
 		}
-		if !stands(filepath.Join(d.root, ".se", ".runtime", "bin", "."+one.binary+"-source")) {
+		if _, err := d.disk.stat(filepath.Join(d.root, ".se", ".runtime", "bin", "."+one.binary+"-source")); err != nil {
 			t.Errorf("%s: no stamp stands beside the binary", one.binary)
 		}
 	}
