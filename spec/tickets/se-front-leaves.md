@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 7527fa3724b4672b
         size: 600
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: bcb2924c11da126ec667fd59a6eb18e9d70b8581
+    hash_after: dd3f2dbb983ee1d4742405ec8550b29f3160e9a6
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/stamp_verb.go:15:1 ExampleCovers: ./RUNME.sh stamp stands in no example's interface. Write an example under sp"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -324,14 +333,19 @@ The approach answers the ask. The red case in TestTheStampVerbRefusesAWordOrBina
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint install.sh src/quack/stamp_verb.go src/branches/review.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the ask names: src/front/cmd leaves, install.sh, the stamp verb, the review worktree, the guard baselines, and spec/design_output/lsp.md, whose build chapter now names index_here alone.
+The change reaches the disk door and the process door, and the stamp verb's cases run on the box's fake disk.
+The stamp verb's header points at spec/design_output/lsp#the-build-beside-the-index, which names the approach.
+The stamp fact stands in lsp.md alone, and install.sh points at that section.
 
 ## tests-green
 
