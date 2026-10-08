@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -132,6 +132,19 @@ record:
         hash: 283da134d28cade9
         size: 373
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 4e9e106c506f7089c85d744e19d33330e235b575
+    hash_after: 5e35fa775b57a4648c224816a191979d10bb833b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 241e02b0d2b87535
+        size: 6760
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -289,26 +302,34 @@ Assumed: no route reaches the archive and naming cases of log.test.js, so they l
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/plugin_libs_test.go src/quack/install_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/plugin_libs_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestThePluginLibrariesHoldTheValeLibraryAlone fails on its assertion and names apply, folders, hash, index-tools, index, log, pull, review, runs, tools and undo.
+TestEveryBuiltBinaryRebuildsWhenItsSourceMovesAhead passes today. It reads install.sh and holds every binary in stampPackages to a stamp fresh case.
+Surprise one: test/contract/install.test.js holds no rebuilt case any more, since scripts-folder-leaves dropped it. Approach line twelve reads stale, and tools.test.js holds the last two readers of rebuilt.
+Surprise two: src/quack/stamp_verb.go owns the rebuild decision, and its fake-door tests already stand, so the new test covers the install wiring alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- TestThePluginLibrariesHoldTheValeLibraryAlone decides line one, go test ./src/modules/... line two, and ./RUNME.sh check at tests-green line three.
+- Both tests read tracked files and reach no door, so no fake applies.
 
 # gate
 
