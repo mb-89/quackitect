@@ -43,6 +43,17 @@ func JSONText(said any) string {
 	return string(body)
 }
 
+// A value as text: nothing for nil, a string as it stands, and anything else as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func ScalarText(said any) string {
+	if said == nil {
+		return ""
+	}
+	if text, ok := said.(string); ok {
+		return text
+	}
+	return fmt.Sprint(said)
+}
+
 // A field's value as text: nothing for nil, a list or an object as its JSON, and a scalar as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
 func FieldText(said any) string {
 	switch one := said.(type) {

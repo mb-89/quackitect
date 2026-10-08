@@ -8,7 +8,6 @@ import (
 	"errors"
 	"strings"
 
-	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks/write"
 	"quackitect/src/yaml"
 )
@@ -60,9 +59,9 @@ func EventOf(input map[string]any, event, surface string) (CopilotEvent, error) 
 	if named, ok := copilotNames[event]; ok {
 		event = named
 	}
-	tool := check.TextOf(firstOf(input, "tool_name", "toolName"))
+	tool := yaml.ScalarText(firstOf(input, "tool_name", "toolName"))
 	return CopilotEvent{
-		Event: event, Surface: surface, Session: check.TextOf(firstOf(input, "session_id", "sessionId")),
+		Event: event, Surface: surface, Session: yaml.ScalarText(firstOf(input, "session_id", "sessionId")),
 		Tool: tool[strings.LastIndex(tool, ".")+1:], Args: args, Retry: yaml.Truthy(input["stop_hook_active"]),
 	}, nil
 }
@@ -103,7 +102,7 @@ func PostedAs(event string) string {
 // The Claude calls one Copilot tool call stands for: a shell call as Bash, an edit as one Write a changed file, and any other tool as itself. [[spec/tickets/copilot-hooks-run-in-go]]
 func CallsOf(event CopilotEvent, read func(path string) (string, error)) ([]map[string]any, error) {
 	if shellTools[event.Tool] {
-		return []map[string]any{{"tool": bashTool, "command": check.TextOf(event.Args["command"])}}, nil
+		return []map[string]any{{"tool": bashTool, "command": yaml.ScalarText(event.Args["command"])}}, nil
 	}
 	changed, err := write.Mutations(event.Tool, event.Args, read)
 	if err != nil {
@@ -172,10 +171,10 @@ func copilotStep(said Answer) ([]string, CopilotResult) {
 			}
 			fields, _ := one.Result.(map[string]any)
 			if fields["deny"] != nil {
-				return nil, CopilotResult{Deny: check.TextOf(fields["deny"])}
+				return nil, CopilotResult{Deny: yaml.ScalarText(fields["deny"])}
 			}
 			if fields["block"] != nil {
-				return nil, CopilotResult{Block: check.TextOf(fields["block"])}
+				return nil, CopilotResult{Block: yaml.ScalarText(fields["block"])}
 			}
 			return nil, CopilotResult{}
 		case blockKind:

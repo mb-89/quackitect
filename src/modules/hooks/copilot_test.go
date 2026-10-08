@@ -68,6 +68,9 @@ func TestCopilotEventKeepsTheLastToolName(t *testing.T) {
 			t.Errorf("cloud arguments %v read %+v, %v, and want the path on one", args, event, err)
 		}
 	}
+	if numbered, err := EventOf(map[string]any{"tool_name": "edit", "session_id": 7}, "PreToolUse", "vscode"); err != nil || numbered.Session != "7" {
+		t.Errorf("a numbered session reads %+v, %v, and wants the session as its text", numbered, err)
+	}
 	if stop, err := EventOf(map[string]any{"stop_hook_active": true}, "agentStop", "vscode"); err != nil || stop.Event != "Stop" || !stop.Retry {
 		t.Errorf("a repeated agent stop reads %+v, %v, and wants a Stop retry", stop, err)
 	}

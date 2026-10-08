@@ -8,6 +8,19 @@ import (
 	"testing"
 )
 
+// Nil reads as nothing, a string as it stands, and any other value as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func TestScalarTextReadsEachKind(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		said any
+		want string
+	}{{nil, ""}, {"a word", "a word"}, {3, "3"}, {true, "true"}} {
+		if got := ScalarText(one.said); got != one.want {
+			t.Errorf("ScalarText(%#v) answers %q, and wants %q", one.said, got, one.want)
+		}
+	}
+}
+
 // Nil, false, a zero, NaN and the empty string read false, and every other value reads true. [[spec/tickets/shared-helpers-stand-once]]
 func TestTruthyReadsEachKind(t *testing.T) {
 	t.Parallel()

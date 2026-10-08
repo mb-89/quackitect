@@ -59,7 +59,6 @@ var (
 	SurveyFindsNode          = surveyFindsNode
 	SurveyNamesInstalls      = surveyNamesInstalls
 	TextFaults               = textFaults
-	TextOf                   = textOf
 	Textual                  = textual
 	UnreasonedIn             = unreasoned
 	Walked                   = walked
