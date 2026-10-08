@@ -1,8 +1,12 @@
 // The cloud read over either variable, where a flat value reads false.
 // [[spec/tickets/cage-libs-leave]]
-package command
+package command_test
 
-import "testing"
+import (
+	"testing"
+
+	"quackitect/src/modules/hooks/command"
+)
 
 // [[spec/guidance/cloud/cloud]]
 func TestInCloudReadsEitherVariableAndAFlatValueReadsFalse(t *testing.T) {
@@ -20,8 +24,8 @@ func TestInCloudReadsEitherVariableAndAFlatValueReadsFalse(t *testing.T) {
 		{map[string]string{"SE_CLOUD": ""}, false},
 		{map[string]string{}, false},
 	} {
-		if got := InCloud(func(name string) string { return one.env[name] }); got != one.want {
-			t.Errorf("InCloud over %v reads %v, and wants %v", one.env, got, one.want)
+		if got := command.InCloud(func(name string) string { return one.env[name] }); got != one.want {
+			t.Errorf("command.InCloud over %v reads %v, and wants %v", one.env, got, one.want)
 		}
 	}
 }

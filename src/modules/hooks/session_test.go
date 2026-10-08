@@ -2,7 +2,7 @@
 // the old pull hook: the id and the harness, and nothing
 // where the start names no id.
 // [[spec/tickets/level0-hooks-forward-to-go]]
-package hooks
+package hooks // level0: InPackageTest - reaches the in-package helpers treeOf and holdDoor, and the unexported sessionFile
 
 import (
 	"encoding/json"

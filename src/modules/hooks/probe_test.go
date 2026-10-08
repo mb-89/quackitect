@@ -1,8 +1,8 @@
-// The reply probe at the door, off the cases test/level0/reply-hook.test.js
+// The reply probe at the door, off the cases the old reply hook
 // held: the main agent's first call after a marked prompt lands in the session
 // log as the probe's row, and no other call does.
 // [[spec/tickets/level0-hooks-forward-to-go]]
-package hooks
+package hooks // level0: InPackageTest - reaches the in-package helpers treeOf, holdDoor and hooks, and the unexported sessionLog
 
 import (
 	"encoding/json"

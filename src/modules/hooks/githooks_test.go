@@ -1,11 +1,9 @@
 // The git hooks' rules over taught git reads: the version delete, the hold on
 // every push, the stale hold a take moves, the unchecked tip and the marker.
 // [[spec/tickets/git-hooks-run-in-go]]
-package hooks
+package hooks // level0: InPackageTest - reaches the in-package helpers taughtGit and treeOf
 
 import (
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -32,13 +30,7 @@ func ghLine(branch, sha string) string {
 // A root holding the box file, and the git reads of work/x held by another box with its tip at the time. [[spec/tickets/git-hooks-run-in-go]]
 func ghHeld(t *testing.T, tipHand string, at time.Time) (string, map[string]string) {
 	t.Helper()
-	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, ".se", ".runtime"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(root, ".se", ".runtime", "box.json"), []byte(`{"id":"myb0x"}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	root := treeOf(t, map[string]string{".se/.runtime/box.json": `{"id":"myb0x"}`}, "")
 	return root, map[string]string{
 		"show origin/work/x:spec/tickets/x.md": ghTicket(ghOther),
 		"log -1 --format=%ct origin/work/x":    strconv.FormatInt(at.Unix(), 10),
@@ -48,7 +40,7 @@ func ghHeld(t *testing.T, tipHand string, at time.Time) (string, map[string]stri
 
 func TestPrePushRefusesAVersionDelete(t *testing.T) {
 	t.Parallel()
-	said := New(Outside{Git: taughtGit(nil)}).PrePush(t.TempDir(), Push{Refs: "(delete) " + ghZeros + " refs/heads/v1 " + ghTip + "\n"})
+	said := New(Outside{Git: taughtGit(nil)}).PrePush(treeOf(t, nil, ""), Push{Refs: "(delete) " + ghZeros + " refs/heads/v1 " + ghTip + "\n"})
 	if !strings.HasPrefix(said, "v1 is a version branch, and this command would delete it.") {
 		t.Fatalf("pre-push answers %q, and wants the delete of v1 refused", said)
 	}
@@ -79,7 +71,7 @@ func TestPrePushLetsAStaleHoldMoveByTheTake(t *testing.T) {
 
 func TestPrePushRefusesAnAgentsTipPastTheCheck(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root := treeOf(t, nil, "")
 	said := New(Outside{Git: taughtGit(nil)}).PrePush(root, Push{Refs: ghLine("work/y", ghTip), Agent: true})
 	if !strings.HasPrefix(said, "work/y takes a push the check has passed, and no check has run here.") {
 		t.Fatalf("pre-push answers %q, and wants an agent's unchecked tip refused", said)
@@ -93,7 +85,7 @@ func TestPrePushRefusesAnAgentsTipPastTheCheck(t *testing.T) {
 func TestPrePushPassesAnAgentsBeatAndRescueWhereNoCheckRan(t *testing.T) {
 	t.Parallel()
 	for _, branch := range []string{"beats/x", "rescue/x"} {
-		if said := New(Outside{Git: taughtGit(nil)}).PrePush(t.TempDir(), Push{Refs: ghLine(branch, ghTip), Agent: true}); said != "" {
+		if said := New(Outside{Git: taughtGit(nil)}).PrePush(treeOf(t, nil, ""), Push{Refs: ghLine(branch, ghTip), Agent: true}); said != "" {
 			t.Fatalf("pre-push answers %q, and wants an agent's push to %s through on no stamp", said, branch)
 		}
 	}
@@ -119,7 +111,7 @@ func TestPrePushReadsTheHoldsBeatBeforeItsTip(t *testing.T) {
 func TestPreCommitRefusesAMarker(t *testing.T) {
 	t.Parallel()
 	delta := "diff --git a/b.md b/b.md\n--- a/b.md\n+++ b/b.md\n@@ -0,0 +3 @@\n+<<<<<<< ours\n"
-	said := New(Outside{Git: taughtGit(map[string]string{"diff --cached --unified=0": delta})}).PreCommit(t.TempDir(), Settings{})
+	said := New(Outside{Git: taughtGit(map[string]string{"diff --cached --unified=0": delta})}).PreCommit(treeOf(t, nil, ""), Settings{})
 	if !strings.Contains(said, "b.md:3  a conflict marker") {
 		t.Fatalf("pre-commit answers %q, and wants the marker refused by file and line", said)
 	}

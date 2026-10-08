@@ -1,7 +1,7 @@
 // What the door picks off the transcript rows a post carries: the prompt's
 // before, and a spoke post's last texts, its text and its rows.
 // [[spec/tickets/level0-hooks-forward-to-go]]
-package hooks
+package hooks // level0: InPackageTest - reaches the in-package helpers doorOver and hooks, and the unexported promptEvent and spokeEvent
 
 import (
 	"reflect"

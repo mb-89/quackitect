@@ -1,6 +1,6 @@
-// The handover marks the door writes off the stops fold's answer, off marksDue,
-// dropsDue and dropsClear in src/bridge/handover.js, and the hand a retro hold
-// meets, off HandOf in src/pull/pull_holds.go.
+// The handover marks the door writes off the stops fold's answer: the due
+// mark, its drops and the clear. The hand a retro hold meets reads off HandOf
+// in src/pull/pull_holds.go.
 // [[spec/tickets/cage-stop-marks-port]]
 package hooks
 
@@ -90,7 +90,7 @@ func (d *Door) marks(session, root string) {
 	}
 }
 
-// Each clear held turns into the read, keeping every other field, as readsNext in src/bridge/handover.js wrote it. [[spec/tickets/the-clear-hands-back-the-leaf]]
+// Each clear held turns into the read, keeping every other field. [[spec/tickets/the-clear-hands-back-the-leaf]]
 func readsNext(tree disk) {
 	for _, name := range tree.List(holdsFolder) {
 		at := holdsFolder + "/" + name

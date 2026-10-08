@@ -143,7 +143,7 @@ func TestTheDeskGuardRefusesAWorkBranchOffTheCloudAlone(t *testing.T) {
 	} {
 		d := &Door{}
 		d.from.Git = taughtGit(map[string]string{"rev-parse --abbrev-ref HEAD": one.branch})
-		said := d.deskGuard("git commit -m x", t.TempDir(), Settings{Cloud: one.cloud})
+		said := d.deskGuard("git commit -m x", treeOf(t, nil, ""), Settings{Cloud: one.cloud})
 		if refused := strings.Contains(said, "lands nowhere on "+one.branch); refused != one.refuses {
 			t.Errorf("the desk guard over %s, cloud %v, says %q, and wants a refusal %v", one.branch, one.cloud, said, one.refuses)
 		}

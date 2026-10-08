@@ -1,10 +1,12 @@
 // The version guard over every write a command makes to a version branch.
 // [[spec/tickets/cage-libs-leave]]
-package command
+package command_test
 
 import (
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks/command"
 )
 
 // [[spec/design_output/work#a-version-branch-stands]]
@@ -26,15 +28,15 @@ func TestTheVersionGuardReadsEveryVersionWrite(t *testing.T) {
 		{"git branch -D v4-recovered", "", ""},
 		{"git branch -D voice-recovered", "", ""},
 	} {
-		said := VersionGuard(one.command)
+		said := command.VersionGuard(one.command)
 		if one.name == "" {
 			if said != "" {
-				t.Errorf("VersionGuard(%q) says %q, and wants nothing", one.command, said)
+				t.Errorf("command.VersionGuard(%q) says %q, and wants nothing", one.command, said)
 			}
 			continue
 		}
 		if want := one.name + " is a version branch, and this command would " + one.how + " it."; !strings.HasPrefix(said, want) {
-			t.Errorf("VersionGuard(%q) says %q, and wants it to open on %q", one.command, said, want)
+			t.Errorf("command.VersionGuard(%q) says %q, and wants it to open on %q", one.command, said, want)
 		}
 	}
 }
