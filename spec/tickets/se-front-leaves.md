@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 3d97752189303e3ba25f1ecb2e0265b4ea773fde
+    hash_after: 3d97752189303e3ba25f1ecb2e0265b4ea773fde
+    inputs:
+      - name: ask
+        hash: 437e98549d4660fd
+        size: 570
+      - name: [[spec/tickets/schema-libs-leave]]
+        hash: d12e682d5468fd5d
+        size: 531
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -157,38 +169,76 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Delete src/front/cmd, and every builder of the binary drops it:
+
+- install.sh: front_here, get_front and the se-front arm of wanted, missed, here, why, get and the install loop leave.
+- src/quack/stamp_verb.go: stampPackages holds se-index alone, and its usage line names se-index alone.
+- src/branches/review.go: builds holds se-index alone.
+- spec/design_output/review.md: the row on the worktree's se-front build names the se-index build alone.
+- src/pull/edit.go: the comment naming se-front names the front package.
+- src/imports/baseline: the blackbox and purity rows of src/front/cmd leave through ./RUNME.sh guards --update.
+
+The src/front package stays, since src/pull and src/quack call it as a library. A box that already holds the old binary keeps a stray file under .se/.runtime/bin, which nothing runs.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- install.sh here, get, why, missed and wanted, which call front_here and get_front
+- src/quack/stamp_verb.go stampVerb, which reads stampPackages
+- src/quack/bundle_verb_test.go TestEveryBuiltBinaryRebuildsWhenItsSourceMovesAhead and TestTheStampReadsTheFilesGoListsForTheBinaryNamed, which read stampPackages
+- src/branches/review.go the worktree build, which reads builds
+- src/branches/port_f_review_test.go, which asserts the worktree's se-front
+- src/quack/session_start_test.go, whose skip lists name se-front
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go TestTheStampVerbRefusesAWordOrBinaryItKnowsNot, which takes a case refusing stamp fresh se-front
+- git ls-files src/front/cmd and git grep -n se-front over install.sh, stamp_verb.go and review.go decide the first two done_when lines
+- ./RUNME.sh check decides the third
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- install.sh
+- src/front/cmd/door.go
+- src/front/cmd/main.go
+- src/front/cmd/main_test.go
+- src/front/cmd/owns.yaml
+- src/quack/stamp_verb.go
+- src/quack/bundle_verb_test.go
+- src/quack/session_start_test.go
+- src/branches/review.go
+- src/branches/port_f_review_test.go
+- src/pull/edit.go
+- spec/design_output/review.md
+- src/imports/baseline/blackbox.txt
+- src/imports/baseline/purity.txt
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened install.sh, stamp_verb.go, review.go, edit.go, the review design note and each test naming se-front, and a git grep finds no road running the binary
+- the callers list names every reader of stampPackages, builds and the install's front functions
+- each done_when line names the command or test deciding it
+- the approach adds no config key
 
 ## tests-red
 
