@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["engine-and-doors-leave", "tree-libs-leave"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 839ab9fc1cab1fab
         size: 2586
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 9c7eb03ea1ef3d69dd7082e1d2c8257526b423b9
+    hash_after: b9c46cc40de6058fbfba53602e395bd15ed95227
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -471,14 +480,19 @@ accept. The approach answers the ask, and a red test decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, and the notes the ported rules now catch.
+- The write door and the note readers take their fakes, and the goldens stand in testdata.
+- Each new Go function names this ticket.
+- Each design note points at the Go owner of the rule it names.
 
 ## tests-green
 
