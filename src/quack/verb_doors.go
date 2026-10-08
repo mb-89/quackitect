@@ -21,7 +21,7 @@ const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"
 	walkLine       = "%s:%d:%d: %s\n"
-	markedWalk     = "%s:%d:%d %s stands marked: %s\n"
+	markedWalk     = "%s stands marked: %s"
 	contractLine   = "%s keeps the contract of %s\n"
 	outsideLine    = "%s stands inside %s, its own outside\n"
 	walksRefused   = "A walk-around reaches past its door. Reach it through the door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"
@@ -129,7 +129,7 @@ func walksOver(root string, out, errs io.Writer) int {
 		for _, one := range owns.Walks(rel, text, doors) {
 			switch {
 			case one.Marked:
-				fmt.Fprintf(out, markedWalk, rel, one.Line, one.Column, one.Name, one.Reason)
+				fmt.Fprintln(out, check.NoticeLine(rel, one.Line, one.Column, fmt.Sprintf(markedWalk, one.Name, one.Reason)))
 			default:
 				refused++
 				fmt.Fprintf(errs, walkLine, rel, one.Line, one.Column, one.Says())
