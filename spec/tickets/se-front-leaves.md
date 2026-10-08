@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: "src/quack/stamp_verb.go:15:1 ExampleCovers: ./RUNME.sh stamp stands in no example's interface. Write an example under sp"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 9370892f0534c82b24de9adbd5a7994bf9036864
+    hash_after: 9370892f0534c82b24de9adbd5a7994bf9036864
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   80.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7527fa3724b4672b
+        size: 600
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -354,26 +377,33 @@ The stamp fact stands in lsp.md alone, and install.sh points at that section.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack src/branches
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The se-front binary leaves: src/front/cmd goes, and install.sh, the stamp verb and the review worktree build the index binary alone. The src/front package stays as the library Go code reads. The guard baselines drop the rows of the deleted files, and the build chapter of the lsp design note names index_here alone. A binary no road ran cost every fresh box a build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the ask names, the guard baselines its deletion moves, and the lsp note naming the install's stamp.
+The stamp verb reaches the disk and the process through the box doors, and its cases run on their fakes.
+The stamp verb's header points at spec/design_output/lsp#the-build-beside-the-index.
+The stamp fact stands in lsp.md alone, and install.sh points at that section.
 
 # accept
 
