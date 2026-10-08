@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: d17ce41170ddc790
         size: 6505
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 4a599c6e92cc8bd2fba8b10fae5cc2c956b2c485
+    hash_after: 166f24f6f253eff548c9175a15b19970b4451fb9
+    inputs:
+      - name: design/draft
+        hash: d17ce41170ddc790
+        size: 6505
+      - name: design/tests-red
+        hash: 908215df2f5f3c67
+        size: 1972
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -332,8 +344,9 @@ Surprise three: the standing contract tests pass with the node block in place, s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -404,3 +417,11 @@ Surprise three: the standing contract tests pass with the node block in place, s
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate accepts, and implement carries these points:
+
+- Keep settingsFile, settingsLocalFile, portBase, vehiclePointer and pluginFolder as aliases of the vehicle constants. hookprobe_test.go, doctor_verb.go, doctor_verb_test.go, check.go, check_test.go and probe_cold.go read them, and change nowhere then.
+- Point the comment in src/quack/check.go naming vehicle.js at Pointer in src/vehicle/pure.go.
+- The gate fixed three test gaps: the no-node test walks all of src/stub, the enable table holds a stale-path row, and a contract case holds the fallback where the binary fails. That case passes today, and guards the change.
+- A vehicle with no built binary enables on the second shim call, since the first call's exec builds the binary. The approach takes that cost over a second install on every call.
+- The enabledPlugins shape stays the private note enabled-plugins-shape, which the retro decides.
