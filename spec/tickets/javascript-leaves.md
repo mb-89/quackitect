@@ -147,6 +147,25 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: ed326bc9d6d75d0c2d46e53b6480967ddb12973a
+    hash_after: ed326bc9d6d75d0c2d46e53b6480967ddb12973a
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/javascript-leaves already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 232bc1595e9752ed
+        size: 1445
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -238,7 +257,7 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 <!-- the form is verdict -->
 
 accept with points
-- unloaded-js-readers-leave: .claude/skills/level0/lib/vale.js and src/engine/tools.js stand loaded by their own tests alone, as their rows in the doors note say. Delete each with its test and its row, and point the Go comments naming them at their Go owners.
+- level0-note-drops-faultin: spec/design_output/level0.md, section 'A broken rule says so', names faultIn in lib/vale.js, which unloaded-js-readers-leave deleted; name the code that stops ./RUNME.sh lint on a broken rule now, or cut the line
 
 # retro
 
