@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: 241e02b0d2b87535
         size: 6760
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 4b097140abc9e39ef4298075e3cc654e0f592795
+    hash_after: 4b097140abc9e39ef4298075e3cc654e0f592795
+    inputs:
+      - name: design/draft
+        hash: 241e02b0d2b87535
+        size: 6760
+      - name: design/tests-red
+        hash: 07b7e015895bd976
+        size: 1052
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -338,8 +350,9 @@ Surprise two: src/quack/stamp_verb.go owns the rebuild decision, and its fake-do
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
