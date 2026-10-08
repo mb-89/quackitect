@@ -128,6 +128,25 @@ record:
     hand: the engine
     hash_before: 3ea664748c13ab37b2ca22629a369e5cc1922be3
     hash_after: 3ea664748c13ab37b2ca22629a369e5cc1922be3
+  - step: accept
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 6e67e6dfe9c240cc885dbd8743d27c1508a26c5a
+    hash_after: 6e67e6dfe9c240cc885dbd8743d27c1508a26c5a
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/javascript-leaves already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 232bc1595e9752ed
+        size: 1445
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -216,8 +235,10 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- unloaded-js-readers-leave: .claude/skills/level0/lib/vale.js and src/engine/tools.js stand loaded by their own tests alone, as their rows in the doors note say. Delete each with its test and its row, and point the Go comments naming them at their Go owners.
 
 # retro
 
