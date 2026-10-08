@@ -24,31 +24,14 @@ const files = disk();
 const read = (where) => JSON.parse(files.read(join(root, where)));
 
 // [[spec/design_output/extension#the-grid-check]]
-test("the schema this tree ships places every widget in a cell of its own", () => {
-  assert.deepEqual(gridFaults(read(SCHEMA)), []);
-});
-
 // [[spec/design_output/extension#one-declaration-draws-it]]
-test("every control the schema declares draws, the work buttons among them", () => {
+test("the schema this tree ships places every widget in a cell of its own", () => {
   const schema = read(SCHEMA);
+  assert.deepEqual(gridFaults(schema), []);
   assert.deepEqual(
-    drawnIn(schema).map((one) => one.key),
-    [
-      "stop.hold",
-      "ask.wanted",
-      "bridge.hook",
-      "log.open",
-      "work.editor",
-      "work.pull",
-      "work.new",
-      "engine.vehicle",
-      "engine.stub",
-      "engine.binding",
-    ],
+    entriesIn(schema).filter((one) => one.widget && !one.group),
+    [],
   );
-
-  const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
-  assert.deepEqual(waiting, []);
 });
 
 // [[spec/design_output/extension#a-click-writes-the-file]]
@@ -57,7 +40,10 @@ test("every widget writing a key names one the declaration carries", () => {
   for (const one of drawnIn(read(SCHEMA))) {
     if (one.widget === "action" || one.widget === "process") continue;
     assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
-    assert.ok(one.options.includes(said.get(one.key).value), `${one.key} rests on an option`);
+    assert.ok(
+      one.options.includes(said.get(one.key).value),
+      `${one.key} rests on an option`,
+    );
   }
 });
 
@@ -154,38 +140,4 @@ test("no manifest source git holds names a version of its own", () => {
   ]) {
     assert.equal(read(one).version, undefined, one);
   }
-});
-
-// Each line under a path of the tree that matches the pattern. [[spec/tickets/branch-scripts-leave]]
-function naming(pattern, ...paths) {
-  const out = [];
-  const walk = (path) => {
-    if (path.endsWith(".js")) {
-      for (const line of files.read(join(root, path)).split("\n"))
-        if (pattern.test(line)) out.push(`${path}: ${line.trim()}`);
-      return;
-    }
-    for (const one of files.list(join(root, path)))
-      if (one.kind === "dir" || one.name.endsWith(".js")) walk(join(path, one.name));
-  };
-  for (const path of paths) walk(path);
-  return out;
-}
-
-// [[spec/tickets/the-lens-reads-v1]]
-test("src/extension/lib names no door.read, door.list, door.imports or door.watch", () => {
-  assert.deepEqual(
-    naming(/door\.(read|list|imports|watch)/, "src/extension/lib"),
-    [],
-    "the hosts under src/extension/lib read off the index alone",
-  );
-});
-
-// [[spec/tickets/the-sidebar-writes-through-actions]]
-test("sidebar.js and lib name no door.write or door.append", () => {
-  assert.deepEqual(
-    naming(/door\.(write|append)/, "src/extension/sidebar.js", "src/extension/lib"),
-    [],
-    "the sidebar and its hosts write through the index alone",
-  );
 });

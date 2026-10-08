@@ -503,8 +503,8 @@ word outside the vocabulary where it judges the finding false. The lint keeps
 those findings, so a verb reading through `readsProse` lets a line through that
 the lint names later.
 
-A contract case in `test/contract/process.test.js` mints a ticket off every
-route under `spec/processes`, and real Vale reads it. A line a route writes
+A contract case in `src/modules/lsp/rules_contract_test.go` reads a ticket
+minted off every route under `spec/processes`, and real Vale reads it. A line a route writes
 carries no finding there, so a verb minting off a route meets no refusal over
 the route's own words.
 

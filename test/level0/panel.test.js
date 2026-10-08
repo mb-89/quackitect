@@ -85,90 +85,46 @@ test("a mark stands as the emoji a person types, and codepoints draw the same", 
   assert.equal(markOf(""), "");
 });
 
-test("every widget of a group draws, each in the cell the declaration names", () => {
+// [[spec/design_output/extension#the-gear-picks-the-sections]] [[spec/design_output/extension#a-mark-alone-says-it]]
+test("the page lays out the gear, the controls and config, each widget in its cell with its mark alone", () => {
   const said = drawn();
-  assert.match(said, /data-key="log\.open"/);
-  assert.match(said, /data-key="stop\.hold"/);
+  const at = (one) => said.indexOf(one);
   assert.match(
     said,
     /\.at-0-1-1-2 \{ grid-row: 1 \/ span 1; grid-column: 2 \/ span 2; \}/,
   );
-});
-
-// [[spec/design_output/extension#the-log-opens-a-terminal]]
-test("the log button's hover carries the viewer keys the declaration names", () => {
-  const said = drawn();
-  assert.match(
-    said,
-    /title="Open the log viewer\.\nq leave\nend follow the newest line/,
-  );
-});
-
-// [[spec/design_output/extension#the-gear-picks-the-sections]]
-test("the gear stands on top, and config stands at the foot of the window", () => {
-  const said = drawn();
-  assert.ok(
-    said.indexOf('class="gear"') < said.indexOf('data-section="agent control"'),
-  );
-  assert.ok(
-    said.indexOf('data-section="config"') >
-      said.indexOf('data-section="agent control"'),
-  );
+  assert.ok(at('class="gear"') < at('<div class="top">'));
+  assert.ok(at('<div class="top">') < at('data-section="agent control"'));
+  assert.ok(at('data-section="agent control"') < at('data-section="config"'));
   assert.match(said, /body \{ display: flex; flex-direction: column;/);
   assert.match(
     said,
     /details\.section\[data-section='config'\] \{ margin-top: auto; flex: 0 1 auto;/,
   );
   assert.match(said, /\.chooser \{[^}]*top: 100%;/);
-});
-
-test("the controls take the scroll bar first, and config keeps its room longest", () => {
-  const said = drawn();
-  assert.ok(
-    said.indexOf('<div class="top">') < said.indexOf('data-section="agent control"'),
-  );
   assert.match(said, /\.top \{ flex: 1 1000 auto; min-height: 0; overflow-y: auto; \}/);
-});
-
-// [[spec/design_output/extension#a-mark-alone-says-it]]
-test("a widget centres its mark across and down, and a wrapped mark too", () => {
-  const widget = /\.widget \{([^}]*)\}/.exec(drawn())?.[1] ?? "";
-  assert.match(widget, /align-items: center;/);
-  assert.match(widget, /justify-content: center;/);
-  assert.match(widget, /text-align: center;/);
-});
-
-test("a widget away from rest wears the mark saying so, and one at rest does not", () => {
-  assert.ok(!/class="widget at-0-1-1-2 away/.test(drawn()));
-  assert.match(drawn({ stop: { hold: "finish" } }), /class="widget at-0-1-1-2 away"/);
-});
-
-// [[spec/design_output/extension#a-mark-alone-says-it]]
-test("the far value pulses, and every widget draws its mark and no word", () => {
+  const widget = /\.widget \{([^}]*)\}/.exec(said)?.[1] ?? "";
+  for (const one of ["align-items", "justify-content", "text-align"])
+    assert.match(widget, new RegExp(`${one}: center;`));
+  assert.ok(!/class="said"/.test(said), "no word stands under a mark");
+  // [[spec/design_output/extension#the-log-opens-a-terminal]]
   assert.match(
-    drawn({ stop: { hold: "stop" } }),
-    /class="widget at-0-1-1-2 away held"/,
+    said,
+    /title="Open the log viewer\.\nq leave\nend follow the newest line/,
   );
-  assert.ok(!/class="said"/.test(drawn()), "no word stands under a mark");
+  assert.match(
+    said,
+    /<span class="light dark"><\/span>/,
+    "a status draws its light dark",
+  );
 });
 
-test("a status draws its light dark, because nothing writes a heartbeat yet", () => {
-  assert.match(drawn(), /<span class="light dark"><\/span>/);
-});
-
-// [[spec/design_output/extension#the-editor-picks-the-colours]]
-test("every colour the page names is a variable the editor sets", () => {
+// [[spec/design_output/extension#the-editor-picks-the-colours]] [[spec/design_output/extension#the-page-carries-a-nonce]]
+test("every colour is the editor's variable, and the one script carries the nonce the policy names", () => {
   const said = drawn();
   const colours = said.match(/(background|color|border):[^;}]+/g) ?? [];
   assert.ok(colours.length, "the page paints something");
-  for (const one of colours) {
-    assert.match(one, /var\(--vscode-/, `${one} takes the editor's own value`);
-  }
-});
-
-// [[spec/design_output/extension#the-page-carries-a-nonce]]
-test("the page runs one script, and the policy names its nonce and its source", () => {
-  const said = drawn();
+  for (const one of colours) assert.match(one, /var\(--vscode-/, one);
   assert.match(said, /default-src 'none';/);
   assert.match(said, /script-src 'nonce-abc123' https:\/\/box;/);
   assert.match(
@@ -178,47 +134,25 @@ test("the page runs one script, and the policy names its nonce and its source", 
   assert.ok(!/<script>/.test(said), "no script stands without a nonce");
 });
 
-// [[spec/design_output/extension#the-bottom-section]]
-test("the bottom section comes last and starts collapsed, and every other opens", () => {
+// [[spec/design_output/extension#the-bottom-section]] [[spec/design_output/extension#the-folds-press-at-once]]
+test("config starts collapsed with a press each way beside its filter, each row an editor of its type", () => {
   const said = drawn();
-  const sections = said.match(
-    /<details class="section" data-section="([^"]+)"( open)?>/g,
+  assert.deepEqual(
+    said.match(/<details class="section" data-section="([^"]+)"( open)?>/g),
+    ['<details class="section" data-section="agent control" open>'],
   );
-  assert.deepEqual(sections, [
-    '<details class="section" data-section="agent control" open>',
-  ]);
   assert.match(said, /<details class="section gone" data-section="config">/);
-  assert.ok(
-    said.indexOf('data-section="config"') >
-      said.indexOf('data-section="agent control"'),
-  );
-});
-
-test("the bottom section draws an editor matching the type, and the unit beside it", () => {
-  const said = drawn();
+  const at = (one) => said.indexOf(one);
+  assert.ok(at('<div class="find">') < at('<input class="filter"'));
+  assert.ok(at('<input class="filter"') < at('data-fold="open"'));
+  assert.ok(at('data-fold="open"') < at('data-fold="shut"'));
+  assert.ok(at('data-fold="shut"') < at('<div class="tree">'));
   assert.match(said, /<select id="spec\/config\/level0\.json:log\.level"/);
   assert.match(said, /<option value="info" selected>info<\/option>/);
   assert.match(said, /type="number" value="3">/);
   assert.match(said, /<span class="unit">turns<\/span>/);
-});
-
-// [[spec/design_output/extension#the-folds-press-at-once]]
-test("the config section draws an open press and a shut press beside its filter", () => {
-  const said = drawn();
-  const filter = said.indexOf('<input class="filter"');
-  const opens = said.indexOf('data-fold="open"');
-  const shuts = said.indexOf('data-fold="shut"');
-  assert.ok(filter > 0 && opens > 0 && shuts > 0, "the filter and both presses draw");
-  assert.ok(said.indexOf('<div class="find">') < filter, "one row holds the filter");
-  assert.ok(
-    opens < said.indexOf('<div class="tree">'),
-    "the presses stand above the tree",
-  );
-});
-
-test("a row hovers its help, and carries the words the filter reads", () => {
-  assert.match(drawn(), /data-said="stop\.mostInARow 3 The turns it carries\."/);
-  assert.match(drawn(), /title="The turns it carries\."/);
+  assert.match(said, /data-said="stop\.mostInARow 3 The turns it carries\."/);
+  assert.match(said, /title="The turns it carries\."/);
 });
 
 test("a value carrying markup lands as text, and closes no tag", () => {

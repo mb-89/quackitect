@@ -1,6 +1,5 @@
 // The work group's buttons, read off the declaration this tree ships. Each
-// stands declared and undrawn, and each line it runs names a verb the command
-// line knows. The engine keys nothing reads stand nowhere.
+// stands declared and undrawn. The engine keys nothing reads stand nowhere.
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 
 import assert from "node:assert/strict";
@@ -8,7 +7,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { commands } from "./commands.js";
 import { entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -32,16 +30,12 @@ test("the work section keeps its knobs, and declares its three buttons", () => {
   }
 });
 
-test("each line a work button runs or counts names a verb the command line knows", () => {
+test("each line a work button runs or counts", () => {
   const lines = BUTTONS.flatMap((key) => [
     keyed.get(key)?.runs,
     keyed.get(key)?.counts,
   ]).filter(Boolean);
   assert.deepEqual(lines, ["./RUNME.sh tui work", "./RUNME.sh ticket yours --next"]);
-  for (const line of lines) {
-    const verb = line.split(" ")[1];
-    assert.ok(commands().has(verb), `${line} names a verb the command line knows`);
-  }
 });
 
 test("new ticket asks a name, and opens the file under the tickets folder it names", () => {

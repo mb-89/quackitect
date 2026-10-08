@@ -44,8 +44,8 @@ reads. `.vale.ini` names each one in a section, beside the doors and their
 fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`test/contract/outside-in-doors.test.js` drives Vale over the name of each
-file, so a section a hand writes meets its case.
+`src/modules/lsp/rules_contract_test.go` drives Vale over a probe under each
+path a section names, so a section a hand writes meets its case.
 
 # A raw run keeps bytes
 
@@ -120,8 +120,8 @@ one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 
 Other contract tests stand there too, because they drive a real thing as well.
-`vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
-config and the session file this tree tracks.
+The prose rules run through Vale itself in
+`src/modules/lsp/rules_contract_test.go`, under the contract tag.
 
 | door | real | fake | contract suite |
 |---|---|---|---|
@@ -255,19 +255,15 @@ The lsp move touches no git, so it stands apart from that order.
 
 A rule asserted against a stub is a rule nobody runs, so a case proving a
 rule reaches Vale. A case spawning the binary a line costs the battery a
-minute under load, and a red under that load names no cause. So one helper,
-`test/contract/ruled.js`, is the one place a rule test reaches Vale:
+minute under load, and a red under that load names no cause. So one table,
+`src/modules/lsp/rules_contract_test.go`, is the one place a rule test reaches
+Vale:
 
-| what a file does | what the helper does |
+| what a row names | what the table does |
 |---|---|
-| hands the runner a case body the helper builds over the case's texts, at the top | writes every text under the path it names, each in a folder of its own |
-| reads the findings a text by key inside the case | runs Vale once over the folder, on the first case |
-| asks for the fixer | runs the fixer twice more over the folder, and reads each text back after each round |
+| a path, a text, a rule, and whether it fires | writes every text under its path, each in a folder of its own, over a temp root holding the tree's `.vale.ini` and styles |
+| a ticket each route mints | reads the mint's golden, and writes each ticket as a row the voice passes |
+| | runs Vale once over the folder, and holds each row to its findings |
 
-So a file spawns Vale once, and again for each round where it proves the
-fixer. A case proves its rule off findings in memory. A text declared inside a case
-comes after that run, so the helper runs again for it.
-
-The helper reads the config's own sections too, with Vale's glob, where a star
-spans a slash. So a case proving a path stands off a rule reads the section
-that switches it off, and spawns nothing.
+A probe under a path a section switches off proves the path stands off the
+rule, because Vale reads the section there.

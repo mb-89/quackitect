@@ -91,14 +91,14 @@ func partNamed(parts []part, name string) part {
 
 func TestCheckParts(t *testing.T) {
 	t.Parallel()
-	t.Run("the battery holds its eight parts", func(t *testing.T) {
+	t.Run("the battery holds its nine parts", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
 		names := []string{}
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules"}
+		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules", "lines"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
@@ -239,7 +239,7 @@ func TestTestArgv(t *testing.T) {
 	if len(testParts) != 2 || !testParts[0].shared || testParts[1].shared {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
-	red := "test/level0/battery-reporter.test.js"
+	red := "test/level0/lens.test.js"
 	argv := testArgv(root, []string{red}, testParts[0])
 	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/logbook.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)

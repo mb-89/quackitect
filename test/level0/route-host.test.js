@@ -10,30 +10,26 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { FLIP, routeHostOf } from "../../src/extension/lib/route-host.js";
 import { ticketText, v1Over } from "./v1-index.js";
 
-const HOLDS = ".se/.runtime/hold";
+const HOLD_FILE = ".se/.runtime/hold/person-a-desk.json";
 const PATH = "spec/tickets/one.md";
-
-// The host over a door whose editor saves the ticket before it draws, since the index draws the saved file. [[spec/tickets/the-lens-reads-v1]]
-function hostOf(door) {
-  const drawn = routeHostOf(door);
-  return {
-    ...drawn,
-    opened: (path, text) => {
-      door.disk.write(path, text);
-      return drawn.opened(path, text);
-    },
-    changed: (path, text) => {
-      door.disk.write(path, text);
-      return drawn.changed(path, text);
-    },
-  };
-}
-
+const NOTE = "spec/guidance/working.md";
 const SHORT = ticketText("route-short");
 const CLOSED = ticketText("route-closed");
 const TWO = ticketText("route-two");
 const LONG = ticketText("route-long");
+const VERDICT = ticketText("route-verdict");
 
+// The host over a door whose editor saves the ticket before it draws, since the index draws the saved file. [[spec/tickets/the-lens-reads-v1]]
+function hostOf(door) {
+  const drawn = routeHostOf(door);
+  const saving = (run) => (path, text) => {
+    door.disk.write(path, text);
+    return run(path, text);
+  };
+  return { ...drawn, opened: saving(drawn.opened), changed: saving(drawn.changed) };
+}
+
+// The editor's door: each page it hands records its posts, and each verb answers off the table. [[spec/tickets/the-host-runs-the-verbs]]
 function doorOf({
   files = {},
   inset = true,
@@ -62,48 +58,28 @@ function doorOf({
       disposed: false,
       hears: () => {},
       gone: () => {},
-      post: (message) => page.posts.push(message),
-      onMessage: (hear) => {
-        page.hears = hear;
-      },
-      onGone: (run) => {
-        page.gone = run;
-      },
-      hide: () => {
-        page.hidden = true;
-      },
-      show: () => {
-        page.hidden = false;
-      },
-      dispose: () => {
-        page.disposed = true;
-      },
     };
-    return page;
+    return Object.assign(page, {
+      post: (message) => page.posts.push(message),
+      onMessage: (hear) => (page.hears = hear),
+      onGone: (run) => (page.gone = run),
+      hide: () => (page.hidden = true),
+      show: () => (page.hidden = false),
+      dispose: () => (page.disposed = true),
+    });
   };
   const disk = fakeDisk(files);
   return {
     said,
     disk,
     theme: () => theme,
-    page: (path, lines) => {
-      if (!inset) return null;
-      const page = pageOf(path, lines);
-      said.pages.push(page);
-      return page;
-    },
-    panel: (path) => {
-      const page = pageOf(path, 0);
-      said.panels.push(page);
-      return page;
-    },
+    page: (path, lines) =>
+      inset ? said.pages[said.pages.push(pageOf(path, lines)) - 1] : null,
+    panel: (path) => said.panels[said.panels.push(pageOf(path, 0)) - 1],
     folds: (path) => said.folds.push(path),
     unfolds: (path) => said.unfolds.push(path),
     jumps: (path, line) => said.jumps.push([path, line]),
-    picks: async (prompt, options) => {
-      said.picks.push([prompt, options]);
-      return picked;
-    },
+    picks: async (prompt, options) => said.picks.push([prompt, options]) && picked,
     asksLine: async () => "the ask stands unmet",
     saves: async (path) => said.saved.push(path),
     index: {
@@ -120,20 +96,22 @@ function doorOf({
 }
 
 const kinds = (page) => page.posts.map((one) => one.kind);
+const held = (path) => ({
+  [HOLD_FILE]: JSON.stringify({
+    ticket: "one",
+    step: "draft",
+    hand: "person a-desk",
+    path,
+  }),
+});
 
-test("a ticket draws its route over the folded frontmatter, and ready answers the graph and the theme", async () => {
-  const hold = { ticket: "one", step: "draft", hand: "person a-desk" };
-  const door = doorOf({
-    files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold) },
-  });
+test("a ticket draws its route over the folded frontmatter, ready answers the graph and the theme, and a theme change follows", async () => {
+  const door = doorOf({ files: held() });
   const host = hostOf(door);
   await host.opened(PATH, SHORT);
-
-  assert.equal(door.said.pages.length, 1);
-  assert.deepEqual(door.said.folds, [PATH]);
+  assert.deepEqual([door.said.pages.length, door.said.folds], [1, [PATH]]);
   const page = door.said.pages[0];
   await page.hears({ kind: "ready" });
-
   assert.deepEqual(kinds(page), ["graph", "theme"]);
   const [graph, theme] = page.posts;
   assert.deepEqual(
@@ -144,41 +122,44 @@ test("a ticket draws its route over the folded frontmatter, and ready answers th
     graph.steps.map((one) => one.name),
     ["draft"],
   );
-  assert.equal(graph.held, true);
-  assert.equal(theme.theme, "dark");
+  assert.deepEqual([graph.held, theme.theme], [true, "dark"]);
+  door.theme = () => "light";
+  host.themed();
+  assert.deepEqual(page.posts.at(-1), { kind: "theme", theme: "light" });
+
+  await host.opened(NOTE, SHORT);
+  assert.deepEqual(
+    [door.said.pages.length, door.said.folds],
+    [1, [PATH]],
+    "a note outside the folders draws nothing",
+  );
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a person's hold on a ticket that reads closed draws the page unheld", async () => {
-  const hold = { ticket: "one", step: "draft", hand: "person a-desk", path: PATH };
-  const door = doorOf({
-    files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold), [PATH]: CLOSED },
-  });
+test("a person's hold on a ticket that reads closed draws the page unheld, and the closed ticket carries the flip", async () => {
+  const door = doorOf({ files: { ...held(PATH), [PATH]: CLOSED } });
   const host = hostOf(door);
   await host.opened(PATH, CLOSED);
-  const page = door.said.pages[0];
-  await page.hears({ kind: "ready" });
-
-  assert.equal(page.posts[0].held, false);
+  await door.said.pages[0].hears({ kind: "ready" });
+  assert.equal(door.said.pages[0].posts[0].held, false);
+  assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
+  assert.deepEqual(host.lenses(NOTE), []);
 });
 
-test("a note outside the ticket folders draws nothing", async () => {
-  const door = doorOf();
-  await hostOf(door).opened("spec/guidance/working.md", SHORT);
-  assert.deepEqual(door.said.pages, []);
-  assert.deepEqual(door.said.folds, []);
-});
-
-test("the side panel stands in where the inset fails, and takes the same messages", async () => {
+test("the side panel stands in where the inset fails, and a panel the person closes leaves the host", async () => {
   const door = doorOf({ inset: false, theme: "light" });
-  await hostOf(door).opened(PATH, SHORT);
-
-  assert.equal(door.said.panels.length, 1);
+  const host = hostOf(door);
+  await host.opened(PATH, SHORT);
   const page = door.said.panels[0];
   await page.hears({ kind: "ready" });
   assert.deepEqual(kinds(page), ["graph", "theme"]);
-  assert.equal(page.posts[0].held, false);
-  assert.equal(page.posts[1].theme, "light");
+  assert.deepEqual([page.posts[0].held, page.posts[1].theme], [false, "light"]);
+
+  page.posts.length = 0;
+  page.gone();
+  await host.changed(PATH, TWO);
+  host.themed();
+  assert.deepEqual([page.posts, host.lenses(PATH)], [[], []]);
 });
 
 test("the flip shows the YAML and back, and the lens title follows", async () => {
@@ -189,95 +170,46 @@ test("the flip shows the YAML and back, and the lens title follows", async () =>
   assert.deepEqual(host.lenses(PATH), [
     { title: "Show the YAML", command: FLIP, arguments: [PATH] },
   ]);
-
   host.flipped(PATH);
-  assert.equal(page.hidden, true);
-  assert.deepEqual(door.said.unfolds, [PATH]);
-  assert.equal(host.lenses(PATH)[0].title, "Show the drawing");
-
+  assert.deepEqual(
+    [page.hidden, door.said.unfolds, host.lenses(PATH)[0].title],
+    [true, [PATH], "Show the drawing"],
+  );
   host.flipped(PATH);
-  assert.equal(page.hidden, false);
-  assert.deepEqual(door.said.folds, [PATH, PATH]);
-  assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
+  assert.deepEqual(
+    [page.hidden, door.said.folds, host.lenses(PATH)[0].title],
+    [false, [PATH, PATH], "Show the YAML"],
+  );
   assert.deepEqual(host.names, ["holds/standing", "tickets/all"]);
 });
 
-test("a closed ticket carries the flip", async () => {
-  const door = doorOf();
-  const host = hostOf(door);
-  await host.opened(PATH, CLOSED);
-  assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
-  assert.deepEqual(host.lenses("spec/guidance/working.md"), []);
-});
-
-test("a change redraws the drawing with the new route", async () => {
+test("a change redraws the route, and a taller route opens a taller page again, hidden under the YAML side", async () => {
   const door = doorOf();
   const host = hostOf(door);
   await host.opened(PATH, SHORT);
-  const page = door.said.pages[0];
+  const first = door.said.pages[0];
   await host.changed(PATH, TWO);
-
-  const last = page.posts.at(-1);
-  assert.equal(last.kind, "graph");
+  assert.equal(first.posts.at(-1).kind, "graph");
   assert.deepEqual(
-    last.graph.nodes.map((one) => one.id),
+    first.posts.at(-1).graph.nodes.map((one) => one.id),
     ["draft", "review"],
   );
-});
 
-test("a theme change reaches every page", async () => {
-  const door = doorOf();
-  const host = hostOf(door);
-  await host.opened(PATH, SHORT);
-  door.theme = () => "light";
-  host.themed();
-  assert.deepEqual(door.said.pages[0].posts.at(-1), { kind: "theme", theme: "light" });
-});
-
-test("a longer route opens a taller inset, and a change of height opens it again", async () => {
-  const short = doorOf();
-  await hostOf(short).opened(PATH, SHORT);
-  const long = doorOf();
-  await hostOf(long).opened(PATH, LONG);
-  assert.ok(long.said.pages[0].lines > short.said.pages[0].lines);
-
-  const host = hostOf(short);
-  await host.opened(PATH, SHORT);
-  const first = short.said.pages.at(-1);
   await host.changed(PATH, LONG);
-  assert.equal(first.disposed, true);
-  assert.ok(short.said.pages.at(-1).lines > first.lines);
+  const taller = door.said.pages.at(-1);
+  assert.deepEqual([first.disposed, taller.lines > first.lines], [true, true]);
+
+  const yaml = doorOf();
+  const flipped = hostOf(yaml);
+  await flipped.opened(PATH, SHORT);
+  flipped.flipped(PATH);
+  await flipped.changed(PATH, LONG);
+  assert.deepEqual(
+    [yaml.said.pages.length, yaml.said.pages.at(-1).hidden, yaml.said.folds],
+    [2, true, [PATH]],
+  );
+  assert.equal(flipped.lenses(PATH)[0].title, "Show the drawing");
 });
-
-test("a longer route under the YAML side reopens the page hidden, and folds nothing", async () => {
-  const door = doorOf();
-  const host = hostOf(door);
-  await host.opened(PATH, SHORT);
-  host.flipped(PATH);
-  await host.changed(PATH, LONG);
-
-  const now = door.said.pages.at(-1);
-  assert.equal(door.said.pages.length, 2);
-  assert.equal(now.hidden, true);
-  assert.deepEqual(door.said.folds, [PATH]);
-  assert.equal(host.lenses(PATH)[0].title, "Show the drawing");
-});
-
-test("a page the person closes leaves the host, so a change posts nothing", async () => {
-  const door = doorOf({ inset: false });
-  const host = hostOf(door);
-  await host.opened(PATH, SHORT);
-  const page = door.said.panels[0];
-  page.gone();
-
-  await host.changed(PATH, TWO);
-  host.themed();
-  assert.deepEqual(page.posts, []);
-  assert.deepEqual(host.lenses(PATH), []);
-});
-
-// [[spec/tickets/the-host-runs-the-verbs]]
-const VERDICT = ticketText("route-verdict");
 
 async function pressed(message, options = {}, text = SHORT) {
   const door = doorOf(options);
@@ -286,18 +218,21 @@ async function pressed(message, options = {}, text = SHORT) {
   return door.said;
 }
 
-test("a jump opens the ticket at the line its node names", async () => {
-  const said = await pressed({
+// [[spec/tickets/the-host-runs-the-verbs]]
+test("a jump opens the ticket at its node's line, and a press on the pointer takes the ticket", async () => {
+  const jumped = await pressed({
     kind: "jump",
     step: "draft",
     chapter: "# draft",
     line: 12,
   });
-  assert.deepEqual(said.jumps, [[PATH, 12]]);
-  assert.deepEqual(said.ran, []);
+  assert.deepEqual([jumped.jumps, jumped.ran], [[[PATH, 12]], []]);
+  assert.deepEqual((await pressed({ kind: "take", step: "draft" })).ran, [
+    ["ticket", "pull", "one"],
+  ]);
 });
 
-test("an edit saves the ticket, and runs the route verb over the whole route", async () => {
+test("an edit saves the ticket and runs the route verb over the whole route, and a refusal warns", async () => {
   const steps = [{ name: "draft", does: "works draft" }];
   const said = await pressed({ kind: "edit", steps });
   assert.deepEqual(said.saved, [PATH]);
@@ -305,49 +240,34 @@ test("an edit saves the ticket, and runs the route verb over the whole route", a
     ["ticket", "route", "one", `--steps=${JSON.stringify(steps)}`],
   ]);
   assert.deepEqual(said.told, []);
-});
 
-test("a press on the pointer takes the ticket", async () => {
-  const said = await pressed({ kind: "take", step: "draft" });
-  assert.deepEqual(said.ran, [["ticket", "pull", "one"]]);
-});
-
-test("a hand-back on a verdict leaf saves, and runs the pull the verdict decides", async () => {
-  const said = await pressed({ kind: "handback", step: "review" }, {}, VERDICT);
-  assert.deepEqual(said.picks, []);
-  assert.deepEqual(said.saved, [PATH]);
-  assert.deepEqual(said.ran, [["ticket", "pull", "one"]]);
-});
-
-test("a hand-back on another leaf asks pass or fail, and a closed pick runs nothing", async () => {
-  const passed = await pressed({ kind: "handback", step: "draft" }, { picked: "pass" });
-  assert.equal(passed.picks.length, 1);
-  assert.deepEqual(passed.ran, [["ticket", "pull", "one", "--pass"]]);
-
-  const failed = await pressed({ kind: "handback", step: "draft" }, { picked: "fail" });
-  assert.deepEqual(failed.ran, [
-    ["ticket", "pull", "one", "--fail", "the ask stands unmet"],
-  ]);
-
-  const closed = await pressed({ kind: "handback", step: "draft" });
-  assert.deepEqual(closed.ran, []);
-});
-
-test("a refused route edit shows its refusal as a warning", async () => {
-  const refused = {
+  const json = {
     code: 1,
     out: JSON.stringify({ refused: "draft stands behind the pointer.", at: "draft" }),
     err: "",
   };
-  const said = await pressed({ kind: "edit", steps: [] }, { ran: { route: refused } });
-  assert.deepEqual(said.told, [
+  const refused = await pressed({ kind: "edit", steps: [] }, { ran: { route: json } });
+  assert.deepEqual(refused.told, [
     ["one: refused", "draft stands behind the pointer.", true],
   ]);
-  assert.equal(said.says[0][0], "./RUNME.sh ticket route one --steps=[]");
+  assert.equal(refused.says[0][0], "./RUNME.sh ticket route one --steps=[]");
+  const bare = { code: 2, out: "", err: "route names no ticket: one\n" };
+  const plain = await pressed({ kind: "edit", steps: [] }, { ran: { route: bare } });
+  assert.deepEqual(plain.told, [["one: refused", "route names no ticket: one", true]]);
 });
 
-test("a refusal carrying no JSON shows the verb's first line", async () => {
-  const refused = { code: 2, out: "", err: "route names no ticket: one\n" };
-  const said = await pressed({ kind: "edit", steps: [] }, { ran: { route: refused } });
-  assert.deepEqual(said.told, [["one: refused", "route names no ticket: one", true]]);
+test("a hand-back on a verdict leaf saves and runs the pull, and on another leaf asks pass or fail", async () => {
+  const verdict = await pressed({ kind: "handback", step: "review" }, {}, VERDICT);
+  assert.deepEqual(
+    [verdict.picks, verdict.saved, verdict.ran],
+    [[], [PATH], [["ticket", "pull", "one"]]],
+  );
+  for (const [picked, ran] of [
+    ["pass", [["ticket", "pull", "one", "--pass"]]],
+    ["fail", [["ticket", "pull", "one", "--fail", "the ask stands unmet"]]],
+    ["", []],
+  ]) {
+    const said = await pressed({ kind: "handback", step: "draft" }, { picked });
+    assert.deepEqual([said.picks.length, said.ran], [1, ran], picked);
+  }
 });

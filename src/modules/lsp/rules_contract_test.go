@@ -136,7 +136,7 @@ func proseProbes() []ruleProbe {
 		"| what | count |", "|---|---|", "| events | 186 |", "", "1. The verb exits `0` on survives.", "",
 	}, "\n")
 	return []ruleProbe{
-		// vale.test.js
+		// the voice rules
 		{noteAt, "THIS IS THE SHOUTED PART, and it follows.", "ShoutedLead", true},
 		{noteAt, "The engine reads SQLite and answers JSON.", "ShoutedLead", false},
 		{noteAt, "It is a door rather than a window.", "Antithesis", true},
@@ -189,7 +189,7 @@ func proseProbes() []ruleProbe {
 		{noteAt, "# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n", "CountedList", true},
 		{noteAt, "# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n", "CountedList", true},
 		{noteAt, "# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n", "CountedList", false},
-		// paragraph.test.js
+		// the paragraph rules
 		{noteAt, "The engine reads it, and the reader waits; so it goes.\n", "Characters", true},
 		{noteAt, "The engine reads it, and the reader waits.\n", "Characters", false},
 		{noteAt, "The engine reads `a; b` and the reader waits.\n", "Characters", false},
@@ -265,7 +265,7 @@ func proseProbes() []ruleProbe {
 		{noteAt, "The rule holds its bound, and a numbered note stands.", "PastTense", false},
 		{noteAt, "A settled question waits, and a complicated one waits longer.", "PastTense", false},
 		{noteAt, "A rule the table switched off leaves a refused write behind.", "PastTense", false},
-		// shape.test.js
+		// the shape rules
 		{guidanceAt, guidanceFront("") + "# Nothing here\n\nA note carrying no chapter.\n", "VoiceShape.GuidanceChapter", true},
 		{guidanceAt, guidanceFront("") + chapterOf(2), "VoiceShape.GuidanceChapter", false},
 		{guidanceAt, guidanceFront("") + chapterOf(16), "VoiceShape.GuidanceCap", true},
@@ -299,11 +299,11 @@ func proseProbes() []ruleProbe {
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script, and more\"}\n", entry, true},
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script\", source: \"https://a.org/x,y\"}\n", entry, true},
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script\", source: somewhere}\n", entry, true},
-		// vale-fix.test.js, the rows a run reads; the writes of the fixer stand outside a rule table
+		// the rows a fixer run reads; the fixer's writes stand outside a rule table
 		{noteAt, "# Notes\n\nDON'T STOP AT ALL HERE, and then calm.\n", "ShoutedLead", true},
 		{noteAt, "# Notes\n\n```\nIt's a duck, e.g. a mallard.\n```\n", "Contraction", false},
 		{noteAt, "# Notes\n\n<!-- because: the fixer leaves this alone -->\n<!-- vale VoiceParagraph.Contraction = NO -->\nIt's here.\n", "Contraction", false},
-		// outside-in-doors.test.js
+		// the outside-in rule
 		{moduleAt, reads, "OutsideInDoors", true},
 		{moduleAt, "const said = process.argv.slice(2);\n", "OutsideInDoors", true},
 		{moduleAt, "const win = process.platform === \"win32\";\n", "OutsideInDoors", true},
@@ -327,7 +327,7 @@ func proseProbes() []ruleProbe {
 		{"src/index/door.go", spawn, "OutsideInDoors", false},
 		{"src/engine/swap/door.go", osImport, "OutsideInDoors", false},
 		{"src/front/front_test.go", osImport, "OutsideInDoors", false},
-		// schema.test.js
+		// the schema rules
 		{"spec/guidance/_probe.md", pastText, anyRule, false},
 		{guidanceAt, pastText, anyRule, true},
 	}
@@ -426,7 +426,7 @@ func TestEachProseRuleFiresOnItsProbeAndStaysQuietOnItsTwin(t *testing.T) {
 		t.Skip("no vale stands on this box")
 	}
 	probes := append(proseProbes(), mintedProbes(t, tree)...)
-	// Each probe in a folder of its own, so two probes under one path stand apart, as ruled.js lays them out. [[spec/design_output/doors#one-contract-test-per-door]]
+	// Each probe in a folder of its own, so two probes under one path stand apart. [[spec/design_output/doors#one-contract-test-per-door]]
 	texts, paths := map[string]string{}, []string{}
 	for i, one := range probes {
 		at := fmt.Sprintf("p%d/%s", i, one.path)

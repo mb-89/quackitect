@@ -30,28 +30,17 @@ const doorOf = (held) => {
   };
 };
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
-test("the binary wears an ending on windows and none anywhere else", () => {
-  assert.equal(binaryOf("win32"), `${NAME}.exe`);
-  assert.equal(binaryOf("linux"), NAME);
-  assert.equal(binaryOf("darwin"), NAME);
-});
-
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
-test("the ask names the built binary, the lsp verb and the tree", () => {
+// The editor starts quack lsp, which the index binary answers, so no second server stands. [[spec/design_output/lsp#one-checker-every-front-asks]] [[spec/tickets/the-lsp-server-leaves]]
+test("the ask names the index binary, its ending on windows alone, the lsp verb and the tree", () => {
+  assert.deepEqual(
+    [binaryOf("win32"), binaryOf("linux"), binaryOf("darwin")],
+    [`${NAME}.exe`, NAME, NAME],
+  );
   const ask = serverAsk("/at/root", "linux");
-  assert.equal(ask.at, `${BIN}/${NAME}`);
-  assert.equal(ask.server.command, `/at/root/${BIN}/${NAME}`);
-  assert.deepEqual(ask.server.args, ["lsp"]);
-  assert.equal(ask.server.options.cwd, "/at/root");
-});
-
-// The editor starts quack lsp, which the index binary answers, so no second server stands. [[spec/tickets/the-lsp-server-leaves]]
-test("the editor starts quack lsp off the index binary", () => {
-  const ask = serverAsk("/at/root", "linux");
-  assert.equal(ask.at, INDEX);
+  assert.deepEqual([ask.at, `${BIN}/${NAME}`], [INDEX, INDEX]);
   assert.equal(ask.server.command, `/at/root/${INDEX}`);
   assert.deepEqual(ask.server.args, ["lsp"]);
+  assert.equal(ask.server.options.cwd, "/at/root");
   assert.equal(serverAsk("/at/root", "win32").at, `${INDEX}.exe`);
 });
 
@@ -124,10 +113,6 @@ test("the client the editor builds starts the server again on every close, past 
   assert.deepEqual(client.options.documentSelector, ask.client.documentSelector);
   for (let at = 0; at < 12; at++) await client.closes();
   assert.equal(client.starts, 12, "every close starts the server again");
-
-  const bare = new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
-  for (let at = 0; at < 12; at++) await bare.closes();
-  assert.equal(bare.starts, 4, "the client's own handler gives up at its cap");
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

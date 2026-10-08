@@ -22,7 +22,6 @@ function node(sel, said = {}) {
     dataset: said.dataset ?? {},
     value: said.value ?? "",
     open: said.open,
-    rows: said.rows ?? [],
     classList: {
       add: (one) => classes.add(one),
       remove: (one) => classes.delete(one),
@@ -33,16 +32,25 @@ function node(sel, said = {}) {
   };
 }
 
-function page(nodes) {
+// A page holding the nodes, wired, recording what it posts and the look it keeps. [[spec/guidance/code/testing]]
+function wired(nodes = []) {
   const held = new Map();
-  return {
+  const root = {
+    posted: [],
+    state: {},
     addEventListener: (name, said) => held.set(name, said),
     fire: (name, target) => held.get(name)?.({ target }),
     querySelectorAll: (want) =>
       nodes.filter((one) => want.split(",").some((part) => part.trim() === one.sel)),
     querySelector: (want) => nodes.find((one) => one.sel === want),
   };
+  wire(root, (one) => root.posted.push(one), {
+    get: () => root.state,
+    set: (one) => (root.state = one),
+  });
+  return root;
 }
+const on = (sel, target) => ({ closest: (want) => (want === sel ? target : null) });
 
 const HOLD = {
   key: "stop.hold",
@@ -52,178 +60,14 @@ const HOLD = {
   value: "off",
 };
 
-// [[spec/design_output/extension#a-click-becomes-a-message]]
-test("a click on an action asks for the run the declaration names", () => {
-  assert.deepEqual(
-    messageFor({ key: "log.open", widget: "action", runs: "./RUNME.sh tui" }),
-    {
-      kind: "run",
-      key: "log.open",
-      runs: "./RUNME.sh tui",
-    },
-  );
-});
-
-// [[spec/design_output/extension#a-gesture-picks-a-state]]
-test("a click on a toggle posts the press alone, and the host counts it", () => {
-  assert.deepEqual(messageFor(HOLD), { kind: "press", key: "stop.hold" });
-});
-
-test("a click on the page away from a widget posts nothing", () => {
-  const root = page([]);
-  const posted = [];
-  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
-  root.fire("click", { closest: () => null });
-  assert.deepEqual(posted, []);
-});
-
-test("five clicks on a widget post five presses, and the page counts none", () => {
-  const widget = { dataset: HOLD };
-  const root = page([]);
-  const posted = [];
-  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
-  for (let i = 0; i < 5; i++) {
-    root.fire("click", { closest: (want) => (want === ".widget" ? widget : null) });
-  }
-  assert.deepEqual(posted, Array(5).fill({ kind: "press", key: "stop.hold" }));
-});
-
-test("an editor changed in the bottom section posts the key and what stands in it", () => {
-  const root = page([]);
-  const posted = [];
-  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
-  root.fire("change", {
-    dataset: { key: "helper.find" },
-    value: "sonnet",
-    closest: () => null,
+// [[spec/design_output/extension#a-click-becomes-a-message]] [[spec/design_output/pull#the-bless]]
+test("a click asks the run an action names, and the bless value the button does not hold", () => {
+  const run = { key: "log.open", widget: "action", runs: "./RUNME.sh tui" };
+  assert.deepEqual(messageFor(run), {
+    kind: "run",
+    key: "log.open",
+    runs: "./RUNME.sh tui",
   });
-  assert.deepEqual(posted, [{ kind: "set", key: "helper.find", value: "sonnet" }]);
-});
-
-// [[spec/design_output/extension#the-filter-reads-an-expression]]
-test("the filter reads a regular expression, and a bad one reads as plain words", () => {
-  assert.equal(matches("stop.hold running", "^stop\\."), true);
-  assert.equal(matches("stop.hold running", "helper"), false);
-  assert.equal(matches("helper.find haiku", "fi(nd"), false);
-  assert.equal(matches("helper.fi(nd haiku", "fi(nd"), true);
-  assert.equal(matches("anything", ""), true);
-});
-
-test("a node shows where a row under it matches, and goes where none does", () => {
-  const hold = node(".row", { dataset: { said: "stop.hold running" } });
-  const model = node(".row", { dataset: { said: "helper.find haiku" } });
-  const stop = node("details.keys", { rows: [hold] });
-  const helper = node("details.keys", { rows: [model] });
-  const root = page([hold, model, stop, helper]);
-
-  show(root, "^stop");
-  assert.equal(hold.classList.contains("gone"), false);
-  assert.equal(model.classList.contains("gone"), true);
-  assert.equal(stop.classList.contains("gone"), false);
-  assert.equal(helper.classList.contains("gone"), true);
-});
-
-test("the page takes back the filter and the sections the last look held", () => {
-  const box = node(".filter");
-  const one = node("details.section", { dataset: { section: "config" }, open: false });
-  const root = page([box, one]);
-
-  restore(root, { filter: "helper", open: { config: true } });
-  assert.equal(box.value, "helper");
-  assert.equal(one.open, true);
-});
-
-test("opening a section writes what the page holds, and no value with it", () => {
-  const root = page([]);
-  let held = {};
-  wire(root, () => {}, { get: () => held, set: (one) => (held = one) });
-  root.fire("toggle", { dataset: { section: "config" }, open: true });
-  assert.deepEqual(held, { open: { config: true } });
-});
-
-// [[spec/design_output/extension#the-gear-picks-the-sections]]
-test("the gear opens the chooser, and a tick brings its section back", () => {
-  const chooser = { sel: ".chooser", hidden: true };
-  const gear = { sel: ".gear", closest: (want) => (want === ".gear" ? gear : null) };
-  const section = node("details.section", { dataset: { section: "config" } });
-  const box = {
-    sel: '.pick[data-pick="config"]',
-    checked: false,
-    dataset: { pick: "config" },
-    closest: () => null,
-  };
-  const root = page([chooser, gear, section, box]);
-
-  let state = {};
-  const view = {
-    get: () => state,
-    set: (one) => {
-      state = one;
-    },
-  };
-  wire(root, () => {}, view);
-
-  root.fire("click", gear);
-  assert.equal(chooser.hidden, false, "the gear opens it");
-
-  box.checked = true;
-  root.fire("change", box);
-  assert.deepEqual(state.picks, { config: true }, "the choice rides in the state");
-  assert.ok(!section.classList.contains("gone"), "the section stands again");
-});
-
-test("a section a person unticks goes, and the tick rides through a redraw", () => {
-  const section = node("details.section", {
-    classes: [],
-    dataset: { section: "agent control" },
-  });
-  const box = {
-    sel: '.pick[data-pick="agent control"]',
-    checked: true,
-    dataset: { pick: "agent control" },
-  };
-  const root = page([section, box]);
-
-  picked(root, { "agent control": false });
-  assert.ok(section.classList.contains("gone"));
-  assert.equal(box.checked, false);
-
-  restore(root, { picks: { "agent control": true } });
-  assert.ok(!section.classList.contains("gone"));
-  assert.equal(box.checked, true);
-});
-
-// [[spec/design_output/extension#the-folds-press-at-once]]
-test("the open press opens every group of the config section, and the shut press shuts each", () => {
-  const groups = [
-    node("details.file", { open: false }),
-    node("details.keys", { open: false }),
-    node("details.keys", { open: true }),
-  ];
-  const opens = { dataset: { fold: "open" } };
-  const shuts = { dataset: { fold: "shut" } };
-  const root = page(groups);
-  wire(root, () => {}, { get: () => ({}), set: () => {} });
-  const pressed = (button) =>
-    root.fire("click", { closest: (want) => (want === ".fold" ? button : null) });
-
-  pressed(opens);
-  assert.deepEqual(
-    groups.map((one) => one.open),
-    [true, true, true],
-    "every group opens",
-  );
-
-  pressed(shuts);
-  assert.deepEqual(
-    groups.map((one) => one.open),
-    [false, false, false],
-    "every group shuts",
-  );
-});
-
-// [[spec/design_output/pull#the-bless]]
-test("a click on the bless button asks the value it does not hold", () => {
   assert.deepEqual(messageFor({ widget: "bless", key: "bless", value: "false" }), {
     kind: "bless",
     value: true,
@@ -234,14 +78,106 @@ test("a click on the bless button asks the value it does not hold", () => {
   });
 });
 
+// [[spec/design_output/extension#a-gesture-picks-a-state]]
+test("five clicks on a toggle post five presses, a click off a widget nothing, and an edit its key and value", () => {
+  const root = wired();
+  for (let i = 0; i < 5; i++) root.fire("click", on(".widget", { dataset: HOLD }));
+  root.fire("click", { closest: () => null });
+  root.fire("change", {
+    dataset: { key: "helper.find" },
+    value: "sonnet",
+    closest: () => null,
+  });
+  assert.deepEqual(root.posted, [
+    ...Array(5).fill({ kind: "press", key: "stop.hold" }),
+    { kind: "set", key: "helper.find", value: "sonnet" },
+  ]);
+});
+
+// [[spec/design_output/extension#the-filter-reads-an-expression]]
+test("the filter reads a regular expression, a bad one as plain words, and a node goes where no row matches", () => {
+  assert.equal(matches("stop.hold running", "^stop\\."), true);
+  assert.equal(matches("stop.hold running", "helper"), false);
+  assert.equal(matches("helper.find haiku", "fi(nd"), false);
+  assert.equal(matches("helper.fi(nd haiku", "fi(nd"), true);
+  assert.equal(matches("anything", ""), true);
+  const hold = node(".row", { dataset: { said: "stop.hold running" } });
+  const model = node(".row", { dataset: { said: "helper.find haiku" } });
+  const stop = node("details.keys", { rows: [hold] });
+  const helper = node("details.keys", { rows: [model] });
+  show(wired([hold, model, stop, helper]), "^stop");
+  assert.deepEqual(
+    [hold, model, stop, helper].map((one) => one.classList.contains("gone")),
+    [false, true, false, true],
+  );
+});
+
+test("opening a section keeps the look, and the page takes back the filter and the sections it held", () => {
+  const root = wired();
+  root.fire("toggle", { dataset: { section: "config" }, open: true });
+  assert.deepEqual(root.state, { open: { config: true } });
+  const box = node(".filter");
+  const one = node("details.section", { dataset: { section: "config" }, open: false });
+  restore(wired([box, one]), { filter: "helper", open: { config: true } });
+  assert.deepEqual([box.value, one.open], ["helper", true]);
+});
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+test("the gear opens the chooser, a tick brings its section back, and an untick rides through a redraw", () => {
+  const chooser = { sel: ".chooser", hidden: true };
+  const gear = { sel: ".gear", closest: (want) => (want === ".gear" ? gear : null) };
+  const section = node("details.section", {
+    dataset: { section: "config" },
+    classes: ["gone"],
+  });
+  const box = {
+    sel: '.pick[data-pick="config"]',
+    checked: false,
+    dataset: { pick: "config" },
+    closest: () => null,
+  };
+  const root = wired([chooser, gear, section, box]);
+  root.fire("click", gear);
+  assert.equal(chooser.hidden, false, "the gear opens it");
+  box.checked = true;
+  root.fire("change", box);
+  assert.deepEqual(root.state.picks, { config: true });
+  assert.ok(!section.classList.contains("gone"), "the section stands again");
+
+  picked(root, { config: false });
+  assert.deepEqual([section.classList.contains("gone"), box.checked], [true, false]);
+  restore(root, { picks: { config: true } });
+  assert.deepEqual([section.classList.contains("gone"), box.checked], [false, true]);
+});
+
+// [[spec/design_output/extension#the-folds-press-at-once]]
+test("the open press opens every group of the config section, and the shut press shuts each", () => {
+  const groups = [
+    node("details.file", { open: false }),
+    node("details.keys", { open: false }),
+    node("details.keys", { open: true }),
+  ];
+  const root = wired(groups);
+  root.fire("click", on(".fold", { dataset: { fold: "open" } }));
+  assert.deepEqual(
+    groups.map((one) => one.open),
+    [true, true, true],
+  );
+  root.fire("click", on(".fold", { dataset: { fold: "shut" } }));
+  assert.deepEqual(
+    groups.map((one) => one.open),
+    [false, false, false],
+  );
+});
+
 // [[spec/design_output/extension#the-views-section]]
 test("a click on a view button posts a call with every field of its row, keyed", () => {
-  assert.deepEqual(
-    callFor({ calls: "tickets/open" }, [
-      { dataset: { field: "name" }, value: "a-name" },
-    ]),
-    { kind: "call", calls: "tickets/open", input: { name: "a-name" } },
-  );
+  const fields = [{ dataset: { field: "name" }, value: "a-name" }];
+  assert.deepEqual(callFor({ calls: "tickets/open" }, fields), {
+    kind: "call",
+    calls: "tickets/open",
+    input: { name: "a-name" },
+  });
   assert.deepEqual(callFor({ calls: "work/pull" }), {
     kind: "call",
     calls: "work/pull",

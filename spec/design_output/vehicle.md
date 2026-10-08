@@ -117,8 +117,8 @@ A fresh vehicle takes the steps any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
 The case runs that `RUNME` over a fake install, so it proves the verbs and
-waits for no fetch. `test/contract/fetching.js` names the wants that reach
-past the box, and the case skips every one through `SE_INSTALL_SKIP`. The
+waits for no fetch. The case skips every want reaching past the box through
+`SE_INSTALL_SKIP`. The
 vehicle borrows the method's modules through a link, and the survey this box
 holds. Its home is a folder the case makes. The stub's cases point the shim at
 a vehicle of one script the file writes. So a shim case proves the hand-over,

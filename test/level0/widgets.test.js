@@ -57,21 +57,17 @@ const SCHEMA = {
   },
 };
 
-test("every leaf of the schema stands as one entry, and the comment stands as none", () => {
-  const keys = entriesIn(SCHEMA).map((one) => one.key);
-  assert.deepEqual(keys, [
-    "stop.mostInARow",
-    "stop.hold",
-    "log.open",
-    "engine.binding",
-  ]);
-});
-
-test("an entry carries the options the schema names as an enum", () => {
-  const one = entriesIn(SCHEMA).find((each) => each.key === "stop.hold");
-  assert.deepEqual(one.options, ["off", "finish", "stop"]);
-  assert.equal(one.section, "stop");
-  assert.equal(one.leaf, "hold");
+test("every leaf of the schema stands as one entry with its enum's options, and the comment as none", () => {
+  const entries = entriesIn(SCHEMA);
+  assert.deepEqual(
+    entries.map((one) => one.key),
+    ["stop.mostInARow", "stop.hold", "log.open", "engine.binding"],
+  );
+  const { options, section, leaf } = entries[1];
+  assert.deepEqual(
+    [options, section, leaf],
+    [["off", "finish", "stop"], "stop", "hold"],
+  );
 });
 
 // [[spec/design_output/extension#one-declaration-draws-it]]
@@ -92,18 +88,10 @@ test("a group holds its widgets in rows, each row in column order", () => {
   );
 });
 
-test("a widget carries the value the files answer, and the layer answering it", () => {
+test("a widget carries the value the files answer, the layer answering it, and its rest", () => {
   const values = valuesOf({ stop: { hold: "off" } }, { stop: { hold: "stop" } });
   const cell = groupsIn(SCHEMA, values)[0].rows[0].cells[1];
-  assert.equal(cell.value, "stop");
-  assert.equal(cell.layer, LOCAL);
-  assert.equal(cell.rest, "off");
-});
-
-test("the tracked file answers a key the local file leaves alone", () => {
-  const values = valuesOf({ stop: { hold: "off" } }, { log: { level: "warn" } });
-  assert.deepEqual(values.get("stop.hold"), { value: "off", layer: TRACKED });
-  assert.deepEqual(values.get("log.level"), { value: "warn", layer: LOCAL });
+  assert.deepEqual([cell.value, cell.layer, cell.rest], ["stop", LOCAL, "off"]);
 });
 
 // [[spec/design_output/extension#the-bottom-section]]
@@ -124,28 +112,27 @@ test("the tree names one node per file, and a row per key under it", () => {
     tree[0].sections[0].rows.map((one) => one.key),
     ["stop.mostInARow", "stop.hold"],
   );
-});
-
-test("a row takes the unit and the help the schema gives its key", () => {
-  const tree = treeIn(SCHEMA, [{ path: TRACKED, said: { stop: { mostInARow: 3 } } }]);
-  const row = tree[0].sections[0].rows[0];
-  assert.equal(row.unit, "turns");
-  assert.equal(row.help, "How many turns.");
-  assert.equal(row.type, "number");
+  const { unit, help, type } = tree[0].sections[0].rows[0];
+  assert.deepEqual([unit, help, type], ["turns", "How many turns.", "number"]);
 });
 
 // [[spec/tickets/the-config-schema-gets-generated]]
-test("valuesOf lays the built-ins under the files", () => {
+test("valuesOf lays the built-ins under the tracked file, and the tracked under the local", () => {
   const schema = structuredClone(SCHEMA);
   schema.properties.stop.properties.hold.default = "off";
   schema.properties.stop.properties.mostInARow.default = 3;
-  const values = valuesOf({ stop: { mostInARow: 5 } }, {}, schema);
+  const values = valuesOf(
+    { stop: { mostInARow: 5 } },
+    { log: { level: "warn" } },
+    schema,
+  );
   assert.deepEqual(values.get("stop.hold"), { value: "off", layer: "built-in" });
   assert.deepEqual(values.get("stop.mostInARow"), { value: 5, layer: TRACKED });
-});
-
-// [[spec/tickets/the-config-schema-gets-generated]]
-test("valuesOf with no schema reads the two files alone", () => {
-  const values = valuesOf({ stop: { mostInARow: 5 } }, {});
-  assert.deepEqual([...values.keys()], ["stop.mostInARow"]);
+  assert.deepEqual(values.get("log.level"), { value: "warn", layer: LOCAL });
+  const bare = valuesOf({ stop: { mostInARow: 5 } }, {});
+  assert.deepEqual(
+    [...bare.keys()],
+    ["stop.mostInARow"],
+    "no schema reads the files alone",
+  );
 });
