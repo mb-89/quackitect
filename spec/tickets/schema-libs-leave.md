@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
 depends_on: ["engine-and-doors-leave", "tree-libs-leave"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: c70846da0c1716dc
         size: 15506
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 449fba70cebace9f538e2941db414d732d3e8e2f
+    hash_after: d6dc04f8f1ac5dabd322c1a9feb71e1dabee1afb
+    inputs:
+      - name: design/draft
+        hash: c70846da0c1716dc
+        size: 15506
+      - name: design/tests-red
+        hash: 839ab9fc1cab1fab
+        size: 2586
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -446,8 +458,9 @@ The tests reach no door. Check cases seed Texts in memory, and quack cases read 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, and a red test decides every done_when line. Every library the done_when globs name stands tracked, and approach line one names each of them. A git grep over .claude, src, test, package.json, RUNME.sh, install.sh and .github finds no importer of a leaving library outside the leaving set and the tests the approach deletes or rewrites. The hooks, src/extension, src/scripts and src/stub import none of them. The Go owners the approach relies on exist: src/note, src/yaml, check/schema.go, check/mint.go, check/rerouted.go, check.Minted, check.SlugOf, withRoute in verb_mint.go, src/pull/hash.go, src/pull/pull_hand.go, command/todo.go, src/projection and src/prose. The red tests exist and fail on their own assertions. TestTheSchemaLibrariesStandNowhere decides both git ls-files lines, the note and check tests decide the go test line, and the check at tests-green decides the last. Points the implementer fixes in place: (1) Approach line fifteen and src/modules/check/export.go in size carry no work, since check.SlugOf already stands exported, so drop both. (2) TestNoTestImportsALeavingSchemaFile reads only test/. Widen its glob over src/extension, src/scripts, src/stub and .claude/skills/level0/hooks. (3) The callers list sends logbook, route-host, sidebar, sidebar-work and sidebar-writes through v1Over and the fronts golden, and size leaves them out. Run them against the golden, and add any of them that changes to size. Seed every text they read into src/note/testdata/fronts.golden.json before the update run. (4) The write door holds a second RelativeTo beside the one in check. Point the door.go comment at one Go owner, and park the duplicate as a private note. (5) Approach line thirty retargets the inventory table rows, which still name plugin-libs-leave for every leaving library. Move the leaving tests out of the per-ticket lists under plugin-libs-leave, branch-scripts-leave, pull-scripts-leave, ticket-scripts-leave and engine-and-doors-leave too. (6) Once schema-route.js leaves, hash.js has no importer. Add a Discussion line on plugin-libs-leave saying hash.js stands orphaned.
 
 # implement
 
