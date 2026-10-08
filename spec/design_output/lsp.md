@@ -341,12 +341,12 @@ The server builds into the index binary, `se-index`, so it takes no build of
 its own. A binary built off other source lints against rules the tree no longer
 carries.
 
-`index_here` and `front_here` in `install.sh` ask `stamp fresh`, the box verb
+`index_here` in `install.sh` asks `stamp fresh`, the box verb
 in `src/quack/stamp_verb.go`, whether the stamp beside the binary holds the hash
 of its source. The hash reads every Go file of each tree package the binary
 imports, and each file a `//go:embed` line there names. It reads the root
 `go.mod` and `go.sum` too, through `sourceStamp` in that file. A test file moves nothing. The build runs `stamp write`. A box
-with no index reads the front writer stale, and its build writes no stamp.
+with no index binary reads it stale.
 
 # The client starts it again
 
