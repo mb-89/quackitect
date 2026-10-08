@@ -5,10 +5,7 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"maps"
-	// level0: OutsideInDoors - the verb hashes the drawing's sources off the tree, as a build reads source
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -29,20 +26,20 @@ const (
 
 // Bundles the drawing, or under here answers 0 where the shipped banner names the stamp the sources give now. [[spec/tickets/scripts-folder-leaves]]
 func bundleVerb(d boxDoors, argv []string) int {
-	stamp, err := drawingStamp(d.root)
+	stamp, err := drawingStamp(d.disk, d.root)
 	if err != nil {
 		fmt.Fprintln(d.errs, err)
 		return 1
 	}
 	if len(argv) > 0 && argv[0] == "here" {
-		shipped, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(drawingOut)))
+		shipped, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(drawingOut)))
 		if err != nil || strings.SplitN(string(shipped), "\n", 2)[0] != drawingBanner+stamp {
 			return 1
 		}
 		return 0
 	}
 	webview := filepath.Join(d.root, filepath.FromSlash(drawingWebview))
-	if !stands(filepath.Join(webview, "node_modules", "esbuild", "package.json")) {
+	if !d.disk.stands(filepath.Join(webview, "node_modules", "esbuild", "package.json")) {
 		fmt.Fprintln(d.errs, "esbuild stands nowhere under "+drawingWebview+": run npm install there, then ./RUNME.sh bundle again.")
 		return 1
 	}
@@ -59,18 +56,13 @@ func bundleVerb(d boxDoors, argv []string) int {
 }
 
 // The hash of every file under the entry's folder and the lock, each under its path from the root in forward slashes, as HashText in src/pull/hash.go reads it, so the shipped banner holds on every box. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
-func drawingStamp(root string) (string, error) {
+func drawingStamp(disk diskDoors, root string) (string, error) {
 	webview := filepath.Join(root, filepath.FromSlash(drawingWebview))
-	files := []string{filepath.Join(webview, drawingLock)}
-	err := filepath.WalkDir(filepath.Join(webview, filepath.Dir(filepath.FromSlash(drawingEntry))), func(at string, entry fs.DirEntry, err error) error {
-		if err == nil && !entry.IsDir() {
-			files = append(files, at)
-		}
-		return err
-	})
+	under, err := disk.walkFiles(filepath.Join(webview, filepath.Dir(filepath.FromSlash(drawingEntry))))
 	if err != nil {
 		return "", err
 	}
+	files := append([]string{filepath.Join(webview, drawingLock)}, under...)
 	named := map[string]string{}
 	for _, at := range files {
 		rel, _ := filepath.Rel(root, at)
@@ -78,7 +70,7 @@ func drawingStamp(root string) (string, error) {
 	}
 	parts := []string{}
 	for _, path := range slices.Sorted(maps.Keys(named)) {
-		text, err := os.ReadFile(named[path])
+		text, err := disk.read(named[path])
 		if err != nil {
 			return "", err
 		}

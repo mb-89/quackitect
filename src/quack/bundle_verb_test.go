@@ -32,8 +32,7 @@ func bundleTree(t *testing.T, d boxDoors, entry string) {
 
 func stampHere(t *testing.T, disk diskDoors, root string) string {
 	t.Helper()
-	_ = disk
-	stamp, err := drawingStamp(root)
+	stamp, err := drawingStamp(disk, root)
 	if err != nil {
 		t.Fatal(err)
 	}

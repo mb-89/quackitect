@@ -8,8 +8,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	// level0: OutsideInDoors - the probe stands a fresh clone in a temp folder, as the cold probe does
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -95,7 +93,7 @@ func smokeChecks() []string {
 // Stands the box, runs the session on its door, prints each check, and removes the temp tree. [[spec/tickets/probes-leave-node]]
 func probed(d boxDoors, delta string, stands func(func(string), coldBox) bool, clears bool, names []string) int {
 	say := func(line string) { fmt.Fprintln(d.out, line) }
-	temp, err := os.MkdirTemp("", "se-dry-")
+	temp, err := d.disk.makeTemp("", "se-dry-")
 	if err != nil {
 		say("FAIL clone: " + err.Error())
 		return exitFailed
@@ -103,7 +101,7 @@ func probed(d boxDoors, delta string, stands func(func(string), coldBox) bool, c
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: coldPort(d.pid), delta: delta}
 	defer func() {
 		stopsIndex(d, box.tree)
-		leaves(os.RemoveAll, temp, say)
+		leaves(d.disk.removeAll, temp, say)
 	}()
 	if !stands(say, box) {
 		return exitFailed
@@ -197,9 +195,9 @@ func drySession(d boxDoors, tree string, clears bool) drySeen {
 	env := cloneEnv(tree)
 	index := filepath.Join(tree, filepath.FromSlash(indexBinary))
 	d.run([]string{index, "standing"}, runOpts{cwd: tree, env: env, timeout: dryStandingWait})
-	text, ok := readText(filepath.Join(tree, filepath.FromSlash(hooks.StandingFile)))
+	text, err := d.disk.read(filepath.Join(tree, filepath.FromSlash(hooks.StandingFile)))
 	var standing hooks.Standing
-	if !ok || json.Unmarshal([]byte(text), &standing) != nil {
+	if err != nil || json.Unmarshal(text, &standing) != nil {
 		return seen
 	}
 	seen.door = true

@@ -64,7 +64,6 @@ src/quack/boxdoors.go realRun
 src/quack/boxfiles.go readText
 src/quack/boxfiles.go realAppend
 src/quack/boxfiles.go stands
-src/quack/bundle_verb.go bundleVerb
 src/quack/bundle_verb.go drawingStamp
 src/quack/checkdoors.go checkDoorsOf
 src/quack/checkdoors.go redHere
@@ -73,9 +72,6 @@ src/quack/checkdoors.go surveyAt
 src/quack/checkdoors.go toolOf
 src/quack/commit.go landingHere
 src/quack/editorlink.go realOf
-src/quack/hook_verb.go copilotReader
-src/quack/hook_verb.go hookAsk
-src/quack/hook_verb.go hookHere
 src/quack/io.go beatsIndex
 src/quack/io.go ioMain
 src/quack/io.go ioProcesses
@@ -84,7 +80,6 @@ src/quack/io.go runsIO
 src/quack/lsp.go lspVerb
 src/quack/lspprobe.go fileURL
 src/quack/main.go askIndex
-src/quack/main.go configOn
 src/quack/main.go dumps
 src/quack/main.go main
 src/quack/main.go manages
@@ -93,15 +88,9 @@ src/quack/main.go wired
 src/quack/main.go wiringOf
 src/quack/placements.go moduleMain
 src/quack/placements.go runsModule
-src/quack/probe_clear.go dryRun.clearRun
-src/quack/probe_clear.go grouped
-src/quack/probe_clear.go keyed
-src/quack/probe_clear.go unparked
-src/quack/probe_dry.go probed
 src/quack/rules.go treeRules
 src/quack/serve_verb.go serveReal
 src/quack/stamp_verb.go sourceStamp
-src/quack/stamp_verb.go stampVerb
 src/quack/ticket_doors.go pullHere
 src/quack/ticket_doors.go rootsOf
 src/quack/ticket_doors.go servesHere

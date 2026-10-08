@@ -6,8 +6,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	// level0: OutsideInDoors - the probe writes the fresh clone it stands, as the cold probe does
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -56,11 +54,11 @@ func (s *dryRun) clearRun(env map[string]string) *dryCleared {
 		return dryRan{words: strings.Join(words, " "), exit: ran.code, said: ran.stdout + ran.stderr}
 	}
 	cleared := &dryCleared{runs: []dryRan{grouped(s.d, s.tree, env)}}
-	keyed(s.tree)
+	keyed(s.d.disk, s.tree)
 	s.raise("prompt.submit", map[string]any{"text": "carry on", "origin": map[string]any{"kind": dryOwner}})
 	s.raise(dryToolCall, map[string]any{"tool": "Read", "file_path": filepath.Join(s.tree, "README.md")})
 	cleared.runs = append(cleared.runs, pull())
-	_ = os.WriteFile(filepath.Join(s.tree, filepath.FromSlash(dryHandoverFile)), []byte(dryHandoverText), 0o644)
+	_ = s.d.disk.write(filepath.Join(s.tree, filepath.FromSlash(dryHandoverFile)), []byte(dryHandoverText), 0o644)
 	cleared.runs = append(cleared.runs, pull("handover", "--pass"))
 	s.ends()
 	cleared.pulled = pull().said
@@ -75,8 +73,8 @@ func grouped(d boxDoors, tree string, env map[string]string) dryRan {
 	opts := runOpts{cwd: tree, timeout: dryEventWait}
 	minted := d.run([]string{filepath.Join(tree, "RUNME.sh"), "mint", "ticket", "spec/tickets/" + dryGroup + ".md", "--process=trivial"}, runOpts{cwd: tree, env: env, timeout: dryEventWait})
 	leaf := filepath.Join(tree, "spec", "tickets", dryLeaf+".md")
-	_ = os.MkdirAll(filepath.Dir(leaf), 0o755)
-	_ = os.WriteFile(leaf, []byte(dryLeafText), 0o644)
+	_ = d.disk.makeAll(filepath.Dir(leaf), 0o755)
+	_ = d.disk.write(leaf, []byte(dryLeafText), 0o644)
 	unparked(d, tree)
 	branched := d.run([]string{"git", "checkout", "-q", "-B", "work/" + dryGroup}, opts)
 	d.run(append(append([]string{"git"}, dryAuthor...), "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"), opts)
@@ -101,15 +99,16 @@ func unparked(d boxDoors, tree string) {
 	var files []string
 	for _, file := range strings.Split(parked.stdout, "\n") {
 		at := filepath.Join(tree, filepath.FromSlash(file))
-		text, ok := readText(at)
-		if file == "" || !ok {
+		body, err := d.disk.read(at)
+		text := string(body)
+		if file == "" || err != nil {
 			continue
 		}
 		first := parkLine.FindStringIndex(text)
 		if first == nil {
 			continue
 		}
-		if os.WriteFile(at, []byte(text[:first[0]]+text[first[1]:]), 0o644) == nil {
+		if d.disk.write(at, []byte(text[:first[0]]+text[first[1]:]), 0o644) == nil {
 			files = append(files, file)
 		}
 	}
@@ -120,11 +119,11 @@ func unparked(d boxDoors, tree string) {
 }
 
 // Sets the handover key under the fill the session reports, so the first measure marks the session due. [[spec/tickets/the-clear-continues-the-session]]
-func keyed(tree string) {
+func keyed(disk diskDoors, tree string) {
 	at := filepath.Join(tree, filepath.FromSlash(config.Local))
 	was := map[string]any{}
-	if text, ok := readText(at); ok {
-		_ = json.Unmarshal([]byte(text), &was)
+	if text, err := disk.read(at); err == nil {
+		_ = json.Unmarshal(text, &was)
 	}
 	context, _ := was["context"].(map[string]any)
 	if context == nil {
@@ -133,8 +132,8 @@ func keyed(tree string) {
 	context["handoverAt"] = dryKey
 	was["context"] = context
 	text, _ := json.Marshal(was)
-	_ = os.MkdirAll(filepath.Dir(at), 0o755)
-	_ = os.WriteFile(at, append(text, '\n'), 0o644)
+	_ = disk.makeAll(filepath.Dir(at), 0o755)
+	_ = disk.write(at, append(text, '\n'), 0o644)
 }
 
 // The work the leaf makes lands as a commit on the box's branch, and origin carries it. [[spec/tickets/the-clear-hands-back-the-leaf]]

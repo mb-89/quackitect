@@ -433,6 +433,11 @@ func configAt(root string) (map[string]configRow, error) {
 
 // Every key both config files under the root hold, read through the disk door, resolved over the wiring's shared keys and the SE_ variables. [[spec/tickets/test-walks-move-onto-fakes]]
 func configOn(disk diskDoors, root string) (map[string]configRow, error) {
+	return configOver(disk, os.Environ, root)
+}
+
+// Every key both config files under the root hold, read through the disk door and resolved over the SE_ variables the environment names. [[spec/tickets/quack-reaches-through-box-doors]]
+func configOver(disk diskDoors, environ func() []string, root string) (map[string]configRow, error) {
 	read := func(path string) []byte {
 		body, _ := disk.read(filepath.Join(root, filepath.FromSlash(path)))
 		return body
@@ -442,7 +447,7 @@ func configOn(disk diskDoors, root string) (map[string]configRow, error) {
 		return nil, err
 	}
 	env := map[string]string{}
-	for _, one := range os.Environ() {
+	for _, one := range environ() {
 		if name, value, ok := strings.Cut(one, "="); ok && strings.HasPrefix(name, "SE_") {
 			env[name] = value
 		}

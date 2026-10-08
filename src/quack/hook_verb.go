@@ -9,14 +9,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	// level0: OutsideInDoors - the verb names the status a Copilot reply answers, a constant and no reach
-	"net/http"
-	// level0: OutsideInDoors - the hook verb builds its own hand off the box, as main.go builds the command line's
-	"os"
 	"path/filepath"
 	"time"
 
-	"quackitect/src/index"
 	"quackitect/src/modules/hooks"
 )
 
@@ -39,6 +34,12 @@ const (
 	copilotFault   = "Level zero: "
 )
 
+// The first status a reply answers on success, and the first past it. [[spec/tickets/quack-reaches-through-box-doors]]
+const (
+	replyOK   = 200
+	replyPast = 300
+)
+
 // The Copilot events the registrations name, which the verb answers beside the git hooks. [[spec/tickets/copilot-hooks-run-in-go]]
 var copilotEvents = map[string]bool{"SessionStart": true, "PreToolUse": true, "PostToolUse": true, "Stop": true}
 
@@ -49,20 +50,19 @@ func init() {
 }
 
 // The doors over this box: the root the index names, the cloud the harness variables say, the process's environment and stdin, and the clock. [[spec/tickets/git-hooks-run-in-go]]
-func hookHere() hookDoors {
-	root, err := index.Root()
-	if err != nil {
-		root = "."
-	}
+func hookHere() hookDoors { return hookOn(quietBox()) }
+
+// The hook's hand off one set of box doors: its root, environment, input, clock, disk and post. [[spec/tickets/quack-reaches-through-box-doors]]
+func hookOn(box boxDoors) hookDoors {
 	surface := hooks.VSCodeSurface
-	if copilotCloudAt(realDisk(), root, os.Getenv) {
+	if copilotCloudAt(box.disk, box.root, box.env) {
 		surface = hooks.CloudSurface
 	}
-	rows, _ := configAt(root)
+	rows, _ := configOver(box.disk, box.environ, box.root)
 	return hookDoors{
-		// level0: OutsideInDoors - the hook verb builds its own hand off the box, as main.go builds the command line's
-		root: root, cloud: commandSettings(quietBox(), root).Cloud, env: os.Getenv, stdin: os.Stdin, now: time.Now,
-		copilot: surface, ask: hookAsk(root, copilotWait), log: logsRow(root, configWord(rows, "log.level")), run: serveRuns, disk: realDisk(),
+		root: box.root, cloud: commandSettings(box, box.root).Cloud, env: box.env, stdin: box.input, now: box.clock.Now,
+		copilot: surface, ask: hookAsk(box.disk, box.post, box.root, copilotWait),
+		log: logsRowOn(box.disk, box.clock.Now, box.root, configWord(rows, "log.level")), run: serveRuns, disk: box.disk,
 	}
 }
 
@@ -86,10 +86,10 @@ type hookDoors struct {
 }
 
 // The ask reading the standing file under the root and posting there with its bearer token, within the wait. [[spec/tickets/copilot-hooks-run-in-go]]
-func hookAsk(root string, wait time.Duration) func(hooks.Post) (hooks.Answer, error) {
+func hookAsk(disk diskDoors, posts func(url, token, body string, wait time.Duration) (int, string, error), root string, wait time.Duration) func(hooks.Post) (hooks.Answer, error) {
 	return func(post hooks.Post) (hooks.Answer, error) {
 		var standing hooks.Standing
-		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
+		text, err := disk.read(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
 		if err == nil {
 			err = json.Unmarshal(text, &standing)
 		}
@@ -97,8 +97,8 @@ func hookAsk(root string, wait time.Duration) func(hooks.Post) (hooks.Answer, er
 			return hooks.Answer{}, err
 		}
 		body, _ := json.Marshal(post)
-		status, said, err := realPost(fmt.Sprintf(copilotAddress, standing.Port), standing.Token, string(body), wait)
-		if err == nil && (status < http.StatusOK || status >= http.StatusMultipleChoices) {
+		status, said, err := posts(fmt.Sprintf(copilotAddress, standing.Port), standing.Token, string(body), wait)
+		if err == nil && (status < replyOK || status >= replyPast) {
 			err = fmt.Errorf("the hooks door answers %d", status)
 		}
 		var answer hooks.Answer
@@ -141,7 +141,7 @@ func copilotAnswer(d hookDoors, name string, event *hooks.CopilotEvent) (hooks.C
 		return hooks.CopilotResult{}, err
 	}
 	*event = read
-	result, err := hooks.CopilotAnswers(read, d.ask, copilotReader(d.root), d.root)
+	result, err := hooks.CopilotAnswers(read, d.ask, copilotReader(d.disk, d.root), d.root)
 	if err != nil {
 		return result, err
 	}
@@ -156,12 +156,12 @@ func copilotAnswer(d hookDoors, name string, event *hooks.CopilotEvent) (hooks.C
 }
 
 // The read of a file an edit names, under the root where the path stands relative. [[spec/tickets/copilot-hooks-run-in-go]]
-func copilotReader(root string) func(path string) (string, error) {
+func copilotReader(disk diskDoors, root string) func(path string) (string, error) {
 	return func(path string) (string, error) {
 		if !filepath.IsAbs(path) {
 			path = filepath.Join(root, filepath.FromSlash(path))
 		}
-		text, err := os.ReadFile(path)
+		text, err := disk.read(path)
 		return string(text), err
 	}
 }

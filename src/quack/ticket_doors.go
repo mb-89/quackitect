@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"quackitect/src/failure"
 	"quackitect/src/index"
@@ -136,7 +137,12 @@ func pullLog(work, floor string) func(level, kind, said string, extra map[string
 
 // The session log's row writer under the work root, which answers the fault a write meets. [[spec/tickets/copilot-hooks-run-in-go]]
 func logsRow(work, floor string) func(level, kind, said string, extra map[string]any) error {
-	write := appendsRow(realDisk(), work, wall.Now)
+	return logsRowOn(realDisk(), wall.Now, work, floor)
+}
+
+// The session log's row writer under the work root, over the disk and the clock it takes. [[spec/tickets/quack-reaches-through-box-doors]]
+func logsRowOn(disk diskDoors, now func() time.Time, work, floor string) func(level, kind, said string, extra map[string]any) error {
+	write := appendsRow(disk, work, now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {

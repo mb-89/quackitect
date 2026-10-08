@@ -7,10 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	// level0: OutsideInDoors - the case stands a real hooks door the verb posts to, the verb's door test
-	"net/http"
-	"net/http/httptest"
-	"net/url"
 	// level0: OutsideInDoors - the case reads the real repository it drives, the verb's door test
 	"os"
 	// level0: OutsideInDoors - the case runs the real hook script, the hook's door test
@@ -381,25 +377,47 @@ func TestHookCloudTakesJSONStringArgumentsAndItsOwnEnvelope(t *testing.T) {
 
 func TestHookAsksTheDoorTheStandingFileNames(t *testing.T) {
 	t.Parallel()
-	var bearer string
+	d, _, _, _ := fakeBoxDoors(t)
+	root := d.root
+	hq1SeedDisk(t, d.disk, root, map[string]string{hooks.StandingFile: `{"port":4711,"token":"t0k"}`})
+	var address, bearer string
 	var posted hooks.Post
-	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bearer = r.Header.Get("Authorization")
-		body, _ := io.ReadAll(r.Body)
-		_ = json.Unmarshal(body, &posted)
-		_, _ = w.Write([]byte(`{"effects":[{"kind":"after","text":"from the door"}]}`))
-	}))
-	defer door.Close()
-	at, _ := url.Parse(door.URL)
-	root := t.TempDir() // level0: FixtureOutsideHome - the case lays its own standing file, naming its own door
-	seedFile(t, root, hooks.StandingFile, `{"port":`+at.Port()+`,"token":"t0k"}`)
-	said := copilotHooks(root, "vscode", hookAsk(root, time.Second), nil, "SessionStart", `{"session_id":"s1"}`)
+	post := func(url, token, body string, _ time.Duration) (int, string, error) {
+		address, bearer = url, token
+		_ = json.Unmarshal([]byte(body), &posted)
+		return 200, `{"effects":[{"kind":"after","text":"from the door"}]}`, nil
+	}
+	said := copilotHooks(root, "vscode", hookAsk(d.disk, post, root, time.Second), nil, "SessionStart", `{"session_id":"s1"}`)
 	want := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": "from the door"}}
 	if !reflect.DeepEqual(said.reply, want) {
 		t.Fatalf("the real ask answers %q, and wants the door's after as context", said.out)
 	}
-	if bearer != "Bearer t0k" || posted.Event != "session.start" || posted.Root != root {
-		t.Errorf("the door took %q, %+v, and wants the standing token and a session.start under the root", bearer, posted)
+	if address != "http://127.0.0.1:4711/hook" || bearer != "t0k" || posted.Event != "session.start" || posted.Root != root {
+		t.Errorf("the door took %q at %q, %+v, and wants the standing token and a session.start under the root at the standing port", bearer, address, posted)
+	}
+}
+
+func TestTheHookHandReadsTheBoxDoors(t *testing.T) {
+	t.Parallel()
+	d, _, _, _ := fakeBoxDoors(t)
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{hooks.StandingFile: `{"port":4711,"token":"t0k"}`})
+	asked := ""
+	d.post = func(url, _, _ string, _ time.Duration) (int, string, error) {
+		asked = url
+		return 200, `{"effects":[]}`, nil
+	}
+	hand := hookOn(d)
+	if _, err := hand.ask(hooks.Post{Event: "session.start"}); err != nil || asked != "http://127.0.0.1:4711/hook" {
+		t.Errorf("the hand asks %q and meets %v, and wants the box's post at the standing port", asked, err)
+	}
+	if err := hand.log("warn", copilotKind, "from the hand", nil); err != nil {
+		t.Fatal(err)
+	}
+	if logged, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(sessionLog))); err != nil || !strings.Contains(string(logged), `"said":"from the hand"`) {
+		t.Errorf("the box's disk holds the log %q, and wants the hand's row", logged)
+	}
+	if hand.root != d.root || !hand.now().Equal(d.clock.Now()) {
+		t.Errorf("the hand stands at %q at %v, and wants the box's root and clock", hand.root, hand.now())
 	}
 }
 
