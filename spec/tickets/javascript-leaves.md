@@ -212,12 +212,15 @@ record:
   - step: retro/cloud
     hand: box ba1101ec7b2d · claude-code-remote
     hash_before: 0676b5e9ea1dbc87dd10e4f5580192a450d55508
-    hash_after: 0676b5e9ea1dbc87dd10e4f5580192a450d55508
+    hash_after: b967fdf6f57842dcb4de943f20de66b8b5c70d45
     inputs:
       - name: retro/write
         hash: 09110f7f98a63a74
         size: 2964
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: PR 141 stands green with auto-merge on, waiting on approval
 reason: done
 ---
 
