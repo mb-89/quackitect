@@ -120,8 +120,6 @@ folder.
 | `.claude/skills/level0/hooks/` | the level zero function hooks, which Claude Code loads as TypeScript modules |
 | `.claude/skills/level0/tests/` | the tests of those hooks, in TypeScript beside them |
 | `src/stub/.claude/skills/level0/hooks/` | the stub's bridgehead, in TypeScript, in the stub a project takes |
-| `.claude/skills/level0/lib/vale.js` | the readers of the JSON the rules-over verb writes, which its own test alone loads |
-| `src/engine/tools.js` | the survey reader, which its own test alone loads |
 | `src/doors/clock.js` | the clock door the extension loads, which the process door stands on |
 | `src/doors/disk.js` | the disk door the extension loads |
 | `src/doors/http.js` | the http door the extension's index door posts through |

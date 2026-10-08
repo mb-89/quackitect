@@ -238,8 +238,8 @@ func TestTheJavaScriptPartRefusesAFileTheListLeavesOut(t *testing.T) {
 		},
 		{
 			name:  "a list covering every file, a folder row and a file row, passes",
-			note:  doorsNoteListing("src/extension/", "src/engine/tools.js"),
-			files: []string{"src/extension/one.js", "src/extension/lib/two.ts", "src/engine/tools.js", "src/one.go"},
+			note:  doorsNoteListing("src/extension/", "src/engine/three.js"),
+			files: []string{"src/extension/one.js", "src/extension/lib/two.ts", "src/engine/three.js", "src/one.go"},
 			code:  0,
 		},
 	}

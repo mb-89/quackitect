@@ -12,7 +12,7 @@ import (
 	"quackitect/src/owns"
 )
 
-// The rule names and the words this module owns, with the exemption rule unreasoned of .claude/skills/level0/lib/vale.js spells again, because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
+// The rule names and the words this module owns, with the exemption rule unreasoned. [[spec/design_output/lsp#the-server-runs-the-tools]]
 const (
 	Unreasoned      = "ExemptionCarriesAReason"
 	FileCeiling     = "FileCeiling"

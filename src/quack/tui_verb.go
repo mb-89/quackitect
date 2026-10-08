@@ -391,7 +391,7 @@ func tuiReal() tuiDoors {
 	}
 }
 
-// The go program the tools file names, else one under the binaries' folder, else go off the path, as whereIs in src/engine/tools.js answers. [[spec/design_output/tui#the-verb-builds-it]]
+// The go program the tools file names, else one under the binaries' folder, else go off the path. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiGoOf(disk diskDoors, root string) string {
 	var known map[string]struct {
 		Path string `json:"path"`

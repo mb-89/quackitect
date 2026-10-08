@@ -23,7 +23,7 @@ const (
 	PullCommitStand = "PullCommitStands"
 )
 
-// The private half and its notes, which private.go owns, and the prose and code a rule reads, off lib/vale.js. [[spec/design_output/private#the-second-door]]
+// The private half and its notes, which private.go owns, and the prose and code a rule reads. [[spec/design_output/private#the-second-door]]
 const (
 	home  = ".se"
 	notes = ".se/notes"
