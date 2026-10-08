@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: acce97a30d11751b7ce4def77ef75429464897ca
+    hash_after: acce97a30d11751b7ce4def77ef75429464897ca
+    inputs:
+      - name: ask
+        hash: 965aca16ed5ff388
+        size: 494
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -151,38 +160,69 @@ Five quack verbs reach os, exec and the clock past a door under an OutsideInDoor
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each reach moves onto the doors the function already holds, and each file drops its os and net/http imports with their markers.
+
+- bundle_verb.go: bundleVerb reads the shipped drawing through d.disk.read. drawingStamp takes the diskDoors and walks the webview through disk.list in place of filepath.WalkDir, reading each source through disk.read.
+- stamp_verb.go: stampVerb reads, makes the folder and writes the stamp through d.disk, and sourceStamp reads each file through d.disk.read.
+- hook_verb.go: hookHere builds its hand off quietBox(): env, input, clock.Now and disk come from the box doors, and copilotCloudAt reads the box's disk and env. hookAsk takes the read and the post it reaches, and copilotReader takes the read. The two status bounds of a 2xx reply stand as named constants, so net/http leaves.
+- probe_clear.go: clearRun, grouped, unparked and keyed write through d.disk, and keyed takes the boxDoors.
+- probe_dry.go: probed makes its temp tree through d.disk.makeTemp and removes it through d.disk.removeAll.
+
+The registered twins still hand the real doors through realBoxDoors, so nothing changes on a real run. The purity baseline rows these functions hold leave through ./RUNME.sh guards --update.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb.go bundleVerb, which calls drawingStamp
+- src/quack/bundle_verb_test.go TestTheShippedDrawingNamesTheStampItsSourcesGive and TestTheDrawingStampMovesWithASourceUnderTheWebviewAndHoldsOtherwise, which call drawingStamp
+- src/quack/hook_verb.go init, which calls hookHere
+- src/quack/hook_verb.go copilotAnswer, which calls copilotReader
+- src/quack/hook_verb_test.go copilotHooks callers, which call hookAsk
+- src/quack/probe_clear.go dryRun.clearRun, which calls keyed
+- src/quack/probe_dry.go probeDry and probeSmoke, which call probed
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb_test.go TestTheSourceStampReadsFreshAfterAWriteAndStaleOnceASourceMoves, moved onto newFakeDisk so the stamp writes and reads in memory
+- src/owns/tree_test.go and src/imports/walkaround_test.go, which decide the done_when line with no marker left in the five files
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/bundle_verb.go
+- src/quack/stamp_verb.go
+- src/quack/hook_verb.go
+- src/quack/probe_clear.go
+- src/quack/probe_dry.go
+- src/quack/bundle_verb_test.go
+- src/quack/hook_verb_test.go
+- src/imports/baseline/purity.txt
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened boxDoors and realBoxDoors in boxdoors.go, diskDoors and realDisk in boxfiles.go, newFakeDisk in box_doors_test.go, and each reach the five files hold
+- the callers list names every caller of drawingStamp, hookAsk, copilotReader, hookHere, keyed and probed, off a grep of src
+- the done_when line is decided by go test over src/owns and src/imports, with git grep finding no OutsideInDoors marker in the five files
+- the approach adds no config key
 
 ## tests-red
 
