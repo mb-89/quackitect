@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -166,8 +167,11 @@ func TestHookPrePushRefusesABranchAnotherBoxHolds(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
 	stampsGreen(t, root, sha)
-	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
-	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now())
+	tip, err := strconv.ParseInt(gitDoes(t, root, "log", "-1", "--format=%ct", "origin/work/x"), 10, 64)
+	if err != nil {
+		t.Fatalf("the hold's commit time reads %v", err)
+	}
+	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Unix(tip, 0))
 	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) || !strings.Contains(errs, "branch sync") {
 		t.Fatalf("pre-push answers %d, %q, and wants a branch another box holds refused, naming the holder and main", code, errs)
 	}
