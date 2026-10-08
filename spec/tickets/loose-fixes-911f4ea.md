@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 fix: true
 record:
   - step: sync
@@ -143,6 +143,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f9a347032e0b · claude-code-remote
+    hash_before: 41abbc13f27ab6806e4eeb69d262e93946286de2
+    hash_after: 41abbc13f27ab6806e4eeb69d262e93946286de2
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -224,38 +236,56 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `doors-pr-windows-goes-green` closes: the pull request it waited on merged with both runners green, and the check passes on this box
+- the private note on the trivial route closes as dropped, and the improve line below carries its gap
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the pull request read answered the Windows question at once, because the ticket discussion named the pull request
+- the check passed on the first run, because main already carried the fix
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 00:20, the hand-back met a refusal: the tests field expects green, and the check answers a timing table
+- 00:23, the box minted a successor into this group by mistake, and removed it before any commit
+- 00:24, a hook refused a gate and a landing joined by a semicolon, and a second hook refused a bare git push
+- 00:20, the MCP pull tool met a refused connection to its index
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the tests field of `spec/processes/trivial.yaml` names a command that answers green where a ticket touches no code, a choice the owner makes over the three routes carrying it
+- a box reads the mint usage in `spec/guidance/cloud/cloud.md` before it mints, since a mint on a work branch lands in the group
+- a box pushes through the push verb, per `spec/guidance/cloud/cloud.md`
+- a box falls back to the command line where the MCP index refuses, per `spec/guidance/working.md`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The child carried no code, since its fix landed on main before the box took the branch. The box weighed a route fix against the scope of a fix group, and kept the branch at its edge.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro states each fact once, and points at the route file
+- the retro adds no number
+- the retro writes no header
+- the retro carries each error with its time, and no owner prompt turned the run
+- the retro names the role, and no name, address or path of the box
 
 ## cloud
 
