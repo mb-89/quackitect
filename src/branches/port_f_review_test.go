@@ -55,8 +55,8 @@ func pfReviewTree(t *testing.T, check pfCheck, handback string) *tree {
 	one.cut(workBranch+pfName, "main")
 	one.land("the ask", map[string]string{ticketAt(pfName): pfAsk})
 	one.land("the work", map[string]string{
-		ticketAt(pfName):        handback,
-		"go.mod":                "module pfreview\n\ngo 1.24\n",
+		ticketAt(pfName):    handback,
+		"go.mod":            "module pfreview\n\ngo 1.24\n",
 		"src/quack/main.go": "package main\n\nfunc main() {}\n",
 		"src/a.js":          "export const a = 1;\n",
 	})

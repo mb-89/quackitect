@@ -5,8 +5,6 @@ package main
 
 import (
 	"fmt"
-	// level0: OutsideInDoors - the verb hashes the source a build reads and writes the stamp beside the binary, as a build does
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -37,16 +35,16 @@ func stampVerb(d boxDoors, argv []string) int {
 		return 1
 	}
 	if argv[0] == "fresh" {
-		if said, err := os.ReadFile(at); err != nil || strings.TrimSpace(string(said)) != now {
+		if said, err := d.disk.read(at); err != nil || strings.TrimSpace(string(said)) != now {
 			return 1
 		}
 		return 0
 	}
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(at), 0o755); err != nil {
 		fmt.Fprintln(d.errs, err)
 		return 1
 	}
-	if err := os.WriteFile(at, []byte(now+"\n"), 0o644); err != nil {
+	if err := d.disk.write(at, []byte(now+"\n"), 0o644); err != nil {
 		fmt.Fprintln(d.errs, err)
 		return 1
 	}
@@ -73,7 +71,7 @@ func sourceStamp(d boxDoors, pkg string) (string, error) {
 	slices.Sort(paths)
 	var parts []string
 	for _, one := range slices.Compact(paths) {
-		if text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(one))); err == nil {
+		if text, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(one))); err == nil {
 			parts = append(parts, one+"\n"+string(text))
 		}
 	}
