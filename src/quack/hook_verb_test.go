@@ -382,12 +382,12 @@ func TestHookAsksTheDoorTheStandingFileNames(t *testing.T) {
 	hq1SeedDisk(t, d.disk, root, map[string]string{hooks.StandingFile: `{"port":4711,"token":"t0k"}`})
 	var address, bearer string
 	var posted hooks.Post
-	post := func(url, token, body string, _ time.Duration) (int, string, error) {
+	d.post = func(url, token, body string, _ time.Duration) (int, string, error) {
 		address, bearer = url, token
 		_ = json.Unmarshal([]byte(body), &posted)
 		return 200, `{"effects":[{"kind":"after","text":"from the door"}]}`, nil
 	}
-	said := copilotHooks(root, "vscode", hookAsk(d.disk, post, root, time.Second), nil, "SessionStart", `{"session_id":"s1"}`)
+	said := copilotHooks(root, "vscode", hookOn(d).ask, nil, "SessionStart", `{"session_id":"s1"}`)
 	want := map[string]any{"hookSpecificOutput": map[string]any{"hookEventName": "SessionStart", "additionalContext": "from the door"}}
 	if !reflect.DeepEqual(said.reply, want) {
 		t.Fatalf("the real ask answers %q, and wants the door's after as context", said.out)
@@ -400,16 +400,7 @@ func TestHookAsksTheDoorTheStandingFileNames(t *testing.T) {
 func TestTheHookHandReadsTheBoxDoors(t *testing.T) {
 	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
-	hq1SeedDisk(t, d.disk, d.root, map[string]string{hooks.StandingFile: `{"port":4711,"token":"t0k"}`})
-	asked := ""
-	d.post = func(url, _, _ string, _ time.Duration) (int, string, error) {
-		asked = url
-		return 200, `{"effects":[]}`, nil
-	}
 	hand := hookOn(d)
-	if _, err := hand.ask(hooks.Post{Event: "session.start"}); err != nil || asked != "http://127.0.0.1:4711/hook" {
-		t.Errorf("the hand asks %q and meets %v, and wants the box's post at the standing port", asked, err)
-	}
 	if err := hand.log("warn", copilotKind, "from the hand", nil); err != nil {
 		t.Fatal(err)
 	}
