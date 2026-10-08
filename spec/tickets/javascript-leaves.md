@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -166,6 +166,25 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 8db9fc4e069228fc4abfcd29bd37f62d72e6e47f
+    hash_after: 8db9fc4e069228fc4abfcd29bd37f62d72e6e47f
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/javascript-leaves already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 232bc1595e9752ed
+        size: 1445
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -256,8 +275,7 @@ The group ends with `./RUNME.sh check` green, and the JavaScript that stays list
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- level0-note-drops-faultin: spec/design_output/level0.md, section 'A broken rule says so', names faultIn in lib/vale.js, which unloaded-js-readers-leave deleted; name the code that stops ./RUNME.sh lint on a broken rule now, or cut the line
+accept
 
 # retro
 
