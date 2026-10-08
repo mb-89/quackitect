@@ -1767,7 +1767,7 @@ error, leaves standard output empty, and exits non-zero. A reader parsing JSON
 alone then finds no breach. So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
-`faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
+`lspRules` in `src/quack/rules.go` turns a failed load into a `RulesLoad` error, and `./RUNME.sh lint` stops on it.
 The write door reads a lint that runs nowhere the same way, whatever the fault:
 
 | what stands | what the door does |
