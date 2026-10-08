@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 53ceb5e3634b885937846c10c0e8999a9ded013c
+    hash_after: 53ceb5e3634b885937846c10c0e8999a9ded013c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/check passes; green, src/yaml passes; green, src/note passes
+      - name: check
+        exit: 0
+        said: "   68.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 839ab9fc1cab1fab
+        size: 2586
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -501,26 +524,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/schema_libs_test.go src/quack/minted_golden_test.go src/quack/shipped_schemas_test.go src/modules/check/route_test.go src/modules/check/schema_test.go src/modules/check/table_test.go src/modules/check/paths_test.go src/yaml/yaml_test.go src/note/note_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sixteen libraries under `.claude/skills/level0/lib` that read schemas, tickets, todos, paths and words leave, with the front door and the tests of their code. Their rules read in Go: the schema and table checks in `src/modules/check`, the note reader in `src/note`, the YAML reader in `src/yaml`, and the vocabulary in `src/projection`. Goldens pin what the mint writes and what each shipped schema refuses. The ported rules caught four notes the JS checker passed, and those notes now hold to them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, and the notes the ported rules catch.
+- The readers take the memory tree and the fake index, and the goldens stand beside their tests.
+- Each new Go function names this ticket.
+- Each design note points at the Go owner of the rule it names.
 
 # accept
 
