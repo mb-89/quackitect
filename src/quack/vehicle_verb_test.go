@@ -328,11 +328,12 @@ func TestVehicleSettleMakesABareWorkAProject(t *testing.T) {
 	work := filepath.Join(where, "work")
 	doors.env["SE_WORK_ROOT"] = work
 	code, out, errs := vehicleRun(doors, false, "settle")
-	if code != 0 || out != "method "+doors.root+"\n" || errs != "" {
+	method := filepath.ToSlash(doors.root)
+	if code != 0 || out != "method "+method+"\n" || errs != "" {
 		t.Fatalf("%d %q %q", code, out, errs)
 	}
-	if method, _, ok := vehicle.PointerOf(vehicleRead(t, filepath.Join(work, filepath.FromSlash(vehicle.Pointer)))); !ok || method != doors.root {
-		t.Fatal("the work's pointer names this vehicle", method)
+	if said, _, ok := vehicle.PointerOf(vehicleRead(t, filepath.Join(work, filepath.FromSlash(vehicle.Pointer)))); !ok || said != method {
+		t.Fatal("the work's pointer names this vehicle", said)
 	}
 	if vehicleRead(t, filepath.Join(work, vehicle.PluginFolder, "lib/apply.js")) != "export const a = 1;\n" {
 		t.Fatal("the hook's closure travels into the work")

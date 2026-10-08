@@ -74,7 +74,7 @@ func bootTree(t *testing.T) string {
 		t.Fatal(err)
 	}
 	bootWrite(t, filepath.Join(tree, "install.sh"), string(body), 0o755)
-	bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), bootIndex, 0o755)
+	bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", binNamed("se-index")), bootIndex, 0o755)
 	return tree
 }
 
@@ -253,7 +253,7 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		tree := bootTree(t)
 		bin := filepath.Join(tree, ".se", ".runtime", "bin")
 		path := filepath.Join(tree, "path")
-		bootWrite(t, filepath.Join(bin, "se-index"), stampIndex, 0o755)
+		bootWrite(t, filepath.Join(bin, binNamed("se-index")), stampIndex, 0o755)
 		bootWrite(t, filepath.Join(tree, "index-copy"), stampIndex, 0o755)
 		bootWrite(t, filepath.Join(path, "go"), stampGo, 0o755)
 		bootWrite(t, filepath.Join(tree, ".se", ".runtime", "fresh-code"), one.code, 0o644)
