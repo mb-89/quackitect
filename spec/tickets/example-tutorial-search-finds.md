@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,88 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-depends_on: [example-tutorial-tab-draws]
+depends_on: ["example-tutorial-tab-draws"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 1e82a2043f8aa84c1901b87e36db3ee5a42132c0
+    hash_after: 1e82a2043f8aa84c1901b87e36db3ee5a42132c0
+    inputs:
+      - name: ask
+        hash: cbde1a14dc72bbf9
+        size: 629
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: dc59c52ecdc209add95d2ea475ec7c558c643058
+    hash_after: dc59c52ecdc209add95d2ea475ec7c558c643058
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tutorial fails
+    inputs:
+      - name: design/draft
+        hash: 2c01e3f3b017de14
+        size: 3315
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote · helper-4
+    hash_before: fc1f01339b6f17fd14e54920d26dd93ddf5b51fb
+    hash_after: fc1f01339b6f17fd14e54920d26dd93ddf5b51fb
+    inputs:
+      - name: design/draft
+        hash: 2c01e3f3b017de14
+        size: 3315
+      - name: design/tests-red
+        hash: 534e9b74e1d3d6d2
+        size: 1118
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 7a1a4d1bf7309615fead15a56044584a2ad92a4b
+    hash_after: 6a4fddece79902e55b70152b38b675b37f032438
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: c9d1592c996f7c1c735fa9d70f6b9909b77e3e3d
+    hash_after: c9d1592c996f7c1c735fa9d70f6b9909b77e3e3d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tutorial passes
+      - name: check
+        exit: 0
+        said: "   58.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 534e9b74e1d3d6d2
+        size: 1118
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -154,38 +234,66 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+All in src/tui/tutorial/tab.go, after [[spec/design_output/examples#the-search]].
+
+1. The tab holds a `content bool` beside `word`; title mode is the zero value.
+2. `kept()` reads one pure function `matches(row, word, content)`: title mode tests the lowered title, content mode the lowered title, each keyword and the body. The tree already drops a chapter holding no kept row, since `Left` draws headings off the kept rows alone.
+3. A new Act in `Keys`, `alt+m`, with `Under: true`, so it works while the filter line takes letters (the `alt+l` pattern in src/tui/log/tab.go). It flips `content` and calls `Move(m, 0)`, so the selection lands on a kept row. `alt+m` stands free across src/tui.
+4. `Left` opens with a dim line naming the mode, `title search` or `content search`, while `word` stands non-empty. The footer cannot carry it: `RenderMarks` reads the marks of `Tabs[0]`, the log.
+5. `Detail` in content mode with a word wraps each line through `draw.Wrap(line, w)` itself and hands each wrapped line as a `Drawn` part, every case-blind match rendered in a `matchStyle` (reverse video) and the rest in the line's own style. The title line takes the same light. Title mode draws as it stands. Cost: a match the wrap splits lights on each half apart; the keywords stay unlit, because `Detail` draws none.
+6. `Narrow` keeps its body: an empty word keeps every row, and `Move(m, 0)` holds `At` where it stands, so clearing brings the tree back with the selection held. Its comment drops the line saying the search ticket owns the modes.
+
+Assumptions: a match is a case-blind substring, as `kept()` reads it today; the mode survives a cleared line, so the next search runs in the mode the user set.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/frame/filterpane.go Model.Narrow, calling Tab.Narrow
+- src/tui/frame/model.go Model.Update, calling Tab.Keys for an Under act
+- src/tui/frame/keys.go Model bands, calling Tab.Keys for the help
+- src/tui/frame/model.go Model.LoadPane, calling Tab.Detail
+- src/tui/frame/model.go Model.View, calling Tab.Left
+- src/tui/tutorial/tab.go Tab.Move and Tab.Left, calling kept
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab_test.go TestTitleModeKeepsTheExamplesWhoseTitleMatches
+- src/tui/tutorial/tab_test.go TestContentModeKeepsTitleKeywordsOrBodyMatches
+- src/tui/tutorial/tab_test.go TestContentModeLightsEveryMatchInTheMainView
+- src/tui/tutorial/tab_test.go TestAltMTurnsTheModeOverUnderTheFilterPane
+- src/tui/tutorial/tab_test.go TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab.go
+- src/tui/tutorial/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened tab.go, frame/filterpane.go, frame/part.go, frame/tabs.go, frame/keys.go, frame/model.go, frame/footer.go, draw/wrap.go and tab_test.go, and checked each claim there
+- the callers list names the frame call sites of Narrow, Keys, Detail and Left, found by grep over src/tui/frame, and the two in-tab callers of kept
+- done_when 1 meets TestTitleModeKeepsTheExamplesWhoseTitleMatches; 2 meets TestContentModeKeepsTitleKeywordsOrBodyMatches and TestContentModeLightsEveryMatchInTheMainView; 3 meets TestAltMTurnsTheModeOverUnderTheFilterPane and TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld; 4 meets those cases and ./RUNME.sh check
+- the approach adds no config key
 
 ## tests-red
 
@@ -194,26 +302,31 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tutorial/tab_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tutorial/tab_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion, and the four cases standing before pass. Title and content cases miss the mode line on the tree. alt+m falls through to the text input and types an m, so the line reads boxm. Clearing finds the selection on the first row, since content mode never keeps the keyword row. The light case counts no lit match. A surprise: no test in src/tui forces a colour profile, so a lit match reads as plain text. A TestMain sets the ANSI profile once before any case, which keeps the cases parallel.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when 1 meets TestTitleModeKeepsTheExamplesWhoseTitleMatches, 2 meets TestContentModeKeepsTitleKeywordsOrBodyMatches and TestContentModeLightsEveryMatchInTheMainView, 3 meets TestAltMTurnsTheModeOverUnderTheFilterPane and TestClearingTheSearchBringsTheTreeBackWithTheSelectionHeld, and 4 meets those cases with ./RUNME.sh check at implement
+- the tests reach the registry door alone, through registry.Fake, which the window helper already hands the tab
 
 # gate
 
@@ -222,8 +335,9 @@ none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -234,14 +348,19 @@ none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/tui/tutorial/tab.go src/tui/tutorial/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/tutorial/tab.go and its test alone, the two files the size field names
+- the change reaches the registry door alone, through the window helper and registry.Fake
+- each new function and the alt+m key carry a link to spec/design_output/examples#the-search
+- the mode names and the match style stand once, as names at the top of tab.go
 
 ## tests-green
 
@@ -250,26 +369,33 @@ none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tutorial/tab_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Tutorial tab's search takes two modes. Title mode keeps each example whose title holds the word. Content mode also reads each keyword and the body, and lights every match in the main view in reverse video. The `alt+m` key turns the mode over, and works while the filter line takes letters. A dim line over the tree names the mode while the search holds a word. Clearing the line brings back every row, with the selection where it stood. The footer cannot name the mode, since it reads the marks of the log tab. The test helper opens the filter pane only where it stands closed, because a second open closes it. Its gofmt line on the Tab struct landed in c9d1592c9, beside example-first-chapters-stand, since the check reads the whole tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/tutorial/tab.go and its test alone
+- the cases reach the registry door alone, through registry.Fake
+- each new function and the alt+m key link to spec/design_output/examples#the-search
+- the mode names and the match style stand once, as names at the top of tab.go
 
 # accept
 

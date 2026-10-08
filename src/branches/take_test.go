@@ -1,6 +1,6 @@
 // The take and the open: nothing free, the claim, and the open.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported heldIn, cloudMark and fieldOf after take runs
 
 import "testing"
 
@@ -58,4 +58,21 @@ func TestAnOpenNamingNothingRefuses(t *testing.T) {
 		t.Fatalf("a bare open answers %d", code)
 	}
 	holds(t, one.errs.String(), "branch open needs a group")
+}
+
+// A dependency standing as a work branch on origin waits for its merge, and one standing nowhere reads as closed. [[spec/design_output/pull#children-before-their-group]]
+func TestADependencyOnALiveBranchWaits(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, nil)
+	one.branch("other", map[string]string{"notes.txt": "at work\n"})
+	if one.d.closedHere(nil, "other") {
+		t.Fatal("a dependency on the live branch work/other reads as closed")
+	}
+	if !one.d.closedHere(nil, "gone") {
+		t.Fatal("a dependency standing nowhere reads as open")
+	}
+	kid := named{Name: "kid", Text: withField(childNote, "depends_on", "[other]")}
+	if said := one.d.waitsAt(kid, nil); said != "kid waits for other to close" {
+		t.Fatalf("the child waiting on work/other reads %q", said)
+	}
 }

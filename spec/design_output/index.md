@@ -121,7 +121,7 @@ A start waits on readiness, and on no fixed span:
 
 | the caller | it waits until |
 |---|---|
-| the one holding the claim | the door stands, or the index it spawned exits, and it renews the claim each poll |
+| the one holding the claim | the door stands, or the index it spawns exits, and it renews the claim each poll |
 | one meeting a fresh claim | the door stands, or the claim goes stale and it takes the claim itself |
 | either | the hang guard `startHang` passes, where the index neither stands nor exits |
 
@@ -296,7 +296,7 @@ without waiting, which leaves the first question warm.
 ## Find reads a body
 
 `mcp__level0__find` takes `function` beside `words`. The name goes to the
-index, and `runsFind` in `src/bridge/search.js` keeps the first row whose line
+index, and `bodyFound` in `src/modules/search/search.go` keeps the first row whose line
 defines it:
 
 - a `function` or a `const`, `let` or `var` holding one
@@ -403,14 +403,14 @@ compiler.
 |---|---|
 | the root `go.mod` | the driver's pin |
 | `install.sh` | the index build, beside the language server's |
-| `goEnvOf` in `src/scripts/cli-go.js` | the environment every Go test runs under |
+| `goGate` in `src/quack/check.go` | the environment every Go test runs under |
 
 The driver pin stays on a release asking for the Go the root `go.mod` names.
 For the reasoning, see [[spec/rationales/the-index-drops-cgo]].
 
 The battery runs each module's tests, then the Go formatter over that module's
 folder. A file the formatter writes another way turns the check red, and the
-check names that file. `formatFaults` in `src/scripts/cli-go.js` writes the
+check names that file. `goGate` in `src/quack/check.go` writes the
 findings, and a case drives it. A box carrying no formatter leaves the gate
 silent, the way a box carrying no Go leaves the tests unrun.
 

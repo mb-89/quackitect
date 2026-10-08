@@ -1,8 +1,7 @@
-// The listing's rows under a group over a real clone, as
-// test/level0/work-rows.test.js and the list case of work.test.js read them:
-// each child, what it waits on, and a group row naming a branch behind main.
+// The listing's rows under a group over a real clone: each child, what it
+// waits on, and a group row naming a branch behind main.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads rows through the unexported tree fixture, the pa helpers and ticketAt
 
 import (
 	"strings"

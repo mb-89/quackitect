@@ -1,8 +1,8 @@
-// The sync, ported off test/level0/work-sync.test.js over a real repository:
-// trunk comes into main and into a work branch, the branch's own push first,
-// and a conflict whose ticket front alone clashes merges key by key.
+// The sync over a real repository: trunk comes into main and into a work
+// branch, the branch's own push first, and a conflict whose ticket front alone
+// clashes merges key by key.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs sync through the pd helpers and reads the unexported quiet and exit codes
 
 import (
 	"strings"

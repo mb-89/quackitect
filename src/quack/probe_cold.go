@@ -5,9 +5,10 @@
 package main
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -15,6 +16,7 @@ import (
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
+	"quackitect/src/pull"
 	"quackitect/src/vehicle"
 )
 
@@ -37,34 +39,18 @@ const (
 	vehiclePointer = vehicle.Pointer
 	// The index binary the start road launches, as indexBinary in src/index/binary.go builds it. [[spec/design_output/level0#the-cold-probe]]
 	indexBinary = binFolder + "/se-index"
-	// The install steps a cold clone skips, as INSTALL_SKIP in .claude/skills/level0/hooks/level0.js names them. [[spec/design_output/level0#the-cold-probe]]
+	// The install steps a cold clone skips, as the background install in install.sh names them. [[spec/design_output/level0#the-cold-probe]]
 	installSkip = "editor-link editor-extensions editor-client go"
 )
 
 // The checks the cold probe reads, in order. [[spec/design_output/level0#the-cold-probe]]
 var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 
-// The cold path: a commit touching one runs the cold probe. [[spec/design_output/level0#the-cold-probe]]
-var coldPath = []string{
-	".claude/skills/level0/hooks/",
-	"src/modules/hooks/",
-	"src/quack/",
-	"install.sh",
-}
-
-// The paths of the cold path list among the paths. A folder entry ends on a slash and takes every path under it. [[spec/design_output/level0#the-cold-probe]]
-func coldIn(paths []string) []string {
-	var out []string
-	for _, path := range paths {
-		for _, cold := range coldPath {
-			if (strings.HasSuffix(cold, "/") && strings.HasPrefix(path, cold)) || path == cold {
-				out = append(out, path)
-				break
-			}
-		}
-	}
-	return out
-}
+// The cold path, which ColdPath and ColdIn in src/pull/cold.go own. [[spec/design_output/level0#the-cold-probe]]
+var (
+	coldPath = pull.ColdPath
+	coldIn   = pull.ColdIn
+)
 
 // The prompt the cold client runs. [[spec/design_output/level0#the-cold-probe]]
 var coldPrompt = strings.Join([]string{
@@ -113,7 +99,7 @@ func stepsOf(stream string) coldSteps {
 		if one.text("type") == "result" {
 			steps.result = one.text("result")
 		}
-		if one.text("type") != "assistant" || truthy(one["parent_tool_use_id"]) {
+		if one.text("type") != "assistant" || yaml.Truthy(one["parent_tool_use_id"]) {
 			continue
 		}
 		message, _ := one["message"].(map[string]any)
@@ -129,21 +115,6 @@ func stepsOf(stream string) coldSteps {
 		}
 	}
 	return steps
-}
-
-// Whether a JSON value reads as true in JavaScript. [[spec/design_output/level0#the-cold-probe]]
-func truthy(value any) bool {
-	switch one := value.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case string:
-		return one != ""
-	case float64:
-		return one != 0
-	}
-	return true
 }
 
 // One check of the cold probe, whether it passes, and what shows it. [[spec/design_output/level0#the-cold-probe]]
@@ -343,6 +314,13 @@ func coldLines(checks []coldCheck) []string {
 	return out
 }
 
+// The modes a made folder, a written file and the carried login take. [[spec/design_output/level0#the-cold-probe]]
+const (
+	coldFolderMode = 0o755
+	coldFileMode   = 0o644
+	coldLoginMode  = 0o600
+)
+
 // The folders one cold run stands on: the temporary folder, the clone, its port, and the working change as a patch. [[spec/design_output/level0#the-cold-probe]]
 type coldBox struct {
 	temp, tree string
@@ -352,7 +330,7 @@ type coldBox struct {
 
 // Clones the commit into a fresh folder, runs the client there, and removes the folder, stopping the index the run started. A delta is the staged change as a patch, so the clone runs the commit about to land. [[spec/design_output/level0#the-cold-probe]]
 func probeCold(d boxDoors, client string, say func(string), delta string) int {
-	temp, err := os.MkdirTemp("", "se-cold-")
+	temp, err := d.disk.makeTemp("", "se-cold-")
 	if err != nil {
 		say("FAIL clone: " + err.Error())
 		return exitFailed
@@ -360,7 +338,7 @@ func probeCold(d boxDoors, client string, say func(string), delta string) int {
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: coldPort(d.pid), delta: delta}
 	defer func() {
 		stopsIndex(d, box.tree)
-		_ = os.RemoveAll(temp)
+		_ = d.disk.removeAll(temp)
 	}()
 	return coldRun(d, client, say, box)
 }
@@ -391,17 +369,17 @@ func coldTree(d boxDoors, say func(string), box coldBox) string {
 	if installed.code != 0 {
 		say(tail(orElse(installed.stderr, installed.stdout)))
 	}
-	points(box)
+	points(d.disk, box)
 	config := filepath.Join(box.temp, "config")
-	_ = os.MkdirAll(config, 0o755)
+	_ = d.disk.makeAll(config, coldFolderMode)
 	return config
 }
 
 // A desk runs a server at the base port, so the clone's hook reads its own port off the pointer. [[spec/design_output/level0#the-cold-probe]]
-func points(box coldBox) {
+func points(disk diskDoors, box coldBox) {
 	pointer := filepath.Join(box.tree, filepath.FromSlash(vehiclePointer))
-	_ = os.MkdirAll(filepath.Dir(pointer), 0o755)
-	_ = os.WriteFile(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), 0o644)
+	_ = disk.makeAll(filepath.Dir(pointer), coldFolderMode)
+	_ = disk.write(pointer, []byte(`{"method":`+jsonString(box.tree)+`,"port":`+strconv.Itoa(box.port)+"}\n"), coldFileMode)
 }
 
 // The first text, or the second where the first is empty, as || reads them. [[spec/design_output/level0#the-cold-probe]]
@@ -422,10 +400,9 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	ran := d.run(clientArgv(client, filepath.Join(box.tree, filepath.FromSlash(pluginFolder))), runOpts{
 		cwd: box.tree,
 		env: map[string]string{
-			"CLAUDE_CODE_REMOTE":                "true",
-			"CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1",
-			"CLAUDE_CONFIG_DIR":                 config,
-			"SE_BRIDGE_PORT":                    strconv.Itoa(box.port),
+			"CLAUDE_CODE_REMOTE": "true",
+			"CLAUDE_CONFIG_DIR":  config,
+			"SE_BRIDGE_PORT":     strconv.Itoa(box.port),
 		},
 		timeout: probeWait,
 	})
@@ -436,7 +413,7 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	if ran.fault != "" {
 		say("The client stops: " + ran.fault + ".")
 	}
-	checks := readsCold(probeRows(filepath.Join(box.tree, filepath.FromSlash(sessionLog))), stepsOf(ran.stdout))
+	checks := readsCold(probeRows(d.disk, filepath.Join(box.tree, filepath.FromSlash(sessionLog))), stepsOf(ran.stdout))
 	for _, line := range coldLines(checks) {
 		say(line)
 	}
@@ -457,11 +434,11 @@ func carriesLogin(d boxDoors, config string) bool {
 	if home == "" {
 		return false
 	}
-	login, ok := readText(filepath.Join(home, configFolder, loginFile))
-	if !ok {
+	login, err := d.disk.read(filepath.Join(home, configFolder, loginFile))
+	if err != nil {
 		return false
 	}
-	return os.WriteFile(filepath.Join(config, loginFile), []byte(login), 0o600) == nil
+	return d.disk.write(filepath.Join(config, loginFile), login, coldLoginMode) == nil
 }
 
 // Applies the staged change in the clone and commits it, as a box commits its work before it hands over, so the clear meets no work standing on this box alone. [[spec/tickets/the-check-takes-a-minute]]
@@ -474,7 +451,7 @@ func takesDelta(d boxDoors, box coldBox, say func(string)) bool {
 	if !strings.HasSuffix(text, "\n") {
 		text += "\n"
 	}
-	if err := os.WriteFile(patch, []byte(text), 0o644); err != nil {
+	if err := d.disk.write(patch, []byte(text), coldFileMode); err != nil {
 		say("FAIL delta: " + err.Error())
 		return false
 	}

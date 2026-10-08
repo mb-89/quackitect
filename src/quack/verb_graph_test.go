@@ -1,7 +1,7 @@
 // The graph verb answers a process or a ticket as the nodes and the edges
 // GraphIn in src/modules/tickets draws, as indented JSON.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

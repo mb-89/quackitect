@@ -3,21 +3,20 @@
 package config
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 )
 
-// A root holding the files a case names, written under the test's own folder. [[spec/tickets/the-colours-stand-in-config]]
+// A root holding the files a case names, written through the door under the test's own folder. [[spec/tickets/test-walks-move-onto-fakes]]
 func rootWith(t *testing.T, files map[string]string) string {
 	t.Helper()
-	root := t.TempDir()
+	root := t.TempDir() // level0: FixtureOutsideHome - each case writes the layer files of its own root
 	for path, said := range files {
 		at := filepath.Join(root, filepath.FromSlash(path))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := makeDir(filepath.Dir(at), 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(at, []byte(said), 0o644); err != nil {
+		if err := writeFile(at, []byte(said), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -190,6 +189,21 @@ func TestWhereAnswersTheBuiltIn(t *testing.T) {
 	}
 	if said := Count(root, "names.words"); said != 4 {
 		t.Fatalf("the count answers %d, and wants the default 4", said)
+	}
+}
+
+// The default reads the schema alone, past a value the tracked and local files set. [[spec/tickets/stale-span-reads-schema-unset]]
+func TestDefaultReadsTheSchemaAlone(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Tracked: `{"work": {"staleAfter": "1h"}}`,
+		Local:   `{"work": {"staleAfter": "2h"}}`,
+		Schema:  `{"properties": {"work": {"properties": {"staleAfter": {"default": "30m"}}}}}`,
+	})
+	if said, held := Default(root, "work.staleAfter"); !held || said != "30m" {
+		t.Fatalf("the default reads %v, held %v, and wants 30m", said, held)
+	}
+	if _, held := Default(root, "work.unknown"); held {
+		t.Fatal("a key the schema leaves out holds a default")
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"io"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/git"
 )
 
@@ -59,6 +60,8 @@ type It struct {
 	Ready func() bool
 	// The process a ticket's ask stands in, read by the schema checks a hand-back runs. [[spec/design_output/pull#the-answers]]
 	Schemas Schemas
+	// The failure nodes each refusal raises through. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+	Failures failure.Registry
 }
 
 // The stamp a clock writes, as toISOString writes it. [[spec/design_output/pull#the-hand-and-the-hold]]

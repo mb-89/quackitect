@@ -199,14 +199,14 @@ func holderOf(hand string) string {
 	return ""
 }
 
-// Whether the hold on origin stands dead: its beat decides where it says anything, and the tip's age past the stale span otherwise. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// Whether the hold on origin stands dead: its beat decides where it says anything, and the tip's age past the stale span otherwise. [[spec/design_output/work#the-session-beats-its-hold]]
 func (d *Door) staleTip(root, branch string, push Push) bool {
 	when, err := strconv.ParseInt(d.git(root, "log", "-1", "--format=%ct", "origin/"+branch), timeBase, timeBits)
 	if err != nil || when == 0 || push.Now.IsZero() {
 		return false
 	}
 	beat := d.git(root, "log", "-1", "--format=%ct %s", "origin/"+branches.BeatBranch(strings.TrimPrefix(branch, command.WorkBranch)))
-	return branches.HoldStale(when, beat, push.Now.Unix(), branches.StaleSpan(push.StaleAfter), branches.BeatSpan(push.BeatAfter))
+	return branches.HoldStale(when, beat, push.Now.Unix(), branches.StaleSpan(root, push.StaleAfter), branches.BeatSpan(push.BeatAfter))
 }
 
 // A tip moves the hold where its ticket names this box, or nobody. A tip carrying no ticket moves nothing. [[spec/tickets/stale-hold-moves-by-take]]

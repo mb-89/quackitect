@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -73,18 +72,18 @@ func copilotRegistrations() []copilotFile {
 }
 
 // Whether this box runs Copilot's cloud agent: the mark a cloud setup leaves, or the two variables the agent sets. [[spec/design_output/copilot#setup-and-discovery]]
-func copilotCloud(d boxDoors) bool { return copilotCloudAt(d.root, d.env) }
+func copilotCloud(d boxDoors) bool { return copilotCloudAt(d.disk, d.root, d.env) }
 
 // Whether the box under the root runs Copilot's cloud agent, read off the mark and the environment. [[spec/tickets/copilot-hooks-run-in-go]]
-func copilotCloudAt(root string, env func(name string) string) bool {
-	return stands(filepath.Join(root, filepath.FromSlash(copilotCloudMark))) ||
+func copilotCloudAt(disk diskDoors, root string, env func(name string) string) bool {
+	return disk.stands(filepath.Join(root, filepath.FromSlash(copilotCloudMark))) ||
 		(env("GITHUB_COPILOT_GIT_TOKEN") != "" && env("COPILOT_AGENT_PROMPT") != "")
 }
 
 // Whether this box runs Copilot: the cloud, the editor's terminal, a registration standing, or an editor listing the extension. [[spec/design_output/copilot#setup-and-discovery]]
 func copilotDetected(d boxDoors) bool {
 	if copilotCloud(d) || d.env("TERM_PROGRAM") == "vscode" ||
-		stands(filepath.Join(d.root, ".github", "hooks", "level0.json")) {
+		d.disk.stands(filepath.Join(d.root, ".github", "hooks", "level0.json")) {
 		return true
 	}
 	for _, editor := range []string{"code", "code-insiders"} {
@@ -99,6 +98,12 @@ func copilotDetected(d boxDoors) bool {
 	return false
 }
 
+// The modes a made folder and a written registration take. [[spec/design_output/copilot#setup-and-discovery]]
+const (
+	copilotFolderMode = 0o755
+	copilotFileMode   = 0o644
+)
+
 // Writes the registrations a target asks, auto where Copilot runs here, and answers the files it writes. A file lacking the mark refuses the whole write. [[spec/design_output/copilot#setup-and-discovery]]
 func copilotSetup(d boxDoors, target string) ([]string, error) {
 	if !slices.Contains([]string{"auto", "vscode", "cloud"}, target) {
@@ -109,7 +114,8 @@ func copilotSetup(d boxDoors, target string) ([]string, error) {
 	}
 	var pending []copilotFile
 	for _, one := range copilotRegistrations() {
-		if previous, ok := readText(filepath.Join(d.root, filepath.FromSlash(one.name))); ok {
+		if body, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(one.name))); err == nil {
+			previous := string(body)
 			if previous == one.content {
 				continue
 			}
@@ -122,20 +128,20 @@ func copilotSetup(d boxDoors, target string) ([]string, error) {
 	var written []string
 	for _, one := range pending {
 		at := filepath.Join(d.root, filepath.FromSlash(one.name))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := d.disk.makeAll(filepath.Dir(at), copilotFolderMode); err != nil {
 			return written, err
 		}
-		if err := os.WriteFile(at, []byte(one.content), 0o644); err != nil {
+		if err := d.disk.write(at, []byte(one.content), copilotFileMode); err != nil {
 			return written, err
 		}
 		written = append(written, one.name)
 	}
 	if target == "cloud" {
 		at := filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := d.disk.makeAll(filepath.Dir(at), copilotFolderMode); err != nil {
 			return written, err
 		}
-		if err := os.WriteFile(at, []byte("cloud\n"), 0o644); err != nil {
+		if err := d.disk.write(at, []byte("cloud\n"), copilotFileMode); err != nil {
 			return written, err
 		}
 	}

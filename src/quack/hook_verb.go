@@ -9,7 +9,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	// level0: OutsideInDoors - the verb names the status a Copilot reply answers, a constant and no reach
 	"net/http"
+	// level0: OutsideInDoors - the hook verb builds its own hand off the box, as main.go builds the command line's
 	"os"
 	"path/filepath"
 	"time"
@@ -53,13 +55,14 @@ func hookHere() hookDoors {
 		root = "."
 	}
 	surface := hooks.VSCodeSurface
-	if copilotCloudAt(root, os.Getenv) {
+	if copilotCloudAt(realDisk(), root, os.Getenv) {
 		surface = hooks.CloudSurface
 	}
 	rows, _ := configAt(root)
 	return hookDoors{
-		root: root, cloud: commandSettings(root).Cloud, env: os.Getenv, stdin: os.Stdin, now: time.Now,
-		copilot: surface, ask: hookAsk(root, copilotWait), log: logsRow(root, configWord(rows, "log.level")), run: serveRuns,
+		// level0: OutsideInDoors - the hook verb builds its own hand off the box, as main.go builds the command line's
+		root: root, cloud: commandSettings(quietBox(), root).Cloud, env: os.Getenv, stdin: os.Stdin, now: time.Now,
+		copilot: surface, ask: hookAsk(root, copilotWait), log: logsRow(root, configWord(rows, "log.level")), run: serveRuns, disk: realDisk(),
 	}
 }
 
@@ -78,6 +81,8 @@ type hookDoors struct {
 	log func(level, kind, line string, fields map[string]any) error
 	// The run of a program in a folder the down word starts the index with, as serveDoors.run answers it. [[spec/tickets/level0-hooks-forward-to-go]]
 	run func(argv []string, cwd string) (int, string, error)
+	// The disk the down word reads the door's standing file through. [[spec/design_output/doors#a-door-reads-the-outside]]
+	disk diskDoors
 }
 
 // The ask reading the standing file under the root and posting there with its bearer token, within the wait. [[spec/tickets/copilot-hooks-run-in-go]]
@@ -175,7 +180,7 @@ func hookVerb(d hookDoors) twin {
 			return hookDown(d, argv[2], out, errs)
 		}
 		door := hooks.New(hooks.Outside{Root: d.root, Git: gitRead})
-		settings := commandSettings(d.root)
+		settings := commandSettings(quietBox(), d.root)
 		settings.Cloud = d.cloud
 		said := ""
 		switch event {

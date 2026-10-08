@@ -6,7 +6,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -31,9 +30,7 @@ type wantedTool struct {
 // The tools, in the order the survey writes them. [[spec/design_output/tools#what-the-survey-writes]]
 var wantedTools = []wantedTool{
 	{name: "node", asks: []string{"--version"}},
-	{name: "vale", asks: []string{"--version"}},
 	{name: "biome", asks: []string{"--version"}},
-	{name: "vale-ls", asks: []string{"--version"}},
 	{name: "go", asks: []string{"version"}},
 	{name: "git", asks: []string{"--version"}},
 	{name: "claude", asks: []string{"--version"}},
@@ -99,7 +96,7 @@ func standing(d boxDoors, one wantedTool) *toolAt {
 	}
 	for _, call := range calls {
 		for _, place := range placesFor(call, d.env, d.root+"/"+binFolder) {
-			if !stands(place) {
+			if !d.disk.stands(place) {
 				continue
 			}
 			if len(one.asks) == 0 {
@@ -141,36 +138,42 @@ func surveyText(found map[string]*toolAt) string {
 	return said.String()
 }
 
+// The modes the survey's folder and file take. [[spec/design_output/tools#what-the-survey-writes]]
+const (
+	surveyFolderMode = 0o755
+	surveyFileMode   = 0o644
+)
+
 // Surveys the box and writes the file whole, so a caller reading it mid-write reads the old survey or the new one whole. [[spec/design_output/tools#what-the-survey-writes]]
 func writeSurvey(d boxDoors) (map[string]*toolAt, error) {
 	found := survey(d)
 	at := filepath.Join(d.root, filepath.FromSlash(toolsFile))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(at), surveyFolderMode); err != nil {
 		return found, err
 	}
-	if err := os.WriteFile(at+".part", []byte(surveyText(found)), 0o644); err != nil {
+	if err := d.disk.write(at+".part", []byte(surveyText(found)), surveyFileMode); err != nil {
 		return found, err
 	}
-	return found, os.Rename(at+".part", at)
+	return found, d.disk.rename(at+".part", at)
 }
 
 // The survey the file holds, empty where it stands nowhere or reads as no object. [[spec/design_output/tools#where-a-caller-looks]]
-func readSurvey(root string) map[string]*toolAt {
+func readSurvey(disk diskDoors, root string) map[string]*toolAt {
 	found := map[string]*toolAt{}
-	text, ok := readText(filepath.Join(root, filepath.FromSlash(toolsFile)))
-	if !ok || json.Unmarshal([]byte(text), &found) != nil {
+	text, err := disk.read(filepath.Join(root, filepath.FromSlash(toolsFile)))
+	if err != nil || json.Unmarshal(text, &found) != nil {
 		return map[string]*toolAt{}
 	}
 	return found
 }
 
 // Where a tool stands: the survey's path where it stands, the tree's own binary, or its bare name. [[spec/design_output/tools#where-a-caller-looks]]
-func whereIs(root, name string, known map[string]*toolAt) string {
-	if one := known[name]; one != nil && one.Path != "" && stands(one.Path) {
+func whereIs(disk diskDoors, root, name string, known map[string]*toolAt) string {
+	if one := known[name]; one != nil && one.Path != "" && disk.stands(one.Path) {
 		return one.Path
 	}
 	for _, guess := range []string{name + ".exe", name} {
-		if at := root + "/" + binFolder + "/" + guess; stands(at) {
+		if at := root + "/" + binFolder + "/" + guess; disk.stands(at) {
 			return at
 		}
 	}

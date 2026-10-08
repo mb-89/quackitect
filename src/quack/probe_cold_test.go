@@ -1,16 +1,17 @@
 // The cold probe over fake doors: its reading of the log rows and the
 // client's stream, and the runner over the clone, the install and the client.
 // [[spec/design_output/level0#the-cold-probe]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
+
+	"quackitect/src/pull"
 )
 
 const coldSentence = "level0 holds this session: 58 rules, 4 notes, the stop hook on."
@@ -210,7 +211,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	d, runner, out, _ := fakeBoxDoors(t)
 	d.pid = 12345
 	clientAnswers(&d, func(_ []string, o runOpts) ranResult {
-		writeLog(t, o.cwd, logText(coldWhole()...))
+		writeLog(t, d.disk, o.cwd, logText(coldWhole()...))
 		return ranResult{stdout: stream(streamSaid(coldSentence+"\nTOOLS: mcp__level0__stop", nil), streamCalls("Read"))}
 	})
 	if code := probeVerb(d, []string{"cold"}); code != 0 {
@@ -232,14 +233,14 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	if !slices.Contains(client, "--plugin-dir") || client[slices.Index(client, "--plugin-dir")+1] != filepath.Join(tree, ".claude", "skills", "level0") {
 		t.Errorf("the client runs as %v", client)
 	}
-	if o.env["CLAUDE_CODE_REMOTE"] != "true" || o.env["CLAUDE_CODE_ENABLE_FUNCTION_HOOKS"] != "1" ||
+	if o.env["CLAUDE_CODE_REMOTE"] != "true" || o.env["CLAUDE_CODE_ENABLE_FUNCTION_HOOKS"] != "" ||
 		o.env["CLAUDE_CONFIG_DIR"] != filepath.Join(temp, "config") || o.env["SE_BRIDGE_PORT"] != strconv.Itoa(coldPort(12345)) {
 		t.Errorf("the client runs under %+v", o)
 	}
 	if stop := runner.ran[3]; !slices.Equal(stop, []string{filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), "stop"}) {
 		t.Errorf("the stop runs as %v", stop)
 	}
-	if _, err := os.Stat(temp); err == nil {
+	if _, err := d.disk.stat(temp); err == nil {
 		t.Error("the clone still stands")
 	}
 	if !strings.Contains(out.String(), "The install answers 0.\nPASS hook: ") {
@@ -254,7 +255,7 @@ func TestAClientStandingNowhereFailsTheColdProbeAndTheCloneStillGoes(t *testing.
 	if code := probeVerb(d, []string{"cold"}); code != 1 || !strings.Contains(out.String(), "claude stands nowhere") {
 		t.Errorf("a missing client answers %d\n%s", code, out)
 	}
-	if _, err := os.Stat(filepath.Dir(cloneOf(t, runner))); err == nil {
+	if _, err := d.disk.stat(filepath.Dir(cloneOf(t, runner))); err == nil {
 		t.Error("the clone still stands")
 	}
 }
@@ -270,16 +271,17 @@ func TestTheDesksLoginRidesIntoTheFreshConfigFolder(t *testing.T) {
 	if carriesLogin(d, config) {
 		t.Error("a desk keeping no login carries one")
 	}
-	_ = os.MkdirAll(filepath.Join(home, ".claude"), 0o755)
-	_ = os.WriteFile(filepath.Join(home, ".claude", ".credentials.json"), []byte(`{"login":1}`), 0o600)
-	_ = os.WriteFile(filepath.Join(home, ".claude", "settings.json"), []byte("{}"), 0o644)
+	_ = d.disk.makeAll(filepath.Join(home, ".claude"), 0o755)
+	_ = d.disk.makeAll(config, 0o755)
+	_ = d.disk.write(filepath.Join(home, ".claude", ".credentials.json"), []byte(`{"login":1}`), 0o600)
+	_ = d.disk.write(filepath.Join(home, ".claude", "settings.json"), []byte("{}"), 0o644)
 	if !carriesLogin(d, config) {
 		t.Fatal("the login carries no file")
 	}
-	if said, _ := readText(filepath.Join(config, ".credentials.json")); said != `{"login":1}` {
+	if said := d.disk.text(filepath.Join(config, ".credentials.json")); said != `{"login":1}` {
 		t.Errorf("the login reads %q", said)
 	}
-	if stands(filepath.Join(config, "settings.json")) {
+	if d.disk.stands(filepath.Join(config, "settings.json")) {
 		t.Error("the desk's settings ride along")
 	}
 }
@@ -328,13 +330,13 @@ func TestTheFreshBoxPointsTheHookAtAPortOfItsOwn(t *testing.T) {
 	d, runner, _, _ := fakeBoxDoors(t)
 	temp := t.TempDir()
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 6900}
-	if config := coldTree(d, func(string) {}, box); config != filepath.Join(temp, "config") || !stands(config) {
+	if config := coldTree(d, func(string) {}, box); config != filepath.Join(temp, "config") || !d.disk.stands(config) {
 		t.Errorf("the config folder reads %q", config)
 	}
 	if ran := ranWords(runner); len(ran) != 2 || !strings.HasPrefix(ran[0], "git clone") || !strings.HasPrefix(ran[1], "sh ") {
 		t.Errorf("the runs read %v", ran)
 	}
-	said, _ := readText(filepath.Join(box.tree, ".se", ".runtime", "vehicle.json"))
+	said := d.disk.text(filepath.Join(box.tree, ".se", ".runtime", "vehicle.json"))
 	var pointer struct{ Port int }
 	if json.Unmarshal([]byte(said), &pointer) != nil || pointer.Port != 6900 {
 		t.Errorf("the pointer reads %q", said)
@@ -393,5 +395,16 @@ func TestATailKeepsTheLastLinesOnOne(t *testing.T) {
 	t.Parallel()
 	if got := tail("\n1\n2\n3\n4\n5\n6\n7\n"); got != "2 | 3 | 4 | 5 | 6 | 7" {
 		t.Errorf("the tail reads %q", got)
+	}
+}
+
+// A retro value reads true as JavaScript reads it: none, a nil dict, a zero and NaN read false. [[spec/tickets/shared-helpers-stand-once]]
+func TestARetroValueReadsAsJavaScriptReadsIt(t *testing.T) {
+	t.Parallel()
+	if retroJSTruthy(retroJSNone{}) || retroJSTruthy((*retroJSDict)(nil)) || retroJSTruthy(0.0) || retroJSTruthy("") || !retroJSTruthy(&retroJSDict{}) || !retroJSTruthy("x") {
+		t.Fatal("a retro value reads otherwise than JavaScript reads it")
+	}
+	if pull.JSQuote("a\"b\n") != `"a\"b\n"` {
+		t.Fatalf("the quote reads %s", pull.JSQuote("a\"b\n"))
 	}
 }

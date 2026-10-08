@@ -5,6 +5,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the tree's own plugin folder, as a build check reads source
 	"os"
 	"path/filepath"
 	"regexp"
@@ -28,7 +29,7 @@ var schemaLibs = []string{
 // [[spec/tickets/schema-libs-leave]]
 var leavingImport = regexp.MustCompile(`["'][^"']*/(lib/(schema[a-z-]*|ticket|todo|slug|paths|vocabulary|snippets|helpers|refuse)|doors/front|doors/fake/front|tree-of)\.js["']`)
 
-// Every file that could import a leaving one: the tests, the extension, the scripts, the stub and the hooks. [[spec/tickets/schema-libs-leave]]
+// Every file to search for an import of a leaving one: the tests, the extension, the scripts, the stub and the hooks. [[spec/tickets/schema-libs-leave]]
 var schemaReaders = []string{
 	"test/*.js", "test/*/*.js", "test/*/*/*.js",
 	"src/extension/*.js", "src/extension/*/*.js", "src/extension/*/*/*.js",

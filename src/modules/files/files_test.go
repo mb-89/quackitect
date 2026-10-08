@@ -57,7 +57,10 @@ func TestAPushedChangeReachesTheFamily(t *testing.T) {
 	}
 }
 
-// The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder. [[spec/tickets/tickets-becomes-a-module]]
+// A built program's first bytes, a NUL byte among them. [[spec/tickets/sweep-reads-tracked-after-restart]]
+const binaryBody = "\x7fELF\x02\x01\x01\x00"
+
+// The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder, and no binary file. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 	root := t.TempDir()
 	disk := NewDisk(root)
@@ -65,6 +68,9 @@ func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 		if err := disk.Write(path, "said"); err != nil {
 			t.Fatal(err)
 		}
+	}
+	if err := disk.Write("quack", binaryBody); err != nil {
+		t.Fatal(err)
 	}
 	c := q.New()
 	hand := Registers(c)
@@ -86,9 +92,40 @@ func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
 	if got, _ := read.Read("files/.se/.runtime/plan.json").(q.Content); got.Text != "said" {
 		t.Fatalf("the plan reads %+v", got)
 	}
-	for _, path := range []string{"files/.se/.runtime/bin/tool.json", "files/.git/HEAD"} {
+	for _, path := range []string{"files/.se/.runtime/bin/tool.json", "files/.git/HEAD", "files/quack"} {
 		if got := read.Read(path); got != (q.Content{}) {
 			t.Fatalf("%s reads %+v", path, got)
+		}
+	}
+}
+
+// A seed past its cap commits in batches, and the family holds every file once they land. [[spec/tickets/seed-splits-under-bus-cap]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestASeedPastItsCapCommitsInBatches(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	paths := []string{"a.md", "b.md", "c.md"}
+	for _, path := range paths {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	commits := 0
+	stop, err := seedsIn(root, NewFakeWatch(), func(values map[string]any) error {
+		commits++
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, len("said")+1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for _, path := range paths {
+		if got, _ := s.Snapshot().Read("files/" + path).(q.Content); got.Text != "said" || commits != len(paths) {
+			t.Fatalf("files/%s reads %+v over %d commits", path, got, commits)
 		}
 	}
 }

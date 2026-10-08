@@ -1,6 +1,6 @@
 // The fill verb: a ticket a person saves with a process and no route takes
 // what the mint writes for it, its front and its written chapters riding in
-// as the mint's fields, off fill in src/scripts/ticket.js and ticket-fill.js.
+// as the mint's fields.
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
 package main
 

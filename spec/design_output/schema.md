@@ -11,10 +11,10 @@ reads one, how it weighs a note against one, and what it answers.
 |---|---|
 | the reader and the checker | `src/note`, `src/yaml` and `src/modules/check`, one file a topic |
 | the ticket door | `src/modules/hooks/write` |
-| the sweep, beside the tree rules | `src/modules/check/sweep.go` |
+| the sweep, beside the tree rules | `src/modules/check/sweep.go`, run by `Sweep` in `src/modules/check/checker.go` |
 | the underscore skip | `isDraft` in `src/modules/check/paths.go`, and every caller of it |
 | the `mint` verb | `src/quack/verb_mint.go` |
-| the `mint_note` tool | `src/modules/edits/edits.go` |
+| the `mint_note` tool | `src/modules/edits/edits.go`, and the note it shapes in `src/modules/check/mint.go` |
 
 # The reader and the checker
 
@@ -391,9 +391,8 @@ kind settles.
 
 | the reader | how it skips |
 |---|---|
-| Vale, over the tree | `--glob=!{...,**/_*}` |
-| Vale, over one file | the last section of `.vale.ini` |
-| the language server | that same section |
+| the Go rules | the last row of `sections` in `src/rules/scope.go`, which bases the path on no style |
+| the language server | that same row |
 | the write door | `isDraft` before the code door and the prose door |
 | the rules over two files | `tree.paths()` drops one |
 | the standing layer | `readFolder` drops one |

@@ -1,10 +1,10 @@
 // The tracked settings deny the merge tool of the GitHub connector, so auto-merge stays the one road to main.
 // [[spec/tickets/probe-at-revision-guards-merges]]
-package main
+package main // level0: InPackageTest - the case reads the unexported settingsFile of the command
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tracked settings file the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strings"

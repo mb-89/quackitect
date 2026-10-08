@@ -9,7 +9,7 @@ package work
 
 import (
 	"fmt"
-	"path/filepath"
+	"io/fs"
 	"slices"
 	"strconv"
 	"strings"
@@ -73,8 +73,8 @@ func (s TicketSchema) Knows(key string) bool {
 func (s TicketSchema) Owned(key string) bool { return s.fields[key].owned }
 
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
-func readTicketSchema(root string) (TicketSchema, error) {
-	text, err := readFile(filepath.Join(root, filepath.FromSlash(TicketSchemaAt)))
+func readTicketSchema(files fs.FS) (TicketSchema, error) {
+	text, err := fs.ReadFile(files, TicketSchemaAt)
 	if err != nil {
 		return TicketSchema{}, err
 	}
@@ -198,7 +198,11 @@ func (t *Tab) MoveColumn(name string) {
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func (t *Tab) TicketRules() TicketSchema {
 	if t.rules == nil {
-		said, err := readTicketSchema(Root(t.Path))
+		files := t.Files
+		if files == nil {
+			files = treeAt(Root(t.Path))
+		}
+		said, err := readTicketSchema(files)
 		if err != nil {
 			said = TicketSchema{fields: map[string]fieldRule{}, needed: map[string]bool{}}
 		}

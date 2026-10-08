@@ -17,15 +17,15 @@ The strongest objection: a test at the command line runs slower than one at a mo
 
 The draft cases ran in full at the module and again through the wired quack. The review cases ran in Go and again in JavaScript. Each pair failed together, and a fix to one copy left the other stale. The contract suite stays the one table that runs twice, because it holds a fake to the real thing.
 
-## 3. A test leaves with its code
+## 3. Tests leave with code
 
 The JavaScript audit found whole test files over modules no entry loaded. They passed over code nobody ran, and a reader took them as proof the code mattered.
 
-## 4. A comparison leaves at its switch
+## 4. Comparisons leave at switches
 
 Every migration phase stood switched on, and the twin goldens, the shadow rows and the removal guards still ran. Phase three's done-when said no JavaScript twin of a Go check stands, and the twins stood anyway. A rule over every phase holds where a done-when line slipped.
 
-## 5. A golden file pins a behavior
+## 5. Golden files pin behavior
 
 | the golden file | what it held | what it cost |
 |---|---|---|
@@ -35,7 +35,7 @@ Every migration phase stood switched on, and the twin goldens, the shadow rows a
 
 A golden file holding incidental output failed on an unrelated edit. The file ceiling covers code files alone, so a prose file growing no longer moves a test.
 
-## 6. One test line per code line
+## 6. Tests stay under code
 
 The window package held ten lines of test for each line of code, because the root package tested its subpackages. Fixtures count, since a frozen copy of the tree costs a reader as much as a test does. A module past the ceiling holds copies of one behavior. The ceiling stays a reading for the retro audit until a command answers it.
 

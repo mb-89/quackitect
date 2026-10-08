@@ -1,6 +1,6 @@
-// The rules the lint reads over a file's text past Vale and Biome: an
-// exemption naming no reason, the code ceilings, and the magic numbers. Each
-// reads what its JavaScript twin reads, so the lint and the panel agree.
+// The rules the lint reads over a file's text past the Go rules and Biome: an
+// exemption naming no reason, the code ceilings, and the magic numbers. A rule
+// with a JavaScript twin reads what it reads, so the lint and the panel agree.
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
 package check
 
@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"quackitect/src/owns"
 )
 
 // The rule names and the words this module owns, with the exemption rule unreasoned of .claude/skills/level0/lib/vale.js spells again, because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -51,7 +53,20 @@ var (
 
 // Whether the lint's walk reaches a path: no folder it passes, and no draft. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func walked(path string) bool {
+	return reached(path, false)
+}
+
+// Whether the doors' guard reaches a path: the lint's walk, and the skill scripts past the agent's folder. [[spec/design_output/doors#nothing-walks-around-a-door]]
+func doorsWalked(path string) bool {
+	return reached(path, owns.OnSkills(slashed(path)))
+}
+
+// Whether a walk reaches a path, passing the agent's folder where the path stands on the road to its skills. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func reached(path string, skills bool) bool {
 	for _, part := range strings.Split(slashed(path), "/") {
+		if skills && part == owns.AgentFolder {
+			continue
+		}
 		if walkPasses[part] || strings.HasPrefix(part, "_") {
 			return false
 		}
@@ -62,17 +77,20 @@ func walked(path string) bool {
 // The rules over one file's text, where the lint's walk reaches it, under the ceilings named and each finding marked as the source says. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func textFaults(tree *Tree, path string, function, file int, source string) []Finding {
 	prose, sized := proseFile.MatchString(path), sizedFile.MatchString(path)
-	if (!prose && !sized) || !walked(path) {
+	if (!prose && !sized) || !doorsWalked(path) {
 		return nil
 	}
-	text := tree.Read(path)
+	text, linted := tree.Read(path), walked(path)
 	out := []Finding{}
-	if prose {
+	if prose && linted {
 		out = append(out, unreasoned(path, text)...)
 	}
-	if sized {
+	if sized && linted {
 		out = append(out, sizeFaults(path, text, function, file)...)
 		out = append(out, magicIn(path, text)...)
+	}
+	if sized {
+		out = append(out, walkFaults(tree, slashed(path))...)
 	}
 	for i := range out {
 		out[i].Source = source
@@ -101,10 +119,13 @@ func unreasoned(path, text string) []Finding {
 	return out
 }
 
-// A file past its ceiling, and each function past its own, in lines. A ceiling of nothing holds its rule off. [[spec/design_output/level0#the-size-ceiling]]
+// A code file past its ceiling, and each function past its own, in lines. A ceiling of nothing holds its rule off, and a file holding no code meets none. [[spec/design_output/level0#the-size-ceiling]]
 func sizeFaults(path, text string, function, file int) []Finding {
-	lines := lineBreak.Split(text, -1)
 	out := []Finding{}
+	if !sizedFile.MatchString(path) {
+		return out
+	}
+	lines := lineBreak.Split(text, -1)
 	if file > 0 && len(lines) > file {
 		out = append(out, warn(FileCeiling, path, 1, fmt.Sprintf(fileSays, file, len(lines))))
 	}

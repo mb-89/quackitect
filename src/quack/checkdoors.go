@@ -16,7 +16,6 @@ import (
 	"runtime"
 	"slices"
 	"strings"
-	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/tickets"
@@ -43,11 +42,11 @@ func roadRoot(args []string, fallback func() (string, error)) string {
 // The doors over the real box, under the root the verb road names. [[spec/design_output/work#the-battery-answers-first]]
 func checkDoorsOf(out, errs io.Writer) checkDoors {
 	root := roadRoot(os.Args, index.Root)
-	self, _ := os.Executable()
+	self, _ := selfPath()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, self: self, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
-	d.browser, _ = browserFrom(os.Getenv, runtime.GOOS == "darwin")
+	d := checkDoors{root: root, self: self, now: wall.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(realDisk(), root, wall.Now), out: out, errs: errs, disk: realDisk()}
+	d.browser, _ = browserFrom(d.disk, os.Getenv, runtime.GOOS == "darwin")
 	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {

@@ -85,8 +85,8 @@ took it at its word. A person gives anything, so that ground admitted anything.
 Two sessions handed out calls they owned, and [[spec/rationales/cloud]] carries
 what that cost.
 
-Version four wrote the test this ground wants, and `spec/guidance/behaviour.md`
-on the `v4` branch holds it:
+Version four wrote the test this ground wants, and `behaviour.md` under
+`spec/guidance` on the `v4` branch holds it:
 
 - Spend your thinking where a mistake is dear to undo. Where it is cheap, decide and move.
 - Disagree and commit. Write the concern where a reader decides it, and continue.

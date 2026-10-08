@@ -3,7 +3,9 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case stands a hook beside a binary in a temp root, the hook's door test
 	"os"
+	// level0: OutsideInDoors - the case runs the real hook script, the hook's door test
 	"os/exec"
 	"path/filepath"
 	"strings"

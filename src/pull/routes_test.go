@@ -1,11 +1,10 @@
 // The routes this tree ships hold the shape the verbs read: where each opens,
-// who passes each leaf, and what the gates and the asks name, off the cases
-// test/contract/process.test.js held.
+// who passes each leaf, and what the gates and the asks name.
 // [[spec/tickets/pull-scripts-leave]]
 package pull
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the retro guidance this tree ships
 	"path/filepath"
 	"regexp"
 	"strings"

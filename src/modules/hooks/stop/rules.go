@@ -5,6 +5,8 @@
 package stop
 
 import (
+	"quackitect/src/yaml"
+
 	"fmt"
 	"regexp"
 	"strconv"
@@ -169,7 +171,7 @@ func ruleOf(one map[string]any) (Rule, bool) {
 	rule := Rule{
 		ID: textOf(one["id"]), Side: textOf(one["side"]), Priority: priority, Decides: textOf(one["decides"]),
 		Runs: textOf(one["runs"]), Asks: textOf(one["asks"]), Says: textOf(one["says"]), Waits: textOf(one["waits"]),
-		Yields: truthy(one["yields"]), Beside: truthy(one["beside"]),
+		Yields: yaml.Truthy(one["yields"]), Beside: yaml.Truthy(one["beside"]),
 	}
 	if !ok || (rule.Side != StopSide && rule.Side != GoSide) || (rule.Decides != Claimed && rule.Decides != Mechanical) {
 		return Rule{}, false
@@ -192,19 +194,4 @@ func textOf(said any) string {
 		return strings.Join(parts, ",")
 	}
 	return fmt.Sprint(said)
-}
-
-// A value as the bridge's Boolean reads it. [[spec/tickets/cage-stop-rules-port]]
-func truthy(said any) bool {
-	switch one := said.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case int:
-		return one != 0
-	case string:
-		return one != ""
-	}
-	return true
 }

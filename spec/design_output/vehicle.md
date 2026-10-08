@@ -36,7 +36,7 @@ moved tree keeps the one it has.
 ## A marker names the root
 
 The walk goes up from the folder in hand, looking for the one file a method
-tree carries: `.claude/skills/level0/.claude-plugin/plugin.json`.
+tree carries: `plugin.json` under `.claude/skills/level0/.claude-plugin`.
 
 Deriving a root from where a program sits answers a folder with the same
 confidence whatever folder it is. A rule read out of that guess names files
@@ -77,26 +77,18 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
-## The styles assemble once
+## Rules read the work root
 
-A project writes a rule of its own, and the method's rules keep standing over
-it. Both roots hold their styles under `spec/config/styles`, and `assemble` in
-`src/scripts/styles.js` writes the pair into one folder:
+The Go rules read the rule files `ruleFiles` in `src/rules/load.go` names. The
+method's `rules-over` verb runs inside the work root:
 
-| what the assembly writes | where it stands |
+| what | where it comes from |
 |---|---|
-| the styles both roots hold | `.se/vale/styles` under the work root |
-| the config naming that folder | `.se/vale/.vale.ini` beside it |
+| the binary | the method root |
+| each rule file | `spec/config/styles` under the work root |
+| a rule file the work root lacks | nowhere, so the load fails and names the file |
 
-The method's files land first, and a name the work root holds again replaces
-one. The config comes from the work root where it holds one, and from the
-method otherwise. The vale door hands that config to Vale, and a tree driving
-itself hands its own.
-
-The private folder stands off git, so nobody edits what the assembly writes.
-The assembly writes again where a source reads newer than the derived config.
-It writes again too where the names the roots hold differ from the copies
-standing there, so a rule a root drops refuses no write.
+For details, see [[spec/design_output/rules#load-reads-the-rule-files]].
 
 ## A vehicle stands alone
 
@@ -240,7 +232,7 @@ ignores the targets alone:
 | source | target |
 |---|---|
 | `marketplace.json` | `.claude-plugin/marketplace.json` |
-| `plugin.json` | `.claude/skills/level0/.claude-plugin/plugin.json` |
+| `plugin.json` | `plugin.json` under `.claude/skills/level0/.claude-plugin` |
 | `icon.svg` | the path `src/extension/package.json` names |
 
 So a fresh clone carries no target, and the stamp writes each one on the first
@@ -338,9 +330,7 @@ command's last line.
 
 `test/level0/bridgehead.test.js` drives the hook over a fake git and a fake
 disk. The fakes behave: the clone writes the vehicle's RUNME, and the attach
-writes the driver. `test/contract/stub.test.js` clones this tree as the
-upstream into a temp home under `SE_SLOW`. It reads the register, the
-pointer, the driver and the hook back.
+writes the driver.
 
 One routine run against a stub repo proves the road on a cloud box, read off
 the run's log. It takes the following:
@@ -353,7 +343,5 @@ Nothing on a desk stands in for it.
 
 ## Nothing of the method travels
 
-`test/contract/stub.test.js` produces a stub into a folder it makes, reads
-every file back, and walks the whole folder. Every path it meets stands in
-the list the pure module names, and none of the method's files stands beside
+Every path a produced stub holds stands in the list the pure module names, and none of the method's files stands beside
 them. A refused vehicle leaves the folder as it stands.

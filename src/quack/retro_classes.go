@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -24,8 +23,11 @@ var retroSources = []string{"log", "transcripts", "all"}
 // A disposition that joins no class opens on one of these, and a reason or a place follows. [[spec/guidance/retro/classify]]
 var retroKinds = []string{"dropped:", "done:", "ticket:"}
 
-// The input folders whose every file carries a disposition too: the collected notes and the memory. [[spec/guidance/retro/classify]]
-var retroDrainedFolders = []struct{ folder, prefix string }{{"tickets", "note"}, {"memory", "memory"}}
+// The input folders whose every file carries a disposition too: the collected notes, the memory and the scripts, where a script keeps its ending in its id. [[spec/guidance/retro/classify]] [[spec/design_output/model#the-guards-hold-a-baseline]]
+var retroDrainedFolders = []struct {
+	folder, prefix string
+	whole          bool
+}{{"tickets", "note", false}, {"memory", "memory", false}, {"scripts", "script", true}}
 
 // The memory's index, which carries no disposition. [[spec/guidance/retro/classify]]
 const retroMemoryIndex = "MEMORY.md"
@@ -52,7 +54,7 @@ type retroRates struct {
 	order   []string
 }
 
-func init() { register("retro classes", retroClassesVerb(retroRoot)) }
+func init() { register("retro classes", retroClassesVerb(quietBox)) }
 
 // The hand's record, read, or nil where it reads as no JSON. [[spec/guidance/retro/classify]]
 func retroRecordOf(text string) *retroRecord {
@@ -80,24 +82,26 @@ func retroRecordOf(text string) *retroRecord {
 }
 
 // Every collected note and memory, by id, so each one answers where it goes. Collect nests the memory under the project's folder name, so the walk reaches every level. [[spec/guidance/retro/classify]]
-func retroDrainedOf(home string) []retroItem {
+func retroDrainedOf(disk diskDoors, home string) []retroItem {
 	out := []retroItem{}
-	var walk func(at, prefix string)
-	walk = func(at, prefix string) {
-		entries, err := os.ReadDir(at)
+	var walk func(at, prefix string, whole bool)
+	walk = func(at, prefix string, whole bool) {
+		entries, err := disk.list(at)
 		if err != nil {
 			return
 		}
 		for _, entry := range entries {
 			if entry.IsDir() {
-				walk(filepath.Join(at, entry.Name()), prefix)
+				walk(filepath.Join(at, entry.Name()), prefix, whole)
+			} else if whole {
+				out = append(out, retroItem{id: prefix + ":" + entry.Name()})
 			} else if strings.HasSuffix(entry.Name(), ".md") && entry.Name() != retroMemoryIndex {
 				out = append(out, retroItem{id: prefix + ":" + strings.TrimSuffix(entry.Name(), ".md")})
 			}
 		}
 	}
 	for _, one := range retroDrainedFolders {
-		walk(filepath.Join(home, retroInput, one.folder), one.prefix)
+		walk(filepath.Join(home, retroInput, one.folder), one.prefix, one.whole)
 	}
 	return out
 }
@@ -198,7 +202,7 @@ func retroPatternOf(said any) *regexp.Regexp {
 }
 
 // Each class's rate: its matches per active hour of the input, to two places. [[spec/guidance/retro/classify]]
-func retroRatesOf(root, name string, classes []any) *retroRates {
+func retroRatesOf(disk diskDoors, root, name string, classes []any) *retroRates {
 	measures := []retroMeasure{}
 	for _, one := range classes {
 		measure := retroJSField(one, "measure")
@@ -208,7 +212,7 @@ func retroRatesOf(root, name string, classes []any) *retroRates {
 			pattern: retroPatternOf(retroJSField(measure, "pattern")),
 		})
 	}
-	counts, hours := retroCountsOver(root, name, measures)
+	counts, hours := retroCountsOver(disk, root, name, measures)
 	rates := &retroRates{Hours: hours, Classes: map[string]retroRate{}}
 	for _, one := range measures {
 		if _, seen := rates.Classes[one.id]; !seen {
@@ -233,25 +237,27 @@ func (r *retroRates) value() *retroJSDict {
 }
 
 // The verb: refuses a record short of anything, and writes each class's rate. [[spec/guidance/retro/classify]]
-func retroClassesVerb(root func() string) twin {
+func retroClassesVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name := root(), retroWordAt(argv, 2)
+		d := box()
+		disk := d.disk
+		base, name := retroRootOf(d), retroWordAt(argv, 2)
 		home, at := "", ""
 		if name != "" {
 			home = retroHome(base, name)
 			at = filepath.Join(home, retroClassesFile)
 		}
-		if at == "" || !retroIsThere(at) || !retroIsThere(filepath.Join(home, retroCutsFile)) {
+		if at == "" || !disk.stands(at) || !disk.stands(filepath.Join(home, retroCutsFile)) {
 			fmt.Fprintf(errs, "retro classes reads %s beside the chapters of a retro, and none stands.\n", retroClassesFile)
 			return 2
 		}
-		record := retroRecordOf(retroFileText(at))
+		record := retroRecordOf(disk.text(at))
 		if record == nil {
 			fmt.Fprintf(errs, "%s reads as no JSON\n", retroClassesFile)
 			return 1
 		}
-		columns, faults := retroColumnsOf(home)
-		items := append(retroItemsOf(columns), retroDrainedOf(home)...)
+		columns, faults := retroColumnsOf(disk, home)
+		items := append(retroItemsOf(columns), retroDrainedOf(disk, home)...)
 		faults = append(faults, retroFaultsOf(record, items)...)
 		if len(faults) > 0 {
 			for _, one := range faults {
@@ -259,8 +265,8 @@ func retroClassesVerb(root func() string) twin {
 			}
 			return 1
 		}
-		rates := retroRatesOf(base, name, record.classes)
-		if err := retroJSWrite(filepath.Join(home, retroRatesFile), rates.value()); err != nil {
+		rates := retroRatesOf(disk, base, name, record.classes)
+		if err := retroJSWrite(disk, filepath.Join(home, retroRatesFile), rates.value()); err != nil {
 			fmt.Fprintln(errs, err)
 			return 1
 		}

@@ -1,19 +1,18 @@
 // The plan tool answers in Go: a plan call writes the plan file as the bridge
 // writes it, and a plan field riding a Go-answered call writes it too.
 // [[spec/tickets/plan-writes-off-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/modules/hooks"
 	manager "quackitect/src/modules/index"
+	"quackitect/src/modules/plans"
 	"quackitect/src/q"
 )
 
@@ -24,10 +23,10 @@ const (
 	planFile        = ".se/.runtime/plan.json"
 )
 
-// The plan file under the root, as the queue reads it. [[spec/tickets/plan-writes-off-go]]
-func planOn(t *testing.T, root string) map[string]any {
+// The plan file under the root, read through the disk door, as the queue reads it. [[spec/tickets/test-walks-move-onto-fakes]]
+func planOn(t *testing.T, disk diskDoors, root string) map[string]any {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(planFile)))
+	text, err := disk.read(filepath.Join(root, filepath.FromSlash(planFile)))
 	if err != nil {
 		t.Fatalf("the plan file reads %v", err)
 	}
@@ -41,8 +40,8 @@ func planOn(t *testing.T, root string) map[string]any {
 // [[spec/tickets/plan-writes-off-go]]
 func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	seedFile(t, root, planFile, `{"working":"","todos":[],"places":{},"kept":true}`)
+	root, disk := "/tree", newFakeDisk()
+	hq2Seed(t, disk, filepath.Join(root, filepath.FromSlash(planFile)), `{"working":"","todos":[],"places":{},"kept":true}`)
 	c := q.New()
 	as := manager.Registers(c)
 	if one, ok := modules[plansModuleType]; ok {
@@ -51,9 +50,8 @@ func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 	store := q.NewStore(c)
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
-		Accept: accepts(root, store, nil),
+		Steps: func(func()) {}, Clock: stillClock(),
+		Accept: plans.Accept(plansOutside(disk, root, store)),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -66,7 +64,7 @@ func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 	if text := fmt.Sprint(said.Result); !strings.HasPrefix(text, "The plan stands: 1 todo(s) open, working on w.") {
 		t.Errorf("the plan answers %q, and wants it to open on the count and the work", text)
 	}
-	plan := planOn(t, root)
+	plan := planOn(t, disk, root)
 	todos, _ := plan["todos"].([]any)
 	if plan["working"] != "w" || plan["kept"] != true || len(todos) != 1 {
 		t.Fatalf("the plan file holds %v, and wants w, the kept key and one todo", plan)
@@ -87,7 +85,7 @@ func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if plan := planOn(t, world.root); plan["working"] != "riding" {
+	if plan := planOn(t, realDisk(), world.root); plan["working"] != "riding" {
 		t.Errorf("the plan file holds %v, and wants the riding field's work", plan)
 	}
 }
@@ -96,7 +94,7 @@ func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
 func TestAPlanAnswerReadsThePlaceOffTheQueuesPorts(t *testing.T) {
 	t.Parallel()
 	world := waitWorldOf(t)
-	wiring, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
+	wiring, err := realDisk().read(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,6 +1,6 @@
 // The verb table: a need naming a branch verb, and a loud verb's log.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported holdsVerb and codeRefused, and declares contains for the dispatch tests
 
 import (
 	"strings"
@@ -20,7 +20,11 @@ func TestALoudVerbLogsItsCode(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	var rows []string
-	one.d.Log = func(level, kind, said string, _ map[string]any) { rows = append(rows, level+" "+kind+" "+said) }
+	one.d.Log = func(level, kind, said string, _ map[string]any) {
+		if kind == "work" {
+			rows = append(rows, level+" "+kind+" "+said)
+		}
+	}
 	one.branchSays("open")
 	if len(rows) != 1 || rows[0] != "warn work open answered 2" {
 		t.Fatalf("the log holds %v", rows)

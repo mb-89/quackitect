@@ -1,0 +1,5 @@
+# The pull's door: the files and the git program a pull reads.
+pull:
+  go: [os, os/exec]
+  files: [door.go]
+  contract: [src/pull/disk_contract_test.go]

@@ -1,11 +1,9 @@
 // The survey's reads: the places a PATH names, the version a tool says, and
 // where a caller looks for a tool.
 // [[spec/design_output/tools#reading-the-path-variable]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
-	"path/filepath"
 	"slices"
 	"testing"
 )
@@ -35,18 +33,16 @@ func TestTheVersionComesOffTheFirstLine(t *testing.T) {
 
 func TestACallerLooksAtTheSurveyThenTheTreesBinaryThenTheBareName(t *testing.T) {
 	t.Parallel()
-	d, _, _, _ := fakeBoxDoors(t, "vale")
-	at := d.env("PATH") + "/vale"
-	if got := whereIs(d.root, "vale", map[string]*toolAt{"vale": {Path: at}}); got != at {
+	d, _, _, _ := fakeBoxDoors(t)
+	at := "/path/vale"
+	hq1SeedDisk(t, d.disk, "/", map[string]string{"path/vale": "", d.root + "/" + binFolder + "/biome": ""})
+	if got := whereIs(d.disk, d.root, "vale", map[string]*toolAt{"vale": {Path: at}}); got != at {
 		t.Errorf("off the survey %q", got)
 	}
-	bin := filepath.Join(d.root, filepath.FromSlash(binFolder))
-	_ = os.MkdirAll(bin, 0o755)
-	_ = os.WriteFile(filepath.Join(bin, "biome"), nil, 0o755)
-	if got := whereIs(d.root, "biome", map[string]*toolAt{"biome": {Path: "/gone"}}); got != d.root+"/"+binFolder+"/biome" {
+	if got := whereIs(d.disk, d.root, "biome", map[string]*toolAt{"biome": {Path: "/gone"}}); got != d.root+"/"+binFolder+"/biome" {
 		t.Errorf("off the tree %q", got)
 	}
-	if got := whereIs(d.root, "claude", nil); got != "claude" {
+	if got := whereIs(d.disk, d.root, "claude", nil); got != "claude" {
 		t.Errorf("bare %q", got)
 	}
 }

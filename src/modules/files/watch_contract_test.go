@@ -8,11 +8,12 @@
 package files
 
 import (
+	"path/filepath"
+	"runtime"
 	"testing"
-	"time"
-)
 
-const patience = 2 * time.Second
+	"quackitect/src/watcher/watchertest"
+)
 
 func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 	t.Run("a write comes back as a change", func(t *testing.T) {
@@ -33,16 +34,11 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 		if err := disk.Write("a.md", "said"); err != nil {
 			t.Fatal(err)
 		}
-		last, until := "", time.After(patience)
-		for last != "said" {
-			select {
-			case last = <-seen:
-			case <-until:
-				t.Fatalf("the change reads %q", last)
-			}
+		for last := ""; last != "said"; {
+			last = <-seen
 		}
 	})
-	t.Run("a runtime JSON file comes back, and the database does not", func(t *testing.T) {
+	t.Run("a runtime JSON file comes back, and the database, a new empty file and a binary file do not", func(t *testing.T) {
 		disk, watch := open(t)
 		for _, folder := range []string{".se/.runtime/hold/keep.json", ".se/.runtime/undo/keep.json"} {
 			if err := disk.Write(folder, "{}\n"); err != nil {
@@ -62,22 +58,19 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 			t.Fatal(err)
 		}
 		defer stop()
+		if err := disk.Write("quack", ""); err != nil {
+			t.Fatal(err)
+		}
+		if err := disk.Write("quack", binaryBody); err != nil {
+			t.Fatal(err)
+		}
 		for _, path := range []string{".se/.runtime/index.db", ".se/.runtime/undo/one.json", ".se/.runtime/plan.json"} {
 			if err := disk.Write(path, "{}\n"); err != nil {
 				t.Fatal(err)
 			}
 		}
-		until := time.After(patience)
-		for {
-			select {
-			case path := <-seen:
-				if path == ".se/.runtime/plan.json" {
-					return
-				}
-				t.Fatalf("the watch hands %s", path)
-			case <-until:
-				t.Fatal("the plan never comes back")
-			}
+		if path := <-seen; path != ".se/.runtime/plan.json" {
+			t.Fatalf("the watch hands %s", path)
 		}
 	})
 }
@@ -95,4 +88,22 @@ func TestWatchKeepsItsContract(t *testing.T) {
 			return NewDisk(root), NewWatch(root)
 		})
 	})
+}
+
+// The stop hung on Windows while the watch added a folder, so the real watch stops while folders appear, once the first stands. [[spec/tickets/a-watch-stops-mid-add]]
+// level0: FixtureOutsideHome - the contract runs the real watch over a real folder of its own, since the hang stood in the real watch alone
+func TestAStopReturnsWhileFoldersAppear(t *testing.T) {
+	for round := 0; round < 20; round++ {
+		root := t.TempDir()
+		stop, err := NewWatch(root).Changes(func(string, string, int64, bool) {})
+		if err != nil {
+			t.Fatal(err)
+		}
+		appearing := watchertest.Appearing(root)
+		for stands, _ := filepath.Glob(filepath.Join(root, "*")); len(stands) == 0; stands, _ = filepath.Glob(filepath.Join(root, "*")) {
+			runtime.Gosched()
+		}
+		watchertest.Returns(t, func() error { stop(); return nil })
+		appearing()
+	}
 }

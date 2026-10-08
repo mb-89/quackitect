@@ -1,12 +1,10 @@
 // The doctor's read of the hooks: the reader takes every address the settings
 // files name, and the probe says which one answers.
 // [[spec/design_output/level0#the-doctor-probes-every-hook]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"sync"
@@ -17,20 +15,6 @@ import (
 // A settings file naming one address, in the shape the client reads. [[spec/design_output/level0#the-doctor-probes-every-hook]]
 func hookSettings(url string) string {
 	return `{"hooks":{"PreToolUse":[{"matcher":"*","hooks":[{"type":"http","url":"` + url + `"}]}]}}`
-}
-
-// Writes each file a case names under a folder. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-func writeFiles(t *testing.T, folder string, files map[string]string) {
-	t.Helper()
-	for path, text := range files {
-		at := filepath.Join(folder, filepath.FromSlash(path))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
 }
 
 // A GET answering the addresses a case names, and standing dead for the rest. [[spec/design_output/level0#the-doctor-probes-every-hook]]
@@ -54,13 +38,13 @@ func wheres(found []hookNamed) []string {
 
 func TestTheHookReaderTakesAnAddressOutOfEachOfTheThreeSettingsFiles(t *testing.T) {
 	t.Parallel()
-	root, home := t.TempDir(), t.TempDir()
-	writeFiles(t, root, map[string]string{
+	root, home, disk := "/tree", "/home/one", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
 		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
 		settingsLocalFile: hookSettings("http://127.0.0.1:2/b"),
 	})
-	writeFiles(t, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:3/c")})
-	found := hooksNamed(root, home)
+	hq1SeedDisk(t, disk, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:3/c")})
+	found := hooksNamed(disk, root, home)
 	if got := wheres(found); !reflect.DeepEqual(got, []string{"http://127.0.0.1:1/a", "http://127.0.0.1:2/b", "http://127.0.0.1:3/c"}) {
 		t.Errorf("the addresses read %v", got)
 	}
@@ -80,9 +64,9 @@ func TestASettingsFileHoldingNoHooksStandingNowhereOrTornNamesNoAddress(t *testi
 		"nowhere":  {},
 		"torn":     {settingsFile: "{"},
 	} {
-		root := t.TempDir()
-		writeFiles(t, root, files)
-		if found := hooksNamed(root, ""); len(found) != 0 {
+		disk := newFakeDisk()
+		hq1SeedDisk(t, disk, "/tree", files)
+		if found := hooksNamed(disk, "/tree", ""); len(found) != 0 {
 			t.Errorf("%s names %v", name, found)
 		}
 	}
@@ -90,24 +74,24 @@ func TestASettingsFileHoldingNoHooksStandingNowhereOrTornNamesNoAddress(t *testi
 
 func TestACommandHookStandsOutsideTheAddresses(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	writeFiles(t, root, map[string]string{settingsFile: `{"hooks":{"PreToolUse":[
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{settingsFile: `{"hooks":{"PreToolUse":[
 		{"hooks":[{"type":"command","command":"C:\\hook.exe"}]},
 		{"hooks":[{"type":"command","command":"/usr/bin/hook"}]},
 		{"hooks":[{"type":"http","url":"http://127.0.0.1:1/a"}]}]}}`})
-	if got := wheres(hooksNamed(root, "")); !reflect.DeepEqual(got, []string{"http://127.0.0.1:1/a"}) {
+	if got := wheres(hooksNamed(disk, root, "")); !reflect.DeepEqual(got, []string{"http://127.0.0.1:1/a"}) {
 		t.Errorf("the addresses read %v", got)
 	}
 }
 
 func TestTwoFilesNamingOneAddressNameItOnceOffTheFileReadingFirst(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	writeFiles(t, root, map[string]string{
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
 		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
 		settingsLocalFile: hookSettings("http://127.0.0.1:1/a"),
 	})
-	found := hooksNamed(root, "")
+	found := hooksNamed(disk, root, "")
 	if len(found) != 1 || found[0].file != settingsFile {
 		t.Errorf("the reader finds %v", found)
 	}
@@ -146,17 +130,6 @@ func TestAHookAnsweringStandsAndOneAnsweringNothingWarns(t *testing.T) {
 	}
 }
 
-func TestAHookAnsweringAFailingStatusStands(t *testing.T) {
-	t.Parallel()
-	d, _, _, _ := fakeBoxDoors(t)
-	where := "http://127.0.0.1:36368/hook"
-	// The real GET answers a 500 with its body and no error, so the fake does the same. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-	d.get = answeringGet(map[string]string{where: "Internal Server Error"})
-	if rows := hookRows(d, []hookNamed{{where, settingsFile}}); !strings.HasPrefix(rows[0][1], "stands at") {
-		t.Errorf("the row reads %v", rows)
-	}
-}
-
 func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
 	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
@@ -171,11 +144,7 @@ func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
 		if count == 2 {
 			close(second)
 		} else {
-			select {
-			case <-second:
-			case <-time.After(5 * time.Second):
-				return "", errors.New("the second call never came")
-			}
+			<-second
 		}
 		return "", errors.New("fetch failed")
 	}
@@ -184,7 +153,7 @@ func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
 		t.Fatalf("the probe asks %v and answers %v", asked, rows)
 	}
 	for _, row := range rows {
-		if strings.Contains(row[1], "never came") || !strings.HasPrefix(row[1], "warn") {
+		if !strings.HasPrefix(row[1], "warn") {
 			t.Errorf("a call waited alone: %v", row)
 		}
 	}

@@ -1,6 +1,6 @@
 // The check verb: the tests, level zero, the Go tests, the doors, the
-// projections, the plugin, the server and the rules over the tree, all at
-// once and each timed, and the stamp a door reads before a push.
+// projections, the plugin, its types, the server and the rules over the tree,
+// all at once and each timed, and the stamp a door reads before a push.
 // [[spec/design_output/work#the-battery-answers-first]]
 package main
 
@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -68,7 +67,7 @@ type part struct {
 	lead bool
 }
 
-// What the check reaches: the root, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
+// What the check reaches: the root, the disk under it, a verb through quack's own road, a process, whether an index door stands, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
 type checkDoors struct {
 	root      string
 	self      string
@@ -84,7 +83,14 @@ type checkDoors struct {
 	git       func(args ...string) string
 	log       func(row map[string]any) error
 	out, errs io.Writer
+	disk      diskDoors
 }
+
+// The modes a made folder and a written file take. [[spec/design_output/work#the-battery-answers-first]]
+const (
+	checkFolderMode = 0o755
+	checkFileMode   = 0o644
+)
 
 // One run of the test part. A unit test touches memory alone, so every unit file shares one process. A contract test drives a real door, so each keeps a process of its own. [[spec/tickets/the-tests-start-fewer-processes]]
 type testPart struct {
@@ -130,8 +136,8 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		if quiet {
 			d.out = io.Discard
 		}
-		_ = os.Remove(d.at(lintFile))
-		_ = os.Remove(d.at(goRedFile))
+		_ = d.disk.remove(d.at(lintFile))
+		_ = d.disk.remove(d.at(goRedFile))
 		owned := !d.indexUp()
 		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
 		if owned {
@@ -144,7 +150,7 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 		var found lintFound
 		_ = json.Unmarshal([]byte(d.text(lintFile)), &found)
 		var spawns *spawnTally
-		if tally, err := os.ReadFile(d.at(spawnsFile)); err == nil {
+		if tally, err := d.disk.read(d.at(spawnsFile)); err == nil {
 			one := spawnsIn(string(tally))
 			spawns = &one
 		}
@@ -190,25 +196,22 @@ func saysParts(d checkDoors, report batteryReport) {
 // The stamp the check leaves, which a door reads before a push. [[spec/design_output/work#the-battery-answers-first]]
 func writesStamp(d checkDoors, code int, stood []finding, report *batteryReport) error {
 	at := d.at(stampFile)
-	before, _ := os.ReadFile(at)
+	before, _ := d.disk.read(at)
 	said := stampFor(code, d.git("rev-parse", "HEAD"), d.git("status", "--porcelain") == "", d.now().UTC().Format(logStamp), stood, report, before, int(d.config(runsKey)))
 	text, err := json.MarshalIndent(said, "", "  ")
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(at), checkFolderMode); err != nil {
 		return err
 	}
-	return os.WriteFile(at, append(text, '\n'), 0o644)
+	return d.disk.write(at, append(text, '\n'), checkFileMode)
 }
 
 // A path under the root, and the text a file there holds, or nothing. [[spec/design_output/work#the-battery-answers-first]]
 func (d checkDoors) at(rel string) string { return filepath.Join(d.root, filepath.FromSlash(rel)) }
 
-func (d checkDoors) text(rel string) string {
-	said, _ := os.ReadFile(d.at(rel))
-	return string(said)
-}
+func (d checkDoors) text(rel string) string { return d.disk.text(d.at(rel)) }
 
 // The battery: the ready step alone, then each lead part alone in part order, then every other part at once. The last wave reads every start of its parts, then starts them and waits for all of them, each part timed under its name, the ready step among them. A lead part holds cases bounded by the wall clock, a door start or a call's latency, which a box the go build and the whole-tree Vale load runs past. [[spec/tickets/the-check-runs-beside]] It answers the first red code, the ready step's first and then in part order, and the red names, so a red part names itself while every part beside it still reports. Every part reads the ready step's output, the built binaries and the index door standing on them, so every part waits on it. No part reads another part's output, so no part waits on another for its output, and the total is the ready step's span, every lead part's and the slowest other part's. [[spec/tickets/index-cases-wait-for-it]] [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
 func batteryRun(ready part, parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
@@ -302,12 +305,16 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 		where = []string{"."}
 	}
 	return []part{
+		{name: "changed", run: func() int { return d.verb([]string{"lint", "--changed", "--strict"}, quiet) }},
 		{name: "tests", run: func() int { return testsRun(d, quiet) }, lead: true},
 		{name: "level0", run: func() int { return level0Runs(d, quiet) }, lead: true},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
+		{name: "guards", run: func() int { return d.verb([]string{"guards"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},
 		{name: "plugin", run: func() int { return pluginHolds(d) }},
+		{name: "types", run: func() int { return typesHold(d) }},
+		{name: "plugin-tests", run: func() int { return pluginTestsHold(d) }},
 		{name: "server", run: func() int { return serverHolds(d) }},
 		{name: "rules", run: func() int { return d.verb(append([]string{"lint"}, where...), quiet) }},
 		{name: "lines", run: func() int { return linesHold(d) }},
@@ -332,9 +339,9 @@ func level0Runs(d checkDoors, quiet bool) int {
 	return code
 }
 
-// The plugin the engine reads validates, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]]
+// The plugin the engine reads validates strictly, so a warning fails the part, and a box with no claude says so and carries on. [[spec/design_output/copilot#setup-and-discovery]] [[spec/tickets/level0-plugin-validate-in-check]]
 func pluginHolds(d checkDoors) int {
-	code, said, err := d.run([]string{"claude", "plugin", "validate", filepath.FromSlash(pluginDir)}, nil, true)
+	code, said, err := d.run([]string{"claude", "plugin", "validate", "--strict", filepath.FromSlash(pluginDir)}, nil, true)
 	if err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so the plugin goes unvalidated here.")
 		return 0
@@ -344,6 +351,26 @@ func pluginHolds(d checkDoors) int {
 	}
 	fmt.Fprintln(d.errs, strings.TrimSpace(said))
 	fmt.Fprintln(d.errs, "The engine reads this module's source, and it refuses the above.")
+	return 1
+}
+
+// The hooks module types against the engine this box runs: claude lays the engine's types into the plugin as it loads it, and tsc reads the plugin against them. The print run asks for a prompt and exits before any model turn, once the load has laid the types. A box with no claude or no tsc says so and carries on. [[spec/tickets/level0-hooks-move-to-typescript]]
+func typesHold(d checkDoors) int {
+	plugin := filepath.FromSlash(pluginDir)
+	if _, _, err := d.run([]string{"claude", "--plugin-dir", plugin, "-p", ""}, nil, true); err != nil {
+		fmt.Fprintln(d.out, "claude stands nowhere, so no types are laid and the hooks go untyped here.")
+		return 0
+	}
+	code, said, err := d.run([]string{"tsc", "-p", plugin}, nil, true)
+	if err != nil {
+		fmt.Fprintln(d.out, "tsc stands nowhere, so the hooks go untyped here.")
+		return 0
+	}
+	if code == 0 {
+		return 0
+	}
+	fmt.Fprintln(d.errs, strings.TrimSpace(said))
+	fmt.Fprintln(d.errs, "The hooks module fails its types against the engine this box runs, as the above says.")
 	return 1
 }
 
@@ -461,10 +488,10 @@ func writesGoRed(d checkDoors, red []redCase) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(d.at(goRedFile)), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(d.at(goRedFile)), checkFolderMode); err != nil {
 		return err
 	}
-	return os.WriteFile(d.at(goRedFile), text, 0o644)
+	return d.disk.write(d.at(goRedFile), text, checkFileMode)
 }
 
 // The test part: the unit run, then the contract run, the red list apart, each run's cases written for the battery's report. The runs go one after the other, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-tests-start-fewer-processes]] [[spec/design_output/pull#the-gate]]
@@ -480,8 +507,8 @@ func testsRun(d checkDoors, quiet bool) int {
 	code := 0
 	lines := []string{}
 	for _, one := range testParts {
-		_ = os.Remove(d.at(one.times))
-		ran, _, err := d.run(append([]string{"node"}, testArgv(d.root, d.red, one)...), testEnv(d, tally), quiet)
+		_ = d.disk.remove(d.at(one.times))
+		ran, _, err := d.run(append([]string{"node"}, testArgv(d.disk, d.root, d.red, one)...), testEnv(d, tally), quiet)
 		if err != nil {
 			fmt.Fprintln(d.errs, startFault("node", err))
 			ran = exitFailed
@@ -489,11 +516,11 @@ func testsRun(d checkDoors, quiet bool) int {
 		if code == 0 {
 			code = ran
 		}
-		if said, err := os.ReadFile(d.at(one.times)); err == nil {
+		if said, err := d.disk.read(d.at(one.times)); err == nil {
 			lines = append(lines, string(said))
 		}
 	}
-	if err := os.WriteFile(d.at(timesFile), []byte(strings.Join(lines, "\n")), 0o644); err != nil {
+	if err := d.disk.write(d.at(timesFile), []byte(strings.Join(lines, "\n")), checkFileMode); err != nil {
 		fmt.Fprintln(d.errs, err)
 		return exitFailed
 	}
@@ -512,14 +539,14 @@ func testEnv(d checkDoors, tally string) []string {
 // An empty tally the process door writes into while the tests run. [[spec/design_output/work#the-battery-answers-first]]
 func freshTally(d checkDoors) (string, error) {
 	at := d.at(spawnsFile)
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(at), checkFolderMode); err != nil {
 		return "", err
 	}
-	return at, os.WriteFile(at, nil, 0o644)
+	return at, d.disk.write(at, nil, checkFileMode)
 }
 
 // The runner's flags for one part: the spec report to the screen, the battery's reporter to the part's file, and every test file the glob reaches less the red list. A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/pull#the-gate]]
-func testArgv(root string, red []string, one testPart) []string {
+func testArgv(disk diskDoors, root string, red []string, one testPart) []string {
 	argv := []string{"--test"}
 	if one.shared {
 		argv = append(argv, "--experimental-test-isolation=none")
@@ -533,7 +560,7 @@ func testArgv(root string, red []string, one testPart) []string {
 		return append(argv, one.glob)
 	}
 	folder, end := one.glob[:strings.LastIndex(one.glob, "/")], one.glob[strings.LastIndex(one.glob, "*")+1:]
-	listed, _ := os.ReadDir(filepath.Join(root, filepath.FromSlash(folder)))
+	listed := disk.listed(filepath.Join(root, filepath.FromSlash(folder)))
 	files := []string{}
 	for _, entry := range listed {
 		path := folder + "/" + entry.Name()

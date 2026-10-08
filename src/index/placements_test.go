@@ -1,40 +1,39 @@
 // The placements: each process restarts alone and the index stays warm, and
 // the index answers the inputs and publishes a run where a commit moves one.
 // [[spec/design_output/model#the-placements]]
-package index
+package index // level0: InPackageTest - it reaches the fakeStore and until helpers procs_test declares
 
 import (
-	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
-// Two fakes placed apart, each its own process, and the store they commit to. [[spec/design_output/model#the-placements]]
-func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
+// Two fakes placed apart, each its own process, the store they commit to, and the processes the fake spawn runs. [[spec/design_output/model#the-placements]]
+func placedTwo(t *testing.T) (*q.Store, *fakeProcs, func()) {
 	t.Helper()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	store, hand := fakeStore(t)
+	procs := newFakeProcs()
 	one := func(instance, topic string) Placed {
-		return Placed{Name: instance, Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: 50 * time.Millisecond, Topics: []string{topic}}
+		return Placed{Name: instance, Command: []string{"fakeio", instance}, Instances: map[string]q.Writer{instance: hand}, Topics: []string{topic}, Spawn: procs.Spawn}
 	}
-	placements := NewPlacements(bus, store, []Placed{one("fake", "fakeio"), one("other", "otherio")})
+	placements := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{one("fake", "fakeio"), one("other", "otherio")})
+	placements.gap = 0
 	stop, err := placements.Start()
 	if err != nil {
 		bus.Close()
 		t.Fatal(err)
 	}
 	until(t, store, "both fakes at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 && snap.Read("other/out") == 7 })
-	return store, placements, func() { stop(); bus.Close() }
+	return store, procs, func() { stop(); bus.Close() }
 }
-
-// The cap on a wait for the spawner's ask, which a green run never meets. [[spec/tickets/each-door-meets-one-test]]
-const askCap = 5 * time.Second
 
 // A timer that answers a wait of nothing at once and holds every other, and sends each span it is asked on the channel it answers. [[spec/tickets/each-door-meets-one-test]]
 func fakeTimer() (func(time.Duration) <-chan time.Time, <-chan time.Duration) {
@@ -53,24 +52,18 @@ func fakeTimer() (func(time.Duration) <-chan time.Time, <-chan time.Duration) {
 }
 
 // Waits until the spawner asks the timer for the span. [[spec/tickets/each-door-meets-one-test]]
-func timerAsked(t *testing.T, asks <-chan time.Duration, span time.Duration) {
-	t.Helper()
-	capped := time.After(askCap)
-	for {
-		select {
-		case got := <-asks:
-			if got == span {
-				return
-			}
-		case <-capped:
-			t.Fatalf("the spawner asks no wait of %v of the timer it names", span)
+func timerAsked(asks <-chan time.Duration, span time.Duration) {
+	for got := range asks {
+		if got == span {
+			return
 		}
 	}
 }
 
 // New placements wait the default gap between two spawns, and it stays short. [[spec/tickets/the-modules-start-together]]
 func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
-	if got := NewPlacements(nil, nil, nil).gap; got != spawnGap {
+	t.Parallel()
+	if got := NewPlacements(qtest.Wall(), nil, nil, nil).gap; got != spawnGap {
 		t.Fatalf("new placements wait %v between spawns, and want %v", got, spawnGap)
 	}
 	if spawnGap > 50*time.Millisecond {
@@ -79,25 +72,30 @@ func TestThePlacementsWaitTheDefaultGap(t *testing.T) {
 }
 
 func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer bus.Close()
 	store, hand := fakeStore(t)
+	procs := newFakeProcs()
 	one := func(instance string) Placed {
-		return Placed{Name: instance, Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: time.Hour}
+		return Placed{Name: instance, Command: []string{"fakeio", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: time.Hour, Spawn: procs.Spawn}
 	}
 	// The case names a gap past its stop, and the fake timer holds it, so the stop lands between the two spawns on any box. [[spec/tickets/the-modules-start-together]]
 	timer, asks := fakeTimer()
-	spawns := NewPlacements(bus, store, []Placed{one("fake"), one("other")})
+	spawns := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{one("fake"), one("other")})
 	spawns.gap = time.Hour
 	stop, err := spawns.Timer(timer).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
-	timerAsked(t, asks, time.Hour)
+	timerAsked(asks, time.Hour)
 	stop()
+	if got := procs.count(); got != 1 {
+		t.Fatalf("the spawns start %d process(es) about a stop before the second, and want fake's alone", got)
+	}
 	if got := read(store, "other/out"); got != 0 {
 		t.Fatalf("other/out reads %v after a stop before its spawn, where no process of other starts", got)
 	}
@@ -105,14 +103,15 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 
 // The stop answers once the spawner returns, so no spawn lands past it. The timer holds the spawner until the stop begins. [[spec/tickets/stop-join-test-stands-red]]
 func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer bus.Close()
 	store, hand := fakeStore(t)
-	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
-	placements := NewPlacements(bus, store, []Placed{placed})
+	placed := Placed{Name: "fake", Command: []string{"fakeio", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Spawn: newFakeProcs().Spawn}
+	placements := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{placed})
 	placements.Timer(func(time.Duration) <-chan time.Time {
 		<-placements.quit
 		return make(chan time.Time)
@@ -130,31 +129,34 @@ func TestAStopJoinsTheSpawnerBeforeItAnswers(t *testing.T) {
 }
 
 func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
+	t.Parallel()
 	bus, err := StartBus()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer bus.Close()
 	store, hand := fakeStore(t)
-	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	procs := newFakeProcs()
+	placed := Placed{Name: "fake", Command: []string{"fakeio", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Spawn: procs.Spawn}
 	timer, asks := fakeTimer()
-	stop, err := NewPlacements(bus, store, []Placed{placed}).After(time.Hour).Timer(timer).Start()
+	stop, err := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{placed}).After(time.Hour).Timer(timer).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
-	timerAsked(t, asks, time.Hour)
+	timerAsked(asks, time.Hour)
 	stop()
-	if got := read(store, "fake/out"); got != 0 {
-		t.Fatalf("fake/out reads %v inside the start window, where nothing spawns", got)
+	if got := procs.count(); got != 0 {
+		t.Fatalf("the placements start %d process(es) inside the start window, where nothing spawns", got)
 	}
 }
 
 func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
-	store, _, stop := placedTwo(t)
+	t.Parallel()
+	store, procs, stop := placedTwo(t)
 	defer stop()
 	other, first := read(store, "other/pid"), read(store, "fake/pid")
 	before := store.Snapshot().Revision
-	kills(t, first)
+	procs.kills(t, first)
 	until(t, store, "the killed fake back", func(snap q.Snapshot) bool {
 		pid := snap.Read("fake/pid")
 		return pid != first && pid != 0 && snap.Read("fake/out") == 7
@@ -192,7 +194,7 @@ func doublerPlaced(t *testing.T) (*q.Store, q.Writer, *Bus, Placed) {
 		t.Fatal(err)
 	}
 	t.Cleanup(bus.Close)
-	placed := Placed{Name: "doubler", Command: []string{os.Args[0], "-test.run=^TestFakeIdleProcess$"}, Instances: map[string]q.Writer{"doubler": {}}, Restart: time.Hour, Topics: []string{"doubler"}}
+	placed := Placed{Name: "doubler", Command: []string{"idle"}, Instances: map[string]q.Writer{"doubler": {}}, Restart: time.Hour, Topics: []string{"doubler"}, Spawn: newFakeProcs().Spawn}
 	return store, source, bus, placed
 }
 
@@ -214,8 +216,9 @@ func runsOf(t *testing.T, peer *Peer) chan struct{} {
 }
 
 func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
-	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	stop, err := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,11 +232,7 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case <-runs:
-	case <-time.After(10 * time.Second):
-		t.Fatal("a move of source/all publishes no run of doubler")
-	}
+	<-runs
 	saved, err := peer.Inputs("doubler")
 	if err != nil {
 		t.Fatalf("the inputs of doubler meet %v", err)
@@ -244,8 +243,9 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 }
 
 func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
-	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	stop, err := NewPlacements(qtest.NewFake(time.Time{}), bus, store, []Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -271,10 +271,12 @@ func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
 	}
 }
 
-// A commit answering an earlier run leaves the reader waiting on a run sent while the process computed. [[spec/tickets/mid-run-commit-clears-early]]
+// A commit answering an earlier run leaves the reader waiting on a run sent while the process computed: the settle ends on its wait alone, and the answer to the later run ends the next one with no tick. [[spec/tickets/mid-run-commit-clears-early]]
 func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
+	t.Parallel()
 	store, source, bus, placed := doublerPlaced(t)
-	placements := NewPlacements(bus, store, []Placed{placed})
+	clock := newToldClock()
+	placements := NewPlacements(clock, bus, store, []Placed{placed})
 	stop, err := placements.Start()
 	if err != nil {
 		t.Fatal(err)
@@ -286,6 +288,10 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 	}
 	defer peer.Close()
 	runs := runsOf(t, peer)
+	said := make(chan string, toldWaits)
+	was := stderr
+	stderr = toldWriter(said)
+	t.Cleanup(func() { stderr = was })
 	answers := func(ask func(string) ([]byte, error)) {
 		t.Helper()
 		if _, err := ask("doubler"); err != nil {
@@ -297,11 +303,7 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 		if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": all}); err != nil {
 			t.Fatal(err)
 		}
-		select {
-		case <-runs:
-		case <-time.After(10 * time.Second):
-			t.Fatal("a move of source/all publishes no run of doubler")
-		}
+		<-runs
 	}
 	answers(peer.Inputs)
 	if err := peer.Commit("doubler", map[string]any{}); err != nil {
@@ -314,36 +316,65 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 	if err := peer.Commit("doubler", map[string]any{}); err != nil {
 		t.Fatal(err)
 	}
-	began := time.Now()
-	placements.Settle(time.Second)
-	if gone := time.Since(began); gone < 900*time.Millisecond {
-		t.Fatalf("the settle ends after %v on the answer to the first run, and wants the second answered", gone)
+	// The index names a value it reads as none after the answer to the first run, so that answer reached it first. [[spec/tickets/test-walks-move-onto-fakes]]
+	if err := peer.Commit("doubler", map[string]any{"t/none": 1}); err != nil {
+		t.Fatal(err)
 	}
+	for line := range said {
+		if strings.Contains(line, "t/none") {
+			break
+		}
+	}
+	ended := make(chan struct{})
+	go func() {
+		placements.Settle(time.Second)
+		close(ended)
+	}()
+	clock.waitsOn(time.Second)
+	placements.mu.Lock()
+	waiting := placements.pending["doubler"]
+	placements.mu.Unlock()
+	if !waiting {
+		t.Fatal("the settle ends on the answer to the first run, and wants the second answered")
+	}
+	clock.Tick(time.Second)
+	<-ended
 	answers(peer.Moved)
 	if err := peer.Commit("doubler", map[string]any{}); err != nil {
 		t.Fatal(err)
 	}
-	began = time.Now()
 	placements.Settle(10 * time.Second)
-	if gone := time.Since(began); gone > 5*time.Second {
-		t.Fatalf("the answer to the second run holds the settle for %v", gone)
+}
+
+// A writer telling each line on the channel, dropping the line where the channel stands full. [[spec/tickets/test-walks-move-onto-fakes]]
+type toldWriter chan string
+
+func (one toldWriter) Write(said []byte) (int, error) {
+	select {
+	case one <- string(said):
+	default:
 	}
+	return len(said), nil
 }
 
 // A settle on a silent process ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
 func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
+	t.Parallel()
 	store, _, bus, placed := doublerPlaced(t)
-	placements := NewPlacements(bus, store, []Placed{placed})
+	clock := newToldClock()
+	placements := NewPlacements(clock, bus, store, []Placed{placed})
 	stop, err := placements.Start()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stop()
 	for range 200 {
-		began := time.Now()
-		placements.Settle(time.Millisecond)
-		if gone := time.Since(began); gone > time.Second {
-			t.Fatalf("a settle of a millisecond on the silent doubler holds for %v", gone)
-		}
+		ended := make(chan struct{})
+		go func() {
+			placements.Settle(time.Millisecond)
+			close(ended)
+		}()
+		clock.passes(time.Millisecond)
+		<-ended
 	}
 }

@@ -156,7 +156,7 @@ func entriesIn(list any, parent string, out []entry) []entry {
 func graphOf(front *yaml.Doc, walk []entry, sections []note.Section) Graph {
 	record := map[string]*yaml.Doc{}
 	for _, item := range yaml.AsList(front.Get("record")) {
-		if one := yaml.AsDoc(item); one != nil && truthy(one.Get("step")) {
+		if one := yaml.AsDoc(item); one != nil && yaml.Truthy(one.Get("step")) {
 			record[yaml.AsString(one.Get("step"))] = one
 		}
 	}
@@ -203,7 +203,7 @@ func reachedOf(front *yaml.Doc, walk []entry) []string {
 		}
 	}
 	for _, item := range yaml.AsList(front.Get("record")) {
-		if one := yaml.AsDoc(item); one != nil && truthy(one.Get("step")) {
+		if one := yaml.AsDoc(item); one != nil && yaml.Truthy(one.Get("step")) {
 			out = append(out, yaml.AsString(one.Get("step")))
 		}
 	}
@@ -216,15 +216,15 @@ func nodeOf(one entry, front, held *yaml.Doc, reached []string) Node {
 	if one.leaf {
 		node.Kind = leafKind
 	}
-	if truthy(one.said.Get("does")) {
+	if yaml.Truthy(one.said.Get("does")) {
 		node.Does = yaml.AsString(one.said.Get("does"))
 	}
-	if truthy(one.said.Get("when")) {
+	if yaml.Truthy(one.said.Get("when")) {
 		node.When, node.Dotted = yaml.AsString(one.said.Get("when")), true
 	}
 	node.Person = yaml.AsString(one.said.Get("by")) == personWord
 	node.At = one.path == yaml.AsString(front.Get("step"))
-	if truthy(held.Get("skipped")) {
+	if yaml.Truthy(held.Get("skipped")) {
 		why := yaml.AsString(held.Get("why"))
 		node.Skipped, node.Why = true, &why
 	}
@@ -288,7 +288,7 @@ func leafDrawn(walk []entry, leaf entry, sections []note.Section) DrawnLeaf {
 	}
 	fields := []DrawnField{}
 	for _, item := range yaml.AsList(leaf.said.Get("evidence")) {
-		if one := yaml.AsDoc(item); one != nil && truthy(one.Get("name")) {
+		if one := yaml.AsDoc(item); one != nil && yaml.Truthy(one.Get("name")) {
 			fields = append(fields, DrawnField{Name: yaml.AsString(one.Get("name")), Form: yaml.AsString(one.Get("form")), Says: yaml.AsString(one.Get("says")), Items: []string{}})
 		}
 	}
@@ -345,21 +345,6 @@ func headingLines(sections []note.Section, path string) func(string) int {
 		}
 		return sections[at].Line
 	}
-}
-
-// Whether a value reads as true where JavaScript tests it. [[spec/tickets/the-lens-reads-v1]]
-func truthy(said any) bool {
-	switch one := said.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case int:
-		return one != 0
-	case string:
-		return one != ""
-	}
-	return true
 }
 
 // The route as JSON in the order the front writes it, and an empty list where the front holds none. [[spec/tickets/the-lens-reads-v1]]

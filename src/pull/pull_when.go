@@ -1,6 +1,5 @@
 // The conditions a leaf's when names, read off the box and the ticket, and
-// the cleanup a desk's empty queue hands out, off src/scripts/pull-when.js
-// and pull-cleanup.js.
+// the cleanup a desk's empty queue hands out.
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
 package pull
 

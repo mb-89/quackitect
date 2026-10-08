@@ -46,7 +46,7 @@ func shimVehicle(t *testing.T, at string) string {
 	return at
 }
 
-// Runs the shim in the stub with the variables named over the box's own, and answers its exit code, stdout and stderr.
+// Runs the shim in the stub with the variables named over the box's own, and answers its exit code, stdout and stderr. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 func runShim(t *testing.T, stub string, env map[string]string, argv ...string) (int, string, string) {
 	t.Helper()
 	cmd := exec.Command("sh", append([]string{"RUNME.sh"}, argv...)...)
@@ -68,13 +68,13 @@ func runShim(t *testing.T, stub string, env map[string]string, argv ...string) (
 	return code, out.String(), errs.String()
 }
 
-// A path as sh prints it, in either slash, read without case, since pwd -W answers a drive letter on Windows.
+// A path as sh prints it, in either slash, read without case, since pwd -W answers a drive letter on Windows. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 func samePath(said, want string) bool {
 	flat := func(path string) string { return strings.ToLower(filepath.ToSlash(path)) }
 	return flat(said) == flat(want)
 }
 
-// The vehicle answers every argument, and the stub stands as the work root.
+// The vehicle answers every argument, and the stub stands as the work root. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 func handsOver(t *testing.T, stdout, stub, argv string) {
 	t.Helper()
 	lines := strings.Split(strings.TrimSpace(stdout), "\n")

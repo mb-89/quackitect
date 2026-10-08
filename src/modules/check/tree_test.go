@@ -10,12 +10,6 @@ import (
 )
 
 const seedSettings = `{
-  "vale.valeCLI.installVale": false,
-  "vale.valeCLI.path": ".se/.runtime/bin/vale",
-  "vale.valeCLI.config": "spec/config/editor.vale.ini",
-  "vale.valeCLI.minAlertLevel": "inherited",
-  "vale.valeCLI.lintOnChange": true,
-  "vale.enableSpellcheck": false,
   "biome.lsp.bin": {
     "linux-x64": ".se/.runtime/bin/biome",
     "win32-x64": ".se/.runtime/bin/biome.exe"
@@ -28,17 +22,15 @@ const seedSettings = `{
 `
 
 const seedOffered = `{
-  "recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"]
+  "recommendations": ["biomejs.biome", "bierner.markdown-mermaid"]
 }
 `
 
-const seedEditorIni = "StylesPath = styles\nMinAlertLevel = suggestion\n"
-
-const seedInstall = "here() {\n  case $1 in\n    vale) [ -x \"$bin/vale\" ] ;;\n    biome) [ -x \"$bin/biome\" ] ;;\n  esac\n}\n"
+const seedInstall = "here() {\n  case $1 in\n    biome) [ -x \"$bin/biome\" ] ;;\n  esac\n}\n"
 
 // The seed with one file changed, and every rule's findings named alone. [[spec/design_output/tree#the-rules-over-two-files]]
 func seededTree(change map[string]string) *Tree {
-	texts := Texts{Settings: seedSettings, Offered: seedOffered, EditorIni: seedEditorIni, Install: seedInstall}
+	texts := Texts{Settings: seedSettings, Offered: seedOffered, Install: seedInstall}
 	for at, text := range change {
 		if text == "" {
 			delete(texts, at)
@@ -82,29 +74,17 @@ type ruleRow struct {
 	wants []string
 }
 
-func TestSettingsNameBinariesRefusesAnotherBinaryAndAnInstallWithNoVale(t *testing.T) {
-	plain := strings.Replace(seedSettings, `"vale.valeCLI.path": ".se/.runtime/bin/vale"`, `"vale.valeCLI.path": "vale"`, 1)
-	windows := strings.Replace(seedSettings, "bin/vale\"", "bin/vale.exe\"", 1)
-	noVale := strings.Replace(seedInstall, "    vale) [ -x \"$bin/vale\" ] ;;", "    vale) true ;;", 1)
+func TestSettingsNameBinariesRefusesAnotherBinaryAndAnInstallWithNoBiome(t *testing.T) {
+	plain := strings.Replace(seedSettings, `"linux-x64": ".se/.runtime/bin/biome"`, `"linux-x64": "biome"`, 1)
+	noBiome := strings.Replace(seedInstall, "    biome) [ -x \"$bin/biome\" ] ;;", "    biome) true ;;", 1)
 	rowsOf(t, settingsNameBinaries, []ruleRow{
 		{"the seed", seededTree(nil), nil},
-		{"another binary", seededTree(map[string]string{Settings: plain}), []string{"SettingsNameBinaries " + Settings + " vale.valeCLI.path"}},
-		{"the Windows vale", seededTree(map[string]string{Settings: windows}), nil},
-		{"an install with no vale", seededTree(map[string]string{Install: noVale}), []string{"SettingsNameBinaries " + Install + " " + Settings + " runs " + Bin + "/vale, and this script installs no vale."}},
+		{"another binary", seededTree(map[string]string{Settings: plain}), []string{"SettingsNameBinaries " + Settings + " biome.lsp.bin"}},
+		{"an install with no biome", seededTree(map[string]string{Install: noBiome}), []string{"SettingsNameBinaries " + Install + " " + Settings + " runs " + Bin + "/biome, and this script installs no biome."}},
 	})
 	if found := settingsNameBinaries(seededTree(map[string]string{Settings: plain})); len(found) != 1 || found[0].Line <= 1 {
 		t.Fatalf("another binary draws %+v, and wants one finding at the line naming the binary", found)
 	}
-}
-
-func TestEditorDrawsWriteRulesRefusesItsOwnLevelAStyleAndAMissingConfig(t *testing.T) {
-	ownLevel := strings.Replace(seedSettings, `"vale.valeCLI.minAlertLevel": "inherited"`, `"vale.valeCLI.minAlertLevel": "warning"`, 1)
-	rowsOf(t, editorDrawsWriteRules, []ruleRow{
-		{"the seed", seededTree(nil), nil},
-		{"its own level", seededTree(map[string]string{Settings: ownLevel}), []string{"EditorDrawsWriteRules " + Settings + " " + EditorIni + " draws at suggestion. Set vale.valeCLI.minAlertLevel to inherited."}},
-		{"a style turned on", seededTree(map[string]string{EditorIni: seedEditorIni + "[*.md]\nBasedOnStyles = VoiceParagraph\n"}), []string{"turns on a style"}},
-		{"a config nobody wrote", seededTree(map[string]string{EditorIni: ""}), []string{"vale.valeCLI.config"}},
-	})
 }
 
 func TestBiomeOnWindowsRefusesAPlainPath(t *testing.T) {

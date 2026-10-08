@@ -7,7 +7,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the work view file the tree ships, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -29,13 +29,10 @@ const workRowsSaid = `[
    "step": "do", "todo": true, "queue": "2", "says": "A ticket in no group."}
 ]`
 
-// The tree a window writes into: the base file this project ships, and the log. [[spec/design_output/tui#the-work-tab]]
+// The root a window stands over, which every read reaches through a fake. [[spec/design_output/tui#the-work-tab]]
 func workTree(t *testing.T) string {
 	t.Helper()
-	root := t.TempDir()
-	writeAt(t, root, work.BaseAt, string(shippedBase(t)))
-	writeAt(t, root, ".se/.log/session.jsonl", "")
-	return root
+	return t.TempDir()
 }
 
 func shippedBase(t *testing.T) []byte {
@@ -64,17 +61,6 @@ func loadWork(t *testing.T, rows string) *tree.Tree {
 		t.Fatalf("the tab reads its base file and its rows, and answered %v", err)
 	}
 	return grid
-}
-
-func writeAt(t *testing.T, root, rel, text string) {
-	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(rel))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
 }
 
 func logOf(root string) string {

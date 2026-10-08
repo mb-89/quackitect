@@ -1,7 +1,7 @@
 // The index verb asks the index the words it reads, standing where none come,
 // and prints the answer indented, or the fault on the error stream.
 // [[spec/tickets/read-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"

@@ -8,12 +8,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"math/bits"
 	"regexp"
 	"slices"
 	"strings"
-	"unicode/utf16"
 
+	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
@@ -327,7 +326,7 @@ func (d *Doors) takeable(one named, all []named, group string) string {
 	return at.Path
 }
 
-// Whether a dependency stands closed, here or on trunk, and closed where it stands nowhere. [[spec/design_output/pull#children-before-their-group]]
+// Whether a dependency stands closed, here or on trunk, open while its group's work branch stands, and closed where it stands nowhere. [[spec/design_output/pull#a-live-branch-holds-dependents]]
 func (d *Doors) closedHere(all []named, dep string) bool {
 	for _, one := range all {
 		if one.Name == dep {
@@ -336,7 +335,8 @@ func (d *Doors) closedHere(all []named, dep string) bool {
 	}
 	said := d.textAt("origin/"+trunk, ticketsFolder+"/"+dep+noteEnd)
 	if said == "" {
-		return true
+		_, live := d.Repo.Resolve("refs/remotes/origin/" + workBranch + dep)
+		return !live
 	}
 	return fieldOf(said, "state") == closedState
 }
@@ -371,8 +371,8 @@ func blessedEntry(one *yaml.Doc) bool { return entryField(one, "blessed") != "" 
 
 // Whether a record item is a verdict: no bless, no skip, no return and no open take. [[spec/design_output/pull#the-bless]]
 func verdictEntry(one *yaml.Doc) bool {
-	return !blessedEntry(one) && !truthy(one.Get("skipped")) && !truthy(one.Get("returns")) &&
-		!(truthy(one.Get("hash_before")) && !truthy(one.Get("hash_after")))
+	return !blessedEntry(one) && !yaml.Truthy(one.Get("skipped")) && !yaml.Truthy(one.Get("returns")) &&
+		!(yaml.Truthy(one.Get("hash_before")) && !yaml.Truthy(one.Get("hash_after")))
 }
 
 // The gate holds a verdict as the last word on it, and no bless yet. [[spec/design_output/pull#the-bless]]
@@ -422,7 +422,7 @@ func blessHash(text string, at *leaf) string {
 	writes := json.NewEncoder(&said)
 	writes.SetEscapeHTML(false)
 	_ = writes.Encode(read)
-	return hashText(strings.TrimSuffix(said.String(), "\n"))
+	return pull.HashText(strings.TrimSuffix(said.String(), "\n"))
 }
 
 var commentRow = regexp.MustCompile(`^\s*<!--.*-->\s*$`)
@@ -477,24 +477,4 @@ func sectionAt(sections []section, path string) int {
 		from = found + 1
 	}
 	return found
-}
-
-// The constants of HashText in src/pull/hash.go. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-const (
-	fnvOffset = 0x811c9dc5
-	fnvPrime  = 0x01000193
-	mixSeed   = 0x9e3779b9
-	mixPrime  = 0x85ebca6b
-	mixRotate = 13
-)
-
-// The hash hashText answers, over the UTF-16 units JavaScript reads. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-func hashText(text string) string {
-	low, high := uint32(fnvOffset), uint32(mixSeed)
-	for _, code := range utf16.Encode([]rune(text)) {
-		low = (low ^ uint32(code)) * fnvPrime
-		high = (high + uint32(code) + 1) * mixPrime
-		high = bits.RotateLeft32(high, mixRotate)
-	}
-	return fmt.Sprintf("%08x%08x", low, high)
 }

@@ -6,6 +6,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	// level0: OutsideInDoors - the probe writes the fresh clone it stands, as the cold probe does
 	"os"
 	"path/filepath"
 	"regexp"

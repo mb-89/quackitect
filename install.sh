@@ -98,13 +98,9 @@ for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.s
   fi
 done
 
-# Pinned, so every box builds the same tree. Vale ships a binary for each
+# Pinned, so every box builds the same tree. Biome ships a binary for each
 # platform, so nothing here compiles and no C toolchain is needed.
-vale_version=3.20.0
 biome_version=2.5.12
-# vale-ls pins itself here, beside its asset table, and nothing else downloads it.
-vale_ls_version=0.5.1
-vale_ls_releases=https://github.com/vale-cli/vale-ls/releases/download
 
 say() { printf '%s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -143,33 +139,6 @@ case "$(uname -m)" in
   *)             arch=64-bit ;;
 esac
 
-get_vale() {
-  if [ "$os" = "Windows" ]; then
-    name="vale_${vale_version}_Windows_${arch}.zip"
-  else
-    name="vale_${vale_version}_${os}_${arch}.tar.gz"
-  fi
-  from="https://github.com/errata-ai/vale/releases/download/v${vale_version}/${name}"
-
-  say "  downloading Vale ${vale_version}"
-  mkdir -p "$bin"
-  tmp=$(mktemp -d)
-  if have curl; then curl -fsSL "$from" -o "$tmp/$name"
-  elif have wget; then wget -q "$from" -O "$tmp/$name"
-  else say "Neither curl nor wget is here, so Vale cannot be downloaded." >&2; exit 1
-  fi
-
-  if [ "$os" = "Windows" ]; then
-    unpack "$tmp/$name" "$tmp" || exit 1
-  else
-    tar -xzf "$tmp/$name" -C "$tmp" vale
-  fi
-
-  mv "$tmp/vale${exe}" "$bin/vale${exe}"
-  chmod +x "$bin/vale${exe}"
-  rm -rf "$tmp"
-}
-
 get_biome() {
   case "$os" in
     Windows) name="biome-win32-x64.exe" ;;
@@ -203,43 +172,6 @@ get_go() {
     dnf)     install_with_pm golang ;;
     *)       install_with_pm go ;;
   esac
-}
-
-unpack() {
-  if have unzip; then unzip -oq "$1" -d "$2"
-  elif have python3; then python3 -m zipfile -e "$1" "$2"
-  else say "Neither unzip nor python3 opens a zip here." >&2; return 1
-  fi
-}
-
-# The editor wants this one, and the doors hold without it, so a failure here
-# costs a line and the tree goes on.
-get_vale_ls() {
-  # [[spec/design_output/editor#the-asset-matrix]]
-  case "$os-$arch" in
-    Linux-64-bit) target=x86_64-unknown-linux-gnu ;;
-    Linux-arm64) target=aarch64-unknown-linux-gnu ;;
-    macOS-64-bit) target=x86_64-apple-darwin ;;
-    macOS-arm64) target=aarch64-apple-darwin ;;
-    Windows-64-bit) target=x86_64-pc-windows-gnu ;;
-    Windows-arm64) target=aarch64-pc-windows-msvc ;;
-    *) return 1 ;;
-  esac
-  from="$vale_ls_releases/v$vale_ls_version/vale-ls-$target.zip"
-
-  say "  downloading vale-ls"
-  mkdir -p "$bin"
-  tmp=$(mktemp -d)
-  name=${from##*/}
-  if have curl; then curl -fsSL "$from" -o "$tmp/$name" || return 1
-  elif have wget; then wget -q "$from" -O "$tmp/$name" || return 1
-  else say "Neither curl nor wget downloads vale-ls here." >&2; return 1
-  fi
-
-  unpack "$tmp/$name" "$tmp" || return 1
-  mv "$tmp/vale-ls${exe}" "$bin/vale-ls${exe}" || return 1
-  chmod +x "$bin/vale-ls${exe}"
-  rm -rf "$tmp"
 }
 
 # THE SERVER AND THE INDEX ARE PURE GO, SO THEY NEED NO COMPILER.
@@ -342,13 +274,12 @@ set_hooks() {
 
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
-  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
+  [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "index" ] || [ "$1" = "se-front" ]
 }
 
 missed() {
   case $1 in
-    vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
     go)      say "  go stays missing, so ./RUNME.sh tui prints plain rows." >&2 ;;
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
@@ -359,9 +290,7 @@ missed() {
 
 here() {
   case $1 in
-    vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
-    vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
     go)      have go ;;
     go-modules) modules_here ;;
     index) index_here ;;
@@ -372,9 +301,7 @@ here() {
 
 why() {
   case $1 in
-    vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
-    vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
     go) say "go: it builds the viewer ./RUNME.sh tui opens the door log in, and the index" ;;
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
@@ -385,9 +312,7 @@ why() {
 
 get() {
   case $1 in
-    vale) get_vale ;;
     biome) get_biome ;;
-    vale-ls) get_vale_ls ;;
     go) get_go ;;
     go-modules) get_modules ;;
     index) get_index ;;
@@ -399,7 +324,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in vale biome vale-ls go go-modules \
+for one in biome go go-modules \
   index se-front git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"

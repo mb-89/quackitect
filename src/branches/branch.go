@@ -1,6 +1,5 @@
 // The branch and cloud verbs: one table, each verb a function over the doors,
-// and the log row a loud verb leaves, as work, cloud and tell in
-// src/scripts/work.js answer them.
+// and the log row a loud verb leaves.
 // [[spec/design_output/work#the-round-trip]]
 package branches
 

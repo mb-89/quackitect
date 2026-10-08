@@ -1,12 +1,11 @@
 // The fixtures the port_f cases share: the method root carrying the ticket
 // schema, a hold a hand keeps, and a work branch the clone stands on.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pf helpers on the tree fixture and reads holdAt and ticketSchema
 
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -21,9 +20,9 @@ import (
 // A method root holding the tree's own ticket schema, so an inserted step re-routes. [[spec/tickets/work-verbs-port-to-go]]
 func pfMethod(t *testing.T) *files.FakeDisk {
 	t.Helper()
-	schema, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(ticketSchema)))
-	if err != nil {
-		t.Fatal(err)
+	schema, held, err := files.NewDisk(filepath.Join("..", "..")).Read(ticketSchema)
+	if !held {
+		t.Fatal(ticketSchema, " stands nowhere: ", err)
 	}
 	root := files.NewFakeDisk()
 	if err := root.Write(ticketSchema, string(schema)); err != nil {

@@ -36,10 +36,7 @@ test("a caller takes the surveyed path, and the guess where none stands", () => 
 });
 
 test("a guess names the Windows binary and the plain one, and nothing else", () => {
-  assert.deepEqual(guesses("vale-ls"), [
-    ".se/.runtime/bin/vale-ls.exe",
-    ".se/.runtime/bin/vale-ls",
-  ]);
+  assert.deepEqual(guesses("biome"), [".se/.runtime/bin/biome.exe", ".se/.runtime/bin/biome"]);
 });
 
 test("a box with no survey file hands the caller an empty one", () => {

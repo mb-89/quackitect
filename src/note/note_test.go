@@ -4,7 +4,7 @@ package note
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the front golden this tree tracks
 	"reflect"
 	"slices"
 	"testing"

@@ -33,7 +33,7 @@ func RedList(text string) []string {
 	}
 	passed := map[string]bool{}
 	for _, item := range yaml.AsList(front.Get("record")) {
-		if one := yaml.AsDoc(item); one != nil && !truthy(one.Get("skipped")) {
+		if one := yaml.AsDoc(item); one != nil && !yaml.Truthy(one.Get("skipped")) {
 			step := yaml.AsString(one.Get("step"))
 			passed[step[strings.LastIndex(step, "/")+1:]] = true
 		}
@@ -51,13 +51,13 @@ func RedList(text string) []string {
 	return slices.Compact(out)
 }
 
-// The files one leaf names under its red field, each row a bare path. A row a list payload wrote before formatted took arrays holds its paths joined by commas. [[spec/design_output/pull#kept-red-leaves]]
+// The files one leaf names under its red field, each row a path, and the case a row names after its path read as the path alone. A row a list payload wrote before formatted took arrays holds its paths joined by commas. [[spec/tickets/check-skips-named-red-tests]] [[spec/design_output/pull#kept-red-leaves]]
 func RedRows(text, path string) []string {
 	out := []string{}
 	for _, row := range chapterFields(note.Read(text).Sections, path)[redField] {
 		for _, one := range strings.Split(listMark.ReplaceAllString(row, ""), ",") {
-			if one = strings.TrimSpace(strings.ReplaceAll(one, "`", "")); one != "" {
-				out = append(out, one)
+			if words := strings.Fields(strings.ReplaceAll(one, "`", "")); len(words) > 0 {
+				out = append(out, words[0])
 			}
 		}
 	}

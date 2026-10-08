@@ -4,6 +4,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case writes the config into a temp root and hands the real streams, the doors' own test
 	"os"
 	"path/filepath"
 	"testing"

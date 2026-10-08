@@ -1,10 +1,11 @@
 // The leave: done hands a finished group back, release lets a hold go, and
-// read prints what a branch carries, as finish, release and read in
-// src/scripts/work.js answer them.
+// read prints what a branch carries.
 // [[spec/design_output/work#a-box-leaves]]
 package branches
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -73,7 +74,7 @@ func (d *Doors) retroOpen(text string) string {
 		for at := len(record) - 1; at >= 0; at-- {
 			if strings.TrimSpace(asText(record[at].Get("step"))) == path {
 				last := record[at]
-				return truthy(last.Get("skipped")) || (truthy(last.Get("hash_after")) && !truthy(last.Get("returns")))
+				return yaml.Truthy(last.Get("skipped")) || (yaml.Truthy(last.Get("hash_after")) && !yaml.Truthy(last.Get("returns")))
 			}
 		}
 		return false
@@ -196,6 +197,13 @@ func (d *Doors) leaves(branch, at, says string, moved []string, final front.Orde
 		}
 		d.say("%s stands %s, and hands %s to %s.", name, closedState, strings.Join(moved, ", "), parent)
 	}
+	// The pull request opens in the same call, and a run with no token leaves it to the dispatch and the work skill. [[spec/tickets/branch-done-opens-the-pr]]
+	row := pullRow{Branch: branch}
+	if d.workPull(branch, &row) == codeOK {
+		d.say("The pull request over %s against %s stands %s, with auto-merge on: %s", branch, trunk, row.State, row.URL)
+		return codeOK
+	}
+	d.say("%s", row.Why)
 	d.say("Open the pull request over %s against %s, with auto-merge on, as the work skill says.", branch, trunk)
 	return codeOK
 }

@@ -2,11 +2,11 @@
 // every target the tree holds byte for byte, and prints the line node prints.
 // A stale target goes, a file the owner keeps beside the targets stays.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the sources and the targets the tree holds, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,6 +16,9 @@ import (
 
 // The repository root, as a test under src/quack reaches it. [[spec/tickets/config-verbs-port-to-go]]
 var projectRepo = filepath.Join("..", "..")
+
+// The tree this repository holds, read as the build check reads its source. [[spec/tickets/test-walks-move-onto-fakes]]
+var hq3TreeDisk = diskDoors{read: os.ReadFile, list: os.ReadDir, stat: os.Stat}
 
 // The sources the projections read: files, and folders read one level deep. [[spec/tickets/config-verbs-port-to-go]]
 var (
@@ -38,55 +41,52 @@ var projectedTargets = map[string]string{
 	".claude/output-styles":             ".md",
 }
 
-// Copies one file from one root to the same path under another. [[spec/tickets/config-verbs-port-to-go]]
-func projectCopy(t *testing.T, from, to, path string) {
+// The root the cases project under on the fake disk. [[spec/tickets/test-walks-move-onto-fakes]]
+const hq3ProjectRoot = "/tree"
+
+// Copies one file of the repository to the same path under the root on the disk. [[spec/tickets/config-verbs-port-to-go]]
+func projectCopy(t *testing.T, disk diskDoors, to, path string) {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join(from, filepath.FromSlash(path)))
+	text, err := hq3TreeDisk.read(filepath.Join(projectRepo, filepath.FromSlash(path)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	projectWrite(t, to, path, string(text))
+	projectWrite(t, disk, to, path, string(text))
 }
 
-// Writes a text at a path under a root, its folders made. [[spec/tickets/config-verbs-port-to-go]]
-func projectWrite(t *testing.T, root, path, text string) {
+// Writes a text at a path under a root on the disk, its folders made. [[spec/tickets/config-verbs-port-to-go]]
+func projectWrite(t *testing.T, disk diskDoors, root, path, text string) {
 	t.Helper()
-	at := filepath.Join(root, filepath.FromSlash(path))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	hq1SeedDisk(t, disk, root, map[string]string{path: text})
 }
 
-// A temp root holding the sources the repository's projections read, and no target. [[spec/tickets/config-verbs-port-to-go]]
-func projectSourcesRoot(t *testing.T) string {
+// A fake disk whose root holds the sources the repository's projections read, and no target. [[spec/tickets/config-verbs-port-to-go]]
+func projectSourcesRoot(t *testing.T) diskDoors {
 	t.Helper()
-	root := t.TempDir()
+	disk := newFakeDisk()
 	for _, path := range projectedSources {
-		projectCopy(t, projectRepo, root, path)
+		projectCopy(t, disk, hq3ProjectRoot, path)
 	}
 	for _, folder := range projectedSourceFolders {
-		listed, err := os.ReadDir(filepath.Join(projectRepo, filepath.FromSlash(folder)))
+		listed, err := hq3TreeDisk.list(filepath.Join(projectRepo, filepath.FromSlash(folder)))
 		if err != nil {
 			t.Fatal(err)
 		}
 		for _, one := range listed {
 			if !one.IsDir() {
-				projectCopy(t, projectRepo, root, folder+"/"+one.Name())
+				projectCopy(t, disk, hq3ProjectRoot, folder+"/"+one.Name())
 			}
 		}
 	}
-	return root
+	return disk
 }
 
-// The projected files standing under a root's target folders, by path. [[spec/tickets/config-verbs-port-to-go]]
-func projectTargetsUnder(t *testing.T, root string) map[string]string {
+// The projected files standing under a root's target folders on the disk, by path. [[spec/tickets/config-verbs-port-to-go]]
+func projectTargetsUnder(t *testing.T, disk diskDoors, root string) map[string]string {
 	t.Helper()
 	out := map[string]string{}
 	for folder, end := range projectedTargets {
-		listed, err := os.ReadDir(filepath.Join(root, filepath.FromSlash(folder)))
+		listed, err := disk.list(filepath.Join(root, filepath.FromSlash(folder)))
 		if err != nil {
 			continue
 		}
@@ -94,7 +94,7 @@ func projectTargetsUnder(t *testing.T, root string) map[string]string {
 			if one.IsDir() || !strings.HasSuffix(one.Name(), end) {
 				continue
 			}
-			text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(folder), one.Name()))
+			text, err := disk.read(filepath.Join(root, filepath.FromSlash(folder), one.Name()))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -104,11 +104,18 @@ func projectTargetsUnder(t *testing.T, root string) map[string]string {
 	return out
 }
 
-// Runs the verb over a root, and answers what it prints. [[spec/tickets/config-verbs-port-to-go]]
-func runProject(t *testing.T, root string, dry bool) string {
+// The box a project case runs on: the work root the case names, and the fake disk. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func projectBox(disk diskDoors, work string) func() boxDoors {
+	return func() boxDoors {
+		return boxDoors{env: func(key string) string { return map[string]string{workRootVar: work}[key] }, disk: disk}
+	}
+}
+
+// Runs the verb over the root on the disk, and answers what it prints. [[spec/tickets/config-verbs-port-to-go]]
+func runProject(t *testing.T, disk diskDoors, work string, dry bool) string {
 	t.Helper()
 	var out, errs strings.Builder
-	if code := projectVerb(func() (string, error) { return root, nil })(nil, dry, &out, &errs); code != 0 {
+	if code := projectVerb(func() (string, error) { return hq3ProjectRoot, nil }, projectBox(disk, work))(nil, dry, &out, &errs); code != 0 {
 		t.Fatalf("project answers exit status %d: %s", code, errs.String())
 	}
 	return out.String()
@@ -117,7 +124,7 @@ func runProject(t *testing.T, root string, dry bool) string {
 // The line the JavaScript verb prints over the repository's projections and its targets. [[spec/tickets/config-verbs-port-to-go]]
 func projectLine(t *testing.T, wanted int) string {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join(projectRepo, filepath.FromSlash(projector.Projections)))
+	text, err := hq3TreeDisk.read(filepath.Join(projectRepo, filepath.FromSlash(projector.Projections)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,12 +132,12 @@ func projectLine(t *testing.T, wanted int) string {
 }
 
 func TestProjectWritesTheTreeTargetsByteForByte(t *testing.T) {
-	t.Setenv(workRootVar, "")
-	root := projectSourcesRoot(t)
-	said := runProject(t, root, false)
+	t.Parallel()
+	disk := projectSourcesRoot(t)
+	said := runProject(t, disk, "", false)
 
-	want := projectTargetsUnder(t, projectRepo)
-	got := projectTargetsUnder(t, root)
+	want := projectTargetsUnder(t, hq3TreeDisk, projectRepo)
+	got := projectTargetsUnder(t, disk, hq3ProjectRoot)
 	if len(want) == 0 {
 		t.Fatal("the repository holds no projected target")
 	}
@@ -150,31 +157,31 @@ func TestProjectWritesTheTreeTargetsByteForByte(t *testing.T) {
 }
 
 func TestProjectRemovesAStaleTargetAndKeepsTheOwnersFile(t *testing.T) {
-	t.Setenv(workRootVar, "")
-	root := projectSourcesRoot(t)
+	t.Parallel()
+	disk := projectSourcesRoot(t)
 	const stale = ".claude/commands/se-config-gone-away.md"
 	const kept = ".claude/commands/owners-note.md"
-	projectWrite(t, root, stale, "stale\n")
-	projectWrite(t, root, kept, "mine\n")
-	runProject(t, root, false)
-	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(stale))); !os.IsNotExist(err) {
+	projectWrite(t, disk, hq3ProjectRoot, stale, "stale\n")
+	projectWrite(t, disk, hq3ProjectRoot, kept, "mine\n")
+	runProject(t, disk, "", false)
+	if disk.stands(filepath.Join(hq3ProjectRoot, filepath.FromSlash(stale))) {
 		t.Errorf("%s stands after the projection, and nothing wants it", stale)
 	}
-	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(kept))); err != nil {
-		t.Errorf("%s goes, and no projection owns it: %v", kept, err)
+	if !disk.stands(filepath.Join(hq3ProjectRoot, filepath.FromSlash(kept))) {
+		t.Errorf("%s goes, and no projection owns it", kept)
 	}
 }
 
 func TestProjectDryWritesNothing(t *testing.T) {
-	t.Setenv(workRootVar, "")
-	root := projectSourcesRoot(t)
+	t.Parallel()
+	disk := projectSourcesRoot(t)
 	const stale = ".claude/commands/se-config-gone-away.md"
-	projectWrite(t, root, stale, "stale\n")
-	said := runProject(t, root, true)
-	if got := projectTargetsUnder(t, root); len(got) != 1 {
+	projectWrite(t, disk, hq3ProjectRoot, stale, "stale\n")
+	said := runProject(t, disk, "", true)
+	if got := projectTargetsUnder(t, disk, hq3ProjectRoot); len(got) != 1 {
 		t.Errorf("a dry run leaves %d target(s), and the one stale target alone stood", len(got))
 	}
-	if line := projectLine(t, len(projectTargetsUnder(t, projectRepo))); said != line {
+	if line := projectLine(t, len(projectTargetsUnder(t, hq3TreeDisk, projectRepo))); said != line {
 		t.Errorf("a dry run prints %q, and the projection prints %q", said, line)
 	}
 }
@@ -194,29 +201,26 @@ func firstRule(text string) string {
 
 // The sources stand in the method root and the work root lays its own over them: a method source still projects, a work source wins, and the targets land in the work root. [[spec/design_output/vehicle#the-work-root-inherits]]
 func TestProjectWritesTheWorkRootOffTheMethodSources(t *testing.T) {
-	method := projectSourcesRoot(t)
-	work := t.TempDir()
+	t.Parallel()
+	disk := projectSourcesRoot(t)
+	const work = "/work"
 	const note = "spec/guidance/arguing.md"
 	const rule = "1. The work root's rule wins over the method's."
-	projectWrite(t, work, note, "# Actionables\n\n"+rule+"\n")
-	t.Setenv(workRootVar, work)
-	runProject(t, method, false)
-	if got := projectTargetsUnder(t, method); len(got) != 0 {
+	projectWrite(t, disk, work, note, "# Actionables\n\n"+rule+"\n")
+	runProject(t, disk, work, false)
+	if got := projectTargetsUnder(t, disk, hq3ProjectRoot); len(got) != 0 {
 		t.Errorf("the method root takes %d target(s), and the work root alone takes them", len(got))
 	}
-	got := projectTargetsUnder(t, work)
+	got := projectTargetsUnder(t, disk, work)
 	style := got[styleTarget]
 	if !strings.Contains(style, "## arguing\n\n"+rule+"\n\n") {
 		t.Errorf("the style carries no rule of the work root's %s:\n%s", note, style)
 	}
-	methodNote, err := os.ReadFile(filepath.Join(method, filepath.FromSlash(note)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if first := firstRule(string(methodNote)); first == "" || strings.Contains(style, first) {
+	methodNote := disk.text(filepath.Join(hq3ProjectRoot, filepath.FromSlash(note)))
+	if first := firstRule(methodNote); first == "" || strings.Contains(style, first) {
 		t.Errorf("the style carries the method's rule %q, and the work root's note replaces it", first)
 	}
-	for path, text := range projectTargetsUnder(t, projectRepo) {
+	for path, text := range projectTargetsUnder(t, hq3TreeDisk, projectRepo) {
 		if path == styleTarget {
 			continue
 		}
@@ -226,44 +230,45 @@ func TestProjectWritesTheWorkRootOffTheMethodSources(t *testing.T) {
 	}
 }
 
-// Runs the verb under --check over a root, and answers its status and both streams. [[spec/design_output/projection#check-refuses-a-stale-one]]
-func checkProject(root string) (int, string, string) {
+// Runs the verb under --check over the root on the disk, and answers its status and both streams. [[spec/design_output/projection#check-refuses-a-stale-one]]
+func checkProject(disk diskDoors) (int, string, string) {
 	var out, errs strings.Builder
-	code := projectVerb(func() (string, error) { return root, nil })([]string{"project", projectCheck}, false, &out, &errs)
+	code := projectVerb(func() (string, error) { return hq3ProjectRoot, nil }, projectBox(disk, ""))([]string{"project", projectCheck}, false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 
 func TestProjectCheckReadsEveryTargetAndWritesNone(t *testing.T) {
-	t.Setenv(workRootVar, "")
+	t.Parallel()
 	t.Run("a projected tree holds", func(t *testing.T) {
-		root := projectSourcesRoot(t)
-		runProject(t, root, false)
-		if code, out, errs := checkProject(root); code != 0 || !strings.Contains(out, "every target reads as projected") {
+		disk := projectSourcesRoot(t)
+		runProject(t, disk, "", false)
+		if code, out, errs := checkProject(disk); code != 0 || !strings.Contains(out, "every target reads as projected") {
 			t.Fatalf("check answers %d, %q, %q", code, out, errs)
 		}
 	})
 	t.Run("a missing, a changed and an extra target each name themselves, and nothing is written", func(t *testing.T) {
-		root := projectSourcesRoot(t)
-		runProject(t, root, false)
+		disk := projectSourcesRoot(t)
+		runProject(t, disk, "", false)
 		const extra = ".claude/commands/se-config-gone-away.md"
-		projectWrite(t, root, extra, "stale\n")
-		projectWrite(t, root, styleTarget, "by hand\n")
-		code, _, errs := checkProject(root)
+		projectWrite(t, disk, hq3ProjectRoot, extra, "stale\n")
+		projectWrite(t, disk, hq3ProjectRoot, styleTarget, "by hand\n")
+		code, _, errs := checkProject(disk)
 		if code != exitFailed || !strings.Contains(errs, extra+" extra") || !strings.Contains(errs, styleTarget+" differs") {
 			t.Fatalf("check answers %d, %q", code, errs)
 		}
-		if text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(styleTarget))); string(text) != "by hand\n" {
+		at := filepath.Join(hq3ProjectRoot, filepath.FromSlash(styleTarget))
+		if disk.text(at) != "by hand\n" {
 			t.Errorf("check writes %s", styleTarget)
 		}
-		if err := os.Remove(filepath.Join(root, filepath.FromSlash(styleTarget))); err != nil {
+		if err := disk.remove(at); err != nil {
 			t.Fatal(err)
 		}
-		if _, _, errs := checkProject(root); !strings.Contains(errs, styleTarget+" missing") {
+		if _, _, errs := checkProject(disk); !strings.Contains(errs, styleTarget+" missing") {
 			t.Fatalf("check names no missing target: %q", errs)
 		}
 	})
 	t.Run("a tree naming no projection holds", func(t *testing.T) {
-		if code, out, _ := checkProject(t.TempDir()); code != 0 || !strings.Contains(out, "names no projection") {
+		if code, out, _ := checkProject(newFakeDisk()); code != 0 || !strings.Contains(out, "names no projection") {
 			t.Fatalf("check answers %d, %q", code, out)
 		}
 	})

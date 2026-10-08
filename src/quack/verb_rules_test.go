@@ -1,7 +1,7 @@
 // The rules verb in Go: each style's rule and its message, and the refusal
 // where the style folder stands nowhere.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"
@@ -10,7 +10,7 @@ import (
 
 func rulesRan(root string) (int, string, string) {
 	var out, errs strings.Builder
-	code := rulesVerb(func() (string, error) { return root, nil })([]string{"rules"}, false, &out, &errs)
+	code := rulesVerb(func() (string, error) { return root, nil }, realDisk())([]string{"rules"}, false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -51,7 +50,7 @@ type retroMeasure struct {
 	pattern *regexp.Regexp
 }
 
-func init() { register("retro timeline", retroTimelineVerb(retroRoot)) }
+func init() { register("retro timeline", retroTimelineVerb(quietBox)) }
 
 // The time a line carries in its source's field, in milliseconds, and NaN where it carries none. [[spec/guidance/retro/chapter]]
 func retroTimeOf(source retroSource, line string) float64 {
@@ -63,11 +62,11 @@ func retroTimeOf(source retroSource, line string) float64 {
 }
 
 // Every .jsonl file under a source of the input, as a path under the input, sorted. [[spec/guidance/retro/chapter]]
-func retroTimelineWalk(input, top string) []string {
+func retroTimelineWalk(disk diskDoors, input, top string) []string {
 	out := []string{}
 	var into func(rel string)
 	into = func(rel string) {
-		entries, err := os.ReadDir(filepath.Join(input, filepath.FromSlash(rel)))
+		entries, err := disk.list(filepath.Join(input, filepath.FromSlash(rel)))
 		if err != nil {
 			return
 		}
@@ -86,19 +85,19 @@ func retroTimelineWalk(input, top string) []string {
 }
 
 // The lines of a file under the input. [[spec/guidance/retro/chapter]]
-func retroTimelineLines(input, path string) []string {
-	return strings.Split(retroFileText(filepath.Join(input, filepath.FromSlash(path))), "\n")
+func retroTimelineLines(disk diskDoors, input, path string) []string {
+	return strings.Split(disk.text(filepath.Join(input, filepath.FromSlash(path))), "\n")
 }
 
 // Every timed file of the input: its path under the input, and the time of each line. A line with no time takes the time before it. [[spec/guidance/retro/chapter]]
-func retroTimedFiles(root, name string) []retroTimedFile {
+func retroTimedFiles(disk diskDoors, root, name string) []retroTimedFile {
 	input := filepath.Join(retroHome(root, name), retroInput)
 	out := []retroTimedFile{}
 	for _, source := range retroTimed {
-		for _, path := range retroTimelineWalk(input, source.top) {
+		for _, path := range retroTimelineWalk(disk, input, source.top) {
 			file := retroTimedFile{path: path, source: source.top}
 			last := math.NaN()
-			for _, line := range retroTimelineLines(input, path) {
+			for _, line := range retroTimelineLines(disk, input, path) {
 				if when := retroTimeOf(source, line); !math.IsNaN(when) {
 					last = when
 				}
@@ -149,19 +148,21 @@ func retroHoursOf(files []retroTimedFile) []*retroHourRow {
 }
 
 // The verb: prints the hours holding work, with the idle stretches between them, and writes them beside the input. [[spec/guidance/retro/chapter]]
-func retroTimelineVerb(root func() string) twin {
+func retroTimelineVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name := root(), retroWordAt(argv, 2)
-		if name == "" || !retroIsThere(filepath.Join(retroHome(base, name), retroInput)) {
+		d := box()
+		disk := d.disk
+		base, name := retroRootOf(d), retroWordAt(argv, 2)
+		if name == "" || !disk.stands(filepath.Join(retroHome(base, name), retroInput)) {
 			fmt.Fprintln(errs, "retro timeline names a retro whose collect stands: ./RUNME.sh retro timeline <retro>")
 			return 2
 		}
-		hours := retroHoursOf(retroTimedFiles(base, name))
+		hours := retroHoursOf(retroTimedFiles(disk, base, name))
 		rows := []any{}
 		for _, one := range hours {
 			rows = append(rows, retroJSObject("hour", one.hour, "transcripts", one.transcripts, "log", one.log, "faults", one.faults, "sessions", len(one.sessions)))
 		}
-		if err := retroJSWrite(filepath.Join(retroHome(base, name), "timeline.json"), rows); err != nil {
+		if err := retroJSWrite(disk, filepath.Join(retroHome(base, name), "timeline.json"), rows); err != nil {
 			fmt.Fprintln(errs, err)
 			return 1
 		}
@@ -187,7 +188,7 @@ func retroTimelineVerb(root func() string) twin {
 }
 
 // Each measure's matches over the input, and the active hours they fall in, read in one pass. A measure names its source, log or transcripts, or all. [[spec/guidance/retro/classify]]
-func retroCountsOver(root, name string, measures []retroMeasure) (map[string]int, int) {
+func retroCountsOver(disk diskDoors, root, name string, measures []retroMeasure) (map[string]int, int) {
 	input := filepath.Join(retroHome(root, name), retroInput)
 	counts := map[string]int{}
 	for _, one := range measures {
@@ -201,8 +202,8 @@ func retroCountsOver(root, name string, measures []retroMeasure) (map[string]int
 				reading = append(reading, one)
 			}
 		}
-		for _, path := range retroTimelineWalk(input, source.top) {
-			for _, line := range retroTimelineLines(input, path) {
+		for _, path := range retroTimelineWalk(disk, input, source.top) {
+			for _, line := range retroTimelineLines(disk, input, path) {
 				if when := retroTimeOf(source, line); !math.IsNaN(when) {
 					hours[math.Floor(when/retroHourMillis)] = true
 				}

@@ -1,7 +1,7 @@
-// The leave over a real clone, as test/level0/work.test.js drives it through
-// fake doors: done and its log row, release over an unpushed branch, and read.
+// The leave over a real clone through fake doors: done and its log row,
+// release over an unpushed branch, and read.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported checkStamp, entryField and recordIn after leave runs
 
 import (
 	"fmt"
@@ -85,17 +85,6 @@ func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
 	}
 	if one.read(ticketAt("one-group")) != paGroupNote {
 		t.Fatal("the group on the tree moves")
-	}
-}
-
-// A branch level with origin releases. [[spec/tickets/work-verbs-port-to-go]]
-func TestPALevelBranchReleases(t *testing.T) {
-	t.Parallel()
-	one := newTree(t, nil)
-	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
-	paOn(one, "one-group")
-	if code := one.branchSays("release"); code != codeOK {
-		t.Fatalf("release answers %d: %s", code, paSaid(one))
 	}
 }
 

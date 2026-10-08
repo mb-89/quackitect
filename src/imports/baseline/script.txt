@@ -1,0 +1,7 @@
+.githooks/pre-commit
+.githooks/pre-push
+prototype/trace-view/build2.py
+prototype/trace-view/build3.py
+prototype/trace-view/extract2.py
+prototype/trace-view/trace-build.py
+prototype/trace-view/trace-probe.py

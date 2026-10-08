@@ -1,7 +1,7 @@
 // The standing verb in Go: the layer level zero hands a session, and the
 // canary under it.
 // [[spec/tickets/config-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"
@@ -12,7 +12,7 @@ const standingNote = "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say wh
 
 func standingRan(root string, env map[string]string) (int, string, string) {
 	var out, errs strings.Builder
-	code := standingVerb(func() (string, error) { return root, nil }, func(name string) string { return env[name] })([]string{"standing"}, false, &out, &errs)
+	code := standingVerb(func() (string, error) { return root, nil }, func() boxDoors { return boxDoors{env: func(name string) string { return env[name] }, disk: realDisk()} })([]string{"standing"}, false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 

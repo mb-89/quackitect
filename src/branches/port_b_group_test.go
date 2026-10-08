@@ -1,7 +1,7 @@
-// The standing, the listing and the trunk end over a fake tree, ported from
-// test/level0/work-group.test.js: list, the stale hold, merge, release, close.
+// The standing, the listing and the trunk end over a fake tree: list, the
+// stale hold, merge, release, close.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported group fields, recordIn, staleKey and groupStanding
 
 import (
 	"regexp"

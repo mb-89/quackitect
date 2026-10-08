@@ -1,18 +1,17 @@
 // quack lsp relays the editor's stdio to the lsp IO module whole, the token
 // line first.
 // [[spec/tickets/the-lsp-door-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"net"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own wiring, as a build check reads source
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
-	"time"
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/lsp"
@@ -102,42 +101,55 @@ func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {
 	}
 }
 
+// A connection to a fake IO module, which hears the stream until its write side half-closes, then answers its reply and ends. [[spec/tickets/test-walks-move-onto-fakes]]
+type hq1Conn struct {
+	mu    sync.Mutex
+	heard bytes.Buffer
+	ended chan struct{}
+	reply *io.PipeReader
+}
+
+// The fake module's connection, answering the reply once the stream ends. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq1Module(reply string) *hq1Conn {
+	read, write := io.Pipe()
+	conn := &hq1Conn{ended: make(chan struct{}), reply: read}
+	go func() {
+		<-conn.ended
+		write.Write([]byte(reply))
+		write.Close()
+	}()
+	return conn
+}
+
+func (conn *hq1Conn) Read(p []byte) (int, error) { return conn.reply.Read(p) }
+
+func (conn *hq1Conn) Write(p []byte) (int, error) {
+	conn.mu.Lock()
+	defer conn.mu.Unlock()
+	return conn.heard.Write(p)
+}
+
+func (conn *hq1Conn) CloseWrite() error { close(conn.ended); return nil }
+
+func (conn *hq1Conn) Close() error { return nil }
+
+// What the module heard. [[spec/tickets/test-walks-move-onto-fakes]]
+func (conn *hq1Conn) said() string {
+	conn.mu.Lock()
+	defer conn.mu.Unlock()
+	return conn.heard.String()
+}
+
 func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
 	t.Parallel()
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer listen.Close()
 	frame := "Content-Length: 2\r\n\r\n{}"
-	heard := make(chan string, 1)
-	go func() {
-		conn, err := listen.Accept()
-		if err != nil {
-			heard <- ""
-			return
-		}
-		defer conn.Close()
-		read, _ := io.ReadAll(conn)
-		conn.Write([]byte(frame))
-		heard <- string(read)
-	}()
-	conn, err := net.Dial("tcp", listen.Addr().String())
-	if err != nil {
-		t.Fatal(err)
-	}
+	conn := hq1Module(frame)
 	var out bytes.Buffer
 	if err := relays(strings.NewReader(frame), &out, conn, "tok"); err != nil {
 		t.Fatal(err)
 	}
-	conn.Close()
-	select {
-	case said := <-heard:
-		if said != "tok\n"+frame {
-			t.Fatalf("the IO module hears %q, and wants the token line, then the frame whole", said)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("the IO module hears nothing")
+	if said := conn.said(); said != "tok\n"+frame {
+		t.Fatalf("the IO module hears %q, and wants the token line, then the frame whole", said)
 	}
 	if out.String() != frame {
 		t.Fatalf("the editor reads %q, and wants the reply frame whole", out.String())
@@ -146,41 +158,21 @@ func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
 
 func TestQuackLspDialsThePortTheStandingFileNames(t *testing.T) {
 	t.Parallel()
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer listen.Close()
-	root := t.TempDir()
-	standing := filepath.Join(root, filepath.FromSlash(lsp.StandingFile))
-	os.MkdirAll(filepath.Dir(standing), 0o755)
-	body, _ := json.Marshal(lsp.Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: "tok"})
-	os.WriteFile(standing, body, 0o600)
-	heard := make(chan string, 1)
-	go func() {
-		conn, err := listen.Accept()
-		if err != nil {
-			heard <- ""
-			return
-		}
-		defer conn.Close()
-		read, _ := io.ReadAll(conn)
-		heard <- string(read)
-	}()
+	root, disk := "/tree", newFakeDisk()
+	body, _ := json.Marshal(lsp.Standing{Port: 4711, Token: "tok"})
+	hq1SeedDisk(t, disk, root, map[string]string{lsp.StandingFile: string(body)})
+	conn := hq1Module("")
+	dialed := 0
+	dial := func(port int) (io.ReadWriteCloser, error) { dialed = port; return conn, nil }
 	started := false
 	var out bytes.Buffer
-	if err := lsps(root, func() error { started = true; return nil }, strings.NewReader("{}"), &out); err != nil {
+	if err := lsps(disk, dial, root, func() error { started = true; return nil }, strings.NewReader("{}"), &out); err != nil {
 		t.Fatal(err)
 	}
-	if !started {
-		t.Fatal("the verb starts no index")
+	if !started || dialed != 4711 {
+		t.Fatalf("the verb starts an index %v, and dials %d where the standing file names 4711", started, dialed)
 	}
-	select {
-	case said := <-heard:
-		if said != "tok\n{}" {
-			t.Fatalf("the IO module hears %q, and wants the token line, then the input", said)
-		}
-	case <-time.After(5 * time.Second):
-		t.Fatal("the IO module hears nothing")
+	if said := conn.said(); said != "tok\n{}" {
+		t.Fatalf("the IO module hears %q, and wants the token line, then the input", said)
 	}
 }

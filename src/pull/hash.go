@@ -86,6 +86,8 @@ func canonical(out *strings.Builder, value any) {
 }
 
 // A string as JSON.stringify quotes it: the quote, the backslash and the control characters escaped, and nothing else. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+var JSQuote = jsQuote
+
 func jsQuote(said string) string {
 	var out strings.Builder
 	out.WriteByte('"')

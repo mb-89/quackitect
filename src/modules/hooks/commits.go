@@ -7,6 +7,7 @@ package hooks
 import (
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/hooks/command"
 )
 
@@ -47,18 +48,20 @@ func when(gate bool, guard func() string) string {
 // The findings the voice refuses over the message a commit carries, read off the command or the file it names. A door with no Voice reads none. [[spec/tickets/cage-commit-guards-port]]
 func (d *Door) commitVoice(line, root string, tree disk) []command.Row {
 	said, ok := command.CommitIn(line)
-	if !ok || d.from.Voice == nil {
+	if !ok {
 		return nil
 	}
 	message := said.Text
 	if said.Form == command.FormFile {
 		message = tree.text(said.File)
 	}
+	// The model read needs no Vale, so it runs ahead of the voice. [[spec/tickets/model-trailer-refuses-in-place]]
+	rows := command.ModelTrailers(message)
 	text := command.WithoutTrailers(message)
-	if strings.TrimSpace(text) == "" {
-		return nil
+	if d.from.Voice == nil || strings.TrimSpace(text) == "" {
+		return rows
 	}
-	return command.RefusesIn(d.from.Voice(root, text))
+	return append(rows, command.RefusesIn(d.from.Voice(root, text))...)
 }
 
 // A commit's delta carries no private shape, no name the box answers, and no text out of a raw note. [[spec/design_output/private#both-doors-one-check]]
@@ -119,7 +122,7 @@ func (d *Door) todoIn(root, tip string, span ...string) string {
 	return ""
 }
 
-// A desk lands nothing on a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
+// A desk lands nothing on a work branch, and the refusal raises its node through the failure door. The bridge writes the row, since this door decides in its shadow. [[spec/design_output/work#a-desk-works-on-trunk]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
 func (d *Door) deskGuard(line, root string, settings Settings) string {
 	commits, pushes := command.TouchesGit(line)
 	if !commits && !pushes {
@@ -133,7 +136,8 @@ func (d *Door) deskGuard(line, root string, settings Settings) string {
 	if commits {
 		how = command.HowCommit
 	}
-	return command.DeskRefusal("this " + how + " lands nowhere on " + branch)
+	said := command.DeskSaid("this " + how + " lands nowhere on " + branch)
+	return strings.Join(failure.Raise(failure.Load(failure.Dir{Root: root}), "desk-works-on-trunk", said).Lines(), "\n")
 }
 
 // A landing on the trunk takes a green battery and the verb, and a cloud box holding a work branch hands it back. [[spec/design_output/work#a-box-writes-its-branch]]

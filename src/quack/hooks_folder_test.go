@@ -4,7 +4,9 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the tree's own hooks folder, as a build check reads source
 	"os"
+	// level0: OutsideInDoors - the case lists the tree's own files with git, as a build check reads source
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -17,10 +19,10 @@ import (
 // The keys the pull tool forwards to the verb. [[spec/tickets/doors-read-what-commands-do]]
 var harnessKeys = regexp.MustCompile(`HARNESS_KEYS = \[([^\]]*)\]`)
 
-// Every key the pull tool forwards names a harness the hand rule reads, off the copy check test/level0/level1.test.js held. [[spec/tickets/doors-read-what-commands-do]]
+// Every key the pull tool forwards names a harness the hand rule reads. [[spec/tickets/doors-read-what-commands-do]]
 func TestEveryKeyThePullToolForwardsNamesAHarness(t *testing.T) {
 	t.Parallel()
-	text, err := os.ReadFile(filepath.Join(treeRoot, ".claude", "skills", "level0", "hooks", "pull-tool.js"))
+	text, err := os.ReadFile(filepath.Join(treeRoot, ".claude", "skills", "level0", "hooks", "pull-tool.ts"))
 	if err != nil {
 		t.Fatal(err)
 	}

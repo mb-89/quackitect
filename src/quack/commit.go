@@ -8,17 +8,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/proc"
+	"quackitect/src/pull"
 )
 
 // The usage, the flag keeping a commit home, the name a finding of the message stands under, and the road the message names its ticket by. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -51,6 +52,7 @@ type landingDoors struct {
 	voice  func(message string) []heard
 	log    func(row map[string]any) error
 	now    func() time.Time
+	box    boxDoors
 }
 
 // The doors over this box: the root the index names, the cloud the harness variables say, each verb through quack's own road, and claude where the survey or the PATH names it. [[spec/tickets/landing-verbs-port-to-go]]
@@ -59,16 +61,36 @@ func landingHere() landingDoors {
 	if err != nil {
 		root = "."
 	}
+	box := quietBox()
 	return landingDoors{
 		root:   root,
 		git:    git.NewRepo(root, proc.Real),
-		cloud:  commandSettings(root).Cloud,
-		verb:   roadVerb(root),
-		claude: claudeAt(root),
-		voice:  func(message string) []heard { return heardOver(root, commitName, message).rows },
-		log:    appendsRow(root, time.Now),
-		now:    time.Now,
+		cloud:  commandSettings(box, root).Cloud,
+		verb:   roadVerbOver(proc.Real, selfPath, root),
+		claude: claudeAt(box, root),
+		voice:  func(message string) []heard { return heardOver(box, root, commitName, message).rows },
+		log:    appendsRow(box.disk, root, wall.Now),
+		now:    wall.Now,
+		box:    box,
 	}
+}
+
+// The claude the survey names where it stands, else the one on the PATH, else nothing. [[spec/design_output/tools#where-a-caller-looks]]
+func claudeAt(box boxDoors, root string) string {
+	var survey map[string]struct {
+		Path string `json:"path"`
+	}
+	if text, err := box.disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
+		if said := survey["claude"].Path; said != "" && standsUnder(box.disk, "", said) {
+			return said
+		}
+	}
+	for _, place := range placesFor("claude", box.env, "") {
+		if box.disk.standsFile(place) {
+			return place
+		}
+	}
+	return ""
 }
 
 // The commit verb over the doors. A dry run reads the message and writes nothing. [[spec/design_output/work#the-battery-answers-first]]
@@ -89,6 +111,13 @@ func commitVerb(d landingDoors) twin {
 		// [[spec/design_output/level0#a-write-names-its-ticket]]
 		if fault := command.TicketFault(command.TicketOf(message), rootDisk{d.root}, messageHow); fault != "" {
 			fmt.Fprintln(errs, fault)
+			return exitUsage
+		}
+		// A trailer naming a model stops the commit before anything stages. [[spec/tickets/commit-door-refuses-model-trailers]]
+		if rows := command.ModelTrailers(message); len(rows) > 0 {
+			for _, one := range rows {
+				fmt.Fprintf(errs, "%s: %s\n", one.Said, one.Message)
+			}
 			return exitUsage
 		}
 		refused, form := messageFindings(d, message)
@@ -145,18 +174,15 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	branch, _ := d.git.Head()
 	// A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !d.cloud && strings.HasPrefix(branch, command.WorkBranch) {
-		fmt.Fprintln(errs, command.DeskRefusal("this commit lands nowhere on "+branch))
+		raised := failure.Raise(failure.Load(failure.Dir{Root: d.root}), "desk-works-on-trunk", command.DeskSaid("this commit lands nowhere on "+branch))
+		if err := raisedOnto(failureDoors{root: d.root, now: d.now, disk: d.box.disk}, raised, errs); err != nil {
+			fmt.Fprintln(errs, err)
+		}
 		return exitUsage
 	}
 	// A merge lands through this verb once its files carry no marker, so a marker refuses before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
 	if said := d.markedUnmerged(); said != "" {
 		fmt.Fprintln(errs, said)
-		return exitFailed
-	}
-	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-	if code, said := d.verb("test"); code != 0 {
-		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
-		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
 		return exitFailed
 	}
 	// The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
@@ -173,6 +199,20 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	if len(adds) > 0 {
 		stage = func() error { return d.git.Add(adds) }
 	}
+	// The rules answer in seconds, so a refused file stops the commit before the tests and the check. [[spec/tickets/rules-lint-changed-files-first]]
+	if reach := handWritten(d.stagesTo(adds, only)); len(reach) > 0 {
+		if code, said := d.verb(append([]string{"lint", "--strict"}, reach...)...); code != 0 {
+			fmt.Fprintln(errs, "The rules refuse a file this commit stages, so nothing stages and nothing lands:")
+			fmt.Fprintln(errs, orNothing(said, "the lint answers nothing"))
+			return exitFailed
+		}
+	}
+	// The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+	if code, said := d.verb("test"); code != 0 {
+		fmt.Fprintln(errs, "The tests answer red, so nothing stages and nothing lands:")
+		fmt.Fprintln(errs, orNothing(said, "the test run answers nothing"))
+		return exitFailed
+	}
 	if err := stage(); err != nil {
 		fmt.Fprintln(errs, "The staging comes back refused, so the commit stands undone:")
 		fmt.Fprintln(errs, err)
@@ -183,13 +223,18 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 		fmt.Fprintln(errs, said)
 		return exitFailed
 	}
-	cold := coldIn(d.stagedPaths(only))
-	if len(cold) > 0 && (d.claude == "" || !standsUnder("", d.claude)) {
+	cold := pull.ColdIn(d.stagedPaths(only))
+	if len(cold) > 0 && (d.claude == "" || !standsUnder(d.box.disk, "", d.claude)) {
 		d.unstages(only)
 		fmt.Fprintf(errs, "claude stands nowhere on this box, so %s lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.\n", strings.Join(cold, ", "))
 		return exitFailed
 	}
-	if _, err := d.git.Commit(message, only); err != nil {
+	// Git takes no partial commit during a merge, so a merge lands the whole index the staging fed. [[spec/design_output/work#no-commit-carries-a-marker]]
+	pathspec := only
+	if _, merging := d.git.Resolve(mergeHeadRef); merging {
+		pathspec = nil
+	}
+	if _, err := d.git.Commit(message, pathspec); err != nil {
 		d.unstages(only)
 		fmt.Fprintln(errs, "The commit comes back refused, so nothing lands:")
 		fmt.Fprintln(errs, err)
@@ -227,10 +272,10 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	return 0
 }
 
-// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// The branch a red commit on work/<group> reaches. src/branches spells it again, since the two packages share no module. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueBranch = "rescue/"
 
-// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A cloud box dies with its tree, so a red commit on a work branch reaches origin on the box's own rescue branch, by force, and the work branch stays green. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) rescues(branch string, errs io.Writer) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !d.cloud || !onWork {
@@ -245,7 +290,7 @@ func (d landingDoors) rescues(branch string, errs io.Writer) {
 	fmt.Fprintf(errs, "The commit stands on origin under %s, and nowhere on %s, so a takeover takes it in.\n", rescue, branch)
 }
 
-// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// A green push carrying the rescue drops it from origin. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 func (d landingDoors) dropsRescue(branch string) {
 	group, onWork := strings.CutPrefix(branch, command.WorkBranch)
 	if !onWork {
@@ -260,7 +305,7 @@ func (d landingDoors) dropsRescue(branch string) {
 	}
 }
 
-// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-a-rescue-branch]]
+// Where origin keeps a branch, the rescue among them. [[spec/design_output/work#a-red-commit-reaches-rescue]]
 const rescueRef = "refs/heads/"
 
 func orNothing(said, nothing string) string {
@@ -326,7 +371,7 @@ func (d landingDoors) markedUnmerged() string {
 	var marked []markedLine
 	unmerged, _ := d.git.Unmerged()
 	for _, file := range unmerged {
-		text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(file)))
+		text, err := d.box.disk.read(d.at(file))
 		if err != nil {
 			continue
 		}
@@ -368,7 +413,7 @@ func (d landingDoors) movedFrom(paths []string) []string {
 		}
 	}
 	// A journaled old path joins where the staged delta names it or git still holds it, so a move that landed long ago adds no pathspec git refuses. [[spec/tickets/commit-skips-landed-moves]]
-	for _, one := range journaledMoves(d.root) {
+	for _, one := range d.journaledMoves() {
 		for _, path := range paths {
 			var under string
 			switch {
@@ -389,7 +434,7 @@ func (d landingDoors) movedFrom(paths []string) []string {
 
 // A path git add matches stands on disk or in the index. [[spec/tickets/commit-stages-a-moved-path]]
 func (d landingDoors) stagable(path string) bool {
-	return standsUnder(d.root, path) || d.git.Tracked(path)
+	return standsUnder(d.box.disk, d.root, path) || d.git.Tracked(path)
 }
 
 // A move the rename verb journals: its old path and its new one. [[spec/tickets/rename-detection-misses-rewrites]]
@@ -399,15 +444,15 @@ type journaledMove struct {
 }
 
 // The rename verb journals each move, so a rewrite past git's similarity cut still names its old path. [[spec/tickets/rename-detection-misses-rewrites]]
-func journaledMoves(root string) []journaledMove {
-	folder := filepath.Join(root, filepath.FromSlash(undoFolder))
-	found, _ := os.ReadDir(folder)
+func (d landingDoors) journaledMoves() []journaledMove {
+	folder := d.at(undoFolder)
+	found := d.box.disk.listed(folder)
 	var out []journaledMove
 	for _, one := range found {
 		if one.IsDir() || !strings.HasSuffix(one.Name(), ".json") {
 			continue
 		}
-		text, err := os.ReadFile(filepath.Join(folder, one.Name()))
+		text, err := d.box.disk.read(filepath.Join(folder, one.Name()))
 		if err != nil {
 			continue
 		}

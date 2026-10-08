@@ -2,12 +2,11 @@
 // rows, the handover to a standing window, the launch, and the viewer build
 // with its source stamp, each held to what the JavaScript answers.
 // [[spec/design_output/tui#the-verb-builds-it]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
 	"io"
-	"os"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -25,6 +24,7 @@ import (
 // What a fake box records: the builds it ran, the launches, and the tabs it told. [[spec/design_output/tui#the-verb-builds-it]]
 type tuiBox struct {
 	root     string
+	disk     diskDoors
 	builds   [][]string
 	cwds     []string
 	launched [][]string
@@ -38,14 +38,14 @@ type tuiBox struct {
 // A box whose go writes the binary it is asked for. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiBoxAt(t *testing.T) *tuiBox {
 	t.Helper()
-	box := &tuiBox{root: filepath.ToSlash(t.TempDir())}
+	box := &tuiBox{root: "/tree", disk: newFakeDisk()}
 	box.build = func(argv []string) (int, string, error) {
-		if err := os.MkdirAll(filepath.Dir(argv[3]), 0o755); err != nil {
+		if err := box.disk.makeAll(filepath.Dir(argv[3]), 0o755); err != nil {
 			return 0, "", err
 		}
-		return 0, "", os.WriteFile(argv[3], []byte("binary"), 0o755)
+		return 0, "", box.disk.write(argv[3], []byte("binary"), 0o755)
 	}
-	tuiWrites(t, box.root, map[string]string{
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{
 		"src/tui/main.go":    "package main\n\nimport \"quackitect/src/yaml\"\n",
 		"go.mod":             "module quackitect",
 		"src/tui/ui_test.go": "package main",
@@ -53,22 +53,10 @@ func tuiBoxAt(t *testing.T) *tuiBox {
 	return box
 }
 
-func tuiWrites(t *testing.T, root string, files map[string]string) {
+// The text a file holds on the box's fake disk. [[spec/tickets/test-walks-move-onto-fakes]]
+func (box *tuiBox) reads(t *testing.T, path string) string {
 	t.Helper()
-	for rel, text := range files {
-		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
-func tuiReads(t *testing.T, path string) string {
-	t.Helper()
-	body, err := os.ReadFile(path)
+	body, err := box.disk.read(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,6 +68,7 @@ func (box *tuiBox) doors() tuiDoors {
 		root:    box.root,
 		windows: box.windows,
 		goTool:  "go",
+		disk:    box.disk,
 		run: func(argv []string, cwd string) (int, string, error) {
 			box.builds = append(box.builds, argv)
 			box.cwds = append(box.cwds, cwd)
@@ -126,6 +115,7 @@ func TestTuiTabWanted(t *testing.T) {
 	}{
 		{[]string{"tui", "--tab", "work"}, "work"},
 		{[]string{"tui", "log"}, "log"},
+		{[]string{"tui", "tutorial"}, "tutorial"},
 		{[]string{"tui", "work", "--count"}, "work"},
 		{[]string{"tui", "--tab", "nope", "work"}, ""},
 		{[]string{"tui", "--tab"}, ""},
@@ -161,7 +151,7 @@ func TestTuiWorkCountPrintsNoCountAndLaunchesNothing(t *testing.T) {
 func TestTuiPlainPrintsTheSessionRows(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
-	tuiWrites(t, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
 	code, out, errs := box.runs("--plain")
 	want := ".se/.log/session.jsonl\n" + strings.Join(tuiRowsSaid, "\n") + "\n"
 	if code != 0 || out != want || errs != "" {
@@ -179,7 +169,7 @@ func TestTuiPlainAllReadsTheRotatedFilesFirst(t *testing.T) {
 	row := func(said string) string {
 		return `{"at":"2026-01-02T03:04:05.678Z","level":"info","kind":"k","said":"` + said + `"}`
 	}
-	tuiWrites(t, box.root, map[string]string{
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{
 		".se/.log/session.jsonl":                        row("now"),
 		".se/.log/old/2026-01-02T03-04-05-b.jsonl":      row("later"),
 		".se/.log/old/2026-01-01T03-04-05-a.jsonl":      row("first"),
@@ -201,7 +191,7 @@ func TestTuiNoGoPrintsTheRowsAndAsksForGo(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 0, "", errors.New("no go here") }
-	tuiWrites(t, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
 	code, out, errs := box.runs()
 	want := ".se/.log/session.jsonl\n" + strings.Join(tuiRowsSaid, "\n") +
 		"\n\nGo builds the viewer these rows open in. Install Go, and run this again.\n"
@@ -227,7 +217,7 @@ func TestTuiHandsTheTabToAStandingWindow(t *testing.T) {
 		if !slices.Equal(box.told, []string{one.tab}) || len(box.launched) != 0 {
 			t.Errorf("told %v, launched %v", box.told, box.launched)
 		}
-		if held, err := os.Stat(filepath.Join(box.root, ".se", ".log")); err != nil || !held.IsDir() {
+		if held, err := box.disk.stat(filepath.Join(box.root, ".se", ".log")); err != nil || !held.IsDir() {
 			t.Errorf("the log folder stands not: %v", err)
 		}
 	}
@@ -263,11 +253,11 @@ func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 	if len(box.builds) != 1 || !slices.Equal(box.builds[0], want) || box.cwds[0] != box.root {
 		t.Fatalf("builds %v in %v", box.builds, box.cwds)
 	}
-	stamp := tuiReads(t, box.root+"/.se/.runtime/bin/.logview-source")
+	stamp := box.reads(t, box.root+"/.se/.runtime/bin/.logview-source")
 	if !regexp.MustCompile(`^[0-9a-f]{16}\n$`).MatchString(stamp) {
 		t.Errorf("stamp %q", stamp)
 	}
-	if stamp != index.HashText(tuiSourceText(box.root))+"\n" {
+	if stamp != index.HashText(tuiSourceText(box.disk, box.root))+"\n" {
 		t.Errorf("stamp %q answers no hash of the source", stamp)
 	}
 }
@@ -276,14 +266,14 @@ func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 func TestTuiBuildLandsBesideTheOldBinary(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
-	tuiWrites(t, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
 	if exe, why, _ := tuiViewerOf(box.doors()); exe != box.exe() || why != "" {
 		t.Fatalf("exe %q, why %q", exe, why)
 	}
-	if tuiReads(t, box.exe()) != "binary" || tuiReads(t, box.exe()+".old") != "old binary" {
+	if box.reads(t, box.exe()) != "binary" || box.reads(t, box.exe()+".old") != "old binary" {
 		t.Error("the old binary stepped not aside")
 	}
-	if _, err := os.Stat(box.exe() + ".new"); err == nil {
+	if box.disk.stands(box.exe() + ".new") {
 		t.Error("the fresh build stands beside under its own name")
 	}
 }
@@ -292,14 +282,14 @@ func TestTuiBuildLandsBesideTheOldBinary(t *testing.T) {
 func TestTuiBuildLandsWhileTheLastAsideStandsHeld(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
-	tuiWrites(t, box.root, map[string]string{
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{
 		".se/.runtime/bin/logview":          "running binary",
 		".se/.runtime/bin/logview.old/held": "older binary",
 	})
 	if exe, _, _ := tuiViewerOf(box.doors()); exe != box.exe() {
 		t.Fatalf("exe %q", exe)
 	}
-	if tuiReads(t, box.exe()) != "binary" || tuiReads(t, box.exe()+".old1") != "running binary" {
+	if box.reads(t, box.exe()) != "binary" || box.reads(t, box.exe()+".old1") != "running binary" {
 		t.Error("the running binary stepped not aside to the next name")
 	}
 }
@@ -319,12 +309,12 @@ func TestTuiFailedSwapFailsTheVerbAndAsksNotForGo(t *testing.T) {
 		}
 		held[aside+"/held"] = "older binary"
 	}
-	tuiWrites(t, box.root, held)
+	hq1SeedDisk(t, box.disk, box.root, held)
 	code, out, errs := box.runs()
 	if code != exitFailed || out != "" || !strings.Contains(errs, "logview") {
 		t.Fatalf("code %d\nout %q\nerrs %q", code, out, errs)
 	}
-	if len(box.launched) != 0 || tuiReads(t, box.exe()) != "running binary" {
+	if len(box.launched) != 0 || box.reads(t, box.exe()) != "running binary" {
 		t.Error("the verb launched a viewer, or the running binary moved")
 	}
 }
@@ -353,7 +343,7 @@ func TestTuiRebuildsOnlyWhereTheSourceMoves(t *testing.T) {
 		{map[string]string{"src/other/other.go": "package other"}, 6},
 		{map[string]string{"go.sum": "sum"}, 7},
 	} {
-		tuiWrites(t, box.root, one.files)
+		hq1SeedDisk(t, box.disk, box.root, one.files)
 		if said := builds(); said != one.want {
 			t.Fatalf("after %v the box ran %d builds, want %d", one.files, said, one.want)
 		}
@@ -368,10 +358,10 @@ func TestTuiFailedBuildSaysWhy(t *testing.T) {
 	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "main.go:1: syntax error" {
 		t.Errorf("exe %q, why %q", exe, why)
 	}
-	if _, err := os.Stat(box.root + "/.se/.runtime/bin/.logview-source"); err == nil {
+	if box.disk.stands(box.root + "/.se/.runtime/bin/.logview-source") {
 		t.Error("a failed build stamps its source")
 	}
-	tuiWrites(t, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
 	exe, why, _ := tuiViewerOf(box.doors())
 	if exe != box.exe() || why != "the build fails, so the last one runs: main.go:1: syntax error" {
 		t.Errorf("exe %q, why %q", exe, why)
@@ -413,14 +403,14 @@ func TestTuiCollatesAsLocaleCompare(t *testing.T) {
 func TestTuiSourceTextJoinsPathsAndTexts(t *testing.T) {
 	t.Parallel()
 	box := tuiBoxAt(t)
-	tuiWrites(t, box.root, map[string]string{"src/yaml/yaml.go": "package yaml", "src/yaml/notes.txt": "skip"})
+	hq1SeedDisk(t, box.disk, box.root, map[string]string{"src/yaml/yaml.go": "package yaml", "src/yaml/notes.txt": "skip"})
 	r := box.root
 	want := strings.Join([]string{
 		r + "/src/tui/main.go", "package main\n\nimport \"quackitect/src/yaml\"\n",
 		r + "/src/yaml/yaml.go", "package yaml",
 		r + "/go.mod", "module quackitect",
 	}, "\x1f")
-	if said := tuiSourceText(r); said != want {
+	if said := tuiSourceText(box.disk, r); said != want {
 		t.Errorf("text %q\nwant %q", said, want)
 	}
 }
@@ -449,5 +439,15 @@ func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
 		if !strings.HasPrefix(one, runtime) {
 			t.Errorf("%s stands outside %s", one, runtime)
 		}
+	}
+}
+
+// The collation puts punctuation first, then digits, then letters in either case with lower case first on a tie, then any other rune. [[spec/design_output/tui#the-verb-builds-it]]
+func TestTuiCollateOrdersEachClassOfRune(t *testing.T) {
+	t.Parallel()
+	names := []string{"é", "b", "B", "a", "9", "0", "_"}
+	slices.SortFunc(names, tuiCollate)
+	if want := []string{"_", "0", "9", "a", "b", "B", "é"}; !slices.Equal(names, want) {
+		t.Errorf("the collation orders %q, and wants %q", names, want)
 	}
 }

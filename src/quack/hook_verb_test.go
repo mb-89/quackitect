@@ -7,10 +7,13 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	// level0: OutsideInDoors - the case stands a real hooks door the verb posts to, the verb's door test
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	// level0: OutsideInDoors - the case reads the real repository it drives, the verb's door test
 	"os"
+	// level0: OutsideInDoors - the case drives a real repository and its bare origin with git, the verb's door test
 	"os/exec"
 	"path/filepath"
 	"reflect"
@@ -34,6 +37,7 @@ func hookDoorsOver(root string, cloud bool, env map[string]string, stdin string,
 		env:   func(name string) string { return env[name] },
 		stdin: strings.NewReader(stdin),
 		now:   func() time.Time { return now },
+		disk:  realDisk(),
 	}
 }
 
@@ -78,6 +82,7 @@ func preCommits(t *testing.T, path, text string) (int, string) {
 	root, _ := hookRepo(t)
 	lays(t, root, path, text)
 	gitDoes(t, root, "add", "-A")
+	// level0: OutsideInDoors - the case hands the hook doors one wall reading over the real repository, the verb's door test
 	code, _, errs := runsTwin(hookVerb(hookDoorsOver(root, false, nil, "", time.Now())), "hook", "pre-commit")
 	return code, errs
 }
@@ -142,6 +147,7 @@ func TestHookPreCommitPassesACleanDelta(t *testing.T) {
 func TestHookPrePushRefusesAVersionDelete(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, nil, "(delete) "+hookZeros+" refs/heads/v1 "+gitDoes(t, root, "rev-parse", "HEAD")+"\n", time.Now())
 	if code != exitFailed || !strings.Contains(errs, "v1") || !strings.Contains(errs, "delete") {
 		t.Fatalf("pre-push answers %d, %q, and wants the delete of a version branch refused", code, errs)
@@ -152,6 +158,7 @@ func TestHookPrePushRefusesACloudPushToTrunk(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
 	stampsGreen(t, root, gitDoes(t, root, "rev-parse", "HEAD"))
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, true, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.HasPrefix(errs, "A cloud box pushes its own work branch alone, and main stands for the desk.") {
 		t.Fatalf("pre-push answers %d, %q, and wants a cloud push to main refused on a green stamp", code, errs)
@@ -161,6 +168,7 @@ func TestHookPrePushRefusesACloudPushToTrunk(t *testing.T) {
 func TestHookPrePushRefusesARedBatteryOnTrunk(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, hookAgent, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.HasPrefix(errs, "main takes a green battery, and ") || !strings.Contains(errs, "Run `./RUNME.sh check` last") {
 		t.Fatalf("pre-push answers %d, %q, and wants an agent's push to main refused without a stamp", code, errs)
@@ -175,6 +183,7 @@ func TestHookPrePushRefusesAnUncheckedTip(t *testing.T) {
 	lays(t, root, "src/bridge/two.js", "export const two = 2;\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "--no-verify", "-m", "y: code past the check")
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, hookAgent, pushLine("work/y", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.HasPrefix(errs, "work/y takes a push the check has passed, and ") {
 		t.Fatalf("pre-push answers %d, %q, and wants a tip past the checked commit refused", code, errs)
@@ -185,6 +194,7 @@ func TestHookPrePushRefusesABranchAnotherBoxHolds(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
 	stampsGreen(t, root, sha)
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now())
 	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) || !strings.Contains(errs, "branch sync") {
 		t.Fatalf("pre-push answers %d, %q, and wants a branch another box holds refused, naming the holder and main", code, errs)
@@ -195,6 +205,7 @@ func TestHookPrePushRefusesAPlainPushOntoAStaleHold(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
 	stampsGreen(t, root, sha)
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now().Add(24*time.Hour))
 	if code != exitFailed || !strings.Contains(errs, "stale hold of "+hookHolder) || !strings.Contains(errs, "./RUNME.sh branch take x") {
 		t.Fatalf("pre-push answers %d, %q, and wants a plain push onto a stale hold refused, naming the take", code, errs)
@@ -204,6 +215,7 @@ func TestHookPrePushRefusesAPlainPushOntoAStaleHold(t *testing.T) {
 func TestHookPrePushRefusesTheOwnersPushOntoABranchAnotherBoxHolds(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, nil, pushLine("work/x", sha), time.Now())
 	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) {
 		t.Fatalf("pre-push answers %d, %q, and wants the owner's terminal refused on a branch another box holds", code, errs)
@@ -217,6 +229,7 @@ func TestHookPrePushRefusesATodoTag(t *testing.T) {
 	lays(t, root, "spec/tickets/z.md", "---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "z: a tagged note")
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, nil, pushLine("work/z", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed || !strings.Contains(errs, "spec/tickets/z.md") {
 		t.Fatalf("pre-push answers %d, %q, and wants a push carrying a tagged note refused by name", code, errs)
@@ -227,6 +240,7 @@ func TestHookPrePushLetsTheOwnersTerminalThrough(t *testing.T) {
 	t.Parallel()
 	root, _ := hookRepo(t)
 	gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "a-ticket: no check")
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, nil, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != 0 || errs != "" {
 		t.Fatalf("pre-push answers %d, %q, and wants the owner's push to main through with no stamp", code, errs)
@@ -240,10 +254,12 @@ func TestHookPrePushLetsARedWorkBranchThroughUnderCI(t *testing.T) {
 	lays(t, root, ".github/workflows/check.yml", "name: check\n")
 	gitDoes(t, root, "add", "-A")
 	gitDoes(t, root, "commit", "-q", "-m", "y: the workflow")
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, errs := prePushes(root, false, hookAgent, pushLine("work/y", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != 0 || errs != "" {
 		t.Fatalf("pre-push answers %d, %q, and wants an agent's red work branch through where CI guards the tree", code, errs)
 	}
+	// level0: OutsideInDoors - the push dates its claims against the real commits' wall time, the verb's door test
 	code, _ = prePushes(root, false, hookAgent, pushLine("main", gitDoes(t, root, "rev-parse", "HEAD")), time.Now())
 	if code != exitFailed {
 		t.Fatalf("pre-push answers %d, and wants the red push to main refused under CI still", code)
@@ -294,6 +310,7 @@ type copilotSaid struct {
 // Runs one Copilot event over the root, the surface, the ask and a log failing with fails where it is set. [[spec/tickets/copilot-hooks-run-in-go]]
 func copilotHooks(root, surface string, ask func(hooks.Post) (hooks.Answer, error), fails error, event, input string) copilotSaid {
 	var said copilotSaid
+	// level0: OutsideInDoors - the case hands the hook doors one wall reading over the real repository, the verb's door test
 	d := hookDoorsOver(root, surface == "cloud", nil, input, time.Now())
 	d.copilot = surface
 	d.ask = ask

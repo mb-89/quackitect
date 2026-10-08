@@ -4,12 +4,9 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"quackitect/src/index"
 )
 
 // The folder the retros stand under, as Retro in src/modules/check/folders.go names it. [[spec/guidance/retro/chapter]]
@@ -38,14 +35,10 @@ func retroHome(root, name string) string {
 	return filepath.Join(root, filepath.FromSlash(retroFolder), name)
 }
 
-// The root a retro verb works under: the work root SE_WORK_ROOT names, then the tree's root, or the folder quack stands in where none answers. [[spec/design_output/vehicle#the-work-root-inherits]]
-func retroRoot() string {
-	if at := strings.TrimSpace(os.Getenv(workRoot)); at != "" {
+// The root a retro verb works under: the work root SE_WORK_ROOT names, then the root the box doors read. [[spec/design_output/vehicle#the-work-root-inherits]]
+func retroRootOf(d boxDoors) string {
+	if at := strings.TrimSpace(d.env(workRoot)); at != "" {
 		return at
 	}
-	root, err := index.Root()
-	if err != nil {
-		return "."
-	}
-	return root
+	return d.root
 }

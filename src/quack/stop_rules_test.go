@@ -1,10 +1,10 @@
 // The stop rules this tree ships, read off spec/config/stop the way the hook reads
 // them: every file pools whole, a later file's rule votes, and a check a rule names stands.
 // [[spec/design_output/stop#where-the-rules-live]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the stop rule file the tree holds, as a build check reads source
 	"path/filepath"
 	"testing"
 

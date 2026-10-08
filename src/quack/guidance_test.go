@@ -1,10 +1,9 @@
 // quack reads the guidance files off the tree, each keyed by its path under
 // the root.
 // [[spec/tickets/the-guidance-topic-lands]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -14,10 +13,10 @@ import (
 	"quackitect/src/q"
 )
 
-// The gate of the standard route reads the design review note, and no other review note, off the case test/contract/process.test.js held. [[spec/tickets/one-review-a-ticket]]
+// The gate of the standard route reads the design review note, and no other review note. [[spec/tickets/one-review-a-ticket]]
 func TestTheStandardGateReadsTheDesignReviewNoteAlone(t *testing.T) {
 	t.Parallel()
-	rows, err := guidanceRows(treeRoot, map[string]string{})
+	rows, err := guidanceRows(realDisk(), treeRoot, map[string]string{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,10 +26,10 @@ func TestTheStandardGateReadsTheDesignReviewNoteAlone(t *testing.T) {
 	}
 }
 
-// Every note under a subfolder of spec/guidance reaches some leaf of some process, off the case test/contract/guidance-tags.test.js held. [[spec/design_input/level-two#guidance]]
+// Every note under a subfolder of spec/guidance reaches some leaf of some process. [[spec/design_input/level-two#guidance]]
 func TestEveryGuidanceNoteUnderASubfolderReachesSomeLeaf(t *testing.T) {
 	t.Parallel()
-	files, err := guidanceFiles(treeRoot)
+	files, err := guidanceFiles(realDisk(), treeRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,15 +58,15 @@ func TestEveryGuidanceNoteUnderASubfolderReachesSomeLeaf(t *testing.T) {
 
 func TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
+	root, disk := "/tree", newFakeDisk()
 	at := filepath.Join(root, filepath.FromSlash(guidance.Guidance), "code")
-	if err := os.MkdirAll(at, 0o755); err != nil {
+	if err := disk.makeAll(at, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
+	if err := disk.write(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	said, err := guidanceFiles(root)
+	said, err := guidanceFiles(disk, root)
 	if err != nil {
 		t.Fatal(err)
 	}

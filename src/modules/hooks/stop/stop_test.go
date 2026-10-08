@@ -232,3 +232,10 @@ func TestEndsOnQuestionReadsTheLastProse(t *testing.T) {
 		t.Error("ends-on-a-question reads true on a desk, want false")
 	}
 }
+
+// A closed state reads off the front, and a note with no front reads open. [[spec/tickets/shared-helpers-stand-once]]
+func TestAClosedStateReadsOffTheFront(t *testing.T) {
+	if !Closed("---\r\nstate: closed\r\n---\n") || Closed("state: closed\n") {
+		t.Fatal("the closed state reads apart from the front")
+	}
+}

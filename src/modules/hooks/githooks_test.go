@@ -56,7 +56,7 @@ func TestPrePushRefusesAVersionDelete(t *testing.T) {
 
 func TestPrePushHoldsTheOwnersPushOntoAHeldBranch(t *testing.T) {
 	t.Parallel()
-	now := time.Now()
+	now := time.Unix(1790000000, 0)
 	root, reads := ghHeld(t, ghOther, now)
 	said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now})
 	if !strings.HasPrefix(said, "work/x stands in the hand of "+ghOther+", and a branch has one writer.") {
@@ -66,7 +66,7 @@ func TestPrePushHoldsTheOwnersPushOntoAHeldBranch(t *testing.T) {
 
 func TestPrePushLetsAStaleHoldMoveByTheTake(t *testing.T) {
 	t.Parallel()
-	now := time.Now()
+	now := time.Unix(1790000000, 0)
 	root, reads := ghHeld(t, "box myb0x · claude-code", now)
 	if said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now.Add(ghStale)}); said != "" {
 		t.Fatalf("pre-push answers %q, and wants a tip moving the stale hold to this box through", said)
@@ -99,10 +99,10 @@ func TestPrePushPassesAnAgentsBeatAndRescueWhereNoCheckRan(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/work#a-hold-beats-with-its-session]]
+// [[spec/design_output/work#the-session-beats-its-hold]]
 func TestPrePushReadsTheHoldsBeatBeforeItsTip(t *testing.T) {
 	t.Parallel()
-	now := time.Now()
+	now := time.Unix(1790000000, 0)
 	beatRead := "log -1 --format=%ct %s origin/beats/x"
 	root, reads := ghHeld(t, ghOther, now.Add(-ghStale))
 	reads[beatRead] = strconv.FormatInt(now.Unix()-60, 10) + " " + ghOther + " beats"

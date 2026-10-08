@@ -4,7 +4,7 @@ package draw
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the cases read the colours file the tree ships and the package's own source, as a build check reads source
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,7 +15,7 @@ func treeRoot() string { return filepath.Join("..", "..", "..") }
 // The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
 	LoadColoursForCases(treeRoot())
-	os.Exit(m.Run())
+	m.Run()
 }
 
 func TestTheShippedFileHoldsAColourForEveryKindTheWindowDraws(t *testing.T) {

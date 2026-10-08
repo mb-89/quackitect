@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,17 +16,19 @@ import (
 // The key that turns the stop hook off where it reads false. [[spec/design_output/level0#the-canary]]
 const stopKey = "stop.enabled"
 
-func init() { register("standing", standingVerb(index.Root, os.Getenv)) }
+func init() { register("standing", standingVerb(index.Root, quietBox)) }
 
 // standing over the root, the work root over it where SE_WORK_ROOT names one: the layer with no kind, then the canary. [[spec/design_output/level0#the-standing-layer]]
-func standingVerb(root func() (string, error), env func(string) string) twin {
+func standingVerb(root func() (string, error), box func() boxDoors) twin {
 	return func(_ []string, _ bool, out, errs io.Writer) int {
 		at, err := root()
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		if _, err := os.Stat(filepath.Join(at, filepath.FromSlash(brief.Guidance))); err != nil {
+		hand := box()
+		env := hand.env
+		if !hand.disk.stands(filepath.Join(at, filepath.FromSlash(brief.Guidance))) {
 			fmt.Fprintf(errs, "There is no %s, so nothing is handed over.\n", brief.Guidance)
 			return exitUsage
 		}

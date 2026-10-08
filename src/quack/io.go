@@ -28,6 +28,8 @@ const (
 	ioBeat        = 5 * time.Second
 	ioRestart     = 5 * time.Second
 	answerWait    = 30 * time.Second
+	// The kind of the session log row a failed start writes. [[spec/tickets/io-start-fault-shows]]
+	ioStartFault = "io-start-fault"
 )
 
 // quack io: the IO process the index spawns, which runs the wiring's IO instances until the bus goes. [[spec/design_output/model#the-io-process]]
@@ -49,7 +51,7 @@ func ioMain() error {
 		return err
 	}
 	defer peer.Close()
-	stop, err := ioOver(peer, root, ioStarts(w))
+	stop, err := ioOver(peer, root, ioStarts(w), appendsRow(realDisk(), root, wall.Now))
 	if err != nil {
 		return err
 	}
@@ -58,9 +60,12 @@ func ioMain() error {
 	return nil
 }
 
+// The vehicle the running binary stands in, and none where it stands in no vehicle's runtime folder. [[spec/tickets/vehicle-rules-come-down]]
+func ownVehicle() string { return vehicleOf(os.Executable()) }
+
 // The wiring a process the index spawns reads: the work root's, then its vehicle's, and none where neither stands. [[spec/design_output/model#the-wiring-file]]
 func spawnedWiring(root string) (q.Wiring, error) {
-	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	text, err := wiringOf(root, ownVehicle())
 	if err != nil || text == "" {
 		return q.Wiring{}, err
 	}
@@ -110,12 +115,12 @@ func moduleOf(w q.Wiring, instance string) string {
 }
 
 // Runs each start over the bus, publishing what it commits on commit.<instance>, and answers the stop of them all. [[spec/design_output/model#the-io-process]]
-func runsIO(url, token string, starts map[string]index.Start) (func(), error) {
+func runsIO(url, token string, starts map[string]index.Start, say func(row map[string]any) error) (func(), error) {
 	peer, err := index.Dial(url, token)
 	if err != nil {
 		return nil, err
 	}
-	stop, err := ioOver(peer, "", starts)
+	stop, err := ioOver(peer, "", starts, say)
 	if err != nil {
 		peer.Close()
 		return nil, err
@@ -126,49 +131,40 @@ func runsIO(url, token string, starts map[string]index.Start) (func(), error) {
 	}, nil
 }
 
-// Watches the index's beat on lease.index, and writes a watchdog row where it falls silent past the term. [[spec/design_output/model#the-watcher-of-the-watchdog]]
-func watchesIndex(peer *index.Peer, term time.Duration, say func(row map[string]any) error) (func(), error) {
+// Watches the index's beat on lease.index, and writes a watchdog row where it falls silent past the term, on the clock it takes. [[spec/design_output/model#the-watcher-of-the-watchdog]] [[spec/tickets/quack-waits-on-the-clock]]
+func watchesIndex(peer *index.Peer, from q.Clock, term time.Duration, say func(row map[string]any) error) (func(), error) {
 	var mu sync.Mutex
-	last, said := time.Now(), false
+	last, said := from.Now(), false
 	stop, err := peer.Leases(func(part string) {
 		if part != indexPart {
 			return
 		}
 		mu.Lock()
-		last, said = time.Now(), false
+		last, said = from.Now(), false
 		mu.Unlock()
 	})
 	if err != nil {
 		return nil, err
 	}
-	ticks, quit := time.NewTicker(term/watchSteps), make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-quit:
-				return
-			case <-ticks.C:
-				mu.Lock()
-				silent, since := !said && time.Since(last) > term, last
-				if silent {
-					said = true
-				}
-				mu.Unlock()
-				if silent {
-					_ = say(map[string]any{"kind": "watchdog", "part": indexPart, "since": since.UTC().Format(time.RFC3339Nano)})
-				}
-			}
+	ticks := from.Every(term/watchSteps, func(at time.Time) {
+		mu.Lock()
+		silent, since := !said && at.Sub(last) > term, last
+		if silent {
+			said = true
 		}
-	}()
+		mu.Unlock()
+		if silent {
+			_ = say(map[string]any{"kind": "watchdog", "part": indexPart, "since": since.UTC().Format(time.RFC3339Nano)})
+		}
+	})
 	return func() {
-		ticks.Stop()
-		close(quit)
+		ticks()
 		stop()
 	}, nil
 }
 
-// Each start commits over the peer under its instance, and the IO process beats its lease while it runs. [[spec/design_output/model#a-lease]]
-func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(), error) {
+// Each start commits over the peer under its instance, and the IO process beats its lease while it runs. A start that fails writes a row through say, and the others run on. [[spec/design_output/model#a-lease]] [[spec/tickets/io-start-fault-shows]]
+func ioOver(peer *index.Peer, root string, starts map[string]index.Start, say func(row map[string]any) error) (func(), error) {
 	var stops []func()
 	halt := func() {
 		for _, one := range stops {
@@ -178,8 +174,8 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 	for instance, start := range starts {
 		stop, err := start(root, func(_ q.Writer, values map[string]any) error { return peer.Commit(instance, values) })
 		if err != nil {
-			halt()
-			return nil, fmt.Errorf("%s starts not: %w", instance, err)
+			_ = say(map[string]any{"kind": ioStartFault, "instance": instance, "said": err.Error()})
+			continue
 		}
 		stops = append(stops, stop)
 		// An empty commit says the start stands, after what it seeds, so a reader waits on the seed and on no later event. [[spec/tickets/the-split-deployment-takes-over]]
@@ -188,25 +184,14 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 			return nil, fmt.Errorf("%s answers not: %w", instance, err)
 		}
 	}
-	watching, err := watchesIndex(peer, manager.LeaseTerm(root), appendsRow(root, time.Now))
+	watching, err := watchesIndex(peer, wall, manager.LeaseTerm(root), say)
 	if err != nil {
 		halt()
 		return nil, err
 	}
-	beats, quit := time.NewTicker(ioBeat), make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-quit:
-				return
-			case <-beats.C:
-				_ = peer.Beat(ioPart)
-			}
-		}
-	}()
+	beats := wall.Every(ioBeat, func(time.Time) { _ = peer.Beat(ioPart) })
 	return func() {
-		beats.Stop()
-		close(quit)
+		beats()
 		watching()
 		halt()
 	}, nil
@@ -218,7 +203,7 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 	if err != nil {
 		return index.Managed{}, err
 	}
-	instances, placed := open.io, placementsOf(open.wiring, open.hands, placementLists(root), self)
+	instances, placed := open.io, placementsOf(open.wiring, open.hands, placementLists(realDisk(), root), self)
 	if len(instances) == 0 && len(placed) == 0 {
 		return index.Managed{Stop: func() {}}, nil
 	}
@@ -252,7 +237,7 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 		bus.Close()
 		return index.Managed{}, err
 	}
-	placements := index.NewPlacements(bus, store, placed)
+	placements := index.NewPlacements(wall, bus, store, placed)
 	stop, err := placements.Start()
 	if err != nil {
 		beating.Close()
@@ -292,8 +277,8 @@ func beatsIndex(bus *index.Bus, store *q.Store) (*index.Peer, error) {
 }
 
 // The lists of instances the processes/placements key holds, each list one process. [[spec/design_output/model#the-placements]]
-func placementLists(root string) [][]string {
-	rows, err := configAt(root)
+func placementLists(disk diskDoors, root string) [][]string {
+	rows, err := configOn(disk, root)
 	if err != nil {
 		return nil
 	}

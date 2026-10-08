@@ -1,7 +1,6 @@
 // The pull. One verb hands a hand the next leaf of a ticket, and the same verb
 // takes the leaf back with a verdict. The engine checks the hand-back, writes
-// the record, moves the step, commits, pushes, and hands out the next leaf,
-// off src/scripts/pull.js, pulling in work.js and pull-tool.js.
+// the record, moves the step, commits, pushes, and hands out the next leaf.
 // [[spec/design_output/pull#the-answers]]
 package pull
 
@@ -12,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -277,18 +277,19 @@ func (it *It) Pull(argv []string) int {
 	as := flagValue(rest, "--as")
 	said := verdictFlag(rest)
 	if said.why != "" {
-		it.Errorln(said.why)
+		it.Refuse(failure.Raise(it.Failures, "pull-flags-refused", said.why))
 		return 2
 	}
 	branch := it.branch()
 	onTrunk := branch == Trunk
 	// A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
 	if !it.Cloud && strings.HasPrefix(branch, WorkBranch) {
-		return it.deskRefused("the pull hands nothing out on "+branch, "")
+		return it.deskRefused("the pull hands nothing out on " + branch)
 	}
 	if !onTrunk && !strings.HasPrefix(branch, WorkBranch) {
-		it.Errorln(fmt.Sprintf("ticket pull runs on %s or a work branch, and this is %s.", Trunk, branch))
-		it.Errorln(fmt.Sprintf("Call %s from %s, which hands out work there.", CallOf("ticket", "pull"), Trunk))
+		it.Refuse(failure.Raise(it.Failures, "pull-branch-off-road",
+			fmt.Sprintf("ticket pull runs on %s or a work branch, and this is %s.", Trunk, branch),
+			fmt.Sprintf("Call %s from %s, which hands out work there.", CallOf("ticket", "pull"), Trunk)))
 		return 2
 	}
 	group := ""
@@ -320,8 +321,9 @@ func (it *It) Pull(argv []string) int {
 		return it.takeBack(who, name, said.reason)
 	}
 	// A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-road-stands-first]]
-	working := it.workingTodo()
-	todo := working
+	// A helper's --as binds to the ticket the plan names, which holds no plain pull. [[spec/tickets/helpers-keep-the-plan-ticket]]
+	working := it.planWorking()
+	todo := it.workingTodo()
 	if held != nil || said.said != "" {
 		todo = ""
 	}
@@ -341,8 +343,9 @@ func (it *It) Pull(argv []string) int {
 	asking := wanted != "" && named == "" && said.said == "" && held == nil
 	helps := as != "" && wanted == working
 	if asking && it.Binding == bindQueue && wanted != it.Minted && !helps && !it.byPerson(took) {
-		it.Errorln(wanted + " stands behind the queue, because this session binds to it.")
-		it.Errorln(fmt.Sprintf("Call %s with no name, and take what it hands you.", CallOf("ticket", "pull")))
+		it.Refuse(failure.Raise(it.Failures, "pull-queue-binds",
+			wanted+" stands behind the queue, because this session binds to it.",
+			fmt.Sprintf("Call %s with no name, and take what it hands you.", CallOf("ticket", "pull"))))
 		return 2
 	}
 	if asking {
@@ -367,6 +370,14 @@ func (it *It) Pull(argv []string) int {
 	}
 	if !it.fetched(branch) {
 		return 1
+	}
+	// A desk on trunk fast-forwards main in fetched, so the cold check reads a work branch alone. [[spec/tickets/running-work-takes-main-fixes]]
+	if !onTrunk {
+		if cold := it.coldMoved(); len(cold) > 0 {
+			it.Refuse(failure.Raise(it.Failures, "pull-cold-path-moved", fmt.Sprintf("main moves the cold path past %s: %s.", branch, strings.Join(cold, ", ")),
+				fmt.Sprintf("Run ./RUNME.sh branch sync, then %s again.", CallOf("ticket", "pull"))))
+			return 1
+		}
 	}
 	if group != "" && GroupClosed(it.Disk, group) {
 		it.Say(Done, fmt.Sprintf("%s stands closed, so work/%s takes no more work.", group, group),
@@ -397,9 +408,28 @@ func (it *It) fetched(branch string) bool {
 	if it.Git.FastForward("origin/"+branch) == nil {
 		return true
 	}
-	it.Say(Refused, fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
-		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch))
+	it.Refuse(failure.Raise(it.Failures, "pull-origin-diverges", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
+		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch)))
 	return false
+}
+
+// The cold path files origin/main moves past HEAD, which a running box takes in through a sync before it works on. [[spec/tickets/running-work-takes-main-fixes]]
+func (it *It) coldMoved() []string {
+	_ = it.Git.Fetch(Trunk)
+	main := "origin/" + Trunk
+	base, ok := it.Git.MergeBase("HEAD", main)
+	if !ok {
+		return nil
+	}
+	moved, _ := it.Git.Diff(base, main)
+	var paths []string
+	for _, one := range moved {
+		paths = append(paths, one.Path)
+		if one.From != "" {
+			paths = append(paths, one.From)
+		}
+	}
+	return ColdIn(paths)
 }
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -432,11 +462,7 @@ func (it *It) stillHeld(held Hold) int {
 	} else {
 		rows = append(rows, "", "Read them again with "+CallOf("branch", "guidance", as...)+".")
 	}
-	lines := []string{Refused}
-	for _, row := range rows {
-		lines = append(lines, "  "+row)
-	}
-	it.Errorln(it.cutRefusal(strings.Join(lines, "\n"), again))
+	it.Errorln(it.cutRefusal(it.refusal(failure.Raise(it.Failures, "pull-hand-holds", rows...)), again))
 	return 1
 }
 
@@ -460,11 +486,11 @@ func (it *It) stepReads(held Hold) []string {
 // A hand takes back a leaf it handed back, so the step stands there again. [[spec/design_output/pull#what-a-hand-out-reads]]
 func (it *It) takeBack(who *Who, name, path string) int {
 	if who.Held != nil {
-		it.Say(Refused, fmt.Sprintf("%s stands in your hand at %s. Hand it back first.", who.Held.Ticket, who.Held.Step))
+		it.Refuse(failure.Raise(it.Failures, "pull-hand-holds", fmt.Sprintf("%s stands in your hand at %s. Hand it back first.", who.Held.Ticket, who.Held.Step)))
 		return 1
 	}
 	if name == "" {
-		it.Say(Refused, "--back names the ticket and the leaf: ticket pull <ticket> --back <leaf>")
+		it.Refuse(failure.Raise(it.Failures, "pull-back-names-leaf", "--back names the ticket and the leaf: ticket pull <ticket> --back <leaf>"))
 		return 1
 	}
 	if !it.fetched(who.Branch) {
@@ -478,22 +504,22 @@ func (it *It) takeBack(who *Who, name, path string) int {
 		}
 	}
 	if one == nil {
-		it.Say(Refused, fmt.Sprintf("%s stands nowhere under %s or %s.", name, Tickets, Notes))
+		it.Refuse(failure.Raise(it.Failures, "pull-ticket-nowhere", fmt.Sprintf("%s stands nowhere under %s or %s.", name, Tickets, Notes)))
 		return 1
 	}
 	if LeafOf(one.Front, path) == nil {
-		it.Say(Refused, fmt.Sprintf("%s names no leaf of %s.", path, name))
+		it.Refuse(failure.Raise(it.Failures, "pull-leaf-unknown", fmt.Sprintf("%s names no leaf of %s.", path, name)))
 		return 1
 	}
 	var wrote *yaml.Doc
 	for _, entry := range entriesOf(one.Front) {
-		if yaml.AsString(entry.Get("step")) == path && !truthy(yaml.AsString(entry.Get("skipped"))) {
+		if yaml.AsString(entry.Get("step")) == path && !yaml.Truthy(entry.Get("skipped")) {
 			wrote = entry
 		}
 	}
 	role := RoleOf(who.Hand)
 	if wrote == nil || yaml.AsString(wrote.Get("hand")) != role {
-		it.Say(Refused, fmt.Sprintf("%s carries no hand-back by %s, so it is another hand's or nobody's.", path, role))
+		it.Refuse(failure.Raise(it.Failures, "pull-back-other-hand", fmt.Sprintf("%s carries no hand-back by %s, so it is another hand's or nobody's.", path, role)))
 		return 1
 	}
 	tip := ""
@@ -506,7 +532,7 @@ func (it *It) takeBack(who *Who, name, path string) int {
 	it.landed(one, []string{role + " takes " + path + " back"}, nil)
 	if !one.Private {
 		if ok, why := it.pushed(who.Branch); !ok {
-			it.Say(Refused, append([]string{"The take-back stands on this box, and its push reaches no origin."}, why...)...)
+			it.Refuse(failure.Raise(it.Failures, "pull-push-refused", append([]string{"The take-back stands on this box, and its push reaches no origin."}, why...)...))
 			return 1
 		}
 	}

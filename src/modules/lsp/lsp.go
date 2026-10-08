@@ -99,6 +99,8 @@ type Outside struct {
 	Quiet time.Duration
 	// What the check module lends the server, which the wiring hands in. [[spec/tickets/lsp-module-serves-the-features]]
 	Check Check
+	// The time a token read and a quiet span wait on. [[spec/tickets/go-waits-on-events]]
+	Clock q.Clock
 }
 
 // The server over the buffers an editor holds open, and what it last published for each. [[spec/tickets/the-lsp-door-lands]]
@@ -110,7 +112,7 @@ type Server struct {
 	// The tool rows by file, the address each open path came in under, the runs a change waits on, and the writer a run's publish goes to. [[spec/tickets/lsp-module-draws-the-tools]]
 	tools   map[string][]Finding
 	uris    map[string]string
-	timers  map[string]*time.Timer
+	timers  map[string]func() bool
 	pending sync.WaitGroup
 	runs    sync.Mutex
 	push    func(bodies ...[]byte)
@@ -193,7 +195,7 @@ func New(from Outside) *Server {
 	if from.Check.Tree == nil && from.Tools != nil {
 		from.Check = from.Tools.Check
 	}
-	return &Server{from: from, open: map[string]string{}, sent: map[string]string{}, tools: map[string][]Finding{}, uris: map[string]string{}, timers: map[string]*time.Timer{}}
+	return &Server{from: from, open: map[string]string{}, sent: map[string]string{}, tools: map[string][]Finding{}, uris: map[string]string{}, timers: map[string]func() bool{}}
 }
 
 // Answers one LSP message with the bodies it replies: initialize and shutdown answer, and didOpen and didChange commit the buffer and publish its diagnostics. didClose empties the buffer and publishes none. [[spec/design_output/model#the-editor-starts-quack-lsp]]
@@ -499,7 +501,7 @@ func Listen(root string, server *Server) (func(), error) {
 func serves(raw net.Conn, token string, server *Server, mu *sync.Mutex, conns map[*conn]bool) {
 	defer raw.Close()
 	reader := bufio.NewReader(raw)
-	raw.SetReadDeadline(time.Now().Add(tokenReadTimeout))
+	raw.SetReadDeadline(server.from.Clock.Now().Add(tokenReadTimeout))
 	line, err := reader.ReadString('\n')
 	if err != nil || subtle.ConstantTimeCompare([]byte(strings.TrimSpace(line)), []byte(token)) != 1 {
 		return

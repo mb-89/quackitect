@@ -173,7 +173,7 @@ A fix ticket names the command deciding it where one exists, and a prose criteri
 | experiment | run, then decide by a person: keep, drop or grow |
 | tree retro | feedback by a person, collect to audit, the backlog check, chapter to classify, the report the owner passes, then the mint |
 
-The retro mint names the process each class needs. Today `src/engine/retro/mint.js` writes every class as a standard ticket.
+The retro mint names the process each class needs.
 
 # The bless
 

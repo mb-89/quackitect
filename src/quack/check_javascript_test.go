@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -65,10 +64,10 @@ func TestTheJavaScriptPartRefusesAFileTheListLeavesOut(t *testing.T) {
 			}
 			d, _, errs := linesDoors(t, files, one.files)
 			at := filepath.Join(d.root, "spec", "design_output", "doors.md")
-			if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			if err := d.disk.makeAll(filepath.Dir(at), 0o755); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.WriteFile(at, []byte(one.note), 0o644); err != nil {
+			if err := d.disk.write(at, []byte(one.note), 0o644); err != nil {
 				t.Fatal(err)
 			}
 			if got := javascriptListed(d); got != one.code {

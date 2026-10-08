@@ -46,3 +46,10 @@ func TestRefusedTodoCountsTheNotes(t *testing.T) {
 		}
 	}
 }
+
+// A gate point reads off the front, and a note with no front names none. [[spec/tickets/shared-helpers-stand-once]]
+func TestAGatePointReadsOffTheFront(t *testing.T) {
+	if !isGatePoint("---\r\n"+pointKey+": "+gatePoint+"\r\n---\nbody") || isGatePoint(pointKey+": "+gatePoint) {
+		t.Fatal("the gate point reads apart from the front")
+	}
+}

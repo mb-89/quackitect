@@ -1,0 +1,4 @@
+# The files IO module: the disk, and its watcher.
+files:
+  go: [os]
+  contract: [src/modules/files/disk_contract_test.go, src/modules/files/watch_contract_test.go]

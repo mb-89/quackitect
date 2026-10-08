@@ -13,7 +13,6 @@ var (
 	ChaptersWanted           = chaptersWanted
 	CheckNote                = checkNote
 	CheckNoteIn              = checkNoteIn
-	EditorDrawsWriteRules    = editorDrawsWriteRules
 	EveryPointerResolvesOver = everyPointerResolves
 	ExtensionsOnOffer        = extensionsOnOffer
 	Fault                    = fault
@@ -60,8 +59,11 @@ var (
 	SurveyFindsNode          = surveyFindsNode
 	SurveyNamesInstalls      = surveyNamesInstalls
 	TextFaults               = textFaults
+	TextOf                   = textOf
 	Textual                  = textual
 	UnreasonedIn             = unreasoned
+	Walked                   = walked
+	DoorsWalked              = doorsWalked
 	WordsIn                  = wordsIn
 )
 

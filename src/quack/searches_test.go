@@ -1,7 +1,7 @@
 // The index ask decodes a Grep's and a Glob's params into the index's ask,
 // and encodes the answer back into the shape se-index prints.
 // [[spec/tickets/grep-glob-answer-off-index]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"reflect"

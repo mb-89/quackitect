@@ -1,0 +1,4 @@
+# The front's door: the process the front runs in.
+front:
+  go: [os]
+  files: [door.go]

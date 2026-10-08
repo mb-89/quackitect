@@ -1,0 +1,6 @@
+# The wall: the real time a case importing no module reads and waits on.
+# [[spec/tickets/go-waits-on-events]]
+wall:
+  go: [time.Now, time.NewTicker, time.After, time.AfterFunc, context.WithTimeout]
+  files: [wall.go]
+  contract: [src/q/qtest/wall_contract_test.go]

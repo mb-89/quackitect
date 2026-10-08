@@ -3,9 +3,10 @@
 package main
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -26,7 +27,7 @@ func init() { registerBox("doctor", doctorVerb) }
 
 // Prints one row a thing: every tool, the servers, the editor, the sidebar, the browser, the commit hook, the rules, the survey, the server and every hook. [[spec/tickets/box-verbs-port-to-go]]
 func doctorVerb(d boxDoors, _ []string) int {
-	known := readSurvey(d.root)
+	known := readSurvey(d.disk, d.root)
 	found := known
 	if len(found) == 0 {
 		found, _ = writeSurvey(d)
@@ -36,18 +37,18 @@ func doctorVerb(d boxDoors, _ []string) int {
 		rows = append(rows, [2]string{one.name, standsAt(found[one.name])})
 	}
 	rows = append(rows,
-		[2]string{"biome lsp-proxy", lspProxy(d, whereIs(d.root, "biome", known))},
+		[2]string{"biome lsp-proxy", lspProxy(d, whereIs(d.disk, d.root, "biome", known))},
 		// The editor starts quack lsp off the index binary, so the probe starts the same. [[spec/tickets/the-lsp-server-leaves]]
-		[2]string{"quack lsp", lspProbe(d, indexBuilt(d.root), d.root)},
-		[2]string{"editor", editorRow(d.root)},
+		[2]string{"quack lsp", lspProbe(d, indexBuilt(d.disk, d.root), d.root)},
+		[2]string{"editor", editorRow(d.disk, d.root)},
 		[2]string{"sidebar", sidebarSays(d)},
 		[2]string{"browser", browserSays(d)},
 		[2]string{"commit hook", hooksSay(d)},
-		[2]string{"vale rules", valeRules(d.root)},
-		[2]string{"survey", surveyRow(d.root)},
+		[2]string{"vale rules", valeRules(d.disk, d.root)},
+		[2]string{"survey", surveyRow(d.disk, d.root)},
 		[2]string{"server", serverLine(d)},
 	)
-	rows = append(rows, hookRows(d, hooksNamed(d.root, homeOf(d.env)))...)
+	rows = append(rows, hookRows(d, hooksNamed(d.disk, d.root, homeOf(d.env)))...)
 	for _, row := range rows {
 		said := strings.TrimSpace(row[1])
 		if said == "" {
@@ -60,7 +61,7 @@ func doctorVerb(d boxDoors, _ []string) int {
 
 // Whether the biome the survey names carries a language server proxy. [[spec/tickets/box-verbs-port-to-go]]
 func lspProxy(d boxDoors, biome string) string {
-	if !stands(biome) {
+	if !d.disk.stands(biome) {
 		return "missing, run ./RUNME.sh"
 	}
 	if d.run([]string{biome, "lsp-proxy", "--help"}, runOpts{}).code == 0 {
@@ -70,10 +71,10 @@ func lspProxy(d boxDoors, biome string) string {
 }
 
 // The index binary where the install built it, and nothing where it stands unbuilt. [[spec/tickets/the-lsp-server-leaves]]
-func indexBuilt(root string) string {
+func indexBuilt(disk diskDoors, root string) string {
 	bare := filepath.Join(root, filepath.FromSlash(indexBinary))
 	for _, at := range []string{bare, bare + ".exe"} {
-		if stands(at) {
+		if disk.stands(at) {
 			return at
 		}
 	}
@@ -81,8 +82,8 @@ func indexBuilt(root string) string {
 }
 
 // The editor's settings, which start both servers. [[spec/tickets/box-verbs-port-to-go]]
-func editorRow(root string) string {
-	if stands(filepath.Join(root, filepath.FromSlash(editorSettings))) {
+func editorRow(disk diskDoors, root string) string {
+	if disk.stands(filepath.Join(root, filepath.FromSlash(editorSettings))) {
 		return editorSettings + ", both servers"
 	}
 	return "missing"
@@ -92,28 +93,28 @@ func editorRow(root string) string {
 func sidebarSays(d boxDoors) string {
 	home := homeOf(d.env)
 	folder := filepath.Join(home, ".vscode", "extensions")
-	if home == "" || !stands(folder) {
+	if home == "" || !d.disk.stands(folder) {
 		return "no editor folder on this box, so no link"
 	}
 	manifest := filepath.Join(d.root, filepath.FromSlash(extensionTarget))
 	var said struct{ Publisher, Name, Version string }
-	text, _ := readText(manifest)
+	text := d.disk.text(manifest)
 	if err := json.Unmarshal([]byte(text), &said); err != nil {
 		return "the manifest at src/extension/package.json reads as no JSON"
 	}
 	id := said.Publisher + "." + said.Name
 	dest := filepath.Join(folder, id+"-"+said.Version)
 	switch {
-	case editorLinkedAt(dest, filepath.Dir(manifest)):
-		if editorRegistered(folder, id) {
+	case editorLinkedAt(d.disk, dest, filepath.Dir(manifest)):
+		if editorRegistered(d.disk, folder, id) {
 			return "linked, and the list names " + id
 		}
 		return "linked, and the list misses " + id + ": run ./RUNME.sh"
-	case isLink(dest) && !stands(dest):
+	case isLink(d.disk, dest) && !d.disk.stands(dest):
 		return "a link pointing nowhere: run ./RUNME.sh"
-	case isLink(dest):
+	case isLink(d.disk, dest):
 		return "a link into another tree: run ./RUNME.sh"
-	case stands(dest):
+	case d.disk.stands(dest):
 		return "a copy in place of the link: run ./RUNME.sh"
 	}
 	return "unlinked: run ./RUNME.sh"
@@ -121,7 +122,7 @@ func sidebarSays(d boxDoors) string {
 
 // The browser the drawing's test drives, with the rung that found it. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
 func browserSays(d boxDoors) string {
-	path, from := browserFrom(d.env, d.goos == "darwin")
+	path, from := browserFrom(d.disk, d.env, d.goos == "darwin")
 	if path == "" {
 		return "missing, run ./RUNME.sh"
 	}
@@ -132,10 +133,10 @@ func browserSays(d boxDoors) string {
 func hooksSay(d boxDoors) string {
 	at := hooksFolder + "/pre-commit"
 	push := hooksFolder + "/pre-push"
-	if !stands(filepath.Join(d.root, filepath.FromSlash(at))) {
+	if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(at))) {
 		return at + " stands nowhere"
 	}
-	if !stands(filepath.Join(d.root, filepath.FromSlash(push))) {
+	if !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(push))) {
 		return push + " stands nowhere"
 	}
 	said := strings.TrimSpace(d.run([]string{"git", "config", "--get", "core.hooksPath"}, runOpts{cwd: d.root}).stdout)
@@ -149,18 +150,17 @@ func hooksSay(d boxDoors) string {
 }
 
 // How many rules each rule folder holds, or missing where the first stands nowhere. [[spec/tickets/box-verbs-port-to-go]]
-func valeRules(root string) string {
+func valeRules(disk diskDoors, root string) string {
 	counts := make([]int, len(ruleFolders))
 	for at, one := range ruleFolders {
 		folder := filepath.Join(root, "spec", "config", "styles", one)
-		if !stands(folder) {
+		if !disk.stands(folder) {
 			if at == 0 {
 				return "missing"
 			}
 			continue
 		}
-		listed, _ := os.ReadDir(folder)
-		for _, file := range listed {
+		for _, file := range disk.listed(folder) {
 			if file.Type().IsRegular() && strings.HasSuffix(file.Name(), ".yml") {
 				counts[at]++
 			}
@@ -174,16 +174,16 @@ func valeRules(root string) string {
 }
 
 // Whether the survey file stands. [[spec/design_output/tools#where-a-caller-looks]]
-func surveyRow(root string) string {
-	if stands(filepath.Join(root, filepath.FromSlash(toolsFile))) {
+func surveyRow(disk diskDoors, root string) string {
+	if disk.stands(filepath.Join(root, filepath.FromSlash(toolsFile))) {
 		return toolsFile
 	}
 	return "absent, run ./RUNME.sh tools"
 }
 
 // The port the vehicle pointer names, or the base port. [[spec/design_output/level0#the-check-reads-the-server]]
-func portHere(root string) int {
-	text, _ := readText(filepath.Join(root, filepath.FromSlash(vehiclePointer)))
+func portHere(disk diskDoors, root string) int {
+	text := disk.text(filepath.Join(root, filepath.FromSlash(vehiclePointer)))
 	var said struct {
 		Port any `json:"port"`
 	}
@@ -205,12 +205,12 @@ func portHere(root string) int {
 
 // The row the doctor prints under `server`, so a person asking after a fall reads it there. [[spec/design_output/level0#the-bridge-says-it-falls]]
 func serverLine(d boxDoors) string {
-	where := "http://127.0.0.1:" + strconv.Itoa(portHere(d.root)) + "/health"
+	where := "http://127.0.0.1:" + strconv.Itoa(portHere(d.disk, d.root)) + "/health"
 	body, err := d.get(where, healthWait)
 	var said struct {
 		OK any `json:"ok"`
 	}
-	if err == nil && json.Unmarshal([]byte(body), &said) == nil && truthy(said.OK) {
+	if err == nil && json.Unmarshal([]byte(body), &said) == nil && yaml.Truthy(said.OK) {
 		return "stands at " + where
 	}
 	return "none at " + where

@@ -6,6 +6,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the tree's own install.sh, as a build check reads source
 	"os"
 	"path/filepath"
 	"regexp"

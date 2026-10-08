@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/work-review.js` gathers what a reader wants off a branch. This note
+`src/branches/review.go` gathers what a reader wants off a branch. This note
 covers the verb, the worktree it runs in, and the questions it answers.
 
 # What the reader is
@@ -79,7 +79,7 @@ The things below follow from where that worktree lands:
 |---|---|
 | the worktree carries no `.se/.runtime/bin` | copies `.se/.runtime/tools.json` in, whose paths name this box's binaries |
 | `RUNME.sh` downloads every tool | builds the branch's own quack into the worktree's bin and runs its `check`, leaving the install script out |
-| the install script stamps the brand, and git ignores what it writes | stamps the worktree through `stamps` in `src/scripts/brand.js`, with the brand of the caller's tree |
+| the install script stamps the brand, and git ignores what it writes | stamps the worktree through `stamps` in `src/quack/brand.go`, with the brand of the caller's tree |
 | the worktree carries no `node_modules` and no `.se/.runtime/bin/zig`, and the survey names no compiler [[spec/design_output/index#the-compiler-it-needs]] | links the caller's two in, and unlinks them before `git worktree remove` |
 | the check writes its own builds into `.se/.runtime/bin` | borrows the compiler's folder alone, so a branch's build lands in the worktree's own bin |
 | the check mints through `se-front`, which the install alone builds | builds the branch's own `se-front` into the worktree's bin before the check |
@@ -144,7 +144,7 @@ report with nothing to fix fits on one line:
 ## The unreached row
 
 The accept refuses a group that leaves dead code behind. The verb reads git
-at the branch's ref, never the working tree:
+at the branch's ref alone:
 
 | the step | what it reads |
 |---|---|
@@ -158,15 +158,15 @@ A folder counts reached where one of these holds:
 - a file the branch adds there says `package main`
 - the folder holds tests alone
 - the folder sits under `testdata`
-- a Go file past the folder imports its quoted path, so `src/used` never matches `src/usedfoo`
+- a Go file past the folder imports its quoted path, so `src/usedfoo` falls outside `src/used`
 
-Every added file of a folder left unreached stands in the `unreached` row, one
-a line, and the row counts one fix:
+Every file the branch adds to an unreached folder stands in the `unreached`
+row, one a line, and the row counts one fix:
 
     unreached  src/lone/lone.go
                src/lone/lone_test.go
 
-The word is unreached, because [[spec/vocabulary/terms.yml]] gives orphan to a
+The row says unreached, because [[spec/vocabulary/terms.yml]] gives orphan to a
 branch sharing no history with main.
 
 # The queue takes done branches

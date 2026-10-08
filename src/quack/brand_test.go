@@ -1,10 +1,9 @@
 // The brand a vehicle stamps: the slug off its folder, the names the stamp
 // writes, and the targets it writes off the brand folder or the shapes.
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -61,56 +60,46 @@ func TestTheVersionLandsInPlaceOrLastAndAnEmptyOneLeavesTheText(t *testing.T) {
 	}
 }
 
-func seedTree(t *testing.T, root string, files map[string]string) {
-	t.Helper()
-	for rel, text := range files {
-		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
 func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	seedTree(t, root, map[string]string{
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
 		"package.json":                    `{"version":"1.2.3"}`,
 		brandFolder + "/marketplace.json": `{"name":"","owner":{"name":""}}`,
 		brandFolder + "/plugin.json":      `{"name":"level0","author":{"name":""}}`,
 		brandFolder + "/icon.svg":         "<svg/>",
 		extensionTarget:                   `{"name":"ext","version":"0.0.0"}`,
 	})
-	done, err := stamps(root, "acme")
+	done, err := stamps(disk, root, "acme")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if want := []string{marketplaceTarget, pluginTarget, extensionTarget, iconTarget}; !slices.Equal(done, want) {
 		t.Fatalf("the stamp writes %v, want %v", done, want)
 	}
-	plugin, _ := readText(filepath.Join(root, filepath.FromSlash(pluginTarget)))
+	plugin := disk.text(filepath.Join(root, filepath.FromSlash(pluginTarget)))
 	if plugin != "{\n  \"name\": \"level0\",\n  \"author\": {\n    \"name\": \"acme\"\n  },\n  \"version\": \"1.2.3\"\n}\n" {
 		t.Errorf("the plugin reads\n%s", plugin)
 	}
-	if again, _ := stamps(root, "acme"); len(again) != 0 {
+	if again, _ := stamps(disk, root, "acme"); len(again) != 0 {
 		t.Errorf("a second stamp writes %v", again)
 	}
 }
 
 func TestACloneHoldingNoSourceAndNoTargetTakesTheShapes(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	done, err := stamps(root, "acme")
+	root, disk := "/tree", newFakeDisk()
+	if err := disk.makeAll(root, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	done, err := stamps(disk, root, "acme")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if want := []string{marketplaceTarget, pluginTarget}; !slices.Equal(done, want) {
 		t.Fatalf("the stamp writes %v, want %v", done, want)
 	}
-	market, _ := readText(filepath.Join(root, filepath.FromSlash(marketplaceTarget)))
+	market := disk.text(filepath.Join(root, filepath.FromSlash(marketplaceTarget)))
 	if held := objectOf(market); held == nil || held.values["name"] != "acme" || len(held.values["plugins"].([]any)) != 1 {
 		t.Errorf("the marketplace reads\n%s", market)
 	}
@@ -118,9 +107,9 @@ func TestACloneHoldingNoSourceAndNoTargetTakesTheShapes(t *testing.T) {
 
 func TestATargetStandingWithNoSourceReadsAsItsOwnSource(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	seedTree(t, root, map[string]string{marketplaceTarget: "{\n  \"name\": \"acme\",\n  \"owner\": {\n    \"name\": \"acme\"\n  }\n}\n"})
-	done, _ := stamps(root, "acme")
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{marketplaceTarget: "{\n  \"name\": \"acme\",\n  \"owner\": {\n    \"name\": \"acme\"\n  }\n}\n"})
+	done, _ := stamps(disk, root, "acme")
 	if slices.Contains(done, marketplaceTarget) {
 		t.Errorf("a stamped target with no source takes a write: %v", done)
 	}

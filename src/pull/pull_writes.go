@@ -1,15 +1,16 @@
 // What a hand-back writes: the record, the step it moves to, the commit and
-// the push. Each one ends by handing the next leaf out, off
-// src/scripts/pull-writes.js and pull-children.js.
+// the push. Each one ends by handing the next leaf out.
 // [[spec/design_output/pull#the-pass]]
 package pull
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strconv"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/front"
 	"quackitect/src/yaml"
 )
@@ -258,7 +259,7 @@ func (it *It) minted(who *Who, one *Held, leaf *Leaf, held Hold, findings []Find
 
 // A child that mints nothing lands nothing, so the hold stands. [[spec/design_output/pull#a-finding-rides-out]]
 func (it *It) unminted(one *Held, leaf *Leaf, why string) int {
-	it.Say(Refused, why, "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+	it.Refuse(failure.Raise(it.Failures, "pull-child-unminted", why, "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path)))
 	return 1
 }
 
@@ -323,7 +324,7 @@ func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor strin
 		stands = stands || each.Name == successor
 	}
 	if !stands {
-		it.Say(Refused, fmt.Sprintf("%s stands nowhere yet. Mint it, then hand back --became %s.", successor, successor))
+		it.Refuse(failure.Raise(it.Failures, "pull-successor-nowhere", fmt.Sprintf("%s stands nowhere yet. Mint it, then hand back --became %s.", successor, successor)))
 		return 1
 	}
 	after := ""
@@ -349,7 +350,7 @@ func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor strin
 // [[spec/design_output/pull#answered]]
 func (it *It) answeredBy(who *Who, one *Held, leaf *Leaf, held Hold, answerer string, answered []Answered) int {
 	if answerer == one.Name {
-		it.Say(Refused, one.Name+" answers no ask of its own. Name the ticket answering it.")
+		it.Refuse(failure.Raise(it.Failures, "pull-answers-itself", one.Name+" answers no ask of its own. Name the ticket answering it."))
 		return 1
 	}
 	stands := false
@@ -357,7 +358,7 @@ func (it *It) answeredBy(who *Who, one *Held, leaf *Leaf, held Hold, answerer st
 		stands = stands || each.Name == answerer
 	}
 	if !stands {
-		it.Say(Refused, fmt.Sprintf("%s stands nowhere. Name the ticket answering this ask, then hand back --answered %s.", answerer, answerer))
+		it.Refuse(failure.Raise(it.Failures, "pull-answerer-nowhere", fmt.Sprintf("%s stands nowhere. Name the ticket answering this ask, then hand back --answered %s.", answerer, answerer)))
 		return 1
 	}
 	after := ""
@@ -395,7 +396,7 @@ func (it *It) onward(who *Who, rows []string) int {
 
 // [[spec/design_output/pull#the-refused-commit]]
 func (it *It) unlanded(one *Held, leaf *Leaf, finding string) int {
-	it.Say(Refused, unlandedRows(one, leaf, finding)...)
+	it.Refuse(failure.Raise(it.Failures, "pull-commit-refused", unlandedRows(one, leaf, finding)...))
 	return 1
 }
 
@@ -411,7 +412,7 @@ func unlandedRows(one *Held, leaf *Leaf, finding string) []string {
 
 // [[spec/design_output/pull#the-rejected-push]]
 func (it *It) refusedPush(why []string) int {
-	it.Say(Refused, append([]string{"The hand-back stands on this box, and its push reaches no origin."}, why...)...)
+	it.Refuse(failure.Raise(it.Failures, "pull-push-refused", append([]string{"The hand-back stands on this box, and its push reaches no origin."}, why...)...))
 	return 1
 }
 
@@ -503,10 +504,5 @@ func (it *It) changedFiles(since string) []string {
 }
 
 func sortedKeys(said map[string]bool) []string {
-	out := make([]string, 0, len(said))
-	for key := range said {
-		out = append(out, key)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(said))
 }

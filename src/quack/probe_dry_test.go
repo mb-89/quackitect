@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	// level0: OutsideInDoors - the case stands the clone's files in a temp root, the probe's door test
 	"os"
 	"path/filepath"
 	"slices"
@@ -358,10 +359,10 @@ func TestTheSmokeStandsTheCloneWithTheRootsBuiltToolsAndInstallsNothing(t *testi
 	d, runner, _, _ := fakeBoxDoors(t)
 	bin := filepath.Join(d.root, filepath.FromSlash(runFolder), "bin")
 	for _, one := range []string{"se-index", "se-index.old"} {
-		if err := os.MkdirAll(bin, 0o755); err != nil {
+		if err := d.disk.makeAll(bin, 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(filepath.Join(bin, one), []byte(one), 0o755); err != nil {
+		if err := d.disk.write(filepath.Join(bin, one), []byte(one), 0o755); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -379,13 +380,13 @@ func TestTheSmokeStandsTheCloneWithTheRootsBuiltToolsAndInstallsNothing(t *testi
 		}
 	}
 	copied := filepath.Join(box.tree, filepath.FromSlash(runFolder), "bin")
-	if text, err := os.ReadFile(filepath.Join(copied, "se-index")); err != nil || string(text) != "se-index" {
+	if text, err := d.disk.read(filepath.Join(copied, "se-index")); err != nil || string(text) != "se-index" {
 		t.Errorf("the clone's index reads %q, %v", text, err)
 	}
-	if _, err := os.Stat(filepath.Join(copied, "se-index.old")); err == nil {
+	if _, err := d.disk.stat(filepath.Join(copied, "se-index.old")); err == nil {
 		t.Error("the clone carries the build an update keeps behind")
 	}
-	pointer, _ := os.ReadFile(filepath.Join(box.tree, filepath.FromSlash(vehiclePointer)))
+	pointer, _ := d.disk.read(filepath.Join(box.tree, filepath.FromSlash(vehiclePointer)))
 	if !strings.Contains(string(pointer), jsonString(box.tree)) || !strings.Contains(string(pointer), `"port":7001`) {
 		t.Errorf("the pointer reads %q", pointer)
 	}

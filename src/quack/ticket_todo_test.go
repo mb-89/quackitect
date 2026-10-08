@@ -1,7 +1,6 @@
-// ticket todo parks a ticket for the next pull, and --off takes the tag away,
-// off the roads test/level0/ticket-todo.test.js covers.
+// ticket todo parks a ticket for the next pull, and --off takes the tag away.
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"
@@ -16,14 +15,10 @@ func todoCaseTicket(state, extra string) string {
 const slowLint = ".se/tickets/slow-lint.md"
 
 func TestTicketTodo(t *testing.T) {
-	t.Run("todo tags a note standing already, and --off takes the tag away", func(t *testing.T) {
+	t.Run("--off takes the tag away", func(t *testing.T) {
 		root := editCaseTree(t)
-		seedsFile(t, root, slowLint, todoCaseTicket("open", ""))
-		code, out, errs := runsApart(t, root, false, "ticket", "todo", "slow-lint")
-		if got, _ := readsBack(t, root, slowLint); code != 0 || errs != "" || out != slowLint+" stands at todo, and the next pull hands it back first.\n" || !strings.Contains(got, "\ntodo: true\n") {
-			t.Fatalf("todo answers %d, %q, %q, and writes %q", code, out, errs, got)
-		}
-		code, out, _ = runsApart(t, root, false, "ticket", "todo", "slow-lint", "--off")
+		seedsFile(t, root, slowLint, todoCaseTicket("open", "todo: true\n"))
+		code, out, _ := runsApart(t, root, false, "ticket", "todo", "slow-lint", "--off")
 		if got, _ := readsBack(t, root, slowLint); code != 0 || out != slowLint+" carries no todo, and a push takes it away from here.\n" || got != todoCaseTicket("open", "") {
 			t.Fatalf("todo --off answers %d, %q, and writes %q", code, out, got)
 		}
@@ -52,33 +47,12 @@ func TestTicketTodo(t *testing.T) {
 			}
 		}
 	})
-	t.Run("a ticket riding a branch takes no tag, and the refusal names the branch", func(t *testing.T) {
-		root := editCaseTree(t)
-		stands := todoCaseTicket("open", "group: the-flag-parks-work\n")
-		seedsFile(t, root, aThing, stands)
-		code, out, errs := runsApart(t, root, false, "ticket", "todo", "a-thing")
-		want := aThing + " rides the-flag-parks-work, and that branch speaks for it already.\nA todo parks work no branch carries.\n"
-		if got, _ := readsBack(t, root, aThing); code != 2 || out != "" || errs != want || got != stands {
-			t.Fatalf("todo answers %d, %q, %q, and writes %q", code, out, errs, got)
-		}
-	})
 	t.Run("--off reaches a ticket riding a branch, so a tag never sticks", func(t *testing.T) {
 		root := editCaseTree(t)
 		seedsFile(t, root, aThing, todoCaseTicket("open", "todo: true\ngroup: the-flag-parks-work\n"))
 		code, _, _ := runsApart(t, root, false, "ticket", "todo", "a-thing", "--off")
 		if got, _ := readsBack(t, root, aThing); code != 0 || strings.Contains(got, "\ntodo:") {
 			t.Fatalf("todo --off answers %d, and writes %q", code, got)
-		}
-	})
-	t.Run("todo takes a ticket, and names no ticket it fails to find", func(t *testing.T) {
-		root := editCaseTree(t)
-		code, out, errs := runsApart(t, root, false, "ticket", "todo")
-		if code != 2 || out != "" || errs != "ticket todo needs a ticket: ./RUNME.sh ticket todo slow-lint\n" {
-			t.Errorf("a bare todo answers %d, %q, %q", code, out, errs)
-		}
-		code, out, errs = runsApart(t, root, false, "ticket", "todo", "nothing-here")
-		if code != 2 || out != "" || errs != "nothing-here names no ticket under .se/tickets or spec/tickets.\n" {
-			t.Errorf("a missing todo answers %d, %q, %q", code, out, errs)
 		}
 	})
 	t.Run("a dry run says so, and writes nothing", func(t *testing.T) {

@@ -1,5 +1,5 @@
 // An owner's prompt keeps the questions it asks, which the answer check
-// reads, off questionsIn in .claude/skills/level0/lib/answer.js.
+// reads.
 // [[spec/tickets/prose-tools-answer-in-go]]
 package hooks
 

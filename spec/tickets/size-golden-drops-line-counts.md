@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,100 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+process_hash: c671f20a6ae2a4a6
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 3083f7a5dfa2e32db313b919d1cfe5e24c2e6e57
+    hash_after: 3083f7a5dfa2e32db313b919d1cfe5e24c2e6e57
+    inputs:
+      - name: ask
+        hash: 1c3f36d653132a35
+        size: 398
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: dc528d7fb0c4dddf08ba533b367960d567156f74
+    hash_after: dc528d7fb0c4dddf08ba533b367960d567156f74
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: f8d26b0dc8cbb876
+        size: 3221
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 4b71b06e1e89e969a44cba484628fe69200eb250
+    hash_after: 4b71b06e1e89e969a44cba484628fe69200eb250
+    inputs:
+      - name: ask
+        hash: 1c3f36d653132a35
+        size: 398
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: bd0ecfd6de5b0d3806e064692f8182db0858511d
+    hash_after: bd0ecfd6de5b0d3806e064692f8182db0858511d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 214d2c12ba7a3ba4
+        size: 3636
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-6
+    hash_before: 2aecdc41fbd4f7f9493b1aeaa5854978a47464d3
+    hash_after: 2aecdc41fbd4f7f9493b1aeaa5854978a47464d3
+    inputs:
+      - name: design/draft
+        hash: 214d2c12ba7a3ba4
+        size: 3636
+      - name: design/tests-red
+        hash: 6d000a52f89ddc69
+        size: 817
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 3e1dc99ef689e03b149412ce49b281b46d4aee1d
+    hash_after: 3e1dc99ef689e03b149412ce49b281b46d4aee1d
+    answered:
+      - name: lint
+        exit: 0
+        said: "   89.8  in all"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 122a203e1f2172a395b40e89e0a925ec61b53edd
+    hash_after: 122a203e1f2172a395b40e89e0a925ec61b53edd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   92.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6d000a52f89ddc69
+        size: 817
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+group: engine-verbs-hold
+reason: done
 ---
 
 # Ask
@@ -149,38 +241,65 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The size golden holds rows the Go side alone reports, and every row names a prose or data file with its line count. sizeFaults in src/modules/check/textfaults.go sizes every path it meets, while its JavaScript twin sizeFaults in .claude/skills/level0/lib/size.js sizes code files alone, gated on SIZED. textFaults gates on sizedFile already, so the lint itself reads no prose file for size; only the twin walk goTwins in src/quack/check_twins_test.go feeds check.SizeFaults a ticket or a note.
+
+The fix moves the gate into sizeFaults: it answers nothing where sizedFile reads no code path, as the JavaScript twin does. textFaults keeps its own gate, so the lint reads the same rows. A rerun of go test ./src/quack -run TestTwinGoldens -twins then writes src/modules/check/testdata/size.golden.json with both sides empty. A ticket or note edit then moves no golden.
+
+For the test verb: testVerb in src/branches/test.go adds the packages a changed golden's readers stand in, beside goPackagesOf. The stub goldenReaders(changed []string, tests map[string]string) []string gets its body: for each changed path under a testdata folder, it names the folder's own package and every package whose _test.go text names that folder past src/. testVerb builds the map off d.filesUnder("src") and d.read. twinsAt in src/quack/check_twins_test.go reads filepath.Join("..", "modules", "check", "testdata") today, so the change writes it as filepath.FromSlash("../modules/check/testdata"), and its text names the folder the reader looks for.
+
+The gate meets the ask with less than the title names, since the counted rows stand through the twin walk alone. goldenReaders closes the test line, since today a changed golden maps to no package.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/textfaults.go textFaults (calls sizeFaults)
+- src/modules/check/export.go SizeFaults (exports sizeFaults)
+- src/quack/check_twins_test.go goTwins (calls check.SizeFaults)
+- src/quack/check_twins_test.go TestTwinGoldens (reads twinsAt)
+- src/branches/test.go testVerb (calls goldenReaders)
+- src/branches/branch.go verb table row test (runs testVerb)
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/check/textfaults_test.go TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds
+- src/modules/check/textfaults_test.go TestACodeFilePastTheCeilingStillNamesItsCeiling
+- src/branches/test_test.go TestGoldenReadersNameEveryPackageReadingAChangedGolden
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/check/textfaults.go
+- src/modules/check/textfaults_test.go
+- src/modules/check/testdata/size.golden.json
+- src/quack/check_twins_test.go
+- src/branches/test.go
+- src/branches/test_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened textfaults.go (textFaults, sizeFaults, sizedFile), export.go SizeFaults, testdata/size.golden.json, quack/check_twins_test.go (goTwins, TestTwinGoldens, twinsAt), test/level0/check-twins.js, .claude/skills/level0/lib/size.js (SIZED, sizeFaults), branches/test.go (testVerb, goldenReaders stub, goPackagesOf) and doors.go (filesUnder, read); twinsAt reads filepath.Join today, and the approach now says so.
+- Callers came from a grep for SizeFaults and sizeFaults( across src, from the goldenReaders call site in testVerb, and from the branch verb table row for test.
+- The first done_when line meets TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds under go test ./src/modules/check/; the second meets TestGoldenReadersNameEveryPackageReadingAChangedGolden plus a run of ./RUNME.sh branch test at tests-green listing src/quack and src/modules/check; the third is ./RUNME.sh check on the commit.
+- The approach adds no config key, so no default file changes.
 
 ## tests-red
 
@@ -189,26 +308,32 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/textfaults_test.go src/branches/test_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/check/textfaults_test.go
+src/branches/test_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+A note, a JSON file and a YAML file past the ceiling each draw a size row, and the golden names prose and data files the lint leaves out. The readers stub names no package for a changed golden. The code file case passes already, and it guards the ceiling on code through the change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The check line meets TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds, the test verb line meets TestGoldenReadersNameEveryPackageReadingAChangedGolden, and the check line waits for tests-green.
+The size cases read pure text and the tracked golden, and the readers case reads a map the verb builds, so no case reaches a door.
 
 # gate
 
@@ -217,8 +342,10 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- golden-readers-read-joined-paths: goldenReaders matches a slash path past src/, so src/tui/log/golden_test.go logGoldenAt, written filepath.Join("..", "..", "quack", "testdata"), names no reader for src/quack/testdata/log.golden.json; implement writes that reader FromSlash as it writes twinsAt, or goldenReaders reads the joined form too.
 
 # implement
 
@@ -229,14 +356,19 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list: textfaults.go, size.golden.json, check_twins_test.go through its child, and branches test.go; the readers' paths in src/tui/log landed with golden-readers-read-joined-paths.
+The test verb reads the tree through the Doors read and filesUnder it already owns, and goldenReaders reads a map the tests seed.
+sizeFaults and goldenReaders each carry a link to spec/tickets/size-golden-drops-line-counts.
+The code gate stands once in sizedFile, and the golden folder's name once in goldenFolder.
 
 ## tests-green
 
@@ -245,26 +377,33 @@ Each edit to a file past the ceiling turns the check red until a hand counts the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/textfaults_test.go src/branches/test_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A ticket or note edit no longer moves a golden. sizeFaults in src/modules/check/textfaults.go draws no size row for a prose or data file, as the JavaScript size rule reads code alone, so the size golden stands empty on both sides. The test verb now runs every package that reads a changed golden: goldenReaders in src/branches/test.go names the golden folder own package and every package whose test text names that folder, and the readers write their paths with slashes so the text names it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list: textfaults.go, size.golden.json, check_twins_test.go through its child, and branches test.go; the readers' paths in src/tui/log landed with golden-readers-read-joined-paths.
+The test verb reads the tree through the Doors read and filesUnder it already owns, and goldenReaders reads a map the tests seed.
+sizeFaults and goldenReaders each carry a link to spec/tickets/size-golden-drops-line-counts.
+The code gate stands once in sizedFile, and the golden folder's name once in goldenFolder.
 
 # accept
 

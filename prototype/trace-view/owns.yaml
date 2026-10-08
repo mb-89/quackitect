@@ -1,0 +1,6 @@
+# The prototype: a sketch that reaches time and processes on its own, so it
+# stands as its own outside.
+prototype:
+  js: [setTimeout, clearTimeout, node:child_process]
+  files: [build2.py, build3.py, city.js, diagrams.js, drawv.js, extract2.py, mx.js, nav2.js, page.js, shot19.mjs, shot20.mjs, shot21.mjs, trace-build.py, trace-probe.py, views.js]
+  outside: true

@@ -1,7 +1,7 @@
 // The score verb counts the improvements a retro mints, and names each with
 // its state and the retro it comes off.
 // [[spec/design_input/the-agent-pulls-tickets]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 
@@ -13,7 +13,7 @@ func TestRetroScoreCountsOpenImprovements(t *testing.T) {
 	retroMintWrite(t, root, "spec/tickets/fix-b.md", "---\nkind: [[ticket]]\ngroup: retro-abc\n---\n")
 	retroMintWrite(t, root, "spec/tickets/fix-a.md", "---\nkind: [[ticket]]\nstate: closed\ngroup: retro-abc\n---\n")
 	retroMintWrite(t, root, "spec/tickets/plain.md", "---\nkind: [[ticket]]\nstate: open\ngroup: other\n---\n")
-	code, out, errs := retroMintHeard(retroScoreVerb(func() string { return root }), "retro", "score")
+	code, out, errs := retroMintHeard(retroScoreVerb(retroBoxAt(root)), "retro", "score")
 	want := "2 improvement(s) stand in the tree, and 1 stay open.\n  fix-a closed, off retro-abc\n  fix-b open, off retro-abc\n"
 	if code != 0 || out != want {
 		t.Fatalf("retro score answers %d and prints %q, %q", code, out, errs)
@@ -24,7 +24,7 @@ func TestRetroScoreCountsOpenImprovements(t *testing.T) {
 func TestRetroScoreScoresNothingWhereNoRetroMints(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	code, out, _ := retroMintHeard(retroScoreVerb(func() string { return root }), "retro", "score")
+	code, out, _ := retroMintHeard(retroScoreVerb(retroBoxAt(root)), "retro", "score")
 	if code != 0 || out != "No retro mints an improvement yet, so this one scores nothing.\n" {
 		t.Fatalf("retro score answers %d and prints %q", code, out)
 	}

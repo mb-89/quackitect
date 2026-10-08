@@ -1,7 +1,7 @@
 // A word nothing registers reaches no program: the node module names it as
 // no verb, and starts nothing.
 // [[spec/tickets/program-of-drops-node]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"io"

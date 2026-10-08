@@ -2,13 +2,12 @@
 // gate, the test runner's files and the rows under --errors. The battery's
 // run stands in check_battery_test.go.
 // [[spec/design_output/work#the-battery-answers-first]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -46,6 +45,7 @@ type checkFake struct {
 func (one *checkFake) doors() checkDoors {
 	d := checkDoors{
 		root:     "/tree",
+		disk:     newFakeDisk(),
 		platform: "linux",
 		verb: func(words []string, _ bool) int {
 			one.held.Lock()
@@ -98,7 +98,7 @@ func TestCheckParts(t *testing.T) {
 		for _, one := range parts {
 			names = append(names, one.name)
 		}
-		want := []string{"tests", "level0", "go", "doors", "projections", "plugin", "server", "rules", "lines", "javascript"}
+		want := []string{"changed", "tests", "level0", "go", "doors", "guards", "projections", "plugin", "types", "plugin-tests", "server", "rules", "lines", "javascript"}
 		if !reflect.DeepEqual(names, want) {
 			t.Fatalf("the parts read %v, and want %v", names, want)
 		}
@@ -112,6 +112,14 @@ func TestCheckParts(t *testing.T) {
 		want := [][]string{{"probe", "smoke", "--working"}, {"doors"}, {"project", "--check"}, {"lint", "src/quack"}}
 		if !reflect.DeepEqual(fake.verbs, want) {
 			t.Fatalf("the verbs read %v, and want %v", fake.verbs, want)
+		}
+	})
+	// A warning in a file the branch changes turns the check red, before the tests run. [[spec/tickets/rules-lint-changed-files-first]]
+	t.Run("the changed part runs the strict lint over the changed files", func(t *testing.T) {
+		fake := &checkFake{}
+		partNamed(partsOf(fake.doors(), nil, false), "changed").run()
+		if !reflect.DeepEqual(fake.verbs, [][]string{{"lint", "--changed", "--strict"}}) {
+			t.Fatalf("the changed part ran %v", fake.verbs)
 		}
 	})
 	t.Run("the rules read the root where the words name no path", func(t *testing.T) {
@@ -132,17 +140,45 @@ func TestCheckParts(t *testing.T) {
 			}
 		}
 	})
-	t.Run("the plugin part validates the plugin, and passes where claude stands nowhere", func(t *testing.T) {
+	t.Run("the plugin part validates the plugin strictly, and passes where claude stands nowhere", func(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"claude": 1}}
 		if code := partNamed(partsOf(fake.doors(), nil, false), "plugin").run(); code != 1 {
 			t.Fatalf("a refused plugin answers %d", code)
 		}
-		if !reflect.DeepEqual(fake.runs, [][]string{{"claude", "plugin", "validate", filepath.Join(".claude", "skills", "level0")}}) {
+		if !reflect.DeepEqual(fake.runs, [][]string{{"claude", "plugin", "validate", "--strict", filepath.Join(".claude", "skills", "level0")}}) {
 			t.Fatalf("the plugin part ran %v", fake.runs)
 		}
 		gone := &checkFake{gone: map[string]bool{"claude": true}}
 		if code := partNamed(partsOf(gone.doors(), nil, false), "plugin").run(); code != 0 {
 			t.Fatalf("no claude answers %d", code)
+		}
+	})
+	t.Run("the types part lays the engine's types, then runs tsc over the plugin", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"claude": 1, "tsc": 0}}
+		if code := partNamed(partsOf(fake.doors(), nil, false), "types").run(); code != 0 {
+			t.Fatalf("a plugin whose types hold answers %d", code)
+		}
+		plugin := filepath.Join(".claude", "skills", "level0")
+		want := [][]string{{"claude", "--plugin-dir", plugin, "-p", ""}, {"tsc", "-p", plugin}}
+		if !reflect.DeepEqual(fake.runs, want) {
+			t.Fatalf("the types part ran %v, and want %v", fake.runs, want)
+		}
+	})
+	t.Run("the types part fails where tsc refuses the hooks", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"tsc": 2}, said: map[string]string{"tsc": "hooks/level0.ts(1,1): error TS2322"}}
+		doors := fake.doors()
+		var said strings.Builder
+		doors.errs = &said
+		if code := partNamed(partsOf(doors, nil, false), "types").run(); code != 1 || !strings.Contains(said.String(), "TS2322") {
+			t.Fatalf("a refused type answers %d, and says %q", code, said.String())
+		}
+	})
+	t.Run("the types part passes where claude or tsc stands nowhere", func(t *testing.T) {
+		for _, gone := range []string{"claude", "tsc"} {
+			fake := &checkFake{codes: map[string]int{"tsc": 2}, gone: map[string]bool{gone: true}}
+			if code := partNamed(partsOf(fake.doors(), nil, false), "types").run(); code != 0 {
+				t.Fatalf("no %s answers %d", gone, code)
+			}
 		}
 	})
 	t.Run("the server part reads the health call", func(t *testing.T) {
@@ -172,6 +208,7 @@ func TestServerRead(t *testing.T) {
 	}
 }
 
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestGoGate(t *testing.T) {
 	t.Parallel()
 	read := func(path string) string {
@@ -240,7 +277,7 @@ func TestTestArgv(t *testing.T) {
 		t.Fatalf("the test parts read %v, and want the shared unit run, then the contract run", testParts)
 	}
 	red := "test/level0/lens.test.js"
-	argv := testArgv(root, []string{red}, testParts[0])
+	argv := testArgv(realDisk(), root, []string{red}, testParts[0])
 	if slices.Contains(argv, red) || !slices.Contains(argv, "test/level0/logbook.test.js") {
 		t.Fatalf("the run names %v, and wants every file but the red one", argv)
 	}
@@ -252,12 +289,13 @@ func TestTestArgv(t *testing.T) {
 	if !slices.Contains(argv, "--experimental-test-isolation=none") || !slices.Contains(argv, "--test") {
 		t.Fatalf("the unit run reads %v, and wants one shared process", argv)
 	}
-	if !slices.Contains(testArgv(root, nil, testParts[1]), "test/contract/*.test.js") {
+	if !slices.Contains(testArgv(realDisk(), root, nil, testParts[1]), "test/contract/*.test.js") {
 		t.Fatal("no red list runs the glob")
 	}
 }
 
 // A red check ends by naming each red case with its file, and its line where the run names one. [[spec/tickets/ci-reds-name-their-cases]]
+// level0: FixtureOutsideHome - a red run writes its red cases under a root of the case's own
 func TestCheckEndsOnTheRedCases(t *testing.T) {
 	t.Parallel()
 	ends := func(t *testing.T, run func(doors *checkDoors, argv []string) (int, string)) []string {
@@ -281,8 +319,8 @@ func TestCheckEndsOnTheRedCases(t *testing.T) {
 				return 0, ""
 			}
 			row := caseLine(map[string]any{"file": "test/level0/a.test.js", "name": "a case", "nesting": 0, "ms": 3, "ok": false, "said": "it broke", "line": 12})
-			_ = os.MkdirAll(filepath.Dir(doors.at(testParts[0].times)), 0o755)
-			_ = os.WriteFile(doors.at(testParts[0].times), []byte(row+"\n"), 0o644)
+			_ = doors.disk.makeAll(filepath.Dir(doors.at(testParts[0].times)), checkFolderMode)
+			_ = doors.disk.write(doors.at(testParts[0].times), []byte(row+"\n"), checkFileMode)
 			return 1, ""
 		})
 		if want := []string{"The red cases:", "  test/level0/a.test.js:12: a case: it broke"}; !reflect.DeepEqual(rows, want) {
@@ -450,7 +488,7 @@ func TestCheckVerb(t *testing.T) {
 		}
 	})
 	t.Run("the standing file names a door where its process lives", func(t *testing.T) {
-		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, os.Getpid()): true} {
+		for text, want := range map[string]bool{"": false, `{"pid":0}`: false, fmt.Sprintf(`{"pid":%d}`, quietBox().pid): true} {
 			if indexStands(text) != want {
 				t.Fatalf("%q reads a door %v", text, !want)
 			}
@@ -462,8 +500,8 @@ func TestCheckVerb(t *testing.T) {
 		doors.root = t.TempDir()
 		doors.verb = func(words []string, _ bool) int {
 			if words[0] == "lint" {
-				_ = os.MkdirAll(filepath.Dir(doors.at(lintFile)), 0o755)
-				_ = os.WriteFile(doors.at(lintFile), []byte(`{"stood":[{"file":"src/a.go","source":"tree"}],"erred":[]}`), 0o644)
+				_ = doors.disk.makeAll(filepath.Dir(doors.at(lintFile)), 0o755)
+				_ = doors.disk.write(doors.at(lintFile), []byte(`{"stood":[{"file":"src/a.go","source":"tree"}],"erred":[]}`), 0o644)
 			}
 			return 0
 		}
@@ -536,7 +574,7 @@ func TestTestVerb(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()
 		doors.root = t.TempDir()
-		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, os.Executable)([]string{"test"}, false, io.Discard, io.Discard)
+		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, func() (string, error) { return "/bin/quack", nil })([]string{"test"}, false, io.Discard, io.Discard)
 		if len(fake.runs) != len(testParts) || fake.runs[0][0] != "node" {
 			t.Fatalf("the verb ran %v", fake.runs)
 		}

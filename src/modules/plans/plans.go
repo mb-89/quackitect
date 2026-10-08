@@ -1,5 +1,5 @@
 // The plans module: the plan tool, which writes the plan file the queue reads
-// and answers the place each new todo takes, off src/bridge/plan.js. It stands
+// and answers the place each new todo takes. It stands
 // off the wiring until the flip.
 // [[spec/tickets/plan-writes-off-go]]
 package plans
@@ -25,7 +25,7 @@ const (
 	noUndo  = "the plan file is the box's runtime state, which the next plan call rewrites"
 )
 
-// The words a todo's place takes, which src/modules/queue/outline.go and src/scripts/pull-outline.js own, the highest digit a place reads, and the clock's shape, as toISOString writes it. [[spec/design_output/pull#a-todo-forces-a-place]]
+// The words a todo's place takes, which src/modules/queue/outline.go owns, the highest digit a place reads, and the clock's shape, as toISOString writes it. [[spec/design_output/pull#a-todo-forces-a-place]]
 const (
 	firstWord  = "true"
 	endWord    = "end"

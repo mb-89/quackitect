@@ -1,4 +1,4 @@
-// The shape of a full update, off src/engine/status.js: the chapters
+// The shape of a full update: the chapters
 // spec/config/status.yaml names, which the door stamps on each event while the
 // owner asks for a full update, and what a reply lacks of them.
 // [[spec/tickets/cage-stop-rules-port]]
@@ -77,7 +77,7 @@ func (demand *Demand) lacks(text string) string {
 	return statusLacks(text, demand.Chapters)
 }
 
-// The block a full update lacking its chapters holds the turn's end with, off holdsTurn in src/bridge/answer.js, or nothing. [[spec/design_output/extension#the-ask-is-a-line]]
+// The block a full update lacking its chapters holds the turn's end with, or nothing. [[spec/design_output/extension#the-ask-is-a-line]]
 func holdsTurn(state Holds, text string) string {
 	lacks := state.Demand.lacks(strings.TrimSpace(text))
 	if lacks == "" {

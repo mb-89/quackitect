@@ -1,7 +1,7 @@
 // A hold that reads whether its box still beats: an ended beat frees the
 // branch at once under take --over, and a live beat keeps an old hold.
 // [[spec/tickets/holds-beat-with-the-session]]
-package branches
+package branches // level0: InPackageTest - it adds beat methods to the unexported tree fixture and reads beatPush, heldIn and the exit codes
 
 import (
 	"regexp"
@@ -52,6 +52,9 @@ func TestTakeOverRefusesAHoldThatStillBeats(t *testing.T) {
 		one.beatOn(pcGroup, pcOther, "beats", testNow.Add(time.Hour-time.Minute))
 		if code := one.branchSays(argv...); code != codeRed {
 			t.Fatalf("%v over a beating hold answers %d: %s", argv, code, one.pcSaid())
+		}
+		if argv[1] == pcGroup && !strings.Contains(one.errs.String(), "failure take-branch-held-live ") {
+			t.Fatalf("%v raises no take-branch-held-live: %s", argv, one.errs.String())
 		}
 		if held := heldIn(one.show("origin/"+workBranch+pcGroup, ticketAt(pcGroup))); held == nil || held.Hand != pcOther {
 			t.Fatalf("%v moves the beating hold: %+v", argv, held)

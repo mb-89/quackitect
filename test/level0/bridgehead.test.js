@@ -13,13 +13,13 @@ import {
   register,
   roadsOf,
   serveOf,
-} from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
+} from "../../src/stub/.claude/skills/level0/hooks/bridgehead.ts";
 
 const STUB = "/stub";
 const HOME = "/home/agent";
 const CLONED = `${HOME}/.se/vehicles/acme`;
 const UPSTREAM = "https://host/acme/acme.git";
-const HOOK = ".claude/skills/level0/hooks/level0.js";
+const HOOK = ".claude/skills/level0/hooks/level0.ts";
 const LINK = JSON.stringify({
   vehicle: "abc123",
   name: "acme",
@@ -133,8 +133,12 @@ test("the commands carry the upstream, the clone folder, the work root and the v
 
 test("a cloud box with an empty register clones the upstream from vehicle.json, attaches, starts the server and says the vehicle stands", async () => {
   const files = stub();
-  const outside = fakeProc(
-    { node: ENV, git: cloneInto(files), env: attachInto(files), sh: { exitCode: 0 } });
+  const outside = fakeProc({
+    node: ENV,
+    git: cloneInto(files),
+    env: attachInto(files),
+    sh: { exitCode: 0 },
+  });
   const { $, context } = await started(files, outside);
 
   const argvs = outside.ran.map((one) => one.argv);
@@ -246,21 +250,23 @@ test("the attach always runs the standing", async () => {
   const outside = fakeProc({ node: env, env: attachInto(files), sh: { exitCode: 0 } });
   const { $ } = await started(files, outside);
   const argvs = outside.ran.map((one) => one.argv);
-  assert.deepEqual(argvs.slice(1), [attachOf("/desk/acme", STUB), serveOf("/desk/acme")]);
+  assert.deepEqual(argvs.slice(1), [
+    attachOf("/desk/acme", STUB),
+    serveOf("/desk/acme"),
+  ]);
   assert.match(String($.logged[0] ?? ""), /acme stands/, "the vehicle says it stands");
 });
 
 test("a clone that fails stops the road, and the log names the step and its last line", async () => {
   const files = stub();
-  const outside = fakeProc(
-    {
-      node: ENV,
-      git: {
-        exitCode: 128,
-        stderr:
-          "Cloning into 'acme'...\nfatal: repository 'https://host/acme/acme.git/' not found\n",
-      },
-    });
+  const outside = fakeProc({
+    node: ENV,
+    git: {
+      exitCode: 128,
+      stderr:
+        "Cloning into 'acme'...\nfatal: repository 'https://host/acme/acme.git/' not found\n",
+    },
+  });
   const { $, context } = await started(files, outside);
   assert.equal(outside.ran.length, 2, "the clone is the last command");
   assert.equal(files.exists(`${STUB}/.se/.runtime/project.json`), false, "no driver");
@@ -292,4 +298,3 @@ test("a record naming no upstream stops before the clone", async () => {
   assert.equal(line.step, "clone");
   assert.match(line.detail, /upstream/);
 });
-

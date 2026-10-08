@@ -1,6 +1,5 @@
-// What the door picks off the transcript rows a post carries, off the cases
-// test/level0/transcript.test.js held: the prompt's before, and a spoke post's
-// last texts, its text and its rows.
+// What the door picks off the transcript rows a post carries: the prompt's
+// before, and a spoke post's last texts, its text and its rows.
 // [[spec/tickets/level0-hooks-forward-to-go]]
 package hooks
 
@@ -12,7 +11,7 @@ import (
 )
 
 // The newest rows as the forwarder cuts them: role, id, text and the results flag, as JSON reads them. [[spec/tickets/level0-hooks-forward-to-go]]
-func transcriptRows() []any {
+func forwardedRows() []any {
 	return []any{
 		map[string]any{"role": "user", "id": "u1", "text": "go"},
 		map[string]any{"role": "assistant", "id": "a1", "text": " the first "},
@@ -34,7 +33,7 @@ func landed(t *testing.T, post Post) map[string]any {
 }
 
 func TestAPromptTakesTheNewestRowAsItsBefore(t *testing.T) {
-	fields := landed(t, Post{Event: promptEvent, E: map[string]any{"session_id": "s1", "text": "x", "rows": transcriptRows()}})
+	fields := landed(t, Post{Event: promptEvent, E: map[string]any{"session_id": "s1", "text": "x", "rows": forwardedRows()}})
 	if fields["before"] != "a2" {
 		t.Fatalf("the prompt lands %v, and wants the newest row's id a2 as its before", fields)
 	}
@@ -45,7 +44,7 @@ func TestAPromptTakesTheNewestRowAsItsBefore(t *testing.T) {
 }
 
 func TestASpokePostTakesTheLastTextsAndTheStepText(t *testing.T) {
-	fields := landed(t, Post{Event: spokeEvent, E: map[string]any{"session_id": "s1", "tool": "Read", "call": "s1:2", "text": "", "rows": transcriptRows()}})
+	fields := landed(t, Post{Event: spokeEvent, E: map[string]any{"session_id": "s1", "tool": "Read", "call": "s1:2", "text": "", "rows": forwardedRows()}})
 	if want := []any{"the first", "the second"}; !reflect.DeepEqual(fields["texts"], want) {
 		t.Fatalf("the spoke post lands texts %#v, and wants the agent's own texts in order, %v", fields["texts"], want)
 	}
@@ -56,7 +55,7 @@ func TestASpokePostTakesTheLastTextsAndTheStepText(t *testing.T) {
 	if len(rows) != 4 || !reflect.DeepEqual(rows[1], map[string]any{"role": "assistant", "id": "a1", "text": "the first"}) || !reflect.DeepEqual(rows[2], map[string]any{"role": "user", "id": "u2", "results": true}) {
 		t.Fatalf("the spoke post lands rows %#v, and wants each row by its role and id, the agent's text trimmed", fields["rows"])
 	}
-	step := landed(t, Post{Event: spokeEvent, E: map[string]any{"session_id": "s1", "tool": "Read", "text": "the step's own", "rows": transcriptRows()}})
+	step := landed(t, Post{Event: spokeEvent, E: map[string]any{"session_id": "s1", "tool": "Read", "text": "the step's own", "rows": forwardedRows()}})
 	if step["text"] != "the step's own" {
 		t.Fatalf("a spoke post carrying the step's text lands %q, and wants that text", step["text"])
 	}

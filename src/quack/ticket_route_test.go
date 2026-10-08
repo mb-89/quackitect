@@ -2,11 +2,11 @@
 // roads, each case a tree, the words it runs and what the verb answers, kept
 // in testdata/ticket_route.json.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the JS answers the tree keeps under testdata, as a build check reads source
 	"strings"
 	"testing"
 

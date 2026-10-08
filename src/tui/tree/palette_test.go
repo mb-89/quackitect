@@ -5,7 +5,6 @@
 package tree
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -15,5 +14,5 @@ import (
 // The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
 	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
-	os.Exit(m.Run())
+	m.Run()
 }

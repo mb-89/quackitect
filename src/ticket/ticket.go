@@ -35,6 +35,8 @@ type Tip struct {
 	Name  string `json:"name"`
 	Trunk string `json:"trunk"`
 	Files []File `json:"files"`
+	// The ticket paths trunk holds and the tip lacks, so a reader lays the tip's files over trunk's. [[spec/tickets/tips-carry-branch-changes-alone]]
+	Gone []string `json:"gone,omitempty"`
 }
 
 // A ticket file off a git tree. [[spec/tickets/the-index-reads-standing-branches]]

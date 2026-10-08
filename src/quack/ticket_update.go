@@ -1,7 +1,6 @@
 // The update verb: a changed process copies onto a ticket, every leaf the
 // ticket reached keeps what it holds, and a person's edit past them stops the
-// copy unless --over says to write over it, off update in src/scripts/ticket.js
-// and baseOf and driftOf in ticket-drift.js.
+// copy unless --over says to write over it.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 package main
 

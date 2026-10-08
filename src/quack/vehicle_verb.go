@@ -6,13 +6,10 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
-	"quackitect/src/index"
 	"quackitect/src/proc"
 	"quackitect/src/vehicle"
 )
@@ -31,12 +28,13 @@ type vehicleDoors struct {
 
 // The real doors, read at each run. [[spec/design_output/doors#a-door-reads-the-outside]]
 func vehicleOutside() vehicleDoors {
+	box := quietBox()
 	return vehicleDoors{
-		env:     vehicleEnv(os.Environ()),
-		root:    vehicleRootHere(),
-		now:     time.Now,
-		pid:     os.Getpid(),
-		windows: runtime.GOOS == "windows",
+		env:     vehicleEnv(box.environ()),
+		root:    vehicleRootHere(box),
+		now:     wall.Now,
+		pid:     box.pid,
+		windows: box.windows(),
 		git:     vehicleGit,
 	}
 }
@@ -53,13 +51,13 @@ func vehicleEnv(pairs []string) map[string]string {
 }
 
 // The tree the verb runs from: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
-func vehicleRootHere() string {
-	if said := os.Getenv("QUACKITECT_ROOT"); said != "" {
+func vehicleRootHere(box boxDoors) string {
+	if said := box.env("QUACKITECT_ROOT"); said != "" {
 		if abs, err := filepath.Abs(said); err == nil {
 			return abs
 		}
 	}
-	if bin, err := os.Executable(); err == nil {
+	if bin, err := selfPath(); err == nil {
 		if real, err := filepath.EvalSymlinks(bin); err == nil {
 			bin = real
 		}
@@ -68,10 +66,7 @@ func vehicleRootHere() string {
 			return root
 		}
 	}
-	if root, err := index.Root(); err == nil {
-		return root
-	}
-	return "."
+	return box.root
 }
 
 // Git in a folder: its trimmed output, and whether it exited zero, its errors kept quiet. [[spec/design_output/doors#a-door-standing-on-another]]

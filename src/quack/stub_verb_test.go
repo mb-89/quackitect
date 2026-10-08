@@ -1,10 +1,9 @@
 // The stub verb over a temp method: the usage, a stub beside its vehicle, no
 // upstream, an empty brand and a written stub.
 // [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -66,9 +65,7 @@ func TestStubVerbEmptyBrand(t *testing.T) {
 	_, doors := vehicleFixture(t)
 	// Windows names no folder ..., and --- slugs to nothing the same way. [[spec/tickets/window-verbs-windows-green]]
 	nameless := filepath.Join(filepath.Dir(doors.root), "---")
-	if err := os.Rename(doors.root, nameless); err != nil {
-		t.Fatal(err)
-	}
+	vehicleSeed(t, nameless, map[string]string{vehicle.Marker: "{}", "package.json": `{"version":"0.1.0"}`, ".se/.runtime/identity.json": `{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}`})
 	doors.root = nameless
 	code, _, errs := stubRun(doors, "into", "stub")
 	if code != 1 || errs != "--- carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.\n" {

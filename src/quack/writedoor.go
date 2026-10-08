@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/edits"
@@ -28,11 +27,11 @@ var (
 
 const (
 	unranRule  = "VoiceRulesRan"
-	unranSays  = "The voice rules did not run over this file: vale answered nothing. Mend the rule or the setup it names, and write again."
+	unranSays  = "The voice rules did not run over this file: the rules answered nothing. Mend the rule or the setup it names, and write again."
 	errorLevel = "error"
 )
 
-// What the schemas answer over a written note, off schemaDoor in src/bridge/write.js: the stranger fault of the schema governing its path first, then the faults its own kind's schema finds. [[spec/design_output/schema#the-door-refuses-a-departure]]
+// What the schemas answer over a written note: the stranger fault of the schema governing its path first, then the faults its own kind's schema finds. [[spec/design_output/schema#the-door-refuses-a-departure]]
 func writeSchema(root, where, text string) write.Judged {
 	schemas := check.SchemasIn(check.TreeOver(root, rootDisk{root}))
 	if governor := check.GovernorOf(schemas, where); governor != nil {
@@ -57,12 +56,12 @@ func judgedOf(found []check.Finding) []write.Finding {
 	return out
 }
 
-// The findings the voice keeps over a written file, off proseFaults in src/bridge/write.js: none over code or on a box with no Vale, and a refusing row over prose where Vale answers nothing. [[spec/design_output/level0#a-note-reads-clean-first]]
+// The findings the voice keeps over a written file: none over code or on a box with no Vale, and a refusing row over prose where Vale answers nothing. [[spec/design_output/level0#a-note-reads-clean-first]]
 func writeProse(root, where, text string) []write.Finding {
 	if codeFile.MatchString(where) {
 		return nil
 	}
-	said := heardOver(root, where, text)
+	said := heardOver(quietBox(), root, where, text)
 	if !said.ran {
 		if said.stands && proseFile.MatchString(where) {
 			return []write.Finding{{Rule: unranRule, Line: 1, Column: 1, Message: unranSays, Severity: errorLevel}}
@@ -83,7 +82,7 @@ func writeProse(root, where, text string) []write.Finding {
 // What the edits module reads past its own disk: the ticket door, the write door, the sweep and the mint, over the root. [[spec/tickets/edit-tools-answer-in-go]]
 func editsOutside(root string) edits.Outside {
 	return edits.Outside{
-		Root: root, Now: time.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
+		Root: root, Now: wall.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
 		Ticket: func(name string, files []string) string {
 			for _, one := range files {
 				if one != write.Handover {
@@ -98,7 +97,7 @@ func editsOutside(root string) edits.Outside {
 	}
 }
 
-// The write door over a text an edit writes, in the order onWrite in src/bridge/write.js reads it: the bless file, a draft or a path outside passing, the markers of a merge, the open ticket, the engine's fields, the owner, the private notes, then the schema and the voice. [[spec/tickets/edit-door-rules-port]]
+// The write door over a text an edit writes, in this order: the bless file, a draft or a path outside passing, the markers of a merge, the open ticket, the engine's fields, the owner, the private notes, then the schema and the voice. [[spec/tickets/edit-door-rules-port]]
 func editDoor(root string) func(where, was string, stands bool, text string) edits.Judged {
 	return func(where, was string, stands bool, text string) edits.Judged {
 		if where == write.BlessFile {
@@ -252,3 +251,38 @@ func (one rootDisk) List(folder string) []string { return one.Names(folder) }
 
 // The schema read walks no tree, so the disk lists no path. [[spec/tickets/cage-write-door-port]]
 func (one rootDisk) Paths() []string { return nil }
+
+// The files under a root read through a disk door, as rootDisk reads them off the box. [[spec/tickets/test-walks-move-onto-fakes]]
+type doorSource struct {
+	root string
+	disk diskDoors
+}
+
+func (one doorSource) at(path string) string {
+	return filepath.Join(one.root, filepath.FromSlash(path))
+}
+
+func (one doorSource) Read(path string) (string, bool) {
+	said, err := one.disk.read(one.at(path))
+	return string(said), err == nil
+}
+
+func (one doorSource) Exists(path string) bool { return one.disk.stands(one.at(path)) }
+
+func (one doorSource) Folder(path string) bool {
+	said, err := one.disk.stat(one.at(path))
+	return err == nil && said.IsDir()
+}
+
+func (one doorSource) Names(folder string) []string {
+	out := []string{}
+	for _, each := range one.disk.listed(one.at(folder)) {
+		if !each.IsDir() {
+			out = append(out, each.Name())
+		}
+	}
+	return out
+}
+
+// The read walks no tree, so the door lists no path. [[spec/tickets/test-walks-move-onto-fakes]]
+func (one doorSource) Paths() []string { return nil }

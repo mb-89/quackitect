@@ -25,6 +25,22 @@ func TestProcessHash(t *testing.T) {
 	}
 }
 
+// Each named field lands in the order the process names it, a text field as a paragraph and a list field as lines, and a field nobody names stays out. [[spec/tickets/verbs-mint-tickets-and-keys]]
+func TestAskFromWritesEachFieldInRouteOrder(t *testing.T) {
+	t.Parallel()
+	ask := []any{}
+	for _, one := range [][2]string{{"gain", "text"}, {"breaks", "text"}, {"done_when", "list"}, {"view", "text"}} {
+		field := yaml.New()
+		field.Set("name", one[0])
+		field.Set("form", one[1])
+		ask = append(ask, field)
+	}
+	said := map[string][]string{"done_when": {"one passes", "two passes"}, "gain": {"It gains."}, "breaks": {"It breaks."}, "view": {"  "}}
+	if got, want := AskFrom(ask, said), "It gains.\n\nIt breaks.\n\n- one passes\n- two passes"; got != want {
+		t.Errorf("AskFrom reads %q, want %q", got, want)
+	}
+}
+
 func TestProcessAt(t *testing.T) {
 	t.Parallel()
 	disk := FakeDisk{"spec/processes/small.yaml": "ask:\n  - name: why\n    says: why it matters\nsteps:\n  - name: build\n", "spec/processes/group.yaml": "steps: []\n"}

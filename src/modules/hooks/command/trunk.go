@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // The trunk, the head of a work branch, the ways a landing takes, and the letters a short sha keeps. [[spec/design_output/work#a-box-writes-its-branch]]
@@ -123,12 +125,9 @@ func namesABranch(command string) bool {
 	return false
 }
 
-// The desk guard's text. [[spec/design_output/work#a-desk-works-on-trunk]]
-func DeskRefusal(what string) string {
-	return strings.Join([]string{
-		"A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + ".",
-		"Run git switch " + Trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>.",
-	}, "\n")
+// The message a desk refusal builds, off deskSaid in lib/cloud.js, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func DeskSaid(what string) string {
+	return "A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + "."
 }
 
 // Whether the check's stamp answers green on the sha, and what it says, off the stamp stampFile in src/quack/check.go names. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
@@ -151,7 +150,7 @@ func Battery(stamp string, stands bool, sha string) (bool, string) {
 	if json.Unmarshal([]byte(stamp), &read) != nil {
 		return false, none
 	}
-	said := textOf(read.Sha)
+	said := yaml.JSONText(read.Sha)
 	switch {
 	case said == "":
 		return false, none
@@ -160,7 +159,7 @@ func Battery(stamp string, stands bool, sha string) (bool, string) {
 	case read.Clean != true:
 		return false, "the check ran over an unclean tree"
 	case read.Ok != true:
-		return false, "the check answered red at " + textOf(read.At)
+		return false, "the check answered red at " + yaml.JSONText(read.At)
 	}
 	if warned, _ := read.Warnings.(float64); warned > 0 {
 		return false, strconv.FormatFloat(warned, 'f', -1, floatBits) + " warning(s) stand in " + itoa(len(read.Files)) + " file(s), which ./RUNME.sh lint names"
@@ -196,7 +195,7 @@ func StampSha(stamp string) string {
 	if json.Unmarshal([]byte(stamp), &read) != nil {
 		return ""
 	}
-	return textOf(read.Sha)
+	return yaml.JSONText(read.Sha)
 }
 
 // The refusal a push past the check meets. [[spec/tickets/level0-runs-on-the-door]]

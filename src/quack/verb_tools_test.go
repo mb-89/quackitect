@@ -2,10 +2,10 @@
 // command line answers: each topic's verbs, and every other verb under the
 // verb topic.
 // [[spec/tickets/agents-call-quack-directly]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the wiring the tree holds, as a build check reads source
 	"path/filepath"
 	"testing"
 

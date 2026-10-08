@@ -12,8 +12,11 @@ import (
 )
 
 // Every whole line of the file as a record, a line with no time taking the one before it, and nothing where no file stands. A half line waits for its end. [[spec/design_output/tui#one-frame]]
-func ReadLog(path string) ([]Record, error) {
-	body, err := readFile(path)
+func ReadLog(path string) ([]Record, error) { return readLog(readFile, path) }
+
+// The read over the door a caller hands it, so a case seeds a fake. [[spec/tickets/test-walks-move-onto-fakes]]
+func readLog(read func(string) ([]byte, error), path string) ([]Record, error) {
+	body, err := read(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
 	}

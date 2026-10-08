@@ -3,11 +3,11 @@
 // result reaches the session later. Each case runs the real wiring over a
 // temp tree, with the waits module beside it.
 // [[spec/tickets/find-and-wait-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the wiring the tree holds, as a build check reads source
 	"path/filepath"
 	"strings"
 	"sync"
@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/hooks"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The wait action and its tool, the session the cases post in, a call wait shorter than any signal, a call wait past every signal, and the saves a case's table holds unread. [[spec/tickets/find-and-wait-in-go]]
@@ -101,8 +102,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 	table := &savedTable{held: heldTable{}, saved: make(chan []byte, savesHeld)}
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{table},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+		Steps: func(func()) {}, Clock: stillClock(),
 		Accept: accepts(root, store, nil),
 	})
 	if err != nil {
@@ -110,13 +110,14 @@ func waitWorldOf(t *testing.T) waitWorld {
 	}
 	t.Cleanup(served.Stop)
 	hook := hookedOf(w, hands, hooksModule)
+	stamps := qtest.NewFake(time.Unix(0, 0))
 	door := hooks.New(hooks.Outside{
-		Store: store, As: hook.as, Bound: hook.bound, Now: time.Now, Root: root,
+		Store: store, As: hook.as, Bound: hook.bound, Clock: wall, Root: root,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err
 		},
-		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
+		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), stamps.Now()) },
 	})
 	return waitWorld{served: served, door: door, root: root, saved: table.saved}
 }

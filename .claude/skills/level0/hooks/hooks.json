@@ -1,6 +1,6 @@
 {
   "description": "Level zero: one forwarder posting every event to the hooks door, and the pull as a tool.",
   "modules": [
-    "./pull-tool.js"
+    "./pull-tool.ts"
   ]
 }

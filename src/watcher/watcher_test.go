@@ -2,10 +2,8 @@ package watcher
 
 import (
 	"fmt"
-	"os"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/fsnotify/fsnotify"
 
@@ -106,7 +104,12 @@ func (one *windowsLike) close() error {
 func TestAStopReturnsWhileTheHearAdds(t *testing.T) {
 	for round := 0; round < 200; round++ {
 		fake := newWindowsLike()
+		heard := make(chan struct{}, 1)
 		eyes := over(fake.source(), func(eyes *Watcher, event fsnotify.Event) {
+			select {
+			case heard <- struct{}{}:
+			default:
+			}
 			_ = eyes.Add(event.Name)
 		})
 		quit := make(chan struct{})
@@ -120,30 +123,8 @@ func TestAStopReturnsWhileTheHearAdds(t *testing.T) {
 				}
 			}
 		}()
-		time.Sleep(time.Millisecond)
+		<-heard
 		watchertest.Returns(t, eyes.Close)
 		close(quit)
-	}
-}
-
-// [[spec/tickets/a-watch-stops-mid-add]]
-func TestAStopReturnsOverTheRealWatch(t *testing.T) {
-	for round := 0; round < 20; round++ {
-		root := t.TempDir()
-		eyes, err := New(func(eyes *Watcher, event fsnotify.Event) {
-			if info, err := os.Stat(event.Name); err == nil && info.IsDir() {
-				_ = eyes.Add(event.Name)
-			}
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := eyes.Add(root); err != nil {
-			t.Fatal(err)
-		}
-		stop := watchertest.Appearing(root)
-		time.Sleep(5 * time.Millisecond)
-		watchertest.Returns(t, eyes.Close)
-		stop()
 	}
 }

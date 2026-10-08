@@ -136,7 +136,6 @@ func proseProbes() []ruleProbe {
 		"| what | count |", "|---|---|", "| events | 186 |", "", "1. The verb exits `0` on survives.", "",
 	}, "\n")
 	return []ruleProbe{
-		// the voice rules
 		{noteAt, "THIS IS THE SHOUTED PART, and it follows.", "ShoutedLead", true},
 		{noteAt, "The engine reads SQLite and answers JSON.", "ShoutedLead", false},
 		{noteAt, "It is a door rather than a window.", "Antithesis", true},
@@ -186,10 +185,13 @@ func proseProbes() []ruleProbe {
 		{headerAt, "// The doors this module reads.\n\nexport const one = 1;\n", "CodeHeader", false},
 		{"src/scripts/ephemeral.js", "// The tickets the engine mints at a pull. Each stands in the hold alone,\n// carries no file, and dies at its hand-back. The clear runs as three of them,\n// and the context door marks the session due so the pull hands the first.\n\nexport const one = 1;\n", "CodeHeader", true},
 		{"src/scripts/ephemeral.js", "// The tickets the engine mints at a pull. The clear runs as a run of them.\n\nexport const one = 1;\n", "CodeHeader", false},
+		// A comment line past the code passes where it points, suppresses or directs. [[spec/tickets/comment-rules-meet-the-lint]]
+		{headerAt, "export const one = 1;\n// The one the door reads. [[spec/tickets/a-thing]]\nexport const two = 2;\n", "CodeComment", false},
+		{headerAt, "export const one = 1;\n// level0: CodeComment - a fixture\n// nolint: a fixture\nexport const two = 2;\n", "CodeComment", false},
+		{headerAt, "export const one = 1;\n// The one the door reads.\nexport const two = 2;\n", "CodeComment", true},
 		{noteAt, "# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n", "CountedList", true},
 		{noteAt, "# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n", "CountedList", true},
 		{noteAt, "# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n", "CountedList", false},
-		// the paragraph rules
 		{noteAt, "The engine reads it, and the reader waits; so it goes.\n", "Characters", true},
 		{noteAt, "The engine reads it, and the reader waits.\n", "Characters", false},
 		{noteAt, "The engine reads `a; b` and the reader waits.\n", "Characters", false},
@@ -265,7 +267,6 @@ func proseProbes() []ruleProbe {
 		{noteAt, "The rule holds its bound, and a numbered note stands.", "PastTense", false},
 		{noteAt, "A settled question waits, and a complicated one waits longer.", "PastTense", false},
 		{noteAt, "A rule the table switched off leaves a refused write behind.", "PastTense", false},
-		// the shape rules
 		{guidanceAt, guidanceFront("") + "# Nothing here\n\nA note carrying no chapter.\n", "VoiceShape.GuidanceChapter", true},
 		{guidanceAt, guidanceFront("") + chapterOf(2), "VoiceShape.GuidanceChapter", false},
 		{guidanceAt, guidanceFront("") + chapterOf(16), "VoiceShape.GuidanceCap", true},
@@ -299,11 +300,9 @@ func proseProbes() []ruleProbe {
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script, and more\"}\n", entry, true},
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script\", source: \"https://a.org/x,y\"}\n", entry, true},
 		{wordsAt, "terms:\n  - {word: shim, means: \"a script\", source: somewhere}\n", entry, true},
-		// the rows a fixer run reads; the fixer's writes stand outside a rule table
 		{noteAt, "# Notes\n\nDON'T STOP AT ALL HERE, and then calm.\n", "ShoutedLead", true},
 		{noteAt, "# Notes\n\n```\nIt's a duck, e.g. a mallard.\n```\n", "Contraction", false},
 		{noteAt, "# Notes\n\n<!-- because: the fixer leaves this alone -->\n<!-- vale VoiceParagraph.Contraction = NO -->\nIt's here.\n", "Contraction", false},
-		// the outside-in rule
 		{moduleAt, reads, "OutsideInDoors", true},
 		{moduleAt, "const said = process.argv.slice(2);\n", "OutsideInDoors", true},
 		{moduleAt, "const win = process.platform === \"win32\";\n", "OutsideInDoors", true},
@@ -327,7 +326,6 @@ func proseProbes() []ruleProbe {
 		{"src/index/door.go", spawn, "OutsideInDoors", false},
 		{"src/engine/swap/door.go", osImport, "OutsideInDoors", false},
 		{"src/front/front_test.go", osImport, "OutsideInDoors", false},
-		// the schema rules
 		{"spec/guidance/_probe.md", pastText, anyRule, false},
 		{guidanceAt, pastText, anyRule, true},
 	}

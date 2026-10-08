@@ -5,7 +5,7 @@
 package pull
 
 import (
-	"os"
+	"os" // level0: OutsideInDoors - the case seeds a method root of its own on disk, as the hand reads it
 	"path/filepath"
 	"testing"
 )

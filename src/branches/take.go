@@ -1,21 +1,22 @@
 // The take and the open: a group reaches the cloud as a branch of its own, and
-// a cloud box takes the next free one and writes its claim on the group, as
-// openGroup, take and claimGroup in src/scripts/work.js answer them.
+// a cloud box takes the next free one and writes its claim on the group.
 // [[spec/design_output/work#the-take-writes-the-record]]
 package branches
 
 import (
+	"fmt"
 	"slices"
 	"sort"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/front"
 )
 
 // A group reaches the cloud as a branch of its own, pushed off trunk, so no hand runs git for it. [[spec/design_output/work#a-group-is-a-ticket]]
 func openGroup(d *Doors, name string, _ []string) int {
 	if name == "" {
-		d.warn("branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs")
+		d.raises(failure.Raise(d.Failures, "take-open-names-no-group", "branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs"))
 		return codeRefused
 	}
 	if d.offTrunk("open") {
@@ -25,13 +26,13 @@ func openGroup(d *Doors, name string, _ []string) int {
 	text := d.textAt("origin/"+trunk, at)
 	switch {
 	case text == "":
-		d.warn("%s carries no %s, so push the group first.", trunk, at)
+		d.raises(failure.Raise(d.Failures, "take-group-unpushed", fmt.Sprintf("%s carries no %s, so push the group first.", trunk, at)))
 		return codeRefused
 	case !isGroup(text):
-		d.warn("%s names no group process, so a branch carries nothing.", at)
+		d.raises(failure.Raise(d.Failures, "take-names-no-group", at+" names no group process, so a branch carries nothing."))
 		return codeRefused
 	case fieldOf(text, "state") == closedState:
-		d.warn("%s stands closed, and a closed group opens no branch.", at)
+		d.raises(failure.Raise(d.Failures, "take-group-closed", at+" stands closed, and a closed group opens no branch."))
 		return codeRefused
 	}
 	branch := workBranch + name
@@ -45,11 +46,11 @@ func openGroup(d *Doors, name string, _ []string) int {
 	}
 	mark := d.markOff(branch)
 	if mark == "" {
-		d.warn("The commit that opens %s came back refused, so nothing is pushed.", branch)
+		d.raises(failure.Raise(d.Failures, "take-open-commit-refused", "The commit that opens "+branch+" came back refused, so nothing is pushed."))
 		return codeRed
 	}
 	if !d.pushTo(mark, branch) {
-		d.warn("%s", refusedPush(branch))
+		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(branch)))
 		return codeRed
 	}
 	d.say("%s stands at %s in the cloud, carrying %s.", branch, todo, at)
@@ -73,15 +74,14 @@ func (d *Doors) markOff(branch string) string {
 func (d *Doors) pushTo(commit, branch string) bool {
 	pushed := d.Repo.PushTo(commit, branch)
 	if !pushed.OK && pushed.Err != "" {
-		d.warn("%s", strings.TrimSpace(pushed.Err))
+		fmt.Fprintln(d.Errs, strings.TrimSpace(pushed.Err))
 	}
 	return pushed.OK
 }
 
-// The refusal a desk meets where a verb moves it onto a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
-func deskRefusal(what string) string {
-	return "A desk works on " + trunk + " alone, and a cloud box works each " + workBranch + " branch, so " + what + ".\n" +
-		"Run git switch " + trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+// The message a desk refusal raises, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func deskSaid(what string) string {
+	return "A desk works on " + trunk + " alone, and a cloud box works each " + workBranch + " branch, so " + what + "."
 }
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
@@ -91,10 +91,15 @@ func take(d *Doors, name string, argv []string) int {
 		name = word(argv, 2)
 	}
 	if !d.cloud() {
-		d.warn("%s", deskRefusal("branch take moves this box onto no branch"))
+		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskSaid("branch take moves this box onto no branch")))
 		return codeRefused
 	}
-	if d.dirty("") {
+	// A named take of the branch this box stands on carries its own commits on, so a box whose hold went stale under another takes it back. [[spec/design_output/work#a-branch-moves-clean]]
+	keeps := ""
+	if name != "" && d.here() == workBranch+name {
+		keeps = workBranch + name
+	}
+	if d.dirtyPast("", keeps) {
 		return codeRefused
 	}
 	d.fetch()
@@ -112,15 +117,16 @@ func take(d *Doors, name string, argv []string) int {
 		}
 		past := d.pastHold(holding, read.Stand, read.Standing)
 		if past == "" {
-			d.warn("The take names %s, and this box holds %s, which stands in work.", named, holding.Branch)
-			d.warn("Hand %s back with ./RUNME.sh branch release, or ./RUNME.sh branch done, then take %s.", holding.Branch, named)
+			d.raises(failure.Raise(d.Failures, "take-hand-holds",
+				fmt.Sprintf("The take names %s, and this box holds %s, which stands in work.", named, holding.Branch),
+				fmt.Sprintf("Hand %s back with ./RUNME.sh branch release, or ./RUNME.sh branch done, then take %s.", holding.Branch, named)))
 			return codeRed
 		}
 		d.say("%s stands %s, so its hold drops and the take goes on to %s.", holding.Branch, past, named)
 	}
 	if name != "" {
 		if live := d.liveHold(read.Stand, read.Standing, workBranch+name); live != "" {
-			d.warn("%s", live)
+			d.raises(failure.Raise(d.Failures, "take-branch-held-live", live))
 			return codeRed
 		}
 	}
@@ -154,7 +160,7 @@ func take(d *Doors, name string, argv []string) int {
 			}
 		}
 		if len(free) == 0 {
-			d.warn("work/%s stands at no free %s. Run ./RUNME.sh branch list to read where it stands.", name, todo)
+			d.raises(failure.Raise(d.Failures, "take-branch-not-free", fmt.Sprintf("work/%s stands at no free %s. Run ./RUNME.sh branch list to read where it stands.", name, todo)))
 			return codeRed
 		}
 	}
@@ -173,7 +179,7 @@ func take(d *Doors, name string, argv []string) int {
 		return wanted[a].Branch < wanted[b].Branch
 	})
 	for _, one := range wanted {
-		if d.dirty(one.Branch) {
+		if d.dirtyPast(one.Branch, keeps) {
 			return codeRefused
 		}
 		if !d.onBranch(one.Branch) {
@@ -260,7 +266,9 @@ func (d *Doors) onBranch(branch string) bool {
 	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
-	_ = d.Repo.ResetTo("origin/"+branch, true)
+	if !d.Repo.IsAncestor("origin/"+branch, "HEAD") {
+		_ = d.Repo.ResetTo("origin/"+branch, true)
+	}
 	for _, one := range parked {
 		_ = d.write(one.Name, one.Text)
 	}
@@ -304,13 +312,12 @@ func (d *Doors) claimGroup(one stand) int {
 	if _, err := d.Repo.Commit(one.Branch+": "+says, nil); err != nil {
 		_ = d.Repo.Reset([]string{at})
 		_ = d.write(at, was)
-		d.warn("The claim on %s would not commit, so the take stands undone.", one.Branch)
-		d.warn("%s", strings.TrimSpace(err.Error()))
+		d.raises(failure.Raise(d.Failures, "take-claim-refused", "The claim on "+one.Branch+" would not commit, so the take stands undone.", strings.TrimSpace(err.Error())))
 		return codeRed
 	}
 	if !d.push(one.Branch) {
 		_ = d.Repo.ResetTo("origin/"+one.Branch, false)
-		d.warn("%s", refusedPush(one.Branch))
+		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(one.Branch)))
 		return codeRed
 	}
 	d.writeBeat(one.Name, role, false)
@@ -318,7 +325,7 @@ func (d *Doors) claimGroup(one stand) int {
 		d.takesRescue(one)
 	}
 	if d.sync() == codeRed {
-		d.warn("Resolve the conflict on %s and commit it, then work the ask below.", one.Branch)
+		d.raises(failure.Raise(d.Failures, "take-sync-conflict", "Resolve the conflict on "+one.Branch+" and commit it, then work the ask below."))
 		d.brief(one.Branch, one.Name, hand, was)
 		return codeRed
 	}

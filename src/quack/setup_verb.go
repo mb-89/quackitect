@@ -37,7 +37,7 @@ var setupItems = []setupItem{
 		want: "editor-client",
 		why:  "editor-client: the language client the extension starts the server through",
 		here: func(d boxDoors) bool {
-			return stands(filepath.Join(d.root, "src", "extension", "node_modules", "vscode-languageclient"))
+			return d.disk.stands(filepath.Join(d.root, "src", "extension", "node_modules", "vscode-languageclient"))
 		},
 		get: func(d boxDoors) bool {
 			say(d, "  installing the language client")
@@ -49,7 +49,7 @@ var setupItems = []setupItem{
 		want: "browser",
 		why:  "browser: the chromium the drawing's test drives",
 		here: func(d boxDoors) bool {
-			path, _ := browserFrom(d.env, d.goos == "darwin")
+			path, _ := browserFrom(d.disk, d.env, d.goos == "darwin")
 			return path != ""
 		},
 		get: func(d boxDoors) bool {
@@ -73,7 +73,7 @@ var setupItems = []setupItem{
 	},
 	{
 		want: "editor-extensions",
-		why:  "editor-extensions: the Vale, Biome and Mermaid extensions the tracked settings point at",
+		why:  "editor-extensions: the Biome and Mermaid extensions the tracked settings point at",
 		here: func(d boxDoors) bool {
 			listed, ok := listedExtensions(d)
 			if !ok {
@@ -121,7 +121,7 @@ func setupVerb(d boxDoors, argv []string) int {
 		}
 	}
 	landed := slices.Contains(argv, "--landed") || len(missing) > 0
-	if landed || !stands(filepath.Join(d.root, filepath.FromSlash(toolsFile))) {
+	if landed || !d.disk.stands(filepath.Join(d.root, filepath.FromSlash(toolsFile))) {
 		if _, err := writeSurvey(d); err != nil {
 			say(d, "  the survey wrote no tools.json, so every caller guesses again.")
 		}
@@ -143,7 +143,7 @@ func say(d boxDoors, line string) { fmt.Fprintln(d.out, line) }
 // Whether a home folder stands with the editor's extensions folder under it. [[spec/design_output/extension#a-box-names-its-home]]
 func editorHere(d boxDoors) bool {
 	home := homeOf(d.env)
-	return home != "" && stands(filepath.Join(home, ".vscode", "extensions"))
+	return home != "" && d.disk.stands(filepath.Join(home, ".vscode", "extensions"))
 }
 
 // The extensions the editor lists, lowercased, and false where no code stands. A code exiting past zero lists none. [[spec/tickets/code-failure-reads-missing]]
@@ -200,7 +200,7 @@ func setupBrand(d boxDoors) bool {
 		fmt.Fprintln(d.errs, emptyBrand(d.root))
 		return false
 	}
-	done, err := stamps(d.root, brand)
+	done, err := stamps(d.disk, d.root, brand)
 	for _, one := range done {
 		say(d, "  "+one+" reads "+brand)
 	}

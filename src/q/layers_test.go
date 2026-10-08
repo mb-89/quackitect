@@ -1,13 +1,17 @@
 // A key at rest reads the variable over the local file, the local file over
 // the tracked one, and a shared key the tracked file alone.
 // [[spec/design_output/model#a-keys-layers]]
-package q
+package q_test
 
-import "testing"
+import (
+	"testing"
 
-func parsed(t *testing.T, text string) Ordered {
+	"quackitect/src/q"
+)
+
+func parsed(t *testing.T, text string) q.Ordered {
 	t.Helper()
-	out, err := JSON.Parse([]byte(text))
+	out, err := q.JSON.Parse([]byte(text))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,18 +30,18 @@ func TestAnswerWordsReadsTheVariableOverTheLocalFileOverTheTrackedOne(t *testing
 	env := map[string]string{"SE_ANSWER_WORDS": "90"}
 	cases := []struct {
 		name           string
-		tracked, local Ordered
+		tracked, local q.Ordered
 		env            map[string]string
 		value, layer   string
 	}{
 		{"every layer set", tracked, local, env, "90", "SE_ANSWER_WORDS"},
-		{"a blank variable", tracked, local, map[string]string{"SE_ANSWER_WORDS": " "}, "120", LocalConfig},
-		{"no variable", tracked, local, nil, "120", LocalConfig},
-		{"the tracked file alone", tracked, Ordered{}, nil, "100", TrackedConfig},
-		{"no layer", Ordered{}, Ordered{}, nil, "150", BuiltInLayer},
+		{"a blank variable", tracked, local, map[string]string{"SE_ANSWER_WORDS": " "}, "120", q.LocalConfig},
+		{"no variable", tracked, local, nil, "120", q.LocalConfig},
+		{"the tracked file alone", tracked, q.Ordered{}, nil, "100", q.TrackedConfig},
+		{"no layer", q.Ordered{}, q.Ordered{}, nil, "150", q.BuiltInLayer},
 	}
 	for _, one := range cases {
-		value, layer, ok := Settled("answer.words", schema, one.tracked, one.local, one.env)
+		value, layer, ok := q.Settled("answer.words", schema, one.tracked, one.local, one.env)
 		if !ok || value != one.value || layer != one.layer {
 			t.Fatalf("%s: answer.words reads %q off %q, not %q off %q", one.name, value, layer, one.value, one.layer)
 		}
@@ -49,16 +53,16 @@ func TestMigrationOpentasksReadsTheTrackedFileAlone(t *testing.T) {
 	tracked := parsed(t, `{"migration": {"opentasks": "shadow"}}`)
 	local := parsed(t, `{"migration": {"opentasks": "old"}}`)
 	env := map[string]string{"SE_MIGRATION_OPENTASKS": "old"}
-	if value, layer, ok := Settled("migration.opentasks", schema, tracked, local, env); !ok || value != `"shadow"` || layer != TrackedConfig {
+	if value, layer, ok := q.Settled("migration.opentasks", schema, tracked, local, env); !ok || value != `"shadow"` || layer != q.TrackedConfig {
 		t.Fatalf("migration.opentasks reads %s off %q, not the tracked file's value", value, layer)
 	}
-	if value, layer, ok := Settled("migration.opentasks", schema, Ordered{}, local, env); !ok || value != `"new"` || layer != BuiltInLayer {
+	if value, layer, ok := q.Settled("migration.opentasks", schema, q.Ordered{}, local, env); !ok || value != `"new"` || layer != q.BuiltInLayer {
 		t.Fatalf("migration.opentasks with no tracked value reads %s off %q, not its built-in", value, layer)
 	}
 }
 
 func TestAVariableReadsAsAStringWhereItHoldsNoJSON(t *testing.T) {
-	value, _, _ := AtRest(KeyOfDotted("log.level"), Ordered{}, Ordered{}, map[string]string{"SE_LOG_LEVEL": "warn"})
+	value, _, _ := q.AtRest(q.KeyOfDotted("log.level"), q.Ordered{}, q.Ordered{}, map[string]string{"SE_LOG_LEVEL": "warn"})
 	if value != `"warn"` {
 		t.Fatalf("SE_LOG_LEVEL=warn reads %s, not a JSON string", value)
 	}
@@ -66,23 +70,23 @@ func TestAVariableReadsAsAStringWhereItHoldsNoJSON(t *testing.T) {
 
 func TestACamelLeafReadsTheVariableItsKebabSpellingNames(t *testing.T) {
 	env := map[string]string{"SE_STOP_MOSTINAROW": "9", "SE_STOP_MOST_IN_A_ROW": "4"}
-	if value, layer, ok := AtRest(KeyOfDotted("stop.mostInARow"), Ordered{}, Ordered{}, env); !ok || value != "4" || layer != "SE_STOP_MOST_IN_A_ROW" {
+	if value, layer, ok := q.AtRest(q.KeyOfDotted("stop.mostInARow"), q.Ordered{}, q.Ordered{}, env); !ok || value != "4" || layer != "SE_STOP_MOST_IN_A_ROW" {
 		t.Fatalf("stop.mostInARow reads %s off %q, not 4 off SE_STOP_MOST_IN_A_ROW", value, layer)
 	}
 }
 
 func TestADottedKeyRoundTrips(t *testing.T) {
-	key := KeyOfDotted("watchdog.backoffFirst")
+	key := q.KeyOfDotted("watchdog.backoffFirst")
 	if key.Name != "watchdog/config/backoff-first" || key.Dotted() != "watchdog.backoffFirst" {
 		t.Fatalf("watchdog.backoffFirst names %q and reads back %q", key.Name, key.Dotted())
 	}
 }
 
 func TestASharedKeyTakesNothingOffTheLocalFile(t *testing.T) {
-	key := KeyOfDotted("migration.opentasks")
+	key := q.KeyOfDotted("migration.opentasks")
 	key.Shared = true
 	local := parsed(t, `{"migration": {"opentasks": "old"}}`)
-	if value, layer, ok := AtRest(key, Ordered{}, local, nil); ok {
+	if value, layer, ok := q.AtRest(key, q.Ordered{}, local, nil); ok {
 		t.Fatalf("a shared key no tracked file sets reads %s off %s", value, layer)
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -35,7 +34,7 @@ type retroHeld struct {
 	count  int
 }
 
-func init() { register("retro chapters", retroChaptersVerb(retroRoot)) }
+func init() { register("retro chapters", retroChaptersVerb(quietBox)) }
 
 // The cuts, read and checked: a start before an end, and each chapter opening where the one before closes. [[spec/guidance/retro/chapter]]
 func retroCutsOf(text string) ([]retroCut, []string) {
@@ -124,23 +123,25 @@ func retroCommitsIn(root, from, to string) []any {
 }
 
 // The verb: refuses a gap, an overlap or a line past every chapter, and writes each chapter's lines. [[spec/guidance/retro/chapter]]
-func retroChaptersVerb(root func() string) twin {
+func retroChaptersVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name := root(), retroWordAt(argv, 2)
+		d := box()
+		disk := d.disk
+		base, name := retroRootOf(d), retroWordAt(argv, 2)
 		home, at := "", ""
 		if name != "" {
 			home = retroHome(base, name)
 			at = filepath.Join(home, retroCutsFile)
 		}
-		if at == "" || !retroIsThere(at) {
+		if at == "" || !disk.stands(at) {
 			fmt.Fprintf(errs, "retro chapters reads %s in the retro's folder, and none stands.\n", retroCutsFile)
 			fmt.Fprintln(errs, "Run ./RUNME.sh retro timeline <retro>, cut the window, and write the cuts there.")
 			return 2
 		}
-		cuts, faults := retroCutsOf(retroFileText(at))
+		cuts, faults := retroCutsOf(disk.text(at))
 		held, outside := map[string]*retroHeld{}, 0
 		if len(faults) == 0 {
-			held, outside = retroPlaced(cuts, retroTimedFiles(base, name))
+			held, outside = retroPlaced(cuts, retroTimedFiles(disk, base, name))
 		}
 		if outside > 0 {
 			faults = append(faults, fmt.Sprintf("%d timed line(s) fall past every chapter", outside))
@@ -151,7 +152,7 @@ func retroChaptersVerb(root func() string) twin {
 			}
 			return 1
 		}
-		if err := os.MkdirAll(filepath.Join(home, retroChaptersFolder), 0o777); err != nil {
+		if err := disk.makeAll(filepath.Join(home, retroChaptersFolder), 0o777); err != nil {
 			fmt.Fprintln(errs, err)
 			return 1
 		}
@@ -167,7 +168,7 @@ func retroChaptersVerb(root func() string) twin {
 				lines.set(path, ranges)
 			}
 			record := retroJSObject("id", one.id, "title", one.title, "from", from, "to", to, "lines", lines, "commits", retroCommitsIn(base, from, to))
-			if err := retroJSWrite(filepath.Join(home, retroChaptersFolder, one.id+".json"), record); err != nil {
+			if err := retroJSWrite(disk, filepath.Join(home, retroChaptersFolder, one.id+".json"), record); err != nil {
 				fmt.Fprintln(errs, err)
 				return 1
 			}

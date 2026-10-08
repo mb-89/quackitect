@@ -1,6 +1,6 @@
 // The notes verb asks the index's notes with the words it reads.
 // [[spec/tickets/read-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"strings"

@@ -4,7 +4,7 @@
 package main
 
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -89,9 +89,9 @@ func retroOutsideIndexFrom(said, sub string, from int) int {
 }
 
 // The folders standing at the tree's top, named the way the harness names them. [[spec/guidance/retro/collect]]
-func retroOutsideInside(root string) []string {
+func retroOutsideInside(disk diskDoors, root string) []string {
 	out := []string{}
-	for _, one := range retroCollectListed(root) {
+	for _, one := range disk.listed(root) {
 		if one.IsDir() {
 			out = append(out, strings.ToLower(retroSlugOf(one.Name())))
 		}
@@ -101,9 +101,10 @@ func retroOutsideInside(root string) []string {
 
 // Copies every source into the input folder, and answers the folders it reads. A file changed past since copies, and a transcript keeps its lines stamped past the window. [[spec/guidance/retro/collect]]
 func retroOutsideInto(it retroCollectDoors, into string, since, window time.Time, refused *[]retroCollectRow) []string {
+	disk := it.disk
 	folders := []string{}
 	slug := retroSlugOf(it.root)
-	inside := retroOutsideInside(it.root)
+	inside := retroOutsideInside(disk, it.root)
 	bases := map[string]string{"home": it.home, "temp": it.temp}
 	for _, source := range retroOutsideSources {
 		base := bases[source.base]
@@ -111,45 +112,45 @@ func retroOutsideInto(it retroCollectDoors, into string, since, window time.Time
 			continue
 		}
 		at := filepath.Join(append([]string{base}, source.under...)...)
-		for _, one := range retroCollectListed(at) {
+		for _, one := range disk.listed(at) {
 			if !one.IsDir() || !retroBelongs(one.Name(), slug, inside) {
 				continue
 			}
 			folders = append(folders, source.kind+"/"+one.Name())
 			from := filepath.Join(at, one.Name())
 			if source.kind != "transcripts" {
-				retroOutsideCopyTree(from, filepath.Join(into, source.kind, one.Name()), since, nil, time.Time{}, refused)
+				retroOutsideCopyTree(disk, from, filepath.Join(into, source.kind, one.Name()), since, nil, time.Time{}, refused)
 				continue
 			}
-			retroOutsideCopyTree(from, filepath.Join(into, "transcripts", one.Name()), since, []string{retroOutsideMemory}, window, refused)
-			retroOutsideCopyTree(filepath.Join(from, retroOutsideMemory), filepath.Join(into, retroOutsideMemory, one.Name()), time.Time{}, nil, time.Time{}, refused)
+			retroOutsideCopyTree(disk, from, filepath.Join(into, "transcripts", one.Name()), since, []string{retroOutsideMemory}, window, refused)
+			retroOutsideCopyTree(disk, filepath.Join(from, retroOutsideMemory), filepath.Join(into, retroOutsideMemory, one.Name()), time.Time{}, nil, time.Time{}, refused)
 		}
 	}
 	return folders
 }
 
 // Copies a folder, past the stores and the skips, and keeps a transcript's lines inside the window where one stands. [[spec/guidance/retro/collect]]
-func retroOutsideCopyTree(from, to string, since time.Time, skips []string, window time.Time, refused *[]retroCollectRow) {
-	for _, one := range retroCollectListed(from) {
+func retroOutsideCopyTree(disk diskDoors, from, to string, since time.Time, skips []string, window time.Time, refused *[]retroCollectRow) {
+	for _, one := range disk.listed(from) {
 		if slices.Contains(skips, one.Name()) || slices.Contains(retroOutsideStores, one.Name()) {
 			continue
 		}
 		was := filepath.Join(from, one.Name())
 		now := filepath.Join(to, one.Name())
 		if one.IsDir() {
-			retroOutsideCopyTree(was, now, since, nil, window, refused)
+			retroOutsideCopyTree(disk, was, now, since, nil, window, refused)
 			continue
 		}
-		if err := retroOutsideCopyOne(was, to, now, since, window); err != nil {
+		if err := retroOutsideCopyOne(disk, was, to, now, since, window); err != nil {
 			*refused = append(*refused, retroCollectRow{Path: was, Refused: retroCollectReasonOf(err)})
 		}
 	}
 }
 
 // Copies one file, past one older than since, and cuts a transcript to the window. [[spec/guidance/retro/collect]]
-func retroOutsideCopyOne(was, to, now string, since, window time.Time) error {
+func retroOutsideCopyOne(disk diskDoors, was, to, now string, since, window time.Time) error {
 	if !since.IsZero() {
-		said, err := os.Stat(was)
+		said, err := disk.stat(was)
 		if err != nil {
 			return err
 		}
@@ -157,21 +158,21 @@ func retroOutsideCopyOne(was, to, now string, since, window time.Time) error {
 			return nil
 		}
 	}
-	if err := os.MkdirAll(to, 0o777); err != nil {
+	if err := disk.makeAll(to, 0o777); err != nil {
 		return err
 	}
-	text, err := os.ReadFile(was)
+	text, err := disk.read(was)
 	if err != nil {
 		return err
 	}
 	if !window.IsZero() && strings.HasSuffix(was, retroOutsideLines) {
-		return os.WriteFile(now, []byte(retroOutsideWithinWindow(string(text), window)), 0o666)
+		return disk.write(now, []byte(retroOutsideWithinWindow(string(text), window)), 0o666)
 	}
-	mode := os.FileMode(0o666)
-	if said, err := os.Stat(was); err == nil {
+	mode := fs.FileMode(0o666)
+	if said, err := disk.stat(was); err == nil {
 		mode = said.Mode().Perm()
 	}
-	return os.WriteFile(now, text, mode)
+	return disk.write(now, text, mode)
 }
 
 // The lines stamped at or past the window. A line with no stamp takes the stamp before it, and one before any stamp stays. [[spec/tickets/the-retro-finishes-its-asks]]

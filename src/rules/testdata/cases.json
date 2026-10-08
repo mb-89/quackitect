@@ -1,0 +1,230 @@
+[
+  {
+    "check": "VoiceParagraph.Auxiliary",
+    "path": "notes.md",
+    "refuses": "The engine has written the file.\n",
+    "passes": "The engine writes the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.Characters",
+    "path": "notes.md",
+    "refuses": "The door reads a & b.\n",
+    "passes": "The door reads a and b.\n"
+  },
+  {
+    "check": "VoiceParagraph.CodeSpans",
+    "path": "notes.md",
+    "refuses": "Run `a`, `b`, `c`, `d` and `e` in order.\n",
+    "passes": "Run `a`, `b`, `c` and `d` in order.\n"
+  },
+  {
+    "check": "VoiceParagraph.Contraction",
+    "path": "notes.md",
+    "refuses": "The door doesn't read the file.\n",
+    "passes": "The door does not read the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.EtCetera",
+    "path": "notes.md",
+    "refuses": "The door reads notes, tickets, etc.\n",
+    "passes": "The door reads notes, tickets and so on.\n"
+  },
+  {
+    "check": "VoiceParagraph.Hedge",
+    "path": "notes.md",
+    "refuses": "The door just reads the file.\n",
+    "passes": "The door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.Latin",
+    "path": "notes.md",
+    "refuses": "The door reads a note, e.g. a ticket.\n",
+    "passes": "The door reads a note, for example a ticket.\n"
+  },
+  {
+    "check": "VoiceParagraph.ListItem",
+    "path": "notes.md",
+    "refuses": "- The door reads every note in the tree and every ticket in the queue and every rule in the folder before it answers\n",
+    "passes": "- The door reads every note in the tree before it answers\n"
+  },
+  {
+    "check": "VoiceParagraph.Markup",
+    "path": "notes.md",
+    "refuses": "# The door reads every note here\n\nThe door reads the file.\n",
+    "passes": "# The door\n\nThe door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.Modal",
+    "path": "notes.md",
+    "refuses": "The door would read the file.\n",
+    "passes": "The door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.ModalRequirement",
+    "path": "spec/design_input/probe.md",
+    "refuses": "- The door may refuse the write.\n",
+    "passes": "- The door shall refuse the write.\n"
+  },
+  {
+    "check": "VoiceParagraph.Paragraph",
+    "path": "notes.md",
+    "refuses": "The door reads the file. The door reads the file. The door reads the file. The door reads the file. The door reads the file. The door reads the file. The door reads the file.\n",
+    "passes": "The door reads the file. The door reads the file. The door reads the file. The door reads the file. The door reads the file. The door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.ParagraphAnswer",
+    "path": "answer.md",
+    "refuses": "- The door reads the file.\n\nThe door reads the file. The door reads the file. The door reads the file. The door reads the file.\n",
+    "passes": "- The door reads the file.\n\nThe door reads the file. The door reads the file. The door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.PastTense",
+    "path": "notes.md",
+    "refuses": "The engine wrote the file.\n",
+    "passes": "The engine writes the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.Progressive",
+    "path": "notes.md",
+    "refuses": "The engine is writing the file.\n",
+    "passes": "The engine writes the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.RestatedTable",
+    "path": "notes.md",
+    "refuses": "| step | what it does |\n|---|---|\n| pull | the engine hands the next free ticket to the hand |\n\nThe engine hands the next free ticket to the hand at a pull.\n",
+    "passes": "| step | what it does |\n|---|---|\n| pull | the engine hands the next free ticket to the hand |\n\nRead the table before the pull.\n"
+  },
+  {
+    "check": "VoiceParagraph.Sentence",
+    "path": "notes.md",
+    "refuses": "The door reads the note the note the note the note the note the note the note the note the note the note the note the note.\n",
+    "passes": "The door reads the note the note the note the note the note the note the note the note the note the note the note.\n"
+  },
+  {
+    "check": "VoiceParagraph.Shape",
+    "path": "notes.md",
+    "refuses": "The door reads the file.\n\nThe door reads the file.\n\nThe door reads the file.\n\nThe door reads the file.\n",
+    "passes": "The door reads the file.\n\nThe door reads the file.\n\nThe door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.ShapeAnswer",
+    "path": "answer.md",
+    "refuses": "The door reads the file.\n",
+    "passes": "- The door reads the file.\n"
+  },
+  {
+    "check": "VoiceParagraph.Vocabulary",
+    "path": "notes.md",
+    "refuses": "The door refuses a flibbertigibbet.\n",
+    "passes": "The door refuses a write.\n"
+  },
+  {
+    "check": "VoiceScript.NoPathInScript",
+    "path": "run.sh",
+    "refuses": "node -e \"import('$ROOT/src/x.js')\"\n",
+    "passes": "cd \"$ROOT\" && node -e \"import('./src/x.js')\"\n"
+  },
+  {
+    "check": "VoiceShape.GuidanceCap",
+    "path": "spec/guidance/probe.md",
+    "refuses": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Actionables\n\n1. Run the check.\n2. Run the check.\n3. Run the check.\n4. Run the check.\n5. Run the check.\n6. Run the check.\n7. Run the check.\n8. Run the check.\n9. Run the check.\n10. Run the check.\n11. Run the check.\n12. Run the check.\n13. Run the check.\n14. Run the check.\n15. Run the check.\n16. Run the check.\n",
+    "passes": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Actionables\n\n1. Run the check.\n2. Run the check.\n3. Run the check.\n4. Run the check.\n5. Run the check.\n6. Run the check.\n7. Run the check.\n8. Run the check.\n9. Run the check.\n10. Run the check.\n11. Run the check.\n12. Run the check.\n13. Run the check.\n14. Run the check.\n15. Run the check.\n"
+  },
+  {
+    "check": "VoiceShape.GuidanceChapter",
+    "path": "spec/guidance/probe.md",
+    "refuses": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Rules\n\n1. Run the check.\n",
+    "passes": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Actionables\n\n1. Run the check.\n"
+  },
+  {
+    "check": "VoiceShape.GuidanceEnv",
+    "path": "spec/guidance/probe.md",
+    "refuses": "---\nkind: [[guidance]]\nenv:\n  - level_zero\n---\n\n# Actionables\n\n1. Run the check.\n",
+    "passes": "---\nkind: [[guidance]]\nenv:\n  - LEVEL_ZERO\n---\n\n# Actionables\n\n1. Run the check.\n"
+  },
+  {
+    "check": "VoiceShape.MarkedRuleNamesFailure",
+    "path": "spec/guidance/probe.md",
+    "refuses": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Actionables\n\n1. Run the check. *\n",
+    "passes": "---\nkind: [[guidance]]\nscope: [\"agents\"]\nrationale: [[spec/rationales/probe]]\n---\n\n# Actionables\n\n1. Run the check. A skipped check lets a fault through. *\n"
+  },
+  {
+    "check": "VoiceShape.StopRule",
+    "path": "spec/config/stop/probe.yml",
+    "refuses": "- id: the-probe\n  side: stop\n  priority: 1\n  decides: claimed\n",
+    "passes": "- id: the-probe\n  side: stop\n  priority: 1\n  decides: claimed\n  says: The turn ends.\n"
+  },
+  {
+    "check": "VoiceShape.VocabularyEntry",
+    "path": "spec/vocabulary/probe.yml",
+    "refuses": "terms:\n  - {word: splice}\n",
+    "passes": "terms:\n  - {word: splice, means: \"to insert rows into a list\"}\n"
+  },
+  {
+    "check": "VoiceVale.Antithesis",
+    "path": "notes.md",
+    "refuses": "It is a door rather than a window.\n",
+    "passes": "It is a door.\n"
+  },
+  {
+    "check": "VoiceVale.CodeComment",
+    "path": "src/bridge/probe.js",
+    "refuses": "export const one = 1;\n// The one the door reads.\nexport const two = 2;\n",
+    "passes": "export const one = 1;\n// The one the door reads. [[spec/tickets/a-thing]]\nexport const two = 2;\n"
+  },
+  {
+    "check": "VoiceVale.CodeHeader",
+    "path": "src/bridge/probe.js",
+    "refuses": "// The four doors this module reads.\n\nexport const one = 1;\n",
+    "passes": "// The doors this module reads.\n\nexport const one = 1;\n"
+  },
+  {
+    "check": "VoiceVale.CountedList",
+    "path": "notes.md",
+    "refuses": "The three steps below run in order:\n\n- one\n- two\n- three\n",
+    "passes": "The steps below run in order:\n\n- one\n- two\n- three\n"
+  },
+  {
+    "check": "VoiceVale.DigitInProse",
+    "path": "spec/design_output/probe.md",
+    "refuses": "The verb exits 0 on survives.\n",
+    "passes": "The verb exits `0` on survives.\n"
+  },
+  {
+    "check": "VoiceVale.FakeDoorsInTest",
+    "path": "test/level0/probe.test.js",
+    "refuses": "import { disk } from \"../../src/doors/disk.js\";\n",
+    "passes": "import { fakeDisk } from \"../../src/doors/fake/disk.js\";\n"
+  },
+  {
+    "check": "VoiceVale.History",
+    "path": "notes.md",
+    "refuses": "The door used to read the config.\n",
+    "passes": "The door reads the config.\n"
+  },
+  {
+    "check": "VoiceVale.OutsideInDoors",
+    "path": "src/bridge/probe.js",
+    "refuses": "export const home = process.env.HOME;\n",
+    "passes": "export const home = hand.home;\n"
+  },
+  {
+    "check": "VoiceVale.Passive",
+    "path": "notes.md",
+    "refuses": "The file was written by the engine.\n",
+    "passes": "The engine writes the file.\n"
+  },
+  {
+    "check": "VoiceVale.Private",
+    "path": "notes.md",
+    "refuses": "Reach the owner at somebody@example.com when the box stalls.\n",
+    "passes": "Reach the owner through the queue when the box stalls.\n"
+  },
+  {
+    "check": "VoiceVale.ShoutedLead",
+    "path": "notes.md",
+    "refuses": "THIS IS THE SHOUTED PART, and it follows.\n",
+    "passes": "This is the shouted part, and it follows.\n"
+  }
+]

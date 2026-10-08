@@ -1,6 +1,6 @@
 // The work module's rows: one a ticket, with its place and its flags, one a
-// standing branch, and one a placed todo no ticket carries, ported from
-// answerOf in src/scripts/work-answer.js. The git module reads the branches.
+// standing branch, and one a placed todo no ticket carries. The git module
+// reads the branches.
 // [[spec/tickets/open-tasks-come-from-work]]
 package work
 
@@ -90,7 +90,7 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(rows, open, yours)
 }
 
-// The words a row reads, which src/scripts/work-answer.js names and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+// The words a row reads. [[spec/design_output/pull#the-queue-is-an-outline]]
 const (
 	groupKind   = "group"
 	ticketKind  = "ticket"

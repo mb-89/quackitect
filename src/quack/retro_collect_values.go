@@ -9,11 +9,12 @@ import (
 	"encoding/json"
 	"io"
 	"math"
-	"os"
 	"slices"
 	"sort"
 	"strconv"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // An object JSON.parse reads, its keys in the order the text writes them. [[spec/guidance/retro/collect]]
@@ -26,7 +27,7 @@ type retroCollectObject struct {
 func retroKeptReport(stamp string) string {
 	parsed, _ := retroCollectParsed(stamp)
 	report := retroCollectGet(parsed, "battery")
-	if !retroCollectTruthy(report) {
+	if !yaml.Truthy(report) {
 		return ""
 	}
 	runs, _ := retroCollectGet(parsed, "runs").([]any)
@@ -54,7 +55,7 @@ func retroKeptReport(stamp string) string {
 	return retroCollectPretty(out)
 }
 
-// Each part's median over the runs, as medianParts in src/scripts/battery.js reads it. [[spec/guidance/retro/effect]]
+// Each part's median over the runs. [[spec/guidance/retro/effect]]
 func retroCollectMedianParts(runs []any) *retroCollectObject {
 	held := retroCollectNewObject()
 	for _, run := range runs {
@@ -173,21 +174,6 @@ func retroCollectGet(said any, key string) any {
 	return nil
 }
 
-// Whether a value reads true, as JavaScript reads one. [[spec/guidance/retro/collect]]
-func retroCollectTruthy(said any) bool {
-	switch one := said.(type) {
-	case nil:
-		return false
-	case bool:
-		return one
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	case string:
-		return one != ""
-	}
-	return true
-}
-
 // A value as String writes it, and nothing for null. [[spec/guidance/retro/collect]]
 func retroCollectText(said any) string {
 	switch one := said.(type) {
@@ -247,28 +233,4 @@ func retroCollectPretty(said any) string {
 	writes.SetIndent("", "  ")
 	_ = writes.Encode(said)
 	return out.String()
-}
-
-// The entries of a folder by name, or none where it stands nowhere. [[spec/guidance/retro/collect]]
-func retroCollectListed(at string) []os.DirEntry {
-	entries, err := os.ReadDir(at)
-	if err != nil {
-		return nil
-	}
-	return entries
-}
-
-// A file's text, or nothing. [[spec/guidance/retro/collect]]
-func retroCollectRead(at string) string {
-	text, err := os.ReadFile(at)
-	if err != nil {
-		return ""
-	}
-	return string(text)
-}
-
-// Whether a path stands. [[spec/guidance/retro/collect]]
-func retroCollectExists(at string) bool {
-	_, err := os.Stat(at)
-	return err == nil
 }

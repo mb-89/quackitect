@@ -1,6 +1,6 @@
 // The box hands a person's work out of its branch: the child closes as became,
 // the successor stands outside the group carrying the question, and the group
-// is free to close, as src/scripts/work-unblock.js answers it.
+// is free to close.
 // [[spec/design_output/work#a-person-step-leaves]]
 package branches
 

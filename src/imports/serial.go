@@ -1,5 +1,5 @@
 // The tests that run alone: a top-level test calling no t.Parallel and
-// reaching no t.Setenv or t.Chdir, which bar it from running beside the others.
+// reaching no t.Setenv, t.Chdir or RunsAlone marker, which bar it from running beside the others.
 // [[spec/guidance/code/testing]]
 package imports
 
@@ -9,11 +9,12 @@ import (
 	"strings"
 )
 
-// The calls that bar a test from running beside the others, and the call that runs it there. [[spec/guidance/code/testing]]
+// The calls that bar a test from running beside the others, each a write to state the whole process shares, and the call that runs it there. registersFor writes the verb registry quack's parallel cases read. [[spec/guidance/code/testing]]
 var (
-	barsParallel = []string{"Setenv", "Chdir"}
+	barsParallel = []string{"Setenv", "Chdir", "registersFor"}
 	parallelCall = "Parallel"
 	testPrefix   = "Test"
+	runsAlone    = "level0: RunsAlone - "
 )
 
 // The top-level tests of the files that run alone, though nothing bars them from running beside the others. [[spec/guidance/code/testing]]
@@ -33,6 +34,13 @@ func SerialTests(files []*ast.File) []string {
 		}
 	}
 	barred := map[string]bool{}
+	for _, file := range files {
+		for _, decl := range file.Decls {
+			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Doc != nil && strings.Contains(fn.Doc.Text(), runsAlone) {
+				barred[fn.Name.Name] = true
+			}
+		}
+	}
 	for grew := true; grew; {
 		grew = false
 		for name, body := range bodies {

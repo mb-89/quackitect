@@ -39,7 +39,7 @@ A reply ending the turn stands at the turn's end, and a reply to a demand stands
 
 ## A prompt is the owner's
 
-`onPromptSubmit` in `src/bridge/answer.js` reads where a prompt comes from:
+`prompted` in `src/modules/hooks/fold.go` reads where a prompt comes from:
 
 | the origin | the row | a reply owed |
 |---|---|---|
@@ -145,7 +145,7 @@ The viewer holds a floor of its own over what the disk carries. For details, see
 `sayLine` in `src/quack/verb_log.go` shapes a line. The writers below follow
 it, one for each runtime:
 
-- `logHere` in `hooks/level0.js`, through `$.fs`
+- `wrote` in `hooks/level0.ts`, through the `log` verb, and through `$.fs` where the verb fails
 - `appendRows` in `src/modules/hooks/rows.go`, for the Go hooks and verbs
 - `src/extension/lib/logbook.js`, through the editor door, for the sidebar
 
@@ -192,7 +192,7 @@ current one alone.
 
 `./RUNME.sh log` answers the rows the log holds, narrowed by the flags below:
 
-| the flag | what it reads | the owner it calls |
+| the flag | what it reads | the owner it calls in `src/quack/verb_log.go` |
 |---|---|---|
 | `--since <span>` | the rows whose stamp falls inside the span | `spanOf` |
 | `--level <name>` | the rows at that level and above | `narrowed` |
@@ -200,8 +200,6 @@ current one alone.
 | `--words <text>` | the rows carrying every word, in any case | `carries` |
 | `--last <count>` | the last rows, after every filter above | `lastOf` |
 | `--count` | one row a kind, the most first, over the rows the filters keep | `logCounts` |
-
-Each owner stands in `src/quack/verb_log.go`.
 
 `./RUNME.sh find --log <words>` hands its words to this verb, because the index
 walks no log. `logFiles` in `src/quack/verb_log.go` owns the files the read
