@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: javascript-leaves
 parent: remaining-js-names-its-reason
+record:
+  - step: do
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: ba80cc5a7ad40f6e4718037b6afa1c3b479a3fd9
+    hash_after: ba80cc5a7ad40f6e4718037b6afa1c3b479a3fd9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   85.1  in all"
+    inputs:
+      - name: ask
+        hash: 450e25d27dd26f6b
+        size: 509
+    def: 6d8d4db4b183406b
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the src/doors/ and test/ rows cover a folder, so a new JavaScript file there pas
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_lines_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The table under The JavaScript that stays in [[spec/design_output/doors]] names each door and fake under src/doors one file a row. The test rows stand one a subfolder: test/contract/ and test/level0/ each hold only tests of code a row above names, and test/battery-reporter.js stands as its own row. A new door or fake now needs its own row and reason, so the javascript part of the check refuses its regrowth. Commit 0553c20f9 carries the change.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: src/doors stands one file a row, and each test subfolder keeps one reason since every file there loads only code that stays
+- the cleanup it reveals is none: every row covers a tracked file, which the javascript part of the check asserts
+- each fact stands once: the reasons stand in the doors note, and the check reads them there
 
 # Discussion
 
