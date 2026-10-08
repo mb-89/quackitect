@@ -1,6 +1,5 @@
 // The bless: a gate carrying bless true waits after its verdict, and a bless
-// binds to the hash of what it blesses, so an edit strips it, off
-// src/scripts/pull-bless.js.
+// binds to the hash of what it blesses, so an edit strips it.
 // [[spec/design_output/pull#the-bless]]
 package pull
 
@@ -10,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"quackitect/src/failure"
 	"quackitect/src/yaml"
 )
 
@@ -54,7 +54,7 @@ func blessedEntry(entry *yaml.Doc) bool {
 }
 
 func verdictEntry(entry *yaml.Doc) bool {
-	return !blessedEntry(entry) && !truthy(yaml.AsString(entry.Get("skipped"))) && !truthy(yaml.AsString(entry.Get("returns"))) &&
+	return !blessedEntry(entry) && !yaml.Truthy(entry.Get("skipped")) && !yaml.Truthy(entry.Get("returns")) &&
 		!(yaml.AsString(entry.Get("hash_before")) != "" && yaml.AsString(entry.Get("hash_after")) == "")
 }
 
@@ -214,7 +214,7 @@ func (it *It) mayBless() string {
 // A person writes whether an agent at this desk blesses, and an agent writes it nowhere. [[spec/tickets/the-sidebar-writes-through-actions]]
 func (it *It) BlessDesk(word string) int {
 	if it.Agent || AgentOf(it.Env) != "" {
-		it.Say(Refused, BlessRefusal())
+		it.Refuse(failure.Raise(it.Failures, "pull-bless-agent", BlessRefusal()))
 		return 1
 	}
 	agent := strings.TrimSpace(word) == "true"
@@ -229,7 +229,7 @@ func (it *It) Bless(path, name string) int {
 		if name == "" {
 			name = "nothing"
 		}
-		it.Say(Refused, name+" names no ticket, so nothing blesses.")
+		it.Refuse(failure.Raise(it.Failures, "pull-bless-no-ticket", name+" names no ticket, so nothing blesses."))
 		return 2
 	}
 	text, _ := it.Disk.Read(path)
@@ -240,22 +240,22 @@ func (it *It) Bless(path, name string) int {
 		if leaf != nil {
 			at = leaf.Path
 		}
-		it.Say(Refused, fmt.Sprintf("%s stands at %s, which asks no bless.", one.Name, at))
+		it.Refuse(failure.Raise(it.Failures, "pull-bless-not-asked", fmt.Sprintf("%s stands at %s, which asks no bless.", one.Name, at)))
 		return 1
 	}
 	if !waitsBless(one.Text, leaf) {
-		it.Say(Refused, fmt.Sprintf("%s at %s holds no verdict to bless yet.", one.Name, leaf.Path))
+		it.Refuse(failure.Raise(it.Failures, "pull-bless-no-verdict", fmt.Sprintf("%s at %s holds no verdict to bless yet.", one.Name, leaf.Path)))
 		return 1
 	}
 	if refusal := it.mayBless(); refusal != "" {
-		it.Say(Refused, refusal)
+		it.Refuse(failure.Raise(it.Failures, "pull-bless-refused", refusal))
 		return 1
 	}
 	changes := []string{"blesses " + leaf.Path}
 	text = withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(it.HandOf())), pair("blessed", blessHash(one.Text, leaf)))
 	one.Text = it.stepOn(one, leaf, text, &changes, false)
 	if finding := it.landedAlone(one, changes); finding != "" {
-		it.Say(Refused, finding)
+		it.Refuse(failure.Raise(it.Failures, "pull-commit-refused", finding))
 		return 1
 	}
 	it.Println(fmt.Sprintf("%s %s.", one.Name, strings.Join(changes, ", ")))

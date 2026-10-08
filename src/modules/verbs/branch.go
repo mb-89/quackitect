@@ -3,7 +3,7 @@
 // [[spec/tickets/work-verbs-become-actions]]
 package verbs
 
-// Every verb work in src/scripts/work.js answers, from open to test. [[spec/tickets/work-verbs-become-actions]]
+// Every verb the work program answers, from open to test. [[spec/tickets/work-verbs-become-actions]]
 var BranchVerbs = []Verb{
 	{Name: "open", Doc: "pushes work/<group> off main for a group ticket, so the cloud finds it"},
 	{Name: "take", Doc: "takes the next branch marked todo, and prints its ask"},

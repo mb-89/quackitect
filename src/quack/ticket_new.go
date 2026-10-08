@@ -1,5 +1,5 @@
 // ticket new: the bare ticket where no file stands, and a standing one keeps
-// what it holds, off bare in src/scripts/ticket.js.
+// what it holds.
 // [[spec/tickets/the-sidebar-writes-through-actions]]
 package main
 

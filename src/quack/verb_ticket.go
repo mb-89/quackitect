@@ -1,14 +1,17 @@
 // The bare ticket: the usage, one line a sub-verb, which twinOf reaches where
-// no longer words name a registered verb, off ticket in src/scripts/ticket.js.
+// no longer words name a registered verb.
 // [[spec/tickets/ticket-verbs-port-to-go]]
 package main
 
-import "io"
+import (
+	"io"
+	"strconv"
+)
 
 func init() { register("ticket", ticketUsageVerb()) }
 
 // The usage the bare ticket prints, one line a sub-verb. [[spec/tickets/ticket-verbs-port-to-go]]
-const ticketUsage = `Usage: ./RUNME.sh ticket <verb>
+var ticketUsage = `Usage: ./RUNME.sh ticket <verb>
 
   pull [ticket]       take the next leaf of this group, or hand one back with --pass, --fail, --became, --answered
   note <name> <line>  write a private ticket off the note process, and carry on
@@ -20,7 +23,7 @@ const ticketUsage = `Usage: ./RUNME.sh ticket <verb>
   bless <ticket>      bless the verdict a gate asking one holds, and move the step on, or --desk=<true|false> the desk's word
   new <path>          write the bare ticket where no file stands
   fill <path>         write the route a saved ticket's process names, or print it under --stdout
-  place <ticket> <n>  place the ticket at 1 to 9 in its queue level, and the same place again clears it
+  place <ticket> <n>  place the ticket at ` + strconv.Itoa(firstPlace) + ` to ` + strconv.Itoa(lastPlace) + ` in its queue level, and the same place again clears it
   urgent <ticket>     flip the ticket's urgent mark
   set <ticket> <field> <value>  write one field of the ticket's front, as the schema takes it
                       note takes --` + talkKey + ` where a person decides it, and --` + todoKey + ` to park it

@@ -1,8 +1,7 @@
-// The take over a fake clone, as test/level0/work.test.js drives it through
-// fake doors: the uncommitted check, the parked ticket, the unpushed branch,
-// and the stuck hand-over handed out first.
+// The take over a fake clone through fake doors: the uncommitted check, the
+// parked ticket, the unpushed branch, and the stuck hand-over handed out first.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it reads the unexported staleKey and the group editors after take runs
 
 import (
 	"fmt"
@@ -114,6 +113,25 @@ func TestPATakeRefusesPickedBranchAhead(t *testing.T) {
 	holds(t, paSaid(one), "work/one-group holds 3 commit(s) origin lacks")
 	if one.rev("work/one-group") != tip {
 		t.Fatal("the take resets the commits away")
+	}
+}
+
+// A take naming the branch the box stands on carries its commits ahead of origin on, claims on top of them, and pushes them. [[spec/design_output/work#a-branch-moves-clean]]
+func TestPATakeNamedKeepsTheBranchItStandsOnAhead(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, nil)
+	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
+	paOn(one, "one-group")
+	one.land("ahead", map[string]string{"a.md": "a\n"})
+	tip := one.rev("HEAD")
+	if code := one.branchSays("take", "one-group"); code != codeOK {
+		t.Fatalf("the take answers %d: %s", code, paSaid(one))
+	}
+	if !one.d.Repo.IsAncestor(tip, "HEAD") {
+		t.Fatal("the take resets the commit away")
+	}
+	if one.rev("origin/work/one-group") != one.rev("HEAD") {
+		t.Fatal("the take leaves the commit and its claim unpushed")
 	}
 }
 

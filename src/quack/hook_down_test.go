@@ -54,6 +54,7 @@ type downSaid struct {
 // Runs the down word for the event over the box, on a cloud box or a desk, with the event's fields on stdin. [[spec/tickets/level0-hooks-forward-to-go]]
 func downs(t *testing.T, b *downBox, cloud bool, event, input string) downSaid {
 	t.Helper()
+	// level0: OutsideInDoors - the case hands the hook doors one wall reading, as the verb's root hands it in
 	d := hookDoorsOver(t.TempDir(), cloud, nil, input, time.Now())
 	d.ask, d.run = b.ask, b.run
 	d.log = func(level, kind, line string, fields map[string]any) error {
@@ -192,6 +193,7 @@ func TestTheSessionStartFallSaysNothingToThePerson(t *testing.T) {
 
 func TestTheDownWordNamingNoEventPrintsTheUsage(t *testing.T) {
 	t.Parallel()
+	// level0: OutsideInDoors - the case hands the hook doors one wall reading, as the verb's root hands it in
 	code, out, errs := runsTwin(hookVerb(hookDoorsOver(t.TempDir(), false, nil, "", time.Now())), "hook", "down")
 	if code != exitFailed || out != "" || !strings.Contains(errs, "down <event>") {
 		t.Fatalf("the down word with no event answers %d, %q, %q, and wants the usage naming the event it takes", code, out, errs)

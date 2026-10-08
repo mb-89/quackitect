@@ -1,11 +1,13 @@
 // The stops fold: what the bridge keeps on its box for the turn's end, and the
 // answer to a Stop in the order the bridge's classic.Stop ran:
-// a helper's stop, holdsForHandover, then onStop in src/bridge/stop.js. The
+// a helper's stop, holdsForHandover, then onStop. The
 // fold reads the tree off the door's stamp and the holds off their own fold.
 // [[spec/tickets/cage-stop-rules-port]]
 package hooks
 
 import (
+	"quackitect/src/yaml"
+
 	"encoding/json"
 	"strconv"
 	"strings"
@@ -22,7 +24,7 @@ const (
 	holdsField   = "holds"
 )
 
-// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off src/bridge/handover.js and the stop package. [[spec/tickets/cage-stop-rules-port]]
+// The events the fold reads beside the holds fold's, the stop call, and the words of the handover and the todo list, off the stop package. [[spec/tickets/cage-stop-rules-port]]
 const (
 	startEvent   = "session.start"
 	endEvent     = "session.end"
@@ -136,7 +138,7 @@ func stepStops(state Stops, event q.Event) Stops {
 	case saidEvent:
 		state.Reported = state.Reported || stop.ReportStands(textOf(fields, "text"))
 	case spawnEvent:
-		if truthy(fields["background"]) {
+		if yaml.Truthy(fields["background"]) {
 			state.Helpers++
 		}
 	case measureEvent:
@@ -169,7 +171,7 @@ func (state Stops) copied() Stops {
 
 // A prompt from outside the plugin puts the run of holds back, an owner's prompt opens a turn no report answers yet, and the binding reads again. [[spec/design_output/stop#the-tooth-holds-its-state]]
 func (state *Stops) prompted(fields, held map[string]any, facts Stopped, at time.Time) {
-	if !truthy(fields["mine"]) {
+	if !yaml.Truthy(fields["mine"]) {
 		state.InARow = 0
 	}
 	origin, _ := fields["origin"].(map[string]any)
@@ -253,7 +255,7 @@ func (state *Stops) claims(fields, held map[string]any, facts Stopped, holds Hol
 	}
 	reason := callField(fields, "reason")
 	rule, known := stop.ReasonOf(facts.Rules, reason)
-	// The call words its answer as claims in src/bridge/stop.js does. [[spec/tickets/log-report-stop-in-go]]
+	// The call words its answer as claims. [[spec/tickets/log-report-stop-in-go]]
 	if !known {
 		var ids []string
 		for _, one := range stop.StopReasons(rulesOr(facts.Rules)) {
@@ -372,7 +374,7 @@ func (state Stops) factsOf(held map[string]any, facts Stopped, holds Holds, clai
 		hold = holds.Stood
 	}
 	return stop.Facts{
-		Off: facts.Off, Hold: hold, Claimed: claimed, Text: text, Cloud: truthy(held[heldCloud]), Binding: textOf(held, heldBinding),
+		Off: facts.Off, Hold: hold, Claimed: claimed, Text: text, Cloud: yaml.Truthy(held[heldCloud]), Binding: textOf(held, heldBinding),
 		Prompts: state.Prompts, Todos: state.standing(), Helpers: state.Helpers, Reported: state.Reported,
 		Group: facts.Group, Holds: facts.Holds, Private: facts.Private, Queue: facts.Queue, PersonStep: facts.PersonStep,
 		Working: facts.Working, Planned: facts.Planned, Rules: facts.Rules,
@@ -397,6 +399,17 @@ func tasksRun(tasks any) bool {
 		}
 	}
 	return false
+}
+
+// The events the fill rides: every call of the agent's own, and the turn's end, which the harness measures only after the vote. [[spec/design_output/stop#the-context-hands-over]]
+var filled = map[string]bool{toolEvent: true, stopEvent: true}
+
+// The fill a post carries where the door reads it: on a filled event of the main agent. The bridgehead sends the session's fill on every event, and a helper's event measures the main agent's context, so it reads none. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+func filledOf(post Post) any {
+	if !filled[post.Event] || textOf(post.E, "agentId", "agent_id") != "" {
+		return nil
+	}
+	return post.Fill
 }
 
 // A fill as the bridge's Number reads it, and whether one stands. [[spec/design_output/stop#the-context-hands-over]]

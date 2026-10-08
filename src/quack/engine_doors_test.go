@@ -11,11 +11,12 @@ import (
 )
 
 // The engine files, doors, fakes and tests the approach sends away. [[spec/tickets/engine-and-doors-leave]]
+// The clock and http doors stay, since the process door and the extension's tests stand on them. [[spec/design_output/doors#the-javascript-that-stays]]
 var engineDoors = []string{
 	"src/engine/group.js", "src/engine/named.js", "src/engine/front-merge.js", "src/engine/swap",
-	"src/doors/clock.js", "src/doors/http.js", "src/doors/index.js", "src/doors/log.js",
-	"src/doors/fake/clock.js", "src/doors/fake/http.js", "src/doors/fake/index.js", "src/doors/fake/log.js", "src/doors/fake/awake.js",
-	"test/contract/clock.test.js", "test/contract/http.test.js", "test/contract/index.test.js", "test/contract/log.test.js", "test/contract/compact.test.js",
+	"src/doors/index.js", "src/doors/log.js",
+	"src/doors/fake/index.js", "src/doors/fake/log.js", "src/doors/fake/awake.js",
+	"test/contract/index.test.js", "test/contract/log.test.js", "test/contract/compact.test.js",
 	"test/level0/group.test.js", "test/level0/front-merge.test.js", "test/level0/quoted.test.js", "test/level0/ticket-folders.test.js",
 }
 

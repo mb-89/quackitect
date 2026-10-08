@@ -5,6 +5,7 @@ package main
 
 import (
 	"io/fs"
+	// level0: OutsideInDoors - the case reads the tree's own stub settings, as a build check reads source
 	"os"
 	"path/filepath"
 	"strings"

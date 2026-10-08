@@ -1,18 +1,15 @@
-// The quack spawns past the node module and Vale, each over a FakeRunner
+// The quack spawns past the node module, each over a FakeRunner
 // taught the program its command names, so no case starts a process.
 // [[spec/tickets/quack-spawns-all-take-the-runner]]
-package main
+package main // level0: InPackageTest - the cases swap the package's spawns through its unexported seams, over the in-package helpers fakeQuack and fakeSelf
 
 import (
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
 
-	"quackitect/src/modules/check"
 	"quackitect/src/proc"
-	"quackitect/src/prose"
 	"quackitect/src/pull"
 )
 
@@ -38,7 +35,7 @@ func TestToolRunsHandsTheStreamsThrough(t *testing.T) {
 	t.Parallel()
 	fake, ran := teaches("/fake/tool", proc.Said{Out: "out", Err: "err", Code: 3})
 	var out, errs strings.Builder
-	dir := t.TempDir()
+	dir := sharedFolder()
 	if code := toolRunsOver(fake.Run, strings.NewReader("keys"))(dir, &out, &errs, "/fake/tool", "--fix"); code != 3 || out.String() != "out" || errs.String() != "err" {
 		t.Fatalf("a tool run answers %d and writes %q, %q, and wants 3 and the tool's streams", code, out.String(), errs.String())
 	}
@@ -54,7 +51,7 @@ func TestToolRunsHandsTheStreamsThrough(t *testing.T) {
 func TestARoadVerbAnswersItsStreamsAsOneText(t *testing.T) {
 	t.Parallel()
 	fake, ran := teaches(fakeQuack, proc.Said{Out: "said\n", Err: "warned\n", Code: 3})
-	root := t.TempDir()
+	root := sharedFolder()
 	code, said := roadVerbOver(fake.Run, fakeSelf, root)("ticket", "pull")
 	if code != 3 || said != "said\nwarned" {
 		t.Fatalf("the road answers %d, %q, and wants 3 and both streams as one text", code, said)
@@ -69,7 +66,7 @@ func TestTheBranchTakeRunsTheRoadOnTheCallersStreams(t *testing.T) {
 	t.Parallel()
 	fake, ran := teaches(fakeQuack, proc.Said{Out: "taken\n", Err: "note\n", Code: 2})
 	var out, errs strings.Builder
-	root := t.TempDir()
+	root := sharedFolder()
 	it := &pull.It{Root: root, Out: &out, Err: &errs}
 	if code := takesBranchOver(fake.Run, fakeSelf)("/scripts", "a-group", it); code != 2 || out.String() != "taken\n" || errs.String() != "note\n" {
 		t.Fatalf("the take answers %d and writes %q, %q, and wants 2 and the road's streams", code, out.String(), errs.String())
@@ -82,7 +79,7 @@ func TestTheBranchTakeRunsTheRoadOnTheCallersStreams(t *testing.T) {
 
 func TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
+	dir := sharedFolder()
 	runme := filepath.Join(dir, "RUNME.sh")
 	fake, ran := teaches(runme, proc.Said{Out: "out", Err: "err", Code: 4})
 	got := retroMintRunmeOver(fake.Run)(dir, []string{retroMintRunmeAt, "ticket", "pull"}, map[string]string{"B": "2", "A": "1"})
@@ -97,31 +94,10 @@ func TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv(t *testing.T) {
 	}
 }
 
-func TestValeHeardOverTheDoorReadsTheTextAsTheFile(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	vale := filepath.Join(root, filepath.FromSlash(check.Bin), "vale")
-	if err := os.MkdirAll(filepath.Dir(vale), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(vale, nil, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	fake, ran := teaches(vale, proc.Said{Err: "the config breaks", Code: 2})
-	got := heardInOver(fake.Run, root, "spec/a.md", "a text", prose.All)
-	if !got.stands || got.ran || got.why != "the config breaks" {
-		t.Fatalf("an unread Vale answers %+v, and wants it standing, unread, with its stderr as why", got)
-	}
-	want := []string{vale, "--config=" + valeOwn, "--path=spec/a.md", "--output=JSON", "--no-exit"}
-	if one := ranOnce(t, *ran); !slices.Equal(one.Argv, want) || one.Dir != root || one.Stdin != "a text" || one.Wait != valeSpan {
-		t.Fatalf("Vale runs %+v, and wants %q in %s reading the text under its span", one, want, root)
-	}
-}
-
 func TestAReviewGathersOffTheBranchVerbUnderTheWorkRoot(t *testing.T) {
 	t.Parallel()
 	fake, ran := teaches(fakeQuack, proc.Said{Out: "working\n{\"branch\":\"work/a\"}\n"})
-	method, root := t.TempDir(), t.TempDir()
+	method, root := filepath.Join(sharedFolder(), "method"), filepath.Join(sharedFolder(), "work")
 	material, why := reviewRunOver(fake.Run, fakeSelf, method)(root, "work/a")
 	if material.Branch != "work/a" || why != "" {
 		t.Fatalf("the review gathers %+v, %q, and wants the branch's material", material, why)
@@ -149,7 +125,7 @@ func TestServeRunsReadsASignalAsOne(t *testing.T) {
 		{"a program that never starts answers its fault", proc.Said{Err: "broke", Code: proc.NotStarted}, 0, true},
 	} {
 		fake, ran := teaches("/fake/serve", row.said)
-		dir := t.TempDir()
+		dir := sharedFolder()
 		code, errs, err := serveRunsOver(fake.Run)([]string{"/fake/serve", "up"}, dir)
 		if code != row.code || errs != "broke" || (err != nil) != row.fault {
 			t.Fatalf("%s: the run answers %d, %q, %v", row.name, code, errs, err)
@@ -164,7 +140,7 @@ func TestTheViewerLaunchHandsTheTerminalThrough(t *testing.T) {
 	t.Parallel()
 	fake, ran := teaches("/fake/viewer", proc.Said{Out: "frame", Err: "warn", Code: proc.Signalled})
 	var out, errs strings.Builder
-	dir := t.TempDir()
+	dir := sharedFolder()
 	code, err := tuiLaunchOver(fake.Run, strings.NewReader("keys"))([]string{"/fake/viewer"}, dir, &out, &errs)
 	if code != 1 || err != nil || out.String() != "frame" || errs.String() != "warn" {
 		t.Fatalf("the launch answers %d, %v and writes %q, %q, and wants a signal's end as 1 and the viewer's streams", code, err, out.String(), errs.String())

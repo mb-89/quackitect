@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	// level0: OutsideInDoors - the writer reads and writes the golden the tree ships, as a build check reads source
 	"os"
 	"testing"
 

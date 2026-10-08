@@ -8,6 +8,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	// level0: OutsideInDoors - the probe stands a fresh clone in a temp folder, as the cold probe does
 	"os"
 	"path/filepath"
 	"slices"
@@ -108,7 +109,7 @@ func probed(d boxDoors, delta string, stands func(func(string), coldBox) bool, c
 		return exitFailed
 	}
 	seen := drySession(d, box.tree, clears)
-	checks := readsNamed(probeRows(filepath.Join(box.tree, filepath.FromSlash(sessionLog))), seen, names)
+	checks := readsNamed(probeRows(d.disk, filepath.Join(box.tree, filepath.FromSlash(sessionLog))), seen, names)
 	for _, line := range coldLines(checks) {
 		say(line)
 	}
@@ -141,25 +142,25 @@ func smokeTree(d boxDoors, say func(string), box coldBox) bool {
 	}
 	from := filepath.Join(d.root, filepath.FromSlash(binFolder))
 	to := filepath.Join(box.tree, filepath.FromSlash(binFolder))
-	if err := os.MkdirAll(to, 0o755); err != nil {
+	if err := d.disk.makeAll(to, coldFolderMode); err != nil {
 		say("FAIL clone: " + err.Error())
 		return false
 	}
-	built, _ := os.ReadDir(from)
+	built, _ := d.disk.list(from)
 	for _, one := range built {
 		if one.IsDir() || strings.HasSuffix(one.Name(), keptOld) {
 			continue
 		}
-		text, err := os.ReadFile(filepath.Join(from, one.Name()))
+		text, err := d.disk.read(filepath.Join(from, one.Name()))
 		if err == nil {
-			err = os.WriteFile(filepath.Join(to, one.Name()), text, 0o755)
+			err = d.disk.write(filepath.Join(to, one.Name()), text, coldFolderMode)
 		}
 		if err != nil {
 			say("FAIL clone: " + err.Error())
 			return false
 		}
 	}
-	points(box)
+	points(d.disk, box)
 	return true
 }
 

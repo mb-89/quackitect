@@ -5,7 +5,8 @@
 package projection
 
 import (
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -198,10 +199,5 @@ func grouped(said []string, at int) []string {
 
 // The paths of a map in sorted order, so a caller writes them the same way each time. [[spec/tickets/config-verbs-port-to-go]]
 func Paths(said map[string]string) []string {
-	out := make([]string, 0, len(said))
-	for path := range said {
-		out = append(out, path)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(said))
 }

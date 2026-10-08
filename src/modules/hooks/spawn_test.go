@@ -1,5 +1,5 @@
-// The layer the door puts into a spawned helper's prompt, off onAgentSpawn in
-// src/bridge/guidance.js: one case table, which the JavaScript builders write.
+// The layer the door puts into a spawned helper's prompt: one case table,
+// which the JavaScript builders write.
 // [[spec/tickets/spawn-answers-off-the-door]]
 package hooks
 
@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"quackitect/src/q"
 )
 
 // The case table the JavaScript builders write. [[spec/tickets/spawn-answers-off-the-door]]
@@ -153,5 +155,48 @@ func TestASpawnOfAKindTakesThatKindsLayer(t *testing.T) {
 	}
 	if !ran {
 		t.Fatalf("no row of %s names a kind with a layer", layerCases)
+	}
+}
+
+// A helper's spawn opens on the hand of the session the session file names, and the wrapper's own spawn and a box naming no session take no line. [[spec/design_output/pull#a-hand-of-its-own]]
+// level0: FixtureOutsideHome - each case seeds the session file into a tree of its own.
+func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+	const tag = "You are the hand of session s7 on this box, so you pull under no --as."
+	for _, one := range []struct {
+		name    string
+		session string
+		own     bool
+		prompt  string
+		want    string
+	}{
+		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, "work one step", tag + "\n\nwork one step"},
+		{"the wrapper's own spawn", `{"id":"s7"}`, true, "work one step", ""},
+		{"the pull's hand, whose own field the kit drops", `{"id":"s7"}`, false, q.HandOfItsOwn + ", named helper-1", ""},
+		{"a box carrying no session file", "", false, "work one step", ""},
+		{"a session file naming no id", `{"harness":"claude-code"}`, false, "work one step", ""},
+	} {
+		t.Run(one.name, func(t *testing.T) {
+			files := map[string]string{}
+			if one.session != "" {
+				files[sessionFile] = one.session
+			}
+			root := treeOf(t, files, "")
+			door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
+			said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: map[string]any{
+				"session_id": "s1", "prompt": one.prompt, "own": one.own,
+			}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := ""
+			for _, effect := range said.Effects {
+				if event, ok := effect.Result.(map[string]any); ok && effect.Kind == eventEffect {
+					got = textOf(event, "prompt")
+				}
+			}
+			if got != one.want {
+				t.Fatalf("the spawn's prompt reads %q, and wants %q", got, one.want)
+			}
+		})
 	}
 }

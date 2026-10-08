@@ -1,8 +1,8 @@
 // The dispatcher's plan over a fake origin and its clone: what stands ready,
-// held, waiting, stuck, loose and left for a person, ported off
-// test/level0/dispatch.test.js.
+// held, waiting, stuck, loose and left for a person, ported off the
+// JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported dispatchPlan and its rows, and declares the dp helpers the fire and write tests use
 
 import (
 	"encoding/json"

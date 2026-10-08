@@ -4,36 +4,39 @@
 package swap
 
 import (
-	"os"
-	"path/filepath"
+	"io/fs"
 	"testing"
+	"testing/fstest"
 	"time"
 )
 
-func TestAFileSwappedInAtThePathReadsAsSwapped(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "server")
-	if err := os.WriteFile(path, []byte("old build"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	first, err := os.Stat(path)
+// A disk in memory holding the server's build, and the stat door reading it. [[spec/tickets/test-walks-move-onto-fakes]]
+func fakeServer(t *testing.T, build string) (fstest.MapFS, stat, fs.FileInfo) {
+	t.Helper()
+	disk := fstest.MapFS{"server": {Data: []byte(build), Mode: 0o755, ModTime: time.Unix(100, 0)}}
+	door := func(path string) (fs.FileInfo, error) { return fs.Stat(disk, path) }
+	first, err := door("server")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if Swapped(first, path) {
+	return disk, door, first
+}
+
+func TestAFileSwappedInAtThePathReadsAsSwapped(t *testing.T) {
+	disk, door, first := fakeServer(t, "old build")
+	if swapped(door, first, "server") {
 		t.Fatal("the same file reads as swapped")
 	}
-
-	if err := os.Rename(path, path+".old"); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(path, []byte("the new build"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	later := first.ModTime().Add(time.Second)
-	if err := os.Chtimes(path, later, later); err != nil {
-		t.Fatal(err)
-	}
-	if !Swapped(first, path) {
+	disk["server"] = &fstest.MapFile{Data: []byte("the new build"), Mode: 0o755, ModTime: first.ModTime().Add(time.Second)}
+	if !swapped(door, first, "server") {
 		t.Fatal("a new build at the path reads as no swap")
+	}
+}
+
+func TestAPathStandingNowhereReadsAsNoSwap(t *testing.T) {
+	disk, door, first := fakeServer(t, "old build")
+	delete(disk, "server")
+	if swapped(door, first, "server") {
+		t.Fatal("a path standing nowhere reads as swapped")
 	}
 }

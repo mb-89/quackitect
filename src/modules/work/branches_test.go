@@ -1,6 +1,5 @@
 // A standing work branch draws one row with no state, and a trunk ticket
-// naming its group rides the branch and draws no row, as answerOf in
-// src/scripts/work-answer.js draws them.
+// naming its group rides the branch and draws no row.
 // [[spec/tickets/the-index-reads-standing-branches]]
 package work
 

@@ -1,6 +1,6 @@
-// A group reaches done once every ticket a box can close stands closed, as
-// src/scripts/work-fix.js reads it. Work a person alone can do stands on the
-// person route, and that alone leaves the group loose on main.
+// A group reaches done once every ticket a box can close stands closed. Work
+// a person alone can do stands on the person route, and that alone leaves the
+// group loose on main.
 // [[spec/design_output/work#a-box-leaves]]
 package branches
 

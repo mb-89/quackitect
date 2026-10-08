@@ -1,0 +1,6 @@
+# The index's door: the disk, the processes, the signals and the socket the
+# index serves on.
+index:
+  go: [os, os/exec, os/signal, net, net/http, syscall]
+  files: [door.go, door_fake_test.go, actions.go, bus.go, detach_unix.go, detach_windows.go, main.go, ops.go, tools.go, v1.go]
+  contract: [src/index/index_contract_test.go, src/index/fakeindex_contract_test.go, src/index/bus_contract_test.go, src/index/detach_contract_test.go, src/index/detach_windows_contract_test.go]

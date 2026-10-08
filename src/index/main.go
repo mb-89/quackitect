@@ -37,7 +37,7 @@ const (
 var postTimeout = postWait
 
 // The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
-func Main(manage Manage, starts ...Start) {
+func Main(clock q.Clock, manage Manage, starts ...Start) {
 	Serving()
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
@@ -52,21 +52,26 @@ func Main(manage Manage, starts ...Start) {
 	}
 
 	if argv[0] == "serve" {
-		exits(serves(root, manage, starts))
+		exits(serves(clock, root, manage, starts))
 	}
-	exits(asks(root, argv))
+	exits(asks(clock, root, argv))
 }
 
 // The root every verb works in, which the composition root reads its wiring off. [[spec/design_output/index#a-door-comes-back]]
 func Root() (string, error) { return rootHere() }
 
 // The base of /v1 on the door standing over the root, which it starts where none answers, so a client reaches the index the way every other client does. [[spec/tickets/the-quack-cli-gets-generated]]
-func V1() (string, error) {
+func V1(clock q.Clock) (string, error) {
 	root, err := rootHere()
 	if err != nil {
 		return "", err
 	}
-	if _, err := reaches(root, []string{"standing"}); err != nil {
+	return V1At(clock, root)
+}
+
+// The base of the /v1 door standing for the tree at root. [[spec/guidance/code/testing]]
+func V1At(clock q.Clock, root string) (string, error) {
+	if _, err := reaches(clock, root, []string{"standing"}); err != nil {
 		return "", err
 	}
 	standing, err := standingOf(root)
@@ -101,7 +106,7 @@ func rooted(path string) string {
 	return path
 }
 
-func serves(root string, manage Manage, starts []Start) int {
+func serves(clock q.Clock, root string, manage Manage, starts []Start) int {
 	// A second serve beside a live door places every module again, and the first door's file goes with whichever leaves first. [[spec/tickets/process-shadow-reads-clean]]
 	if said, live := liveDoor(root); live {
 		fmt.Fprintf(stderr, "an index stands over this tree already, at port %d\n", said.Port)
@@ -112,7 +117,7 @@ func serves(root string, manage Manage, starts []Start) int {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	stop, _, err := ServeManaged(root, filepath.Join(root, Runtime, "index.db"), q.Main, manage, starts...)
+	stop, _, err := ServeManaged(clock, root, filepath.Join(root, Runtime, "index.db"), q.Main, manage, starts...)
 	if err != nil {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1
@@ -121,9 +126,9 @@ func serves(root string, manage Manage, starts []Start) int {
 	defer dropsOwn(root, pid)
 
 	select {
-	case <-stops(swap.Watches):
+	case <-stops(func(gone func()) { swap.Watches(clock, gone) }):
 	case <-stopAsked:
-	case <-displaced(root, pid, displacedEvery):
+	case <-displaced(clock, root, pid, displacedEvery):
 	}
 	stop()
 	return 0
@@ -152,11 +157,13 @@ func dropsOwn(root string, pid int) {
 }
 
 // Closes once the standing file names another door, or none, on two looks in a row, so a door no caller reaches leaves and takes its placements with it. [[spec/tickets/process-shadow-reads-clean]]
-func displaced(root string, pid int, every time.Duration) <-chan struct{} {
+func displaced(clock q.Clock, root string, pid int, every time.Duration) <-chan struct{} {
 	out := make(chan struct{})
+	looks, stop := ticks(clock, every)
 	go func() {
+		defer stop()
 		misses := 0
-		for range time.Tick(every) {
+		for range looks {
 			if said, err := standingOf(root); err == nil && said.Pid == pid {
 				misses = 0
 				continue
@@ -171,12 +178,12 @@ func displaced(root string, pid int, every time.Duration) <-chan struct{} {
 }
 
 // Asks the index standing over the root, and answers its result, so the composition root runs a verb that writes through a module. [[spec/design_output/model#everything-on-disk-mirrors]]
-func Ask(argv ...string) (any, error) {
+func Ask(clock q.Clock, argv ...string) (any, error) {
 	root, err := rootHere()
 	if err != nil {
 		return nil, err
 	}
-	said, err := reaches(root, argv)
+	said, err := reaches(clock, root, argv)
 	if err != nil {
 		return nil, err
 	}
@@ -186,8 +193,8 @@ func Ask(argv ...string) (any, error) {
 	return said.Result, nil
 }
 
-func asks(root string, argv []string) int {
-	said, err := reaches(root, argv)
+func asks(clock q.Clock, root string, argv []string) int {
+	said, err := reaches(clock, root, argv)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
@@ -216,12 +223,12 @@ func asks(root string, argv []string) int {
 }
 
 // [[spec/design_output/index#a-door-comes-back]]
-func reaches(root string, argv []string) (answer, error) {
-	from := startNow()
+func reaches(clock q.Clock, root string, argv []string) (answer, error) {
+	from := clock.Now()
 	for try := 0; try < reachTries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && stands(standing, root) {
-			said, posted := postsWithin(standing, argv, postSpan(from))
+			said, posted := postsWithin(standing, argv, postSpan(clock, from))
 			if posted == nil {
 				return said, nil
 			}
@@ -234,7 +241,7 @@ func reaches(root string, argv []string) (answer, error) {
 			posts(standing, []string{"stop"})
 		}
 		removeFile(standingPath(root))
-		if err := starts(root); err != nil {
+		if err := starts(clock, root); err != nil {
 			return answer{}, err
 		}
 	}
@@ -276,8 +283,8 @@ func standingOf(root string) (Standing, error) {
 }
 
 // The span a reach's post waits on its door: what the hang guard leaves since the reach began, and one poll pause at least, so a cold door's first answer meets the guard alone. [[spec/tickets/cold-runner-waits-meet-readiness]]
-func postSpan(from time.Time) time.Duration {
-	return max(min(postTimeout, startHang-startNow().Sub(from)), startPollPause)
+func postSpan(clock q.Clock, from time.Time) time.Duration {
+	return max(min(postTimeout, startHang-clock.Now().Sub(from)), startPollPause)
 }
 
 func posts(standing Standing, argv []string) (answer, error) {
@@ -293,7 +300,7 @@ func postsWithin(standing Standing, argv []string, span time.Duration) (answer, 
 		return answer{}, err
 	}
 
-	client := &http.Client{Timeout: span}
+	client := &http.Client{Timeout: span, Transport: doorTransport}
 	said, err := client.Post(
 		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
 	if err != nil {

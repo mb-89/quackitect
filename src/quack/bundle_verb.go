@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"maps"
+	// level0: OutsideInDoors - the verb hashes the drawing's sources off the tree, as a build reads source
 	"os"
 	"path/filepath"
 	"slices"

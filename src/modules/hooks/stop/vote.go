@@ -1,5 +1,5 @@
-// The vote at a turn's end, and the block text asksForStop in
-// src/bridge/stop.js writes. [[spec/tickets/cage-stop-rules-port]]
+// The vote at a turn's end, and the block text asking for a stop.
+// [[spec/tickets/cage-stop-rules-port]]
 package stop
 
 import (

@@ -46,6 +46,7 @@ terms:
   - {word: desk, means: "a session a person runs by hand outside a cloud box which hands person steps out"}
   - {word: dispatch, means: "to hand a ready group to a worker such as a cloud session or a copilot worker"}
   - {word: door, means: "the one place the tree reaches or guards an outside thing and refuses what breaks a rule"}
+  - {word: io module, means: "a door written in Go as a module whose registration carries the IO flag"}
   - {word: draft, means: "an answer written before it goes out which a tool checks against the voice rules"}
   - {word: editor, means: "the code editor a person works in which draws findings and the ticket drawing as they type"}
   - {word: engine, means: "the part that hands out the next ticket by rules and checks every hand back"}

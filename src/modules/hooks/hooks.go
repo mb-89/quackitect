@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/modules/hooks/review"
 	"quackitect/src/modules/hooks/write"
@@ -64,6 +65,10 @@ type Post struct {
 	Harness string         `json:"harness,omitempty"`
 	Fill    any            `json:"fill,omitempty"`
 	Old     any            `json:"old,omitempty"`
+	// The transcript's rows as the session hands them, newest last, which the door trims into the fields its folds read. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/level0-hooks-hold-no-rule]]
+	Messages []any `json:"messages,omitempty"`
+	// Says the post asks back for a step the first post answered, so its rows ask back no more. [[spec/tickets/level0-hooks-hold-no-rule]]
+	Back bool `json:"back,omitempty"`
 }
 
 // [[spec/design_output/model#the-effects]]
@@ -113,7 +118,7 @@ type Outside struct {
 	Bound func(local string) string
 	Call  Call
 	Ops   func(caller string) []Op
-	Now   func() time.Time
+	Clock q.Clock
 	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
 	Shadow func(row map[string]any) error
 	// The tree a post naming no root stands in, what the config says there, and a git read's output there. None reads no tree, no cap and no git. [[spec/tickets/cage-command-rules-port]]
@@ -130,6 +135,8 @@ type Outside struct {
 	Schema func(root, where, text string) write.Judged
 	// The index's own lease off index/health: its last renewal, its term, and whether it stands. None reads the index as up. [[spec/design_output/model#the-watcher-of-the-watchdog]]
 	Health func() (renewed time.Time, term time.Duration, held bool)
+	// The sentinel's ear: each post the bridge sends, as its event and its payload. None hears nothing. [[spec/design_output/failures#the-sentinel-fires-a-watch]]
+	Hear func(event failure.Event)
 	// The index a Grep or a Glob asks, by method and params in the shape se-index reads, and its answer in the shape it prints. None passes every search to the harness. [[spec/tickets/grep-glob-answer-off-index]]
 	Index func(method string, params map[string]any) (map[string]any, error)
 	// What the branch verb gathers for a review under the root, or why it gathered nothing. None passes the review to the bridge. [[spec/tickets/review-spawns-off-the-door]]
@@ -183,8 +190,6 @@ type Door struct {
 	reviews map[string]review.Material
 	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
 	downSince time.Time
-	// The sessions a marked prompt armed the reply probe in. [[spec/tickets/the-reply-probe-runs]]
-	probing map[string]bool
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -214,7 +219,19 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}, probing: map[string]bool{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
+}
+
+// The sentinel hears each post as its event and its payload in compact JSON, so a watch matches a tool's command inside it. [[spec/tickets/the-hooks-feed-the-sentinel]]
+func (d *Door) hears(post Post) {
+	if d.from.Hear == nil {
+		return
+	}
+	text, err := json.Marshal(post.E)
+	if err != nil {
+		return
+	}
+	d.from.Hear(failure.Event{Kind: post.Event, Text: string(text)})
 }
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -225,6 +242,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if !fills(post) {
 		post.Fill = nil
 	}
+	post = transcribed(post)
 	root := post.Root
 	if root == "" {
 		root = d.from.Root
@@ -236,7 +254,6 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	post = picks(post)
 	session := d.sessionFor(post, root)
 	d.writesSession(post, root)
-	d.probes(session, post, root)
 	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}
@@ -245,6 +262,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	d.rows(session, root)
 	d.repeats(session, root)
 	d.readsHealth(post)
+	d.hears(post)
 	effects := []Effect{}
 	if said, ok := d.rewrites(session, post); ok {
 		effects = append(effects, said)
@@ -332,12 +350,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
-func (d *Door) now() time.Time {
-	if d.from.Now == nil {
-		return time.Now()
-	}
-	return d.from.Now()
-}
+func (d *Door) now() time.Time { return d.from.Clock.Now() }
 
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {

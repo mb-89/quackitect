@@ -62,6 +62,16 @@ func holdsRule(found []Finding, rule, file string) bool {
 	return false
 }
 
+// A placed check process commits the sweep as the writer Registers hands back, so that writer owns it. [[spec/tickets/sweep-reads-tracked-after-restart]]
+func TestTheWriterRegistersHandsBackCommitsTheSweep(t *testing.T) {
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	if _, err := s.Commit(s.Snapshot().Revision, hand, map[string]any{SweepPort: []Finding{}}); err != nil {
+		t.Fatalf("the sweep commits as the check's writer, and the store answers %v", err)
+	}
+}
+
 func TestTheSweepAnswersADeadPointerOffTheFiles(t *testing.T) {
 	found := sweepOver(t, map[string]string{"spec/a.md": "# A\n\nSee [[spec/nowhere]].\n"}, nil)
 	if !holdsRule(found, "EveryPointerResolves", "spec/a.md") {

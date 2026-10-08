@@ -113,7 +113,7 @@ func GroupClosed(disk Disk, group string) bool {
 	return false
 }
 
-// Why a ticket naming a closed group stands refused, or nothing. [[spec/design_output/pull#a-closed-group-takes-no-child]]
+// Why a ticket naming a closed group stands refused, or nothing. [[spec/design_output/pull#a-closed-group-stays-shut]]
 func ClosedGroup(disk Disk, text string) string {
 	group := FieldOf(text, GroupField)
 	if group == "" || !GroupClosed(disk, group) {

@@ -1,7 +1,6 @@
-// The brief fold: the canary debt the bridge keeps on its box, off sessionHere,
-// paid, onTurnComplete, owesCanary and onSessionCompact in src/bridge/guidance.js,
-// and the blocks the door answers off it. The door stamps the brief on every
-// event, so the fold reads no file. [[spec/tickets/brief-answers-off-the-door]]
+// The brief fold: the canary debt the bridge keeps on its box, and the blocks
+// the door answers off it. The door stamps the brief on every event, so the
+// fold reads no file. [[spec/tickets/brief-answers-off-the-door]]
 package hooks
 
 import (
@@ -62,13 +61,13 @@ func stepBrief(state Brief, event q.Event) Brief {
 		state.reads()
 	case saidEvent:
 		text := textOf(fields, "text")
-		// A paid session writing the line again marks the step, as repeats in src/bridge/guidance.js reads it. [[spec/tickets/brief-owes-after-a-clear]]
+		// A paid session writing the line again marks the step. [[spec/tickets/brief-owes-after-a-clear]]
 		if state.Paid && brief.CanaryIn(text, state.Stamp.Sentence) != brief.None {
 			state.Said.Heard = heardTwice
 		}
 		state.pays(text)
 	case endEvent:
-		// A clear opens the debt again, as onSessionEnd in src/bridge/guidance.js opens it. [[spec/tickets/brief-owes-after-a-clear]]
+		// A clear opens the debt again. [[spec/tickets/brief-owes-after-a-clear]]
 		if textOf(fields, "reason") == clearReason {
 			state.Owes, state.Paid = true, false
 		}
@@ -186,7 +185,7 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 			out = append(out, Effect{Kind: afterKind, Name: one.Name, Text: one.Text})
 			names = append(names, one.Name)
 		}
-		// The row naming the blocks that reach the session, as layerOf in src/bridge/guidance.js logs it. [[spec/tickets/the-brief-leaves-the-bridge]]
+		// The row naming the blocks that reach the session. [[spec/tickets/the-brief-leaves-the-bridge]]
 		d.logs(root, rowOf(d.now(), contextKind, fmt.Sprintf("%d block(s) reach the session", len(names)), strings.Join(names, " ")))
 	}
 	if state.Said.Owes {
@@ -210,7 +209,7 @@ var heard = map[string]string{
 	heardTwice:  brief.HeardAgain,
 }
 
-// The canary row the newest step heard, as paid, onTurnComplete and repeats in src/bridge/guidance.js log it: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]
+// The canary row the newest step heard: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]
 func (d *Door) repeats(session, root string) {
 	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
 	d.mu.Lock()
@@ -226,7 +225,7 @@ func (d *Door) repeats(session, root string) {
 	d.logs(root, row)
 }
 
-// The handover reaches one read, so the read removes it, as handoverHere in src/bridge/guidance.js does. A post standing in no tree reads none. [[spec/design_output/work#one-handover-stands]]
+// The handover reaches one read, so the read removes it. A post standing in no tree reads none. [[spec/design_output/work#one-handover-stands]]
 func handoverAt(root string) string {
 	if root == "" {
 		return ""

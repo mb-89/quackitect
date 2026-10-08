@@ -1,7 +1,7 @@
 // The projected modules load where the watch loads, so the sidebar reads the
 // view bases and the bless word over /v1.
 // [[spec/tickets/the-sidebar-reads-v1]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"testing"

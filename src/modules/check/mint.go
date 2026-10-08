@@ -365,12 +365,4 @@ func tableRows(table *yaml.Doc) []string {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
-func textOf(said any) string {
-	if said == nil {
-		return ""
-	}
-	if text, ok := said.(string); ok {
-		return text
-	}
-	return fmt.Sprint(said)
-}
+func textOf(said any) string { return yaml.ScalarText(said) }

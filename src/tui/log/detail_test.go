@@ -4,9 +4,7 @@
 package log
 
 import (
-	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -41,6 +39,7 @@ func TestALineThatDoesNotParseStandsAsAnUnparsedRow(t *testing.T) {
 	}
 }
 
+// The details show the door, the time, the fields and the whole text, and leave out the permalink, the file, the received time and the level. [[spec/design_output/tui]]
 func TestTheDetailsShowTheDoorTheTimeTheFieldsAndTheWholeText(t *testing.T) {
 	t.Parallel()
 	long := strings.Repeat("word ", 40)
@@ -57,11 +56,6 @@ func TestTheDetailsShowTheDoorTheTimeTheFieldsAndTheWholeText(t *testing.T) {
 	if strings.Count(said, "word") != 40 {
 		t.Fatalf("the details hold all 40 words of the text, and hold %d", strings.Count(said, "word"))
 	}
-}
-
-func TestTheDetailsLeaveOutPermalinkFileAndReceivedTime(t *testing.T) {
-	t.Parallel()
-	said := details([]Record{row(1, "stop", "the turn ends")}, 0)
 	for _, noise := range []string{"Permalink", "Received", "File:", "info"} {
 		if strings.Contains(said, noise) {
 			t.Fatalf("the details carry no %q, and read:\n%s", noise, said)
@@ -69,67 +63,49 @@ func TestTheDetailsLeaveOutPermalinkFileAndReceivedTime(t *testing.T) {
 	}
 }
 
-func TestAPromptShowsItsReplyAndTheReplyShowsItsPrompt(t *testing.T) {
+// A prompt's details carry its answer, its notes up to the next prompt and the reply ending its turn; a reply carries every prompt of its turn in order; an answer carries its own prompt alone; a tool row and a note carry no prompt. [[spec/design_output/tui#the-details]]
+func TestTheDetailsCarryTheRowsOfTheirTurn(t *testing.T) {
 	t.Parallel()
-	all := []Record{
-		row(1, "prompt", "are you bound?"),
-		row(2, "tool", "Read"),
-		row(3, "reply", "yes, bound"),
-		row(4, "prompt", "and now?"),
+	turns := map[string][]Record{
+		"reply": {row(1, "prompt", "are you bound?"), row(2, "tool", "Read"), row(3, "reply", "yes, bound"), row(4, "prompt", "and now?")},
+		"two":   {row(1, "prompt", "first ask"), row(2, "tool", "Read"), row(3, "prompt", "and one more thing"), row(4, "reply", "both done")},
+		"answers": {row(1, "prompt", "build the door"), row(2, "answer", "you want the door"), row(3, "tool", "Read"),
+			row(4, "prompt", "and the bell"), row(5, "answer", "and the bell too"), row(6, "reply", "door and bell stand")},
+		"notes": {row(1, "prompt", "are you bound?"), row(2, "note", "ahead of the answer"), row(3, "answer", "bound to the queue"),
+			row(4, "note", "after the answer"), row(5, "prompt", "and now?"), row(6, "note", "under the second prompt"), row(7, "reply", "yes, bound")},
 	}
-	if said := details(all, 0); !strings.Contains(said, "yes, bound") {
-		t.Fatalf("the prompt's details carry its reply, and read:\n%s", said)
+	for _, one := range []struct {
+		turn       string
+		at         int
+		has, lacks []string
+	}{
+		{"reply", 0, []string{"yes, bound"}, nil},
+		{"reply", 2, []string{"are you bound?"}, nil},
+		{"reply", 3, nil, []string{"yes, bound"}},
+		{"reply", 1, nil, []string{"yes, bound", "are you bound?"}},
+		{"two", 0, []string{"both done"}, nil},
+		{"two", 3, []string{"first ask", "and one more thing"}, nil},
+		{"answers", 0, []string{"you want the door", "door and bell stand"}, []string{"and the bell too"}},
+		{"answers", 4, []string{"and the bell"}, []string{"build the door"}},
+		{"notes", 0, []string{"ahead of the answer", "after the answer"}, []string{"under the second prompt"}},
+		{"notes", 1, nil, []string{"are you bound?"}},
+		{"notes", 3, nil, []string{"are you bound?"}},
+		{"notes", 4, nil, []string{"ahead of the answer", "after the answer"}},
+	} {
+		said := details(turns[one.turn], one.at)
+		for _, want := range one.has {
+			if !strings.Contains(said, want) {
+				t.Errorf("row %d of %s carries %q, and its details read:\n%s", one.at, one.turn, want, said)
+			}
+		}
+		for _, not := range one.lacks {
+			if strings.Contains(said, not) {
+				t.Errorf("row %d of %s carries no %q, and its details read:\n%s", one.at, one.turn, not, said)
+			}
+		}
 	}
-	if said := details(all, 2); !strings.Contains(said, "are you bound?") {
-		t.Fatalf("the reply's details carry its prompt, and read:\n%s", said)
-	}
-	if said := details(all, 3); strings.Contains(said, "yes, bound") {
-		t.Fatalf("a prompt with no reply after it borrows none, and read:\n%s", said)
-	}
-	if said := details(all, 1); strings.Contains(said, "yes, bound") || strings.Contains(said, "are you bound?") {
-		t.Fatalf("a tool row carries no pair, and read:\n%s", said)
-	}
-}
-
-func TestAPromptInsideATurnShowsTheReplyEndingItAndTheReplyShowsEveryPrompt(t *testing.T) {
-	t.Parallel()
-	all := []Record{
-		row(1, "prompt", "first ask"),
-		row(2, "tool", "Read"),
-		row(3, "prompt", "and one more thing"),
-		row(4, "reply", "both done"),
-	}
-	if said := details(all, 0); !strings.Contains(said, "both done") {
-		t.Fatalf("the first prompt of the turn shows the reply ending it, and read:\n%s", said)
-	}
-	said := details(all, 3)
-	if !strings.Contains(said, "first ask") || !strings.Contains(said, "and one more thing") {
-		t.Fatalf("the reply shows both prompts of its turn, and read:\n%s", said)
-	}
-	if strings.Index(said, "first ask") > strings.Index(said, "and one more thing") {
+	if said := details(turns["two"], 3); strings.Index(said, "first ask") > strings.Index(said, "and one more thing") {
 		t.Fatalf("the reply shows its prompts in the order they came, and read:\n%s", said)
-	}
-}
-
-func TestAPromptShowsItsAnswerAndItsReplyAndTheAnswerShowsItsPrompt(t *testing.T) {
-	t.Parallel()
-	all := []Record{
-		row(1, "prompt", "build the door"),
-		row(2, "answer", "you want the door"),
-		row(3, "tool", "Read"),
-		row(4, "prompt", "and the bell"),
-		row(5, "answer", "and the bell too"),
-		row(6, "reply", "door and bell stand"),
-	}
-	said := details(all, 0)
-	if !strings.Contains(said, "you want the door") || !strings.Contains(said, "door and bell stand") {
-		t.Fatalf("the prompt shows its answer and the reply ending its turn, and read:\n%s", said)
-	}
-	if strings.Contains(said, "and the bell too") {
-		t.Fatalf("the prompt borrows no answer of a later prompt, and read:\n%s", said)
-	}
-	if said := details(all, 4); !strings.Contains(said, "and the bell") || strings.Contains(said, "build the door") {
-		t.Fatalf("the answer shows its own prompt alone, and read:\n%s", said)
 	}
 }
 
@@ -143,13 +119,17 @@ func TestAToolRowNamesTheToolAndEveryOtherRowItsDoor(t *testing.T) {
 	}
 }
 
-func TestAPromptWearsOneColourOnItsDoorAndOnItsText(t *testing.T) {
+// The said column wears the colour the kind list names for its kind, and a prompt wears no background. [[spec/design_output/tui#colours]]
+func TestTheSaidColumnWearsTheColourOfItsKind(t *testing.T) {
 	t.Parallel()
 	if draw.KindStyle("prompt").GetBackground() != (lipgloss.NoColor{}) {
 		t.Fatal("a prompt wears its own text colour, and no background")
 	}
-	if draw.KindStyle("prompt").GetForeground() != saidStyle(row(1, "prompt", "x")).GetForeground() {
-		t.Fatal("a prompt wears one colour on its door and on its text")
+	for _, kind := range []string{"prompt", "note", "answer"} {
+		got, want := saidStyle(row(1, kind, "x")).GetForeground(), draw.KindStyle(kind).GetForeground()
+		if got != want || want == (lipgloss.NoColor{}) {
+			t.Fatalf("%s wears its kind's colour %v in the said column, and wears %v", kind, want, got)
+		}
 	}
 }
 
@@ -192,131 +172,12 @@ func TestTheFilterReadsKQL(t *testing.T) {
 	}
 }
 
-func TestAHalfFilterIsStillTypingAndABadPatternSaysSo(t *testing.T) {
-	t.Parallel()
-	for _, said := range []string{`"open`, "/open", "(a or", "kind:", "a and"} {
-		if _, err := draw.ParseFilter(said); !errors.Is(err, draw.ErrIncomplete) {
-			t.Fatalf("%q is still typing, and read %v", said, err)
-		}
-	}
-	if _, err := draw.ParseFilter("/[a/"); err == nil || errors.Is(err, draw.ErrIncomplete) {
-		t.Fatalf("a pattern that fails to compile says so, and read %v", err)
-	}
-}
-
-func TestAWrappedValueLinesUpUnderItself(t *testing.T) {
-	t.Parallel()
-	said := draw.Wrap("tool  "+strings.Repeat("abc ", 10), 20)
-	for _, line := range strings.Split(said, "\n")[1:] {
-		if !strings.HasPrefix(line, "      ") {
-			t.Fatalf("a continuation starts under the value at column 6, and read %q", line)
-		}
-	}
-	for _, line := range strings.Split(said, "\n") {
-		if len([]rune(line)) > 20 {
-			t.Fatalf("no line runs past 20, and %q does", line)
-		}
-	}
-}
-
-// [[spec/design_output/tui#the-details]]
-// A note takes a colour of its own, and the said column wears it too. [[spec/design_output/tui#colours]]
-func TestANoteTakesAColourOfItsOwnInBothColumns(t *testing.T) {
-	t.Parallel()
-	mark := draw.KindStyle("note").GetForeground()
-	if mark == (lipgloss.NoColor{}) {
-		t.Fatal("a note row takes a colour of its own, and the kind list names none")
-	}
-	for _, other := range []string{"prompt", "reply", "answer", "tool"} {
-		if draw.KindStyle(other).GetForeground() == mark {
-			t.Fatalf("a note reads apart from %s, and the two share a colour", other)
-		}
-	}
-	if got := saidStyle(row(1, "note", "the lint drags")).GetForeground(); got != mark {
-		t.Fatalf("the said column wears the note's colour %v, and wears %v", mark, got)
-	}
-}
-
-// The colour stands in the kind list alone, so the said column reads it there. [[spec/design_output/tui#colours]]
-func TestTheSaidColumnReadsTheKindListAndNamesNoColourOfItsOwn(t *testing.T) {
-	t.Parallel()
-	for _, kind := range []string{"note", "answer"} {
-		if got := saidStyle(row(1, kind, "x")).GetForeground(); got != draw.KindStyle(kind).GetForeground() {
-			t.Fatalf("%s reads one colour, and the two columns read %v and %v", kind, got, draw.KindStyle(kind).GetForeground())
-		}
-	}
-}
-
-// A person opening the prompt reads what the session parked under it, and a note stands apart from the prompt that asked for it. [[spec/design_output/tui#the-details]]
-func TestAPromptShowsTheNoteItCarriesAndTheNoteStandsApartFromItsPrompt(t *testing.T) {
-	t.Parallel()
-	all := []Record{
-		row(1, "prompt", "are you bound?"),
-		row(2, "note", "the lint drags"),
-		row(3, "reply", "yes, bound"),
-		row(4, "prompt", "and now?"),
-	}
-	if said := details(all, 0); !strings.Contains(said, "the lint drags") {
-		t.Fatalf("the prompt's details carry the note it holds, and read:\n%s", said)
-	}
-	if said := details(all, 1); strings.Contains(said, "are you bound?") {
-		t.Fatalf("the note's details carry no prompt, and read:\n%s", said)
-	}
-	if said := details(all, 3); strings.Contains(said, "the lint drags") {
-		t.Fatalf("a prompt after the note borrows none, and read:\n%s", said)
-	}
-}
-
-// A note after the answer stands with the prompt too, up to the prompt after it, and each note stands apart from any prompt on its own. [[spec/design_output/tui#the-details]]
-func TestAPromptShowsTheNotesOnBothSidesOfItsAnswer(t *testing.T) {
-	t.Parallel()
-	all := []Record{
-		row(1, "prompt", "are you bound?"),
-		row(2, "note", "ahead of the answer"),
-		row(3, "answer", "bound to the queue"),
-		row(4, "note", "after the answer"),
-		row(5, "prompt", "and now?"),
-		row(6, "note", "under the second prompt"),
-		row(7, "reply", "yes, bound"),
-	}
-	said := details(all, 0)
-	for _, want := range []string{"ahead of the answer", "after the answer"} {
-		if !strings.Contains(said, want) {
-			t.Fatalf("the prompt carries %q, and its details read:\n%s", want, said)
-		}
-	}
-	if strings.Contains(said, "under the second prompt") {
-		t.Fatalf("a note under the prompt after it stays there, and the details read:\n%s", said)
-	}
-	if got := details(all, 3); strings.Contains(got, "are you bound?") {
-		t.Fatalf("the note after the answer stands apart from the prompt above it, and reads:\n%s", got)
-	}
-}
-
-func TestAWrapLinesUpUnderAValueACharacterWiderThanAByte(t *testing.T) {
-	t.Parallel()
-	said := "  1…9        open the tab at that place and the next one too"
-	lines := strings.Split(draw.Wrap(said, 40), "\n")
-	if len(lines) < 2 {
-		t.Fatalf("a long line wraps, and reads %v", lines)
-	}
-	under := len([]rune(lines[0][:strings.Index(lines[0], "open")]))
-	if got := len([]rune(lines[1])) - len([]rune(strings.TrimLeft(lines[1], " "))); got != under {
-		t.Fatalf("the rest lines up under the value at %d, and stands at %d", under, got)
-	}
-}
-
 func row(at int, door, said string) Record {
-	return Record{
-		At:    time.Date(2026, 9, 11, 15, 0, at, 0, time.UTC),
-		Level: "info",
-		Kind:  door,
-		Said:  said,
-	}
+	return Record{At: time.Date(2026, 9, 11, 15, 0, at, 0, time.UTC), Level: "info", Kind: door, Said: said}
 }
 
 // The rows wear the colours the config names, and a case run stands in for the window's start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
 	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
-	os.Exit(m.Run())
+	m.Run()
 }

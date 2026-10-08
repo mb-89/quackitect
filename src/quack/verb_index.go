@@ -7,11 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-
-	"quackitect/src/index"
 )
 
-// An ask of the index standing over the root, which starts one where none answers. index.Ask answers it, and a case hands in its own. [[spec/tickets/read-verbs-port-to-go]]
+// An ask of the index standing over the root, which starts one where none answers. askIndex answers it, and a case hands in its own. [[spec/tickets/read-verbs-port-to-go]]
 type asker func(argv ...string) (any, error)
 
 // The method the index verb asks where it reads no words, and the method whose answer prints as its text. [[spec/tickets/read-verbs-port-to-go]] [[spec/design_output/model#quack-why]]
@@ -20,7 +18,7 @@ const (
 	whyAsk      = "why"
 )
 
-func init() { register("index", indexVerb(index.Ask)) }
+func init() { register("index", indexVerb(askIndex)) }
 
 // index off the ask: the words as the index reads them, and standing where none come. [[spec/tickets/read-verbs-port-to-go]]
 func indexVerb(ask asker) twin {

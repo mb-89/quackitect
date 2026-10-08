@@ -1,12 +1,11 @@
 // The branch twins and wiring, and the work/yours door their cases share
 // with the ticket cases in ticket_twins_test.go.
 // [[spec/tickets/work-verbs-become-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,20 +19,24 @@ import (
 func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, index.Runtime), 0o755); err != nil {
-		t.Fatal(err)
-	}
 	c := q.New()
 	hand := q.OutIn(c, "work/yours", []work.YoursRow{}, q.Doc("the rows as the case seeds them"))
 	seeds := func(_ string, commit index.Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"work/yours": rows})
 	}
-	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
+	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(stop)
-	body, err := os.ReadFile(filepath.Join(root, index.Runtime, "index.json"))
+	base := hq3V1Of(t, root)
+	return func() (string, error) { return base, nil }
+}
+
+// The V1 base the index serving under the root names in the standing file it writes on the box's disk. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq3V1Of(t *testing.T, root string) string {
+	t.Helper()
+	body, err := realDisk().read(filepath.Join(root, index.Runtime, "index.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,8 +44,7 @@ func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
 	if err := json.Unmarshal(body, &standing); err != nil {
 		t.Fatal(err)
 	}
-	base := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1)
-	return func() (string, error) { return base, nil }
+	return fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1)
 }
 
 var yoursRows = []work.YoursRow{

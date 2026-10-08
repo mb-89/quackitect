@@ -5,7 +5,6 @@ package main
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -14,24 +13,24 @@ import (
 )
 
 // A text of n lines, as wc -l counts them. [[spec/tickets/test-lines-stay-under-code]]
-func linesOf(n int) string { return strings.Repeat("line\n", n) }
+func repeatedLines(n int) string { return strings.Repeat("line\n", n) }
 
 // Doors over a temp root holding the files, and a git answering ls-files with the listed ones alone. [[spec/guidance/code/testing]]
 func linesDoors(t *testing.T, files map[string]int, listed []string) (checkDoors, *bytes.Buffer, *bytes.Buffer) {
 	t.Helper()
 	root := t.TempDir()
+	d := (&checkFake{}).doors()
+	d.root = root
 	for rel, n := range files {
 		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := d.disk.makeAll(filepath.Dir(at), 0o755); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(at, []byte(linesOf(n)), 0o644); err != nil {
+		if err := d.disk.write(at, []byte(repeatedLines(n)), 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}
 	var out, errs bytes.Buffer
-	d := (&checkFake{}).doors()
-	d.root = root
 	d.out, d.errs = &out, &errs
 	d.git = func(args ...string) string {
 		if slices.Contains(args, "ls-files") {

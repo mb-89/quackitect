@@ -14,6 +14,8 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"quackitect/src/q"
 )
 
 // The port the window holds, one below the bridge's, where the register hands out none, and the wait a call takes. [[spec/design_output/tui#a-second-launch-hands-over]]
@@ -53,12 +55,12 @@ func OpenDoor(port int, take func(tea any)) (*http.Server, error) {
 }
 
 // Hands a tab to whatever stands on that port, and answers whether it took it. [[spec/design_output/tui#a-second-launch-hands-over]]
-func TellPort(port int, tab string) bool {
+func TellPort(clock q.Clock, port int, tab string) bool {
 	body, err := json.Marshal(said{Tab: tab})
 	if err != nil {
 		return false
 	}
-	ctx, stop := context.WithTimeout(context.Background(), callWait)
+	ctx, stop := clock.WithTimeout(context.Background(), callWait)
 	defer stop()
 	where := fmt.Sprintf("http://127.0.0.1:%d/tab", port)
 	call, err := http.NewRequestWithContext(ctx, http.MethodPost, where, bytes.NewReader(body))

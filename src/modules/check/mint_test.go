@@ -1,5 +1,6 @@
-// The mint writes the front a schema asks, and a chapter for each section.
-// [[spec/tickets/edit-tools-answer-in-go]]
+// The mint writes the front a schema asks, and a chapter for each section, each
+// value as the yaml module's scalar text reads it.
+// [[spec/tickets/edit-tools-answer-in-go]] [[spec/tickets/shared-helpers-stand-once]]
 package check
 
 import (

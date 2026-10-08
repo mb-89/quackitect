@@ -1,11 +1,11 @@
 // The write door's ports against the tree: the schema answers each write
 // table teaches the hooks door, and the voice a box with no Vale reads.
 // [[spec/tickets/cage-write-door-port]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the write tables the tree holds, as a build check reads source
 	"reflect"
 	"testing"
 
@@ -45,7 +45,7 @@ func TestTheSchemaPortAnswersWhatEveryWriteTableTeaches(t *testing.T) {
 
 func TestWriteProseReadsNothingWhereNoValeStands(t *testing.T) {
 	t.Parallel()
-	if found := writeProse(t.TempDir(), write.Handover, "# Where it stands\n"); found != nil {
+	if found := writeProse(t.TempDir(), write.Handover, "# Where it stands\n"); found != nil { // level0: FixtureOutsideHome - the door reads a root of the case's own where no Vale stands
 		t.Errorf("writeProse answers %v under a root with no Vale", found)
 	}
 }

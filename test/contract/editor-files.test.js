@@ -1,5 +1,5 @@
 // The editor's file door, against the real filesystem. The editor's own file
-// system offers no append, so the door appends through node, and this case
+// system offers no append, so the door appends through the disk door, and this case
 // holds that road to what the fake in the sidebar's cases does.
 // [[spec/design_output/log#every-writer-appends]]
 
@@ -15,9 +15,14 @@ const { fileDoor } = require("../../src/extension/editor-files.js");
 test("the editor door appends a line after every line another writer holds, and makes the folder it lands in", async () => {
   const files = disk();
   const root = files.tempDir("level0-editor-");
-  const door = fileDoor({ subscriptions: [] }, {}, (path) => ({
-    fsPath: join(root, ...String(path).split("/")),
-  }));
+  const door = fileDoor(
+    { subscriptions: [] },
+    {},
+    (path) => ({
+      fsPath: join(root, ...String(path).split("/")),
+    }),
+    { disk: files },
+  );
   const at = ".se/.log/session.jsonl";
 
   await door.append(at, "one\n");

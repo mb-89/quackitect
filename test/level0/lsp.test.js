@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { startsServer } from "../../src/extension/extension.js";
 import {
   BIN,
@@ -53,22 +54,25 @@ test("the client watches markdown and every file a two-file rule reads", () => {
     "**/.vscode/settings.json",
     "**/.vscode/extensions.json",
     "**/install.sh",
-    "**/.vale.ini",
   ]) {
     assert.ok(patterns.includes(one), one);
   }
+  assert.ok(
+    patterns.every((one) => !/vale/i.test(one)),
+    "the Go rules read no prose linter's config",
+  );
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("a built server starts, and an unbuilt one starts nothing", async () => {
-  const built = doorOf({ [BIN]: [binaryOf(process.platform), "vale"] });
+  const built = doorOf({ [BIN]: [binaryOf(process.platform), "biome"] });
   assert.equal(
     await startsServer(built),
     `/at/root/${BIN}/${binaryOf(process.platform)}`,
   );
   assert.equal(built.asked.length, 1);
 
-  const bare = doorOf({ [BIN]: ["vale"] });
+  const bare = doorOf({ [BIN]: ["biome"] });
   assert.equal(await startsServer(bare), "");
   assert.equal(bare.asked.length, 0);
 });
@@ -113,6 +117,25 @@ test("the client the editor builds starts the server again on every close, past 
   assert.deepEqual(client.options.documentSelector, ask.client.documentSelector);
   for (let at = 0; at < 12; at++) await client.closes();
   assert.equal(client.starts, 12, "every close starts the server again");
+});
+
+// The pause waits on the clock door the caller hands in, so the client holds no timer of its own. [[spec/design_output/doors#time-is-a-door]]
+test("the client starts the server again once the clock it is handed passes the pause", async () => {
+  const time = fakeClock();
+  const client = clientOf(clientModule(), serverAsk("/at/root", "linux"), time.wait);
+  let closed = false;
+  const closing = client.closes().then(() => {
+    closed = true;
+  });
+  await Promise.resolve();
+  assert.equal(closed, false, "the close waits on the clock");
+  time.tick();
+  await closing;
+  assert.equal(client.starts, 1);
+  await assert.rejects(
+    clientOf(clientModule(), serverAsk("/at/root", "linux")).handler.closed(),
+    "a client handed no clock holds no wait of its own",
+  );
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

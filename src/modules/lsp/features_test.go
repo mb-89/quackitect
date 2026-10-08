@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"quackitect/src/q/qtest"
 )
 
 // The files a hover reads: the paragraph schema naming the vocabulary, the terms, the endings, and a note. [[spec/tickets/lsp-module-serves-the-features]]
@@ -28,7 +30,7 @@ func featuresOver(t *testing.T, files map[string]string) *Server {
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
 		Files: func() map[string]string { return files },
-		Check: fakeCheck,
+		Check: fakeCheck, Clock: qtest.Wall(),
 	})
 }
 

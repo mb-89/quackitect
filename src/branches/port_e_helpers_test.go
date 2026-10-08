@@ -1,7 +1,7 @@
 // The fixtures the port_e cases share: a marked group, a closed one, a tree
 // ready to merge, a refusing origin, and the reads on origin a case asserts.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pe helpers on the tree fixture and drives cloudMark and run
 
 import (
 	"errors"

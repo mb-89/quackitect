@@ -262,8 +262,7 @@ Every rule here reads strings, so every case hands one in.
 
 - `src/modules/hooks/command/private_test.go` drives the functions, the reader and the checks over strings and a fixture diff.
 - `src/quack/hook_verb_test.go` drives the hook verb over a real repository and its bare origin.
-- `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
-- `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
+- `src/modules/hooks/write/door_test.go` drives the write door's reads over a note's text and its edits.
 
 ## What it costs
 
@@ -324,7 +323,7 @@ no person: the nobody users, and the agent names a cloud box runs under.
 
 # The judged half
 
-`spec/config/styles/VoiceJudged/Role.yml` asks the judge one question per span,
+The judge takes one question per span,
 on the tracked notes alone: does this text name a role, or one person?
 
 | label | what the rule does |

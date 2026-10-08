@@ -10,8 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/git"
@@ -44,6 +44,14 @@ func registeredRepo(root string) git.Repo { return standingRepo(root) }
 // The rules whose findings refuse at a door: a lint that ran nowhere reads no rule, and a private name leaves the box. [[spec/design_output/level0#the-panel-holds-a-warning]]
 var refusing = map[string]bool{"VoiceRulesRan": true, "Private": true}
 
+// The pull a verb runs over, built for one call's output and errors: the live one on this box, or one over the fakes in the example harness. [[spec/design_output/examples#one-runner-two-drivers]]
+type pullOver func(out, errs io.Writer) (*pull.It, int)
+
+// The live pull over the roots and the repository a registered verb takes. [[spec/design_output/pull#the-answers]]
+func pullingHere(rootOf func() (string, error), repoAt func(root string) git.Repo) pullOver {
+	return func(out, errs io.Writer) (*pull.It, int) { return pullHere(rootOf, repoAt, out, errs) }
+}
+
 // The pull over this box: the disk and git under the work root, the config under the method root, and the verbs and topics other code answers. [[spec/design_output/pull#the-answers]]
 func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, out, errs io.Writer) (*pull.It, int) {
 	method, work, err := rootsOf(rootOf)
@@ -59,28 +67,27 @@ func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 	}
 	rows, _ := configAt(method)
 	it := &pull.It{
-		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: time.Now, Out: out, Err: errs,
+		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: wall.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),
 		Words: configInt(rows, "names.words"), Fails: configInt(rows, "work.failsBeforePerson"),
 		Refusals: configInt(rows, "work.refusalsBeforeFail"), Splits: configInt(rows, "work.stepsBeforeSplit"),
 		PersonSigns: configWord(rows, "work.personSigns") == "true",
 		Weights:     pull.Weights{Block: configNumber(rows, "queue.block"), Day: configNumber(rows, "queue.day"), Fail: configNumber(rows, "queue.fail")},
 		Binding:     configWord(rows, "engine.binding"), CapBytes: configInt(rows, "pull.cap"), CapMargin: configInt(rows, "pull.margin"),
-		Log:     pullLog(work, configWord(rows, "log.level")),
-		Rules:   brief.RulesOf,
-		Shell:   pull.ShellOver(proc.Real, work),
-		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
+		Log:      pullLog(work, configWord(rows, "log.level")),
+		Rules:    brief.RulesOf,
+		Shell:    pull.ShellOver(proc.Real, work),
+		Schemas:  func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
+		Failures: failure.Load(failure.Dir{Root: method}),
 	}
 	it.Notes = func(key string) []string {
-		said, err := guidanceRows(method, env)
+		said, err := guidanceRows(realDisk(), method, env)
 		if err != nil {
 			return []string{}
 		}
 		return said[key]
 	}
-	if valeAt(method) != "" {
-		it.Voice = pullVoice(method)
-	}
+	it.Voice = pullVoice(method)
 	scripts := filepath.Join(method, "src", "scripts")
 	it.Take = func(group string) int { return takesBranch(scripts, group, it) }
 	it.Ready = it.ReadyToMerge
@@ -129,7 +136,7 @@ func pullLog(work, floor string) func(level, kind, said string, extra map[string
 
 // The session log's row writer under the work root, which answers the fault a write meets. [[spec/tickets/copilot-hooks-run-in-go]]
 func logsRow(work, floor string) func(level, kind, said string, extra map[string]any) error {
-	write := appendsRow(work, time.Now)
+	write := appendsRow(realDisk(), work, wall.Now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {
@@ -164,7 +171,7 @@ func pullVoice(root string) func(path, text string, first, last int) []pull.Voic
 		if strings.TrimSpace(text) == "" {
 			return nil
 		}
-		said := heardIn(root, path, text, prose.Past)
+		said := heardIn(quietBox(), root, path, text, prose.Past)
 		if !said.ran {
 			return nil
 		}
@@ -195,7 +202,7 @@ const hooksDoor = index.Runtime + "/hooks.json"
 // The index this box serves, started where none answers, and the port it stands at. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func servesHere(root string) string {
 	was, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))
-	if _, err := index.V1(); err != nil {
+	if _, err := reachV1(); err != nil {
 		return "No index answers, and the start fails: " + err.Error()
 	}
 	door, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooksDoor)))

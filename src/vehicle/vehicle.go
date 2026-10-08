@@ -74,7 +74,7 @@ func idOf(now Clock, pid int) string {
 	if len(digits) > stampTail {
 		digits = digits[len(digits)-stampTail:]
 	}
-	tail, _ := strconv.ParseInt(digits, 10, 64)
+	tail, _ := strconv.ParseInt(digits, decimalBase, bitSize)
 	return strconv.FormatInt(tail, hexBase) + strconv.FormatInt(int64(pid), hexBase)
 }
 
@@ -207,7 +207,7 @@ func EntryFor(d Disk, now Clock, method string, version any, pid int) (string, *
 	return id, EntryOf(id, version, method, Stamp(now)), nil
 }
 
-// The version a folder's package.json holds, or "0", as version() in src/scripts/cli-read.js reads it. [[spec/design_output/vehicle#one-file-holds-the-version]]
+// The version a folder's package.json holds, or "0". [[spec/design_output/vehicle#one-file-holds-the-version]]
 func VersionOf(d Disk, folder string) any {
 	parsed, ok := Parse(readIf(d, filepath.Join(folder, "package.json")))
 	if !ok {

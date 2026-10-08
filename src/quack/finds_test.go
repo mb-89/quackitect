@@ -3,7 +3,7 @@
 // Each case calls the action by name over a tree in a temp folder and a fake
 // of the reads the door hands the manager.
 // [[spec/tickets/find-and-wait-in-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"errors"
@@ -70,8 +70,7 @@ func findCall(t *testing.T, root string, reads index.Reads, input any) string {
 	store := q.NewStore(c)
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Now: time.Now,
-		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
+		Steps: func(func()) {}, Clock: stillClock(),
 		Accept: accepts(root, store, reads),
 	})
 	if err != nil {

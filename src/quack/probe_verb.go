@@ -64,7 +64,7 @@ func probeVerb(d boxDoors, argv []string) int {
 	if len(argv) > 0 {
 		said = argv[0]
 	}
-	client := whereIs(d.root, "claude", readSurvey(d.root))
+	client := whereIs(d.disk, d.root, "claude", readSurvey(d.disk, d.root))
 	switch said {
 	case "compact":
 		return compaction(d, client)
@@ -170,7 +170,7 @@ func compaction(d boxDoors, client string) int {
 		fmt.Fprintln(d.errs, "claude stands nowhere, so this box measures no compaction.")
 		return exitFailed
 	}
-	rows := probeRows(filepath.Join(d.root, filepath.FromSlash(sessionLog)))
+	rows := probeRows(d.disk, filepath.Join(d.root, filepath.FromSlash(sessionLog)))
 	read := readsCompaction(rows)
 	for _, one := range rows {
 		kind := one.text("kind")
@@ -209,9 +209,8 @@ func (r probeRow) text(key string) string {
 }
 
 // The rows of the log at the path, a torn line dropping alone, and no row where the log stands nowhere. [[spec/design_output/log#every-writer-appends]]
-func probeRows(at string) []probeRow {
-	text, _ := readText(at)
-	return rowsOfText(text)
+func probeRows(disk diskDoors, at string) []probeRow {
+	return rowsOfText(disk.text(at))
 }
 
 // The rows a log's text holds, a line no parser takes dropping alone. [[spec/design_output/log#every-writer-appends]]

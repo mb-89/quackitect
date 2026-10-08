@@ -1,7 +1,7 @@
 // ticket new writes the bare ticket where no file stands, and leaves a
-// standing one, off the roads test/level0/ticket-new.test.js covers.
+// standing one.
 // [[spec/tickets/the-sidebar-writes-through-actions]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import "testing"
 

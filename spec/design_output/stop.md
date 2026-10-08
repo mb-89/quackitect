@@ -62,8 +62,7 @@ and its result says to end the message with the line. A claim lives until the
 turn's end.
 
 A message holding the stop line alone ends a turn too, and the answer gate
-reads it clean. `stopLine` in `src/modules/drafts/answer.go` holds the test, and
-`test/level0/stop-dry-run.test.js` runs both gates over one answer.
+reads it clean. `stopLine` in `src/modules/drafts/answer.go` holds the test.
 
 ## A turn with no line
 
@@ -221,7 +220,7 @@ to a fresh conversation of its own, and a clear takes the place of the
 compaction. A ticket is the unit of work, so the ticket in hand runs to its
 end first. The clear then runs as three ephemeral tickets. For the owner's
 words, see [[spec/design_input/the-clear-hands-ephemeral-tickets]].
-`src/bridge/handover.js` holds the door, `src/pull/pull_ephemeral.go` holds the
+`src/modules/hooks/stops.go` holds the door, `src/pull/pull_ephemeral.go` holds the
 tickets, and the key at zero switches it off.
 
 | step | what happens | who does it |
@@ -319,7 +318,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person`, and the box is no cloud box |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `helpers-running` | the turn's end names a helper the harness still runs, or a helper spawned in the background sends no stop yet |
-| `ends-on-a-question` | the box is a cloud box, and the last prose paragraph of the answer, past the tables, the headings and the stop line, closes on a question mark |
+| `ends-on-a-question` | the box is a cloud box. The answer's last prose paragraph, past the tables, the headings and the stop line, closes on a question mark |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
@@ -374,13 +373,13 @@ the turn.
 | a cloud box | reads the last prose paragraph | holds, and the agent decides and carries on |
 
 The check reads the text alone at the turn's end, and stays out of
-`ReadsText`, so the stop call runs it with the rest of the vote. For why a box
+`ReadsText`. So the stop call runs it with the rest of the vote. For why a box
 decides, see [[spec/guidance/cloud/cloud]].
 
 ## A refusal names its check
 
 Every refusal of a claim says which check falls, and what the check sees.
-`claimFalls` in `src/bridge/stop.js` writes the sentence, and both doors read it:
+`ClaimFalls` in `src/modules/hooks/stop/checks.go` writes the sentence, and both doors read it:
 
 | door | what it answers where the claim falls |
 |---|---|
@@ -394,9 +393,9 @@ skips the checks reading the answer's text, since no answer stands yet.
 ## A refusal names the binding
 
 The last line of every refusal names the binding, the file that sets it, and a
-moment. `bindingLine` in `src/bridge/binding.js` writes it.
+moment. `BindingLine` in `src/modules/hooks/stop/vote.go` writes it.
 
-- `whereFrom` in `src/bridge/config.js` reads the local file, then the tracked file.
+- `layerOf` in `src/quack/command.go` reads the local file, then the tracked file.
 - `asks` reads those same layers, so the line names no layer the hook skips.
 - The environment stays out of both, because the hook reads none of it.
 - The moment is when the server first reads the binding after a change.

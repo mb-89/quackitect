@@ -9,7 +9,6 @@ import (
 	"io"
 	"math"
 	"math/big"
-	"os"
 	"regexp"
 	"slices"
 	"sort"
@@ -17,6 +16,9 @@ import (
 	"strings"
 	"time"
 	"unicode/utf16"
+
+	"quackitect/src/pull"
+	"quackitect/src/yaml"
 )
 
 // The bits an array index takes, the base a hex text reads in, and the precision and the tie toFixed rounds at. [[spec/tickets/retro-verbs-port-to-go]]
@@ -196,7 +198,7 @@ func retroJSIndent(value any, indent string) string {
 		}
 		return retroJSNumber(one)
 	case string:
-		return retroJSQuote(one)
+		return pull.JSQuote(one)
 	case []string:
 		list := []any{}
 		for _, item := range one {
@@ -224,7 +226,7 @@ func retroJSIndent(value any, indent string) string {
 			if _, none := one.values[key].(retroJSNone); none {
 				continue
 			}
-			items = append(items, retroJSQuote(key)+": "+retroJSIndent(one.values[key], inner))
+			items = append(items, pull.JSQuote(key)+": "+retroJSIndent(one.values[key], inner))
 		}
 		if len(items) == 0 {
 			return "{}"
@@ -234,41 +236,9 @@ func retroJSIndent(value any, indent string) string {
 	return "null"
 }
 
-// A string quoted as JSON.stringify quotes it. [[spec/tickets/retro-verbs-port-to-go]]
-func retroJSQuote(text string) string {
-	var out strings.Builder
-	out.WriteByte('"')
-	for _, r := range text {
-		switch r {
-		case '"':
-			out.WriteString(`\"`)
-		case '\\':
-			out.WriteString(`\\`)
-		case '\b':
-			out.WriteString(`\b`)
-		case '\f':
-			out.WriteString(`\f`)
-		case '\n':
-			out.WriteString(`\n`)
-		case '\r':
-			out.WriteString(`\r`)
-		case '\t':
-			out.WriteString(`\t`)
-		default:
-			if r < 0x20 {
-				fmt.Fprintf(&out, `\u%04x`, r)
-			} else {
-				out.WriteRune(r)
-			}
-		}
-	}
-	out.WriteByte('"')
-	return out.String()
-}
-
 // A value written to its file as JSON, two spaces deep, and a newline after. [[spec/tickets/retro-verbs-port-to-go]]
-func retroJSWrite(path string, value any) error {
-	return os.WriteFile(path, []byte(retroJSStringify(value)+"\n"), 0o666)
+func retroJSWrite(disk diskDoors, path string, value any) error {
+	return disk.write(path, []byte(retroJSStringify(value)+"\n"), 0o666)
 }
 
 // A number as JavaScript's String writes it. [[spec/tickets/retro-verbs-port-to-go]]
@@ -365,21 +335,10 @@ func retroJSNullish(value any) bool {
 
 // Whether JavaScript reads a value as true. [[spec/tickets/retro-verbs-port-to-go]]
 func retroJSTruthy(value any) bool {
-	switch one := value.(type) {
-	case nil, retroJSNone:
-		return false
-	case bool:
-		return one
-	case int:
-		return one != 0
-	case float64:
-		return one != 0 && !math.IsNaN(one)
-	case string:
-		return one != ""
-	case *retroJSDict:
-		return one != nil
+	if dict, held := value.(*retroJSDict); held {
+		return dict != nil
 	}
-	return true
+	return !retroJSNullish(value) && yaml.Truthy(value)
 }
 
 // Whether two plain values are strictly equal, as === reads them. [[spec/tickets/retro-verbs-port-to-go]]

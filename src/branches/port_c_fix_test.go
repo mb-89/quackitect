@@ -1,7 +1,7 @@
-// What a group leaves open, ported from test/level0/work-fix.test.js: each
-// open child, and each open loose ticket the branch adds, past the person route.
+// What a group leaves open: each open child, and each open loose ticket the
+// branch adds, past the person route.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported fix readers addedHere, leftOpen and onPersonRoute
 
 import (
 	"slices"

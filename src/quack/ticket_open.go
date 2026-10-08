@@ -1,6 +1,5 @@
 // ticket open: a draft with an Ask opens at its first leaf in one commit of
-// its own, through the voice and the group checks, off open in
-// src/scripts/ticket.js and OpensDraft in src/pull.
+// its own, through the voice and the group checks, off OpensDraft in src/pull.
 // [[spec/design_output/pull#a-draft-opens]]
 package main
 

@@ -22,26 +22,23 @@ editor the way it reaches the check:
 | source | draws an open file | draws a closed file |
 |---|---|---|
 | this server's own checks | this server | this server |
-| Vale, through the tense reader | this server, off the buffer | this server |
+| the Go rules, through the tense reader | this server, off the buffer | this server |
 | the code faults and the exemption markers | this server, off the buffer | this server |
 | Biome | the Biome extension, while a person types | this server |
 
 For how the server runs each tool, see [[spec/design_output/lsp#the-server-runs-the-tools]].
 
-The Vale extension runs raw Vale, which knows no tense reader. So the
-workspace settings hand it a filter no rule passes, and it draws nothing.
-
 A file redraws on the roads below:
 
 | road | what redraws |
 |---|---|
-| the server starts | every file, off this server's sweep, then off Vale and Biome over the tree |
+| the server starts | every file, off this server's sweep, then off the Go rules and Biome over the tree |
 | the editor opens a file | that file, off the buffer |
-| a person types in a file | that file off the buffer, and Vale again after the quiet span |
-| the editor saves a file | that file, and Vale and Biome over it at once |
-| the editor closes a file | that file off the disk, and Vale and Biome over it again |
-| anything changes a file on disk | that file, off the index once it sweeps, and Vale and Biome over it at once |
-| a file the tools read changes | every file, off Vale and Biome over the tree |
+| a person types in a file | that file off the buffer, and the Go rules again after the quiet span |
+| the editor saves a file | that file, and the Go rules and Biome over it at once |
+| the editor closes a file | that file off the disk, and the Go rules and Biome over it again |
+| anything changes a file on disk | that file, off the index once it sweeps, and the Go rules and Biome over it at once |
+| a file the tools read changes | every file, off the Go rules and Biome over the tree |
 
 ## One checker every front asks
 
@@ -49,23 +46,20 @@ The fronts below ask for a reading, and each reaches one rule set:
 
 | the front | what it asks |
 |---|---|
-| the editor's panel | the check module's sweep, and Vale and Biome beside it |
+| the editor's panel | the check module's sweep, and the Go rules and Biome beside it |
 | a person, at `quack sweep` | the same sweep, once the index settles |
-| `./RUNME.sh lint` | `quack sweep`, and `findingsOver` in `src/bridge/findings.js` beside it |
+| `./RUNME.sh lint` | `quack sweep`, and `toolsOver` in `src/quack/verb_lint.go` beside it |
 
 `Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
 own rules, and the tools beside them. A box whose quack answers no sweep names
 the fault in the lint, because the tree has no second road.
-
-`test/contract/one-reading.test.js` holds the fronts against each other over
-one file.
 
 ## The lint ends on findings
 
 `./RUNME.sh lint` prints the count a rule first, then the sum, then the
 finding lines. A long run scrolls its head away, and the eye lands on the
 last lines. So the lines a hand fixes stand last. `lintRows` in
-`src/scripts/cli-read.js` owns the order, and the warning note stands between
+`src/quack/verb_lint.go` owns the order, and the warning note stands between
 the count and the findings.
 
 # The server reads the index
@@ -142,15 +136,15 @@ come from:
 
 # The server runs the tools
 
-The server runs both binaries the way `findingsOver` in
-`src/bridge/findings.js` runs them for the lint, so both lists name the same
+The server runs the Go rules and Biome the way `toolsOver` in
+`src/quack/verb_lint.go` runs them for the lint, so both lists name the same
 rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 
 | what | where the server reads it |
 |---|---|
-| each binary | `.se/.runtime/tools.json`, else the runtime binary folder |
-| the Vale config | `.vale.ini` at the root, else the one the assembly writes under `.se/vale` |
-| the folders Vale skips | `PARKED` in `src/bridge/findings.js` |
+| the Biome binary | `.se/.runtime/tools.json`, else the runtime binary folder |
+| the Go rules | `rules.Load` over `spec/config/styles` at the root, handed in as `Tools.Rules` |
+| the folders the rules skip | `parkedFolders` in `src/modules/lsp/tools.go` |
 | the Biome config | `biomeConfig` in `src/modules/lsp/tools.go` |
 | a past tense row | `prose.ReadsAsPast` in `src/prose` |
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
@@ -164,25 +158,26 @@ Biome extension:
 
 | the rows | the source |
 |---|---|
-| Vale's | `vale` |
+| the Go rules' | `rules` |
 | Biome's | `biome` |
 | the code faults and the exemption markers | `tree` |
 
 | the box | what the server draws |
 |---|---|
 | a row names a file the index holds nowhere, or a draft | nothing |
-| Vale answers a fault, or stands nowhere | `ValeRuns` on the config, in Vale's own words, so a broken rule stands in the panel |
+| the rules load nothing | `RulesLoad` on each file, naming the load's fault, so a broken rule stands in the panel |
 | no Biome | no Biome row |
 
 `GridHolds` reads JavaScript modules, so this server draws none of it.
 `TestEveryStopFileReadsWhole` in `src/quack/stop_rules_test.go` holds the stop
 folder to the pool.
 
-# The config reads absolute paths
+# The scope reads root paths
 
-Vale matches a section of `.vale.ini` against the path it receives, and an
-editor hands it an absolute one. So every section naming a folder opens on
-`**/`, and a contract test holds that.
+The server hands the Go rules each path from the root, the way the tree names
+it. A row of `sections` in `src/rules/scope.go` naming a folder opens on `**/`,
+which matches the root or any folder. For details, see
+[[spec/design_output/rules#a-rule-reads-its-paths]].
 
 # A second copy draws
 
@@ -202,7 +197,7 @@ The pass reads every note, so the tree holds its findings and each front pays it
 once. A buffer the editor changes drops them, and the next ask pays again.
 `Over` hands one file its own share, and the sweep hands back the whole list.
 
-Vale carries the third rule of the set, over a line beside a table. For how it
+The Go rules carry the third rule of the set, over a line beside a table. For how it
 lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
 
 # A pointer reaches a heading
@@ -252,8 +247,8 @@ write door hands in.
 a tree that stands no more. The past tense rule reads a verb, and these markers
 read in the present, so they pass it and carry the history anyway.
 
-The rationales argue a change, so `.vale.ini` switches this rule off there, the
-way it switches the past tense off.
+The rationales argue a change, so `sections` in `src/rules/scope.go` switches
+this rule off there, the way it switches the past tense off.
 
 # The editor speaks over stdio
 
@@ -323,8 +318,8 @@ and the lint reads it:
 | a file | the rows on that file |
 | a folder | the rows under that folder |
 
-`readingFor` in `src/scripts/cli-read.js` lays the tools' rows `findingsOver`
-draws beside them. The survey stands on the box alone, so the lint reads `SurveyFindsNode` off the
+`lintReading` in `src/quack/verb_lint.go` lays the tools' rows beside the
+sweep's rows. The survey stands on the box alone, so the lint reads `SurveyFindsNode` off the
 box. The sweep reads the tracked files, and leaves that rule out.
 
 # A closed ticket is history
@@ -336,7 +331,7 @@ under `spec/tickets` whose frontmatter says `state: closed`:
 | the front | where it drops the rows |
 |---|---|
 | the server | `isHistory` in `src/modules/check/history.go`, in the checker's four entry points |
-| the lint | `pastHistory` in `src/bridge/findings.js` |
+| the lint | `pastHistory` in `src/modules/check/history.go`, through `src/quack/verb_lint.go` |
 
 An open ticket keeps every row.
 
@@ -348,9 +343,9 @@ carries.
 
 `index_here` and `front_here` in `install.sh` ask `stamp fresh`, the box verb
 in `src/quack/stamp_verb.go`, whether the stamp beside the binary holds the hash
-of its source. The hash reads every Go and embedded file of each tree package
-the binary imports, and the root `go.mod` and `go.sum`, through `sourceStamp`
-in that file. A test file moves nothing. The build runs `stamp write`. A box
+of its source. The hash reads every Go file of each tree package the binary
+imports, and each file a `//go:embed` line there names. It reads the root
+`go.mod` and `go.sum` too, through `sourceStamp` in that file. A test file moves nothing. The build runs `stamp write`. A box
 with no index reads the front writer stale, and its build writes no stamp.
 
 # The client starts it again
@@ -364,7 +359,7 @@ pause of a second. A server falling at its start then loops once a second.
 
 # The doctor probes the server
 
-`doctor` prints a `quack lsp` row off `lspProbe` in `src/scripts/lsp-probe.js`.
+`doctor` prints a `quack lsp` row off `lspProbe` in `src/quack/lspprobe.go`.
 The probe starts `quack lsp` off the index binary in the tree, writes `initialize`, a `didOpen` of
 a note under `spec/tickets` carrying no frontmatter, `shutdown` and `exit`, and
 reads what comes back.

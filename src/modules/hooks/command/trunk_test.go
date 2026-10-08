@@ -8,6 +8,22 @@ import (
 	"testing"
 )
 
+// [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+// The message alone, since the node desk-works-on-trunk holds the remedy. [[spec/tickets/the-twins-leave-whole]]
+func TestDeskSaidBuildsTheMessage(t *testing.T) {
+	said := DeskSaid("this push lands nowhere on work/one")
+	if want := "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/one."; said != want {
+		t.Errorf("DeskSaid answers %q, want %q", said, want)
+	}
+}
+
+// The node desk-works-on-trunk owns the remedy, so no desk text of this package spells it. [[spec/tickets/the-twins-leave-whole]]
+func TestDeskSaidSpellsNoRemedy(t *testing.T) {
+	if said := DeskSaid("this commit lands nowhere on work/one"); strings.Contains(said, "git switch") || strings.Contains(said, "branch merge") {
+		t.Errorf("DeskSaid spells the remedy: %q", said)
+	}
+}
+
 func TestTouchesGitReadsNestedGit(t *testing.T) {
 	for _, one := range []struct {
 		command         string

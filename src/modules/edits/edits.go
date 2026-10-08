@@ -1,5 +1,5 @@
 // The edits module: patch, replace, undo and mint, each landing through the
-// write door with a journal an undo reads back, off src/bridge/apply.js. It
+// write door with a journal an undo reads back. It
 // stands off the wiring until the door's missing rules port.
 // [[spec/tickets/edit-tools-answer-in-go]]
 package edits

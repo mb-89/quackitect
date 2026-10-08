@@ -128,3 +128,38 @@ func treeWrite(t *testing.T, root, path, text string) {
 		t.Fatal(err)
 	}
 }
+
+// The fill rides every post, and the door reads it on the main agent's call and Stop alone: a fill past the key there marks the session due, and anywhere else marks nothing. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+// level0: FixtureOutsideHome - each case's door writes the due mark into a tree of its own.
+func TestTheDoorReadsTheFillOnTheMainAgentsCallsAlone(t *testing.T) {
+	for _, one := range []struct {
+		event string
+		agent string
+		due   bool
+	}{
+		{toolEvent, "", true},
+		{toolEvent, "a1", false},
+		{submitEvent, "", false},
+		{startEvent, "", false},
+		{turnEvent, "", false},
+		{spawnEvent, "", false},
+	} {
+		t.Run(one.event+" "+one.agent, func(t *testing.T) {
+			root := treeOf(t, map[string]string{}, "")
+			e := map[string]any{"session_id": "s1", "tool": "Read", "text": "go on"}
+			if one.agent != "" {
+				e["agentId"] = one.agent
+			}
+			post := Post{Event: one.event, Root: root, E: e, Fill: float64(caseFill)}
+			if (filledOf(post) != nil) != one.due {
+				t.Fatalf("the door reads the fill %v, and wants it read: %v", filledOf(post), one.due)
+			}
+			if _, err := marksDoor(t).Hook(post); err != nil {
+				t.Fatal(err)
+			}
+			if _, marked := (disk{root}).Read(dueMark); marked != one.due {
+				t.Fatalf("the due mark stands: %v, and wants %v", marked, one.due)
+			}
+		})
+	}
+}

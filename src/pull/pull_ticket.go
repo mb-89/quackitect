@@ -1,6 +1,6 @@
 // The ticket writes the pull shares with the note and open verbs: a ticket
 // minted off a route with a hand's line as its Ask, the voice over that Ask,
-// and a draft's open, off src/scripts/ticket.js and ticket-ask-lint.js.
+// and a draft's open.
 // [[spec/design_output/pull#a-draft-opens]]
 package pull
 

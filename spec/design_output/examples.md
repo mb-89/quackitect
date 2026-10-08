@@ -55,8 +55,8 @@ An example asserts behavior, phrase by phrase, and holds no golden copy of the
 whole output. A form
 outside the table refuses at the schema, so a new form lands here first.
 
-A schema at `spec/schemas/example.schema.yaml` governs `spec/examples/**`, and
-the prose rules read every example as they read a note.
+A schema governs `spec/examples/**`, and the prose rules read every example as
+they read a note. For the schema, see [[spec/tickets/example-schema-reads-steps]].
 
 # The places
 

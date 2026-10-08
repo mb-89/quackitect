@@ -1,7 +1,7 @@
 // The retro usage prints one line a verb, so each verb's action reads its doc
 // off the line that names it, and exits 0 bare and 2 on an unknown word.
 // [[spec/tickets/retro-usage-names-every-verb]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"regexp"
@@ -43,6 +43,7 @@ func TestRetroUsageExitsTwoOnAWordNoVerbAnswers(t *testing.T) {
 	want := "Usage: ./RUNME.sh retro <verb>\n\n" +
 		"  notes            the private notes still open on this box, and 0 when none stands\n" +
 		"  audit            the experiments still open, and 0 once each stands decided\n" +
+		"  gaps             each verb no example shows, and each test beside a verb an example shows\n" +
 		"  collect <ticket> copies this box into the retro's folder, and writes its manifest; --again merges what arrived since\n" +
 		"  new              mints a retro off its route, opens it, and hands out its first leaf\n" +
 		"  timeline <retro> the hours holding work, per source, with the idle stretches between\n" +

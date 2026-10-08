@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/projection.js` writes one source into every target.
+`src/projection/projection.go` writes one source into every target.
 This note covers the projections, the door refusing a target, and the verb.
 
 # One source, written everywhere
@@ -175,7 +175,8 @@ writes one rule file per check:
       "wrap": "none"
     }
 
-The schema holds the values and `lib/paragraph.js` holds the Tengo. So a cap
+The schema holds the values, and `lib/paragraph.js` writes each script rule as
+its head alone. The Go script of that name in `src/rules` runs it. So a cap
 moves in one file, and the rule file carrying it follows at the next
 projection. `wrap` reads `none`, because a rule file is YAML and its mark
 stands in a comment at the top. The folder `spec/config/styles/VoiceParagraph`
@@ -183,7 +184,7 @@ holds one file per check, and the comment at the top of each names its layer.
 
 ## A layer writes two files
 
-A Vale rule file carries one `extends`, and a script rule carries one scope. So
+A rule file carries one `extends`, and a script rule carries one scope. So
 a layer writing several kinds of check writes the files below:
 
 | why two | which |
@@ -194,10 +195,11 @@ a layer writing several kinds of check writes the files below:
 | the perfect reads `VBN` and the progressive reads `VBG` | `Progressive.yml` beside `Auxiliary.yml` |
 | a substitution carries one action, and `and so on` carries none | `EtCetera.yml` beside `Latin.yml` |
 
-`Paragraph.yml` and `Sentence.yml` count in a scope Vale gives them, so they
-reach a comment in code as well as a paragraph of prose. A script rule reads
-the raw scope, which in a code file is the whole source, so `.vale.ini` stands
-every script rule off there.
+`Paragraph.yml` and `Sentence.yml` count in a scope the Go rules give them, so
+they reach a comment in code as well as a paragraph of prose. A script rule
+reads the raw scope, which in a code file is the whole source. So the code row
+of `sections` in `src/rules/scope.go` turns every paragraph script rule but
+`RestatedTable` off there.
 
 ## The list opens an answer
 

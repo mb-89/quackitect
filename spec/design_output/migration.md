@@ -62,7 +62,7 @@ A box reads the argument here before it asks about a ruling:
 | area | what goes with no successor | what moves to Go | what stays |
 |---|---|---|---|
 | `src/scripts`: work, pull, ticket | the JSON hops over standard output, the check spawns in `cli.js`, the git read on every call, the dispatch and the usage | the pull, the queue and the outline, `work-answer.js`, the branch standing, the route walk, the ticket writes | nothing |
-| `src/scripts`: the command line, check, retro, install | the verb routing in `cli.js`, `cli-doors.js`, `cli-served.js`, `serve.js` and `tui-build.js`, and most of `install.sh` | the battery and the stamp, the commit and the push, the log read, the retro, the vehicle and the stub, the styles, the browser and the bundle | the editor link, brand, and the battery's reporter under `test` |
+| `src/scripts`: the command line, check, retro, install | the verb routing in `cli.js`, `cli-doors.js`, `cli-served.js`, `serve.js` and `tui-build.js`, and most of `install.sh` | the battery, stamp, commit and push, the log read, the retro, the vehicle and stub, the styles, the browser and bundle | the editor link, brand, and the battery's reporter under `test` |
 | `src/bridge`, `src/doors`, `src/engine` | the server's lifecycle, reload and self-test. The caches, the index spawn per search, and the state a restart carries over | every cage rule, the tools as actions, the doors as Go IO modules with fakes, the retro | nothing |
 | `.claude/skills/level0` | the start road, the pull's process hop and the search relay. The Copilot copy of the cage, the standing files, and the JavaScript twins of Go checks | config layering, guidance, the answer gate, voice, the bash guard, tickets, apply and undo, projections | the hook module, cut to a thin forwarder |
 | `src/index`, `src/lsp`, config, yaml, pointer | the standing-file protocol, written twice, three self-spawn loops, the LSP's index client, the findings port, the long poll and the hash caches | the LSP rules and the schema checker, tickets, config | the index core, the LSP protocol and features, yaml |
@@ -89,7 +89,7 @@ already differ.
 
 | the fact | the copies | what already differs |
 |---|---|---|
-| config resolution | `src/config`, `src/bridge/config.js`, `src/extension/lib/widgets.js`, `src/lsp/config.go` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
+| config resolution | `src/config`, `src/extension/lib/widgets.js` | two readers skip the environment, and JavaScript alone merges the method and work roots. For details, see [[spec/tickets/config-reads-differ-by-reader]] |
 | frontmatter parse and write | parsers in `index/front.go`, `index/ticket.go`, `lsp/note.go`, `note/note.go` and `branches/group.go`, and three writers | Go quotes a value, and JavaScript leaves it bare |
 | the Ask chapter | `branches/group.go`, `pull-chapter.js`, `index/ticket.go` | `branches/group.go` keeps comments and the other two drop them, so the queue's text and the index's differ |
 | held and group standing | `branches/group.go`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
@@ -115,7 +115,7 @@ already differ.
 | git hooks run with no index, a fresh clone carries no binary, and Copilot's command hooks time out | one `quack` binary, and `quack hook` starts the index where none answers | 1 |
 | frontmatter rewrites and the generated Vale rules must stay byte for byte | Go becomes the one writer after one commit rewriting every ticket, and CI compares the Vale output byte for byte | 1 |
 | twins differ in pointer resolution, env naming, skip lists and the schema subset | golden files per twin, and the owner reads each difference at the merge | 3 |
-| `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` scan JavaScript imports | the analyzers of [[spec/design_output/model#the-build-checks-imports]] | 1 |
+| `FakeDoorsInTest` and `OutsideInDoors` scan JavaScript imports | the analyzers of [[spec/design_output/model#the-build-checks-imports]] | 1 |
 
 # The bugs on the way
 

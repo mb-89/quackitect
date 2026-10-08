@@ -1,6 +1,5 @@
-// ticket set: one field of a ticket's front, written as the schema takes it,
-// off set and written in src/scripts/ticket-edit.js. ticket urgent writes
-// through the same road.
+// ticket set: one field of a ticket's front, written as the schema takes it.
+// ticket urgent writes through the same road.
 // [[spec/tickets/view-actions-run-through-verbs]]
 package main
 
@@ -13,20 +12,20 @@ import (
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket set", ticketSet(index.Root)) }
+func init() { register("ticket set", ticketSet(pullingHere(index.Root, registeredRepo))) }
 
 // The schema a written field is weighed against, which SCHEMA in ticket-edit.js names too. [[spec/design_output/schema#the-verbs-own-their-fields]]
 const ticketSchemaAt = "spec/schemas/ticket.schema.yaml"
 
 // [[spec/tickets/view-actions-run-through-verbs]]
-func ticketSet(rootOf func() (string, error)) twin {
+func ticketSet(here pullOver) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
-		disk, err := workDisk(rootOf)
-		if err != nil {
-			fmt.Fprintln(errs, err)
-			return exitFailed
+		it, code := here(out, errs)
+		if it == nil {
+			return code
 		}
+		disk := it.Disk
 		at, found := ticketNamed(disk, said)
 		if !found || wordAt(said, 1) == "" {
 			fmt.Fprintf(errs, "%s needs a ticket, a field and a value: ./RUNME.sh ticket set slow-lint group a-group\n", nameOr(said, "ticket set"))
@@ -70,7 +69,7 @@ func ticketWritten(disk pull.Disk, at, key, value string, dry bool, out, errs io
 	if value == "" || value == pull.FlagOff {
 		written, err = pull.WithoutField(text, key)
 	}
-	// [[spec/design_output/pull#a-closed-group-takes-no-child]]
+	// [[spec/design_output/pull#a-closed-group-stays-shut]]
 	if key == pull.GroupField && err == nil {
 		if why := pull.ClosedGroup(disk, written); why != "" {
 			fmt.Fprintln(errs, why)

@@ -1,5 +1,4 @@
-// A place the plan overrides lights the todo letter, as overrides in
-// src/scripts/work-answer.js lights it.
+// A place the plan overrides lights the todo letter.
 // [[spec/tickets/rows-todo-folds-overrides]]
 package work
 

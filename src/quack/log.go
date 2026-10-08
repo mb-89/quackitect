@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/fs"
-	"os"
 	"path/filepath"
 
 	logmodule "quackitect/src/modules/log"
@@ -23,8 +22,8 @@ func logRows(text string) []logmodule.Row {
 }
 
 // Prints every row of the session log under the root, and no row where no log stands. [[spec/tickets/the-log-topic-lands]]
-func logs(root string) error {
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+func logs(box boxDoors, root string) error {
+	body, err := box.disk.read(filepath.Join(root, filepath.FromSlash(sessionLog)))
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
@@ -32,6 +31,6 @@ func logs(root string) error {
 	if err != nil {
 		return err
 	}
-	_, err = os.Stdout.Write(append(text, '\n'))
+	_, err = box.out.Write(append(text, '\n'))
 	return err
 }

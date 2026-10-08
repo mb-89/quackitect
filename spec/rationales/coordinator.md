@@ -5,7 +5,7 @@ explains: [[spec/guidance/coordinator/coordinator]]
 
 # Why
 
-The coordinator ran a fleet week from a desk session that read no note of its own. The retro of that week, [[spec/tickets/retro-0d14eda]], found it reporting claims no read backed, asking rulings the owner had given, running one session past its context, and dropping follow-ups. The note binds through `SE_COORDINATOR`, which the owner sets when starting a coordinator session, so no box and no desk session reads it.
+The coordinator ran a fleet week from a desk session that read no note of its own. The retro of that week, [[spec/tickets/retro-0d14eda]], found its faults. It reported claims no read backed, asked rulings the owner had given, ran one session past its context, and dropped follow-ups. The note binds through `SE_COORDINATOR`, which the owner sets when starting a coordinator session, so no box and no desk session reads it.
 
 ## 1. One role
 
@@ -19,11 +19,11 @@ The owner acts on a report without checking it, so a claim with nothing behind i
 
 The owner gave rulings that the coordinator asked again a shift later, since the chat that held them had ended. The tickets and the design input carry the rulings that stand.
 
-## 4. A ruling asked as a ticket
+## 4. Rulings ride on tickets
 
 A ticket outlives the session, and the owner answers it at the desk. A question in a chat reaches the owner only while that chat stays open.
 
-## 5. A shift ends on a handover
+## 5. Shifts end on handovers
 
 One session ran past its context and lost the state of the fleet at the cut. A handover written before the end hands the next shift what stands and what waits.
 
@@ -37,4 +37,4 @@ The retro found the coordinator committing with raw git and flipping phases with
 
 ## 8. The repo folder
 
-The retro found the coordinator writing past the doors and answering past the ceiling, from a session that loaded no level-zero plugin. The plugin loads off the folder a session opens in, so a session opened elsewhere meets no write door, no answer gate and no stop door. The start refusal reaches a session in the repo folder alone, because the boot hook lives in that folder's settings. A session opened anywhere else meets no refusal, so this rule carries that case by itself.
+The retro found the coordinator writing past the doors and answering past the ceiling, from a session that loaded no level-zero plugin. The plugin loads off the folder a session opens in. A session opened elsewhere meets no write door, no answer gate and no stop door. The start refusal reaches a session in the repo folder alone, because the boot hook lives in that folder's settings. A session opened anywhere else meets no refusal, so this rule carries that case by itself.

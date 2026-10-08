@@ -1,7 +1,7 @@
 // quack config resolves every key off the config module, each key with the
 // layer it comes from.
 // [[spec/tickets/cfg-topic-holds-one-resolver]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"

@@ -1,13 +1,13 @@
 // The quack verbs' repository cases run on FakeRepo, so they spawn no git, and
 // the doors chapter lists them among no test reaching a real door.
 // [[spec/tickets/quack-repos-meet-fake-git]]
-package main
+package main_test
 
 import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the doors chapter the tree holds, as a build check reads source
 	"path/filepath"
 	"slices"
 	"strconv"

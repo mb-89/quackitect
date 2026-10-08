@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	// level0: OutsideInDoors - the verb hashes the source a build reads and writes the stamp beside the binary, as a build does
 	"os"
 	"path/filepath"
 	"slices"

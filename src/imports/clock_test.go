@@ -1,18 +1,19 @@
 // The real-wait guard, named over a planted file and over every test the tree
 // holds against the door audit.
 // [[spec/guidance/code/testing]]
-package imports
+package imports_test
 
 import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/imports"
+	"quackitect/src/modules/files"
 )
 
 // The note whose tables list every test reaching a real door. [[spec/design_output/doors#one-contract-test-per-door]]
@@ -55,7 +56,7 @@ func TestASleepAndASpawnAreNamedThroughTheirImportNames(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess", "proc.Real"}
-	if said := RealWaits(file); !slices.Equal(said, want) {
+	if said := imports.RealWaits(file); !slices.Equal(said, want) {
 		t.Fatalf("the real waits read %v, where %v stand", said, want)
 	}
 }
@@ -77,42 +78,59 @@ func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
 		"c/quiet_test.go":   parsed(plantedQuiet),
 	}
 	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess, proc.Real"}
-	if said := UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
+	if said := imports.UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
 		t.Fatalf("the guard names %v, where %v stands", said, want)
+	}
+}
+
+func TestASpanMatchingNoFileIsNamed(t *testing.T) {
+	t.Parallel()
+	if said := imports.StaleSpans(plantedAudit+"a suffix: `_contract_test.go`, a door: `.d/gone.js`, `.d/here.js`\n", []string{"a/listed_test.go", "c/other_test.go", ".d/here.js"}); !slices.Equal(said, []string{"b/*_test.go", ".d/gone.js"}) {
+		t.Fatalf("the guard names %v, where b/*_test.go and .d/gone.js alone match no file, and the bare suffix names no path", said)
 	}
 }
 
 func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	t.Parallel()
-	root := filepath.Join("..", "..")
-	note, err := os.ReadFile(filepath.Join(root, doorAudit))
+	tree := files.NewDisk(filepath.Join("..", ".."))
+	note, _, err := tree.Read(doorAudit)
 	if err != nil {
 		t.Fatal(err)
 	}
-	files := map[string]*ast.File{}
-	err = filepath.WalkDir(filepath.Join(root, "src"), func(at string, entry fs.DirEntry, err error) error {
-		if err != nil || entry.IsDir() || !strings.HasSuffix(at, "_test.go") {
-			return err
-		}
-		rel, err := filepath.Rel(root, at)
-		if err != nil {
-			return err
-		}
-		rel = filepath.ToSlash(rel)
-		file, err := parser.ParseFile(token.NewFileSet(), at, nil, 0)
-		if err != nil {
-			return err
-		}
-		files[rel] = file
-		return nil
-	})
+	listed, err := tree.List("src")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(note), "_test.go`") {
+	parsed := map[string]*ast.File{}
+	for _, rel := range listed {
+		if !strings.HasSuffix(rel, "_test.go") {
+			continue
+		}
+		text, _, err := tree.Read(rel)
+		if err != nil {
+			t.Fatal(err)
+		}
+		file, err := parser.ParseFile(token.NewFileSet(), rel, text, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		parsed[rel] = file
+	}
+	if !strings.Contains(note, "_test.go`") {
 		t.Fatalf("%s lists no test file", doorAudit)
 	}
-	for _, line := range UnauditedWaits(string(note), files) {
+	held := append([]string{}, listed...)
+	for _, folder := range []string{"test", ".claude", "spec"} {
+		more, err := tree.List(folder)
+		if err != nil {
+			t.Fatal(err)
+		}
+		held = append(held, more...)
+	}
+	for _, span := range imports.StaleSpans(note, held) {
+		t.Errorf("%s names %s, and no file the tree holds matches it", doorAudit, span)
+	}
+	for _, line := range imports.UnauditedWaits(note, parsed) {
 		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)
 	}
 }

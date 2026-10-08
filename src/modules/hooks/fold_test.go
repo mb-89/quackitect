@@ -5,6 +5,8 @@
 package hooks
 
 import (
+	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -138,7 +140,7 @@ func TestAPaidUpdateDropsTheAsk(t *testing.T) {
 	}
 }
 
-// An ask pressed to another value since the demand opened stands at its pay, as dropsAsk in src/bridge/ask.js leaves it. [[spec/tickets/cage-hold-drops-port]]
+// An ask pressed to another value since the demand opened stands at its pay. [[spec/tickets/cage-hold-drops-port]]
 func TestAnAskPressedSinceStandsAtItsPay(t *testing.T) {
 	land := stepper()
 	land(toolEvent, "", map[string]any{"tool": "Read", heldField: map[string]any{heldAsk: "brief"}})
@@ -148,5 +150,64 @@ func TestAnAskPressedSinceStandsAtItsPay(t *testing.T) {
 	}
 	if state.Demand != nil {
 		t.Fatalf("the demand reads %+v after the pay, and wants none", state.Demand)
+	}
+}
+
+// The raw rows a bridgehead sends trim into the fields the holds read: a prompt keys on the newest row's id, and any other post reads the newest rows and the agent's last texts, oldest first. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/level0-hooks-hold-no-rule]]
+func TestTheDoorTrimsTheRawTranscript(t *testing.T) {
+	raw := []any{
+		map[string]any{"role": "user", "id": "u1", "text": "go"},
+		map[string]any{"role": "assistant", "uuid": "a1", "text": " the first "},
+		map[string]any{"role": "user", "id": "u2", "toolResults": float64(1)},
+		map[string]any{"role": "user", "id": "u3", "toolResults": []any{}},
+		map[string]any{"role": "assistant", "id": "a2", "text": "the second"},
+	}
+	many := make([]any, 0, transcriptRows+transcriptTexts+2)
+	for at := range cap(many) {
+		many = append(many, map[string]any{"role": "assistant", "id": strconv.Itoa(at), "text": strconv.Itoa(at)})
+	}
+	for _, one := range []struct {
+		name   string
+		post   Post
+		before string
+		texts  []any
+		rows   []any
+	}{
+		{"a prompt keys on the newest row", Post{Event: promptEvent, Messages: raw}, "a2", nil, nil},
+		{"a prompt over no row keys on none", Post{Event: promptEvent, Messages: []any{}}, "", nil, nil},
+		{"a spoke post reads the rows and the texts", Post{Event: spokeEvent, Messages: raw}, "",
+			[]any{"the first", "the second"},
+			[]any{
+				map[string]any{"role": "user", "id": "u1"},
+				map[string]any{"role": "assistant", "id": "a1", "text": "the first"},
+				map[string]any{"role": "user", "id": "u2", "results": true},
+				map[string]any{"role": "user", "id": "u3"},
+				map[string]any{"role": "assistant", "id": "a2", "text": "the second"},
+			}},
+	} {
+		t.Run(one.name, func(t *testing.T) {
+			got := transcribed(one.post)
+			if got.Messages != nil || textOf(got.E, "before") != one.before {
+				t.Fatalf("the post reads %+v, and wants before %q and no raw rows", got, one.before)
+			}
+			if one.post.Event == promptEvent {
+				if _, rides := got.E["rows"]; rides {
+					t.Fatalf("a prompt carries rows %v, and wants none", got.E["rows"])
+				}
+				return
+			}
+			if !reflect.DeepEqual(got.E["texts"], one.texts) || !reflect.DeepEqual(got.E["rows"], one.rows) {
+				t.Fatalf("the post reads texts %v and rows %v, and wants %v and %v", got.E["texts"], got.E["rows"], one.texts, one.rows)
+			}
+		})
+	}
+	long := transcribed(Post{Event: spokeEvent, Messages: many})
+	rows, _ := long.E["rows"].([]any)
+	texts, _ := long.E["texts"].([]any)
+	if len(rows) != transcriptRows || len(texts) != transcriptTexts || texts[len(texts)-1] != strconv.Itoa(len(many)-1) {
+		t.Fatalf("a long transcript reads %d rows and texts %v, and wants the newest %d and %d", len(rows), texts, transcriptRows, transcriptTexts)
+	}
+	if same := transcribed(Post{Event: spokeEvent, E: map[string]any{"texts": []any{"kept"}}}); textOf(same.E, "before") != "" || len(same.E) != 1 {
+		t.Fatalf("a post carrying no raw rows reads %+v, and wants it as it came", same.E)
 	}
 }

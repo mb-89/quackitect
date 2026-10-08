@@ -4,6 +4,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the schemas the tree ships, as a build check reads source
 	"os"
 	"path/filepath"
 	"regexp"
@@ -79,8 +80,14 @@ func TestEveryNoteSchemaNamesItsKindAChapterAndItsPaths(t *testing.T) {
 func TestEveryKindMintsANoteTheCheckerPasses(t *testing.T) {
 	t.Parallel()
 	schemas := shippedSchemas(t)
+	// An example stands in a chapter folder alone, so its mint lands there. [[spec/design_output/examples#the-places]]
+	placed := map[string]string{"example": "spec/examples/100_a/_example.md"}
 	for _, kind := range schemas.Names() {
-		text, why := check.Minted(schemas, kind, "_"+kind+".md", map[string]any{})
+		at := placed[kind]
+		if at == "" {
+			at = "_" + kind + ".md"
+		}
+		text, why := check.Minted(schemas, kind, at, map[string]any{})
 		if why != "" || !strings.HasPrefix(text, "---\nkind: [["+kind+"]]") {
 			t.Errorf("the %s mint answers %q, and wants a clean note naming its kind:\n%s", kind, why, text)
 		}

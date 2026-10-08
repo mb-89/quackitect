@@ -1,0 +1,4 @@
+# The config's door: the files the config reads.
+config:
+  go: [os]
+  files: [door.go]

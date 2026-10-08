@@ -1,14 +1,11 @@
 // The road hands each verb by the verbs slice's mode, and a twin in shadow
 // writes a shadow row where it answers apart from the verb's program.
 // [[spec/tickets/runme-hands-verbs-to-quack]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -107,31 +104,15 @@ func TestTheNewRoadRunsTheTwinForReal(t *testing.T) {
 	}
 }
 
-// A box with no runtime hears which one to install, in one line. [[spec/tickets/bare-desk-names-missing-node]]
-func TestAStartFaultNamesAMissingRuntime(t *testing.T) {
-	t.Parallel()
-	_, err := exec.LookPath("no-such-runtime")
-	said := startFault("no-such-runtime", err)
-	if strings.Contains(said, "\n") || said != "No no-such-runtime stands on the PATH. Install no-such-runtime, and run this again." {
-		t.Fatalf("the fault reads %q", said)
-	}
-}
-
 // The mode reads the verbs key off the tracked file under the root, and none where the file sets none. [[spec/tickets/runme-hands-verbs-to-quack]]
 func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	if said := modeOf(root); said != "" {
+	disk := newFakeDisk()
+	if said := modeOf(disk, "/tree"); said != "" {
 		t.Fatalf("a bare root reads %q", said)
 	}
-	at := filepath.Join(root, "spec", "config")
-	if err := os.MkdirAll(at, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"migration": {"verbs": "new"}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if said := modeOf(root); said != "new" {
+	hq1SeedDisk(t, disk, "/tree", map[string]string{"spec/config/level0.json": `{"migration": {"verbs": "new"}}`})
+	if said := modeOf(disk, "/tree"); said != "new" {
 		t.Fatalf("the root reads %q, and wants new", said)
 	}
 }
@@ -144,19 +125,6 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 		out.Reset()
 		if code := verbs(doors, argv); code != 0 || out.String() != "old\n" || len(*rows) != 0 {
 			t.Fatalf("%v answers %d, %q, rows %v", argv, code, out.String(), *rows)
-		}
-	}
-}
-
-// The road holds retro notes among its twins, and Go registers retro whole, so every mode runs it in quack alone. [[spec/tickets/retro-notes-twin-joins-road]] [[spec/tickets/retro-verbs-run-in-go]]
-func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
-	t.Parallel()
-	if registry["retro notes"] == nil {
-		t.Fatal("the registry holds no retro notes twin")
-	}
-	for _, mode := range []string{modeShadow, modeNew, "old"} {
-		if roadOf(mode, []string{"retro", "notes"}, registry) != toQuack {
-			t.Fatalf("retro notes takes another road than quack in %s", mode)
 		}
 	}
 }

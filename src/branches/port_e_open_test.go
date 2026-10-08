@@ -1,8 +1,7 @@
 // A group reaching the cloud over a fake tree: the open, and the reads that
-// tell a fresh cut from a landed branch, as test/level0/work-open.test.js and
-// the take case of test/level0/roots.test.js hold.
+// tell a fresh cut from a landed branch.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported landedHere, mergedHere and refsIn
 
 import (
 	"reflect"

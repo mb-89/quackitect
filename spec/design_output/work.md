@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/branches` holds every verb over a work branch, and
+`src/branches/branch.go` holds every verb over a work branch, and
 `src/branches/group.go` holds what a group's ticket reads and writes. This note
 covers the branch, the group on it, and the round trip.
 
@@ -56,8 +56,8 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 | its children | every ticket under `spec/tickets` naming it under `group` |
 | the claim | the push that writes the record |
 
-The children stand before their group. `emptyGroup` in
-`src/scripts/pull-hand.js` refuses a group mint and a group open while no
+The children stand before their group. `EmptyGroup` in
+`src/pull/tickets.go` refuses a group mint and a group open while no
 ticket names the group under `group`, so no group stands empty.
 
 A group of one ticket is the ordinary case, and a group of many is the same
@@ -77,7 +77,7 @@ reads the chain `ancestorsOf` in `src/branches/group.go` walks off trunk:
 | a parent reaches no worker, and opens no branch | `freeIn` in `src/branches/free.go`, and `opensOf` in `src/branches/dispatch_write.go` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
 | each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/branches/dispatch.go` |
-| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
+| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/branches/merge.go` |
 
 A group no hand reaches stands open on trunk, on no branch, opens none in
 this run, and waits on nothing.
@@ -100,7 +100,7 @@ refuses leaves the ticket as the take finds it, and the take stops.
 A sync conflict after the claim still prints the ask.
 
 The name decides which ask a take hands, through `pastHold` in
-`src/scripts/work-held.js`:
+`src/branches/held.go`:
 
 | the take names | the branch this box holds stands | the take |
 |---|---|---|
@@ -111,7 +111,7 @@ The name decides which ask a take hands, through `pastHold` in
 No take hands the ask of a branch it does not name.
 
 The take reads the group before it writes that entry, through `standsOpen` in
-`src/scripts/work.js`. A group whose open children hold no step a hand can take
+`src/branches/take.go`. A group whose open children hold no step a hand can take
 stays at `todo`, and the take names the step each child waits at. The take
 then reads the next free group, and claims the first one holding a step a hand
 takes. So one group waiting on a person holds no other group up, and the record
@@ -152,7 +152,7 @@ all:
 
 # One reading answers git
 
-`answerOf` in `src/scripts/work-answer.js` reads what git knows once, and
+`branchesOf` in `src/modules/tickets/tickets.go` reads what git knows once, and
 `branch list --queue` orders that one reading. No verb writes it to a file.
 The work tab reads the index instead, where a branch informs a ticket's
 standing and nothing more. For what the tab draws, see
@@ -254,12 +254,14 @@ Under yours it carries the answers below, and each is a verb:
 `work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from
 the tip, so nothing writes to a branch nobody holds.
 
-## A hold beats with its session
+## The session beats its hold
 
 The tip's age reads a box dead late, and reads a live box that commits
-nothing dead. So a box holding a group beats: `branch beat` pushes a
-parentless commit on the empty tree to the branch `beats/<group>`, by force, with
-the clock door's time and the subject `<hand> beats`. `branch beat --end`
+nothing dead. So a box holding a group beats. `branch beat` pushes a
+parentless commit on the empty tree to the branch `beats/<group>`, by force.
+The commit carries the clock door's time and the subject `<hand> beats`.
+
+`branch beat --end`
 writes `<hand> ends`. The take writes the first beat, a Stop command hook
 beats at each turn's end, and a SessionEnd command hook ends the hold. Its
 matcher leaves out `clear`, since a clear goes on inside a living box.
@@ -271,9 +273,9 @@ matcher leaves out `clear`, since a clear goes on inside a living box.
 | none, or older | by the tip's age against `work.staleAfter` |
 
 A beat younger than half of `work.beatAfter` writes nothing, so a beat at
-every turn costs one push a span. The verb answers 0 and prints nothing off a
-branch this box holds, and on a refused push, since a Stop hook answering 2
-holds the turn. The beat stands on a branch, since the cloud's git proxy
+every turn costs one push a span. The verb exits clean and prints nothing off a
+branch this box holds, and on a refused push. A Stop hook exiting with its
+blocking code holds the turn. The beat stands on a branch, since the cloud's git proxy
 refuses a push outside `refs/heads`. The fetch brings it with every branch,
 and the list reads the refs it brings.
 
@@ -283,7 +285,7 @@ and the list reads the refs it brings.
 | `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
 | `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
 
-## A red commit reaches a rescue branch
+## A red commit reaches rescue
 
 A cloud box dies with its tree, and a commit the check answers red stays on
 the box. So on a cloud box standing on `work/<group>`, the commit verb pushes
@@ -293,9 +295,9 @@ The work branch stays green, so CI and the pull request read no red commit.
 | who | what it does with `rescue/<group>` |
 |---|---|
 | the commit verb, red on a cloud box | pushes HEAD there by force, and names it |
-| the commit verb, green and pushed | deletes it on origin where HEAD carries it |
+| the commit verb, green with a push | deletes it on origin where HEAD carries it |
 | the take, over another box's hold | merges it in, pushes, and deletes it |
-| the take, on a conflict | aborts the merge, leaves it on origin, and names `git merge origin/rescue/<group>` |
+| the take, on a conflict | backs out of the merge, leaves it on origin, and names `git merge origin/rescue/<group>` |
 
 A desk, and a branch off `work/`, write no rescue. The push door lets the red
 push through, since CI guards a work branch.
@@ -314,7 +316,7 @@ is the box saying it leaves. It reads in this order:
 | an open child group | files it into the group's parent |
 | the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
 
-`leftOpen` in `src/scripts/work-fix.js` reads what stands open. The person
+`leftOpen` in `src/branches/fix.go` reads what stands open. The person
 route is the one ticket leaving a group. A ticket the mint writes on a `work/`
 branch names that branch's group, through `joinsGroup` beside it. So a box's own
 question, finding or fix stays in the group until it closes.
@@ -400,7 +402,7 @@ the verb refuses it. So a desk mints the successor off this route:
     ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
 `TestThePersonRouteOpensAtAPersonStepAndAnyHandCarriesOn` in `src/pull/routes_test.go` reads that route off disk and holds it open, and
-`test/level0/unblock.test.js` mints off it and runs the verb.
+`src/branches/port_f_unblock_test.go` runs the verb.
 
 # One handover stands
 
@@ -452,19 +454,19 @@ a rejected push and takes the next. For details, see
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].
 
-## The check runs once a head
+## One check runs a head
 
 `.github/workflows/check.yml` runs on a push to `main` and on a pull request
 against `main`, and nowhere else.
 
-| event | concurrency group | a newer run |
+| event | `concurrency` group | a newer run |
 |---|---|---|
-| a pull request | one per pull request | cancels the run it supersedes |
+| a pull request | one per pull request | cancels the older run it replaces |
 | a push to `main` | one per run | waits beside it, and cancels nothing |
 
 The fleet pushes often. A push run on every branch beside its pull request
-run doubled each head's jobs, and superseded runs kept their runners, so the
-queue held `main`'s own run back. A group per ref on `main` still drops a
+run doubles each head's jobs. A replaced run keeps its runner, so the
+queue holds `main`'s own run back. A group per ref on `main` still drops a
 queued run when a newer one joins, so `main` takes a group per run. The job
 and its matrix keep their names, so the required checks still report under
 the names branch protection reads.
@@ -753,12 +755,12 @@ so a part reading it reads nothing. No part reads another part's output, so no
 part waits on another. `readyOf` in `src/quack/check.go` holds the step.
 [[spec/tickets/index-cases-wait-for-it]]
 
-The tests and the level zero smoke lead: each runs alone after the ready
+The tests and the level zero smoke lead. Each runs alone after the ready
 step, the tests first, and every other part starts once both end. Their cases bound the
-wall clock, a door start or a call's latency, and a box the go build and the
-whole-tree Vale load runs past them.
-Where no index door stands before the run, the check stops the one it stands
-up once every part ends, so a run leaves no process behind.
+wall clock, a door start or a call's latency. On some boxes the go build and the
+whole-tree Vale load run past them.
+Where no index door stands before the run, the check stands one up. It stops
+that one once every part ends, so a run leaves no process behind.
 [[spec/tickets/the-check-runs-beside]]
 
 The battery's report rides the stamp under `battery`, and a retro keeps one a
@@ -814,7 +816,7 @@ reads, in the steps below:
 
 | the step | what it runs | what it answers on red |
 |---|---|---|
-| the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the message | `messageFindings`, in `src/quack/commit.go` | every finding at once, and no commit |
 | the tests | `./RUNME.sh test`, before anything stages | what the run says, and no commit |
 | the commit | `git add -A` and `git commit`, over the paths the call names or the whole tree | what git says, with the staging back |
 | the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
@@ -874,7 +876,7 @@ again, so `main` takes a branch only where the merged tree passes.
 `branch done` leaves no open ticket on the branch. So an open ticket naming the
 group at the merge is one trunk gains after the branch's last sync. It loses its
 `group` field inside the merge commit, through `freeChildren` in
-`src/scripts/work-merge.js`, and stands loose on trunk, where `branch list` names
+`src/branches/merge.go`, and stands loose on trunk, where `branch list` names
 it and the next pull hands it out. A closed ticket keeps its `group`, because the
 pair is the history of one group and what it holds.
 
@@ -916,7 +918,7 @@ runs `run`, then `decide`, which a person takes:
 | drop | the code leaves, and the ticket closes on the reason |
 | grow | a ticket of its own carries it, and the experiment closes `became` |
 
-`retro audit` answers the trials standing open, and each trial standing closed
+`retro audit` answers the trials standing open, and each trial at its close
 with no decision and no successor. The retro's `audit` step
 runs it as a command its evidence names. A need names a verb a box holds, and
 reads the tree nowhere. So the hold stands in the evidence, and the need stands

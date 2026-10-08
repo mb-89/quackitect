@@ -1,5 +1,5 @@
 // What the door reads off the tree for the stops fold, off the reads behind
-// CHECKS in src/bridge/stop.js and EveryHold in src/pull/pull_holds.go: the
+// EveryHold in src/pull/pull_holds.go: the
 // rules, the plan, the holds, the tickets, and the branches git names.
 // [[spec/tickets/cage-stop-rules-port]]
 package hooks
@@ -42,7 +42,7 @@ type heldFile struct {
 func (d *Door) stoppedOf(post Post, settings Settings, root string) Stopped {
 	facts := Stopped{Off: settings.StopOff, Most: settings.MostInARow, HandoverAt: settings.HandoverAt, Layer: settings.BindingLayer}
 	whole := post.Event == stopEvent || (post.Event == toolEvent && textOf(post.E, "tool") == stopCall)
-	measured := post.Event == measureEvent || post.Event == turnEvent || post.Fill != nil
+	measured := post.Event == measureEvent || post.Event == turnEvent || filledOf(post) != nil
 	if root == "" || !(whole || measured) {
 		return facts
 	}

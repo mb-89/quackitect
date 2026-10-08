@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// The bless file, off src/scripts/pull-bless.js, under the folder src/modules/check/folders.go owns, and the variables naming the hand and the box, off harness and cloudVars in src/pull/pull_holds.go. [[spec/design_output/pull#the-bless]]
+// The bless file, off src/pull/pull_bless.go, under the folder src/modules/check/folders.go owns, and the variables naming the hand and the box, off harness and cloudVars in src/pull/pull_holds.go. [[spec/design_output/pull#the-bless]]
 const blessFile = ".se/.runtime/bless.json"
 
 // [[spec/design_output/pull#the-bless]]

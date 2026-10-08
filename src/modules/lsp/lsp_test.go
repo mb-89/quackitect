@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
@@ -21,7 +20,7 @@ import (
 // The recording the replay drives, under the tree's root. [[spec/design_output/model#an-inbound-fake-replays]]
 const recording = "../../../test/replay/lsp/one-session.jsonl"
 
-// A sweep that behaves: an open buffer of spec/a.md carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
+// A sweep that behaves: an open buffer of a note carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
 func serverOver(t *testing.T) (*Server, *q.Store) {
 	t.Helper()
 	store, as := catalogOf(t)
@@ -34,7 +33,7 @@ func serverOver(t *testing.T) (*Server, *q.Store) {
 		}
 		return []Finding{}
 	}
-	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep}), store
+	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep, Clock: qtest.Wall()}), store
 }
 
 // A store over the module and the inputs its texts read, as a case seeds them. [[spec/tickets/lsp-module-draws-the-tools]]
@@ -67,7 +66,7 @@ func TestTheListenWritesTheDoorFile(t *testing.T) {
 }
 
 func TestTheListensStopHaltsTheTools(t *testing.T) {
-	fake := taughtTools(map[string]string{"vale": "{}"}, nil)
+	fake := taughtTools(nil, nil)
 	server, _ := toolsOver(t, map[string]string{}, fake)
 	halted := make(chan struct{})
 	server.from.Tools.Halt = func() { close(halted) }
@@ -120,11 +119,7 @@ func TestAnOpenAnswersWhileTheCommitRepublishes(t *testing.T) {
 		server.Handle(opened("file:///tree/spec/b.md", "# B\n"))
 		close(done)
 	}()
-	select {
-	case <-done:
-	case <-time.After(5 * time.Second):
-		t.Fatal("the open waits on the republish its own commit runs")
-	}
+	<-done
 }
 
 func TestAClosedBufferDropsItsName(t *testing.T) {
@@ -156,7 +151,6 @@ func asks(t *testing.T, root, token string) string {
 		t.Fatal(err)
 	}
 	defer conn.Close()
-	conn.SetDeadline(time.Now().Add(5 * time.Second))
 	asked := `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`
 	fmt.Fprintf(conn, "%s\nContent-Length: %d\r\n\r\n%s", token, len(asked), asked)
 	read := bufio.NewReader(conn)

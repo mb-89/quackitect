@@ -13,7 +13,7 @@ import (
 	"quackitect/src/modules/hooks"
 )
 
-// The reply probe's words, the marker and the event off the door's probe, and the warning PROMPT_WHY in src/bridge/answer.js opens on. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's words, the marker and the event off the door's probe, and the warning promptWhy in src/modules/hooks/fold.go opens on. [[spec/tickets/the-reply-probe-runs]]
 const (
 	replyMarker = hooks.ReplyMarker
 	replyEvent  = hooks.ReplyEvent
@@ -75,14 +75,14 @@ func readsReply(rows []probeRow, out string) replyRead {
 // Runs the client on the reply prompt, and prints the fields the call's row carries. [[spec/tickets/the-reply-probe-runs]]
 func probeReply(d boxDoors, client string) int {
 	log := filepath.Join(d.root, filepath.FromSlash(sessionLog))
-	before := len(probeRows(log))
+	before := len(probeRows(d.disk, log))
 	cage := filepath.Join(d.root, filepath.FromSlash(pluginFolder))
 	ran := d.run([]string{client, "-p", replyOpens, "--plugin-dir", cage}, runOpts{cwd: d.root, timeout: probeWait})
 	if ran.missing {
 		fmt.Fprintln(d.errs, "claude stands nowhere, so this box probes no reply.")
 		return exitFailed
 	}
-	rows := probeRows(log)
+	rows := probeRows(d.disk, log)
 	if before > len(rows) {
 		before = len(rows)
 	}

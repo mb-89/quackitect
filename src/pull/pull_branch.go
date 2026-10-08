@@ -1,11 +1,14 @@
 // The branch a pull takes on trunk, the free tickets a desk works there,
-// and the prompt a hand of its own takes, off src/scripts/pull-hand.js.
+// and the prompt a hand of its own takes.
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 package pull
 
 import (
 	"fmt"
 	"strings"
+
+	"quackitect/src/failure"
+	"quackitect/src/q"
 )
 
 // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
@@ -55,7 +58,7 @@ func (it *It) branchTaken(named string) int {
 		return it.Take(named)
 	}
 	if named != "" {
-		return it.deskRefused("the pull takes no branch for "+named, named)
+		return it.deskRefused("the pull takes no branch for " + named)
 	}
 	if it.Ready != nil && it.Ready() {
 		return 0
@@ -64,13 +67,10 @@ func (it *It) branchTaken(named string) int {
 }
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]
-func (it *It) deskRefused(what, name string) int {
-	if name == "" {
-		name = "<name>"
-	}
-	it.Say(Refused,
-		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what),
-		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name))
+// The message alone, since the node desk-works-on-trunk holds the remedy. [[spec/tickets/go-pull-desk-remedy-once]]
+func (it *It) deskRefused(what string) int {
+	it.Refuse(failure.Raise(it.Failures, "desk-works-on-trunk",
+		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what)))
 	return 2
 }
 
@@ -91,7 +91,7 @@ func spawnPrompt(ticket string, leaf *Leaf, name string) string {
 		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
 	}
 	return strings.Join([]string{
-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
+		fmt.Sprintf("%s, named %s, and you work one step of one ticket.", q.HandOfItsOwn, name),
 		"",
 		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
 		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",

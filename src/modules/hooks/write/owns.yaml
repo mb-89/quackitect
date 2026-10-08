@@ -1,0 +1,4 @@
+# The write door of the hooks: a write's reads, which reach nothing yet.
+write:
+  go: []
+  files: [door.go]

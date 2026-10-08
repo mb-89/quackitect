@@ -4,6 +4,12 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 package branches
 
+import (
+	"fmt"
+
+	"quackitect/src/config"
+)
+
 // The key naming the span a claim goes stale past. [[spec/design_output/work#a-stale-group-is-yours]]
 const staleKey = "work.staleAfter"
 
@@ -15,20 +21,23 @@ func tipAge(one stand, now int64) int64 {
 	return max(0, now-one.When)
 }
 
-// The span a claim goes stale past, the config's or the default. [[spec/design_output/work#a-stale-group-is-yours]]
+// The span a claim goes stale past: the config door's, or the schema default at the method root where the door answers nothing. No span reads no claim as stale. [[spec/design_output/work#a-stale-group-is-yours]] [[spec/tickets/stale-span-reads-schema-unset]]
 func (d *Doors) staleSpan() int64 {
-	return StaleSpan(d.config(staleKey))
+	return StaleSpan(d.Method, d.config(staleKey))
 }
 
-// The seconds a claim goes stale past, off the config's work.staleAfter or the default where it says nothing. [[spec/tickets/git-hooks-run-in-go]]
-func StaleSpan(config string) int64 {
-	if said := spanOf(config); said > 0 {
-		return int64(said)
+// The seconds a claim goes stale past, off the config's work.staleAfter or the schema default at the root where it says nothing. [[spec/tickets/git-hooks-run-in-go]] [[spec/tickets/stale-span-reads-schema-unset]]
+func StaleSpan(root, said string) int64 {
+	if span := spanOf(said); span > 0 {
+		return int64(span)
 	}
-	return int64(spanOf(staleSpan))
+	if said, held := config.Default(root, staleKey); held {
+		return int64(spanOf(fmt.Sprint(said)))
+	}
+	return 0
 }
 
-// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#a-hold-beats-with-its-session]]
+// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#the-session-beats-its-hold]]
 type claim struct {
 	Age   string
 	Stale bool

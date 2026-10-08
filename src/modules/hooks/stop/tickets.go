@@ -9,9 +9,8 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The front's fence, the fields the checks read, and the hands that take no leaf off the queue. [[spec/tickets/the-stop-reads-the-state]]
+// The fields the checks read, and the hands that take no leaf off the queue. [[spec/tickets/the-stop-reads-the-state]]
 const (
-	frontFence  = "---"
 	stateKey    = "state"
 	openState   = "open"
 	closedState = "closed"
@@ -22,20 +21,6 @@ const (
 
 // The hands a leaf names that the queue hands no desk. [[spec/design_output/stop#the-mechanical-checks]]
 var handsNoDesk = map[string]bool{personHand: true, "children": true, "helper": true}
-
-// The front a note opens with, or none. [[spec/design_output/schema#what-a-note-reads-as]]
-func frontOf(text string) *yaml.Doc {
-	rows := lineEnd.Split(text, -1)
-	if strings.TrimSpace(rows[0]) != frontFence {
-		return nil
-	}
-	for at := 1; at < len(rows); at++ {
-		if strings.TrimSpace(rows[at]) == frontFence {
-			return yaml.AsDoc(yaml.Read(strings.Join(rows[1:at], "\n")))
-		}
-	}
-	return nil
-}
 
 // A front's field as String reads it, or nothing where no front stands. [[spec/tickets/cage-stop-rules-port]]
 func field(front *yaml.Doc, key string) string {
@@ -52,7 +37,7 @@ func bare(said string) string {
 
 // Who takes the leaf a ticket's pointer names, or its first leaf where no pointer stands, and whether a leaf stands. [[spec/tickets/the-stop-reads-the-state]]
 func LeafBy(text string) (string, bool) {
-	front := frontOf(text)
+	front := yaml.FrontOf(text)
 	if front == nil {
 		return "", false
 	}
@@ -90,7 +75,7 @@ func walk(steps any, parent string) []entry {
 
 // A group stands in hand where its last record opened a step and closed none. [[spec/design_output/pull#the-group-holds-the-turn]]
 func HeldGroup(text string) bool {
-	front := frontOf(text)
+	front := yaml.FrontOf(text)
 	if front == nil || field(front, stateKey) == closedState {
 		return false
 	}
@@ -105,12 +90,12 @@ func HeldGroup(text string) bool {
 
 // The group a ticket lands in, or nothing. [[spec/design_output/work#a-group-is-a-ticket]]
 func GroupOf(text string) string {
-	return bare(field(frontOf(text), groupRoute))
+	return bare(field(yaml.FrontOf(text), groupRoute))
 }
 
 // A private ticket open and off the note route carries the turn. [[spec/design_output/pull#the-private-queue]]
 func OpenPrivate(text string) bool {
-	front := frontOf(text)
+	front := yaml.FrontOf(text)
 	return field(front, stateKey) == openState && !onRoute(front, noteRoute)
 }
 
@@ -122,7 +107,7 @@ func onRoute(front *yaml.Doc, route string) bool {
 // The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group carries the mark. [[spec/design_output/stop#the-mechanical-checks]]
 func QueueHolds(texts []string) bool {
 	for _, text := range texts {
-		front := frontOf(text)
+		front := yaml.FrontOf(text)
 		if field(front, stateKey) != openState {
 			continue
 		}
@@ -144,7 +129,7 @@ func QueueHolds(texts []string) bool {
 
 // Whether a ticket's text reads closed, off its front's state. [[spec/design_output/pull#the-hand-and-the-hold]]
 func Closed(text string) bool {
-	return bare(field(frontOf(text), stateKey)) == closedState
+	return bare(field(yaml.FrontOf(text), stateKey)) == closedState
 }
 
 // Whether a ticket, or the group it lands in, stands at a leaf a person takes. [[spec/tickets/the-stop-reads-the-state]]

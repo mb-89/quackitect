@@ -28,19 +28,23 @@ const (
 	downContext   = "prompt.context"
 	startStands   = 0
 	startByPerson = 3
+	startNoRoot   = 4
+	startNoNode   = 5
+	startInstalls = 7
 	startFails    = 8
+	startNoBuild  = 9
 )
 
 // The level and the reason each start code reads as. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 var startReasons = map[int][2]string{
-	0: {"info", "no index answered, so the bridgehead starts one"},
-	1: {"warn", "the start of the index fails"},
-	3: {"", "a person starts the index here"},
-	4: {"warn", "the method root is absent, so no index starts"},
-	5: {"warn", "this box carries no node, so no index starts"},
-	7: {"info", "the index stands nowhere, so the bridgehead installs the tree and starts it"},
-	8: {"warn", "the index fails its standing, so no door stands"},
-	9: {"warn", "the install builds no index, so no index starts"},
+	startStands:   {"info", "no index answered, so the bridgehead starts one"},
+	1:             {"warn", "the start of the index fails"},
+	startByPerson: {"", "a person starts the index here"},
+	startNoRoot:   {"warn", "the method root is absent, so no index starts"},
+	startNoNode:   {"warn", "this box carries no node, so no index starts"},
+	startInstalls: {"info", "the index stands nowhere, so the bridgehead installs the tree and starts it"},
+	startFails:    {"warn", "the index fails its standing, so no door stands"},
+	startNoBuild:  {"warn", "the install builds no index, so no index starts"},
 }
 
 // The level and the reason a start code reads as. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -80,7 +84,7 @@ func downStarts(d hookDoors) (int, string) {
 	if !d.cloud {
 		return startByPerson, ""
 	}
-	code, said := serveDetachedStart(serveDoors{root: d.root, run: d.run})
+	code, said := serveDetachedStart(serveDoors{root: d.root, run: d.run, disk: d.disk})
 	if code != 0 {
 		return startFails, said
 	}

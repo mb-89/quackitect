@@ -1,7 +1,7 @@
 // The retro's matrix verb over seeded chapters and findings: a column short of
 // its findings refused, and the report drawn.
 // [[spec/guidance/retro/read]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"regexp"

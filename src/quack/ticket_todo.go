@@ -1,5 +1,5 @@
 // ticket todo: a ticket parked for the next pull, and --off takes the tag
-// away, off todo in src/scripts/ticket.js.
+// away.
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 package main
 
@@ -12,24 +12,24 @@ import (
 	"quackitect/src/pull"
 )
 
-func init() { register("ticket todo", ticketTodo(index.Root)) }
+func init() { register("ticket todo", ticketTodo(pullingHere(index.Root, registeredRepo))) }
 
 // The tag the pull hands back first. [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 const todoKey = "todo"
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
-func ticketTodo(rootOf func() (string, error)) twin {
+func ticketTodo(here pullOver) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		said := argv[min(2, len(argv)):]
 		if wordAt(said, 0) == "" {
 			fmt.Fprintf(errs, "ticket %s needs a ticket: ./RUNME.sh ticket %s slow-lint\n", todoKey, todoKey)
 			return exitUsage
 		}
-		disk, err := workDisk(rootOf)
-		if err != nil {
-			fmt.Fprintln(errs, err)
-			return exitFailed
+		it, code := here(out, errs)
+		if it == nil {
+			return code
 		}
+		disk := it.Disk
 		at, found := ticketNamed(disk, said)
 		if !found {
 			fmt.Fprintf(errs, "%s names no ticket under %s or %s.\n", said[0], pull.Notes, pull.Tickets)

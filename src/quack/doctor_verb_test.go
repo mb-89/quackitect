@@ -1,9 +1,8 @@
 // The doctor verb over fake doors: every row it prints, each road a row
 // takes, and the order the rows stand in. [[spec/tickets/box-verbs-port-to-go]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -49,7 +48,7 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 		}
 		labels = append(labels, strings.TrimRight(line[:toolColumn], " "))
 	}
-	want := "node vale biome vale-ls go git claude sh python biome lsp-proxy quack lsp editor sidebar browser commit hook vale rules survey server"
+	want := "node biome go git claude sh python biome lsp-proxy quack lsp editor sidebar browser commit hook vale rules survey server"
 	if got := strings.Join(labels, " "); got != want {
 		t.Errorf("the rows read\n%s\nwant\n%s", got, want)
 	}
@@ -76,23 +75,23 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 func TestTheDoctorReadsTheSurveyThatStandsAndWritesOneWhereNoneDoes(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t, "git")
-	writeFiles(t, d.root, map[string]string{toolsFile: `{"node":{"path":"/opt/node","version":"22.0.0"}}`})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{toolsFile: `{"node":{"path":"/opt/node","version":"22.0.0"}}`})
 	rows := doctorRows(t, d, out)
 	if rows["node"] != "22.0.0  /opt/node" || rows["git"] != "missing, run ./RUNME.sh" || len(runner.ran) != 0 {
 		t.Errorf("a standing survey reads node %q, git %q, after %v", rows["node"], rows["git"], runner.ran)
 	}
 	d, _, out, _ = fakeBoxDoors(t)
-	if rows := doctorRows(t, d, out); rows["survey"] != toolsFile || !stands(filepath.Join(d.root, toolsFile)) {
+	if rows := doctorRows(t, d, out); rows["survey"] != toolsFile || !d.disk.stands(filepath.Join(d.root, toolsFile)) {
 		t.Errorf("a box with no survey reads %q", rows["survey"])
 	}
-	if text, _ := readText(filepath.Join(d.root, toolsFile)); !strings.Contains(text, `"node": null`) {
+	if text := d.disk.text(filepath.Join(d.root, toolsFile)); !strings.Contains(text, `"node": null`) {
 		t.Errorf("the survey written reads %s", text)
 	}
 }
 
 func TestTheSurveyRowNamesHowToWriteOne(t *testing.T) {
 	t.Parallel()
-	if got := surveyRow(t.TempDir()); got != "absent, run ./RUNME.sh tools" {
+	if got := surveyRow(newFakeDisk(), "/tree"); got != "absent, run ./RUNME.sh tools" {
 		t.Errorf("the row reads %q", got)
 	}
 }
@@ -101,7 +100,7 @@ func TestTheBiomeRowAsksTheBiomeTheSurveyNames(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	biome := filepath.Join(d.root, "biome")
-	writeFiles(t, d.root, map[string]string{"biome": "", toolsFile: `{"biome":{"path":` + jsonString(biome) + `}}`})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{"biome": "", toolsFile: `{"biome":{"path":` + jsonString(biome) + `}}`})
 	if rows := doctorRows(t, d, out); rows["biome lsp-proxy"] != "this biome carries one" {
 		t.Errorf("the row reads %q", rows["biome lsp-proxy"])
 	}
@@ -117,26 +116,26 @@ func TestTheBiomeRowAsksTheBiomeTheSurveyNames(t *testing.T) {
 func TestTheQuackLspRowProbesTheIndexBinary(t *testing.T) {
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
-	writeFiles(t, d.root, map[string]string{indexBinary: ""})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{indexBinary: ""})
 	runner.answers["se-index lsp"] = ranResult{code: 3, stderr: "no tree\n"}
 	if rows := doctorRows(t, d, out); rows["quack lsp"] != "warn: quack lsp exits with 3 before it answers: no tree" {
 		t.Errorf("the row reads %q", rows["quack lsp"])
 	}
-	if got := indexBuilt(d.root); got != filepath.Join(d.root, filepath.FromSlash(indexBinary)) {
+	if got := indexBuilt(d.disk, d.root); got != filepath.Join(d.root, filepath.FromSlash(indexBinary)) {
 		t.Errorf("the index binary stands at %q", got)
 	}
-	root := t.TempDir()
-	writeFiles(t, root, map[string]string{indexBinary + ".exe": ""})
-	if got := indexBuilt(root); !strings.HasSuffix(got, "se-index.exe") {
+	disk := newFakeDisk()
+	hq1SeedDisk(t, disk, "/tree", map[string]string{indexBinary + ".exe": ""})
+	if got := indexBuilt(disk, "/tree"); !strings.HasSuffix(got, "se-index.exe") {
 		t.Errorf("a Windows index binary stands at %q", got)
 	}
 }
 
 func TestTheEditorRowNamesTheSettingsThatStartBothServers(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	writeFiles(t, root, map[string]string{editorSettings: "{}"})
-	if got := editorRow(root); got != ".vscode/settings.json, both servers" {
+	disk := newFakeDisk()
+	hq1SeedDisk(t, disk, "/tree", map[string]string{editorSettings: "{}"})
+	if got := editorRow(disk, "/tree"); got != ".vscode/settings.json, both servers" {
 		t.Errorf("the row reads %q", got)
 	}
 }
@@ -145,10 +144,10 @@ func TestTheEditorRowNamesTheSettingsThatStartBothServers(t *testing.T) {
 func sidebarBox(t *testing.T) (boxDoors, string, string) {
 	t.Helper()
 	d, _, _, _ := fakeBoxDoors(t)
-	home := t.TempDir()
-	writeFiles(t, d.root, map[string]string{"src/extension/package.json": `{"name":"quackitect","version":"0.1.0","publisher":"quackitect"}`})
+	home := "/home/one"
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"name":"quackitect","version":"0.1.0","publisher":"quackitect"}`})
 	folder := filepath.Join(home, ".vscode", "extensions")
-	if err := os.MkdirAll(folder, 0o755); err != nil {
+	if err := d.disk.makeAll(folder, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	return withEnv(d, map[string]string{"HOME": home}), folder, filepath.Join(folder, "quackitect.quackitect-0.1.0")
@@ -161,29 +160,34 @@ func TestTheSidebarRowReadsEveryShapeTheLinkStandsIn(t *testing.T) {
 	if got := sidebarSays(d); got != "unlinked: run ./RUNME.sh" {
 		t.Errorf("no link reads %q", got)
 	}
-	if err := os.Symlink(source, dest); err != nil {
-		t.Skip("this box makes no link:", err)
+	if err := d.disk.symlink(source, dest); err != nil {
+		t.Fatal(err)
 	}
 	if got := sidebarSays(d); got != "linked, and the list misses quackitect.quackitect: run ./RUNME.sh" {
 		t.Errorf("a link off the list reads %q", got)
 	}
-	writeFiles(t, folder, map[string]string{editorList: `[{"identifier":{"id":"other.one"}},{"value":[{"identifier":{"id":"quackitect.quackitect"}}]}]`})
+	hq1SeedDisk(t, d.disk, folder, map[string]string{editorList: `[{"identifier":{"id":"other.one"}},{"value":[{"identifier":{"id":"quackitect.quackitect"}}]}]`})
 	if got := sidebarSays(d); got != "linked, and the list names quackitect.quackitect" {
 		t.Errorf("a listed link reads %q", got)
 	}
-	os.Remove(dest)
-	other := t.TempDir()
-	os.Symlink(other, dest)
+	other := "/other"
+	if err := d.disk.makeAll(other, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	hq1Relink(t, d.disk, other, dest)
 	if got := sidebarSays(d); got != "a link into another tree: run ./RUNME.sh" {
 		t.Errorf("a link elsewhere reads %q", got)
 	}
-	os.Remove(dest)
-	os.Symlink(filepath.Join(other, "gone"), dest)
+	hq1Relink(t, d.disk, filepath.Join(other, "gone"), dest)
 	if got := sidebarSays(d); got != "a link pointing nowhere: run ./RUNME.sh" {
 		t.Errorf("a dead link reads %q", got)
 	}
-	os.Remove(dest)
-	os.MkdirAll(dest, 0o755)
+	if err := d.disk.remove(dest); err != nil {
+		t.Fatal(err)
+	}
+	if err := d.disk.makeAll(dest, 0o755); err != nil {
+		t.Fatal(err)
+	}
 	if got := sidebarSays(d); got != "a copy in place of the link: run ./RUNME.sh" {
 		t.Errorf("a copy reads %q", got)
 	}
@@ -191,12 +195,12 @@ func TestTheSidebarRowReadsEveryShapeTheLinkStandsIn(t *testing.T) {
 
 func TestTheEditorListReadsAnUnreadableFileAsNamingNothing(t *testing.T) {
 	t.Parallel()
-	folder := t.TempDir()
-	writeFiles(t, folder, map[string]string{editorList: "[{"})
-	if editorRegistered(folder, "quackitect.quackitect") {
+	disk, folder := newFakeDisk(), "/folder"
+	hq1SeedDisk(t, disk, folder, map[string]string{editorList: "[{"})
+	if editorRegistered(disk, folder, "quackitect.quackitect") {
 		t.Error("a torn list names the id")
 	}
-	if editorRegistered(t.TempDir(), "quackitect.quackitect") {
+	if editorRegistered(disk, "/empty", "quackitect.quackitect") {
 		t.Error("a missing list names the id")
 	}
 }
@@ -204,8 +208,8 @@ func TestTheEditorListReadsAnUnreadableFileAsNamingNothing(t *testing.T) {
 func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
 	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
-	home := t.TempDir()
-	writeFiles(t, d.root, map[string]string{
+	home := "/home/one"
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{
 		"x/chrome":                            "",
 		"pw/chromium-9/chrome-linux/chrome":   "",
 		"pw/chromium-12/chrome-linux/chrome":  "",
@@ -213,9 +217,9 @@ func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
 		"a/chromium-browser":                  "",
 		"b/google-chrome":                     "",
 	})
-	writeFiles(t, home, map[string]string{".cache/ms-playwright/chromium-7/chrome-linux/chrome": ""})
+	hq1SeedDisk(t, d.disk, home, map[string]string{".cache/ms-playwright/chromium-7/chrome-linux/chrome": ""})
 	at := func(path string) string { return filepath.Join(d.root, filepath.FromSlash(path)) }
-	twoFolders := map[string]string{"PATH": at("a") + string(os.PathListSeparator) + at("b")}
+	twoFolders := map[string]string{"PATH": at("a") + string(filepath.ListSeparator) + at("b")}
 	if runtime.GOOS == "windows" {
 		twoFolders["PATHEXT"] = ".EXE"
 	}
@@ -227,7 +231,7 @@ func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
 		{map[string]string{"PLAYWRIGHT_CHROMIUM": "/gone", "PLAYWRIGHT_BROWSERS_PATH": at("pw")}, at("pw/chromium-12/chrome-linux/chrome") + ", off PLAYWRIGHT_BROWSERS_PATH"},
 		{twoFolders, at("a/chromium-browser") + ", off PATH"},
 		{map[string]string{"PATH": "/nowhere"}, filepath.Join(home, ".cache", "ms-playwright", "chromium-7", "chrome-linux", "chrome") + ", off playwright install"},
-		{map[string]string{"PATH": "/nowhere", "HOME": t.TempDir()}, "missing, run ./RUNME.sh"},
+		{map[string]string{"PATH": "/nowhere", "HOME": "/home/nobody"}, "missing, run ./RUNME.sh"},
 	} {
 		env := map[string]string{"HOME": home}
 		for key, value := range one.env {
@@ -256,7 +260,7 @@ func TestThePlaywrightCacheReadsTheHomeEachBoxNames(t *testing.T) {
 			t.Errorf("the cache over %v reads %q, want %q", one.env, got, one.want)
 		}
 	}
-	if got := browserUnder(""); got != "" {
+	if got := browserUnder(newFakeDisk(), ""); got != "" {
 		t.Errorf("no folder reads %q", got)
 	}
 }
@@ -264,11 +268,11 @@ func TestThePlaywrightCacheReadsTheHomeEachBoxNames(t *testing.T) {
 func TestTheCommitHookRowReadsBothHooksAndTheFolderGitReads(t *testing.T) {
 	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
-	writeFiles(t, d.root, map[string]string{".githooks/pre-commit": ""})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{".githooks/pre-commit": ""})
 	if got := hooksSay(d); got != ".githooks/pre-push stands nowhere" {
 		t.Errorf("a lone pre-commit reads %q", got)
 	}
-	writeFiles(t, d.root, map[string]string{".githooks/pre-push": ""})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{".githooks/pre-push": ""})
 	for said, want := range map[string]string{
 		".githooks\n":  ".githooks/pre-commit and .githooks/pre-push, which git reads",
 		".git/hooks\n": "git reads .git/hooks, so run ./RUNME.sh",
@@ -286,14 +290,14 @@ func TestTheCommitHookRowReadsBothHooksAndTheFolderGitReads(t *testing.T) {
 
 func TestTheValeRowCountsTheRulesOfEachFolder(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	writeFiles(t, root, map[string]string{
+	root, disk := "/tree", newFakeDisk()
+	hq1SeedDisk(t, disk, root, map[string]string{
 		"spec/config/styles/VoiceVale/A.yml":   "",
 		"spec/config/styles/VoiceVale/B.yml":   "",
 		"spec/config/styles/VoiceVale/c.txt":   "",
 		"spec/config/styles/VoiceScript/D.yml": "",
 	})
-	if got := valeRules(root); got != "2 in VoiceVale, 0 in VoiceShape, 1 in VoiceScript" {
+	if got := valeRules(disk, root); got != "2 in VoiceVale, 0 in VoiceShape, 1 in VoiceScript" {
 		t.Errorf("the row reads %q", got)
 	}
 }
@@ -304,7 +308,7 @@ func TestTheServerRowNamesABridgeStandingDownAndOneStandingUp(t *testing.T) {
 	if got := serverLine(d); got != "none at http://127.0.0.1:6510/health" {
 		t.Errorf("a bridge standing down reads %q", got)
 	}
-	writeFiles(t, d.root, map[string]string{vehiclePointer: `{"port":6517}`})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{vehiclePointer: `{"port":6517}`})
 	var asked string
 	d.get = func(where string, wait time.Duration) (string, error) {
 		asked = where
@@ -324,12 +328,12 @@ func TestTheServerRowNamesABridgeStandingDownAndOneStandingUp(t *testing.T) {
 	if got := serverLine(d); got != "none at http://127.0.0.1:6517/health" {
 		t.Errorf("a bridge answering no JSON reads %q", got)
 	}
-	writeFiles(t, d.root, map[string]string{vehiclePointer: `{"port":"6518"}`})
-	if got := portHere(d.root); got != 6518 {
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{vehiclePointer: `{"port":"6518"}`})
+	if got := portHere(d.disk, d.root); got != 6518 {
 		t.Errorf("a port written as text reads %d", got)
 	}
-	writeFiles(t, d.root, map[string]string{vehiclePointer: `{`})
-	if got := portHere(d.root); got != portBase {
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{vehiclePointer: `{`})
+	if got := portHere(d.disk, d.root); got != portBase {
 		t.Errorf("a torn pointer reads %d", got)
 	}
 }
@@ -337,8 +341,8 @@ func TestTheServerRowNamesABridgeStandingDownAndOneStandingUp(t *testing.T) {
 func TestTheDoctorPrintsARowAHookAfterTheServer(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
-	home := t.TempDir()
-	writeFiles(t, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:36368/hook")})
+	home := "/home/one"
+	hq1SeedDisk(t, d.disk, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:36368/hook")})
 	d = withEnv(d, map[string]string{"HOME": home})
 	doctorVerb(d, nil)
 	rows := strings.Split(strings.TrimSuffix(out.String(), "\n"), "\n")
@@ -347,5 +351,16 @@ func TestTheDoctorPrintsARowAHookAfterTheServer(t *testing.T) {
 	}
 	if !strings.HasPrefix(rows[len(rows)-2], "server ") {
 		t.Errorf("the row before the hook reads %q", rows[len(rows)-2])
+	}
+}
+
+// Takes the link at the destination away, and links the target in its place. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq1Relink(t *testing.T, disk diskDoors, target, dest string) {
+	t.Helper()
+	if err := disk.remove(dest); err != nil {
+		t.Fatal(err)
+	}
+	if err := disk.symlink(target, dest); err != nil {
+		t.Fatal(err)
 	}
 }

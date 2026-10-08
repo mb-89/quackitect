@@ -1,14 +1,13 @@
 // The rows a reader of the whole tree takes: the list with its hashes and the
 // tracked flag, and the texts it names.
 // [[spec/design_output/index#a-reader-takes-the-tree]]
-package index
+package index // level0: InPackageTest - it reaches the shared tree, opened and sweptDB helpers
 
-import (
-	"os/exec"
-	"testing"
-)
+import "testing"
 
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(t *testing.T) {
+	t.Parallel()
 	root := tree(t)
 	write(t, root, "src/stub/.claude-plugin/plugin.json", "{\"name\": \"level0\"}\n")
 	db := opened(t, root)
@@ -32,16 +31,10 @@ func TestTheListNamesEveryPathWithItsHashAndAFolderGitHoldsNowhereTracksThemAll(
 	}
 }
 
+// level0: FixtureOutsideHome - the case writes its own tree
 func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
-	root := tree(t)
-	for _, argv := range [][]string{{"init", "-q"}, {"add", "spec/one.md"}} {
-		run := exec.Command("git", argv...)
-		run.Dir = root
-		if said, err := run.CombinedOutput(); err != nil {
-			t.Fatalf("git %v: %s", argv, said)
-		}
-	}
-	db := opened(t, root)
+	t.Parallel()
+	db := openedWith(t, tree(t), func(rel string) bool { return rel == "spec/one.md" })
 
 	held, err := Files(db)
 	if err != nil {
@@ -55,7 +48,8 @@ func TestAFolderGitHoldsMarksTheRowsItTracks(t *testing.T) {
 }
 
 func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
-	db := opened(t, tree(t))
+	t.Parallel()
+	db := sweptDB(t)
 
 	named, err := Texts(db, []string{"src/plain.js", "nowhere.md"})
 	if err != nil {
@@ -75,7 +69,8 @@ func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
 
 // The hash reads the text as the engine's hashText does, so a note hashed on either side matches. [[spec/design_output/pull#an-input-marks-its-steps]]
 func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
-	db := opened(t, tree(t))
+	t.Parallel()
+	db := sweptDB(t)
 
 	said, err := Hashes(db, []HashAsk{{Path: "src/plain.js", Size: 10}, {Path: "nowhere.md"}})
 	if err != nil {
@@ -95,6 +90,7 @@ func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
 
 // The hashes HashText in src/pull/hash.go answers, which the viewer's stamp reads. [[spec/design_output/tui#the-verb-builds-it]]
 func TestHashTextMatchesJavaScript(t *testing.T) {
+	t.Parallel()
 	for text, want := range map[string]string{
 		"":                 "811c9dc59e3779b9",
 		"abc":              "1a47e90b6898d0cd",

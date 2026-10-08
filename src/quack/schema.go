@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -24,8 +23,8 @@ const (
 )
 
 // The catalog of every key the tree declares: the modules the wiring loads, and the manager the root always loads. [[spec/tickets/the-config-schema-gets-generated]]
-func catalogOf(root string) (*q.Catalog, error) {
-	text, err := os.ReadFile(filepath.Join(root, wiringAt))
+func catalogOf(disk diskDoors, root string) (*q.Catalog, error) {
+	text, err := disk.read(filepath.Join(root, wiringAt))
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +69,8 @@ func (n *schemaNode) under(name string) *schemaNode {
 }
 
 // The schema's text, as the verb writes it: one object a section and one member a key, sections and members in name order, the drawing laid over each entry. [[spec/tickets/the-config-schema-gets-generated]]
-func schemaText(root string) ([]byte, error) {
-	c, err := catalogOf(root)
+func schemaText(disk diskDoors, root string) ([]byte, error) {
+	c, err := catalogOf(disk, root)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +82,7 @@ func schemaText(root string) ([]byte, error) {
 		}
 		at.entry = keyEntry(key)
 	}
-	if err := drawsOver(root, tree); err != nil {
+	if err := drawsOver(disk, root, tree); err != nil {
 		return nil, err
 	}
 	schema := q.Ordered{Object: true}
@@ -117,8 +116,8 @@ func keyEntry(key q.Key) q.Ordered {
 }
 
 // Lays each member of the drawing over the entry it names, and stands an entry naming no key as the drawing holds it. [[spec/tickets/the-config-schema-gets-generated]]
-func drawsOver(root string, tree *schemaNode) error {
-	text, err := os.ReadFile(filepath.Join(root, drawsAt))
+func drawsOver(disk diskDoors, root string, tree *schemaNode) error {
+	text, err := disk.read(filepath.Join(root, drawsAt))
 	if err != nil {
 		return err
 	}
@@ -193,14 +192,17 @@ func literal(text string) q.Ordered {
 }
 
 // quack schema prints the schema, and quack schema --write writes it. [[spec/tickets/the-config-schema-gets-generated]]
-func schemas(root string, write bool) error {
-	text, err := schemaText(root)
+func schemas(box boxDoors, root string, write bool) error {
+	text, err := schemaText(box.disk, root)
 	if err != nil {
 		return err
 	}
 	if !write {
-		_, err := os.Stdout.Write(text)
+		_, err := box.out.Write(text)
 		return err
 	}
-	return os.WriteFile(filepath.Join(root, schemaAt), text, 0o644)
+	return box.disk.write(filepath.Join(root, schemaAt), text, schemaMode)
 }
+
+// The mode the written schema takes. [[spec/tickets/the-config-schema-gets-generated]]
+const schemaMode = 0o644

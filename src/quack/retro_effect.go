@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"path/filepath"
 	"sort"
 )
@@ -115,7 +114,7 @@ type retroCases struct {
 	values map[string]any
 }
 
-func init() { register("retro effect", retroEffectVerb(retroRoot)) }
+func init() { register("retro effect", retroEffectVerb(quietBox)) }
 
 // A case keys on its file and its name, because two files share a name. [[spec/guidance/retro/effect]]
 func retroBatteryKey(one any) string {
@@ -239,9 +238,9 @@ func retroJSKeyOf(value any) string {
 }
 
 // The two batteries side by side as the JSON the verb writes, or nil where this retro holds none. A retro with no last one reads against nothing, so its battery stands as the baseline. [[spec/guidance/retro/effect]]
-func retroBatteryValue(root, name, last string) *retroJSDict {
+func retroBatteryValue(disk diskDoors, root, name, last string) *retroJSDict {
 	read := func(retro string) any {
-		value, ok := retroJSParse(retroFileText(filepath.Join(retroHome(root, retro), retroBattery)))
+		value, ok := retroJSParse(disk.text(filepath.Join(retroHome(root, retro), retroBattery)))
 		if !ok {
 			return nil
 		}
@@ -272,17 +271,17 @@ func retroBatteryValue(root, name, last string) *retroJSDict {
 }
 
 // A retro's file: in its private home where it stands there, and in the tracked folder otherwise. [[spec/tickets/retro-read-reads-every-record]]
-func retroKeptAt(root, name, file string) string {
-	if private := filepath.Join(retroHome(root, name), file); retroIsThere(private) {
+func retroKeptAt(disk diskDoors, root, name, file string) string {
+	if private := filepath.Join(retroHome(root, name), file); disk.stands(private) {
 		return private
 	}
 	return filepath.Join(root, filepath.FromSlash(retroKept), name, file)
 }
 
 // The retro before this one holding class fixes, by the time its collect ran, from its private home or the tracked folder. [[spec/tickets/retro-read-reads-every-record]]
-func retroLastRetro(root, name string) string {
+func retroLastRetro(disk diskDoors, root, name string) string {
 	when := func(one string) float64 {
-		read, ok := retroJSParse(retroFileText(retroKeptAt(root, one, retroEffectCollected)))
+		read, ok := retroJSParse(disk.text(retroKeptAt(disk, root, one, retroEffectCollected)))
 		if !ok {
 			return 0
 		}
@@ -298,12 +297,12 @@ func retroLastRetro(root, name string) string {
 	}
 	list, seen := []found{}, map[string]bool{name: true}
 	for _, folder := range []string{retroFolder, retroKept} {
-		entries, _ := os.ReadDir(filepath.Join(root, filepath.FromSlash(folder)))
+		entries := disk.listed(filepath.Join(root, filepath.FromSlash(folder)))
 		for _, one := range entries {
 			if !one.IsDir() || seen[one.Name()] {
 				continue
 			}
-			if !retroIsThere(retroKeptAt(root, one.Name(), retroClassesFile)) || !retroIsThere(retroKeptAt(root, one.Name(), retroRatesFile)) {
+			if !disk.stands(retroKeptAt(disk, root, one.Name(), retroClassesFile)) || !disk.stands(retroKeptAt(disk, root, one.Name(), retroRatesFile)) {
 				continue
 			}
 			seen[one.Name()] = true
@@ -336,22 +335,24 @@ func retroVerdictOf(before, now retroRate) string {
 }
 
 // The verb: counts the last retro's classes over this input, and writes each verdict. [[spec/guidance/retro/effect]]
-func retroEffectVerb(root func() string) twin {
+func retroEffectVerb(box func() boxDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name := root(), retroWordAt(argv, 2)
-		if name == "" || !retroIsThere(retroHome(base, name)) {
+		d := box()
+		disk := d.disk
+		base, name := retroRootOf(d), retroWordAt(argv, 2)
+		if name == "" || !disk.stands(retroHome(base, name)) {
 			fmt.Fprintln(errs, "retro effect names a retro whose collect stands: ./RUNME.sh retro effect <retro>")
 			return 2
 		}
 		home := retroHome(base, name)
-		last := retroLastRetro(base, name)
-		battery := retroBatteryValue(base, name, last)
+		last := retroLastRetro(disk, base, name)
+		battery := retroBatteryValue(disk, base, name, last)
 		var written any
 		if battery != nil {
 			written = battery
 		}
 		if last == "" {
-			if err := retroJSWrite(filepath.Join(home, retroEffectFile), retroJSObject("last", "", "classes", []any{}, "battery", written)); err != nil {
+			if err := retroJSWrite(disk, filepath.Join(home, retroEffectFile), retroJSObject("last", "", "classes", []any{}, "battery", written)); err != nil {
 				fmt.Fprintln(errs, err)
 				return 1
 			}
@@ -361,13 +362,13 @@ func retroEffectVerb(root func() string) twin {
 			}
 			return 0
 		}
-		record := retroRecordOf(retroFileText(retroKeptAt(base, last, retroClassesFile)))
-		before, ok := retroJSParse(retroFileText(retroKeptAt(base, last, retroRatesFile)))
+		record := retroRecordOf(disk.text(retroKeptAt(disk, base, last, retroClassesFile)))
+		before, ok := retroJSParse(disk.text(retroKeptAt(disk, base, last, retroRatesFile)))
 		if record == nil || !ok {
 			fmt.Fprintf(errs, "%s of %s reads as no JSON\n", retroClassesFile+" or "+retroRatesFile, last)
 			return 1
 		}
-		now := retroRatesOf(base, name, record.classes)
+		now := retroRatesOf(disk, base, name, record.classes)
 		rows, said := []any{}, []string{}
 		for _, one := range record.classes {
 			id := retroJSField(one, "id")
@@ -391,7 +392,7 @@ func retroEffectVerb(root func() string) twin {
 			said = append(said, fmt.Sprintf("%s  %s to %s an hour  %s  %s",
 				key, retroJSText(retroJSField(was, "rate")), retroJSNumber(is.Rate), verdict, retroJSText(retroJSField(one, "class"))))
 		}
-		if err := retroJSWrite(filepath.Join(home, retroEffectFile), retroJSObject("last", last, "classes", rows, "battery", written)); err != nil {
+		if err := retroJSWrite(disk, filepath.Join(home, retroEffectFile), retroJSObject("last", last, "classes", rows, "battery", written)); err != nil {
 			fmt.Fprintln(errs, err)
 			return 1
 		}

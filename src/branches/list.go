@@ -1,6 +1,6 @@
 // The branch listing: one row a group, its tickets under it, the loose tickets
-// after, and the narrow reads a flag asks for, as src/scripts/work-list.js
-// draws them. The queue and the JSON read the index the board reads.
+// after, and the narrow reads a flag asks for. The queue and the JSON read
+// the index the board reads.
 // [[spec/design_output/work#a-row-per-group]]
 package branches
 

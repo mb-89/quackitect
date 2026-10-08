@@ -77,12 +77,13 @@ func stringsIn(said any, out []string) []string {
 }
 
 // Every hook address the settings files name, in reading order, each off the file naming it first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-func hooksNamed(root, home string) []hookNamed {
+func hooksNamed(disk diskDoors, root, home string) []hookNamed {
 	var found []hookNamed
 	seen := map[string]bool{}
 	for _, file := range settingsFiles(root, home) {
-		text, ok := readText(file.at)
-		if !ok {
+		body, err := disk.read(file.at)
+		text := string(body)
+		if err != nil {
 			continue
 		}
 		said, err := orderedOf(text)

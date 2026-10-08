@@ -1,9 +1,9 @@
-// The review over a fake clone, ported off test/level0/review.test.js: what it
+// The review over a fake clone: what it
 // gathers, the check a worktree of the branch runs, the report and the cases a
 // red run names. The runner builds se-index off the branch, and the built
 // stand-in runs the case's check, so the check runs.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported review steps: material, checked, report and whatFailed
 
 import (
 	"encoding/json"

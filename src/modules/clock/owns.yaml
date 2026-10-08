@@ -1,0 +1,5 @@
+# The clock: the one reach of time, through every member of time and context
+# that reads the time now or waits on it.
+clock:
+  go: [time.Now, time.Since, time.Until, time.Sleep, time.After, time.AfterFunc, time.NewTimer, time.NewTicker, time.Tick, context.WithTimeout, context.WithDeadline, context.WithTimeoutCause, context.WithDeadlineCause]
+  contract: [src/modules/clock/clock_contract_test.go]

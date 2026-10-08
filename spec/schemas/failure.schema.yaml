@@ -1,0 +1,50 @@
+# A failure the tree raises, under the name a module, the sentinel or an agent
+# raises it by. The file name is the id, and every node names the remedies a
+# reader runs next. [[spec/design_output/failures#a-failure-is-a-node]]
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: failure
+
+governs:
+  - spec/failures/**
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - level
+    - remedies
+  properties:
+    kind:
+      const: failure
+      x-link: true
+      description: the schema this note is minted from
+
+    level:
+      enum: [debug, info, warn, error, fatal]
+      description: the level the failure raises at, off the log ladder
+
+    remedies:
+      type: array
+      description: one remedy a line, each a thing the reader does next, and one at least
+
+    reaction:
+      type: string
+      description: the verb line the engine runs when the failure fires, after ./RUNME.sh
+
+    watch:
+      type: object
+      description: the event the sentinel fires the failure on, its pattern and its quiet span in minutes
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: When
+      required: true
+      description: when the failure fires, in a sentence or two

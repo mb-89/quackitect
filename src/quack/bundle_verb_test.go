@@ -4,6 +4,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the shipped drawing and its sources, as a build check reads source
 	"os"
 	"path/filepath"
 	"reflect"
@@ -129,8 +130,8 @@ func TestTheInsetLoadsTheDrawingFromInsideTheExtension(t *testing.T) {
 	for _, one := range found {
 		names = append(names, filepath.Base(one))
 	}
-	if !reflect.DeepEqual(names, []string{"route.css", "route.mjs"}) {
-		t.Errorf("the drawing folder holds %v, and wants the script and its style sheet", names)
+	if !reflect.DeepEqual(names, []string{"owns.yaml", "route.css", "route.mjs"}) {
+		t.Errorf("the drawing folder holds %v, and wants the script, its style sheet and the outsides it owns", names)
 	}
 	inset, err := os.ReadFile(filepath.Join(treeRoot, "src", "extension", "editor-inset.js"))
 	if err != nil {

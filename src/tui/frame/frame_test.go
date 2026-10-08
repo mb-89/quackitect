@@ -2,10 +2,9 @@
 // bands of the help and the footer of status marks. Every model here
 // reads memory and no file.
 
-package frame
+package frame_test
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	"github.com/charmbracelet/x/ansi"
 
 	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 // A tab of the case's own, carrying the whole interface and drawing its names and one line a row. [[spec/design_output/tui#the-window-is-a-split]]
@@ -29,68 +29,68 @@ func stub(name, band, selection string) stubTab {
 
 func (s stubTab) Name() string { return s.name }
 
-func (s stubTab) Label(*Model) string { return s.name }
+func (s stubTab) Label(*frame.Model) string { return s.name }
 
-func (stubTab) Init(*Model) tea.Cmd { return nil }
+func (stubTab) Init(*frame.Model) tea.Cmd { return nil }
 
-func (stubTab) Update(*Model, tea.Msg) (bool, tea.Cmd) { return false, nil }
+func (stubTab) Update(*frame.Model, tea.Msg) (bool, tea.Cmd) { return false, nil }
 
-func (s stubTab) Left(m *Model, w, rows int) string {
+func (s stubTab) Left(m *frame.Model, w, rows int) string {
 	return "the " + s.name + " names\n" + strings.TrimSuffix(strings.Repeat("the "+s.name+" stands here\n", rows), "\n")
 }
 
-func (s stubTab) Detail(m *Model, w int) []Part {
-	return []Part{{Text: "the " + s.name + " details"}}
+func (s stubTab) Detail(m *frame.Model, w int) []frame.Part {
+	return []frame.Part{{Text: "the " + s.name + " details"}}
 }
 
-func (stubTab) Selected(*Model) string { return "" }
+func (stubTab) Selected(*frame.Model) string { return "" }
 
-func (s stubTab) Narrowed(m *Model) bool { return *s.held != "" }
+func (s stubTab) Narrowed(m *frame.Model) bool { return *s.held != "" }
 
-func (s stubTab) Keys(m *Model) Band {
-	return Band{Name: s.band, Acts: []Act{
-		{Key: Bind("r", "read the row", "r"), Do: func(m *Model, _ string) tea.Cmd { return nil }},
+func (s stubTab) Keys(m *frame.Model) frame.Band {
+	return frame.Band{Name: s.band, Acts: []frame.Act{
+		{Key: frame.Bind("r", "read the row", "r"), Do: func(m *frame.Model, _ string) tea.Cmd { return nil }},
 	}}
 }
 
-func (s stubTab) Selection(m *Model) Band {
+func (s stubTab) Selection(m *frame.Model) frame.Band {
 	if s.selection == "" {
-		return Band{}
+		return frame.Band{}
 	}
-	return Band{Name: s.selection, Acts: []Act{
-		{Key: Bind("o", "open the note", "o"), Do: func(m *Model, _ string) tea.Cmd { return nil }},
+	return frame.Band{Name: s.selection, Acts: []frame.Act{
+		{Key: frame.Bind("o", "open the note", "o"), Do: func(m *frame.Model, _ string) tea.Cmd { return nil }},
 	}}
 }
 
-func (stubTab) Presets(m *Model) []Preset {
-	return []Preset{{Name: "not done", Filter: "not state: closed", Key: "alt+1"}}
+func (stubTab) Presets(m *frame.Model) []frame.Preset {
+	return []frame.Preset{{Name: "not done", Filter: "not state: closed", Key: "alt+1"}}
 }
 
-func (stubTab) Move(*Model, int) {}
+func (stubTab) Move(*frame.Model, int) {}
 
-func (stubTab) Jump(*Model, string) {}
+func (stubTab) Jump(*frame.Model, string) {}
 
-func (stubTab) Press(*Model, int, int) {}
+func (stubTab) Press(*frame.Model, int, int) {}
 
-func (s stubTab) Narrow(_ *Model, said string) error {
+func (s stubTab) Narrow(_ *frame.Model, said string) error {
 	*s.held = said
 	return nil
 }
 
-func (stubTab) Sorted(*Model, Preset) {}
+func (stubTab) Sorted(*frame.Model, frame.Preset) {}
 
-func (stubTab) Pressed(*Model, Preset) bool { return false }
+func (stubTab) Pressed(*frame.Model, frame.Preset) bool { return false }
 
-func (stubTab) Marks(*Model) (string, string) { return "", "info" }
+func (stubTab) Marks(*frame.Model) (string, string) { return "", "info" }
 
 // The window over a log stub and a work stub, ten rows high. [[spec/design_output/tui#the-window-is-a-split]]
-func window() Model {
-	m := New("no/such/log.jsonl", time.UTC, []Tab{stub("log", "THE LOG", ""), stub("work", "THE WORK", "THE TICKET")})
-	m.W, m.H = 120, 10+NamesWide+HeadWide+FootWide
+func window() frame.Model {
+	m := frame.New("no/such/log.jsonl", time.UTC, []frame.Tab{stub("log", "THE LOG", ""), stub("work", "THE WORK", "THE TICKET")})
+	m.W, m.H = 120, 10+frame.NamesWide+frame.HeadWide+frame.FootWide
 	return m
 }
 
-func press(m Model, keys ...string) Model {
+func press(m frame.Model, keys ...string) frame.Model {
 	for _, name := range keys {
 		var msg tea.KeyMsg
 		switch name {
@@ -102,7 +102,7 @@ func press(m Model, keys ...string) Model {
 			msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(name)}
 		}
 		out, _ := m.Update(msg)
-		m = out.(Model)
+		m = out.(frame.Model)
 	}
 	return m
 }
@@ -156,7 +156,7 @@ func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) 
 func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	t.Parallel()
 	m := window()
-	drawn := RenderParts(m.HelpParts(60), 60)
+	drawn := frame.RenderParts(m.HelpParts(60), 60)
 	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the help names %q, and reads:\n%s", want, drawn)
@@ -173,7 +173,7 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 		t.Fatalf("a tab selecting nothing adds no selection band, and the help reads:\n%s", drawn)
 	}
 	work := press(m, "2")
-	drawn = RenderParts(work.HelpParts(60), 60)
+	drawn = frame.RenderParts(work.HelpParts(60), 60)
 	for _, want := range []string{"THE WORK", "read the row", "THE TICKET", "open the note"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the open tab's band names %q, and the help reads:\n%s", want, drawn)
@@ -189,20 +189,20 @@ func TestTheFooterCarriesTheFloorAndAFunnelAtFixedPlaces(t *testing.T) {
 	t.Parallel()
 	m := window()
 	lines := strings.Split(m.View(), "\n")
-	if len(lines) != HeadWide+NamesWide+m.Rows()+FootWide {
+	if len(lines) != frame.HeadWide+frame.NamesWide+m.Rows()+frame.FootWide {
 		t.Fatalf("the window stands the head, the tab and the foot high, and drew %d lines", len(lines))
 	}
 	rule, marks := lines[len(lines)-2], lines[len(lines)-1]
 	if !strings.Contains(rule, "────") {
 		t.Fatalf("a rule stands over the marks, and reads %q", rule)
 	}
-	if !strings.Contains(marks, "INFO") || !strings.Contains(marks, draw.Dim.Render(FilterMark)) {
+	if !strings.Contains(marks, "INFO") || !strings.Contains(marks, draw.Dim.Render(frame.FilterMark)) {
 		t.Fatalf("the marks carry a dark funnel and the floor, and read %q", marks)
 	}
 	wide := ansi.StringWidth(marks)
 	m = press(m, "alt+f", "l", "i", "n", "e", "enter")
 	marks = strings.Split(m.View(), "\n")[len(lines)-1]
-	if !strings.Contains(marks, draw.LevelStyle("error").Render(FilterMark)) {
+	if !strings.Contains(marks, draw.LevelStyle("error").Render(frame.FilterMark)) {
 		t.Fatalf("a held filter lights the funnel, and the marks read %q", marks)
 	}
 	if ansi.StringWidth(marks) != wide {
@@ -222,19 +222,19 @@ func TestTheWindowNamesItsTabsAndAnswersZeroForAnyOther(t *testing.T) {
 
 func TestATabMsgOpensThatTabAndAnUnknownOneLeavesTheOpenTab(t *testing.T) {
 	t.Parallel()
-	next, _ := window().Update(TabMsg{Name: "work"})
-	m := next.(Model)
+	next, _ := window().Update(frame.TabMsg{Name: "work"})
+	m := next.(frame.Model)
 	if m.Open != 1 {
 		t.Fatalf("a TabMsg opens the work tab, and tab %d stands open", m.Open)
 	}
-	next, _ = m.Update(TabMsg{Name: "nothing"})
-	if next.(Model).Open != 1 {
-		t.Fatalf("a name no tab carries leaves the open one, and tab %d stands open", next.(Model).Open)
+	next, _ = m.Update(frame.TabMsg{Name: "nothing"})
+	if next.(frame.Model).Open != 1 {
+		t.Fatalf("a name no tab carries leaves the open one, and tab %d stands open", next.(frame.Model).Open)
 	}
 }
 
 // The marks wear the colours the config names, and a case run stands in for the window's start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
 	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
-	os.Exit(m.Run())
+	m.Run()
 }

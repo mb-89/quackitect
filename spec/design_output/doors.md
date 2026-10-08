@@ -16,14 +16,16 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 |---|---|---|
 | `proc` | a program | `src/doors/proc.js` |
 | `disk` | the filesystem | `src/doors/disk.js` |
+| `clock` | the time now | `src/doors/clock.js` |
+| `http` | a server over the network | `src/doors/http.js` |
 
 Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands
 in something else.
 
-Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
-`new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
-nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
+The guard holds the line. A use of an owned name outside its door fails the
+check, and so does a `node:` module no door declares. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
 
 # A door reads the outside
 
@@ -40,12 +42,12 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the lsp IO module reads the box through its own `door.go` |
 
 A root stands off the rule, because it builds the hand every module past it
-reads. `.vale.ini` names each one in a section, beside the doors and their
-fakes. Each rule takes its own switch, because a file standing off one wants
+reads. `sections` in `src/rules/scope.go` names each one in a row, beside the
+doors and their fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`src/modules/lsp/rules_contract_test.go` drives Vale over a probe under each
-path a section names, so a section a hand writes meets its case.
+`src/modules/lsp/rules_contract_test.go` drives the rules over a probe under
+each path a row names, so a row a hand writes meets its case.
 
 # A raw run keeps bytes
 
@@ -65,12 +67,19 @@ pairing under one name.
 
 The git door stands in `src/modules/git/git.go` with `FakeGit`, and the table of Go doors names its contract suite.
 
+| door | stands on | its fake |
+|---|---|---|
+| `proc` | `clock`, for a respawn's window | `src/doors/fake/proc.js` |
+
 # A fake behaves
 
 Each door has a fake beside it in `src/doors/fake`. A fake behaves: a test
 writes to the fake disk and reads the same bytes back. The fake process answers
 from a table and throws on any command outside it. A test scripting the answers
 tests its own script, so no door here has a mock.
+
+The fake clock stands still until a test moves it with `tick`, so a case that
+reads the time replays.
 
 | the call | the real disk and the fake |
 |---|---|
@@ -94,27 +103,25 @@ driving a door through a fake asserts on something.
 The bridgehead is a door: it sits in the agent's path, and it is the outside
 thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
 and in no `src/doors`, because the client loads a hooks module from that
-folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
-straight into `decide`, so a test drives the server with no client, no wire
-and no port. For details, see
+folder alone. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # The JavaScript that stays
 
-JavaScript stands where nothing else runs. Each tracked JavaScript file sits
-under a row below, and the `javascript` part of `./RUNME.sh check` refuses a
+JavaScript stands where nothing else runs. Each JavaScript file git tracks sits
+under a row below. The `javascript` part of `./RUNME.sh check` refuses a
 file no row covers and a row covering no file. A row ending in `/` covers its
 folder.
 
 | files | reason |
 |---|---|
 | `src/extension/` | the VS Code extension, which VS Code loads as JavaScript |
-| `.claude/skills/level0/hooks/` | the level zero function hooks, which Claude Code loads as JavaScript modules |
-| `src/stub/.claude/skills/level0/hooks/` | the same hooks, in the stub a project takes |
-| `.claude/skills/level0/lib/vale.js` | a Vale script, which the lint-without-vale group owns |
-| `src/scripts/styles.js` | a Vale script, which the lint-without-vale group owns |
-| `src/engine/tools.js` | the survey reader the Vale door takes, which the lint-without-vale group owns |
-| `src/doors/` | the doors and fakes the tests of the extension, the hooks and the Vale scripts drive |
+| `.claude/skills/level0/hooks/` | the level zero function hooks, which Claude Code loads as TypeScript modules |
+| `.claude/skills/level0/tests/` | the tests of those hooks, in TypeScript beside them |
+| `src/stub/.claude/skills/level0/hooks/` | the stub's bridgehead, in TypeScript, in the stub a project takes |
+| `.claude/skills/level0/lib/vale.js` | the readers of the JSON the rules-over verb writes, which its own test alone loads |
+| `src/engine/tools.js` | the survey reader, which its own test alone loads |
+| `src/doors/` | the doors and fakes the extension's tests drive, the clock the process door stands on among them |
 | `test/` | the tests of the JavaScript that stays, and the reporter the check runs them under |
 | `prototype/trace-view/` | the prototype a funnel note cites as evidence, which runs in no product |
 
@@ -149,8 +156,8 @@ The prose rules run through Vale itself in
 |---|---|---|---|
 | `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
 | `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
-| `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
-| `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
+| `clock` | `src/doors/clock.js` | `src/doors/fake/clock.js` | `test/contract/clock.test.js` |
+| `http` | `src/doors/http.js` | none | `test/contract/http.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
 
 The contract suite is the one test that drives the real door, and every other
@@ -169,14 +176,14 @@ running both. [[spec/design_output/model#the-fake-keeps-a-contract]]
 | the pull's disk | `src/pull/door.go` | `FakeDisk` | `src/pull/disk_contract_test.go` |
 | the viewer's caller | `src/tui/registry` | `Fake` | `src/tui/registry/call_contract_test.go` |
 | the viewer's catalog | `src/tui/registry` | `Fake` | `src/tui/registry/catalog_contract_test.go` |
-| index | `src/index` | `src/q/qtest` | `src/index/contract_test.go` |
-| bus | `src/index/bus.go` | none | `src/index/bus_test.go` |
-| a placed process | `src/index/procs.go` | none | `src/index/procs_test.go` |
+| index | `src/index` | `src/q/qtest` | `src/index/fakeindex_contract_test.go` |
+| bus | `src/index/bus.go` | none | `src/index/bus_contract_test.go` |
+| a placed process | `src/index/procs.go` | the case's `Spawner` | `src/index/detach_contract_test.go`, `src/index/detach_windows_contract_test.go` and the spawned process suite below |
 | a spawned process | `src/proc/proc.go` | `FakeRunner` | `src/proc/proc_contract_test.go` |
 | the vehicle's shim | `src/vehicle` | none | `src/vehicle/shim_contract_test.go` |
 | the branch verbs' git, process and disk | `src/branches/doors.go` | `FakeRepo`, `FakeRunner` and `FakeDisk` | the git, process and disk suites above |
 | the quack landing and ticket verbs' git | `src/quack/ticket_doors.go` | `FakeRepo` over the case's folder | the git suite above |
-| the box and check doors of quack | `src/quack` | none | none |
+| the box and check doors of quack | `src/quack` | none | `src/quack/box_doors_contract_test.go`, `src/quack/box_processes_contract_test.go`, `src/quack/ending_contract_test.go`, `src/quack/ending_windows_contract_test.go` |
 | the viewer's frame over the network | `src/tui/frame` | none | none |
 
 A test outside these suites reaching a real door stands in a family, and each
@@ -184,20 +191,20 @@ family carries its fate:
 
 | family | files | fate |
 |---|---|---|
-| the placements over real processes | `src/index/placements_test.go`, `src/quack/placements_test.go`, `src/quack/io_test.go`, `src/quack/split_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
+| the placements over real processes | `src/quack/box_processes_contract_test.go` | door tests of a placed process, whose waits run on a fake timer and a fake clock |
 | the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
-| the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
+| the quack binary each case builds | `src/quack/manager_test.go`, `src/quack/box_processes_contract_test.go` | builds once a package run |
 | the quack verbs spawning through a verb | `src/quack/registry_test.go`, `src/quack/person_run_test.go`, `src/quack/voice_verb_test.go` | moved onto the process door's fake |
-| the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/codec_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
-| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go` | door tests of the index door |
-| the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
-| a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
-| a child ended whole, and a door standing apart from its starter | `src/quack/ending_test.go`, `src/quack/ending_windows_test.go`, `src/index/detach_test.go`, `src/index/detach_windows_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
-| the dispatcher's fix ask through vale itself | `src/branches/dispatch_vale_test.go` | door test of vale, and the branch guard leaves it out by name |
+| the twins and goldens over the real tree | `src/quack/codec_test.go` | door tests of the tree the Go and the JavaScript both read |
+| the index door over a real listener | `src/index/index_contract_test.go` | door tests of the index door |
+| the index's own reads of git | `src/index/index_contract_test.go` | door tests of the index's git read |
+| a real file watch that stops mid-add | `src/modules/files/watch_contract_test.go` | door tests of the file watch |
+| a child ended whole, and a door standing apart from its starter | `src/quack/ending_contract_test.go`, `src/quack/ending_windows_contract_test.go`, `src/index/detach_contract_test.go`, `src/index/detach_windows_contract_test.go` | door tests of a spawned process's group and tree, each waiting on a pipe's end |
+| a bare RUNME.sh under sh | `src/quack/runme_test.go` | door test of the road's shell entry, over a planted path of real tools |
 | the git hooks and the boot word over real git and sh | `src/quack/githooks_exe_test.go`, `src/quack/hook_verb_test.go`, `src/quack/hooks_folder_test.go`, `src/quack/session_start_test.go` | door tests of the shell entry points, each over a real repository or a copy of the script under a temporary folder |
 
-The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
+The check reads every code span naming a test file in these tables. It names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
 
 The one state a module holds is `namePatterns` in
 `src/modules/check/private.go`, a memo of a pure compile, and it stands as the
@@ -205,7 +212,7 @@ named exception.
 
 # The git door carries writes
 
-`FakeGit` holds four reads. The branch verbs, the quack verbs and the pull run
+`FakeGit` holds reads alone. The branch verbs, the quack verbs and the pull run
 git's whole command line, writes among it, so a test of them spawns git. One
 door carrying the writes, with a fake and one contract suite, moves those cases
 into memory. [[spec/tickets/unfaked-doors-take-fakes]]
@@ -213,22 +220,35 @@ into memory. [[spec/tickets/unfaked-doors-take-fakes]]
 | part | what it holds |
 |---|---|
 | `Repo` in `src/modules/git` | the typed operations below, each one git command line in the real door |
-| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index, a merge's stages, the worktrees, the hooks a case sets, and the work tree on a `FakeDisk` or a real folder, and the four reads of `Git` answered off them, so `FakeGit` leaves once its cases move |
+| `FakeRepo` beside it | commits keyed by the hash of their content, the refs, `HEAD`, the index and a merge's stages. It holds the worktrees, the hooks a case sets, and the work tree on a `FakeDisk` or a real folder. It answers the reads of `Git` off them, so `FakeGit` leaves once its cases move |
 | an origin | a second `FakeRepo`, which push and fetch move commits and refs between |
 | `src/modules/git/repo_contract_test.go` | each case run against `FakeRepo` and a real repository under a temporary folder, the one door test of git's writes |
 
-The operations the three packages run:
+The operations the branch verbs, the quack verbs and the pull run:
 
 | kind | operations |
 |---|---|
-| reads | the head and its branch, a ref resolved, a file at a ref or at a merge's stage, many files at refs in one ask, the files at a ref under a folder, the paths two refs differ in, the patch or its stat between two refs, the commits one ref stands ahead and behind, the commits a ref carries whose patch another lacks, the merge base, the first-parent line, the work tree's status, the log over a range, the refs under a prefix, the refs under a prefix a ref holds, the second a commit was made, a config key, a commit's signature, the paths the ignore file holds out, whether the index tracks a path, the unmerged paths, the index's changes against `HEAD`, the lines the index adds, the log of one path, the branches origin holds, the refs origin holds under a prefix with their commits |
-| writes to the work tree | add, reset of paths or to a ref, a reset that keeps or drops local changes, a path restored from `HEAD`, commit, an amend, switch with or without a new branch, a worktree added and removed |
-| writes across refs | merge under a message of its own or with no fast-forward, naming the paths that conflict, rebase onto a ref, a fast-forward, update or delete of a ref, a commit off a ref's tree or off files written over it that moves no ref, push with a lease, push of a commit to a branch, a branch deleted on origin, fetch of a branch or of every branch with prune, a shallow clone fetched whole |
+| reads of a ref | the head and its branch, a ref resolved, the merge base, the first-parent line |
+| reads of ref lists | the refs under a prefix, and the ones under a prefix a ref holds |
+| reads of origin | the branches origin holds, and the refs origin holds under a prefix with their commits |
+| reads of files | a file at a ref or at a merge's stage, and many files at refs in one ask |
+| reads of trees | the files at a ref under a folder, the paths two refs differ in, the patch or its stat between them |
+| reads of commits | the commits one ref stands ahead and behind, the commits a ref carries whose patch another lacks, and the time a commit carries |
+| reads of logs | the log over a range, the log of one path, and a commit's signature |
+| reads of the box | the work tree's status, a config key, the paths the ignore file holds out, and whether the index tracks a path |
+| reads of the index | the unmerged paths, the index's changes against `HEAD`, and the lines the index adds |
+| writes to the index | add, a reset of paths or to a ref, a reset that keeps or drops local changes, commit, and an amend |
+| writes to the work tree | a path `HEAD` restores, a switch with or without a new branch, and a worktree's add and removal |
+| merges | a merge with its own message or no fast-forward, naming the paths that conflict, and a rebase onto a ref |
+| moves of a ref | a fast-forward, and an update or delete of a ref |
+| commits off a tree | a commit that moves no ref, off a ref's tree or off the files a call writes over it |
+| pushes | a push with a lease, a push of a commit to a branch, and a branch's delete on origin |
+| fetches | a fetch of a branch, a fetch of every branch that drops each ref origin removes, and a shallow clone's whole history |
 
-The fake merges three ways a path at a time. A path both sides change
+The fake merges a path at a time, its base against both sides. A path both sides change
 differently conflicts whole, where git merges hunks apart. A case needing a
-merge of lines stays a door test, and the contract suite holds one case proving
-the two agree on a path one side alone changes.
+merge of lines stays a door test. The contract suite holds one case proving the
+two agree on a path one side alone changes.
 
 The probe's clone and apply stay on the real door, because the probe measures a
 cold box.
@@ -243,12 +263,12 @@ with the halt and the wait they need.
 | part | what it holds |
 |---|---|
 | `Runner` in `src/proc` | the door, a function the real one fills with `exec`, outside `src/modules`, since it registers no ports |
-| `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it never starts |
+| `Halting` beside it | a real `Runner` and its halt: the halt ends every run in flight, and a run after it starts no process |
 | `Wait` on a command | the span past which a run ends with a fault, and zero sets no limit |
-| `Streams` on a command | the caller's input and output streams, which a run reads and writes in place of `Stdin` and the buffers, so a viewer or a tool hands the terminal straight through |
+| `Streams` on a command | the caller's input and output streams, which a run reads and writes in place of `Stdin` and the buffers. A viewer or a tool hands the terminal straight through them |
 | `Signalled` | the code a run a signal ends answers, apart from `NotStarted` |
-| `FakeRunner` beside it | a table from a program's name to a handler, which answers a fault on a program nobody taught it, as `src/doors/fake/proc.js` does, and its own `Halt`, `Ends` and `After` for the halt and the wait |
-| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env, the streams, a signal's end, a program that never starts, the halt and the wait |
+| `FakeRunner` beside it | a table from a program's name to a handler, answering a fault on a program outside the table, as `src/doors/fake/proc.js` does. It carries its own `Halt`, `Ends` and `After` for the halt and the wait |
+| `src/proc/proc_contract_test.go` | each case run against both: output, errors, an exit code, input, env and the streams. Others cover a signal's end, a program that fails to start, the halt and the wait |
 
 The branch verbs' `rawEnv`, the pull's shell, and every spawn in the quack
 verbs outside the box and check doors take the `Runner`. Each quack spawn
@@ -289,3 +309,83 @@ Vale:
 
 A probe under a path a section switches off proves the path stands off the
 rule, because Vale reads the section there.
+
+# A door declares its names
+
+A door and an IO module are one thing: an IO module is a door written in Go,
+whose registration carries `q.IO()`. Every door, Go and JavaScript, declares
+what it owns in `owns.yaml` in its own folder, and one guard reads every
+declaration. A new door adds its declaration and nothing else.
+
+    # The clock: the one reach of time.
+    clock:
+      go: [time.Now, time.Sleep, context.WithTimeout]
+      js: [Date.now, new Date(), setTimeout]
+      files: [clock.js, fake/clock.js]
+
+| key | what it holds |
+|---|---|
+| the door's name | one entry, and a folder holds one entry a door standing there |
+| `go` | a package, which the door owns whole, or `package.Member`, where several doors share the package and the door owns that member alone |
+| `js` | `node:<module>`, a global such as `setTimeout`, a member of one such as `Date.now`, or `new Date()`, the constructor reading the time now |
+| `files` | the door's files, under the folder. With none named, every file standing in the folder is the door |
+| `contract` | the door's contract tests, as paths from the root. For details, see [[spec/design_output/doors#a-door-names-its-contracts]] |
+| `outside` | `true` where the files are their own outside, as a page bundle or a prototype no node door reaches. The names stand owned inside those files and nowhere else, and the doors verb lists each file |
+
+Several doors own one name at times. A package's `door.go` owns `os` beside the
+files IO module, and each reads the disk for its own package.
+
+## A door names its contracts
+
+A contract test drives the real thing, so it uses the names its door owns. The
+door names it under `contract`, and holds it beside its own files. The test
+still walks around every other door.
+
+| a contract test | where it stands |
+|---|---|
+| Go | a file ending `_contract_test.go` |
+| JavaScript | `test/contract/<door>.test.js`, beside `src/doors/<door>.js` |
+
+`TestEveryContractTestNamesItsDoor` in `src/owns` refuses a contract test no
+door names. A path naming no contract test, or standing nowhere, is a fault of
+the declaration. The rest of `test/contract` drives the tree, and meets its
+doors as every other test does.
+
+## Nothing walks around a door
+
+A walk-around is a use of an owned name in a file outside every door owning
+it. `src/owns` reads the declarations and finds the walk-arounds, and every
+surface asks it:
+
+| the surface | what it does with a walk-around |
+|---|---|
+| `WalksAroundADoor` in `src/modules/check` | refuses it in the lint, so `./RUNME.sh check`, the commit, the push and CI refuse it. The lsp IO module draws it as a person types |
+| `walkaround` in `src/imports` | names it in a Go package, beside `onlyq` |
+| `./RUNME.sh doors` | lists every door's contract tests, its walk-arounds and its marked lines |
+
+The guard reads every file the lint's walk reaches, and the scripts under
+`.claude/skills` past it, the level0 hooks among them. `OnSkills` in
+`src/owns/owns.go` names that road. The other rules of the lint stay off the
+agent's folder.
+
+A walk around a door fails the check. A `node:` module no door declares walks
+around no door, past the modules `src/owns/script.go` names as reaching
+nothing. The one escape is the marker on the line or the line above:
+
+    // level0: OutsideInDoors - <why the door cannot serve>
+
+A marker naming no reason passes nothing.
+
+## Time is a door
+
+The clock owns time. Code waits on the event a duration stands for: a channel,
+a ready signal, a watcher event, a process exit, an index sweep. A test moves
+the fake clock with `Tick`, or waits on that event.
+
+The JavaScript clock answers `after`, with the `cancel` it takes back, `wait`
+and `ms`, and its fake fires each timer as `tick` passes it. A timer naming
+`unref` lets the process end while it waits.
+
+Go shares `time` and `context`, so the clock owns their members reading or
+waiting on the time now. `time.Duration` and `time.Date` stay free to every
+file.

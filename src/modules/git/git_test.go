@@ -4,6 +4,7 @@
 package git
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -22,7 +23,9 @@ func TestTheStartCommitsTheTipsAndEachChange(t *testing.T) {
 	}
 	var commits [][]ticket.Tip
 	Start(fake, every, func(values map[string]any) error {
-		commits = append(commits, values[Port].([]ticket.Tip))
+		if tips, ok := values[Port].([]ticket.Tip); ok {
+			commits = append(commits, tips)
+		}
 		return nil
 	})
 	if len(commits) != 1 || len(commits[0]) != 1 || commits[0][0].Name != "the-group" {
@@ -59,6 +62,36 @@ func TestTheStartCommitsTrunksTicketFiles(t *testing.T) {
 	tick(time.Time{})
 	if len(trunks) != 2 || len(trunks[0]) != 1 || len(trunks[1]) != 2 {
 		t.Fatalf("the start commits trunk, then trunk again once it moves, and commits %+v", trunks)
+	}
+}
+
+// A port the bus refuses leaves the tracked paths landing, and the next tick sends it again. [[spec/tickets/sweep-reads-tracked-after-restart]]
+func TestARefusedPortLeavesTheOthersLandingAndRetries(t *testing.T) {
+	fake := NewFake()
+	fake.Push("the-group", map[string]string{"spec/tickets/the-group.md": "open\n"})
+	fake.Add(1, "spec/tickets/the-group.md")
+	var tick func(time.Time)
+	every := func(_ time.Duration, hand func(time.Time)) func() {
+		tick = hand
+		return func() {}
+	}
+	refused, landed := 0, map[string]bool{}
+	Start(fake, every, func(values map[string]any) error {
+		if _, ok := values[Port]; ok && refused == 0 {
+			refused++
+			return errors.New("maximum payload exceeded")
+		}
+		for port := range values {
+			landed[port] = true
+		}
+		return nil
+	})
+	if !landed[TrackedPort] || landed[Port] {
+		t.Fatalf("the start lands %v, and wants the tracked paths beside the refused tips", landed)
+	}
+	tick(time.Time{})
+	if !landed[Port] {
+		t.Fatalf("the next tick lands %v, and wants the tips sent again", landed)
 	}
 }
 

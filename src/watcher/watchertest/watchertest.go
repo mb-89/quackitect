@@ -6,12 +6,14 @@ package watchertest
 import (
 	"errors"
 	"fmt"
-	"os" // level0: OutsideInDoors - a test helper makes the folders a real watch hears
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+
+	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // The time a stop takes before the test reads it as hung. [[spec/tickets/a-watch-stops-mid-add]]
@@ -34,7 +36,7 @@ func Appearing(root string) (stop func()) {
 			default:
 			}
 			at = filepath.Join(at, fmt.Sprint(n%depth))
-			if os.MkdirAll(at, 0o755) != nil || n%depth == depth-1 {
+			if makeAll(at) != nil || n%depth == depth-1 {
 				at = root
 			}
 		}
@@ -48,14 +50,23 @@ func Appearing(root string) (stop func()) {
 // Runs stop, and fails the test where it takes past Hung. [[spec/tickets/a-watch-stops-mid-add]]
 func Returns(t *testing.T, stop func() error) {
 	t.Helper()
+	err, hung := stopsWithin(qtest.Wall(), Hung, stop)
+	if hung {
+		t.Fatal("the stop hangs while the watch adds a folder")
+	}
+	if err != nil && !errors.Is(err, fsnotify.ErrClosed) {
+		t.Fatal(err)
+	}
+}
+
+// The stop's answer, or hung where the clock passes the span first. [[spec/tickets/go-waits-on-events]]
+func stopsWithin(clock q.Clock, span time.Duration, stop func() error) (err error, hung bool) {
 	stopped := make(chan error, 1)
 	go func() { stopped <- stop() }()
 	select {
 	case err := <-stopped:
-		if err != nil && !errors.Is(err, fsnotify.ErrClosed) {
-			t.Fatal(err)
-		}
-	case <-time.After(Hung):
-		t.Fatal("the stop hangs while the watch adds a folder")
+		return err, false
+	case <-clock.After(span):
+		return nil, true
 	}
 }

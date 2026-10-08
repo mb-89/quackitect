@@ -1,6 +1,6 @@
 // The leave: done refuses short of a green stamp, and the retro comes first.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported retroOpen and saysGreen through the tree fixture
 
 import "testing"
 

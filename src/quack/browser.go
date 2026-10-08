@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -42,11 +41,11 @@ func browserCache(env func(string) string, mac bool) string {
 }
 
 // The newest chromium a Playwright folder holds, or nothing. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-func browserUnder(folder string) string {
+func browserUnder(disk diskDoors, folder string) string {
 	if folder == "" {
 		return ""
 	}
-	listed, err := os.ReadDir(folder)
+	listed, err := disk.list(folder)
 	if err != nil {
 		return ""
 	}
@@ -64,7 +63,7 @@ func browserUnder(folder string) string {
 	sort.SliceStable(builds, func(a, b int) bool { return builds[a].number > builds[b].number })
 	for _, one := range builds {
 		for _, rest := range browserInside {
-			if at := filepath.Join(append([]string{folder, one.name}, rest...)...); stands(at) {
+			if at := filepath.Join(append([]string{folder, one.name}, rest...)...); disk.stands(at) {
 				return at
 			}
 		}
@@ -73,7 +72,7 @@ func browserUnder(folder string) string {
 }
 
 // Where a call stands on the PATH, a Windows box trying the exe ending too. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-func browserOnPath(call string, env func(string) string) string {
+func browserOnPath(disk diskDoors, call string, env func(string) string) string {
 	windows := env("PATHEXT") != ""
 	said := env("PATH")
 	if said == "" {
@@ -88,7 +87,7 @@ func browserOnPath(call string, env func(string) string) string {
 			continue
 		}
 		for _, ending := range endings {
-			if at := filepath.Join(folder, call+ending); stands(at) {
+			if at := filepath.Join(folder, call+ending); disk.stands(at) {
 				return at
 			}
 		}
@@ -97,19 +96,19 @@ func browserOnPath(call string, env func(string) string) string {
 }
 
 // The first browser the order finds, with the rung that found it, or two empty strings. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-func browserFrom(env func(string) string, mac bool) (path, from string) {
-	if named := env("PLAYWRIGHT_CHROMIUM"); named != "" && stands(named) {
+func browserFrom(disk diskDoors, env func(string) string, mac bool) (path, from string) {
+	if named := env("PLAYWRIGHT_CHROMIUM"); named != "" && disk.stands(named) {
 		return named, "PLAYWRIGHT_CHROMIUM"
 	}
-	if at := browserUnder(env("PLAYWRIGHT_BROWSERS_PATH")); at != "" {
+	if at := browserUnder(disk, env("PLAYWRIGHT_BROWSERS_PATH")); at != "" {
 		return at, "PLAYWRIGHT_BROWSERS_PATH"
 	}
 	for _, call := range browserCalls {
-		if at := browserOnPath(call, env); at != "" {
+		if at := browserOnPath(disk, call, env); at != "" {
 			return at, "PATH"
 		}
 	}
-	if at := browserUnder(browserCache(env, mac)); at != "" {
+	if at := browserUnder(disk, browserCache(env, mac)); at != "" {
 		return at, "playwright install"
 	}
 	return "", ""

@@ -1,8 +1,7 @@
-// The fixtures the ported done, fix and held cases share: the group of
-// test/level0/work-doors.js, its children, and a tree with the group pushed
-// on its own work branch.
+// The fixtures the ported done, fix and held cases share: the group, its
+// children, and a tree with the group pushed on its own work branch.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it declares the unexported pc helpers on the tree fixture and reads handOf, roleOf and boxFile
 
 import (
 	"fmt"
@@ -11,7 +10,7 @@ import (
 	"quackitect/src/front"
 )
 
-// The group of work-doors.js: a sync step, then its children. [[spec/tickets/work-verbs-port-to-go]]
+// The group: a sync step, then its children. [[spec/tickets/work-verbs-port-to-go]]
 const pcGroupNote = `---
 kind: [[ticket]]
 state: open
@@ -43,7 +42,7 @@ const (
 	pcBoxID = "d462e994b4cef"
 )
 
-// A ticket at an agent step, in the group and state named, as CHILD in work-doors.js writes it. [[spec/tickets/work-verbs-port-to-go]]
+// A ticket at an agent step, in the group and state named. [[spec/tickets/work-verbs-port-to-go]]
 func pcChild(group, state string) string {
 	return "---\nkind: [[ticket]]\nstate: " + state + "\ngroup: " + group + "\nsteps:\n  - name: do\n    does: makes the change the ask names\n---\n\n# Ask\n\nOne piece of it.\n\n# do\n\n# Discussion\n\nNothing yet.\n"
 }

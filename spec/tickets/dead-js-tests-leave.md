@@ -57,7 +57,7 @@ The check keeps running tests of code nothing loads. A reader keeps meeting a br
 - the tree holds no test file `audit/test-audit-js.txt` marks DELETE, re-verified against the tree, and no unloaded module it tests
 - `sym.cjs` on the audit branch decides what loads
 - the JS take-path test files stay for `js-take-path-leaves`
-- the live test/level0 files stay for level-zero-becomes-a-typed-mod
+- the live test/level0 files stay for level-zero-typed-mod
 - `./RUNME.sh check` exits 0
 
 # do

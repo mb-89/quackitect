@@ -1,0 +1,6 @@
+# The hooks: the engine hands them $ as their door layer, and $ carries no
+# clock, so the hooks read time on their own and the folder stands as its own
+# outside.
+hooks:
+  js: [Date.now, new Date()]
+  outside: true

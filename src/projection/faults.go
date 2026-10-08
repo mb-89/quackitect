@@ -27,7 +27,7 @@ func faultsUnder(said any, shape *Object, at string) []string {
 	out := []string{}
 	kind := kindOf(said)
 	typed := shape.Get("type")
-	if truthy(typed) && kind != typed {
+	if holdsTrue(typed) && kind != typed {
 		where := at
 		if where == "" {
 			where = "the schema"

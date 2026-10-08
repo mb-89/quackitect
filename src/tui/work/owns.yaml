@@ -1,0 +1,4 @@
+# The work view's door: the files it reads.
+work:
+  go: [os]
+  files: [door.go]

@@ -20,7 +20,6 @@ const WATCHES = [
   { scheme: "file", pattern: "**/.vscode/settings.json" },
   { scheme: "file", pattern: "**/.vscode/extensions.json" },
   { scheme: "file", pattern: "**/install.sh" },
-  { scheme: "file", pattern: "**/.vale.ini" },
 ];
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -46,7 +45,7 @@ function serverAsk(root, platform) {
 const PAUSE = 1000;
 
 // The client the editor starts quack lsp through. The client's own handler stops at a cap of starts again, and a rebuild or a stale binary ends the server as often as the source moves. So every close starts it again. [[spec/design_output/lsp#the-client-starts-it-again]]
-function clientOf(node, ask, wait = sleep) {
+function clientOf(node, ask, wait) {
   return new node.LanguageClient(ask.id, ask.name, ask.server, {
     ...ask.client,
     errorHandler: {
@@ -57,10 +56,6 @@ function clientOf(node, ask, wait = sleep) {
       },
     },
   });
-}
-
-function sleep(ms) {
-  return new Promise((done) => setTimeout(done, ms));
 }
 
 module.exports = { BIN, ID, NAME, WATCHES, binaryOf, clientOf, serverAsk };

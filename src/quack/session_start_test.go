@@ -7,7 +7,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	// level0: OutsideInDoors - the case boots the real install.sh in a temp tree, the boot's door test
 	"os"
+	// level0: OutsideInDoors - the case boots the real install.sh in a temp tree, the boot's door test
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -99,6 +101,7 @@ func bootRun(t *testing.T, tree string, env map[string]string) (int, string) {
 // Runs the boot word as bootRun does, with the hook input on its stdin. [[spec/tickets/the-coordinator-runs-under-level0]]
 func bootRunOn(t *testing.T, tree string, env map[string]string, input string) (int, string) {
 	t.Helper()
+	// level0: OutsideInDoors - the boot runs a real shell, so the case bounds it, the boot's door test
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	run := exec.CommandContext(ctx, "sh", filepath.Join(tree, "install.sh"), "boot")
@@ -256,7 +259,7 @@ func TestTheBootRunsTheInstallOnABoxSECloudMarks(t *testing.T) {
 func TestTheBootAnswersZeroWhereTheInstallFails(t *testing.T) {
 	t.Parallel()
 	tree := bootTree(t)
-	// A file standing where the runtime folder goes fails the install before it fetches anything.
+	// A file standing where the runtime folder goes fails the install before it fetches anything. [[spec/design_output/level0#the-boot-hook]]
 	if err := os.RemoveAll(filepath.Join(tree, ".se")); err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +289,7 @@ func TestTheBootSkipsWhatTheColdProbeSkips(t *testing.T) {
 func TestTheBootReadsTheManifestTheBrandWrites(t *testing.T) {
 	t.Parallel()
 	tree := bootTree(t)
-	wrote, err := stamps(tree, "tree")
+	wrote, err := stamps(realDisk(), tree, "tree")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -64,7 +64,7 @@ func isNoteSchema(said *yaml.Doc) bool {
 		return false
 	}
 	body := yaml.AsDoc(said.Get("body"))
-	return body != nil && len(yaml.AsList(body.Get("sections"))) > 0
+	return body != nil && (len(yaml.AsList(body.Get("sections"))) > 0 || yaml.AsString(body.Get("x-steps")) != "")
 }
 
 // [[spec/design_output/schema#a-data-schema-holds-yaml]]
@@ -139,8 +139,13 @@ func checkNote(text string, schema *yaml.Doc, where string) []Finding {
 func checkNoteWith(text string, schema *yaml.Doc, where string, schemas *Kinds) []Finding {
 	note := readNote(text)
 	kind := yaml.AsString(schema.Get("kind"))
+	front, body := yaml.AsDoc(schema.Get("frontmatter")), yaml.AsDoc(schema.Get("body"))
 	out := frontFaults(note, schema, kind, where, schemas)
-	return append(out, bodyFaults(note, yaml.AsDoc(schema.Get("body")), kind, where)...)
+	if note.Front.Stands {
+		out = append(out, edgeFaults(note, yaml.AsDoc(front.Get("properties")), kind, where)...)
+	}
+	out = append(out, bodyFaults(note, body, kind, where)...)
+	return append(out, stepFaults(text, body, where)...)
 }
 
 // What a walk over one note's keys holds: the kind, the file, the line of each key path, the root a keyword names a step in, and the schemas a $ref reads. [[spec/design_output/schema#the-checker-walks-every-key]]

@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,8 +116,81 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 70672ee0ff0d · claude-code-remote
+    hash_before: d9e95dceec87c6db6cd24629c940a191c9fc878d
+    hash_after: d9e95dceec87c6db6cd24629c940a191c9fc878d
+    inputs:
+      - name: ask
+        hash: c53f269eb8381838
+        size: 808
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 70672ee0ff0d · claude-code-remote
+    hash_before: 626560620aedaf2450030660a0873058396411ea
+    hash_after: 626560620aedaf2450030660a0873058396411ea
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/example fails
+    inputs:
+      - name: design/draft
+        hash: 7d580475d667653d
+        size: 3016
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 3cca88ad95cc5cfcfd8629c8ea5e2c2faca1da3b
+    hash_after: 3cca88ad95cc5cfcfd8629c8ea5e2c2faca1da3b
+    inputs:
+      - name: design/draft
+        hash: 7d580475d667653d
+        size: 3016
+      - name: design/tests-red
+        hash: 8ad2d654834a376c
+        size: 691
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 0639c0ee399ef31a6aa3c371c0fafa1c882f547f
+    hash_after: 0639c0ee399ef31a6aa3c371c0fafa1c882f547f
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: 6d3d2e4498090324852c4ab57b6465044db6efcc
+    hash_after: 6d3d2e4498090324852c4ab57b6465044db6efcc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/example passes; green, src/imports passes; green, src/modules/check passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   65.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8ad2d654834a376c
+        size: 691
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -154,38 +228,71 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A pure package `src/example` owns the one parser. `example.Read(path, text)` answers an `Example` and its faults. The example holds the chapter off the path, whether that chapter is a `9xx_dev` one, the front fields and the steps. A step holds the prose since the last call, the call's words past `./RUNME.sh`, its line and its expect lines. An expect holds its form, its words and its line.
+
+The parser reads every `sh`, `bash` or `shell` fence. A line there is blank, a `./RUNME.sh` call or an `# expect:` line, and any other line is a fault. A call holding a pipe, a redirect, a `;`, a `&&` or a substitution outside quotes is a fault too. An expect line before any call faults, and so does a form outside the design table or one with the wrong words.
+
+`spec/schemas/example.schema.yaml` governs `spec/examples/**`. It asks for `kind`, `title`, `keywords` and `interface`. Its `edge` field carries `x-under`, a glob of the `9xx_dev` chapters, and the front checker reads that new key: the field stands under the glob and nowhere else. The body carries `x-steps: example` and no chapters, `isNoteSchema` takes a body naming either, and `checkNote` adds the parser's faults as `Example.<rule>` findings. So lint, the sweep, the write door and the mint all refuse an example out of shape off one road.
+
+`src/imports` lists `src/example` with the pure packages, so a module, the harness and the tab import it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/schema.go schemasIn, which calls isNoteSchema
+- src/modules/check/schema.go checkNoteIn, which calls checkNote
+- src/modules/check/mint.go, the mint's check, which calls checkNote
+- src/modules/check/checker.go, the file check and the sweep, which reach noteFaults
+- src/modules/check/schema.go checkNote, which calls frontFaults
+- src/imports/imports.go pastQ, which reads pureTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/example/example_test.go TestAPlantedExampleReadsEachExpectForm
+- src/example/example_test.go TestALinePastRunmeRefuses
+- src/example/example_test.go TestAnExpectFormOutsideTheTableRefuses
+- src/example/example_test.go TestAnExpectBeforeAnyCallRefuses
+- src/example/example_test.go TestTheChapterNamesADeveloperCase
+- src/modules/check/example_test.go TestAnExampleNamesTitleKeywordsAndInterface
+- src/modules/check/example_test.go TestADeveloperCaseAloneNamesItsEdge
+- src/modules/check/example_test.go TestTheCheckRefusesAStepOutOfShape
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/example/example.go
+- src/example/example_test.go
+- spec/schemas/example.schema.yaml
+- src/modules/check/schema.go
+- src/modules/check/example.go
+- src/modules/check/example_test.go
+- src/imports/imports.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: schema.go, schema-body.go, note.go, mint.go, checker.go and imports.go
+- the callers list names each caller of checkNote, frontFaults, isNoteSchema and pureTree
+- each done_when line names its test: the schema in the check tests, the parser in the example tests, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
@@ -194,26 +301,32 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/example/example_test.go
+- src/quack/example_schema_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The schema cases stand in `src/quack` and not in the check package, beside the mint test. A test there reads the real schema file, and a module test seeds its fixture. So the cases prove the shipped file, and the draft's check-package cases merge into them. The parser gains one case: a quoted operator stays a word of the call.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the schema rows in the quack test, the parser in the example test, and the check at the end
+- the tests reach no door: the parser is pure, and the schema test seeds a tree of texts
 
 # gate
 
@@ -222,8 +335,9 @@ none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -234,14 +348,19 @@ none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the two red test files the tests-red step names and one imports case
+- the parser is pure and the check hook reads texts alone, so the change reaches no door
+- each new function points at its section of spec/design_output/examples
+- the expect forms stand once, in the forms map of src/example, and the check reads the parser for them
 
 ## tests-green
 
@@ -250,26 +369,33 @@ none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A pure package src/example owns the one parser of an example. It reads the front, the chapter off the path and the steps of every sh block, and it refuses a line past ./RUNME.sh or an expect form outside the design table. The schema spec/schemas/example.schema.yaml governs spec/examples, and the check reads the parser through x-steps and holds edge to the developer chapters through x-under, so lint, the write door and the mint refuse an example out of shape off one road.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, the red test files and one imports case
+- the parser is pure and the check hook reads texts alone, so the change reaches no door
+- each new function points at its section of spec/design_output/examples
+- the expect forms stand once, in the forms map of src/example
 
 # accept
 

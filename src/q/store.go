@@ -7,7 +7,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -421,12 +423,7 @@ func (s *Store) Values(names []string) map[string]any {
 func Matches(pattern, name string) bool { return matches(pattern, name) }
 
 func sortedKeys(seen map[string]bool) []string {
-	out := make([]string, 0, len(seen))
-	for name := range seen {
-		out = append(out, name)
-	}
-	sort.Strings(out)
-	return out
+	return slices.Sorted(maps.Keys(seen))
 }
 
 // Clears the down mark of an instance whose process commits again. [[spec/design_output/model#a-process-ends]]

@@ -1,8 +1,8 @@
 // The merge over a real tree: a claude branch comes in by its commits, a work
 // branch closes once trunk reaches origin, and a pull request at the tip holds
-// the merge back, as test/level0/work-merge-cloud.test.js holds.
+// the merge back.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it runs the cloud merge through the pe helpers and the unexported tree fixture
 
 import (
 	"testing"

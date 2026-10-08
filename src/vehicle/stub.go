@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // Git runs git in the method root, and answers its trimmed output and whether it exited zero. [[spec/design_output/doors#a-door-standing-on-another]]
@@ -105,7 +107,7 @@ type Enabled struct {
 func EnablePlugin(d Disk, work, method string) (Enabled, error) {
 	record, _ := Parse(readIf(d, under(work, Link)))
 	name, _ := Get(record, "name")
-	if !Truthy(name) {
+	if !yaml.Truthy(name) {
 		return Enabled{Why: work + " holds no " + Link + " naming a brand, so no marketplace takes the vehicle."}, nil
 	}
 	at := under(work, SettingsLocal)

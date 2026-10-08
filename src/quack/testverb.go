@@ -6,11 +6,10 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 )
 
-func init() { register("test", testVerb(checkDoorsOf, os.Executable)) }
+func init() { register("test", testVerb(checkDoorsOf, selfPath)) }
 
 // The test verb over the doors: the test part where no word names a file, and branch test over the words where one does. [[spec/design_output/pull#the-test-verb]]
 func testVerb(doorsOf func(out, errs io.Writer) checkDoors, self func() (string, error)) twin {

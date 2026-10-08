@@ -4,9 +4,69 @@
 package yaml
 
 import (
+	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 )
+
+// Whether a loose value reads as true, as JavaScript reads one, for every package. [[spec/tickets/shared-helpers-stand-once]]
+var Truthy = truthy
+
+func truthy(said any) bool {
+	switch one := said.(type) {
+	case nil:
+		return false
+	case bool:
+		return one
+	case int:
+		return one != 0
+	case int64:
+		return one != 0
+	case float64:
+		return one != 0 && !math.IsNaN(one)
+	case string:
+		return one != ""
+	}
+	return true
+}
+
+// A loose value as the bridge's String reads it: nothing for nil, a string as it stands, and JSON for the rest. [[spec/tickets/shared-helpers-stand-once]]
+func JSONText(said any) string {
+	switch one := said.(type) {
+	case nil:
+		return ""
+	case string:
+		return one
+	}
+	body, _ := json.Marshal(said)
+	return string(body)
+}
+
+// A value as text: nothing for nil, a string as it stands, and anything else as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func ScalarText(said any) string {
+	if said == nil {
+		return ""
+	}
+	if text, ok := said.(string); ok {
+		return text
+	}
+	return fmt.Sprint(said)
+}
+
+// A field's value as text: nothing for nil, a list or an object as its JSON, and a scalar as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func FieldText(said any) string {
+	switch one := said.(type) {
+	case nil:
+		return ""
+	case string:
+		return one
+	case map[string]any, []any:
+		body, _ := json.Marshal(one)
+		return string(body)
+	}
+	return fmt.Sprint(said)
+}
 
 func AsDoc(said any) *Doc {
 	if one, held := said.(*Doc); held {

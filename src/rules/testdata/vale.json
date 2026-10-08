@@ -1,0 +1,233 @@
+{
+  "VoiceParagraph.Auxiliary": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Auxiliary", "Line": 1, "Span": [12, 22], "Match": "has written", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Characters": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Characters", "Line": 1, "Span": [18, 18], "Match": "&", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.CodeSpans": {
+    "refuses": [
+      {"Check": "VoiceParagraph.CodeSpans", "Line": 1, "Span": [1, 40], "Match": "Run `a`, `b`, `c`, `d` and `e` in order.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Contraction": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Contraction", "Line": 1, "Span": [10, 16], "Match": "doesn't", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.EtCetera": {
+    "refuses": [
+      {"Check": "VoiceParagraph.EtCetera", "Line": 1, "Span": [32, 35], "Match": "etc.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Hedge": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Hedge", "Line": 1, "Span": [10, 13], "Match": "just", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Latin": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Latin", "Line": 1, "Span": [24, 27], "Match": "e.g.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.ListItem": {
+    "refuses": [
+      {"Check": "VoiceParagraph.ListItem", "Line": 1, "Span": [1, 116], "Match": "- The door reads every note in the tree and every ticket in the queue and every rule in the folder before it answers", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Markup": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Markup", "Line": 1, "Span": [1, 32], "Match": "# The door reads every note here", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Modal": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Modal", "Line": 1, "Span": [10, 14], "Match": "would", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.ModalRequirement": {
+    "refuses": [
+      {"Check": "VoiceParagraph.ModalRequirement", "Line": 1, "Span": [12, 14], "Match": "may", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Paragraph": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Paragraph", "Line": 1, "Span": [24, 25], "Match": ". ", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.ParagraphAnswer": {
+    "refuses": [
+      {"Check": "VoiceParagraph.ParagraphAnswer", "Line": 3, "Span": [24, 25], "Match": ". ", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.PastTense": {
+    "refuses": [
+      {"Check": "VoiceParagraph.PastTense", "Line": 1, "Span": [12, 16], "Match": "wrote", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Progressive": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Progressive", "Line": 1, "Span": [12, 21], "Match": "is writing", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.RestatedTable": {
+    "refuses": [
+      {"Check": "VoiceParagraph.RestatedTable", "Line": 5, "Span": [1, 60], "Match": "The engine hands the next free ticket to the hand at a pull.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Sentence": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Sentence", "Line": 1, "Span": [1, 3], "Match": "The", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Shape": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Shape", "Line": 1, "Span": [1, 102], "Match": "The door reads the file.\n\nThe door reads the file.\n\nThe door reads the file.\n\nThe door reads the file.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.ShapeAnswer": {
+    "refuses": [
+      {"Check": "VoiceParagraph.ShapeAnswer", "Line": 1, "Span": [1, 24], "Match": "The door reads the file.", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceParagraph.Vocabulary": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Vocabulary", "Line": 1, "Span": [20, 34], "Match": "flibbertigibbet", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceScript.NoPathInScript": {
+    "refuses": [
+      {"Check": "VoiceScript.NoPathInScript", "Line": 1, "Span": [1, 34], "Match": "node -e \"import('$ROOT/src/x.js')\"", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.GuidanceCap": {
+    "refuses": [
+      {"Check": "VoiceShape.GuidanceCap", "Line": 24, "Span": [1, 18], "Match": "16. Run the check.", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.GuidanceChapter": {
+    "refuses": [
+      {"Check": "VoiceShape.GuidanceChapter", "Line": 1, "Span": [1, 3], "Match": "---", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.GuidanceEnv": {
+    "refuses": [
+      {"Check": "VoiceShape.GuidanceEnv", "Line": 4, "Span": [1, 14], "Match": "  - level_zero", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.MarkedRuleNamesFailure": {
+    "refuses": [
+      {"Check": "VoiceShape.MarkedRuleNamesFailure", "Line": 9, "Span": [1, 19], "Match": "1. Run the check. *", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.StopRule": {
+    "refuses": [
+      {"Check": "VoiceShape.StopRule", "Line": 1, "Span": [1, 1], "Match": "-", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceShape.VocabularyEntry": {
+    "refuses": [
+      {"Check": "VoiceShape.VocabularyEntry", "Line": 2, "Span": [1, 18], "Match": "  - {word: splice}", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.Antithesis": {
+    "refuses": [
+      {"Check": "VoiceParagraph.Hedge", "Line": 1, "Span": [14, 19], "Match": "rather", "Severity": "warning"},
+      {"Check": "VoiceVale.Antithesis", "Line": 1, "Span": [14, 24], "Match": "rather than", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.CodeComment": {
+    "refuses": [
+      {"Check": "VoiceVale.CodeComment", "Line": 2, "Span": [1, 26], "Match": "// The one the door reads.", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.CodeHeader": {
+    "refuses": [
+      {"Check": "VoiceVale.CodeHeader", "Line": 1, "Span": [8, 11], "Match": "four", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.CountedList": {
+    "refuses": [
+      {"Check": "VoiceVale.CountedList", "Line": 1, "Span": [5, 15], "Match": "three steps", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.DigitInProse": {
+    "refuses": [
+      {"Check": "VoiceVale.DigitInProse", "Line": 1, "Span": [16, 16], "Match": "0", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.FakeDoorsInTest": {
+    "refuses": [
+      {"Check": "VoiceVale.FakeDoorsInTest", "Line": 1, "Span": [1, 47], "Match": "import { disk } from \"../../src/doors/disk.js\";", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.History": {
+    "refuses": [
+      {"Check": "VoiceVale.History", "Line": 1, "Span": [10, 16], "Match": "used to", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.OutsideInDoors": {
+    "refuses": [
+      {"Check": "VoiceVale.OutsideInDoors", "Line": 1, "Span": [1, 37], "Match": "export const home = process.env.HOME;", "Severity": "error"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.Passive": {
+    "refuses": [
+      {"Check": "VoiceParagraph.PastTense", "Line": 1, "Span": [10, 12], "Match": "was", "Severity": "warning"},
+      {"Check": "VoiceVale.Passive", "Line": 1, "Span": [10, 20], "Match": "was written", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.Private": {
+    "refuses": [
+      {"Check": "VoiceVale.Private", "Line": 1, "Span": [20, 39], "Match": "somebody@example.com", "Severity": "error"},
+      {"Check": "VoiceParagraph.Characters", "Line": 1, "Span": [28, 28], "Match": "@", "Severity": "warning"}
+    ],
+    "passes": []
+  },
+  "VoiceVale.ShoutedLead": {
+    "refuses": [
+      {"Check": "VoiceVale.ShoutedLead", "Line": 1, "Span": [1, 25], "Match": "THIS IS THE SHOUTED PART,", "Severity": "warning"}
+    ],
+    "passes": []
+  }
+}

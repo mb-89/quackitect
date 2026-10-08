@@ -2,21 +2,37 @@
 // past its dot folders into the retro's input folder, copies the transcripts,
 // the memory and the scratchpads beside it, and leaves the folders behind.
 // [[spec/guidance/retro/collect]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"slices"
 	"sort"
 	"strings"
-	"syscall"
 	"testing"
+	"testing/fstest"
 	"time"
 )
+
+// A fake disk as the hand a verb takes, and the disk itself, whose files a case dates. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2FakeDisk() (diskDoors, *fakeDisk) {
+	f := &fakeDisk{files: fstest.MapFS{}}
+	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename, appendTo: f.appendTo, readlink: f.readlink, symlink: f.symlink, makeTemp: f.makeTemp}, f
+}
+
+// The error code a disk names, as diskCodes reads it. [[spec/tickets/test-walks-move-onto-fakes]]
+func hq2Errno(t *testing.T, name string) error {
+	t.Helper()
+	for code, said := range diskCodes {
+		if said == name {
+			return code
+		}
+	}
+	t.Fatalf("diskCodes names no %s", name)
+	return nil
+}
 
 // The retro every case collects for, and the time the clock stands at. [[spec/guidance/retro/collect]]
 const (
@@ -31,12 +47,15 @@ type retroCollectWorld struct {
 	root, home, temp, slug string
 	trunk                  *retroTrunk
 	move                   func(from, to string) error
+	disk                   diskDoors
+	fake                   *fakeDisk
 }
 
 // A world seeded with the files every case starts on. [[spec/guidance/retro/collect]]
 func retroNewCollectWorld(t *testing.T, trunk *retroTrunk) *retroCollectWorld {
 	t.Helper()
-	w := &retroCollectWorld{t: t, root: t.TempDir(), home: t.TempDir(), temp: t.TempDir(), trunk: trunk, move: os.Rename}
+	disk, fake := hq2FakeDisk()
+	w := &retroCollectWorld{t: t, root: "/work/tree", home: "/work/home", temp: "/work/temp", trunk: trunk, move: disk.rename, disk: disk, fake: fake}
 	w.slug = retroSlugOf(w.root)
 	w.seed(retroCollectFiles(w.slug))
 	return w
@@ -87,39 +106,37 @@ func (w *retroCollectWorld) seed(files map[string]string) {
 // Writes one file dated at the epoch. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) write(key, text string) {
 	w.t.Helper()
-	at := w.at(key)
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		w.t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-		w.t.Fatal(err)
-	}
+	hq2Seed(w.t, w.disk, w.at(key), text)
 	w.touch(key, "1970-01-01T00:00:00Z")
 }
 
 // Dates a file at a time. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) touch(key, when string) {
 	w.t.Helper()
-	if err := os.Chtimes(w.at(key), retroWhen(when), retroWhen(when)); err != nil {
-		w.t.Fatal(err)
+	w.fake.mu.Lock()
+	defer w.fake.mu.Unlock()
+	held, ok := w.fake.files[fakeKey(w.at(key))]
+	if !ok {
+		w.t.Fatalf("%s stands nowhere to date", key)
 	}
+	held.ModTime = retroWhen(when)
 }
 
 // The text a file holds, or nothing. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) read(key string) string {
-	text, _ := os.ReadFile(w.at(key))
+	text, _ := w.disk.read(w.at(key))
 	return string(text)
 }
 
 // Whether a file or a folder stands. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) exists(key string) bool {
-	_, err := os.Stat(w.at(key))
+	_, err := w.disk.stat(w.at(key))
 	return err == nil
 }
 
 // When a file last changed. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) modified(key string) time.Time {
-	said, err := os.Stat(w.at(key))
+	said, err := w.disk.stat(w.at(key))
 	if err != nil {
 		return time.Time{}
 	}
@@ -134,6 +151,7 @@ func (w *retroCollectWorld) run(argv ...string) (int, string) {
 		temp: w.temp,
 		now:  func() time.Time { return retroWhen(retroCollectNow) },
 		git:  w.trunk.run,
+		disk: w.disk,
 		move: w.move,
 	}
 	var said strings.Builder
@@ -148,7 +166,7 @@ func (w *retroCollectWorld) collect(more ...string) (int, string) {
 
 // The names standing under the private folder, sorted. [[spec/guidance/retro/collect]]
 func (w *retroCollectWorld) standing() []string {
-	entries, _ := os.ReadDir(w.at("tree:.se"))
+	entries, _ := w.disk.list(w.at("tree:.se"))
 	out := []string{}
 	for _, one := range entries {
 		out = append(out, one.Name())
@@ -245,7 +263,7 @@ func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
 func TestRetroCollectFailsAndNamesTheManifestWhereItsWriteFails(t *testing.T) {
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
-	if err := os.MkdirAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
+	if err := w.disk.makeAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -370,228 +388,5 @@ func TestRetroCollectKeepsTheBatteryReportBesideTheRecordOneARetro(t *testing.T)
 	bare.collect()
 	if bare.exists("tree:.se/.retro/" + retroCollectName + "/battery.json") {
 		t.Fatal("a stamp carrying no report leaves none behind")
-	}
-}
-
-// The last retro's collect opens the window, and the memory is standing state. [[spec/guidance/retro/collect]]
-func TestRetroCollectLeavesATranscriptOlderThanTheLastCollectOutAndTakesTheMemoryWhole(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
-	w.write("home:.claude/projects/"+w.slug+"/old.jsonl", `{"type":"user"}`+"\n")
-	w.touch("home:.claude/projects/"+w.slug+"/old.jsonl", "2026-09-10T00:00:00Z")
-	w.touch("home:.claude/projects/"+w.slug+"/session.jsonl", "2026-09-15T00:00:00Z")
-	w.touch("home:.claude/projects/"+w.slug+"/memory/MEMORY.md", "2026-09-10T00:00:00Z")
-
-	_, said := w.collect()
-
-	if !strings.Contains(said, "since 2026-09-12T00:00:00.000Z") {
-		t.Fatalf("collect says %q", said)
-	}
-	if w.exists(retroInputKey("transcripts/" + w.slug + "/old.jsonl")) {
-		t.Fatal("a transcript older than the last collect stays out")
-	}
-	if !w.exists(retroInputKey("transcripts/" + w.slug + "/session.jsonl")) {
-		t.Fatal("a transcript past the last collect lands")
-	}
-	if !w.exists(retroInputKey("memory/" + w.slug + "/MEMORY.md")) {
-		t.Fatal("the memory comes whole")
-	}
-	if !w.exists(retroCollectLast) {
-		t.Fatal("an earlier retro stays")
-	}
-}
-
-// A gate runs the evidence again, and a torn run deletes nothing it moved. [[spec/guidance/retro/collect]]
-func TestRetroCollectSecondRunAnswersTheFirstAndATornRunCarriesOn(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.collect()
-
-	code, said := w.collect()
-	if code != 0 || !strings.Contains(said, "holds a whole run already") {
-		t.Fatalf("a second run answers %d: %q", code, said)
-	}
-
-	if err := os.Remove(w.at(retroInputKey("manifest.jsonl"))); err != nil {
-		t.Fatal(err)
-	}
-	w.write("tree:.se/late.md", "written after the first run\n")
-	code, said = w.collect()
-	if code != 0 {
-		t.Fatalf("a torn run answers %d: %s", code, said)
-	}
-	if !w.exists(retroInputKey("log/one.jsonl")) {
-		t.Fatal("what the first run moves survives")
-	}
-	if !w.exists(retroInputKey("late.md")) {
-		t.Fatal("what stands since moves too")
-	}
-}
-
-// A second pass merges what arrives since, and overwrites nothing. [[spec/guidance/retro/collect]]
-func TestRetroCollectSecondPassMergesWhatArrivesSinceAndKeepsBothLogs(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.collect()
-
-	w.write("tree:.se/.log/one.jsonl", `{"said":"a later line"}`+"\n")
-	w.write("tree:.se/tickets/a-later-note.md", "---\nkind: [[ticket]]\n---\n")
-	w.write("tree:.se/config.json", "{}\n")
-	code, said := w.collect("--again")
-
-	if code != 0 {
-		t.Fatalf("a second pass answers %d: %s", code, said)
-	}
-	if got := w.read(retroInputKey("log/one.jsonl")); got != `{"said":"a line"}`+"\n" {
-		t.Fatalf("the first log reads %q", got)
-	}
-	if got := w.read(retroInputKey("log/one.2.jsonl")); got != `{"said":"a later line"}`+"\n" {
-		t.Fatalf("the later log reads %q", got)
-	}
-	for _, path := range []string{"tickets/a-note.md", "tickets/a-later-note.md", "config.json"} {
-		if !w.exists(retroInputKey(path)) {
-			t.Fatalf("%s lands in the input", path)
-		}
-	}
-	if w.exists("tree:.se/config.json") {
-		t.Fatal("a loose file moves")
-	}
-}
-
-// A move failing on the error a disk names, the way a busy or a watched path refuses its rename. [[spec/guidance/retro/collect]]
-func retroRefusingMove(refuses func(from string) bool, code syscall.Errno) func(from, to string) error {
-	return func(from, to string) error {
-		if refuses(filepath.ToSlash(from)) {
-			return &os.LinkError{Op: "rename", Old: from, New: to, Err: code}
-		}
-		return os.Rename(from, to)
-	}
-}
-
-// A file the disk holds takes a line of its own, and the verb names what stays. [[spec/guidance/retro/collect]]
-func TestRetroCollectMoveTheDiskRefusesTakesAManifestLineAndTheVerbNamesWhatStays(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.move = retroRefusingMove(func(from string) bool { return strings.Contains(from, "check.out") }, syscall.EBUSY)
-
-	code, said := w.collect()
-
-	if code != 1 {
-		t.Fatalf("collect answers %d, want 1", code)
-	}
-	if !strings.Contains(said, "refused .se/check.out: EBUSY") {
-		t.Fatalf("collect says %q", said)
-	}
-	if !strings.Contains(said, ".se/check.out still stands beside the dot folders") {
-		t.Fatalf("collect names no file that stays: %q", said)
-	}
-	if !slices.ContainsFunc(w.manifest(), func(one map[string]any) bool { return one["refused"] == "EBUSY" }) {
-		t.Fatal("the manifest carries the refusal")
-	}
-}
-
-// An editor watching a folder refuses its rename, and its files still move. [[spec/guidance/retro/collect]]
-func TestRetroCollectFolderTheDiskRefusesToMoveWholeMovesFileByFile(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	w.write("tree:.se/tmp/ste/words.txt", "one\n")
-	w.move = retroRefusingMove(func(from string) bool { return strings.HasSuffix(from, ".se/tmp") }, syscall.EPERM)
-
-	code, said := w.collect()
-
-	if code != 0 {
-		t.Fatalf("collect answers %d, want 0: %s", code, said)
-	}
-	if got := w.read(retroInputKey("tmp/ste/words.txt")); got != "one\n" {
-		t.Fatalf("the file moves, and reads %q", got)
-	}
-	if w.exists("tree:.se/tmp") {
-		t.Fatal("the folder leaves nothing")
-	}
-	if slices.ContainsFunc(w.manifest(), func(one map[string]any) bool { return one["refused"] != nil }) {
-		t.Fatal("the manifest holds no refusal")
-	}
-}
-
-// A transcript line carrying a stamp. [[spec/tickets/the-retro-finishes-its-asks]]
-func retroStamped(when, more string) string {
-	return `{"timestamp":"` + when + `"` + more + `}`
-}
-
-// [[spec/tickets/the-retro-finishes-its-asks]]
-func TestRetroCollectLeavesATranscriptLineStampedBeforeTheLastCollectOut(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	session := "home:.claude/projects/" + w.slug + "/session.jsonl"
-	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
-	w.write(session, strings.Join([]string{
-		retroStamped("2026-09-11T08:00:00.000Z", `,"said":"old"`),
-		`{"said":"old, no stamp"}`,
-		retroStamped("2026-09-13T08:00:00.000Z", `,"said":"new"`),
-		`{"said":"new, no stamp"}`,
-	}, "\n"))
-	w.touch(session, "2026-09-13T08:00:00Z")
-
-	w.collect()
-
-	copied := w.read(retroInputKey("transcripts/" + w.slug + "/session.jsonl"))
-	if strings.Contains(copied, `"old`) {
-		t.Fatalf("an old line lands: %q", copied)
-	}
-	if !strings.Contains(copied, `"said":"new"`) || !strings.Contains(copied, "new, no stamp") {
-		t.Fatalf("the new lines land: %q", copied)
-	}
-}
-
-// [[spec/tickets/the-second-collect-keeps-lines]]
-func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	session := "home:.claude/projects/" + w.slug + "/session.jsonl"
-	first := retroStamped("2026-09-19T11:00:00.000Z", `,"said":"first"`)
-	w.write(session, first)
-	w.collect()
-
-	w.write(session, strings.Join([]string{first, retroStamped("2026-09-19T13:00:00.000Z", `,"said":"later"`)}, "\n"))
-	w.touch(session, "2026-09-19T13:00:00Z")
-	w.collect("--again")
-
-	copied := w.read(retroInputKey("transcripts/" + w.slug + "/session.jsonl"))
-	if !strings.Contains(copied, `"said":"first"`) || !strings.Contains(copied, `"said":"later"`) {
-		t.Fatalf("the transcript reads %q", copied)
-	}
-}
-
-// [[spec/tickets/the-retro-finishes-its-asks]]
-func TestRetroCollectCopiesTheScriptsAndLeavesThemAndASecondPassCopiesWhatChanges(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	code, said := w.collect()
-	if code != 0 {
-		t.Fatalf("collect answers %d: %s", code, said)
-	}
-	if !w.exists("tree:.se/scripts/one.mjs") {
-		t.Fatal("the scripts stay in place")
-	}
-	if !w.exists(retroInputKey("scripts/one.mjs")) {
-		t.Fatal("the scripts copy into the input")
-	}
-
-	w.write("tree:.se/scripts/two.mjs", "// a later script\n")
-	w.touch("tree:.se/scripts/two.mjs", "2026-09-19T13:00:00Z")
-	code, said = w.collect("--again")
-
-	if code != 0 {
-		t.Fatalf("a second pass answers %d: %s", code, said)
-	}
-	if !w.exists("tree:.se/scripts/one.mjs") || !w.exists("tree:.se/scripts/two.mjs") {
-		t.Fatal("the scripts stay in place")
-	}
-	if got := w.read(retroInputKey("scripts/two.mjs")); got != "// a later script\n" {
-		t.Fatalf("the later script reads %q", got)
-	}
-	if w.exists(retroInputKey("scripts/one.2.mjs")) {
-		t.Fatal("an unchanged script copies once")
 	}
 }

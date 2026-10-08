@@ -1,12 +1,10 @@
-// ticket note writes a private ticket off the note process and carries on,
-// off the roads test/level0/ticket-verb.test.js, ticket-todo.test.js and
-// roots.test.js cover.
+// ticket note writes a private ticket off the note process and carries on.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"encoding/json"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the ticket schema and the wiring the tree holds, as a build check reads source
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -63,11 +61,14 @@ func noteCaseWiring(t *testing.T, root string) {
 	seedsFile(t, root, "spec/wiring.yaml", string(wiring))
 }
 
-// Seeds the fake Vale where the voice finds it. [[spec/design_output/doors#a-fake-behaves]]
+// Seeds the rule files the voice loads. [[spec/tickets/go-rules-replace-vale]]
 func noteCaseVoice(t *testing.T, root string) {
 	t.Helper()
-	fakeVale(t, root, fakeValeLines, "")
+	seedsRules(t, root)
 }
+
+// What the Characters rule answers on a semicolon in prose. [[spec/tickets/go-rules-replace-vale]]
+const noteCaseSemicolon = "The character ; stands outside the set a paragraph admits: letters, digits, space, and . , ? ! : ( ) ' \" -. Write it in words, or put it in a code span."
 
 // Whether the text holds a row the pattern matches whole. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func holdsRow(text, pattern string) bool {
@@ -152,6 +153,11 @@ func TestTicketNote(t *testing.T) {
 			t.Fatalf("the note holds:\n%s", text)
 		}
 	})
+}
+
+// The note verb's guards: the name and the line it takes, the cap, the rules, a private name and the dry run. [[spec/tickets/rules-lint-changed-files-first]]
+// level0: FixtureOutsideHome - each case writes notes into a tree of its own
+func TestTicketNoteGuards(t *testing.T) {
 	t.Run("note takes a name and a line", func(t *testing.T) {
 		root := noteCaseTree(t)
 		for _, argv := range [][]string{{"ticket", "note"}, {"ticket", "note", "slow-lint"}, {"ticket", "note", "slow-lint", "--todo", "--talk"}} {
@@ -203,7 +209,7 @@ func TestTicketNote(t *testing.T) {
 				line = i + 1
 			}
 		}
-		want := ".se/tickets/a-name.md holds an Ask that breaks a rule of form, and it lands. Leave the lines as they stand, and carry on:\n  line " + strconv.Itoa(line) + " breaks Characters: A semicolon joins two sentences.\n"
+		want := ".se/tickets/a-name.md holds an Ask that breaks a rule of form, and it lands. Leave the lines as they stand, and carry on:\n  line " + strconv.Itoa(line) + " breaks Characters: " + noteCaseSemicolon + "\n"
 		if line == 0 || errs != want {
 			t.Fatalf("note warns %q, and wants %q", errs, want)
 		}
@@ -211,8 +217,8 @@ func TestTicketNote(t *testing.T) {
 	t.Run("note refuses a line carrying a private name, and writes nothing", func(t *testing.T) {
 		root := noteCaseTree(t)
 		noteCaseVoice(t, root)
-		code, out, errs := runsApart(t, root, false, "ticket", "note", "a-name", "the note names SECRET")
-		if code != 1 || out != "" || !strings.HasPrefix(errs, ".se/tickets/a-name.md would hold an Ask that breaks the voice rules, so the verb writes nothing:\n  line ") || !strings.HasSuffix(errs, " breaks Private: A private name leaves the box.\n\nRewrite the line, then run the verb again.\n") {
+		code, out, errs := runsApart(t, root, false, "ticket", "note", "a-name", "The note names "+"someone"+"@"+"somewhere.net"+".")
+		if code != 1 || out != "" || !strings.HasPrefix(errs, ".se/tickets/a-name.md would hold an Ask that breaks the voice rules, so the verb writes nothing:\n  line ") || !strings.Contains(errs, " breaks Private: ") || !strings.HasSuffix(errs, "\n\nRewrite the line, then run the verb again.\n") {
 			t.Fatalf("note answers %d, %q, %q", code, out, errs)
 		}
 		if _, stands := readsBack(t, root, ".se/tickets/a-name.md"); stands {

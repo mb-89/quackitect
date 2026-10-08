@@ -126,7 +126,7 @@ func TestRouteOf(t *testing.T) {
 }
 
 // The front the drawing edits, and the route each move and drop answers. test/level0/drawing-edit.test.js holds edit.js to the same routes. [[spec/tickets/ticket-scripts-leave]]
-//
+
 //go:embed testdata/drawing_edits.json
 var drawingEdits []byte
 

@@ -1,7 +1,7 @@
 // The unreached scan the accept reads: a group adding a package nothing
 // imports stands with something to fix, and the review names each file.
 // [[spec/tickets/accept-runs-the-orphan-scan]]
-package branches
+package branches // level0: InPackageTest - the case builds on the in-package helpers newTree and holds, and reads the unexported codeOK and ticketAt
 
 import (
 	"strings"

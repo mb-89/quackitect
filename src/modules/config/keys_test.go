@@ -48,20 +48,12 @@ func TestConfigKeysNameEachLayer(t *testing.T) {
 		"queue.weight": {"5", Tracked},
 		"queue.depth":  {"6", Local},
 		"queue.fail":   {"7", OverrideLayer},
+		"queue.day":    {"4", BuiltIn},
 	} {
 		row := rows[key]
 		if fmt.Sprint(row["value"]) != want[0] || row["layer"] != want[1] {
 			t.Fatalf("%s reads %v, and wants %s off %s", key, row, want[0], want[1])
 		}
-	}
-}
-
-func TestConfigKeysCarryTheBuiltInWhereNoLayerSets(t *testing.T) {
-	ix := layered(t, "queue", fourDeclared)
-	ix.Seed(files(`{}`, `{}`))
-	row := keyRows(t, ix)["queue.day"]
-	if fmt.Sprint(row["value"]) != "4" || row["layer"] != "built-in" {
-		t.Fatalf("queue.day reads %v, and wants its built-in 4 off the built-in layer, as quack config names it", row)
 	}
 }
 

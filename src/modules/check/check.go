@@ -10,6 +10,5 @@ const Prefix = "check/"
 
 // The module type the wiring loads as check: the sweep the LSP's rules answer. [[spec/tickets/lsp-rules-move-to-check]]
 func Registers(c *q.Catalog) q.Writer {
-	q.DerivedIn(c, SweepPort, []Finding{}, sweepOf, q.Doc("every finding the LSP's rules answer over the files the index mirrors"))
-	return q.Join()
+	return q.DerivedIn(c, SweepPort, []Finding{}, sweepOf, q.Doc("every finding the LSP's rules answer over the files the index mirrors"))
 }

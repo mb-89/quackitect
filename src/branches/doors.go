@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/src/failure"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
 	"quackitect/src/proc"
@@ -52,12 +53,16 @@ type Doors struct {
 	Runme []string
 	// The queue as branch list --queue prints it, off the index. [[spec/design_output/pull#the-queue-is-a-score]]
 	Queue func() int
-	// The last beat on each group, read once a run, and dropped at each fetch. [[spec/design_output/work#a-hold-beats-with-its-session]]
+	// The last beat on each group, read once a run, and dropped at each fetch. [[spec/design_output/work#the-session-beats-its-hold]]
 	beats map[string]beat
 	// An index value by its name, decoded into the target. [[spec/design_output/work#one-reading-answers-git]]
 	Value func(name string, into any) error
 	// Every leaf's notes, keyed process:path, off the Go guidance module. [[spec/tickets/the-guidance-topic-lands]]
 	Guidance func() (map[string][]string, error)
+	// The failure nodes each refusal raises through. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+	Failures failure.Registry
+	// The door every GitHub and routine request goes through. Nil sends nothing. [[spec/tickets/branch-done-opens-the-pr]]
+	Send Send
 }
 
 // Prints what git said on red, as a loud git run does, and answers whether it ran green. [[spec/design_output/doors#a-door-standing-on-another]]
@@ -194,6 +199,17 @@ func (d *Doors) say(format string, args ...any) { fmt.Fprintf(d.Out, format+"\n"
 
 // Prints a line to the standard error. [[spec/design_output/doors#one-door-per-outside-thing]]
 func (d *Doors) warn(format string, args ...any) { fmt.Fprintf(d.Errs, format+"\n", args...) }
+
+// A refusal through the failure door: the message the site builds, its detail rows, the id and each remedy, and the row the log takes. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func (d *Doors) raises(raised failure.Raised) {
+	for _, line := range raised.Lines() {
+		fmt.Fprintln(d.Errs, line)
+	}
+	if d.Log != nil {
+		said, _ := raised.Row("")["said"].(string)
+		d.Log(raised.Level, failure.RowKind, said, map[string]any{failure.IDField: raised.ID})
+	}
+}
 
 // Runs one of the tree's own verbs under the root, as a person types it. [[spec/tickets/the-verbs-need-no-wrapper]]
 func (d *Doors) verb(dir string, words ...string) Said {

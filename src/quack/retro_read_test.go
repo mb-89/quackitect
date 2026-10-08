@@ -1,7 +1,7 @@
 // The retro's reader verb over a seeded chapter: every owner prompt, fault and
 // command, each with its file and line.
 // [[spec/tickets/the-retro-finishes-its-asks]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"fmt"
@@ -86,6 +86,7 @@ func TestRetroReadMarksAFaultAsTheTimelineCountsItAndALineOfNoJSONEarnsNone(t *t
 }
 
 // retro read counts a prompt the owner queues mid-turn and lists a refusal that carries no error mark; the queue's own line and a task's queued line earn none. [[spec/tickets/retro-read-reads-every-record]]
+// level0: FixtureOutsideHome - the case lays a retro's records into a tree of its own
 func TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

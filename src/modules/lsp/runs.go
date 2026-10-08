@@ -65,7 +65,7 @@ func (s *Server) schedule(at string) {
 	if s.from.Tools == nil {
 		return
 	}
-	if old := s.timers[at]; old != nil && old.Stop() {
+	if stop := s.timers[at]; stop != nil && stop() {
 		s.pending.Done()
 	}
 	quiet := s.from.Quiet
@@ -73,7 +73,7 @@ func (s *Server) schedule(at string) {
 		quiet = lintQuiet
 	}
 	s.pending.Add(1)
-	s.timers[at] = time.AfterFunc(quiet, func() {
+	s.timers[at] = s.from.Clock.AfterFunc(quiet, func() {
 		defer s.pending.Done()
 		s.runOver([]string{at})
 	})

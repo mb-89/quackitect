@@ -1,6 +1,6 @@
 // The group reads: the front, the record, the step, the ask and the spans.
 // [[spec/tickets/work-verbs-port-to-go]]
-package branches
+package branches // level0: InPackageTest - it drives the unexported group readers: fieldOf, spanOf, stepOf, aged, groupStanding and the with editors
 
 import (
 	"slices"
@@ -164,5 +164,14 @@ func TestADependencyReadsBare(t *testing.T) {
 	listed := "---\ndepends_on:\n  - c\n  - 'd'\nstate: open\n---\n"
 	if got := dependsOnText(listed); !slices.Equal(got, []string{"c", "d"}) {
 		t.Fatalf("the listed waits read %v", got)
+	}
+}
+
+// A hash_after reading false leaves the take open, as JavaScript reads the field. [[spec/tickets/shared-helpers-stand-once]]
+func TestAHashAfterReadingFalseLeavesTheTakeOpen(t *testing.T) {
+	t.Parallel()
+	taken := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "abc"}, {Key: "hash_after", Value: "false"}})
+	if take := heldIn(taken); take == nil || take.HashBefore != "abc" {
+		t.Fatalf("the take holds %+v", take)
 	}
 }

@@ -13,7 +13,6 @@ var (
 	ChaptersWanted           = chaptersWanted
 	CheckNote                = checkNote
 	CheckNoteIn              = checkNoteIn
-	EditorDrawsWriteRules    = editorDrawsWriteRules
 	EveryPointerResolvesOver = everyPointerResolves
 	ExtensionsOnOffer        = extensionsOnOffer
 	Fault                    = fault
@@ -62,6 +61,8 @@ var (
 	TextFaults               = textFaults
 	Textual                  = textual
 	UnreasonedIn             = unreasoned
+	Walked                   = walked
+	DoorsWalked              = doorsWalked
 	WordsIn                  = wordsIn
 )
 

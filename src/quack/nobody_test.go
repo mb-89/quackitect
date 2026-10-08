@@ -4,6 +4,7 @@
 package main
 
 import (
+	// level0: OutsideInDoors - the case reads the tree's own rule script, as a build check reads source
 	"os"
 	"path/filepath"
 	"regexp"

@@ -9,18 +9,16 @@ This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files
 
-Vale hands a rule one buffer. Its script sandbox offers `text` and `fmt` alone,
-so a rule weighing a config against the code reading it finds no second file
-there.
+A prose rule reads one buffer, so a rule weighing a config against the code
+reading it finds no second file there.
 
 These rules live in `src/modules/check`, and `Rules` in `checker.go` names them. `./RUNME.sh lint`
-runs each one over the whole tree, beside the rules Vale holds and the rules
-Biome holds.
+runs each one over the whole tree, beside the Go rules in `src/rules` and the
+rules Biome holds.
 
 | the rule | the two things it weighs |
 |---|---|
 | `SettingsNameBinaries` | `.vscode/settings.json`, `install.sh` |
-| `EditorDrawsWriteRules` | `.vscode/settings.json`, `spec/config/editor.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
 | `NoLogDeleted` | every source file git holds |
@@ -113,13 +111,14 @@ what the rule over them does.
 `lint` runs these rules where it sweeps the whole tree. The task does that, and
 so does `./RUNME.sh check`.
 
-Naming a path instead runs Vale, Biome and the script rule over that path, and
+Naming a path instead runs the Go rules and Biome over that path, and
 leaves the tree rules out. A rule over the whole tree answers the same list
 whatever path a person names.
 
 # The script rule draws live
 
-`.vale.ini` maps a shell ending to `md`, so Vale reads a shell script.
+A row of `sections` in `src/rules/scope.go` bases a shell ending on
+`VoiceScript`, so the Go rules read a shell script.
 `spec/config/styles/VoiceScript` holds one rule over those endings, and
 `NoPathInScript` stands there.
 

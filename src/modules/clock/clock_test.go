@@ -9,60 +9,33 @@ import (
 	"quackitect/src/q"
 )
 
-func TestTheMinuteMovesOnTick(t *testing.T) {
+// The minute commits at start and as it turns, a poll inside the same minute commits nothing, and a stopped clock commits no more, so two clocks started apart agree within a poll. [[spec/tickets/process-shadow-reads-clean]]
+func TestTheMinuteCommitsAtStartAndAsItTurns(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
 	s := q.NewStore(c)
-	at := time.Date(2026, 1, 1, 0, 0, 30, 0, time.UTC)
-	fake := NewFake(at)
+	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 30, 0, time.UTC))
+	commits := 0
 	stop := Start(fake, func(values map[string]any) error {
+		commits++
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)
 		return err
 	})
-	defer stop()
-	first := at.Unix() / 60
-	if got := s.Snapshot().Read(Port); got != first {
-		t.Fatalf("the minute reads %v at start, not %d", got, first)
+	first := fake.Now().Unix() / 60
+	for _, step := range []struct {
+		span    time.Duration
+		minute  int64
+		commits int
+	}{{29 * time.Second, first, 1}, {time.Second, first + 1, 2}} {
+		fake.Tick(step.span)
+		if got := s.Snapshot().Read(Port); got != step.minute || commits != step.commits {
+			t.Fatalf("the minute reads %v over %d commits, and wants %d over %d", got, commits, step.minute, step.commits)
+		}
 	}
-	if fake.Now() != at {
-		t.Fatalf("the fake reads %v with no tick, not %v", fake.Now(), at)
-	}
-	fake.Tick(time.Minute)
-	if got := s.Snapshot().Read(Port); got != first+1 {
-		t.Fatalf("the minute reads %v after a tick, not %d", got, first+1)
-	}
-}
-
-func TestAStoppedClockCommitsNoMinute(t *testing.T) {
-	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
-	commits := 0
-	stop := Start(fake, func(map[string]any) error {
-		commits++
-		return nil
-	})
 	stop()
 	fake.Tick(time.Minute)
-	if commits != 1 {
-		t.Fatalf("the clock commits %d times, past the one at start", commits)
-	}
-}
-
-// The minute commits as it turns, and a poll inside the same minute commits nothing, so two clocks started apart agree within a poll. [[spec/tickets/process-shadow-reads-clean]]
-func TestTheMinuteCommitsAsItTurns(t *testing.T) {
-	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 30, 0, time.UTC))
-	var minutes []any
-	stop := Start(fake, func(values map[string]any) error {
-		minutes = append(minutes, values[Port])
-		return nil
-	})
-	defer stop()
-	fake.Tick(29 * time.Second)
-	if len(minutes) != 1 {
-		t.Fatalf("the clock commits %v before the minute turns, and wants the one at start", minutes)
-	}
-	fake.Tick(time.Second)
-	if len(minutes) != 2 || minutes[1] != minutes[0].(int64)+1 {
-		t.Fatalf("the clock commits %v as the minute turns, and wants the next minute", minutes)
+	if commits != 2 {
+		t.Fatalf("a stopped clock commits %d times, past the two before its stop", commits)
 	}
 }
 

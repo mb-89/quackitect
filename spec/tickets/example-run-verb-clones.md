@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -18,7 +19,7 @@ steps:
         from: anyone
         by: anyone
         input: ask
-        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
         evidence:
           - name: approach
             form: text
@@ -115,9 +116,82 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 22b42ea1501e8967
+process_hash: c671f20a6ae2a4a6
 group: examples-run-as-tests
-depends_on: [example-schema-reads-steps]
+depends_on: ["example-schema-reads-steps"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: c228f0b29d9b35421dbc4e6e5e7380f2afefc34b
+    hash_after: c228f0b29d9b35421dbc4e6e5e7380f2afefc34b
+    inputs:
+      - name: ask
+        hash: 6c68752c49fe8075
+        size: 667
+      - name: [[spec/design_output/examples]]
+        hash: 5245c4fe35ade37e
+        size: 8237
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 42197a224bb7 · claude-code-remote
+    hash_before: fb04502049b3d0cbb6984fcf94a934ee0106cb33
+    hash_after: fb04502049b3d0cbb6984fcf94a934ee0106cb33
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 38bc371b8dffa4b7
+        size: 2120
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 1e361f08e8892feef759ea2a9838c12fde27746b
+    hash_after: 1e361f08e8892feef759ea2a9838c12fde27746b
+    inputs:
+      - name: design/draft
+        hash: 38bc371b8dffa4b7
+        size: 2120
+      - name: design/tests-red
+        hash: 38211288a03a4098
+        size: 763
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: a5e24345266e2fca8d4b4572312f700e5f5613b9
+    hash_after: fe1a5bddc28da44802095932a63755d1de3b31e3
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23ee163eaf36 · claude-code-remote
+    hash_before: 62037a283ad64dda28dcae01e878a920da92b2a3
+    hash_after: 62037a283ad64dda28dcae01e878a920da92b2a3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   68.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 38211288a03a4098
+        size: 763
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -154,38 +228,58 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new verb file `src/quack/example_verb.go` registers `example` whole, as `ticket` stands, so `wholeOf` routes it to Go under every mode. `example run <path>` takes these steps:
+
+1. It reads the file under the root, and `example.Read` parses it. A fault exits 1, naming the line.
+2. It clears `.se/.runtime/examples/<name>`, where the name is the file's base, and clones the tree there with `git clone --local` through the process door.
+3. Each step runs in its own process, `./RUNME.sh <words>` with the clone as its folder. The verb prints the step's prose, the call, the output and one line per expect line. The verdict comes from `example.Holds`, which reads files under the clone. That evaluator is the harness ticket's, so both drivers judge alike.
+4. The run exits 1 where any expect misses, and 0 otherwise. The clone stays for the user to read.
+
+The verb takes its root and its runner as arguments: `exampleVerb(index.Root, proc.Real)`. A case hands it a temporary root and a `FakeRunner` whose `git` copies the tree and whose `./RUNME.sh` answers by its words.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/registry.go register, which takes the verb at init
+- src/quack/verbs.go wholeOf and verbs, which route example to Go
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb_test.go TestARunPrintsEachStepAndItsVerdicts
+- src/quack/example_verb_test.go TestARunLeavesTheUsersTreeByteForByte
+- src/quack/example_verb_test.go TestAMissExitsOneAndASecondRunClearsTheClone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb.go
+- src/quack/example_verb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every function named stands opened: register and goAnswer in registry.go, twinOf, roadOf and wholeOf in verbs.go, ticketUsageVerb as the whole-word model, proc.Command, proc.Runner and proc.FakeRunner, and example.Read with the Holds the harness ticket adds
+- the callers list names the registry and the road, the one way a verb is reached
+- each done_when line names its test: the clone and the detached steps, the printed prose, call, output and verdicts, the tree left byte for byte, and the check run itself
+- the approach adds no config key
 
 ## tests-red
 
@@ -194,26 +288,31 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/example_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The byte-for-byte case passes over the stub, since a verb doing nothing leaves the tree whole. It holds the real verb once the change lands, and the two other cases stand red on their own assertions. The fake box clones by copying the tree, and its ./RUNME.sh writes a ticket into the folder it runs in, so a write landing outside the clone shows.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a case: the clone and the step in it, the printed prose, call, output and verdicts, the tree byte for byte, and the check at the end
+- every door the tests reach has a fake: the process through FakeRunner, and the disk is the case temporary folder, as the ticket verb cases hold it
 
 # gate
 
@@ -222,8 +321,10 @@ none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- example-run-pauses-between-steps: the owner says an interactive run shows each command before it runs and pauses between steps until the user presses Enter, and the approach runs every step straight through; the builder prints the call before it runs, waits on a line of input between steps, runs straight through where the input is no terminal, and adds a case feeding the input
 
 # implement
 
@@ -234,14 +335,19 @@ none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/quack/
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names: example_verb.go and example_verb_test.go
+- every door has a fake: the process through FakeRunner, the disk a case temporary folder, and the pause an argument the case records
+- the comment on src/quack/example_verb.go names the approach, and links the design
+- every fact stands once: example.Holds judges each expect line, as the harness does
 
 ## tests-green
 
@@ -250,26 +356,33 @@ none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/example_verb_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+./RUNME.sh example run <path> reads the example and clears its last clone. It clones the tree with git clone --local into .se/.runtime/examples/<name>, and runs each step there as its own ./RUNME.sh process. It prints each step prose and call before the call runs, then its output and a holds or miss line per expect line, judged by example.Holds over the clone. Between steps it waits for Enter where a person sits at the terminal, and runs straight through otherwise. A miss exits 1, and an example out of shape refuses before any clone. The clone stays for the user to read, and the tree the user works in stands as it was.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names: example_verb.go and example_verb_test.go
+- every door has a fake: the process through FakeRunner, the disk a case temporary folder, and the pause an argument the case records
+- the comment on src/quack/example_verb.go names the approach, and links the design
+- every fact stands once: example.Holds judges each expect line, as the harness does
 
 # accept
 

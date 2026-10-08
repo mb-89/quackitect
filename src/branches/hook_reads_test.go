@@ -4,6 +4,7 @@
 package branches
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -22,18 +23,23 @@ func TestHandInNamesTheOpenTake(t *testing.T) {
 
 func TestStaleSpanReadsTheConfigOrTheDefault(t *testing.T) {
 	t.Parallel()
-	if said := StaleSpan("2h"); said != 2*hour {
+	root, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := staleDefault(t)
+	if said := StaleSpan(root, "2h"); said != 2*hour {
 		t.Fatalf("StaleSpan answers %d, and wants two hours", said)
 	}
-	if said := StaleSpan(""); said != int64(spanOf(staleSpan)) {
+	if said := StaleSpan(root, ""); want == 0 || said != want {
 		t.Fatalf("StaleSpan answers %d, and wants the default span", said)
 	}
-	if said := StaleSpan("nonsense"); said != int64(spanOf(staleSpan)) {
+	if said := StaleSpan(root, "nonsense"); said != want {
 		t.Fatalf("StaleSpan over an unreadable span answers %d, and wants the default span", said)
 	}
 }
 
-// [[spec/design_output/work#a-hold-beats-with-its-session]]
+// [[spec/design_output/work#the-session-beats-its-hold]]
 func TestHoldStaleReadsTheBeatBeforeTheTipsAge(t *testing.T) {
 	t.Parallel()
 	const now, stale, span = int64(1767268800), int64(1800), int64(600)

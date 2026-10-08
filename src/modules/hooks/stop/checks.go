@@ -1,6 +1,5 @@
-// Every check the stop door answers, off CHECKS, claimFalls and FALLS in
-// src/bridge/stop.js, each a function over the facts the door stamps and the
-// box keeps. [[spec/tickets/cage-stop-rules-port]]
+// Every check the stop door answers, each a function over the facts the door
+// stamps and the box keeps. [[spec/tickets/cage-stop-rules-port]]
 package stop
 
 import "strings"

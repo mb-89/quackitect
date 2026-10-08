@@ -2,10 +2,57 @@ package yaml
 
 import (
 	"encoding/json"
+	"math"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+// Nil reads as nothing, a string as it stands, and any other value as Go prints it. [[spec/tickets/shared-helpers-stand-once]]
+func TestScalarTextReadsEachKind(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		said any
+		want string
+	}{{nil, ""}, {"a word", "a word"}, {3, "3"}, {true, "true"}} {
+		if got := ScalarText(one.said); got != one.want {
+			t.Errorf("ScalarText(%#v) answers %q, and wants %q", one.said, got, one.want)
+		}
+	}
+}
+
+// Nil, false, a zero, NaN and the empty string read false, and every other value reads true. [[spec/tickets/shared-helpers-stand-once]]
+func TestTruthyReadsEachKind(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		said any
+		want bool
+	}{
+		{nil, false}, {false, false}, {0, false}, {0.0, false}, {int64(0), false}, {math.NaN(), false}, {"", false},
+		{true, true}, {1, true}, {int64(-3), true}, {-2.5, true}, {"x", true}, {"false", true}, {[]any{}, true}, {map[string]any{}, true},
+	} {
+		if got := Truthy(one.said); got != one.want {
+			t.Errorf("Truthy(%#v) reads %v, want %v", one.said, got, one.want)
+		}
+	}
+}
+
+// The shared readers answer as the copies they replace did: the front, a JSON text and a field text. [[spec/tickets/shared-helpers-stand-once]]
+func TestTheSharedReadersAnswerEachShape(t *testing.T) {
+	t.Parallel()
+	if front := FrontOf("---\r\nstate: open\r\n---\nbody"); front == nil || AsString(front.Get("state")) != "open" {
+		t.Fatalf("the front reads %+v", front)
+	}
+	if FrontOf("no front") != nil || FrontOf("---\nstate: open") != nil {
+		t.Fatal("a note with no closed front reads a front")
+	}
+	if JSONText(nil) != "" || JSONText("x") != "x" || JSONText(2.5) != "2.5" || JSONText([]any{"a"}) != `["a"]` {
+		t.Fatal("JSONText reads a value otherwise than String reads it")
+	}
+	if FieldText(nil) != "" || FieldText(true) != "true" || FieldText(map[string]any{"a": 1.0}) != `{"a":1}` {
+		t.Fatal("FieldText reads a value otherwise than a log row reads it")
+	}
+}
 
 const schemaYaml = `# a comment the reader skips
 kind: handover

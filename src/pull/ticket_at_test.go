@@ -5,6 +5,20 @@ package pull
 
 import "testing"
 
+// A ticket's name reads as a ticket, and a todo's title or a bare path reads as none. [[spec/tickets/pull-hands-the-working-ticket]]
+func TestNamesTicket(t *testing.T) {
+	t.Parallel()
+	disk := FakeDisk{
+		"spec/tickets/alpha.md": "---\nstate: open\n---\n",
+		".se/tickets/note.md":   "---\nstate: open\n---\n",
+	}
+	for name, want := range map[string]bool{"alpha": true, "note": true, "alpha.md": true, "mend the lint": false, "spec/tickets/alpha.md": false, "": false} {
+		if got := namesTicket(disk, name); got != want {
+			t.Errorf("namesTicket(%q) reads %v, want %v", name, got, want)
+		}
+	}
+}
+
 func TestTicketAt(t *testing.T) {
 	t.Parallel()
 	disk := FakeDisk{

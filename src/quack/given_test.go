@@ -1,11 +1,11 @@
 // The core holds no given form: every name has a writer module, and a module
 // registers what comes in as an out-port.
 // [[spec/tickets/commits-name-their-writer]]
-package main
+package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
 	"io/fs"
-	"os"
+	"os" // level0: OutsideInDoors - the case reads the tree's own source, as a build check reads it
 	"path/filepath"
 	"strings"
 	"testing"

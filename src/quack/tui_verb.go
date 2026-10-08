@@ -7,23 +7,17 @@
 package main
 
 import (
-	"bytes"
-	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"math"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
-	"unicode/utf16"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks/brief"
@@ -32,7 +26,7 @@ import (
 )
 
 // The tabs a caller names, the first one a handover opens where none is named. [[spec/design_output/tui#a-tab-the-caller-names]]
-var tuiTabs = []string{"log", "work"}
+var tuiTabs = []string{"log", "work", "tutorial"}
 
 // The log's folders, as Log in src/modules/check/folders.go and logOld in src/quack/verb_log.go name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (
@@ -64,7 +58,14 @@ type tuiDoors struct {
 	run     func(argv []string, cwd string) (int, string, error)
 	launch  func(argv []string, cwd string, out, errs io.Writer) (int, error)
 	tell    func(tab string) bool
+	disk    diskDoors
 }
+
+// The modes a made folder and the stamp take. [[spec/design_output/tui#the-verb-builds-it]]
+const (
+	tuiFolderMode = 0o755
+	tuiStampMode  = 0o644
+)
 
 func init() { register("tui", tuiVerb(tuiReal)) }
 
@@ -111,7 +112,7 @@ func tuiTabWanted(argv []string) string {
 
 // Hands the tab to a window already standing, or launches the viewer holding the terminal. [[spec/design_output/tui#a-second-launch-hands-over]]
 func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
-	if err := os.MkdirAll(filepath.Join(filepath.FromSlash(d.root), filepath.FromSlash(tuiLogFolder)), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Join(filepath.FromSlash(d.root), filepath.FromSlash(tuiLogFolder)), tuiFolderMode); err != nil {
 		fmt.Fprintln(errs, err)
 		return exitFailed
 	}
@@ -139,8 +140,8 @@ func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
 func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, errs io.Writer) int {
 	var read []string
 	if slices.Contains(argv, "--all") {
-		read = logFiles(filepath.FromSlash(d.root), "", time.Time{})
-	} else if tuiExists(session) {
+		read = logFiles(d.disk, filepath.FromSlash(d.root), "", time.Time{})
+	} else if d.disk.stands(session) {
 		read = []string{session}
 	}
 	if len(read) == 0 {
@@ -148,7 +149,7 @@ func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, er
 		return 0
 	}
 	for _, path := range read {
-		body, err := os.ReadFile(path)
+		body, err := d.disk.read(path)
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
@@ -165,7 +166,7 @@ func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, er
 	return 0
 }
 
-// A path as the reader names it, under the root, as showOf in src/bridge/findings.js answers. [[spec/design_output/log#one-verb-reads-the-log]]
+// A path as the reader names it, under the root. [[spec/design_output/log#one-verb-reads-the-log]]
 func tuiShow(root, path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	base := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")
@@ -175,11 +176,6 @@ func tuiShow(root, path string) string {
 	return strings.TrimPrefix(said, base+"/")
 }
 
-func tuiExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
 // The viewer's binary, built whenever the source its stamp hashes moves, and why where none runs. A build that lands and swaps not in answers a fault, since the box holds Go. [[spec/tickets/tui-swap-fails-loud]]
 func tuiViewerOf(d tuiDoors) (string, string, error) {
 	exe := d.root + "/" + tuiBin + "/logview"
@@ -187,8 +183,8 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 		exe += ".exe"
 	}
 	stamp := d.root + "/" + tuiStamp
-	hash := index.HashText(tuiSourceText(d.root))
-	if held, err := os.ReadFile(stamp); err == nil && tuiExists(exe) && strings.TrimSpace(string(held)) == hash {
+	hash := index.HashText(tuiSourceText(d.disk, d.root))
+	if held, err := d.disk.read(stamp); err == nil && d.disk.stands(exe) && strings.TrimSpace(string(held)) == hash {
 		return exe, "", nil
 	}
 	// A running binary holds its file on Windows and renames alone, so the build lands beside it and swaps in. [[spec/design_output/tui#the-verb-builds-it]]
@@ -197,14 +193,14 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 	if err != nil {
 		code, stderr = 1, err.Error()
 	}
-	if code == 0 && tuiExists(fresh) {
-		if err := tuiSwapsIn(fresh, exe); err != nil {
+	if code == 0 && d.disk.stands(fresh) {
+		if err := tuiSwapsIn(d.disk, fresh, exe); err != nil {
 			return "", "", err
 		}
-		if err := os.MkdirAll(d.root+"/"+tuiBin, 0o755); err != nil {
+		if err := d.disk.makeAll(d.root+"/"+tuiBin, tuiFolderMode); err != nil {
 			return exe, err.Error(), nil
 		}
-		if err := os.WriteFile(stamp, []byte(hash+"\n"), 0o644); err != nil {
+		if err := d.disk.write(stamp, []byte(hash+"\n"), tuiStampMode); err != nil {
 			return exe, err.Error(), nil
 		}
 		return exe, "", nil
@@ -213,30 +209,30 @@ func tuiViewerOf(d tuiDoors) (string, string, error) {
 	if why == "" {
 		why = "go builds no viewer here"
 	}
-	if tuiExists(exe) {
+	if d.disk.stands(exe) {
 		return exe, "the build fails, so the last one runs: " + why, nil
 	}
 	return "", why, nil
 }
 
 // The old binary steps aside by rename, and the fresh one takes its name. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiSwapsIn(fresh, exe string) error {
-	if tuiExists(exe) {
-		if err := os.Rename(exe, tuiAsideOf(exe+".old")); err != nil {
+func tuiSwapsIn(disk diskDoors, fresh, exe string) error {
+	if disk.stands(exe) {
+		if err := disk.rename(exe, tuiAsideOf(disk, exe+".old")); err != nil {
 			return err
 		}
 	}
-	return os.Rename(fresh, exe)
+	return disk.rename(fresh, exe)
 }
 
 // The first name beside the binary that stands free or clears, because a window still running one stepped aside earlier holds that file on Windows. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiAsideOf(old string) string {
+func tuiAsideOf(disk diskDoors, old string) string {
 	for n := range tuiAside {
 		at := old
 		if n > 0 {
 			at = fmt.Sprintf("%s%d", old, n)
 		}
-		if !tuiExists(at) || os.Remove(at) == nil {
+		if !disk.stands(at) || disk.remove(at) == nil {
 			return at
 		}
 	}
@@ -244,9 +240,9 @@ func tuiAsideOf(old string) string {
 }
 
 // The text the stamp hashes: every source file's path and text under the viewer's packages and the module files, joined on the unit separator. [[spec/design_output/tui#the-packages-the-window-holds]]
-func tuiSourceText(root string) string {
+func tuiSourceText(disk diskDoors, root string) string {
 	var folders []string
-	for _, one := range tuiGoFoldersOf(root, tuiSource) {
+	for _, one := range tuiGoFoldersOf(disk, root, tuiSource) {
 		folders = append(folders, root+"/"+one)
 	}
 	for _, one := range tuiModuleFiles {
@@ -254,19 +250,18 @@ func tuiSourceText(root string) string {
 	}
 	var parts []string
 	for _, folder := range folders {
-		for _, path := range tuiSourcesUnder(folder) {
-			body, _ := os.ReadFile(path)
-			parts = append(parts, path+tuiJoin+string(body))
+		for _, path := range tuiSourcesUnder(disk, folder) {
+			parts = append(parts, path+tuiJoin+disk.text(path))
 		}
 	}
 	return strings.Join(parts, tuiJoin)
 }
 
 // A package folder and every tree package it imports, to the end of the chain, a folder below another left out. [[spec/tickets/go-code-shares-one-module]]
-func tuiGoFoldersOf(root, folder string) []string {
+func tuiGoFoldersOf(disk diskDoors, root, folder string) []string {
 	seen := []string{folder}
 	for queue := []string{folder}; len(queue) > 0; queue = queue[1:] {
-		for _, next := range tuiImportsOf(root + "/" + queue[0]) {
+		for _, next := range tuiImportsOf(disk, root+"/"+queue[0]) {
 			if !slices.Contains(seen, next) {
 				seen = append(seen, next)
 				queue = append(queue, next)
@@ -288,8 +283,8 @@ func tuiGoFoldersOf(root, folder string) []string {
 }
 
 // The tree packages a folder's own Go files import, the folders below it read too. [[spec/tickets/go-code-shares-one-module]]
-func tuiImportsOf(at string) []string {
-	entries, err := os.ReadDir(at)
+func tuiImportsOf(disk diskDoors, at string) []string {
+	entries, err := disk.list(at)
 	if err != nil {
 		return nil
 	}
@@ -297,10 +292,9 @@ func tuiImportsOf(at string) []string {
 	for _, one := range entries {
 		path := at + "/" + one.Name()
 		if one.IsDir() {
-			out = append(out, tuiImportsOf(path)...)
+			out = append(out, tuiImportsOf(disk, path)...)
 		} else if strings.HasSuffix(one.Name(), ".go") && !strings.HasSuffix(one.Name(), "_test.go") {
-			body, _ := os.ReadFile(path)
-			for _, found := range tuiImport.FindAllStringSubmatch(string(body), -1) {
+			for _, found := range tuiImport.FindAllStringSubmatch(disk.text(path), -1) {
 				out = append(out, found[1])
 			}
 		}
@@ -309,21 +303,21 @@ func tuiImportsOf(at string) []string {
 }
 
 // Every source file under a folder and its packages, in the order localeCompare walks them, so a move under a tab's folder rebuilds the viewer. [[spec/design_output/tui#the-packages-the-window-holds]]
-func tuiSourcesUnder(folder string) []string {
-	if !tuiExists(folder) {
+func tuiSourcesUnder(disk diskDoors, folder string) []string {
+	if !disk.stands(folder) {
 		return nil
 	}
 	if strings.HasSuffix(folder, "/go.mod") || strings.HasSuffix(folder, "/go.sum") {
 		return []string{folder}
 	}
-	entries, _ := os.ReadDir(folder)
-	slices.SortFunc(entries, func(one, other os.DirEntry) int { return tuiCollate(one.Name(), other.Name()) })
+	entries := disk.listed(folder)
+	slices.SortFunc(entries, func(one, other fs.DirEntry) int { return tuiCollate(one.Name(), other.Name()) })
 	var out []string
 	for _, one := range entries {
 		name := one.Name()
 		switch {
 		case one.IsDir():
-			out = append(out, tuiSourcesUnder(folder+"/"+name)...)
+			out = append(out, tuiSourcesUnder(disk, folder+"/"+name)...)
 		case one.Type().IsRegular() && !strings.HasSuffix(name, "_test.go") &&
 			(strings.HasSuffix(name, ".go") || strings.HasSuffix(name, ".mod") || strings.HasSuffix(name, ".sum")):
 			out = append(out, folder+"/"+name)
@@ -335,6 +329,13 @@ func tuiSourcesUnder(folder string) []string {
 // The punctuation in the order the root collation sorts it, before the digits and the letters. [[spec/design_output/tui#the-verb-builds-it]]
 const tuiPunctuation = "_-,;:!?.'\"()[]{}@*/\\&#%`^+<=>|~$"
 
+// The weight each class of rune starts at in that collation: the digits, the letters in either case, and any other rune past them. [[spec/design_output/tui#the-verb-builds-it]]
+const (
+	tuiDigitWeight  = 100
+	tuiLetterWeight = 200
+	tuiOtherWeight  = 1000
+)
+
 // Orders two names as localeCompare in Node does for the names a source folder holds: punctuation, then digits, then letters in any case, and lower case first on a tie. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiCollate(one, other string) int {
 	weight := func(r rune) int {
@@ -342,13 +343,13 @@ func tuiCollate(one, other string) int {
 		case strings.ContainsRune(tuiPunctuation, r):
 			return 1 + strings.IndexRune(tuiPunctuation, r)
 		case r >= '0' && r <= '9':
-			return 100 + int(r-'0')
+			return tuiDigitWeight + int(r-'0')
 		case r >= 'a' && r <= 'z':
-			return 200 + int(r-'a')
+			return tuiLetterWeight + int(r-'a')
 		case r >= 'A' && r <= 'Z':
-			return 200 + int(r-'A')
+			return tuiLetterWeight + int(r-'A')
 		}
-		return 1000 + int(r)
+		return tuiOtherWeight + int(r)
 	}
 	left, right := []rune(one), []rune(other)
 	for at := 0; at < min(len(left), len(right)); at++ {
@@ -371,210 +372,6 @@ func tuiCollate(one, other string) int {
 	return strings.Compare(one, other)
 }
 
-// The fields asRow in src/quack/verb_log.go prints first, its column widths, and the indent of the rest. [[spec/design_output/log#what-one-line-looks-like]]
-const (
-	tuiStampFrom  = 11
-	tuiStampTo    = 23
-	tuiLevelWidth = 5
-	tuiKindWidth  = 6
-	tuiIndent     = tuiStampTo - tuiStampFrom + 1
-)
-
-var tuiOwnFields = []string{"at", "level", "kind", "said"}
-
-// A JSON object with its keys in the order JavaScript enumerates them. [[spec/design_output/log#what-one-line-looks-like]]
-type tuiObject struct {
-	keys []string
-	vals map[string]any
-}
-
-// The value a missing field reads as. [[spec/design_output/log#what-one-line-looks-like]]
-type tuiUndefined struct{}
-
-// Each row a log text holds, printed as asRow prints it. A torn line drops alone, and the rows around it stand. [[spec/design_output/log#every-writer-appends]]
-func tuiRowsIn(text string) []string {
-	var out []string
-	for _, line := range strings.Split(text, "\n") {
-		if strings.TrimSpace(line) == "" || !json.Valid([]byte(line)) {
-			continue
-		}
-		dec := json.NewDecoder(bytes.NewReader([]byte(line)))
-		dec.UseNumber()
-		row, err := tuiParse(dec)
-		if err != nil || row == nil {
-			continue
-		}
-		out = append(out, tuiAsRow(row))
-	}
-	return out
-}
-
-// One JSON value, an object keeping its key order. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiParse(dec *json.Decoder) (any, error) {
-	tok, err := dec.Token()
-	if err != nil {
-		return nil, err
-	}
-	switch tok {
-	case json.Delim('{'):
-		obj := &tuiObject{vals: map[string]any{}}
-		for dec.More() {
-			key, err := dec.Token()
-			if err != nil {
-				return nil, err
-			}
-			value, err := tuiParse(dec)
-			if err != nil {
-				return nil, err
-			}
-			name := key.(string)
-			if _, held := obj.vals[name]; !held {
-				obj.keys = append(obj.keys, name)
-			}
-			obj.vals[name] = value
-		}
-		_, err := dec.Token()
-		return obj, err
-	case json.Delim('['):
-		list := []any{}
-		for dec.More() {
-			value, err := tuiParse(dec)
-			if err != nil {
-				return nil, err
-			}
-			list = append(list, value)
-		}
-		_, err := dec.Token()
-		return list, err
-	}
-	return tok, nil
-}
-
-// One row as asRow prints it: the time, the level, the kind and the line, and every other field below. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiAsRow(row any) string {
-	keys, field := tuiEntries(row)
-	said := fmt.Sprintf("%s %s %s %s",
-		tuiSlice(tuiString(field("at")), tuiStampFrom, tuiStampTo),
-		tuiPad(tuiString(field("level")), tuiLevelWidth),
-		tuiPad(tuiString(field("kind")), tuiKindWidth),
-		tuiString(field("said")))
-	var rest []string
-	for _, key := range keys {
-		if !slices.Contains(tuiOwnFields, key) {
-			rest = append(rest, key+"="+tuiString(field(key)))
-		}
-	}
-	if len(rest) == 0 {
-		return said
-	}
-	return said + "\n" + strings.Repeat(" ", tuiIndent) + strings.Join(rest, " ")
-}
-
-// The keys Object.entries walks, integer keys first, and a field's value, undefined where none stands. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiEntries(row any) ([]string, func(string) any) {
-	switch one := row.(type) {
-	case *tuiObject:
-		var numbered, named []string
-		for _, key := range one.keys {
-			if tuiIndexKey(key) {
-				numbered = append(numbered, key)
-			} else {
-				named = append(named, key)
-			}
-		}
-		slices.SortFunc(numbered, func(a, b string) int {
-			left, _ := strconv.ParseUint(a, 10, 64)
-			right, _ := strconv.ParseUint(b, 10, 64)
-			return cmp.Compare(left, right)
-		})
-		return append(numbered, named...), func(key string) any {
-			if value, held := one.vals[key]; held {
-				return value
-			}
-			return tuiUndefined{}
-		}
-	case []any:
-		keys := make([]string, len(one))
-		for at := range one {
-			keys[at] = strconv.Itoa(at)
-		}
-		return keys, func(key string) any {
-			if at, err := strconv.Atoi(key); err == nil && at >= 0 && at < len(one) && tuiIndexKey(key) {
-				return one[at]
-			}
-			return tuiUndefined{}
-		}
-	}
-	return nil, func(string) any { return tuiUndefined{} }
-}
-
-// Whether a key is an array index, which JavaScript enumerates first and in number order. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiIndexKey(key string) bool {
-	at, err := strconv.ParseUint(key, 10, 64)
-	return err == nil && at < math.MaxUint32 && strconv.FormatUint(at, 10) == key
-}
-
-// A value as String in JavaScript prints it. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiString(value any) string {
-	switch one := value.(type) {
-	case tuiUndefined:
-		return "undefined"
-	case nil:
-		return "null"
-	case string:
-		return one
-	case bool:
-		return strconv.FormatBool(one)
-	case json.Number:
-		number, _ := strconv.ParseFloat(one.String(), 64)
-		return tuiJSNumber(number)
-	case []any:
-		parts := make([]string, len(one))
-		for at, item := range one {
-			if item != nil {
-				parts[at] = tuiString(item)
-			}
-		}
-		return strings.Join(parts, ",")
-	}
-	return "[object Object]"
-}
-
-// A number as JavaScript prints it: plain between a millionth and 1e21, and in exponent form past them. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiJSNumber(number float64) string {
-	switch {
-	case math.IsNaN(number):
-		return "NaN"
-	case math.IsInf(number, 1):
-		return "Infinity"
-	case math.IsInf(number, -1):
-		return "-Infinity"
-	case number == 0:
-		return "0"
-	}
-	if size := math.Abs(number); size >= 1e-6 && size < 1e21 {
-		return strconv.FormatFloat(number, 'f', -1, 64)
-	}
-	mantissa, power, _ := strings.Cut(strconv.FormatFloat(number, 'e', -1, 64), "e")
-	sign, digits := power[:1], strings.TrimLeft(power[1:], "0")
-	return mantissa + "e" + sign + digits
-}
-
-// A text's UTF-16 units from one place to another, as slice in JavaScript cuts it. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiSlice(text string, from, to int) string {
-	units := utf16.Encode([]rune(text))
-	from, to = min(from, len(units)), min(to, len(units))
-	return string(utf16.Decode(units[from:to]))
-}
-
-// A text padded with spaces to a width counted in UTF-16 units, as padEnd pads it. [[spec/design_output/log#what-one-line-looks-like]]
-func tuiPad(text string, width int) string {
-	if short := width - len(utf16.Encode([]rune(text))); short > 0 {
-		return text + strings.Repeat(" ", short)
-	}
-	return text
-}
-
 // The real doors: the tree's root, the go program the tools file names, a captured run, a launch holding the caller's terminal, and the tell to the window's port. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiReal() tuiDoors {
 	root, err := index.Root()
@@ -582,28 +379,30 @@ func tuiReal() tuiDoors {
 		root = "."
 	}
 	root = filepath.ToSlash(root)
+	box := quietBox()
 	return tuiDoors{
 		root:    root,
-		windows: runtime.GOOS == "windows",
-		goTool:  tuiGoOf(root),
+		windows: box.windows(),
+		goTool:  tuiGoOf(box.disk, root),
 		run:     serveRuns,
 		launch:  tuiLaunch,
 		tell:    tuiTellAt(frame.WindowPort),
+		disk:    box.disk,
 	}
 }
 
 // The go program the tools file names, else one under the binaries' folder, else go off the path, as whereIs in src/engine/tools.js answers. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiGoOf(root string) string {
+func tuiGoOf(disk diskDoors, root string) string {
 	var known map[string]struct {
 		Path string `json:"path"`
 	}
-	if body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(brief.ToolsFile))); err == nil && json.Unmarshal(body, &known) == nil {
-		if said := known["go"].Path; said != "" && tuiExists(said) {
+	if body, err := disk.read(filepath.Join(root, filepath.FromSlash(brief.ToolsFile))); err == nil && json.Unmarshal(body, &known) == nil {
+		if said := known["go"].Path; said != "" && disk.stands(said) {
 			return said
 		}
 	}
 	for _, guess := range []string{tuiBin + "/go.exe", tuiBin + "/go"} {
-		if at := root + "/" + guess; tuiExists(at) {
+		if at := root + "/" + guess; disk.stands(at) {
 			return at
 		}
 	}
@@ -612,7 +411,7 @@ func tuiGoOf(root string) string {
 
 // Runs the viewer on the caller's terminal over the real process door. [[spec/design_output/tui#the-verb-builds-it]]
 func tuiLaunch(argv []string, cwd string, out, errs io.Writer) (int, error) {
-	return tuiLaunchOver(proc.Real, os.Stdin)(argv, cwd, out, errs)
+	return tuiLaunchOver(proc.Real, realBoxDoors(out, errs).input)(argv, cwd, out, errs)
 }
 
 // Runs the viewer through the process door on the input it hands through and the caller's output and error streams, which pass straight through where they are files. A signal's end reads as 1. [[spec/tickets/quack-spawns-all-take-the-runner]]
@@ -631,5 +430,5 @@ func tuiLaunchOver(run proc.Runner, in io.Reader) func(argv []string, cwd string
 
 // The tell to whatever window stands on a port, which answers whether it took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]
 func tuiTellAt(port int) func(tab string) bool {
-	return func(tab string) bool { return frame.TellPort(port, tab) }
+	return func(tab string) bool { return frame.TellPort(wall, port, tab) }
 }

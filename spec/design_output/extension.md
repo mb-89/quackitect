@@ -315,9 +315,9 @@ argument, and a fake door drives the whole path.
 | `lenses` | the buttons over a ticket, and a watcher over the holds |
 | `runsVerb` | a child process running the pull |
 
-Outside the editor files, the extension imports nothing from `node:`. So the
-`DoorsOnly` rule reads the rest of the folder and finds nothing to refuse: the
-rule names `node:` imports, and `vscode` stands outside its list.
+Outside the editor files, the extension imports nothing from `node:`, so
+nothing in the rest of the folder walks around a door. For the guard, see
+[[spec/design_output/doors#nothing-walks-around-a-door]].
 
 ## The watcher draws it again
 
@@ -630,7 +630,7 @@ counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
 
 ## A button runs the pull
 
-Each button runs `pull` through `src/scripts/verbs/ticket.js` of the method, as a
+Each button runs `pull` through `src/quack/verb_ticket.go` of the method, as a
 child of the extension:
 
 | the button | the line |
