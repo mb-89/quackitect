@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 fix: true
 record:
   - step: sync
@@ -99,6 +99,18 @@ record:
         exit: 0
         said: work/loose-fixes-911f4ea already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box f9a347032e0b · claude-code-remote
+    hash_before: 5a7bb096aa870dbe0f5b8c6c32c4c1614a3fc216
+    hash_after: 5a7bb096aa870dbe0f5b8c6c32c4c1614a3fc216
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 4fda339dd698ce5e
+        size: 13377
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -132,14 +144,20 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[doors-pr-windows-goes-green]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the one child carries no diff on this branch
+- the children add up to the goal: the one loose agent ticket naming this group is the one child
+- no child waits on another
+- no child reads from a sibling
+- the diff stays inside one review
 
 # children
 
