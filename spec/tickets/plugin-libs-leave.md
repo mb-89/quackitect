@@ -411,6 +411,17 @@ Surprise two: src/quack/stamp_verb.go owns the rebuild decision, and its fake-do
 
 <!-- what anybody adds, at any time, on this ticket -->
 
+The gate accepts, and implement carries these points. The gate verdict holds them file by file.
+
+- `PrivateFolderOwned` in `src/modules/check/folders.go` names `lib/folders.js` as owner, and lets a copy pass only beside that word. Give the rule a Go owner, and change its fixtures in `folders_test.go` and every copy's comment in the same change.
+- Those copies stand outside Go too: `install.sh`, the stub's `RUNME.sh` and `bridgehead.js`, the hooks `level0.js` and `pull-tool.js`, and five extension files. Item fourteen reaches every source file and the installer.
+- `tree.md` and `private.md` name `tools.js` and `folders.js`, and join the design notes item fourteen points at Go.
+- `level1.test.js` drives the hook `pull-tool.js` in four cases and the `handedBack` helper. Keep those, as item seven keeps its cases, and drop the cases over `lib/pull.js` alone.
+- `src/engine/tools.js` takes `surveyOf`, `pathOf`, `guesses` and `TOOLS` beside `readTools` and `whereIs`, and nothing more. `survey`, `writeSurvey`, `installedTools` and `rebuilt` leave with their `tools.test.js` cases, since Go owns each.
+- `tree.test.js` keeps the half of its session case that holds `pull-tool.js` to no session file.
+- Items twelve, sixteen and seventeen, and the callers row naming the door files, read stale: those landed in the children.
+- The gate rewrote the red test on `git ls-files`, as done_when line one reads.
+
 The case `a stop file short of a field is refused` in `test/contract/tree.test.js` still runs `StopFolderIsData` once [[spec/tickets/bridge-library-leaves]] removes `findings.js`. Deleting the rule takes that case with it, or ports it to Go first.
 
 The row naming `src/doors/front.js` as gone with [[spec/tickets/engine-and-doors-leave]] reads wrong. The front door, its fake and `front.test.js` stay there, since the schema-mint tests pass in the fake front, and [[spec/tickets/schema-libs-leave]] takes the front door. The git door, its fake, `git.test.js` and `real-git.test.js` stay too, and this ticket takes them once its library tests leave.
