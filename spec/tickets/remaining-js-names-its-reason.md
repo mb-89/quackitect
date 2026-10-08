@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -123,6 +123,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: e52d8ac06acd3006833d258d8295ef7a6fd67ca0
+    hash_after: e52d8ac06acd3006833d258d8295ef7a6fd67ca0
+    inputs:
+      - name: ask
+        hash: 6bdac60bf84e4f30
+        size: 320
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -157,38 +166,58 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new chapter in spec/design_output/doors.md, `# The JavaScript that stays`, holds a two-column table: `| files | reason |`. A cell ending in `/` covers every file under that folder, and any other cell names one file. The rows are as follows. `src/extension/` is the VS Code extension, which VS Code loads as JavaScript. `.claude/skills/level0/hooks/` holds the level zero function hooks Claude Code loads as JavaScript modules. `src/stub/.claude/skills/level0/hooks/` holds the same hooks as the stub a project takes. `.claude/skills/level0/lib/vale.js`, `src/scripts/styles.js` and `src/engine/tools.js` are the Vale scripts the lint-without-vale group owns, which this group leaves standing per its ask. `src/doors/` holds the doors and fakes that the extension's tests, the hooks' tests and the Vale scripts drive. `test/` holds the tests of the code that stays, and the reporter the check runs them under. `prototype/trace-view/` is the prototype that spec/funnel/the-editor-draws-the-trace cites as evidence; it runs in no product, as the group's inventory decides.
+
+A new check part named `javascript` sits in partsOf in src/quack/check.go, beside `lines`, and runs javascriptListed(d) in a new src/quack/check_javascript.go. That function reads the doors note through d.text and takes the table under that heading. It lists files through d.git("ls-files", "-z", "--cached", "--others", "--exclude-standard"), the same call linesHold makes, and keeps the paths whose extension is a JavaScript one in lineLanguages, so both parts read one list of extensions. It answers 1 and names each file no row covers, with the line: add a row with its reason to the doors note, or delete the file. It also answers 1 for a row covering no tracked file, so the list can't keep a stale reason. A missing heading or an empty table answers 1 too, so a renamed chapter can't pass silently. Each new part takes its own name, so a red run says which list fell out of step.
+
+Weighed: putting the check into linesHold would save a part, but it would mix two refusals under one name. A separate part costs one more line in the battery table. Assumed: the reasons stand at folder grain, not per file, because the owner's words name the reasons by kind (the extension, the hooks), and a per-file list would grow with each extension file and repeat one reason dozens of times.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go partsOf, which runs the new part
+- src/quack/check_javascript.go javascriptListed, called by partsOf alone
+- src/quack/check_lines.go lineLanguages, read by javascriptListed for the JavaScript extensions
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_javascript_test.go TestTheJavaScriptPartRefusesAFileTheListLeavesOut
+- src/quack/check_javascript_test.go TestTheJavaScriptPartRefusesARowCoveringNoFile
+- src/quack/check_javascript_test.go TestTheJavaScriptPartPassesWhereEveryFileStandsListed
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/design_output/doors.md
+- src/quack/check.go
+- src/quack/check_javascript.go
+- src/quack/check_javascript_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened each file the approach names: partsOf and checkDoors in src/quack/check.go, linesHold and lineLanguages in src/quack/check_lines.go, the linesDoors fake in src/quack/check_lines_test.go (which the new tests copy for their git and root), the doors note's chapters, and the group's inventory, which keeps prototype/trace-view. Every remaining tracked JavaScript file was listed by git ls-files, and its importers were traced with git grep; the extension and hooks import nothing outside their own folders.
+The callers list names partsOf, the new function and the lineLanguages it reads. No other code calls into the new part.
+The first done_when line is decided by TestTheJavaScriptPartRefusesAFileTheListLeavesOut. The second, ./RUNME.sh check exiting 0, is decided by the check run itself, where the new part reads the real tree.
+The approach adds no config key.
 
 ## tests-red
 
