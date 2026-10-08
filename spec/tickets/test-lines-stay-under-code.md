@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,18 @@ record:
         hash: f851464d50688d2a
         size: 9882
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1ba21c2e626 · claude-code-remote · helper-4
+    hash_before: 026ff08db724afe4b94dd0e07676db78070b96d4
+    hash_after: 026ff08db724afe4b94dd0e07676db78070b96d4
+    inputs:
+      - name: design/draft
+        hash: f851464d50688d2a
+        size: 9882
+      - name: design/tests-red
+        hash: 6568a71d0caae0ac
+        size: 1045
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -372,8 +384,9 @@ Surprise two: the table holds firing alone, so exact counts, severities and line
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
