@@ -16,12 +16,12 @@ import (
 	"quackitect/src/owns"
 )
 
-// Where the doors and their contract tests stand, as DOORS and CONTRACT in src/scripts/cli-doors.js name them. [[spec/design_output/doors#one-contract-test-per-door]]
+// Where the doors and their contract tests stand, as DOORS and CONTRACT in src/scripts/cli-doors.js name them. A marked line carries no colon past its column, so setup-go's problem matcher reads it as no error and leaves the step's annotations to the failing case. [[spec/tickets/doors-walk-reads-clean]]
 const (
 	doorsFolder    = "src/doors"
 	contractFolder = "test/contract"
 	walkLine       = "%s:%d:%d: %s\n"
-	markedWalk     = "%s:%d:%d: %s stands marked: %s\n"
+	markedWalk     = "%s:%d:%d %s stands marked: %s\n"
 	contractLine   = "%s keeps the contract of %s\n"
 	outsideLine    = "%s stands inside %s, its own outside\n"
 	walksRefused   = "A walk-around reaches past its door. Reach it through the door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"

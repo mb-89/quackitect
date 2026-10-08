@@ -4,6 +4,7 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -44,8 +45,13 @@ func TestDoorsRefusesAWalkAroundARefusingDoor(t *testing.T) {
 	if code != exitFailed || errs != ".claude/skills/one/wait.go:5:14: time.Sleep walks around clock\nsrc/engine/wait.go:5:14: time.Sleep walks around clock\n"+walksRefused+"\n" {
 		t.Fatalf("doors answers %d, %q and %q, and wants the walk-around refused", code, out, errs)
 	}
-	if !strings.Contains(out, "src/engine/hung.go:6:2: time.Sleep stands marked: a hung child needs a deadline\n") {
+	if !strings.Contains(out, "src/engine/hung.go:6:2 time.Sleep stands marked: a hung child needs a deadline\n") {
 		t.Fatalf("doors prints %q, and wants the marked line listed", out)
+	}
+	for _, line := range strings.Split(out, "\n") {
+		if goMatcher.MatchString(line) {
+			t.Errorf("doors prints %q, which setup-go's problem matcher reads as an error", line)
+		}
 	}
 }
 
@@ -62,6 +68,9 @@ func TestDoorsListsAScriptWalkingAroundADoor(t *testing.T) {
 		t.Fatalf("doors answers %d, %q and %q, and wants the script's walk-around alone, refused", code, out, errs)
 	}
 }
+
+// The pattern of setup-go's problem matcher, which turns a line it reads into an error annotation. [[spec/tickets/doors-walk-reads-clean]]
+var goMatcher = regexp.MustCompile(`^\s*(.+\.go):(?:(\d+):(\d+):)? (.*)`)
 
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	t.Parallel()
