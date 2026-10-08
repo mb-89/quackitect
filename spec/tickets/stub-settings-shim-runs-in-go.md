@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 8571d5037cc9e8706a0b100083a154dd5221cc92
+    hash_after: 8571d5037cc9e8706a0b100083a154dd5221cc92
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/vehicle passes
+      - name: check
+        exit: 0
+        said: "   62.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 908215df2f5f3c67
+        size: 1972
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -387,26 +410,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/stub_settings_test.go src/quack/vehicle_verb_test.go src/vehicle/shim_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A stub enables the plugin through `vehicle enable`, a Go verb, and runs no Node. The verb reads the brand off the stub's `vehicle.json`. It names the vehicle a directory marketplace in `.claude/settings.local.json` and enables `level0` under that brand once, keeping every standing key. It writes only where the text changes. The stub's shim calls the vehicle binary for it, and prints the old fallback line where the binary is missing or fails. `lib/vehicle.js` leaves with its test, and the quack names for the settings, port and pointer now alias the Go owners in `src/vehicle/pure.go`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, plus the check.go comment the gate named.
+- The verb table runs on temp roots, and the contract cases on a fake binary.
+- Each new Go function points at a-stub-names-its-vehicle in the level zero note.
+- The settings names stand in src/vehicle/pure.go alone, and each note points there.
 
 # accept
 
