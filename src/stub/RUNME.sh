@@ -50,7 +50,7 @@ fi
 # path differs per box. The binary stands where install.sh builds it, and a
 # vehicle holding none enables on the call after the vehicle's RUNME builds it.
 # [[spec/design_output/level0#a-stub-names-its-vehicle]]
-bin="$vehicle/.se/.runtime/bin/se-index"
+bin="$vehicle/.se/.runtime/bin/se-index" # src/modules/check/folders.go owns the runtime folder
 [ -x "$bin.exe" ] && bin="$bin.exe"
 if ! { [ -x "$bin" ] && SE_WORK_ROOT="$here" "$bin" verb "$vehicle/src/scripts" vehicle enable >/dev/null 2>&1; }; then
   printf '%s\n' "The marketplace reached no settings, so this session loads the plugin from wherever it already stands." >&2

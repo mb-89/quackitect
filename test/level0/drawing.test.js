@@ -1,5 +1,5 @@
 // Which files the editor draws. The index draws a ticket's graph, and
-// test/level0/lens-v1.test.js holds the drawing over a fake index.
+// test/level0/lens.test.js holds the drawing over a fake index.
 // [[spec/tickets/the-lens-reads-v1]]
 
 import assert from "node:assert/strict";

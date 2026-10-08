@@ -36,8 +36,6 @@ An id the registry lacks still prints its message, and names the id as unregiste
 
 `Raised.Row` answers the log row: kind `failure`, the level, the message, and a `failure` field holding the id. So `./RUNME.sh failure count` reads the log, and counts each failure by id.
 
-`src/doors/failure.js` is the twin. `failure(disk, log)` answers `raise(id, said)`, reads the same nodes, prints the same lines and writes the same row. `src/doors/fake/failure.js` answers off nodes a case hands in, and keeps every raised id.
-
 # The check holds the registry
 
 Cases under `src/failure` read the tree, and the check runs them:

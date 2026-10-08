@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+# level0: HandScript - it runs before any binary stands, so it builds the binary the engine runs
 # Installs what this tree needs, and nothing else. RUNME calls this before it
 # calls the command line, so a person runs RUNME and everything works.
 #

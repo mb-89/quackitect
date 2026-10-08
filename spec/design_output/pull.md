@@ -516,10 +516,10 @@ word outside the vocabulary where it judges the finding false. The lint keeps
 those findings, so a verb reading through `prose.Kept` lets a line through that
 the lint names later.
 
-A contract case in `src/modules/lsp/rules_contract_test.go` reads a ticket
-the mint writes off every route under `spec/processes`, and real Vale reads it. A line a route writes
-carries no finding there, so a verb minting off a route meets no refusal over
-the route's own words.
+`TestEveryRoutesMintedTicketPassesTheRules` in `src/rules/rules_test.go`
+reads the ticket the mint writes off every route under `spec/processes`. The
+rules read it. A line a route writes carries no warning there, so a verb
+minting off a route meets no refusal over its words.
 
 ## The commands answer
 

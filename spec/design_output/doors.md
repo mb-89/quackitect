@@ -46,8 +46,9 @@ reads. `sections` in `src/rules/scope.go` names each one in a row, beside the
 doors and their fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
-`src/modules/lsp/rules_contract_test.go` drives the rules over a probe under
-each path a row names, so a row a hand writes meets its case.
+`TestAScopedRuleReadsItsPathsAlone` in `src/rules/rules_test.go` drives a
+scoped rule over a path inside its scope and paths outside it, so a row a hand
+writes meets its case.
 
 # A raw run keeps bytes
 
@@ -149,8 +150,7 @@ one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 
 Other contract tests stand there too, because they drive a real thing as well.
-The prose rules run through Vale itself in
-`src/modules/lsp/rules_contract_test.go`, under the contract tag.
+The prose rules run in Go, and `src/rules` holds their cases.
 
 | door | real | fake | contract suite |
 |---|---|---|---|
@@ -295,20 +295,10 @@ The lsp move touches no git, so it stands apart from that order.
 
 # A rule test spawns once
 
-A rule asserted against a stub is a rule nobody runs, so a case proving a
-rule reaches Vale. A case spawning the binary a line costs the battery a
-minute under load, and a red under that load names no cause. So one table,
-`src/modules/lsp/rules_contract_test.go`, is the one place a rule test reaches
-Vale:
-
-| what a row names | what the table does |
-|---|---|
-| a path, a text, a rule, and whether it fires | writes every text under its path, each in a folder of its own, over a temp root holding the tree's `.vale.ini` and styles |
-| a ticket each route mints | reads the mint's golden, and writes each ticket as a row the voice passes |
-| | runs Vale once over the folder, and holds each row to its findings |
-
-A probe under a path a section switches off proves the path stands off the
-rule, because Vale reads the section there.
+A rule asserted against a stub is a rule nobody runs. So one table,
+`src/rules/testdata/cases.json`, holds a fixture each rule refuses and a twin it
+passes, and `TestEachRuleRefusesItsFixtureAndPassesItsTwin` in
+`src/rules/rules_test.go` runs the loaded rules over both, in process.
 
 # A door declares its names
 
