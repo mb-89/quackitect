@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: javascript-leaves
 parent: remaining-js-names-its-reason
+record:
+  - step: do
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 61269e61a0c022f4c86fc5a1d5c19dd1aa72011b
+    hash_after: 61269e61a0c022f4c86fc5a1d5c19dd1aa72011b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 3 file(s); green, src/modules/examples passes
+      - name: check
+        exit: 0
+        said: "   80.4  in all"
+    inputs:
+      - name: ask
+        hash: d5b0f8dcc3a0d3f1
+        size: 600
+    def: 6d8d4db4b183406b
+reason: done
 ---
 
 # Ask
@@ -47,7 +65,6 @@ the group inventory in spec/tickets/javascript-leaves.md marks src/doors/disk.js
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test test/contract/disk.test.js test/contract/proc.test.js test/contract/wire.test.js src/modules/examples/examples_test.go
@@ -55,20 +72,25 @@ the group inventory in spec/tickets/javascript-leaves.md marks src/doors/disk.js
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every door stays in src/doors, departing from the ask. The extension's editor-doors.js loads clock, disk, http and proc from src/doors by a path it builds at runtime, which a grep on import lines misses, and proc stands on clock and disk. wire.js is the server the contract tests stand up, and owns node:http in src/doors/owns.yaml. Each fake stands beside its door, per [[spec/design_output/doors#a-fake-behaves]]. A move splits doors that stand on each other, or walks a test around a door. The group inventory rows read stays, door.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change departs from the ask, and the Discussion names why: the extension loads the doors by built path
+- the cleanup it reveals is the stale clock and http rows, which now read stays, door in the group inventory
+- each fact stands once: the reason under this ticket's Discussion, and the inventory row points at this ticket
 
 # Discussion
 
