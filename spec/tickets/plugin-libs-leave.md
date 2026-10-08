@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 7f6d9e30b19c4ba214c9136d5e47c63d1dfd142f
+    hash_after: 7f6d9e30b19c4ba214c9136d5e47c63d1dfd142f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   87.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 07b7e015895bd976
+        size: 1052
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -393,26 +416,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/plugin_libs_test.go src/quack/install_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The level zero plugin library holds the lint group's `vale.js` alone. Eleven libraries leave with their tests: apply, folders, hash, index-tools, index, log, pull, review, runs, tools and undo. Go already ran each rule they held, so a rule now changes in one language. The JavaScript tests that stay, over the hooks and the extension, spell the names they read with a pointer at the Go owner. `PrivateFolderOwned` takes `folders.go` as the owner of the runtime folder names, and every copy points there. The JavaScript git door leaves with its fake and its tests, since nothing reads it now.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft and the gate name, plus the git door the Discussion hands this ticket.
+- The JavaScript tests that stay run on their fakes, and the Go rule tests take their fixtures.
+- Each changed comment points at its Go owner.
+- folders.go owns the folder names, and every copy points there.
 
 # accept
 
