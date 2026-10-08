@@ -83,13 +83,22 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 fix: true
 record:
   - step: sync
     hand: box f9a347032e0b · claude-code-remote
     hash_before: f4d4cfc83cc85511989a3c7c6932f494ef11b478
     session: cse_01NDHJqHBMiFBoMeufqUF5YY
+  - step: sync
+    hand: box f9a347032e0b · claude-code-remote
+    hash_before: d3495ac80e5afa063e8a9176b0bcfa0f8cfdfb55
+    hash_after: d3495ac80e5afa063e8a9176b0bcfa0f8cfdfb55
+    answered:
+      - name: sync
+        exit: 0
+        said: work/loose-fixes-911f4ea already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -112,8 +121,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
