@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,6 +155,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box f9a347032e0b · claude-code-remote
+    hash_before: 4f4da87a0578a0c15b02d66c156f0b8ea8462580
+    hash_after: 4f4da87a0578a0c15b02d66c156f0b8ea8462580
+    inputs:
+      - name: retro/write
+        hash: b6668caf412ab42f
+        size: 1816
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -294,20 +304,27 @@ The child carried no code, since its fix landed on main before the box took the 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 00:20, the MCP index server refused its connection, and the command line carried the hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 00:24, a hook held a gate and a landing apart
+- 00:24, a hook sent the push through the push verb
+- 00:15, a hook asked every shell call to name its ticket
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- no ticket stands minted with no group
+- the trivial route gap waits for the owner at spec/processes/trivial.yaml
 
 # Discussion
 
