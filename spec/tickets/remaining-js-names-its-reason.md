@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: d872d0de66d998b2f09f3830ea8290f0e524aa31
+    hash_after: d872d0de66d998b2f09f3830ea8290f0e524aa31
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   78.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: feffe0d6fd4febe4
+        size: 774
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_lines_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The doors design note lists each JavaScript file that stays, with its reason, under The JavaScript that stays. The javascript part of the check refuses a tracked JavaScript file no row covers, and a row covering no file. Its cases stand in src/quack/check_lines_test.go, and they pass with the check on the branch head.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the doors note, check.go, check_javascript.go and the test file the cases folded into
+- the part reaches git and the disk through checkDoors, whose fake the cases drive
+- the file header of check_javascript.go points at the doors note section the approach implements
+- the list stands once, in the doors note, and the check reads it there
 
 # accept
 
