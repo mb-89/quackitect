@@ -112,6 +112,9 @@ record:
     hand: box ba1101ec7b2d · claude-code-remote
     hash_before: 6874c8da30449f545047f80ea571f5e52d68741c
     session: cse_01Vzgwb5Dc586imx6m8Gnoyt
+    hash_after: ed006348ade339d8f5fedde8a0ce9bcbe90fc8ed
+    model: claude-opus-5-5
+    final: "javascript-leaves closes done: the readers no road loads left, the level0 note names the Go reader, and the check answers 0."
   - step: split
     hand: box ba1101ec7b2d · claude-code-remote
     hash_before: e28e0354facf6833323ec9cc2e0dbb351328bf8c
