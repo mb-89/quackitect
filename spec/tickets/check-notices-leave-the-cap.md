@@ -83,14 +83,12 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-cloud: true
 ---
 
 # Ask
 
 <!-- goal, as text: what these tickets add up to, for the hand that takes them -->
-goal: `check (windows-latest)` stands green on main run after run, and a red run names its failing Go case among the job's annotations.
-
+goal: a red `check` job names its failing Go case among the step's error annotations. No informational line of the check reads as an error to setup-go's problem matcher.
 
 # sync
 
@@ -208,6 +206,13 @@ goal: `check (windows-latest)` stands green on main run after run, and a red run
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The order that minted this group says to open its branch with `./RUNME.sh branch open`, and to leave main unpushed. The verb refuses until main carries the group, and it commits a marker on main and pushes it. The box kept the second rule: the fixes and these tickets reached origin through the commit verb as `rescue/windows-check-holds`, and the pull request runs from there. The route stands at draft, and the owner decides whether to close the three or open the group.
+The order that minted this group leaves main unpushed, and `./RUNME.sh branch open` pushes a marker on main. The box cut `work/check-notices-leave-the-cap` off main by hand, and the fixes reach origin through the commit verb. The route stands at draft, and the owner decides whether to close the two or open the group.
 
-The red case in the Windows runs of `#131` and `#134` is `TestTheQuackBinaryBuildsOnce`. Windows refuses its TempDir cleanup the delete of `quack.exe`, since a parallel case's index runs from a link to the same file. The doors walk's marked lines spent the step's error annotations, so the case stood in the job log alone.
+| part | what changes |
+|---|---|
+| `check.NoticeLine` | prints a place and its words with no colon past the column, the form setup-go's matcher passes over |
+| the lint | prints every finding it lets pass through `check.NoticeLine`, and a refused one as before |
+| the doors walk | prints its marked line through `check.NoticeLine` |
+| `check.ErrorMatcher` | holds setup-go's pattern, and the check and doors tests read lines against it |
+
+The red case in the Ubuntu run of `#139` is `TestARunPastItsWaitEndsWithAFault`. Its TempDir cleanup found the folder not empty. The fake runner answers the wait at once and leaves its program running. That program writes `ready` into the case's folder while the cleanup removes it. The case now hands a line that writes nothing. The race stands unreproduced on this box, across `-count=500 -race -cpu=1,2,8`.

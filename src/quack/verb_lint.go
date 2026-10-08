@@ -127,7 +127,7 @@ func lintVerb(doors func() (lintDoors, error)) twin {
 				refused++
 			}
 		}
-		for _, row := range lintRows(found, refused) {
+		for _, row := range lintRows(found, refused, strict) {
 			fmt.Fprintln(out, row)
 		}
 		// A warning turns nothing red, because the doors let it land and the push waits on the panel. [[spec/design_output/config#the-engine-controls]]
@@ -265,8 +265,8 @@ func leavesFoundAt(disk diskDoors, at string) func(found lintFound) error {
 	}
 }
 
-// The count reads first, and the finding lines stand last, where the reader's eye lands. [[spec/design_output/lsp#the-lint-ends-on-findings]]
-func lintRows(found []check.Finding, refused int) []string {
+// The count reads first, and the finding lines stand last, where the reader's eye lands. A finding the lint lets pass prints as a notice, so CI spends its error annotations on what refuses. [[spec/design_output/lsp#the-lint-ends-on-findings]] [[spec/tickets/check-lines-read-as-notices]]
+func lintRows(found []check.Finding, refused int, strict bool) []string {
 	per, order := map[string]int{}, []string{}
 	for _, one := range found {
 		if per[one.Rule] == 0 {
@@ -286,7 +286,11 @@ func lintRows(found []check.Finding, refused int) []string {
 	}
 	out = append(out, "")
 	for _, one := range found {
-		out = append(out, lintLine(one))
+		if refuses(one, strict) {
+			out = append(out, lintLine(one))
+		} else {
+			out = append(out, check.NoticeLine(one.File, one.Line, one.Column, one.Rule+": "+one.Message))
+		}
 	}
 	return out
 }

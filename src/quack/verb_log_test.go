@@ -350,21 +350,22 @@ func TestLintVerb(t *testing.T) {
 			t.Fatalf("lint answers %d, %q, logs %v, and wants the pass at debug", code, out, fake.rows)
 		}
 	})
-	t.Run("warnings print the count a rule first and the lines last, exit 0 and log at warn", func(t *testing.T) {
+	// A warning prints as a notice, so CI spends no error annotation on it. [[spec/tickets/check-lines-read-as-notices]]
+	t.Run("warnings print the count a rule first and the lines last as notices, exit 0 and log at warn", func(t *testing.T) {
 		fake := &lintFake{
 			tools: []check.Finding{lintRow("a.md", "Sentence", check.SeverityWarning)},
-			swept: []check.Finding{lintRow("b.md", "Passive", check.SeverityWarning), lintRow("c.md", "Passive", check.SeverityWarning)},
+			swept: []check.Finding{lintRow("b.go", "Passive", check.SeverityWarning), lintRow("c.go", "Passive", check.SeverityWarning)},
 		}
 		code, out, _ := runsTwin(fake.verb(t, nil), "lint")
 		want := strings.Join([]string{
 			"     2  Passive", "     1  Sentence", "     3  in all", "",
 			"3 stand at warning. They stand in the Problems panel, and the push waits until the panel stands clear.", "",
-			"a.md:2:3: Sentence: Sentence says", "b.md:2:3: Passive: Passive says", "c.md:2:3: Passive: Passive says", "",
+			"a.md:2:3 Sentence: Sentence says", "b.go:2:3 Passive: Passive says", "c.go:2:3 Passive: Passive says", "",
 		}, "\n")
 		if code != 0 || out != want {
 			t.Fatalf("lint answers %d, %q, and wants %q", code, out, want)
 		}
-		if row := fake.rows[0]; row["level"] != "warn" || row["said"] != "3 line(s) break a rule" || row["detail"] != "a.md:2 Sentence, b.md:2 Passive, c.md:2 Passive" {
+		if row := fake.rows[0]; row["level"] != "warn" || row["said"] != "3 line(s) break a rule" || row["detail"] != "a.md:2 Sentence, b.go:2 Passive, c.go:2 Passive" {
 			t.Fatalf("lint logs %v, and wants the warn row naming the first rows", row)
 		}
 	})
