@@ -105,7 +105,7 @@ func retroCollectFirst(said ...string) string {
 	return ""
 }
 
-// Git run in the root, its output and its error trimmed, as src/doors/git.js runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
+// Git run in the root, its output and its error trimmed, as src/modules/git/git.go runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
 func retroCollectGitIn(root string) func(args ...string) retroRan {
 	return func(args ...string) retroRan {
 		said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root})

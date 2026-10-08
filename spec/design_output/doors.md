@@ -16,7 +16,6 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 |---|---|---|
 | `proc` | a program | `src/doors/proc.js` |
 | `disk` | the filesystem | `src/doors/disk.js` |
-| `git` | a repository | `src/doors/git.js` |
 
 Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands
@@ -64,11 +63,7 @@ Git runs a program, so it takes the door beneath it and builds on that. A fake
 of the door beneath then stands in for the one above, and one file holds the
 pairing under one name.
 
-| door | stands on | its fake |
-|---|---|---|
-| `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
-
-The fake git answers `ran`, the commands it takes, in order.
+The git door stands in `src/modules/git/git.go` with `FakeGit`, and the table of Go doors names its contract suite.
 
 # A fake behaves
 
@@ -132,7 +127,6 @@ config and the session file this tree tracks.
 |---|---|---|---|
 | `proc` | `src/doors/proc.js` | `src/doors/fake/proc.js` | `test/contract/proc.test.js` |
 | `disk` | `src/doors/disk.js` | `src/doors/fake/disk.js` | `test/contract/disk.test.js` |
-| `git` | `src/doors/git.js` | `src/doors/fake/git.js` | `test/contract/git.test.js` |
 | `vale` | `src/doors/vale.js` | none | `test/contract/vale.test.js` |
 | `biome` | `src/doors/biome.js` | none | `test/contract/biome.test.js` |
 | `wire` | `src/doors/wire.js` | none | `test/contract/wire.test.js` |
