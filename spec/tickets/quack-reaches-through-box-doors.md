@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -228,6 +228,15 @@ record:
         hash: e8c2e2eb7be289ba
         size: 948
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 623169e544a6802754159192fac800e7ce37b621
+    hash_after: 2b567fdee9c1987306de241a8310202fc5815b6a
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/hook_verb.go:47:1 ExampleCovers: ./RUNME.sh hook stands in no example's interface. Write an example under spec"
+    def: f150b8c0dc20fe45
 group: javascript-leaves
 ---
 
@@ -498,14 +507,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/bundle_verb.go src/quack/hook_verb.go src/quack/probe_clear.go src/quack/probe_dry.go src/quack/main.go src/quack/ticket_doors.go src/quack/hook_verb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-2 names, and main.go for the gate's point on the environment configOn read
+- each reach goes through the box doors, and each door has its fake: newFakeDisk, the fake post, the fake clock and the fake environment
+- hookOn, configOver and logsRowOn each point at this ticket, which names the approach
+- the status bounds stand once as constants in hook_verb.go, and each door stands once in boxdoors.go
 
 ## tests-green
 
