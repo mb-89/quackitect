@@ -3,7 +3,11 @@
 // [[spec/design_output/tree#what-a-rule-answers]]
 package check
 
-import "sort"
+import (
+	"fmt"
+	"regexp"
+	"sort"
+)
 
 const (
 	SeverityError   = "error"
@@ -21,6 +25,14 @@ type Finding struct {
 	Severity string `json:"severity"`
 	// The tool a finding comes from, where a tool draws it, and nothing for this server's own rules. [[spec/design_output/lsp#the-server-runs-the-tools]]
 	Source string `json:"source,omitempty"`
+}
+
+// setup-go's problem matcher, which reads a matching line of a CI step as an error annotation. GitHub keeps ten of those a step, so a notice matching it hides the failing case. [[spec/tickets/check-lines-read-as-notices]]
+var ErrorMatcher = regexp.MustCompile(`^\s*(.+\.go):(?:(\d+):(\d+):)? (.*)`)
+
+// A place and its words as a line ErrorMatcher passes over: the column closes the place with no colon. Every informational line naming a place prints through here. [[spec/tickets/check-lines-read-as-notices]]
+func NoticeLine(file string, line, column int, words string) string {
+	return fmt.Sprintf("%s:%d:%d %s", file, line, column, words)
 }
 
 func fault(rule, file string, line int, message string) Finding {

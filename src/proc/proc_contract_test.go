@@ -17,9 +17,11 @@ import (
 // The line a run that waits hands sh, the file it leaves once it stands, the span between two looks for it, and the wait a case arms. [[spec/tickets/test-walks-move-onto-fakes]]
 const (
 	waitsLine = ": > ready; exec sleep 30"
-	readyFile = "ready"
-	looks     = 10 * time.Millisecond
-	shortWait = 100 * time.Millisecond
+	// A run that waits and writes nothing, so a run the wait ends leaves no write racing its folder's cleanup. [[spec/tickets/check-lines-read-as-notices]]
+	sleepsLine = "exec sleep 30"
+	readyFile  = "ready"
+	looks      = 10 * time.Millisecond
+	shortWait  = 100 * time.Millisecond
 )
 
 // The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk in place of the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
@@ -38,6 +40,10 @@ type halting struct {
 func haltingRunners(t *testing.T) map[string]halting {
 	fake := &FakeRunner{After: firesAtOnce}
 	fake.Programs = map[string]Program{"sh": func(one Command) Said {
+		if one.Argv[2] == sleepsLine {
+			<-fake.Ends()
+			return Said{}
+		}
 		if one.Argv[2] != waitsLine {
 			return fakeSh(one)
 		}
@@ -265,7 +271,7 @@ func TestARunAfterTheHaltNeverStarts(t *testing.T) {
 func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 	t.Parallel()
 	for name, one := range haltingRunners(t) {
-		if answer := one.run(Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait}); answer.Code == 0 || answer.Err == "" { // level0: FixtureOutsideHome - each run stands in a folder of its own
+		if answer := one.run(Command{Argv: []string{"sh", "-c", sleepsLine}, Wait: shortWait}); answer.Code == 0 || answer.Err == "" {
 			t.Errorf("the %s runner's run past its wait answers %+v", name, answer)
 		}
 	}
