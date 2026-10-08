@@ -90,6 +90,7 @@ record:
     hand: box f9a347032e0b · claude-code-remote
     hash_before: f4d4cfc83cc85511989a3c7c6932f494ef11b478
     session: cse_01NDHJqHBMiFBoMeufqUF5YY
+    hash_after: 887ac6355b22a7c6f54967c6fa8cbd8be7e0c4ba
   - step: sync
     hand: box f9a347032e0b · claude-code-remote
     hash_before: d3495ac80e5afa063e8a9176b0bcfa0f8cfdfb55
