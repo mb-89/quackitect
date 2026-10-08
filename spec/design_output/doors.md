@@ -122,8 +122,20 @@ folder.
 | `src/stub/.claude/skills/level0/hooks/` | the stub's bridgehead, in TypeScript, in the stub a project takes |
 | `.claude/skills/level0/lib/vale.js` | the readers of the JSON the rules-over verb writes, which its own test alone loads |
 | `src/engine/tools.js` | the survey reader, which its own test alone loads |
-| `src/doors/` | the doors `src/extension/editor-doors.js` loads at runtime, the server the contract tests stand up, and the fakes the extension's tests drive |
-| `test/` | the tests of the JavaScript that stays, and the reporter the check runs them under |
+| `src/doors/clock.js` | the clock door the extension loads, which the process door stands on |
+| `src/doors/disk.js` | the disk door the extension loads |
+| `src/doors/http.js` | the http door the extension's index door posts through |
+| `src/doors/proc.js` | the process door the extension loads |
+| `src/doors/wire.js` | the server the http and editor index contract tests stand up |
+| `src/doors/fake/behaves.js` | the guard every fake shares |
+| `src/doors/fake/clock.js` | the clock door's fake, which the extension's tests drive |
+| `src/doors/fake/disk.js` | the disk door's fake, which the extension's tests drive |
+| `src/doors/fake/http.js` | the http door's fake, which the extension's tests drive |
+| `src/doors/fake/proc.js` | the process door's fake, which the extension's tests drive |
+| `src/doors/fake/vscode.js` | the fake editor the extension's tests load |
+| `test/battery-reporter.js` | the reporter the check runs the JavaScript tests under |
+| `test/contract/` | the contract tests of the doors, the extension and the hooks' settings |
+| `test/level0/` | the tests of the extension, the hooks and the Vale scripts that stay |
 | `prototype/trace-view/` | the prototype a funnel note cites as evidence, which runs in no product |
 
 To add JavaScript, add its row with its reason. To delete the last file under
