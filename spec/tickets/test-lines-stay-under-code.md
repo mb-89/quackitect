@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: 9d87608f4b3ea5d125f0414b20f8fdf953422869
+    hash_after: 9d87608f4b3ea5d125f0414b20f8fdf953422869
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "   63.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6568a71d0caae0ac
+        size: 1045
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -427,26 +450,33 @@ go build ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/check_lines_test.go src/modules/lsp/rules_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check gains a `lines` part. It counts the tracked lines of each language, Go, JavaScript with TypeScript, and shell, and refuses a language whose test lines pass its code lines. A Go fixture under `testdata` or `test/replay` counts as test lines. JavaScript held about twice as many test lines as code, so its tests now hold each behaviour once: files pinning the tree's own text leave, the sidebar, lens, pull-tool and level0 door tests fold into one file a family, and the Vale rule cases run as one Go table under the contract tag. The Vale door keeps its door case. Go and JavaScript both stand under their code lines now.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names, plus contract/sidebar.test.js and pull.md, which pinned or named files that leave.
+- The lines part runs on the check's doors, and its test on their fakes.
+- check_lines.go points at rule six of the test guidance.
+- One table in check_lines.go owns the languages, and tests.md points there.
 
 # accept
 
