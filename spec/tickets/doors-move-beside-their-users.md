@@ -71,3 +71,5 @@ the group inventory in spec/tickets/javascript-leaves.md marks src/doors/disk.js
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The change departs from the ask: every file stays in `src/doors`. `src/extension/editor-doors.js` builds each door's path at runtime and loads `clock.js`, `disk.js`, `http.js` and `proc.js` from there, which `git grep` on an import line misses. So the extension is the user of `disk.js` and `proc.js`. `proc.js` stands on `clock.js` and `disk.js`. `wire.js` owns `node:http` in `src/doors/owns.yaml` for the contract tests. Each fake stands beside its door, as [[spec/design_output/doors#a-fake-behaves]] says. A move splits doors that stand on each other, or walks a test around a door. The inventory rows of the group now read `stays, door`, and so do the stale `clock` and `http` rows, whose files stand as well.

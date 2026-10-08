@@ -241,7 +241,8 @@ The inventory follows. Every JavaScript file the tree tracks, off `git ls-files`
 |---|---|
 | stays | the VS Code extension, which VS Code loads as JavaScript |
 | stays thin | a function hook Claude Code loads as a JavaScript module, cut to a forwarder of its event |
-| moves | the reporter `node --test` loads, the extension's build, a fake the extension tests load, or shell running before any binary stands: each leaves `src/scripts` or `src/doors` for a home beside its user |
+| moves | the reporter `node --test` loads, the extension's build, or shell running before any binary stands: each leaves `src/scripts` for a home beside its user |
+| stays, door | a door the extension loads, the server its contract tests stand up, or a fake its tests drive, each beside the others in `src/doors` |
 | stays, prototype | a browser prototype outside the product, which a funnel note points at |
 | other group | the lint-without-vale group takes it |
 
@@ -355,29 +356,29 @@ The code:
 | `src/bridge/write.js` | goes | `src/modules/hooks/write/door.go` | [[spec/tickets/bridge-library-leaves]] |
 | `src/doors/awake.js` | goes | none, dead | [[spec/tickets/engine-and-doors-leave]] |
 | `src/doors/biome.js` | goes | `src/modules/check` | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/clock.js` | goes | `src/modules/clock` | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/disk.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/clock.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
+| `src/doors/disk.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/fake/awake.js` | goes | none, dead | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/fake/behaves.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
-| `src/doors/fake/clock.js` | goes | `src/modules/clock` | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/fake/disk.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/fake/behaves.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
+| `src/doors/fake/clock.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
+| `src/doors/fake/disk.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/fake/front.js` | goes | `src/front` | [[spec/tickets/schema-libs-leave]] |
 | `src/doors/fake/git.js` | goes | `src/modules/git` | [[spec/tickets/plugin-libs-leave]] |
-| `src/doors/fake/http.js` | goes | `src/modules/http` | [[spec/tickets/engine-and-doors-leave]] |
+| `src/doors/fake/http.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/fake/index.js` | goes | `src/index` | [[spec/tickets/engine-and-doors-leave]] |
 | `src/doors/fake/log.js` | goes | `src/modules/log` | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/fake/proc.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/fake/proc.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/fake/session.js` | goes | `src/modules/hooks` | [[spec/tickets/copilot-hooks-run-in-go]] |
-| `src/doors/fake/vscode.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/fake/vscode.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/front.js` | goes | `src/front` | [[spec/tickets/schema-libs-leave]] |
 | `src/doors/git.js` | goes | `src/modules/git` | [[spec/tickets/plugin-libs-leave]] |
-| `src/doors/http.js` | goes | `src/quack/boxdoors.go` | [[spec/tickets/engine-and-doors-leave]] |
+| `src/doors/http.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/index.js` | goes | `src/index` | [[spec/tickets/engine-and-doors-leave]] |
 | `src/doors/log.js` | goes | `src/modules/log` | [[spec/tickets/engine-and-doors-leave]] |
-| `src/doors/proc.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/proc.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/doors/session.js` | goes | `src/modules/hooks` | [[spec/tickets/copilot-hooks-run-in-go]] |
 | `src/doors/vale.js` | other group | | |
-| `src/doors/wire.js` | moves | | [[spec/tickets/remaining-js-names-its-reason]] |
+| `src/doors/wire.js` | stays, door | | [[spec/tickets/doors-move-beside-their-users]] |
 | `src/engine/front-merge.js` | goes | `src/branches/sync.go` | [[spec/tickets/engine-and-doors-leave]] |
 | `src/engine/group.js` | goes | `src/branches/group.go` | [[spec/tickets/engine-and-doors-leave]] |
 | `src/engine/named.js` | goes | `src/modules/hooks/command/ticket.go` | [[spec/tickets/engine-and-doors-leave]] |

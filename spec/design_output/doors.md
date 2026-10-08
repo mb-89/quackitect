@@ -121,7 +121,7 @@ folder.
 | `src/stub/.claude/skills/level0/hooks/` | the stub's bridgehead, in TypeScript, in the stub a project takes |
 | `.claude/skills/level0/lib/vale.js` | the readers of the JSON the rules-over verb writes, which its own test alone loads |
 | `src/engine/tools.js` | the survey reader, which its own test alone loads |
-| `src/doors/` | the doors and fakes the extension's tests drive, the clock the process door stands on among them |
+| `src/doors/` | the doors `src/extension/editor-doors.js` loads at runtime, the server the contract tests stand up, and the fakes the extension's tests drive |
 | `test/` | the tests of the JavaScript that stays, and the reporter the check runs them under |
 | `prototype/trace-view/` | the prototype a funnel note cites as evidence, which runs in no product |
 
