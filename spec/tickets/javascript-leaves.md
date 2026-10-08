@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -206,6 +206,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box ba1101ec7b2d · claude-code-remote
+    hash_before: 0676b5e9ea1dbc87dd10e4f5580192a450d55508
+    hash_after: 0676b5e9ea1dbc87dd10e4f5580192a450d55508
+    inputs:
+      - name: retro/write
+        hash: 09110f7f98a63a74
+        size: 2964
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -384,20 +394,28 @@ The group's ask was met before this box took it. What remained was proof that no
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 10:11 the index process reached a proxy port the box no longer serves, so its push to origin failed and a shell push carried each commit
+- the gh CLI, which the box lacks, so the pull request goes through the GitHub connector
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the canary gate at 10:12, which logged no canary on an answer that opened with it
+- the index stopping under the go tests, which this run worked around by starting it before each shell hand-back
+- the push guard at 10:20, which wanted a check on the commit it pushes
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- cloud-setup-runs-root-install, a person ticket the owner holds, which stays on main
+- no ticket minted with no group
+- the handover names the pull request and its watch as the step left
 
 # Discussion
 
