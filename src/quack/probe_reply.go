@@ -17,14 +17,14 @@ import (
 const (
 	replyMarker = hooks.ReplyMarker
 	replyEvent  = hooks.ReplyEvent
-	replySays   = "se-probe-reply writes this line"
+	replySays   = hooks.ReplySays
 	promptWhy   = "The owner sent a prompt"
 	// The width a field's name pads to, and the characters of its value the verb shows. [[spec/tickets/the-reply-probe-runs]]
 	replyKeyWidth = 12
 	replyShown    = 80
 )
 
-// The prompt the reply probe runs, as REPLY_PROBE.opens says it. [[spec/tickets/the-reply-probe-runs]]
+// The prompt the reply probe runs. [[spec/tickets/the-reply-probe-runs]]
 var replyOpens = strings.Join([]string{
 	replyMarker + ".",
 	"In one message, write the line `" + replySays + "` as text, then call Read on README.md.",

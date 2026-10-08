@@ -46,7 +46,6 @@ var coldChecks = []string{"hook", "server", "rules", "tools", "canary", "quiet"}
 // The cold path: a commit touching one runs the cold probe. [[spec/design_output/level0#the-cold-probe]]
 var coldPath = []string{
 	".claude/skills/level0/hooks/",
-	".claude/skills/level0/lib/guidance.js",
 	"src/modules/hooks/",
 	"src/quack/",
 	"install.sh",

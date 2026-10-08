@@ -8,10 +8,11 @@ import (
 	"strings"
 )
 
-// The reply probe's marker and the said its row carries, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them. [[spec/tickets/the-reply-probe-runs]]
+// The reply probe's marker, the event its row carries, and the line its prompt asks for. [[spec/tickets/the-reply-probe-runs]] [[spec/tickets/guidance-lib-leaves]]
 const (
 	ReplyMarker = "se-probe-reply"
 	ReplyEvent  = "probe.reply"
+	ReplySays   = ReplyMarker + " writes this line"
 	probeKind   = "probe"
 	// The cap on a string the probe's row carries. [[spec/tickets/the-reply-probe-runs]]
 	slimCap = 4000

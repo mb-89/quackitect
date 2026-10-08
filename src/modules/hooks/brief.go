@@ -195,19 +195,19 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 	return out
 }
 
-// The kind a canary row logs under, and the warning a second line logs, which DOOR in src/bridge/guidance.js and HEARD.again in .claude/skills/level0/lib/guidance.js own, spelled again here because Go reads no JavaScript. [[spec/tickets/brief-owes-after-a-clear]]
+// The kind a canary row logs under, the key a second line logs under, and the kind of the context row. [[spec/tickets/brief-owes-after-a-clear]]
 const (
 	canaryKind  = "level0"
 	heardTwice  = "again"
 	contextKind = "context"
 )
 
-// What each canary row says, which HEARD in .claude/skills/level0/lib/guidance.js owns, spelled again here because Go reads no JavaScript. [[spec/tickets/the-brief-leaves-the-bridge]]
+// What each canary row says, off the heard rows in the brief package. [[spec/tickets/the-brief-leaves-the-bridge]] [[spec/tickets/guidance-lib-leaves]]
 var heard = map[string]string{
-	brief.Same:  "the canary opens the answer whole",
-	brief.Other: "the canary opens the answer with other counts",
-	brief.None:  "the canary opens no answer",
-	heardTwice:  "the canary opens a second answer in one context",
+	brief.Same:  brief.HeardSame,
+	brief.Other: brief.HeardOther,
+	brief.None:  brief.HeardNone,
+	heardTwice:  brief.HeardAgain,
 }
 
 // The canary row the newest step heard, as paid, onTurnComplete and repeats in src/bridge/guidance.js log it: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]

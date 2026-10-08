@@ -643,7 +643,7 @@ The numbers come out of the standing block alone. So an answer carrying them
 proves the block stands in front of the model past the compaction.
 
 `./RUNME.sh probe reply` runs the client headless on the prompt
-`REPLY_PROBE.opens` in `.claude/skills/level0/lib/guidance.js` names:
+`replyOpens` in `src/quack/probe_reply.go` names:
 
 1. The prompt's marker arms the bridgehead at `prompt.submit`.
 2. The next `tool.call` writes one `probe.reply` row, whose detail holds the
@@ -714,7 +714,7 @@ and the stream:
 | tools | a `mcp__level0__` name past the read tools reaches the session |
 | canary | the first text opens on the sentence, and no later text repeats it |
 
-The canary check also fails on a `HEARD.again` row, and on a `gate` row asking
+The canary check also fails on a `HeardAgain` row, and on a `gate` row asking
 for the canary after the payment. The probe prints one line a check, and exits
 `0` where every check passes.
 
@@ -1126,8 +1126,9 @@ work stands.
 
 A guidance note's `Examples` table follows its rules into every block the
 rules reach. That is the standing layer, a helper's prompt, a kind's layer and
-the output style. `rulesOf` in `lib/guidance.js` writes the numbered rules and
-the table under them, so every reader carries one shape. The canary counts the
+the output style. `RulesOf` in `src/modules/hooks/brief/rules.go` writes the
+numbered rules and the table under them, and `rulesOf` in
+`src/projection/style.go` writes the style's, so every reader carries one shape. The canary counts the
 rules alone, because a row shows a rule and adds none.
 [[spec/guidance/guidance]]
 
@@ -1175,7 +1176,8 @@ line for that sentence:
 
 So the log carries the canary as well, and a person reads it later without
 watching the session run. `./RUNME.sh standing` ends with the same sentence,
-because `canary` builds it in `lib/guidance.js` and both callers read it there.
+because `Canary` builds it in `src/modules/hooks/brief/brief.go` and both
+callers read it there.
 
 ## The canary opens an answer
 
@@ -1193,7 +1195,7 @@ and the owner reads the failure long afterwards. So the sentence carries a
 debt, and the cage holds the session to it.
 
 The debt opens where the first `turn.complete` carries an answer the canary
-opens no line of. `canaryIn` reads the first line and answers `same`, `other`
+opens no line of. `CanaryIn` reads the first line and answers `same`, `other`
 or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
@@ -1274,7 +1276,7 @@ The hook prepends the session's own standing text to the spawn's prompt, under
 the heading the session reads, and puts the task under `# Your task`.
 
 One guidance file then binds every agent in the tree, and no helper reads a
-second copy. `forHelper` in `lib/guidance.js` builds the text, and the log
+second copy. `ForHelper` in `src/modules/hooks/brief/layer.go` builds the text, and the log
 writes one `agent` line naming the type it reaches.
 
 The rules a helper writes under are the rules the write door holds it to, so

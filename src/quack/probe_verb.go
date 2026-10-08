@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"quackitect/src/modules/hooks/brief"
 )
 
 // The words the probe answers, and the line an unknown word prints. [[spec/tickets/box-verbs-port-to-go]]
@@ -29,15 +31,15 @@ const pluginFolder = ".claude/skills/level0"
 // The word naming the revision the dry road runs at. [[spec/tickets/probe-at-revision-guards-merges]]
 const atFlag = "--at"
 
-// What each canary row says, which HEARD in .claude/skills/level0/lib/guidance.js owns, spelled again here because Go reads no JavaScript. [[spec/design_output/level0#the-canary]]
+// What each canary row says, off the heard rows in the brief package. [[spec/design_output/level0#the-canary]] [[spec/tickets/guidance-lib-leaves]]
 const (
-	heardSame  = "the canary opens the answer whole"
-	heardOther = "the canary opens the answer with other counts"
-	heardNone  = "the canary opens no answer"
-	heardAgain = "the canary opens a second answer in one context"
+	heardSame  = brief.HeardSame
+	heardOther = brief.HeardOther
+	heardNone  = brief.HeardNone
+	heardAgain = brief.HeardAgain
 )
 
-// The compaction probe's prompt and the variable that arms it, as PROBE in .claude/skills/level0/lib/guidance.js names them. [[spec/design_output/level0#what-the-probe-does]]
+// The compaction probe's prompt and the variable that arms it. [[spec/design_output/level0#what-the-probe-does]]
 const (
 	compactVariable = "SE_PROBE_COMPACT"
 	compactOpens    = "Say hello in one line."

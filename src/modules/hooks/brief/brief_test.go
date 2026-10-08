@@ -79,6 +79,17 @@ func TestTheCanaryReadsTheFirstLine(t *testing.T) {
 	}
 }
 
+// Each heard row says its own line about the canary, so a row reads apart from the others. [[spec/tickets/guidance-lib-leaves]]
+func TestEachHeardRowSaysItsOwnLine(t *testing.T) {
+	seen := map[string]bool{}
+	for _, one := range []string{HeardSame, HeardOther, HeardNone, HeardAgain} {
+		if seen[one] || !strings.HasPrefix(one, "the canary ") {
+			t.Fatalf("the heard row %q repeats or names no canary", one)
+		}
+		seen[one] = true
+	}
+}
+
 // A layer opens the prompt and the task follows under its heading, and no layer leaves the prompt alone. [[spec/tickets/spawn-answers-off-the-door]]
 func TestTheHelperReadsTheLayerBeforeItsTask(t *testing.T) {
 	wrapped := ForHelper("### voice\n\n1. Say what is.", "do the thing")

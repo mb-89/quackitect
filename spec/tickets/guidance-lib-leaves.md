@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 70d2653b2e1c9134
         size: 1252
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b1ba21c2e626 · claude-code-remote
+    hash_before: d6dc04f8f1ac5dabd322c1a9feb71e1dabee1afb
+    hash_after: b85619a71b49040ce4b2aee3686baaa272552343
+    answered:
+      - name: lint
+        exit: 0
+        said: "   76.8  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -362,14 +371,24 @@ accept. The approach answers the ask, and a red test decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the size list, spec/tickets/javascript-leaves.md for gate point four, and one new test case in each touched Go folder for the commit door.
+The change reaches no door. The new cases read constants and in-memory text through readOver and stepsOver.
+Every new constant and case names this ticket or a level0 design section in its comment.
+The heard rows stand once in brief.HeardSame, HeardOther, HeardNone and HeardAgain, and the reply line once in hooks.ReplySays. hooks/brief.go, probe_verb.go, probe_reply.go and probe_test.go read those constants.
+Gate point one: the schema tags case goes to schema-libs-leave approach line nineteen.
+Gate point two: this ticket lands first, so it deletes guidance-tags.test.js.
+Gate point three: line fifteen covers the lib file alone, so the src/bridge/guidance.js pointers in brief.go, spawn.go and spawn_test.go stay.
+Gate point five: the callers also take probe_cold_test.go, probe_dry_test.go and probe_verb_test.go.
+Gate point six: line eight rests on the owner's word that tests test behavior and interfaces.
 
 ## tests-green
 

@@ -144,8 +144,9 @@ func TestAQuotedTagReachesTheLeafItsBareWordReaches(t *testing.T) {
 		"spec/guidance/code/bare.md":   "---\ntags: [testing, code]\n---\n# Bare\n",
 		"spec/guidance/code/flow.md":   "---\ntags: [\"testing\", 'code']\n---\n# Flow\n",
 		"spec/guidance/code/block.md":  "---\ntags:\n  - \"testing\"\n  - 'code'\n---\n# Block\n",
+		"spec/guidance/code/spaced.md": "---\ntags: [ \"testing\" , 'code' ]\n---\n# Spaced\n",
 	})
-	want := []string{"spec/guidance/code/bare", "spec/guidance/code/block", "spec/guidance/code/flow", "spec/guidance/own"}
+	want := []string{"spec/guidance/code/bare", "spec/guidance/code/block", "spec/guidance/code/flow", "spec/guidance/code/spaced", "spec/guidance/own"}
 	if got := notesOf(steps["standard:design/tests-red"]); !reflect.DeepEqual(got, want) {
 		t.Errorf("design/tests-red reads %v, and wants %v", got, want)
 	}

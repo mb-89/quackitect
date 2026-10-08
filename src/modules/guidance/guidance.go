@@ -34,7 +34,7 @@ type filesIn struct {
 	Files map[string]q.Content `q:"files/<path...>"`
 }
 
-// The frontmatter block, a list item and a pair, the way the frontmatter reader in the level0 lib reads them. [[spec/design_input/level-two#guidance]]
+// The frontmatter block, a list item and a pair, which frontOf and words read. [[spec/design_input/level-two#guidance]] [[spec/tickets/guidance-lib-leaves]]
 var (
 	frontAt = regexp.MustCompile(`^---\r?\n((?s:.*?))\r?\n---`)
 	itemAt  = regexp.MustCompile(`^\s*-\s+(.*)$`)

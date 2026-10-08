@@ -12,9 +12,6 @@ import (
 	"testing"
 )
 
-// The line the probe's prompt asks the agent to write, as REPLY_PROBE.says in .claude/skills/level0/lib/guidance.js names it. [[spec/tickets/level0-hooks-forward-to-go]]
-const replySays = ReplyMarker + " writes this line"
-
 // The posts of session s1 under a fresh tree, and the probe rows its session log holds after them. [[spec/tickets/level0-hooks-forward-to-go]]
 func probeRows(t *testing.T, posts ...Post) []LogRow {
 	t.Helper()
@@ -47,14 +44,14 @@ func called(e map[string]any) Post {
 func TestTheFirstCallAfterAMarkedPromptWritesTheReplyProbeRow(t *testing.T) {
 	rows := probeRows(t,
 		submitted(ReplyMarker+". In one message, write the line as text, then call Read on README.md."),
-		called(map[string]any{"tool": "Read", "file_path": "README.md", "text": replySays}),
+		called(map[string]any{"tool": "Read", "file_path": "README.md", "text": ReplySays}),
 		called(map[string]any{"tool": "Glob", "pattern": "*.md"}),
 	)
 	if len(rows) != 1 {
 		t.Fatalf("the log holds %d probe rows, %+v, and wants the first call's alone", len(rows), rows)
 	}
 	var detail map[string]any
-	if err := json.Unmarshal([]byte(rows[0].Detail), &detail); err != nil || detail["text"] != replySays || detail["tool"] != "Read" {
+	if err := json.Unmarshal([]byte(rows[0].Detail), &detail); err != nil || detail["text"] != ReplySays || detail["tool"] != "Read" {
 		t.Fatalf("the probe row's detail reads %q, and wants the call's fields with the text it carries", rows[0].Detail)
 	}
 }
@@ -66,7 +63,7 @@ func TestAPromptWithNoMarkerAndAHelpersCallWriteNoProbeRow(t *testing.T) {
 	rows := probeRows(t,
 		submitted(ReplyMarker+". Write the line."),
 		called(map[string]any{"tool": "Read", "file_path": "a.md", "agentId": "h1"}),
-		called(map[string]any{"tool": "Read", "file_path": "README.md", "text": replySays}),
+		called(map[string]any{"tool": "Read", "file_path": "README.md", "text": ReplySays}),
 	)
 	if len(rows) != 1 || !strings.Contains(rows[0].Detail, "README.md") {
 		t.Fatalf("a helper's call and then the main agent's write %+v, and want one row, off the main agent's call", rows)

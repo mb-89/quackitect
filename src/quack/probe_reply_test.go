@@ -9,6 +9,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks"
 )
 
 // The row the bridgehead writes for the first call after a marked prompt. [[spec/tickets/the-reply-probe-runs]]
@@ -23,6 +25,14 @@ func replyFields(pairs ...string) string {
 	}
 	text, _ := json.Marshal(said)
 	return string(text)
+}
+
+// The prompt asks for the line the door's probe names. [[spec/tickets/guidance-lib-leaves]]
+func TestTheReplyPromptAsksForTheDoorsLine(t *testing.T) {
+	t.Parallel()
+	if !strings.HasPrefix(replyOpens, hooks.ReplyMarker+".") || !strings.Contains(replyOpens, "`"+hooks.ReplySays+"`") {
+		t.Errorf("the prompt reads %q", replyOpens)
+	}
 }
 
 func TestTheReplyReadsWhichFieldCarriesTheLine(t *testing.T) {

@@ -157,6 +157,15 @@ func TestStyleNumbersEachNotesRulesAndItsExamples(t *testing.T) {
 	}
 }
 
+// The style reads the Actionables chapter alone, and leaves the Motivation and Discussion items out. [[spec/tickets/guidance-lib-leaves]]
+func TestStyleReadsTheActionablesChapterAlone(t *testing.T) {
+	said := readOver(t, styleEntry, Texts{"g/a.md": "# Motivation\n\n1. why\n\n# Actionables\n\n1. Act.\n\n# Discussion\n\n1. talk\n"})
+	got := said.Wanted["o/level0.md"]
+	if !strings.Contains(got, "1. Act.\n") || strings.Contains(got, "why") || strings.Contains(got, "talk") {
+		t.Errorf("the style reads another chapter:\n%s", got)
+	}
+}
+
 func TestStyleWritesNothingWhereNoNoteCarriesARule(t *testing.T) {
 	if said := readOver(t, styleEntry, Texts{"g/a.md": "# Motivation\n\n1. not a rule\n"}); len(said.Wanted) != 0 {
 		t.Errorf("the style writes %v", Paths(said.Wanted))
