@@ -95,8 +95,8 @@ already differ.
 | held and group standing | `branches/group.go`, `work-stands.js`, `index/ticket.go`, and the window's `Placed` | the window overrides it again |
 | the current leaf of a route | `branches/group.go`, `pull-route.js`, `lsp/group.go`, the extension's `lens.js` | a fixture test exists only to keep two of them in step |
 | the hold folder readers | `guidance-hand.js`, `ephemeral.js`, `command/ticket.go`, `lens.js` | `folders.test.js` checks only that the copies agree |
-| session log rows | `lib/log.js`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
-| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `lib/index.js` | each asks its own way |
+| session log rows | `src/quack/verb_log.go`, `tui/log/record.go`, the extension's `rows.js` | the level ladder stands twice |
+| the index client | `lsp/indexed.go`, `tui/work/workindex.go`, `src/modules/hooks/search.go` | each asks its own way |
 | cloud detection | `InCloud` in `src/modules/hooks/command/cloud.go`, the hook's start script, `copilot.js`, the Copilot runtime | `InCloud` reads `0` as off, and the start script reads any value as on |
 | walk skip lists and globs | four skip lists, three glob translators | the two Go translators take different features |
 | runtime paths, the port, `se-index`, `plan.json`, `tools.json` | Go, JavaScript, shell, and the stub hook | each spells them again |

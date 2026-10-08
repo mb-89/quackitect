@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// The handover, the one path inside the tree a harness write reaches past the no-ticket refusal. .claude/skills/level0/lib/folders.js owns it. [[spec/design_output/level0#a-write-names-its-ticket]]
+// The handover, the one path inside the tree a harness write reaches past the no-ticket refusal. src/modules/check/folders.go owns it. [[spec/design_output/level0#a-write-names-its-ticket]]
 const Handover = ".se/HANDOVER.md"
 
 // The tools the harness writes a file through, none carrying a ticket field, and the one of them no rule past the no-ticket refusal reads. [[spec/design_output/level0#a-write-names-its-ticket]]

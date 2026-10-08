@@ -13,7 +13,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The constants of hashText in .claude/skills/level0/lib/hash.js, which src/index/files.go spells again. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The constants of HashText, which src/index/files.go spells again. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const (
 	fnvOffset = 0x811c9dc5
 	fnvPrime  = 0x01000193

@@ -9,8 +9,8 @@ const http = require("node:http");
 const { join } = require("node:path");
 
 // The index binary and the standing file of its hooks door, serveIndexBin in src/quack/serve_verb.go and StandingFile in src/modules/hooks/hooks.go, held again here because the extension imports its own folder alone. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const INDEX = ".se/.runtime/bin/se-index"; // in the runtime folder folders.js owns
-const HOOKS = ".se/.runtime/hooks.json"; // in the runtime folder folders.js owns
+const INDEX = ".se/.runtime/bin/se-index"; // in the runtime folder folders.go owns
+const HOOKS = ".se/.runtime/hooks.json"; // in the runtime folder folders.go owns
 const WIRE_WAIT = 500;
 const STOP_WAIT = 10_000;
 // The span the index takes to answer its standing, which starts its door where none answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]

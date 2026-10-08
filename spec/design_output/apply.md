@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/apply.js` holds the write tools the agent calls. This
+`src/modules/edits` holds the write tools the agent calls. This
 note covers the tools and the journal behind them. For the argument, see
 [[spec/rationales/apply]].
 
@@ -19,7 +19,7 @@ Level zero registers the tools the agent calls: `patch` edits files,
 | `replace` | the sweep: one regex over every file a glob reaches |
 | `undo` | the way back, out of a journal the apply writes first |
 
-The pure half sits in `lib/apply.js` and `lib/undo.js`, which read no disk. The
+The pure half sits in `src/modules/edits/apply.go` and `src/modules/edits/journal.go`, which read no disk. The
 hooks module hands them the text and writes what they answer.
 
 ## Check everything, then write

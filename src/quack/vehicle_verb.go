@@ -64,7 +64,7 @@ func vehicleRootHere() string {
 			bin = real
 		}
 		root := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(bin))))
-		if filepath.Join(root, ".se", ".runtime", "bin") == filepath.Dir(bin) { // the runtime folder .claude/skills/level0/lib/folders.js owns
+		if filepath.Join(root, ".se", ".runtime", "bin") == filepath.Dir(bin) { // the runtime folder src/modules/check/folders.go owns
 			return root
 		}
 	}

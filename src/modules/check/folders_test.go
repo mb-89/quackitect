@@ -36,10 +36,10 @@ func TestPrivateFolderOwnedRefusesASpellingNamingNoOwner(t *testing.T) {
 		}, []string{"src/bridge/left.js:1", "src/scripts/old.js:1"}},
 		{"a name the half left", Texts{"src/scripts/rest.js": "const notes = \".se/notes\";\n"}, []string{}},
 		{"the owner beside the copy, a test, and the owner itself", Texts{
-			"src/extension/copy.js":                "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
-			"test/level0/folders.test.js":          "const at = \".se/.runtime/bin\";\n",
-			"src/modules/check/folders_test.go":    "const at = \".se/.runtime/bin\"\n",
-			".claude/skills/level0/lib/folders.js": "export const RUN = \".se/.runtime\";\n",
+			"src/extension/copy.js":             "// The folder folders.go owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
+			"test/level0/folders.test.js":       "const at = \".se/.runtime/bin\";\n",
+			"src/modules/check/folders_test.go": "const at = \".se/.runtime/bin\"\n",
+			"src/modules/check/folders.go":      "const Run = \".se/.runtime\"\n",
 		}, []string{}},
 	} {
 		t.Run(one.name, func(t *testing.T) {
@@ -50,14 +50,14 @@ func TestPrivateFolderOwnedRefusesASpellingNamingNoOwner(t *testing.T) {
 	}
 }
 
-// The escape binds to the line, so an import of the owner excuses no other spelling. [[spec/design_input/the-runtime-files-stand-apart]]
-func TestAnImportAloneExcusesNoSpellingAndACommentAboveDoes(t *testing.T) {
-	const imports = "import { inRun } from \"../../.claude/skills/level0/lib/folders.js\";\n"
+// The escape binds to the line, so the owner named on a code line excuses no other spelling. [[spec/design_input/the-runtime-files-stand-apart]]
+func TestTheOwnerOnACodeLineExcusesNoSpellingAndACommentAboveDoes(t *testing.T) {
+	const imports = "const OWNER = \"src/modules/check/folders.go\";\n"
 	loose := Texts{"src/scripts/two.js": imports + "const at = \".se/.runtime/bin\";\n"}
 	if got, want := spelledIn(loose, "PrivateFolderOwned"), []string{"src/scripts/two.js:2"}; !reflect.DeepEqual(got, want) {
-		t.Fatalf("a spelling under an import alone draws %q, and wants %q", got, want)
+		t.Fatalf("a spelling under a code line naming the owner draws %q, and wants %q", got, want)
 	}
-	named := Texts{"src/scripts/two.js": imports + "// The folder folders.js owns, spelled again here.\nconst at = \".se/.runtime/bin\";\n"}
+	named := Texts{"src/scripts/two.js": imports + "// The folder folders.go owns, spelled again here.\nconst at = \".se/.runtime/bin\";\n"}
 	if got := spelledIn(named, "PrivateFolderOwned"); len(got) != 0 {
 		t.Fatalf("a spelling under the owner's comment draws %q, and wants nothing", got)
 	}

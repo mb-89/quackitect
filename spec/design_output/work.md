@@ -738,7 +738,7 @@ reads that, and every other warning holds the push.
 
 So `done` stops meaning "the session believes this passes". It comes to mean
 "a program runs on this commit, and it passes with no warning standing". One
-reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
+reading, `saysGreen` in `src/branches/done.go`, answers `done`, the pre-push hook and
 the Bash door alike, so a warning holds every road off the box.
 
 The ready step runs alone before the parts, and every part waits on it:

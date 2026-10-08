@@ -110,7 +110,7 @@ const tuiRowText = `{"at":"2026-01-02T03:04:05.678Z","level":"warn","kind":"note
 {"at":"2026-01-02T03:04:05.678Z","level":"info","kind":"status","said":"plain"}
 {"said":"no at"}`
 
-// The rows asRow in .claude/skills/level0/lib/log.js prints over tuiRowText. [[spec/design_output/log#one-verb-reads-the-log]]
+// The rows asRow in src/quack/verb_log.go prints over tuiRowText. [[spec/design_output/log#one-verb-reads-the-log]]
 var tuiRowsSaid = []string{
 	"03:04:05.678 warn  note   hello\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7",
 	"03:04:05.678 info  status plain",
@@ -441,7 +441,7 @@ func TestTuiWindowListensOneBelowTheBridge(t *testing.T) {
 	}
 }
 
-// Every runtime path the window verbs spell stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+// Every runtime path the window verbs spell stands under the runtime folder brief.ToolsFile names, which src/modules/check/folders.go owns. [[spec/design_input/the-runtime-files-stand-apart]]
 func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
 	t.Parallel()
 	runtime := path.Dir(brief.ToolsFile) + "/"

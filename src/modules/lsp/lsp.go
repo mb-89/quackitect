@@ -34,7 +34,7 @@ const BuffersName = "buffers/<path...>"
 // The prefix of a name the watch module writes a file's text under, which a commit moving it names. [[spec/tickets/lsp-module-draws-the-tools]]
 const filesPrefix = "files/"
 
-// The file the listen writes its port and token to, under the root. .claude/skills/level0/lib/folders.js owns the folder. [[spec/tickets/the-lsp-door-lands]]
+// The file the listen writes its port and token to, under the root. src/modules/check/folders.go owns the folder. [[spec/tickets/the-lsp-door-lands]]
 const StandingFile = ".se/.runtime/lsp-door.json"
 
 // The protocol's words: the version and the name the server answers, its methods, the full-text sync kind, and the JSON-RPC error code. [[spec/tickets/the-lsp-door-lands]]

@@ -28,7 +28,7 @@ const (
 	editWait       = 10 * time.Second
 )
 
-// .claude/skills/level0/lib/folders.js owns the undo journal folder, and the package spells it again. [[spec/tickets/edit-tools-answer-in-go]]
+// src/modules/check/folders.go owns the undo journal folder, and the package spells it again. [[spec/tickets/edit-tools-answer-in-go]]
 const journalFolder = ".se/.runtime/undo"
 
 // The schemas a case copies into its tree, off the repo's own. [[spec/tickets/edit-tools-answer-in-go]]

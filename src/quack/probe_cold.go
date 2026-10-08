@@ -22,7 +22,7 @@ import (
 const (
 	// The tools the index serves start here. [[spec/design_output/level0#the-cold-probe]]
 	servedTools = "mcp__level0__"
-	// The one tool the hook registers itself, beside the index's, as PULL_CALL in lib/pull.js names it. [[spec/tickets/level0-tools-leave-the-bridge]]
+	// The one tool the hook registers itself, beside the index's, as PullSpec in src/pull/pull.go names it. [[spec/tickets/level0-tools-leave-the-bridge]]
 	pullCall = servedTools + "pull"
 	// The port base PortBase in src/vehicle/pure.go names, and the spread past it a cold server takes. [[spec/design_output/level0#the-cold-probe]]
 	portBase   = vehicle.PortBase
@@ -35,7 +35,7 @@ const (
 	configFolder = ".claude"
 	// The pointer the clone's hook reads its port off, which Pointer in src/vehicle/pure.go names. [[spec/design_output/level0#the-cold-probe]]
 	vehiclePointer = vehicle.Pointer
-	// The index binary the start road launches, as BIN in lib/index.js names it. [[spec/design_output/level0#the-cold-probe]]
+	// The index binary the start road launches, as indexBinary in src/index/binary.go builds it. [[spec/design_output/level0#the-cold-probe]]
 	indexBinary = binFolder + "/se-index"
 	// The install steps a cold clone skips, as INSTALL_SKIP in .claude/skills/level0/hooks/level0.js names them. [[spec/design_output/level0#the-cold-probe]]
 	installSkip = "editor-link editor-extensions editor-client go"

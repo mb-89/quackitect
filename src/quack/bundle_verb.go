@@ -57,7 +57,7 @@ func bundleVerb(d boxDoors, argv []string) int {
 	return 0
 }
 
-// The hash of every file under the entry's folder and the lock, each under its path from the root in forward slashes, as hashText in lib/hash.js reads it, so the shipped banner holds on every box. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
+// The hash of every file under the entry's folder and the lock, each under its path from the root in forward slashes, as HashText in src/pull/hash.go reads it, so the shipped banner holds on every box. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
 func drawingStamp(root string) (string, error) {
 	webview := filepath.Join(root, filepath.FromSlash(drawingWebview))
 	files := []string{filepath.Join(webview, drawingLock)}

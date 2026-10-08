@@ -11,7 +11,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The row kind a reply lands under, the levels a log line takes, and the module the three tools register under. LEVELS and REPLY_KIND in .claude/skills/level0/lib/log.js own the words. [[spec/design_output/log#the-log-tool]]
+// The row kind a reply lands under, the levels a log line takes, and the module the three tools register under. Ladder in src/modules/log/log.go owns the levels. [[spec/design_output/log#the-log-tool]]
 const (
 	replyRow    = "reply"
 	toolsModule = "hooks"
@@ -19,7 +19,7 @@ const (
 
 var logLevels = []string{"debug", infoLevel, "warn", "error", "fatal"}
 
-// The log tool's input, as logSpec in .claude/skills/level0/lib/log.js declares it. [[spec/design_output/log#the-log-tool]]
+// The log tool's input, which this package declares. [[spec/design_output/log#the-log-tool]]
 type LogInput struct {
 	Kind  string `json:"kind" doc:"What the line is, such as status or note."`
 	Said  string `json:"said" doc:"One sentence, 80 characters at most."`
@@ -38,7 +38,7 @@ type StopInput struct {
 	Next   string `json:"next" doc:"What the owner does next, in one sentence."`
 }
 
-// The review tool's input, as reviewSpec in .claude/skills/level0/lib/review.js declared it. [[spec/tickets/level0-tools-leave-the-bridge]]
+// The review tool's input, which this package declares. [[spec/tickets/level0-tools-leave-the-bridge]]
 type ReviewInput struct {
 	Branch string `json:"branch" doc:"The branch to read, such as the-config-holds-numbers."`
 }

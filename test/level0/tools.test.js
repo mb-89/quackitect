@@ -1,131 +1,23 @@
-// The survey, over a fake box. These cases assert what a caller reads out of
+// The survey reader, over a fake box. These cases assert what a caller reads out of
 // .se/.runtime/tools.json, so a wrong path shows here first.
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   guesses,
-  installedTools,
   pathOf,
-  placesFor,
-  rebuilt,
+  readTools,
   surveyOf,
   TOOLS,
-  toolLines,
-  versionOf,
-  WANTED,
-} from "../../.claude/skills/level0/lib/tools.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readTools, survey, whereIs, writeSurvey } from "../../src/engine/tools.js";
+  whereIs,
+} from "../../src/engine/tools.js";
 
 const ROOT = "/box";
 const BIN = `${ROOT}/.se/.runtime/bin`;
-const UNIX = { PATH: "/usr/bin:/bin" };
 
 const boxWith = (paths) => fakeDisk(Object.fromEntries(paths.map((at) => [at, ""])));
-
-test("the survey names the path and the version of a tool in .se/.runtime/bin", () => {
-  const files = boxWith([`${BIN}/vale`]);
-  const outside = fakeProc({
-    [`${BIN}/vale --version`]: { stdout: "vale version 3.20.0" },
-  });
-
-  const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
-
-  assert.deepEqual(found.vale, { path: `${BIN}/vale`, version: "3.20.0" });
-});
-
-test("the survey finds a tool on the path variable where .se/.runtime/bin holds none", () => {
-  const files = boxWith(["/usr/bin/git"]);
-  const outside = fakeProc({
-    "/usr/bin/git --version": { stdout: "git version 2.43.0" },
-  });
-
-  const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
-
-  assert.deepEqual(found.git, { path: "/usr/bin/git", version: "2.43.0" });
-});
-
-test("a tool absent from the box reads as null", () => {
-  const found = survey({ disk: boxWith([]), proc: fakeProc({}) }, ROOT, UNIX);
-
-  for (const one of WANTED) assert.equal(found[one.name], null, one.name);
-});
-
-test("a tool this tree asks no version of stands with its path alone", () => {
-  const files = boxWith(["/bin/sh"]);
-
-  const found = survey({ disk: files, proc: fakeProc({}) }, ROOT, UNIX);
-
-  assert.deepEqual(found.sh, { path: "/bin/sh" });
-});
-
-test("a tool answering nothing about its version keeps its path", () => {
-  const files = boxWith([`${BIN}/go`]);
-  const outside = fakeProc({ [`${BIN}/go version`]: { exitCode: 1, stdout: "" } });
-
-  const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
-
-  assert.deepEqual(found.go, { path: `${BIN}/go`, version: "" });
-});
-
-test("python answers to python3 first, and to python after it", () => {
-  const files = boxWith(["/usr/bin/python"]);
-  const outside = fakeProc({
-    "/usr/bin/python --version": { stdout: "Python 3.12.1" },
-  });
-
-  const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
-
-  assert.deepEqual(found.python, { path: "/usr/bin/python", version: "3.12.1" });
-});
-
-test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
-  const files = boxWith([`${BIN}/vale`]);
-  const outside = fakeProc({ [`${BIN}/vale --version`]: { stdout: "3.20.0" } });
-
-  writeSurvey({ disk: files, proc: outside }, ROOT, UNIX);
-  const read = surveyOf(files.read(`${ROOT}/${TOOLS}`));
-
-  assert.deepEqual(
-    Object.keys(read),
-    WANTED.map((one) => one.name),
-  );
-  assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
-  assert.equal(
-    files.exists(`${ROOT}/${TOOLS}.part`),
-    false,
-    "the survey lands whole by a move, and leaves no part behind",
-  );
-});
-
-test("the survey reaches .se/.runtime/bin before any folder on the path variable", () => {
-  const places = placesFor("vale", UNIX, BIN);
-
-  assert.deepEqual(places, [`${BIN}/vale`, "/usr/bin/vale", "/bin/vale"]);
-});
-
-test("a box carrying PATHEXT splits on the semicolon and takes each ending", () => {
-  const places = placesFor("node", { Path: "C:\\tools", PATHEXT: ".COM;.EXE" }, BIN);
-
-  assert.deepEqual(places, [
-    `${BIN}/node`,
-    `${BIN}/node.com`,
-    `${BIN}/node.exe`,
-    "C:\\tools/node",
-    "C:\\tools/node.com",
-    "C:\\tools/node.exe",
-  ]);
-});
-
-test("a version reads as the number a tool prints on its first line", () => {
-  assert.equal(versionOf("v24.19.0\n"), "24.19.0");
-  assert.equal(versionOf("Version: 2.5.12"), "2.5.12");
-  assert.equal(versionOf("go version go1.27.0 windows/amd64\n"), "1.27.0");
-  assert.equal(versionOf("it says nothing"), "");
-});
 
 test("a broken survey file reads as an empty box, and refuses nobody", () => {
   assert.deepEqual(surveyOf("{"), {});
@@ -154,81 +46,12 @@ test("a box with no survey file hands the caller an empty one", () => {
   assert.deepEqual(readTools(boxWith([]), ROOT), {});
 });
 
-test("the rule reads the tools the install script installs, and no link", () => {
-  const said = [
-    "here() {",
-    "  case $1 in",
-    "    node)    have node ;;",
-    `    vale)    [ -x "$bin/vale\${exe}" ] ;;`,
-    "    go)      have go ;;",
-    "    editor-link) editor_linked ;;",
-    "  esac",
-    "}",
-  ].join("\n");
+test("a caller reads the survey file the Go verb writes", () => {
+  const files = fakeDisk({
+    [`${ROOT}/${TOOLS}`]: JSON.stringify({
+      vale: { path: `${BIN}/vale`, version: "3.20.0" },
+    }),
+  });
 
-  assert.deepEqual(installedTools(said), ["node", "vale", "go"]);
-});
-
-// A binary older than its own source runs by rules the tree no longer carries. [[spec/design_output/index#the-compiler-it-needs]]
-test("a here case asking find for a newer source names the binary that rebuilds", () => {
-  const said = [
-    "front_here() {",
-    '  newer=$(find "$root/src/front" -name \'*.go\' -newer "$bin/se-front" -print -quit)',
-    "}",
-    "vale_here() {",
-    '  [ -x "$bin/vale" ]',
-    "}",
-  ].join("\n");
-
-  assert.deepEqual(rebuilt(said), ["front"]);
-});
-
-// A binary keys on a hash of its source and of the folders its go.mod replaces. [[spec/tickets/every-server-stands-and-answers]]
-test("a here case asking go-stamp.sh fresh names the binary that rebuilds", () => {
-  const said = [
-    "index_here() {",
-    '  [ -x "$bin/se-index" ] && sh "$root/src/scripts/go-stamp.sh" fresh se-index',
-    "}",
-  ].join("\n");
-
-  assert.deepEqual(rebuilt(said), ["index"]);
-});
-
-test("every wanted tool says when to reach for it", () => {
-  for (const one of WANTED) {
-    assert.ok(String(one.for ?? "").trim(), `${one.name} carries no for`);
-  }
-});
-
-test("the tool lines name the tools that stand, each with its version and its for", () => {
-  const found = {
-    node: { path: "/usr/bin/node", version: "22.0.0" },
-    sh: { path: "/bin/sh" },
-    go: null,
-  };
-  const wanted = [
-    { name: "node", for: "a helper script" },
-    { name: "sh", for: "a shell script" },
-    { name: "go", for: "building a program" },
-  ];
-
-  assert.deepEqual(toolLines(found, wanted), [
-    "- `node` 22.0.0, for a helper script",
-    "- `sh`, for a shell script",
-  ]);
-});
-
-test("a registered tool's line is the first sentence of its description", () => {
-  const specs = [
-    {
-      name: "mcp__level0__find",
-      description: "Finds the lines carrying the words. Ask it before a Grep.",
-    },
-    { name: "mcp__level0__mint_note", description: "Writes a note under its schema" },
-  ];
-
-  assert.deepEqual(toolLines({}, [], specs), [
-    "- `mcp__level0__find`: Finds the lines carrying the words.",
-    "- `mcp__level0__mint_note`: Writes a note under its schema.",
-  ]);
+  assert.equal(pathOf(readTools(files, ROOT), "vale"), `${BIN}/vale`);
 });

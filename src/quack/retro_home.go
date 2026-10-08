@@ -12,7 +12,7 @@ import (
 	"quackitect/src/index"
 )
 
-// The folder the retros stand under, as RETRO in .claude/skills/level0/lib/folders.js names it. [[spec/guidance/retro/chapter]]
+// The folder the retros stand under, as Retro in src/modules/check/folders.go names it. [[spec/guidance/retro/chapter]]
 const retroFolder = ".se/.retro"
 
 // The input folder of one retro, which collect fills. [[spec/guidance/retro/chapter]]

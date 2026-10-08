@@ -5,15 +5,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
-import {
-  binaryOf,
-  callsIndexTool,
-  registersIndexTools,
-} from "../../.claude/skills/level0/lib/index-tools.js";
-import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import LIST from "../../src/index/testdata/tools.golden.json" with { type: "json" };
 
 const BIN = "/method/.se/.runtime/bin/se-index";
+// The tool the pull registers, as PullSpec in src/pull/pull.go names it. [[spec/design_output/pull#the-checks]]
+const PULL_CALL = "mcp__level0__pull";
 
 // A hook engine whose binary prints the list, or answers what the case hands it. [[spec/tickets/the-hook-registers-index-tools]]
 function engine(answer = { stdout: JSON.stringify(LIST), exitCode: 0 }) {
@@ -36,11 +32,6 @@ function engine(answer = { stdout: JSON.stringify(LIST), exitCode: 0 }) {
   return { $, registered, ran };
 }
 
-test("the binary stands under the method root's runtime folder", () => {
-  assert.equal(binaryOf("/method", false), BIN);
-  assert.equal(binaryOf("/method", true), `${BIN}.exe`);
-});
-
 test("the hook registers each tool the binary lists, and the pull its verb prints", async () => {
   const held = [];
   register(
@@ -62,29 +53,4 @@ test("the hook registers each tool the binary lists, and the pull its verb print
   assert.deepEqual(ran[1], [BIN, "verb", "/method/src/scripts", "ticket", "pull", "--spec"]);
   const add = registered.find((one) => one.name === "index_t_add");
   assert.deepEqual(Object.keys(add).sort(), ["description", "inputSchema", "name"]);
-});
-
-test("a call of an index tool runs act with the arguments the event spreads, and answers what it prints", async () => {
-  const { $, ran } = engine();
-  const tools = await registersIndexTools($, BIN);
-  const said = await callsIndexTool($, BIN, tools, {
-    tool: "mcp__level0__index_t_add",
-    a: 2,
-    b: 3,
-  });
-  assert.deepEqual(ran.at(-1), [BIN, "act", "t/add", '{"a":2,"b":3}']);
-  assert.equal(said, '{"sum": 5}');
-  await callsIndexTool($, BIN, tools, {
-    tool: "mcp__level0__index_t_echo",
-    input: "x",
-  });
-  assert.deepEqual(ran.at(-1), [BIN, "act", "t/echo", '"x"']);
-});
-
-test("a binary that answers nothing registers no tool", async () => {
-  for (const answer of [new Error("no binary"), { stdout: "", exitCode: 1 }]) {
-    const { $, registered } = engine(answer);
-    assert.deepEqual(await registersIndexTools($, BIN), []);
-    assert.deepEqual(registered, []);
-  }
 });

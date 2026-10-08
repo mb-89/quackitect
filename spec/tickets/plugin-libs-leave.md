@@ -441,3 +441,7 @@ The row naming `src/doors/front.js` as gone with [[spec/tickets/engine-and-doors
 [[spec/tickets/schema-libs-leave]] deletes `test/contract/ticket.test.js`, and cuts `test/contract/schema.test.js` to its underscore draft case. Neither reads the git door any more, and `real-git.test.js` keeps no entry for either.
 
 Once `schema-route.js` leaves, `.claude/skills/level0/lib/hash.js` stands orphaned: no JavaScript file imports it. Delete it here, and point the Go comments naming `hashText` in it at `src/pull/hash.go`.
+
+The comments pointing at `folders.go` sit on code lines in three files, so their tests ride with this ticket:
+
+    ./RUNME.sh branch test src/pull/pull_test.go src/q/layers_test.go test/level0/door-spawn.test.js

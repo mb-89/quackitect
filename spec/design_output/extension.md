@@ -283,8 +283,8 @@ Every press that writes, every run and every edit in the config tree writes a
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
 A window appends each line to the one file its first line names, through the
-editor door. The row shape comes from `lib/log.js`, the module every writer
-reads. The line honours `log.level`, the same as every other door. For details,
+editor door. The row shape comes from `sayLine` in `src/quack/verb_log.go`, which every
+writer follows. The line honours `log.level`, the same as every other door. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
 ## A button names its commands

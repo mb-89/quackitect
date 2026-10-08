@@ -563,7 +563,7 @@ func TestVehicleWithPortTakesTheFirstFreePort(t *testing.T) {
 	}
 }
 
-// The pointer stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+// The pointer stands under the runtime folder brief.ToolsFile names, which src/modules/check/folders.go owns. [[spec/design_input/the-runtime-files-stand-apart]]
 func TestPointerStandsInTheRuntimeFolder(t *testing.T) {
 	if !strings.HasPrefix(Pointer, path.Dir(brief.ToolsFile)+"/") {
 		t.Errorf("%s stands outside %s", Pointer, path.Dir(brief.ToolsFile))

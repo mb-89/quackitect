@@ -14,9 +14,9 @@ import (
 // The folder the notes stand in, the files the blocks read, and the names each block rides under. [[spec/tickets/brief-answers-off-the-door]]
 const (
 	Guidance = "spec/guidance"
-	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
+	// src/modules/check/folders.go owns the runtime folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
 	ToolsFile = ".se/.runtime/tools.json"
-	// .claude/skills/level0/lib/folders.js owns the handover's folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
+	// src/modules/check/folders.go owns the handover's folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
 	HandoverFile  = ".se/HANDOVER.md"
 	ToolsBlock    = "level0-tools"
 	CanaryBlock   = "level0-canary"
@@ -42,7 +42,7 @@ const (
 	HeardAgain = "the canary opens a second answer in one context"
 )
 
-// The tools the survey names, in the order the block lists them, off WANTED in .claude/skills/level0/lib/tools.js. [[spec/tickets/brief-answers-off-the-door]]
+// The tools the survey names, in the order wantedTools in src/quack/survey.go lists them, each with what to reach for it for. [[spec/tickets/brief-answers-off-the-door]]
 var wanted = [][2]string{
 	{"node", "a helper script"},
 	{"vale", "the prose rules"},

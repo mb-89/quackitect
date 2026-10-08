@@ -25,9 +25,9 @@ import (
 	"unicode/utf16"
 )
 
-// The folders and names the verbs read and write, as lib/voice.js, lib/vale.js and lib/log.js name them. [[spec/design_output/projection#the-second-target]]
+// The folders and names the verbs read and write, as lib/voice.js and lib/vale.js name them, and the log folder Log in src/modules/check/folders.go. [[spec/design_output/projection#the-second-target]]
 const (
-	Measured = ".se/.runtime/measure" // the runtime folder .claude/skills/level0/lib/folders.js owns
+	Measured = ".se/.runtime/measure" // the runtime folder src/modules/check/folders.go owns
 	Shortest = 25
 	Days     = 7
 	Answer   = "answer.md"

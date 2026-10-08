@@ -26,7 +26,7 @@ Biome holds.
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
 | `NothingPrivateTravels` | every text file git holds, and the box it lints on |
-| `SurveyNamesInstalls` | `install.sh`, `lib/tools.js` |
+| `SurveyNamesInstalls` | `install.sh`, `src/modules/check/tree.go` |
 | `PrivateFolderOwned` | every source file git holds, and `src/modules/check/folders.go` |
 | `InstallerHoldsTheNames` | `install.sh`, `src/modules/check/folders.go` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |

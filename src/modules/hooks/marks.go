@@ -13,11 +13,11 @@ import (
 
 // The runtime files the handover reads, which the package spells again. [[spec/tickets/cage-stop-marks-port]]
 const (
-	// .claude/skills/level0/lib/folders.js owns the due mark's folder, and the package spells it again. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
+	// src/modules/check/folders.go owns the due mark's folder, and the package spells it again. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 	dueFile = ".se/.runtime/due.json"
-	// .claude/skills/level0/lib/folders.js owns the box file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// src/modules/check/folders.go owns the box file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	boxFile = ".se/.runtime/box.json"
-	// .claude/skills/level0/lib/folders.js owns the session file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// src/modules/check/folders.go owns the session file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	sessionFile = ".se/.runtime/session.json"
 )
 

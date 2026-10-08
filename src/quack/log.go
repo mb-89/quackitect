@@ -14,7 +14,7 @@ import (
 	logmodule "quackitect/src/modules/log"
 )
 
-// The session log under the root, as SESSION in .claude/skills/level0/lib/log.js names it. [[spec/design_output/log#what-one-line-looks-like]]
+// The session log under the root, in the log folder src/modules/check/folders.go owns. [[spec/design_output/log#what-one-line-looks-like]]
 const sessionLog = ".se/.log/session.jsonl"
 
 // The rows the module reads off one session log's text. [[spec/tickets/the-log-topic-lands]]

@@ -24,12 +24,21 @@ var (
 	}
 )
 
-// The file owning the folder names, the word a copy names it by, and the file owning the lists. [[spec/design_input/the-runtime-files-stand-apart]]
+// The word a copy names this file by, the file owning the folder names and the lists, and the private folder. [[spec/design_input/the-runtime-files-stand-apart]]
 const (
-	foldersJS  = ".claude/skills/level0/lib/folders.js"
-	owner      = "folders.js"
+	owner      = "folders.go"
 	foldersAt  = "src/modules/check/folders.go"
 	privateDir = ".se"
+)
+
+// The folders under the private one, which every copy beside a comment naming this file spells again. [[spec/design_input/the-runtime-files-stand-apart]]
+const (
+	Run     = privateDir + "/.runtime"
+	Retro   = privateDir + "/.retro"
+	Log     = privateDir + "/.log"
+	Holds   = Run + "/hold"
+	Notes   = privateDir + "/notes"
+	Tickets = privateDir + "/tickets"
 )
 
 var (
@@ -82,7 +91,7 @@ func spelledOver(tree *Tree, path string) []Finding {
 			continue
 		}
 		out = append(out, fault("PrivateFolderOwned", path, at+1,
-			"This line spells a folder "+foldersJS+" owns. Take the name from there, or name that file in a comment beside the copy."))
+			"This line spells a folder "+foldersAt+" owns. Take the name from there, or name that file in a comment beside the copy."))
 	}
 	return out
 }
@@ -91,7 +100,7 @@ func spelledOver(tree *Tree, path string) []Finding {
 func ownedPaths(tree *Tree) []string {
 	out := []string{}
 	for _, path := range tree.Paths() {
-		if (ownedFile.MatchString(path) || path == Install) && !aTestFile.MatchString(path) && path != foldersJS {
+		if (ownedFile.MatchString(path) || path == Install) && !aTestFile.MatchString(path) && path != foldersAt {
 			out = append(out, path)
 		}
 	}

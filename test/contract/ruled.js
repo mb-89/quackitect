@@ -6,11 +6,13 @@
 
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
-import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { faultIn, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
+
+// The index binary under the root, as indexBinary in src/index/binary.go builds it, in the runtime folder folders.go owns. [[spec/design_output/index#a-door-comes-back]]
+const BIN = ".se/.runtime/bin/se-index";
 
 export const NOTE = "notes.md";
 const CONFIG = ".vale.ini";

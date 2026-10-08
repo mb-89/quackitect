@@ -5,7 +5,7 @@ package queue
 
 import "quackitect/src/q"
 
-// The plan's file, which .claude/skills/level0/lib/folders.js owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
+// The plan's file, which src/modules/check/folders.go owns and a module spells again. [[spec/design_output/model#everything-on-disk-mirrors]]
 const Plan = ".se/.runtime/plan.json"
 
 // [[spec/design_output/model#everything-on-disk-mirrors]]

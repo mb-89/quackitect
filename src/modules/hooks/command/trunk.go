@@ -131,7 +131,7 @@ func DeskRefusal(what string) string {
 	}, "\n")
 }
 
-// Whether the check's stamp answers green on the sha, and what it says, off stampOf and saysGreen in lib/runs.js. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
+// Whether the check's stamp answers green on the sha, and what it says, off the stamp stampFile in src/quack/check.go names. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
 func Battery(stamp string, stands bool, sha string) (bool, string) {
 	const none = "no check has run here"
 	if !stands {

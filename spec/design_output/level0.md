@@ -236,7 +236,7 @@ Then the old server writes
 one `fatal` line naming the exit and the line the child writes, and exits
 with one. A child standing past the window is the server, and the old one
 exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
-`SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
+the file is `.se/.log/serve.log`. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
 `restarts` in `src/bridge/server.js` ends the listen and starts the child on

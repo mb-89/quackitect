@@ -3,9 +3,9 @@
 // reads them on every platform and the door alone touches vscode.
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 
-// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
+// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by src/modules/check/folders.go and spelled again here because the extension bundles alone.
 const BIN = ".se/.runtime/bin";
-// The index binary, whose lsp verb relays the editor to the lsp IO module. index.js owns the name, spelled again here because the extension bundles alone. [[spec/tickets/the-lsp-server-leaves]]
+// The index binary, whose lsp verb relays the editor to the lsp IO module. indexBinary in src/index/binary.go owns the name, spelled again here because the extension bundles alone. [[spec/tickets/the-lsp-server-leaves]]
 const NAME = "se-index";
 const ID = "quackitect";
 

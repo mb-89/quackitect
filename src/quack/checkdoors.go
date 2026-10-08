@@ -22,7 +22,7 @@ import (
 	"quackitect/src/modules/tickets"
 )
 
-// The survey of the tools this box holds, which tools.js owns, and the folder of tickets the red list reads. [[spec/design_output/tools#where-a-caller-looks]] [[spec/design_output/pull#the-gate]]
+// The survey of the tools this box holds, which toolsFile in src/quack/survey.go names, and the folder of tickets the red list reads. [[spec/design_output/tools#where-a-caller-looks]] [[spec/design_output/pull#the-gate]]
 const (
 	surveyFile    = runtimeDir + "/tools.json"
 	publicTickets = "spec/tickets"

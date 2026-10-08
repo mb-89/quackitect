@@ -6,11 +6,11 @@
 
 const LINK = "vehicle.json";
 const ASKING = 10000;
-// The pointer in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+// The pointer in the runtime folder folders.go owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 const POINTER = ".se/.runtime/vehicle.json";
-// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
+// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by sessionLog in src/quack/log.go and spelled again here because this hook imports nothing.
 const SESSION = ".se/.log/session.jsonl";
-// The register in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-register-places-an-identity]]
+// The register in the runtime folder folders.go owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-register-places-an-identity]]
 const REGISTER = ".se/.runtime/registry.json";
 const PORT = 6510;
 const CLONE_WAIT = 600000;
@@ -105,7 +105,7 @@ export function serveOf(vehicle) {
   return [
     "sh",
     "-c",
-    'nohup "$1/.se/.runtime/bin/se-index" standing >/dev/null 2>&1 &', // a copy of BIN, which .claude/skills/level0/lib/folders.js roots
+    'nohup "$1/.se/.runtime/bin/se-index" standing >/dev/null 2>&1 &', // a copy of the binary indexBinary in src/index/binary.go builds, under the folder src/modules/check/folders.go owns
     "sh",
     vehicle,
   ];

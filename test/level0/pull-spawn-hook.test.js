@@ -5,7 +5,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
-import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
+
+// The tool the pull registers, as PullSpec in src/pull/pull.go names it. [[spec/design_output/pull#the-checks]]
+const PULL_CALL = "mcp__level0__pull";
 
 const SPAWN =
   "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it.";

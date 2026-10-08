@@ -12,7 +12,7 @@ import (
 // The files the layers stand in, and the layer a key no file sets reads. [[spec/design_output/config#the-layers]]
 const (
 	TrackedConfig = "spec/config/level0.json"
-	LocalConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
+	LocalConfig   = ".se/.runtime/config.json" // src/modules/check/folders.go owns this name
 	SchemaConfig  = "spec/config/level0.schema.json"
 	BuiltInLayer  = "built-in"
 )

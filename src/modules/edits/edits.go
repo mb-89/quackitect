@@ -31,7 +31,7 @@ const (
 	keeps       = "the edit journals every file it writes, which edits/undo reads back"
 )
 
-// .claude/skills/level0/lib/folders.js owns the undo journal folder, and the package spells it again. [[spec/design_output/apply#the-journal-holds-both-halves]]
+// src/modules/check/folders.go owns the undo journal folder, and the package spells it again. [[spec/design_output/apply#the-journal-holds-both-halves]]
 const Journal = ".se/.runtime/undo"
 
 // A patch: the ops, the ticket it serves, what it is for, and whether it writes. [[spec/design_output/apply#check-everything-then-write]]

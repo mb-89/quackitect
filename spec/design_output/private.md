@@ -28,8 +28,8 @@ line and a key each stand there, and git carries none of them.
 ## Three kinds stand apart
 
 Two named folders stand under the private one, and the folder a file stands in
-says which kind it is. `.claude/skills/level0/lib/folders.js` owns both names,
-and every writer takes its folder from there.
+says which kind it is. `src/modules/check/folders.go` owns both names,
+and every copy elsewhere names that file beside it.
 
 | kind | where it stands | who reads it |
 |---|---|---|

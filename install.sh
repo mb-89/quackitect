@@ -9,10 +9,10 @@
 
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-# The runtime folder .claude/skills/level0/lib/folders.js owns, spelled here and
+# The runtime folder folders.go owns, spelled here and
 # nowhere else in this script, because a shell script imports nothing.
 run="$root/.se/.runtime"
-# The same folder folders.js owns, in the home tree, where the register stands.
+# The same folder folders.go owns, in the home tree, where the register stands.
 home_run="${HOME:-}/.se/.runtime"
 bin="$run/bin"
 
@@ -39,7 +39,7 @@ if [ "${1:-}" = boot ]; then
 fi
 
 # The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned
-# by folders.js and spelled again here because a shell script imports nothing. A
+# by folders.go and spelled again here because a shell script imports nothing. A
 # box carrying the old places hands them to the index walk, so this moves them.
 
 # The folder answers to .runtime, so a box carrying an older name renames it
@@ -68,7 +68,7 @@ for one in bin hold review undo measure copilot box.json session.json \
 done
 
 # The identity wore the name copy.json before, so a box carrying that name
-# keeps the identity it made. folders.js owns the name it takes.
+# keeps the identity it made. folders.go owns the name it takes.
 if [ -f "$run/copy.json" ] && [ ! -f "$run/identity.json" ]; then
   mv "$run/copy.json" "$run/identity.json" 2>/dev/null || true
 fi
@@ -78,17 +78,17 @@ fi
 
 # The register stands in the home folder, under the same runtime half. A box
 # carrying it straight under .se hands the reader nothing, so this moves it. The
-# old place stands here on purpose, and folders.js owns the name either side.
+# old place stands here on purpose, and folders.go owns the name either side.
 if [ -n "${HOME:-}" ] && [ -f "$HOME/.se/registry.json" ] &&
   [ ! -f "$home_run/registry.json" ]; then
   mkdir -p "$home_run"
-  # The old place folders.js leaves behind, which this line takes out of the way.
+  # The old place folders.go leaves behind, which this line takes out of the way.
   mv "$HOME/.se/registry.json" "$home_run/registry.json" 2>/dev/null || true
 fi
 
 # The log is history and no runtime state, and it answers to .se/.log, a dot
 # folder a running session writes while the retro holds the rest. Every older
-# spelling of the folder comes home, and folders.js owns the folder it spells.
+# spelling of the folder comes home, and folders.go owns the folder it spells.
 # folders.go owns these names as LOGGED.
 for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
   if [ -d "$one" ]; then

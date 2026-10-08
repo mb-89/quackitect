@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// The runtime folder RUN in lib/folders.js names. [[spec/design_input/the-runtime-files-stand-apart]]
+// The runtime folder Run in src/modules/check/folders.go names. [[spec/design_input/the-runtime-files-stand-apart]]
 const Run = ".se/.runtime"
 
 // The files a vehicle and a project keep, and the register's name. [[spec/design_output/vehicle#what-a-vehicle-needs]]
@@ -35,7 +35,7 @@ var Left = []string{".git", ".se", "node_modules", "_to_delete"}
 const PortBase = 6510
 
 // The pointer a project keeps to its vehicle and port. [[spec/design_input/the-runtime-files-stand-apart]]
-const Pointer = ".se/.runtime/vehicle.json" // the runtime folder .claude/skills/level0/lib/folders.js owns
+const Pointer = ".se/.runtime/vehicle.json" // the runtime folder src/modules/check/folders.go owns
 
 // The hooks manifest, and the two manifests a stub takes beside the modules. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 const Hooks = "hooks/hooks.json"

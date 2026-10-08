@@ -7,7 +7,7 @@
 import { register as forwarder } from "./level0.js";
 
 // The binary under the method root, which serveIndexBin in src/quack/serve_verb.go names, and the scripts folder its verb road takes. [[spec/tickets/cli-js-leaves]]
-const BINARY = ".se/.runtime/bin/se-index"; // .claude/skills/level0/lib/folders.js owns the folder
+const BINARY = ".se/.runtime/bin/se-index"; // src/modules/check/folders.go owns the folder
 const SCRIPTS = "src/scripts";
 // The tool the pull registers, as PullSpec in src/pull/pull.go names it, under the prefix every level zero tool carries. [[spec/design_output/pull#the-checks]]
 const PULL_CALL = "mcp__level0__pull";

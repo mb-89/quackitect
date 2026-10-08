@@ -609,7 +609,7 @@ func TestVoiceFromJSONReadsValeRows(t *testing.T) {
 	}
 }
 
-// The measured answers stand under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+// The measured answers stand under the runtime folder brief.ToolsFile names, which src/modules/check/folders.go owns. [[spec/design_input/the-runtime-files-stand-apart]]
 func TestMeasuredStandsInTheRuntimeFolder(t *testing.T) {
 	if !strings.HasPrefix(Measured, path.Dir(brief.ToolsFile)+"/") {
 		t.Errorf("%s stands outside %s", Measured, path.Dir(brief.ToolsFile))

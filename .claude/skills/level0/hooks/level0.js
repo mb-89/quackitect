@@ -5,9 +5,9 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 // The standing file the hooks door writes, which StandingFile in src/modules/hooks/hooks.go owns. [[spec/design_output/level0#the-bridgehead-and-the-server]]
-const STANDING = ".se/.runtime/hooks.json"; // .claude/skills/level0/lib/folders.js owns the folder
+const STANDING = ".se/.runtime/hooks.json"; // src/modules/check/folders.go owns the folder
 // The binary under the method root, which serveIndexBin in src/quack/serve_verb.go names, and the scripts folder its verb road takes. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const BINARY = ".se/.runtime/bin/se-index"; // .claude/skills/level0/lib/folders.js owns the folder
+const BINARY = ".se/.runtime/bin/se-index"; // src/modules/check/folders.go owns the folder
 const SCRIPTS = "src/scripts";
 const INSTALL = "install.sh";
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], which installSkip in src/quack/probe_cold.go spells again.

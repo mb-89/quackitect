@@ -479,7 +479,7 @@ func sectionAt(sections []section, path string) int {
 	return found
 }
 
-// The constants of hashText in .claude/skills/level0/lib/hash.js. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+// The constants of HashText in src/pull/hash.go. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 const (
 	fnvOffset = 0x811c9dc5
 	fnvPrime  = 0x01000193

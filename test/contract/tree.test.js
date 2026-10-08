@@ -30,11 +30,10 @@ test("no count chain stands in the verb, the viewer or the badge line", () => {
   }
 });
 
-// The hooks door writes the session file, and the plugin's library spells it once beside it. [[spec/design_input/the-runtime-files-stand-apart]]
-test("every forced copy of the session file says what the hand module says", () => {
+// The hooks door writes the session file, and the pull hook leaves it to the door. [[spec/design_input/the-runtime-files-stand-apart]]
+test("the pull hook spells no session file, which the hooks door writes", () => {
   const SESSION = /sessionFile = "([^"]+)"/.exec(text("src/modules/hooks/marks.go"))?.[1];
   assert.ok(SESSION, "the hooks door spells the session file");
-  assert.match(text(".claude/skills/level0/lib/pull.js"), new RegExp(`"${SESSION}"`));
   assert.doesNotMatch(
     text(".claude/skills/level0/hooks/pull-tool.js"),
     new RegExp(`"${SESSION}"`),

@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 )
 
-// The index binary the tree builds, whose folder .claude/skills/level0/lib/folders.js owns and whose name lib/index.js owns. [[spec/design_output/index#a-door-comes-back]]
+// The index binary the tree builds, whose folder src/modules/check/folders.go owns, and which every copy of its path names. [[spec/design_output/index#a-door-comes-back]]
 func indexBinary(root string) string {
 	name := "se-index"
 	if runtime.GOOS == "windows" {

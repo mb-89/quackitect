@@ -1,6 +1,5 @@
 // The manifest: many ops, many files, one atomic answer. Every op reads the
-// file as the ops before it leave it, and one failure refuses the whole batch,
-// off applied in .claude/skills/level0/lib/apply.js.
+// file as the ops before it leave it, and one failure refuses the whole batch.
 // [[spec/design_output/apply#check-everything-then-write]]
 package edits
 

@@ -5,7 +5,7 @@
 const { readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
-// The file standingPath in src/index/door.go writes, in the runtime folder folders.js owns, spelled again here because the extension imports its own folder alone. [[spec/design_output/model#surfaces]]
+// The file standingPath in src/index/door.go writes, in the runtime folder src/modules/check/folders.go owns, spelled again here because the extension imports its own folder alone. [[spec/design_output/model#surfaces]]
 const STANDING = [".se", ".runtime", "index.json"];
 // The pause before a watch opens again, since the index restarts under a window. [[spec/tickets/the-sidebar-reads-v1]]
 const REOPEN = 2000;

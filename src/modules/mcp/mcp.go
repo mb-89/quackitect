@@ -31,7 +31,7 @@ const (
 	defaultWait = 1
 )
 
-// The file the listen writes its port and token to, under the root. .claude/skills/level0/lib/folders.js owns the folder, and a module spells it again. [[spec/tickets/the-mcp-module-lands]]
+// The file the listen writes its port and token to, under the root. src/modules/check/folders.go owns the folder, and a module spells it again. [[spec/tickets/the-mcp-module-lands]]
 const StandingFile = ".se/.runtime/mcp.json"
 
 // The protocol's words: the version and the name the server answers, its methods, and the JSON-RPC error codes. [[spec/tickets/the-mcp-module-lands]]

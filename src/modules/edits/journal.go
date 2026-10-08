@@ -1,6 +1,6 @@
 // The journal an undo reads. It holds both halves of every file, so drift
-// refuses the restore and the text comes back out of the entry itself, off
-// .claude/skills/level0/lib/undo.js, whose keys it keeps.
+// refuses the restore and the text comes back out of the entry itself, under
+// the keys the journal files already on disk carry.
 // [[spec/design_output/apply#the-journal-holds-both-halves]]
 package edits
 

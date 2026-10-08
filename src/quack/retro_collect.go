@@ -41,10 +41,10 @@ const (
 	retroCollectISO       = "2006-01-02T15:04:05.000Z"
 )
 
-// The stamp the last check writes, as STAMP in .claude/skills/level0/lib/runs.js names it under RUN in folders.js. [[spec/guidance/retro/collect]]
+// The stamp the last check writes, as stampFile in src/quack/check.go names it under Run in src/modules/check/folders.go. [[spec/guidance/retro/collect]]
 var retroCollectStamp = filepath.Join(".se", ".runtime", "check.json")
 
-// The folder the holds stand in, as HOLDS in .claude/skills/level0/lib/folders.js names it. [[spec/design_output/pull#the-hand-and-the-hold]]
+// The folder the holds stand in, as Holds in src/modules/check/folders.go names it. [[spec/design_output/pull#the-hand-and-the-hold]]
 var retroCollectHolds = filepath.Join(".se", ".runtime", "hold")
 
 // The codes a move can meet, named the way node names them. [[spec/guidance/retro/collect]]

@@ -30,7 +30,7 @@ var skipped = map[string]bool{".git": true, "node_modules": true}
 const private = ".se"
 
 // The dot folders under the private one the watch adds by name, each with the extension of the files a module reads there: a loaded projection's JSON, and the session log's lines. Each stands alone, and no folder under it joins. [[spec/tickets/the-log-topic-lands]]
-// .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
+// src/modules/check/folders.go owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
 var named = map[string]string{".se/.runtime": ".json", ".se/.runtime/hold": ".json", ".se/.log": ".jsonl"}
 
 // Whether a change at rel reaches the family: a path the walk stands off does not, past a file carrying its folder's extension straight under a named folder. [[spec/design_output/model#everything-on-disk-mirrors]]

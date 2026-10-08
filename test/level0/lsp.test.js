@@ -5,7 +5,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BIN as INDEX } from "../../.claude/skills/level0/lib/index.js";
 import { startsServer } from "../../src/extension/extension.js";
 import {
   BIN,
@@ -14,6 +13,9 @@ import {
   NAME,
   serverAsk,
 } from "../../src/extension/lib/lsp.js";
+
+// The index binary under the root, as indexBinary in src/index/binary.go builds it, in the runtime folder folders.go owns. [[spec/design_output/index#a-door-comes-back]]
+const INDEX = ".se/.runtime/bin/se-index";
 
 const doorOf = (held) => {
   const asked = [];

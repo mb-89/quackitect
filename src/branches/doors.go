@@ -18,7 +18,7 @@ import (
 	"quackitect/src/proc"
 )
 
-// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+// src/modules/check/folders.go owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 const runtimeFolder = ".se/.runtime"
 
 // What a run answers: whether it exits zero, its output and its errors, each trimmed. [[spec/design_output/doors#one-door-per-outside-thing]]

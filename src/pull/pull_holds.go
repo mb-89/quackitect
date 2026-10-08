@@ -12,9 +12,9 @@ import (
 
 // The folders and files the hand and the hold stand in. [[spec/design_output/pull#the-hand-and-the-hold]]
 const (
-	// The runtime half and the retro half of the private folder, which .claude/skills/level0/lib/folders.js owns. [[spec/design_output/pull#the-hand-and-the-hold]]
+	// The runtime half and the retro half of the private folder, which src/modules/check/folders.go owns. [[spec/design_output/pull#the-hand-and-the-hold]]
 	runtimeFolder = ".se/.runtime"
-	retroFolder   = ".se/.retro" // folders.js owns this name too
+	retroFolder   = ".se/.retro" // folders.go owns this name too
 	Holds         = runtimeFolder + "/hold"
 	boxFile       = runtimeFolder + "/box.json"
 	sessionFile   = runtimeFolder + "/session.json"

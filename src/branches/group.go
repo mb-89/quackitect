@@ -18,7 +18,7 @@ import (
 // The folders, the branch prefix, the fields and the states the engine reads. [[spec/design_output/level0#a-write-names-its-ticket]]
 const (
 	ticketsFolder = "spec/tickets"
-	// .claude/skills/level0/lib/folders.js owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
+	// src/modules/check/folders.go owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
 	notesFolder  = ".se/tickets"
 	noteEnd      = ".md"
 	workBranch   = "work/"

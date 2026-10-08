@@ -1,17 +1,14 @@
-// The pull tool's pure half. The argv it hands the shell, the spawn and the
-// session, read with no harness standing.
+// The pull hook over a fake harness: what it registers, the argv it hands the
+// binary, and what it answers. src/pull owns the pull itself.
 // [[spec/design_output/pull#the-hand-out]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import * as lib from "../../.claude/skills/level0/lib/pull.js";
-import {
-  PULL_CALL,
-  pullSpec,
-  sessionOf,
-  spawnPromptIn,
-} from "../../.claude/skills/level0/lib/pull.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+
+// The tool the pull registers and the spec the verb prints, as PullSpec in src/pull/pull.go names them. [[spec/design_output/pull#the-checks]]
+const PULL_CALL = "mcp__level0__pull";
+const PULL_SPEC = { name: "pull" };
 
 // The harness the hook reaches: the files it writes, the tool it registers first, and the lines it says. [[spec/design_output/pull#the-hand-and-the-hold]]
 function harness() {
@@ -45,7 +42,7 @@ test("the module registers one session start, and it registers the pull the verb
   box.$.process = {
     run: async (argv) =>
       argv.includes("--spec")
-        ? { exitCode: 0, stdout: JSON.stringify(pullSpec()) }
+        ? { exitCode: 0, stdout: JSON.stringify(PULL_SPEC) }
         : { exitCode: 1, stdout: "" },
   };
   await starts[0](
@@ -54,30 +51,6 @@ test("the module registers one session start, and it registers the pull the verb
     async (said) => said,
   );
   assert.deepEqual(registered, ["pull"], "the pull tool registers off the verb");
-});
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
-  const said =
-    "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it.";
-  assert.equal(
-    spawnPromptIn(said),
-    "You are a hand of your own, named helper-2.\n1. Run it.",
-  );
-  assert.equal(spawnPromptIn("work  a-child at design/draft\n\nprose"), "");
-  assert.equal(spawnPromptIn(""), "");
-});
-
-// The verb reads the input into an argv, which TestPullArgvOf in src/pull/pull_test.go decides. [[spec/design_output/pull#the-hand-out]]
-test("the tool registers as pull, and its verdict takes the four words", () => {
-  assert.equal(PULL_CALL, "mcp__level0__pull");
-  assert.equal(pullSpec().name, "pull");
-  assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [
-    "pass",
-    "fail",
-    "became",
-    "answered",
-  ]);
 });
 
 // A hand-back through the tool, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/tickets/the-judge-leaves-the-code]]
@@ -129,22 +102,6 @@ test("the pull tool answers what the pull prints, and asks no model", async () =
   assert.equal(ran.judged, false, "the tool runs no --judge road");
   assert.deepEqual(ran.asked, [], "the tool asks no model");
   assert.equal(ran.said, "work");
-});
-
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("the library beside the hook owns the one spelling of the session file", () => {
-  assert.equal(
-    lib.SESSION,
-    ".se/.runtime/session.json",
-    "the hook imports the path, so one copy stands",
-  );
-});
-
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("the session file takes the id every harness this tree meets spells", () => {
-  assert.equal(sessionOf({ session: { id: "s7" } }).id, "s7");
-  assert.equal(sessionOf({ sessionId: "s8" }).id, "s8");
-  assert.equal(sessionOf({ session_id: "s9" }).id, "s9");
 });
 
 // The hook matches the name the plugin registers, and runs the verb through the binary under the method root. [[spec/design_output/pull#the-checks]]

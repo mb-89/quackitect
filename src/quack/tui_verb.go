@@ -34,7 +34,7 @@ import (
 // The tabs a caller names, the first one a handover opens where none is named. [[spec/design_output/tui#a-tab-the-caller-names]]
 var tuiTabs = []string{"log", "work"}
 
-// The log's folders, as FOLDER and OLD in .claude/skills/level0/lib/log.js name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
+// The log's folders, as Log in src/modules/check/folders.go and logOld in src/quack/verb_log.go name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (
 	tuiLogFolder = ".se/.log"
 	tuiNoLog     = "No log stands yet. A writer starts one the next time it says a line."
@@ -44,7 +44,7 @@ const (
 // The viewer's source folder, the binaries' folder, the stamp beside the binary, the module files every stamp reads, the mark a key joins on, and the names an old binary tries. [[spec/design_output/tui#the-verb-builds-it]]
 const (
 	tuiSource = "src/tui"
-	tuiBin    = ".se/.runtime/bin" // the runtime folder .claude/skills/level0/lib/folders.js owns
+	tuiBin    = ".se/.runtime/bin" // the runtime folder src/modules/check/folders.go owns
 	tuiStamp  = tuiBin + "/.logview-source"
 	tuiJoin   = "\x1f"
 	tuiAside  = 9
@@ -371,7 +371,7 @@ func tuiCollate(one, other string) int {
 	return strings.Compare(one, other)
 }
 
-// The fields asRow in .claude/skills/level0/lib/log.js prints first, its column widths, and the indent of the rest. [[spec/design_output/log#what-one-line-looks-like]]
+// The fields asRow in src/quack/verb_log.go prints first, its column widths, and the indent of the rest. [[spec/design_output/log#what-one-line-looks-like]]
 const (
 	tuiStampFrom  = 11
 	tuiStampTo    = 23

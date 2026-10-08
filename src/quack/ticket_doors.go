@@ -121,7 +121,7 @@ const (
 	logSaid  = 80
 )
 
-// The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as rowOf in lib/log.js shapes it. [[spec/design_output/log#what-one-line-looks-like]]
+// The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as sayLine in src/quack/verb_log.go shapes it. [[spec/design_output/log#what-one-line-looks-like]]
 func pullLog(work, floor string) func(level, kind, said string, extra map[string]any) {
 	says := logsRow(work, floor)
 	return func(level, kind, said string, extra map[string]any) { _ = says(level, kind, said, extra) }

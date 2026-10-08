@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// .claude/skills/level0/lib/folders.js owns the session log's folder, and the package spells it again. [[spec/tickets/prompt-answers-off-the-door]]
+// src/modules/check/folders.go owns the session log's folder, and the package spells it again. [[spec/tickets/prompt-answers-off-the-door]]
 const sessionLog = ".se/.log/session.jsonl"
 
 // The level and kinds a prompt's row carries, the stamp toISOString writes, and the flags an append opens the log with. [[spec/tickets/prompt-answers-off-the-door]]
@@ -24,7 +24,7 @@ const (
 	appendFlags = os.O_APPEND | os.O_CREATE | os.O_WRONLY
 )
 
-// One row of the session log, field for field as rowOf in .claude/skills/level0/lib/log.js writes it. [[spec/tickets/prompt-answers-off-the-door]]
+// One row of the session log, field for field as sayLine in src/quack/verb_log.go writes it. [[spec/tickets/prompt-answers-off-the-door]]
 type LogRow struct {
 	At     string `json:"at"`
 	Level  string `json:"level"`
