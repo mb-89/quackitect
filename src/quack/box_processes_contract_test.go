@@ -232,7 +232,8 @@ func stopped(t *testing.T, bin, root string) {
 	}
 }
 
-// The root built into a folder, as the install builds it, linked off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
+// The root built into a folder, as the install builds it, off the one build this run takes. A link opens no handle, where a copy's write handle rides into a fork a parallel case makes, and exec of the copy answers text file busy. [[spec/tickets/quack-build-links-each-case]]
+// Windows takes a copy: a running image there denies delete on every name of its file, so a link leaves each case's folder locked by any other case's index. Its exec inherits no handle the copy holds. [[spec/tickets/quack-build-copies-on-windows]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
 	built, err := quackBinary()
@@ -243,10 +244,25 @@ func built(t *testing.T, folder string) string {
 	if err := os.MkdirAll(folder, 0o755); err != nil {
 		t.Fatal(err)
 	}
+	if runtime.GOOS == "windows" {
+		if err := copied(built, bin); err != nil {
+			t.Fatalf("the build does not copy into %s: %v", folder, err)
+		}
+		return bin
+	}
 	if err := os.Link(built, bin); err != nil {
 		t.Fatalf("the build does not link into %s: %v", folder, err)
 	}
 	return bin
+}
+
+// The file at from written to to, closed before it returns, so no handle outlives the copy. [[spec/tickets/quack-build-copies-on-windows]]
+func copied(from, to string) error {
+	text, err := os.ReadFile(from)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(to, text, 0o755)
 }
 
 // The one go build of the root this run takes, into a folder of its own that the run removes. [[spec/tickets/each-door-meets-one-test]]
@@ -279,6 +295,24 @@ func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 	built(t, t.TempDir())
 	if got := quackBuilds.Load(); got != 1 {
 		t.Fatalf("the quack binary builds %d times, where one build serves every case", got)
+	}
+}
+
+// A case's binary leaves its folder while another case's index runs from a binary of its own, as TempDir's cleanup removes it. [[spec/tickets/quack-build-copies-on-windows]]
+// level0: FixtureOutsideHome - the contract runs the real quack binary as an index in one folder, and removes the binary of another
+func TestACaseRemovesItsBinaryWhileAnotherRunsItsOwn(t *testing.T) {
+	t.Parallel()
+	idle := t.TempDir()
+	built(t, idle)
+	bin := built(t, t.TempDir())
+	root := t.TempDir()
+	said, err := quack(t, bin, root, "help")
+	t.Cleanup(func() { stopped(t, bin, root) })
+	if err != nil {
+		t.Fatalf("quack help over a root with no door answers %v: %s", err, said)
+	}
+	if err := os.RemoveAll(idle); err != nil {
+		t.Fatalf("the idle case's folder stays while another case's index runs: %v", err)
 	}
 }
 
