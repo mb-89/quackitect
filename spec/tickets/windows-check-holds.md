@@ -206,3 +206,7 @@ goal: `check (windows-latest)` stands green on main run after run, and a red run
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The order that minted this group says to open its branch with `./RUNME.sh branch open`, and never to push main. The verb refuses until main carries the group, and it commits a marker on main and pushes it. The box kept the second rule: the fixes and these tickets reached origin through the commit verb as `rescue/windows-check-holds`, and the pull request runs from there. The route stands at draft, and the owner decides whether to close the three or open the group.
+
+The red case in the Windows runs of #131 and #134 is `TestTheQuackBinaryBuildsOnce`, failing its TempDir cleanup on `quack.exe` with Access is denied. The doors walk's marked lines spent the step's error annotations, so the case stood in the job log alone.
