@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -190,6 +190,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: ee29eb95da7d60778855a96c109d819e7bb0534a
+    hash_after: ee29eb95da7d60778855a96c109d819e7bb0534a
+    inputs:
+      - name: ask
+        hash: cb58743a72ffa477
+        size: 1045
+      - name: implement/tests-green
+        hash: cee8662f5965d336
+        size: 1228
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -433,8 +446,11 @@ Every done_when line meets a case in src/modules/lsp/lenses_test.go, the check l
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+
+The ask names no view, since a VS Code user sees the same buttons. The box decides this person step under the cloud rule, and the lens cases stand for the read.
 
 # Discussion
 
