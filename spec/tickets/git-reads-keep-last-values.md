@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 3a2ac63c047b0776
         size: 375
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 1498ee7b92ea6f04a3b3de4b0ac526b1b40973e7
+    hash_after: 1498ee7b92ea6f04a3b3de4b0ac526b1b40973e7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/git fails
+    inputs:
+      - name: design/draft
+        hash: ee11e19875f11b5d
+        size: 1038
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -214,26 +227,31 @@ In Start's send, a read that answers an error leaves its port out of that tick. 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/git
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion: the failed tick commits an empty tips list after the one branch, so the index drops every branch for a span. The wrapper fails the tips read alone, and the fake answers every other read.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the failed-read case fails today, and the fix turns it green
+- doors: the case runs on FakeGit, wrapped to fail one read, and the fake stands as it does
 
 # gate
 

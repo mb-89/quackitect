@@ -95,6 +95,43 @@ func TestARefusedPortLeavesTheOthersLandingAndRetries(t *testing.T) {
 	}
 }
 
+// A git whose tips read fails once the flag stands. [[spec/tickets/git-reads-keep-last-values]]
+type failingTips struct {
+	*FakeGit
+	fails bool
+}
+
+func (one *failingTips) Tips() ([]ticket.Tip, error) {
+	if one.fails {
+		return nil, errors.New("cannot read the packs")
+	}
+	return one.FakeGit.Tips()
+}
+
+// A tick whose read fails commits nothing for its port, so the last value stands. [[spec/tickets/git-reads-keep-last-values]]
+func TestAFailedReadKeepsTheLastValue(t *testing.T) {
+	fake := NewFake()
+	fake.Push("the-group", map[string]string{"spec/tickets/the-group.md": "open\n"})
+	from := &failingTips{FakeGit: fake}
+	var tick func(time.Time)
+	every := func(_ time.Duration, hand func(time.Time)) func() {
+		tick = hand
+		return func() {}
+	}
+	var sent [][]ticket.Tip
+	Start(from, every, func(values map[string]any) error {
+		if tips, ok := values[Port]; ok {
+			sent = append(sent, tips.([]ticket.Tip))
+		}
+		return nil
+	})
+	from.fails = true
+	tick(time.Time{})
+	if len(sent) != 1 || len(sent[0]) != 1 {
+		t.Fatalf("the tips commit %v, and want the one branch once, with nothing on the failed tick", sent)
+	}
+}
+
 func TestTheTipsStandUnderTheirLocalPort(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
 	if got, ok := index.Read(Port).([]ticket.Tip); !ok || len(got) != 0 {
