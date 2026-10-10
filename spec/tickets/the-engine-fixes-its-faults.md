@@ -366,3 +366,10 @@ The owner moves every loose agent ticket into the cloud, so the group also carri
 - the bridge's last check asks the owner to close the editor and read `/health`
 - the probe gains a `reply` run
 - the probe's run on a desk with function hooks goes to the owner as a question
+
+The owner reopens the group for five drafts written before the JavaScript left. The route runs this way:
+
+- `./RUNME.sh branch open` commits a marker on `main` and pushes it, and refuses a closed group, so the box cuts `work/the-engine-fixes-its-faults` off `main` by hand, as the branches of `#138` and `#140` did
+- the old remote branch sits inside `main`, so the fresh branch reaches it as a fast-forward
+- `--back` answers the hand behind a leaf alone, and the engine passes `children`, so no hand reopens the group
+- `engine-leaves-take-back` lets the hand on the group branch take back the engine's leaf, and the group reopens at `children`
