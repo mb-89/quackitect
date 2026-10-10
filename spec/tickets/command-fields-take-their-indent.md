@@ -1,37 +1,325 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
-  - name: do
-    does: makes the change the ask names
-    to: retro
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
     evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
-        form: text
-        says: what you change, and what surprises you
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
+process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 12de8c964dec5831cfe337a3511d8e18a8ead486
+    hash_after: 12de8c964dec5831cfe337a3511d8e18a8ead486
+    inputs:
+      - name: ask
+        hash: 72c1e1d85aa253df
+        size: 674
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 286716e0a180ad7f6134294fc21b94554f962adf
+    hash_after: 286716e0a180ad7f6134294fc21b94554f962adf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 3669a3657c0b01a4
+        size: 1149
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6150d1759159 · claude-code-remote · helper-4
+    hash_before: 1b9e659108fe2c080d5ed5ea9dee4506688f163c
+    hash_after: c1d49048693551b46ec818462b1491c503d3564d
+    inputs:
+      - name: design/draft
+        hash: 3669a3657c0b01a4
+        size: 1149
+      - name: design/tests-red
+        hash: a00f2535094647ec
+        size: 402
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: eeff09109eaf1101d25350fc2ea5ec6d259a6fe5
+    hash_after: eeff09109eaf1101d25350fc2ea5ec6d259a6fe5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 8a0ee1e4072968e7cd5fd4ebfc872891af7f1a77
+    hash_after: 8a0ee1e4072968e7cd5fd4ebfc872891af7f1a77
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   95.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: a00f2535094647ec
+        size: 402
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
 
-- `carriedIn` in `.claude/skills/level0/lib/tested.js` reads a test off a command line indented four spaces
-- a hand-back passing a command field with no indent writes it bare
-- the commit hook then finds no carried test, and refuses code whose test the ticket names
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+gain: a hand-back writes every command field indented four spaces, so the commit hook reads each test a ticket carries.
 
-The hand-back writes a command field in the indented form itself, whatever indent the hand passes.
+<!-- breaks, as text: what breaks if it is never done -->
+breaks: `formatted` in `src/pull/pull_chapter.go` writes a command field as the hand passes it. `CarriedIn` in `src/modules/hooks/command/tested.go` reads a bare line only where it opens on `./RUNME.sh`, so the hook refuses code whose test a bare line names.
 
-The hook then reads the tests a ticket carries, and no hand learns the indent by a refusal.
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+done_when:
 
-Without it, every hand-back of code meets the refusal once, and a handover has to carry the indent as a rule.
+- `go test ./src/pull/ -run TestACommandFieldLandsIndented` passes, over a bare field and a field indented two spaces
+- `go test ./src/modules/hooks/command/ -run TestHeldTestsReadTheHeldTicketsCommandLines` passes
+- `./RUNME.sh check` answers 0 on this box
 
-- a case hands back a command field with no indent, and reads it written indented four spaces
-- a case commits code whose test only the ticket's command field names, and reads the hook pass
-- `./RUNME.sh check` exits 0
+<!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
+view: none
 
-# do
+<!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
+from: none
 
-<!-- makes the change the ask names -->
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+`withPayload` in `src/pull/pull_chapter.go` takes the leaf in hand. For a field the leaf names under `form: command`, it writes each row of the formatted value trimmed and indented four spaces, whatever indent the hand passes. Every other form writes as it does now. `chapterLines` and `commandsRun` trim each row, so the runs read the same line, and `CarriedIn` reads the indented row.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- `src/pull/pull_back.go`, `handBack`, the one caller of `withPayload`
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- `src/pull/pull_indent_test.go`, `TestACommandFieldLandsIndented`, over a bare field, a field indented two spaces and a text field left as it stands
+- `src/modules/hooks/command/tested_test.go`, `TestHeldTestsReadTheHeldTicketsCommandLines`, standing as it is
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- `src/pull/pull_chapter.go`
+- `src/pull/pull_back.go`
+- `src/pull/pull_indent_test.go`
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- `withPayload`, `formatted`, `withFieldText`, `handBack` and `CarriedIn` stand opened, and the claims hold there
+- `handBack` is the one caller, found by search over `src`
+- each done_when line meets its named test
+- the approach adds no config key
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh test src/pull/pull_indent_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/pull/pull_indent_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+The bare field lands bare under `## tests`, so the case fails on its own assertion. The text field lands as it stands.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the one done_when case fails on its assertion, and the second line names a standing test
+- the case drives the cloud pull fakes, so it reaches no real door
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+
+# implement
 
 ## change
 
@@ -39,6 +327,87 @@ Without it, every hand-back of code meets the refusal once, and a handover has t
 
 <!-- the form is text -->
 
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+    ./RUNME.sh lint src/pull/pull_chapter.go src/pull/pull_back.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches src/pull/pull_chapter.go and src/pull/pull_back.go, both under size in the draft
+- the change reaches no door: it rewrites text in memory, and the case drives the cloud pull fakes
+- each new function and the constant point at this ticket, and withPayload keeps its pointer at the design output
+- the indent stands once, as commandIndent in src/pull/pull_chapter.go
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+    ./RUNME.sh test src/pull/pull_indent_test.go
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+    ./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+A hand-back now writes each row of a field the leaf names under `form: command` trimmed and indented four spaces, whatever indent the hand passes. The commit hook reads an indented row as a test the ticket carries, so a bare `go test` line no longer slips past it. Every other form writes as before, and the runs read the same trimmed line.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches `src/pull/pull_chapter.go` and `src/pull/pull_back.go`, the files the draft names
+- the change reaches no door, and the case drives the cloud pull fakes
+- each new function and the constant point at this ticket
+- the indent stands once, in `src/pull/pull_chapter.go`
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A helper read the draft and the red case against the code, and answers accept with no points. The gate stands unworked on a fault of the pull:
+
+- the gate waits for a hand other than the draft's, and the pull names a helper `--as` hand for it
+- a helper's bare pull answers `wait`, naming the three children as free
+- a helper's pull by name meets `pull-queue-binds`
+- `handOut` in `src/pull/pull_hand.go` gives no reason, so the fault stands unconfirmed
+
+The ask moves off the JavaScript `carriedIn` onto the Go code. The fault stands in part: the Go `CarriedIn` also reads a bare `./RUNME.sh` line, and skips every other bare line.

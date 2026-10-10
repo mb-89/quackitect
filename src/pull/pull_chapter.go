@@ -25,6 +25,9 @@ const (
 	found       = "findings"
 )
 
+// The indent a command row takes, so the commit hook reads it as a test. [[spec/tickets/command-fields-take-their-indent]]
+const commandIndent = "    "
+
 // A gate's words read as the review's: accept as pass, reject as fail. [[spec/design_output/pull#the-gate]]
 var openers = map[string]string{"pass": "pass", "fail": "fail", "accept": "pass", "reject": "fail"}
 
@@ -128,14 +131,18 @@ func AskOf(text string) string {
 }
 
 // The payload's fields written under the leaf's chapter, or why one lands nowhere. [[spec/design_output/pull#a-leaf-comes-back]]
-func withPayload(text, path, payload string) (string, string) {
+func withPayload(text, path string, leaf *Leaf, payload string) (string, string) {
 	var fields front.Ordered
 	if json.Unmarshal([]byte(payload), &fields) != nil {
 		return "", "--fields takes a JSON object, one key per field of the leaf in hand."
 	}
 	now := text
 	for _, pair := range fields {
-		put, why := withFieldText(now, path, pair.Key, formatted(pair.Value))
+		said := formatted(pair.Value)
+		if leaf.commandField(pair.Key) {
+			said = indented(said)
+		}
+		put, why := withFieldText(now, path, pair.Key, said)
 		if why != "" {
 			return "", why
 		}
@@ -163,6 +170,29 @@ func formatted(said any) string {
 	}
 	text = leadBlanks.ReplaceAllString(manyBlanks.ReplaceAllString(strings.Join(rows, "\n"), "\n\n"), "")
 	return strings.TrimRight(text, " \t\n\r")
+}
+
+// Whether the leaf names the field under the command form. [[spec/tickets/command-fields-take-their-indent]]
+func (leaf *Leaf) commandField(name string) bool {
+	for _, field := range leaf.Evidence {
+		if fieldWord(field, "name") == name {
+			return fieldWord(field, "form") == "command"
+		}
+	}
+	return false
+}
+
+// Each row trimmed and indented as a command row, a blank row left blank. [[spec/tickets/command-fields-take-their-indent]]
+func indented(said string) string {
+	rows := rowsOf(said)
+	for i, row := range rows {
+		if row = strings.TrimSpace(row); row != "" {
+			rows[i] = commandIndent + row
+		} else {
+			rows[i] = row
+		}
+	}
+	return strings.Join(rows, "\n")
 }
 
 // A value off JSON as String writes it: a list joins by commas, and an object reads as its tag. [[spec/design_output/pull#the-fields-ride-the-payload]]
@@ -484,18 +514,28 @@ func VerdictIn(rows []string) Verdict {
 		}
 	}
 	reason := strings.Join(tabled(rest), "; ")
-	if findings == "" {
-		return Verdict{Said: openers[word], Reason: reason}
+	if findings != "" {
+		return Verdict{Said: found, Reason: reason, Findings: findingsOf(rest)}
 	}
-	out := Verdict{Said: found, Reason: reason, Findings: []Finding{}}
+	out := Verdict{Said: openers[word], Reason: reason}
+	// A reject's rows ride to the gate, which mints them on a group. [[spec/tickets/gate-findings-reach-the-queue]]
+	if word == "reject" {
+		out.Findings = findingsOf(rest)
+	}
+	return out
+}
+
+// A finding a row, named where the row opens on a name and a colon, and a table row left out. [[spec/design_output/pull#a-finding-rides-out]]
+func findingsOf(rest []string) []Finding {
+	out := []Finding{}
 	for _, row := range rest {
 		if strings.HasPrefix(row, "|") {
 			continue
 		}
 		if said := findingRow.FindStringSubmatch(row); said != nil {
-			out.Findings = append(out.Findings, Finding{Name: said[1], Line: strings.TrimSpace(said[2])})
+			out = append(out, Finding{Name: said[1], Line: strings.TrimSpace(said[2])})
 		} else {
-			out.Findings = append(out.Findings, Finding{Line: row})
+			out = append(out, Finding{Line: row})
 		}
 	}
 	return out

@@ -14,7 +14,7 @@ import (
 )
 
 // The session log under the root, in the log folder src/modules/check/folders.go owns. [[spec/design_output/log#what-one-line-looks-like]]
-const sessionLog = ".se/.log/session.jsonl"
+const sessionLog = logmodule.SessionPath
 
 // The rows the module reads off one session log's text. [[spec/tickets/the-log-topic-lands]]
 func logRows(text string) []logmodule.Row {

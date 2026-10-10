@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
 state: closed
+reason: done
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +19,7 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
+    checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on", "each child names what it reads from its siblings, and the children land in that order", "a group whose diff grows past one review splits into a group of its own before it grows further"]
     evidence:
       - name: children
         form: list
@@ -62,7 +64,8 @@ steps:
             says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
-            says: how each bad line stops happening, named by its home
+            home: true
+            says: how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks
           - name: thoughts
             form: text
             says: what the thoughts say that the actions do not, off the transcript
@@ -81,8 +84,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 5d4a884bfb2491ff
-step: retro/cloud
+process_hash: d9f9539fef3ec913
 record:
   - step: sync
     hand: box d7e124b659cd · claude-code-remote
@@ -160,7 +162,72 @@ record:
         hash: 2d5e441b8968dccd
         size: 3237
     def: 4da1ca5da87d5bbc
-reason: done
+  - step: children
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: ea6bbd599b16f8ca310e4c5e906d2880b5fc4d18
+    hash_after: ea6bbd599b16f8ca310e4c5e906d2880b5fc4d18
+    returns: 1
+    why: the hand takes it back
+  - step: split
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 5b38728f5f1a8e41b94a4aadc521cfa8e46ab464
+    hash_after: 0aac77679dcda0eed612be46ba3a6b885ade5e16
+    inputs:
+      - name: ask
+        hash: 3827a3cc3d458ead
+        size: 295
+    def: 19b6849b1f151cd5
+  - step: children
+    hand: the engine
+    hash_before: 5eef749b59194e8381c2a321978b73c9cb8b82e7
+    hash_after: 5eef749b59194e8381c2a321978b73c9cb8b82e7
+  - step: accept
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 9b7a2cbc90120d2eadf0113130e70e773c78b196
+    hash_after: 9b7a2cbc90120d2eadf0113130e70e773c78b196
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-engine-fixes-its-faults already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 3827a3cc3d458ead
+        size: 295
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 5f4afebf01eea313cab0125107c09cf597b588a3
+    hash_after: 5f4afebf01eea313cab0125107c09cf597b588a3
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 9212d3ba17f6a591a6b2fd972125d656385045bd
+    hash_after: 9212d3ba17f6a591a6b2fd972125d656385045bd
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 98cc619d8b61b29f0979251726dfb6820c6355ff
+    hash_after: 73087e5ddba9dd4fb14316afce85bc84d627b033
+    inputs:
+      - name: retro/write
+        hash: a6f483677dc94788
+        size: 2646
+    def: 4da1ca5da87d5bbc
+    final: the-engine-fixes-its-faults closes done, and its pull request goes to main with auto-merge on
 ---
 
 # Ask
@@ -191,33 +258,23 @@ Done when every child closes through the command it names.
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/a-rewind-spares-landed-tests]], standard
-- [[spec/tickets/behind-read-reaches-past-ask]], trivial
-- [[spec/tickets/box-keys-fold-drive-letters]], trivial
-- [[spec/tickets/cloud-ask-names-the-hold]], trivial
-- [[spec/tickets/cloud-boxes-ask-nobody]], standard
-- [[spec/tickets/cloud-boxes-leave-trunk-alone]], standard
-- [[spec/tickets/commit-skips-landed-moves]], trivial
-- [[spec/tickets/kept-red-reads-red-list]], trivial
-- [[spec/tickets/kept-red-subject-matches-whole]], trivial
-- [[spec/tickets/one-writer-holds-a-branch]], standard
-- [[spec/tickets/phase-two-carries-badge-lines]], trivial
-- [[spec/tickets/prepush-reds-land-together]], trivial
-- [[spec/tickets/push-gate-needs-the-engine]], standard
-- [[spec/tickets/serve-probes-the-register-port]], trivial
-- [[spec/tickets/sync-takes-its-own-branch]], standard
-- [[spec/tickets/the-bridge-outlives-its-starter]], standard
-- [[spec/tickets/the-queue-views-agree]], standard
-- [[spec/tickets/the-reply-probe-runs]], question
+- [[spec/tickets/answer-rules-read-one-file]], trivial
+- [[spec/tickets/replayed-red-leaf-reads-green]], trivial
+- [[spec/tickets/command-fields-take-their-indent]], standard
+- [[spec/tickets/failed-evidence-keeps-its-output]], standard
+- [[spec/tickets/gate-findings-reach-the-queue]], standard
+- the children of the first run stand closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each child is one change a review reads whole
-- the goal's parts each meet a child: the trunk guard, the desk push, the kept red leaf, and the one count. The desk trials stand as person questions such as a-desk-runs-probe-reply
-- every child stands closed, so none waits on another
+- each child is one change in one or two Go files a review reads whole
+- the reopened goal is these five faults, each read against the Go code, and every one meets a child
+- no child waits on another, since each touches its own function
+- no child reads a sibling's output, so they land in any order
+- the diff stays one review: five small changes and the reopen road
 
 # children
 
@@ -243,7 +300,7 @@ accept
 <!-- retro notes, which passes when the private folder is empty -->
 <!-- the form is command -->
 
-./RUNME.sh retro notes
+    ./RUNME.sh retro notes
 
 ## write
 
@@ -254,68 +311,60 @@ accept
 <!-- what was done, one line a ticket or a thing -->
 <!-- the form is list -->
 
-- a-rewind-spares-landed-tests: gate accepted with two points, then built. `keptRed` keeps a landed red leaf, and `stepOn` and `advanced` walk past it
-- kept-red-subject-matches-whole and kept-red-reads-red-list: the whole-change subject match, and the red list read through `redListOf`
-- cloud-boxes-ask-nobody and cloud-ask-names-the-hold: the cloud ask door, and the note naming it
-- cloud-boxes-leave-trunk-alone, one-writer-holds-a-branch and push-gate-needs-the-engine: the three `holds` reads, landed together under prepush-reds-land-together
-- sync-takes-its-own-branch: `branch sync` merges `origin/<the branch>` before trunk
-- gate-points-pass-the-push: drafted off the retro note, for the owner to open
+- `command-fields-take-their-indent` closes done: a hand-back writes a command field indented, so the commit hook reads its tests
+- `failed-evidence-keeps-its-output` closes done: a red command's refusal names the session log and each failing Go case
+- `gate-findings-reach-the-queue` closes done: a reject at a group's accept mints its rows as children and waits at children, and a nameless row refuses
+- `reject-rows-reach-rejected` and `nameless-reject-meets-a-case` close became onto `gate-findings-reach-the-queue`, which built both
+- the group passes accept, and the four private notes close
 
 ### well
 
 <!-- what went well, and what made it go well -->
 <!-- the form is list -->
 
-- every gate read the named functions and the git history before its verdict, so each draft's claims met the code before the build
-- landing the three `holds` changes in one change let each `tests-green` pass on the shared red file
-- the commit verb ran the check and pushed on every finished thing, so origin matched the box after each step
+- a helper read each gate, so every gate kept a hand other than the draft's
+- the new refusal of `failed-evidence-keeps-its-output` named its own failing case the first time the check met it
+- the command line ran the pull in the same turn, where the MCP pull answered a turn later
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- 21:36 the plan tool answered that no server stood at the event port while the shell read 200 there. A second call passed with no change on this side
-- 21:40, 21:52 and 22:03 the push door refused each gate hand-back, because the gate's points carry the todo tag
-- 21:41 `./RUNME.sh commit -m` came back refused. The verb takes the message as its first argument
-- 21:42 and 21:53 a ticket name under `working` in the plan turned into a todo, and the pull waited on it
-- 21:45 `keptRed` read `leaf.leaves` off a bare walk entry and threw
-- 21:44 the split verb moved `childrenSay` with no header and no imports, and the `pull.js` re-export broke `pull-steps`
-- 21:45, 21:52 and 22:17 the Bash door refused a `git stash` and two chains whose landing followed a pipe
-- 21:52 a doc-only trivial step found no green command: the check ends on another ticket's lint line, and `branch test` answers missing
-- 22:03 three tickets held red cases in one test file, so no `tests-green` could pass alone
+- 19:45: the MCP pull failed twice with the index restarts on a tests-green hand-back, and the command line landed it
+- 19:50: a tests field naming a go test run refused, because its last line read ok and cached in place of green
+- 20:05 to 20:18: the helper pulls met wait and pull-queue-binds, because the plan still named a closed ticket. The plan field riding a report call left the plan file unchanged
+- 20:25: the check refused an import of the log module from the hooks module, since a module imports no module
+- 20:27 to 20:40: the closing commit refused a hooks file, because the hook drops the tests a closed ticket carries
+- 19:42: the stop claimed the helpers still ran, and the hook refused it, since a cloud turn that ends stops its helpers
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 <!-- the form is list -->
 
-- the tagged gate points: gate-points-pass-the-push
-- the plan tool's reach to the server: the bridge note in `spec/design_output/level0.md`, once a desk reproduces it
-- the commit verb's usage: the refusal names the positional message
-- a ticket name under `working`: the plan tool names a todo title, not a ticket
-- the walk entry: `keptRed` reads the route order off the ticket text
-- the split verb: it copies the imports and header a cut function needs
-- the doc-only step: the trivial route names the owning test file
-- the shared red file: a draft naming a test file another open ticket holds red names it under `depends_on`
+- the spawn sets the plan to the ticket it hands, in `src/pull/pull_hand.go`, so a helper pull binds there
+- the hook reads the tests of the ticket the commit closes, in `src/modules/hooks/command/ticket.go`
+- a case edits a draft past implement/change and reads the walk keep design/tests-red, in `src/pull/pull_kept_test.go`
+- a tests field names the tests-red command, as the engine reads green off the test verb, per `spec/processes/standard.md`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The pull hands gates and builds of one group to one box, so the builder reads the other tickets' drafts anyway. A shared red file turns that into one change. Each close still ran its own route, and the accept read the whole diff against the goal.
+The gates cost the most time, and none of it on review. Each helper verdict came back accept within minutes, and the wait sat in binding the helper to the ticket. A spawn that sets the plan itself removes that wait.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each fact stands in the file owning it, and the retro points there
-- the retro adds no number
-- the retro adds no file header
-- no owner prompt came in this run, and each error carries its time
-- the chapter names roles alone
+- each fact points at the file owning it
+- the retro adds no number to the tree
+- the retro writes no file header
+- the chapter carries the errors with their times, and the session saw no owner prompt past the clear
+- the chapter names roles, and no box or person
 
 ## cloud
 
@@ -326,28 +375,25 @@ The pull hands gates and builds of one group to one box, so the builder reads th
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- nothing the work needed: every tool stood installed, and no host or right came back refused
-- 21:36 the level0 server stood down at session start, and `./RUNME.sh serve` brought it up
+- none: every tool the run needed stood on the box, and no host or right met a refusal
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- the push door's todo refusal on each gate hand-back
-- the Bash door's git write and landing rules
-- the commit hook's test-beside-code rule, on a split module and a server wire
-- the file ceiling on `pull-hand.js`
-- no conflict at sync, since the branch already carried main
+- the commit hook refused a closing commit for a hooks file with no test beside it, at 20:27
+- the import rule refused a module importing a module, at 20:25
+- the guard on git writes refused a stash and a raw push, and the push verb landed the push
+- the commit verb ran past the shell's cap and finished in the background, green
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- gate-points-pass-the-push stands as a draft in no group, for the owner to open
-- the desk trials in the group's Discussion stand as person question tickets, such as a-desk-runs-probe-reply
-- the handover says the branch stands done, and the next session takes the next free branch
+- no person step stands parked, and the run minted no ticket outside the group
+- the handover names the three faults the retro carries under improve, for the next group to mint
 
 # Discussion
 
@@ -359,3 +405,10 @@ The owner moves every loose agent ticket into the cloud, so the group also carri
 - the bridge's last check asks the owner to close the editor and read `/health`
 - the probe gains a `reply` run
 - the probe's run on a desk with function hooks goes to the owner as a question
+
+The owner reopens the group for five drafts written before the JavaScript left. The route runs this way:
+
+- `./RUNME.sh branch open` commits a marker on `main` and pushes it, and refuses a closed group, so the box cuts `work/the-engine-fixes-its-faults` off `main` by hand, as the branches of `#138` and `#140` did
+- the old remote branch sits inside `main`, so the fresh branch reaches it as a fast-forward
+- `--back` answers the hand behind a leaf alone, and the engine passes `children`, so no hand reopens the group
+- `engine-leaves-take-back` lets the hand on the group branch take back the engine's leaf, and the group reopens at `children`

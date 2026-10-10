@@ -81,7 +81,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 		payload = held.Payload
 	}
 	if payload != "" {
-		put, why := withPayload(one.Text, held.Step, payload)
+		put, why := withPayload(one.Text, held.Step, leaf, payload)
 		if why != "" {
 			it.Refuse(failure.Raise(it.Failures, "pull-fields-refused", why))
 			return 1
@@ -143,7 +143,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	case decided.Said == "answered":
 		return it.answeredBy(who, one, leaf, *held, decided.Reason, answered)
 	case decided.Said == "fail" && leaf.Gate != "":
-		return it.rejected(who, one, leaf, *held, decided.Reason, answered)
+		return it.rejected(who, one, leaf, *held, decided.Reason, decided.Findings, answered)
 	case decided.Said == "fail":
 		return it.failed(who, one, leaf, *held, decided.Reason, answered)
 	case decided.Findings != nil:
