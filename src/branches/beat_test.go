@@ -77,6 +77,52 @@ func TestListNamesAnOldHoldLiveWhileItsBoxBeats(t *testing.T) {
 	}
 }
 
+// The progress span these cases set through the config fake, beside the fixture's stale span, and the clock the span named past now. [[spec/design_output/work#a-live-hold-stalls]]
+func (one *tree) stallClock(ahead time.Duration) {
+	one.d.Config = func(key string) any {
+		if key == "work.progressAfter" {
+			return "30m"
+		}
+		return fixtureConfig(key)
+	}
+	one.d.Now = func() time.Time { return testNow.Add(ahead) }
+}
+
+// branch list writes stalled beside a hold whose box beats while its tip stands past work.progressAfter, and asks nothing under Yours. [[spec/design_output/work#a-live-hold-stalls]]
+func TestAHoldThatBeatsAndMovesNoCommitStalls(t *testing.T) {
+	t.Parallel()
+	one := pcTakingHeld(t, 0, 0)
+	one.stallClock(40 * time.Minute)
+	one.beatOn(pcGroup, pcOther, "beats", testNow.Add(39*time.Minute))
+	one.branchSays("list", "--fetch")
+	said := one.out.String()
+	if !regexp.MustCompile(`work/one-group\s+held.*\bstalled\b`).MatchString(said) {
+		t.Fatalf("the row names the beating hold with no commit for 40m no stalled: %s", said)
+	}
+	if strings.Contains(said, "Yours") {
+		t.Fatalf("a hold stalled under twice the span stands under Yours: %s", said)
+	}
+}
+
+// The Stop hook's beat on a stalled hold answers 0 and blocks once with a handover ask, and a second beat on the same tip prints nothing. [[spec/design_output/work#a-live-hold-stalls]]
+func TestTheBeatAsksAStalledBoxForAHandoverOnce(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, nil)
+	hand := one.pcHand()
+	pcOnGroup(one, map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, hand, "b818c390")})
+	one.stallClock(40 * time.Minute)
+	if code := one.branchSays("beat"); code != codeOK {
+		t.Fatalf("the beat answers %d: %s", code, one.pcSaid())
+	}
+	first := one.out.String()
+	if !strings.Contains(first, `"decision":"block"`) || !strings.Contains(strings.ToLower(first), "handover") {
+		t.Fatalf("the beat on a stalled hold asks for no handover: %q", first)
+	}
+	if code := one.branchSays("beat"); code != codeOK || one.out.String() != "" {
+		t.Fatalf("a second beat on the same tip answers %d and prints %q", code, one.out.String())
+	}
+}
+
 // branch beat writes the hand's beat on origin, a second beat inside half the span writes nothing, and --end writes the end. [[spec/tickets/holds-beat-with-the-session]]
 func TestABeatInsideHalfTheSpanWritesNothing(t *testing.T) {
 	t.Parallel()

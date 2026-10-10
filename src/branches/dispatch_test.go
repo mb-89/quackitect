@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/front"
 	"quackitect/src/modules/files"
 )
 
@@ -140,6 +141,67 @@ func TestDispatchReadsAStaleHoldReadyAndAFreshHoldHeld(t *testing.T) {
 	dpSame(t, dpReady(plan), []string{"left"})
 	if len(plan.Held) != 1 || plan.Held[0].Group != "worked" || plan.Held[0].Age == "" {
 		t.Fatalf("the held part reads %#v", plan.Held)
+	}
+}
+
+// A group branch whose tip stands the span named old, its box beating a minute ago, under a progress span of 30m. [[spec/design_output/work#a-live-hold-stalls]]
+func (one *tree) dpStalled(name, note string, tip time.Duration) {
+	one.t.Helper()
+	one.branchAt(name, map[string]string{ticketAt(name): note}, testNow.Add(-tip))
+	one.beatOn(name, "box 3f9a", "beats", testNow.Add(-time.Minute))
+	one.stallClock(0)
+}
+
+// The rows under stalled in the plan the last run printed as JSON, or a failure where the plan carries no stalled part. [[spec/design_output/work#a-live-hold-stalls]]
+func (one *tree) dpStalledRows() []struct {
+	Group  string `json:"group"`
+	Person bool   `json:"person"`
+} {
+	one.t.Helper()
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(strings.TrimSpace(one.out.String())), &raw); err != nil {
+		one.t.Fatal(err)
+	}
+	part, ok := raw["stalled"]
+	if !ok {
+		one.t.Fatalf("the plan carries no stalled part: %s", one.out.String())
+	}
+	var rows []struct {
+		Group  string `json:"group"`
+		Person bool   `json:"person"`
+	}
+	if err := json.Unmarshal(part, &rows); err != nil {
+		one.t.Fatal(err)
+	}
+	return rows
+}
+
+// A live hold whose tip stands past twice work.progressAfter on a first take reads stale: ready, so the fire sends a fresh box, and named under stalled. [[spec/design_output/work#a-live-hold-stalls]]
+func TestDispatchFiresAFreshBoxPastTwiceTheProgressSpan(t *testing.T) {
+	t.Parallel()
+	one := dpTree(t, nil)
+	one.dpStalled("left", dpHeld(), 70*time.Minute)
+	one.dpRun("--dry", "--json")
+	plan := one.dpJSON()
+	dpSame(t, dpReady(&plan), []string{"left"})
+	rows := one.dpStalledRows()
+	if len(rows) != 1 || rows[0].Group != "left" || rows[0].Person {
+		t.Fatalf("the stalled part reads %#v", rows)
+	}
+}
+
+// A live hold past twice work.progressAfter whose open take took it over reads a person's: not ready, and named under stalled with person true. [[spec/design_output/work#a-live-hold-stalls]]
+func TestDispatchNamesAPersonWhereATakeOverStallsAgain(t *testing.T) {
+	t.Parallel()
+	one := dpTree(t, nil)
+	over := withEntry(groupNote, front.Ordered{{Key: "step", Value: "sync"}, {Key: "hand", Value: "box 3f9a"}, {Key: "hash_before", Value: "a1b2c3"}, {Key: "over", Value: true}})
+	one.dpStalled("left", over, 70*time.Minute)
+	one.dpRun("--dry", "--json")
+	plan := one.dpJSON()
+	dpSame(t, dpReady(&plan), []string{})
+	rows := one.dpStalledRows()
+	if len(rows) != 1 || rows[0].Group != "left" || !rows[0].Person {
+		t.Fatalf("the stalled part reads %#v", rows)
 	}
 }
 

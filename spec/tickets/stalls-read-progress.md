@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: red-freezes-and-stalls-show
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: e62a4e6394147d46
         size: 962
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: c34f318540fa182ee5b5f6c11e2348e090278654
+    hash_after: c34f318540fa182ee5b5f6c11e2348e090278654
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: fef67274ad2a5f8a
+        size: 2094
+      - name: [[spec/design_output/work]]
+        hash: 2905f4996b0af7be
+        size: 45994
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -248,26 +264,33 @@ For details, see [[spec/design_output/work#a-live-hold-stalls]]. The owner's mes
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/beat_test.go src/branches/dispatch_test.go src/modules/hooks/githooks_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go
+- src/branches/dispatch_test.go
+- src/modules/hooks/githooks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The list row of a hold beating with no commit for 40m reads live alone. The beat prints nothing. The dispatch plan carries no stalled part and fires nothing past twice the span. The pre-push door names the old hand as the one writer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case, and the config line meets the default the schema gains
+- the cases reach git, the clock and the config through the fake repo, the injected clock and the config fake
 
 # gate
 

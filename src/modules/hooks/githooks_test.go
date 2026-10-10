@@ -69,6 +69,25 @@ func TestPrePushLetsAStaleHoldMoveByTheTake(t *testing.T) {
 	}
 }
 
+// A take moves a hold whose box beats while its tip stands past twice work.progressAfter, off the schema default. [[spec/design_output/work#a-live-hold-stalls]]
+func TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan(t *testing.T) {
+	t.Parallel()
+	now := time.Unix(1790000000, 0)
+	root := treeOf(t, map[string]string{
+		".se/.runtime/box.json":           `{"id":"myb0x"}`,
+		"spec/config/level0.schema.json": `{"properties": {"work": {"properties": {"progressAfter": {"default": "30m"}}}}}`,
+	}, "")
+	reads := map[string]string{
+		"show origin/work/x:spec/tickets/x.md":    ghTicket(ghOther),
+		"log -1 --format=%ct origin/work/x":       strconv.FormatInt(now.Add(-70*time.Minute).Unix(), 10),
+		"show " + ghTip + ":spec/tickets/x.md":    ghTicket("box myb0x · claude-code"),
+		"log -1 --format=%ct %s origin/beats/x": strconv.FormatInt(now.Unix()-60, 10) + " " + ghOther + " beats",
+	}
+	if said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now}); said != "" {
+		t.Fatalf("pre-push answers %q, and wants a take moving a hold stalled past twice the progress span through", said)
+	}
+}
+
 func TestPrePushRefusesAnAgentsTipPastTheCheck(t *testing.T) {
 	t.Parallel()
 	root := treeOf(t, nil, "")
