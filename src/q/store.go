@@ -174,7 +174,7 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	// The cells this commit replaces decide what moves, so a commit landing first meets the comparison. [[spec/tickets/a-commit-reads-moves-under-lock]]
+	// The cells this commit replaces decide what moves, so a commit landing first meets the comparison. [[spec/tickets/commits-read-moves-locked]]
 	moved := movedIn(Snapshot{values: s.values, down: s.down, store: s}, values)
 	next := make(map[string]cell, len(s.values)+len(values))
 	for name, held := range s.values {

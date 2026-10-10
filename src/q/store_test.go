@@ -17,7 +17,7 @@ func TestSortedKeysAnswerTheSetInOrder(t *testing.T) {
 	}
 }
 
-// A commit landing past an earlier snapshot moves against the cell it replaces, so the wave meets the restore. [[spec/tickets/a-commit-reads-moves-under-lock]]
+// A commit landing past an earlier snapshot moves against the cell it replaces, so the wave meets the restore. [[spec/tickets/commits-read-moves-locked]]
 func TestACommitMovesAgainstTheValueItReplaces(t *testing.T) {
 	c := New()
 	x := OutIn(c, "t/x", "")

@@ -332,7 +332,7 @@ func TestARedrawKeepsTheSortAPersonSet(t *testing.T) {
 	}
 }
 
-// The edit follows its row by name, where a row arrives above it. [[spec/tickets/an-open-edit-outlives-a-redraw]]
+// The edit follows its row by name, where a row arrives above it. [[spec/tickets/open-edits-outlive-redraws]]
 func TestARedrawKeepsAnOpenEdit(t *testing.T) {
 	t.Parallel()
 	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)

@@ -130,11 +130,11 @@ goal: the TUI keeps a person's place across a redraw. An open cell edit, the cur
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/an-open-edit-outlives-a-redraw]], standard
+- [[spec/tickets/open-edits-outlive-redraws]], standard
 - [[spec/tickets/a-filter-keeps-the-cursor]], standard
 - [[spec/tickets/a-redraw-keeps-the-sort]], standard
 - [[spec/tickets/a-refetch-keeps-the-selection]], standard
-- [[spec/tickets/a-commit-reads-moves-under-lock]], standard
+- [[spec/tickets/commits-read-moves-locked]], standard
 - [[spec/tickets/unwatched-providers-meet-a-caller]], standard, routed onto one decide leaf
 
 ## checked

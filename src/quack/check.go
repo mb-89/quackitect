@@ -30,6 +30,7 @@ const (
 	indexFile   = runtimeDir + "/index.json"
 	reporter    = "test/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
+	typesConfig = pluginDir + "/.claude-plugin/types/tsconfig.json"
 	installer   = "install.sh"
 )
 
@@ -359,6 +360,11 @@ func typesHold(d checkDoors) int {
 	plugin := filepath.FromSlash(pluginDir)
 	if _, _, err := d.run([]string{"claude", "--plugin-dir", plugin, "-p", ""}, nil, true); err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so no types are laid and the hooks go untyped here.")
+		return 0
+	}
+	// A lay leaving no types leaves tsc nothing to extend, so it goes untyped as a box with no claude does. [[spec/tickets/untyped-boxes-check-on]]
+	if d.text(typesConfig) == "" {
+		fmt.Fprintln(d.out, "claude lays no types here, so the hooks go untyped here.")
 		return 0
 	}
 	code, said, err := d.run([]string{"tsc", "-p", plugin}, nil, true)

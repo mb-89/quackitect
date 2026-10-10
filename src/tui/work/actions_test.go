@@ -178,7 +178,7 @@ func TestAnEditPostsSetFieldForEveryRowItWrites(t *testing.T) {
 	}
 }
 
-// A rows change landing mid-edit leaves every key in the edit, and Enter writes the row it opened on. [[spec/tickets/an-open-edit-outlives-a-redraw]]
+// A rows change landing mid-edit leaves every key in the edit, and Enter writes the row it opened on. [[spec/tickets/open-edits-outlive-redraws]]
 func TestAKeyInAnEditStaysInItAcrossARedraw(t *testing.T) {
 	t.Parallel()
 	m, tab, posted := actionWindow(t, everyResult)
