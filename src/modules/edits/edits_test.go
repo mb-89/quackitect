@@ -68,3 +68,27 @@ func TestAPartWrittenApplyUndoes(t *testing.T) {
 		}
 	}
 }
+
+// Two applies at one clock reading each keep an entry, and the undo takes back the second. [[spec/tickets/journal-names-stay-unique]]
+// level0: FixtureOutsideHome - the case writes its file and its journal into its own root.
+func TestTwoAppliesInOneMillisecondKeepTwoEntries(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "a.txt"), []byte("one\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	from := Outside{Root: root, Now: func() time.Time { return time.Unix(0, 0) }}
+	for _, step := range [][2]string{{"one", "two"}, {"two", "three"}} {
+		if _, err := from.patches(Patch{Ops: []Op{{File: "a.txt", Old: step[0], New: step[1]}}}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if found, _ := os.ReadDir(filepath.Join(root, filepath.FromSlash(Journal))); len(found) != 2 {
+		t.Fatalf("the journal holds %d entries, and wants one an apply", len(found))
+	}
+	if _, err := from.undoes(Undo{}); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := os.ReadFile(filepath.Join(root, "a.txt")); string(got) != "two\n" {
+		t.Errorf("a.txt reads %q after one undo, and wants the first apply standing", got)
+	}
+}

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ef340abe75ddfe64
         size: 307
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 38da488332847fd6829d52c47c4e35f7076718a8
+    hash_after: 38da488332847fd6829d52c47c4e35f7076718a8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/edits fails
+    inputs:
+      - name: design/draft
+        hash: 0643c3848fc12caf
+        size: 1419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,31 @@ A pure FreeName(at, taken) in journal.go names an entry. It keeps the stamp's se
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion: two patches at one clock reading leave one entry, since the second wrote over the first. The first apply then has no way back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the two-patch case fails today, and the free name turns it green
+- doors: the case runs on a temp folder through Outside, the module's own disk door, marked as building its own root
 
 # gate
 
