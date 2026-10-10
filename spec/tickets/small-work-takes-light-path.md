@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 93f43e6e0d6cbad9
         size: 1103
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 146d62cd8a9707e447aa1806f49ca9be68b52562
+    hash_after: 146d62cd8a9707e447aa1806f49ca9be68b52562
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 629f9b2b6b972396
+        size: 2693
+    def: 08e16d07b0de477c
+    frozen:
+      - path: src/quack/verb_mint_light_test.go
+        hash: 2bdabddefdbca065
 ---
 
 # Ask
@@ -239,26 +255,31 @@ The trivial hash moves, so an open trivial ticket at `do` takes the new route at
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/quack/verb_mint_light_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_mint_light_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+`TestAMintWithNoProcessTakesTheTrivialRoute` fails on its own assertion: with no `--process`, the mint takes no route, so it refuses `--gain` as no field of a ticket note. `TestAMintWithStandardKeepsTheFullRoute` passes, and guards the full route through the change. The trivial case reads `leave working code alone` in the minted route, so the trivial step's checklist carries those words.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when lines: the mint line meets the red trivial case, the standard line its guard, the trivial line the stopping line read in the same case, the guidance line the lint checkpoint, and the example line TestEveryExampleHoldsItsSteps once pull-light.md lands at the change
+- the doors: both cases run on mintTree, a temp tree with git, seeded with the shipped trivial and standard routes
 
 # gate
 
