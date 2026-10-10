@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -188,6 +188,15 @@ record:
     hash_after: a9781ff9f3442abf35b09e937bafd3c668551779
     returns: 1
     why: "Carry keeps the edit open but leaves the marks and last behind, so a fill after a redraw writes every row the view holds: re-point marks and last by name path as at is, with a red case that marks two rows, redraws with a row above, fills, and finds the two alone written; a departed row loses the typed value in silence: name the departure in the notice, with a case asserting it"
+  - step: design/draft-2
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 830951312a329d84c15638dc20400a318fc896d4
+    hash_after: 830951312a329d84c15638dc20400a318fc896d4
+    inputs:
+      - name: ask
+        hash: 97110e026beedf1c
+        size: 671
+    def: 05d09c51410ea2a3
 group: the-tui-keeps-its-place
 ---
 
@@ -317,38 +326,58 @@ Both cases fail on their assertions. After one work/rows change mid-edit, `u` po
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` copies the open edit, and points its `at` at the item holding the same name path in the new items, walked over `Items` as `itemAt` walks. It re-points every mark and the last mark the same way, so a fill after a redraw reaches the marked rows alone. Where a row left, its mark drops, and the edit keeps an empty `at`. The edit carries its row name, so `Take` on a departed row writes nothing. It returns that name with the reason that the row left, and the tab names it in the notice through `writes`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes, the one caller of Carry
+- src/tui/work/workedit.go Tab.editing and Tab.writes, through Take and Fill
+- src/tui/tree/treedraw.go Tree.edits, which draws the edit cell off edit.key
+- src/tui/tree/treemark.go fillWhere, MarkedItems and MarkRun, which read the marks and last
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawKeepsAnOpenEdit
+- src/tui/tree/tree_test.go TestARedrawKeepsTheMarksAFillReaches
+- src/tui/tree/tree_test.go TestATakeOnARowThatLeftSaysSo
+- src/tui/work/actions_test.go TestAKeyInAnEditStaysInItAcrossARedraw
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the marks and last stay behind, so a fill after a redraw writes every row: Carry re-points both by name path, and TestARedrawKeepsTheMarksAFillReaches decides it
+- a departed row loses the typed value in silence: Take returns the row name with the reason, and TestATakeOnARowThatLeftSaysSo decides it
+- the edit cell draws off edit.key, so a redraw whose columns lack it hides the cell: real redraws read the columns off the base file, so the work case adding a column to the first tree alone is the case edge, and the change leaves it
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/treeedit.go
+- src/tui/tree/tree_test.go
+- src/tui/work/actions_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Carry, Mark, MarkRun, fillWhere, MarkedItems, Take, write, itemAt, edits, editing and writes
+- the callers list names takes, the edit keys, the cell draw and the mark readers
+- each done_when line names its test, and the two new cases decide the reject findings
+- the approach adds no config key
 
 ## tests-red-2
 
