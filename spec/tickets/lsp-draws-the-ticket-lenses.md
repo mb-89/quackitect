@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -171,6 +171,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: bc878437196ead113eabc8b5321724caa16d5394
+    hash_after: 2d091bab4653d0fbdd9931393e8a3877f79fdb48
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "   82.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4466b101c4de7b5b
+        size: 780
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -365,26 +384,37 @@ Every done_when line meets a case in src/modules/lsp/lenses_test.go, the check l
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/lenses_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`se-index lsp` now draws the buttons over a ticket, runs their press and fills a picked process on save. The rules port `src/extension/lib/lens.js` into `src/modules/lsp/lenses.go`, so every LSP editor gets them and the hand rule stands once in Go.
+
+- the draft wrote the whole rules, and tests-red stood them back as stubs; the change restores them unchanged
+- the lens cases carry the in-package mark, since they reach `stepsIn` and the package's helpers
+- the check's types part went red on a box whose claude lays no engine types, so the fix standing on work/the-engine-fixes-its-faults rides here too, and merges as a no-op once that group lands
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches lenses.go and lenses_test.go, both in the ask's size, and the ported types fix touches `src/quack/check.go` and its tests alone, to green the check
+- the ticket port is the one door the rules reach, and the fake in lenses_test.go stands for it
+- the header of lenses.go points at this ticket, and `spec/design_output/lsp#a-ticket-carries-its-buttons` holds the approach
+- the command name and the press words stand once, in lenses.go
 
 # accept
 
