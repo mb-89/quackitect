@@ -8,6 +8,7 @@ package pull // level0: InPackageTest - reaches the in-package helpers cloudPull
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -113,6 +114,38 @@ type unmergedRepo struct {
 }
 
 func (one unmergedRepo) Unmerged() ([]string, error) { return one.paths, nil }
+
+// A git door whose push origin refuses while refused holds. [[spec/tickets/cut-groups-check-the-push]]
+type refusingRepo struct {
+	git.Repo
+	refused *bool
+}
+
+func (one refusingRepo) Push(branch string, upstream bool) git.Pushed {
+	if *one.refused {
+		return git.Pushed{Err: "remote: the push is refused"}
+	}
+	return one.Repo.Push(branch, upstream)
+}
+
+func TestARefusedGroupPushSaysSoAndRetries(t *testing.T) {
+	t.Parallel()
+	it, out, _ := cloudPull(t)
+	refused := true
+	it.Git = refusingRepo{Repo: it.Git, refused: &refused}
+	all := []*Held{{Name: "h", Path: "spec/tickets/h.md", Text: groupTicket}}
+	it.cutForGroups(all)
+	if said := out.String(); strings.Contains(said, "is cut and pushed") || !strings.Contains(said, "remote: the push is refused") {
+		t.Fatalf("the refused cut says\n%s\nand wants the refusal", said)
+	}
+	refused = false
+	out.Reset()
+	it.cutForGroups(all)
+	heads, _ := it.Git.RemoteHeads(WorkBranch)
+	if !strings.Contains(out.String(), "work/h is cut and pushed") || !slices.Contains(heads, "work/h") {
+		t.Fatalf("the next pull says\n%s\nand origin holds %v", out.String(), heads)
+	}
+}
 
 func TestAPassWhileGitListsAnUnmergedPathWritesNothingAndNamesIt(t *testing.T) {
 	t.Parallel()

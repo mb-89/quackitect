@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box e310323746a3 · claude-code-remote
+    hash_before: 964b41b33302c57c37085aa16bb48fb403672316
+    hash_after: 964b41b33302c57c37085aa16bb48fb403672316
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   96.6  in all"
+    inputs:
+      - name: ask
+        hash: 66834950b63c54a2
+        size: 440
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_landed_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`cutForGroups` reads the push result. It says pushed once origin takes the branch, and names the refusal otherwise. A later pull pushes a branch an earlier pull cut, and a failed `RemoteHeads` read cuts nothing.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask and the fix sketch
+- the change reveals no cleanup
+- the refusal line stands in `cutForGroups` alone
 
 # Discussion
 

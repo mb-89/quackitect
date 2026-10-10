@@ -25,7 +25,10 @@ func freeIn(all []*Held) []*Held {
 // An open group works on a branch, so a desk cuts one where none stands and leaves the group to the cloud. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func (it *It) cutForGroups(all []*Held) {
 	stands := map[string]bool{}
-	heads, _ := it.Git.RemoteHeads(WorkBranch)
+	heads, err := it.Git.RemoteHeads(WorkBranch)
+	if err != nil {
+		return
+	}
 	for _, head := range heads {
 		stands[head] = true
 	}
@@ -34,10 +37,15 @@ func (it *It) cutForGroups(all []*Held) {
 			continue
 		}
 		branch := WorkBranch + one.Name
-		if stands[branch] || it.Git.Branch(branch, Trunk) != nil {
+		if stands[branch] {
 			continue
 		}
-		it.Git.Push(branch, true)
+		// A branch cut on an earlier pull whose push came back refused stands local alone, so this pull pushes it again. [[spec/tickets/cut-groups-check-the-push]]
+		_ = it.Git.Branch(branch, Trunk)
+		if ran := it.Git.Push(branch, true); !ran.OK {
+			it.Println(branch + " is cut, and origin refuses its push: " + strings.TrimSpace(ran.Err))
+			continue
+		}
 		it.Println(branch + " is cut and pushed, because a group works on a branch and the cloud takes it.")
 	}
 }
