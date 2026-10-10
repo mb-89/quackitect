@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 526194ecc88177b3208dbcd0f5e8578bd3ea2fde
+    hash_after: 526194ecc88177b3208dbcd0f5e8578bd3ea2fde
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   94.5  in all"
+    inputs:
+      - name: ask
+        hash: 8bdfdf31d38f2a5b
+        size: 445
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/port_a_take_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`onBranch` in `src/branches/take.go` restores each parked note to HEAD before the switch, and wrote the saved texts back only after a switch that landed. A refused switch lost the todo-tag edits under take, beat, free and done. A deferred write now puts every parked note back on both roads.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: a parked note keeps its edits whether the switch lands or refuses
+- the change reveals no cleanup
+- the fact stands once: the deferred write in `onBranch` alone puts the notes back
 
 # Discussion
 
