@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: e89705fe9b8955c1936f9ff578c18080df9c796a
+    hash_after: b2f8ba5a5cb82f756106d29f923a6229ee460fec
+    inputs:
+      - name: ask
+        hash: 93f43e6e0d6cbad9
+        size: 1103
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -159,38 +168,69 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The light route is the trivial route, and it gains the stopping line.
+
+- `spec/processes/trivial.yaml`: the `do` step says it makes the change with tests covering every rule of the ask, commits both on a clean tree, and stops once they pass. A checklist line carries the stopping line word for word.
+- `src/quack/verb_mint.go`: a ticket minted with no `--process` takes the trivial route. The name comes from one exported constant, `pull.LightRoute`, which the finding route in `childrenOf` reads too.
+- `spec/guidance/tickets.md` rule 6: a ticket one session holds whole mints with no `--process`. That is one module, the ask as the design, no open design question and no view. Anything else names `--process=standard`.
+- The example harness wires no mint verb, and the mint reads the real disk. So the example shows the pull handing out a trivial leaf with its stopping line. The planted alpha names the trivial route on a stale hash, and the pull reroutes it onto the shipped file.
+
+The trivial hash moves, so an open trivial ticket at `do` takes the new route at its next pull and keeps its step. The group route stays as it stands, so no open group moves back to its split.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/verb_mint.go` `mintVerb` calls `withRoute`
+- `src/pull/pull_writes.go` `childrenOf` reads the trivial route
+- `src/pull/pull_stale.go` `processRead` reroutes an open trivial ticket
+- `src/quack/examples_harness_test.go` `plantedTickets` plants alpha
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- mint line: `src/quack/verb_mint_light_test.go` `TestAMintWithNoProcessTakesTheTrivialRoute`, which reads the stopping line in the minted route
+- standard line: `src/quack/verb_mint_light_test.go` `TestAMintWithStandardKeepsTheFullRoute`
+- trivial line: the stopping line in the minted route, and the example
+- guidance line: a checkpoint, `./RUNME.sh lint spec/guidance/tickets.md`
+- example line: `spec/examples/110_tickets/pull-light.md`, run by `TestEveryExampleHoldsItsSteps`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
+- the ask names `mint-light.md`, and the harness wires no mint, so `pull-light.md` proves the light route through the pull
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/processes/trivial.yaml
+- src/quack/verb_mint.go
+- src/quack/verb_mint_light_test.go
+- src/pull/pull_writes.go
+- src/quack/examples_harness_test.go
+- spec/examples/110_tickets/pull-light.md
+- spec/guidance/tickets.md
+- spec/rationales/tickets.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened `verb_mint.go`, `withRoute`, `childrenOf`, `processRead`, `trivial.yaml`, the tickets guidance and the harness fixture
+- the callers list names every reader of the trivial route and the mint's route choice
+- each done_when line names its case or its checkpoint
+- the change adds no config key
 
 ## tests-red
 
