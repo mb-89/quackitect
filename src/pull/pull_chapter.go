@@ -71,6 +71,7 @@ func (it *It) workAnswer(one *Held, leaf *Leaf) string {
 	}
 	if leaf.Gate != "" {
 		rows = append(rows, "      answers: "+leaf.Gate, "      before the clear: "+beforeClear)
+		rows = append(rows, reopenedRows(one.Text)...)
 	}
 	if leaf.Final {
 		rows = append(rows, it.acceptRows(one, leaf)...)
