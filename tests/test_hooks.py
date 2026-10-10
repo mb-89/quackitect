@@ -110,6 +110,32 @@ class TestPreTool(HookCase):
         reason = self.hook("pre-tool", tool_name="Write", tool_input={"file_path": frozen})
         self.assertIn("FROZEN", reason["hookSpecificOutput"]["permissionDecisionReason"])
 
+    def test_no_false_positives_from_the_real_pilot(self):
+        """Exact read-only commands real agents ran in the pilot that an earlier regex wrongly denied."""
+        self.to_green()
+        for cmd in ("git status && git branch --show-current && git log --oneline -3 && ls -R pkg tests 2>/dev/null; "
+                    "cat tests/test_x.py 2>/dev/null",
+                    "python3 -m unittest tests.test_x 2>&1 | tail -n 5",
+                    "cat tests/test_x.py > /tmp/copy.py",
+                    "git diff --stat HEAD~1 -- tests/ ; echo \"exit=$?\""):
+            self.assertIsNone(self.hook("pre-tool", tool_name="Bash", tool_input={"command": cmd}), cmd)
+        for cmd in ("printf 'x' >> tests/test_x.py", "sed -i.bak 's/1/2/' tests/test_x.py",
+                    "cp /tmp/other.py tests/test_x.py", "echo hi > ./tests/test_x.py"):
+            self.assertEqual(self.decision(self.hook("pre-tool", tool_name="Bash", tool_input={"command": cmd})),
+                             "deny", cmd)
+
+    def test_reviewer_may_inspect_but_not_write(self):
+        self.to_green()
+        self.hx.submit("s1", "tests_green", sha="c" * 40)
+        self.hx.done("s1")
+        self.hx.claim("s2", "reviewer", "T-1")
+        e = lambda cmd: self.hook("pre-tool", session="s2", tool_name="Bash", tool_input={"command": cmd})
+        for cmd in ("git checkout -q fa6d6b5 2>&1; python3 -m unittest tests.test_x 2>&1 | tail -15",
+                    "mkdir -p /tmp/scratch && git show HEAD:pkg/x.py > /tmp/scratch/x.py"):
+            self.assertIsNone(e(cmd), cmd)
+        for cmd in ("git commit -am fix", "git push origin hx/T-1", "git merge main"):
+            self.assertEqual(self.decision(e(cmd)), "deny", cmd)
+
     def test_reviewer_cannot_change_anything(self):
         self.to_green()
         self.hx.submit("s1", "tests_green", sha="c" * 40)

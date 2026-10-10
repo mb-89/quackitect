@@ -124,7 +124,7 @@ Traceback (most recent call last):
   File "/usr/lib/python3.11/unittest/loader.py", line 162, in loadTestsFromName
     module = __import__(module_name)
              ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/hx-verify-8v293vip/tests/test_slug.py", line 2, in <module>
+  File "/tmp/hx-verify-gdkpu4ls/tests/test_slug.py", line 2, in <module>
     from textkit.slug import slugify
 ModuleNotFoundError: No module named 'textkit.slug'
 

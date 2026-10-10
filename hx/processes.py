@@ -124,7 +124,10 @@ GROUP = {
     },
 }
 
-BUILTIN = {p["name"]: p for p in (FEATURE, BUGFIX, CHORE, GROUP)}
+# hx-0, the smallest version that should beat a single agent: red -> green -> review -> accept -> land.
+MVP = dict(BUGFIX, name="mvp")
+
+BUILTIN = {p["name"]: p for p in (FEATURE, BUGFIX, CHORE, GROUP, MVP)}
 
 
 def normalize(proc):

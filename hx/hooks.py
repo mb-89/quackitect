@@ -27,10 +27,27 @@ READONLY_BASH = re.compile(r"^\s*(ls|cat|head|tail|grep|rg|find|pwd|wc|echo|git\
 FORCE_PUSH = re.compile(r"\bgit\s+push\b[^\n;&|]*\s(--force(-with-lease)?|-f)\b")
 PUSH_MAIN = re.compile(r"\bgit\s+push\b[^\n;&|]*\s(\S+:)?(refs/heads/)?(main|master)\b")
 REBASE = re.compile(r"\bgit\s+(rebase|pull\s+(-r|--rebase))\b")
-MUTATE = re.compile(r"(\bsed\s+-i|\btee\b|>|\brm\b|\bmv\b|\bcp\b|\bgit\s+(checkout|restore|rm|mv)\b|\btruncate\b"
+MUTATE = re.compile(r"(\bsed\s+(-\w*\s+)*-\w*i|\btee\b|\brm\b|\bmv\b|\bcp\b|\bgit\s+(rm|mv)\b|\btruncate\b"
                     r"|\bperl\s+-\w*i)")
+REDIRECT = re.compile(r"(?<![0-9&>])>>?\s*([^\s;&|<>()]+)")  # stdout redirect targets; not 2>... or &>...
+SEGMENTS = re.compile(r"\|\||&&|;|\||\n")
 OWNER_CMDS = re.compile(r"\bhx\s+(answer|approve|changes|override|pause|resume|cancel|revoke|edit|import|ticket)\b")
-GIT_WRITE = re.compile(r"\bgit\s+(commit|push|merge|cherry-pick|reset)\b")
+GIT_WRITE = re.compile(r"\bgit\s+(commit|push|merge|rebase|cherry-pick)\b")
+
+
+def touches_frozen(cmd, frozen):
+    """True if a simple command in `cmd` writes a frozen file: a redirect into it, or a mutating command
+    (sed -i, tee, rm, mv, cp, ...) naming it. Reads such as `cat tests/x.py 2>/dev/null` are fine.
+    Deliberately conservative: the frozen-blob check in the gate is the guarantee, this is feedback."""
+    def hit(text):
+        return any(text == f or text.endswith("/" + f) for f in frozen)
+    for target in REDIRECT.findall(cmd):
+        if hit(target.strip("'\"")):
+            return True
+    for seg in SEGMENTS.split(cmd):
+        if MUTATE.search(seg) and any(f in seg for f in frozen):
+            return True
+    return False
 
 MAX_STOP_BLOCKS = 2
 CP_NAG = int(os.environ.get("HX_CP_NAG", "25"))
@@ -174,8 +191,9 @@ def on_pre_tool(d):
         if tool in WRITE_TOOLS:
             return deny("hx: reviewers may not edit files. Record what must change with "
                         "`hx submit review --verdict changes --finding '...'`.")
-        if cmd and (GIT_WRITE.search(cmd) or (MUTATE.search(cmd) and not harmless)):
-            return deny("hx: reviewers may not change the repository; report findings instead.")
+        if cmd and GIT_WRITE.search(cmd):
+            return deny("hx: reviewers may not commit, push or merge; report findings with `hx submit review`. "
+                        "(Inspecting is fine: checkout of the candidate, running tests, scratch files.)")
     frozen = t["frozen"] if step != "red" else {}
     if tool in WRITE_TOOLS and frozen:
         path = ti.get("file_path") or ti.get("notebook_path") or ""
@@ -191,7 +209,7 @@ def on_pre_tool(d):
             return deny(f"hx: never push to main; push {t['branch']}. The merge queue lands reviewed commits.")
         if REBASE.search(cmd) and t["heads"].get("red"):
             return deny("hx: do not rebase: it breaks red→green ancestry. Merge origin/main instead.")
-        if frozen and MUTATE.search(cmd) and any(f in cmd for f in frozen):
+        if frozen and touches_frozen(cmd, frozen):
             return deny("hx: that command would modify a FROZEN test file. Change the code instead.")
     return None
 

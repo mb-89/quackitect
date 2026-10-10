@@ -1,0 +1,61 @@
+{
+ "model": "haiku",
+ "budget_per_session": 0.6,
+ "max_turns": 0,
+ "solo_restarts": 0,
+ "results": [
+  {
+   "task": "duration",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.027468099999999995,
+   "seconds": 82.30000000000001,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.011,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.006,
+     11,
+     [
+      "hx brief",
+      "FROZEN"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.01,
+     10,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  }
+ ]
+}
