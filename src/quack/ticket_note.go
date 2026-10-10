@@ -60,6 +60,11 @@ func ticketNote(here pullOver) twin {
 		}
 		// A note lands on its first call, so a name past the cap cuts to its first words and says so. [[spec/tickets/prose-verbs-land-first-try]]
 		named := cutTo(name, it.Words)
+		// A note stands flat under the notes folder, where the pull lists it. [[spec/tickets/note-names-stay-flat]]
+		if !pull.NewTicketPath(pull.Notes + "/" + named + ".md") {
+			fmt.Fprintf(errs, "%s stands outside the names a note takes. Name it in lower case, digits and hyphens.\n", name)
+			return exitUsage
+		}
 		if named != name {
 			fmt.Fprintf(out, "%s holds more than %d words, so the note stands as %s.\n", name, it.Words, named)
 		}
