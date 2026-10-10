@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 56dc466b70fefe10
         size: 625
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: b107a430d9580e59c6d80806d77a989c9fbbf409
+    hash_after: b107a430d9580e59c6d80806d77a989c9fbbf409
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/yaml fails
+    inputs:
+      - name: design/draft
+        hash: f659931c04d059b7
+        size: 1258
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,32 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/yaml src/front
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/yaml/yaml_test.go
+- src/front/front_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The scalar read strips the quotes and keeps every escape, so a backslash doubles and an escaped quote keeps its backslash. A single-quoted doubled quote reads as two. A value that `Quote` leaves plain round-trips today, so the front case carries values that force quotes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets its failing case in the two test files
+- the tests reach no door, since the yaml read and the front writer run over text alone
 
 # gate
 

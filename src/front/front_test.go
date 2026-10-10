@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"quackitect/src/modules/files"
+	notes "quackitect/src/note"
+	"quackitect/src/yaml"
 )
 
 const body = "\n# Ask\n\nA body: with a colon, and --- a fence of its own.\n"
@@ -199,4 +201,23 @@ func bodyOf(text string) string {
 		}
 	}
 	return text
+}
+
+// A value Set writes reads back as written, so a read and a rewrite keep it. [[spec/tickets/quoted-fronts-round-trip]]
+func TestASetValueReadsBackAsWritten(t *testing.T) {
+	for _, value := range []string{`"quoted" opens it`, `path: C:\tree\spec`, `a: "b" \\ c`, "key: value", "a #hash", "one\ntwo", `'it's: here`, `ends \ `} {
+		text := "---\nkind: [[ticket]]\n---\n" + body
+		for round := 0; round < 2; round++ {
+			written, err := Set(text, "title", value)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := yaml.AsString(notes.Read(written).Front.Said.Get("title"))
+			if got != value {
+				t.Errorf("%q reads back as %q on round %d", value, got, round+1)
+				break
+			}
+			text, value = written, got
+		}
+	}
 }
