@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: green, src/quack passes; green, src/modules/hooks passes; green, src/modules/log passes
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: fbea9d182944c8f066dd240bc570794473ada1af
+    hash_after: a3390cc41461eac34e62e2582a0c0ec4ad0eb0e4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   90.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: ece152b88e9d8b30
+        size: 377
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/pull/red_log_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A command field that misses what it expects now refuses with the path of the session log, which holds its whole output, and with each failing Go case its output names. A hand reads the failing case off the refusal and fixes it, in place of a blind retry. The log path now stands once in the log module, and the failing-case pattern once in the pull, so the check and the hooks read the same two names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the six files the draft names, and no other
+- the change reaches no door, and the case drives a fake shell and a fake log
+- each new name points at this ticket
+- the log path and the failing-case pattern each stand once. The quack copies read them, and the hooks copy points at the log module by comment, since a module imports no module
 
 # accept
 
