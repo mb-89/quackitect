@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-tui-keeps-its-place
 step: do
+record:
+  - step: do
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 5451724127d46cd588aaa47dea7599847e850da7
+    hash_after: 5451724127d46cd588aaa47dea7599847e850da7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   78.1  in all"
+    inputs:
+      - name: ask
+        hash: 926e66420f027f51
+        size: 573
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`typesHold` in `src/quack/check.go` reads whether the lay left `.claude-plugin/types/tsconfig.json`, and where it left none the part says the hooks go untyped and carries on, as for a box with no `claude`. This box runs a `claude` that lays no types, so `tsc` refused the plugin config and wrote a `.js` beside each hook, which failed the stub case. The types cases move to `check_types_test.go`, since `check_test.go` stood at the line cap. Three ticket names of this group shrink to five words, as the name rule asks.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the file split and the renames are the cleanup the check names on the way
+- the stray .js files tsc wrote stand removed from the working tree
+- the types path stands once, as typesConfig beside pluginDir
 
 # Discussion
 
