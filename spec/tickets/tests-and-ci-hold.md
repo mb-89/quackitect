@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 54da26a4513f · claude-code-remote
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: 234e819a3bd6ecfad00ceb682139564275bd3c98
     hash_after: 234e819a3bd6ecfad00ceb682139564275bd3c98
+  - step: accept
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: e4d292292e69e85411c82ef14fa6f1b7013f065e
+    hash_after: e4d292292e69e85411c82ef14fa6f1b7013f065e
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/tests-and-ci-hold already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 9ee9ce1729d4b9bc
+        size: 416
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -171,8 +187,17 @@ goal: A new cloud box starts installed through the old setup path. Origin names 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the old setup path: src/scripts/install.sh hands every argument to the root install, under a case reading the argument count
+- origin branches: the close deletes none for the reason its says field gives, and old-groups-leave-origin carries the delete to the owner
+- the stale install: RUNME.sh runs install.sh on a bare call, a missing binary or a stale stamp, on stderr
+- the weak tests: the session read, the zombie wait, the deferred stop, the held port, the shared TestMain and the fake env each fail where their thing breaks
+- the CI cache keys on the Biome pin install.sh carries, over the folder the install writes
+- Biome fetches the arm asset on an arm Linux box, and a binary that cannot run is fetched again
+- the write door cleans both sides, and a climb out of the root reads as outside
+- a fresh binary now skips the want checks, so a want lost after the build returns at the next boot or the next stale stamp
 
 # retro
 
