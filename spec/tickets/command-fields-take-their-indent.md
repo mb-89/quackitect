@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 12de8c964dec5831cfe337a3511d8e18a8ead486
+    hash_after: 12de8c964dec5831cfe337a3511d8e18a8ead486
+    inputs:
+      - name: ask
+        hash: 72c1e1d85aa253df
+        size: 674
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -164,38 +173,50 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`withPayload` in `src/pull/pull_chapter.go` takes the leaf in hand. For a field the leaf names under `form: command`, it writes each row of the formatted value trimmed and indented four spaces, whatever indent the hand passes. Every other form writes as it does now. `chapterLines` and `commandsRun` trim each row, so the runs read the same line, and `CarriedIn` reads the indented row.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_back.go`, `handBack`, the one caller of `withPayload`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_indent_test.go`, `TestACommandFieldLandsIndented`, over a bare field, a field indented two spaces and a text field left as it stands
+- `src/modules/hooks/command/tested_test.go`, `TestHeldTestsReadTheHeldTicketsCommandLines`, standing as it is
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_chapter.go`
+- `src/pull/pull_back.go`
+- `src/pull/pull_indent_test.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `withPayload`, `formatted`, `withFieldText`, `handBack` and `CarriedIn` stand opened, and the claims hold there
+- `handBack` is the one caller, found by search over `src`
+- each done_when line meets its named test
+- the approach adds no config key
 
 ## tests-red
 
