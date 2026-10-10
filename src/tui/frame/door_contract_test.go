@@ -17,25 +17,21 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-// A port nothing holds, off the listener the system hands out. [[spec/design_output/tui#a-second-launch-hands-over]]
-func freePort(t *testing.T) int {
+// A listener on the port the system hands out, held from the bind on, so no parallel case takes the port in a gap. [[spec/tickets/door-tests-hold-their-port]]
+func heldPort(t *testing.T) (net.Listener, int) {
 	t.Helper()
 	at, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer at.Close()
-	return at.Addr().(*net.TCPAddr).Port
+	return at, at.Addr().(*net.TCPAddr).Port
 }
 
 func TestTheDoorTakesATabAndHandsItToTheWindow(t *testing.T) {
 	t.Parallel()
-	port := freePort(t)
+	at, port := heldPort(t)
 	took := make(chan any, 1)
-	door, err := OpenDoor(port, func(msg any) { took <- msg })
-	if err != nil {
-		t.Fatalf("the door opens on a free port, and answers %v", err)
-	}
+	door := ServeDoor(at, func(msg any) { took <- msg })
 	defer door.Close()
 	if !TellPort(qtest.Wall(), port, "work") {
 		t.Fatal("a caller hands the door a tab, and the door takes it")
@@ -50,21 +46,30 @@ func TestTheDoorTakesATabAndHandsItToTheWindow(t *testing.T) {
 	}
 }
 
-func TestACallToAPortNobodyHoldsAnswersFalse(t *testing.T) {
+// The port stands held by a listener that drops each call, so no door answers there and no parallel case binds it. [[spec/tickets/door-tests-hold-their-port]]
+func TestACallWhereNoDoorAnswersAnswersFalse(t *testing.T) {
 	t.Parallel()
-	if TellPort(qtest.Wall(), freePort(t), "log") {
-		t.Fatal("a port nobody holds takes no tab, so the launch opens a window of its own")
+	at, port := heldPort(t)
+	defer at.Close()
+	go func() {
+		for {
+			call, err := at.Accept()
+			if err != nil {
+				return
+			}
+			_ = call.Close()
+		}
+	}()
+	if TellPort(qtest.Wall(), port, "log") {
+		t.Fatal("a port where no door answers takes no tab, so the launch opens a window of its own")
 	}
 }
 
 func TestTheDoorRefusesABodyThatNamesNoTab(t *testing.T) {
 	t.Parallel()
-	port := freePort(t)
+	at, port := heldPort(t)
 	var took atomic.Int32
-	door, err := OpenDoor(port, func(_ any) { took.Add(1) })
-	if err != nil {
-		t.Fatal(err)
-	}
+	door := ServeDoor(at, func(_ any) { took.Add(1) })
 	defer door.Close()
 	answer, err := http.Post("http://"+net.JoinHostPort("127.0.0.1", strconv.Itoa(port))+"/tab", "application/json", strings.NewReader("no json"))
 	if err != nil {
