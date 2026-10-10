@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: be4d886ae694aac2dbe0215084a893737c5815c0
+    hash_after: dc12a995d711ec6678285f29bcd50fae13db35ba
+    inputs:
+      - name: ask
+        hash: 899317d2c93210e8
+        size: 426
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,50 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+When a put fails after another put lands, writes() rewrites the journal entry to the files the disk now holds from this apply. It keeps each file in `wrote` as it stands. It keeps the failing file only where it stands on disk, with Made set to the text read back, because a truncated WriteFile leaves neither half. It drops every file the batch did not reach. Restores then passes every listed file, so undo puts Was back and removes the files the apply made. Restores and undoes stay as they are.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits.go patches, through writes
+- src/modules/edits/edits.go the replace sweep, through writes
+- src/modules/edits/edits.go the mint, through writes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits_test.go, the part-written case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits.go
+- src/modules/edits/edits_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: writes, undoes, Restores, JournalOf and put stand as the approach reads them
+- callers: writes is the one door every apply reaches, so every caller is in the list
+- done_when: the part-written case decides the one line
+- config: the approach adds no key
 
 ## tests-red
 
