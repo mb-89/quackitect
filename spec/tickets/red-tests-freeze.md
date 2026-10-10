@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -246,6 +246,15 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/pull]]
+  - step: design/tests-red-2
+    hand: the engine
+    stale: [[spec/design_output/pull]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/pull]]
 group: red-freezes-and-stalls-show
 ---
 
