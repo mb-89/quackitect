@@ -821,6 +821,18 @@ A red leaf's pass freezes its red files, so the hand making them green cannot be
 - A fail, a `--became` and an `--answered` skip the check, because they land no pass.
 - A record holding no `frozen` row checks nothing, so a route with no red leaf stands as it is.
 
+## The next line rides hand-backs
+
+A hand-back carries one line for a stranger, so every claim leaves a baton. `src/pull/pull_next.go` holds the mechanism.
+
+| read | how |
+|---|---|
+| the line | `--next "<line>"` on any hand-back: a pass, a fail, a gate verdict, a `--became` or an `--answered` |
+| the record | the entry the hand writes keeps it under `next` |
+| the hand-out | every hand-out of the ticket shows the latest `next` under the leaf line |
+
+A take over reads the line beside the beat. For details, see [[spec/design_output/work#a-takeover-reads-the-beat]].
+
 # Done leaves no takeable step
 
 `branch done` closes a group only where no ticket naming it stands open, and a

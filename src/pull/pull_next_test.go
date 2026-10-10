@@ -50,14 +50,14 @@ func TestAFailHandBackWritesItsNextLine(t *testing.T) {
 	}
 }
 
-// The hand-out after a pass with --next shows the line under the leaf. [[spec/tickets/crash-leaves-a-handover]]
+// The hand-out the pass with --next prints, of the ticket's next leaf, shows the line under the leaf. [[spec/tickets/crash-leaves-a-handover]]
 func TestTheNextHandOutShowsTheNextLine(t *testing.T) {
 	t.Parallel()
 	it := nextBox(t)
-	if code, said := pulled(t, it, "alpha", "--pass", "--fields", `{"tests":"echo assertion","red":"- `+frozenFile+`"}`, "--next", nextLine); code != 0 {
-		t.Fatalf("the pass answers %d:\n%s", code, said)
+	code, said := pulled(t, it, "alpha", "--pass", "--fields", `{"tests":"echo assertion","red":"- `+frozenFile+`"}`, "--next", nextLine)
+	if code != 0 || !strings.Contains(said, "alpha at implement/tests-green") {
+		t.Fatalf("the pass answers %d with no next hand-out:\n%s", code, said)
 	}
-	_, said := pulled(t, it)
 	if !strings.Contains(said, "The hand before left: "+nextLine) {
 		t.Fatalf("the hand-out shows no next line:\n%s", said)
 	}

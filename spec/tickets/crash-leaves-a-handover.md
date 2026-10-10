@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -173,6 +173,15 @@ record:
         hash: 3ce642ed632fb96f
         size: 49558
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 340a0e79778ceb31aebcec1f5b1df918e2bc3d63
+    hash_after: 340a0e79778ceb31aebcec1f5b1df918e2bc3d63
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -336,14 +345,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/branches/left.go src/branches/beat.go src/branches/take.go src/pull/pull_next.go src/pull/pull_writes.go src/pull/pull_gate.go src/pull/pull.go src/pull/pull_chapter.go spec/schemas/ticket.schema.yaml spec/examples/110_tickets/pull-next.md src/quack/examples_harness_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stands in the files the draft names, plus the harness fixture, whose alpha refused every hand-back
+- the take cases run on the fake tree, and the pull cases and the example on the fakes of the pull
+- each function and constant in `left.go` and `pull_next.go` points at its design section
+- the beat files and the next field stand once, in `left.go`, `pull_next.go` and the ticket schema
 
 ## tests-green
 

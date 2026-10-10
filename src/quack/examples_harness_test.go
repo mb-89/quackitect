@@ -44,7 +44,7 @@ const (
 // The planted group and its one child, the leaf a first pull hands out. [[spec/design_output/examples#doors-fixtures-and-the-ratio]]
 var plantedTickets = map[string]string{
 	"spec/tickets/g.md":         "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nA group of one change.\n",
-	"spec/tickets/alpha.md":     "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: do\n    does: makes the change\n    evidence:\n      - name: tests\n        form: command\n        expects: green\n        says: the tests\n      - name: says\n        form: text\n        says: what changes\nprocess: [[spec/processes/small]]\ngroup: g\n---\n\n# Ask\n\nSome change the owner asks for.\n\n# do\n\n<!-- makes the change -->\n\n## tests\n\n<!-- the tests -->\n\n## says\n\n<!-- what changes -->\n\n# Discussion\n",
+	"spec/tickets/alpha.md":     "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: tests\n        form: command\n        expects: green\n        says: the tests\n      - name: says\n        form: text\n        says: what changes\nprocess: [[spec/processes/small]]\ngroup: g\n---\n\n# Ask\n\nSome change the owner asks for.\n\n# do\n\n<!-- makes the change -->\n\n## tests\n\n<!-- the tests -->\n\n## says\n\n<!-- what changes -->\n\n# Discussion\n",
 	"spec/processes/small.yaml": "steps: []\n",
 	".gitignore":                ".se/\n",
 }
