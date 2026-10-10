@@ -94,16 +94,18 @@ func TestWatchKeepsItsContract(t *testing.T) {
 // level0: FixtureOutsideHome - the contract runs the real watch over a real folder of its own, since the hang stood in the real watch alone
 func TestAStopReturnsWhileFoldersAppear(t *testing.T) {
 	for round := 0; round < 20; round++ {
-		root := t.TempDir()
-		stop, err := NewWatch(root).Changes(func(string, string, int64, bool) {})
-		if err != nil {
-			t.Fatal(err)
-		}
-		appearing := watchertest.Appearing(root)
-		for stands, _ := filepath.Glob(filepath.Join(root, "*")); len(stands) == 0; stands, _ = filepath.Glob(filepath.Join(root, "*")) {
-			runtime.Gosched()
-		}
-		watchertest.Returns(t, func() error { stop(); return nil })
-		appearing()
+		// A hang fails through t.Fatal, which runs the round's defers alone, so the folders stop appearing before TempDir's cleanup. [[spec/tickets/appearing-stops-on-a-fatal]]
+		func() {
+			root := t.TempDir()
+			stop, err := NewWatch(root).Changes(func(string, string, int64, bool) {})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer watchertest.Appearing(root)()
+			for stands, _ := filepath.Glob(filepath.Join(root, "*")); len(stands) == 0; stands, _ = filepath.Glob(filepath.Join(root, "*")) {
+				runtime.Gosched()
+			}
+			watchertest.Returns(t, func() error { stop(); return nil })
+		}()
 	}
 }
