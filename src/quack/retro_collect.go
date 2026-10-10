@@ -297,7 +297,6 @@ func retroCollectMovedInto(it retroCollectDoors, into string) []retroCollectRow 
 		}
 		path := retroCollectPrivate + "/" + name
 		if one.IsDir() && retroCollectFileByFile(it, was, now, path, &out) {
-			_ = disk.removeAll(was)
 			continue
 		}
 		out = append(out, retroCollectRow{Path: path, Refused: retroCollectReasonOf(err)})
@@ -305,7 +304,7 @@ func retroCollectMovedInto(it retroCollectDoors, into string) []retroCollectRow 
 	return out
 }
 
-// Moves every file a folder holds, and answers whether none stays behind. [[spec/guidance/retro/collect]]
+// Moves every file a folder holds, removes the folder once it stands empty, and answers whether none stays behind. A file written after the listing keeps its folder, since the remove takes an empty folder alone. [[spec/tickets/collect-removes-what-it-moved]]
 func retroCollectFileByFile(it retroCollectDoors, was, now, path string, out *[]retroCollectRow) bool {
 	disk := it.disk
 	whole := true
@@ -324,6 +323,9 @@ func retroCollectFileByFile(it retroCollectDoors, was, now, path string, out *[]
 			*out = append(*out, retroCollectRow{Path: path + "/" + one.Name(), Refused: retroCollectReasonOf(err)})
 			whole = false
 		}
+	}
+	if whole {
+		_ = disk.remove(was)
 	}
 	return whole
 }

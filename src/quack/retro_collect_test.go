@@ -271,6 +271,33 @@ func TestRetroCollectMovesEverythingPastTheDotFoldersAndLeavesTheRuntimeAndRetro
 	}
 }
 
+// A log row written while the fallback moves the log stands after it, since the fallback deletes only what it moved. [[spec/tickets/collect-removes-what-it-moved]]
+func TestRetroCollectKeepsALogFileWrittenWhileItMovesFileByFile(t *testing.T) {
+	t.Parallel()
+	w := retroNewCollectWorld(t, retroFakeTrunk())
+	w.seed(map[string]string{retroInputKey("log/old.jsonl"): "{}\n"})
+	live := w.at("tree:.se/.log/session.jsonl")
+	w.move = func(from, to string) error {
+		err := w.disk.rename(from, to)
+		if strings.HasSuffix(from, "one.jsonl") {
+			_ = w.disk.write(live, []byte(`{"said":"a late line"}`+"\n"), 0o644)
+		}
+		return err
+	}
+
+	code, said := w.collect("--again")
+
+	if code != 0 {
+		t.Fatalf("collect answers %d, want 0: %s", code, said)
+	}
+	if !w.exists(retroInputKey("log/one.jsonl")) {
+		t.Fatal("the listed log file lands in the input")
+	}
+	if !w.exists("tree:.se/.log/session.jsonl") {
+		t.Fatal("the log file written after the listing stands where it was written")
+	}
+}
+
 // A session run from a folder inside the tree names a folder of its own. [[spec/guidance/retro/collect]]
 func TestRetroCollectCopiesTheTranscriptsMemoryAndScratchpadsOfThisTreeAndNoOther(t *testing.T) {
 	t.Parallel()
