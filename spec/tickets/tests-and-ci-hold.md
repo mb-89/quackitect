@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box 54da26a4513f · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/tests-and-ci-hold took 88 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: f80f283a4d6200b1cae08085d11adfd2ce73a1fd
+    hash_after: f80f283a4d6200b1cae08085d11adfd2ce73a1fd
+    inputs:
+      - name: ask
+        hash: 9ee9ce1729d4b9bc
+        size: 416
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -123,14 +132,31 @@ goal: A new cloud box starts installed through the old setup path. Origin names 
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/setup-install-path-stands]] trivial
+- [[spec/tickets/merged-work-branches-close]] trivial
+- [[spec/tickets/runme-installs-when-stale]] standard
+- [[spec/tickets/a-killed-door-reads-dead]] trivial
+- [[spec/tickets/appearing-stops-on-a-fatal]] trivial
+- [[spec/tickets/bus-cap-builds-its-origin]] trivial
+- [[spec/tickets/door-tests-hold-their-port]] trivial
+- [[spec/tickets/quack-tests-remove-their-folders]] trivial
+- [[spec/tickets/the-fake-runner-drops-names]] trivial
+- [[spec/tickets/ci-caches-the-runtime-bin]] trivial
+- [[spec/tickets/biome-fetches-its-arch]] trivial
+- [[spec/tickets/write-door-cleans-its-paths]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one fix sketch or one verb road, small enough to review whole
+- each goal sentence maps to a child: the old setup path, the branch close, the stale install, the six weak tests, the CI cache, the Biome arch and the write door
+- no child waits on another, so none names depends_on
+- no child reads a sibling, so the land order stands free
+- the diff stays one review, so no child splits into a group
 
 # children
 
