@@ -509,8 +509,8 @@ step's commit.
 | separation of duties on review and decision | runs, tested |
 | leases, fencing, stall kill, synthesised handover, bounded retry, hold | runs, tested |
 | supervisor tick with a scripted worker and fault injection | runs, tested |
-| HTTP API, owner page (inbox, board, ticket timeline), steering verbs | runs |
-| MCP server, hooks, Claude Code worker adapter | runs; see the demo transcript in README.md |
+| HTTP API, owner page (inbox, board, ticket timeline), steering verbs | runs; phone and desktop screenshots under docs/ |
+| MCP server, hooks, Claude Code worker adapter | runs; two live runs in LIVE.md, four faults found there fixed and tested |
 | groups and dependency order | data model only |
 | pull request, auto-merge, CI webhook | adapter interface and webhook endpoint; forge calls stubbed |
 | sync step, notifications, autopilot | design only |

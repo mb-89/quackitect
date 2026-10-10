@@ -47,12 +47,24 @@ class RedGate(unittest.TestCase):
         self.assertEqual(r["verdict"], "fail")
         self.assertIn("adds a test", r["detail"])
 
-    def test_missing_commit_fails(self):
+    def test_done_with_missing_evidence_is_refused_and_the_attempt_goes_on(self):
+        # found by a live run: a worker whose evidence was refused called done anyway and burned a gate
         eng, repo, clock = make("mvp")
         c = eng.claim("t1")
-        r = eng.done(c["attempt"], c["token"])
-        self.assertEqual(r["verdict"], "fail")
-        self.assertIn("missing evidence", r["detail"])
+        with self.assertRaises(HarnessError) as cm:
+            eng.done(c["attempt"], c["token"])
+        self.assertEqual(cm.exception.code, "not_ready")
+        self.assertIn("commit", cm.exception.message)
+        self.assertFalse(eng.can_stop(c["attempt"])[0])
+        self.assertEqual(eng.ticket("t1")["fails"], {})
+
+    def test_a_string_in_a_list_field_is_wrapped(self):
+        # found by a live run: a worker sent retro.slow as a string
+        eng, repo, clock = make("default")
+        c = eng.claim("t1")
+        s = eng.evidence(c["attempt"], c["token"], "plan", {"criteria": "fizz(3) is Fizz", "tests": ["test_3"], "files": ""})
+        self.assertEqual(s["filed"], ["plan"])
+        self.assertEqual(eng.done(c["attempt"], c["token"])["verdict"], "pass")
 
     def test_commit_off_branch_refused(self):
         eng, repo, clock = make("mvp")
@@ -92,6 +104,30 @@ class GreenGate(unittest.TestCase):
         eng.evidence(c["attempt"], c["token"], "commit", {"sha": sha})
         eng.evidence(c["attempt"], c["token"], "test_change", {"why": "the test imported the wrong module"})
         self.assertEqual(eng.done(c["attempt"], c["token"])["verdict"], "pass")
+
+    def test_an_accepted_test_change_stands_in_later_rounds(self):
+        # found by a live run: a reviewer sent the ticket back, the next attempt added tests with a
+        # test_change note and passed, the owner rejected once more, and the next commit (tests untouched)
+        # failed the tamper check because the baseline was still the test step's commit
+        eng, repo, clock = make("mvp")
+        run_test_step(eng, repo)
+        c = eng.claim("t1")
+        sha = commit(repo, "ticket/t1", {"tests/test_fizz.py": "more tests", "fizz.py": "v1"}, tests_exit=0)
+        eng.evidence(c["attempt"], c["token"], "commit", {"sha": sha})
+        eng.evidence(c["attempt"], c["token"], "test_change", {"why": "added the tests the plan named"})
+        self.assertEqual(eng.done(c["attempt"], c["token"])["verdict"], "pass")
+        run_review_step(eng, verdict="request_changes", findings=["a docstring"])
+        c = eng.claim("t1")
+        sha = commit(repo, "ticket/t1", {"fizz.py": "v2 with docstring"}, tests_exit=0)
+        eng.evidence(c["attempt"], c["token"], "commit", {"sha": sha})
+        r = eng.done(c["attempt"], c["token"])
+        self.assertEqual(r["verdict"], "pass", r["detail"])
+        # and a later tamper against the accepted tests is still caught
+        run_review_step(eng, verdict="request_changes", findings=["once more"])
+        c = eng.claim("t1")
+        sha = commit(repo, "ticket/t1", {"tests/test_fizz.py": "weakened", "fizz.py": "v3"}, tests_exit=0)
+        eng.evidence(c["attempt"], c["token"], "commit", {"sha": sha})
+        self.assertEqual(eng.done(c["attempt"], c["token"])["verdict"], "fail")
 
     def test_max_fails_holds_the_ticket(self):
         eng, repo, clock = make("mvp")
@@ -244,6 +280,19 @@ class OwnerVerbs(unittest.TestCase):
         eng.decide("t1", "approve")
         self.assertEqual(eng.ticket("t1")["state"], "done")
         self.assertIn("pr_opened", [e["kind"] for e in eng.timeline("t1")["events"]])
+
+    def test_retro_briefing_carries_the_timeline(self):
+        eng, repo, clock = make("trivial")
+        c = eng.claim("t1")
+        sha = commit(repo, "ticket/t1", {"fizz.py": "ok"}, tests_exit=0)
+        eng.evidence(c["attempt"], c["token"], "commit", {"sha": sha})
+        eng.done(c["attempt"], c["token"])
+        eng.decide("t1", "approve")
+        # the trivial route has no retro; the context builder is what the default route's retro step reads
+        lines = eng._timeline_context(eng._row("t1"))
+        self.assertIn("## The ticket's timeline", lines)
+        self.assertTrue(any("attempt 1 · implement · agent · passed" in l for l in lines))
+        self.assertTrue(any("owner · accept · approve" in l for l in lines))
 
     def test_ask_and_answer(self):
         eng, repo, clock = make("mvp")

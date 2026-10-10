@@ -104,14 +104,39 @@ catches defects at anything like 0.7, whether a real worker files
 evidence as it goes, and whether the briefing re-grounds a real model
 after compaction. Those are the benchmark's job.
 
-Sensitivity worth running before trusting any one number:
-`--p-review-catch 0.3` (a weak reviewer), `--rework 0` (a lone restart
-that loses nothing, the most favourable case for the lone agent), and
-`--p-false-done 0.1` (a careful lone agent).
+Sensitivity, 400 tasks per cell, the base setting with one or three
+knobs moved toward the lone agent:
 
-### The live run
+| setting | condition | success | defect delivered | incomplete | cost | cost per success | owner taps |
+|---|---|---|---|---|---|---|---|
+| weak reviewer: p_review_catch 0.3 | lone | 0.63 | 0.30 | 0.06 | 44.4 | 70.1 | 0.00 |
+| weak reviewer: p_review_catch 0.3 | harness | 0.78 | 0.22 | 0.00 | 46.7 | 59.7 | 0.06 |
+| lone restart loses nothing: rework 0 | lone | 0.63 | 0.30 | 0.06 | 39.5 | 62.5 | 0.00 |
+| lone restart loses nothing: rework 0 | harness | 0.92 | 0.08 | 0.00 | 50.1 | 54.3 | 0.06 |
+| careful lone agent: p_false_done 0.1 | lone | 0.72 | 0.21 | 0.07 | 45.6 | 63.6 | 0.00 |
+| careful lone agent: p_false_done 0.1 | harness | 0.92 | 0.08 | 0.00 | 50.1 | 54.3 | 0.06 |
+| all three at once | lone | 0.72 | 0.21 | 0.07 | 40.6 | 56.6 | 0.00 |
+| all three at once | harness | 0.78 | 0.22 | 0.00 | 46.7 | 59.7 | 0.06 |
 
-[LIVE.md](LIVE.md) records one run of the service driving Claude Code
-through the `mvp` route. One run is a demonstration that the seams hold
-(briefing in, verbs out, gates verified, stop refused), not a
-measurement.
+The reading: the reviewer's catch rate is the number everything turns
+on. With a weak reviewer and a careful lone agent the two conditions
+deliver the same defect rate, and the harness then pays for its gates
+with nothing to show but completion under crashes. The benchmark's
+second study, the reviewer against planted defects, is the one to run
+first.
+
+### The live runs
+
+[LIVE.md](LIVE.md) records two runs of the service driving Claude Code,
+through the `mvp` route and through the full `default` route with the
+owner deciding from the inbox. Two runs are a demonstration that the
+seams hold (briefing in, verbs out, gates verified, stop refused, the
+reviewer sending work back, the owner's note landing), not a
+measurement. The second run found four faults in the prototype, which
+is the other thing a live run is for; each is fixed and tested.
+
+One observation from the runs bears on the benchmark: in both runs the
+real reviewer attempt did catch what the implementer let through (a
+committed `.pyc`, three tests the plan named and the implementer
+skipped). Two observations are not a rate. The planted-defect study
+above is how to get one.

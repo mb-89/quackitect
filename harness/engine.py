@@ -339,6 +339,8 @@ class Engine:
             out += ["", f"## Last gate result on this step: {gr['verdict']}", (gr["detail"] or "")[:1500]]
         if step.owner == "helper":
             out += self._reviewer_context(t)
+        if "retro" in step.requires:
+            out += self._timeline_context(t)
         notes = _loads(t["notes"], [])
         if notes:
             out += ["", "## Notes"] + [f"- {n['who']}: {n['text']}" for n in notes[-8:]]
@@ -367,6 +369,18 @@ class Engine:
             out += ["", f"## The diff ({t['base_sha'][:10]}..{commit['body']['sha'][:10]})", "```", diff, "```"]
         return out
 
+    def _timeline_context(self, t: dict) -> list[str]:
+        """What a retro reads: every attempt with its outcome, every gate with its verdict, the owner's decisions."""
+        out = ["", "## The ticket's timeline"]
+        for a in self.store.all("select * from attempt where ticket=? order by id", t["id"]):
+            mins = ((a["ended"] or self.now()) - a["started"]) / 60
+            out.append(f"- attempt {a['id']} · {a['step']} · {a['role']} · {a['outcome'] or 'open'} · {a['calls']} verb calls · {mins:.1f} min")
+        for g in self.store.all("select * from gate_result where ticket=? order by id", t["id"]):
+            out.append(f"- gate {g['step']} · {g['verdict']} · {(g['detail'] or '')[:120]}")
+        for d in self.store.all("select * from decision where ticket=? order by id", t["id"]):
+            out.append(f"- owner · {d['step']} · {d['verdict']} · {d['note'] or ''}")
+        return out
+
     def evidence(self, attempt_id: int, token: str, kind: str, body: dict) -> dict:
         with self.store.tx():
             a, t = self._auth(attempt_id, token, f"evidence:{kind}")
@@ -378,9 +392,12 @@ class Engine:
                 raise HarnessError("unknown_kind", f"unknown evidence kind {kind}; kinds: {sorted(EVIDENCE_SHAPE)}")
             if not isinstance(body, dict):
                 raise HarnessError("bad_shape", "body must be an object")
+            body = dict(body)
             for field, typ in shape.items():
                 if field not in body:
                     raise HarnessError("bad_shape", f"{kind} needs {field}")
+                if typ is list and isinstance(body[field], str):
+                    body[field] = [body[field]] if body[field].strip() else []
                 if typ is int and isinstance(body[field], bool) or not isinstance(body[field], typ):
                     raise HarnessError("bad_shape", f"{kind}.{field} must be {typ.__name__}")
             for field in NONEMPTY.get(kind, ()):
@@ -426,6 +443,10 @@ class Engine:
         with self.store.tx():
             a, t = self._auth(attempt_id, token, "done")
             step = self._step(t)
+            rnd = self._round(t)
+            missing = [k for k in step.requires if self._latest(t["id"], step.name, k, rnd) is None]
+            if missing:
+                raise HarnessError("not_ready", f"the gate cannot run: evidence missing on this step: {', '.join(missing)}. File it, then call harness_done again")
             self._event(t["id"], "gating", attempt=a["id"], step=step.name)
             verdict, detail = self._gate(t, step)
             self.store.run(
@@ -510,6 +531,18 @@ class Engine:
                        f"harness_handover (done, remaining, blockers, files, next) if it does not, or harness_ask for the owner. Then stop.")
 
     # ------------------------------------------------------------ gates
+    def _accepted_tests_sha(self, t: dict, step: Step) -> str | None:
+        """The commit whose test files stand accepted: the last green pass on this step, else the test step's commit."""
+        last_pass = self.store.one(
+            "select attempt from gate_result where ticket=? and step=? and verdict='pass' and attempt is not null order by id desc limit 1",
+            t["id"], step.name)
+        if last_pass:
+            c = self.store.one("select body from evidence where attempt=? and kind='commit' order by id desc limit 1", last_pass["attempt"])
+            if c:
+                return json.loads(c["body"])["sha"]
+        tcommit = self._latest(t["id"], "test", "commit")
+        return tcommit["body"]["sha"] if tcommit else None
+
     def _gate(self, t: dict, step: Step) -> tuple[str, str]:
         rnd = self._round(t)
         ev = {k: self._latest(t["id"], step.name, k, rnd) for k in step.requires}
@@ -539,10 +572,10 @@ class Engine:
                 return "pass", f"`{t['test_cmd']}` fails at {sha[:10]} (exit {code}); tests changed: {[p for _, p in changed]}"
             if code != 0:
                 return "fail", f"`{t['test_cmd']}` fails at {sha[:10]} (exit {code}):\n{out[-1500:]}"
-            tcommit = self._latest(t["id"], "test", "commit")
-            if tcommit:
+            baseline = self._accepted_tests_sha(t, step)
+            if baseline:
                 try:
-                    tampered = [(s, p) for s, p in self.repo.changed_files(tcommit["body"]["sha"], sha, paths) if s in "MD"]
+                    tampered = [(s, p) for s, p in self.repo.changed_files(baseline, sha, paths) if s in "MD"]
                 except Exception as e:
                     return "error", f"the verifier could not diff: {e}"
                 if tampered and not ev.get("test_change") and not self._latest(t["id"], step.name, "test_change", rnd):

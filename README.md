@@ -140,12 +140,16 @@ $ harness decide fizz approve
 ticket fizz: state done, stalls 1, attempts 12, gates 13
 ```
 
-## Live run with Claude Code
+## Live runs with Claude Code
 
-See [LIVE.md](LIVE.md) for a transcript of the service driving Claude
-Code through the `mvp` route on a toy repository.
+[LIVE.md](LIVE.md) records two runs of the service driving Claude Code:
+the `mvp` route on a toy repository, and the full `default` route with
+the owner rejecting once from the inbox. The second run found four
+faults in the prototype; each has a fix and a test.
 
 ## The owner's page
+
+![the inbox on a phone](docs/inbox-phone.png)
 
 `GET /` serves one page. On a phone the inbox is the first screen: one
 card per decision with two or three buttons. Under it the board: one

@@ -5,7 +5,9 @@ PAGE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>harness</title>
 <style>
-body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f4f5f7;color:#111}
+*{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f4f5f7;color:#111;overflow-wrap:anywhere}
 header{padding:12px 16px;background:#1f2937;color:#fff;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
 header a{color:#fff;text-decoration:none;font-weight:600}
 main{padding:12px;max-width:960px;margin:auto}
@@ -24,6 +26,13 @@ td,th{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:to
 pre{white-space:pre-wrap;word-break:break-word;font-size:12px;background:#f3f4f6;padding:8px;border-radius:8px;margin:4px 0}
 .ev{font-size:13px;margin:4px 0}
 .ok{color:#15803d}.bad{color:#b91c1c}
+@media (max-width:600px){
+  table,tbody,tr,td{display:block;width:auto}
+  tr.head{display:none}
+  tr{border-bottom:6px solid #f4f5f7;padding:6px 0}
+  td{border:0;padding:3px 12px}
+  td:first-child{font-weight:600;padding-top:8px}
+}
 </style></head><body>
 <header><a href="#">harness</a><span id="clock" class="muted"></span></header>
 <main id="app">loading</main>
@@ -71,7 +80,7 @@ async function render(){
     document.getElementById('clock').textContent=new Date(s.now*1000).toLocaleTimeString();
     let h='<h2>Inbox · '+s.inbox.length+' waiting on you</h2>';
     h+=s.inbox.length?s.inbox.map(c=>card(c,s.now)).join(''):'<div class="card muted">Nothing waits on you.</div>';
-    h+='<h2>Board</h2><table><tr><th>ticket</th><th>where</th><th>budget</th><th></th></tr>'+s.board.map(r=>row(r,s.now)).join('')+'</table>';
+    h+='<h2>Board</h2><table><tr class="head"><th>ticket</th><th>where</th><th>budget</th><th></th></tr>'+s.board.map(r=>row(r,s.now)).join('')+'</table>';
     app.innerHTML=h;
   }catch(e){app.innerHTML='<div class="card bad">'+esc(e.message||e)+'</div>'}
 }
@@ -83,7 +92,7 @@ async function renderTicket(id){
   h+='<h2>Gates</h2><div class="card">'+(d.gates.length?d.gates.map(g=>`<div class="ev"><b class="${g.verdict==='pass'?'ok':'bad'}">${esc(g.verdict)}</b> ${esc(g.step)} · attempt ${g.attempt==null?'owner':g.attempt}<pre>${esc(g.detail)}</pre></div>`).join(''):'<span class="muted">none yet</span>')+'</div>';
   h+='<h2>Evidence</h2><div class="card">'+(d.evidence.length?d.evidence.map(e=>`<div class="ev"><b>${esc(e.kind)}</b> on ${esc(e.step)} by attempt ${e.attempt} ${e.verified?'<span class="ok">verified '+esc(e.detail)+'</span>':''}<pre>${esc(JSON.stringify(e.body))}</pre></div>`).join(''):'<span class="muted">none yet</span>')+'</div>';
   h+='<h2>Handovers</h2><div class="card">'+(d.handovers.length?d.handovers.map(x=>`<div class="ev"><b>${esc(x.step)}</b> · ${x.synthesized?'synthesized by the harness':'attempt '+x.attempt}`+['done','remaining','blockers','files','next'].filter(k=>x[k]).map(k=>`<div class="line">${k}: ${esc(x[k])}</div>`).join('')+'</div>').join(''):'<span class="muted">none</span>')+'</div>';
-  h+='<h2>Attempts</h2><table><tr><th>#</th><th>step</th><th>role</th><th>worker</th><th>calls</th><th>outcome</th></tr>'+d.attempts.map(a=>`<tr><td>${a.id}</td><td>${esc(a.step)}</td><td>${esc(a.role)}</td><td>${esc(a.worker)}</td><td>${a.calls}</td><td>${esc(a.outcome||'open')}</td></tr>`).join('')+'</table>';
+  h+='<h2>Attempts</h2><table><tr class="head"><th>#</th><th>step</th><th>role</th><th>worker</th><th>calls</th><th>outcome</th></tr>'+d.attempts.map(a=>`<tr><td>${a.id}</td><td>${esc(a.step)}</td><td>${esc(a.role)}</td><td>${esc(a.worker)}</td><td>${a.calls}</td><td>${esc(a.outcome||'open')}</td></tr>`).join('')+'</table>';
   h+='<h2>Timeline</h2><div class="card">'+d.events.slice().reverse().map(e=>`<div class="ev"><span class="muted">${new Date(e.ts*1000).toLocaleTimeString()}</span> <b>${esc(e.kind)}</b> ${esc(JSON.stringify(e.body))}</div>`).join('')+'</div>';
   app.innerHTML=h;
 }
