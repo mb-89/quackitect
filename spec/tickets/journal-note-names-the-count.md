@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: edits-and-files-hold
 parent: journal-names-stay-unique
+record:
+  - step: do
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 25aeaa415432de6547bdd2aa86f9005f60c114f5
+    hash_after: 25aeaa415432de6547bdd2aa86f9005f60c114f5
+reason: became
+successors: [journal-names-stay-unique]
 ---
 
 # Ask
