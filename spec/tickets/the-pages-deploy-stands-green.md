@@ -147,12 +147,15 @@ record:
   - step: retro/cloud
     hand: box 1c02af353dfc · claude-code-remote
     hash_before: 8f165ce48b317f9b1941f01410fce2bd7daf31bb
-    hash_after: 8f165ce48b317f9b1941f01410fce2bd7daf31bb
+    hash_after: d93cffc0700b45f12ea047d36dc827728c8c82c1
     inputs:
       - name: retro/write
         hash: e2f6db577d466c89
         size: 2043
     def: 4da1ca5da87d5bbc
+    model: claude-opus-5-5
+    cost: 0
+    final: work/the-pages-deploy-stands-green closes done, its pull request opens with auto-merge
 reason: done
 ---
 
