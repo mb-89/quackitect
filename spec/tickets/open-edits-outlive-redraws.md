@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-3
+step: gate
 steps:
   - name: design
     steps:
@@ -278,6 +278,19 @@ record:
         hash: 97110e026beedf1c
         size: 671
     def: 720f39ea2ba7bd6a
+  - step: design/tests-red-3
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: f5c4cadd75bc566264b18a4acd83b9e00291d2af
+    hash_after: f5c4cadd75bc566264b18a4acd83b9e00291d2af
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft-3
+        hash: f4637c13bb8a936e
+        size: 2046
+    def: 0e7553671e6a287d
 group: the-tui-keeps-its-place
 ---
 
@@ -572,26 +585,32 @@ The cloud box decides this step, as the cloud guidance asks. Both findings hold,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go
+- src/tui/work/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The new case fails on its assertion: the carry drops the edit, so no fill stands to test. It asserts the open edit first, since without that the fill writes nothing for the wrong reason and the case passes today. The earlier cases stay red the same way.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line and each gate finding meets a test that fails on its own assertion
+- the work case posts through the registry Fake
 
 # gate
 

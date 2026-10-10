@@ -381,6 +381,26 @@ func TestARedrawKeepsTheMarksAFillReaches(t *testing.T) {
 	}
 }
 
+// A mark whose row left keeps the fill off the rows nobody marked. [[spec/tickets/open-edits-outlive-redraws]]
+func TestAFillAfterEveryMarkedRowLeftWritesNothing(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Mark()
+	was.MoveTo(0)
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("x")})
+	now := NewTree(columns(), []Item{item("one", "open", "")}, true)
+	now.Carry(was)
+	if !now.Editing() {
+		t.Fatal("the edit on one stands open across the redraw")
+	}
+	now.Fill()
+	if said := ValueOf(now.Items[0], "says"); said != "" || len(now.Written()) != 0 {
+		t.Fatalf("the fill reaches no row nobody marked, and one says %q", said)
+	}
+}
+
 // A take whose row left the view writes nothing, and names the row with the reason. [[spec/tickets/open-edits-outlive-redraws]]
 func TestATakeOnARowThatLeftSaysSo(t *testing.T) {
 	t.Parallel()
