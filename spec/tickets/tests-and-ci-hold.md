@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 54da26a4513f · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: a134fcd708a4a9b0d0201e8566921277c289be69
+    hash_after: a134fcd708a4a9b0d0201e8566921277c289be69
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -228,38 +240,62 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- runme-installs-when-stale: RUNME.sh installs on a bare call, a missing binary or a stale stamp, on stderr, and the browser fetch names the pinned playwright-core
+- setup-install-path-stands: a shim at src/scripts/install.sh hands every argument to the root install
+- the-fake-runner-drops-names: the fake sh reads one environment model on every line
+- write-door-cleans-its-paths: RelativeTo cleans both sides, and a climb out of the root reads as outside
+- the group walked sync, split, children and accept
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the commit door named the missing test, and the held ticket command line carried it, so the hand-back landed
+- each fix ran once against the old code first, so every new case shows red where its thing breaks
+- one shared planter and runner in runme_test.go kept the src/quack tests under the ratio
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- about 22:20 UTC the level0 tool server dropped after the take, so every write went through the shell and Edit in place of the patch tool
+- about 22:22 UTC a lint over RUNME.sh read pointers as missing on an index built mid-edit, and a rerun passed
+- about 22:28 UTC the check went red on the ratio guard, an untracked shim path, and the changed part
+- about 22:30 UTC the pull ran a tests field naming a test path as the command, and the run failed
+- about 22:38 UTC the pull refused a checklist of two lines against three items
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- a dropped tool server stays a finding for `spec/design_output/level0`, since the box met it outside the tree
+- a lint on an index built while a file changes reads in `src/quack/verb_lint.go`
+- a new test lands staged and under the ratio before the check, as `src/quack/check_lines.go` counts it
+- the tests field names a runnable command, as the trivial route says in `spec/processes/trivial.md`
+- the checklist answer carries one line an item, as `spec/schemas/ticket.schema.yaml` asks
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The dispatched branch waited on an owner read, so the engine handed this box the group with the oldest open work. The stale-install change trades a want check each verb for speed. A want lost after the build now returns at the next boot or the next stale stamp, and the accept verdict names that trade.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in its ticket, and the retro points at the tickets
+- the change adds no number
+- the change writes no file header
+- the badly list carries the run errors with their times, and no owner prompt reached this run
+- the chapter names roles alone, and no box name or path
 
 ## cloud
 
