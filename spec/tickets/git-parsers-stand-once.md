@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 42901e755d3d884e
         size: 1691
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-10
+    hash_before: 744d8f2a1771c3647a0cae89aac5342091fe9b37
+    hash_after: e7cdc3f78428a301d6ec0a9b860a5eda68cc64e7
+    inputs:
+      - name: design/draft
+        hash: 42901e755d3d884e
+        size: 1691
+      - name: design/tests-red
+        hash: a57dad0203377a1a
+        size: 600
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -266,8 +278,12 @@ The case fails on its own assertion: framed reads the short payload as empty, wh
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the draft names a test where both readers parse one log with a quoted path among it, and git_test.go holds no such case, so the implementer writes it beside addedIn, with a quoted path read once through each key
+- framed breaks on a size it cannot parse, and ShowMany goes on to the next ask, so the one framer picks a behaviour and the framer test covers it
+- the approach holds otherwise: Stood keys stay quoted to meet the ls-tree paths of filesAt, Added unquotes for pull_hand.go, ShowMany keeps blobs alone, framed keeps every kind, and the short-payload case fails today on its own assertion
 
 # implement
 
