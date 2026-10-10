@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -255,6 +255,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/pull]]
+  - step: design/tests-red
+    skipped: true
+    kept: 3dad4a713612b3ecbb4d8e6feeb7778ae52b5516
+    why: its red tests stand as 3dad4a713 landed them, and a later leaf passed since
 group: red-freezes-and-stalls-show
 ---
 
