@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: a57dad0203377a1a
         size: 600
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-18
+    hash_before: 19a2c5ce082be16219547a7073a2178db53e09b4
+    hash_after: c53aa3891c5aa98069133640c548fc79ba8b8537
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/git/git.go src/modules/git/repo.go src/modules/git/door_refs.go src/modules/git/git_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the three git module files and their test, as the size names
+- doors: the cases read logs and streams held in memory, and reach no door
+- approach: each new comment points at this ticket, naming one parser and one framer
+- one place: the parser, framer and header constants stand once, in the git module
 
 ## tests-green
 

@@ -100,26 +100,10 @@ func (one *door) ShowMany(asks []string) (map[string]string, error) {
 	if said.Code != 0 {
 		return nil, errors.New(strings.TrimSpace(said.Err))
 	}
-	stream, at := said.Out, 0
-	for _, ask := range asks {
-		ends := strings.IndexByte(stream[at:], '\n')
-		if ends < 0 {
-			break
+	for at, got := range frames(said.Out, len(asks)) {
+		if got.kind == blobKind {
+			out[asks[at]] = got.payload
 		}
-		head := strings.Fields(stream[at : at+ends])
-		at += ends + 1
-		if len(head) != batchFields {
-			continue
-		}
-		size, err := strconv.Atoi(head[2])
-		if err != nil {
-			continue
-		}
-		to := min(at+size, len(stream))
-		if head[1] == "blob" {
-			out[ask] = stream[at:to]
-		}
-		at = min(to+1, len(stream))
 	}
 	return out, nil
 }

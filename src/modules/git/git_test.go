@@ -142,7 +142,7 @@ func TestTheTipsStandUnderTheirLocalPort(t *testing.T) {
 // A batch answers a payload an ask and an empty text for a missing object, and a payload holding a newline stays whole. [[spec/design_output/work#the-listing-reads-git-once]]
 func TestTheBatchReadsEachPayloadAndNothingForAMissingObject(t *testing.T) {
 	said := "aaa blob 6\nab\ncd\n\nmain:spec/tickets/gone.md missing\nbbb blob 3\nxyz\n"
-	got := framed([]byte(said), 3)
+	got := framed(said, 3)
 	if len(got) != 3 || got[0] != "ab\ncd\n" || got[1] != "" || got[2] != "xyz" {
 		t.Fatalf("the batch reads %q", got)
 	}
@@ -150,16 +150,44 @@ func TestTheBatchReadsEachPayloadAndNothingForAMissingObject(t *testing.T) {
 
 // A payload cut short keeps what the batch carries, as every reader of the one framer reads it. [[spec/tickets/git-parsers-stand-once]]
 func TestAShortPayloadKeepsWhatTheBatchCarries(t *testing.T) {
-	got := framed([]byte("aaa blob 3\nxyz\nbbb blob 6\nab"), 2)
+	got := framed("aaa blob 3\nxyz\nbbb blob 6\nab", 2)
 	if len(got) != 2 || got[0] != "xyz" || got[1] != "ab" {
 		t.Fatalf("the batch reads %q", got)
 	}
 }
 
+// The one framer names each kind, leaves a missing object and a size it cannot parse empty, and reads on at the next ask. [[spec/tickets/git-parsers-stand-once]]
+func TestTheFramerKeepsKindsAndReadsPastABadSize(t *testing.T) {
+	said := "main:gone missing\nttt tree 2\nt1\nbad blob x\nccc blob 2\nok\n"
+	got := frames(said, 4)
+	want := []frame{{}, {kind: "tree", payload: "t1"}, {}, {kind: blobKind, payload: "ok"}}
+	if len(got) != len(want) {
+		t.Fatalf("the batch reads %+v", got)
+	}
+	for at := range want {
+		if got[at] != want[at] {
+			t.Fatalf("the batch reads %+v, and wants %+v", got, want)
+		}
+	}
+}
+
 // The log lists the newest commit first, so a path added twice keeps its newest second, and a blank line reads as nothing. [[spec/tickets/verbs-queue-order]]
 func TestTheAgesKeepEachPathsNewestAdd(t *testing.T) {
-	said := stoodIn("200\n\nspec/tickets/again.md\n100\n\nspec/tickets/again.md\nspec/tickets/once.md\n")
+	said := addedIn("200\n\nspec/tickets/again.md\n100\n\nspec/tickets/again.md\nspec/tickets/once.md\n", asPrinted)
 	if len(said) != 2 || said["spec/tickets/again.md"] != 200 || said["spec/tickets/once.md"] != 100 {
 		t.Fatalf("the ages read %v", said)
+	}
+}
+
+// Both readers parse one log: Stood keeps a quoted path as git prints it, and Added reads it back. [[spec/tickets/git-parsers-stand-once]]
+func TestBothReadersParseOneLogWithAQuotedPath(t *testing.T) {
+	log := "300\n\n\"spec/tickets/caf\\303\\251.md\"\nspec/tickets/plain.md\n"
+	stood := addedIn(log, asPrinted)
+	if len(stood) != 2 || stood[`"spec/tickets/caf\303\251.md"`] != 300 || stood["spec/tickets/plain.md"] != 300 {
+		t.Fatalf("the stood ages read %v", stood)
+	}
+	added := addedIn(log, unquoted)
+	if len(added) != 2 || added["spec/tickets/café.md"] != 300 || added["spec/tickets/plain.md"] != 300 {
+		t.Fatalf("the added ages read %v", added)
 	}
 }

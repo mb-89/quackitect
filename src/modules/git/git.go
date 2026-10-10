@@ -47,7 +47,10 @@ const (
 // A batch header reads `<name> <kind> <size>`, and a missing object `<ask> missing`. [[spec/design_output/work#the-listing-reads-git-once]]
 const (
 	headerFields = 3
+	kindAt       = 1
 	sizeAt       = 2
+	// The kind of a file's content in a batch. [[spec/tickets/git-parsers-stand-once]]
+	blobKind = "blob"
 )
 
 // The log writes each second in decimal, and a second fits an int64. [[spec/tickets/verbs-queue-order]]
@@ -135,7 +138,7 @@ func (one *repo) Stood() (map[string]int64, error) {
 	if err != nil {
 		return nil, err
 	}
-	one.headAt, one.stood = commit, stoodIn(said)
+	one.headAt, one.stood = commit, addedIn(said, asPrinted)
 	return one.stood, nil
 }
 
@@ -164,8 +167,8 @@ func (one *repo) shallow() string {
 	return string(body)
 }
 
-// The log names a second, then the paths that commit adds, newest first, so the first second a path meets is its newest add. [[spec/design_output/pull#the-queue-is-a-score]]
-func stoodIn(said string) map[string]int64 {
+// The log names a second, then the paths that commit adds, newest first, so the first second a path meets is its newest add. Each path keys the map through key, the one parser Stood and Added share. [[spec/tickets/git-parsers-stand-once]]
+func addedIn(said string, key func(string) string) map[string]int64 {
 	out := map[string]int64{}
 	var when int64
 	for _, row := range strings.Split(said, "\n") {
@@ -177,11 +180,16 @@ func stoodIn(said string) map[string]int64 {
 			when = second
 			continue
 		}
-		if _, stands := out[line]; !stands {
-			out[line] = when
+		if _, stands := out[key(line)]; !stands {
+			out[key(line)] = when
 		}
 	}
 	return out
+}
+
+// A path as git prints it, quotes and all, so it meets the quoted paths ls-tree lists. [[spec/tickets/git-parsers-stand-once]]
+func asPrinted(path string) string {
+	return path
 }
 
 // Trunk's commit, and each work branch as its name and its commit, in the order git lists them. [[spec/tickets/the-index-reads-standing-branches]]
@@ -271,32 +279,47 @@ func (one *repo) textsAt(commit string, paths, more []string) ([]ticket.File, []
 	if err != nil {
 		return nil, nil, err
 	}
-	texts := framed([]byte(said), len(asks))
+	texts := framed(said, len(asks))
 	for at := range files {
 		files[at].Text = texts[at]
 	}
 	return files, texts[len(files):], nil
 }
 
-// The payload a batch answers each ask, and nothing for a missing object. [[spec/design_output/work#the-listing-reads-git-once]]
-func framed(said []byte, count int) []string {
-	out := make([]string, count)
+// One answer of a cat-file --batch stream: the kind its header names, and its payload. [[spec/tickets/git-parsers-stand-once]]
+type frame struct {
+	kind, payload string
+}
+
+// The frame a batch answers each ask, the one framer every batch read shares. A missing object, or a size that does not parse, leaves its frame empty, and the read goes on at the next line. A payload cut short keeps what the stream carries. [[spec/tickets/git-parsers-stand-once]]
+func frames(said string, count int) []frame {
+	out := make([]frame, count)
 	for at := 0; at < count; at++ {
-		ends := bytes.IndexByte(said, '\n')
+		ends := strings.IndexByte(said, '\n')
 		if ends < 0 {
 			break
 		}
-		head := strings.Fields(string(said[:ends]))
+		head := strings.Fields(said[:ends])
 		said = said[ends+1:]
 		if len(head) != headerFields {
 			continue
 		}
 		size, err := strconv.Atoi(head[sizeAt])
-		if err != nil || size > len(said) {
-			break
+		if err != nil || size < 0 {
+			continue
 		}
-		out[at] = string(said[:size])
+		size = min(size, len(said))
+		out[at] = frame{kind: head[kindAt], payload: said[:size]}
 		said = said[min(size+1, len(said)):]
+	}
+	return out
+}
+
+// The payload a batch answers each ask, of every kind, and nothing for a missing object. [[spec/tickets/git-parsers-stand-once]]
+func framed(said string, count int) []string {
+	out := make([]string, count)
+	for at, got := range frames(said, count) {
+		out[at] = got.payload
 	}
 	return out
 }
