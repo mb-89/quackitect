@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 1c02af353dfc · claude-code-remote
@@ -107,6 +107,22 @@ record:
     hand: the engine
     hash_before: 5b22f3a8d2afae927168eb5470f4a9c757b00353
     hash_after: 5b22f3a8d2afae927168eb5470f4a9c757b00353
+  - step: accept
+    hand: box 1c02af353dfc · claude-code-remote
+    hash_before: 5408399cc8eddffa27b06084a2d2e247f655cb8e
+    hash_after: 5408399cc8eddffa27b06084a2d2e247f655cb8e
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-pages-deploy-stands-green already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 4ff7b06f1e59b7a8
+        size: 104
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -155,8 +171,12 @@ The pages build and deployment run on main passes, since the folder its source n
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the build source: docs/index.md stands, so the folder the pages setting names exists on the branch
+- the build: github-pages 232 over main ends on the run log error, and over the new folder it writes index.html with the repository link
+- the proof on main: the pages run on the merge commit decides the goal, and the box reads it after the merge
 
 # retro
 
@@ -235,3 +255,7 @@ The pages build and deployment run on main passes, since the folder its source n
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The order that minted this group leaves main unpushed, and `./RUNME.sh branch open` pushes a marker on main. The box cut `work/the-pages-deploy-stands-green` off main by hand, as `#138` and `#140` did, and the pull request carries the group to main. With no marker on main, `./RUNME.sh branch take` finds the branch at no free todo, so the box pulls the tickets directly.
+
+The proof of the goal is the pages run on the merge commit. The pull request carries no pages run, since pages builds main alone, so the box ran the same build locally first. The child's Discussion holds that run.
