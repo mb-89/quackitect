@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -188,6 +188,10 @@ record:
   - step: gate
     hand: the engine
     stale: "[[spec/design_output/work]], [[spec/design_output/pull]]"
+  - step: design/tests-red
+    skipped: true
+    kept: 2f31f89ef9b0342fc9e602c9060999437e9520ae
+    why: its red tests stand as 2f31f89ef landed them, and a later leaf passed since
 ---
 
 # Ask
