@@ -129,7 +129,7 @@ function renderInbox(items) {
       <div class="kind ${esc(q.kind)}">${esc(q.kind)} · ${esc(q.ticket)} · ${esc(q.step || "")}</div>
       <div class="text">${esc(q.summary)}</div>
       <div class="small muted">${esc(q.title)} · risk ${esc(q.risk)} · asked ${mins(q.age_s)} ago${due}</div>
-      <input type="text" placeholder="optional note (required for changes)" id="txt-${esc(q.id)}">
+      <input type="text" placeholder="${q.options.includes("changes") ? "note (required for changes)" : "optional note"}" id="txt-${esc(q.id)}">
       <div class="opts">${opts}<button data-open="${esc(q.ticket)}">details</button></div></div>`;
   }).join("");
 }
@@ -142,7 +142,7 @@ function renderBoard(rows) {
       <span class="dot ${esc(r.health)}" title="${esc(r.health)}"></span>
       <span class="title"><b>${esc(r.id)}</b> ${esc(r.title)}</span>
       <span class="chip">${esc(r.step || r.status)}${r.visit > 1 ? " #" + r.visit : ""}</span>
-      <span class="why">${esc(r.why)}${r.holder ? " · " + esc(r.holder) : ""}</span></div>`;
+      <span class="why">${esc(r.why)}${r.holder && !String(r.why).includes(r.holder) ? " · " + esc(r.holder) : ""}</span></div>`;
   let html = "";
   groups.forEach(g => {
     html += `<div class="group"><span class="dot ${esc(g.health)}"></span>${esc(g.id)} ${esc(g.title)} <span class="chip">${esc(g.step || g.status)}</span></div>`;

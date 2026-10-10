@@ -175,6 +175,162 @@ TASKS = {
             '''},
 }
 
+HARD_TASKS = {
+    "csv": {
+        "title": "csv_split(line) -> fields", "module": "pkg/csvsplit.py", "test": "tests/test_csvsplit.py",
+        "body": "Split one CSV line (RFC 4180 subset). Implement csv_split(line) in pkg/csvsplit.py; do not use the "
+                "csv module.",
+        "criteria": ["fields are separated by commas and empty fields are kept: 'a,,c' -> ['a', '', 'c'], "
+                     "',' -> ['', '']",
+                     "a field may be quoted with double quotes and then contain commas: '\"a,b\",c' -> ['a,b', 'c']",
+                     "inside a quoted field two double quotes stand for one: '\"say \"\"hi\"\"\"' -> ['say \"hi\"']",
+                     "malformed input raises ValueError: an unterminated quote ('\"abc') or text between a closing "
+                     "quote and the next comma ('\"a\"b,c')"],
+        "hidden": '''
+            import unittest
+            from pkg.csvsplit import csv_split
+
+
+            class Hidden(unittest.TestCase):
+                def test_plain(self):
+                    self.assertEqual(csv_split("a,b,c"), ["a", "b", "c"])
+                    self.assertEqual(csv_split("a,,c"), ["a", "", "c"])
+                    self.assertEqual(csv_split(","), ["", ""])
+                    self.assertEqual(csv_split("a,"), ["a", ""])
+
+                def test_quoted(self):
+                    self.assertEqual(csv_split('"a,b",c'), ["a,b", "c"])
+                    self.assertEqual(csv_split('"",x'), ["", "x"])
+                    self.assertEqual(csv_split('x,"y"'), ["x", "y"])
+
+                def test_escaped_quotes(self):
+                    self.assertEqual(csv_split('"say ""hi"""'), ['say "hi"'])
+                    self.assertEqual(csv_split('""""'), ['"'])
+                    self.assertEqual(csv_split('"a""b",c'), ['a"b', "c"])
+
+                def test_malformed(self):
+                    for s in ['"abc', '"a"b,c', 'a,"b', '"a""']:
+                        with self.assertRaises(ValueError, msg=s):
+                            csv_split(s)
+            '''},
+    "ttlcache": {
+        "title": "TTLCache(capacity, ttl, clock)", "module": "pkg/ttlcache.py", "test": "tests/test_ttlcache.py",
+        "body": "A small LRU cache with expiry. Implement class TTLCache(capacity, ttl, clock=time.monotonic) with "
+                "get(key) and set(key, value) in pkg/ttlcache.py. clock() returns seconds.",
+        "criteria": ["get(key) returns the value stored by set(key, value), or None if the key is missing",
+                     "an entry expires ttl seconds after it was set: from clock() >= set_time + ttl, get returns None",
+                     "when a set would exceed capacity, the least recently used entry is evicted; get and set both "
+                     "count as use",
+                     "setting an existing key replaces its value and restarts its ttl; capacity < 1 or ttl <= 0 "
+                     "raise ValueError"],
+        "hidden": '''
+            import unittest
+            from pkg.ttlcache import TTLCache
+
+
+            class Clock:
+                def __init__(self):
+                    self.t = 0.0
+
+                def __call__(self):
+                    return self.t
+
+
+            class Hidden(unittest.TestCase):
+                def test_get_set(self):
+                    c = TTLCache(2, 10, clock=Clock())
+                    self.assertIsNone(c.get("a"))
+                    c.set("a", 1)
+                    self.assertEqual(c.get("a"), 1)
+
+                def test_expiry_boundary(self):
+                    clk = Clock()
+                    c = TTLCache(2, 10, clock=clk)
+                    c.set("a", 1)
+                    clk.t = 9.999
+                    self.assertEqual(c.get("a"), 1)
+                    clk.t = 10.0
+                    self.assertIsNone(c.get("a"))
+
+                def test_lru(self):
+                    c = TTLCache(2, 100, clock=Clock())
+                    c.set("a", 1)
+                    c.set("b", 2)
+                    c.get("a")
+                    c.set("c", 3)
+                    self.assertIsNone(c.get("b"))
+                    self.assertEqual(c.get("a"), 1)
+                    self.assertEqual(c.get("c"), 3)
+
+                def test_set_refreshes(self):
+                    clk = Clock()
+                    c = TTLCache(2, 10, clock=clk)
+                    c.set("a", 1)
+                    clk.t = 5
+                    c.set("a", 2)
+                    clk.t = 12
+                    self.assertEqual(c.get("a"), 2)
+                    clk.t = 15
+                    self.assertIsNone(c.get("a"))
+
+                def test_set_counts_as_use(self):
+                    c = TTLCache(2, 100, clock=Clock())
+                    c.set("a", 1)
+                    c.set("b", 2)
+                    c.set("a", 3)
+                    c.set("c", 4)
+                    self.assertIsNone(c.get("b"))
+                    self.assertEqual(c.get("a"), 3)
+
+                def test_invalid(self):
+                    for cap, ttl in ((0, 1), (1, 0), (1, -1)):
+                        with self.assertRaises(ValueError):
+                            TTLCache(cap, ttl, clock=Clock())
+            '''},
+    "semver": {
+        "title": "semver_compare(a, b)", "module": "pkg/semver.py", "test": "tests/test_semver.py",
+        "body": "Compare versions by Semantic Versioning 2.0.0 precedence. Implement semver_compare(a, b) in "
+                "pkg/semver.py returning a negative number, 0 or a positive number.",
+        "criteria": ["MAJOR.MINOR.PATCH compare numerically: '1.10.0' > '1.9.0'",
+                     "a pre-release has lower precedence than its release: '1.0.0-alpha' < '1.0.0'",
+                     "pre-release identifiers compare left to right: numeric ones numerically, others in ASCII "
+                     "order, numeric < non-numeric, and more identifiers win when all before are equal: "
+                     "1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 "
+                     "< 1.0.0-rc.1 < 1.0.0",
+                     "build metadata (+...) is ignored; invalid versions raise ValueError: '1.0', '01.0.0' "
+                     "(leading zero), '1.0.0-' (empty pre-release)"],
+        "hidden": '''
+            import unittest
+            from pkg.semver import semver_compare as cmp
+
+
+            class Hidden(unittest.TestCase):
+                def test_core(self):
+                    self.assertGreater(cmp("1.10.0", "1.9.0"), 0)
+                    self.assertLess(cmp("1.9.9", "2.0.0"), 0)
+                    self.assertEqual(cmp("1.2.3", "1.2.3"), 0)
+
+                def test_prerelease_below_release(self):
+                    self.assertLess(cmp("1.0.0-alpha", "1.0.0"), 0)
+                    self.assertGreater(cmp("1.0.0", "1.0.0-rc.1"), 0)
+
+                def test_spec_chain(self):
+                    chain = ["1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2",
+                             "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0"]
+                    for a, b in zip(chain, chain[1:]):
+                        self.assertLess(cmp(a, b), 0, (a, b))
+                        self.assertGreater(cmp(b, a), 0, (b, a))
+
+                def test_build_and_invalid(self):
+                    self.assertEqual(cmp("1.0.0+build.1", "1.0.0+other"), 0)
+                    self.assertLess(cmp("1.0.0-alpha+x", "1.0.0-alpha.1"), 0)
+                    for bad in ("1.0", "01.0.0", "1.0.0-"):
+                        with self.assertRaises(ValueError, msg=bad):
+                            cmp(bad, "1.0.0")
+            '''},
+}
+TASKS.update(HARD_TASKS)
+
 SETTINGS = {"hooks": {
     "SessionStart": [{"hooks": [{"type": "command", "command": f"python3 {HX} hook session-start"}]}],
     "UserPromptSubmit": [{"hooks": [{"type": "command", "command": f"python3 {HX} hook prompt"}]}],
@@ -332,7 +488,7 @@ def run_hx(task, base, model, budget, max_turns, max_sessions, verbose=False):
             "test_cmd": f"python3 -m unittest {t['test'][:-3].replace('/', '.')}",
             "ci_cmd": "python3 -m unittest discover -s tests -t ."}
     sh([sys.executable, HX, "import", "/dev/stdin"], base, env=claude_env(henv), input=json.dumps({"tickets": [spec]}))
-    sessions, n, retried = [], 0, False
+    sessions, n, retried, dirs = [], 0, False, {}
     while n < max_sessions:
         sh([sys.executable, HX, "tick"], base, env=claude_env(henv))
         st = FileStore(store).read()
@@ -357,10 +513,15 @@ def run_hx(task, base, model, budget, max_turns, max_sessions, verbose=False):
             continue
         n += 1
         sid = f"{task}-{n}-{tk['step']}"
-        work = clone(origin, os.path.join(base, "agents", sid), tk["branch"])
-        os.makedirs(os.path.join(work, ".claude"), exist_ok=True)
-        with open(os.path.join(work, ".claude", "settings.json"), "w") as f:
-            json.dump(SETTINGS, f)
+        key = (tk["step"], run["visit"])
+        if max_turns and key in dirs:
+            work = dirs[key]  # same step continues in the same sandbox (context exhausted, files survive)
+        else:
+            work = clone(origin, os.path.join(base, "agents", sid), tk["branch"])
+            os.makedirs(os.path.join(work, ".claude"), exist_ok=True)
+            with open(os.path.join(work, ".claude", "settings.json"), "w") as f:
+                json.dump(SETTINGS, f)
+        dirs[key] = work
         env = claude_env(dict(henv, HX_SESSION=sid, HX_TICKET=tid, HX_ROLE=role))
         prompt = (f"You are an hx {role} agent. Your brief was injected at session start (run `hx brief` to see it "
                   f"again). Do exactly the current step for ticket {tid}, then `hx done`. Push before `hx submit`.")

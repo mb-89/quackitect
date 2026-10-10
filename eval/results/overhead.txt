@@ -1,0 +1,12 @@
+python interpreter start (baseline): 12 ms
+
+  log size     fold  hx brief  pre-tool  post-tool  (median ms)
+         9      0.3        47        53         52
+       345      4.0        55        62         57
+      1758     25.6        83        87         88
+
+brief for an active green step: 963 chars ~ 240 tokens, 17 lines
+untruncated briefs in the demo transcript: 4, chars median 1440, max 1655 (~413 tokens)
+
+FileStore    append:    1966 events/s (0.5 ms each, incl. validation)
+GitRefStore  append:      62 events/s (16.1 ms each, incl. validation)

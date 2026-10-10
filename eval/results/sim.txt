@@ -1,0 +1,29 @@
+## Default assumptions, n=1000 tickets per condition, seed=1
+
+metric                         single agent         hx
+tickets done (claimed)                97.3%     100.0%
+done AND correct                      72.8%      96.1%
+done but wrong (false done)           24.5%       3.9%
+agent minutes / ticket                  146        175
+agent minutes / correct                 200        182
+wall-clock hours / ticket               3.5        3.1
+owner interactions / ticket            1.08       0.63
+sessions / ticket                       1.8        6.0
+hx internals per ticket: crashes 0.48, spins 0.29, false-done caught 0.20, tampering caught 0.08, escalations 0.01
+
+## Sensitivity: done-and-correct rate (single agent -> hx)
+
+scenario                                         single       hx   min/correct single  min/correct hx
+all agent failure rates x0 (perfect agent)       100.0%   100.0%                   80             110
+failure rates x0.5                                91.6%    98.8%                  123             145
+failure rates x1.5                                58.8%    96.0%                  311             196
+no false done, no tampering                       86.8%    97.6%                  147             181
+crash-heavy (p_crash 0.3)                         59.6%    97.2%                  268             217
+weak reviewer (r_review 0.2)                      75.2%    94.4%                  204             180
+hx tests as weak as solo                          75.2%    94.8%                  204             191
+
+Invariants checked on every hx run: one holder per active run, leases match runs, no step passed without verified evidence, replay(log) == live state.
+
+real	0m5.392s
+user	0m5.348s
+sys	0m0.012s

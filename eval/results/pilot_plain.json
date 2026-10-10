@@ -1,0 +1,260 @@
+{
+ "model": "haiku",
+ "budget_per_session": 0.6,
+ "max_turns": 0,
+ "solo_restarts": 0,
+ "results": [
+  {
+   "task": "duration",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.012267820000000002,
+   "seconds": 20.9,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "duration",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.01482744,
+   "seconds": 49.400000000000006,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.006,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.005,
+     7,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.004,
+     4,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  },
+  {
+   "task": "wrap",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.009085039999999999,
+   "seconds": 33.6,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "wrap",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.01950379,
+   "seconds": 65.5,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.007,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.007,
+     8,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.006,
+     7,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  },
+  {
+   "task": "roman",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.00704502,
+   "seconds": 23.1,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "roman",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.015581779999999998,
+   "seconds": 55.4,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.006,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.005,
+     7,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.004,
+     4,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  },
+  {
+   "task": "intervals",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.0066396300000000005,
+   "seconds": 27.8,
+   "hidden_passed": 3,
+   "hidden_total": 3,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "intervals",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.013853569999999999,
+   "seconds": 45.6,
+   "hidden_passed": 3,
+   "hidden_total": 3,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.005,
+     7,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.004,
+     6,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.004,
+     6,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,215 @@
+{
+ "model": "haiku",
+ "budget_per_session": 0.6,
+ "max_turns": 0,
+ "solo_restarts": 0,
+ "results": [
+  {
+   "task": "csv",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.0071208800000000004,
+   "seconds": 22.4,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "csv",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.01639904,
+   "seconds": 51.1,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.005,
+     7,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.006,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.005,
+     6,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  },
+  {
+   "task": "ttlcache",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.00969618,
+   "seconds": 33.8,
+   "hidden_passed": 6,
+   "hidden_total": 6,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "ttlcache",
+   "condition": "hx",
+   "sessions": 3,
+   "cost": 0.01756377,
+   "seconds": 54.6,
+   "hidden_passed": 6,
+   "hidden_total": 6,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 1,
+   "events": {
+    "claim": 3,
+    "evidence": 3,
+    "done": 3,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.007,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.006,
+     8,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.004,
+     5,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  },
+  {
+   "task": "semver",
+   "condition": "solo",
+   "sessions": 1,
+   "cost": 0.007970419999999999,
+   "seconds": 26.2,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "errors": []
+  },
+  {
+   "task": "semver",
+   "condition": "hx",
+   "sessions": 5,
+   "cost": 0.0328883,
+   "seconds": 102.1,
+   "hidden_passed": 4,
+   "hidden_total": 4,
+   "solved": true,
+   "landed": true,
+   "scored_on": "main",
+   "status": "done",
+   "step": null,
+   "rejected_evidence": 0,
+   "handovers": 0,
+   "review_rounds": 2,
+   "events": {
+    "claim": 5,
+    "evidence": 5,
+    "done": 5,
+    "release": 0
+   },
+   "steps": [
+    [
+     "red",
+     0.007,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.006,
+     6,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.007,
+     8,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "green",
+     0.006,
+     8,
+     [
+      "hx brief"
+     ],
+     null
+    ],
+    [
+     "review",
+     0.007,
+     9,
+     [
+      "hx brief"
+     ],
+     null
+    ]
+   ]
+  }
+ ]
+}
