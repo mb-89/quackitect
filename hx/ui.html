@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hx owner</title>
+<style>
+:root {
+  --bg: #f5f6f8; --card: #ffffff; --ink: #1b1f24; --muted: #5d6672; --line: #e1e4e9;
+  --accent: #2456d4; --accent-ink: #ffffff; --btn: #eef1f5;
+  --red: #c4302b; --amber: #b56a00; --green: #2c7a3a; --grey: #8b939d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1215; --card: #171b20; --ink: #e5e8ec; --muted: #9aa3ad; --line: #2a3037;
+    --accent: #7ea3ff; --accent-ink: #0f1215; --btn: #222831;
+    --red: #ff6e66; --amber: #f2b14a; --green: #5cc46d; --grey: #6c7580;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1215; --card: #171b20; --ink: #e5e8ec; --muted: #9aa3ad; --line: #2a3037;
+  --accent: #7ea3ff; --accent-ink: #0f1215; --btn: #222831;
+  --red: #ff6e66; --amber: #f2b14a; --green: #5cc46d; --grey: #6c7580;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { position: sticky; top: 0; z-index: 3; background: var(--card); border-bottom: 1px solid var(--line);
+  padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+header .counts { color: var(--muted); font-size: 14px; }
+header .counts b { color: var(--ink); }
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px; max-width: 1240px; margin: 0 auto; }
+@media (min-width: 960px) {
+  main { grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.25fr); }
+  #detail { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 80px); overflow: auto; }
+}
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 8px 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.q .kind { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.q .kind.escalation { color: var(--red); } .q .kind.approval { color: var(--accent); } .q .kind.agent { color: var(--amber); }
+.q .text { margin: 6px 0; overflow-wrap: anywhere; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+button { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 14px; min-height: 44px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600; }
+button.danger { color: var(--red); }
+input[type=text] { font: inherit; width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-top: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; display: inline-block; }
+.red { background: var(--red); } .amber { background: var(--amber); } .green { background: var(--green); } .grey { background: var(--grey); }
+.group { font-weight: 600; padding: 10px 2px 4px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+.row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; align-items: center;
+  padding: 10px 2px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.row:last-child { border-bottom: 0; }
+.row .title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .why { grid-column: 2 / 4; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--btn); border: 1px solid var(--line); white-space: nowrap; }
+.pipe { display: flex; gap: 3px; flex-wrap: wrap; margin: 8px 0; }
+.pipe span { font-size: 12px; padding: 2px 7px; border-radius: 6px; background: var(--btn); color: var(--muted); }
+.pipe span.done { background: color-mix(in srgb, var(--green) 22%, transparent); color: var(--ink); }
+.pipe span.cur { background: var(--accent); color: var(--accent-ink); }
+.gate div { padding: 3px 0; overflow-wrap: anywhere; }
+.ok::before { content: "✓ "; color: var(--green); font-weight: 700; }
+.missing::before { content: "○ "; color: var(--amber); font-weight: 700; }
+.owner::before { content: "◆ "; color: var(--accent); font-weight: 700; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12.5px; background: var(--bg); border: 1px solid var(--line);
+  border-radius: 8px; padding: 10px; max-height: 340px; overflow: auto; }
+details summary { cursor: pointer; color: var(--muted); padding: 6px 0; }
+.tl { font-size: 12.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+.banner { background: var(--red); color: #fff; padding: 8px 16px; text-align: center; display: none; }
+.empty { color: var(--muted); padding: 6px 2px; }
+</style>
+</head>
+<body>
+<div class="banner" id="banner"></div>
+<header>
+  <div><b>hx</b> <span class="counts" id="counts">loading…</span></div>
+  <div><button id="pauseAll">Pause all</button></div>
+</header>
+<main>
+  <section>
+    <h2>Needs you</h2>
+    <div id="inbox"></div>
+    <h2>Board</h2>
+    <div class="card" id="board"></div>
+    <details class="card"><summary>Digest (what a push would say)</summary><pre id="digest"></pre></details>
+  </section>
+  <section id="detail"><div class="card muted">Tap a ticket for its gate, evidence and timeline.</div></section>
+</main>
+<script>
+"use strict";
+const KEY = "hx_owner_token";
+let TOKEN = "", STATE = null, OPEN = null, BUSY = false;
+function loadToken() {
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("token")) {
+    TOKEN = h.get("token");
+    try { localStorage.setItem(KEY, TOKEN); } catch (e) {}
+    history.replaceState(null, "", location.pathname);
+    return;
+  }
+  try { TOKEN = localStorage.getItem(KEY) || ""; } catch (e) { TOKEN = ""; }
+  if (!TOKEN) TOKEN = prompt("hx owner token") || "";
+}
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+async function api(path, body) {
+  const r = await fetch(path, { method: body ? "POST" : "GET",
+    headers: { "Authorization": "Bearer " + TOKEN, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.message || j.error || ("HTTP " + r.status));
+  return j;
+}
+function banner(msg) { const b = document.getElementById("banner"); b.textContent = msg || ""; b.style.display = msg ? "block" : "none"; }
+function mins(s) { if (s == null) return ""; s = Math.max(0, s); return s < 3600 ? Math.round(s / 60) + "m" : (s / 3600).toFixed(1) + "h"; }
+
+function renderInbox(items) {
+  const el = document.getElementById("inbox");
+  if (!items.length) { el.innerHTML = '<div class="card empty">Nothing needs you. Agents are working.</div>'; return; }
+  el.innerHTML = items.map(q => {
+    const opts = (q.options.length ? q.options : ["answer"]).map(o =>
+      `<button class="${o === "approve" || o === q.default ? "primary" : ""}" data-q="${esc(q.id)}" data-c="${esc(o)}">${esc(o.replace("_", " "))}</button>`).join("");
+    const due = q.due_s != null ? ` · default <b>${esc(q.default)}</b> in ${mins(q.due_s)}` : "";
+    return `<div class="card q" id="card-${esc(q.id)}">
+      <div class="kind ${esc(q.kind)}">${esc(q.kind)} · ${esc(q.ticket)} · ${esc(q.step || "")}</div>
+      <div class="text">${esc(q.summary)}</div>
+      <div class="small muted">${esc(q.title)} · risk ${esc(q.risk)} · asked ${mins(q.age_s)} ago${due}</div>
+      <input type="text" placeholder="optional note (required for changes)" id="txt-${esc(q.id)}">
+      <div class="opts">${opts}<button data-open="${esc(q.ticket)}">details</button></div></div>`;
+  }).join("");
+}
+function renderBoard(rows) {
+  const el = document.getElementById("board");
+  const groups = rows.filter(r => r.kind === "group");
+  const byParent = {};
+  rows.filter(r => r.kind !== "group").forEach(r => (byParent[r.group || ""] = byParent[r.group || ""] || []).push(r));
+  const row = r => `<div class="row" data-open="${esc(r.id)}">
+      <span class="dot ${esc(r.health)}" title="${esc(r.health)}"></span>
+      <span class="title"><b>${esc(r.id)}</b> ${esc(r.title)}</span>
+      <span class="chip">${esc(r.step || r.status)}${r.visit > 1 ? " #" + r.visit : ""}</span>
+      <span class="why">${esc(r.why)}${r.holder ? " · " + esc(r.holder) : ""}</span></div>`;
+  let html = "";
+  groups.forEach(g => {
+    html += `<div class="group"><span class="dot ${esc(g.health)}"></span>${esc(g.id)} ${esc(g.title)} <span class="chip">${esc(g.step || g.status)}</span></div>`;
+    html += (byParent[g.id] || []).map(row).join("");
+  });
+  html += (byParent[""] || []).map(row).join("");
+  el.innerHTML = html || '<div class="empty">No tickets yet.</div>';
+}
+async function refresh() {
+  if (BUSY) return;
+  try {
+    STATE = await api("/api/state");
+    banner("");
+    const c = STATE.counts;
+    document.getElementById("counts").innerHTML =
+      `<b>${c.inbox}</b> need you · <b>${c.active}</b> working · ${c.red ? `<b style="color:var(--red)">${c.red} red</b> · ` : ""}${c.done} done`;
+    document.getElementById("pauseAll").textContent = STATE.paused_all ? "Resume all" : "Pause all";
+    renderInbox(STATE.inbox);
+    renderBoard(STATE.board);
+    document.getElementById("digest").textContent = STATE.digest;
+    if (OPEN) openTicket(OPEN, true);
+  } catch (e) { banner("Cannot reach the coordinator: " + e.message); }
+}
+async function openTicket(id, quiet) {
+  OPEN = id;
+  let d;
+  try { d = await api("/api/ticket/" + encodeURIComponent(id)); } catch (e) { if (!quiet) banner(e.message); return; }
+  const t = d.ticket, run = d.run || {};
+  const passed = new Set((d.history || []).map(h => h.step));
+  const pipe = d.process.map(s => `<span class="${s.id === t.step ? "cur" : passed.has(s.id) ? "done" : ""}">${esc(s.id)}</span>`).join("");
+  const gate = (d.gate || []).map(g => `<div class="${esc(g.status)}"><b>${esc(g.check)}</b> — ${esc(g.msg)}</div>`).join("") || '<div class="muted">no open step</div>';
+  const cp = d.last_checkpoint;
+  const cpHtml = cp ? `<div class="small">${["done","next","risks","text"].filter(k => cp[k]).map(k => `<div><b>${k}</b>: ${esc(cp[k])}</div>`).join("")}<div class="muted">by ${esc(cp.by)} on ${esc(cp.step)}</div></div>` : '<div class="muted small">none</div>';
+  const ev = (d.evidence || []).map(e => `<div class="small"><span class="${e.verified ? "ok" : "missing"}"></span><b>${esc(e.kind)}</b> ${esc(e.step)}#${e.visit} by ${esc(e.by)}: ${esc((e.report && (e.report.summary || e.report.reason)) || "")}</div>`).join("") || '<div class="muted small">none</div>';
+  const crit = (t.criteria || []).map(c => `<div class="small"><b>${esc(c.id)}</b> ${esc(c.text)}</div>`).join("");
+  const tl = (d.timeline || []).slice().reverse().map(e => `<div>${e.seq} ${esc(e.actor.kind)} <b>${esc(e.type)}</b> ${esc(e.summary)}</div>`).join("");
+  const paused = t.status === "paused";
+  document.getElementById("detail").innerHTML = `<div class="card">
+    <div style="display:flex;gap:8px;align-items:center"><span class="dot ${esc(d.health)}"></span><b>${esc(t.id)}</b> ${esc(t.title)}</div>
+    <div class="small muted">${esc(t.status)} · ${esc(d.why)} · risk ${esc(t.risk)} · prio ${esc(t.priority)}${run.holder ? " · holder " + esc(run.holder) + " (epoch " + run.epoch + ")" : ""}</div>
+    <div class="pipe">${pipe}</div>
+    <h2>Gate for ${esc(t.step || "-")}</h2><div class="gate">${gate}</div>
+    <h2>Acceptance criteria</h2>${crit}
+    <h2>Last checkpoint</h2>${cpHtml}
+    <h2>Evidence</h2>${ev}
+    <div class="opts">
+      <button data-act="${paused ? "resume" : "pause"}" data-t="${esc(t.id)}">${paused ? "Resume" : "Pause"}</button>
+      <button data-act="revoke" data-t="${esc(t.id)}">Reassign</button>
+      <button data-act="override" data-t="${esc(t.id)}">Override gate…</button>
+      <button class="danger" data-act="cancel" data-t="${esc(t.id)}">Cancel</button>
+    </div>
+    <details><summary>Agent brief (what the holder sees)</summary><pre>${esc(d.brief)}</pre></details>
+    <details><summary>Timeline (${(d.timeline || []).length})</summary><div class="tl">${tl}</div></details>
+  </div>`;
+}
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("button, .row");
+  if (!b) return;
+  try {
+    if (b.dataset.q) {
+      const txt = document.getElementById("txt-" + b.dataset.q);
+      const text = txt ? txt.value.trim() : "";
+      if (b.dataset.c === "changes" && !text) { txt.focus(); txt.placeholder = "say what must change"; return; }
+      BUSY = true;
+      await api("/api/answer", { qid: b.dataset.q, choice: b.dataset.c === "answer" ? null : b.dataset.c, text: text || null });
+    } else if (b.dataset.act) {
+      const body = { action: b.dataset.act, ticket: b.dataset.t };
+      if (b.dataset.act === "override") { body.reason = prompt("Reason for overriding the gate (recorded):"); if (!body.reason) return; }
+      if (b.dataset.act === "cancel" && !confirm("Cancel " + b.dataset.t + "?")) return;
+      BUSY = true;
+      await api("/api/control", body);
+    } else if (b.id === "pauseAll") {
+      BUSY = true;
+      await api("/api/control", { action: STATE && STATE.paused_all ? "resume" : "pause" });
+    } else if (b.dataset.open) {
+      openTicket(b.dataset.open);
+      if (window.innerWidth < 960) document.getElementById("detail").scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+  } catch (e) { banner(e.message); }
+  BUSY = false;
+  refresh();
+});
+loadToken();
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
