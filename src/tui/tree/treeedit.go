@@ -29,6 +29,7 @@ type Edit struct {
 	key   string
 	was   string
 	at    string
+	name  string
 	input textinput.Model
 	offer []string
 }
@@ -54,7 +55,7 @@ func (t *Tree) Open(col int) bool {
 	line.SetValue(was)
 	line.CursorEnd()
 	line.Focus()
-	t.edit = &Edit{key: key, was: was, at: held.at, input: line}
+	t.edit = &Edit{key: key, was: was, at: held.at, name: held.item.Name, input: line}
 	t.edit.offer = t.offers(key, was)
 	return true
 }
@@ -98,6 +99,12 @@ func (t *Tree) Take() []string {
 		return nil
 	}
 	said, key := t.edit.input.Value(), t.edit.key
+	if t.itemAt(t.edit.at) == nil {
+		t.wrote, t.refused = t.wrote[:0], RowLeft
+		left := []string{t.edit.name}
+		t.edit = nil
+		return left
+	}
 	left := t.write([]string{t.edit.at}, key, said)
 	t.edit = nil
 	t.rebuild()

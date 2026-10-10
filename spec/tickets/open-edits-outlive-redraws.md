@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -315,6 +315,15 @@ record:
         hash: 4b515a0765c28136
         size: 535
     def: 0123baf18afe92c2
+  - step: implement/change
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 7fedf8e8d78ff3c123c7c66b7cd5a760c0c91810
+    hash_after: 7fedf8e8d78ff3c123c7c66b7cd5a760c0c91810
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: the-tui-keeps-its-place
 ---
 
@@ -659,11 +668,18 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/tui/tree/tree.go src/tui/tree/treeedit.go src/tui/tree/treemark.go src/tui/tree/tree_test.go
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `tree.go`, `treeedit.go` and `treemark.go`, which the draft-3 size names
+- the change reaches no door, so it needs no fake
+- the comments on `carryPlaces`, `places`, `Take` and `Marks` point at this ticket
+- the name path stands in `keyOf` alone, and `places` reads it there
 
 ## tests-green
 
