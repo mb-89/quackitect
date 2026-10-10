@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -324,7 +324,36 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 4430ef9b554460a9b2282780bdb334270a2dbc56
+    hash_after: 4430ef9b554460a9b2282780bdb334270a2dbc56
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tree passes; green, src/tui/work passes
+      - name: check
+        exit: 0
+        said: "   67.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2d2fe4fa34fdcb5c
+        size: 494
+      - name: design/tests-red-2
+        hash: 9a2e36a4f6864953
+        size: 521
+      - name: design/tests-red-3
+        hash: 4b515a0765c28136
+        size: 535
+    def: e7abe94ca1f57e1a
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: the-tui-keeps-its-place
+reason: done
 ---
 
 # Ask
@@ -688,26 +717,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree src/tui/work
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A redraw of work/rows built a new tree and dropped the open edit, so the next typed letters fell to the tab key map, where `u` flips urgent and `P` pulls a ticket. `Carry` now carries the edit, the marks and the last mark, each pointed at the row holding the same name path in the new items. A mark whose row left stays on an address no row holds, so a fill reaches no row nobody marked. A take on a row that left writes nothing, and names the row with `RowLeft`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft-3 size names
+- the change reaches no door, so it needs no fake
+- the comments on `carryPlaces` and `places` name the approach and point at this ticket
+- the name path stands in `keyOf` alone, and `places` reads it there
 
 # accept
 
