@@ -167,6 +167,43 @@ func TestARefusedFileLeavesTheSeedAndTheWatchStanding(t *testing.T) {
 	}
 }
 
+// A change the watch hears while the seed commits lands after the seed, so it stands last. [[spec/tickets/watch-opens-before-the-seed]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestAChangeHeardDuringTheSeedLandsLast(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	for _, path := range []string{"a.md", "b.md"} {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	watch := NewFakeWatch()
+	heard := false
+	stop, err := seedsIn(root, watch, func(values map[string]any) error {
+		if !heard {
+			heard = true
+			watch.Push("a.md", "edited", false)
+			watch.Push("b.md", "", true)
+		}
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, seedBatch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	read := s.Snapshot()
+	if got, _ := read.Read("files/a.md").(q.Content); got.Text != "edited" {
+		t.Errorf("files/a.md reads %+v, and wants the edit heard during the seed", got)
+	}
+	if got, _ := read.Read("files/b.md").(q.Content); got != (q.Content{}) {
+		t.Errorf("files/b.md reads %+v, and wants the delete heard during the seed", got)
+	}
+}
+
 // An error under the root costs its own path, and an error at the root ends the walk. [[spec/tickets/seed-survives-bad-files]]
 func TestTheWalkGoesPastAPathItCannotRead(t *testing.T) {
 	goneErr := fs.ErrNotExist

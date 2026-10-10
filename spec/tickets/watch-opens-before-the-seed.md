@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: d73aa2d684b2b6ee
         size: 398
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: ab510859e3605c3f265644bb311bdf1afc125249
+    hash_after: ab510859e3605c3f265644bb311bdf1afc125249
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/files fails
+    inputs:
+      - name: design/draft
+        hash: 88a105fe68bca8a1
+        size: 2010
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ seedsIn opens the watch first, through from.Changes, with a hand that holds each
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestAChangeHeardDuringTheSeedLandsLast fails on both its assertions: files/a.md reads the seed's said, and files/b.md still reads said after its delete. The FakeWatch holds no hand while the seed commits, so both pushes land nowhere. The same file already stands red for seed-survives-bad-files, and watch_folders_test.go for watch-hands-new-folders.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the ask's one line meets TestAChangeHeardDuringTheSeedLandsLast, which fails on its own assertion
+- doors: the case walks a temp root through the real disk and commits to a store in memory over FakeWatch
 
 # gate
 
