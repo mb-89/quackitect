@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 400a4669a33376d19fd5f5c573b937ec98e9738a
+    hash_after: 03999e875167654438b4f2ec66eb1837583615d7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   59.1  in all"
+    inputs:
+      - name: ask
+        hash: d8835ad421da9c2c
+        size: 549
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`DeadAnchor` and `src/modules/check/anchor.go` go. `unresolved` in `pointer.go` already names a chapter nobody wrote, over the lines `EveryPointerResolves` reads, so a dead heading draws one row and a fenced pointer or a Go string draws none. `TestADeadHeadingDrawsOneRow` failed red on all three rows and passes now. The lsp design section points at the one rule.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change takes the fix sketch first choice
+- the design note and the log test drop the old rule name
+- the chapter check stands in `unresolved` alone
 
 # Discussion
 
