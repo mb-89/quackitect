@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/q"
@@ -30,6 +31,7 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 	}
 	defer stop()
 	t.Setenv("QUACKITECT_ROOT", root)
+	heardStanding(t)
 	at := filepath.Join(root, filepath.FromSlash(dumpPath("files/")))
 	if err := dumps("files/"); err != nil {
 		t.Fatal(err)
@@ -45,6 +47,22 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 	}
 	if !strings.Contains(written, "files/seen.md") || !strings.Contains(written, "a dumped line") || written != said {
 		t.Fatalf("quack dump writes %q where the index answers %q", written, said)
+	}
+}
+
+// Waits until the index answers the standing file the serve writes, since the watch hands its new folder in after the seed, and a dump racing it answers a different prefix. [[spec/tickets/seed-survives-bad-files]]
+func heardStanding(t *testing.T) {
+	t.Helper()
+	deadline := wall.Now().Add(30 * time.Second)
+	for {
+		said, err := askIndex("dump", "files/")
+		if text, ok := said.(string); err == nil && ok && strings.Contains(text, "files/.se/.runtime/index.json") {
+			return
+		}
+		if wall.Now().After(deadline) {
+			t.Fatalf("the index never answers its standing file: %q (%v)", said, err)
+		}
+		<-wall.After(20 * time.Millisecond)
 	}
 }
 

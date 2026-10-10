@@ -65,39 +65,69 @@ type watch struct{ root string }
 // The real watch under root. [[spec/design_output/model#its-file-carries-its-fake]]
 func NewWatch(root string) Watch { return watch{root} }
 
+// What a folder joins the watch through: the watcher, or a case's record. [[spec/tickets/watch-hands-new-folders]]
+type adder interface{ Add(path string) error }
+
+// What the real watch holds while it runs: the paths heard with bytes, and every file it meets. The start's walk and the watcher's loop both reach it. [[spec/tickets/watch-hands-new-folders]]
+type held struct {
+	mu    sync.Mutex
+	known map[string]bool
+	seen  map[string]bool
+}
+
+func newHeld() *held { return &held{known: map[string]bool{}, seen: map[string]bool{}} }
+
 func (one watch) Changes(hand Hand) (func(), error) {
 	// The watcher's loop adds a folder while a stop runs, and its Close returns. [[spec/tickets/a-watch-stops-mid-add]]
-	known := map[string]bool{}
+	state := newHeld()
 	eyes, err := watcher.New(func(eyes *watcher.Watcher, event fsnotify.Event) {
-		one.hears(eyes, event, hand, known)
+		one.hears(eyes, event, hand, state)
 	})
 	if err != nil {
 		return func() {}, err
 	}
-	if err := one.adds(eyes, one.root); err != nil {
+	// The watcher's loop hears while the start walk runs, so the walk holds the lock hears holds. [[spec/tickets/watch-hands-new-folders]]
+	state.mu.Lock()
+	err = one.adds(eyes, one.root, state, nil)
+	state.mu.Unlock()
+	if err != nil {
 		eyes.Close()
 		return func() {}, err
-	}
-	for folder := range named {
-		_ = eyes.Add(filepath.Join(one.root, filepath.FromSlash(folder)))
 	}
 	return func() { eyes.Close() }, nil
 }
 
-// Every folder under root, so a write in a folder below reaches the watch. [[spec/design_output/model#io-modules-and-their-fakes]]
-func (one watch) adds(eyes *watcher.Watcher, from string) error {
+// A folder the walk or the watcher refuses under from costs itself alone. [[spec/tickets/seed-survives-bad-files]]
+// Every folder under from the walk enters joins the watch, a named folder among them, and every heard file joins the record; with a hand, each file's text is handed too. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (one watch) adds(eyes adder, from string, state *held, hand Hand) error {
 	return filepath.WalkDir(from, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil || !entry.IsDir() {
-			return err
+		if err != nil {
+			return walkPast(from, path, err)
 		}
-		if skipped[entry.Name()] || (strings.HasPrefix(entry.Name(), ".") && filepath.Base(filepath.Dir(path)) == private) {
-			return filepath.SkipDir
+		rel, _ := filepath.Rel(one.root, path)
+		rel = filepath.ToSlash(rel)
+		if entry.IsDir() {
+			if rel != "." && !entered(rel) {
+				return filepath.SkipDir
+			}
+			return walkPast(from, path, eyes.Add(path))
 		}
-		return eyes.Add(path)
+		if !entry.Type().IsRegular() || !heard(rel) {
+			return nil
+		}
+		// A folder event on a folder the watch holds, as Windows fires for a write under it, walks it again, and a file the record holds already is handed no second time. [[spec/tickets/watch-hands-new-folders]]
+		met := state.seen[rel]
+		state.seen[rel] = true
+		if info, err := entry.Info(); err == nil && hand != nil && !met {
+			state.reads(path, rel, info, hand)
+		}
+		return nil
 	})
 }
 
-func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, known map[string]bool) {
+func (one watch) hears(eyes adder, event fsnotify.Event, hand Hand, state *held) {
+	state.mu.Lock()
+	defer state.mu.Unlock()
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
@@ -105,13 +135,12 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, k
 	rel = filepath.ToSlash(rel)
 	if !heard(rel) {
 		if named[rel] != "" {
-			_ = eyes.Add(event.Name)
+			_ = one.adds(eyes, event.Name, state, hand)
 		}
 		return
 	}
 	if event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
-		delete(known, rel)
-		hand(rel, "", 0, true)
+		state.leaves(rel, hand)
 		return
 	}
 	info, err := os.Stat(event.Name)
@@ -119,21 +148,41 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, k
 		return
 	}
 	if info.IsDir() {
-		_ = one.adds(eyes, event.Name)
+		_ = one.adds(eyes, event.Name, state, hand)
 		return
 	}
-	body, err := os.ReadFile(event.Name)
+	state.seen[rel] = true
+	state.reads(event.Name, rel, info, hand)
+}
+
+// Hands a heard file's text, and gone where it no longer stands. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (state *held) reads(path, rel string, info fs.FileInfo, hand Hand) {
+	body, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
-		hand(rel, "", 0, true)
+		state.leaves(rel, hand)
 		return
 	}
 	// A read lands before its writer's bytes, and the write that follows brings them. [[spec/tickets/sweep-reads-tracked-after-restart]]
-	if err != nil || (len(body) == 0 && !known[rel]) {
+	if err != nil || (len(body) == 0 && !state.known[rel]) {
 		return
 	}
-	known[rel] = textual(string(body))
-	if known[rel] {
+	state.known[rel] = textual(string(body))
+	if state.known[rel] {
 		hand(rel, string(body), info.ModTime().UnixNano(), false)
+	}
+}
+
+// Hands gone for rel and for every recorded file under rel plus a slash, so a folder moved out leaves no ghost and a sibling sharing its prefix stays. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (state *held) leaves(rel string, hand Hand) {
+	delete(state.known, rel)
+	delete(state.seen, rel)
+	hand(rel, "", 0, true)
+	for path := range state.seen {
+		if strings.HasPrefix(path, rel+"/") {
+			delete(state.known, path)
+			delete(state.seen, path)
+			hand(path, "", 0, true)
+		}
 	}
 }
 
@@ -155,7 +204,7 @@ func entered(rel string) bool {
 func Standing(root string, hand Hand) error {
 	return filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return walkPast(root, path, err)
 		}
 		rel, _ := filepath.Rel(root, path)
 		rel = filepath.ToSlash(rel)
@@ -178,6 +227,14 @@ func Standing(root string, hand Hand) error {
 		}
 		return nil
 	})
+}
+
+// What a walk does past a path it cannot read: an error at the root ends it, and one under the root costs that path alone. [[spec/tickets/seed-survives-bad-files]]
+func walkPast(root, at string, err error) error {
+	if at == root {
+		return err
+	}
+	return nil
 }
 
 // A watch handing the changes a test pushes, or the writes of a FakeDisk it listens on. [[spec/design_output/model#io-modules-and-their-fakes]]
@@ -244,30 +301,43 @@ func ContentOf(text string) q.Content {
 	return q.Content{Hash: hex.EncodeToString(sum[:]), Text: text}
 }
 
-// Commits each change the watch hands, under the family's local name. A change the store refuses reaches failed. [[spec/design_output/model#io-modules-are-modules]]
-func Start(from Watch, commit func(values map[string]any) error) (stop func(), err error) {
-	return from.Changes(func(path, text string, changed int64, gone bool) {
-		value := q.Content{}
-		if !gone {
-			value = ContentOf(text)
-			value.Changed = changed
-		}
-		_ = commit(map[string]any{familyPrefix + path: value})
-	})
+// Commits one heard change under the family's local name, so a live change and the seed's drain give a change the same value. [[spec/tickets/watch-opens-before-the-seed]]
+func commitsHeard(commit func(values map[string]any) error, path, text string, changed int64, gone bool) {
+	value := q.Content{}
+	if !gone {
+		value = ContentOf(text)
+		value.Changed = changed
+	}
+	_ = commit(map[string]any{familyPrefix + path: value})
 }
 
-// Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. A change landing during the walk and committing before it loses to the walk's older read, until its next change sets it right. [[spec/tickets/tickets-becomes-a-module]]
+// Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. [[spec/tickets/tickets-becomes-a-module]]
 func Seeds(root string, from Watch, commit func(values map[string]any) error) (stop func(), err error) {
 	return seedsIn(root, from, commit, seedBatch)
 }
 
 // The seed in commits of at most most text bytes each, the last one landing whatever stands, so one message stays under the bus cap. [[spec/tickets/seed-splits-under-bus-cap]]
+// The watch opens before the walk and holds each change it hears, and the seed's last commit drains them in order, so a change during the walk lands after it. [[spec/tickets/watch-opens-before-the-seed]]
 func seedsIn(root string, from Watch, commit func(values map[string]any) error, most int) (stop func(), err error) {
+	var mu sync.Mutex
+	live, waiting := false, []func(){}
+	stop, err = from.Changes(func(path, text string, changed int64, gone bool) {
+		mu.Lock()
+		if !live {
+			waiting = append(waiting, func() { commitsHeard(commit, path, text, changed, gone) })
+			mu.Unlock()
+			return
+		}
+		mu.Unlock()
+		commitsHeard(commit, path, text, changed, gone)
+	})
+	if err != nil {
+		return func() {}, err
+	}
 	batch, size := map[string]any{}, 0
-	var failed error
 	err = Standing(root, func(path, text string, changed int64, _ bool) {
-		if size > 0 && size+len(text) > most && failed == nil {
-			failed = commit(batch)
+		if size > 0 && size+len(text) > most {
+			landEach(commit, batch)
 			batch, size = map[string]any{}, 0
 		}
 		value := ContentOf(text)
@@ -275,13 +345,33 @@ func seedsIn(root string, from Watch, commit func(values map[string]any) error, 
 		batch[familyPrefix+path], size = value, size+len(text)
 	})
 	if err != nil {
+		stop()
 		return func() {}, err
 	}
-	if failed != nil {
-		return func() {}, failed
+	landEach(commit, batch)
+	// The drain commits outside the lock, and sets live on the read finding the list empty, so no change slips between. [[spec/tickets/watch-opens-before-the-seed]]
+	for {
+		mu.Lock()
+		if len(waiting) == 0 {
+			live = true
+			mu.Unlock()
+			return stop, nil
+		}
+		next := waiting
+		waiting = nil
+		mu.Unlock()
+		for _, one := range next {
+			one()
+		}
 	}
-	if err := commit(batch); err != nil {
-		return func() {}, err
+}
+
+// Commits a batch, and where the commit refuses it, each file alone, so a file refused alone drops out of the seed and the rest land. [[spec/tickets/seed-survives-bad-files]]
+func landEach(commit func(values map[string]any) error, batch map[string]any) {
+	if commit(batch) == nil {
+		return
 	}
-	return Start(from, commit)
+	for path, value := range batch {
+		_ = commit(map[string]any{path: value})
+	}
 }

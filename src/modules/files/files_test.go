@@ -4,11 +4,14 @@
 package files
 
 import (
+	"errors"
+	"io/fs"
 	"testing"
 
 	"quackitect/src/q"
 )
 
+// level0: FixtureOutsideHome - the seed walks an empty root of the case's own
 func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
@@ -17,7 +20,7 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	})
 	s := q.NewStore(c)
 	disk := NewFakeDisk()
-	stop, err := Start(NewFakeWatchOver(disk), func(values map[string]any) error {
+	stop, err := Seeds(t.TempDir(), NewFakeWatchOver(disk), func(values map[string]any) error {
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)
 		return err
 	})
@@ -30,30 +33,6 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	}
 	if got, ok := s.Snapshot().Read("files/a.md").(q.Content); !ok || got.Text != "said" || got.Hash == "" {
 		t.Fatalf("files/a.md reads %+v", s.Snapshot().Read("files/a.md"))
-	}
-}
-
-func TestAPushedChangeReachesTheFamily(t *testing.T) {
-	c := q.New()
-	hand := Registers(c)
-	s := q.NewStore(c)
-	watch := NewFakeWatch()
-	stop, err := Start(watch, func(values map[string]any) error {
-		_, err := s.Commit(s.Snapshot().Revision, hand, values)
-		return err
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	watch.Push("spec/b.md", "b", false)
-	watch.Push("spec/b.md", "", true)
-	if got := s.Snapshot().Read("files/spec/b.md"); got != (q.Content{}) {
-		t.Fatalf("files/spec/b.md reads %+v after it leaves", got)
-	}
-	watch.Push("spec/c.md", "c", false)
-	if got, _ := s.Snapshot().Read("files/spec/c.md").(q.Content); got.Text != "c" {
-		t.Fatalf("files/spec/c.md reads %+v", got)
 	}
 }
 
@@ -127,6 +106,89 @@ func TestASeedPastItsCapCommitsInBatches(t *testing.T) {
 		if got, _ := s.Snapshot().Read("files/" + path).(q.Content); got.Text != "said" || commits != len(paths) {
 			t.Fatalf("files/%s reads %+v over %d commits", path, got, commits)
 		}
+	}
+}
+
+// A file the commit refuses drops out of the seed, the rest land, and the watch starts. [[spec/tickets/seed-survives-bad-files]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestARefusedFileLeavesTheSeedAndTheWatchStanding(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	for _, path := range []string{"a.md", "big.md"} {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	watch := NewFakeWatch()
+	stop, err := seedsIn(root, watch, func(values map[string]any) error {
+		if _, ok := values["files/big.md"]; ok {
+			return errors.New("maximum payload exceeded")
+		}
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, seedBatch)
+	if err != nil {
+		t.Fatalf("the seed answers %v, and wants the watch started past the refused file", err)
+	}
+	defer stop()
+	watch.Push("c.md", "later", false)
+	read := s.Snapshot()
+	if got, _ := read.Read("files/a.md").(q.Content); got.Text != "said" {
+		t.Errorf("files/a.md reads %+v", got)
+	}
+	if got, _ := read.Read("files/c.md").(q.Content); got.Text != "later" {
+		t.Errorf("files/c.md reads %+v, and wants the live change", got)
+	}
+}
+
+// A change the watch hears while the seed commits lands after the seed, so it stands last. [[spec/tickets/watch-opens-before-the-seed]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestAChangeHeardDuringTheSeedLandsLast(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	for _, path := range []string{"a.md", "b.md"} {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	watch := NewFakeWatch()
+	heard := false
+	stop, err := seedsIn(root, watch, func(values map[string]any) error {
+		if !heard {
+			heard = true
+			watch.Push("a.md", "edited", false)
+			watch.Push("b.md", "", true)
+		}
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, seedBatch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	read := s.Snapshot()
+	if got, _ := read.Read("files/a.md").(q.Content); got.Text != "edited" {
+		t.Errorf("files/a.md reads %+v, and wants the edit heard during the seed", got)
+	}
+	if got, _ := read.Read("files/b.md").(q.Content); got != (q.Content{}) {
+		t.Errorf("files/b.md reads %+v, and wants the delete heard during the seed", got)
+	}
+}
+
+// An error under the root costs its own path, and an error at the root ends the walk. [[spec/tickets/seed-survives-bad-files]]
+func TestTheWalkGoesPastAPathItCannotRead(t *testing.T) {
+	goneErr := fs.ErrNotExist
+	if got := walkPast("root", "root/a", goneErr); got != nil {
+		t.Errorf("a folder gone under the root answers %v, and wants the walk to go on", got)
+	}
+	if got := walkPast("root", "root", goneErr); got != goneErr {
+		t.Errorf("a missing root answers %v, and wants its error", got)
 	}
 }
 
