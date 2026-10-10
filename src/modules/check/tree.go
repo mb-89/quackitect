@@ -31,35 +31,13 @@ type Tree struct {
 	// The tool survey, a runtime file the index walks past, read once at the start the way the node is. [[spec/design_output/lsp#the-server-reads-the-index]]
 	Survey string
 
-	guard    sync.Mutex
-	overlay  map[string]string
-	held     []string
-	restated []Finding
-	passed   bool
-	// Each note's parse by its text, and the guidance pairs by the guidance texts. [[spec/design_output/lsp#a-change-reads-one-note]]
-	parses    map[string]parse
-	ruleKey   string
-	ruleFound []Finding
+	guard   sync.Mutex
+	overlay map[string]string
+	held    []string
+	// Each note's parse by its text, which every rule over the note reads within one sweep. [[spec/design_output/lsp#a-change-reads-one-note]]
+	parses map[string]parse
 	// The declarations and the doors they read as. [[spec/design_output/doors#a-door-declares-its-names]]
 	declared declared
-	// The bodies standing in two packages, by a hash of every Go text. [[spec/tickets/shared-helpers-stand-once]]
-	copyKey   string
-	copyFound []Finding
-}
-
-// The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
-func (one *Tree) Restated(pass func() []Finding) []Finding {
-	one.guard.Lock()
-	found, passed := one.restated, one.passed
-	one.guard.Unlock()
-	if passed {
-		return found
-	}
-	found = pass()
-	one.guard.Lock()
-	one.restated, one.passed = found, true
-	one.guard.Unlock()
-	return found
 }
 
 // [[spec/tickets/lsp-rules-move-to-check]]
@@ -79,14 +57,6 @@ func (one *Tree) Holds(path, text string) {
 	if !listed(one.held, slashed(path)) {
 		one.held = nil
 	}
-	one.restated, one.passed = nil, false
-}
-
-func (one *Tree) Drops(path string) {
-	one.guard.Lock()
-	defer one.guard.Unlock()
-	delete(one.overlay, slashed(path))
-	one.held, one.restated, one.passed = nil, nil, false
 }
 
 // Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -163,7 +133,7 @@ func (one *Tree) Folder(path string) bool {
 func (one *Tree) Forgets() {
 	one.guard.Lock()
 	defer one.guard.Unlock()
-	one.held, one.restated, one.passed = nil, nil, false
+	one.held = nil
 }
 
 const (

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: bdd4bf74735d9817e386b60c8c0f0e86685c3e5c
+    hash_after: 0fefa71526f973098164bfc6bce392d225cd84b0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   65.2  in all"
+    inputs:
+      - name: ask
+        hash: 6c3755de4bacea9b
+        size: 434
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each front builds a fresh `Tree` per sweep, and the sweep runs each pass once, so the restated slot, the guidance-pair key and the Go-body hash go with `keyedOnce`. `Drops`, `Pulls`, `Changes` and `ErrNoIndex` had no caller and go. `parses`, the doors memo and the path list stay. `TestASecondSweepReadsTheBufferThatAddsACopy` pins that a second sweep reads a changed buffer.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch
+- the lsp design note drops the guidance-pair row
+- the memo the tree keeps stands in one table
 
 # Discussion
 

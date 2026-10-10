@@ -15,13 +15,6 @@ func CheckerOver(tree *Tree, pointer, rule int) *Checker {
 	return &Checker{tree: tree, pointer: pointer, rule: rule}
 }
 
-// [[spec/design_output/lsp#a-second-copy-draws]]
-func (one *Checker) restatedAll() []Finding {
-	return one.tree.Restated(func() []Finding {
-		return restatedFaults(one.tree, one.pointer, one.rule)
-	})
-}
-
 // Every rule over the whole tree, which the sweep runs. [[spec/design_output/tree#what-a-rule-answers]]
 var Rules = []func(*Tree) []Finding{
 	settingsNameBinaries,
@@ -60,7 +53,7 @@ func (one *Checker) Sweep() []Finding {
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
 	out = append(out, anchorSweep(one.tree)...)
-	out = append(out, one.restatedAll()...)
+	out = append(out, restatedFaults(one.tree, one.pointer, one.rule)...)
 	return sorted(pastHistory(one.tree, out))
 }
 

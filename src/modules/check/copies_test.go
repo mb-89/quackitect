@@ -75,3 +75,16 @@ func TestMethodsSharingABodyPass(t *testing.T) {
 		}
 	}
 }
+
+// A second sweep over one tree reads the Go text a buffer changes, so no pass answers from the sweep before. [[spec/design_output/lsp#a-change-reads-one-note]]
+func TestASecondSweepReadsTheBufferThatAddsACopy(t *testing.T) {
+	tree := TreeOver("", Texts{"src/a/a.go": counting("a", "tally", "items", "word"), "src/b/b.go": "package b\n"})
+	checker := CheckerOver(tree, 0, 0)
+	if found := checker.Sweep(); holdsRule(found, copyRule, "src/b/b.go") {
+		t.Fatalf("the first sweep answers %+v, and wants no copy", found)
+	}
+	tree.Holds("src/b/b.go", counting("b", "tally", "items", "word"))
+	if found := checker.Sweep(); !holdsRule(found, copyRule, "src/b/b.go") {
+		t.Fatalf("the second sweep answers %+v, and wants %s on the buffer", found, copyRule)
+	}
+}
