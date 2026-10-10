@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box b0a22705166b · claude-code-remote · helper-4
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 7cb1614d86cc45fddd5474c1b15dcde5ac29e614
+    hash_after: 7cb1614d86cc45fddd5474c1b15dcde5ac29e614
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -214,38 +226,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/open-edits-outlive-redraws]]: `Carry` carries the open edit, the marks and the last mark by name path, and a take on a row that left names it with `RowLeft`
+- [[spec/tickets/a-filter-keeps-the-cursor]]: tests-green handed back on the carry an earlier box landed
+- [[spec/tickets/a-redraw-keeps-the-sort]]: tests-green handed back on the carry an earlier box landed
+- the group accept, over every child and the store and registry fixes
+- a merge of main, taking main side of the laid-types check in `src/quack/check.go`
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red tests an earlier box wrote decided the edit carry whole, so the change went green on its first run
+- the draft-3 approach named every file and caller, so the build needed no read past it
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 21:06 the gate hand-back refused a finding row naming the ticket in hand, since a row mints a child
+- 21:12 the implement/change hand-back refused twice: first on empty lint and checklist evidence, then on the commit hook, since the red tests landed in an earlier commit and no test stood staged
+- 21:19 the accept hand-back refused on a sync conflict in `src/quack/check.go` and its test, where main landed the same laid-types fix under another constant name
+- 21:02 the level0 server dropped at the session start, so every write ran through the verbs and a script in place of the patch door
+- no owner prompt reached the run, which a schedule fired
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- a gate row names a new child, and a fix the builder makes in place rides as a plain pass: `spec/guidance/review/design.md`
+- the tested hook counts a test file a held ticket lists under its red evidence: `src/modules/hooks/command/tested.go`
+- a box fixing a check fault searches main for the same fix first: [[spec/guidance/cloud/cloud]]
+- a session meeting a dropped level0 server says so in its first line: `.claude/skills/level0`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The run read as a hand-back loop more than a build. Three of the four refusals came from the hand-back shape, not the code, so a reader judging this group reads the store and tree diffs and can trust the ticket record for the rest. The laid-types conflict shows two boxes meeting the same red check on the same day.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact points at the ticket or file owning it
+- the retro adds no number past the times
+- the change writes no header
+- the badly list carries each error with its time, and says no owner prompt came
+- the chapter names the box by role alone
 
 ## cloud
 
