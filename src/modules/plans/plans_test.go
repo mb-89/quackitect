@@ -5,7 +5,9 @@
 package plans
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"strings"
 	"testing"
 	"time"
@@ -136,5 +138,49 @@ func TestTheModuleRegistersThePlanTool(t *testing.T) {
 	Registers(c)
 	if looks, ok := c.Presentation(Module + "/set"); !ok || looks.Tool != tool.PlanTool {
 		t.Errorf("the module registers %+v, and wants plans/set under the tool name plan", looks)
+	}
+	// The book serialises a declared write, so two plan calls at once read one after the other. [[spec/tickets/plan-keeps-its-todos]]
+	if declared, ok := q.NewStore(c).Declared(Module + "/set"); !ok || !declared.Writes {
+		t.Errorf("plans/set declares %+v, and wants its writes declared", declared)
+	}
+}
+
+// A plan file reading as no JSON object refuses the call, and the file stands as it was. [[spec/tickets/plan-keeps-its-todos]]
+func TestAPlanFileReadingAsNoObjectRefusesAndStands(t *testing.T) {
+	for _, text := range []string{`{"working":"w","todos":[{"title":"kept"}],}`, `[]`, `not json`} {
+		file := &fakePlan{text: text}
+		_, err := Accept(file.outside(0))(q.Request{Module: Module, Verb: setVerb, Args: tool.Plan{Add: []tool.PlanTodo{{Title: "new"}}}})
+		if err == nil || !strings.Contains(err.Error(), "reads as no JSON object") {
+			t.Errorf("%q answers %v, and wants a refusal naming no JSON object", text, err)
+		}
+		if file.text != text {
+			t.Errorf("%q stands as %q after a refused call", text, file.text)
+		}
+	}
+}
+
+// A missing or blank plan file reads as an empty plan. [[spec/tickets/plan-keeps-its-todos]]
+func TestAMissingOrBlankPlanFileReadsEmpty(t *testing.T) {
+	for _, gone := range []error{nil, fs.ErrNotExist} {
+		file := &fakePlan{text: " \n"}
+		from := file.outside(0)
+		from.Read = func() (string, error) { return "", gone }
+		if _, err := Accept(from)(q.Request{Module: Module, Verb: setVerb, Args: tool.Plan{Add: []tool.PlanTodo{{Title: "new"}}}}); err != nil || !strings.Contains(file.text, `"title": "new"`) {
+			t.Errorf("a read answering %v gives %v and writes %q", gone, err, file.text)
+		}
+	}
+}
+
+// A read failing past not-exist refuses the call, and writes nothing. [[spec/tickets/plan-keeps-its-todos]]
+func TestAReadErrorPastNotExistRefuses(t *testing.T) {
+	file := &fakePlan{text: "untouched"}
+	from := file.outside(0)
+	denied := errors.New("permission denied")
+	from.Read = func() (string, error) { return "", denied }
+	if _, err := Accept(from)(q.Request{Module: Module, Verb: setVerb, Args: tool.Plan{Working: "w"}}); !errors.Is(err, denied) {
+		t.Errorf("a denied read answers %v, and wants the read error", err)
+	}
+	if file.text != "untouched" {
+		t.Errorf("a refused call writes %q", file.text)
 	}
 }

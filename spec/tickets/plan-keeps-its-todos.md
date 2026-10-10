@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: d80404492aa4c870
         size: 765
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: dc3d13b7ad1af1f011717da29a5828b948e3879b
+    hash_after: dc3d13b7ad1af1f011717da29a5828b948e3879b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/plans fails
+    inputs:
+      - name: design/draft
+        hash: 7cfe6ceb9a7dcf57
+        size: 1446
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -221,26 +234,31 @@ Three changes in `src/modules/plans/plans.go`. `Registers` adds `q.Writes()` to 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/plans
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/plans/plans_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three cases fail on their own assertion: the action declares no write, a text reading as no object gets overwritten with a fresh plan, and a denied read writes a fresh plan. The case for a missing or blank file passes already, and it guards the empty plan through the change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets its failing case in `plans_test.go`
+- the tests reach the plan file through the fake read and write the module takes, and the store through `q.NewStore`
 
 # gate
 
