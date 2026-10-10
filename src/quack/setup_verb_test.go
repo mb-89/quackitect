@@ -406,12 +406,19 @@ func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
 	}
 }
 
-// The roads a session merges a pull request by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]]
+// The roads a session merges a pull request or commits on the server by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]] [[spec/tickets/github-writes-leave-the-allowlist]]
 var (
 	mergeRoads = []string{
 		"mcp__github__merge_pull_request",
 		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
 		"Bash(gh pr merge:*)",
+		"Bash(gh api *merge*)",
+		"mcp__github__push_files",
+		"mcp__github__create_or_update_file",
+		"mcp__github__delete_file",
+		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__push_files",
+		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__create_or_update_file",
+		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__delete_file",
 	}
 	autoMerge = "enable_pr_auto_merge"
 )
