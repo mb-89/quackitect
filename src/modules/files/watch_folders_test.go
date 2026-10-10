@@ -2,7 +2,7 @@
 // named folder made after the start. The cases hand hears the events the
 // watcher delivers, over a root of their own, so each reads at once.
 // [[spec/tickets/watch-hands-new-folders]]
-package files
+package files // level0: InPackageTest - the cases drive the unexported watch, held and joined the real watch runs on
 
 import (
 	"os"

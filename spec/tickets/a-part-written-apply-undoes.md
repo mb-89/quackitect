@@ -165,6 +165,19 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 8365efe776f73bdf126a4905a3a2aba59e578f75
+    hash_after: 8365efe776f73bdf126a4905a3a2aba59e578f75
+    returns: 1
+    why: the case this ticket wrote passes, and the edits package stays red on the cases journal-names-stay-unique and regex-replacements-read-js-groups own, which stand at their gates. The ratio guard reads src/modules/files past one to one until the files tickets write their code. Green waits on those siblings.
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/edits fails
+      - name: check
+        exit: 1
+        said: "   78.5  in all"
 ---
 
 # Ask
@@ -319,26 +332,33 @@ The approach answers the ask: writes() in src/modules/edits/edits.go rewrites th
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+An apply that fails past its first put now rewrites its journal entry to the files it left on disk. The entry keeps every file written before the failure. It keeps the failing file only where it stands on disk, with the text read back. It drops every file the batch did not reach. Undo then puts each listed file back and refuses none, so the undo the error names restores the tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: src/modules/edits/edits.go alone, beside the case in edits_test.go
+- doors: the change reaches the disk through the Outside root, and the case runs it over a temp root
+- comment: reached points at this ticket
+- one place: reached alone holds which files a part-written apply keeps
 
 # accept
 
