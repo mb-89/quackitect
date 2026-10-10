@@ -4,7 +4,8 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	// level0: OutsideInDoors - the case writes the config into a temp root and hands the real streams, the doors' own test
-	"os"
+	"io"
+	"os" // level0: OutsideInDoors - the cases write a config into a root of their own, which pullHere reads off the real disk
 	"path/filepath"
 	"strings"
 	"testing"
@@ -81,5 +82,22 @@ func TestThePullTakesItsCapAndMarginOffTheConfig(t *testing.T) {
 	}
 	if it.CapBytes != 9000 || it.CapMargin != 650 {
 		t.Fatalf("the pull carries the cap %d and the margin %d, and wants 9000 off the file and 650 off SE_PULL_MARGIN", it.CapBytes, it.CapMargin)
+	}
+}
+
+// A tracked config that fails to parse stops the pull with the parse error, so no threshold reads as zero unheard. [[spec/tickets/pull-reports-config-faults]]
+func TestPullHereRefusesABrokenTrackedConfig(t *testing.T) {
+	root := t.TempDir() // level0: FixtureOutsideHome - the case writes its own config into a root of its own
+	t.Setenv(workRootVar, "")
+	if err := os.MkdirAll(filepath.Join(root, "spec", "config"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "spec", "config", "level0.json"), []byte(`{"work": {"failsBeforePerson": 3,}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var errs strings.Builder
+	it, code := pullHere(func() (string, error) { return root, nil }, func(string) git.Repo { return nil }, io.Discard, &errs)
+	if it != nil || code != exitFailed || !strings.Contains(errs.String(), "level0.json") {
+		t.Fatalf("a broken config builds a pull %v with the code %d, and says %q", it != nil, code, errs.String())
 	}
 }

@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -26,7 +27,7 @@ type configRow struct {
 func configRows(tracked, local []byte, env map[string]string, declared map[string]q.Key) (map[string]configRow, error) {
 	trackedFile, err := configParsed(tracked)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", config.Tracked, err)
 	}
 	localFile, err := configParsed(local)
 	if err != nil {
