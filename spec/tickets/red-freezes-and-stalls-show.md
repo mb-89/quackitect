@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box cc2a5a1dc9c0 · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 96c3d6c70bb1ec2ea1b4acd6ed4727960ac957c0
+    hash_after: 96c3d6c70bb1ec2ea1b4acd6ed4727960ac957c0
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -213,38 +225,61 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/stalls-read-progress]]: tests-red-3, gate, the change and tests-green, so a live hold past work.progressAfter stalls and past twice it moves
+- [[spec/tickets/red-tests-freeze]]: implement/change and tests-green over the code an earlier round landed
+- the group: sync with trunk, split, and accept after an independent review
+- the exe hook case retries a stub that reads text file busy
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red cases from tests-red-2 already decided every gate finding, so tests-red-3 passed on a fresh read of the tree
+- the freeze from red-tests-freeze caught two moved red files on this run's own hand-back, and the reopen path let both honest moves through
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 22:18 the first branch take met a push refusal, since another box released the branch and pushed in the same minute
+- the gate rejected stalls-read-progress twice with the same words before a person step answered it
+- the first tests-green hand-back met a gofmt fault in a red test file and three past-tense lines in work.md the design pass left
+- the hand-back check failed once on TestGitHooksTakeTheExeWhereItStandsAlone, a text file busy race the solo runs never show
+- the review found an old box beating on after a take over, which keeps a taken hold live, and two pass paths that skip the freeze
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- a take that meets a push refusal fetches and retries once by itself: `src/branches/take.go`
+- a gate reject repeating the last one word for word reads the red cases before it answers: [[spec/guidance/review/design]]
+- the tests-red pass runs gofmt over its red files before it freezes them: `src/pull/pull_frozen.go`
+- the stub race stays fixed by the retry in `src/quack/githooks_exe_test.go`
+- the beat checks the origin ticket's open take before it pushes, so a box whose hold was taken stops beating: `src/branches/beat.go`
+- a red leaf pass through minted findings writes its frozen rows, and a verdict that decides became skips the freeze: `src/pull/pull_writes.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The branch looked contested at the take, so the run checked the hold before working: the earlier box had released it. The rest of the run was steady leaf work. Two of the review's findings come from the design's own wording, so the run left them as they stand and carried the two real ones forward.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact of the change stands in settings.go or the design note, and the tickets point there
+- progressAfter takes its number once in settings.go, and the retry count takes a named constant
+- the headers of the touched files stand as they were, and say what each file is for
+- the badly list carries each error of the run with its time, and no owner prompt came
+- the chapter names the box by role alone
 
 ## cloud
 
