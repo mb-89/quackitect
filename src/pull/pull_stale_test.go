@@ -76,12 +76,14 @@ func pullsOldHash(t *testing.T, step, process string) string {
 }
 
 func TestATicketPastTestsGreenKeepsItsStepOnAReword(t *testing.T) {
+	t.Parallel()
 	if said := pullsOldHash(t, "later", rewordedProcess()); !strings.HasPrefix(said, "work  alpha at later") {
 		t.Fatalf("the pull hands out:\n%s", said)
 	}
 }
 
 func TestATicketAtTestsGreenTakesTheNewWording(t *testing.T) {
+	t.Parallel()
 	said := pullsOldHash(t, "tests-green", rewordedProcess())
 	if !strings.HasPrefix(said, "work  alpha at tests-green") || !strings.Contains(said, newGreen) {
 		t.Fatalf("the pull hands out:\n%s", said)
@@ -89,6 +91,7 @@ func TestATicketAtTestsGreenTakesTheNewWording(t *testing.T) {
 }
 
 func TestAnEvidenceMoveStillSendsATicketBack(t *testing.T) {
+	t.Parallel()
 	moved := "steps:\n" + strings.Replace(routeOf(oldLeaves), "name: says\n        form: text", "name: says\n        form: list", 1)
 	if said := pullsOldHash(t, "later", moved); !strings.HasPrefix(said, "work  alpha at tests-green") {
 		t.Fatalf("the pull hands out:\n%s", said)

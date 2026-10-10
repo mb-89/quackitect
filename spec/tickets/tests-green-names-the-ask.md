@@ -377,3 +377,6 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The change keeps `input: design/tests-red` on `implement/tests-green`, and adds no `ask` there. The hand-out prints the Ask on every leaf already, so the new `does` names the ask without the input. Then `does` and `gate` stay the only keys the reword moves, and `wordingFields` covers both. [[spec/tickets/reworded-input-keeps-the-step]]
+- The callers list gains `src/pull/pull_hand.go`, whose queue scan calls `readAgain` and so `staleRead`. [[spec/tickets/stale-callers-name-hand-out]]
