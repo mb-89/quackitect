@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 88a105fe68bca8a1
         size: 2010
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-9
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    inputs:
+      - name: design/draft
+        hash: 88a105fe68bca8a1
+        size: 2010
+      - name: design/tests-red
+        hash: 2a447c014015cdea
+        size: 692
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,10 @@ TestAChangeHeardDuringTheSeedLandsLast fails on both its assertions: files/a.md 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+The cause holds: seedsIn walks and commits before Start opens the watch, so a change in that gap reaches no hand. FakeWatch.Push hands each change inside the call, so the pushes from the first commit meet a holding hand, and the holding lock stands apart from the commit. The drain sets live on the read that finds the list empty, so no change slips past it. The callers list is whole, and TestAChangeHeardDuringTheSeedLandsLast fails on its own assertions.
 
 # implement
 
