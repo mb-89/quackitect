@@ -86,6 +86,7 @@ function doorOf({ seed = {}, given = {}, folder = "", typed = "" } = {}) {
     opened: [],
     told: [],
     read: [],
+    executed: [],
   });
   return {
     files,
@@ -132,6 +133,11 @@ function doorOf({ seed = {}, given = {}, folder = "", typed = "" } = {}) {
     opens: async (path) => said.opened.push(path),
     says: () => {},
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),
+    // The take runs the server's command. [[spec/tickets/extension-keeps-the-editor-parts]]
+    executes: async (command, ...args) => {
+      said.executed.push([command, ...args]);
+      return { word: "work" };
+    },
     registerView: (id, resolve) => said.views.set(id, resolve),
   };
 }
@@ -405,14 +411,15 @@ test("a run an action names posts it as a person with the folder, and the bless 
 });
 
 // [[spec/tickets/the-lens-calls-actions]]
-test("pull for me takes the ticket the queue names and opens it, and an empty queue says so", async () => {
+test("pull for me runs the server's ticket command on the ticket the queue names and opens it, and an empty queue says so", async () => {
   const door = doorOf({
     given: {
       "work/yours": [{ ticket: "one", path: "spec/tickets/one.md", step: "do" }],
     },
   });
   await press(door, "work.pull");
-  assert.deepEqual(posted(door, "ticket/pull"), [{ args: ["one"], person: true }]);
+  assert.deepEqual(door.said.executed, [[COMMAND, "take", "one", "spec/tickets/one.md"]]);
+  assert.deepEqual(posted(door, "ticket/pull"), []);
   assert.deepEqual(door.said.opened, ["spec/tickets/one.md"]);
 
   const empty = doorOf({ given: { "work/yours": [] } });
@@ -447,8 +454,8 @@ test("new ticket writes a ticket with an empty process and opens it, keeps one s
   assert.deepEqual([closed.said.opened, closed.said.told], [[], []]);
 });
 
-// [[spec/design_output/extension#it-starts-silent]] [[spec/design_output/extension#a-ticket-carries-its-buttons]] [[spec/tickets/the-inset-folds-the-frontmatter]]
-test("a start runs nothing, registers the view, the commands and the editor's events, and watches before a view opens", async () => {
+// [[spec/design_output/extension#it-starts-silent]] [[spec/design_output/lsp#a-ticket-carries-its-buttons]] [[spec/tickets/the-inset-folds-the-frontmatter]]
+test("a start runs nothing, registers the view, the flip and the editor's events, leaves the ticket command to the server, and watches before a view opens", async () => {
   const door = doorOf();
   const handed = { lenses: [], editors: [], changes: [], themes: [], saves: [] };
   door.lenses = (one) => handed.lenses.push(one);
@@ -466,12 +473,13 @@ test("a start runs nothing, registers the view, the commands and the editor's ev
   );
   assert.deepEqual(
     door.index.watches.map((one) => one.names),
-    [NAMES, ["holds/standing", "tickets/cloud"], ["holds/standing", "tickets/all"]],
+    [NAMES, ["holds/standing", "tickets/all"]],
   );
-  assert.equal(door.said.commands.get(COMMAND), handed.lenses[0].took);
+  assert.equal(door.said.commands.has(COMMAND), false);
   assert.equal(typeof door.said.commands.get(FLIP), "function");
-  for (const one of ["editors", "changes", "themes", "saves"])
+  for (const one of ["editors", "changes", "themes"])
     assert.equal(handed[one].length, 1, one);
+  assert.equal(handed.saves.length, 0);
   assert.deepEqual(await handed.lenses[0].lenses("spec/guidance/working.md", ""), []);
 });
 

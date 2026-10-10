@@ -70,7 +70,7 @@ func deskBless(in BlessIn) []q.Request {
 // The standing holds, which the lens, the marks and the drawing read. [[spec/tickets/the-lens-reads-v1]]
 const StandingName = "holds/standing"
 
-// The hand a hold names where a person takes it, the rule personHolds in src/extension/lib/lens.js holds. [[spec/tickets/the-lens-reads-v1]]
+// The hand a hold names where a person takes it, the rule personHolds in src/modules/lsp/lenses.go holds. [[spec/tickets/the-lens-reads-v1]]
 const personHand = "person"
 
 // The state a ticket leaves its holds at. [[spec/design_output/pull#the-hand-and-the-hold]]

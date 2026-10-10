@@ -7,6 +7,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { COMMAND } from "../../src/extension/lib/lens.js";
 import { FLIP, routeHostOf } from "../../src/extension/lib/route-host.js";
 import { ticketText, v1Over } from "./v1-index.js";
 
@@ -48,6 +49,7 @@ function doorOf({
     told: [],
     picks: [],
     jumps: [],
+    executed: [],
   };
   const pageOf = (path, lines) => {
     const page = {
@@ -92,6 +94,11 @@ function doorOf({
     },
     says: (lines) => said.says.push(lines),
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),
+    // A press runs the server's command, whose middleware saves and asks. [[spec/tickets/extension-keeps-the-editor-parts]]
+    executes: async (command, ...args) => {
+      said.executed.push([command, ...args]);
+      return { word: "work" };
+    },
   };
 }
 
@@ -227,9 +234,8 @@ test("a jump opens the ticket at its node's line, and a press on the pointer tak
     line: 12,
   });
   assert.deepEqual([jumped.jumps, jumped.ran], [[[PATH, 12]], []]);
-  assert.deepEqual((await pressed({ kind: "take", step: "draft" })).ran, [
-    ["ticket", "pull", "one"],
-  ]);
+  const took = await pressed({ kind: "take", step: "draft" });
+  assert.deepEqual([took.executed, took.ran], [[[COMMAND, "take", "one", PATH]], []]);
 });
 
 test("an edit saves the ticket and runs the route verb over the whole route, and a refusal warns", async () => {
@@ -256,18 +262,18 @@ test("an edit saves the ticket and runs the route verb over the whole route, and
   assert.deepEqual(plain.told, [["one: refused", "route names no ticket: one", true]]);
 });
 
-test("a hand-back on a verdict leaf saves and runs the pull, and on another leaf asks pass or fail", async () => {
+test("a hand-back on a verdict leaf runs the server's command, and on another leaf asks pass or fail", async () => {
   const verdict = await pressed({ kind: "handback", step: "review" }, {}, VERDICT);
   assert.deepEqual(
-    [verdict.picks, verdict.saved, verdict.ran],
-    [[], [PATH], [["ticket", "pull", "one"]]],
+    [verdict.picks, verdict.executed, verdict.ran],
+    [[], [[COMMAND, "back", "one", PATH]], []],
   );
-  for (const [picked, ran] of [
-    ["pass", [["ticket", "pull", "one", "--pass"]]],
-    ["fail", [["ticket", "pull", "one", "--fail", "the ask stands unmet"]]],
+  for (const [picked, executed] of [
+    ["pass", [[COMMAND, "pass", "one", PATH]]],
+    ["fail", [[COMMAND, "fail", "one", PATH]]],
     ["", []],
   ]) {
     const said = await pressed({ kind: "handback", step: "draft" }, { picked });
-    assert.deepEqual([said.picks.length, said.ran], [1, ran], picked);
+    assert.deepEqual([said.picks.length, said.executed, said.ran], [1, executed, []], picked);
   }
 });

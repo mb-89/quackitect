@@ -7,7 +7,7 @@ const { fresh, pressed } = require("./lib/gesture.js");
 const { logbookOf } = require("./lib/logbook.js");
 const { panelHtml } = require("./lib/panel.js");
 const { rowOf } = require("./lib/rows.js");
-const { actsOn, ticketLensOf } = require("./lib/lens.js");
+const { COMMAND, actsOn } = require("./lib/lens.js");
 const { viewsOf } = require("./lib/views.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, plainOf } = require("./lib/values.js");
@@ -240,12 +240,12 @@ async function catalogOf(asked) {
   return Object.fromEntries(CATALOG.map((name, at) => [name, rows[at]]));
 }
 
-// Pull for me takes the first row of work/yours, through the road the ticket's buttons run. [[spec/tickets/the-lens-calls-actions]]
+// Pull for me takes the first row of work/yours, through the server's command the ticket's buttons run. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
 async function pullsNext(door, asked) {
   const next = (await asked(YOURS))?.[0];
   if (!next?.ticket || !next?.path)
     return door.tells("Nothing waits on you", "", false);
-  const said = await ticketLensOf(door).took("take", next.ticket, next.path);
+  const said = await door.executes(COMMAND, "take", next.ticket, next.path);
   if (said?.word !== "refused") await door.opens(next.path);
   return said;
 }
