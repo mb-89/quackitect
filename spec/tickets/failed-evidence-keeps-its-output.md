@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 257278ec6c80e60ee31b928db04af7c2ac81e852
+    hash_after: 257278ec6c80e60ee31b928db04af7c2ac81e852
+    inputs:
+      - name: ask
+        hash: a8b48289c170ac68
+        size: 590
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -163,38 +172,57 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`loggedRed` in `src/pull/pull_commands.go` answers the line a refusal adds. It names the session log's path and every failing Go case the output holds, read off the `--- FAIL:` lines. Two owners move with it:
+
+- the failing-case pattern stands exported in `src/pull`, and `goRedIn` in `src/quack/battery.go` reads it there
+- the session log path stands exported in `src/modules/log`, and the copies in `src/quack/log.go` and `src/modules/hooks/rows.go` point at it
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_commands.go`, `commandsRun`, the one caller of `loggedRed`
+- `src/quack/battery.go`, `goRedIn`, the reader of the failing-case pattern
+- `src/quack/log.go` and `src/modules/hooks/rows.go`, the readers of the session log path
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/pull/red_log_test.go`, `TestARedCommandLogsItsWholeOutputAndItsRefusalSaysSo`, with the refusal naming the log's path and each failing case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_commands.go`
+- `src/pull/red_log_test.go`
+- `src/quack/battery.go`
+- `src/quack/log.go`
+- `src/modules/hooks/rows.go`
+- `src/modules/log/log.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `commandsRun`, `loggedRed`, `goRedIn` and both path copies stand opened, and the claims hold there
+- the callers come off a search over `src`
+- the done_when case names its test
+- the approach adds no config key
 
 ## tests-red
 
