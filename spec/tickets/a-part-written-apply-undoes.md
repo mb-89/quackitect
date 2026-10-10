@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a98648b614bc9a9a
         size: 1144
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-4
+    hash_before: 916e6b834a81f4320b00e2b174c99c04d8fb701b
+    hash_after: 916e6b834a81f4320b00e2b174c99c04d8fb701b
+    inputs:
+      - name: design/draft
+        hash: a98648b614bc9a9a
+        size: 1144
+      - name: design/tests-red
+        hash: d4bc9252842d46cd
+        size: 671
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -262,8 +274,11 @@ The case fails on its own assertion, with the refusal the finding names: undo re
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: writes() in src/modules/edits/edits.go rewrites the journal entry, after a put fails past the first, to the files that apply left on disk, so Restores in journal.go meets no unreached file and undo puts Was back. The red case TestAPartWrittenApplyUndoes in src/modules/edits/edits_test.go fails the second of three puts (b/c.txt, under a file named b), runs undo, and reads every file back at its old text, so it decides the one done_when line. The callers list holds: patches, the replace sweep and mints each reach writes through lands. The size names the two files the ask touches.
 
 # implement
 
