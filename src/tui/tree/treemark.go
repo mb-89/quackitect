@@ -60,8 +60,16 @@ func (t Tree) rowOf(at string) int {
 	return -1
 }
 
-// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-func (t Tree) Marks() int { return len(t.marks) }
+// The rows a mark reaches, so a mark whose row left a redraw counts none. [[spec/tickets/open-edits-outlive-redraws]]
+func (t Tree) Marks() int {
+	reach := 0
+	for at := range t.marks {
+		if t.itemAt(at) != nil {
+			reach++
+		}
+	}
+	return reach
+}
 
 // [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
 func (t Tree) Marked(at string) bool { return t.marks[at] }
