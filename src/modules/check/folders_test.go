@@ -80,8 +80,8 @@ func TestInstallerHoldsTheNamesRefusesALoopApartFromItsList(t *testing.T) {
 		t.Run(one.name, func(t *testing.T) {
 			checker := CheckerOver(TreeOver("/tree", Texts{Install: one.text}), 0, 0)
 			said := []string{}
-			for _, found := range checker.Over(Install) {
-				if found.Rule == "InstallerHoldsTheNames" {
+			for _, found := range checker.Sweep() {
+				if found.Rule == "InstallerHoldsTheNames" && found.File == Install {
 					said = append(said, found.Message)
 				}
 			}

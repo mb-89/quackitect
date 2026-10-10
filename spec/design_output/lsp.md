@@ -195,7 +195,7 @@ by writing zero.
 
 The pass reads every note, so the tree holds its findings and each front pays it
 once. A buffer the editor changes drops them, and the next ask pays again.
-`Over` hands one file its own share, and the sweep hands back the whole list.
+The sweep hands back the whole list, and a front reads its file's share off it.
 
 The Go rules carry the third rule of the set, over a line beside a table. For how it
 lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
@@ -214,8 +214,8 @@ draws `DeadAnchor` on the pointer's line, and the message names the anchor.
 | a heading the note holds | nothing |
 | a heading the note lacks | `DeadAnchor`, with the file, the line and the anchor |
 
-`Over` reads the one file the front names, and `Sweep` reads every tracked
-file, so the panel and `./RUNME.sh lint` draw the same finding. A heading
+`Sweep` reads every tracked file, so the panel and `./RUNME.sh lint` draw the
+same finding. A heading
 renamed takes every pointer at the old name down at once, and the sweep names
 each one.
 
