@@ -401,3 +401,28 @@ func TestAFailedWatchKeepsTheOtherFolders(t *testing.T) {
 		t.Fatalf("the watch stands on %v, and wants b past the refused a", eyes.added)
 	}
 }
+
+// A ticket id, a file name, a dotted name, a path, a quote and a bare AND each read as words, so each finds its line. [[spec/design_output/index#the-questions-it-answers]]
+// level0: FixtureOutsideHome - the case writes and sweeps its own tree
+func TestFindTakesPunctuatedWords(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "spec/punct.md", "the-sweep-prepares-once reads index.go and door.took under spec/design_output, says \"don't\", AND foo:bar\n")
+	db, err := Open(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, _, err := Sweep(db, root); err != nil {
+		t.Fatal(err)
+	}
+	for _, words := range []string{"the-sweep-prepares-once", "index.go", "door.took", "spec/design_output", `"don't"`, "AND", "foo:bar"} {
+		rows, err := Find(db, words, 0)
+		if err != nil || len(rows) == 0 {
+			t.Errorf("find %q answers %v and %v, and wants the line", words, rows, err)
+		}
+		if _, err := Notes(db, words, 0); err != nil {
+			t.Errorf("notes %q answers %v, and wants no query fault", words, err)
+		}
+	}
+}
