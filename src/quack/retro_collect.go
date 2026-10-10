@@ -249,7 +249,7 @@ func retroCollectStillHeld(disk diskDoors, root string, held any) bool {
 		return true
 	}
 	text, err := disk.read(filepath.Join(root, filepath.FromSlash(path)))
-	return err != nil || retroCollectFieldOf(string(text), "state") != retroCollectClosed
+	return err != nil || retroFrontField(string(text), "state") != retroCollectClosed
 }
 
 // The stamp the last check wrote, read against the commit standing now, and red where a warning stands or no count stands. [[spec/guidance/retro/collect]]

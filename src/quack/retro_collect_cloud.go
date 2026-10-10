@@ -61,7 +61,7 @@ func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, r
 			*refused = append(*refused, retroCollectRow{Path: path, Refused: retroCollectFirst(shown.err, "git show")})
 			continue
 		}
-		if !retroCollectIsGroup(shown.out) || retroCollectFieldOf(shown.out, "state") != retroCollectClosed {
+		if !retroCollectIsGroup(shown.out) || retroFrontField(shown.out, "state") != retroCollectClosed {
 			continue
 		}
 		chapter := retroCollectChapterOf(shown.out)
@@ -171,19 +171,7 @@ func retroCollectHoldsText(own []string) bool {
 	})
 }
 
-// A field of a note's front, bare of its link marks, as fieldOf in src/branches/group.go reads it. [[spec/design_output/work#a-group-is-a-ticket]]
-func retroCollectFieldOf(text, key string) string {
-	said := note.Read(text).Front.Said.Get(key)
-	if said == nil {
-		return ""
-	}
-	bare := strings.TrimSpace(retroCollectText(said))
-	bare = strings.TrimSuffix(strings.TrimPrefix(bare, "[["), "]]")
-	return strings.TrimSpace(bare)
-}
-
 // A group ticket links the group process. [[spec/design_output/work#a-group-is-a-ticket]]
 func retroCollectIsGroup(text string) bool {
-	process := retroCollectFieldOf(text, "process")
-	return text != "" && process[strings.LastIndex(process, "/")+1:] == retroCollectGroup
+	return text != "" && retroProcessOf(text) == retroCollectGroup
 }

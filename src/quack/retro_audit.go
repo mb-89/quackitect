@@ -10,8 +10,8 @@ import (
 	"quackitect/src/pull"
 )
 
-// The process a trial runs, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
-const retroAuditExperiment = "spec/processes/experiment"
+// The process a trial runs, by the last part of its link, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
+const retroAuditExperiment = "experiment"
 
 func init() { register("retro audit", retroAuditVerb(quietBox)) }
 
@@ -19,7 +19,7 @@ func init() { register("retro audit", retroAuditVerb(quietBox)) }
 func retroAuditOpenTrials(disk diskDoors, root string) []string {
 	open := []string{}
 	for _, one := range retroScoreNotes(disk, root) {
-		if retroScoreField(one.text, "process") == retroAuditExperiment && retroScoreField(one.text, "state") != closedRow {
+		if retroProcessOf(one.text) == retroAuditExperiment && retroFrontField(one.text, "state") != closedRow {
 			open = append(open, one.name)
 		}
 	}
@@ -30,7 +30,7 @@ func retroAuditOpenTrials(disk diskDoors, root string) []string {
 func retroAuditUndecided(disk diskDoors, root string) []string {
 	silent := []string{}
 	for _, one := range retroScoreNotes(disk, root) {
-		if retroScoreField(one.text, "process") == retroAuditExperiment && retroScoreField(one.text, "state") == closedRow && !retroAuditKept(one.text) {
+		if retroProcessOf(one.text) == retroAuditExperiment && retroFrontField(one.text, "state") == closedRow && !retroAuditKept(one.text) {
 			silent = append(silent, one.name)
 		}
 	}
