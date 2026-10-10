@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 5883be68dc21ea0376a5a52cb534449dec607e92
+    hash_after: 5883be68dc21ea0376a5a52cb534449dec607e92
+    inputs:
+      - name: ask
+        hash: 7985875355c49279
+        size: 1353
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -161,38 +170,75 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The beat carries what a box leaves, and a take over reads it before it beats itself. `writeBeat` lands the beat as today, then, where this box holds a step or `.se/HANDOVER.md` stands, lands a child commit through `CommitFiles` holding `step` (the ticket path and step `holdOf` names) and `HANDOVER.md` (that file's text). `beatsSeen` still reads the tip's time and subject, so the hold verdicts stand. `claimGroup` reads what the box before left ahead of its own `writeBeat`, since that beat overwrites the old one, and on a take over alone prints a block `What the box before left:` ahead of the ask: the last beat's age, the step in hand off the beat's `step` file, the last record entry of that ticket on the branch, every commit subject since the open take's `hash_before`, the rescue line `takesRescue` prints, and the beat's `HANDOVER.md`, or `no handover` where the beat carries none. A plain take prints none of it. On the pull, `--next "<line>"` joins `takes`, and every entry a hand writes at a hand-back (a pass, a fail, a gate verdict) carries `next`. `workAnswer` prints the latest `next` on the ticket's record under the leaf line as `The hand before left: <line>`. The ticket schema gains `next` on a record entry. The change writes the design into [[spec/design_output/work]] under a take over reads what the box left, and [[spec/design_output/pull]] under a hand-back leaves a next line. A beat inside half the span writes nothing, so the step a beat names can trail the hold by that much, and the block names the beat's age beside it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/branches/beat.go` `beatVerb` calls `writeBeat`
+- `src/branches/take.go` `claimGroup` calls `writeBeat`, `takesRescue` and `brief`
+- `src/branches/take.go` `take` calls `claimGroup`
+- `src/branches/beat.go` `takeOver` calls `claimGroup`
+- `src/branches/beat.go` `beatsSeen` reads the beat commit
+- `src/pull/pull_writes.go` `passed` and the fail writers write a hand's entry
+- `src/pull/pull_gate.go` the gate verdict writers write a hand's entry
+- `src/pull/pull.go` `positionalOf` reads `takes`, which gains `--next`
+- `src/pull/pull_back.go` `handBack` and `src/pull/pull_hand.go` `handed` call `workAnswer`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- beat line: `src/branches/left_test.go` `TestABeatCarriesTheStepAndTheHandover`
+- first take line: `src/branches/left_test.go` `TestATakeOverPrintsWhatTheBoxBeforeLeft`
+- second take line: `src/branches/left_test.go` `TestATakeOverPrintsTheCommitsSinceTheDeadTake`
+- third take line: `src/branches/left_test.go` `TestATakeOverPrintsTheHandoverTheBeatCarries` and `TestATakeOverWithNoHandoverSaysNone`
+- fourth take line: `src/branches/left_test.go` `TestAPlainTakePrintsNothingLeft`
+- first pull line: `src/pull/pull_next_test.go` `TestAHandBackWritesItsNextLine` and `TestAFailHandBackWritesItsNextLine`
+- second pull line: `src/pull/pull_next_test.go` `TestTheNextHandOutShowsTheNextLine`
+- example line: `spec/examples/110_tickets/pull-next.md`, run by `src/quack/examples_test.go` `TestEveryExampleHoldsItsSteps`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/beat.go
+- src/branches/take.go
+- src/branches/left.go
+- src/branches/left_test.go
+- src/pull/pull_next.go
+- src/pull/pull_next_test.go
+- src/pull/pull_writes.go
+- src/pull/pull_gate.go
+- src/pull/pull.go
+- src/pull/pull_chapter.go
+- spec/schemas/ticket.schema.yaml
+- spec/design_output/work.md
+- spec/design_output/pull.md
+- spec/examples/110_tickets/pull-next.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened `beat.go`, `take.go`, `held.go`, `hand.go`, `group.go`, `rescue.go`, `pull_writes.go`, `pull_chapter.go`, `pull_frozen.go` and the git door's `CommitFiles` and `EmptyCommit`, and checked each claim there
+- the callers list names every caller of `writeBeat`, `claimGroup`, the entry writers and `workAnswer`
+- each done_when line names its case in the tests list
+- the change adds no config key
 
 ## tests-red
 
