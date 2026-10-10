@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 step: do
+record:
+  - step: do
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: f42953a83c54944c3c16f879fcd337e006d148c6
+    hash_after: 1924db97a6ce6fc0ed9d9218c5076cd711de4822
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/rules passes
+      - name: check
+        exit: 0
+        said: "   96.1  in all"
+    inputs:
+      - name: ask
+        hash: d113e1e04e8b55ff
+        size: 521
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/rules
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer section in `src/rules/scope.go` and `.vale.ini` reaches `level0-answer.md` alone, the name `answerAs` lints an answer as. A ticket or note whose name ends in answer meets its own section's rules. The rule fixtures lint under that name too, and `TestTheAnswerRulesReadTheAnswerFileAlone` holds both sides.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the Discussion says why the ticket stays open past the order
+- the fixtures move to the new name in the same change
+- the name stands once in each of the two section lists, and `answerAs` owns it
 
 # Discussion
 
