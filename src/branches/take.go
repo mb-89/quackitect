@@ -303,7 +303,11 @@ func (d *Doors) claimGroup(one stand) int {
 	before := d.head()
 	role := roleOf(hand)
 	from, base := handedOver(was, role, before)
-	_ = d.write(at, withEntry(base, front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}))
+	entry := front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}
+	if from != "" {
+		entry = append(entry, front.Pair{Key: overField, Value: true})
+	}
+	_ = d.write(at, withEntry(base, entry))
 	_ = d.Repo.Add([]string{at})
 	says := role + " takes it"
 	if from != "" {

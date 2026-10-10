@@ -60,25 +60,22 @@ func PathOf(e map[string]any) string {
 	return textIn(e["notebook_path"])
 }
 
-// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. Both stand cleaned first, so a doubled slash, a dot segment or a .. inside the tree reads as the tree's own path. [[spec/design_output/level0#the-write-door]] [[spec/tickets/write-door-paths-clean]]
+// A path under the root, relative to it, and any other path as it stands, cleaned. [[spec/design_output/level0#the-write-door]]
 func RelativeTo(root, path string) string {
-	said := cleaned(path)
-	at := strings.TrimRight(cleaned(root), "/")
+	said := strings.ReplaceAll(path, "\\", "/")
+	at := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")
 	if at == "" {
 		return said
 	}
-	if under := at + "/"; strings.HasPrefix(strings.ToLower(said), strings.ToLower(under)) {
+	// Both sides stand cleaned, so a doubled slash or a dot-dot spelling of an in-tree path reads as the tree path, and a climb out of the root reads as the outside path it names. [[spec/tickets/write-door-cleans-its-paths]]
+	said, at = pathpkg.Clean(said), pathpkg.Clean(at)
+	if said == ".." || strings.HasPrefix(said, "../") {
+		return pathpkg.Join(at, said)
+	}
+	if under := strings.TrimSuffix(at, "/") + "/"; strings.HasPrefix(strings.ToLower(said), strings.ToLower(under)) {
 		return said[len(under):]
 	}
 	return said
-}
-
-// A path with forward slashes and its doubled slashes, dot segments and .. folded, and an empty path empty. [[spec/tickets/write-door-paths-clean]]
-func cleaned(path string) string {
-	if path == "" {
-		return ""
-	}
-	return pathpkg.Clean(strings.ReplaceAll(path, "\\", "/"))
 }
 
 // Whether a path relative to the root stands outside the tree. [[spec/design_output/level0#the-write-door]]

@@ -5,6 +5,7 @@
 package edits
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"unicode"
@@ -58,6 +59,25 @@ func NameOf(at string) string {
 	}, at)
 	digits += strings.Repeat("0", stampDigits)
 	return digits[:stampDigits] + entryEnd
+}
+
+// The padding digits past the stamp an entry's name counts in, and the counts they hold. [[spec/tickets/journal-names-stay-unique]]
+const (
+	countDigits = 3
+	counts      = 1000
+)
+
+// The first name the taken check reads as free, counting in the padding digits, so two entries in one millisecond both stand and sort in order. [[spec/tickets/journal-names-stay-unique]]
+func FreeName(at string, taken func(name string) bool) string {
+	stamp := NameOf(at)[:stampDigits-countDigits]
+	name := ""
+	for n := range counts {
+		name = stamp + fmt.Sprintf("%0*d", countDigits, n) + entryEnd
+		if !taken(name) {
+			break
+		}
+	}
+	return name
 }
 
 // The newest entry the name wrote, or any where the name is empty. [[spec/design_output/apply#an-entry-says-whose-apply]]

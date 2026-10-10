@@ -107,7 +107,11 @@ func splitWrote(disk diskDoors, root, from, was, rest string, targets []edits.Ch
 	stamp := at.UTC().Format(isoStamp)
 	// The entry names this run, so an undo takes this cut and no other. [[spec/design_output/apply#the-journal-holds-both-halves]]
 	on := splitBy + ":" + stamp
-	where := filepath.Join(root, filepath.FromSlash(edits.Journal), edits.NameOf(stamp))
+	folder := filepath.Join(root, filepath.FromSlash(edits.Journal))
+	where := filepath.Join(folder, edits.FreeName(stamp, func(name string) bool {
+		_, err := disk.stat(filepath.Join(folder, name))
+		return err == nil
+	}))
 	if err := writesFile(disk, where, journalText(edits.JournalOf(stamp, on, splitBy, files, ""))); err != nil {
 		fmt.Fprintf(errs, "The journal would not write, so nothing did: %v\n", err)
 		return exitFailed

@@ -28,4 +28,8 @@ func TestADoorStandsInASessionOfItsOwn(t *testing.T) {
 	if group, err := syscall.Getpgid(run.Process.Pid); err != nil || group != run.Process.Pid {
 		t.Fatalf("the door stands in group %d, %v, and leads none of its own", group, err)
 	}
+	// Setpgid alone passes the group check too, so the case reads the session id, which Setsid alone makes the door's own. [[spec/tickets/a-killed-door-reads-dead]]
+	if session, _, errno := syscall.RawSyscall(syscall.SYS_GETSID, uintptr(run.Process.Pid), 0, 0); errno != 0 || int(session) != run.Process.Pid {
+		t.Fatalf("the door stands in session %d, %v, and leads none of its own", session, errno)
+	}
 }

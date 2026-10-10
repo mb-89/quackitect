@@ -13,6 +13,9 @@ import (
 // The key naming the span a claim goes stale past. [[spec/design_output/work#a-stale-group-is-yours]]
 const staleKey = "work.staleAfter"
 
+// The key naming the span a live hold's tip stalls past. [[spec/design_output/work#a-live-hold-stalls]]
+const progressKey = "work.progressAfter"
+
 // The seconds a tip stands old, or -1 where the clock or the tip says nothing. [[spec/design_output/work#the-listing-reads-git-once]]
 func tipAge(one stand, now int64) int64 {
 	if now == 0 || one.When == 0 {
@@ -28,21 +31,38 @@ func (d *Doors) staleSpan() int64 {
 
 // The seconds a claim goes stale past, off the config's work.staleAfter or the schema default at the root where it says nothing. [[spec/tickets/git-hooks-run-in-go]] [[spec/tickets/stale-span-reads-schema-unset]]
 func StaleSpan(root, said string) int64 {
+	return spanOfKey(root, staleKey, said)
+}
+
+// The seconds a live hold's tip stalls past, off the config's work.progressAfter or the schema default at the root where it says nothing. [[spec/design_output/work#a-live-hold-stalls]]
+func ProgressSpan(root, said string) int64 {
+	return spanOfKey(root, progressKey, said)
+}
+
+// The span the config's text names, or the schema default of the key at the root where it says nothing, or no span. [[spec/tickets/stale-span-reads-schema-unset]]
+func spanOfKey(root, key, said string) int64 {
 	if span := spanOf(said); span > 0 {
 		return int64(span)
 	}
-	if said, held := config.Default(root, staleKey); held {
+	if said, held := config.Default(root, key); held {
 		return int64(spanOf(fmt.Sprint(said)))
 	}
 	return 0
 }
 
-// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#the-session-beats-its-hold]]
+// The span a live hold's tip stalls past: the config door's, or the schema default at the method root. [[spec/design_output/work#a-live-hold-stalls]]
+func (d *Doors) progressSpan() int64 {
+	return ProgressSpan(d.Method, d.config(progressKey))
+}
+
+// A claim's age, whether it stands dead, whether its box still beats, with the beat's age, and whether a live hold stalls and stands a person's. [[spec/design_output/work#a-live-hold-stalls]]
 type claim struct {
-	Age   string
-	Stale bool
-	Live  bool
-	Beat  string
+	Age     string
+	Stale   bool
+	Live    bool
+	Beat    string
+	Stalled bool
+	Person  bool
 }
 
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
