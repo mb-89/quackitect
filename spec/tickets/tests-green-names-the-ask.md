@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
     frozen:
       - path: src/pull/pull_stale_test.go
         hash: aa273832af6fad50
+  - step: gate
+    hand: box 2b095da7efc0 · claude-code-remote · helper-9
+    hash_before: 6572ba8503728d27a4af2b8c4b66cfcab8934c7f
+    hash_after: 6572ba8503728d27a4af2b8c4b66cfcab8934c7f
+    inputs:
+      - name: design/draft
+        hash: 7e005849172a56f2
+        size: 2824
+      - name: design/tests-red
+        hash: 56fb3f5adf2f128b
+        size: 882
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -290,8 +302,11 @@ Both pull cases fail on their own assertion. A ticket on the old hash goes back 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- reworded-input-keeps-the-step: the draft adds `ask` to the `input` of implement/tests-green in spec/processes/standard.yaml, yet `wordingFields` in processRead names `does` and `gate` alone, so on the real route that leaf's def moves outside the wording and a ticket past tests-green still goes back, against done_when line 3; drop the input change or count `input` as unmoved, and make the case in src/pull/pull_stale_test.go reword the leaf's input as the real route does
+- stale-callers-name-hand-out: the callers list skips src/pull/pull_hand.go, whose hand-out calls readAgain and so staleRead
 
 # implement
 
