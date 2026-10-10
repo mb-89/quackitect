@@ -58,20 +58,17 @@ wires:
   guidance.steps: guidance/steps
 `
 
-// The test binary stands in for quack where ioProcesses spawns it: the io and module verbs run main, and each spawn leaves its pid under pidsEnv. [[spec/tickets/kill-case-drives-live-split]]
-func TestMain(m *testing.M) {
-	if len(os.Args) > 1 && (os.Args[1] == ioVerb || os.Args[1] == moduleVerb) {
-		if dir := os.Getenv(pidsEnv); dir != "" {
-			_ = os.WriteFile(filepath.Join(dir, strings.Join(os.Args[1:], "-")), []byte(strconv.Itoa(os.Getpid())), 0o644)
+// The test binary stands in for quack where ioProcesses spawns it: the io and module verbs run main, and each spawn leaves its pid under pidsEnv. TestMain in main_test.go takes this road. [[spec/tickets/kill-case-drives-live-split]] [[spec/tickets/quack-tests-remove-their-folders]]
+func init() {
+	asSpawned = func() {
+		if len(os.Args) > 1 && (os.Args[1] == ioVerb || os.Args[1] == moduleVerb) {
+			if dir := os.Getenv(pidsEnv); dir != "" {
+				_ = os.WriteFile(filepath.Join(dir, strings.Join(os.Args[1:], "-")), []byte(strconv.Itoa(os.Getpid())), 0o644)
+			}
+			main()
+			os.Exit(0)
 		}
-		main()
-		os.Exit(0)
 	}
-	code := m.Run()
-	for _, dir := range buildDirs.dirs {
-		os.RemoveAll(dir)
-	}
-	os.Exit(code)
 }
 
 // The pid the spawned command left past the one named, once it stands, so a case reads a restart by naming the pid before it. [[spec/tickets/kill-case-drives-live-split]]

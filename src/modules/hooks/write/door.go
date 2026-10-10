@@ -4,6 +4,7 @@
 package write
 
 import (
+	pathpkg "path"
 	"regexp"
 	"strings"
 )
@@ -59,14 +60,19 @@ func PathOf(e map[string]any) string {
 	return textIn(e["notebook_path"])
 }
 
-// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. [[spec/design_output/level0#the-write-door]]
+// A path under the root, relative to it, and any other path as it stands, cleaned. [[spec/design_output/level0#the-write-door]]
 func RelativeTo(root, path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	at := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")
 	if at == "" {
 		return said
 	}
-	if under := at + "/"; strings.HasPrefix(strings.ToLower(said), strings.ToLower(under)) {
+	// Both sides stand cleaned, so a doubled slash or a dot-dot spelling of an in-tree path reads as the tree path, and a climb out of the root reads as the outside path it names. [[spec/tickets/write-door-cleans-its-paths]]
+	said, at = pathpkg.Clean(said), pathpkg.Clean(at)
+	if said == ".." || strings.HasPrefix(said, "../") {
+		return pathpkg.Join(at, said)
+	}
+	if under := strings.TrimSuffix(at, "/") + "/"; strings.HasPrefix(strings.ToLower(said), strings.ToLower(under)) {
 		return said[len(under):]
 	}
 	return said

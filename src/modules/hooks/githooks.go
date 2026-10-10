@@ -31,14 +31,15 @@ var (
 	boxOfHand = regexp.MustCompile(`\bbox (\S+)`)
 )
 
-// What a push reads past the door's git: the refs git pipes in, whether a cloud box pushes, whether an agent pushes, work.staleAfter and work.beatAfter off the config, and the clock. [[spec/tickets/git-hooks-run-in-go]]
+// What a push reads past the door's git: the refs git pipes in, whether a cloud box pushes, whether an agent pushes, work.staleAfter, work.beatAfter and work.progressAfter off the config, and the clock. [[spec/tickets/git-hooks-run-in-go]]
 type Push struct {
-	Refs       string
-	Cloud      bool
-	Agent      bool
-	StaleAfter string
-	BeatAfter  string
-	Now        time.Time
+	Refs          string
+	Cloud         bool
+	Agent         bool
+	StaleAfter    string
+	BeatAfter     string
+	ProgressAfter string
+	Now           time.Time
 }
 
 // One line git pipes to pre-push. [[spec/tickets/git-hooks-run-in-go]]
@@ -181,7 +182,7 @@ func (d *Door) heldRefusal(root string, refs []pushedRef, push Push, box string)
 		if hand == "" || holderOf(hand) == box {
 			continue
 		}
-		if !d.staleTip(root, branch, push) {
+		if !d.staleTip(root, branch, push, branches.OverIn(d.git(root, "show", "origin/"+branch+":"+ticket))) {
 			return heldElsewhere(branch, hand)
 		}
 		if !movesHold(d.git(root, "show", one.sha+":"+ticket), box) {
@@ -199,14 +200,16 @@ func holderOf(hand string) string {
 	return ""
 }
 
-// Whether the hold on origin stands dead: its beat decides where it says anything, and the tip's age past the stale span otherwise. [[spec/design_output/work#the-session-beats-its-hold]]
-func (d *Door) staleTip(root, branch string, push Push) bool {
+// Whether the hold on origin stands dead: its beat decides where it says anything, and the tip's age past the stale span otherwise. A live hold past twice the progress span on a first take stands stale too. [[spec/design_output/work#the-session-beats-its-hold]] [[spec/design_output/work#a-live-hold-stalls]]
+func (d *Door) staleTip(root, branch string, push Push, over bool) bool {
 	when, err := strconv.ParseInt(d.git(root, "log", "-1", "--format=%ct", "origin/"+branch), timeBase, timeBits)
 	if err != nil || when == 0 || push.Now.IsZero() {
 		return false
 	}
 	beat := d.git(root, "log", "-1", "--format=%ct %s", "origin/"+branches.BeatBranch(strings.TrimPrefix(branch, command.WorkBranch)))
-	return branches.HoldStale(when, beat, push.Now.Unix(), branches.StaleSpan(root, push.StaleAfter), branches.BeatSpan(push.BeatAfter))
+	now, span := push.Now.Unix(), branches.BeatSpan(push.BeatAfter)
+	return branches.HoldStale(when, beat, now, branches.StaleSpan(root, push.StaleAfter), span) ||
+		branches.HoldStalled(when, beat, now, span, branches.ProgressSpan(root, push.ProgressAfter), over)
 }
 
 // A tip moves the hold where its ticket names this box, or nobody. A tip carrying no ticket moves nothing. [[spec/tickets/stale-hold-moves-by-take]]

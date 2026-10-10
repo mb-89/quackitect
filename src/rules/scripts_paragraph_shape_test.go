@@ -9,13 +9,13 @@ func TestTheParagraphShapeBranchesMeetVale(t *testing.T) {
 	t.Parallel()
 	paraBranchesMeetVale(t, []paraBranch{
 		{"a fence closing a run", "VoiceParagraph.Shape", "notes.md", "The door reads.\n\nThe door reads.\n\n```\ncode\n```\n\nThe door reads.\n\nThe door reads.\n", nil},
-		{"a run in an answer", "VoiceParagraph.ShapeAnswer", "answer.md", "- The door reads.\n\nThe door reads.\n\nThe door reads.\n\nThe door reads.\n", []paraSettled{
+		{"a run in an answer", "VoiceParagraph.ShapeAnswer", "level0-answer.md", "- The door reads.\n\nThe door reads.\n\nThe door reads.\n\nThe door reads.\n", []paraSettled{
 			{3, [2]int{1, 49}, "The door reads.\n\nThe door reads.\n\nThe door reads.", "A run holds 2 paragraphs in an answer with no list, table or diagram between them, and this one holds 3. Carry the rest as structure."},
 		}},
-		{"a heading opening an answer", "VoiceParagraph.ShapeAnswer", "answer.md", "# The door\n\n- The door reads.\n", []paraSettled{
+		{"a heading opening an answer", "VoiceParagraph.ShapeAnswer", "level0-answer.md", "# The door\n\n- The door reads.\n", []paraSettled{
 			{1, [2]int{1, 10}, "# The door", "A heading stands under the TL;DR list, and this one opens the answer. Write the list first."},
 		}},
-		{"a questions table before the list", "VoiceParagraph.ShapeAnswer", "answer.md", "| question | answer |\n|---|---|\n| a | b |\n\n- The door reads.\n", nil},
+		{"a questions table before the list", "VoiceParagraph.ShapeAnswer", "level0-answer.md", "| question | answer |\n|---|---|\n| a | b |\n\n- The door reads.\n", nil},
 		{"a line above the table", "VoiceParagraph.RestatedTable", "notes.md", "The engine hands the next free ticket to the hand at a pull.\n\n| step | what it does |\n|---|---|\n| pull | the engine hands the next free ticket to the hand |\n", []paraSettled{
 			{1, [2]int{1, 60}, "The engine hands the next free ticket to the hand at a pull.", "This line says again what a cell of the table beside it holds. Cut it, and let the table carry it."},
 		}},

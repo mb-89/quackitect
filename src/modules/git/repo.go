@@ -114,7 +114,6 @@ const (
 	mergeHead     = "MERGE_HEAD"
 	noSignature   = "N"
 	shortHash     = 7
-	batchFields   = 3
 	conflictSides = 3
 )
 
@@ -316,18 +315,7 @@ func (one *door) Added(folder string) (map[string]int64, error) {
 	if err != nil {
 		return nil, err
 	}
-	out := map[string]int64{}
-	var when int64
-	for _, row := range rowsIn(said) {
-		if number, err := strconv.ParseInt(row, secondsBase, secondsBits); err == nil {
-			when = number
-			continue
-		}
-		if _, ok := out[unquoted(row)]; !ok {
-			out[unquoted(row)] = when
-		}
-	}
-	return out, nil
+	return addedIn(said, unquoted), nil
 }
 
 func (one *door) Show(ref, path string) (string, bool) {
@@ -468,7 +456,8 @@ func AddsIn(said string) []Line {
 			binary = true
 			continue
 		case !hunk && strings.HasPrefix(row, "+++ "):
-			file = strings.TrimPrefix(unquoted(row[len("+++ "):]), "b/")
+			// Git ends a path holding a space with a tab. [[spec/tickets/staged-adds-drop-the-tab]]
+			file = strings.TrimPrefix(unquoted(strings.TrimSuffix(row[len("+++ "):], "\t")), "b/")
 			if file == "/dev/null" {
 				file = ""
 			}

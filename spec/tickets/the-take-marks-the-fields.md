@@ -304,7 +304,7 @@ A person taking a ticket in the editor sees every field the step in hand still w
 - a put-back or a filled field takes its mark away
 - the marks stand as decorations, off the Problems panel, so no check, commit or push reads them
 
-For details, see [[spec/design_output/extension#a-take-marks-the-fields]].
+For details, see [[spec/design_output/lsp#a-take-marks-the-fields]].
 
 ### checked
 

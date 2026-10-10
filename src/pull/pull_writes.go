@@ -144,7 +144,8 @@ func (it *It) passed(who *Who, one *Held, leaf *Leaf, held Hold, answered []Answ
 		tip = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", tip),
-		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)))
+		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)),
+		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))))
 	changes := append([]string{"passes " + leaf.Path}, also.changes...)
 	one.Text = it.stepOn(one, leaf, text, &changes, also.stays)
 	if finding := it.landed(one, changes, also.wrote); finding != "" {
@@ -218,9 +219,22 @@ func (it *It) minted(who *Who, one *Held, leaf *Leaf, held Hold, findings []Find
 	if leaf.Gate != "" {
 		standsAs = map[string]any{"state": Open, "todo": true, pointField: gatePoint}
 	}
-	route, why := ProcessAt(it.methodDisk(), childRoute)
+	built, names, why := it.childrenOf(one, leaf, findings, standsAs)
 	if why != "" {
 		return it.unminted(one, leaf, why)
+	}
+	wrote := it.wroteChildren(built)
+	return it.passed(who, one, leaf, held, answered, more{changes: []string{"mints " + strings.Join(names, ", ")}, wrote: wrote, stays: leaf.Final || asksBless(leaf)})
+}
+
+// A child a finding mints, at its path, built before any is written. [[spec/design_output/pull#a-finding-rides-out]]
+type mintedChild struct{ at, text string }
+
+// A child a finding on the trivial route, in the ticket's group, standing as the caller asks, or why one mints nothing. [[spec/design_output/pull#a-finding-rides-out]]
+func (it *It) childrenOf(one *Held, leaf *Leaf, findings []Finding, standsAs map[string]any) ([]mintedChild, []string, string) {
+	route, why := ProcessAt(it.methodDisk(), childRoute)
+	if why != "" {
+		return nil, nil, why
 	}
 	folder := Tickets
 	if one.Private {
@@ -230,8 +244,7 @@ func (it *It) minted(who *Who, one *Held, leaf *Leaf, held Hold, findings []Find
 	if IsGroup(one.Text) {
 		group = one.Name
 	}
-	type child struct{ at, text string }
-	built := []child{}
+	built := []mintedChild{}
 	names := []string{}
 	for _, finding := range findings {
 		path := folder + "/" + finding.Name + ".md"
@@ -244,17 +257,22 @@ func (it *It) minted(who *Who, one *Held, leaf *Leaf, held Hold, findings []Find
 		}
 		text, why := it.RoutedTicket(path, route, FromHold(route.Route, one.Name, leaf.Path), finding.Line, fields)
 		if why != "" {
-			return it.unminted(one, leaf, finding.Name+" mints nothing: "+why)
+			return nil, nil, finding.Name + " mints nothing: " + why
 		}
-		built = append(built, child{at: path, text: text})
+		built = append(built, mintedChild{at: path, text: text})
 		names = append(names, finding.Name)
 	}
+	return built, names, ""
+}
+
+// Writes the children built, and answers their paths. [[spec/design_output/pull#a-finding-rides-out]]
+func (it *It) wroteChildren(built []mintedChild) []string {
 	wrote := []string{}
 	for _, one := range built {
 		_ = it.Disk.Write(one.at, one.text)
 		wrote = append(wrote, one.at)
 	}
-	return it.passed(who, one, leaf, held, answered, more{changes: []string{"mints " + strings.Join(names, ", ")}, wrote: wrote, stays: leaf.Final || asksBless(leaf)})
+	return wrote
 }
 
 // A child that mints nothing lands nothing, so the hold stands. [[spec/design_output/pull#a-finding-rides-out]]

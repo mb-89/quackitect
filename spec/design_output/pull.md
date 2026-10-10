@@ -131,6 +131,7 @@ open and `ticket set` refuse it, and name each road out:
 |---|---|
 | standalone | mints the ticket with no group |
 | reopen | the hand behind the group's last leaf takes it back with `ticket pull <group> --back <leaf>` |
+| reopen past a gone hand | the hand on `work/<group>` takes back the leaf the engine passes, with `ticket pull <group> --back children` |
 
 A ticket minted on a closed group's own branch joins no group, and stands
 free. For the run behind this, see [[spec/rationales/pull]].
@@ -692,6 +693,7 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 | `accept with points` | mints a fix ticket a row on the trivial route, `open` and `todo: true`, carrying `parent`, and goes on |
 | `reject` | `rejected` in `src/pull/pull_gate.go` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
 | a second `reject` | puts a person step in before the copies too, through `withPersonStep` |
+| `reject` on a route holding a `by: children` step | `rejectedToChildren` mints an open child a row on the trivial route, in the group, and points `step` at `children`. It copies nothing, so every reject takes this road. A row naming no child refuses the reject, and the hold stands |
 
 - The hand-out of a gate prints its question, and `beforeClear` in `src/pull/pull_chapter.go` beside it.
 - The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.
@@ -801,6 +803,23 @@ The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the chan
 - A rewind before a later leaf passes hands the leaf out, so a case the edited draft adds runs red.
 - A red commit landing no test, and a private ticket with an empty `hash_after`, keep nothing.
 - A case appended to a red file after the change lands runs green at once. The change it guards already stands.
+
+## Red tests freeze
+
+A red leaf's pass freezes its red files, so the hand making them green cannot bend them to its code. `src/pull/pull_frozen.go` holds the mechanism.
+
+| read | how |
+|---|---|
+| the freeze | the pass of a leaf `isRed` answers writes `frozen` on its entry: one `{ path, hash }` per file of its `red` list, `HashText` over the file, or `gone` |
+| the leaves it holds | a leaf holding a command field expecting `green`, and a `final` gate |
+| a moved file | the latest `frozen` row naming the path holds another hash than the file on disk |
+| the way back | `--reopen "<path>: <why>"` on the hand-back, once a file, which the pass entry keeps under `reopen` as `{ path, why }` |
+| a reopened file | a `reopen` row naming the path after its latest freeze |
+| the reviewer | a gate's hand-out lists every reopened file with its why and its leaf |
+
+- A moved file with no reopen refuses the hand-back as any refusal does, and the cap counts it.
+- A fail, a `--became` and an `--answered` skip the check, because they land no pass.
+- A record holding no `frozen` row checks nothing, so a route with no red leaf stands as it is.
 
 # Done leaves no takeable step
 

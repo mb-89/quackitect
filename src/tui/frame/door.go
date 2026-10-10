@@ -38,6 +38,11 @@ func OpenDoor(port int, take func(tea any)) (*http.Server, error) {
 	if err != nil {
 		return nil, err
 	}
+	return ServeDoor(at, take), nil
+}
+
+// Serves the door on a listener the caller already holds, so a port stands held from the bind on. [[spec/tickets/door-tests-hold-their-port]]
+func ServeDoor(at net.Listener, take func(tea any)) *http.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/tab", func(w http.ResponseWriter, r *http.Request) {
 		var one said
@@ -51,7 +56,7 @@ func OpenDoor(port int, take func(tea any)) (*http.Server, error) {
 	})
 	server := &http.Server{Handler: mux, ReadHeaderTimeout: callWait}
 	go func() { _ = server.Serve(at) }()
-	return server, nil
+	return server
 }
 
 // Hands a tab to whatever stands on that port, and answers whether it took it. [[spec/design_output/tui#a-second-launch-hands-over]]

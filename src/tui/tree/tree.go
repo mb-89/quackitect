@@ -227,6 +227,10 @@ func (t *Tree) Carry(from *Tree) {
 	}
 	t.cur = min(from.cur, len(t.Cols)-1)
 	t.Schema = from.Schema
+	// The held row is found among the rows the filter keeps, and a row the filter now hides leaves the cursor at its old place. [[spec/tickets/a-filter-keeps-the-cursor]]
+	t.filter, t.typed = from.filter, from.typed
+	// The sort a person set stands over the base file's, a cleared one too. [[spec/tickets/a-redraw-keeps-the-sort]]
+	t.sorts = from.Sorts()
 	for key, shut := range from.shut {
 		if shut {
 			t.shut[key] = true
@@ -244,6 +248,54 @@ func (t *Tree) Carry(from *Tree) {
 		}
 	}
 	t.top = from.top
+	t.carryPlaces(from)
+}
+
+// The address of every item down the tree against its name path, the hidden rows too, so a mark or an edit finds its row by name. [[spec/tickets/open-edits-outlive-redraws]]
+func places(items []Item, above, up string, into map[string]string) map[string]string {
+	for at, one := range items {
+		here := strconv.Itoa(at)
+		if above != "" {
+			here = above + "/" + here
+		}
+		key := keyOf(up, one.Name)
+		into[here] = key
+		places(one.Kids, here, key, into)
+	}
+	return into
+}
+
+// The open edit and the marks follow their rows by name path, and a mark whose row left stays on an address no row holds, so a fill reaches no row nobody marked. [[spec/tickets/open-edits-outlive-redraws]]
+func (t *Tree) carryPlaces(from *Tree) {
+	was := places(from.Items, "", "", map[string]string{})
+	now := map[string]string{}
+	for at, key := range places(t.Items, "", "", map[string]string{}) {
+		now[key] = at
+	}
+	follow := func(at string) string {
+		if moved, ok := now[was[at]]; ok && was[at] != "" {
+			return moved
+		}
+		return keyStep + at
+	}
+	if from.edit != nil {
+		edit := *from.edit
+		if moved, ok := now[was[edit.at]]; ok {
+			edit.at = moved
+		} else {
+			edit.at = ""
+		}
+		t.edit = &edit
+	}
+	if len(from.marks) > 0 {
+		t.marks = map[string]bool{}
+		for at := range from.marks {
+			t.marks[follow(at)] = true
+		}
+	}
+	if moved, ok := now[was[from.last]]; ok && from.last != "" {
+		t.last = moved
+	}
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
