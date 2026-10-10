@@ -73,7 +73,7 @@
   },
   {
     "check": "VoiceParagraph.ParagraphAnswer",
-    "path": "answer.md",
+    "path": "level0-answer.md",
     "refuses": "- The door reads the file.\n\nThe door reads the file. The door reads the file. The door reads the file. The door reads the file.\n",
     "passes": "- The door reads the file.\n\nThe door reads the file. The door reads the file. The door reads the file.\n"
   },
@@ -109,7 +109,7 @@
   },
   {
     "check": "VoiceParagraph.ShapeAnswer",
-    "path": "answer.md",
+    "path": "level0-answer.md",
     "refuses": "The door reads the file.\n",
     "passes": "- The door reads the file.\n"
   },
