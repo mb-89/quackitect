@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,17 +25,17 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: the-clear-continues-the-session
+step: do
 ---
 
 # Ask
 
-A cloud session proves the clear live: past a low `context.handoverAt` it writes the handover, clears, and keeps working on the resume prompt. The fakes in [[spec/tickets/the-clear-continues-the-session]] meet no remote client, and a remote client may refuse a clear a plugin asks for.
+The cold probe proves the clear live, with the real client in its throwaway clone. Past a low `context.handoverAt` in the clone's runtime config, the session writes the handover, the conversation clears, and the next one opens on the resume prompt and pulls `read-handover`. The fakes in [[spec/tickets/the-clear-continues-the-session]] meet no remote client, and a remote client may refuse a clear a plugin asks for.
 
-Without the trial, a box past the key may still stand idle, and nobody reads why.
+Without the check, a box past the key may still stand idle, and nobody reads why.
 
-- the session log of this box carries the clear's rows, or the warn row naming the refusal. `grep -E 'handover|clear' .se/.log/session.jsonl` decides it
-- the next conversation opens on the resume prompt, and `read-handover` closes. `./RUNME.sh ticket pull` decides it
+- the cold probe's `clear` check reads the clone's handover, then a pull handing `read-handover` past the clear, or the warn row naming the host's refusal. `./RUNME.sh probe cold` decides it
+- the check reads recorded rows and streams in cases of `src/quack`. `go test ./src/quack/ -run Clear` decides it
 - `./RUNME.sh check` exits 0
 
 # do
@@ -85,3 +85,7 @@ The `event` field names the hook the old module wrote on every row. The detail n
 So the plugin now runs a clear the Stop answers at the main agent's next `turn.complete`, after that event's hooks answer, and a timer covers a turn that completed before its Stop. The dry probe raises the Stop first, as the host names, and its fake host refuses a command inside every hook but the turn's completion.
 
 What stands open: the next session past the key loads the new module, and proves the clear live. Run it as the ask says, with the key at 1000 in `.se/.runtime/config.json`, on a branch whose group ticket stands open. A pull on a work branch whose group ticket stands closed answers `done` before it reaches the due mark, so the handover never comes. The trial dropped its `clear` hold and due mark by hand, since only the clear's `session.end` drops them, and the verb refuses to hand `clear` back.
+
+The owner's decision: one live benchmark stands, the cold probe, so this trial becomes its `clear` check, and no second live box or test stands. The ask above takes that shape.
+
+The route: `./RUNME.sh branch open` pushes a marker on main, so the box cut `work/the-clear-continues-the-session` off main by hand, as the groups of #138 and #140 did. The group's own ticket stands closed and takes no child, and the pull refuses to take its leaf back for a hand that never passed it. So this ticket stands with no group, opens alone, and rides the group's branch and its pull request.
