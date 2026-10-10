@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-3
+step: gate
 steps:
   - name: design
     steps:
@@ -284,6 +284,31 @@ record:
         hash: e62a4e6394147d46
         size: 962
     def: 720f39ea2ba7bd6a
+  - step: design/tests-red-3
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 6ec17f93cf260b2f1c94d62938f01377a4ddfad9
+    hash_after: 6ec17f93cf260b2f1c94d62938f01377a4ddfad9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft-3
+        hash: 6e06d68e2e3a4c6a
+        size: 3020
+      - name: [[spec/design_output/work]]
+        hash: 2905f4996b0af7be
+        size: 45994
+    def: 0e7553671e6a287d
+    frozen:
+      - path: src/branches/beat_test.go
+        hash: ec6673c6a5e38ad3
+      - path: src/branches/dispatch_test.go
+        hash: b98ef31ca9d15bed
+      - path: src/modules/hooks/githooks_test.go
+        hash: 23fa883c720fe893
+      - path: src/modules/settings/settings_test.go
+        hash: 3eea3fdab323e368
 group: red-freezes-and-stalls-show
 ---
 
@@ -637,26 +662,34 @@ For details, see [[spec/design_output/work#a-live-hold-stalls]]. The owner's mes
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/beat_test.go src/branches/dispatch_test.go src/modules/hooks/githooks_test.go src/modules/settings/settings_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go
+- src/branches/dispatch_test.go
+- src/modules/hooks/githooks_test.go
+- src/modules/settings/settings_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case the draft-3 tests list names fails on its own assertion. The settings case reads progress-after off the real work settings and finds none, so the config line stands undecided until settings.go carries the default, and the schema regenerates off it. The take-over case finds no over mark on the ticket after take --over. The list row names a hold beating with no commit for 40m live, not stalled. The beat on a stalled hold asks for no handover. The dispatch plan carries no stalled part and fires no fresh box. The pre-push door names the old hand on a hold stalled past twice the span. What surprises: the two gate rejects repeat word for word, and each finding they name already meets a case here.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case: config in settings_test, list in TestAHoldThatBeatsAndMovesNoCommitStalls, owner's message and fresh box in the dispatch cases and the pre-push case, hook in TestTheBeatAsksAStalledBoxForAHandoverOnce, a person in TestATakeOverAStandingHoldWritesOver and TestDispatchNamesAPersonWhereATakeOverStallsAgain
+- the cases reach git, the clock and the config through the fake repo, the injected clock and the config fake, and the settings case reads the real work settings by design
 
 # gate
 
