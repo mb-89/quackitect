@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 63a7edca36ae0a657c22d2abe38a06bc52906647
+    hash_after: 63a7edca36ae0a657c22d2abe38a06bc52906647
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/git passes
+      - name: check
+        exit: 0
+        said: "   81.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6566cd5d7522602f
+        size: 508
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -316,26 +339,33 @@ In the send of Start in src/modules/git/git.go, a failed read becomes an empty v
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/git
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A git read that fails on a tick now leaves its port out of that tick commit. Before, the failure committed an empty value, so the index lost its branches until the next good read. The index now keeps the last good value.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change stays in git.go, beside its test
+- doors: the case runs over the fake git and a fake clock
+- comment: the rewritten line points at this ticket
+- one place: the keep rule stands in the send alone
 
 # accept
 
