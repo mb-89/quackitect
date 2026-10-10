@@ -804,6 +804,23 @@ The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the chan
 - A red commit landing no test, and a private ticket with an empty `hash_after`, keep nothing.
 - A case appended to a red file after the change lands runs green at once. The change it guards already stands.
 
+## Red tests freeze
+
+A red leaf's pass freezes its red files, so the hand making them green cannot bend them to its code. `src/pull/pull_frozen.go` holds the mechanism.
+
+| read | how |
+|---|---|
+| the freeze | the pass of a leaf `isRed` answers writes `frozen` on its entry: one `{ path, hash }` per file of its `red` list, `HashText` over the file, or `gone` |
+| the leaves it holds | a leaf holding a command field expecting `green`, and a `final` gate |
+| a moved file | the latest `frozen` row naming the path holds another hash than the file on disk |
+| the way back | `--reopen "<path>: <why>"` on the hand-back, once a file, which the pass entry keeps under `reopen` as `{ path, why }` |
+| a reopened file | a `reopen` row naming the path after its latest freeze |
+| the reviewer | a gate's hand-out lists every reopened file with its why and its leaf |
+
+- A moved file with no reopen refuses the hand-back as any refusal does, so the hold, the count and the cap read it.
+- A fail, a became and an answered skip the check, because they land no pass.
+- A record holding no `frozen` row checks nothing, so a route with no red leaf stands as it is.
+
 # Done leaves no takeable step
 
 `branch done` closes a group only where no ticket naming it stands open, and a

@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: red-freezes-and-stalls-show
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: 121b20e28326113b29d63999dfd25b56889dbc3c
+    hash_after: 121b20e28326113b29d63999dfd25b56889dbc3c
+    inputs:
+      - name: ask
+        hash: 271bbec27388e167
+        size: 1143
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -165,38 +174,64 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/pull#red-tests-freeze]]. The pass of a red leaf writes `frozen` hashes of its red list, `handBack` refuses a pass at a green leaf or a final gate on a moved file no `reopen` row names, `--reopen "<path>: <why>"` rides the hand-back onto the pass entry, and `workAnswer` lists the reopened files at a gate.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/pull/pull_back.go handBack calls passed and gains the frozen check
+- src/pull/pull_writes.go minted calls passed
+- src/pull/pull.go Pull calls handBack
+- src/pull/pull_back.go handBack calls workAnswer on a bare pull
+- src/pull/pull_hand.go handed calls workAnswer
+- src/pull/pull.go positionalOf reads takes, which gains --reopen
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/pull/pull_frozen_test.go TestARedPassFreezesItsRedFiles
+- src/pull/pull_frozen_test.go TestAMovedRedFileRefusesTheGreenPass
+- src/pull/pull_frozen_test.go TestAnUnmovedRedFileLetsTheGreenPassThrough
+- src/pull/pull_frozen_test.go TestAReopenLetsTheGreenPassThrough
+- src/pull/pull_frozen_test.go TestTheFinalAcceptRefusesAMovedRedFile
+- src/pull/pull_frozen_test.go TestAGateShowsTheReopenedRedFiles
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/pull/pull_frozen.go
+- src/pull/pull_frozen_test.go
+- src/pull/pull_writes.go
+- src/pull/pull_back.go
+- src/pull/pull.go
+- src/pull/pull_chapter.go
+- spec/schemas/ticket.schema.yaml
+- spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function named stands opened: pull_kept.go, pull_writes.go, pull_back.go, pull_accept.go, pull.go
+- the callers list names the callers of passed, handBack, workAnswer and positionalOf
+- each done_when line meets a test in pull_frozen_test.go
+- the change adds no config key
 
 ## tests-red
 
