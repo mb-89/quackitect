@@ -46,6 +46,25 @@ func TestPrePushRefusesAVersionDelete(t *testing.T) {
 	}
 }
 
+// A version ref moved off the remote's tip meets the rewrite refusal, and a fast-forward of it passes. [[spec/tickets/version-guard-skips-git-options]]
+func TestPrePushRefusesAVersionRewrite(t *testing.T) {
+	t.Parallel()
+	const was = "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"
+	line := "refs/heads/v4 " + ghTip + " refs/heads/v4 " + was + "\n"
+	said := New(Outside{Git: taughtGit(nil)}).PrePush(treeOf(t, nil, ""), Push{Refs: line})
+	if !strings.HasPrefix(said, "v4 is a version branch, and this command would rewrite it.") {
+		t.Fatalf("pre-push answers %q, and wants the rewrite of v4 refused", said)
+	}
+	forward := taughtGit(map[string]string{"merge-base " + was + " " + ghTip: was})
+	if said := New(Outside{Git: forward}).PrePush(treeOf(t, nil, ""), Push{Refs: line}); strings.Contains(said, "version branch") {
+		t.Fatalf("pre-push answers %q over a fast-forward of v4", said)
+	}
+	both := line + "(delete) " + ghZeros + " refs/heads/v3 " + ghTip + "\n"
+	if said := New(Outside{Git: taughtGit(nil)}).PrePush(treeOf(t, nil, ""), Push{Refs: both}); !strings.HasPrefix(said, "v4, v3 is a version branch, and this command would delete it.") {
+		t.Fatalf("pre-push answers %q over a rewrite beside a delete", said)
+	}
+}
+
 func TestPrePushHoldsTheOwnersPushOntoAHeldBranch(t *testing.T) {
 	t.Parallel()
 	now := time.Unix(1790000000, 0)

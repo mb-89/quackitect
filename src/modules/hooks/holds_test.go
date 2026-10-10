@@ -200,3 +200,25 @@ func TestTheDoorWritesEachDropItsFoldNames(t *testing.T) {
 		})
 	}
 }
+
+// The field readers run with the door's lock free, so a slow git read on one post stalls no other session's call. [[spec/tickets/door-lock-holds-commit-alone]]
+// level0: FixtureOutsideHome - the stop's readers read a bare root of the test's own
+func TestTheFieldReadersRunBeforeTheDoorsLock(t *testing.T) {
+	door := holdDoor(t, Settings{})
+	reads, locked := 0, 0
+	door.from.Git = func(string, ...string) string {
+		reads++
+		if !door.mu.TryLock() {
+			locked++
+			return ""
+		}
+		door.mu.Unlock()
+		return ""
+	}
+	if err := door.writes("s1", Post{Event: stopEvent, E: map[string]any{"session_id": "s1"}}, Settings{}, t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
+	if reads == 0 || locked != 0 {
+		t.Fatalf("the stop's field readers read git %d times, %d of them under the door's lock", reads, locked)
+	}
+}

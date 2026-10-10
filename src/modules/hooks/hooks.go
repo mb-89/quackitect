@@ -173,9 +173,9 @@ var decided = map[string]bool{
 	stopEvent: true, spawnEvent: true, "tool.describe": true, toolEvent: true, answerEvent: true,
 }
 
-// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. [[spec/design_output/stop#the-context-hands-over]]
+// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. A helper's event measures the main agent's context, so it carries none. This one predicate gates the fill in Hook and in filledOf. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/fill-gate-stands-once]]
 func fills(post Post) bool {
-	return post.Event == stopEvent || post.Event == toolEvent && textOf(post.E, "agentId", "agent_id") == ""
+	return (post.Event == stopEvent || post.Event == toolEvent) && textOf(post.E, "agentId", "agent_id") == ""
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -317,7 +317,12 @@ func (d *Door) Hook(post Post) (Answer, error) {
 }
 
 // Commits the event at the session's next place, stamped with the config its holds read, the facts the stop reads and the canary the brief reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/brief-answers-off-the-door]]
+// The field readers run before the lock, so a slow git or disk read on one post stalls no other session's call. [[spec/tickets/door-lock-holds-commit-alone]]
 func (d *Door) writes(session string, post Post, settings Settings, root string) error {
+	fields := fieldsOf(post)
+	fields[heldField] = heldOf(settings, root)
+	fields[stoppedField] = d.stoppedOf(post, settings, root)
+	fields[briefField] = d.stampOf(settings, root)
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	store := d.from.Store
@@ -329,10 +334,6 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 		}
 	}
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
-	fields := fieldsOf(post)
-	fields[heldField] = heldOf(settings, root)
-	fields[stoppedField] = d.stoppedOf(post, settings, root)
-	fields[briefField] = d.stampOf(settings, root)
 	if d.handed[session] {
 		fields[handedField] = true
 	}

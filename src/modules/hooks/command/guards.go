@@ -85,14 +85,14 @@ type versionRef struct {
 	drop bool
 }
 
-// The refusal a push or a branch over a version branch meets, or nothing. [[spec/design_output/work#a-version-branch-stands]]
+// The refusal a push or a branch over a version branch meets, or nothing, its verb read past git's global options and their values. [[spec/design_output/work#a-version-branch-stands]] [[spec/tickets/version-guard-skips-git-options]]
 func VersionGuard(command string) string {
 	var found []versionRef
 	for _, part := range commandOf.Split(command, -1) {
 		words := strings.Fields(part)
 		for at, one := range words {
 			if one == "git" {
-				found = append(found, versionsIn(words[at+1:])...)
+				found = append(found, versionsIn(afterGit(words[at:]))...)
 				break
 			}
 		}
