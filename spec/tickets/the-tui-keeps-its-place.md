@@ -107,6 +107,10 @@ record:
     hand: box a84d8c0a18eb · claude-code-remote
     hash_before: e882db9d4e2840df8b2b9bf7b241fde8949d7e23
     session: cse_01BZXtnZDaLGMkGopXHPxfTe
+    hash_after: ecce971fedef91a3c5d3f2f4dc05d433f55eae92
+    model: claude-opus-5-5
+    cost: 0
+    final: "RECEIPT: branch=work/the-tui-keeps-its-place prompted=no canary=no"
   - step: children
     hand: the engine
     hash_before: cde9c5d8b758aa80ac582110d72c55dfd25e182d
