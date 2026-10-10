@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: b0c3735d41d4d6807a5369c70af2f6a7882c508b
+    hash_after: b0c3735d41d4d6807a5369c70af2f6a7882c508b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tree passes
+      - name: check
+        exit: 0
+        said: "   60.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d388fdcdddae4016
+        size: 413
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`Carry` found the held row among the unfiltered rows, and the filter then clamped that index onto another row. It now carries the filter before the rebuild, so it finds the held row among the rows the filter keeps. A row the filter now hides leaves the cursor at its old place.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `tree.go` and its test alone
+- the tree reaches no door
+- the comment in `Carry` points at this ticket
+- the filter stands once, carried off the old tree
 
 # accept
 
