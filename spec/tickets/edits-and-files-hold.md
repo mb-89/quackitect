@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a5167492d95e · claude-code-remote
@@ -152,6 +152,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: b604e75ecb0d3b1c25b30cf5eb3a47d3d416b7e5
+    hash_after: b604e75ecb0d3b1c25b30cf5eb3a47d3d416b7e5
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -236,38 +248,70 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- seed-survives-bad-files: tests-green handed back, closed done
+- watch-hands-new-folders: tests-green handed back, closed done
+- watch-opens-before-the-seed: tests-green handed back, closed done
+- the quack dump test waits for the standing file, which the watch change made it race
+- the group's Discussion names the road taken out of the tests-green block
+- the branch took main in, with the check green on the merged head
+- files-start-stands-unused: the accept minted it, and a helper closed it
+- the accept passed twice by a helper hand, the second time clean
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a stress run of the red test caught its race at once, since the case failed alone in a few hundred runs and never in three
+- the helper hand for each accept kept the main hand free for the handover and the retro
+- the accept caught a function left with no caller, since its reviewer read each child's code beside its test
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 21:20 UTC: the check stood red on the quack dump test, and the handover called the package green, since the files watch change made a test outside the package race
+- 21:21 UTC: the git door refused a git stash list, which rode in a read command
+- 21:24 UTC: the commit refused the model trailer the harness asks for
+- 21:25 UTC: the write door refused a patch on a held ticket, since tests-green takes its fields through the pull
+- 21:42 UTC: the stop refused a turn ending on a background helper, since a cloud box stops its helpers with its turn
+- 21:50 UTC: a pkill on a loop's pattern killed the shell running it
+- 21:55 UTC: a proxy error on a helper's push sent its commit to a rescue branch
+- 21:58 UTC: the accept's point named one test of files.Start, and another test still called it
+- 22:05 UTC: the main hand's hold on the accept went stale once a helper passed it, and one pull spent itself on that
+- no owner prompt turned the run, and the plugin's clear opened it
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- implement/change runs the whole check beside the package tests, so a race the change makes elsewhere shows before tests-green: `spec/processes/standard.yaml`
+- a handover names the full path of a tool folder it hands on, since each session takes a new scratchpad: [[spec/guidance/working]]
+- a helper waits inside the turn through a foreground poll on the ticket's step: [[spec/guidance/cloud/cloud]]
+- a review point naming a deletion lists every caller and test, read off a search: [[spec/guidance/review/reviewing]]
+- a background shell stops through its task id, and a pattern kill matches its own shell: [[spec/guidance/working]]
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The red check looked at first like a flake, and the stress run turned it into a cause. The watch now hands a late folder in, so any test comparing two reads of the files family across the serve's start races the same way. The dump test is the one the check met. The stale hold after a helper's pass reads as the engine working as built, though one wasted pull says the main hand could drop its hold where a helper takes the step.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each fact points at its ticket or its guidance note, and nothing restates a rule
+- numbers: the retro adds no number past the times of the run
+- headers: the retro writes no header
+- transcript: each error carries its time, and the line on owner prompts says none turned the run
+- role: the retro names the main hand and the helpers by role, with no name, address or path of the box
 
 ## cloud
 
