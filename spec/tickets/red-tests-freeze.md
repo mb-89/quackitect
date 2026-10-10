@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -200,6 +200,22 @@ record:
         hash: 271bbec27388e167
         size: 1143
     def: 05d09c51410ea2a3
+  - step: design/tests-red-2
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: 0e73dbc53b6214c5fe6bc37e731e0f71a783be3e
+    hash_after: 0e73dbc53b6214c5fe6bc37e731e0f71a783be3e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft-2
+        hash: 8854276953331dae
+        size: 2193
+      - name: [[spec/design_output/pull]]
+        hash: 18bdfb73ec25a90a
+        size: 49571
+    def: 9c7cd4dd4a2dadb8
 group: red-freezes-and-stalls-show
 ---
 
@@ -411,26 +427,31 @@ For details, see [[spec/design_output/pull#red-tests-freeze]]. The pass of a red
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_frozen_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_frozen_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. A bare pull on a held gate prints that the leaf stands in hand, so the gate case drops the hold and reads the fresh hand-out, the one a reviewer meets. The accept with a reopen closes the ticket today and keeps no reopen.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing case, the reopen line at both the green leaf and the accept
+- the cases reach the disk, git and the shell through the fakes `cloudPull` builds
 
 # gate
 

@@ -99,6 +99,17 @@ func greenPass(t *testing.T, it *It, words ...string) (int, string) {
 	return pulled(t, it, append([]string{"alpha", "--pass", "--fields", `{"tests":"echo green"}`}, words...)...)
 }
 
+// A box past the green pass of alpha, its shell answering green, so the accept reruns the red command green. [[spec/design_output/pull#red-tests-freeze]]
+func greenBox(t *testing.T) *It {
+	t.Helper()
+	it := frozenBox(t)
+	it.Shell = ShellOver((&proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said { return proc.Said{Out: "green\n"} }}}).Run, workRoot)
+	if code, said := greenPass(t, it); code != 0 {
+		t.Fatalf("the green pass answers %d:\n%s", code, said)
+	}
+	return it
+}
+
 func stepOfAlpha(it *It) string {
 	text, _ := it.Disk.Read("spec/tickets/alpha.md")
 	return FieldOf(text, "step")
@@ -141,11 +152,7 @@ func TestAReopenLetsTheGreenPassThrough(t *testing.T) {
 
 func TestTheFinalAcceptRefusesAMovedRedFile(t *testing.T) {
 	t.Parallel()
-	it := frozenBox(t)
-	it.Shell = ShellOver((&proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said { return proc.Said{Out: "green\n"} }}}).Run, workRoot)
-	if code, said := greenPass(t, it); code != 0 {
-		t.Fatalf("the green pass answers %d:\n%s", code, said)
-	}
+	it := greenBox(t)
 	landedOn(t, it, map[string]string{frozenFile: movedText})
 	pulled(t, it)
 	code, said := pulled(t, it, "alpha", "--fields", `{"verdict":"accept"}`)
@@ -154,11 +161,27 @@ func TestTheFinalAcceptRefusesAMovedRedFile(t *testing.T) {
 	}
 }
 
+func TestAReopenLetsTheFinalAcceptThrough(t *testing.T) {
+	t.Parallel()
+	it := greenBox(t)
+	landedOn(t, it, map[string]string{frozenFile: movedText})
+	pulled(t, it)
+	if code, said := pulled(t, it, "alpha", "--fields", `{"verdict":"accept"}`, "--reopen", frozenFile+": "+reopenWhy); code != 0 {
+		t.Fatalf("the reopened accept answers %d:\n%s", code, said)
+	}
+	text, _ := it.Disk.Read("spec/tickets/alpha.md")
+	if FieldOf(text, "state") != Closed || !strings.Contains(text, "reopen:") || !strings.Contains(text, reopenWhy) {
+		t.Fatalf("the reopened accept closes nothing, or keeps no reopen:\n%s", text)
+	}
+}
+
 func TestAGateShowsTheReopenedRedFiles(t *testing.T) {
 	t.Parallel()
 	it := frozenBox(t)
 	landedOn(t, it, map[string]string{frozenFile: movedText})
-	if _, said := greenPass(t, it, "--reopen", frozenFile+": "+reopenWhy); !strings.Contains(said, "alpha at accept") || !strings.Contains(said, frozenFile) || !strings.Contains(said, reopenWhy) {
+	greenPass(t, it, "--reopen", frozenFile+": "+reopenWhy)
+	pulled(t, it, "--drop")
+	if _, said := pulled(t, it); !strings.Contains(said, "alpha at accept") || !strings.Contains(said, frozenFile) || !strings.Contains(said, reopenWhy) {
 		t.Fatalf("the accept's hand-out shows no reopened file:\n%s", said)
 	}
 }
