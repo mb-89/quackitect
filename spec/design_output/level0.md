@@ -737,6 +737,18 @@ The canary check also fails on a `HeardAgain` row, and on a `gate` row asking
 for the canary after the payment. The probe prints one line a check, and exits
 `0` where every check passes.
 
+Once those checks pass, the probe runs the client a second time in the same
+clone, past a low `context.handoverAt`, through the real pull.
+`coldClear`, beside `readsCold`, reads the run:
+
+| the clear check reads | it prints |
+|---|---|
+| the handover, then the clear, then a pull handing `read-handover` | PASS |
+| the handover, and the warn row naming the host's refusal | WARN, and the probe still passes |
+| anything else | FAIL |
+
+[[spec/tickets/the-clear-runs-live-remote]]
+
 ## Without the verb
 
 The two log lines pay on their own. A session that compacts in the ordinary

@@ -5,6 +5,7 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"encoding/json"
+	"maps"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -210,7 +211,12 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	d.pid = 12345
-	clientAnswers(&d, func(_ []string, o runOpts) ranResult {
+	key := ""
+	clientAnswers(&d, func(argv []string, o runOpts) ranResult {
+		if argv[2] == coldClearPrompt {
+			key = d.disk.text(filepath.Join(o.cwd, ".se", ".runtime", "config.json"))
+			return ranResult{stdout: clearStream()}
+		}
 		writeLog(t, d.disk, o.cwd, logText(coldWhole()...))
 		return ranResult{stdout: stream(streamSaid(coldSentence+"\nTOOLS: mcp__level0__stop", nil), streamCalls("Read"))}
 	})
@@ -221,8 +227,15 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 	for _, one := range runner.ran {
 		bases = append(bases, filepath.Base(one[0]))
 	}
-	if !slices.Equal(bases, []string{"git", "sh", "claude", "se-index"}) {
+	last := len(bases) - 1
+	if !slices.Equal(bases[:4], []string{"git", "sh", "claude", "RUNME.sh"}) || !slices.Equal(bases[last-1:], []string{"claude", "se-index"}) {
 		t.Errorf("the runs read %v", ranWords(runner))
+	}
+	if second := runner.opts[last-1]; !maps.Equal(second.env, runner.opts[2].env) || !strings.Contains(key, `"handoverAt"`) {
+		t.Errorf("the clear's run stands under %+v, past the key %q", second, key)
+	}
+	if !strings.Contains(out.String(), "PASS clear: ") {
+		t.Errorf("the probe prints\n%s", out)
 	}
 	tree := cloneOf(t, runner)
 	temp := filepath.Dir(tree)
@@ -237,7 +250,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 		o.env["CLAUDE_CONFIG_DIR"] != filepath.Join(temp, "config") || o.env["SE_BRIDGE_PORT"] != strconv.Itoa(coldPort(12345)) {
 		t.Errorf("the client runs under %+v", o)
 	}
-	if stop := runner.ran[3]; !slices.Equal(stop, []string{filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), "stop"}) {
+	if stop := runner.ran[last]; !slices.Equal(stop, []string{filepath.Join(tree, ".se", ".runtime", "bin", "se-index"), "stop"}) {
 		t.Errorf("the stop runs as %v", stop)
 	}
 	if _, err := d.disk.stat(temp); err == nil {
