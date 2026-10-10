@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: edits-and-files-hold
 parent: edits-and-files-hold
+record:
+  - step: do
+    hand: box a5167492d95e · claude-code-remote · helper-16
+    hash_before: 5ccd1515bf7db181d3df01e32a8d9a718c40f266
+    hash_after: 92de53cbaf7e7c2c9a46052c47c89a003aff5f8f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   76.8  in all"
+    inputs:
+      - name: ask
+        hash: 5ce074e280641c3d
+        size: 268
+    def: 97e74ee9911f668d
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ files.Start in src/modules/files/watch.go has no caller left, since seedsIn comm
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/files
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+files.Start goes. Nothing in the tree calls it, since seedsIn commits through commitsHeard. Its last test, TestADiskWriteComesBackThroughWatch, now starts through Seeds over an empty root. The commitsHeard comment no longer names Start.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- ask: Start and its comment are gone, and grep finds no Start in src/modules/files
+- cleanup: commitsHeard stays, since seedsIn calls it, and no other helper loses its last caller
+- one place: the watch path now starts through Seeds alone, and the test meets the same path
 
 # Discussion
 
