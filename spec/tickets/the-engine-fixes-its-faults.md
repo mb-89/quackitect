@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 reason: done
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -206,6 +206,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 9212d3ba17f6a591a6b2fd972125d656385045bd
+    hash_after: 9212d3ba17f6a591a6b2fd972125d656385045bd
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -289,68 +301,60 @@ accept
 <!-- what was done, one line a ticket or a thing -->
 <!-- the form is list -->
 
-- a-rewind-spares-landed-tests: gate accepted with two points, then built. `keptRed` keeps a landed red leaf, and `stepOn` and `advanced` walk past it
-- kept-red-subject-matches-whole and kept-red-reads-red-list: the whole-change subject match, and the red list read through `redListOf`
-- cloud-boxes-ask-nobody and cloud-ask-names-the-hold: the cloud ask door, and the note naming it
-- cloud-boxes-leave-trunk-alone, one-writer-holds-a-branch and push-gate-needs-the-engine: the three `holds` reads, landed together under prepush-reds-land-together
-- sync-takes-its-own-branch: `branch sync` merges `origin/<the branch>` before trunk
-- gate-points-pass-the-push: drafted off the retro note, for the owner to open
+- `command-fields-take-their-indent` closes done: a hand-back writes a command field indented, so the commit hook reads its tests
+- `failed-evidence-keeps-its-output` closes done: a red command's refusal names the session log and each failing Go case
+- `gate-findings-reach-the-queue` closes done: a reject at a group's accept mints its rows as children and waits at children, and a nameless row refuses
+- `reject-rows-reach-rejected` and `nameless-reject-meets-a-case` close became onto `gate-findings-reach-the-queue`, which built both
+- the group passes accept, and the four private notes close
 
 ### well
 
 <!-- what went well, and what made it go well -->
 <!-- the form is list -->
 
-- every gate read the named functions and the git history before its verdict, so each draft's claims met the code before the build
-- landing the three `holds` changes in one change let each `tests-green` pass on the shared red file
-- the commit verb ran the check and pushed on every finished thing, so origin matched the box after each step
+- a helper read each gate, so every gate kept a hand other than the draft's
+- the new refusal of `failed-evidence-keeps-its-output` named its own failing case the first time the check met it
+- the command line ran the pull in the same turn, where the MCP pull answered a turn later
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- 21:36 the plan tool answered that no server stood at the event port while the shell read 200 there. A second call passed with no change on this side
-- 21:40, 21:52 and 22:03 the push door refused each gate hand-back, because the gate's points carry the todo tag
-- 21:41 `./RUNME.sh commit -m` came back refused. The verb takes the message as its first argument
-- 21:42 and 21:53 a ticket name under `working` in the plan turned into a todo, and the pull waited on it
-- 21:45 `keptRed` read `leaf.leaves` off a bare walk entry and threw
-- 21:44 the split verb moved `childrenSay` with no header and no imports, and the `pull.js` re-export broke `pull-steps`
-- 21:45, 21:52 and 22:17 the Bash door refused a `git stash` and two chains whose landing followed a pipe
-- 21:52 a doc-only trivial step found no green command: the check ends on another ticket's lint line, and `branch test` answers missing
-- 22:03 three tickets held red cases in one test file, so no `tests-green` could pass alone
+- 19:45: the MCP pull failed twice with the index restarts on a tests-green hand-back, and the command line landed it
+- 19:50: a tests field naming a go test run refused, because its last line read ok and cached in place of green
+- 20:05 to 20:18: the helper pulls met wait and pull-queue-binds, because the plan still named a closed ticket. The plan field riding a report call left the plan file unchanged
+- 20:25: the check refused an import of the log module from the hooks module, since a module imports no module
+- 20:27 to 20:40: the closing commit refused a hooks file, because the hook drops the tests a closed ticket carries
+- 19:42: the stop claimed the helpers still ran, and the hook refused it, since a cloud turn that ends stops its helpers
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 <!-- the form is list -->
 
-- the tagged gate points: gate-points-pass-the-push
-- the plan tool's reach to the server: the bridge note in `spec/design_output/level0.md`, once a desk reproduces it
-- the commit verb's usage: the refusal names the positional message
-- a ticket name under `working`: the plan tool names a todo title, not a ticket
-- the walk entry: `keptRed` reads the route order off the ticket text
-- the split verb: it copies the imports and header a cut function needs
-- the doc-only step: the trivial route names the owning test file
-- the shared red file: a draft naming a test file another open ticket holds red names it under `depends_on`
+- the spawn sets the plan to the ticket it hands, in `src/pull/pull_hand.go`, so a helper pull binds there
+- the hook reads the tests of the ticket the commit closes, in `src/modules/hooks/command/ticket.go`
+- a case edits a draft past implement/change and reads the walk keep design/tests-red, in `src/pull/pull_kept_test.go`
+- a tests field names the tests-red command, as the engine reads green off the test verb, per `spec/processes/standard.md`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The pull hands gates and builds of one group to one box, so the builder reads the other tickets' drafts anyway. A shared red file turns that into one change. Each close still ran its own route, and the accept read the whole diff against the goal.
+The gates cost the most time, and none of it on review. Each helper verdict came back accept within minutes, and the wait sat in binding the helper to the ticket. A spawn that sets the plan itself removes that wait.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each fact stands in the file owning it, and the retro points there
-- the retro adds no number
-- the retro adds no file header
-- no owner prompt came in this run, and each error carries its time
-- the chapter names roles alone
+- each fact points at the file owning it
+- the retro adds no number to the tree
+- the retro writes no file header
+- the chapter carries the errors with their times, and the session saw no owner prompt past the clear
+- the chapter names roles, and no box or person
 
 ## cloud
 
