@@ -346,4 +346,11 @@ The bare field lands bare under `## tests`, so the case fails on its own asserti
 
 <!-- what anybody adds, at any time, on this ticket -->
 
+A helper read the draft and the red case against the code, and answers accept with no points. The gate stands unworked on a fault of the pull:
+
+- the gate waits for a hand other than the draft's, and the pull names a helper `--as` hand for it
+- a helper's bare pull answers `wait`, naming the three children as free
+- a helper's pull by name meets `pull-queue-binds`
+- `handOut` in `src/pull/pull_hand.go` gives no reason, so the fault stands unconfirmed
+
 The ask moves off the JavaScript `carriedIn` onto the Go code. The fault stands in part: the Go `CarriedIn` also reads a bare `./RUNME.sh` line, and skips every other bare line.
