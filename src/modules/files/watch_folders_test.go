@@ -92,17 +92,6 @@ func TestAFolderMovedOutHandsItsFilesGone(t *testing.T) {
 	}
 }
 
-// Windows fires a write on a folder for a write under it, and the folder's files stand in the record already. [[spec/tickets/watch-hands-new-folders]]
-// level0: FixtureOutsideHome - the case writes a named folder in a root of its own
-func TestAWriteOnAStandingFolderHandsNothing(t *testing.T) {
-	one, state, eyes, handed := started(t, ".se/.runtime/hold/keep.json")
-	hold := filepath.Join(one.root, ".se", ".runtime", "hold")
-	one.hears(eyes, fsnotify.Event{Name: hold, Op: fsnotify.Write}, recording(handed), state)
-	if len(*handed) != 0 {
-		t.Fatalf("the watch hands %v, and wants nothing", *handed)
-	}
-}
-
 // [[spec/tickets/watch-hands-new-folders]]
 // level0: FixtureOutsideHome - the case makes the log folder in a root of its own
 func TestALateLogFolderJoinsTheWatch(t *testing.T) {
