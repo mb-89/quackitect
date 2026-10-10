@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 0fcdb54e1817f512dfe410f31563fb217ff1c0f5
+    hash_after: 0fcdb54e1817f512dfe410f31563fb217ff1c0f5
+    inputs:
+      - name: ask
+        hash: e4a77dd8c818699b
+        size: 682
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,50 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`writes` reads the holds fold of its session under `d.mu`, right after it lands the event, and answers it beside the error as a `landed` value: the fold state and whether it stands. `Hook` hands that value to `held` and to `drops`, which read it in place of a second snapshot and the session's current place. A helper's post landing between the main call's write and its verdict then moves the fold and the place, and the main call still answers the verdict its own event landed. The other folds `marks`, `rows`, `repeats`, `answers`, the brief and the stops read the place the same way, and stand outside this ask as a note of their own.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/modules/hooks/hooks.go` `Hook`, which calls `writes`, `drops` and `held`
+- `src/modules/hooks/holds_test.go` `TestTheFieldReadersRunBeforeTheDoorsLock`, which calls `writes`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/hooks/holds_test.go` `TestAHelpersPostBetweenACallsWriteAndItsVerdictLeavesTheCallsRefusal`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/hooks/hooks.go`
+- `src/modules/hooks/holds.go`
+- `src/modules/hooks/holds_test.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: `Hook` and `writes` in `hooks.go`, `held` and `drops` in `holds.go`, each read for the place and the snapshot
+- the callers list names every caller of `writes`, `held` and `drops`, off a search of the source
+- each done line names `TestAHelpersPostBetweenACallsWriteAndItsVerdictLeavesTheCallsRefusal`, and the check names itself
+- the approach adds no config key
 
 ## tests-red
 
