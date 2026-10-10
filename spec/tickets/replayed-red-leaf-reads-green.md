@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 step: do
+record:
+  - step: do
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: d46b9df0db25900615a09bd38b4bec43e53e3ed7
+    hash_after: 0f44d7006964e521aa6259fa12a01e22b15512f1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "  101.2  in all"
+    inputs:
+      - name: ask
+        hash: 62c5ea6181ba67c7
+        size: 328
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull/pull_kept_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Nothing in the engine changes. The fault the ask names stands in the JavaScript, and the Go port walks past it: a draft edit past `implement/change` marks the red leaf stale, and `keptRed` keeps it while its tests stand. A new Go case drives `keptRed` over the kept leaf and the leaf whose test is gone, and the Discussion lists each function on the road.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, which closes on the evidence and a case proving it
+- the missing case lands in this change, so no note carries it
+- the evidence stands once, in the Discussion, and this answer points there
 
 # Discussion
 
