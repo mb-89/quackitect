@@ -4,7 +4,7 @@
 |---|---|
 | Can a mod be a good UI for the harness? | Yes, as a complement: the in-session view, on every surface the session reaches. Keep the VS Code sidebar for what needs an editor or a text field. |
 | Which surfaces render it? | The kit draws the pane and the band on terminal, desktop, VS Code and mobile. The live check in this cloud session is under [Live in this session](#live-in-this-session). |
-| Does it work in a cloud session? | Yes. The mod runs in the container, reads the index over loopback, and draws on whatever client attaches. |
+| Does it work in a cloud session? | Half. The mod loads, runs and reads the index here, and no client in this session asks it to draw. |
 | Latency? | 1 to 20 ms a read with the mod alone. With level0 loaded, the same read stalls for seconds while the agent works. |
 | What can a mod not do? | Stream through its own fetch, take text on mobile, size its own pane, or sleep past a short hook budget. The full list is under [Limits](#what-a-mod-cannot-do). |
 | Does it work beside level0? | No drawing conflict. With level0 loaded, the mod's reads stall while the agent works. |
@@ -119,7 +119,19 @@ The kit holds each tree to the surface's element table. The kit refuses a tree w
 
 The spike copies the mod into this cloud session's mods folder. It loads only if the owner answers the hot-reload question with "Enable for this session". Once loaded, it writes what it sees to `.se/mod-ui/seen.json`. It records the surfaces attached, renders per surface and component, fetch times, and the lag from a state write to a render.
 
-Result: pending the owner's answer. The section below names what it finds once it runs.
+Result: the owner enables hot reload, and the mod loads in this cloud session.
+
+| what the record holds | value |
+|---|---|
+| reads by the refresh timer, beside level0 | 79 |
+| median read | 46 ms |
+| reads past one second | 16 |
+| renders, by surface and component | none |
+| clients attached (`session.attach`) | none |
+| `$.session.surfaces()` | empty |
+| reads that fail | 2, while the index rewrites `index.json`, and the next tick reads again |
+
+The mod's logic runs in the container, and no client asks it to draw. The client that shows this session to the owner draws no mod site here, neither the band nor the status line. So in this session the mod is a working back end with no screen. The kit's four-surface renders stand, and a live cloud render stays unshown until a client that draws mod sites attaches.
 
 A headless session on this box also loads the copy in the mods folder. With that copy and a `--plugin-dir` copy of the same name, the CLI loads one and says so: `another plugin of that name loads first`.
 
@@ -172,7 +184,7 @@ The numbers come from `/quack-bench` and from the refresh timer's record, measur
 
 Build it as a complement, checked in as its own plugin at `.claude/skills/quack-work`.
 
-- It is the one UI that reaches a cloud session and the mobile app. The TUI is a window on the owner's machine, and the sidebar lives in VS Code.
+- It is the one UI with a road to a cloud session and the mobile app. The TUI is a window on the owner's machine, and the sidebar lives in VS Code. The live check here shows the road unbuilt: no client in this cloud session draws a mod site.
 - It stays thin. Every value comes from the index, so the mod is a view, like the TUI and the sidebar.
 - Keep the sidebar for what needs an editor or a text field: opening files, minting tickets, config.
 
@@ -180,10 +192,11 @@ The cost: a fourth view to keep in step with the index, on an API the types mark
 
 The strongest objection: the TUI already shows all of this, and a mod duplicates it. The answer: the TUI cannot reach a cloud session or a phone, and the mod duplicates no logic. Both draw the same index values, so the index stays the one owner.
 
-The call goes the other way if the stalls trace to the host's design, and level0 holds no part in them. A UI that freezes for seconds whenever the agent works is worse than none.
+The call goes the other way if the stalls trace to the host's design, and level0 holds no part in them. A UI that freezes for seconds whenever the agent works is worse than none. It also shrinks to a terminal and desktop view if no cloud client draws mod sites. Then the TUI covers most of what it adds.
 
 ## What a group holds
 
+1. **A cloud client's draw.** Open a cloud session from the desktop app and the phone. Read `seen.json` for a render. No render means no cloud UI, and the group stops there.
 1. **The stall's cause.** Reproduce the falling-run stalls with level0 and a bare mod. Find what holds the shared hooks host during a turn, and fix it in level0 or report it upstream. This decides the rest.
 2. **A narrow index value.** Add one value the mod reads in a call. It holds open rows, the current ticket and step, and the latest log rows. This replaces the mod's read of `plan.json` and its filter over the whole of `work/rows`.
 3. **A push stream.** Run the `/quack-watch` stream from a `session.start` loop, and drop the five-second timer.
