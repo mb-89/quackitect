@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 74ce9d77bb2ed949
         size: 568
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 4a49664eadaecabf3596748a54c80c1182bcea0d
+    hash_after: 4a49664eadaecabf3596748a54c80c1182bcea0d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: a4e3f6e6ac30b957
+        size: 1074
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/store_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestACommitMovesAgainstTheValueItReplaces fails on its assertion: the stubbed commit names no move for A over B. It pins the contract that closes the gap, and it replays no race, since no hook runs between the snapshot and the lock.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when test fails on its own assertion, and the check line waits on tests-green
+- the case reaches no door, since the store lives in memory
 
 # gate
 

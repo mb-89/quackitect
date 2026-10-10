@@ -17,6 +17,30 @@ func TestSortedKeysAnswerTheSetInOrder(t *testing.T) {
 	}
 }
 
+// A commit landing past an earlier snapshot moves against the cell it replaces, so the wave meets the restore. [[spec/tickets/a-commit-reads-moves-under-lock]]
+func TestACommitMovesAgainstTheValueItReplaces(t *testing.T) {
+	c := New()
+	x := OutIn(c, "t/x", "")
+	s := NewStore(c)
+	if _, err := s.Commit(0, x, map[string]any{"t/x": "A"}); err != nil {
+		t.Fatal(err)
+	}
+	stale := s.Snapshot()
+	if _, err := s.Commit(stale.Revision, x, map[string]any{"t/x": "B"}); err != nil {
+		t.Fatal(err)
+	}
+	_, _, moved, err := s.commit(stale.Revision, x, map[string]any{"t/x": "A"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fmt.Sprint(moved) != "[t/x]" {
+		t.Fatalf("A over B moves t/x, whatever a snapshot before B reads, and the commit names %v", moved)
+	}
+	if _, _, moved, _ = s.commit(stale.Revision, x, map[string]any{"t/x": "A"}); len(moved) != 0 {
+		t.Fatalf("A over A moves nothing, and the commit names %v", moved)
+	}
+}
+
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
 	n := OutIn(c, "t/n", 0)

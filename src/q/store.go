@@ -64,7 +64,7 @@ func (s *Store) Snapshot() Snapshot {
 // [[spec/design_output/model#snapshots-and-revisions]]
 func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, error) {
 	before := s.Snapshot()
-	revision, heard, err := s.commit(read, as, values)
+	revision, heard, _, err := s.commit(read, as, values)
 	for _, hand := range heard {
 		hand(values)
 	}
@@ -135,7 +135,7 @@ func (s *Store) settle(name string, view Snapshot) (any, bool, error) {
 	if same(view.Read(name), value) {
 		return value, false, nil
 	}
-	_, _, err := s.commit(view.Revision, Writer{[]*registration{one}}, map[string]any{name: value})
+	_, _, _, err := s.commit(view.Revision, Writer{[]*registration{one}}, map[string]any{name: value})
 	return value, err == nil, err
 }
 
@@ -161,18 +161,18 @@ func (one Snapshot) with(name string, value any) Snapshot {
 }
 
 // The hands hear a commit after the lock lets go, so a hand reading a snapshot waits on nothing. [[spec/design_output/model#the-fake-index]]
-func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []func(values map[string]any), error) {
+func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []func(values map[string]any), []string, error) {
 	for name, value := range values {
 		one := s.owner(name)
 		if one == nil {
-			return 0, nil, fmt.Errorf("the catalog holds no active provider of %s", name)
+			return 0, nil, nil, fmt.Errorf("the catalog holds no active provider of %s", name)
 		}
 		// Only the writer holding the name's active owner writes it. [[spec/tickets/commits-name-their-writer]]
 		if !as.holds(one) {
-			return 0, nil, fmt.Errorf("%s belongs to %s, and the commit names another writer", name, one.portName())
+			return 0, nil, nil, fmt.Errorf("%s belongs to %s, and the commit names another writer", name, one.portName())
 		}
 		if got := reflect.TypeOf(value); got == nil || !got.AssignableTo(one.typ) {
-			return 0, nil, fmt.Errorf("%s holds a %s, not a %T", name, one.typ, value)
+			return 0, nil, nil, fmt.Errorf("%s holds a %s, not a %T", name, one.typ, value)
 		}
 	}
 	s.mu.Lock()
@@ -196,7 +196,7 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 	}
 	s.revision++
 	s.values = next
-	return s.revision, s.heard, nil
+	return s.revision, s.heard, nil, nil
 }
 
 // Takes the names out of the store in one revision, so a value past its window leaves. [[spec/design_output/model#what-stays-how-long]]
