@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -92,12 +92,60 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "gate rejects 2 times: where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written; the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
+      - name: draft-3
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-3
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-3
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2", "design/draft-3", "design/tests-red-3"]
     evidence:
       - name: verdict
         form: verdict
@@ -105,7 +153,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate", "design/draft-2"]
+    input: ["design/draft", "gate", "design/draft-2", "design/draft-3"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -117,7 +165,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: ["design/tests-red", "design/tests-red-2"]
+        input: ["design/tests-red", "design/tests-red-2", "design/tests-red-3"]
         to: retro
         evidence:
           - name: tests
@@ -210,6 +258,12 @@ record:
         hash: ea644b7b6807c871
         size: 2126
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-8
+    hash_before: b01d522137c7354bb212d9d3bcb40e9d0f1dc3bb
+    hash_after: b01d522137c7354bb212d9d3bcb40e9d0f1dc3bb
+    returns: 2
+    why: "where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written; the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on"
 group: the-tui-keeps-its-place
 ---
 
@@ -426,6 +480,84 @@ Three tree cases fail on their assertions. After a carry the edit stands closed,
 - each done_when test fails on its own assertion, and the check line waits on tests-green
 - the work case posts through the registry Fake, which its contract suite holds
 
+## person-1
+
+<!-- gate rejects 2 times: where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written; the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+## draft-3
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-3
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -436,8 +568,8 @@ Three tree cases fail on their assertions. After a carry the edit stands closed,
 <!-- the form is verdict -->
 
 reject
-- Carry keeps the edit open but leaves the marks and last behind, so a fill after a redraw writes every row the view holds: re-point marks and last by name path as at is, with a red case that marks two rows, redraws with a row above, fills, and finds the two alone written
-- a departed row loses the typed value in silence: name the departure in the notice, with a case asserting it
+- where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written
+- the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on
 
 # implement
 
