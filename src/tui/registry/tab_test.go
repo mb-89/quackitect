@@ -138,6 +138,10 @@ func TestARefetchKeepsTheSelectedName(t *testing.T) {
 	if said := tab.Selected(&m); said != "config/depth" {
 		t.Fatalf("the cursor stays on config/depth across the refetch, and stands on %q", said)
 	}
+	tab.Update(&m, fetched{tab: tab.name, err: errors.New("the door refuses")})
+	if said := tab.Selected(&m); said != "config/depth" {
+		t.Fatalf("a refused fetch keeps the rows and the cursor, and the cursor stands on %q", said)
+	}
 }
 
 // The filter line narrows the rows, and the cursor moves inside what stays. [[spec/design_output/model#the-registry-tabs]]

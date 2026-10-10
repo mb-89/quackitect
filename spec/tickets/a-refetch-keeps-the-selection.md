@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2346f5d72dd69bc6
         size: 423
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b0a22705166b · claude-code-remote · helper-10
+    hash_before: 24dd094915291142985525bca852934ef4c064ca
+    hash_after: 24dd094915291142985525bca852934ef4c064ca
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/tui/registry/tab.go src/tui/registry/tab_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/registry/tab.go and its test alone
+- the tab reads the registry through its door, and the case reads it through the Fake
+- the comment on take points at this ticket
+- the held name moves only on a clean fetch, as the gate point asks, and a case decides the refused fetch
 
 ## tests-green
 
