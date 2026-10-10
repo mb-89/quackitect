@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 28edf6e1640e09fb9caf220aadd96affd873eef6
+    hash_after: 28edf6e1640e09fb9caf220aadd96affd873eef6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tree passes
+      - name: check
+        exit: 0
+        said: "   54.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4df74579efe31fb1
+        size: 392
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each redraw built the tree under the base file sort, and `Carry` copied no sort, so the rows reordered under the person after a press. `Carry` now copies the sort off the old tree, a cleared one too, so the order a person sets stands across a redraw.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `tree.go` and its test alone
+- the tree reaches no door
+- the comment in `Carry` points at this ticket
+- the sort stands once, read off the old tree through `Sorts`
 
 # accept
 
