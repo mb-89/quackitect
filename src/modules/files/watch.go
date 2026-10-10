@@ -299,14 +299,7 @@ func ContentOf(text string) q.Content {
 	return q.Content{Hash: hex.EncodeToString(sum[:]), Text: text}
 }
 
-// Commits each change the watch hands, under the family's local name. A change the store refuses reaches failed. [[spec/design_output/model#io-modules-are-modules]]
-func Start(from Watch, commit func(values map[string]any) error) (stop func(), err error) {
-	return from.Changes(func(path, text string, changed int64, gone bool) {
-		commitsHeard(commit, path, text, changed, gone)
-	})
-}
-
-// Commits one heard change under the family's local name, so Start and the seed's drain give a change the same value. [[spec/tickets/watch-opens-before-the-seed]]
+// Commits one heard change under the family's local name, so a live change and the seed's drain give a change the same value. [[spec/tickets/watch-opens-before-the-seed]]
 func commitsHeard(commit func(values map[string]any) error, path, text string, changed int64, gone bool) {
 	value := q.Content{}
 	if !gone {

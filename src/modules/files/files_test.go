@@ -19,7 +19,7 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	})
 	s := q.NewStore(c)
 	disk := NewFakeDisk()
-	stop, err := Start(NewFakeWatchOver(disk), func(values map[string]any) error {
+	stop, err := Seeds(t.TempDir(), NewFakeWatchOver(disk), func(values map[string]any) error {
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)
 		return err
 	})
