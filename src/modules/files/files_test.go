@@ -11,6 +11,7 @@ import (
 	"quackitect/src/q"
 )
 
+// level0: FixtureOutsideHome - the seed walks an empty root of the case's own
 func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
