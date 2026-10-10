@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -272,6 +272,27 @@ record:
     skipped: true
     kept: fa373a55832fcf68718f742babf7529ea9de3769
     why: its red tests stand as fa373a558 landed them, and a later leaf passed since
+  - step: gate
+    hand: box b9ccbd72b78d · claude-code-remote · helper-9
+    hash_before: a192cfd7c52bf678789510ed09f41da3b2ba7591
+    hash_after: a192cfd7c52bf678789510ed09f41da3b2ba7591
+    inputs:
+      - name: design/draft
+        hash: 3229149659b199fb
+        size: 1686
+      - name: design/tests-red
+        hash: c80cd65ee2fd5eb4
+        size: 671
+      - name: design/draft-2
+        hash: 8854276953331dae
+        size: 2193
+      - name: design/tests-red-2
+        hash: fe01c6bf8fbc99b5
+        size: 577
+      - name: [[spec/design_output/pull]]
+        hash: 3ce642ed632fb96f
+        size: 49558
+    def: 01417e29801ecc2f
 group: red-freezes-and-stalls-show
 ---
 
@@ -519,7 +540,6 @@ Each case fails on its own assertion. A bare pull on a held gate prints that the
 <!-- the form is verdict -->
 
 accept
-- red-freeze-row-names-path: TestARedPassFreezesItsRedFiles finds 'frozen:' and the hash anywhere in the ticket text, so it passes a freeze row that drops or misnames the path; the case can read the frozen row as one { path, hash } pair naming test/a_test.go
 
 # implement
 
