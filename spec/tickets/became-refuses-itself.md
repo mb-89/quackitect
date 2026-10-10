@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box e310323746a3 · claude-code-remote
+    hash_before: c35932449ae16f77058e704acb0e0be95f612b63
+    hash_after: c35932449ae16f77058e704acb0e0be95f612b63
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   91.4  in all"
+    inputs:
+      - name: ask
+        hash: c341179967baf806
+        size: 422
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_failure_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+became compares the successor by file. The ticket in hand naming itself refuses as pull-becomes-itself, and a note still becomes the tracked ticket of its name, as ticket_at.go allows.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and compares paths as the verifier asks, so a note still becomes its tracked ticket
+- the change reveals no cleanup
+- the refusal stands in became alone, with its node under spec/failures
 
 # Discussion
 

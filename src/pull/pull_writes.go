@@ -337,9 +337,14 @@ func (it *It) failed(who *Who, one *Held, leaf *Leaf, held Hold, reason string, 
 
 // [[spec/design_output/pull#became]]
 func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor string, answered []Answered, also more) int {
+	// A note becomes the tracked ticket of its name, so the successor is another file, and the ticket in hand is none. [[spec/tickets/became-refuses-itself]]
 	stands := false
 	for _, each := range TicketsHere(it.Disk) {
-		stands = stands || each.Name == successor
+		stands = stands || (each.Name == successor && each.Path != one.Path)
+	}
+	if !stands && successor == one.Name {
+		it.Refuse(failure.Raise(it.Failures, "pull-becomes-itself", one.Name+" becomes no successor of its own. Name the ticket it becomes."))
+		return 1
 	}
 	if !stands {
 		it.Refuse(failure.Raise(it.Failures, "pull-successor-nowhere", fmt.Sprintf("%s stands nowhere yet. Mint it, then hand back --became %s.", successor, successor)))
