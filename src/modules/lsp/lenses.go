@@ -46,6 +46,8 @@ type Tickets struct {
 	Cloud func() []string
 	Act   func(name string, input any) Ran
 	Save  func(path, text string) error
+	// The drawing of a ticket's path, whose fields the marks read. [[spec/tickets/lsp-marks-the-held-fields]]
+	Drawn func(path string) Drawing
 	Names []string
 }
 

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: ffba78493145a405
         size: 933
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 7cb3e174668d04b90ebf1bcae31fb6f7bf7c4592
+    hash_after: 7cb3e174668d04b90ebf1bcae31fb6f7bf7c4592
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft
+        hash: db15050ce46efa69
+        size: 2286
+      - name: [[spec/design_output/lsp]]
+        hash: e153b67981b2f041
+        size: 24421
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -249,26 +265,34 @@ The server marks the fields a person's hold still wants, answers their hover, an
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/marks_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/marks_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The mark, the marked hover and the new take fail on their own assertions against the stubs in `marks.go`.
+
+- The term hover, the ticket with no person's hold and the hold standing at the start pass already. They guard what the change keeps, so a change that marks every ticket or shows every hold turns them red.
+- The port's `Drawn` and the fake's answer stand in this run, since the cases compile against them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a case in `marks_test.go`, and the check line meets `./RUNME.sh check`
+- the cases reach the drawing and the holds through the fake port in `lenses_test.go`
 
 # gate
 

@@ -42,6 +42,7 @@ type heard struct {
 	answer Ran
 	holds  []Hold
 	cloud  []string
+	drawn  map[string]Drawing
 }
 
 func (one *heard) tickets() Tickets {
@@ -57,6 +58,7 @@ func (one *heard) tickets() Tickets {
 			one.saved[path] = text
 			return nil
 		},
+		Drawn: func(path string) Drawing { return one.drawn[path] },
 		Names: []string{"holds/standing", "tickets/cloud"},
 	}
 }
