@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/person-1
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -186,6 +186,11 @@ record:
       - name: check
         exit: 1
         said: "   78.5  in all"
+  - step: implement/person-1
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: b329e24f5c5a3016ea1ee217e799607431a71098
+    hash_after: b329e24f5c5a3016ea1ee217e799607431a71098
+    def: 6c4270b49c40b30a
 group: edits-and-files-hold
 ---
 
@@ -341,14 +346,19 @@ The approach answers the ask: writes() in src/modules/edits/edits.go rewrites th
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Neither road. The tests and the ratio guard stay as they stand. A helper pull takes the ticket the plan names, so the box pins the plan to each sibling in turn and works its implement/change through a helper hold. Once the edits and files code lands, the edits package and the files ratio turn green, and this tests-green runs again unchanged.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the answer changes no file
+- doors: the answer reaches no door
+- comment: reached keeps its pointer at this ticket
+- one place: the road stands in this answer and in the group Discussion
 
 ## tests-green
 
