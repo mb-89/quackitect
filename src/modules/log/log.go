@@ -18,6 +18,9 @@ const (
 	LadderPort  = "ladder"
 )
 
+// The session log, from the work root. [[spec/tickets/failed-evidence-keeps-its-output]]
+const SessionPath = ".se/.log/session.jsonl"
+
 // The ladder Python's logging climbs. [[spec/design_output/log#what-a-box-writes]]
 var Ladder = []string{"debug", "info", "warn", "error", "fatal"}
 

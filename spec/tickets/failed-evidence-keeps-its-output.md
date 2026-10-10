@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ece152b88e9d8b30
         size: 377
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 8f71bba3879705bdf77b1918f46e5795bf9858a9
+    hash_after: 8f71bba3879705bdf77b1918f46e5795bf9858a9
+    answered:
+      - name: lint
+        exit: 0
+        said: green, src/quack passes; green, src/modules/hooks passes; green, src/modules/log passes
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/pull/pull_commands.go src/modules/log/log.go src/quack/battery.go src/quack/log.go src/modules/hooks/rows.go src/pull/red_log_test.go && ./RUNME.sh test src/quack/retro_effect_test.go src/quack/hook_verb_test.go src/modules/hooks/brief_test.go src/modules/log/log_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the six files the draft names, and no other
+- the change reaches no door: the case drives a fake shell and a fake log
+- each new name points at this ticket, and the red test's header now points here too
+- the log path stands once in `src/modules/log/log.go` and the failing-case pattern once in `src/pull/pull_commands.go`, and the old copies point at them
 
 ## tests-green
 

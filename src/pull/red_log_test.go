@@ -1,5 +1,5 @@
 // A command field missing what it expects logs the command's whole output,
-// and its refusal names the log and each failing Go case. [[spec/tickets/red-commands-log-their-output]]
+// and its refusal names the log and each failing Go case. [[spec/tickets/failed-evidence-keeps-its-output]]
 package pull // level0: InPackageTest - the case reads the unexported commandsRun
 
 import (
