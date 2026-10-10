@@ -58,4 +58,12 @@ function clientOf(node, ask, wait) {
   });
 }
 
-module.exports = { BIN, ID, NAME, WATCHES, binaryOf, clientOf, serverAsk };
+// The client's middleware over the door. [[spec/tickets/extension-keeps-the-editor-parts]]
+function middlewareOf() {
+  return {
+    executeCommand: (command, args, next) => next(command, args),
+    handleDiagnostics: (uri, rows, next) => next(uri, rows),
+  };
+}
+
+module.exports = { BIN, ID, NAME, WATCHES, binaryOf, clientOf, middlewareOf, serverAsk };

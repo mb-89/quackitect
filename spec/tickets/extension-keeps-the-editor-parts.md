@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,22 @@ record:
         hash: 04f8ac725844fe5e
         size: 1012
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 1bc980aecfa44e95fc1cf404284aeac884e9a2d9
+    hash_after: 1bc980aecfa44e95fc1cf404284aeac884e9a2d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 012f4c47a0167a16
+        size: 3909
+      - name: [[spec/design_output/lsp]]
+        hash: c6a62e22f17c2c6a
+        size: 24410
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -265,26 +281,38 @@ The extension starts the language client and keeps the parts LSP holds no word f
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/lsp.test.js test/level0/route-host.test.js test/level0/sidebar.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `test/level0/lsp.test.js`
+- `test/level0/route-host.test.js`
+- `test/level0/sidebar.test.js`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Seven cases fail on their own assertion, and every standing case passes.
+
+- The three middleware cases fail against the pass-through stub in `lib/lsp.js`.
+- The take, the hand-back and pull for me fail, since the host and the sidebar still post the pull.
+- The start case fails, since the start still registers the ticket command and the save hook.
+- The fake doors gain `executes`, the editor's executeCommand, which records the command and its arguments.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the three middleware lines and the sidebar take line meet the cases above, the grep and the deletion meet commands at the change, and the check line meets `./RUNME.sh check`
+- the cases reach the editor through the fake doors alone, and `executes` stands in each fake door they read
 
 # gate
 
