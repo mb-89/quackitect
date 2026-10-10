@@ -1,0 +1,30 @@
+# A one-line change the owner orders: implement, then the owner accepts.
+name = "trivial"
+test_cmd = "python3 -m unittest discover -s tests -q"
+test_paths = ["tests"]
+
+[[step]]
+name = "implement"
+owner = "agent"
+gate = "green"
+requires = ["commit"]
+on_pass = "accept"
+on_fail = "implement"
+max_fails = 2
+max_attempts = 3
+lease_seconds = 900
+progress_seconds = 300
+brief = "Make the change, keep the test command passing, commit on the ticket's branch, file the commit as evidence kind=commit with sha."
+
+[[step]]
+name = "accept"
+owner = "human"
+gate = "human"
+requires = []
+on_pass = "done"
+on_fail = "implement"
+max_fails = 2
+max_attempts = 1
+lease_seconds = 0
+progress_seconds = 0
+brief = "The owner decides in the inbox."

@@ -1,0 +1,43 @@
+# The smallest route that beats a lone agent: red, green, a separate reviewer.
+name = "mvp"
+test_cmd = "python3 -m unittest discover -s tests -q"
+test_paths = ["tests"]
+
+[[step]]
+name = "test"
+owner = "agent"
+gate = "red"
+requires = ["commit"]
+on_pass = "implement"
+on_fail = "test"
+max_fails = 2
+max_attempts = 3
+lease_seconds = 1200
+progress_seconds = 600
+brief = "Write tests for the goal under the test paths and commit them on the ticket's branch. The tests must FAIL at that commit. File the commit as evidence kind=commit with sha. Write no implementation."
+
+[[step]]
+name = "implement"
+owner = "agent"
+gate = "green"
+requires = ["commit"]
+on_pass = "review"
+on_fail = "implement"
+max_fails = 3
+max_attempts = 4
+lease_seconds = 1800
+progress_seconds = 600
+brief = "Implement until the test command passes. Commit on the ticket's branch and file the commit as evidence kind=commit with sha. Leave the tests from the test step as they are, or file evidence kind=test_change with why."
+
+[[step]]
+name = "review"
+owner = "helper"
+gate = "review"
+requires = ["review"]
+on_pass = "done"
+on_fail = "implement"
+max_fails = 2
+max_attempts = 2
+lease_seconds = 900
+progress_seconds = 600
+brief = "Review the diff against the goal. File one evidence kind=review with verdict approve or request_changes and findings as a list. Change no code."
