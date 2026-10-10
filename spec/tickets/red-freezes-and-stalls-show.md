@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box cc2a5a1dc9c0 · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/red-freezes-and-stalls-show already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 0b7e8e2eac1d406c67d8c051584770cafe6e597c
+    hash_after: 0b7e8e2eac1d406c67d8c051584770cafe6e597c
+    inputs:
+      - name: ask
+        hash: c6e74e775b670b87
+        size: 395
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -126,14 +135,21 @@ Done when every child closes through the command it names.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/red-tests-freeze]], standard
+- [[spec/tickets/stalls-read-progress]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child touches one engine part, the pull or the branch holds, and each closes as one review
+- red-tests-freeze holds the red test half of the goal and stalls-read-progress the stuck box half, so nothing of the goal stands outside them
+- neither child waits on the other, so neither names depends_on
+- the children read nothing from each other and land in either order, and both stand closed
+- the group diff stays inside one review, so no child splits into a group
 
 # children
 
