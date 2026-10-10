@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 10b99cf2cbf3a2ce
         size: 684
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-13
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: e27482205c5073f4b2c8bc3613a75a8be77b9f0c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -292,14 +301,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/edits/apply.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: only src/modules/edits/apply.go changes, inside the draft size
+- doors: jsTemplate is pure and reaches no door, so needs no fake
+- approach: jsTemplate and jsGroup comments point at the ticket naming the approach
+- one place: the JavaScript dollar table stands in jsTemplate alone
 
 ## tests-green
 

@@ -6,6 +6,7 @@ package edits
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -184,7 +185,78 @@ func byPattern(one Op, text, at string) (string, int, string) {
 	if one.ExpectCount != nil && int(*one.ExpectCount) != hits {
 		return "", 0, fmt.Sprintf("%s: the pattern matches %d times, and expect_count says %v", at, hits, *one.ExpectCount)
 	}
-	return shape.ReplaceAllString(text, one.Replacement), hits, ""
+	template, refused := jsTemplate(one.Replacement, shape)
+	if refused != "" {
+		return "", 0, at + ": " + refused
+	}
+	return shape.ReplaceAllString(text, template), hits, ""
+}
+
+// A replacement read as JavaScript reads it, written as a Go template, or the reason it refuses. [[spec/tickets/regex-replacements-read-js-groups]]
+func jsTemplate(replacement string, shape *regexp.Regexp) (string, string) {
+	named := map[string]bool{}
+	for _, name := range shape.SubexpNames() {
+		if name != "" {
+			named[name] = true
+		}
+	}
+	var made strings.Builder
+	for at := 0; at < len(replacement); at++ {
+		if replacement[at] != '$' {
+			made.WriteByte(replacement[at])
+			continue
+		}
+		next := byte(0)
+		if at+1 < len(replacement) {
+			next = replacement[at+1]
+		}
+		switch {
+		case next == '$':
+			made.WriteString("$$")
+			at++
+		case next == '&':
+			made.WriteString("${0}")
+			at++
+		case next == '`':
+			return "", "the replacement names the text before the match, which Go regexp holds no place for. Write the text out, or widen the pattern to take it"
+		case next == '\'':
+			return "", "the replacement names the text after the match, which Go regexp holds no place for. Write the text out, or widen the pattern to take it"
+		case next >= '0' && next <= '9':
+			group, width := jsGroup(replacement[at+1:], shape.NumSubexp())
+			if group == 0 {
+				made.WriteString("$$")
+				continue
+			}
+			fmt.Fprintf(&made, "${%d}", group)
+			at += width
+		case next == '<' && len(named) > 0:
+			end := strings.IndexByte(replacement[at+2:], '>')
+			if end < 0 {
+				made.WriteString("$$")
+				continue
+			}
+			if name := replacement[at+2 : at+2+end]; named[name] {
+				made.WriteString("${" + name + "}")
+			}
+			at += 2 + end
+		default:
+			made.WriteString("$$")
+		}
+	}
+	return made.String(), ""
+}
+
+// The group a dollar and its digits name, as JavaScript reads them, and the digits it takes; group 0 stands literal. [[spec/tickets/regex-replacements-read-js-groups]]
+func jsGroup(digits string, count int) (int, int) {
+	if len(digits) > 1 && digits[1] >= '0' && digits[1] <= '9' {
+		if two, _ := strconv.Atoi(digits[:2]); two >= 1 && two <= count {
+			return two, 2
+		}
+	}
+	if one := int(digits[0] - '0'); one >= 1 && one <= count {
+		return one, 1
+	}
+	return 0, 0
 }
 
 // A pattern under the flags out of i, m and s, as the bridge reads them. [[spec/design_output/apply#a-pattern-matching-nothing]]
