@@ -42,6 +42,7 @@ func TestAPatchLandsTheTextTheDoorAnswers(t *testing.T) {
 }
 
 // A put failing after another lands leaves an undo that puts the tree back. [[spec/tickets/a-part-written-apply-undoes]]
+// level0: FixtureOutsideHome - the case writes the files its batch fails over into its own root.
 func TestAPartWrittenApplyUndoes(t *testing.T) {
 	root := t.TempDir()
 	for name, text := range map[string]string{"a.txt": "a\n", "b": "b\n", "d.txt": "d\n"} {

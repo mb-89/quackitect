@@ -4,6 +4,7 @@
 package files
 
 import (
+	"io/fs"
 	"testing"
 
 	"quackitect/src/q"
@@ -25,5 +26,15 @@ func TestAStaleWriteIsRefused(t *testing.T) {
 	current := q.Request{Module: DiskModule, Verb: "write", Args: Write{Path: "a.md", Text: "two", Read: ContentOf("one").Hash}}
 	if _, err := accept(current); err != nil {
 		t.Fatalf("a write naming the current revision answers %v", err)
+	}
+}
+
+// A missing root ends the walk, and a nested folder missing at its own read leaves the walk on its siblings. [[spec/tickets/disk-list-skips-gone-folders]]
+func TestAGoneNestedFolderLeavesTheWalkGoing(t *testing.T) {
+	if got := gone("root", "root"); got != fs.SkipAll {
+		t.Errorf("a missing root answers %v, and wants SkipAll", got)
+	}
+	if got := gone("root", "root/a"); got != nil {
+		t.Errorf("a missing nested folder answers %v, and wants the walk to go on", got)
 	}
 }

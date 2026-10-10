@@ -65,9 +65,10 @@ func (one disk) Read(path string) (string, bool, error) {
 // Every file under the folder at any depth, by its slashed path from the root, sorted. [[spec/design_output/doors#the-git-door-carries-writes]]
 func (one disk) List(folder string) ([]string, error) {
 	out := []string{}
-	err := filepath.WalkDir(one.at(folder), func(at string, entry fs.DirEntry, err error) error {
+	top := one.at(folder)
+	err := filepath.WalkDir(top, func(at string, entry fs.DirEntry, err error) error {
 		if errors.Is(err, fs.ErrNotExist) {
-			return fs.SkipAll
+			return gone(top, at)
 		}
 		if err != nil || entry.IsDir() {
 			return err
@@ -78,6 +79,14 @@ func (one disk) List(folder string) ([]string, error) {
 	})
 	sort.Strings(out)
 	return out, err
+}
+
+// What the walk does past a path gone before its read. [[spec/tickets/disk-list-skips-gone-folders]]
+func gone(top, at string) error {
+	if at == top {
+		return fs.SkipAll
+	}
+	return nil
 }
 
 func (one disk) Remove(path string) error {
