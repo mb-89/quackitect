@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: red-freezes-and-stalls-show
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 271bbec27388e167
         size: 1143
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: b63b6ded3a40cd12aadafe76031b517ddcdaf513
+    hash_after: b63b6ded3a40cd12aadafe76031b517ddcdaf513
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 3229149659b199fb
+        size: 1686
+      - name: [[spec/design_output/pull]]
+        hash: 18bdfb73ec25a90a
+        size: 49571
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -240,26 +256,31 @@ For details, see [[spec/design_output/pull#red-tests-freeze]]. The pass of a red
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_frozen_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_frozen_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the red pass writes no frozen hash, a moved red file passes tests-green and accept, and a reopen leaves no trace in the record or at the gate. The fixture first met the ticket schema, which wants says on every evidence field and a reader for the red list.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a case in src/pull/pull_frozen_test.go, each failing on its assertion
+- the cases reach the disk, git and the shell through the fakes cloudPull builds, and swap the shell for a fake answering green at the accept
 
 # gate
 
