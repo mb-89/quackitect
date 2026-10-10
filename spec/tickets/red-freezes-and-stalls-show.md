@@ -89,6 +89,10 @@ record:
     hand: box cc2a5a1dc9c0 · claude-code-remote
     hash_before: 210710e158d1bd945b3c4a5eb0777c0478d8efb0
     session: cse_01HuedT1uwwN1DNnMT5J3koj
+    hash_after: 57ec73bbbffc6954b9e5a289d0fa37addaf92a09
+    model: claude-opus-5-5
+    cost: 0
+    final: Both children closed, the check stands green, and the group hands back for its pull request.
   - step: sync
     hand: box cc2a5a1dc9c0 · claude-code-remote
     hash_before: a2a91c4847141a0f6184692e892a5a9ce104cd83
