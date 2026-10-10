@@ -9,9 +9,8 @@ const { processDoor } = require("./editor-process.js");
 const { fileDoor } = require("./editor-files.js");
 const { lensDoor } = require("./editor-lens.js");
 const { insetDoor } = require("./editor-inset.js");
-const { fieldDoor } = require("./editor-fields.js");
 const { indexDoor } = require("./editor-index.js");
-const { clientOf } = require("./lib/lsp.js");
+const { clientOf, middlewareOf } = require("./lib/lsp.js");
 
 const NAME = "quackitect";
 const FAR_LEFT = Number.MAX_SAFE_INTEGER;
@@ -30,12 +29,11 @@ function editorDoor(context, doors) {
 
   const uriOf = (path) => vscode.Uri.joinPath(folder.uri, ...String(path).split("/"));
 
-  return {
+  const door = {
     ...processDoor(context, folder, doors),
     ...fileDoor(context, folder, uriOf, doors),
     ...lensDoor(context, folder),
     ...insetDoor(context, folder),
-    ...fieldDoor(context, folder),
     // A verb's action a person presses carries a progress toast. [[spec/tickets/the-lens-calls-actions]]
     index: {
       ...index,
@@ -58,7 +56,7 @@ function editorDoor(context, doors) {
         return "";
       }
       // [[spec/design_output/lsp#the-client-starts-it-again]]
-      const client = clientOf(node, ask, doors.clock.wait);
+      const client = clientOf(node, ask, doors.clock.wait, middlewareOf(door));
       context.subscriptions.push(client);
       client.start();
       return ask.server.command;
@@ -79,6 +77,9 @@ function editorDoor(context, doors) {
     registers(name, run) {
       context.subscriptions.push(vscode.commands.registerCommand(name, run));
     },
+
+    // A press runs a command the client registers off the server. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
+    executes: (command, ...args) => vscode.commands.executeCommand(command, ...args),
 
     // [[spec/design_output/extension#the-status-bar-says-it]]
     shows(states, command) {
@@ -158,6 +159,7 @@ function editorDoor(context, doors) {
       );
     },
   };
+  return door;
 }
 
 function pageOf(view) {

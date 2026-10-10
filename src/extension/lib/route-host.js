@@ -4,8 +4,8 @@
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 
 const { drawable } = require("./drawing.js");
-const { drawnAt } = require("./fields.js");
 const {
+  COMMAND,
   STANDING,
   TICKETS,
   actsOn,
@@ -13,11 +13,12 @@ const {
   routeArgvOf,
   standingOf,
   stepsIn,
-  ticketLensOf,
   ticketOf,
 } = require("./lens.js");
 
 const FLIP = "quackitect.route.flip";
+// The family each ticket's drawing stands under. [[spec/tickets/the-lens-reads-v1]]
+const DRAWN = "tickets/drawn";
 // A ticket the index draws nothing for draws an empty graph. [[spec/tickets/the-lens-reads-v1]]
 const EMPTY = { nodes: [], edges: [] };
 // The inset's height in lines: a node the layout stacks takes a few, between a floor and a ceiling. [[spec/tickets/the-inset-folds-the-frontmatter]]
@@ -34,10 +35,16 @@ function linesOf(graph) {
   return Math.min(CEILING, Math.max(FLOOR, nodes * LINES_A_NODE));
 }
 
+// The drawing of the ticket at path, off the index. [[spec/tickets/the-lens-reads-v1]]
+function drawnAt(door, path) {
+  return door.index?.values(`${DRAWN}/${String(path).replace(/\\/g, "/")}`);
+}
+
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 function routeHostOf(door) {
   const shown = new Map();
-  const tickets = ticketLensOf(door);
+  // A press runs the server's command, whose middleware asks and saves. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
+  const presses = (act, ticket, path) => door.executes(COMMAND, act, ticket, path);
 
   // The message the page draws: the graph, the route, and whether the person holds the ticket. [[spec/design_output/drawing#the-page-speaks-in-messages]]
   // The graph and the route come off tickets/drawn, so they follow the saved file. [[spec/tickets/the-lens-reads-v1]]
@@ -85,7 +92,7 @@ function routeHostOf(door) {
     }
     if (kind === "jump") return door.jumps(path, Number(message.line ?? 1));
     if (kind === "edit") return routes(path, ticket, message.steps);
-    if (kind === "take") return tickets.took("take", ticket, path);
+    if (kind === "take") return presses("take", ticket, path);
     if (kind === "handback")
       return handsBack(path, ticket, one, String(message.step ?? ""));
     return undefined;
@@ -103,13 +110,13 @@ function routeHostOf(door) {
     return ran;
   };
 
-  // A verdict leaf hands back with no flag, and another leaf asks pass or fail, as the ticket's buttons do. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+  // A verdict leaf hands back with no flag, and another leaf asks pass or fail, as the ticket's buttons do. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
   const handsBack = async (path, ticket, one, step) => {
     const leaf = stepsIn(one.text).find((each) => each.leaf && each.path === step);
-    if (leaf?.verdict) return tickets.took("back", ticket, path);
+    if (leaf?.verdict) return presses("back", ticket, path);
     const picked = await door.picks(`Hand back ${step}`, HAND_BACKS);
     if (!HAND_BACKS.includes(picked)) return undefined;
-    return tickets.took(picked, ticket, path);
+    return presses(picked, ticket, path);
   };
 
   // A page draws the message again where the lines hold, and opens again where they move. [[spec/tickets/the-inset-folds-the-frontmatter]]

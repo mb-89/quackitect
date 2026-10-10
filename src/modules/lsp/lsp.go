@@ -6,7 +6,6 @@ package lsp
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/hex"
@@ -17,10 +16,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 	"unicode/utf16"
 	"unicode/utf8"
@@ -101,6 +100,8 @@ type Outside struct {
 	Check Check
 	// The time a token read and a quiet span wait on. [[spec/tickets/go-waits-on-events]]
 	Clock q.Clock
+	// What the buttons over a ticket read and run. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+	Tickets Tickets
 }
 
 // The server over the buffers an editor holds open, and what it last published for each. [[spec/tickets/the-lsp-door-lands]]
@@ -116,13 +117,10 @@ type Server struct {
 	pending sync.WaitGroup
 	runs    sync.Mutex
 	push    func(bodies ...[]byte)
-}
-
-// One line of a recording whose replies differ from the server's. [[spec/design_output/model#an-inbound-fake-replays]]
-type Mismatch struct {
-	Line int
-	Want string
-	Got  string
+	// The count of requests the server sends the client, each id its own. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+	asked atomic.Int64
+	// The tickets the person held when the server learnt them, so only a new take moves the cursor. [[spec/tickets/lsp-marks-the-held-fields]]
+	known map[string]bool
 }
 
 // What the standing file holds: the port, and the token a connection sends first. [[spec/tickets/hooks-standing-file-names-token]]
@@ -208,6 +206,7 @@ func (s *Server) Handle(message []byte) [][]byte {
 	defer s.mu.Unlock()
 	switch in.Method {
 	case initialize:
+		s.learns()
 		return [][]byte{answers(in.ID, map[string]any{
 			"capabilities": capabilities,
 			"serverInfo":   map[string]any{"name": serverName, "version": serverVersion},
@@ -215,13 +214,23 @@ func (s *Server) Handle(message []byte) [][]byte {
 	case shutdown:
 		return [][]byte{answers(in.ID, nil)}
 	case hover:
-		return [][]byte{answers(in.ID, s.reads(s.from.Check.Hover, in.Params, nil))}
+		return [][]byte{answers(in.ID, s.hovers(in.Params))}
 	case completion:
 		return [][]byte{answers(in.ID, s.reads(s.from.Check.Complete, in.Params, []any{}))}
 	case documentLink:
 		return [][]byte{answers(in.ID, s.reads(s.from.Check.Links, in.Params, []any{}))}
 	case foldingRange:
 		return [][]byte{answers(in.ID, s.reads(s.from.Check.Folds, in.Params, []any{}))}
+	// [[spec/tickets/lsp-draws-the-ticket-lenses]]
+	case codeLens:
+		return [][]byte{answers(in.ID, s.lenses(in.Params))}
+	case executeCommand:
+		return s.presses(in.ID, in.Params)
+	case didSave:
+		return s.fills(in.Params)
+	// An answer the client sends to a request of the server's carries no method, and draws no reply. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+	case "":
+		return nil
 	case didOpen, didChange:
 		var params textParams
 		if json.Unmarshal(in.Params, &params) != nil {
@@ -290,7 +299,7 @@ func (s *Server) drawn(uri, at string, swept []Finding, force bool) []byte {
 	}
 	rows := strings.Split(text, "\n")
 	drawn := []diagnostic{}
-	for _, one := range append(append([]Finding{}, swept...), s.tools[at]...) {
+	for _, one := range append(append(append([]Finding{}, swept...), s.tools[at]...), s.markRows(at)...) {
 		drawn = append(drawn, drawsAs(one, rows))
 	}
 	body := marshal(map[string]any{"jsonrpc": rpcVersion, "method": publish, "params": map[string]any{"uri": uri, "diagnostics": drawn}})
@@ -466,8 +475,16 @@ func Listen(root string, server *Server) (func(), error) {
 		}
 	})
 	server.from.Store.OnCommit(func(values map[string]any) {
+		moves := server.MovesLenses(values)
+		// [[spec/tickets/lsp-marks-the-held-fields]]
+		takes := server.Takes(values)
 		for _, one := range held() {
 			one.send(server.Republish(one.known())...)
+			// [[spec/tickets/lsp-draws-the-ticket-lenses]]
+			if moves {
+				one.send(server.Refresh())
+			}
+			one.send(takes...)
 		}
 		go server.follows(values)
 	})
@@ -522,8 +539,22 @@ func serves(raw net.Conn, token string, server *Server, mu *sync.Mutex, conns ma
 			return
 		}
 		one.remember(server, message)
-		one.send(server.Handle(message)...)
+		server.Serve(message, one.send)
 	}
+}
+
+// Answers one message on a connection. A press and a save run beside the frame loop, so a long pull leaves the hover and the lens answering. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+func (s *Server) Serve(message []byte, send func(bodies ...[]byte)) {
+	var in request
+	if json.Unmarshal(message, &in) == nil && (in.Method == executeCommand || in.Method == didSave) {
+		s.pending.Add(1)
+		go func() {
+			defer s.pending.Done()
+			send(s.Handle(message)...)
+		}()
+		return
+	}
+	send(s.Handle(message)...)
 }
 
 // One frame's body: the headers up to the blank line, then as many bytes as Content-Length names. [[spec/tickets/the-lsp-door-lands]]
@@ -548,52 +579,4 @@ func readFrame(reader *bufio.Reader) ([]byte, error) {
 	body := make([]byte, length)
 	_, err := io.ReadFull(reader, body)
 	return body, err
-}
-
-// One line of a recording: a message as the editor sends it, and the replies the server gives. [[spec/design_output/model#an-inbound-fake-replays]]
-type recorded struct {
-	Message json.RawMessage   `json:"message"`
-	Replies []json.RawMessage `json:"replies"`
-}
-
-// The inbound fake: it drives the server off a recording, one message a line, and answers each line whose replies differ. [[spec/design_output/model#an-inbound-fake-replays]]
-func Replay(server *Server, recording []byte) ([]Mismatch, error) {
-	var missed []Mismatch
-	scan := bufio.NewScanner(bytes.NewReader(recording))
-	scan.Buffer(nil, frameCap)
-	for n := 1; scan.Scan(); n++ {
-		line := bytes.TrimSpace(scan.Bytes())
-		if len(line) == 0 {
-			continue
-		}
-		var one recorded
-		if err := json.Unmarshal(line, &one); err != nil {
-			return nil, fmt.Errorf("line %d: %w", n, err)
-		}
-		got := server.Handle(one.Message)
-		if !same(one.Replies, got) {
-			gotRaw := make([]json.RawMessage, len(got))
-			for i, body := range got {
-				gotRaw[i] = body
-			}
-			want, _ := json.Marshal(one.Replies)
-			seen, _ := json.Marshal(gotRaw)
-			missed = append(missed, Mismatch{Line: n, Want: string(want), Got: string(seen)})
-		}
-	}
-	return missed, scan.Err()
-}
-
-// Whether the recorded replies and the server's decode alike, in order. [[spec/design_output/model#an-inbound-fake-replays]]
-func same(want []json.RawMessage, got [][]byte) bool {
-	if len(want) != len(got) {
-		return false
-	}
-	for i := range want {
-		var a, b any
-		if json.Unmarshal(want[i], &a) != nil || json.Unmarshal(got[i], &b) != nil || !reflect.DeepEqual(a, b) {
-			return false
-		}
-	}
-	return true
 }
