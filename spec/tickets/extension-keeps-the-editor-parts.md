@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 5b6f46d49c18911b7181fb6531f8ad3029c1112e
+    hash_after: 5b6f46d49c18911b7181fb6531f8ad3029c1112e
+    inputs:
+      - name: ask
+        hash: 04f8ac725844fe5e
+        size: 1012
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -169,38 +178,85 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The extension starts the language client and keeps the parts LSP holds no word for. The server draws the buttons and the marks, so their JavaScript leaves. For the server's side, see [[spec/design_output/lsp#a-ticket-carries-its-buttons]] and [[spec/design_output/lsp#a-take-marks-the-fields]].
+
+- `lib/lsp.js` gains `middlewareOf(door)`, pure over the door, which `clientOf` hands the client.
+- Its `executeCommand` asks the reason of a fail with no fourth argument, and an empty reason sends nothing.
+- It saves the ticket before a pass, a fail or a back reaches the server.
+- Its `handleDiagnostics` draws each `HeldField` hint through `door.marksFields` as the underline, and hands the other rows on.
+- The client registers `quackitect.ticket` off the server's capability, so `extension.js` registers no command of that name.
+- The sidebar's take and the route host's take and hand-back run `door.runs(COMMAND, ...)`, the editor's executeCommand.
+- The lens provider in `editor-lens.js` draws the route flip alone, and the save hook leaves, since the server fills on didSave.
+- `marksFields` moves from `editor-fields.js` into `editor-lens.js`, and its hover leaves, since the server answers it.
+- `lib/fields.js` and `editor-fields.js` go, and `drawnAt` moves into `route-host.js`.
+- `lib/lens.js` keeps what the route host and the sidebar read, and drops `lensesOf`, `argvOf`, `fillArgvOf` and `ticketLensOf`.
+- `spec/design_output/extension.md` points its two sections at the lsp note.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/extension/extension.js` `activate`, which drops the ticket lens, the fields and the save hook
+- `src/extension/editor.js` `editorDoor`, `startsServer`, which hands the middleware, and the door's `runs`
+- `src/extension/editor-lens.js` `lensDoor`, which gains `marksFields` and loses `onSave`, `tells` and `picks` stay
+- `src/extension/lib/lsp.js` `clientOf`
+- `src/extension/lib/route-host.js` `routeHostOf`, `took` and `handsBack`
+- `src/extension/sidebar.js` `pullsNext`
+- `src/extension/lib/lens.js`, whose exports shrink
+- `test/level0/lens.test.js`, `test/level0/route-host.test.js`, `test/level0/sidebar.test.js`, `test/level0/extension-load.test.js`, `test/level0/fields-to-fill.test.js`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/lsp.test.js` `the middleware asks the reason before a fail reaches the server, and an empty reason sends nothing`
+- `test/level0/lsp.test.js` `the middleware saves the ticket before a hand-back, and a take saves nothing`
+- `test/level0/lsp.test.js` `a field hint draws as the underline, and leaves the Problems rows`
+- `test/level0/sidebar.test.js` `pull for me runs the server's ticket command, and opens the ticket`
+- `test/level0/route-host.test.js` `the page's take and hand-back run the server's ticket command`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- `the-client-drops-fields-js`: this ticket deletes `fields.js` and `editor-fields.js`, and the middleware draws the `HeldField` hint
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/extension/extension.js`
+- `src/extension/editor.js`
+- `src/extension/editor-lens.js`
+- `src/extension/editor-fields.js`, deleted
+- `src/extension/lib/fields.js`, deleted
+- `src/extension/lib/lens.js`
+- `src/extension/lib/lsp.js`
+- `src/extension/lib/route-host.js`
+- `src/extension/sidebar.js`
+- `test/level0/lsp.test.js`
+- `test/level0/lens.test.js`
+- `test/level0/route-host.test.js`
+- `test/level0/sidebar.test.js`
+- `test/level0/extension-load.test.js`
+- `test/level0/fields-to-fill.test.js`, deleted
+- `spec/design_output/extension.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, and `extension.js`, `editor.js`, `editor-lens.js`, `lsp.js`, `route-host.js` and `sidebar.js` checked there
+- the callers list names every user of `lens.js`, `fields.js` and the two editor doors, off a grep of src and test
+- every done_when line meets a case above, the grep over `registerCodeLensProvider`, the deletion, or the check
+- the approach adds no config key
 
 ## tests-red
 
