@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 5924ab640915e0753f7b7b75dd0316b51309fa5d
+    hash_after: 5924ab640915e0753f7b7b75dd0316b51309fa5d
+    inputs:
+      - name: ask
+        hash: 97110e026beedf1c
+        size: 671
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -164,38 +173,50 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` copies the old tree's open edit, typed text and offer with it. It reads the edited row's name path off the old items by the edit's `at`, and points `at` at the item with that path in the new items, walked in their own order. Where the row left, `at` stands empty, `itemAt` finds nothing, and Enter writes nothing. Keys then stay in the edit until Enter or Escape closes it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawKeepsAnOpenEdit
+- src/tui/work/actions_test.go TestAKeyInAnEditStaysInItAcrossARedraw
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/tree_test.go
+- src/tui/work/actions_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Carry, Edit, Open, Take, itemAt, editing and writes, and an `at` naming no item writes nothing
+- a grep finds takes the one caller of Carry
+- each done_when line names its test
+- the approach adds no config key
 
 ## tests-red
 
