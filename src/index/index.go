@@ -100,16 +100,19 @@ func Open(root, at string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// A file that takes no shape, one that is no database among them, rebuilds as a stale one does. [[spec/tickets/index-open-clears-its-companions]]
 	if fresh(db, root) {
-		if _, err := db.Exec(shape); err != nil {
-			return nil, err
+		if _, err := db.Exec(shape); err == nil {
+			return db, setMeta(db, root)
 		}
-		return db, setMeta(db, root)
 	}
 
 	db.Close()
-	if err := removeFile(at); err != nil && !errors.Is(err, fs.ErrNotExist) {
-		return nil, err
+	// The journal and the shared memory go with the file, so the new file replays none of the old. [[spec/tickets/index-open-clears-its-companions]]
+	for _, one := range []string{at, at + "-wal", at + "-shm"} {
+		if err := removeFile(one); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return nil, err
+		}
 	}
 	db, err = sql.Open("sqlite", dsn(at))
 	if err != nil {

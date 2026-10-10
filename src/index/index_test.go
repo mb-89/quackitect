@@ -426,3 +426,43 @@ func TestFindTakesPunctuatedWords(t *testing.T) {
 		}
 	}
 }
+
+// A rebuild clears the old file's -wal and -shm with it, so the new file replays no journal of the door before, which still holds them. [[spec/design_output/index#the-door-owns-the-database]]
+// level0: FixtureOutsideHome - the case opens and writes its own index
+func TestOpenClearsTheWalAndShm(t *testing.T) {
+	t.Parallel()
+	root, at := tree(t), filepath.Join(t.TempDir(), "index.db")
+	old, err := Open(root, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer old.Close()
+	if _, _, err := Sweep(old, root); err != nil {
+		t.Fatal(err)
+	}
+	db, err := Open(t.TempDir(), at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if n := counted(t, db, `SELECT count(*) FROM file`); n != 0 {
+		t.Fatalf("the rebuilt index replays %d row(s) off the old journal", n)
+	}
+}
+
+// A file that is no database rebuilds, so the next start opens a fresh index. [[spec/design_output/index#the-door-owns-the-database]]
+// level0: FixtureOutsideHome - the case opens and writes its own index
+func TestOpenRebuildsACorruptFile(t *testing.T) {
+	t.Parallel()
+	at := filepath.Join(t.TempDir(), "index.db")
+	write(t, filepath.Dir(at), "index.db", strings.Repeat("no database here\n", 512))
+	db, err := Open(tree(t), at)
+	if err != nil {
+		t.Fatalf("open over a corrupt file answers %v, and wants a fresh index", err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow(`SELECT count(*) FROM file`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+}
