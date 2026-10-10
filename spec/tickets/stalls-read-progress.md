@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -92,12 +92,60 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "gate rejects 2 times: no red test decides the config line: the beat and dispatch cases set work.progressAfter through the config fake, and the pre-push case reads a fake schema, so nothing fails while spec/config/level0.schema.json and settings.go carry no work.progressAfter default; add a case reading the real schema default through ./RUNME.sh config or config.Default; the person-on-the-next-stall line rests on over: true, which the dispatch case writes into the fixture by hand; no red case shows claimGroup in take.go writing over: true on a take over a standing hold, so the chain the ask names stays undecided; the draft tests list names src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale, which stands nowhere; the red case is src/modules/hooks/githooks_test.go TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan, so the list and the red list disagree; the hook done_when line meets TestTheBeatAsksAStalledBoxForAHandoverOnce in src/branches/beat_test.go, through the Stop hook's branch beat in .claude/settings.json; the draft names no done_when line beside its test, so write that mapping into tests"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
+      - name: draft-3
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-3
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-3
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2", "design/draft-3", "design/tests-red-3"]
     evidence:
       - name: verdict
         form: verdict
@@ -105,7 +153,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate", "design/draft-2"]
+    input: ["design/draft", "gate", "design/draft-2", "design/draft-3"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -117,7 +165,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: ["design/tests-red", "design/tests-red-2"]
+        input: ["design/tests-red", "design/tests-red-2", "design/tests-red-3"]
         to: retro
         evidence:
           - name: tests
@@ -216,6 +264,12 @@ record:
         hash: 2905f4996b0af7be
         size: 45994
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box b9ccbd72b78d · claude-code-remote · helper-8
+    hash_before: 1f78a76639cc01538c81561f2b6ac79b489d6bda
+    hash_after: 1f78a76639cc01538c81561f2b6ac79b489d6bda
+    returns: 2
+    why: "no red test decides the config line: the beat and dispatch cases set work.progressAfter through the config fake, and the pre-push case reads a fake schema, so nothing fails while spec/config/level0.schema.json and settings.go carry no work.progressAfter default; add a case reading the real schema default through ./RUNME.sh config or config.Default; the person-on-the-next-stall line rests on over: true, which the dispatch case writes into the fixture by hand; no red case shows claimGroup in take.go writing over: true on a take over a standing hold, so the chain the ask names stays undecided; the draft tests list names src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale, which stands nowhere; the red case is src/modules/hooks/githooks_test.go TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan, so the list and the red list disagree; the hook done_when line meets TestTheBeatAsksAStalledBoxForAHandoverOnce in src/branches/beat_test.go, through the Stop hook's branch beat in .claude/settings.json; the draft names no done_when line beside its test, so write that mapping into tests"
 group: red-freezes-and-stalls-show
 ---
 
@@ -473,6 +527,84 @@ Each case fails on its own assertion. The work settings carry no progress-after,
 
 - every done_when line meets a failing case, and the config line meets the work settings case
 - the cases reach git, the clock and the config through the fake repo, the injected clock and the config fake
+
+## person-1
+
+<!-- gate rejects 2 times: no red test decides the config line: the beat and dispatch cases set work.progressAfter through the config fake, and the pre-push case reads a fake schema, so nothing fails while spec/config/level0.schema.json and settings.go carry no work.progressAfter default; add a case reading the real schema default through ./RUNME.sh config or config.Default; the person-on-the-next-stall line rests on over: true, which the dispatch case writes into the fixture by hand; no red case shows claimGroup in take.go writing over: true on a take over a standing hold, so the chain the ask names stays undecided; the draft tests list names src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale, which stands nowhere; the red case is src/modules/hooks/githooks_test.go TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan, so the list and the red list disagree; the hook done_when line meets TestTheBeatAsksAStalledBoxForAHandoverOnce in src/branches/beat_test.go, through the Stop hook's branch beat in .claude/settings.json; the draft names no done_when line beside its test, so write that mapping into tests -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+## draft-3
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-3
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # gate
 
