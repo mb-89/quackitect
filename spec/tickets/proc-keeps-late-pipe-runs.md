@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 96c76eae128f0f248e145f83bab3b20dec04808d
+    hash_after: 91c934750f572ca9bb22aa064e0ec31b2b31c099
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/proc passes
+      - name: check
+        exit: 0
+        said: "   59.9  in all"
+    inputs:
+      - name: ask
+        hash: fe738edbfa495dc4
+        size: 387
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/proc
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`runUnder` in `src/proc/proc.go` reads `exec.ErrWaitDelay` with a process state as the run exit, so a run exiting zero while its child holds the pipes answers code 0 and its output, where it answered `NotStarted` with none before. The generic fault keeps the output read so far. `TestARunWhoseChildHoldsThePipeAnswersItsCode` failed red on the live fault and passes now. It runs on the real runner alone, since the fake holds no pipes, and the ratio guard holds the package at its code lines.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch
+- the case stands small enough for the ratio guard
+- the wait-delay rule stands in `runUnder` alone
 
 # Discussion
 
