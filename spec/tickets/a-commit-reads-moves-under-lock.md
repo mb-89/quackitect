@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 1df1c2ab9a2c23a3
         size: 476
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: d73367ce529fcdc6086fe969d9d06a9dbac7fa7d
+    hash_after: d73367ce529fcdc6086fe969d9d06a9dbac7fa7d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/store.go src/q/store_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/store.go and its test alone, as the ask names
+- the store reaches no door
+- the comment in commit points at this ticket for the approach
+- the moved names live in commit alone, and Commit hands the move hands that list, as the gate point asks
 
 ## tests-green
 

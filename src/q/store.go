@@ -63,17 +63,14 @@ func (s *Store) Snapshot() Snapshot {
 
 // [[spec/design_output/model#snapshots-and-revisions]]
 func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, error) {
-	before := s.Snapshot()
-	revision, heard, _, err := s.commit(read, as, values)
+	revision, heard, moved, err := s.commit(read, as, values)
 	for _, hand := range heard {
 		hand(values)
 	}
 	// A name whose JSON form stays starts no wave, so an equal commit runs nothing below it. [[spec/design_output/model#one-wave-settles-a-change]]
-	if err == nil {
-		if moved := movedIn(before, values); len(moved) > 0 {
-			for _, hand := range s.moving() {
-				hand(moved)
-			}
+	if len(moved) > 0 {
+		for _, hand := range s.moving() {
+			hand(moved)
 		}
 	}
 	return revision, err
@@ -177,6 +174,8 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	// The cells this commit replaces decide what moves, so a commit landing first meets the comparison. [[spec/tickets/a-commit-reads-moves-under-lock]]
+	moved := movedIn(Snapshot{values: s.values, down: s.down, store: s}, values)
 	next := make(map[string]cell, len(s.values)+len(values))
 	for name, held := range s.values {
 		next[name] = held
@@ -196,7 +195,7 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 	}
 	s.revision++
 	s.values = next
-	return s.revision, s.heard, nil, nil
+	return s.revision, s.heard, moved, nil
 }
 
 // Takes the names out of the store in one revision, so a value past its window leaves. [[spec/design_output/model#what-stays-how-long]]
