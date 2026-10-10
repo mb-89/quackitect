@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 04dbfc07e5b3f5d30711b830e31896f1f0da91b6
+    hash_after: 04dbfc07e5b3f5d30711b830e31896f1f0da91b6
+    inputs:
+      - name: ask
+        hash: ae3a3ee001420f25
+        size: 508
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -163,38 +172,48 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` takes the old tree's `filter` and `typed` before its rebuild, so the key lookup finds the held row among the filtered rows. `takes` in `src/tui/work/work.go` then lays the same filter line on, and the rows stand as they are, so the index holds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawUnderAFilterKeepsTheCursor
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/tree_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Carry, rebuild, Narrow, Filtering and takes, and the index lookup runs over the unfiltered rows today
+- a grep finds takes the one caller of Carry
+- the done_when line names TestARedrawUnderAFilterKeepsTheCursor
+- the approach adds no config key
 
 ## tests-red
 
