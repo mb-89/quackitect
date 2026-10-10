@@ -33,10 +33,14 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: go.sum
 
+      # The key reads the Biome pin in install.sh. [[spec/tickets/ci-caches-the-runtime-bin]]
+      - id: biome
+        shell: bash
+        run: echo "version=$(sed -n 's/^biome_version=//p' install.sh)" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v4
         with:
-          path: .se/bin
-          key: se-bin-${{ runner.os }}-vale3.20.0-biome2.5.12
+          path: .se/.runtime/bin/biome*
+          key: se-biome-${{ runner.os }}-${{ steps.biome.outputs.version }}
 
       - env:
           PULL_TOKEN: ${{ secrets.PULL_TOKEN }}
