@@ -210,3 +210,14 @@ goal: A new cloud box starts installed through the old setup path. Origin names 
 The order that minted this group leaves main unpushed, and `./RUNME.sh branch open` pushes a marker on main. The box cut `work/tests-and-ci-hold` off main by hand, as `#138` and `#140` did, and the pull request carries the group to main.
 
 The children come off the review list `groups/tests-and-ci-hold.md` on the review fleet's branch, with the owner's two children first. Each low finding's fix sketch stands as its design, so those children take the trivial route. The medium finding changes the verb road in three places, so it takes the standard route.
+
+The close of merged work branches deletes none. Each `work/*` branch on origin carries commits main's history lacks, counted with `git rev-list --count origin/main..origin/work/<name>`:
+
+| branch kind | what the count shows | why it stays |
+|---|---|---|
+| the old groups, from `the-ticket-answers-the-editor` to `phase7-switch-turns-on` | thousands of commits ahead, and no merge base with main | main's history restarts at a rewrite, so git reads every old commit as unmerged |
+| `check-notices-leave-the-cap`, `dead-tests-and-code-leave`, `windows-check-holds` | one commit ahead, the branch's own opening marker | the marker stands outside main |
+| `hooks-v1-hold-the-line`, `checks-and-index-read-right`, `tickets-keep-their-chapters`, `edits-and-files-hold` | live groups ahead of main | running boxes hold them |
+| `tests-and-ci-hold` | this group | this box holds it |
+
+`./RUNME.sh branch close` deletes a branch git counts merged into main, and it runs on main, where it drops a marker and pushes main. It finds none, and the order forbids a push of main and the delete of a branch carrying an unmerged commit. Deleting the old groups wants a person's call on whether the rewrite carried their work, so this box leaves them standing.
