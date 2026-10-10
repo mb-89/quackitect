@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -163,6 +163,15 @@ record:
         hash: c6a62e22f17c2c6a
         size: 24410
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: f73906688ea60c74a0cc32fc15a3cbaa80a70a40
+    hash_after: 909511bd432440e00cd0773c01465b9830d6bf90
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/voice_verb.go:27:1 ExampleCovers: ./RUNME.sh voice stands in no example's interface. Write an example under sp"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -354,14 +363,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's size names, plus three Go pointer comments in src/modules/lsp/lenses.go, src/modules/holds/holds.go and src/modules/tickets/drawn.go, which the gate's verdict names as stale callers
+- the change reaches the editor through door.executes and door.marksFields, and the fake doors under test/level0 carry both
+- lib/lsp.js points middlewareOf at spec/design_output/lsp, the note owning the approach
+- spec/design_output/extension.md points its two sections at the lsp note and restates neither
 
 ## tests-green
 
