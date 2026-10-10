@@ -74,14 +74,14 @@ func TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan(t *testing.T) 
 	t.Parallel()
 	now := time.Unix(1790000000, 0)
 	root := treeOf(t, map[string]string{
-		".se/.runtime/box.json":           `{"id":"myb0x"}`,
+		".se/.runtime/box.json":          `{"id":"myb0x"}`,
 		"spec/config/level0.schema.json": `{"properties": {"work": {"properties": {"progressAfter": {"default": "30m"}}}}}`,
 	}, "")
 	for over, moves := range map[string]bool{"": true, "    over: true\n": false} {
 		reads := map[string]string{
-			"show origin/work/x:spec/tickets/x.md":    strings.Replace(ghTicket(ghOther), "---\n\n", over+"---\n\n", 1),
-			"log -1 --format=%ct origin/work/x":       strconv.FormatInt(now.Add(-70*time.Minute).Unix(), 10),
-			"show " + ghTip + ":spec/tickets/x.md":    ghTicket("box myb0x · claude-code"),
+			"show origin/work/x:spec/tickets/x.md":  strings.Replace(ghTicket(ghOther), "---\n\n", over+"---\n\n", 1),
+			"log -1 --format=%ct origin/work/x":     strconv.FormatInt(now.Add(-70*time.Minute).Unix(), 10),
+			"show " + ghTip + ":spec/tickets/x.md":  ghTicket("box myb0x · claude-code"),
 			"log -1 --format=%ct %s origin/beats/x": strconv.FormatInt(now.Unix()-60, 10) + " " + ghOther + " beats",
 		}
 		if said := New(Outside{Git: taughtGit(reads)}).PrePush(root, Push{Refs: ghLine("work/x", ghTip), Now: now}); (said == "") != moves {

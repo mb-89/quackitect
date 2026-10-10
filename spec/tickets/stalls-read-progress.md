@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -345,7 +345,41 @@ record:
         exit: 0
         said: "src/quack/hook_verb.go:48:1 ExampleCovers: ./RUNME.sh hook stands in no example's interface. Write an example under spec"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 16db992f79aa19f5118d4d54c9e1dd4fab40e36a
+    hash_after: 16db992f79aa19f5118d4d54c9e1dd4fab40e36a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/modules/hooks passes; green, src/modules/settings passes
+      - name: check
+        exit: 0
+        said: "   52.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: b908c052c159d00e
+        size: 746
+      - name: design/tests-red-2
+        hash: 8770f2c945f2bd4a
+        size: 853
+      - name: design/tests-red-3
+        hash: fdc994577c7ed72b
+        size: 1575
+    def: e7abe94ca1f57e1a
+    reopen:
+      - path: src/branches/dispatch_test.go
+        why: TestDispatchPrintsEveryPartUnderItsHead pins every plan part, so it takes the stalled part the change adds; the red cases stand as frozen
+      - path: src/modules/hooks/githooks_test.go
+        why: gofmt alone, since the check refuses the file as the red pass wrote it; no assertion moves
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: red-freezes-and-stalls-show
+reason: done
 ---
 
 # Ask
@@ -768,26 +802,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/beat_test.go src/branches/dispatch_test.go src/modules/hooks/githooks_test.go src/modules/settings/settings_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A live hold now reads its tip's age against work.progressAfter, which defaults to 30m. Past the span it stalls: branch list writes stalled, the dispatch plan names it under stalled, and the Stop hook's beat asks the box once a tip for a handover. Past twice the span, a first take reads it stale, so the dispatcher fires a fresh box and the pre-push door lets that take through. The take writes over: true on its record entry, so a second stall reads a person's, stands under Yours in branch list and carries person true in the plan.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-3 names, plus the print case of the plan and a quack case proving the hook verb reads the span off the config
+- the change reaches git, the clock, the disk and the config through the branch doors and the hook door's git, each with its fake, and the quack case drives a real repository as its siblings do
+- each new function and constant carries a pointer at spec/design_output/work#a-live-hold-stalls
+- work.progressAfter stands once in settings.go, and the schema and the slash command regenerate off it
 
 # accept
 

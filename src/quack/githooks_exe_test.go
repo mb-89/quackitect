@@ -12,6 +12,12 @@ import (
 	"testing"
 )
 
+// The runs a hook takes while its stub reads busy, and the words the kernel's refusal carries. [[spec/tickets/git-hooks-run-in-go]]
+const (
+	hookTries = 5
+	textBusy  = "Text file busy"
+)
+
 func TestGitHooksTakeTheExeWhereItStandsAlone(t *testing.T) {
 	t.Parallel()
 	for _, name := range []string{"pre-commit", "pre-push"} {
@@ -30,10 +36,21 @@ func TestGitHooksTakeTheExeWhereItStandsAlone(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		said, err := exec.Command("sh", hook).CombinedOutput() // level0: FixtureOutsideHome - the case runs the real hook script, as git runs it
+		said, err := runsHook(hook)
 		line := strings.TrimSpace(string(said))
 		if err != nil || !strings.HasPrefix(line, "exe verb ") || !strings.HasSuffix(line, "/src/scripts hook "+name) {
 			t.Fatalf(".githooks/%s answers %q, %v, and wants se-index.exe run with hook %s", name, said, err, name)
 		}
 	}
+}
+
+// Runs the hook script as git runs it, again while the stub reads busy, since a child a parallel case forks can hold the stub's write handle a moment. [[spec/tickets/git-hooks-run-in-go]]
+func runsHook(hook string) ([]byte, error) {
+	for range hookTries - 1 {
+		said, err := exec.Command("sh", hook).CombinedOutput() // level0: FixtureOutsideHome - the case runs the real hook script, as git runs it
+		if !strings.Contains(string(said), textBusy) {
+			return said, err
+		}
+	}
+	return exec.Command("sh", hook).CombinedOutput() // level0: FixtureOutsideHome - the case runs the real hook script, as git runs it
 }
