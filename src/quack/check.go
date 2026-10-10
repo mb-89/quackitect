@@ -33,6 +33,9 @@ const (
 	installer   = "install.sh"
 )
 
+// The base config the engine lays into the plugin as it loads it. [[spec/tickets/types-wait-for-laid-types]]
+const laidTypes = ".claude-plugin/types/tsconfig.json"
+
 // The flags and variables the parts read: the quiet run, the working change the dry session clones, the tally the process door writes, the list the lint leaves, and Go with no C compiler. [[spec/tickets/the-verbs-need-no-wrapper]] [[spec/tickets/level0-runs-on-the-door]]
 const (
 	errorsFlag  = "--errors"
@@ -359,6 +362,11 @@ func typesHold(d checkDoors) int {
 	plugin := filepath.FromSlash(pluginDir)
 	if _, _, err := d.run([]string{"claude", "--plugin-dir", plugin, "-p", ""}, nil, true); err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so no types are laid and the hooks go untyped here.")
+		return 0
+	}
+	// An engine build that exits before it loads the plugin lays nothing, and tsc over no base config writes its output beside the hooks. [[spec/tickets/types-wait-for-laid-types]]
+	if _, err := d.disk.stat(filepath.Join(d.root, plugin, laidTypes)); err != nil {
+		fmt.Fprintln(d.out, "claude laid no types into the plugin, so the hooks go untyped here.")
 		return 0
 	}
 	code, said, err := d.run([]string{"tsc", "-p", plugin}, nil, true)
