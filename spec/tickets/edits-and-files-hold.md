@@ -254,16 +254,7 @@ The edits module keeps every text it means to keep and undoes every apply it jou
 
 - The branch stands cut off `main` by hand, as #138 and #140 cut theirs. `branch open` reads the group off `origin/main` and marks it there, so it pushes `main`, and this box pushes no `main`.
 - The children run in severity order where the pull allows it. The pull hands a held ticket each of its steps, so the order bends where a ticket waits on a gate.
-- The queue deadlocks at `a-part-written-apply-undoes` tests-green, and the owner picks the road out:
-  - its `tests` runs the whole edits package, which stays red on the cases of `journal-names-stay-unique` and `regex-replacements-read-js-groups`
-  - its `check` meets the `ratio` guard on `src/modules/files`, whose red cases wait on the files tickets' code
-  - the queue binds the session to it, so no sibling's change lands first
-- The roads out, each with its cost:
-  - unbind the queue so the main hand takes every implement/change first, which costs an engine change
-  - narrow `tests` to the ticket's own case and baseline the files ratio until the group's code lands, which bends rule 6 of the tests guidance for one group
-- Helpers wrote these gate verdicts, which no pull delivered yet:
-  - `watch-hands-new-folders`: pass, with rows on the lock `hears` already holds when it calls `adds`, the moved-out prefix matching `rel` plus a slash, the record growing on the start walk, and the named loop in `Changes` going
-  - `watch-opens-before-the-seed`: accept
-  - `git-parsers-stand-once`: pass, with rows on the missing case where both readers parse one log with a quoted path, and on `framed` breaking on a size it cannot parse
-  - `git-reads-keep-last-values`: accept, and implement rewrites the `Start` comment saying a refused read commits no branch
+- The queue stalled at `a-part-written-apply-undoes` tests-green, since its tests and the files `ratio` guard waited on the siblings' code. The box took the road on its implement/person-1: every sibling's implement/change landed first, and then each tests-green handed back over the whole package, the engine and rule 6 of the tests guidance left as they stand.
+- Every child's gate verdict reached its pull, and every child closed done.
+- The files watch change made `TestQuackDumpWritesWhatTheIndexAnswers` race, since the standing file now reaches the files family after the seed. The test waits for it now, through `seed-survives-bad-files`.
 - The `types` part reads the engine's types, and this box's claude lays none. The check runs here with the claude and the tsc that CI pins, out of the scratchpad, ahead on `PATH`.
