@@ -1,7 +1,7 @@
 // The buttons over a ticket the server draws, the press behind each one, and
 // the fill a save runs, each over a fake call of the actions.
 // [[spec/tickets/lsp-draws-the-ticket-lenses]]
-package lsp
+package lsp // level0: InPackageTest - reaches the unexported stepsIn and the package's helpers catalogOf, opened and answered
 
 import (
 	"encoding/json"
