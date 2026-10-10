@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 2e7172410cde3169
         size: 396
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 3f06e9a4907d547c64a6bfeeb879885cf5c6e85e
+    hash_after: 3f06e9a4907d547c64a6bfeeb879885cf5c6e85e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft
+        hash: 046be481cb6f7c4f
+        size: 775
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -222,26 +235,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestARedrawKeepsTheSortAPersonSet fails on its assertion: a sort set by name reads the base sort by says after one carry, as the finding names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when test fails on its own assertion, and the check line waits on tests-green
+- the case reaches no door, since the tree lives in memory
 
 # gate
 

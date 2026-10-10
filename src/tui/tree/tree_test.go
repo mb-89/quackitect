@@ -310,6 +310,27 @@ func TestARedrawUnderAFilterKeepsTheCursor(t *testing.T) {
 	}
 }
 
+// A redraw builds the tree under the base sort, and the sort a press set stands over it. [[spec/tickets/a-redraw-keeps-the-sort]]
+func TestARedrawKeepsTheSortAPersonSet(t *testing.T) {
+	t.Parallel()
+	based := func() *Tree {
+		out := NewTree(columns(), []Item{item("b", "open", "1"), item("a", "open", "2")}, true)
+		out.Sorted([]Sort{{Key: "says"}})
+		return out
+	}
+	was := based()
+	was.Sorted(nil)
+	was.SortOn("name")
+	now := based()
+	now.Carry(was)
+	if got := now.SortSays(); got != was.SortSays() {
+		t.Fatalf("the sort stays %q across a redraw, and reads %q", was.SortSays(), got)
+	}
+	if got := strings.Join(namesOf(now), "|"); got != "a|b" {
+		t.Fatalf("the rows keep the order by name, and read %q", got)
+	}
+}
+
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func TestARedrawKeepsTheOrderUnlessAPlaceChanges(t *testing.T) {
 	t.Parallel()
