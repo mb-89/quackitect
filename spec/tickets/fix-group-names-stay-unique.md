@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: cc615e50d62972e5a8f10555f48774adc06b9e4d
+    hash_after: cc615e50d62972e5a8f10555f48774adc06b9e4d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  101.2  in all"
+    inputs:
+      - name: ask
+        hash: 16b1113f7945d9e5
+        size: 499
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`fixName` in `src/branches/dispatch_write.go` cuts a parent's name to the words the cap keeps, so two parents sharing those words took one fix group name. `writesOf` then wrote the second bundle over the first. `freeName` now gives a name another ticket holds a counter in place of its last kept word. Every bundle of a run then lands under its own fix group, filed under its own parent, under the cap.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: each bundle lands under a fix group of its own
+- the change reveals no cleanup
+- the fact stands once: `freeName` alone keeps a fix group name free
 
 # Discussion
 

@@ -135,6 +135,15 @@ func fixName(words int, main, parent string) string {
 	return cutTo(strings.Join(parts, "-"), words)
 }
 
+// A name another ticket holds gives its last kept word up to a counter, so it stays under the cap and stands alone. [[spec/tickets/fix-group-names-stay-unique]]
+func freeName(name string, words int, taken map[string]bool) string {
+	out := name
+	for count := 2; taken[out]; count++ {
+		out = cutTo(name, max(words-1, 0)) + "-" + strconv.Itoa(count)
+	}
+	return out
+}
+
 var nameJoins = regexp.MustCompile(`[-_.]+`)
 
 // A name past its cap of words keeps its first ones. [[spec/tickets/prose-verbs-land-first-try]]
@@ -162,8 +171,13 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 	out := map[string]string{}
 	texts := trunkOf(read.Loose)
 	// Each bundle becomes a fix group under its parent. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+	taken := map[string]bool{}
+	for name := range texts {
+		taken[name] = true
+	}
 	for _, one := range plan.Bundles {
-		name := fixName(d.nameWords(), main, one.Parent)
+		name := freeName(fixName(d.nameWords(), main, one.Parent), d.nameWords(), taken)
+		taken[name] = true
 		text, why := d.fixGroup(name, one.Parent)
 		if why != "" {
 			return nil, why
