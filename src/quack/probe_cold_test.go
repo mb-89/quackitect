@@ -228,7 +228,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 		bases = append(bases, filepath.Base(one[0]))
 	}
 	last := len(bases) - 1
-	if !slices.Equal(bases[:4], []string{"git", "sh", "claude", "RUNME.sh"}) || !slices.Equal(bases[last-1:], []string{"claude", "se-index"}) {
+	if !slices.Equal(bases[:5], []string{"git", "sh", "claude", "git", "RUNME.sh"}) || !slices.Equal(bases[last-1:], []string{"claude", "se-index"}) {
 		t.Errorf("the runs read %v", ranWords(runner))
 	}
 	if second := runner.opts[last-1]; !maps.Equal(second.env, runner.opts[2].env) || !strings.Contains(key, `"handoverAt"`) {
