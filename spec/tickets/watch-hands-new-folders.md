@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 62a87a3a66859620b99205d990f29ce1a31ea439
+    hash_after: 62a87a3a66859620b99205d990f29ce1a31ea439
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   94.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 1d059c372b05e12d
+        size: 755
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The files family now follows a folder that appears after the watch starts. The watch walks a new or moved-in folder, adds it, and hands each file already in it. A remove or rename hands gone for every file it recorded under the path, so a folder moved out leaves no ghost. A named folder such as .se/.log joins when it appears, which replaces the start loop that added the named folders once. Before, files in a new or moved-in folder never reached the family, a moved-out folder left ghosts, and a late .se/.log went unwatched until a restart. One effect lands elsewhere: the standing file .se/.runtime/index.json now reaches the family after the seed, so the quack dump test waits for it, through seed-survives-bad-files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: watch.go and watch_folders_test.go, as the draft size names
+- doors: the cases record the watcher add through the adder seam, and read a temp root
+- comment: each new comment ends on a pointer at this ticket
+- one place: the record and the known map stand on one held state behind one lock
 
 # accept
 
