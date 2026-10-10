@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 reason: done
 step: retro/cloud
 steps:
@@ -218,6 +218,15 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 98cc619d8b61b29f0979251726dfb6820c6355ff
+    hash_after: 98cc619d8b61b29f0979251726dfb6820c6355ff
+    inputs:
+      - name: retro/write
+        hash: a6f483677dc94788
+        size: 2646
+    def: 4da1ca5da87d5bbc
 ---
 
 # Ask
@@ -365,28 +374,25 @@ The gates cost the most time, and none of it on review. Each helper verdict came
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- nothing the work needed: every tool stood installed, and no host or right came back refused
-- 21:36 the level0 server stood down at session start, and `./RUNME.sh serve` brought it up
+- none: every tool the run needed stood on the box, and no host or right met a refusal
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- the push door's todo refusal on each gate hand-back
-- the Bash door's git write and landing rules
-- the commit hook's test-beside-code rule, on a split module and a server wire
-- the file ceiling on `pull-hand.js`
-- no conflict at sync, since the branch already carried main
+- the commit hook refused a closing commit for a hooks file with no test beside it, at 20:27
+- the import rule refused a module importing a module, at 20:25
+- the guard on git writes refused a stash and a raw push, and the push verb landed the push
+- the commit verb ran past the shell's cap and finished in the background, green
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- gate-points-pass-the-push stands as a draft in no group, for the owner to open
-- the desk trials in the group's Discussion stand as person question tickets, such as a-desk-runs-probe-reply
-- the handover says the branch stands done, and the next session takes the next free branch
+- no person step stands parked, and the run minted no ticket outside the group
+- the handover names the three faults the retro carries under improve, for the next group to mint
 
 # Discussion
 
