@@ -5,10 +5,13 @@ package pull
 
 import (
 	"fmt"
+	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
 	"quackitect/src/front"
+	logmodule "quackitect/src/modules/log"
 	"quackitect/src/note"
 	"quackitect/src/yaml"
 )
@@ -137,15 +140,31 @@ func (it *It) commandsRun(path string, evidence []*yaml.Doc, chapter Chapter, fa
 }
 
 // The line a refusal adds where the log takes a red command's whole output. [[spec/tickets/red-commands-log-their-output]]
-const redLogged = " The session log holds its whole output."
+// A Go run's failing case, read off its output. [[spec/tickets/failed-evidence-keeps-its-output]]
+var GoFailCase = regexp.MustCompile(`^\s*--- FAIL: (\S+)`)
 
-// Logs the whole output of a command that misses what its field expects, and answers the line its refusal adds, or nothing where no log stands. [[spec/tickets/red-commands-log-their-output]]
+// Logs the whole output of a command that misses what its field expects, and answers the line its refusal adds: the log's path and each failing Go case, or nothing where no log stands. [[spec/tickets/failed-evidence-keeps-its-output]]
 func (it *It) loggedRed(name, line, stdout string) string {
 	if it.Log == nil {
 		return ""
 	}
 	it.Log("warn", "work", name+" misses what it expects", map[string]any{"command": line, "output": stdout})
-	return redLogged
+	said := " " + logmodule.SessionPath + " holds its whole output."
+	if cases := failingCases(stdout); len(cases) > 0 {
+		said += " The failing cases: " + strings.Join(cases, ", ") + "."
+	}
+	return said
+}
+
+// Each failing Go case the output names, once, in the order it names them. [[spec/tickets/failed-evidence-keeps-its-output]]
+func failingCases(stdout string) []string {
+	out := []string{}
+	for _, row := range rowsOf(stdout) {
+		if found := GoFailCase.FindStringSubmatch(row); found != nil && !slices.Contains(out, found[1]) {
+			out = append(out, found[1])
+		}
+	}
+	return out
 }
 
 // The first units of a text as slice counts them in JavaScript. [[spec/design_output/pull#the-commands-answer]]
