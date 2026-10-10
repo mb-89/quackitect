@@ -229,6 +229,8 @@ func (t *Tree) Carry(from *Tree) {
 	t.Schema = from.Schema
 	// The held row is found among the rows the filter keeps, and a row the filter now hides leaves the cursor at its old place. [[spec/tickets/a-filter-keeps-the-cursor]]
 	t.filter, t.typed = from.filter, from.typed
+	// The sort a person set stands over the base file's, a cleared one too. [[spec/tickets/a-redraw-keeps-the-sort]]
+	t.sorts = from.Sorts()
 	for key, shut := range from.shut {
 		if shut {
 			t.shut[key] = true

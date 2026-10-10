@@ -333,6 +333,12 @@ func TestARedrawKeepsTheSortAPersonSet(t *testing.T) {
 	if got := strings.Join(namesOf(now), "|"); got != "a|b" {
 		t.Fatalf("the rows keep the order by name, and read %q", got)
 	}
+	was.Sorted(nil)
+	cleared := based()
+	cleared.Carry(was)
+	if got := cleared.SortSays(); got != "" {
+		t.Fatalf("a sort the person cleared stays cleared across a redraw, and reads %q", got)
+	}
 }
 
 // The edit follows its row by name, where a row arrives above it. [[spec/tickets/open-edits-outlive-redraws]]

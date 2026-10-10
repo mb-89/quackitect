@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 4df74579efe31fb1
         size: 392
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b0a22705166b · claude-code-remote · helper-9
+    hash_before: f82cbe2fab81fd3fb8318da84da68eb30ae1cf84
+    hash_after: f82cbe2fab81fd3fb8318da84da68eb30ae1cf84
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/tui/tree/tree.go src/tui/tree/tree_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/tree/tree.go and its test alone
+- the tree reaches no door
+- the comment in Carry points at this ticket
+- the sorts stand once, carried off the old tree, an empty list too, as the gate point asks, and a case decides the cleared sort
 
 ## tests-green
 
