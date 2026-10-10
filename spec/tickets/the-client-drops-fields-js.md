@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: lsp-takes-the-lenses
 parent: lsp-marks-the-held-fields
+record:
+  - step: do
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 3c8a5eeb0eb96a7d928457f1263cccce95e2cd11
+    hash_after: 3c8a5eeb0eb96a7d928457f1263cccce95e2cd11
+    why: extension-keeps-the-editor-parts answers this ask
+reason: answered
 ---
 
 # Ask
