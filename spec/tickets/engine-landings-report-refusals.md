@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: d1cc16db1b5ff5213eead527a40a91c26c949a1b
+    hash_after: d1cc16db1b5ff5213eead527a40a91c26c949a1b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   91.4  in all"
+    inputs:
+      - name: ask
+        hash: ab2741cdff2bab5e
+        size: 425
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_landed_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`advanced` in `src/pull/pull_hand.go` dropped the answer of `landedAlone`. A skip or a children pass that git refused still handed out the next leaf, while the ticket on disk stood at the old step. `movedAlone` now lands each engine step move. On a refusal it puts the held text back and answers why, and the pull names that reason in place of a leaf. The other callers that drop a landing's refusal stand as the private note `engine-repairs-drop-refusals`, which the retro decides.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: no leaf goes out over a move that never landed, and the refusal stands named
+- the cleanup stands as a note of its own: `engine-repairs-drop-refusals` names the four repair paths
+- the fact stands once: `movedAlone` alone lands the engine's step moves in `advanced`
 
 # Discussion
 

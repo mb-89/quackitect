@@ -192,6 +192,27 @@ func TestAPassWhoseStagedDeltaAddsAMarkerPutsTheTicketBackAndSaysWhereItStays(t 
 // alpha with a desk leaf ahead of do, which a cloud box skips. [[spec/tickets/pull-scripts-leave]]
 var skippingTicket = strings.Replace(childTicket, "steps:\n", "steps:\n  - name: first\n    when: desk\n    does: a desk's step\n", 1)
 
+// A git door whose commit the hook refuses. [[spec/tickets/engine-landings-report-refusals]]
+type refusedCommitRepo struct{ git.Repo }
+
+func (refusedCommitRepo) Commit(string, []string) (string, error) {
+	return "", fmt.Errorf("the hook says no")
+}
+
+func TestARefusedEngineLandingHandsNoLeaf(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	must(t, it.Disk.Write("spec/tickets/alpha.md", skippingTicket))
+	it.Git = refusedCommitRepo{Repo: it.Git}
+	code, said := pulled(t, it)
+	if strings.Contains(said, "alpha at do") || !strings.Contains(said, "the hook says no") {
+		t.Fatalf("the pull answers %d, and wants no leaf handed out and the refusal named:\n%s", code, said)
+	}
+	if now, _ := it.Disk.Read("spec/tickets/alpha.md"); now != skippingTicket {
+		t.Fatalf("the ticket reads\n%s\nand wants it as it stood", now)
+	}
+}
+
 func TestAStepTheEngineSkipsCommitsTheTicketAloneAndLeavesTheTreeOut(t *testing.T) {
 	t.Parallel()
 	it, _, _ := cloudPull(t)

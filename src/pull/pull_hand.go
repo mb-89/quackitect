@@ -457,22 +457,31 @@ func (it *It) advanced(one *Held, all []*Held) (*Leaf, string) {
 			changes = append(changes, "passes "+leaf.Path)
 		default:
 			if moved {
-				one.Text = withField(text, "step", path)
-				one.Front = FrontOf(one.Text)
-				it.landedAlone(one, changes)
+				if why := it.movedAlone(one, withField(text, "step", path), changes); why != "" {
+					return nil, why
+				}
 			}
 			return leaf, ""
 		}
 		moved, front = true, FrontOf(text)
 		if leaf.At+1 >= len(leaf.Leaves) {
-			one.Text = shut(text, front, Done)
-			one.Front = FrontOf(one.Text)
-			it.landedAlone(one, append(changes, "closes "+Done))
-			return nil, ""
+			return nil, it.movedAlone(one, shut(text, front, Done), append(changes, "closes "+Done))
 		}
 		path = leaf.Leaves[leaf.At+1].Path
 	}
 	return nil, "loops in its route"
+}
+
+// Lands the engine's step move. A refusal leaves the ticket as it stood and answers why, so a leaf goes out over a landed move alone. [[spec/tickets/engine-landings-report-refusals]]
+func (it *It) movedAlone(one *Held, text string, changes []string) string {
+	stood, front := one.Text, one.Front
+	one.Text, one.Front = text, FrontOf(text)
+	refused := it.landedAlone(one, changes)
+	if refused == "" {
+		return ""
+	}
+	one.Text, one.Front = stood, front
+	return "moves on as " + strings.Join(changes, ", ") + ", and the commit comes back refused: " + refused
 }
 
 // [[spec/design_output/pull#the-hand-rule]]
