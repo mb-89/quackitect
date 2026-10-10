@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -196,6 +196,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 9629341727a33b9bb3cf555cc3f37889f0725d43
+    hash_after: 9629341727a33b9bb3cf555cc3f37889f0725d43
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "   75.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c039c52697b89698
+        size: 735
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -386,26 +405,39 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/marks_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`se-index lsp` now marks the fields a person's hold still wants, in every LSP editor. The rules of `src/extension/lib/fields.js` move into `src/modules/lsp/marks.go`.
+
+- Each unfilled field of the held leaf publishes as a hint with the code `HeldField`.
+- A hover on a marked line answers the field's ask, and any other line keeps the term hover.
+- A commit adding a person's hold sends `window/showDocument` at the first mark of the new take.
+- The holds standing at `initialize` move no cursor.
+- The client side and the removal of the JS land with extension-keeps-the-editor-parts.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size names, and the quack case the commit door asks for
+- the drawing and the holds reach the server through the ticket port, which the fake answers
+- the header of marks.go points at the design section
+- the drawing name stands once, as `DrawnPort`, and a case holds the copy in quack to it
 
 # accept
 
