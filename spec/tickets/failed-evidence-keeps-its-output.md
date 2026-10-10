@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: a8b48289c170ac68
         size: 590
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 4abe176d17244e811e527894c641b8459a8e2477
+    hash_after: 4abe176d17244e811e527894c641b8459a8e2477
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 76efb2bbee77b96a
+        size: 1322
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -231,26 +244,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull/red_log_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/red_log_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The refusal ends on the bare line that the session log holds the output, with no path and no case, so the case fails on its own assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when case fails on its assertion
+- the case runs over a fake shell and a fake log, so it reaches no real door
 
 # gate
 
