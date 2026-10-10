@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: d8d35fc1b144fd4c530e0874c8dd90fdea019c8c
+    hash_after: e9755a7fae374e58de6271f5c5c4eb6aae4ccb79
+    inputs:
+      - name: ask
+        hash: 6f5066e5cc08f412
+        size: 362
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,54 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One added-at parser and one batch framer stand in the git module. addedIn(said, key) reads the log of adds, newest first, and keys each path through key. Stood calls it with the path as git prints it, since its keys meet the quoted ls-tree paths of Tip and Trunk. Added calls it with unquoted, since the pull matches its keys against paths read off the disk. frames(stream) reads a cat-file --batch stream into one frame an ask, each holding its kind and its payload. It clamps a short payload and leaves a missing object empty. framed keeps the payloads of a repo read, and ShowMany keeps the blobs. headerFields and batchFields fold into one constant. The repo's own runner stays as it stands, since moving it onto proc.Runner widens the change past the finding.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/git/git.go repo.Stood, through stoodIn
+- src/modules/git/git.go repo reads, through framed
+- src/pull/pull_hand.go the queue's added-at read, through door.Added
+- src/branches/unreached.go and src/branches/stands.go, through door.ShowMany
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_test.go, the case where both readers parse one log, a quoted path among it
+- src/modules/git/git_test.go, the case where one framer reads a batch holding a missing object and a tree
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/git/git.go
+- src/modules/git/repo.go
+- src/modules/git/door_refs.go
+- src/modules/git/git_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: Stood, stoodIn, framed, door.Added and door.ShowMany stand as the approach reads them
+- callers: the grep over src lists every caller of the four, and the list carries each
+- done_when: the two cases decide the one line
+- config: the approach adds no key
 
 ## tests-red
 

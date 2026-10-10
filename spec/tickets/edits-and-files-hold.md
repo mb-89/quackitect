@@ -210,3 +210,7 @@ The edits module keeps every text it means to keep and undoes every apply it jou
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The branch stands cut off `main` by hand, as #138 and #140 cut theirs. `branch open` reads the group off `origin/main` and marks it there, so it pushes `main`, and this box pushes no `main`.
+- The children run in severity order where the pull allows it. The pull hands a held ticket each of its steps, so the order bends where a ticket waits on a gate.
+- The `types` part reads the engine's types, and this box's claude lays none. The check runs here with the claude and the tsc that CI pins, out of the scratchpad, ahead on `PATH`.
