@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box e310323746a3 · claude-code-remote
+    hash_before: 17d496718817ac3e96c57fed73365e87be17faa8
+    hash_after: 17d496718817ac3e96c57fed73365e87be17faa8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  103.5  in all"
+    inputs:
+      - name: ask
+        hash: 1bc369b8c218f3a1
+        size: 359
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/port_d_list_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+branch list passes trunk tickets to waitsOf, as take, free and dispatch do. A group waiting on an open group that stands on trunk alone, or on a parent group whose depends_on waits, now shows the wait and drops urgent.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and takes the fix sketch as written
+- the change reveals no cleanup
+- the trunk map comes from trunkOf, which owns it
 
 # Discussion
 

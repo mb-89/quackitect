@@ -49,6 +49,17 @@ func TestPDTheListingShowsEverythingUnderAll(t *testing.T) {
 	pdMatches(t, said, `work/landed\s+merged`)
 }
 
+// A group waiting on an open group that stands on trunk alone shows the wait, and no urgent. [[spec/tickets/branch-list-reads-trunk-waits]]
+func TestTheListShowsATrunkOnlyWait(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, map[string]string{ticketAt("first-move"): pdGroupNote})
+	one.branch("one-group", map[string]string{ticketAt("one-group"): pdUnderKind(pdGroupNote, "depends_on: [first-move]")})
+	one.fetch()
+	one.branchSays("list")
+	pdMatches(t, one.out.String(), `work/one-group\s+todo\s+waits for first-move`)
+	pdMisses(t, one.out.String(), `work/one-group\s+todo\s+urgent`)
+}
+
 // A group row behind main keeps its mark after the behind. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDABehindRowKeepsItsMark(t *testing.T) {
 	t.Parallel()
