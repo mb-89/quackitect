@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 72c1e1d85aa253df
         size: 674
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 286716e0a180ad7f6134294fc21b94554f962adf
+    hash_after: 286716e0a180ad7f6134294fc21b94554f962adf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 3669a3657c0b01a4
+        size: 1149
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull/pull_indent_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_indent_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The bare field lands bare under `## tests`, so the case fails on its own assertion. The text field lands as it stands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one done_when case fails on its assertion, and the second line names a standing test
+- the case drives the cloud pull fakes, so it reaches no real door
 
 # gate
 
