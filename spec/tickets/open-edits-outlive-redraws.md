@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-3
+step: design/tests-red-3
 steps:
   - name: design
     steps:
@@ -269,6 +269,15 @@ record:
     hash_before: 56bdd750128abba770ea8ff1f4e88e5986364322
     hash_after: 56bdd750128abba770ea8ff1f4e88e5986364322
     def: c5f02a5133e1e8c2
+  - step: design/draft-3
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: e5d8029496ebcdd7947938421f4d710d536d0342
+    hash_after: e5d8029496ebcdd7947938421f4d710d536d0342
+    inputs:
+      - name: ask
+        hash: 97110e026beedf1c
+        size: 671
+    def: 720f39ea2ba7bd6a
 group: the-tui-keeps-its-place
 ---
 
@@ -503,38 +512,58 @@ The cloud box decides this step, as the cloud guidance asks. Both findings hold,
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` copies the open edit, and points its `at` at the item holding the same name path in the new items, walked over `Items` as `itemAt` walks. It points every mark and the last mark at their rows the same way. A mark whose row left stays under an address no row holds, so the marks never run empty and a fill reaches the marked rows that stand, or none. `Marks` counts the rows a mark reaches. The edit carries its row name, so `Take` on a row that left writes nothing and returns that name with `RowLeft`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes, the one caller of Carry
+- src/tui/work/workedit.go Tab.editing and Tab.writes, through Take and Fill
+- src/tui/tree/treedraw.go Tree.edits, which draws the edit cell off edit.key
+- src/tui/tree/treemark.go fillWhere, MarkedItems, MarkRun and Marks, which read the marks and last
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawKeepsAnOpenEdit
+- src/tui/tree/tree_test.go TestARedrawKeepsTheMarksAFillReaches
+- src/tui/tree/tree_test.go TestAFillAfterEveryMarkedRowLeftWritesNothing
+- src/tui/tree/tree_test.go TestATakeOnARowThatLeftSaysSo
+- src/tui/work/actions_test.go TestAKeyInAnEditStaysInItAcrossARedraw
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- every marked row leaving runs the marks empty, so a fill reaches the whole view: a departed mark stays on an address no row holds, and TestAFillAfterEveryMarkedRowLeftWritesNothing decides it
+- the marks survive a filter only with the filter carry: that carry stands in Carry since commit f82cbe2f, so no depends_on is set. Naming one would deadlock the two, since the filter tests-green waits on this change in the same package
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/treeedit.go
+- src/tui/tree/treemark.go
+- src/tui/tree/tree_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Carry, Mark, MarkRun, Marks, fillWhere, MarkedItems, Take, itemAt and takes
+- the callers list names takes, the edit keys, the cell draw and the mark readers
+- each done_when line and each finding names its test
+- the approach adds no config key
 
 ## tests-red-3
 
