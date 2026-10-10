@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: 4787f37fa6eea1499a7b85a58e047b3a44174f89
+    hash_after: 4787f37fa6eea1499a7b85a58e047b3a44174f89
+    inputs:
+      - name: retro/write
+        hash: a94e4210335e8883
+        size: 2499
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -304,20 +314,26 @@ The dispatched branch waited on an owner read, so the engine handed this box the
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the level0 tool server, gone right after the take, so the patch, report and check_answer tools stood out of reach
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit door, which wanted a test named beside the code at implement/change
+- the ratio guard on src/quack, at the shim test
+- no conflict at sync
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- old-groups-leave-origin, a person ticket carrying the delete of the old group branches, stands free and lands on main with this branch
+- the dispatched group check-notices-leave-the-cap waits on its owner read
 
 # Discussion
 
