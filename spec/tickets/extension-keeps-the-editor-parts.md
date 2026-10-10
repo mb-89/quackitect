@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,21 @@ record:
         hash: c6a62e22f17c2c6a
         size: 24410
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box c729ff43c0cb · claude-code-remote · helper-4
+    hash_before: 59af2d7838f005ea850c9c4fade8b40fa1e80ee9
+    hash_after: 59af2d7838f005ea850c9c4fade8b40fa1e80ee9
+    inputs:
+      - name: design/draft
+        hash: 012f4c47a0167a16
+        size: 3909
+      - name: design/tests-red
+        hash: f52be5635d5f5eac
+        size: 992
+      - name: [[spec/design_output/lsp]]
+        hash: c6a62e22f17c2c6a
+        size: 24410
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -321,8 +336,14 @@ Seven cases fail on their own assertion, and every standing case passes.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask, and a red case or a command decides every done_when line: the three middleware cases in lsp.test.js, the take in sidebar.test.js, the grep, the deletion and the check.
+- The builder fixes in place: the approach names `door.runs` for the editor's executeCommand, but `runs(line)` already stands in `src/extension/editor-files.js`, and the fakes name it `executes`. Build `executes` in `editor.js`, as the tests read.
+- The builder fixes in place: `handleDiagnostics` calls `marksFields` on every publish, an empty one included, so a dropped take clears the underline. The case covers one mark alone.
+- The builder fixes in place: `marksFields` takes a uri and lines counted from nought now, where `editor-fields.js` takes a path and lines counted from one.
+- The builder fixes in place the callers the list misses: `test/level0/route-fixture.test.js` imports `stepsIn`, which stays, and the pointers in `src/modules/tickets/drawn.go` at `headingLines` in `lib/fields.js`, in `src/modules/holds/holds.go` at `personHolds` and in `src/quack/twins.go` at `HARNESS` in `lib/lens.js` go stale where those names leave.
 
 # implement
 
