@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: ac6c19ee5697644dae237a6abc59c607d3cef7d1
+    hash_after: ac6c19ee5697644dae237a6abc59c607d3cef7d1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/edits passes
+      - name: check
+        exit: 0
+        said: "   96.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 10b99cf2cbf3a2ce
+        size: 684
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -322,26 +345,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A regex replacement now reads its template as JavaScript reads it. Groups, the whole match and named groups expand, a group the pattern lacks stays literal, and the text before or after the match is refused by name. Before, the Go template rules ate the dollar forms the agent writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change stays in apply.go, beside its test
+- doors: the case reaches no door
+- comment: each new line points at this ticket
+- one place: the template reading stands in one function
 
 # accept
 
