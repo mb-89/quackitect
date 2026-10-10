@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a2bdbd277d1fdbf7
         size: 1364
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6150d1759159 · claude-code-remote · helper-4
+    hash_before: 21b88d601fcd12cf9f97e99f964925abaf9c0542
+    hash_after: 21b88d601fcd12cf9f97e99f964925abaf9c0542
+    inputs:
+      - name: design/draft
+        hash: a2bdbd277d1fdbf7
+        size: 1364
+      - name: design/tests-red
+        hash: 4f761e24fb6097dd
+        size: 495
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,11 @@ The reject lands, copies `children` as `children-2` and mints no child, so the c
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- reject-rows-reach-rejected: `VerdictIn` in `src/pull/pull_chapter.go` folds the rows of a reject into `Reason` joined by semicolons and fills no `Findings`, and `handBack` in `src/pull/pull_back.go` hands `rejected` the reason alone, so the builder carries the parsed rows to `rejected` and adds both files to the size
+- nameless-reject-meets-a-case: no case covers the refused reject whose row names no ticket, so the builder adds one beside `TestARejectAtAGroupsAcceptMintsItsFindings`
 
 # implement
 
