@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: a00f2535094647ec
         size: 402
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: eeff09109eaf1101d25350fc2ea5ec6d259a6fe5
+    hash_after: eeff09109eaf1101d25350fc2ea5ec6d259a6fe5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -298,14 +307,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/pull/pull_chapter.go src/pull/pull_back.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/pull/pull_chapter.go and src/pull/pull_back.go, both under size in the draft
+- the change reaches no door: it rewrites text in memory, and the case drives the cloud pull fakes
+- each new function and the constant point at this ticket, and withPayload keeps its pointer at the design output
+- the indent stands once, as commandIndent in src/pull/pull_chapter.go
 
 ## tests-green
 
