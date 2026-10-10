@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box a5167492d95e · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/edits-and-files-hold already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box a5167492d95e · claude-code-remote · helper-13
+    hash_before: 3fa22f8f92164288774261e4cb00a54710863963
+    hash_after: 3fa22f8f92164288774261e4cb00a54710863963
+    inputs:
+      - name: ask
+        hash: 602b0febc4ae825f
+        size: 216
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -122,14 +131,32 @@ The edits module keeps every text it means to keep and undoes every apply it jou
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-part-written-apply-undoes]], standard
+- [[spec/tickets/disk-list-skips-gone-folders]], trivial
+- [[spec/tickets/free-name-reads-missing-folder]], trivial
+- [[spec/tickets/git-parsers-stand-once]], standard
+- [[spec/tickets/git-reads-keep-last-values]], standard
+- [[spec/tickets/journal-names-stay-unique]], standard
+- [[spec/tickets/journal-note-names-the-count]], trivial
+- [[spec/tickets/regex-replacements-read-js-groups]], standard
+- [[spec/tickets/seed-survives-bad-files]], standard
+- [[spec/tickets/staged-adds-drop-the-tab]], trivial
+- [[spec/tickets/watch-adds-skip-bad-folders]], trivial
+- [[spec/tickets/watch-hands-new-folders]], standard
+- [[spec/tickets/watch-opens-before-the-seed]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- size: each child changes one or two files beside its test, so each reads whole in one review
+- goal: the children cover every finding on the owner's list, and the owner bars any child past it
+- depends_on: watch-opens-before-the-seed lands after seed-survives-bad-files, since both change seedsIn, and the implement order holds it
+- order: the three gate children closed into their parents, which carry their work
+- size of the group: the diff stays one review, so the group splits no further
 
 # children
 
