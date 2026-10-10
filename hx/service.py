@@ -90,9 +90,9 @@ class CommandLauncher:
     def launch(self, ticket, step, role, prompt):
         cmd = self.template.format(ticket=shlex.quote(ticket), step=shlex.quote(step),
                                    role=shlex.quote(role), prompt=shlex.quote(prompt))
-        p = subprocess.Popen(cmd, shell=True, cwd=self.cwd, stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL, start_new_session=True)
-        return f"pid{p.pid}"
+        subprocess.Popen(cmd, shell=True, cwd=self.cwd, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+        return f"{role}@{ticket}/{step}"
 
 
 def launch_prompt(ticket, role):

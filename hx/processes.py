@@ -30,7 +30,7 @@ STEP_DEFAULTS = {
     "skip_if_gate": False,
 }
 
-_RED = ("Write failing tests only (add stubs so they load and fail on assertions). "
+_RED = ("Write failing tests only, plus stubs so the tests load and run (and fail). "
         "Reference every acceptance criterion id in the tests (e.g. test_ac1_...). "
         "Commit, push the ticket branch, then `hx submit tests_red`. Verified tests are frozen.")
 _GREEN = ("Make the frozen failing tests pass without editing them; keep the whole suite green. "

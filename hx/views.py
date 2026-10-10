@@ -133,7 +133,8 @@ def brief(state, tid, session=None, now=0, ctx=None):
     L.append("TICKET" + (f" (group {t['parent']})" if t["parent"] else "") + f" · risk {t['risk']}")
     if t["body"]:
         L.append("  " + t["body"].strip().replace("\n", "\n  "))
-    L += _criteria_lines(t)
+    if t["criteria"] or not t["children"]:
+        L += _criteria_lines(t)
     if t["test_cmd"] or t["ci_cmd"]:
         L.append(f"  test_cmd: {t['test_cmd'] or '-'}   ci_cmd: {t['ci_cmd'] or '(same)'}")
     if t["scope"]:
@@ -157,7 +158,20 @@ def brief(state, tid, session=None, now=0, ctx=None):
         branch += f" (remote head {ctx['branch_head'][:7]})"
     if ctx.get("main"):
         branch += f" · main {ctx['main'][:7]}"
-    L.append(branch + ". Work on this branch; push before every submit.")
+    if run["role"] == "reviewer":
+        L.append(branch + ". Review the candidate commit; do not commit or push.")
+    elif t["children"]:
+        L.append(f"CHILDREN of {tid}:")
+        for cid in t["children"]:
+            c = state["tickets"][cid]
+            st = c.get("stats", {})
+            retro = next((e for e in reversed(c["evidence"]) if e["kind"] == "retro" and e["verified"]), None)
+            L.append(f"  {cid} {c['title']} [{c['status']}] claims {st.get('claims', 0)}, handovers "
+                     f"{st.get('handovers', 0)}, rejected evidence {st.get('rejected_evidence', 0)}, review rounds "
+                     f"{c['visits'].get('review', 0)}, owner decisions {st.get('owner_decisions', 0)}"
+                     + (f"\n    retro proposes: {retro['payload'].get('change')}" if retro else ""))
+    else:
+        L.append(branch + ". Work on this branch; push before every submit.")
     if chain:
         L.append("EVIDENCE: " + " → ".join(chain))
     if run["step"] == "review" and ctx.get("diffstat"):
@@ -190,7 +204,8 @@ def brief(state, tid, session=None, now=0, ctx=None):
                 and q["kind"] == "agent"]
     for q in answered[-4:]:
         a = q["answer"]
-        L.append(f"OWNER ANSWERED {q['id']} \"{q['text'][:70]}\": {a['choice'] or ''} {a['text'] or ''}".rstrip())
+        L.append(f"OWNER ANSWERED {q['id']} \"{q['text'][:70]}\": {a['choice'] or ''}"
+                 + (f" — \"{a['text']}\"" if a.get("text") else ""))
     open_q = [q for q in state["questions"].values() if q["ticket"] == tid and q["status"] == "open"]
     for q in open_q:
         L.append(f"OPEN QUESTION {q['id']} ({q['kind']}): {q['summary'][:100]}")

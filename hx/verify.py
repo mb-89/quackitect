@@ -209,8 +209,8 @@ class GitVerifier(Verifier):
             raise VerifyError("the tests already pass at this commit; red means they must fail first",
                               payload, tail(out))
         if cls == "broken":
-            raise VerifyError("the tests do not load or none ran; add stubs so they run and fail on "
-                              "assertions", payload, tail(out))
+            raise VerifyError("the tests do not load or none ran; add stubs so they load, run and fail",
+                              payload, tail(out))
         payload["frozen"] = {p: self.blob(sha, p) for p in tests}
         return True, payload, {"summary": summarize(code, out), "tail": tail(out, 8)}
 

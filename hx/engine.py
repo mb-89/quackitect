@@ -432,6 +432,7 @@ def h_ticket_create(state, ev):
         "step": None, "run": None, "visits": {}, "extra_visits": {}, "evidence": [], "history": [],
         "authors": [], "frozen": {}, "heads": {}, "approvals": {}, "epoch": 0, "version": 0,
         "notices": [], "notice_seq": 0, "created_ts": ev["ts"], "created_seq": ev["seq"],
+        "stats": {"claims": 0, "handovers": 0, "rejected_evidence": 0, "owner_decisions": 0},
         "updated_ts": ev["ts"], "done_ts": None,
     }
     state["tickets"][tid] = t
@@ -475,6 +476,7 @@ def h_claim(state, ev):
     run.update(status="active", holder=sess, epoch=t["epoch"], role=sd["role"], claimed_ts=ev["ts"],
                claim_seq=ev["seq"], dispatched=None, nudges=0, last_nudge_ts=None)
     run["claims"] += 1
+    t["stats"]["claims"] += 1
     run["holders"].append(sess)
     _touch(run, ev, progress=True)  # a fresh holder gets a fresh progress clock (max_claims bounds loops)
     state["leases"][sess] = {"ticket": t["id"], "epoch": t["epoch"], "step": run["step"]}
@@ -519,6 +521,8 @@ def h_evidence(state, ev):
          "report": d.get("report") or {}, "by": d["session"], "epoch": d["epoch"], "ts": ev["ts"]}
     t["evidence"].append(e)
     _touch(run, ev, progress=True)
+    if not e["verified"]:
+        t["stats"]["rejected_evidence"] += 1
     if e["verified"]:
         if kind == "tests_red":
             t["frozen"] = dict(payload.get("frozen") or {})
@@ -573,6 +577,8 @@ def h_answer(state, ev):
     who = "owner" if ev["actor"]["kind"] == "owner" else "default"
     q["status"] = "answered"
     q["answer"] = {"choice": choice, "text": d.get("text"), "by": who, "ts": ev["ts"]}
+    if who == "owner":
+        t["stats"]["owner_decisions"] += 1
     ev["ticket"] = t["id"]
     run = t["run"]
     same_run = run and run["step"] == q["step"] and run["visit"] == q["visit"]
@@ -662,6 +668,7 @@ def h_release(state, ev):
     run["releases"] += 1
     if d.get("involuntary"):  # e.g. stopped without finishing (Stop hook gave up)
         run["handovers"] += 1
+        t["stats"]["handovers"] += 1
         run["crashed"] = {"holder": d["session"], "ts": ev["ts"], "why": d.get("reason") or "stopped"}
     _maybe_escalate_stall(state, t, ev)
 
@@ -676,6 +683,7 @@ def h_expire(state, ev):
     _release_lease(state, run)
     run["status"] = "ready"
     run["handovers"] += 1
+    t["stats"]["handovers"] += 1
     run["crashed"] = {"holder": holder, "ts": ev["ts"], "last_activity_ts": run["last_activity_ts"],
                       "why": "lease expired (no activity)"}
     _maybe_escalate_stall(state, t, ev)
@@ -704,6 +712,7 @@ def h_revoke(state, ev):
     run["status"] = "ready"
     if ev["actor"]["kind"] == "system":
         run["handovers"] += 1
+        t["stats"]["handovers"] += 1
         run["crashed"] = {"holder": holder, "ts": ev["ts"], "why": d.get("reason") or "revoked"}
         _maybe_escalate_stall(state, t, ev)
     else:
