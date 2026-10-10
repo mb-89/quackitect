@@ -22,6 +22,8 @@ const (
 	readyFile  = "ready"
 	looks      = 10 * time.Millisecond
 	shortWait  = 100 * time.Millisecond
+	// A run exiting zero while a child it starts holds stderr past the pipes' close. [[spec/tickets/proc-keeps-late-pipe-runs]]
+	heldPipeLine = "echo pushed; (sleep 3 >&2 &); exit 0"
 )
 
 // The line a run that marks its folder hands sh, and the file it leaves there by a relative name, so the case reads the folder on the disk in place of the path form a shell prints, which MSYS sh writes as /c/... on Windows. [[spec/tickets/the-doors-pr-goes-green]]
@@ -97,6 +99,8 @@ func fakeSh(one Command) Said {
 		return Said{Out: one.Stdin}
 	case "kill -TERM $$":
 		return Said{Code: Signalled}
+	case heldPipeLine:
+		return Said{Out: "pushed\n"}
 	case hereLine:
 		if err := os.WriteFile(filepath.Join(one.Dir, hereFile), nil, 0o644); err != nil {
 			return Said{Err: err.Error(), Code: 1}
@@ -273,6 +277,16 @@ func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 	for name, one := range haltingRunners(t) {
 		if answer := one.run(Command{Argv: []string{"sh", "-c", sleepsLine}, Wait: shortWait}); answer.Code == 0 || answer.Err == "" {
 			t.Errorf("the %s runner's run past its wait answers %+v", name, answer)
+		}
+	}
+}
+
+// A run exiting zero while its child holds the pipe answers its code and its output, as a push leaving a background helper does. [[spec/tickets/proc-keeps-late-pipe-runs]]
+func TestARunWhoseChildHoldsThePipeAnswersItsCode(t *testing.T) {
+	t.Parallel()
+	for name, run := range runners() {
+		if said := run(Command{Argv: []string{"sh", "-c", heldPipeLine}}); said.Code != 0 || said.Out != "pushed\n" {
+			t.Errorf("the %s runner answers %+v, and wants code 0 and the output", name, said)
 		}
 	}
 }
