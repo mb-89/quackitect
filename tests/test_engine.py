@@ -4,7 +4,6 @@ import unittest
 from hx import engine, processes
 from hx.engine import Rejected
 from hx.service import OWNER, SYSTEM, RecordingLauncher
-from hx.store import MemoryStore
 from tests.helpers import FakeVerifier, mem_hx, run_feature_to, ticket
 
 
@@ -123,6 +122,24 @@ class TestFencingAndGates(unittest.TestCase):
                               "data": {"epoch": epoch, "last_activity_seq": stale_seq}}])
         self.assertEqual(cm.exception.code, "stale_expire")
         self.assertEqual(hx.state()["tickets"]["T-1"]["run"]["holder"], "w1")
+
+    def test_brief_says_when_the_gate_is_already_satisfied_or_sessions_keep_dying(self):
+        """Found by the fault-injected real pilot: a reviewer cut off after submitting made its successor
+        redo the review; reviewers cut off early never checkpointed."""
+        hx, clk = mem_hx()
+        hx.create_ticket(ticket())
+        run_feature_to(hx, "T-1", stop="review")
+        hx.claim("r1", "reviewer")
+        hx.submit("r1", "review", verdict="approve", ac={"AC1": "ok", "AC2": "ok"})
+        hx.release("r1", involuntary=True, reason="cut off")  # e.g. turn cap hit right after submitting
+        c = hx.claim("r2", "reviewer")
+        self.assertIn("THE GATE IS ALREADY SATISFIED", c["brief"])
+        hx.done("r2")
+        self.assertEqual(hx.state()["tickets"]["T-1"]["step"], "land")
+        hx.create_ticket(ticket("T-2"))
+        hx.claim("w1", "worker", "T-2")
+        hx.release("w1", involuntary=True, reason="cut off")
+        self.assertIn("Earlier sessions on this step ended before finishing (1x)", hx.claim("w2", "worker", "T-2")["brief"])
 
     def test_double_claim_second_gets_other_work_or_rejected(self):
         hx, clk = mem_hx()
@@ -381,7 +398,6 @@ class TestDispatchAndNotify(unittest.TestCase):
         # T-1 starts code work: T-2 (same scope) must wait, T-3 may run
         run_feature_to(hx, "T-1", stop="green")
         from hx.service import scope_blocker
-        st = hx.state()
         run_feature_to(hx, "T-2", stop="red", worker="w2")
         self.assertEqual(scope_blocker(hx.state(), hx.state()["tickets"]["T-2"]), "T-1")
         with self.assertRaises(Rejected) as cm:

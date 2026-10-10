@@ -27,10 +27,10 @@ class RemoteHx:
         except urllib.error.HTTPError as e:
             data = json.loads(e.read() or b"{}")
             if e.code == 409:
-                raise Rejected(data.get("code", "rejected"), data.get("message", ""), data.get("report"))
+                raise Rejected(data.get("code", "rejected"), data.get("message", ""), data.get("report")) from None
             if e.code == 401:
-                raise Rejected("unauthorized", data.get("message") or "not allowed with this token")
-            raise RuntimeError(f"coordinator: HTTP {e.code}: {data.get('message') or data.get('error')}")
+                raise Rejected("unauthorized", data.get("message") or "not allowed with this token") from None
+            raise RuntimeError(f"coordinator: HTTP {e.code}: {data.get('message') or data.get('error')}") from e
 
     def _op(self, op, *args, **kwargs):
         return self._req("/api/op", {"op": op, "args": list(args), "kwargs": kwargs})["result"]

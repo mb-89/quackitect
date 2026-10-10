@@ -71,6 +71,17 @@ cluster-bootstrap over tickets for cost and attention. With 3 seeds per ticket, 
 A 40-ticket suite only detects large effects. That is acceptable for a go/no-go decision, but not for
 fine-tuning.
 
+**Decision rule, fixed before running.** Adopt hx as the default for a class of tickets if, on that
+class:
+
+- the hidden-test pass rate improves by at least 10 points (McNemar p < 0.05), **or** owner interactions
+  per landed ticket fall by at least 30% at an equal pass rate;
+- **and** the cost per *correct* ticket is at most 1.5× the single agent's.
+
+Report the result per ticket-length bucket. The pilot below and the model in §3.3 both predict a
+*routing* answer rather than a global one: send short, well-specified tickets to a single agent (or the
+cheap `mvp` / `chore` routes), and long or risky tickets to the full process.
+
 **Threats to validity.**
 
 - Hidden tests that encode unstated expectations, which favours whichever condition asks more questions.
@@ -120,7 +131,85 @@ PR with CI.
 commands (`2>/dev/null` read as a write; a reviewer's `git checkout <sha>` read as a change). Both are
 fixed and are now regression tests (§DESIGN 2.2).
 
-PILOT_RESULTS_PLACEHOLDER
+**A/B on 7 small tickets, without faults.** Each ticket has 4 acceptance criteria. Every hidden-test
+file was first validated against an independent reference implementation, so all of them are
+satisfiable. One borderline hidden case that the criteria do not state was removed before the runs.
+
+| Ticket | Single agent: hidden | $ | s | hx-0: hidden | $ | s | Sessions | Review rounds |
+|---|---|---|---|---|---|---|---|---|
+| parse_duration | 4/4 | 0.012 | 21 | 4/4 | 0.015 | 49 | 3 | 1 |
+| wrap | 4/4 | 0.009 | 34 | 4/4 | 0.020 | 66 | 3 | 1 |
+| roman | 4/4 | 0.007 | 23 | 4/4 | 0.016 | 55 | 3 | 1 |
+| intervals | 3/3 | 0.007 | 28 | 3/3 | 0.014 | 46 | 3 | 1 |
+| csv_split | 4/4 | 0.007 | 22 | 4/4 | 0.016 | 51 | 3 | 1 |
+| TTLCache | 6/6 | 0.010 | 34 | 6/6 | 0.018 | 55 | 3 | 1 |
+| semver | 4/4 | 0.008 | 26 | 4/4 | 0.033 | 102 | 5 | **2** |
+| **Total** | **7/7** | **0.060** | 188 | **7/7** | **0.131** (2.2×) | 424 (2.3×) | 23 | 8 |
+
+What this shows:
+
+- **No quality difference on small, well-specified tickets.** The model solves them alone. This is the
+  "perfect agent" corner of §3.3, and there hx is pure overhead: 2.2× the dollars and 2.3× the wall
+  clock.
+- **The overhead is per-session orientation.** The single agent used 8–9 turns per ticket. hx used
+  20–27 turns across three fresh sessions, each re-reading the repo, but each turn is cheaper because the
+  context is small. So 3× the turns cost 2.2× the dollars.
+- **The review gate caught a real defect beyond the acceptance tests.** On semver, hx's worker anchored
+  its regex with `$`, which in Python accepts a trailing newline, so `semver_compare("1.0.0\n", ...)`
+  silently passed invalid input. The fresh reviewer found it, routed the ticket back to green with the
+  finding, and the second green fixed it (`\Z`) before landing. The single agent's own implementation did
+  not have this bug. So this is evidence that the mechanism works, not that hx beat the single agent.
+- **No gate rejections, tampering or false "done"** happened in 23 sessions of this model on these tickets.
+  The failure modes hx exists for did not occur at this size, which is the honest finding.
+
+**Fault-injected variant: every session is cut at 5 turns**, below the 8–9 a single agent needs for a whole
+ticket. Both conditions get the same cap. A cut single agent is restarted in the same working directory
+with "continue" (up to 4 restarts). A cut hx session is handed over: SessionEnd releases the lease, and the
+next session for the same step continues in the same directory with a fresh brief. Files survive in both
+conditions, so what is compared is the handover itself, not the disk.
+
+| Ticket | Single agent: hidden | Sessions | $ | hx-0: hidden | Sessions (cut) | $ | Involuntary handovers | Owner escalations |
+|---|---|---|---|---|---|---|---|---|
+| parse_duration | 4/4 | 2 | 0.008 | 4/4 | 4 (1) | 0.018 | 1 | 0 |
+| TTLCache | 6/6 | 2 | 0.011 | 6/6 | 6 (4) | 0.028 | 3 | 0 |
+| semver | 4/4 | 3 | 0.016 | 4/4 | 9 (7) | 0.048 | 6 | 1 |
+| **Total** | **3/3** | 7 | **0.035** | **3/3** | 19 | **0.093** (2.7×) | 10 | 1 |
+
+What this shows:
+
+- **Handover works with a real model.** Every cut hx session was continued by its successor, and all three
+  tickets landed with the hidden tests green. The cleanest trace is in DESIGN §10.8: an unpushed commit was
+  refused as evidence, the session was cut, and the next session read "HANDOVER: … session ended", pushed,
+  submitted and passed.
+- **The stall ladder fired as designed.** After 3 involuntary handovers on semver's review step, the clock
+  escalated to the owner. The driver answered "retry", which in production is one tap.
+- **Under tight caps, hx's per-session orientation hurts.** It needed 19 sessions against 7. The single
+  agent's "continue in the same directory" is a good recovery strategy *when the repo holds all the state*,
+  which it does for one-file tickets.
+- **Two design gaps, found by this run and fixed after it:**
+  1. Reviews were not resumable. No cut reviewer checkpointed, so each successor started its review over.
+  2. A successor whose gate was *already satisfied* re-did the work. One reviewer had submitted a verified
+     review just before its cut; the next reviewer reviewed again instead of running `hx done`.
+
+  The brief now opens with "THE GATE IS ALREADY SATISFIED … run `hx done` now" when that is the case.
+  After any involuntary handover it advises small increments (commit, push and checkpoint after each
+  sub-step, with reviewers putting partial findings in the checkpoint). Both behaviours are unit-tested.
+
+**Did the fix help? Not measurably at this sample size.** Same fault injection, semver and TTLCache, two
+runs each. *Before* is the committed brief in a separate git worktree; *after* is the fixed brief; both
+use the same driver.
+
+| | Solved | Sessions | Review sessions | Involuntary handovers | $ |
+|---|---|---|---|---|---|
+| Before | 4/4 | 21 | 6 | 7 | 0.104 |
+| After | 4/4 | 15 | 4 | 3 | 0.072 |
+
+The totals moved the right way, by about 30%, but the session logs do not support crediting the change.
+The "gate already satisfied" line never triggered in these runs, and the increments advice appeared in
+only 2 briefs. The difference is within the run-to-run noise visible in the first fault-injected run
+(semver needed 9 sessions there and 5–6 here, with the same code). Both behaviours stay, because they are
+cheap and unit-tested. Their effect needs the §2 protocol. Lesson for the protocol: **attribute through
+the logs** (did the mechanism fire?), not only through totals.
 
 ### 3.3 Monte Carlo on the real engine (`eval/sim.py`)
 
@@ -222,7 +311,41 @@ n = (z_{α/2}·√(p10+p01) + z_β·√(p10+p01−(p10−p01)²))² / (p10−p01
 
 ## 4. Reading the results honestly
 
-READING_PLACEHOLDER
+1. **The mechanisms work, including against a real model.** Every failure mode in §3.1 is caught by
+   construction and by tests. The real sessions confirmed the parts no unit test can:
+   - Claude Code honors the hook contract.
+   - Agents follow the brief.
+   - Evidence gates hold.
+   - Handovers resume work.
+   - The stall ladder reaches the owner.
+
+   The pilot also found three real defects that 70 unit tests had missed: hook false positives,
+   non-resumable reviews, and redoing work behind an already-satisfied gate. A real pilot is part of the
+   test suite, not an afterthought.
+2. **The pilot did not show hx beating a single agent, and it could not have.** On small, well-specified
+   tickets this model failed zero times in 30+ sessions. With no false "done", tampering or missed
+   requirement to catch, hx can only add cost: 2.2× without faults and 2.7× under forced interruptions. That
+   matches the model's "perfect agent" row. It means small tickets should take cheap routes; it does not
+   refute the claim.
+3. **The claim lives where the pilot could not go:** long tickets, context resets in the middle of a
+   design, owner decisions that must survive several sessions, parallel work on shared code, and sandbox
+   deaths that lose files. That is what the §2 protocol measures. The model (§3.3) says the gain should be
+   large in quality (+20 points at the default assumptions) and roughly cost-neutral per correct ticket.
+   But its failure rates are assumptions, and the pilot suggests they are *too high for small tickets*.
+   They may well be too low for long ones. Only §2 can say.
+4. **The most robust prediction is owner attention, not quality.** In every simulated scenario with
+   failures, hx needs fewer owner interactions (0.6 against 1.0 per ticket), because restarts, re-prompts
+   and handovers are automatic and only true decisions reach the phone. Both pilot drivers automated the
+   owner, so this is untested. It is the first thing to measure with the UI's timestamps.
+5. **What would change the design.** Suppose §2 shows single agents on long tickets rarely claim false
+   "done" or tamper, and recover well from the repo alone. Then the right product is a lighter harness:
+   - a single session per ticket, plus push-only evidence
+   - a fresh-context reviewer
+   - the owner inbox and the stall ladder
+
+   It would drop per-step sessions and the red/green split, which is where most of the 2–3× overhead comes
+   from. If they do fail often, the full process pays for itself, and the remaining work is cutting
+   orientation cost (`--continue` across worker steps, richer checkpoints).
 
 ## 5. Next measurements, in order
 

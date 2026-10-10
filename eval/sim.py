@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from hx import engine  # noqa: E402
 from hx.engine import Rejected  # noqa: E402
-from hx.service import OWNER, Hx  # noqa: E402
+from hx.service import Hx  # noqa: E402
 from hx.store import FakeClock, MemoryStore  # noqa: E402
 from hx.verify import Verifier  # noqa: E402
 

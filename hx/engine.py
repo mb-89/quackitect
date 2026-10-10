@@ -410,7 +410,7 @@ def h_ticket_create(state, ev):
     try:
         proc = processes.get(d.get("process", "feature"))
     except ValueError as e:
-        raise Rejected("bad_process", str(e))
+        raise Rejected("bad_process", str(e)) from None
     parent = d.get("parent")
     if parent and parent not in state["tickets"]:
         raise Rejected("bad_parent", f"parent {parent!r} does not exist")

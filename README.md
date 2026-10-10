@@ -20,7 +20,7 @@ The documents:
 ## Quick start (standard library only, Python 3.11+, git)
 
 ```bash
-python3 -m unittest discover -s tests -t .     # 73 tests, ~20 s (real git, real hooks, real HTTP)
+python3 -m unittest discover -s tests -t .     # 74 tests, ~20 s (real git, real hooks, real HTTP)
 python3 demo/run_demo.py                       # writes demo/TRANSCRIPT.md (a group of 3 tickets end to end)
 python3 eval/sim.py                            # Monte Carlo: single agent vs hx on the real engine
 python3 eval/overhead.py                       # hook latency, brief size, store throughput

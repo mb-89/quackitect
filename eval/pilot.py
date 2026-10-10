@@ -25,7 +25,6 @@ import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from hx import engine  # noqa: E402
 from hx.store import FileStore  # noqa: E402
 
 HX = os.path.join(ROOT, "bin", "hx")
@@ -467,7 +466,8 @@ def run_solo(task, base, model, budget, max_turns, restarts):
     for i in range(1 + restarts):
         p = prompt if i == 0 else (prompt + "\n\nA previous session worked on this ticket and was interrupted. "
                                    "Inspect the repository state and continue.")
-        res = run_claude(work, p, claude_env(), model, budget, max_turns, os.path.join(RUNS, f"solo-{task}-{i}.jsonl"))
+        res = run_claude(work, p, claude_env(), model, budget, max_turns,
+                         os.path.join(RUNS, f"{os.path.basename(base)}-{i}.jsonl"))
         sessions.append(res)
         if not max_turns or res["error"] != "error_max_turns":
             break
@@ -525,8 +525,8 @@ def run_hx(task, base, model, budget, max_turns, max_sessions, verbose=False):
         env = claude_env(dict(henv, HX_SESSION=sid, HX_TICKET=tid, HX_ROLE=role))
         prompt = (f"You are an hx {role} agent. Your brief was injected at session start (run `hx brief` to see it "
                   f"again). Do exactly the current step for ticket {tid}, then `hx done`. Push before `hx submit`.")
-        res = run_claude(work, prompt, env, model, budget, max_turns, os.path.join(RUNS, f"hx-{sid}.jsonl"),
-                         system=SKILL)
+        res = run_claude(work, prompt, env, model, budget, max_turns,
+                         os.path.join(RUNS, f"hx-{os.path.basename(base)}-{sid}.jsonl"), system=SKILL)
         res["step"], res["role"] = tk["step"], role
         sessions.append(res)
         if verbose:
@@ -566,21 +566,24 @@ def main():
     ap.add_argument("--solo-restarts", type=int, default=0)
     ap.add_argument("--max-sessions", type=int, default=8)
     ap.add_argument("--out", default=os.path.join(ROOT, "eval", "results", "pilot.json"))
+    ap.add_argument("--hx-only", action="store_true", help="skip the single-agent condition")
+    ap.add_argument("--repeat", type=int, default=1, help="run each task this many times")
     a = ap.parse_args()
     base_root = tempfile.mkdtemp(prefix="hx-pilot-")
     results = []
     try:
         tasks = ["duration"] if a.mode == "hookcheck" else a.tasks.split(",")
-        for task in tasks:
-            if a.mode == "ab":
-                r = run_solo(task, os.path.join(base_root, f"solo-{task}"), a.model, a.budget, a.max_turns,
-                             a.solo_restarts)
+        for rep in range(a.repeat):
+            for task in tasks:
+                if a.mode == "ab" and not a.hx_only:
+                    r = run_solo(task, os.path.join(base_root, f"solo-{task}-{rep}"), a.model, a.budget, a.max_turns,
+                                 a.solo_restarts)
+                    results.append(r)
+                    print(json.dumps(r), flush=True)
+                r = run_hx(task, os.path.join(base_root, f"hx-{task}-{rep}"), a.model, a.budget, a.max_turns,
+                           a.max_sessions, verbose=True)
                 results.append(r)
                 print(json.dumps(r), flush=True)
-            r = run_hx(task, os.path.join(base_root, f"hx-{task}"), a.model, a.budget, a.max_turns, a.max_sessions,
-                       verbose=True)
-            results.append(r)
-            print(json.dumps(r), flush=True)
     finally:
         shutil.rmtree(base_root, ignore_errors=True)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)

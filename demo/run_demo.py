@@ -620,7 +620,7 @@ def main(out, transcript):
     d.say("### Numbers")
     d.block("\n".join([
         f"events in the log:            {len(events)}",
-        f"  by type:                    " + ", ".join(f"{k}={v}" for k, v in sorted(by_type.items())),
+        "  by type:                    " + ", ".join(f"{k}={v}" for k, v in sorted(by_type.items())),
         f"owner decisions (taps):       {owner_decisions} (all for the medium-risk ticket)",
         f"agent sessions started:       {len(os.listdir(os.path.join(out, 'agents')))}",
         f"hx calls rejected by a gate:  {d.rejections}",

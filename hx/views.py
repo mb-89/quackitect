@@ -119,9 +119,17 @@ def brief(state, tid, session=None, now=0, ctx=None):
     cfg = state["config"]
     L = [f"hx brief · {tid} \"{t['title']}\" · step {run['step']} (visit {run['visit']}) · "
          f"{run['status']} · epoch {run['epoch']}"]
+    rep = gate_report(state, t)
     if session and run["holder"] == session:
         L.append(f"You hold this step as {run['role']} (session {session}). The lease stays alive while you "
                  f"work; {cfg['lease_ttl_s'] // 60} min of silence = presumed crashed and handed over.")
+        if rep and all(c["status"] == OK for c in rep):
+            L.append(">> THE GATE IS ALREADY SATISFIED: an earlier holder finished this step's work before it was "
+                     "cut off. Do not redo it. Run `hx done` now.")
+        elif run["handovers"]:
+            L.append(f">> Earlier sessions on this step ended before finishing ({run['handovers']}x). Work in small "
+                     f"increments: after each sub-step commit, push and `hx checkpoint --done .. --next ..`"
+                     + (" (reviewers: put findings so far in the checkpoint)." if run["role"] == "reviewer" else "."))
     elif run["status"] == "waiting":
         L.append("This step is waiting for the owner (" + ", ".join(run["waiting_on"]) + "). Do not work on "
                  "it; stop, or claim other work.")
@@ -142,7 +150,7 @@ def brief(state, tid, session=None, now=0, ctx=None):
     L.append("")
     L.append(f"THIS STEP: {run['step']} — " + sd["instructions"].replace("<ticket>", tid))
     L.append("DONE WHEN (gate, checked by hx, not by you):")
-    for c in gate_report(state, t):
+    for c in rep:
         mark = {OK: "[x]", MISSING: "[ ]", OWNER: "[~]"}[c["status"]]
         L.append(f"  {mark} {c['check']}: {c['msg']}")
     L.append("")

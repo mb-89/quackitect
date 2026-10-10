@@ -124,7 +124,7 @@ Traceback (most recent call last):
   File "/usr/lib/python3.11/unittest/loader.py", line 162, in loadTestsFromName
     module = __import__(module_name)
              ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/hx-verify-gdkpu4ls/tests/test_slug.py", line 2, in <module>
+  File "/tmp/hx-verify-d1iy8qkp/tests/test_slug.py", line 2, in <module>
     from textkit.slug import slugify
 ModuleNotFoundError: No module named 'textkit.slug'
 
@@ -278,6 +278,7 @@ dispatch T-2/green -> worker (worker@T-2/green)
 hx: you are working under the hx harness. Your brief:
 hx brief · T-2 "word_count(text)" · step green (visit 1) · active · epoch 4
 You hold this step as worker (session w-d). The lease stays alive while you work; 15 min of silence = presumed crashed and handed over.
+>> Earlier sessions on this step ended before finishing (1x). Work in small increments: after each sub-step commit, push and `hx checkpoint --done .. --next ..`.
 
 TICKET (group G-1) · risk low
   Count words for reading-time estimates.

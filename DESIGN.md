@@ -11,7 +11,7 @@ Clean-room design C. It was written before I looked at any prior implementation;
 | **What does the owner's UI look like, and how does the agent's view differ?** | The owner **manages by exception**. The UI is one responsive web app. **Inbox** first: one-tap decisions, each with a summary of 280 characters or less, options and a default. **Board** second: tickets by step, coloured by health. **Detail** third: the gate checklist, evidence, the last checkpoint and a timeline, plus controls. A push goes out only when something blocks and has no default, or when health is red. Everything else goes into a digest. The **agent** never sees the board. It sees one imperative brief about one ticket and one step: what to do, what counts as done (the gate checklist), what the owner answered and what the previous holder left behind. |
 | **What is the smallest version that beats a single agent?** | The route `red → green → review → accept`, with three gates. *Red*: at a pushed SHA the new tests load, run and fail, and each acceptance criterion is referenced by a test. *Green*: the same frozen tests pass at a descendant SHA in a clean checkout. *Review*: a non-author approves on that exact SHA. Add the brief, plus Stop and PreToolUse hooks, and keep a local log. Parallelism is not needed to win on quality. **To prove it**, run a paired A/B on tasks that have hidden acceptance tests (same model, same budget), with fault injection. See EVAL.md. |
 
-The prototype in this repository implements the engine, the gates and verifiers, the CLI, the Claude Code hooks, the clock (expiry, nudges, escalation, dispatch, the merge queue), three stores (a JSONL file, a git ref and HTTP) and a phone-first owner UI, with 73 tests and a deterministic demo. Real Claude Code sessions (the `claude` CLI 2.1, haiku) ran tickets through it end to end, which confirmed the hook contract (EVAL.md §3.2). Section 10 lists what building and piloting it changed.
+The prototype in this repository implements the engine, the gates and verifiers, the CLI, the Claude Code hooks, the clock (expiry, nudges, escalation, dispatch, the merge queue), two stores (a JSONL file, a git ref) plus an HTTP client for remote agents and a phone-first owner UI (checked in headless Chromium), with 74 tests and a deterministic demo. Real Claude Code sessions (the `claude` CLI 2.1, haiku) ran tickets through it end to end, which confirmed the hook contract (EVAL.md §3.2). Section 10 lists what building and piloting it changed.
 
 ---
 
@@ -45,6 +45,18 @@ The prototype in this repository implements the engine, the gates and verifiers,
  └───────────────────────────────┘            └──────────────────────────────────┘
 ```
 
+**Owners of steps.** Every step has a role:
+
+- **worker**: the main agent.
+- **reviewer**: a *helper agent*, meaning a separate session with a narrower brief and narrower tools.
+  Hooks deny it edits, commits and pushes, and the engine forbids it from having authored the ticket.
+  The same pattern serves any other helper role, such as a retro writer or a researcher.
+- **owner**: the human, who decides through the inbox and can also claim any agent step ("take over").
+- **auto**: the clock, for example the merge queue.
+
+Sub-agents that a session spawns *inside* its own turn loop (Claude Code's Task tool) are invisible to the
+harness by design. They are part of the inner loop, and only the holder's evidence counts.
+
 A **session** holds at most one **lease**: one step-run of one ticket. By default a step is worked by a fresh session. A session may continue to the next step when the process allows it (`red → green` by the same worker is fine), and must not when separation of duties forbids it (review). The harness never steers individual turns. It shapes what the model sees at the boundaries (start, compaction, notices) and polices what it is allowed to do.
 
 ### 2.2 Interfaces, and why each one exists
@@ -55,6 +67,7 @@ A **session** holds at most one **lease**: one step-run of one ticket. By defaul
 | Claude Code hooks (`hx hook <event>`) | Enforcement, context injection and liveness | Hooks are the only mechanism that acts *without the model choosing to*. They inject the brief at SessionStart (startup, resume or compact). PreToolUse denies forbidden calls. Stop refuses to stop while a step is open. PostToolUse sends a throttled heartbeat and nags about checkpoints. SessionEnd releases the lease. |
 | Skill (`SKILL.md`) | Protocol documentation for the model | It is cheap, portable and loaded on demand. It explains *why*, so the model cooperates instead of fighting the hooks. |
 | MCP wrapper (optional) | The same commands as typed tools | Structured arguments help weaker models. It is not the primary interface, because MCP cannot inject context at session start or enforce anything. |
+| Claude Code plugin (packaging; designed, not built) | Distribution | Bundles the hook config, the skill and the optional MCP server into one installable unit, so any repo or cloud sandbox gets the whole agent side with one install. The prototype ships the pieces as `examples/claude-settings.json` and `examples/skill/SKILL.md`. |
 | Agent SDK or own loop | **Not** the primary runtime | It would re-implement tools, permissions and compaction, and would give up the cloud-sandbox product. The engine is runtime-agnostic, so an own loop could call the same library. |
 
 **Hooks give feedback; gates give guarantees.** A hook sees a tool call before it runs and has to guess
@@ -394,3 +407,19 @@ the real-model pilot proved it wrong or incomplete. They have been folded back i
    That is the "perfect agent" corner of the model. Practical consequence: route small, low-risk tickets
    through `chore` or `mvp` with `--continue` (one session runs red and green), and keep the full
    `feature` process for tickets long enough to have failures worth catching.
+8. **Handover works with a real model, and "push before submit" earns its keep.** In the fault-injected
+   pilot, a red session committed its tests and ran `hx submit` without pushing. The verifier refused,
+   because the commit was not on the shared remote. Then the session hit its turn cap. SessionEnd released
+   the lease. The next session's brief opened with "HANDOVER: previous holder … session ended", and that
+   session inspected git, found the unpushed commit, pushed, submitted and passed the gate in 5 turns
+   (EVAL §3.2). Without the remote-only evidence rule, a sandbox death at that moment would have lost the
+   step's work while the log claimed it existed.
+9. **Reviews were not resumable, and successors redid finished work.** Under forced interruptions, no cut
+   reviewer checkpointed, so every successor started its review over. One successor re-reviewed even though
+   its predecessor had already submitted a verified review, which meant the gate was satisfied. The brief
+   now says so up front ("THE GATE IS ALREADY SATISFIED … run `hx done` now"). After any involuntary
+   handover it also advises small increments (commit, push and checkpoint after each sub-step; reviewers
+   checkpoint their findings so far). A before/after pilot could not yet attribute an effect to this
+   change (EVAL §3.2). The general point: *evidence survives its holder*. A step's gate counts verified
+   evidence regardless of which session produced it, and the brief must make that visible, or agents
+   redo work.

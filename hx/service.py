@@ -8,7 +8,7 @@ import shlex
 import subprocess
 import uuid
 
-from . import engine, views
+from . import views
 from .engine import Rejected, step_def
 from .processes import CODE_STEPS
 from .verify import Verifier
