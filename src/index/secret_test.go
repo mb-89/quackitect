@@ -1,12 +1,11 @@
 // The run's secret decides who posts as a person: a /v1 post marking a
-// person and a legacy call carry it, and its file and the standing file stand
+// person and a call to the first port carry it, and its file and the standing file stand
 // at the owner's mode alone.
 // [[spec/tickets/v1-takes-a-run-secret]]
 package index // level0: InPackageTest - it drives the unexported opens and the fake network
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -55,7 +54,7 @@ func TestAPersonPostWithoutTheRunSecretMeetsARefusal(t *testing.T) {
 }
 
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
-func TestTheLegacyPortRefusesACallWithoutTheRunSecret(t *testing.T) {
+func TestTheFirstPortRefusesACallWithoutTheRunSecret(t *testing.T) {
 	t.Parallel()
 	_, standing := markDoor(t)
 	said, err := asksDoor("POST", fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), map[string]string{"Content-Type": "application/json"}, strings.NewReader(`{"method":"files","id":1}`))
@@ -63,7 +62,7 @@ func TestTheLegacyPortRefusesACallWithoutTheRunSecret(t *testing.T) {
 		t.Fatal(err)
 	}
 	if said.StatusCode != statusUnauthorized {
-		t.Fatalf("a legacy call with no secret answers %d: %s", said.StatusCode, said.Body)
+		t.Fatalf("a call to the first port with no secret answers %d: %s", said.StatusCode, said.Body)
 	}
 }
 
@@ -72,7 +71,7 @@ func TestTheStandingAndTheSecretStandAtOwnerMode(t *testing.T) {
 	t.Parallel()
 	one, _ := markDoor(t)
 	for _, at := range []string{standingPath(one.root), filepath.Join(one.root, filepath.FromSlash(Runtime), "person.json")} {
-		said, err := os.Stat(at)
+		said, err := statOf(at)
 		if err != nil {
 			t.Fatalf("%s stands nowhere: %v", at, err)
 		}
