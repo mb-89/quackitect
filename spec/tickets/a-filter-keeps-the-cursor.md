@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ae3a3ee001420f25
         size: 508
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: b358bd441f0eb4c109688a679471b4a2c028cb0e
+    hash_after: b358bd441f0eb4c109688a679471b4a2c028cb0e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft
+        hash: cb5c0d94b74c62c4
+        size: 776
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -222,26 +235,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestARedrawUnderAFilterKeepsTheCursor fails on its assertion: with q2 held under `says: /./` and a row arriving above, the cursor lands on q3, as the finding names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when test fails on its own assertion, and the check line waits on tests-green
+- the case reaches no door, since the tree lives in memory
 
 # gate
 

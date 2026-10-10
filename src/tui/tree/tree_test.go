@@ -291,6 +291,25 @@ func TestARedrawKeepsTheGroupsAPersonOpened(t *testing.T) {
 	}
 }
 
+// The held row is found among the rows the filter keeps, as takes lays the line on after the carry. [[spec/tickets/a-filter-keeps-the-cursor]]
+func TestARedrawUnderAFilterKeepsTheCursor(t *testing.T) {
+	t.Parallel()
+	queued := []Item{item("a", "open", ""), item("b", "open", ""), item("q1", "open", "1"), item("c", "open", ""), item("q2", "open", "2"), item("q3", "open", "3")}
+	was := NewTree(columns(), queued, true)
+	if err := was.Filtering("says: /./"); err != nil {
+		t.Fatal(err)
+	}
+	was.MoveTo(1)
+	now := NewTree(columns(), append([]Item{item("d", "open", "")}, queued...), true)
+	now.Carry(was)
+	if err := now.Filtering("says: /./"); err != nil {
+		t.Fatal(err)
+	}
+	if held := now.Selected(); held == nil || held.Name != "q2" {
+		t.Fatalf("the cursor stays on q2 under the filter, and stands on %v", held)
+	}
+}
+
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func TestARedrawKeepsTheOrderUnlessAPlaceChanges(t *testing.T) {
 	t.Parallel()
