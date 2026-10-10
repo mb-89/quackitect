@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -52,12 +53,51 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -65,7 +105,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -77,7 +117,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -116,8 +156,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
-group: the-tui-keeps-its-place
-step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +182,13 @@ record:
         hash: 8a7d1744a1843e19
         size: 960
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-7
+    hash_before: a9781ff9f3442abf35b09e937bafd3c668551779
+    hash_after: a9781ff9f3442abf35b09e937bafd3c668551779
+    returns: 1
+    why: "Carry keeps the edit open but leaves the marks and last behind, so a fill after a redraw writes every row the view holds: re-point marks and last by name path as at is, with a red case that marks two rows, redraws with a row above, fills, and finds the two alone written; a departed row loses the typed value in silence: name the departure in the notice, with a case asserting it"
+group: the-tui-keeps-its-place
 ---
 
 # Ask
@@ -265,6 +310,74 @@ Both cases fail on their assertions. After one work/rows change mid-edit, `u` po
 - each done_when test fails on its own assertion, and the check line waits on tests-green
 - the work case posts through the registry Fake, which its contract suite holds
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -272,8 +385,11 @@ Both cases fail on their assertions. After one work/rows change mid-edit, `u` po
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- Carry keeps the edit open but leaves the marks and last behind, so a fill after a redraw writes every row the view holds: re-point marks and last by name path as at is, with a red case that marks two rows, redraws with a row above, fills, and finds the two alone written
+- a departed row loses the typed value in silence: name the departure in the notice, with a case asserting it
 
 # implement
 
