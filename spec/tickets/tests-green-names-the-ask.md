@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 16fe7cdf9d3c207d3c418de12c5720e56f242ca5
+    hash_after: 16fe7cdf9d3c207d3c418de12c5720e56f242ca5
+    inputs:
+      - name: ask
+        hash: 18a5b9b7df4d1843
+        size: 1074
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -160,38 +169,68 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The rewording lands in the route and the review guidance, and the pull keeps the step a rewording leaves alone.
+
+- `spec/processes/standard.yaml`: `implement/tests-green` says it makes the change the ask names, with the red tests of `design/tests-red` as its floor, so a rule of the ask lands where no red test names it. Its input gains `ask`.
+- `spec/processes/standard.yaml`: the `gate` question asks which rules of the ask the work breaks, and its `does` scopes the reviewer to those.
+- `spec/guidance/review/design.md` rule 1 names each rule of the ask the approach breaks, and leaves the rest.
+- `src/pull/pull_stale.go` `processRead`: a leaf whose `def` moved, and whose fresh entry differs from the ticket's own copy in `does` and `gate` alone, counts as unmoved. One list, `wordingFields`, names the two keys. So a ticket past tests-green keeps its step and the wording it answered, which `UpdatedRoute` already keeps on a reached leaf. A ticket at tests-green takes the new wording, since `UpdatedRoute` copies the route ahead of the reached leaves.
+- `spec/design_output/pull.md`, chapter An input marks its steps: the process-edit table gains the row for a leaf moved in its wording alone.
+- `spec/examples/110_tickets/pull-tests-green.md`: the pull hands out a ticket at tests-green, and the hand-out names the ask and the floor.
+
+Without the pull change, every open standard ticket past the gate goes back to the gate at its next pull, which the two pull lines of the ask forbid. A change to `evidence`, `input` or any other key still sends a ticket back, so the rule narrows nothing the stale read guards.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/pull/pull_stale.go staleRead calls processRead
+- src/pull/pull_bless.go readAgain calls staleRead
+- src/pull/pull_route.go UpdatedRoute keeps the reached leaves processRead copies
+- src/quack/examples_harness_test.go plantedTickets plants the ticket the example pulls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/pull/pull_stale_test.go TestATicketPastTestsGreenKeepsItsStepOnAReword
+- src/pull/pull_stale_test.go TestATicketAtTestsGreenTakesTheNewWording
+- src/pull/pull_stale_test.go TestAnEvidenceMoveStillSendsATicketBack
+- spec/examples/110_tickets/pull-tests-green.md, run by TestEveryExampleHoldsItsSteps
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/processes/standard.yaml
+- spec/guidance/review/design.md
+- src/pull/pull_stale.go
+- src/pull/pull_stale_test.go
+- spec/design_output/pull.md
+- spec/examples/110_tickets/pull-tests-green.md
+- src/quack/examples_harness_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened processRead, staleRead, UpdatedRoute, FieldsOf, SameStep, standard.yaml, review/design.md and the pull design note
+- the callers list names every reader of processRead and of the route it copies
+- each done_when line names its case, the example, or the check
+- the change adds no config key
 
 ## tests-red
 
