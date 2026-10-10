@@ -115,8 +115,10 @@ func (one watch) adds(eyes adder, from string, state *held, hand Hand) error {
 		if !entry.Type().IsRegular() || !heard(rel) {
 			return nil
 		}
+		// A folder event on a folder the watch holds, as Windows fires for a write under it, walks it again, and a file the record holds already is handed no second time. [[spec/tickets/watch-hands-new-folders]]
+		met := state.seen[rel]
 		state.seen[rel] = true
-		if info, err := entry.Info(); err == nil && hand != nil {
+		if info, err := entry.Info(); err == nil && hand != nil && !met {
 			state.reads(path, rel, info, hand)
 		}
 		return nil
