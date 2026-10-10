@@ -1,5 +1,5 @@
 // The one checker every front asks. The command line, the port and the editor
-// each hand it a path or nothing, and each reads back the same findings.
+// each asks it for the sweep, and each reads back the same findings.
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 package check
 
@@ -37,6 +37,7 @@ var Rules = []func(*Tree) []Finding{
 	everyPointerResolves,
 	everyNamedPathStands,
 	groupAsksNobody,
+	engineSweep,
 	noConflictMarkers,
 	ExampleCovers,
 	exampleProves,
@@ -59,18 +60,8 @@ func (one *Checker) Sweep() []Finding {
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
 	out = append(out, anchorSweep(one.tree)...)
-	out = append(out, engineSweep(one.tree)...)
 	out = append(out, one.restatedAll()...)
 	return sorted(pastHistory(one.tree, out))
 }
 
 func (one *Checker) Tree() *Tree { return one.tree }
-
-// An open buffer writing a field the verbs own hints, and a file no editor holds draws nothing. [[spec/design_output/lsp#an-engine-field-warns]]
-func engineSweep(tree *Tree) []Finding {
-	out := []Finding{}
-	for _, path := range tree.Paths() {
-		out = append(out, engineFaults(tree, path)...)
-	}
-	return out
-}

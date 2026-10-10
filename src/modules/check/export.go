@@ -5,10 +5,7 @@ package check
 
 // [[spec/tickets/lsp-rules-move-to-check]]
 var (
-	ChapterOf         = chapterOf
 	CheckNote         = checkNote
-	DoorsWalked       = doorsWalked
-	FrontOf           = frontOf
 	GovernorOf        = governorOf
 	IsDraft           = isDraft
 	IsNoteSchema      = isNoteSchema
@@ -19,24 +16,16 @@ var (
 	OverLong          = overLong
 	PastHistory       = pastHistory
 	PlaceholderFaults = placeholderFaults
-	PlacesIn          = placesIn
-	PointersIn        = pointersIn
-	ReadNote          = readNote
 	RelativeTo        = relativeTo
 	SchemaFaults      = schemaFaults
 	SchemasIn         = schemasIn
-	SectionsOf        = sectionsOf
-	Slashed           = slashed
 	SlugOf            = slugOf
 	StrangerFault     = strangerFault
 	SurveyFindsNode   = surveyFindsNode
 	TextFaults        = textFaults
-	Textual           = textual
 	UnreasonedIn      = unreasoned
+	DoorsWalked       = doorsWalked
 )
-
-// [[spec/tickets/lsp-rules-move-to-check]]
-type Places = places
 
 // The note's chapters and the slug of each, which the completion offers. [[spec/tickets/lsp-rules-move-to-check]]
 func (one *Tree) Chapters(path string) ([]Section, []string) {

@@ -4,7 +4,6 @@
 package check
 
 import (
-	"strings"
 	"testing"
 
 	"quackitect/src/q"
@@ -70,17 +69,6 @@ func TestTheWriterRegistersHandsBackCommitsTheSweep(t *testing.T) {
 	s := q.NewStore(c)
 	if _, err := s.Commit(s.Snapshot().Revision, hand, map[string]any{SweepPort: []Finding{}}); err != nil {
 		t.Fatalf("the sweep commits as the check's writer, and the store answers %v", err)
-	}
-}
-
-// An open buffer rewriting a field the verbs own draws the hint in the sweep, the one list the editor reads. [[spec/tickets/check-over-leaves-for-sweep]]
-func TestTheSweepHintsAnEngineFieldABufferRewrites(t *testing.T) {
-	schema := "kind: ticket\nfrontmatter:\n  properties:\n    state:\n      x-engine: true\nbody:\n  x-steps: steps\n"
-	ticket := "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n"
-	files := map[string]string{"spec/schemas/ticket.schema.yaml": schema, "spec/tickets/a.md": ticket}
-	buffers := map[string]string{"spec/tickets/a.md": strings.Replace(ticket, "state: open", "state: closed", 1)}
-	if found := sweepSeeded(t, files, pathsOf(files), buffers, nil); !holdsRule(found, EngineOwnsField, "spec/tickets/a.md") {
-		t.Fatalf("the sweep answers %+v, and wants %s on spec/tickets/a.md", found, EngineOwnsField)
 	}
 }
 

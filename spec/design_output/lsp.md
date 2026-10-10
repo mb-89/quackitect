@@ -50,7 +50,7 @@ The fronts below ask for a reading, and each reaches one rule set:
 | a person, at `quack sweep` | the same sweep, once the index settles |
 | `./RUNME.sh lint` | `quack sweep`, and `toolsOver` in `src/quack/verb_lint.go` beside it |
 
-`Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
+`Sweep` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
 own rules, and the tools beside them. A box whose quack answers no sweep names
 the fault in the lint, because the tree has no second road.
 
