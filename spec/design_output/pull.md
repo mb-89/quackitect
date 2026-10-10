@@ -817,8 +817,8 @@ A red leaf's pass freezes its red files, so the hand making them green cannot be
 | a reopened file | a `reopen` row naming the path after its latest freeze |
 | the reviewer | a gate's hand-out lists every reopened file with its why and its leaf |
 
-- A moved file with no reopen refuses the hand-back as any refusal does, so the hold, the count and the cap read it.
-- A fail, a became and an answered skip the check, because they land no pass.
+- A moved file with no reopen refuses the hand-back as any refusal does, and the cap counts it.
+- A fail, a `--became` and an `--answered` skip the check, because they land no pass.
 - A record holding no `frozen` row checks nothing, so a route with no red leaf stands as it is.
 
 # Done leaves no takeable step

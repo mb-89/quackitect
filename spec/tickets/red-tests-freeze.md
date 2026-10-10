@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -237,6 +237,15 @@ record:
         hash: 18bdfb73ec25a90a
         size: 49571
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box b9ccbd72b78d · claude-code-remote · builder
+    hash_before: 6517967880c96b489b50ffcc7ddb1b3a8ddef868
+    hash_after: 6517967880c96b489b50ffcc7ddb1b3a8ddef868
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: red-freezes-and-stalls-show
 ---
 
@@ -495,14 +504,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/pull/pull_frozen.go src/pull/pull_writes.go src/pull/pull_back.go src/pull/pull_chapter.go src/pull/pull.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft lists, and nothing past them
+- the cases reach the disk, git and the shell through the fakes `cloudPull` builds
+- each function carries a pointer at [[spec/design_output/pull#red-tests-freeze]]
+- the chapter in `spec/design_output/pull.md` owns the mechanism, and the schema rows point at it
 
 ## tests-green
 

@@ -308,6 +308,42 @@ frontmatter:
                   type: integer
                   description: the length of the text the hash reads
 
+          frozen:
+            type: array
+            description: one entry per red file a red leaf's pass freezes, per [[spec/design_output/pull#red-tests-freeze]]
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+                - hash
+              properties:
+                path:
+                  type: string
+                  description: the red file
+
+                hash:
+                  type: string
+                  description: the hash of its text at the red pass, or gone
+
+          reopen:
+            type: array
+            description: one entry per frozen file a pass reopens, with why, per [[spec/design_output/pull#red-tests-freeze]]
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+                - why
+              properties:
+                path:
+                  type: string
+                  description: the frozen file the pass reopens
+
+                why:
+                  type: string
+                  description: why the hand changes it
+
           answered:
             type: array
             description: one entry per command field, as the engine runs it
