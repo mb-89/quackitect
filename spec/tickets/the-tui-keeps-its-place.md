@@ -103,6 +103,10 @@ record:
         hash: cc970d23e318d3cb
         size: 346
     def: 19b6849b1f151cd5
+  - step: children
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: e882db9d4e2840df8b2b9bf7b241fde8949d7e23
+    session: cse_01BZXtnZDaLGMkGopXHPxfTe
 ---
 
 # Ask
