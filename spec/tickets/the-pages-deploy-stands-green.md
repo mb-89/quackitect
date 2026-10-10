@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box 1c02af353dfc · claude-code-remote
@@ -94,6 +94,15 @@ record:
         exit: 0
         said: work/the-pages-deploy-stands-green already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 1c02af353dfc · claude-code-remote
+    hash_before: fb761bcd7c79687e22eb9846055fde2183d569cf
+    hash_after: fb761bcd7c79687e22eb9846055fde2183d569cf
+    inputs:
+      - name: ask
+        hash: 4ff7b06f1e59b7a8
+        size: 104
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -118,14 +127,20 @@ The pages build and deployment run on main passes, since the folder its source n
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/pages-finds-its-docs-folder]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is one page, small enough to review whole
+- the child gives the build the folder its source names, which is the whole goal
+- no child waits on another, so none names depends_on
+- the child reads no sibling, so the land order stands free
+- the diff stays one page and two tickets, so no child splits into a group
 
 # children
 
