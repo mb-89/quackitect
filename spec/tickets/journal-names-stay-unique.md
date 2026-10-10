@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/quack/verb_split.go:22:1 ExampleCovers: ./RUNME.sh split stands in no example's interface. Write an example under sp"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 72dada03361af588c8388326fde290d057dd668d
+    hash_after: 72dada03361af588c8388326fde290d057dd668d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/edits passes
+      - name: check
+        exit: 0
+        said: "   85.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 687470fd48202cca
+        size: 483
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -322,26 +345,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two applies at one clock reading now keep two journal entries. A free name counts in the padding digits of the stamp, and each writer checks its own journal folder through its own disk door. A folder that is not there yet reads as nothing taken. Before, the second entry overwrote the first, and undo lost the first apply.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the edits journal, its three writers, their tests and the apply note
+- doors: each case runs over a temp root or the fake disk
+- comment: each new line points at this ticket
+- one place: the free name stands in the journal alone
 
 # accept
 
