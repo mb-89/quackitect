@@ -290,3 +290,15 @@ func TestDropWritesOneKeyOfTheLocalLayer(t *testing.T) {
 		t.Fatalf("a drop into a bare root reads %v off %s, and wants quiet off %s", said, layer, Local)
 	}
 }
+
+// A drop over a local layer holding broken JSON errors and leaves the file as it stands, so a hand edit loses no key. [[spec/tickets/drop-keeps-a-broken-layer]]
+func TestDropRefusesALocalLayerThatFailsToParse(t *testing.T) {
+	broken := `{"stop": {"hold": "finish"},}`
+	root := rootWith(t, map[string]string{Local: broken})
+	if err := Drop(root, "ask.wanted", "quiet"); err == nil {
+		t.Fatal("a drop over broken JSON answers no error")
+	}
+	if held, _ := readFile(filepath.Join(root, filepath.FromSlash(Local))); string(held) != broken {
+		t.Fatalf("the layer holds %q after the drop, and wants %q", held, broken)
+	}
+}

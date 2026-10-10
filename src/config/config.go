@@ -5,7 +5,9 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -28,12 +30,22 @@ const (
 	indent     = "  "
 )
 
-// Writes one key into the local layer under the work root and keeps every other key it holds. It makes the layer's whole folder where none stands. [[spec/tickets/cage-hold-drops-port]]
+// Writes one key into the local layer under the work root and keeps every other key it holds. It makes the layer's whole folder where none stands, and refuses a layer that fails to parse, so a hand edit loses no key. [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/drop-keeps-a-broken-layer]]
 func Drop(root, key, value string) error {
 	at := filepath.Join(root, filepath.FromSlash(Local))
-	held := read(root, Local)
-	if held == nil {
-		held = map[string]any{}
+	held := map[string]any{}
+	body, err := readFile(at)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+	case err != nil:
+		return err
+	default:
+		if err := json.Unmarshal(body, &held); err != nil {
+			return fmt.Errorf("%s holds no JSON object, so the drop of %s writes nothing: %w", Local, key, err)
+		}
+		if held == nil {
+			held = map[string]any{}
+		}
 	}
 	parts := strings.Split(key, ".")
 	here := held
@@ -46,7 +58,7 @@ func Drop(root, key, value string) error {
 		here = next
 	}
 	here[parts[len(parts)-1]] = value
-	body, err := json.MarshalIndent(held, "", indent)
+	body, err = json.MarshalIndent(held, "", indent)
 	if err != nil {
 		return err
 	}
