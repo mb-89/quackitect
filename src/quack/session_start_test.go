@@ -277,3 +277,54 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		}
 	}
 }
+
+// A fake curl writing down the address it fetches, and writing to -o a biome that answers its version where BIOME_ANSWERS says so. [[spec/tickets/biome-fetches-its-arch]]
+const biomeCurl = `#!/bin/sh
+while [ $# -gt 0 ]; do
+  case $1 in
+    -o) shift; printf '#!/bin/sh\nexit 0\n' > "$1" ;;
+    http*) printf '%s\n' "$1" >> "$BIOME_FETCHED" ;;
+  esac
+  shift
+done
+`
+
+// A fake uname answering Linux and the machine BIOME_MACHINE names. [[spec/tickets/biome-fetches-its-arch]]
+const biomeUname = `#!/bin/sh
+case $1 in -m) printf '%s\n' "$BIOME_MACHINE" ;; *) printf 'Linux\n' ;; esac
+`
+
+func TestTheInstallFetchesTheBiomeItsMachineRuns(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		name, machine, standing, asset string
+	}{
+		{"an arm Linux box fetches the arm asset", "aarch64", "", "biome-linux-arm64"},
+		{"an x86 Linux box fetches the x64 asset", "x86_64", "", "biome-linux-x64"},
+		{"a standing binary that cannot run is fetched again", "aarch64", "#!/bin/sh\nexit 126\n", "biome-linux-arm64"},
+		{"a standing binary that answers is fetched never", "aarch64", "#!/bin/sh\nexit 0\n", ""},
+	} {
+		tree := bootTree(t)
+		path := filepath.Join(tree, "path")
+		bootWrite(t, filepath.Join(path, "curl"), biomeCurl, 0o755)
+		bootWrite(t, filepath.Join(path, "uname"), biomeUname, 0o755)
+		if one.standing != "" {
+			bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "biome"), one.standing, 0o755)
+		}
+		fetched := filepath.Join(tree, "fetched")
+		run := exec.Command("sh", filepath.Join(tree, "install.sh")) // level0: FixtureOutsideHome - each install runs the real install.sh in a tree of the case's own
+		run.Dir = tree
+		run.Env = []string{
+			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,
+			"SE_INSTALL_SKIP=go go-modules index git-hooks", "BIOME_MACHINE=" + one.machine, "BIOME_FETCHED=" + fetched,
+		}
+		said, err := run.CombinedOutput()
+		if err != nil {
+			t.Fatalf("%s: the install fails: %v: %s", one.name, err, said)
+		}
+		asked, _ := os.ReadFile(fetched)
+		if got := strings.TrimSpace(string(asked)); (one.asset == "" && got != "") || (one.asset != "" && !strings.HasSuffix(got, "/"+one.asset)) {
+			t.Errorf("%s: the install fetched %q, and wants the asset %q: %s", one.name, got, one.asset, said)
+		}
+	}
+}
