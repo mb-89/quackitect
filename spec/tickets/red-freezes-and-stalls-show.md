@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,25 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 2375e2366a52118478d876078ee14f17ed2c32ea
+    hash_after: 2375e2366a52118478d876078ee14f17ed2c32ea
+    inputs:
+      - name: retro/write
+        hash: 4e1d29431cce88f9
+        size: 2729
+      - name: [[spec/tickets/stalls-read-progress]]
+        hash: e62a4e6394147d46
+        size: 962
+      - name: [[spec/tickets/red-tests-freeze]]
+        hash: 271bbec27388e167
+        size: 1143
+      - name: [[spec/guidance/review/design]]
+        hash: fe12d50994b0674a
+        size: 1832
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -288,20 +307,27 @@ The branch looked contested at the take, so the run checked the hold before work
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 22:18 the level0 MCP server went down after the first take, so every write went through the shell and the verbs on RUNME.sh
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 22:18 a push refusal at the first take, which a fetch and a second take cleared
+- the commit hook refused a change to hook_verb.go with no test beside it, so a quack case joined it
+- the freeze refused two moved red files until a reopen named each
+- a text file busy race in the exe hook case under the full check
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the two review findings ride the retro improve list, for the retro to mint
 
 # Discussion
 
