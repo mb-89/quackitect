@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box c729ff43c0cb · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 2d01bce900acc9d7faabc557e0cffab1cf18228c
+    hash_after: 2d01bce900acc9d7faabc557e0cffab1cf18228c
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -226,38 +238,66 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `lsp-draws-the-ticket-lenses`: the language server draws the ticket buttons and runs their press.
+- `lsp-marks-the-held-fields`: the server marks the fields a held leaf wants, and answers their hover.
+- `the-client-drops-fields-js`: answered by the extension child, which deletes fields.js.
+- `the-marks-note-names-marksin`: the marks note names marksIn.
+- `extension-keeps-the-editor-parts`: the client middleware asks the reason, saves before a hand-back, and draws the underline.
+- The extension shrinks to the client, the route inset, the sidebar and the status bar.
+- A closed ticket's link moves to the lsp note, where its section now stands.
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- A separate hand gated and accepted, so each review read work it did not write.
+- The gate named its fixes in place, so the build took them with no new child.
+- The draft's callers list and the gate's missed callers kept every pointer current.
+- The check ran green on each commit, so the accept found nothing to fix.
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 20:27 the stop hook refused the helpers-still-run reason four times while a helper ran.
+- 20:27 the pull tool answered still running, and its result reached no later turn.
+- 20:31 the Agent tool refused a foreground helper, so waits ran as git log polls.
+- 20:38 the commit verb refused git rm, git push and a model trailer for the builder.
+- 20:48 a stale hold at accept refused the next pull after the helper's verdict landed.
+- 20:50 the commit verb refused -m, since it takes the message as its first word.
+- The owner's opening prompt handed this group to the cloud and asked for the pull request.
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- `src/quack/stop_rules_test.go`: the stop rule reads a helper the Agent tool started as running.
+- `src/pull/pull_holds.go`: a verdict a helper hands back clears the hold the orchestrator took.
+- `.claude/skills/work/SKILL.md`: name the git log wait for a helper's commit inside the turn.
+- `src/quack/commit.go`: the usage line names the message as the first argument, and -m answers that.
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The work itself ran clean, and the friction sat in the waiting. Each in-turn wait on a helper met a different refusal. The stop hook took no helper reason, the pull tool's late result never arrived, and a foreground helper stood refused. A poll on git log for the helper's commit carried every wait in the end. Two small server findings stay as they are. The pressWait comment says ACT_WAIT held the wait, while ACT_WAIT still stands. The Takes known set spans connections, which matters only when two clients share one server.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro states each fact once, and names files by their path
+- the retro adds no number to code
+- the change writes no header
+- the chapter carries the opening prompt and each refusal with its time off the commit log
+- the chapter names roles alone, with no name, address or box path
 
 ## cloud
 
