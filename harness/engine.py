@@ -483,6 +483,23 @@ class Engine:
             a, t = self._auth(attempt_id, token, "heartbeat", progress=False)
             return {"ok": True, "flags": self._status(a, t)["flags"]}
 
+    def worker_exited(self, attempt_id: int) -> dict | None:
+        """The supervisor saw the worker process end. An open attempt ends as crashed."""
+        with self.store.tx():
+            a = self.store.one("select * from attempt where id=?", attempt_id)
+            if a is None or a["outcome"] is not None:
+                return None
+            self._expire(a, "crashed")
+            return self.ticket(a["ticket"])
+
+    def info(self, attempt_id: int) -> dict:
+        a = self.store.one("select * from attempt where id=?", attempt_id)
+        if a is None:
+            raise HarnessError("no_attempt", f"no attempt {attempt_id}")
+        t = self._row(a["ticket"])
+        return {"attempt": a["id"], "ticket": t["id"], "step": a["step"], "role": a["role"],
+                "branch": t["branch"], "open": a["outcome"] is None, "outcome": a["outcome"]}
+
     def can_stop(self, attempt_id: int) -> tuple[bool, str]:
         a = self.store.one("select * from attempt where id=?", attempt_id)
         if a is None:
