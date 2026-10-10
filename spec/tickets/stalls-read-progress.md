@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-3
+step: design/tests-red-3
 steps:
   - name: design
     steps:
@@ -275,6 +275,15 @@ record:
     hash_before: a192cfd7c52bf678789510ed09f41da3b2ba7591
     hash_after: 57d326dc0f3f092011c3403cb4fc0f5165a695c5
     def: 1e1981e5bafc27a0
+  - step: design/draft-3
+    hand: box b9ccbd72b78d · claude-code-remote · drafter3
+    hash_before: 452ac525a5a3caf2051e0bddff7e81e0a800062a
+    hash_after: 452ac525a5a3caf2051e0bddff7e81e0a800062a
+    inputs:
+      - name: ask
+        hash: e62a4e6394147d46
+        size: 962
+    def: 720f39ea2ba7bd6a
 group: red-freezes-and-stalls-show
 ---
 
@@ -551,38 +560,75 @@ The second reject repeats the first word for word, and `tests-red-2` answers eac
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/work#a-live-hold-stalls]]. The owner's message reads as the dispatch plan, the one place that tells the owner what stands ready, held and stuck. A live hold past the new limit reads stalled, past twice it stale on a first take and a person's on a take over.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/branches/held.go` `pastHold` calls `staleClaim`
+- `src/branches/beat.go` `liveHold` calls `staleClaim`
+- `src/branches/free.go` `freeIn` and `stuckIn` call `staleClaim`
+- `src/branches/list.go` `rowOf` calls `staleClaim`
+- `src/branches/dispatch.go` `planned` calls `staleClaim`
+- `src/modules/hooks/githooks.go` `staleTip` calls `HoldStale`
+- `src/branches/branch.go` runs `beatVerb`, which the Stop hook in `.claude/settings.json` calls
+- `src/branches/take.go` `take` and `src/branches/beat.go` `takeOver` call `claimGroup`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- config line: `src/modules/settings/settings_test.go` `TestProgressAfterStandsInTheWorkSettings`
+- list line: `src/branches/beat_test.go` `TestAHoldThatBeatsAndMovesNoCommitStalls`
+- owner's message line: `src/branches/dispatch_test.go` `TestDispatchFiresAFreshBoxPastTwiceTheProgressSpan`, which reads the plan's stalled part
+- hook line: `src/branches/beat_test.go` `TestTheBeatAsksAStalledBoxForAHandoverOnce`, the beat the Stop hook runs
+- dispatch line, fresh box: `src/branches/dispatch_test.go` `TestDispatchFiresAFreshBoxPastTwiceTheProgressSpan` and `src/modules/hooks/githooks_test.go` `TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan`
+- dispatch line, a person: `src/branches/beat_test.go` `TestATakeOverAStandingHoldWritesOver` and `src/branches/dispatch_test.go` `TestDispatchNamesAPersonWhereATakeOverStallsAgain`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the repeated reject: `person-1` answers that `tests-red-2` holds a case for each finding, and the draft stands as `draft-2` wrote it
+- the config line: `TestProgressAfterStandsInTheWorkSettings` reads the built-in default off the work settings, from which the schema regenerates
+- the take over: `TestATakeOverAStandingHoldWritesOver` shows the take writing `over: true`, so the person case rests on a written mark
+- the phantom hook-reads case leaves the list, and the pre-push case stands in its place
+- each tests row names the done_when line it decides
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/settings/settings.go
+- spec/config/level0.schema.json
+- .claude/commands/se-config-work-progressAfter.md
+- spec/schemas/ticket.schema.yaml
+- src/branches/beat.go
+- src/branches/free.go
+- src/branches/group.go
+- src/branches/take.go
+- src/branches/list.go
+- src/branches/dispatch.go
+- src/modules/hooks/githooks.go
+- src/quack/hook_verb.go
+- spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files the approach names stand opened, and each claim checked there
+- the callers list names every caller of `staleClaim`, `HoldStale`, `beatVerb` and `claimGroup`
+- each done_when line names its case in the tests list
+- `work.progressAfter` lands in `settings.go`, and its schema and slash command regenerate off it
 
 ## tests-red-3
 
