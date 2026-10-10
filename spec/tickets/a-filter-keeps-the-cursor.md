@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: cb5c0d94b74c62c4
         size: 776
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-4
+    hash_before: 293d6c09a2292b99810a9444d3a10e4e97119d62
+    hash_after: 293d6c09a2292b99810a9444d3a10e4e97119d62
+    inputs:
+      - name: design/draft
+        hash: cb5c0d94b74c62c4
+        size: 776
+      - name: design/tests-red
+        hash: d388fdcdddae4016
+        size: 413
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,9 @@ TestARedrawUnderAFilterKeepsTheCursor fails on its assertion: with q2 held under
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
