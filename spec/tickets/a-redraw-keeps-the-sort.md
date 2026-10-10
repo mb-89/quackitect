@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 054b065b637dc5c6e0a4f20d7cd8a8bd55aa6869
+    hash_after: 054b065b637dc5c6e0a4f20d7cd8a8bd55aa6869
+    inputs:
+      - name: ask
+        hash: 2e7172410cde3169
+        size: 396
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -163,38 +172,48 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` takes a copy of the old tree's `sorts` before its rebuild, so the rows draw under the sort the person set and the held row is found in that order. The marks the finding names stay out: no work key sets one, and the verifier left that half unconfirmed.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawKeepsTheSortAPersonSet
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/tree_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Carry, SortOn, Sorted, Sorts and ViewOver, and each redraw builds the tree under the base file's sort
+- a grep finds takes the one caller of Carry
+- the done_when line names TestARedrawKeepsTheSortAPersonSet
+- the approach adds no config key
 
 ## tests-red
 
