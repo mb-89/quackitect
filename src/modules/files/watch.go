@@ -65,16 +65,28 @@ type watch struct{ root string }
 // The real watch under root. [[spec/design_output/model#its-file-carries-its-fake]]
 func NewWatch(root string) Watch { return watch{root} }
 
+// What a folder joins the watch through: the watcher, or a case's record. [[spec/tickets/watch-hands-new-folders]]
+type adder interface{ Add(path string) error }
+
+// What the real watch holds while it runs: the paths heard with bytes, and every file it meets. The start's walk and the watcher's loop both reach it. [[spec/tickets/watch-hands-new-folders]]
+type held struct {
+	mu    sync.Mutex
+	known map[string]bool
+	seen  map[string]bool
+}
+
+func newHeld() *held { return &held{known: map[string]bool{}, seen: map[string]bool{}} }
+
 func (one watch) Changes(hand Hand) (func(), error) {
 	// The watcher's loop adds a folder while a stop runs, and its Close returns. [[spec/tickets/a-watch-stops-mid-add]]
-	known := map[string]bool{}
+	state := newHeld()
 	eyes, err := watcher.New(func(eyes *watcher.Watcher, event fsnotify.Event) {
-		one.hears(eyes, event, hand, known)
+		one.hears(eyes, event, hand, state)
 	})
 	if err != nil {
 		return func() {}, err
 	}
-	if err := one.adds(eyes, one.root); err != nil {
+	if err := one.adds(eyes, one.root, state, nil); err != nil {
 		eyes.Close()
 		return func() {}, err
 	}
@@ -85,7 +97,7 @@ func (one watch) Changes(hand Hand) (func(), error) {
 }
 
 // Every folder under root, so a write in a folder below reaches the watch. [[spec/design_output/model#io-modules-and-their-fakes]]
-func (one watch) adds(eyes *watcher.Watcher, from string) error {
+func (one watch) adds(eyes adder, from string, _ *held, _ Hand) error {
 	return filepath.WalkDir(from, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || !entry.IsDir() {
 			return err
@@ -97,7 +109,10 @@ func (one watch) adds(eyes *watcher.Watcher, from string) error {
 	})
 }
 
-func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, known map[string]bool) {
+func (one watch) hears(eyes adder, event fsnotify.Event, hand Hand, state *held) {
+	state.mu.Lock()
+	defer state.mu.Unlock()
+	known := state.known
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
@@ -119,7 +134,7 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand, k
 		return
 	}
 	if info.IsDir() {
-		_ = one.adds(eyes, event.Name)
+		_ = one.adds(eyes, event.Name, state, hand)
 		return
 	}
 	body, err := os.ReadFile(event.Name)

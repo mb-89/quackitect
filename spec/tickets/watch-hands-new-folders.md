@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 06a035779e5c678b
         size: 646
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 7062c665034be3a5a6b9c637449b53b5b8c63747
+    hash_after: 7062c665034be3a5a6b9c637449b53b5b8c63747
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/files fails
+    inputs:
+      - name: design/draft
+        hash: 9502fdb7652648e5
+        size: 1846
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,31 @@ The real watch keeps one record of every file it meets, beside the known map. ad
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch_folders_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All three cases fail on their own assertions. A folder moved in hands nothing, a folder moved out hands gone for the folder alone, and a log folder made after the start joins no watch and hands nothing. The seam lands with today's behavior: adds and hears take an interface holding Add and one held state, and adds takes a hand it leaves unused. The cases hand hears the events the watcher delivers, so each reads at once and waits on nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: each line meets its own case, red today
+- doors: the cases run the real watch over a temp root through the real disk, with a record standing in for the watcher's Add
 
 # gate
 
