@@ -222,3 +222,21 @@ func TestTheFieldReadersRunBeforeTheDoorsLock(t *testing.T) {
 		t.Fatalf("the stop's field readers read git %d times, %d of them under the door's lock", reads, locked)
 	}
 }
+
+// A helper's post on the main session lands between the main call's write and its verdict, and the main call keeps the stop refusal its own event landed. [[spec/tickets/hold-verdicts-ride-the-post]]
+func TestAHelpersPostBetweenACallsWriteAndItsVerdictLeavesTheCallsRefusal(t *testing.T) {
+	settings := settingsOf(t, map[string]any{"stop.hold": "stop"}, false)
+	door := holdDoor(t, settings)
+	main := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Read", "file_path": "a.md"}})
+	helper := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Grep", "agentId": "a1"}})
+	if err := door.writes("s1", main, settings, ""); err != nil {
+		t.Fatal(err)
+	}
+	if err := door.writes("s1", helper, settings, ""); err != nil {
+		t.Fatal(err)
+	}
+	said, ok := door.held("s1", main, "")
+	if !ok || !strings.Contains(said.Text, "so Read is refused") {
+		t.Fatalf("the main call answers %+v, %v, and wants the refusal of Read", said, ok)
+	}
+}

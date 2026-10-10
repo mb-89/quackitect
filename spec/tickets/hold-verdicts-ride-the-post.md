@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: e4a77dd8c818699b
         size: 682
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 288591b97a1af0ab7bfe88bf7778ed47efe43d36
+    hash_after: 288591b97a1af0ab7bfe88bf7778ed47efe43d36
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 1026d52fe5cbe103
+        size: 1528
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,31 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/holds_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The test writes the main call's Read and then a helper's Grep on session s1 under the stop hold, and asks `held` for the main call's verdict. It answers no effect at all. The helper's post moved the session's place past the main call's, so the fold's verdict is the helper's. A helper's call passes the stop hold, so the main call's refusal drops. The ask names both a lost refusal and a borrowed verdict, and this run shows the lost one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets `TestAHelpersPostBetweenACallsWriteAndItsVerdictLeavesTheCallsRefusal`, which fails on its own assertion
+- the test reaches the store and the config through the door's fakes in `holdDoor`, and no other door
 
 # gate
 
