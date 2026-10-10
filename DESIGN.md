@@ -1,0 +1,341 @@
+# hx: a harness for long, gated, multi-agent work
+
+Clean-room design C. It was written before I looked at any prior implementation; see COMPARE.md for that.
+
+## 0. The answer on one screen
+
+| Question | Answer |
+|---|---|
+| **How does the harness hook into the LLM?** | The harness owns the **outer loop**: tickets, steps, sessions and leases. The agent runtime (Claude Code, locally or in a cloud sandbox) owns the **inner loop**: turns and tools. There is exactly one interface, a CLI called `hx`. The model calls it through Bash. **Claude Code hooks** call the same CLI to inject the brief at session start and after compaction, to deny forbidden tool calls (frozen tests, zombie sessions, reviewer edits, force pushes), to refuse a premature stop, and to send a heartbeat. A **skill** documents the protocol. An MCP server is an optional thin wrapper. Each turn the model sees only a compact *brief*, which is a projection of durable state, plus one-line *notices* when something changed. State survives context resets because nothing that matters is held only in the context. |
+| **What is the backend?** | An **append-only event log with a deterministic fold**. One pure function `apply(state, event)` validates every transition. It runs on append when a single writer or a compare-and-swap store is used, and on fold when a log has no CAS. **Processes are data**: steps, each with a role, a gate, the evidence kinds it accepts, routes by outcome, loop limits, an approval policy and a timebox. **Evidence is a pointer to something immutable**, normally a commit SHA, plus the report of a *verifier*. Gates are computed by the engine and never asserted by the agent. **Leases carry epochs**, and the epoch is the fencing token. Expiry is an explicit, conditional event. **Stalls follow a ladder**: first a nudge, then a fresh agent, and only then the owner. Parallel work is coordinated by a dependency DAG, scope-overlap scheduling and a serial merge queue (the `land` step). |
+| **What does the owner's UI look like, and how does the agent's view differ?** | The owner **manages by exception**. The UI is one responsive web app. **Inbox** first: one-tap decisions, each with a summary of 280 characters or less, options and a default. **Board** second: tickets by step, coloured by health. **Detail** third: the gate checklist, evidence, the last checkpoint and a timeline, plus controls. A push goes out only when something blocks and has no default, or when health is red. Everything else goes into a digest. The **agent** never sees the board. It sees one imperative brief about one ticket and one step: what to do, what counts as done (the gate checklist), what the owner answered and what the previous holder left behind. |
+| **What is the smallest version that beats a single agent?** | The route `red → green → review → accept`, with three gates. *Red*: the tests fail on assertions at a SHA, and each acceptance criterion is referenced by a test. *Green*: the same frozen tests pass at a descendant SHA in a clean checkout. *Review*: a non-author approves on that exact SHA. Add the brief, plus Stop and PreToolUse hooks, and keep a local log. Parallelism is not needed to win on quality. **To prove it**, run a paired A/B on tasks that have hidden acceptance tests (same model, same budget), with fault injection. See EVAL.md. |
+
+The prototype in this repository implements the engine, the gates and verifiers, the CLI, the Claude Code hooks, the clock (expiry, nudges, escalation, dispatch, the merge queue), three stores (a JSONL file, a git ref and HTTP) and a phone-first owner UI, with tests and a demo.
+
+---
+
+## 1. First principles
+
+1. **Agents are unreliable narrators.** "Tests pass" is a claim. A green run of the frozen tests at commit `abc123`, in a clean checkout, is evidence. The harness accepts only evidence it can re-check, and it never lets the claimant be the checker.
+2. **Context is a cache, not a store.** Any session can die at any moment: a crash, a context limit, a sandbox reaping, a human closing a laptop. Everything that matters has to be in durable state or in git *before* it matters. The context is rebuilt from state on demand. That rebuilt context is the *brief*.
+3. **The process is a state machine the agent cannot leave.** The agent cannot "go to the next step". It can only ask (`hx done`), and the engine decides by evaluating the gate. Hooks make the forbidden moves fail fast. Gates make them impossible.
+4. **Separate claim, verification and decision.** The agent claims, a verifier (CI or a clean checkout) verifies, and the gate (pure code) decides. Some steps need a human decision. That decision is a typed event from an authenticated owner, never a string an agent can type.
+5. **Owner attention is the scarcest resource.** It is scarcer than tokens or compute. Every interrupt must be answerable from a phone in about ten seconds, which means a summary, options and a default. Anything the harness can retry, it retries before it asks.
+6. **A fresh context is the cheapest fix for a stuck agent.** A long, confused context is the commonest cause of looping. Escalate in this order: nudge, then a fresh session given the brief and the checkpoint, then the owner.
+7. **Make what lands exactly what was verified.** The merge queue lands the reviewed SHA, not the branch tip. Evidence is chained: the green SHA descends from the red SHA, and the review covers the green SHA.
+8. **Determinism over cleverness.** The engine never reads the clock or the network. Time and verification results arrive as data in events. Replaying the log always gives the same state, and that is what makes audit, simulation and every recovery path possible.
+
+---
+
+## 2. Q1: How the harness hooks into the LLM
+
+### 2.1 Outer loop and inner loop
+
+```
+        harness (outer loop)                         agent runtime (inner loop)
+ ┌───────────────────────────────┐            ┌──────────────────────────────────┐
+ │ tick: expire, nudge, escalate │  launch    │ Claude Code session (local/cloud) │
+ │ dispatch ready steps ─────────┼──────────▶ │  SessionStart hook → hx brief     │
+ │                               │            │  model ⇄ tools (Bash/Edit/…)      │
+ │ engine: apply(state, event)   │ ◀──────────┼─ hx claim/checkpoint/submit/done  │
+ │ gates over verified evidence  │   CLI/HTTP │  PreToolUse hook → guards         │
+ │ event log (file/git/http)     │ ◀──────────┼─ PostToolUse hook → heartbeat     │
+ │                               │            │  Stop hook → refuse early stop    │
+ └───────────────────────────────┘            └──────────────────────────────────┘
+```
+
+A **session** holds at most one **lease**: one step-run of one ticket. By default a step is worked by a fresh session. A session may continue to the next step when the process allows it (`red → green` by the same worker is fine), and must not when separation of duties forbids it (review). The harness never steers individual turns. It shapes what the model sees at the boundaries (start, compaction, notices) and polices what it is allowed to do.
+
+### 2.2 Interfaces, and why each one exists
+
+| Mechanism | Role | Why it is there |
+|---|---|---|
+| `hx` CLI | **The** interface: `claim`, `brief`, `checkpoint`, `submit`, `ask`, `done`, `release`, plus the owner and clock commands | Every agent with a shell can use it, and so can every hook, CI job and human. It is testable. Its output is plain text written for a model. |
+| Claude Code hooks (`hx hook <event>`) | Enforcement, context injection and liveness | Hooks are the only mechanism that acts *without the model choosing to*. They inject the brief at SessionStart (startup, resume or compact). PreToolUse denies forbidden calls. Stop refuses to stop while a step is open. PostToolUse sends a throttled heartbeat and nags about checkpoints. SessionEnd releases the lease. |
+| Skill (`SKILL.md`) | Protocol documentation for the model | It is cheap, portable and loaded on demand. It explains *why*, so the model cooperates instead of fighting the hooks. |
+| MCP wrapper (optional) | The same commands as typed tools | Structured arguments help weaker models. It is not the primary interface, because MCP cannot inject context at session start or enforce anything. |
+| Agent SDK or own loop | **Not** the primary runtime | It would re-implement tools, permissions and compaction, and would give up the cloud-sandbox product. The engine is runtime-agnostic, so an own loop could call the same library. |
+
+### 2.3 What the model sees, turn by turn
+
+| Moment | What is injected | Size |
+|---|---|---|
+| Session start (`startup`) | The system prompt and CLAUDE.md as usual, plus **the brief**: role, ticket, acceptance criteria, the current step and its instructions, the gate checklist with ticks, evidence so far (as pointers), the last checkpoint, owner answers, the branch to use, and the exact commands | ≤ ~1.5k tokens |
+| Ordinary turns | Nothing extra. Tool outputs as usual. | 0 |
+| A tool call while something changed | A one-line **notice**: an owner answer arrived, the criteria were edited, a nudge, "checkpoint overdue (30 calls)", "context large, consider checkpoint and release" | ~1 line |
+| A forbidden tool call | A deny reason, for example "tests/test_x.py is frozen since red@a1b2c3; make the code pass the tests instead" | 1-3 lines |
+| An attempt to stop with the step open | The Stop hook blocks with the unmet gate checks and the three legal exits (`done`, `ask`, `release`) | ~5 lines |
+| After compaction (`compact`) | **The brief again**, plus "if your memory conflicts with the brief, the brief wins" | ≤ ~1.5k tokens |
+| After a crash or handover | A new session, and a brief with a "previous holder went silent at T. Last checkpoint: … Commits after it: …" section | ≤ ~2k tokens |
+
+### 2.4 How state survives context resets
+
+There are three layers. The model is told that only the first two are real.
+
+1. **Durable process state**, in the event log: the step, gate status, verified evidence, questions and answers, and checkpoints.
+2. **Durable work state**, in git: commits pushed to the ticket branch. A submission is only valid for a SHA that exists on the shared remote, so "push before submit" is enforced. A crash can lose at most the unpushed edits since the last checkpoint.
+3. **Ephemeral context**: whatever the model currently remembers.
+
+`hx checkpoint "<done; next; risks>"` writes the soft state (intent, plan, gotchas). The PostToolUse hook nags after N tool calls without a checkpoint, and again when the transcript gets large. A **proactive handover** before compaction (`hx release --note`) is preferred to compaction itself, because a fresh session reading a clean brief does better than a session reading its own lossy summary.
+
+---
+
+## 3. Q2: The backend
+
+### 3.1 Event log and fold
+
+```
+event  = {seq, ts, actor:{kind: agent|owner|system|verifier, id}, type, ticket, data}
+state  = fold(apply, events)       # pure; no clock or I/O inside apply
+apply(state, e) -> state'  or  raise Rejected(reason)
+```
+
+* `seq` and `ts` are assigned by the **store** at append time. Agent clocks are irrelevant.
+* **Validate on append** (single writer or CAS store): the writer takes the lock, folds, applies the new event and appends it only if it is valid. The caller gets the rejection, such as a gate report, synchronously.
+* **Validate on fold** (a transport with total order but no CAS, for example comments on an issue): any event may be appended. The fold skips invalid ones deterministically and records them as rejected. Every reader computes the same state.
+* **Conditional events** close the races in which time plays a part. The clock's `expire` carries the `last_activity_seq` it observed. If the holder did anything after that, the expiry is rejected, so a live agent never loses its lease to a stale tick.
+* The process definition is **embedded in `ticket.create`**. Replay is deterministic even after the templates change, and running tickets keep the process version they started with.
+
+Store adapters, all implemented in the prototype:
+
+| Store | Concurrency | When to use it |
+|---|---|---|
+| `FileStore`: JSONL plus `flock` | serialised append under an exclusive lock | single host: local agents and the coordinator |
+| `GitRefStore`: the log as a file on a git ref | CAS through `update-ref new old` (locally) or a fast-forward push (remote), with retry | serverless; a mirror and backup of the coordinator's log in GitHub |
+| `HttpStore`: the CLI talks to `hx serve` | the server is the single writer | agents in cloud sandboxes |
+
+Heartbeats are ordinary events, **coalesced** to at most one per ⅓ of the lease TTL per holder, so about 12 per hour per active agent. That keeps liveness inside the deterministic fold, so the clock needs no side channel.
+
+### 3.2 Data model
+
+```
+Process   {name, version, steps:[StepDef], first}
+StepDef   {id, role: worker|reviewer|owner|auto, instructions, evidence:[kind],
+           gate:[check], next, routes:{outcome: step}, max_visits, expect_min,
+           approval: never|always|risk>=medium, skip_if_gate, same_holder: ok|forbidden}
+Ticket    {id, title, body, criteria:[{id:"AC1", text}], process (embedded),
+           parent (group), deps:[id], scope:[path prefix], risk: low|medium|high,
+           priority, test_cmd, ci_cmd, branch,
+           status: queued|open|paused|done|cancelled,
+           step, visits{step:n}, run, evidence[], history[], authors[],
+           frozen{path: blob}, heads{red, green, merged}, epoch, version, notices[]}
+Run       {step, visit, status: ready|active|waiting, holder, role, epoch,
+           opened_ts, last_activity_{ts,seq}, last_progress_ts, head,
+           checkpoint{done,next,risks,ts,by}, nudges, handovers, crashed,
+           dispatched{ts,launch}}
+Evidence  {id, step, visit, kind, data, by, epoch, verified, verifier, report, ts}
+Question  {id, ticket, step, visit, kind: agent|approval|escalation, text, summary,
+           options, default, deadline_ts, blocking, status, answer, by, ts}
+```
+
+Events: `ticket.create · ticket.edit · ticket.pause · ticket.resume · ticket.cancel · system.pause · system.resume · claim · heartbeat · checkpoint · evidence · ask · answer · done · release · expire · nudge · revoke · override · land · dispatch · notify`.
+
+### 3.3 Route model: the processes that ship with it
+
+The **feature** process (the full lifecycle in the brief):
+
+```
+draft ──▶ design ──▶ red ──▶ green ──▶ review ──approve──▶ accept ──▶ land ──▶ retro ──▶ done
+ (skip if    │ approval   (failing   (implement,  │  ▲  changes      │ changes   │ conflict
+  criteria)  │ if risk≥med  tests)    tests frozen)│  └──────────────┘ to green   │ /red → green
+             └─ changes ─▶ design (visit+1)        └─ reject ─▶ design
+```
+
+| Step | Role | Gate (all must hold) | Evidence |
+|---|---|---|---|
+| draft | worker | `criteria`: at least one acceptance criterion; skipped when already satisfied | the ticket itself |
+| design | worker | `doc:design` (the file at the SHA has the headings Approach, Test plan, Risks), plus `approval` when risk ≥ medium | `doc` |
+| red | worker | `tests_red`: at the SHA the test files changed since the merge-base, they load, and they *fail on assertions*. Every AC id appears in them. They become frozen. | `tests_red` |
+| green | worker | `tests_green`: the SHA descends from red, the frozen blobs are unchanged, `test_cmd` and `ci_cmd` pass in a clean checkout | `tests_green` |
+| review | reviewer (≠ every author) | `review`: a verdict on the green SHA with a per-AC assessment. The outcome routes. | `review` |
+| accept | owner | `approval`; auto-approved by policy when risk = low and review = approve | the owner's decision |
+| land | auto (merge queue) | `merged`: the reviewed SHA merged onto main in a scratch checkout, `ci_cmd` passes on the merge, and main moves by CAS. Otherwise the route is `conflict` back to green. | `land` |
+| retro | worker | `retro`: a note with `went_well`, `went_badly` and `change` | `retro` |
+
+The **bugfix** process is `red → green → review → accept → land`. The **chore** process is `green → review → land`, using `ci_cmd` only. The **group** process is `plan` (skipped if the children exist) `→ run` (auto, gate `children_done`) `→ retro`.
+
+**Loop limits.** `max_visits` defaults to 3. Routing into a step that has reached its limit opens an *escalation* question ("review↔green has looped 3 times: [one more round] [owner takes over] [back to design] [cancel]") instead of looping again.
+
+**Approval as a gate check.** When the only unmet checks are approvals, `done` does not fail. It creates the approval question, puts the run into `waiting` and releases the lease. When the owner answers, the step completes, or with `changes` it routes back. Workers never wait for humans while holding a lease.
+
+### 3.4 Gates and evidence
+
+* **Evidence points at immutable things**: SHAs, blob hashes and test reports. The verifier runs **in a clean checkout of the SHA on the shared remote** (in production, in CI), never in the agent's working directory. Uncommitted or unpushed work cannot count.
+* **The frozen-test chain**: red freezes `{path: blob}` for the test files touched since the merge-base. Green requires the same blobs and ancestry from the red SHA, and review is pinned to the green SHA. Land merges that same SHA. A change to tests after red needs an owner decision (unfreeze), which is visible in the log.
+* **"Broken red" is rejected.** A syntax error, an import failure at collection, or zero tests run is not a meaningful red. The agent is told to add a stub so the tests fail on assertions.
+* **Coverage of the acceptance criteria is checked mechanically.** Every `ACn` id must appear in the frozen tests, as a test name or a comment. The reviewer checks that the mapping is honest. Each check is cheap, and together they are strong.
+* **Separation of duties lives in the engine.** A reviewer must not be an author of the ticket. Owner-only steps need an owner actor. Overrides are owner-only and always carry a reason.
+* **Trust.** Gates count evidence only with `verified=true` from a verifier actor. In local mode the CLI is the verifier (the agent is honest but fallible). In production the coordinator or CI is, and agent-side verification is only a preview.
+
+### 3.5 Leases, liveness, stalls and handover
+
+* `claim` sets `epoch += 1` (per ticket, monotonic). Every mutating call carries the epoch, and a stale epoch gets `LEASE_LOST`. The hooks check the local lease against the engine and **deny every non-read tool** to a zombie, so a session that lost its lease stops within one tool call.
+* **Activity** means any accepted event from the holder, heartbeats included. **Progress** means a checkpoint, a piece of evidence, or a change of HEAD (reported in the heartbeat). They are different signals with different responses:
+
+| Signal | Threshold (default) | Response |
+|---|---|---|
+| no activity | lease TTL of 15 min | `expire` (conditional), run → ready, `handovers+1`, and the brief flags the crash |
+| activity without progress | 1.5 × `expect_min` | `nudge`: the hook delivers "checkpoint and decide: continue, ask or release" |
+| still no progress after the nudge | + `expect_min` | `revoke`: run → ready, handover to a **fresh** session |
+| handovers ≥ 3 on one run | n/a | escalation question to the owner, run → waiting |
+| dispatched but not claimed | 10 min | re-dispatch; after 3 tries, escalate |
+| a question past its deadline | per question | apply the default if one exists (only reversible questions get one), otherwise re-notify with backoff |
+
+**Handover** carries everything except the dead context: the ticket, the step, the gate status, verified evidence, the last checkpoint (`done/next/risks`), the commits pushed since that checkpoint, owner answers, and the note "previous holder went silent". A graceful `release --note` gives the best handover. The Stop and PreCompact paths try hard to obtain one.
+
+### 3.6 Parallel coordination
+
+* **Dependencies**: a ticket stays `queued` until its `deps` are done (landed). It opens automatically when they are.
+* **Scope-overlap scheduling**: each ticket declares path prefixes (refined by the design step). The dispatcher does not start a code-changing step whose scope overlaps that of another ticket that is in flight and not yet landed. This is cheap and prevents most conflicts. An empty scope means unconstrained, plus a warning.
+* **WIP and priority**: global capacity and per-group WIP limits. Steps of tickets already in progress come before new tickets, so work in progress is finished before more is started.
+* **Serial merge queue**: `land` runs one ticket at a time. It merges the reviewed SHA into current main in a scratch checkout, runs `ci_cmd` on the result, and moves main by CAS. A conflict or red build routes back to `green` with the conflicting files in the brief. "Merge main into your branch; never rebase" keeps the evidence chain valid.
+
+### 3.7 Git and CI integration
+
+| Concept | Local prototype | GitHub production |
+|---|---|---|
+| Shared remote | a bare repo `origin.git` | the GitHub repo |
+| Ticket branch | `hx/<ticket>` pushed to origin | the same, with a draft PR opened at red and marked ready at review |
+| Verification | `git worktree add --detach <sha>` in origin, then run `test_cmd` and `ci_cmd` | CI check-runs on the SHA; the coordinator reads the results as evidence |
+| Review evidence | `hx submit review --verdict … --ac AC1=ok …` | the same, mirrored as a PR review comment |
+| Acceptance | owner taps Accept in the hx UI | the hx UI, or a GitHub PR approval from the owner's account (separate identity) |
+| Land | `hx tick` merge queue, with CAS on `refs/heads/main` | GitHub merge queue or auto-merge with required checks; the merge event is the evidence |
+
+If the platform only lets a session push to its own assigned branch, the coordinator records `epoch → session branch` and **promotes** a gated SHA to `hx/<ticket>` after verification. The branch name becomes the fencing token: zombie pushes land on a branch nobody promotes.
+
+### 3.8 Deployment topology (recommendation)
+
+* **Tier 0 (proves the value, single machine).** FileStore, with workers as local Claude Code processes in clones or worktrees, launched by `hx tick --dispatch` or by hand. The owner opens `hx serve` over the LAN or a tailnet.
+* **Tier 1 (cloud agents, recommended).** One small always-on **coordinator** runs `hx serve`: the API, the UI, a tick every 60 s, and a single writer. It mirrors the log to the git ref `hx/state` for durability and audit. Sandboxes reach it over HTTPS with per-session tokens issued at dispatch. GitHub stays the code and CI plane, and the coordinator is the process plane. Owner pushes go out via ntfy, a webhook or email.
+* **Tier 1′ (no always-on host).** A GitRefStore on `hx/state`, with GitHub Actions or a scheduled routine running `hx tick` as the clock and dispatcher. Agents write with CAS on push where allowed, or through the coordinator's promotion path. Latency is minutes instead of seconds, and owner authentication must come from a channel agents cannot use (a separate GitHub identity, or signed UI actions).
+
+I recommend Tier 1, because a single writer is the simplest correct concurrency model and its failure mode is benign. If the coordinator is down, hooks fail open, agents keep coding, and leases cannot expire because the clock is down too. GitHub-as-database was considered and rejected (section 8).
+
+### 3.9 Failure handling
+
+| Failure | Detection | Automatic response | Owner involvement |
+|---|---|---|---|
+| Agent crash or sandbox death | no activity for the TTL | `expire` → ready, then a new session with a crash-flagged brief | only after 3 handovers |
+| Context exhaustion | transcript size or PreCompact | notice "checkpoint and release"; after compaction the brief is re-injected | none |
+| Premature stop | Stop hook | block (at most 2 times) with the gate report, then auto-release as a handover | none |
+| False "done" | gate at `hx done` | rejected with the failing checks and hints | none |
+| Test tampering | PreToolUse deny on frozen paths, plus a blob check in the green gate | denied or rejected | counted in the retro |
+| Broken red (tests do not load) | the verifier classifies it as `broken` | rejected: "add a stub so tests fail on assertions" | none |
+| Spinning (alive, no progress) | progress clock | nudge, then revoke and hand to a fresh agent, then escalate | after the ladder |
+| Zombie (lost its lease) | epoch mismatch | hooks deny tools and writes are rejected | none |
+| Waiting on the owner | a blocking question | lease released, no compute burned; push only if urgent | one tap |
+| Owner silent | deadline passed | apply the default if reversible, otherwise re-notify with backoff | digest |
+| Review loop never converges | `max_visits` | escalation card | one tap |
+| Merge conflict, or main red after the merge | merge queue | route back to green with the conflict list | none |
+| Gate impossible (bad `test_cmd`, missing tooling) | repeated rejections or handovers | escalate: "gate cannot pass: …" | one decision |
+| Store or coordinator unreachable | an hx call fails | hooks fail open, the CLI reports it, and agents keep working | the phone UI cannot load, which is itself the alarm |
+| Double claim | serialised append | the second claim is rejected and it picks other work | none |
+
+---
+
+## 4. Q3: The owner's UI, and how the agent's view differs
+
+### 4.1 The attention budget
+
+The target is **at most one owner interaction per low-risk ticket (often zero), and two for medium or high risk** (design approval and acceptance), plus genuine questions. The harness spends retries, fresh sessions and defaults before it spends the owner.
+
+### 4.2 Surfaces (one responsive web app plus push)
+
+1. **Push**, at most one per 15 minutes outside urgent events. Push only (a) a blocking question with no default, or one whose deadline is under an hour, and (b) a ticket going red (an escalation). Each push deep-links to its card.
+2. **Inbox**, the first screen on the phone. Each card has a ticket, a kind, a summary of 280 characters or less, large option buttons, an optional text field and the default with its deadline. An approval card shows the AC checklist with the reviewer's per-AC verdicts, the diff stat, the test summary and a risk badge, with [Accept] [Changes…] [Open PR]. An escalation card shows why it escalated (the ladder history) with [Retry fresh] [Take over] [Back to design] [Cancel].
+3. **Board**: groups, then tickets. One row per ticket: a health dot, ID, title, a step chip, the holder and its age, and a *why* line ("waiting: owner approval", "stalled: 2 handovers", "queued: deps T-1"). On desktop it becomes a kanban by step.
+4. **Detail**: the gate checklist (live), the last checkpoint, evidence with links, the timeline, and controls: pause, resume, cancel, reassign (revoke), take over, override (with a reason), edit criteria, priority.
+5. **Digest**: a text summary since the last digest (landed, waiting, stalled, cost), for a daily push or for reading on the bus.
+6. **Global kill switch**: pause everything. Hooks then deny all tools except reads and hx calls.
+
+**Health** is green (progressing, or ready with capacity), amber (waiting on the owner, nudged, or no capacity for a long time) or red (escalated or stalled past the ladder). It is grey for queued, done and cancelled.
+
+### 4.3 Phone and desktop
+
+The app and the data are the same. The phone puts the inbox first, then the board as a list, and drills into detail. The desktop shows three panes (inbox, board as kanban, detail with diffs and links). Nothing on the phone requires reading a diff. If a decision does need the diff, the summary says so and links the PR.
+
+### 4.4 Agent view and owner view
+
+| | Agent | Owner |
+|---|---|---|
+| Scope | one ticket, one step | every ticket and group |
+| Form | an imperative brief: "do X; done when [checklist]" | a declarative board: "state; needs you: Z" |
+| Freshness | at session start, after compaction, plus notices | live (polling or SSE) |
+| History | the last checkpoint and pointers to evidence | the full timeline |
+| Controls | `claim / checkpoint / submit / ask / done / release` | answer, approve, pause, cancel, reassign, take over, override, edit |
+| Cannot | approve, override, edit frozen tests, touch other tickets | (nothing is hidden) |
+
+---
+
+## 5. Q4: The smallest version that beats a single agent, and how to prove it
+
+**The minimum (hx-0)** is about 1,000 lines with no server:
+
+1. A ticket: title, ACs and `test_cmd`.
+2. The route `red → green → review → accept`.
+3. Gates: red (it fails on assertions, it loads, the ACs are referenced, it is frozen), green (frozen and passing in a clean checkout, descending from red), and review (by a non-author, on the green SHA).
+4. Hooks: SessionStart brief, Stop guard, PreToolUse frozen-file guard.
+5. A local JSONL log and `hx status`.
+
+**Why it should win.** A single agent's dominant failures on multi-step work each have a matching mechanism:
+
+- **Premature or false "done".** The Stop guard plus the green gate.
+- **Tests that do not test the requirement, or tests edited to pass.** Red first, AC references, freezing and review.
+- **Losing the thread after a reset.** The brief.
+- **Nobody checking.** A fresh-context reviewer.
+
+These are quality gains, so they show up without any parallelism. Parallelism, handover and the owner inbox add throughput and robustness on top.
+
+**Proof.** Run a paired A/B on N ≥ 40 tasks with owner-written **hidden** acceptance tests. Use the same model, the same token and time budget, and three seeds. The primary metric is hidden-test pass rate (McNemar, paired). Secondary metrics are the false-done rate, the regression rate on main, cost per accepted ticket, owner minutes, and the recovery rate under injected crashes. Ablations remove one mechanism at a time. EVAL.md has the protocol and the measurements that could be run in this sandbox.
+
+---
+
+## 6. Loops
+
+| Loop | Period | Driver | What it does |
+|---|---|---|---|
+| Inner (turns) | seconds | Claude Code | model ⇄ tools; hooks add the brief, notices and guards |
+| Step | minutes to hours | session | claim → work → checkpoint* → submit → done or release |
+| Ticket | hours to days | engine | routes by outcome, loops back on changes, enforces loop limits |
+| Clock | 60 s | `hx tick` | expire, nudge, revoke, escalate, deadlines, open deps, land queue, dispatch, notify |
+| Owner | minutes to hours | phone | push or digest → decision → engine |
+| Improvement | per group or week | retro | metrics plus retros → proposed process changes → the owner approves a new process version |
+
+---
+
+## 7. Security and control
+
+* Owner-only events (answer, override, pause, cancel, edit) need the owner actor. In server mode that means an owner token, while agents get per-session tokens bound to their lease.
+* Agents cannot write frozen files, approve, or touch other tickets' leases. Hooks deny these and the engine rejects them.
+* There are no secrets in the log. Evidence is pointers and reports.
+* The kill switch is one event, `system.pause`. Hooks consult it on every tool call.
+
+---
+
+## 8. Rejected trade-offs
+
+1. **The harness owns the agent loop (Agent SDK), and Claude Code is not used.** It would give total control of the context, but it rebuilds tools, permissions, compaction and the sandbox product. Hooks give about 90% of the control at about 5% of the cost. The engine is kept runtime-agnostic so this stays possible.
+2. **MCP as the only integration.** MCP cannot inject the brief at start or after compaction, cannot block a stop, and cannot deny a file edit. It is kept as an optional wrapper.
+3. **GitHub issues, labels and comments as the source of truth.** There are no atomic transitions, the schema drifts, comments are noisy, there are rate limits, and Actions cron latency is high. Worst, agents and the owner often share one GitHub identity, so "owner approved" cannot be authenticated. Comments remain usable as a *transport* through validate-on-fold, and GitHub remains the code, CI and notification plane.
+4. **A state file on main, changed through PRs.** Every transition would cost a PR and a CI run, and all writers would conflict on one file.
+5. **One long-lived agent per ticket across all steps.** Context rot, no independent review, and the cost of a crash grows with time. Fresh sessions plus the brief are cheaper.
+6. **Agent self-reports as evidence.** Rejected outright. Evidence must be reproducible from a commit by someone else.
+7. **Heartbeat-only stall detection.** "Alive" is not "progressing". Activity and progress are tracked separately.
+8. **Human approval at every step.** It burns the attention budget. Approvals are driven by a risk policy, with auto-accept for low risk plus a review plus CI.
+9. **File locks between parallel agents.** They are too coarse and deadlock-prone. Scope scheduling, a serial merge queue and a rebase route are used instead.
+10. **A general workflow engine (Temporal, Airflow, Step Functions).** Heavy to operate, not git-native, and a one-person team cannot run it. The needed semantics (log, fold, leases, clock) fit in a small library.
+11. **Long-term or vector memory for agents.** Checkpoints, evidence, git and retros are enough, and retros change *processes*, not hidden memories.
+12. **A push for every event.** It causes notification fatigue, after which the owner ignores everything. Inbox, digest and urgent-only push instead.
+13. **Rebase-based branch hygiene.** It breaks the red → green ancestry chain. The rule is merge-from-main.
+14. **Implicit lease expiry computed from `now` inside the fold.** That would make replay depend on the clock. Expiry is an explicit, conditional event.
+
+---
+
+## 9. Open questions and known limitations
+
+* Weak tests that still reference every AC id get past the mechanical checks. The defence is the reviewer plus optional owner-held hidden tests for high-risk tickets. Mutation testing would be a stronger gate, at a cost.
+* Frozen tests that main legitimately changes while a ticket is in flight need an owner unfreeze. That is rare, but it is friction.
+* Scope declarations can be wrong. The merge queue catches the consequences late but safely.
+* Local mode trusts the CLI as verifier, which is fine for honest-but-fallible agents. Adversarial agents need CI as the verifier (Tier 1).
+* Proactive handover thresholds (transcript bytes as a proxy for tokens) are heuristics to tune from data.
