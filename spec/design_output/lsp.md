@@ -504,14 +504,14 @@ leaves the hover and the buttons answering.
 
 # A take marks the fields
 
-`marksOf` in `src/modules/lsp/marks.go` reads a ticket's drawing and the
+`marksIn` in `src/modules/lsp/marks.go` reads a ticket's drawing and the
 person's holds, and marks each field the held leaf still wants:
 
 | the server answers | with |
 |---|---|
 | the publish of a held ticket | a hint at each unfilled field's line, code `HeldField` |
 | a hover on a marked line | the leaf's work, the field's name, form and ask, and its items |
-| a hover on any other line | the term hover, as before |
+| a hover on any other line | the term hover |
 | a commit adding a person's hold | `window/showDocument` at the first mark of the new take |
 
 The drawing comes off `tickets/drawn/<path>` through the `Tickets` port, as
