@@ -320,7 +320,9 @@ func TestTheProbeMintsItsGroupUnderTheClonesRoot(t *testing.T) {
 		return filepath.Base(one[0]) == "RUNME.sh" && len(one) > 1 && one[1] == "mint"
 	})
 	// The stale group branch a former run pushes leaves the origin before the mint. [[spec/tickets/probe-drops-its-stale-group]]
-	dropped := slices.IndexFunc(runner.ran, func(one []string) bool { return strings.Join(one, " ") == "git push -q origin --delete work/dry-probe-clears" })
+	dropped := slices.IndexFunc(runner.ran, func(one []string) bool {
+		return strings.Join(one, " ") == "git push -q origin --delete work/dry-probe-clears"
+	})
 	if minted < 0 || dropped < 0 || dropped > minted {
 		t.Fatalf("the drop runs at %d and the mint at %d: %v", dropped, minted, ranWords(runner))
 	}
