@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b0a22705166b · claude-code-remote · helper-10
+    hash_before: 50269f2c5f099dab493fce1b0007e090810d717c
+    hash_after: 50269f2c5f099dab493fce1b0007e090810d717c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/registry passes
+      - name: check
+        exit: 0
+        said: "   77.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2346f5d72dd69bc6
+        size: 423
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/registry
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The registry tab read the selected name off the old index in the new rows, so a name arriving above the cursor moved it. The fetched case of `Update` in `src/tui/registry/tab.go` now reads the held name before it replaces the rows, and points the selection at that name in them. A refused fetch keeps the rows and the cursor as they stand.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/tui/registry/tab.go and its test alone
+- the case reads the registry through the Fake
+- the comment on take points at this ticket
+- the held name stands read once, in take
 
 # accept
 
