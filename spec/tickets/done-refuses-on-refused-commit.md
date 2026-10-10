@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 1b50ed7ae094e8227942beac8a9b90488c40fd84
+    hash_after: 1b50ed7ae094e8227942beac8a9b90488c40fd84
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  100.1  in all"
+    inputs:
+      - name: ask
+        hash: ef7e2dcac975213d
+        size: 568
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/done_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`branch done`, `branch release`, `branch open` and `branch close` dropped the error of their commit. They then pushed an unchanged branch, and done opened an auto-merge pull request for a group still open. `commitsOrStops` in `src/branches/merge.go` now runs each of those commits. On a refusal it takes each file the verb wrote back to HEAD's text, raises `branch-commit-refused` with git's words, and the verb answers red before any push. It restores only the files the verb wrote, because `done` reads no dirty tree and a hard reset would drop the owner's edits. `close` over every merged branch answers red where one commit came back refused.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the four verbs stop at a refused commit and name git's refusal
+- the change carries its cleanup: close over every merged branch reads a refusal too
+- the fact stands once: `commitsOrStops` alone runs the four commits, and `spec/failures/branch-commit-refused.md` names the remedy
 
 # Discussion
 
