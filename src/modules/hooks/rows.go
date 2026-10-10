@@ -10,12 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	logmodule "quackitect/src/modules/log"
 )
 
-// src/modules/check/folders.go owns the session log's folder, and the package spells it again. [[spec/tickets/prompt-answers-off-the-door]]
-const sessionLog = logmodule.SessionPath
+// SessionPath in src/modules/log owns the session log's path, and a module imports no module, so the package spells it again. [[spec/tickets/failed-evidence-keeps-its-output]]
+const sessionLog = ".se/.log/session.jsonl"
 
 // The level and kinds a prompt's row carries, the stamp toISOString writes, and the flags an append opens the log with. [[spec/tickets/prompt-answers-off-the-door]]
 const (
