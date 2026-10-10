@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: d6c7321fe6b7c103
         size: 1376
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-7
+    hash_before: 2c3c36b6ce49ce909b2de0ad7cafe375ef21d99b
+    hash_after: 2c3c36b6ce49ce909b2de0ad7cafe375ef21d99b
+    inputs:
+      - name: design/draft
+        hash: d6c7321fe6b7c103
+        size: 1376
+      - name: design/tests-red
+        hash: 75c3daf71d1621ba
+        size: 657
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,10 @@ Both cases fail on their own assertions. The seed answers the refusal of the one
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- watch-adds-skip-bad-folders: The ask says the files watch still starts past a folder that refuses a read, and the approach changes the seed's walk alone. watch.adds in src/modules/files/watch.go returns every WalkDir error and every eyes.Add error, so Changes fails, Seeds returns that error after the seed commits, and a folder the seed walks past still stops the watch. Route the errors under the root in watch.adds through walkPast, let an Add refused under the root cost that folder alone, name Changes and hears as callers, and add a red case over the adder seam where a folder refuses its Add and the watch still starts.
 
 # implement
 
