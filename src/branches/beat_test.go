@@ -44,6 +44,19 @@ func TestAnEndedHoldMovesUnderTakeOverAtOnce(t *testing.T) {
 	holds(t, one.pcSubjects("origin/"+workBranch+pcGroup), "over from "+pcOther)
 }
 
+// A take over a standing hold marks its record entry over, so a second stall of the hold reads a person's. [[spec/design_output/work#a-live-hold-stalls]]
+func TestATakeOverAStandingHoldWritesOver(t *testing.T) {
+	t.Parallel()
+	one := pcTakingHeld(t, 0, 0)
+	one.beatOn(pcGroup, pcOther, "ends", testNow)
+	if code := one.branchSays("take", "--over", pcGroup); code != codeOK {
+		t.Fatalf("the take --over answers %d: %s", code, one.pcSaid())
+	}
+	if text := one.pcTicket(pcGroup); !strings.Contains(text, "over: true") {
+		t.Fatalf("the take over writes no over mark:\n%s", text)
+	}
+}
+
 // A take, with --over or without, refuses a hold whose box still beats, though its tip stands past the stale span. [[spec/tickets/holds-beat-with-the-session]]
 func TestTakeOverRefusesAHoldThatStillBeats(t *testing.T) {
 	t.Parallel()

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -200,6 +200,22 @@ record:
         hash: e62a4e6394147d46
         size: 962
     def: 05d09c51410ea2a3
+  - step: design/tests-red-2
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: fa373a55832fcf68718f742babf7529ea9de3769
+    hash_after: fa373a55832fcf68718f742babf7529ea9de3769
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft-2
+        hash: 1221b0c21ada3829
+        size: 2885
+      - name: [[spec/design_output/work]]
+        hash: 2905f4996b0af7be
+        size: 45994
+    def: 9c7cd4dd4a2dadb8
 group: red-freezes-and-stalls-show
 ---
 
@@ -429,26 +445,34 @@ For details, see [[spec/design_output/work#a-live-hold-stalls]]. The owner's mes
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/beat_test.go src/branches/dispatch_test.go src/modules/hooks/githooks_test.go src/modules/settings/settings_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go
+- src/branches/dispatch_test.go
+- src/modules/hooks/githooks_test.go
+- src/modules/settings/settings_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The work settings carry no progress-after, a take over writes no over mark, and the pre-push door names the old hand on a stalled hold. The pre-push case now holds a second row: a hold a take over already moved stays with its hand, which the design keeps for a person.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case, and the config line meets the work settings case
+- the cases reach git, the clock and the config through the fake repo, the injected clock and the config fake
 
 # gate
 
