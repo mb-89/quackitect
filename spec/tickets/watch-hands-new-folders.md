@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: e1c69bd0cf28165a6c9a726eafcac2fb2061451e
+    hash_after: e1c69bd0cf28165a6c9a726eafcac2fb2061451e
+    inputs:
+      - name: ask
+        hash: 06a035779e5c678b
+        size: 646
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -157,38 +166,51 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The real watch keeps one record of every file it meets, beside the known map. adds walks a folder by entered, the rule Standing walks by, so a named folder under the private one joins the watch when it appears, and its own named folder below it joins too. The start loop adding the named folders by hand then goes, since adds covers them. adds records every heard file it meets, and where it walks a folder that appears after the start, it hands each file's text as hears does. That covers a folder made with files already in it, and a folder moved in from outside. A remove or a rename hands gone for the path and for every recorded file under it, so a folder moved out leaves no ghost. adds and hears take an interface holding Add, which the watcher satisfies, so a case records what joins the watch. The record and the known map stand behind one lock, since the start's walk and the watcher's loop both reach them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go watch.Changes, through adds and hears
+- src/modules/files/watch.go Start and Seeds, through Changes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch_folders_test.go, the case where a folder holding a file moves in and the file is handed
+- src/modules/files/watch_folders_test.go, the case where a folder holding a file moves out and the file is handed gone
+- src/modules/files/watch_folders_test.go, the case where .se/.log appears after the start, joins the watch, and its file is handed
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go
+- src/modules/files/watch_folders_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: Changes, adds, hears, heard, entered and Standing stand as the approach reads them
+- callers: Changes is the one caller of adds and hears, and Start and Seeds reach Changes
+- done_when: the three cases decide the three lines
+- config: the approach adds no key
 
 ## tests-red
 
