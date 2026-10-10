@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: implement/tests-green
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -182,6 +182,12 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: "[[spec/design_output/work]], [[spec/design_output/pull]]"
+  - step: gate
+    hand: the engine
+    stale: "[[spec/design_output/work]], [[spec/design_output/pull]]"
 ---
 
 # Ask
