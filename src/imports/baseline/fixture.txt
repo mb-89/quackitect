@@ -33,12 +33,6 @@ src/modules/tickets/module_test.go TestATicketRowCarriesTheProgressOfItsRoute
 src/modules/tickets/module_test.go TestAllAnswersEveryTicketWithItsFields
 src/modules/tickets/module_test.go TestAllStandsUnderItsLocalPort
 src/modules/tickets/queue_test.go TestTheCloudPortNamesAMarkedGroup
-src/modules/waits/waits_test.go TestAWaitReturnsAtItsCap
-src/modules/waits/waits_test.go TestAWaitReturnsOnTheFirstSignal
-src/modules/waits/waits_test.go TestAWaitWithNoSignalSaysWhatItTakes
-src/modules/waits/waits_test.go TestAnOutputEndsWithItsProcess
-src/modules/waits/waits_test.go TestAnOutputStandsQuiet
-src/modules/waits/waits_test.go TestQuietCountsFromTheLastChange
 src/modules/work/branches_test.go TestABranchDrawsTheChildrenOnItsTip
 src/modules/work/branches_test.go TestABranchWithNoGroupCopyDrawsNoStep
 src/modules/work/branches_test.go TestAPlacedBranchWithNoTicketDrawsNoTodoRow

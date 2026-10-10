@@ -79,6 +79,9 @@ func (from Outside) waits(in Wait) string {
 			}
 		}
 		if now.Sub(start) >= from.Most {
+			if missing := from.missingOf(pathsOf(in)); len(missing) > 0 {
+				return fmt.Sprintf("The wait reaches its cap of %s, and %s stands nowhere.", seconds(from.Most), strings.Join(missing, ", "))
+			}
 			return fmt.Sprintf("The wait reaches its cap of %s, and no signal comes.", seconds(from.Most))
 		}
 		from.Pause(step)
@@ -137,25 +140,50 @@ func (from Outside) filesOf(paths []string) signal {
 	}
 }
 
-// The paths stand quiet once their size and stamp hold for the span, counted from the last change seen. [[spec/design_output/level0#the-wait-returns-on-signals]]
+// The paths stand quiet once every one stands and their size and stamp hold for the span, counted from the last change seen. A path nobody wrote yet holds the clock. [[spec/tickets/a-missing-path-stays-unquiet]]
 func (from Outside) quietOf(paths []string) func(now time.Time) bool {
 	seen, since := from.stateOf(paths), from.Now()
 	return func(now time.Time) bool {
 		if state := from.stateOf(paths); state != seen {
 			seen, since = state, now
 		}
-		return now.Sub(since) >= from.Quiet
+		return len(from.missingOf(paths)) == 0 && now.Sub(since) >= from.Quiet
 	}
+}
+
+// The output and the files a wait reads. [[spec/tickets/a-missing-path-stays-unquiet]]
+func pathsOf(in Wait) []string {
+	var out []string
+	for _, one := range append([]string{in.Output}, in.Files...) {
+		if one = strings.TrimSpace(one); one != "" {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
+// The paths standing nowhere on the disk. [[spec/tickets/a-missing-path-stays-unquiet]]
+func (from Outside) missingOf(paths []string) []string {
+	var out []string
+	for _, path := range paths {
+		if _, err := os.Stat(from.at(path)); err != nil {
+			out = append(out, path)
+		}
+	}
+	return out
+}
+
+func (from Outside) at(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+	return filepath.Join(from.Root, filepath.FromSlash(path))
 }
 
 func (from Outside) stateOf(paths []string) string {
 	states := make([]string, 0, len(paths))
 	for _, path := range paths {
-		at := path
-		if !filepath.IsAbs(at) {
-			at = filepath.Join(from.Root, filepath.FromSlash(path))
-		}
-		info, err := os.Stat(at)
+		info, err := os.Stat(from.at(path))
 		if err != nil {
 			states = append(states, "none")
 			continue
