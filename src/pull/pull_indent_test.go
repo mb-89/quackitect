@@ -1,4 +1,4 @@
-// A hand-back writes a command field indented four spaces, whatever indent
+// A hand-back writes a command field in the indented form, whatever indent
 // the hand passes, so the commit hook reads the tests a ticket carries.
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
 package pull // level0: InPackageTest - reaches the in-package helpers cloudPull and must
