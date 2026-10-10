@@ -186,3 +186,24 @@ func TestANameReadsAsAWordAlone(t *testing.T) {
 		}
 	}
 }
+
+// A `//` inside a string leaves the code after it, so a block opening past a URL counts its function whole and a door past a URL reads as one. [[spec/design_output/level0#the-size-ceiling]]
+func TestCodeCutKeepsCodeAfterASlashedString(t *testing.T) {
+	lines := []string{
+		"func a(u string) bool {",
+		`	if strings.HasPrefix(u, "https://x") {`,
+		"		return true",
+		"	}",
+		"	u = u + u",
+		"	u = u + u",
+		"	return false",
+		"}",
+	}
+	if got := functionsIn(lines); len(got) != 1 || got[0].lines != len(lines) {
+		t.Fatalf("functionsIn answers %+v, and wants one function of %d lines", got, len(lines))
+	}
+	tree := TreeOver("", Texts{"src/x/x.go": "package x\n\nvar door = fetch(\"http://x\", q.IO())\n"})
+	if !isDoor(tree, "src/x/x.go") {
+		t.Fatal("a q.IO() standing after a URL reads as no door, and wants one")
+	}
+}
