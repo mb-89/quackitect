@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -187,6 +187,15 @@ record:
         hash: c6a62e22f17c2c6a
         size: 24410
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 0892a5bcadc2a48f0989cb4bee0ff99f2cf344be
+    hash_after: 537717a621134f197cb157aa5526f9aabd409f0f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -356,14 +365,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/lsp/marks.go src/modules/lsp/lsp.go src/quack/lsp.go src/quack/lsp_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches marks.go, lsp.go and quack/lsp.go from the size, and quack/lsp_test.go for the case the commit door asks beside the wiring
+- the drawing and the holds reach the server through the ticket port, and the fake in lenses_test.go answers both
+- the header of marks.go points at the design section `a-take-marks-the-fields`
+- the drawing name copies `DrawnPort`, and a quack case holds the copy to it
 
 ## tests-green
 
