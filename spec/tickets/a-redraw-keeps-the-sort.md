@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 046be481cb6f7c4f
         size: 775
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-5
+    hash_before: 3e09817e63492fe06ad78187f98ac77a62a2651e
+    hash_after: 3e09817e63492fe06ad78187f98ac77a62a2651e
+    inputs:
+      - name: design/draft
+        hash: 046be481cb6f7c4f
+        size: 775
+      - name: design/tests-red
+        hash: 4df74579efe31fb1
+        size: 392
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,9 @@ TestARedrawKeepsTheSortAPersonSet fails on its assertion: a sort set by name rea
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
