@@ -31,6 +31,26 @@ func TestEachOpReadsTheFileTheOpsBeforeItLeave(t *testing.T) {
 	}
 }
 
+// A replacement reads as JavaScript reads it: a group by its number or its name, the whole match, and a dollar standing alone. [[spec/tickets/regex-replacements-read-js-groups]]
+func TestAReplacementReadsAsJavaScriptReadsIt(t *testing.T) {
+	for _, one := range []struct{ pattern, replacement, want string }{
+		{`(\d+)px`, "$1rem", "a 12rem b"},
+		{`(\d+)px`, "[$&]", "a [12px] b"},
+		{`(\d+)px`, "$$1", "a $1 b"},
+		{`(\d+)px`, "$9 $x", "a $9 $x b"},
+		{`(?P<n>\d+)px`, "$<n>em", "a 12em b"},
+	} {
+		took := Applied(map[string]Held{"a.txt": {Exists: true, Text: "a 12px b"}}, []Op{{File: "a.txt", Op: "regex", Pattern: one.pattern, Replacement: one.replacement}})
+		if took.Why != "" || took.Files[0].Made != one.want {
+			t.Errorf("%s over a 12px b reads %+v, and wants %q", one.replacement, took, one.want)
+		}
+	}
+	refused := Applied(map[string]Held{"a.txt": {Exists: true, Text: "a 12px b"}}, []Op{{File: "a.txt", Op: "regex", Pattern: "px", Replacement: "$`"}})
+	if !strings.Contains(refused.Why, "the text before the match") {
+		t.Errorf("a replacement naming the text before the match answers %q", refused.Why)
+	}
+}
+
 // [[spec/tickets/edit-regex-names-its-limit]]
 func TestAPatternNamesTheConstructGoLacks(t *testing.T) {
 	for pattern, name := range map[string]string{`a(?=b)`: "a lookaround", `(?<!a)b`: "a lookaround", `(a)\1`: "a backreference", `(?<x>a)\k<x>`: "a backreference"} {

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 05102c0dd70b91fe
         size: 600
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 20cc7fdbf37e6727d0c1a5ed6a787ae804ef2283
+    hash_after: 20cc7fdbf37e6727d0c1a5ed6a787ae804ef2283
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/edits fails
+    inputs:
+      - name: design/draft
+        hash: f4fad5fd663b1692
+        size: 1463
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -216,26 +229,31 @@ byPattern expands each match through a pure jsTemplate(replacement, shape). It r
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/edits/apply_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion, and reproduces the finding: the replacement $1rem over a 12px b gives a and b with the number gone, and no error. The whole-match form lands as a literal, a named group lands as a literal, and a dollar naming no group deletes itself and the word after it. A double dollar already reads as one dollar, since Go and JavaScript agree there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the case holds both lines, and each row fails on its own assertion today but the double dollar
+- doors: the case runs Applied over text held in memory, and reaches no door
 
 # gate
 
