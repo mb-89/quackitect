@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft-3
 steps:
   - name: design
     steps:
@@ -270,6 +270,11 @@ record:
     hash_after: 1f78a76639cc01538c81561f2b6ac79b489d6bda
     returns: 2
     why: "no red test decides the config line: the beat and dispatch cases set work.progressAfter through the config fake, and the pre-push case reads a fake schema, so nothing fails while spec/config/level0.schema.json and settings.go carry no work.progressAfter default; add a case reading the real schema default through ./RUNME.sh config or config.Default; the person-on-the-next-stall line rests on over: true, which the dispatch case writes into the fixture by hand; no red case shows claimGroup in take.go writing over: true on a take over a standing hold, so the chain the ask names stays undecided; the draft tests list names src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale, which stands nowhere; the red case is src/modules/hooks/githooks_test.go TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan, so the list and the red list disagree; the hook done_when line meets TestTheBeatAsksAStalledBoxForAHandoverOnce in src/branches/beat_test.go, through the Stop hook's branch beat in .claude/settings.json; the draft names no done_when line beside its test, so write that mapping into tests"
+  - step: design/person-1
+    hand: box b9ccbd72b78d · claude-code-remote · answerer
+    hash_before: a192cfd7c52bf678789510ed09f41da3b2ba7591
+    hash_after: 57d326dc0f3f092011c3403cb4fc0f5165a695c5
+    def: 1e1981e5bafc27a0
 group: red-freezes-and-stalls-show
 ---
 
@@ -535,8 +540,9 @@ Each case fails on its own assertion. The work settings carry no progress-after,
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The second reject repeats the first word for word, and `tests-red-2` answers each of its findings. The settings case decides the config line, and a take over writes `over: true` in its own case. The tests list names no phantom case, and each row names its done_when line. The second reviewer accepted, and its hand-back read the gate chapter the first round left. So the draft stands as `draft-2` wrote it, and the next round asks a fresh gate.
 
 ## draft-3
 
