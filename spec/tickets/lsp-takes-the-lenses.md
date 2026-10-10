@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box c729ff43c0cb · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/lsp-takes-the-lenses already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: c752a071caf6013ba8cfdf5a216b7ace56fa3bd9
+    hash_after: c752a071caf6013ba8cfdf5a216b7ace56fa3bd9
+    inputs:
+      - name: ask
+        hash: 63a403de5b0c670a
+        size: 315
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -123,14 +132,24 @@ goal: `se-index lsp` draws the buttons over a ticket and runs their press. It ma
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/lsp-draws-the-ticket-lenses]], standard
+- [[spec/tickets/lsp-marks-the-held-fields]], standard
+- [[spec/tickets/the-client-drops-fields-js]], trivial
+- [[spec/tickets/the-marks-note-names-marksin]], trivial
+- [[spec/tickets/extension-keeps-the-editor-parts]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child closed through its own review, and the group's diff reads as one review of the server, the client and their notes
+- the server's buttons, its marks and hover, and the extension's shrink cover the goal, and every child stands closed
+- extension-keeps-the-editor-parts names both server children under depends_on
+- the server children landed first, and the extension child read their command and HeldField code
+- the diff stays one move, the buttons and marks from the extension into the server, so it takes no subgroup
 
 # children
 
