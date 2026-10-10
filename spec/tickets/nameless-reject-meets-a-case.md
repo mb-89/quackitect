@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 parent: gate-findings-reach-the-queue
+record:
+  - step: do
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 35c17c0000a19612cc35df5741a6e33e68abd1c4
+    hash_after: 35c17c0000a19612cc35df5741a6e33e68abd1c4
+reason: became
+successors: [gate-findings-reach-the-queue]
 ---
 
 # Ask
