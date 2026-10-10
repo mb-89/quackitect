@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 7cfe6ceb9a7dcf57
         size: 1446
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1ad094d8843c · claude-code-remote · helper-4
+    hash_before: 53b50e9854130cab3b3583efda452a1001f12ac9
+    hash_after: 53b50e9854130cab3b3583efda452a1001f12ac9
+    inputs:
+      - name: design/draft
+        hash: 7cfe6ceb9a7dcf57
+        size: 1446
+      - name: design/tests-red
+        hash: f0e8a649612f1266
+        size: 574
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -267,8 +279,10 @@ Three cases fail on their own assertion: the action declares no write, a text re
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- misshapen-plan-values-refuse: planOf drops the json.Unmarshal errors on the working, todos and places values, so a file such as {"todos":{}} still reads as zero todos and the next call writes over them; refuse that file the way the draft refuses one reading as no JSON object
 
 # implement
 
