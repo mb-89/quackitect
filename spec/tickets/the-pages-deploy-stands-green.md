@@ -83,7 +83,17 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
+record:
+  - step: sync
+    hand: box 1c02af353dfc · claude-code-remote
+    hash_before: 5408edc826603d596d1ec37e09a96fdddb918094
+    hash_after: 5408edc826603d596d1ec37e09a96fdddb918094
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-pages-deploy-stands-green already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -97,8 +107,9 @@ The pages build and deployment run on main passes, since the folder its source n
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
