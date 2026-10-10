@@ -52,7 +52,6 @@ func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
-	out = append(out, anchorSweep(one.tree)...)
 	out = append(out, restatedFaults(one.tree, one.pointer, one.rule)...)
 	return sorted(pastHistory(one.tree, out))
 }

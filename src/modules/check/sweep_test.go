@@ -167,3 +167,21 @@ func TestTheSweepLeavesTheBoxRulesOut(t *testing.T) {
 		}
 	}
 }
+
+// A pointer at a heading the note lacks draws one row, and a fenced pointer and a Go string draw none. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
+func TestADeadHeadingDrawsOneRow(t *testing.T) {
+	files := map[string]string{
+		"spec/b.md": "# B\n\n## Real\n",
+		"spec/a.md": "# A\n\nSee [[spec/b#nope]].\n\n```\n[[spec/b#also-nope]]\n```\n",
+		"src/x/x.go": "package x\n\nvar s = \"[[spec/b#fixture]]\"\n",
+	}
+	rows := map[string]int{}
+	for _, one := range sweepOver(t, files, nil) {
+		if one.Rule == "EveryPointerResolves" {
+			rows[one.File+":"+itoa(one.Line)]++
+		}
+	}
+	if rows["spec/a.md:3"] != 1 || len(rows) != 1 {
+		t.Fatalf("the sweep draws %v, and wants one row on spec/a.md:3 alone", rows)
+	}
+}

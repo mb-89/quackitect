@@ -256,7 +256,7 @@ func TestTheSweepVerbPrintsTheSettledSweep(t *testing.T) {
 	t.Parallel()
 	var asked []string
 	var out strings.Builder
-	rows := []any{map[string]any{"file": "spec/a.md", "rule": "DeadAnchor", "line": 1}}
+	rows := []any{map[string]any{"file": "spec/a.md", "rule": "EveryPointerResolves", "line": 1}}
 	err := sweeps(&out, func(argv ...string) (any, error) {
 		asked = argv
 		return rows, nil
@@ -267,7 +267,7 @@ func TestTheSweepVerbPrintsTheSettledSweep(t *testing.T) {
 	if strings.Join(asked, " ") != "value check/sweep" {
 		t.Fatalf("the verb asks %v, and wants the settled value of check/sweep", asked)
 	}
-	if out.String() != `[{"file":"spec/a.md","line":1,"rule":"DeadAnchor"}]`+"\n" {
+	if out.String() != `[{"file":"spec/a.md","line":1,"rule":"EveryPointerResolves"}]`+"\n" {
 		t.Fatalf("the verb prints %q", out.String())
 	}
 }
