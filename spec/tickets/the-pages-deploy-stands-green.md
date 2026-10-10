@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 1c02af353dfc · claude-code-remote
@@ -132,6 +132,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 1c02af353dfc · claude-code-remote
+    hash_before: 616bd46e01c76d6d588b6b2935917bade3e7e440
+    hash_after: 616bd46e01c76d6d588b6b2935917bade3e7e440
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -207,38 +219,58 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- pages-finds-its-docs-folder: docs/index.md gives the pages build the folder its source names
+- the group walked sync, split, children and accept on a branch cut off main by hand
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the failed run log named its source folder, so one read found the cause
+- a run of github-pages 232 over main reproduced the run log error word for word, so the local build proves the same thing the runner checks
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- about 23:00 UTC the Bash door refused every call naming no ticket, so the diagnosis ran through the GitHub tools until the mint
+- about 23:05 UTC the mint refused a path without .md, then a group with no child
+- about 23:10 UTC branch take found the hand-cut branch at no free todo, since no marker stands on main
+- about 23:12 UTC the local build met a proxy refusal on the Pages API and a US-ASCII locale
+- about 23:16 UTC the commit refused a trailer naming the model
+- about 23:20 UTC the pull refused the tests field three times, since a change touching no code has no command answering green
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- a cloud order minting a group names the mint order, child first, in `spec/processes/group.yaml`
+- the take reads a hand-cut branch carrying an open group ticket, in `src/branches`
+- the trivial route names the green check form for a change touching no code, in `spec/processes/trivial.yaml`
+- the local pages build sets url, baseurl and a UTF-8 locale, as the child ticket says in `spec/tickets/pages-finds-its-docs-folder.md`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The order dated the failure from early October, and the runs show it red since July, right after the last green run. The setting and the tree parted then. A page in the tree greens the run without a person, and the owner keeps the choice to unpublish.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in its ticket, and the retro points at the tickets
+- the change adds no number
+- the change writes no file header
+- the badly list carries the run errors with their times, and the order is the one owner prompt
+- the chapter names roles alone, and no box name or path
 
 ## cloud
 
