@@ -405,3 +405,18 @@ func TestRenameVerb(t *testing.T) {
 		}
 	})
 }
+
+// A text rename whose name also stands as a path rewrites the text and leaves the file in place, with no journal entry. [[spec/design_output/index#a-rename-reaches-a-name]]
+func TestRenameTextLeavesAnExistingPathInPlace(t *testing.T) {
+	t.Parallel()
+	d := renamesOver(t, map[string]string{"spec/a.md": "# A\n", "spec/b.md": "spec/a.md\n"})
+	if code, out, errs := runsTwin(renameVerb(d), "rename", "spec/a.md", "spec/c.md", "--text"); code != 0 {
+		t.Fatalf("rename answers %d, %q, %q", code, out, errs)
+	}
+	if said, ok := textAt(d, "spec/a.md"); !ok || said != "# A\n" {
+		t.Fatalf("spec/a.md reads %q (%v), and wants it in place", said, ok)
+	}
+	if said, _ := textAt(d, "spec/b.md"); said != "spec/c.md\n" || len(renameEntries(t, d)) != 0 {
+		t.Fatalf("spec/b.md reads %q beside %d journal entries, and wants the text rewritten and none", said, len(renameEntries(t, d)))
+	}
+}
