@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: cb58743a72ffa477
         size: 1045
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a040a9c44bc4 · claude-code-remote
+    hash_before: a5f3264d82c064a49a217b1f2fe88b38fef15b53
+    hash_after: a5f3264d82c064a49a217b1f2fe88b38fef15b53
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft
+        hash: 2216d27f4e7eebfc
+        size: 2351
+      - name: [[spec/design_output/lsp]]
+        hash: 7b9463b115145ef1
+        size: 23526
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -252,26 +268,35 @@ The server draws the buttons over a ticket and runs their press. The extension's
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/lenses_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/lenses_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion against the stubs in `lenses.go`, and every standing case passes.
+
+The surprise: the draft's hand-back committed every file the write door wrote for this ticket, the whole rules among them. So the rules stand back as stubs for this run, and come back at the change.
+
+The replay recording held the old capabilities, so it went red with the new initialize. The recording now carries them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a case in `lenses_test.go`, and the check line meets `./RUNME.sh check`
+- the tests reach the ticket port through a fake holding the holds, the cloud tickets, the calls and the writes
 
 # gate
 
