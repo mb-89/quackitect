@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -191,6 +191,15 @@ record:
     hash_after: e40961606d6ce8ce5114dd492862e5091edfd661
     returns: 1
     why: the done_when line 'a pull test passes both where a reopen entry names the moved file' meets a case for tests-green alone (TestAReopenLetsTheGreenPassThrough); no case passes the final accept over a moved file a reopen names, so that half of the line stands undecided; TestAGateShowsTheReopenedRedFiles reads the reopen in the green pass's output, which reaches workAnswer through handed in pull_hand.go; no case reads it from a bare pull at accept, the path through handBack in pull_back.go a fresh reviewer takes, so an implementation printing the reopen in handed alone passes; the draft tests list names TestAnUnmovedRedFileLetsTheGreenPassThrough, which src/pull/pull_frozen_test.go does not hold
+  - step: design/draft-2
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: 4b068f9e346d3e6a16420344ea64ad9cf9acffd1
+    hash_after: 4b068f9e346d3e6a16420344ea64ad9cf9acffd1
+    inputs:
+      - name: ask
+        hash: 271bbec27388e167
+        size: 1143
+    def: 05d09c51410ea2a3
 group: red-freezes-and-stalls-show
 ---
 
@@ -334,38 +343,66 @@ Each case fails on its own assertion: the red pass writes no frozen hash, a move
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/pull#red-tests-freeze]]. The pass of a red leaf writes `frozen` hashes of its red list. The hand-back at a green leaf or a final gate meets a moved file refused where no `reopen` row names it. The flag `--reopen "<path>: <why>"` rides the hand-back onto the pass entry, and every gate's hand-out lists the reopened files.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_back.go` `handBack` calls `passed` and gains the frozen check
+- `src/pull/pull_writes.go` `minted` calls `passed`
+- `src/pull/pull.go` `Pull` calls `handBack`
+- `src/pull/pull_back.go` `handBack` calls `workAnswer` on a bare pull
+- `src/pull/pull_hand.go` `handed` calls `workAnswer`
+- `src/pull/pull.go` `positionalOf` reads `takes`, which gains `--reopen`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- hash line: `src/pull/pull_frozen_test.go` `TestARedPassFreezesItsRedFiles`
+- green refusal line: `src/pull/pull_frozen_test.go` `TestAMovedRedFileRefusesTheGreenPass`
+- accept refusal line: `src/pull/pull_frozen_test.go` `TestTheFinalAcceptRefusesAMovedRedFile`
+- reopen line, green half: `src/pull/pull_frozen_test.go` `TestAReopenLetsTheGreenPassThrough`
+- reopen line, accept half: `src/pull/pull_frozen_test.go` `TestAReopenLetsTheFinalAcceptThrough`
+- reviewer line: `src/pull/pull_frozen_test.go` `TestAGateShowsTheReopenedRedFiles`, read off a bare pull at accept
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the accept half of the reopen line: `TestAReopenLetsTheFinalAcceptThrough` passes the accept over a moved file a reopen names
+- the reviewer's read: `TestAGateShowsTheReopenedRedFiles` reads a bare pull at accept, the road `handBack` prints
+- the unmoved case leaves the list, since the reopen cases pass the green leaf already
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/pull/pull_frozen.go
+- src/pull/pull_frozen_test.go
+- src/pull/pull_writes.go
+- src/pull/pull_back.go
+- src/pull/pull.go
+- src/pull/pull_chapter.go
+- spec/schemas/ticket.schema.yaml
+- spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files the approach names stand opened, and each claim checked there
+- the callers list names the callers of `passed`, `handBack`, `workAnswer` and `positionalOf`
+- each done_when line names its case in the tests list
+- the change adds no config key
 
 ## tests-red-2
 
