@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 2f4764dfb2883de5ef0e569450b9db76dbb7b23c
+    hash_after: 2f4764dfb2883de5ef0e569450b9db76dbb7b23c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   99.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4f761e24fb6097dd
+        size: 495
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/pull/pull_gate_group_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A reject at a group's accept now mints an open child a finding row, in the group, and sends the group back to its children step. It copies no step, so a second reject takes the same road in place of a refusal. A reject row naming no child refuses the reject, and the hold stands. The gate's two points rode into this build: the reject's rows now reach the gate, and a case covers the nameless row.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask and both gate points
+- the change reaches no door, and both cases drive the cloud pull fakes
+- each new function points at this ticket
+- the child-building loop stands once, and the gate chapter names the road
 
 # accept
 
