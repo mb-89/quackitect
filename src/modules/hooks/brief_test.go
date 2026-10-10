@@ -113,6 +113,34 @@ func TestAPromptContextAfterAStartAnswersTheCanary(t *testing.T) {
 	}
 }
 
+// A first call the index answers hands no layer, so the next call that passes on carries the canary block. [[spec/tickets/brief-waits-for-a-pass]]
+func TestAFirstCallTheIndexAnswersLeavesTheLayerForTheNext(t *testing.T) {
+	one := briefRowsOf(t)[0]
+	root := treeOf(t, one.Files, "")
+	door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer, StopOff: !one.Stop})
+	door.from.Index = (&fakeIndex{texts: map[string]string{"README.md": "a tree"}}).ask
+	send := func(event string, e map[string]any) Answer {
+		t.Helper()
+		post := postOf(holdPost{Event: event, E: e})
+		post.Root = root
+		said, err := door.Hook(post)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return said
+	}
+	send(startEvent, map[string]any{})
+	if said := send(toolEvent, map[string]any{"tool": globTool, "input": map[string]any{"pattern": "*.md"}}); len(said.Effects) == 0 || said.Effects[0].Kind != resultKind {
+		t.Fatalf("the first Glob answers %+v, and wants the index's result", said.Effects)
+	}
+	if said := send(toolEvent, readCall()); !afterHolds(said, one.Canary) {
+		t.Fatalf("the Read after an answered Glob answers %+v, and wants an after carrying the canary block of %q", said.Effects, one.Sentence)
+	}
+	if said := send(toolEvent, readCall()); afterHolds(said, one.Canary) {
+		t.Fatalf("the second Read answers %+v, and wants the layer handed once", said.Effects)
+	}
+}
+
 // A first turn ending on no canary line opens the debt, and the next call carries the owes line. [[spec/tickets/brief-answers-off-the-door]]
 func TestAnOpenDebtRidesTheNextCall(t *testing.T) {
 	one := briefRowsOf(t)[0]

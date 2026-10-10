@@ -190,6 +190,8 @@ type Door struct {
 	reviews map[string]review.Material
 	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
 	downSince time.Time
+	// The sessions a call handed the layer to, which the session's next event stamps for the brief. [[spec/tickets/brief-waits-for-a-pass]]
+	handed map[string]bool
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -219,7 +221,7 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}, handed: map[string]bool{}}
 }
 
 // The sentinel hears each post as its event and its payload in compact JSON, so a watch matches a tool's command inside it. [[spec/tickets/the-hooks-feed-the-sentinel]]
@@ -331,11 +333,15 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	fields[heldField] = heldOf(settings, root)
 	fields[stoppedField] = d.stoppedOf(post, settings, root)
 	fields[briefField] = d.stampOf(settings, root)
+	if d.handed[session] {
+		fields[handedField] = true
+	}
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err
 	}
 	d.seqs[session] = event.Seq
+	delete(d.handed, session)
 	for _, fold := range store.Folds(foldsUnder) {
 		if err := store.Land(strings.Replace(fold, sessionKey, session, 1), event); err != nil {
 			return err
