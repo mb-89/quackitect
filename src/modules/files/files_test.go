@@ -4,6 +4,8 @@
 package files
 
 import (
+	"errors"
+	"io/fs"
 	"testing"
 
 	"quackitect/src/q"
@@ -127,6 +129,52 @@ func TestASeedPastItsCapCommitsInBatches(t *testing.T) {
 		if got, _ := s.Snapshot().Read("files/" + path).(q.Content); got.Text != "said" || commits != len(paths) {
 			t.Fatalf("files/%s reads %+v over %d commits", path, got, commits)
 		}
+	}
+}
+
+// A file the commit refuses drops out of the seed, the rest land, and the watch starts. [[spec/tickets/seed-survives-bad-files]]
+// level0: FixtureOutsideHome - the seed walks a root of the case's own
+func TestARefusedFileLeavesTheSeedAndTheWatchStanding(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	for _, path := range []string{"a.md", "big.md"} {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	watch := NewFakeWatch()
+	stop, err := seedsIn(root, watch, func(values map[string]any) error {
+		if _, ok := values["files/big.md"]; ok {
+			return errors.New("maximum payload exceeded")
+		}
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	}, seedBatch)
+	if err != nil {
+		t.Fatalf("the seed answers %v, and wants the watch started past the refused file", err)
+	}
+	defer stop()
+	watch.Push("c.md", "later", false)
+	read := s.Snapshot()
+	if got, _ := read.Read("files/a.md").(q.Content); got.Text != "said" {
+		t.Errorf("files/a.md reads %+v", got)
+	}
+	if got, _ := read.Read("files/c.md").(q.Content); got.Text != "later" {
+		t.Errorf("files/c.md reads %+v, and wants the live change", got)
+	}
+}
+
+// An error under the root costs its own path, and an error at the root ends the walk. [[spec/tickets/seed-survives-bad-files]]
+func TestTheWalkGoesPastAPathItCannotRead(t *testing.T) {
+	goneErr := fs.ErrNotExist
+	if got := walkPast("root", "root/a", goneErr); got != nil {
+		t.Errorf("a folder gone under the root answers %v, and wants the walk to go on", got)
+	}
+	if got := walkPast("root", "root", goneErr); got != goneErr {
+		t.Errorf("a missing root answers %v, and wants its error", got)
 	}
 }
 

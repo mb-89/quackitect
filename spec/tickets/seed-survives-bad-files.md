@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: cdba6b0cba744e65
         size: 492
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: fc202c319681f16b7c2fb15643fe0d38f3caa54e
+    hash_after: fc202c319681f16b7c2fb15643fe0d38f3caa54e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/files fails
+    inputs:
+      - name: design/draft
+        hash: d6c7321fe6b7c103
+        size: 1376
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ Standing takes its walk errors through a pure walkPast(root, at, err). An error 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertions. The seed answers the refusal of the one file and returns before the watch starts, so the live change after it lands nowhere. The walk answers the error of a nested path it cannot read and ends. The walkPast seam stands with today's answer, so the case meets its assertion and no missing name.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: each line meets its own case, red today
+- doors: the seed case walks a temp root through the real disk and commits to a store in memory over FakeWatch, and the walk case reaches no door
 
 # gate
 

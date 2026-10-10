@@ -155,7 +155,7 @@ func entered(rel string) bool {
 func Standing(root string, hand Hand) error {
 	return filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return walkPast(root, path, err)
 		}
 		rel, _ := filepath.Rel(root, path)
 		rel = filepath.ToSlash(rel)
@@ -178,6 +178,11 @@ func Standing(root string, hand Hand) error {
 		}
 		return nil
 	})
+}
+
+// What the seed's walk does past a path it cannot read. [[spec/tickets/seed-survives-bad-files]]
+func walkPast(root, at string, err error) error {
+	return err
 }
 
 // A watch handing the changes a test pushes, or the writes of a FakeDisk it listens on. [[spec/design_output/model#io-modules-and-their-fakes]]
