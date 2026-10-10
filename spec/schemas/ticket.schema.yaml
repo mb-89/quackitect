@@ -247,6 +247,10 @@ frontmatter:
             type: string
             description: the session the harness names the box in, per [[spec/tickets/boxes-write-their-final-record]]
 
+          over:
+            type: boolean
+            description: whether this take moves a hold another hand still held, per [[spec/design_output/work#a-live-hold-stalls]]
+
           model:
             type: string
             description: the model the box runs, as its hand-back names it

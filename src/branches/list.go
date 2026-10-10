@@ -143,10 +143,13 @@ func (d *Doors) rowOf(one stand, standing map[string]string, now int64) listRow 
 	if age.Live {
 		live = ", live, beat " + age.Beat + " ago"
 	}
+	if age.Stalled {
+		live += ", stalled"
+	}
 	return listRow{
 		Name:  one.Name,
 		Age:   age.Age,
-		Stale: age.Stale,
+		Stale: age.Stale || age.Person,
 		Said:  padEnd(one.Branch, colBranch) + " " + padEnd(status, colStatus) + " " + padEnd(strings.Join(why, ", "), colWhy) + " " + age.Age + live,
 	}
 }

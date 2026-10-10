@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -336,6 +336,15 @@ record:
         hash: 2905f4996b0af7be
         size: 45994
     def: 0123baf18afe92c2
+  - step: implement/change
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 6de4fd0efeb2701038ea87bda1e779c80bbfef72
+    hash_after: 6de4fd0efeb2701038ea87bda1e779c80bbfef72
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/hook_verb.go:48:1 ExampleCovers: ./RUNME.sh hook stands in no example's interface. Write an example under spec"
+    def: f150b8c0dc20fe45
 group: red-freezes-and-stalls-show
 ---
 
@@ -738,14 +747,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint spec/config/level0.schema.json spec/schemas/ticket.schema.yaml src/branches/beat.go src/branches/dispatch.go src/branches/dispatch_test.go src/branches/free.go src/branches/group.go src/branches/list.go src/branches/take.go src/modules/hooks/githooks.go src/modules/settings/settings.go src/quack/hook_verb.go .claude/commands/se-config-work-progressAfter.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-3 names under size, plus dispatch_test.go, whose print case pins every plan part and takes the stalled part, and spec/design_output/work.md stands as the draft wrote it
+- the change reaches git, the clock, the disk and the config through the branch doors, the hook door's git and the Push fields, each with its fake, and the seven red cases pass on them
+- each new function and constant carries a pointer at spec/design_output/work#a-live-hold-stalls
+- work.progressAfter stands once in settings.go, and the schema and the slash command regenerate off it through schema --write and project
 
 ## tests-green
 
