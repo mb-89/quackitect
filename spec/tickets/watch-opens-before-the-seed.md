@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 28eb776aec7237d867f8d45fea9d9c632c615b2f
+    hash_after: 28eb776aec7237d867f8d45fea9d9c632c615b2f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   87.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2a447c014015cdea
+        size: 692
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ The cause holds: seedsIn walks and commits before Start opens the watch, so a ch
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The files watch now opens before the seed walks the tree. While the seed runs, the watch holds each change it hears in order. Once the seed's last commit lands, the seed commits the held changes in that order, then switches the watch to commit live, under one lock so no change slips between the two. A change during the walk now wins over the walk's older read. Before, the watch opened only after the seed, so a file deleted in that gap stayed as a ghost and a file edited there stayed stale. A seed that fails stops the watch before it returns. Start and the drain share one helper that turns a change into its commit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: watch.go and files_test.go, as the ask names
+- doors: the seed cases run over the fake watch and a store in memory
+- comment: each new comment points at this ticket, which carries the approach
+- one place: Start and the drain share one helper giving a change its value
 
 # accept
 
