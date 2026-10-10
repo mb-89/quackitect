@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box b0a22705166b · claude-code-remote · helper-4
@@ -94,6 +94,15 @@ record:
         exit: 0
         said: work/the-tui-keeps-its-place already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box b0a22705166b · claude-code-remote · helper-4
+    hash_before: 9fae3801986fde4f7e35df5b3796511714236bbc
+    hash_after: 9fae3801986fde4f7e35df5b3796511714236bbc
+    inputs:
+      - name: ask
+        hash: cc970d23e318d3cb
+        size: 346
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -119,14 +128,25 @@ goal: the TUI keeps a person's place across a redraw. An open cell edit, the cur
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/an-open-edit-outlives-a-redraw]], standard
+- [[spec/tickets/a-filter-keeps-the-cursor]], standard
+- [[spec/tickets/a-redraw-keeps-the-sort]], standard
+- [[spec/tickets/a-refetch-keeps-the-selection]], standard
+- [[spec/tickets/a-commit-reads-moves-under-lock]], standard
+- [[spec/tickets/unwatched-providers-meet-a-caller]], standard, routed onto one decide leaf
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child holds one finding and one to three files, small enough to review whole
+- the six children hold the six findings of the list, and nothing of the goal stands outside them
+- no child waits on another: the three tree children each touch Carry, and land one after another on one branch
+- the three tree children read nothing from each other past the shared Carry function
+- the group diff stays inside one review
 
 # children
 
