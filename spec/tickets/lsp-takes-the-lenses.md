@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box c729ff43c0cb · claude-code-remote
     hash_before: 75eb0fa3ef2445795b8cd00bc0813891fb252506
     session: cse_013fMAyhVtjaJgmP3RMQ2Ca4
+  - step: sync
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: ea760eaafde5b4bf5ab367d00b9f7a84849042ba
+    hash_after: ea760eaafde5b4bf5ab367d00b9f7a84849042ba
+    answered:
+      - name: sync
+        exit: 0
+        said: work/lsp-takes-the-lenses already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -103,8 +112,9 @@ goal: `se-index lsp` draws the buttons over a ticket and runs their press. It ma
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
