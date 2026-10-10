@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box b0a22705166b · claude-code-remote · helper-4
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: cde9c5d8b758aa80ac582110d72c55dfd25e182d
     hash_after: cde9c5d8b758aa80ac582110d72c55dfd25e182d
+  - step: accept
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 9b7008afdcbc8fe74372dd3a6d776a187f22385f
+    hash_after: fdd61a4f84bb22c525b02e547a9d3455f0544767
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-tui-keeps-its-place took 48 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: cc970d23e318d3cb
+        size: 346
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -165,8 +181,9 @@ goal: the TUI keeps a person's place across a redraw. An open cell edit, the cur
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
