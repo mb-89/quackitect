@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 5fccd9b2e6265ff17c967fae31be539b66f96ed4
+    hash_after: 5fccd9b2e6265ff17c967fae31be539b66f96ed4
+    inputs:
+      - name: retro/write
+        hash: 75ed62e69cbff121
+        size: 2864
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -306,20 +316,29 @@ The work itself ran clean, and the friction sat in the waiting. Each in-turn wai
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- The box lacked nothing: no tool, host, right or install stood missing in this run.
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 20:27 the stop hook refused the helpers-still-run reason while a helper ran.
+- 20:31 a hook refused a foreground helper, so each wait ran as a git log poll.
+- 20:48 the pull refused a second leaf while a stale hold at accept stood.
+- No conflict met the sync, since the branch already carried main.
+- No test failed on the box alone, and the check ran green on each commit.
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- No person step stands parked, and the view leaf passed on the ask's view of none.
+- No ticket stands minted outside the group.
+- The handover names the pull request against main, its auto-merge and the watch until it merges.
 
 # Discussion
 
