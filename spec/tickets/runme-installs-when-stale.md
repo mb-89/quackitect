@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tests-and-ci-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 441e4aac68af37b6
         size: 1142
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box af15433560d6 · claude-code-remote
+    hash_before: 2861efab8c7edcb0beae66343deeb8a38db34ea4
+    hash_after: 2861efab8c7edcb0beae66343deeb8a38db34ea4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: a0570abbc0d0408b
+        size: 1881
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +245,32 @@ RUNME.sh runs install.sh in three cases alone: a bare call, a binary missing, an
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/runme_test.go
+- src/quack/setup_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The fresh case installs and prints installing on stdout ahead of the verb line, so today every verb pays the install and its chatter reaches stdout. The stale and missing cases install as they should, and fail on the install line standing on stdout in place of stderr. The browser line runs playwright-core with no version. The planted PATH of the RUNME cases holds sh and mkdir alone, so the fakes read their folder off ${0%/*} and their code through read, with no dirname or cat.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing case: the skip, the run on stale and missing, stderr, and the pin
+- the RUNME cases plant a go, an install and a binary of their own, and the setup case runs over the fake doors
 
 # gate
 

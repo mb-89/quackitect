@@ -115,3 +115,75 @@ func TestABareRunmeOnADeskWithNoEditorNamesIt(t *testing.T) {
 		}
 	}
 }
+
+// An install that says a line on stdout and leaves a mark, and a binary that answers its stamp off a file and prints any other call. [[spec/tickets/runme-installs-when-stale]]
+const (
+	staleInstall = "#!/usr/bin/env sh\nprintf 'installing\\n'\n: > \"${0%/*}/installed\"\n"
+	staleIndex   = "#!/bin/sh\ncase \"$*\" in *\" stamp fresh se-index\") read -r code < \"${0%/*}/../fresh-code\"; exit \"$code\";; esac\nprintf '%s\\n' \"$*\"\n"
+)
+
+// Runs RUNME.sh branch beat in a root whose stamp answers code, or whose binary stands missing where code is empty, with a go on the PATH. It answers the exit, stdout, stderr and whether the install ran. [[spec/tickets/runme-installs-when-stale]]
+func runVerbOver(t *testing.T, code string) (int, string, string, bool) {
+	t.Helper()
+	shell, err := exec.LookPath("sh")
+	if err != nil {
+		t.Skip("sh stands nowhere on this box")
+	}
+	root := runmeRoot(t)
+	goAt := t.TempDir() // level0: FixtureOutsideHome - each run links a go of its own, so the stale check runs.
+	files := map[string]string{"install.sh": staleInstall, ".se/.runtime/bin/se-index": staleIndex, ".se/.runtime/fresh-code": code}
+	for name, text := range files {
+		if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(name)), []byte(text), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if code == "" {
+		if err := os.Remove(filepath.Join(root, ".se", ".runtime", "bin", "se-index")); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(goAt, "go"), []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command(shell, filepath.Join(root, "RUNME.sh"), "branch", "beat") // level0: FixtureOutsideHome - the case runs the real RUNME.sh under sh, as the Stop hook does.
+	cmd.Dir = root
+	cmd.Env = []string{"PATH=" + goAt + string(os.PathListSeparator) + runmePath(t), "HOME=" + t.TempDir()} // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
+	var out, errs strings.Builder
+	cmd.Stdout, cmd.Stderr = &out, &errs
+	exit := 0
+	if err := cmd.Run(); err != nil {
+		var failed *exec.ExitError
+		if !errors.As(err, &failed) {
+			t.Fatal(err)
+		}
+		exit = failed.ExitCode()
+	}
+	_, marked := os.Stat(filepath.Join(root, "installed"))
+	return exit, strings.ReplaceAll(out.String(), root, "<root>"), errs.String(), marked == nil
+}
+
+// The Stop hook runs a verb each turn, so a verb on a fresh binary pays the stamp check alone. [[spec/tickets/runme-installs-when-stale]]
+func TestAVerbOnAFreshBinarySkipsTheInstall(t *testing.T) {
+	t.Parallel()
+	code, out, errs, installed := runVerbOver(t, "0")
+	if installed || code != 0 || out != "verb <root>/src/scripts branch beat\n" {
+		t.Errorf("a verb on a fresh binary installs %v, answers %d, %q, %q", installed, code, out, errs)
+	}
+}
+
+// A stale or missing binary runs the install, whose lines land on stderr, so stdout carries the verb's answer alone. [[spec/tickets/runme-installs-when-stale]]
+func TestAMissingOrStaleBinaryRunsTheInstallOnStderr(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		name, code, out string
+		exit          int
+	}{
+		{"a stale stamp", "1", "verb <root>/src/scripts branch beat\n", 0},
+		{"a missing binary", "", "", 2},
+	} {
+		code, out, errs, installed := runVerbOver(t, one.code)
+		if !installed || code != one.exit || out != one.out || !strings.Contains(errs, "installing\n") {
+			t.Errorf("%s installs %v, answers %d, %q, %q", one.name, installed, code, out, errs)
+		}
+	}
+}

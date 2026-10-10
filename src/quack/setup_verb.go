@@ -19,6 +19,9 @@ const cmdMissing = 9009
 // The programs Windows ships as cmd shims. [[spec/tickets/setup-reaches-windows-shims]]
 var setupShims = []string{"npm", "npx", "code"}
 
+// The webview's package file, whose devDependencies pin the playwright-core the browser want fetches. [[spec/tickets/runme-installs-when-stale]]
+const webviewPackage = "src/extension/webview/package.json"
+
 // The extensions the tracked settings point at. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 var editorExtensions = check.Extensions
 
