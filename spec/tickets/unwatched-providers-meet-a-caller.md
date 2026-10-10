@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: decide
 steps:
   - name: design
@@ -60,7 +60,20 @@ record:
         hash: 43208b7915326773
         size: 580
     def: c01ae0f2ace0cecb
+  - step: decide
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 474a91057a5dc34015fa1e56bae629630e29bcc1
+    hash_after: 474a91057a5dc34015fa1e56bae629630e29bcc1
+    inputs:
+      - name: design/draft
+        hash: c50db9b254aae739
+        size: 925
+      - name: [[spec/design_output/model]]
+        hash: e490287884daa168
+        size: 78772
+    def: 2848efabc5c1d4f0
 group: the-tui-keeps-its-place
+reason: done
 ---
 
 # Ask
@@ -152,8 +165,9 @@ No code changes. The demand row of [[spec/design_output/model#one-wave-settles-a
 ## reason
 
 <!-- why the code stays, and where the work it waits on stands -->
-
 <!-- the form is text -->
+
+The unwatched path is the first half of demand, which the model note designs: a name with no subscriber, view or watched reader runs when a reader asks. No caller turns it on, since the second half, the reader road, stands unbuilt. Deleting the half cuts a designed feature, and building the road widens this group past its findings list. The path costs a wave one lock a provider. So the code stays, and the private write in TestWhyNamesAPendingValue stands until the road lands and gives the case a public call.
 
 # Discussion
 
