@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: red-freezes-and-stalls-show
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b9ccbd72b78d · claude-code-remote
+    hash_before: e5ddcd0a2929bbadc11bfa89b57d657a60fdf6b9
+    hash_after: e5ddcd0a2929bbadc11bfa89b57d657a60fdf6b9
+    inputs:
+      - name: ask
+        hash: e62a4e6394147d46
+        size: 962
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -165,38 +174,72 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/work#a-live-hold-stalls]]. The owner's message reads as the dispatch plan, the one place that tells the owner what stands ready, held and stuck. A live hold past the new limit reads stalled, past twice it stale on a first take and a person's on a take over.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/held.go pastHold calls staleClaim
+- src/branches/beat.go liveHold calls staleClaim
+- src/branches/free.go freeIn calls staleClaim
+- src/branches/free.go stuckIn calls staleClaim
+- src/branches/list.go rowOf calls staleClaim
+- src/branches/dispatch.go planned calls staleClaim
+- src/modules/hooks/githooks.go staleTip calls HoldStale
+- src/branches/branch.go verb table runs beatVerb, which the Stop hook in .claude/settings.json calls
+- src/branches/take.go take and src/branches/beat.go takeOver call claimGroup
+- src/quack/hook_verb.go hookVerb fills hooks.Push
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/beat_test.go TestAHoldThatBeatsAndMovesNoCommitStalls
+- src/branches/beat_test.go TestTheBeatAsksAStalledBoxForAHandoverOnce
+- src/branches/dispatch_test.go TestDispatchFiresAFreshBoxPastTwiceTheProgressSpan
+- src/branches/dispatch_test.go TestDispatchNamesAPersonWhereATakeOverStallsAgain
+- src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/settings/settings.go
+- spec/config/level0.schema.json
+- .claude/commands/se-config-work-progressAfter.md
+- spec/schemas/ticket.schema.yaml
+- src/branches/beat.go
+- src/branches/free.go
+- src/branches/group.go
+- src/branches/take.go
+- src/branches/list.go
+- src/branches/dispatch.go
+- src/modules/hooks/githooks.go
+- src/quack/hook_verb.go
+- spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- beat.go, free.go, take.go, dispatch.go, githooks.go and hook_verb.go stand opened, and each claim checked there
+- the callers list names every caller of staleClaim, HoldStale, beatVerb and claimGroup
+- each done_when line names a case in the tests list
+- work.progressAfter lands in settings.go, and its schema and slash command regenerate off it
 
 ## tests-red
 
