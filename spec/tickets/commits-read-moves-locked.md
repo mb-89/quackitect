@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: dfe0ed53bf1131d0e1f78097e14447632c8e3000
+    hash_after: dfe0ed53bf1131d0e1f78097e14447632c8e3000
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "   71.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 1df1c2ab9a2c23a3
+        size: 476
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`commit` in `src/q/store.go` reads the names a commit moves off the cells it replaces, while it holds the lock, and `Commit` hands that list to the move hands. Before, `Commit` compared against a snapshot taken before the lock, so a commit landing in that gap could restore the old value and start no wave.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/store.go and src/q/store_test.go alone
+- the store reaches no door
+- the comment in commit points at this ticket
+- the moved names stand in commit alone, and Commit keeps no snapshot of its own
 
 # accept
 
