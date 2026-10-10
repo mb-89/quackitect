@@ -140,9 +140,7 @@ func runVerbOver(t *testing.T, code string) (int, string, string, bool) {
 	plant(t, root, map[string]string{"install.sh": staleInstall, ".se/.runtime/bin/se-index": staleIndex, ".se/.runtime/fresh-code": code})
 	plant(t, goAt, map[string]string{"go": "#!/bin/sh\nexit 0\n"})
 	if code == "" {
-		if err := os.Remove(filepath.Join(root, ".se", ".runtime", "bin", "se-index")); err != nil {
-			t.Fatal(err)
-		}
+		_ = os.Remove(filepath.Join(root, ".se", ".runtime", "bin", "se-index")) // a binary left standing fails the missing case on its own assertion
 	}
 	env := []string{"PATH=" + goAt + string(os.PathListSeparator) + runmePath(t), "HOME=" + t.TempDir()} // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
 	exit, out, errs := runSh(t, root, env, filepath.Join(root, "RUNME.sh"), "branch", "beat")
@@ -150,27 +148,17 @@ func runVerbOver(t *testing.T, code string) (int, string, string, bool) {
 	return exit, out, errs, marked == nil
 }
 
-// The Stop hook runs a verb each turn, so a verb on a fresh binary pays the stamp check alone. [[spec/tickets/runme-installs-when-stale]]
-func TestAVerbOnAFreshBinarySkipsTheInstall(t *testing.T) {
+// The Stop hook runs a verb each turn, so a fresh binary pays the stamp check alone, and a stale or missing one runs the install on stderr, so stdout carries the verb's answer alone. [[spec/tickets/runme-installs-when-stale]]
+func TestAVerbInstallsWhereTheBinaryIsMissingOrStale(t *testing.T) {
 	t.Parallel()
-	code, out, errs, installed := runVerbOver(t, "0")
-	if installed || code != 0 || out != "verb <root>/src/scripts branch beat\n" {
-		t.Errorf("a verb on a fresh binary installs %v, answers %d, %q, %q", installed, code, out, errs)
-	}
-}
-
-// A stale or missing binary runs the install, whose lines land on stderr, so stdout carries the verb's answer alone. [[spec/tickets/runme-installs-when-stale]]
-func TestAMissingOrStaleBinaryRunsTheInstallOnStderr(t *testing.T) {
-	t.Parallel()
+	const beat = "verb <root>/src/scripts branch beat\n"
 	for _, one := range []struct {
 		name, code, out string
 		exit            int
-	}{
-		{"a stale stamp", "1", "verb <root>/src/scripts branch beat\n", 0},
-		{"a missing binary", "", "", 2},
-	} {
+		installs        bool
+	}{{"a fresh binary", "0", beat, 0, false}, {"a stale stamp", "1", beat, 0, true}, {"a missing binary", "", "", 2, true}} {
 		code, out, errs, installed := runVerbOver(t, one.code)
-		if !installed || code != one.exit || out != one.out || !strings.Contains(errs, "installing\n") {
+		if installed != one.installs || code != one.exit || out != one.out || strings.Contains(errs, "installing\n") != one.installs {
 			t.Errorf("%s installs %v, answers %d, %q, %q", one.name, installed, code, out, errs)
 		}
 	}
@@ -184,11 +172,8 @@ func TestTheOldInstallPathRunsTheRootInstall(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	plant(t, root, map[string]string{"install.sh": "#!/usr/bin/env sh\nprintf '%s\\n' \"$#:$*\" > \"${0%/*}/reached\"\n", "src/scripts/install.sh": string(shim)})
-	if code, _, errs := runSh(t, root, os.Environ(), filepath.Join(root, "src", "scripts", "install.sh"), "boot", "two words"); code != 0 {
-		t.Fatalf("the shim answers %d, %q", code, errs)
-	}
-	if said, err := os.ReadFile(filepath.Join(root, "reached")); err != nil || string(said) != "2:boot two words\n" {
-		t.Errorf("the root install reads %q, %v", said, err)
+	plant(t, root, map[string]string{"install.sh": "#!/usr/bin/env sh\nprintf '%s\\n' \"$#:$*\"\n", "src/scripts/install.sh": string(shim)})
+	if code, out, errs := runSh(t, root, os.Environ(), filepath.Join(root, "src", "scripts", "install.sh"), "boot", "two words"); code != 0 || out != "2:boot two words\n" {
+		t.Errorf("the shim answers %d, %q, %q, and wants the root install to hear both words", code, out, errs)
 	}
 }
