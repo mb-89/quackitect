@@ -30,7 +30,7 @@ record:
   - step: do
     hand: box 17969d0d25e0 · claude-code-remote
     hash_before: 2db242a4e59cb039f2ba7d97a18e517a44b0565d
-    hash_after: ea227f3d311543a6c0244b3f2b16aa43d62a105e
+    hash_after: 2c192981c7e0e7efd1bd6b1748191757133801b6
     answered:
       - name: tests
         exit: 0
@@ -46,6 +46,9 @@ record:
         hash: f737dd67dfda93a1
         size: 936
     def: df12650931d480c9
+    model: unstated
+    cost: unknown
+    final: "The cold probe's clear check passes live: the handover closes, the clear runs, and the next conversation opens on the resume prompt and pulls read-handover."
 reason: done
 ---
 
