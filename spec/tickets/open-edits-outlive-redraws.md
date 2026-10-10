@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -197,6 +197,19 @@ record:
         hash: 97110e026beedf1c
         size: 671
     def: 05d09c51410ea2a3
+  - step: design/tests-red-2
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: ad22b966484e0fddc824262defc1b07fcd7c7ecd
+    hash_after: ad22b966484e0fddc824262defc1b07fcd7c7ecd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft-2
+        hash: ea644b7b6807c871
+        size: 2126
+    def: 9c7cd4dd4a2dadb8
 group: the-tui-keeps-its-place
 ---
 
@@ -386,26 +399,32 @@ Both cases fail on their assertions. After one work/rows change mid-edit, `u` po
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go
+- src/tui/work/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three tree cases fail on their assertions. After a carry the edit stands closed, a fill over two marked rows reaches none of them once the carry drops the marks, and a take on a row that left names nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when test fails on its own assertion, and the check line waits on tests-green
+- the work case posts through the registry Fake, which its contract suite holds
 
 # gate
 

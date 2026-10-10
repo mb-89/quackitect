@@ -36,6 +36,9 @@ type Edit struct {
 // The key an item carries naming the field its last write changed, so a writer past the tree reads which one. [[spec/design_output/tui#the-work-tab-takes-edits]]
 const EditedKey = "edited"
 
+// The reason a take writes nothing, where its row left the view in a redraw. [[spec/tickets/open-edits-outlive-redraws]]
+const RowLeft = "The row left the view, so"
+
 // [[spec/design_output/tree-view#a-cell-takes-an-edit]]
 func (t *Tree) Open(col int) bool {
 	held := t.twig()

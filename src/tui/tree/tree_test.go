@@ -350,6 +350,42 @@ func TestARedrawKeepsAnOpenEdit(t *testing.T) {
 	}
 }
 
+// A fill after a redraw reaches the rows a person marked, by name. [[spec/tickets/open-edits-outlive-redraws]]
+func TestARedrawKeepsTheMarksAFillReaches(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", ""), item("three", "open", "")}, true)
+	was.MoveTo(0)
+	was.Mark()
+	was.MoveTo(2)
+	was.Mark()
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("x")})
+	now := NewTree(columns(), []Item{item("new", "open", ""), item("one", "open", ""), item("two", "open", ""), item("three", "open", "")}, true)
+	now.Carry(was)
+	now.Fill()
+	said := []string{}
+	for _, one := range now.Items {
+		said = append(said, one.Name+"="+ValueOf(one, "says"))
+	}
+	if got := strings.Join(said, "|"); got != "new=|one=x|two=|three=x" {
+		t.Fatalf("the fill reaches one and three alone, and the rows read %q", got)
+	}
+}
+
+// A take whose row left the view writes nothing, and names the row with the reason. [[spec/tickets/open-edits-outlive-redraws]]
+func TestATakeOnARowThatLeftSaysSo(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Open(2)
+	now := NewTree(columns(), []Item{item("one", "open", "")}, true)
+	now.Carry(was)
+	left := now.Take()
+	if len(left) != 1 || left[0] != "two" || now.Refused() != RowLeft || len(now.Written()) != 0 {
+		t.Fatalf("the take names two with the reason it left, and names %v with %q", left, now.Refused())
+	}
+}
+
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func TestARedrawKeepsTheOrderUnlessAPlaceChanges(t *testing.T) {
 	t.Parallel()
