@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,30 @@ record:
         hash: 7985875355c49279
         size: 1353
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 4799d2064aafbc40ea323436c51ddba8f83cfe60
+    hash_after: 4799d2064aafbc40ea323436c51ddba8f83cfe60
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 6b62e90910e5f0c3
+        size: 3863
+      - name: [[spec/design_output/work]]
+        hash: fe7734c5336b7508
+        size: 45994
+      - name: [[spec/design_output/pull]]
+        hash: 3ce642ed632fb96f
+        size: 49558
+    def: 08e16d07b0de477c
+    frozen:
+      - path: src/branches/left_test.go
+        hash: 44d86ef9fbf532df
+      - path: src/pull/pull_next_test.go
+        hash: 48f5eee2c7e44fd9
 ---
 
 # Ask
@@ -247,26 +271,32 @@ The beat carries what a box leaves, and a take over reads it before it beats its
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/left_test.go src/pull/pull_next_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/left_test.go
+- src/pull/pull_next_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new take case fails on its own assertion. The take over prints the rescue line and the ask, and nothing of the beat, the step, the record or the handover. The plain take case passes, since it guards what stands today. The pass and the fail write no next field, and the hand-out shows no next line. The example harness runs every example and skips no red file. So `spec/examples/110_tickets/pull-next.md` lands with the change, and fails before it on exit 1 at the hand-back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case in `left_test.go` or `pull_next_test.go`, and the example line lands at the change
+- the take cases reach git, the disk and the clock through the fake tree, and the pull cases through `cloudPull`
 
 # gate
 
