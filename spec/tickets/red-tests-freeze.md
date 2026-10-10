@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -302,7 +302,33 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 43250c1b22fdd2a3069952fd21d0541e3b515ca8
+    hash_after: 43250c1b22fdd2a3069952fd21d0541e3b515ca8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   59.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: c80cd65ee2fd5eb4
+        size: 671
+      - name: design/tests-red-2
+        hash: fe01c6bf8fbc99b5
+        size: 577
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: red-freezes-and-stalls-show
+reason: done
 ---
 
 # Ask
@@ -580,26 +606,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_frozen_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pass of design/tests-red now records the hash of every file in its red list. The pass of implement/tests-green and the final accept refuse while a red file hash moves since that record, so a hand cannot bend a red test to its code. An honest test bug takes the way back: a hand-back with --reopen naming the file and why writes a reopen entry in the record, which lets both passes through and stands in the input the reviewer at accept reads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stands in the pull files and the ticket schema the draft names
+- the cases reach the disk, git and the shell through the fakes cloudPull builds
+- each function and constant in pull_frozen.go points at spec/design_output/pull#red-tests-freeze
+- the freeze and reopen fields stand once in ticket.schema.yaml
 
 # accept
 
