@@ -149,6 +149,7 @@ var sections = map[string][]key{
 	},
 	"work": {
 		{local: "beat-after", def: "10m", doc: "The age of a box's last beat past which its hold reads dead, shorter than staleAfter.", unit: "a span, as 90m, 12h or 3d"},
+		{local: "progress-after", def: "30m", doc: "The age of a live hold's tip past which it reads stalled. Past twice it, a first take moves the hold, and a take over hands it to a person.", unit: "a span, as 90m, 12h or 3d"},
 		{local: "stale-after", def: "30m", doc: "The age of a held group's tip that puts it under yours.", unit: "a span, as 90m, 12h or 3d"},
 		{local: "fails-before-person", def: float64(workFailsBeforePerson), doc: "The times a step fails back before the pull puts a person step in, asking the reason.", unit: "returns"},
 		{local: "refusals-before-fail", def: float64(workRefusalsBeforeFail), doc: "The times one hand-back meets refused before the pull fails the leaf back with the findings.", unit: "refusals"},

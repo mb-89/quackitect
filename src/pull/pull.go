@@ -16,7 +16,7 @@ import (
 )
 
 // The flags that take a value, so the value reads as no name, and the short hash a refusal names. [[spec/design_output/pull#a-hand-of-its-own]]
-var takes = []string{"--as", "--fail", "--became", "--answered", "--back", "--fields"}
+var takes = []string{"--as", "--fail", "--became", "--answered", "--back", "--fields", reopenFlag}
 
 const (
 	shortSha = 8

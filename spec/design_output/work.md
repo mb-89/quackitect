@@ -269,7 +269,7 @@ matcher leaves out `clear`, since a clear goes on inside a living box.
 | the last beat | the hold reads |
 |---|---|
 | ends, at or past the tip's second | dead at once |
-| beats, younger than `work.beatAfter` | live, whatever the tip's age |
+| beats, younger than `work.beatAfter` | live, and it stalls where the tip's age passes `work.progressAfter` |
 | none, or older | by the tip's age against `work.staleAfter` |
 
 A beat younger than half of `work.beatAfter` writes nothing, so a beat at
@@ -284,6 +284,24 @@ and the list reads the refs it brings.
 | `branch take <name>` | refuses, naming the beat's age | takes it over |
 | `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
 | `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
+
+### A live hold stalls
+
+A beat says the box lives, and the tip says it moves. A live hold whose tip
+stands older than `work.progressAfter` stalls. `staleClaim` in
+`src/branches/beat.go` reads it.
+
+| the tip's age on a live hold | the hold reads | who acts |
+|---|---|---|
+| past `work.progressAfter` | live, and it stalls | the Stop hook asks the box for a handover, once a tip |
+| past twice it, on a first take | stale | the dispatcher fires a fresh box, which takes it over |
+| past twice it, on a take over | live and a person's | the dispatch plan names it under `stalled`, for a person |
+
+- A take over a standing hold writes `over: true` on its record entry, so the second stall reads a person's.
+- `branch list` writes `stalled` and the tip's age beside a stalled hold, and puts a person's under yours.
+- The dispatch plan lists every stalled hold under `stalled`. The dry run prints the part, and the Action reads its JSON.
+- `branch beat` prints the Stop hook's `block` answer on a hold that stalls, and keeps that tip under `.se/.runtime`.
+- The pre-push door reads a hold past twice `work.progressAfter` stale, so the fresh box's take lands.
 
 ## A red commit reaches rescue
 
