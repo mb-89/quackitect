@@ -221,12 +221,13 @@ record:
   - step: retro/cloud
     hand: box 6150d1759159 · claude-code-remote
     hash_before: 98cc619d8b61b29f0979251726dfb6820c6355ff
-    hash_after: 98cc619d8b61b29f0979251726dfb6820c6355ff
+    hash_after: 73087e5ddba9dd4fb14316afce85bc84d627b033
     inputs:
       - name: retro/write
         hash: a6f483677dc94788
         size: 2646
     def: 4da1ca5da87d5bbc
+    final: the-engine-fixes-its-faults closes done, and its pull request goes to main with auto-merge on
 ---
 
 # Ask
