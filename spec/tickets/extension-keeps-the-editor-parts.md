@@ -118,7 +118,11 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: design/owner-read
+step: design/draft
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
