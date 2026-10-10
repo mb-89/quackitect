@@ -227,6 +227,8 @@ func (t *Tree) Carry(from *Tree) {
 	}
 	t.cur = min(from.cur, len(t.Cols)-1)
 	t.Schema = from.Schema
+	// The held row is found among the rows the filter keeps, and a row the filter now hides leaves the cursor at its old place. [[spec/tickets/a-filter-keeps-the-cursor]]
+	t.filter, t.typed = from.filter, from.typed
 	for key, shut := range from.shut {
 		if shut {
 			t.shut[key] = true

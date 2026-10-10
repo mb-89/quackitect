@@ -303,6 +303,9 @@ func TestARedrawUnderAFilterKeepsTheCursor(t *testing.T) {
 	was.MoveTo(1)
 	now := NewTree(columns(), append([]Item{item("d", "open", "")}, queued...), true)
 	now.Carry(was)
+	if !now.Narrowed() {
+		t.Fatal("the carry keeps the filter the old tree held")
+	}
 	if err := now.Filtering("says: /./"); err != nil {
 		t.Fatal(err)
 	}
