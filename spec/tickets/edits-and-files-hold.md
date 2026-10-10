@@ -89,6 +89,10 @@ record:
     hand: box a5167492d95e · claude-code-remote
     hash_before: d8d35fc1b144fd4c530e0874c8dd90fdea019c8c
     session: cse_01Q81whv9ndwkuBwHR3RFoDm
+    hash_after: bcba15d738677571340fa3884f00fbd33acb76d4
+    model: claude-opus-5-5
+    cost: unknown
+    final: Every child closed done, the accept passed, the retro stands written, and the check answers green.
   - step: sync
     hand: box a5167492d95e · claude-code-remote · helper-12
     hash_before: 52844a46301b7959c7bf47fdd7fc8ed0fe3c500b
