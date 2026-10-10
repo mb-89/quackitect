@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 97110e026beedf1c
         size: 671
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 703496fe46deba585cd0b438785e08dd64ff7a88
+    hash_after: 703496fe46deba585cd0b438785e08dd64ff7a88
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft
+        hash: 8a7d1744a1843e19
+        size: 960
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,32 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/tree_test.go
+- src/tui/work/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their assertions. After one work/rows change mid-edit, `u` posts tickets/flip-urgent on two-ticket and `P` posts work/pull, as the finding names, and the tree reads no edit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when test fails on its own assertion, and the check line waits on tests-green
+- the work case posts through the registry Fake, which its contract suite holds
 
 # gate
 

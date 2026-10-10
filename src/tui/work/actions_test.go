@@ -178,6 +178,27 @@ func TestAnEditPostsSetFieldForEveryRowItWrites(t *testing.T) {
 	}
 }
 
+// A rows change landing mid-edit leaves every key in the edit, and Enter writes the row it opened on. [[spec/tickets/an-open-edit-outlives-a-redraw]]
+func TestAKeyInAnEditStaysInItAcrossARedraw(t *testing.T) {
+	t.Parallel()
+	m, tab, posted := actionWindow(t, everyResult)
+	selectRow(t, tab, "two-ticket")
+	tab.Tree.CursorTo(len(tab.Tree.Cols) - 1)
+	m = keyed(t, m, "e")
+	arrived := append([]map[string]any{{"name": "a-ticket", "kind": "ticket", "state": "open", "queue": "0"}}, actionRows...)
+	value, _ := json.Marshal(arrived)
+	tab.Update(&m, registry.Change{Name: rowsName, Revision: 2, Value: value})
+	m = keyed(t, m, "u", "P")
+	if len(*posted) != 0 || !tab.Tree.Editing() {
+		t.Fatalf("u and P land in the edit, and the tab posts %v with the edit open %v", postsOf(t, *posted), tab.Tree.Editing())
+	}
+	keyed(t, m, "enter")
+	posts := postsOf(t, *posted)
+	if len(posts) != 1 || posts[0]["name"] != "two-ticket" || posts[0]["value"] != "a-groupuP" {
+		t.Fatalf("enter writes the typed group on two-ticket, and posts %v", posts)
+	}
+}
+
 func TestThePullKeyPostsWorkPull(t *testing.T) {
 	t.Parallel()
 	m, tab, posted := actionWindow(t, everyResult)

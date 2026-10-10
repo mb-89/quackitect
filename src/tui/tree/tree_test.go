@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
 
 	"quackitect/src/tui/draw"
@@ -328,6 +329,24 @@ func TestARedrawKeepsTheSortAPersonSet(t *testing.T) {
 	}
 	if got := strings.Join(namesOf(now), "|"); got != "a|b" {
 		t.Fatalf("the rows keep the order by name, and read %q", got)
+	}
+}
+
+// The edit follows its row by name, where a row arrives above it. [[spec/tickets/an-open-edit-outlives-a-redraw]]
+func TestARedrawKeepsAnOpenEdit(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("hi")})
+	now := NewTree(columns(), []Item{item("new", "open", ""), item("one", "open", ""), item("two", "open", "")}, true)
+	now.Carry(was)
+	if !now.Editing() || now.Typed() != "hi" {
+		t.Fatalf("the edit stands open with hi across the redraw, and editing reads %v with %q", now.Editing(), now.Typed())
+	}
+	now.Take()
+	if said := ValueOf(now.Items[2], "says"); said != "hi" {
+		t.Fatalf("the take writes two, and two says %q while new says %q", said, ValueOf(now.Items[0], "says"))
 	}
 }
 
