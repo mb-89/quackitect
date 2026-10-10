@@ -83,7 +83,17 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
+record:
+  - step: sync
+    hand: box b0a22705166b · claude-code-remote · helper-4
+    hash_before: baaeb56cc53419c155d289b7559af0e67f6abdf9
+    hash_after: baaeb56cc53419c155d289b7559af0e67f6abdf9
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-tui-keeps-its-place already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -98,8 +108,9 @@ goal: the TUI keeps a person's place across a redraw. An open cell edit, the cur
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
