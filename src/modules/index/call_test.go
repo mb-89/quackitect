@@ -114,3 +114,32 @@ func TestTheConfigHoldsOneActionDeadline(t *testing.T) {
 		t.Fatal("watchdog.deadlineAction stands nowhere")
 	}
 }
+
+// A writer past its deadline fails, and holds the writer slot until its run returns, so no second writer runs beside it. [[spec/design_output/model#one-writer-per-tree]]
+func TestAnExpiredWriterHoldsTheSlotUntilItReturns(t *testing.T) {
+	b, c, _ := bookOf(t)
+	gate := make(chan struct{})
+	first, err := Call(b, actions(), "t/save", "a.md", "s1", 0, held(gate))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for one, _ := b.Get(first.Handle); one.Progress.Done == 0; one, _ = b.Get(first.Handle) {
+		b.Wait(first.Handle, slow)
+	}
+	c.pass(2 * time.Minute)
+	if ended := b.Expire(); !slices.Equal(ended, []string{first.Handle}) {
+		t.Fatalf("the expiry ends %v, and wants the first writer", ended)
+	}
+	second, err := Call(b, actions(), "t/save", "b.md", "s1", 0, held(gate))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := stateOf(t, b, second.Handle); got != Queued {
+		close(gate)
+		t.Fatalf("the second writer stands %s while the first still runs, and wants queued", got)
+	}
+	close(gate)
+	if one, ended := b.Wait(second.Handle, patience); !ended || one.State != Done {
+		t.Fatalf("the second writer ends as %+v once the first returns", one)
+	}
+}

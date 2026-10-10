@@ -48,6 +48,9 @@ func (b *Book) runs(s *q.Store, id string, input any, accept func(q.Request) (an
 		if ok {
 			state = one.State
 		}
+		if state == Running {
+			b.live[id] = true
+		}
 		b.mu.Unlock()
 		if state == Running {
 			break
@@ -57,6 +60,7 @@ func (b *Book) runs(s *q.Store, id string, input any, accept func(q.Request) (an
 		}
 		<-woke
 	}
+	defer b.returned(id)
 	one, _ := b.Get(id)
 	said, err := s.Deliver(one.Action, input, accept, func(done, known int, step string) {
 		_ = b.Progress(id, done, known, step)
@@ -66,7 +70,15 @@ func (b *Book) runs(s *q.Store, id string, input any, accept func(q.Request) (an
 	} else {
 		_ = b.Finish(id, said)
 	}
-	if one.Writes {
+}
+
+// A run that returns frees its slot and starts the next writer, an expired one's too. [[spec/design_output/model#one-writer-per-tree]]
+func (b *Book) returned(id string) {
+	b.mu.Lock()
+	delete(b.live, id)
+	writes := b.ops[id] != nil && b.ops[id].Writes
+	b.mu.Unlock()
+	if writes {
 		b.Next()
 	}
 }
