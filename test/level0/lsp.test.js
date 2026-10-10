@@ -79,6 +79,8 @@ test("a field hint draws as the underline, and leaves the Problems rows", () => 
   );
   assert.deepEqual(handed, [[uri, [fault]]]);
   assert.deepEqual(door.said.marked, [[uri, [11]]]);
+  middlewareOf(door).handleDiagnostics(uri, [], () => {});
+  assert.deepEqual(door.said.marked.at(-1), [uri, []], "a dropped take clears the underline");
 });
 
 // The index binary under the root, as indexBinary in src/index/binary.go builds it, in the runtime folder folders.go owns. [[spec/design_output/index#a-door-comes-back]]

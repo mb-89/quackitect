@@ -97,7 +97,7 @@ const (
 	runme          = "./RUNME.sh"
 )
 
-// The id of a ticket at a path, its file name, where it stands directly under a ticket folder. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+// The id of a ticket at a path, its file name, where it stands directly under a ticket folder. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
 func ticketOf(path string) string {
 	said := strings.ReplaceAll(path, "\\", "/")
 	for _, folder := range ticketFolders {
@@ -286,7 +286,7 @@ func lensOf(title, act, ticket, path string) lens {
 	return lens{Title: title, Command: TicketCommand, Arguments: []any{act, ticket, path}}
 }
 
-// The buttons a ticket carries, off its text, the standing holds, and whether the cloud holds it. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+// The buttons a ticket carries, off its text, the standing holds, and whether the cloud holds it. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
 func lensesOf(path, text string, holds []Hold, cloud bool) []lens {
 	ticket := ticketOf(path)
 	// A ticket the cloud holds, by its own marker or its group's, takes no hand here, and a ticket past open draws no button. [[spec/tickets/the-lens-reads-v1]]
@@ -391,7 +391,7 @@ func (s *Server) textOf(at string) string {
 	return ""
 }
 
-// The lenses over the document a request names, at its first line. The caller holds the lock. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+// The lenses over the document a request names, at its first line. The caller holds the lock. [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
 func (s *Server) lenses(params json.RawMessage) any {
 	var said struct {
 		TextDocument document `json:"textDocument"`

@@ -609,44 +609,17 @@ A terminal opens on the shell the box prefers, which is PowerShell there, and
 that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.ps1` instead,
 which is the entry a person there already takes.
 
-# A ticket carries its buttons
+# The client keeps editor parts
 
-A person at a desk takes a ticket and hands it back with no terminal. A
-ticket under `spec/tickets` or `.se/tickets` carries buttons over its first
-line, and `lib/lens.js` decides which:
-
-| what stands | the buttons |
-|---|---|
-| no hold names the ticket, it stands `open`, and its step admits a person | `Take this ticket at <step>` |
-| the same, and its step names another hand | a line naming that hand, and no button |
-| a person's hold names it | `Hand back <step>: pass`, `Hand back: fail…` and `Drop` |
-| a person's hold names it, and the leaf holds a `verdict` field | `Hand back <step>: the verdict decides` and `Drop` |
-| another hand's hold names it | a line naming the hand and the step, and no button |
-| the ticket stands `draft` or `closed` | nothing |
-
-A hold whose hand reads `person` is this desk's own. A step admits a person
-where its `by` reads `person` or `anyone`. The nearest `by` up the route
-counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
+The language server draws a ticket's buttons and runs each press. For details,
+see [[spec/design_output/lsp#a-ticket-carries-its-buttons]].
 
 ## A button runs the pull
 
-Each button runs `pull` through `src/quack/verb_ticket.go` of the method, as a
-child of the extension:
-
-| the button | the line |
-|---|---|
-| take | `ticket pull <ticket>` |
-| pass | `ticket pull <ticket> --pass` |
-| fail | `ticket pull <ticket> --fail "<reason>"`, with the reason a box asks for |
-| the verdict decides | `ticket pull <ticket>`, because the pull refuses a verdict flag there |
-| drop | `ticket pull --drop` |
-
-A hand-back saves the ticket first, because the pull reads the evidence off
-the disk. An empty reason ends a fail, and nothing runs. The first answer word
-of [[spec/design_output/pull#the-answers]] stands in a notification, and a
-refusal takes the warning colour. The whole answer stands in the output
-channel `quackitect`. Then the buttons draw again, and a change under
-`.se/.runtime/hold` draws them too.
+A press runs the server's command. The client's
+middleware in `lib/lsp.js` asks the reason of a fail and saves the ticket
+before a hand-back. The route host and the sidebar's Pull for me run the same
+command through the editor.
 
 ## The views section
 
@@ -673,27 +646,12 @@ without `CLAUDECODE`, `CLAUDE_CODE_REMOTE` and `SE_CLOUD`, and
 the pull reads a person. `SE_WORK_ROOT` names the open folder, so a vehicle's
 own tickets answer.
 
-## A take marks the fields
+## The middleware draws the underline
 
-A person's hold on a ticket marks every field its leaf still wants, with an
-underline in the editor's information colour. `lib/fields.js` decides
-the marks, and `editor-fields.js` draws them:
-
-| what stands | the marks |
-|---|---|
-| a person's hold names the ticket | each field the leaf still wants, on its heading, in route order, with `checked` last |
-| a field holds no line | its heading, or the leaf's heading where the field has none |
-| a person newly takes the ticket | the cursor lands on the first mark |
-| a hold standing as the editor starts | the marks, and the cursor stays |
-| no person's hold names the ticket | nothing |
-
-The leaf and its fields come from `LeafOf` in `src/pull/pull_route.go`,
-and the lines each field holds from `ChapterOf` in `src/pull/pull_chapter.go`.
-The hover over a mark shows the leaf's path and `does`, then the field's
-name, `form` and `says`. On `checked` it lists the checklist.
-
-The marks are a decoration and a hover. The Problems panel lists diagnostics
-alone, so it lists no mark, and a mark blocks no check, commit or push.
+The language server marks the fields a take still wants. For details, see
+[[spec/design_output/lsp#a-take-marks-the-fields]]. The client's middleware
+draws each `HeldField` hint as an underline through `editor-lens.js`, and
+leaves it off the Problems panel.
 
 # What stands open
 

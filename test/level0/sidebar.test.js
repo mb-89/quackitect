@@ -454,7 +454,7 @@ test("new ticket writes a ticket with an empty process and opens it, keeps one s
   assert.deepEqual([closed.said.opened, closed.said.told], [[], []]);
 });
 
-// [[spec/design_output/extension#it-starts-silent]] [[spec/design_output/extension#a-ticket-carries-its-buttons]] [[spec/tickets/the-inset-folds-the-frontmatter]]
+// [[spec/design_output/extension#it-starts-silent]] [[spec/design_output/lsp#a-ticket-carries-its-buttons]] [[spec/tickets/the-inset-folds-the-frontmatter]]
 test("a start runs nothing, registers the view, the flip and the editor's events, leaves the ticket command to the server, and watches before a view opens", async () => {
   const door = doorOf();
   const handed = { lenses: [], editors: [], changes: [], themes: [], saves: [] };
