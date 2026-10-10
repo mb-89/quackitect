@@ -543,28 +543,26 @@ func progressOf(head string) string {
 	return strconv.Itoa(len(passedSteps(lines))) + "/" + strconv.Itoa(all)
 }
 
-// The steps a record entry closes, by a hash after or a skip. [[spec/design_output/index#the-index-answers-the-tickets]]
+// The steps a record entry closes, by a hash after or a skip, where the entry carries no failure. [[spec/design_output/index#the-index-answers-the-tickets]] [[spec/tickets/red-list-skips-failed-records]]
 func passedSteps(lines []string) map[string]bool {
 	out := map[string]bool{}
-	inRecord := false
-	step := ""
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if line != "" && line[0] != ' ' {
-			inRecord = trimmed == "record:"
+	for _, item := range yaml.AsList(yaml.AsDoc(yaml.Read(strings.Join(lines, "\n"))).Get("record")) {
+		entry := yaml.AsDoc(item)
+		if entry == nil {
 			continue
 		}
-		if !inRecord {
-			continue
-		}
-		if said, found := strings.CutPrefix(trimmed, "- step:"); found {
-			step = strings.TrimSpace(said)
-			continue
-		}
-		after, isAfter := strings.CutPrefix(trimmed, "hash_after:")
-		if (isAfter && strings.TrimSpace(after) != "" && strings.TrimSpace(after) != `""`) || trimmed == "skipped: true" {
-			out[step] = true
+		after := strings.TrimSpace(word(entry.Get("hash_after")))
+		if yaml.Truthy(entry.Get("skipped")) || (after != "" && !failedEntry(entry)) {
+			out[word(entry.Get("step"))] = true
 		}
 	}
 	return out
+}
+
+// A record entry a hand-back with --fail writes, which carries returns or a why with no skip. [[spec/tickets/red-list-skips-failed-records]]
+func failedEntry(entry *yaml.Doc) bool {
+	if returns, err := strconv.ParseFloat(word(entry.Get("returns")), floatBits); err == nil && returns > 0 {
+		return true
+	}
+	return !yaml.Truthy(entry.Get("skipped")) && strings.TrimSpace(word(entry.Get("why"))) != ""
 }
