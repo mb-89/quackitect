@@ -172,8 +172,11 @@ conditions, so what is compared is the handover itself, not the disk.
 |---|---|---|---|---|---|---|---|---|
 | parse_duration | 4/4 | 2 | 0.008 | 4/4 | 4 (1) | 0.018 | 1 | 0 |
 | TTLCache | 6/6 | 2 | 0.011 | 6/6 | 6 (4) | 0.028 | 3 | 0 |
-| semver | 4/4 | 3 | 0.016 | 4/4 | 9 (7) | 0.048 | 6 | 1 |
-| **Total** | **3/3** | 7 | **0.035** | **3/3** | 19 | **0.093** (2.7×) | 10 | 1 |
+| semver | 4/4 | 3 | 0.016 | 4/4 | 9 (8) | 0.048 | 6 | 1 |
+| **Total** | **3/3** | 7 | **0.035** | **3/3** | 19 (13 cut) | **0.093** (2.7×) | 10 | 1 |
+
+A cut session that had already passed its step before the cut holds no lease, so it releases nothing.
+That is why cuts (13) exceed involuntary handovers (10).
 
 What this shows:
 
@@ -188,8 +191,10 @@ What this shows:
   which it does for one-file tickets.
 - **Two design gaps, found by this run and fixed after it:**
   1. Reviews were not resumable. No cut reviewer checkpointed, so each successor started its review over.
-  2. A successor whose gate was *already satisfied* re-did the work. One reviewer had submitted a verified
-     review just before its cut; the next reviewer reviewed again instead of running `hx done`.
+  2. Successors whose gate was *already satisfied* re-did the work. Reviewer 7 submitted a verified review
+     and was cut. Reviewers 8 and 9 each started with "[x] review: review approve … by semver-7-review" in
+     their brief, and each reviewed again before one of them finally ran `hx done`. A tick in a checklist
+     was not a strong enough signal for this model.
 
   The brief now opens with "THE GATE IS ALREADY SATISFIED … run `hx done` now" when that is the case.
   After any involuntary handover it advises small increments (commit, push and checkpoint after each

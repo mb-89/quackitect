@@ -415,8 +415,8 @@ the real-model pilot proved it wrong or incomplete. They have been folded back i
    (EVAL §3.2). Without the remote-only evidence rule, a sandbox death at that moment would have lost the
    step's work while the log claimed it existed.
 9. **Reviews were not resumable, and successors redid finished work.** Under forced interruptions, no cut
-   reviewer checkpointed, so every successor started its review over. One successor re-reviewed even though
-   its predecessor had already submitted a verified review, which meant the gate was satisfied. The brief
+   reviewer checkpointed, so every successor started its review over. Two successors re-reviewed although their
+   briefs already showed the review check ticked ("[x] review … by semver-7-review"). A checklist tick is too weak a signal. The brief
    now says so up front ("THE GATE IS ALREADY SATISFIED … run `hx done` now"). After any involuntary
    handover it also advises small increments (commit, push and checkpoint after each sub-step; reviewers
    checkpoint their findings so far). A before/after pilot could not yet attribute an effect to this
