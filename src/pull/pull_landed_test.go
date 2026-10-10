@@ -192,6 +192,45 @@ func TestAPassWhoseStagedDeltaAddsAMarkerPutsTheTicketBackAndSaysWhereItStays(t 
 // alpha with a desk leaf ahead of do, which a cloud box skips. [[spec/tickets/pull-scripts-leave]]
 var skippingTicket = strings.Replace(childTicket, "steps:\n", "steps:\n  - name: first\n    when: desk\n    does: a desk's step\n", 1)
 
+// A git door standing behind origin alone, whose fetch and fast-forward answer what git says. [[spec/tickets/fetch-names-the-real-fault]]
+type behindRepo struct {
+	git.Repo
+	fetch, forward error
+}
+
+func (one behindRepo) Fetch(string) error { return one.fetch }
+
+func (one behindRepo) FastForward(string) error { return one.forward }
+
+func (behindRepo) Count(from, _ string) (int, bool) {
+	if from == "HEAD" {
+		return 2, true
+	}
+	return 0, true
+}
+
+func TestAFailedFastForwardNamesGitsReason(t *testing.T) {
+	t.Parallel()
+	for _, one := range []behindRepo{
+		{forward: fmt.Errorf("error: your local changes would be overwritten by merge")},
+		{fetch: fmt.Errorf("fatal: could not read from remote repository"), forward: fmt.Errorf("fatal: Not possible to fast-forward")},
+	} {
+		it, _, errs := cloudPull(t)
+		one.Repo = it.Git
+		it.Git = one
+		if it.fetched("work/g") {
+			t.Fatal("the pull reads a failed fast-forward as current")
+		}
+		want := one.forward.Error()
+		if one.fetch != nil {
+			want = one.fetch.Error()
+		}
+		if said := errs.String(); !strings.Contains(said, want) || strings.Contains(said, "diverge") {
+			t.Fatalf("the refusal says\n%s\nand wants %q and no divergence", said, want)
+		}
+	}
+}
+
 // A git door whose commit the hook refuses. [[spec/tickets/engine-landings-report-refusals]]
 type refusedCommitRepo struct{ git.Repo }
 

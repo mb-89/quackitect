@@ -400,16 +400,25 @@ func (it *It) dropped(who *Who) int {
 
 // [[spec/design_output/pull#the-pull-fetches-first]]
 func (it *It) fetched(branch string) bool {
-	_ = it.Git.Fetch(branch)
+	if err := it.Git.Fetch(branch); err != nil {
+		it.Refuse(failure.Raise(it.Failures, "pull-fetch-refused", fmt.Sprintf("The fetch of %s fails, so the pull reads no current tree.", branch), strings.TrimSpace(err.Error())))
+		return false
+	}
 	behind, ok := it.Git.Count("HEAD", "origin/"+branch)
 	if !ok || behind == 0 {
 		return true
 	}
-	if it.Git.FastForward("origin/"+branch) == nil {
+	err := it.Git.FastForward("origin/" + branch)
+	if err == nil {
 		return true
 	}
+	// Divergence takes commits on both sides, and every other refusal is git's own to name. [[spec/tickets/fetch-names-the-real-fault]]
+	if ahead, _ := it.Git.Count("origin/"+branch, "HEAD"); ahead == 0 {
+		it.Refuse(failure.Raise(it.Failures, "pull-fast-forward-refused", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and git refuses the fast-forward.", branch, behind), strings.TrimSpace(err.Error())))
+		return false
+	}
 	it.Refuse(failure.Raise(it.Failures, "pull-origin-diverges", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
-		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch)))
+		fmt.Sprintf("Commit or stash the edits in the tree, run git pull --rebase origin %s, then pull again.", branch)))
 	return false
 }
 
