@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: f321c8bf47da33cc52a3f49148d822bda1278e4e
+    hash_after: f321c8bf47da33cc52a3f49148d822bda1278e4e
+    inputs:
+      - name: ask
+        hash: 74ce9d77bb2ed949
+        size: 568
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -163,38 +172,49 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`commit()` in `src/q/store.go` builds a snapshot of the cells it replaces while it holds `s.mu`, runs `movedIn` over it, and returns the moved names beside the heard hands. `Commit` drops its own `Snapshot()` taken before the lock and hands the returned names to the move hands. `settle` takes the new return and ignores it, as it ignores the revision. The race needs a goroutine landing inside the gap no hook reaches, so the red case pins the contract that closes the gap: `commit` names what it moves against the value it replaces, and an equal value moves nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/q/store.go Commit
+- src/q/store.go settle
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/q/store_test.go TestACommitMovesAgainstTheValueItReplaces
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/store.go
+- src/q/store_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened Commit, commit, movedIn, settle and Snapshot.Read in src/q/store.go, and Read takes no lock
+- a grep finds commit called from Commit and settle alone
+- the done_when line names TestACommitMovesAgainstTheValueItReplaces
+- the approach adds no config key
 
 ## tests-red
 
