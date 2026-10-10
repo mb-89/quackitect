@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d4bc9252842d46cd
         size: 671
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 6748abb663c14316819635b2236a0cc6f4468b77
+    hash_after: 6748abb663c14316819635b2236a0cc6f4468b77
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ The approach answers the ask: writes() in src/modules/edits/edits.go rewrites th
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/edits/edits.go src/modules/edits/edits_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change touches src/modules/edits/edits.go alone, and the test stands in edits_test.go from tests-red
+- doors: the change reaches the disk through the Outside root, and the case runs it over a temp root of its own
+- comment: reached carries a line pointing at this ticket
+- one place: the rule for which files a part-written apply keeps stands in reached alone
 
 ## tests-green
 

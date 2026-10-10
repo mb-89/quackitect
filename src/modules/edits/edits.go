@@ -234,7 +234,7 @@ func (from Outside) writes(took Took, on, ticket string) (any, error) {
 		return nil, fmt.Errorf("the undo journal writes nothing, so nothing lands: %w", err)
 	}
 	var wrote []string
-	for _, one := range took.Files {
+	for i, one := range took.Files {
 		if err := from.put(one.File, one.Made, one.Born); err != nil {
 			if len(wrote) == 0 {
 				landed := false
@@ -242,6 +242,8 @@ func (from Outside) writes(took Took, on, ticket string) (any, error) {
 				_ = from.put(name, entryText(entry), false)
 				return nil, fmt.Errorf("nothing written: %s writes nothing: %w", one.File, err)
 			}
+			entry.Files = from.reached(entry.Files, i)
+			_ = from.put(name, entryText(entry), false)
 			return nil, fmt.Errorf("%s writes nothing: %w\nThe tree stands part written. Run undo to put it back, out of %s", one.File, err, name)
 		}
 		wrote = append(wrote, one.File)
@@ -251,6 +253,17 @@ func (from Outside) writes(took Took, on, ticket string) (any, error) {
 		rows = append(rows, fmt.Sprintf("  %s (%d place(s))", one, took.Counts[one]))
 	}
 	return strings.Join(append(rows, "", "Run undo to take this back while nothing else touches these files."), "\n"), nil
+}
+
+// The files of a part-written apply, failing at the file at failed: every file before it, and the failing file only where it stands on disk, with the text read back, since a cut write leaves neither half. Undo then meets only the files the apply reached. [[spec/tickets/a-part-written-apply-undoes]]
+func (from Outside) reached(files []EntryFile, failed int) []EntryFile {
+	out := files[:failed:failed]
+	if body, err := os.ReadFile(from.at(files[failed].File)); err == nil {
+		stands := files[failed]
+		stands.Made = string(body)
+		out = append(out, stands)
+	}
+	return out
 }
 
 // [[spec/design_output/apply#check-everything-then-write]]
