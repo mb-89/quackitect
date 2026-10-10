@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: fe50bd4079c058737879ec2e86e8f4dfe0489503
+    hash_after: fe50bd4079c058737879ec2e86e8f4dfe0489503
+    inputs:
+      - name: ask
+        hash: b506441e9f8fd28c
+        size: 631
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -156,38 +165,60 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A helper `methodDisk` beside `workDisk` in `src/quack/ticket_set.go` answers the disk under the method root that `rootsOf` names. Fill, update, set and urgent then read the method root for their method files, and the ticket itself off the work root. `ticket fill` reads `pull.ProcessAt`, `withRoute` and the schemas through the method disk. `ticket update` reads `pull.ProcessAt`, `copiedBase` with the method repository, and the schema through it. `ticketWritten`, which set and urgent share, takes the method disk for the schema it weighs a value against, off `it.Method`. The JSON case harness takes `spec/processes/` beside `spec/schemas/` into the method root of a vehicle case.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/ticket_fill.go` `ticketFill`
+- `src/quack/ticket_update.go` `ticketUpdate` and `copiedBase`
+- `src/quack/ticket_set.go` `ticketSet` and `ticketWritten`
+- `src/quack/ticket_urgent.go` `ticketUrgent`
+- `src/quack/verb_mint.go` `withRoute`, which fill calls with the method disk
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/quack/testdata/ticket_fill.json` a vehicle case under `TestTicketFillVerb`
+- `src/quack/testdata/ticket_update.json` a vehicle case under `TestTicketUpdateVerb`
+- `src/quack/ticket_set_test.go` a vehicle case under `TestTicketSet`, for set and urgent
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/quack/ticket_set.go`
+- `src/quack/ticket_fill.go`
+- `src/quack/ticket_update.go`
+- `src/quack/ticket_urgent.go`
+- `src/quack/ticket_route_test.go`
+- `src/quack/ticket_set_test.go`
+- `src/quack/testdata/ticket_fill.json`
+- `src/quack/testdata/ticket_update.json`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the four verbs, `workDisk`, `rootsOf`, `withRoute`, `copiedBase` and `ticketWritten` stand opened, and each claim checked there
+- the callers list names each verb and helper the method disk reaches
+- each done_when line names its case under tests
+- the approach adds no config key
 
 ## tests-red
 
