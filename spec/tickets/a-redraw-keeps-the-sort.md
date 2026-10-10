@@ -1,0 +1,399 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: c671f20a6ae2a4a6
+group: the-tui-keeps-its-place
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 054b065b637dc5c6e0a4f20d7cd8a8bd55aa6869
+    hash_after: 054b065b637dc5c6e0a4f20d7cd8a8bd55aa6869
+    inputs:
+      - name: ask
+        hash: 2e7172410cde3169
+        size: 396
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 3f06e9a4907d547c64a6bfeeb879885cf5c6e85e
+    hash_after: 3f06e9a4907d547c64a6bfeeb879885cf5c6e85e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft
+        hash: 046be481cb6f7c4f
+        size: 775
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-5
+    hash_before: 3e09817e63492fe06ad78187f98ac77a62a2651e
+    hash_after: 3e09817e63492fe06ad78187f98ac77a62a2651e
+    inputs:
+      - name: design/draft
+        hash: 046be481cb6f7c4f
+        size: 775
+      - name: design/tests-red
+        hash: 4df74579efe31fb1
+        size: 392
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b0a22705166b · claude-code-remote · helper-9
+    hash_before: f82cbe2fab81fd3fb8318da84da68eb30ae1cf84
+    hash_after: f82cbe2fab81fd3fb8318da84da68eb30ae1cf84
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: 28edf6e1640e09fb9caf220aadd96affd873eef6
+    hash_after: 28edf6e1640e09fb9caf220aadd96affd873eef6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/tree passes
+      - name: check
+        exit: 0
+        said: "   54.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 4df74579efe31fb1
+        size: 392
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+gain: a sort a person sets by a header press or a preset stays across a work/rows redraw.
+
+<!-- breaks, as text: what breaks if it is never done -->
+breaks: each redraw builds the tree under the base file's sort, and `Carry` copies no sort, so the rows reorder under the person seconds after a press.
+
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+done_when:
+
+- `go test ./src/tui/tree/ -run TestARedrawKeepsTheSortAPersonSet` passes
+- `./RUNME.sh check` answers 0 on this box
+
+<!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
+view: none
+
+<!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
+from: none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+`Carry` in `src/tui/tree/tree.go` takes a copy of the old tree's `sorts` before its rebuild, so the rows draw under the sort the person set and the held row is found in that order. The marks the finding names stay out: no work key sets one, and the verifier left that half unconfirmed.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- src/tui/work/work.go Tab.takes
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- src/tui/tree/tree_test.go TestARedrawKeepsTheSortAPersonSet
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- src/tui/tree/tree.go
+- src/tui/tree/tree_test.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- opened Carry, SortOn, Sorted, Sorts and ViewOver, and each redraw builds the tree under the base file's sort
+- a grep finds takes the one caller of Carry
+- the done_when line names TestARedrawKeepsTheSortAPersonSet
+- the approach adds no config key
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh branch test
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/tui/tree/tree_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+TestARedrawKeepsTheSortAPersonSet fails on its assertion: a sort set by name reads the base sort by says after one carry, as the finding names.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the done_when test fails on its own assertion, and the check line waits on tests-green
+- the case reaches no door, since the tree lives in memory
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint src/tui/tree/tree.go src/tui/tree/tree_test.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches src/tui/tree/tree.go and its test alone
+- the tree reaches no door
+- the comment in Carry points at this ticket
+- the sorts stand once, carried off the old tree, an empty list too, as the gate point asks, and a case decides the cleared sort
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+Each redraw built the tree under the base file sort, and `Carry` copied no sort, so the rows reordered under the person after a press. `Carry` now copies the sort off the old tree, a cleared one too, so the order a person sets stands across a redraw.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches `tree.go` and its test alone
+- the tree reaches no door
+- the comment in `Carry` points at this ticket
+- the sort stands once, read off the old tree through `Sorts`
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
