@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -216,6 +216,27 @@ record:
         hash: 18bdfb73ec25a90a
         size: 49571
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box b9ccbd72b78d · claude-code-remote · helper-7
+    hash_before: 1f78a76639cc01538c81561f2b6ac79b489d6bda
+    hash_after: c8e2b6748a424846d7f84be287f9e40606dab36a
+    inputs:
+      - name: design/draft
+        hash: 3229149659b199fb
+        size: 1686
+      - name: design/tests-red
+        hash: c80cd65ee2fd5eb4
+        size: 671
+      - name: design/draft-2
+        hash: 8854276953331dae
+        size: 2193
+      - name: design/tests-red-2
+        hash: fe01c6bf8fbc99b5
+        size: 577
+      - name: [[spec/design_output/pull]]
+        hash: 18bdfb73ec25a90a
+        size: 49571
+    def: 01417e29801ecc2f
 group: red-freezes-and-stalls-show
 ---
 
@@ -462,10 +483,8 @@ Each case fails on its own assertion. A bare pull on a held gate prints that the
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the done_when line 'a pull test passes both where a reopen entry names the moved file' meets a case for tests-green alone (TestAReopenLetsTheGreenPassThrough); no case passes the final accept over a moved file a reopen names, so that half of the line stands undecided
-- TestAGateShowsTheReopenedRedFiles reads the reopen in the green pass's output, which reaches workAnswer through handed in pull_hand.go; no case reads it from a bare pull at accept, the path through handBack in pull_back.go a fresh reviewer takes, so an implementation printing the reopen in handed alone passes
-- the draft tests list names TestAnUnmovedRedFileLetsTheGreenPassThrough, which src/pull/pull_frozen_test.go does not hold
+accept
+- red-freeze-row-names-path: TestARedPassFreezesItsRedFiles finds 'frozen:' and the hash anywhere in the ticket text, so it passes a freeze row that drops or misnames the path; the case can read the frozen row as one { path, hash } pair naming test/a_test.go
 
 # implement
 
