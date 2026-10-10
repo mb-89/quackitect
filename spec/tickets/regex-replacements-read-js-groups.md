@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: f4fad5fd663b1692
         size: 1463
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-6
+    hash_before: 73d86da46fd8f5b298c59d800e48d6a95518323f
+    hash_after: 73d86da46fd8f5b298c59d800e48d6a95518323f
+    inputs:
+      - name: design/draft
+        hash: f4fad5fd663b1692
+        size: 1463
+      - name: design/tests-red
+        hash: 10b99cf2cbf3a2ce
+        size: 684
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -262,8 +274,14 @@ The case fails on its own assertion, and reproduces the finding: the replacement
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+
+- the approach answers the ask: one change in byPattern covers the patch regex op through oneOp and the replace sweep through Applied, and both callers stand as the draft names them
+- the red case in apply_test.go decides both done_when lines, and fails on its own assertion today for every row but the double dollar
+- for the builder, in place: dollar-zero and dollar-zero-zero stand literal, as JavaScript reads them, since Go numbers the whole match as group zero and a plain group lookup would expand it
+- for the builder, in place: dollar and a name in angle brackets stands literal where the pattern holds no named group, and expands empty where the pattern holds named groups but not that one, as JavaScript reads it
 
 # implement
 
