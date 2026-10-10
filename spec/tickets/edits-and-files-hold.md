@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -164,6 +164,25 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: ddf19556b4888c419277a723a9e21208fb984468
+    hash_after: ddf19556b4888c419277a723a9e21208fb984468
+    inputs:
+      - name: retro/write
+        hash: 44e58e0644742ea7
+        size: 3414
+      - name: [[spec/guidance/working]]
+        hash: d86fb2c80be2ce1c
+        size: 4128
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 7c1b55b24304355c
+        size: 3362
+      - name: [[spec/guidance/review/reviewing]]
+        hash: 17d4b8ac167e577c
+        size: 1532
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -320,20 +339,29 @@ The red check looked at first like a flake, and the stress run turned it into a 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 21:20 UTC: the claude and the tsc that CI pins. The check ran with copies from an earlier scratchpad, ahead on PATH.
+- 21:55 UTC: one push met a proxy error, and the commit went to a rescue branch.
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 21:20 UTC: a test that races on this box. The quack dump test failed once in a few hundred runs.
+- 21:30 UTC: a sync with main took many commits in, and no conflict met it.
+- 21:42 UTC: the stop hook refused a turn ending on a running helper.
+- 21:24 UTC: the commit hook refused a model trailer.
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked.
+- no ticket stands minted with no group. The accept minted files-start-stands-unused into this group, and it closed.
+- the handover says branch done and the pull request with auto-merge wait.
 
 # Discussion
 
