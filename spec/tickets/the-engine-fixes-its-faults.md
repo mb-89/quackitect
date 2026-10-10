@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 reason: done
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -168,6 +168,15 @@ record:
     hash_after: ea6bbd599b16f8ca310e4c5e906d2880b5fc4d18
     returns: 1
     why: the hand takes it back
+  - step: split
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 5b38728f5f1a8e41b94a4aadc521cfa8e46ab464
+    hash_after: 0aac77679dcda0eed612be46ba3a6b885ade5e16
+    inputs:
+      - name: ask
+        hash: 3827a3cc3d458ead
+        size: 295
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -198,33 +207,23 @@ Done when every child closes through the command it names.
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/a-rewind-spares-landed-tests]], standard
-- [[spec/tickets/behind-read-reaches-past-ask]], trivial
-- [[spec/tickets/box-keys-fold-drive-letters]], trivial
-- [[spec/tickets/cloud-ask-names-the-hold]], trivial
-- [[spec/tickets/cloud-boxes-ask-nobody]], standard
-- [[spec/tickets/cloud-boxes-leave-trunk-alone]], standard
-- [[spec/tickets/commit-skips-landed-moves]], trivial
-- [[spec/tickets/kept-red-reads-red-list]], trivial
-- [[spec/tickets/kept-red-subject-matches-whole]], trivial
-- [[spec/tickets/one-writer-holds-a-branch]], standard
-- [[spec/tickets/phase-two-carries-badge-lines]], trivial
-- [[spec/tickets/prepush-reds-land-together]], trivial
-- [[spec/tickets/push-gate-needs-the-engine]], standard
-- [[spec/tickets/serve-probes-the-register-port]], trivial
-- [[spec/tickets/sync-takes-its-own-branch]], standard
-- [[spec/tickets/the-bridge-outlives-its-starter]], standard
-- [[spec/tickets/the-queue-views-agree]], standard
-- [[spec/tickets/the-reply-probe-runs]], question
+- [[spec/tickets/answer-rules-read-one-file]], trivial
+- [[spec/tickets/replayed-red-leaf-reads-green]], trivial
+- [[spec/tickets/command-fields-take-their-indent]], standard
+- [[spec/tickets/failed-evidence-keeps-its-output]], standard
+- [[spec/tickets/gate-findings-reach-the-queue]], standard
+- the children of the first run stand closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each child is one change a review reads whole
-- the goal's parts each meet a child: the trunk guard, the desk push, the kept red leaf, and the one count. The desk trials stand as person questions such as a-desk-runs-probe-reply
-- every child stands closed, so none waits on another
+- each child is one change in one or two Go files a review reads whole
+- the reopened goal is these five faults, each read against the Go code, and every one meets a child
+- no child waits on another, since each touches its own function
+- no child reads a sibling's output, so they land in any order
+- the diff stays one review: five small changes and the reopen road
 
 # children
 
