@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: ee11e19875f11b5d
         size: 1038
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-11
+    hash_before: 264218ee8514cf7462ff3d7658682a1c8b14f4fa
+    hash_after: 264218ee8514cf7462ff3d7658682a1c8b14f4fa
+    inputs:
+      - name: design/draft
+        hash: ee11e19875f11b5d
+        size: 1038
+      - name: design/tests-red
+        hash: 6566cd5d7522602f
+        size: 508
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +272,10 @@ The case fails on its own assertion: the failed tick commits an empty tips list 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+In the send of Start in src/modules/git/git.go, a failed read becomes an empty value that commits. Leaving the failed port out of that tick keeps the last value. Trunk and Stood answer an empty list with no error where no trunk or HEAD stands, so those cases commit as before. Registers declares empty defaults for all four ports. The one caller is src/quack/modules.go. TestAFailedReadKeepsTheLastValue decides the done_when line and fails on its own assertion. Implement rewrites the Start comment saying a refused read commits no branch.
 
 # implement
 
