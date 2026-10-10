@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: implement/change
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,12 @@ record:
         hash: e153b67981b2f041
         size: 24421
     def: dc4904ab364efa10
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/lsp]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/lsp]]
 ---
 
 # Ask
