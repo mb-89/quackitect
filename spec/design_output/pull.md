@@ -693,6 +693,7 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 | `accept with points` | mints a fix ticket a row on the trivial route, `open` and `todo: true`, carrying `parent`, and goes on |
 | `reject` | `rejected` in `src/pull/pull_gate.go` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
 | a second `reject` | puts a person step in before the copies too, through `withPersonStep` |
+| `reject` on a route holding a `by: children` step | `rejectedToChildren` mints an open child a row on the trivial route, in the group, and points `step` at `children`. It copies nothing, so every reject takes this road. A row naming no child refuses the reject, and the hold stands |
 
 - The hand-out of a gate prints its question, and `beforeClear` in `src/pull/pull_chapter.go` beside it.
 - The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.

@@ -20,9 +20,12 @@ const rejectsBeforePerson = 2
 var copied = regexp.MustCompile(`(-\d+$)|(^person$)`)
 
 // [[spec/design_output/pull#the-gate]]
-func (it *It) rejected(who *Who, one *Held, leaf *Leaf, held Hold, reason string, answered []Answered) int {
+func (it *It) rejected(who *Who, one *Held, leaf *Leaf, held Hold, reason string, findings []Finding, answered []Answered) int {
 	if leaf.Final && it.acceptCapped(one, leaf) {
 		return it.acceptAsks(who, one, leaf, held, reason, answered)
+	}
+	if children := childrenStepOf(one.Front); children != "" {
+		return it.rejectedToChildren(who, one, leaf, held, reason, findings, answered, children)
 	}
 	round := returnsOf(one.Front, leaf.Path) + 1
 	after := ""
@@ -51,6 +54,48 @@ func (it *It) rejected(who *Who, one *Held, leaf *Leaf, held Hold, reason string
 		return it.refusedPush(why)
 	}
 	return it.onward(who, append([]string{fmt.Sprintf("%s %s.", one.Name, strings.Join(changes, ", "))}, why...))
+}
+
+// The step a group waits on its children at, or nothing on a route holding none. [[spec/tickets/gate-findings-reach-the-queue]]
+func childrenStepOf(front *yaml.Doc) string {
+	for _, step := range WalkOf(front) {
+		if yaml.AsString(step.Said.Get("by")) == "children" {
+			return step.Path
+		}
+	}
+	return ""
+}
+
+// A group's reject mints a child a finding row and goes back to its children step, copying nothing, so every reject takes the same road. A row naming no child refuses the reject, and the hold stands. [[spec/tickets/gate-findings-reach-the-queue]]
+func (it *It) rejectedToChildren(who *Who, one *Held, leaf *Leaf, held Hold, reason string, findings []Finding, answered []Answered, children string) int {
+	if faults := it.findingFaults(Verdict{Findings: findings}, leaf.Path); len(faults) > 0 {
+		return it.refused(who, one, leaf, held, faults)
+	}
+	built, names, why := it.childrenOf(one, leaf, findings, map[string]any{"state": Open})
+	if why != "" {
+		return it.unminted(one, leaf, why)
+	}
+	after := ""
+	if !one.Private {
+		after = it.tipOf()
+	}
+	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
+		pair("returns", returnsOf(one.Front, leaf.Path)+1), pair("why", reason), pair("answered", answeredRows(answered)))
+	one.Text = withField(withField(text, "step", children), "state", Open)
+	wrote := it.wroteChildren(built)
+	changes := []string{"rejects at " + leaf.Path, "mints " + strings.Join(names, ", "), "returns to " + children}
+	if finding := it.landed(one, changes, wrote); finding != "" {
+		for _, at := range wrote {
+			it.remove(at)
+		}
+		return it.unlanded(one, leaf, finding)
+	}
+	it.dropHold(who.Hand)
+	ok, said := it.sentOut(one, who.Branch)
+	if !ok {
+		return it.refusedPush(said)
+	}
+	return it.onward(who, append([]string{fmt.Sprintf("%s %s.", one.Name, strings.Join(changes, ", "))}, said...))
 }
 
 // The phase a gate closes is the step before it. Its leaves go in again at its end, each named for the next round, and a leaf a condition holds, a person step or an earlier copy stays out. [[spec/design_output/pull#the-gate]]

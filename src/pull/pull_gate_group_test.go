@@ -88,6 +88,20 @@ func rejectsInto(t *testing.T, it *It, errs func() string, names ...string) {
 	}
 }
 
+func TestARejectRowNamingNoChildIsRefusedAndTheGroupStays(t *testing.T) {
+	t.Parallel()
+	it, _, errs := cloudPull(t)
+	landedOn(t, it, map[string]string{"spec/tickets/g.md": acceptingGroup, "spec/tickets/alpha.md": closedChild("alpha")})
+	it.Pulling([]string{"pull"})
+	if code := it.Pulling([]string{"pull", "g", "--fields", `{"verdict":"reject\n- the work stands short"}`}); code == 0 || !strings.Contains(errs.String(), "names no child") {
+		t.Fatalf("the nameless reject answers %d:\n%s", code, errs.String())
+	}
+	group, _ := it.Disk.Read("spec/tickets/g.md")
+	if FieldOf(group, "step") != "accept" || strings.Contains(group, "children-2") {
+		t.Fatalf("g stands at %q:\n%s", FieldOf(group, "step"), group)
+	}
+}
+
 func TestARejectAtAGroupsAcceptMintsItsFindings(t *testing.T) {
 	t.Parallel()
 	it, _, errs := cloudPull(t)

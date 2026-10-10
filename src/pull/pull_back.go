@@ -143,7 +143,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	case decided.Said == "answered":
 		return it.answeredBy(who, one, leaf, *held, decided.Reason, answered)
 	case decided.Said == "fail" && leaf.Gate != "":
-		return it.rejected(who, one, leaf, *held, decided.Reason, answered)
+		return it.rejected(who, one, leaf, *held, decided.Reason, decided.Findings, answered)
 	case decided.Said == "fail":
 		return it.failed(who, one, leaf, *held, decided.Reason, answered)
 	case decided.Findings != nil:

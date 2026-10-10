@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 4f761e24fb6097dd
         size: 495
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: f5bf822fc7f0a64e6da45658daf250f322b49e7a
+    hash_after: f5bf822fc7f0a64e6da45658daf250f322b49e7a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/pull/pull_gate.go src/pull/pull_writes.go src/pull/pull_chapter.go src/pull/pull_back.go src/pull/pull_gate_group_test.go spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's four files and the two the gate's first point adds, the chapter and the hand-back
+- the change reaches no door, and both cases drive the cloud pull fakes
+- each new function points at this ticket, and the gate chapter names the new road
+- the child-building loop stands once, and both the mint and the reject call it
 
 ## tests-green
 

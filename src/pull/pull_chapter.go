@@ -514,18 +514,28 @@ func VerdictIn(rows []string) Verdict {
 		}
 	}
 	reason := strings.Join(tabled(rest), "; ")
-	if findings == "" {
-		return Verdict{Said: openers[word], Reason: reason}
+	if findings != "" {
+		return Verdict{Said: found, Reason: reason, Findings: findingsOf(rest)}
 	}
-	out := Verdict{Said: found, Reason: reason, Findings: []Finding{}}
+	out := Verdict{Said: openers[word], Reason: reason}
+	// A reject's rows ride to the gate, which mints them on a group. [[spec/tickets/gate-findings-reach-the-queue]]
+	if word == "reject" {
+		out.Findings = findingsOf(rest)
+	}
+	return out
+}
+
+// A finding a row, named where the row opens on a name and a colon, and a table row left out. [[spec/design_output/pull#a-finding-rides-out]]
+func findingsOf(rest []string) []Finding {
+	out := []Finding{}
 	for _, row := range rest {
 		if strings.HasPrefix(row, "|") {
 			continue
 		}
 		if said := findingRow.FindStringSubmatch(row); said != nil {
-			out.Findings = append(out.Findings, Finding{Name: said[1], Line: strings.TrimSpace(said[2])})
+			out = append(out, Finding{Name: said[1], Line: strings.TrimSpace(said[2])})
 		} else {
-			out.Findings = append(out.Findings, Finding{Line: row})
+			out = append(out, Finding{Line: row})
 		}
 	}
 	return out
