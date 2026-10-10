@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 6566cd5d7522602f
         size: 508
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-16
+    hash_before: 55d5aa33808b307bc34b5ad7b5dfea95177ced7b
+    hash_after: 55d5aa33808b307bc34b5ad7b5dfea95177ced7b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -286,14 +295,19 @@ In the send of Start in src/modules/git/git.go, a failed read becomes an empty v
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/git/git.go src/modules/git/git_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change touches git.go alone, which the draft size names
+- doors: the tests run on the git fake, wrapped to fail one read
+- approach: the doc comment and the send comment link this ticket
+- one place: the send owns the rule, and each comment points at the ticket
 
 ## tests-green
 

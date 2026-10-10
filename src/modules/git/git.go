@@ -452,28 +452,27 @@ func Registers(c *q.Catalog) q.Writer {
 	)
 }
 
-// Commits the tips at start, and again each span where they change. A read git refuses commits no branch. [[spec/tickets/the-index-reads-standing-branches]]
+// Commits the tips at start, and again each span where they change. [[spec/tickets/the-index-reads-standing-branches]]
+// A read git refuses leaves its port out of that tick, so the index keeps the last value it took. [[spec/tickets/git-reads-keep-last-values]]
 func Start(from Git, every func(time.Duration, func(time.Time)) func(), commit func(values map[string]any) error) (stop func()) {
 	last := map[string]string{}
 	send := func() {
-		tips, err := from.Tips()
-		if err != nil {
-			tips = []ticket.Tip{}
+		// A port whose read fails stays out of this tick, and last keeps the value it sent before. [[spec/tickets/git-reads-keep-last-values]]
+		read := map[string]any{}
+		if tips, err := from.Tips(); err == nil {
+			read[Port] = tips
 		}
-		trunk, err := from.Trunk()
-		if err != nil {
-			trunk = []ticket.File{}
+		if trunk, err := from.Trunk(); err == nil {
+			read[TrunkPort] = trunk
 		}
-		stood, err := from.Stood()
-		if err != nil {
-			stood = map[string]int64{}
+		if stood, err := from.Stood(); err == nil {
+			read[StoodPort] = stood
 		}
-		tracked, err := from.Tracked()
-		if err != nil {
-			tracked = []string{}
+		if tracked, err := from.Tracked(); err == nil {
+			read[TrackedPort] = tracked
 		}
 		// Each port commits alone, and stands sent once its commit lands, so a port past the bus cap leaves the others landing and retries on the next span. [[spec/tickets/sweep-reads-tracked-after-restart]]
-		for port, value := range map[string]any{Port: tips, TrunkPort: trunk, StoodPort: stood, TrackedPort: tracked} {
+		for port, value := range read {
 			if key, _ := json.Marshal(value); string(key) != last[port] && commit(map[string]any{port: value}) == nil {
 				last[port] = string(key)
 			}
