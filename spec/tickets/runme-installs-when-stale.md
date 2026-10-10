@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tests-and-ci-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box af15433560d6 · claude-code-remote
+    hash_before: 78cf27a700f0b159739f0353c3176fc04fc836f1
+    hash_after: 78cf27a700f0b159739f0353c3176fc04fc836f1
+    inputs:
+      - name: ask
+        hash: 441e4aac68af37b6
+        size: 1142
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -166,38 +175,55 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+RUNME.sh runs install.sh in three cases alone: a bare call, a binary missing, and a stamp the binary reads stale. A verb on a fresh binary skips the install. The stale check runs the binary's own `stamp fresh se-index` from the root, the same check `index_here` in install.sh runs, and it holds where go stands, since a box with no go builds nothing. It costs one hash of the index sources, a third of a second on a cloud box, in place of the want checks, the setup verb, the survey, the Copilot setup and the brand. RUNME.sh sends the install's stdout to stderr, so a verb's stdout carries the verb's answer alone, `--json` among them. The browser want in src/quack/setup_verb.go runs `npx --yes playwright-core@<pin>`, the pin read off the webview's package.json, so npx fetches the version the tree tests against. The hooks keep calling RUNME.sh, since a fresh binary now costs the stamp check alone.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/settings.json: the Stop hook and the SessionEnd hook, `RUNME.sh branch beat`
+- .github/workflows/check.yml, dispatch.yml, update.yml: each `./RUNME.sh` step
+- every agent and person command naming `./RUNME.sh <verb>`
+- src/quack/setup_verb.go: setupVerb, through the browser item's get
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/runme_test.go: TestAVerbOnAFreshBinarySkipsTheInstall
+- src/quack/runme_test.go: TestAMissingOrStaleBinaryRunsTheInstallOnStderr
+- src/quack/setup_verb_test.go: the browser line names playwright-core at the webview pin
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- RUNME.sh
+- src/quack/setup_verb.go
+- src/quack/runme_test.go
+- src/quack/setup_verb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- RUNME.sh, install.sh index_here and stamp, setup_verb.go and the settings hooks stand opened, and each claim checked there
+- the callers list names the hooks, the workflows and setupVerb
+- each done_when line names a test above
+- the approach adds no config key
 
 ## tests-red
 
