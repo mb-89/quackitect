@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tests-and-ci-hold
 step: do
+record:
+  - step: do
+    hand: box af15433560d6 · claude-code-remote
+    hash_before: 785919120929a7f859207831a9fafb120ba51ffd
+    hash_after: 785919120929a7f859207831a9fafb120ba51ffd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/git passes
+      - name: check
+        exit: 0
+        said: "   57.8  in all"
+    inputs:
+      - name: ask
+        hash: e4806a09de7ecf64
+        size: 696
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,32 @@ Without it the cap holds nowhere the merge reads it, and a desk's answer turns o
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/git
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+This child closes with no code, as the owner allows for a finding judged not worth its code. gitSuite in src/modules/git/git_contract_test.go already holds the bound on the fake and on a real scratch repository: a tip carries only the ticket files its branch changed plus the Gone list, and CI runs it. A scratch origin built near the bus cap would test that same behavior a second time, which spec/guidance/code/tests rule 1 refuses, and it would prove nothing about the live size the cap guards. The live case stays as the ticket tips-carry-branch-changes-alone asks: it skips on a shallow CI checkout, and it caught the real growth on a full clone, where work boxes run the check.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change departs from the ask: no code lands, for the reason the says field gives
+- the cleanup the change reveals: none
+- every fact the change adds stands in one place: the reason stands in this ticket alone
 
 # Discussion
 
