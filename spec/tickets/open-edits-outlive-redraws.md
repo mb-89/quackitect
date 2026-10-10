@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft-3
 steps:
   - name: design
     steps:
@@ -264,6 +264,11 @@ record:
     hash_after: b01d522137c7354bb212d9d3bcb40e9d0f1dc3bb
     returns: 2
     why: "where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written; the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on"
+  - step: design/person-1
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: 56bdd750128abba770ea8ff1f4e88e5986364322
+    hash_after: 56bdd750128abba770ea8ff1f4e88e5986364322
+    def: c5f02a5133e1e8c2
 group: the-tui-keeps-its-place
 ---
 
@@ -487,8 +492,9 @@ Three tree cases fail on their assertions. After a carry the edit stands closed,
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The cloud box decides this step, as the cloud guidance asks. Both findings hold, and draft-3 answers them. A mark whose row leaves stays as a mark on an address no row holds, so a fill after the redraw reaches none. The ticket names a-filter-keeps-the-cursor under depends_on, whose carry keeps the filter that holds the marks.
 
 ## draft-3
 
