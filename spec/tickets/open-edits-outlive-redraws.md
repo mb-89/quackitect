@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -291,6 +291,30 @@ record:
         hash: f4637c13bb8a936e
         size: 2046
     def: 0e7553671e6a287d
+  - step: gate
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: fe3ce5f8455086a0fba0a45cb4beeb7b6e358926
+    hash_after: fe3ce5f8455086a0fba0a45cb4beeb7b6e358926
+    inputs:
+      - name: design/draft
+        hash: 8a7d1744a1843e19
+        size: 960
+      - name: design/tests-red
+        hash: 2d2fe4fa34fdcb5c
+        size: 494
+      - name: design/draft-2
+        hash: ea644b7b6807c871
+        size: 2126
+      - name: design/tests-red-2
+        hash: 9a2e36a4f6864953
+        size: 521
+      - name: design/draft-3
+        hash: f4637c13bb8a936e
+        size: 2046
+      - name: design/tests-red-3
+        hash: 4b515a0765c28136
+        size: 535
+    def: 0123baf18afe92c2
 group: the-tui-keeps-its-place
 ---
 
@@ -621,9 +645,7 @@ The new case fails on its assertion: the carry drops the edit, so no fill stands
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- where every marked row leaves in a redraw, the marks run empty and a fill reaches the whole view: keep a departed mark so the fill reaches none, with a red case that marks one row, redraws without it, fills, and finds nothing written
-- the marks survive a redraw under a filter only with the filter carry, so the ticket names a-filter-keeps-the-cursor under depends_on
+pass
 
 # implement
 
