@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 63f22dba3ab08a50
         size: 808
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-6
+    hash_before: d3d098f8487a16d7f105b6e0e3218a002bb32d5f
+    hash_after: d3d098f8487a16d7f105b6e0e3218a002bb32d5f
+    inputs:
+      - name: design/draft
+        hash: 63f22dba3ab08a50
+        size: 808
+      - name: design/tests-red
+        hash: 2346f5d72dd69bc6
+        size: 423
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,9 @@ TestARefetchKeepsTheSelectedName fails on its assertion: with config/depth selec
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
