@@ -302,22 +302,43 @@ func ContentOf(text string) q.Content {
 // Commits each change the watch hands, under the family's local name. A change the store refuses reaches failed. [[spec/design_output/model#io-modules-are-modules]]
 func Start(from Watch, commit func(values map[string]any) error) (stop func(), err error) {
 	return from.Changes(func(path, text string, changed int64, gone bool) {
-		value := q.Content{}
-		if !gone {
-			value = ContentOf(text)
-			value.Changed = changed
-		}
-		_ = commit(map[string]any{familyPrefix + path: value})
+		commitsHeard(commit, path, text, changed, gone)
 	})
 }
 
-// Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. A change landing during the walk and committing before it loses to the walk's older read, until its next change sets it right. [[spec/tickets/tickets-becomes-a-module]]
+// Commits one heard change under the family's local name, so Start and the seed's drain give a change the same value. [[spec/tickets/watch-opens-before-the-seed]]
+func commitsHeard(commit func(values map[string]any) error, path, text string, changed int64, gone bool) {
+	value := q.Content{}
+	if !gone {
+		value = ContentOf(text)
+		value.Changed = changed
+	}
+	_ = commit(map[string]any{familyPrefix + path: value})
+}
+
+// Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. [[spec/tickets/tickets-becomes-a-module]]
 func Seeds(root string, from Watch, commit func(values map[string]any) error) (stop func(), err error) {
 	return seedsIn(root, from, commit, seedBatch)
 }
 
 // The seed in commits of at most most text bytes each, the last one landing whatever stands, so one message stays under the bus cap. [[spec/tickets/seed-splits-under-bus-cap]]
+// The watch opens before the walk and holds each change it hears, and the seed's last commit drains them in order, so a change during the walk lands after it. [[spec/tickets/watch-opens-before-the-seed]]
 func seedsIn(root string, from Watch, commit func(values map[string]any) error, most int) (stop func(), err error) {
+	var mu sync.Mutex
+	live, waiting := false, []func(){}
+	stop, err = from.Changes(func(path, text string, changed int64, gone bool) {
+		mu.Lock()
+		if !live {
+			waiting = append(waiting, func() { commitsHeard(commit, path, text, changed, gone) })
+			mu.Unlock()
+			return
+		}
+		mu.Unlock()
+		commitsHeard(commit, path, text, changed, gone)
+	})
+	if err != nil {
+		return func() {}, err
+	}
 	batch, size := map[string]any{}, 0
 	err = Standing(root, func(path, text string, changed int64, _ bool) {
 		if size > 0 && size+len(text) > most {
@@ -329,10 +350,25 @@ func seedsIn(root string, from Watch, commit func(values map[string]any) error, 
 		batch[familyPrefix+path], size = value, size+len(text)
 	})
 	if err != nil {
+		stop()
 		return func() {}, err
 	}
 	landEach(commit, batch)
-	return Start(from, commit)
+	// The drain commits outside the lock, and sets live on the read finding the list empty, so no change slips between. [[spec/tickets/watch-opens-before-the-seed]]
+	for {
+		mu.Lock()
+		if len(waiting) == 0 {
+			live = true
+			mu.Unlock()
+			return stop, nil
+		}
+		next := waiting
+		waiting = nil
+		mu.Unlock()
+		for _, one := range next {
+			one()
+		}
+	}
 }
 
 // Commits a batch, and where the commit refuses it, each file alone, so a file refused alone drops out of the seed and the rest land. [[spec/tickets/seed-survives-bad-files]]

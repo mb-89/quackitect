@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2a447c014015cdea
         size: 692
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-17
+    hash_before: 19a2c5ce082be16219547a7073a2178db53e09b4
+    hash_after: 19a2c5ce082be16219547a7073a2178db53e09b4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ The cause holds: seedsIn walks and commits before Start opens the watch, so a ch
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/files/watch.go src/modules/files/files_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change touches the watch file alone, which the ask names
+- doors: the seed cases run over the fake watch and a store in memory
+- approach: each new comment points at this ticket, which carries the approach
+- one place: Start and the drain share one helper giving a change its value
 
 ## tests-green
 
