@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tests-and-ci-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2c7612fc04dadb2e
         size: 831
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: 69d751bc66014157761bd61dee166d8391746d72
+    hash_after: 69d751bc66014157761bd61dee166d8391746d72
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/setup_verb.go:121:1 ExampleCovers: ./RUNME.sh setup stands in no example's interface. Write an example under s"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -311,14 +320,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint RUNME.sh src/quack/setup_verb.go src/quack/setup_verb_test.go src/quack/runme_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches RUNME.sh and src/quack/setup_verb.go, both named in the size list
+- the change reaches the disk door alone, whose fake stands in box_doors_test.go
+- a comment beside the stamp check, the install gate and the pin reader names the ticket it implements
+- the stamp check stands once in RUNME.sh, and the pin stands once in the webview package.json, which the setup reads
 
 ## tests-green
 

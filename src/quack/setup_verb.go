@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"slices"
@@ -21,6 +22,18 @@ var setupShims = []string{"npm", "npx", "code"}
 
 // The webview's package file, whose devDependencies pin the playwright-core the browser want fetches. [[spec/tickets/runme-installs-when-stale]]
 const webviewPackage = "src/extension/webview/package.json"
+
+// The playwright-core package at the version the webview pins, or bare where no pin stands. [[spec/tickets/runme-installs-when-stale]]
+func playwrightPinned(d boxDoors) string {
+	var pkg struct {
+		DevDependencies map[string]string `json:"devDependencies"`
+	}
+	text, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(webviewPackage)))
+	if err != nil || json.Unmarshal(text, &pkg) != nil || pkg.DevDependencies["playwright-core"] == "" {
+		return "playwright-core"
+	}
+	return "playwright-core@" + pkg.DevDependencies["playwright-core"]
+}
 
 // The extensions the tracked settings point at. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 var editorExtensions = check.Extensions
@@ -57,7 +70,7 @@ var setupItems = []setupItem{
 		},
 		get: func(d boxDoors) bool {
 			say(d, "  downloading chromium through playwright")
-			return setupRan(d, []string{"npx", "--yes", "playwright-core", "install", "chromium"}, false, "src", "extension", "webview")
+			return setupRan(d, []string{"npx", "--yes", playwrightPinned(d), "install", "chromium"}, false, "src", "extension", "webview")
 		},
 		missed: "  no browser here, so the check skips the drawing's test.",
 	},
