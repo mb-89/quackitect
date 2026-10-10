@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a040a9c44bc4 · claude-code-remote
+    hash_before: f75a6492969c9b8dea1d17d0e9528da6c905f035
+    hash_after: f75a6492969c9b8dea1d17d0e9528da6c905f035
+    inputs:
+      - name: ask
+        hash: cb58743a72ffa477
+        size: 1045
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -168,38 +177,73 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The server draws the buttons over a ticket and runs their press. The extension's rules move into Go unchanged. For the shape, see [[spec/design_output/lsp#a-ticket-carries-its-buttons]].
+
+- `src/modules/lsp/lenses.go` ports the lens rules of `src/extension/lib/lens.js` as pure functions.
+- A port `Tickets` joins `Outside`: the holds, the cloud tickets, the action call, the file write, and the names.
+- The listener runs a press and a save beside the frame loop, and sends their replies on the same connection.
+- The lock lets go around the call, as `writes` does, since the call's commit republishes under it.
+- A message carrying no method is the client's answer to a request, and draws no reply.
+- `listensLSP` in `src/quack/lsp.go` fills the port off the store, the manager's call and the disk.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/main.go` `listens`, which now hands `listensLSP` the manager
+- `src/quack/lsp.go` `listensLSP`, which fills the new port
+- `src/modules/lsp/lsp.go` `Handle`, `Listen` and `serves`
+- `src/modules/lsp/replay.go` `Replay`, which calls `Handle`
+- `src/modules/lsp/features.go` `capabilities`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/lenses_test.go` `TestTheLensesFollowStateStepHoldAndCloud`
+- `src/modules/lsp/lenses_test.go` `TestARouteNestsAsTheFrontmatterDoes`
+- `src/modules/lsp/lenses_test.go` `TestAPressPostsTicketPullAsAPerson`
+- `src/modules/lsp/lenses_test.go` `TestAFailWithNoReasonRunsNothing`
+- `src/modules/lsp/lenses_test.go` `TestAHandBackWritesTheBufferFirst`
+- `src/modules/lsp/lenses_test.go` `TestACommitMovingTheHoldsRefreshesTheLenses`
+- `src/modules/lsp/lenses_test.go` `TestASaveFillsAPickedProcessOverAnEmptyRoute`
+- `src/modules/lsp/lenses_test.go` `TestAnAnswerFromTheClientDrawsNoReply`
+- `src/quack/lsp_test.go` `TestAPressAnswersAsTheIndexDoorDid`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/lenses.go`
+- `src/modules/lsp/lenses_test.go`
+- `src/modules/lsp/lsp.go`
+- `src/modules/lsp/replay.go`
+- `src/modules/lsp/features.go`
+- `src/quack/lsp.go`
+- `src/quack/main.go`
+- `spec/design_output/lsp.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, and each claim checked there
+- the callers list names every caller of `listensLSP`, `Handle` and the capabilities
+- every done_when line meets a case in `lenses_test.go`, or the check
+- the approach adds no config key
 
 ## tests-red
 

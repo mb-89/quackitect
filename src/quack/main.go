@@ -219,7 +219,7 @@ func listens(root string, store *q.Store, open doors, served manager.Served, rea
 		halts = append(halts, halt)
 	}
 	if one := open.lsp; one.on {
-		halt, err := listensLSP(root, store, one)
+		halt, err := listensLSP(root, store, one, served)
 		if err != nil {
 			for _, halt := range halts {
 				halt()
