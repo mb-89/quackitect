@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -309,6 +309,33 @@ record:
         hash: 23fa883c720fe893
       - path: src/modules/settings/settings_test.go
         hash: 3eea3fdab323e368
+  - step: gate
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: 15ad01c1f56c0f9312d1c102109320a838de143a
+    hash_after: 15ad01c1f56c0f9312d1c102109320a838de143a
+    inputs:
+      - name: design/draft
+        hash: fef67274ad2a5f8a
+        size: 2094
+      - name: design/tests-red
+        hash: b908c052c159d00e
+        size: 746
+      - name: design/draft-2
+        hash: 1221b0c21ada3829
+        size: 2885
+      - name: design/tests-red-2
+        hash: 8770f2c945f2bd4a
+        size: 853
+      - name: design/draft-3
+        hash: 6e06d68e2e3a4c6a
+        size: 3020
+      - name: design/tests-red-3
+        hash: fdc994577c7ed72b
+        size: 1575
+      - name: [[spec/design_output/work]]
+        hash: 2905f4996b0af7be
+        size: 45994
+    def: 0123baf18afe92c2
 group: red-freezes-and-stalls-show
 ---
 
@@ -700,11 +727,7 @@ Every case the draft-3 tests list names fails on its own assertion. The settings
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- no red test decides the config line: the beat and dispatch cases set work.progressAfter through the config fake, and the pre-push case reads a fake schema, so nothing fails while spec/config/level0.schema.json and settings.go carry no work.progressAfter default; add a case reading the real schema default through ./RUNME.sh config or config.Default
-- the person-on-the-next-stall line rests on over: true, which the dispatch case writes into the fixture by hand; no red case shows claimGroup in take.go writing over: true on a take over a standing hold, so the chain the ask names stays undecided
-- the draft tests list names src/branches/hook_reads_test.go TestHoldStaleReadsALiveBeatPastTwiceTheProgressSpanStale, which stands nowhere; the red case is src/modules/hooks/githooks_test.go TestPrePushLetsATakeMoveAHoldStalledPastTwiceTheProgressSpan, so the list and the red list disagree
-- the hook done_when line meets TestTheBeatAsksAStalledBoxForAHandoverOnce in src/branches/beat_test.go, through the Stop hook's branch beat in .claude/settings.json; the draft names no done_when line beside its test, so write that mapping into tests
+accept
 
 # implement
 
