@@ -70,3 +70,14 @@ Every push to main leaves a red pages run, since the build source names `/docs` 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The pages runs on main passed while `docs/book.html` stood, and every run since the folder left fails. The build log names its source as `./docs`, so the setting points at a folder the tree dropped.
+
+| option | weighed |
+|---|---|
+| `docs/index.md` in the tree | taken: the run greens from the repository, and one delete undoes it |
+| unpublish in the Pages settings | left: it wants a person, and the owner may still want the address |
+
+The page departs from the ask in one place. It reads `site.github.repository_url`, a Liquid variable the build's metadata plugin fills, so the tracked file carries no address and no copy of the README.
+
+The box ran `github-pages build` at version 232 over the tree on main, and it ends on the error the run log names. Over a copy of the new folder it builds `index.html` with the repository link. The copy sets `url` and `baseurl`, since the box's proxy refuses the Pages API lookup the runner makes with its token.
