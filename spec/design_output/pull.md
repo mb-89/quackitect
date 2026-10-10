@@ -131,6 +131,7 @@ open and `ticket set` refuse it, and name each road out:
 |---|---|
 | standalone | mints the ticket with no group |
 | reopen | the hand behind the group's last leaf takes it back with `ticket pull <group> --back <leaf>` |
+| reopen past a gone hand | the hand on `work/<group>` takes back the leaf the engine passes, with `ticket pull <group> --back children` |
 
 A ticket minted on a closed group's own branch joins no group, and stands
 free. For the run behind this, see [[spec/rationales/pull]].

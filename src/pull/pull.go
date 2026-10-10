@@ -518,7 +518,9 @@ func (it *It) takeBack(who *Who, name, path string) int {
 		}
 	}
 	role := RoleOf(who.Hand)
-	if wrote == nil || yaml.AsString(wrote.Get("hand")) != role {
+	// A leaf the engine passed belongs to no hand, so the hand on the group's own branch takes it back. [[spec/design_output/pull#a-closed-group-stays-shut]]
+	engines := wrote != nil && yaml.AsString(wrote.Get("hand")) == Engine && who.Branch == WorkBranch+name
+	if wrote == nil || (yaml.AsString(wrote.Get("hand")) != role && !engines) {
 		it.Refuse(failure.Raise(it.Failures, "pull-back-other-hand", fmt.Sprintf("%s carries no hand-back by %s, so it is another hand's or nobody's.", path, role)))
 		return 1
 	}
