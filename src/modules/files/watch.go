@@ -86,36 +86,46 @@ func (one watch) Changes(hand Hand) (func(), error) {
 	if err != nil {
 		return func() {}, err
 	}
-	if err := one.adds(eyes, one.root, state, nil); err != nil {
+	// The watcher's loop hears while the start walk runs, so the walk holds the lock hears holds. [[spec/tickets/watch-hands-new-folders]]
+	state.mu.Lock()
+	err = one.adds(eyes, one.root, state, nil)
+	state.mu.Unlock()
+	if err != nil {
 		eyes.Close()
 		return func() {}, err
-	}
-	for folder := range named {
-		_ = eyes.Add(filepath.Join(one.root, filepath.FromSlash(folder)))
 	}
 	return func() { eyes.Close() }, nil
 }
 
-// Every folder under root, so a write in a folder below reaches the watch. A folder the walk or the watcher refuses under from costs itself alone. [[spec/tickets/seed-survives-bad-files]]
-func (one watch) adds(eyes adder, from string, _ *held, _ Hand) error {
+// A folder the walk or the watcher refuses under from costs itself alone. [[spec/tickets/seed-survives-bad-files]]
+// Every folder under from the walk enters joins the watch, a named folder among them, and every heard file joins the record; with a hand, each file's text is handed too. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (one watch) adds(eyes adder, from string, state *held, hand Hand) error {
 	return filepath.WalkDir(from, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return walkPast(from, path, err)
 		}
-		if !entry.IsDir() {
+		rel, _ := filepath.Rel(one.root, path)
+		rel = filepath.ToSlash(rel)
+		if entry.IsDir() {
+			if rel != "." && !entered(rel) {
+				return filepath.SkipDir
+			}
+			return walkPast(from, path, eyes.Add(path))
+		}
+		if !entry.Type().IsRegular() || !heard(rel) {
 			return nil
 		}
-		if skipped[entry.Name()] || (strings.HasPrefix(entry.Name(), ".") && filepath.Base(filepath.Dir(path)) == private) {
-			return filepath.SkipDir
+		state.seen[rel] = true
+		if info, err := entry.Info(); err == nil && hand != nil {
+			state.reads(path, rel, info, hand)
 		}
-		return walkPast(from, path, eyes.Add(path))
+		return nil
 	})
 }
 
 func (one watch) hears(eyes adder, event fsnotify.Event, hand Hand, state *held) {
 	state.mu.Lock()
 	defer state.mu.Unlock()
-	known := state.known
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
@@ -123,13 +133,12 @@ func (one watch) hears(eyes adder, event fsnotify.Event, hand Hand, state *held)
 	rel = filepath.ToSlash(rel)
 	if !heard(rel) {
 		if named[rel] != "" {
-			_ = eyes.Add(event.Name)
+			_ = one.adds(eyes, event.Name, state, hand)
 		}
 		return
 	}
 	if event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
-		delete(known, rel)
-		hand(rel, "", 0, true)
+		state.leaves(rel, hand)
 		return
 	}
 	info, err := os.Stat(event.Name)
@@ -140,18 +149,38 @@ func (one watch) hears(eyes adder, event fsnotify.Event, hand Hand, state *held)
 		_ = one.adds(eyes, event.Name, state, hand)
 		return
 	}
-	body, err := os.ReadFile(event.Name)
+	state.seen[rel] = true
+	state.reads(event.Name, rel, info, hand)
+}
+
+// Hands a heard file's text, and gone where it no longer stands. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (state *held) reads(path, rel string, info fs.FileInfo, hand Hand) {
+	body, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
-		hand(rel, "", 0, true)
+		state.leaves(rel, hand)
 		return
 	}
 	// A read lands before its writer's bytes, and the write that follows brings them. [[spec/tickets/sweep-reads-tracked-after-restart]]
-	if err != nil || (len(body) == 0 && !known[rel]) {
+	if err != nil || (len(body) == 0 && !state.known[rel]) {
 		return
 	}
-	known[rel] = textual(string(body))
-	if known[rel] {
+	state.known[rel] = textual(string(body))
+	if state.known[rel] {
 		hand(rel, string(body), info.ModTime().UnixNano(), false)
+	}
+}
+
+// Hands gone for rel and for every recorded file under rel plus a slash, so a folder moved out leaves no ghost and a sibling sharing its prefix stays. The caller holds the lock. [[spec/tickets/watch-hands-new-folders]]
+func (state *held) leaves(rel string, hand Hand) {
+	delete(state.known, rel)
+	delete(state.seen, rel)
+	hand(rel, "", 0, true)
+	for path := range state.seen {
+		if strings.HasPrefix(path, rel+"/") {
+			delete(state.known, path)
+			delete(state.seen, path)
+			hand(path, "", 0, true)
+		}
 	}
 }
 

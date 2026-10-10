@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 1d059c372b05e12d
         size: 755
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-15
+    hash_before: 55d5aa33808b307bc34b5ad7b5dfea95177ced7b
+    hash_after: 68f05a8dd1cdb3ed2694a37f2979355a9d46a3c1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/files/watch.go src/modules/files/watch_folders_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the watch file alone, as the draft size names
+- doors: the cases record the watcher add, and read a temp root
+- comment: each new comment ends on a pointer at this ticket
+- one place: the record and known map stand on one held state
 
 ## tests-green
 
