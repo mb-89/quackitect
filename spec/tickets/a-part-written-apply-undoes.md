@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: implement/person-1
 steps:
   - name: design
     steps:
@@ -75,6 +76,15 @@ steps:
             form: command
             expects: 0
             says: the tree builds and lints
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "a-part-written-apply-undoes cannot pass tests-green: the edits package stays red on the cases of journal-names-stay-unique and regex-replacements-read-js-groups, the ratio guard fails on src/modules/files until the files tickets write their code, and the queue binds the box to this ticket. Narrow its tests to its own case and baseline the files ratio until the group's code lands, or unbind the queue so the box takes every implement step first?"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: tests-green
         does: makes the tests pass
         input: design/tests-red
@@ -116,8 +126,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
-group: edits-and-files-hold
-step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -178,6 +186,7 @@ record:
       - name: check
         exit: 1
         said: "   78.5  in all"
+group: edits-and-files-hold
 ---
 
 # Ask
@@ -324,6 +333,22 @@ The approach answers the ask: writes() in src/modules/edits/edits.go rewrites th
 - doors: the change reaches the disk through the Outside root, and the case runs it over a temp root of its own
 - comment: reached carries a line pointing at this ticket
 - one place: the rule for which files a part-written apply keeps stands in reached alone
+
+## person-1
+
+<!-- a-part-written-apply-undoes cannot pass tests-green: the edits package stays red on the cases of journal-names-stay-unique and regex-replacements-read-js-groups, the ratio guard fails on src/modules/files until the files tickets write their code, and the queue binds the box to this ticket. Narrow its tests to its own case and baseline the files ratio until the group's code lands, or unbind the queue so the box takes every implement step first? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## tests-green
 
