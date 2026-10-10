@@ -468,7 +468,8 @@ func AddsIn(said string) []Line {
 			binary = true
 			continue
 		case !hunk && strings.HasPrefix(row, "+++ "):
-			file = strings.TrimPrefix(unquoted(row[len("+++ "):]), "b/")
+			// Git ends a path holding a space with a tab. [[spec/tickets/staged-adds-drop-the-tab]]
+			file = strings.TrimPrefix(unquoted(strings.TrimSuffix(row[len("+++ "):], "\t")), "b/")
 			if file == "/dev/null" {
 				file = ""
 			}
