@@ -180,7 +180,7 @@ func childRows(one stand, all bool) []listRow {
 			continue
 		}
 		var waits []string
-		for _, name := range dependsOnText(child.Text) {
+		for _, name := range dependsOn(frontOf(child.Text)) {
 			if open[name] {
 				waits = append(waits, name)
 			}

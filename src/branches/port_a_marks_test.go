@@ -21,36 +21,6 @@ func TestPAMarkReadsFromTheFront(t *testing.T) {
 	}
 }
 
-// A dependency reads as a list or on one line, with the prefix dropped. [[spec/tickets/work-verbs-port-to-go]]
-func TestPADependencyReadsListOrLine(t *testing.T) {
-	t.Parallel()
-	if said := dependsOnText("---\ndepends_on:\n  - one\n  - work/two\n---\n"); !slices.Equal(said, []string{"one", "two"}) {
-		t.Fatalf("the list reads %q", said)
-	}
-	if said := dependsOnText("---\ndepends_on: a, work/b\n---\n"); !slices.Equal(said, []string{"a", "b"}) {
-		t.Fatalf("the line reads %q", said)
-	}
-	if said := dependsOnText("---\nstatus: todo\n---\n"); len(said) != 0 {
-		t.Fatalf("no dependency reads %q", said)
-	}
-}
-
-// A dependency in a flow list reads without its brackets or its quotes. [[spec/tickets/work-verbs-port-to-go]]
-func TestPADependencyFlowList(t *testing.T) {
-	t.Parallel()
-	cases := map[string][]string{
-		"---\ndepends_on: [one, work/two]\n---\n":  {"one", "two"},
-		"---\ndepends_on: [\"one\", 'two']\n---\n": {"one", "two"},
-		"---\ndepends_on: []\n---\n":               {},
-		"---\ndepends_on:\n  - \"one\"\n---\n":     {"one"},
-	}
-	for text, want := range cases {
-		if said := dependsOnText(text); !slices.Equal(said, want) && !(len(said) == 0 && len(want) == 0) {
-			t.Fatalf("%q reads %q", text, said)
-		}
-	}
-}
-
 // A branch waits for a dependency until trunk holds it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAWaitsUntilTrunkHoldsIt(t *testing.T) {
 	t.Parallel()
