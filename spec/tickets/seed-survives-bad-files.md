@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 75c3daf71d1621ba
         size: 657
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-14
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: 744d8f2a1771c3647a0cae89aac5342091fe9b37
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/files/watch.go src/modules/files/watch_folders_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: watch.go and watch_folders_test.go alone, both under the ask
+- doors: the add case fakes the watcher through the adder seam
+- approach: walkPast and landEach comments name the approach and the ticket
+- one place: walkPast owns the past-a-path rule, both walks call it
 
 ## tests-green
 

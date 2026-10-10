@@ -21,6 +21,26 @@ func (one *joined) Add(path string) error {
 	return nil
 }
 
+// A watcher refusing every folder named bad. [[spec/tickets/seed-survives-bad-files]]
+type refusing struct{ joined }
+
+func (one *refusing) Add(path string) error {
+	if filepath.Base(path) == "bad" {
+		return os.ErrPermission
+	}
+	return one.joined.Add(path)
+}
+
+// A folder refusing its Add costs itself alone, and the watch starts. [[spec/tickets/seed-survives-bad-files]]
+// level0: FixtureOutsideHome - the walk reads a root of the case's own
+func TestAFolderRefusingItsAddLeavesTheWatchStanding(t *testing.T) {
+	one, _, _, _ := started(t, "bad/a.md", "good/b.md")
+	eyes := &refusing{}
+	if err := one.adds(eyes, one.root, newHeld(), nil); err != nil || !slices.Contains(eyes.joined, filepath.Join(one.root, "good")) {
+		t.Fatalf("the watch answers %v and takes %v, and wants the good folder", err, eyes.joined)
+	}
+}
+
 // A watch over a root of its own, started, with the record of what it hands. [[spec/tickets/watch-hands-new-folders]]
 func started(t *testing.T, files ...string) (watch, *held, *joined, *[]string) {
 	root := t.TempDir()

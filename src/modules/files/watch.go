@@ -96,16 +96,19 @@ func (one watch) Changes(hand Hand) (func(), error) {
 	return func() { eyes.Close() }, nil
 }
 
-// Every folder under root, so a write in a folder below reaches the watch. [[spec/design_output/model#io-modules-and-their-fakes]]
+// Every folder under root, so a write in a folder below reaches the watch. A folder the walk or the watcher refuses under from costs itself alone. [[spec/tickets/seed-survives-bad-files]]
 func (one watch) adds(eyes adder, from string, _ *held, _ Hand) error {
 	return filepath.WalkDir(from, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil || !entry.IsDir() {
-			return err
+		if err != nil {
+			return walkPast(from, path, err)
+		}
+		if !entry.IsDir() {
+			return nil
 		}
 		if skipped[entry.Name()] || (strings.HasPrefix(entry.Name(), ".") && filepath.Base(filepath.Dir(path)) == private) {
 			return filepath.SkipDir
 		}
-		return eyes.Add(path)
+		return walkPast(from, path, eyes.Add(path))
 	})
 }
 
@@ -195,9 +198,12 @@ func Standing(root string, hand Hand) error {
 	})
 }
 
-// What the seed's walk does past a path it cannot read. [[spec/tickets/seed-survives-bad-files]]
+// What a walk does past a path it cannot read: an error at the root ends it, and one under the root costs that path alone. [[spec/tickets/seed-survives-bad-files]]
 func walkPast(root, at string, err error) error {
-	return err
+	if at == root {
+		return err
+	}
+	return nil
 }
 
 // A watch handing the changes a test pushes, or the writes of a FakeDisk it listens on. [[spec/design_output/model#io-modules-and-their-fakes]]
@@ -284,10 +290,9 @@ func Seeds(root string, from Watch, commit func(values map[string]any) error) (s
 // The seed in commits of at most most text bytes each, the last one landing whatever stands, so one message stays under the bus cap. [[spec/tickets/seed-splits-under-bus-cap]]
 func seedsIn(root string, from Watch, commit func(values map[string]any) error, most int) (stop func(), err error) {
 	batch, size := map[string]any{}, 0
-	var failed error
 	err = Standing(root, func(path, text string, changed int64, _ bool) {
-		if size > 0 && size+len(text) > most && failed == nil {
-			failed = commit(batch)
+		if size > 0 && size+len(text) > most {
+			landEach(commit, batch)
 			batch, size = map[string]any{}, 0
 		}
 		value := ContentOf(text)
@@ -297,11 +302,16 @@ func seedsIn(root string, from Watch, commit func(values map[string]any) error, 
 	if err != nil {
 		return func() {}, err
 	}
-	if failed != nil {
-		return func() {}, failed
-	}
-	if err := commit(batch); err != nil {
-		return func() {}, err
-	}
+	landEach(commit, batch)
 	return Start(from, commit)
+}
+
+// Commits a batch, and where the commit refuses it, each file alone, so a file refused alone drops out of the seed and the rest land. [[spec/tickets/seed-survives-bad-files]]
+func landEach(commit func(values map[string]any) error, batch map[string]any) {
+	if commit(batch) == nil {
+		return
+	}
+	for path, value := range batch {
+		_ = commit(map[string]any{path: value})
+	}
 }
