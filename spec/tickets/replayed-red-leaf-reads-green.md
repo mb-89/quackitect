@@ -81,4 +81,4 @@ The fault stands no longer. The ticket names the JavaScript route, and the Go po
 - `keptRed` keeps the leaf while its tests stand and a later leaf passes
 - a rename rewriting the draft takes the same road
 
-No Go case drives `keptRed` yet, and the private note `kept-red-wants-its-case` carries that gap.
+`TestALandedRedLeafStandsKeptWhileItsTestsStand` in `src/pull/pull_kept_test.go` drives `keptRed` over both sides: the kept leaf, and the leaf whose test is gone.
