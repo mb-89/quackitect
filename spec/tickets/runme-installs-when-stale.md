@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/quack/setup_verb.go:121:1 ExampleCovers: ./RUNME.sh setup stands in no example's interface. Write an example under s"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: b0e94b203db9498642def0600625f72869d749e9
+    hash_after: b0e94b203db9498642def0600625f72869d749e9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/quack passes; green, src/tui/registry passes; green, src/tui/tree passes; green, src/tui
+      - name: check
+        exit: 0
+        said: "   62.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2c7612fc04dadb2e
+        size: 831
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -341,26 +364,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+RUNME.sh ran the whole install before every verb, so the Stop hook paid the want checks and the setup at each turn end, and install lines landed ahead of a verb answer on stdout. RUNME.sh now runs install.sh where the call is bare, the binary stands missing, or the binary reads its own stamp stale through stamp fresh se-index, the check index_here in install.sh runs; a box with no go keeps its binary. The install writes to stderr, so stdout carries the verb answer alone, --json among them. A verb on a fresh binary drops from a full install to the stamp check alone. The browser want fetches playwright-core at the version the webview package.json pins, and falls back to the bare package where no pin stands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches RUNME.sh and src/quack/setup_verb.go alone
+- the change reaches the disk door alone, whose fake stands in box_doors_test.go
+- a comment beside the stamp check, the install gate and the pin reader names the ticket
+- the stamp check stands once in RUNME.sh, and the pin stands once in the webview package.json
 
 # accept
 
