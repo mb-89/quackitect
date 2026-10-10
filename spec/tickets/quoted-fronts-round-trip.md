@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: d131762ab50f91b60cbd4f88170f5f9e0e10451d
+    hash_after: d131762ab50f91b60cbd4f88170f5f9e0e10451d
+    inputs:
+      - name: ask
+        hash: 56dc466b70fefe10
+        size: 625
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -157,38 +166,52 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`unquote` in `src/yaml/yaml.go` decodes what `front.Quote` encodes. A value that `QuotedWhole` reads as one double-quoted string decodes the escapes `\\`, `\"`, `\n`, `\r` and `\t`, and keeps any other backslash pair as written. A value `QuotedWhole` reads as one single-quoted string turns each doubled quote into one. A value opening and closing on a quote that `QuotedWhole` refuses keeps today's strip of its two ends, so no reader past the front changes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/yaml/yaml.go` `scalar`, which `block`, `listAt` and the item reads call
+- `src/note/note.go` `Read` through `yaml.ReadLines`
+- `src/front/front.go` `Set` through `Quote`, whose output the round trip reads back
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/yaml/yaml_test.go` `TestAQuotedScalarDecodesItsEscapes`
+- `src/front/front_test.go` `TestASetValueReadsBackAsWritten`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/yaml/yaml.go`
+- `src/yaml/yaml_test.go`
+- `src/front/front_test.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `unquote`, `scalar`, `QuotedWhole`, `flowItems`, `front.Quote`, `front.Set` and `note.Read` stand opened, and each claim checked there
+- the callers list names `scalar`, the note read and the front write
+- each done_when line names its case under tests
+- the approach adds no config key
 
 ## tests-red
 
