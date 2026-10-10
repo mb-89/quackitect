@@ -144,7 +144,7 @@ get_biome() {
   case "$os" in
     Windows) name="biome-win32-x64.exe" ;;
     macOS)   name="biome-darwin-$( [ "$arch" = arm64 ] && echo arm64 || echo x64 )" ;;
-    *)       name="biome-linux-x64" ;;
+    *)       name="biome-linux-$( [ "$arch" = arm64 ] && echo arm64 || echo x64 )" ;;
   esac
   from="https://github.com/biomejs/biome/releases/download/@biomejs/biome@${biome_version}/${name}"
 
@@ -274,7 +274,8 @@ missed() {
 
 here() {
   case $1 in
-    biome)   [ -x "$bin/biome${exe}" ] ;;
+    # A binary built for another arch keeps its execute bit, so the binary answers its version. [[spec/tickets/biome-fetches-its-arch]]
+    biome)   [ -x "$bin/biome${exe}" ] && "$bin/biome${exe}" --version >/dev/null 2>&1 ;;
     go)      have go ;;
     go-modules) modules_here ;;
     index) index_here ;;

@@ -38,12 +38,16 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: go.sum
 
-      # The installer downloads each binary from a pinned release. The key
-      # names those versions, so a bump fetches them once and no run after.
+      # The installer downloads Biome from the release install.sh pins. The key
+      # reads that pin, so a bump fetches it once and no run after.
+      # [[spec/tickets/ci-caches-the-runtime-bin]]
+      - id: biome
+        shell: bash
+        run: echo "version=$(sed -n 's/^biome_version=//p' install.sh)" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v4
         with:
-          path: .se/bin
-          key: se-bin-${{ runner.os }}-biome2.5.12
+          path: .se/.runtime/bin/biome*
+          key: se-biome-${{ runner.os }}-${{ steps.biome.outputs.version }}
 
       # The plugin parts read the hooks with the engine's own tools: claude lays
       # the types and validates the module, and tsc reads the hooks against
