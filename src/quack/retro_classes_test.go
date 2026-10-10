@@ -465,14 +465,19 @@ func TestRetroMintKeepsTheNameOfATicketThatMintsWhereALaterOneRefuses(t *testing
 	}
 }
 
-// A second run mints nothing twice. [[spec/guidance/retro/check]]
-func TestRetroMintMintsNothingTwiceOnASecondRun(t *testing.T) {
+// A refused open removes the draft it minted, a rerun mints the ticket, and a third run mints nothing twice. [[spec/guidance/retro/check]] [[spec/tickets/retro-mint-cleans-its-draft]]
+func TestRetroMintCleansARefusedDraftAndMintsNothingTwice(t *testing.T) {
 	t.Parallel()
 	root, fake := retroMintTree(t, []map[string]any{retroMintOpenClass("k1", nil)}, nil)
+	opened := 0
+	fake.answers["./RUNME.sh ticket open the-land-verb-lands"] = func() retroMintRan { opened++; return retroMintRan{code: max(0, 2-opened)} }
+	if code, _, _ := retroMintRuns(root, fake); code != 1 || retroMintReadFile(t, root, retroMintLand) != "" {
+		t.Fatalf("a refused open answers %d and leaves its draft", code)
+	}
 	retroMintRuns(root, fake)
 	code, out, _ := retroMintRuns(root, fake)
-	if code != 0 || out != "0 ticket(s) mint, and 0 class(es) stand closed already.\n" {
-		t.Fatalf("the second run answers %d and prints %q", code, out)
+	if code != 0 || out != "0 ticket(s) mint, and 0 class(es) stand closed already.\n" || retroMintReadFile(t, root, retroMintLand) == "" {
+		t.Fatalf("the third run answers %d and prints %q", code, out)
 	}
 }
 
