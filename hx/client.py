@@ -28,6 +28,8 @@ class RemoteHx:
             data = json.loads(e.read() or b"{}")
             if e.code == 409:
                 raise Rejected(data.get("code", "rejected"), data.get("message", ""), data.get("report"))
+            if e.code == 401:
+                raise Rejected("unauthorized", data.get("message") or "not allowed with this token")
             raise RuntimeError(f"coordinator: HTTP {e.code}: {data.get('message') or data.get('error')}")
 
     def _op(self, op, *args, **kwargs):
