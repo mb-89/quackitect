@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9502fdb7652648e5
         size: 1846
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-8
+    hash_before: 29c5ce35857d1cc76abb59928e3f9d9ef89883dd
+    hash_after: 29c5ce35857d1cc76abb59928e3f9d9ef89883dd
+    inputs:
+      - name: design/draft
+        hash: 9502fdb7652648e5
+        size: 1846
+      - name: design/tests-red
+        hash: 1d059c372b05e12d
+        size: 755
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,13 @@ All three cases fail on their own assertions. A folder moved in hands nothing, a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the lock: watcher.hears delivers events on its own goroutine while Changes runs its start walk, so one lock holds both, and adds takes no lock of its own since hears already holds it
+- moved-out prefix: match recorded files under rel plus a slash, so a sibling such as gone2 is not handed gone, and drop those entries from the record and from known
+- the record grows on the start walk: adds with a nil hand only records files, and with a hand it records them and hands them
+- the named loop in Changes goes, as the draft says: a named folder standing at start joins through adds, and one made later joins through hears
 
 # implement
 
