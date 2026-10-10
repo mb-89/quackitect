@@ -383,6 +383,17 @@ func TestSplitVerb(t *testing.T) {
 			t.Fatalf("the target holds %q", got)
 		}
 	})
+	t.Run("two splits at one clock reading leave two journal entries", func(t *testing.T) {
+		disk := splitTree(t)
+		for _, target := range []string{"src/a.js", "src/b.js"} {
+			if code, said := hq3Splits(disk, "split", splitSource, "--to", target, "--lines", "1-1"); code != 0 {
+				t.Fatalf("the split answers %d: %s", code, said)
+			}
+		}
+		if entries := disk.listed(filepath.Join("/tree", filepath.FromSlash(edits.Journal))); len(entries) != 2 {
+			t.Fatalf("the journal holds %v, and wants one entry a split", entries)
+		}
+	})
 	t.Run("a journal the disk refuses answers a line, and no target lands", func(t *testing.T) {
 		disk := splitTree(t)
 		hq1SeedDisk(t, disk, "/tree", map[string]string{".se": "a file where the folder stands"})

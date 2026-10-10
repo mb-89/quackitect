@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 687470fd48202cca
         size: 483
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-12
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: 41b53e0d2365b1a9d7f958109a77e3b719fbeade
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/verb_split.go:22:1 ExampleCovers: ./RUNME.sh split stands in no example's interface. Write an example under sp"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -292,14 +301,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/edits/journal.go src/modules/edits/edits.go src/quack/verb_split.go src/quack/rename.go spec/design_output/apply.md src/quack/verb_project_test.go src/quack/landing_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the draft size, the gate note in apply.md, and a split and a move case beside the verbs
+- doors: the edits case runs on a temp root, and split and rename stat through the fake disk
+- comment: each new comment line ends on the ticket link naming the free name approach
+- one place: `FreeName` alone counts, and apply.md links the ticket
 
 ## tests-green
 

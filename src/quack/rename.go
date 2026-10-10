@@ -322,7 +322,11 @@ func (d landingDoors) journals(from, to string, order []string, journal map[stri
 	if err := d.box.disk.makeAll(folder, renamedFolderMode); err != nil {
 		return err
 	}
-	return d.box.disk.write(filepath.Join(folder, edits.NameOf(stamp)), append(text, '\n'), renamedMode)
+	name := edits.FreeName(stamp, func(name string) bool {
+		_, err := d.box.disk.stat(filepath.Join(folder, name))
+		return err == nil
+	})
+	return d.box.disk.write(filepath.Join(folder, name), append(text, '\n'), renamedMode)
 }
 
 // Several holds name several tickets, and a move belongs to none of them alone. [[spec/tickets/journal-the-rename-verb]]

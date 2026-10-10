@@ -228,7 +228,7 @@ func opsOf(took Took) []Op {
 // [[spec/design_output/apply#the-journal-holds-both-halves]]
 func (from Outside) writes(took Took, on, ticket string) (any, error) {
 	at := from.Now().UTC().Format(stampForm)
-	name := path.Join(Journal, NameOf(at))
+	name := path.Join(Journal, FreeName(at, from.journalHolds))
 	entry := JournalOf(at, on, journalBy, took.Files, ticket)
 	if err := from.put(name, entryText(entry), true); err != nil {
 		return nil, fmt.Errorf("the undo journal writes nothing, so nothing lands: %w", err)
@@ -253,6 +253,12 @@ func (from Outside) writes(took Took, on, ticket string) (any, error) {
 		rows = append(rows, fmt.Sprintf("  %s (%d place(s))", one, took.Counts[one]))
 	}
 	return strings.Join(append(rows, "", "Run undo to take this back while nothing else touches these files."), "\n"), nil
+}
+
+// Whether the journal folder holds the entry name, an absent folder holding none, since put makes it on the first apply. [[spec/tickets/journal-names-stay-unique]]
+func (from Outside) journalHolds(name string) bool {
+	_, err := os.Stat(from.at(path.Join(Journal, name)))
+	return err == nil
 }
 
 // The files of a part-written apply, failing at the file at failed: every file before it, and the failing file only where it stands on disk, with the text read back, since a cut write leaves neither half. Undo then meets only the files the apply reached. [[spec/tickets/a-part-written-apply-undoes]]
