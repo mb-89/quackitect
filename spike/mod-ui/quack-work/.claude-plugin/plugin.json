@@ -1,0 +1,6 @@
+{
+  "name": "quack-work",
+  "version": "0.1.0",
+  "description": "Spike: the harness's work state (queue, current ticket, log) as a pane, a band and a status line, read from the index's /v1 values.",
+  "types": "./types/index.d.ts"
+}
