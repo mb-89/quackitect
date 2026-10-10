@@ -14,6 +14,8 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+
+	"quackitect/src/pull"
 )
 
 // The cases a report names, the words a red case keeps, the cases a budget warning names, the width a part's seconds pad to, and the milliseconds in a tenth of a second and the tenths in one, which a part's time rounds by. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-runs-fast-again]]
@@ -38,7 +40,7 @@ const (
 )
 
 var (
-	goFailCase    = regexp.MustCompile(`^\s*--- FAIL: (\S+)`)
+	goFailCase    = pull.GoFailCase
 	goSaidLine    = regexp.MustCompile(`^\s+([\w.-]+\.go):(\d+): (.*)$`)
 	goFailPackage = regexp.MustCompile(`^FAIL\s+(\S+)\s`)
 )

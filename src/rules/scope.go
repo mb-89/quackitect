@@ -38,7 +38,7 @@ var sections = []section{
 	{glob: "**/src/scripts/cli*.js", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/src/**/door.go", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
 	{glob: "**/src/**/*_test.go", turns: []turn{{"VoiceVale.OutsideInDoors", false}}},
-	{glob: "*answer.md", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceParagraph.ShapeAnswer", true}, {"VoiceParagraph.ParagraphAnswer", true}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceParagraph.Shape", false}, {"VoiceParagraph.Paragraph", false}, {"VoiceParagraph.PastTense", false}}},
+	{glob: "{level0-answer.md,**/level0-answer.md}", based: []string{"VoiceVale", "VoiceParagraph"}, turns: []turn{{"VoiceParagraph.ShapeAnswer", true}, {"VoiceParagraph.ParagraphAnswer", true}, {"VoiceParagraph.ModalRequirement", false}, {"VoiceParagraph.Shape", false}, {"VoiceParagraph.Paragraph", false}, {"VoiceParagraph.PastTense", false}}},
 	{glob: "**/spec/design_output/*.md", turns: []turn{{"VoiceVale.DigitInProse", true}}},
 	{glob: "**/spec/rationales/*.md", turns: []turn{{"VoiceVale.History", false}, {"VoiceVale.CountedList", false}, {"VoiceParagraph.Hedge", false}, {"VoiceParagraph.PastTense", false}, {"VoiceParagraph.Auxiliary", false}, {"VoiceParagraph.Progressive", false}, {"VoiceParagraph.Modal", false}}},
 	{glob: "**/spec/design_input/*.md", turns: []turn{{"VoiceParagraph.Hedge", false}, {"VoiceParagraph.Modal", false}, {"VoiceVale.CountedList", false}, {"VoiceParagraph.ListItem", false}, {"VoiceParagraph.CodeSpans", false}, {"VoiceParagraph.Characters", false}, {"VoiceParagraph.ModalRequirement", true}}},
