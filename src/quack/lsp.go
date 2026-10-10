@@ -67,6 +67,9 @@ func relays(in io.Reader, out io.Writer, conn io.ReadWriter, token string) error
 // The values the lenses read: the holds module's standing holds, and the tickets the cloud holds, which CloudPort in src/modules/tickets names under the tickets instance. [[spec/tickets/lsp-draws-the-ticket-lenses]]
 const cloudTickets = "tickets/cloud"
 
+// The family a ticket's drawing stands under, which DrawnPort in src/modules/tickets names under the tickets instance, a path past it. [[spec/tickets/lsp-marks-the-held-fields]]
+const drawnTickets = "tickets/drawn/"
+
 // The seconds a press waits on its verb, which ACT_WAIT in src/extension/editor-index.js held for the extension's own post, and the caller its operations stand under. [[spec/tickets/lsp-draws-the-ticket-lenses]]
 const (
 	pressWait = 600 * time.Second
@@ -105,6 +108,11 @@ func lspTickets(root string, store *q.Store, call pressCall, write func(path str
 		},
 		Save: func(path, text string) error {
 			return write(filepath.Join(root, filepath.FromSlash(path)), []byte(text), 0o644)
+		},
+		Drawn: func(path string) lsp.Drawing {
+			var out lsp.Drawing
+			reads(drawnTickets+path, &out)
+			return out
 		},
 		Names: []string{holds.StandingName, cloudTickets},
 	}

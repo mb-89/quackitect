@@ -119,6 +119,8 @@ type Server struct {
 	push    func(bodies ...[]byte)
 	// The count of requests the server sends the client, each id its own. [[spec/tickets/lsp-draws-the-ticket-lenses]]
 	asked atomic.Int64
+	// The tickets the person held when the server learnt them, so only a new take moves the cursor. [[spec/tickets/lsp-marks-the-held-fields]]
+	known map[string]bool
 }
 
 // What the standing file holds: the port, and the token a connection sends first. [[spec/tickets/hooks-standing-file-names-token]]
@@ -204,6 +206,7 @@ func (s *Server) Handle(message []byte) [][]byte {
 	defer s.mu.Unlock()
 	switch in.Method {
 	case initialize:
+		s.learns()
 		return [][]byte{answers(in.ID, map[string]any{
 			"capabilities": capabilities,
 			"serverInfo":   map[string]any{"name": serverName, "version": serverVersion},
@@ -211,7 +214,7 @@ func (s *Server) Handle(message []byte) [][]byte {
 	case shutdown:
 		return [][]byte{answers(in.ID, nil)}
 	case hover:
-		return [][]byte{answers(in.ID, s.reads(s.from.Check.Hover, in.Params, nil))}
+		return [][]byte{answers(in.ID, s.hovers(in.Params))}
 	case completion:
 		return [][]byte{answers(in.ID, s.reads(s.from.Check.Complete, in.Params, []any{}))}
 	case documentLink:
@@ -296,7 +299,7 @@ func (s *Server) drawn(uri, at string, swept []Finding, force bool) []byte {
 	}
 	rows := strings.Split(text, "\n")
 	drawn := []diagnostic{}
-	for _, one := range append(append([]Finding{}, swept...), s.tools[at]...) {
+	for _, one := range append(append(append([]Finding{}, swept...), s.tools[at]...), s.markRows(at)...) {
 		drawn = append(drawn, drawsAs(one, rows))
 	}
 	body := marshal(map[string]any{"jsonrpc": rpcVersion, "method": publish, "params": map[string]any{"uri": uri, "diagnostics": drawn}})
@@ -473,12 +476,15 @@ func Listen(root string, server *Server) (func(), error) {
 	})
 	server.from.Store.OnCommit(func(values map[string]any) {
 		moves := server.MovesLenses(values)
+		// [[spec/tickets/lsp-marks-the-held-fields]]
+		takes := server.Takes(values)
 		for _, one := range held() {
 			one.send(server.Republish(one.known())...)
 			// [[spec/tickets/lsp-draws-the-ticket-lenses]]
 			if moves {
 				one.send(server.Refresh())
 			}
+			one.send(takes...)
 		}
 		go server.follows(values)
 	})

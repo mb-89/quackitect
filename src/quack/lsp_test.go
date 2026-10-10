@@ -17,8 +17,17 @@ import (
 	"quackitect/src/modules/check"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/lsp"
+	"quackitect/src/modules/tickets"
 	"quackitect/src/q"
 )
+
+// The marks read a ticket's drawing under the name the tickets module projects it at. [[spec/tickets/lsp-marks-the-held-fields]]
+func TestTheMarksReadTheDrawingTheTicketsModuleProjects(t *testing.T) {
+	t.Parallel()
+	if want := "tickets/" + tickets.DrawnPort + "/"; drawnTickets != want {
+		t.Fatalf("the marks read the drawing under %q, and the tickets module projects it under %q", drawnTickets, want)
+	}
+}
 
 // A press answers as the extension's index door read a post: the output on an end, the handle past the wait, and the fault on a refusal. [[spec/tickets/lsp-draws-the-ticket-lenses]]
 func TestAPressAnswersAsTheIndexDoorDid(t *testing.T) {
