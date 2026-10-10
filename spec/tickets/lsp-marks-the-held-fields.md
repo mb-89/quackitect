@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -168,6 +168,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/lsp]]
+  - step: design/tests-red
+    skipped: true
+    kept: a47be9d5bb6f9d9db64af39e712b71716e7478cb
+    why: its red tests stand as a47be9d5b landed them, and a later leaf passed since
 ---
 
 # Ask
