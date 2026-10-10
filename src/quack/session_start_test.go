@@ -290,9 +290,7 @@ func installIn(t *testing.T, tree, path string, env ...string) string {
 
 func TestTheInstallFetchesTheBiomeItsMachineRuns(t *testing.T) {
 	t.Parallel()
-	for _, one := range []struct {
-		name, machine, standing, asset string
-	}{
+	for _, one := range []struct{ name, machine, standing, asset string }{
 		{"an arm Linux box fetches the arm asset", "aarch64", "", "biome-linux-arm64"},
 		{"an x86 Linux box fetches the x64 asset", "x86_64", "", "biome-linux-x64"},
 		{"a standing binary that cannot run is fetched again", "aarch64", "#!/bin/sh\nexit 126\n", "biome-linux-arm64"},
@@ -305,10 +303,9 @@ func TestTheInstallFetchesTheBiomeItsMachineRuns(t *testing.T) {
 		if one.standing != "" {
 			bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "biome"), one.standing, 0o755)
 		}
-		fetched := filepath.Join(tree, "fetched")
-		said := installIn(t, tree, path, "SE_INSTALL_SKIP=go go-modules index git-hooks", "BIOME_MACHINE="+one.machine, "BIOME_FETCHED="+fetched)
-		asked, _ := os.ReadFile(fetched)
-		if got := strings.TrimSpace(string(asked)); (one.asset == "" && got != "") || (one.asset != "" && !strings.HasSuffix(got, "/"+one.asset)) {
+		said := installIn(t, tree, path, "SE_INSTALL_SKIP=go go-modules index git-hooks", "BIOME_MACHINE="+one.machine, "BIOME_FETCHED="+filepath.Join(tree, "fetched"))
+		asked, _ := os.ReadFile(filepath.Join(tree, "fetched"))
+		if got := strings.TrimSpace(string(asked)); got[strings.LastIndex(got, "/")+1:] != one.asset {
 			t.Errorf("%s: the install fetched %q, and wants the asset %q: %s", one.name, got, one.asset, said)
 		}
 	}
