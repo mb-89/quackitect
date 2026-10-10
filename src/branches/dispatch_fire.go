@@ -148,8 +148,9 @@ func (d *Doors) redPulls(send Send, plan *dispatchPlan, taken []fireOne) ([]fire
 	var pulls []struct {
 		URL  string `json:"html_url"`
 		Head struct {
-			Ref string `json:"ref"`
-			Sha string `json:"sha"`
+			Ref  string   `json:"ref"`
+			Sha  string   `json:"sha"`
+			Repo headRepo `json:"repo"`
 		} `json:"head"`
 	}
 	if json.Unmarshal([]byte(listed.Text), &pulls) != nil {
@@ -159,7 +160,7 @@ func (d *Doors) redPulls(send Send, plan *dispatchPlan, taken []fireOne) ([]fire
 	var why []string
 	for _, one := range pulls {
 		ref := one.Head.Ref
-		if !strings.HasPrefix(ref, workBranch) || fired[ref] || !plan.atDone[ref] || one.Head.Sha == "" {
+		if !strings.HasPrefix(ref, workBranch) || !one.Head.Repo.ownedBy(gh) || fired[ref] || !plan.atDone[ref] || one.Head.Sha == "" {
 			continue
 		}
 		runs := sent(send, gh.API+"/repos/"+gh.Repo+"/commits/"+one.Head.Sha+"/check-runs", Request{Method: "GET", Headers: gh.Headers})
@@ -432,14 +433,15 @@ func (d *Doors) updates(send Send) ([]updateRow, string) {
 	var pulls []struct {
 		Number int `json:"number"`
 		Head   struct {
-			Ref string `json:"ref"`
+			Ref  string   `json:"ref"`
+			Repo headRepo `json:"repo"`
 		} `json:"head"`
 	}
 	if json.Unmarshal([]byte(listed.Text), &pulls) != nil {
 		pulls = nil
 	}
 	for _, one := range pulls {
-		if !strings.HasPrefix(one.Head.Ref, workBranch) {
+		if !strings.HasPrefix(one.Head.Ref, workBranch) || !one.Head.Repo.ownedBy(gh) {
 			continue
 		}
 		row := updateRow{Branch: one.Head.Ref, Number: one.Number, State: "updated"}
@@ -451,6 +453,16 @@ func (d *Doors) updates(send Send) ([]updateRow, string) {
 		rows = append(rows, row)
 	}
 	return rows, ""
+}
+
+// The repository a pull request's head stands in, which reads empty where its fork stands deleted. [[spec/tickets/dispatch-skips-fork-pulls]]
+type headRepo struct {
+	FullName string `json:"full_name"`
+}
+
+// A head standing in the run's own repository, so a fork's branch named work/<group> meets no worker and no update. [[spec/tickets/dispatch-skips-fork-pulls]]
+func (r headRepo) ownedBy(gh hub) bool {
+	return strings.EqualFold(r.FullName, gh.Repo)
 }
 
 func refusedPull(out *pullRow, what string, said Reply) int {
