@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tests-and-ci-hold
 step: do
+record:
+  - step: do
+    hand: box af15433560d6 · claude-code-remote
+    hash_before: 4b5f29fd26fcb2e3028bbdca39fc85202b96eb2d
+    hash_after: 4b5f29fd26fcb2e3028bbdca39fc85202b96eb2d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   66.7  in all"
+    inputs:
+      - name: ask
+        hash: 2fd12d4a5c9df1c7
+        size: 643
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,32 @@ Without it every agent or developer running the package's tests directly piles u
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+TestMain moves out of the contract-tagged box_processes_contract_test.go into main_test.go, so every build of the quack tests removes the folders sharedFolder and the shared build add to buildDirs. The contract file sets asSpawned in an init, and TestMain takes that road first, so a spawned test binary still runs the io and module verbs and leaves its pid. A plain go test of src/quack under a scratch TMPDIR left no quack-shared folder, where it left one before, and go vet passes under the contract tag. The comments saying TestMain removes the folders now read true in both builds.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the removal runs in every build, and the contract build keeps its spawned road
+- the cleanup the change reveals stands in the change: none further
+- every fact the change adds stands in one place: TestMain and asSpawned point at this ticket
 
 # Discussion
 
