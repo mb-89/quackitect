@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 0ed00b31dadca36d
         size: 761
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 99012cd5455a4ba5f23ea7c8638be03b94ffd41c
+    hash_after: 99012cd5455a4ba5f23ea7c8638be03b94ffd41c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: ab2e1e1551e664fe
+        size: 1595
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +241,32 @@ Two changes. `ReRouted` in `src/modules/check/rerouted.go` answers an error wher
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check src/quack/ticket_route_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/check/rerouted_test.go
+- src/quack/ticket_route_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Under a vehicle the route writes the front alone, since the work root holds no schema, and the case shows the Ask and every chapter gone. A nil schema writes a whole front today, so the row asks for no text. The error return lands with the change, since a new signature would stop the build before any assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets its failing case: the vehicle route case and the nil schema row
+- the route case reaches git through the fake repository the harness stands in, and the disk through two temp roots
 
 # gate
 

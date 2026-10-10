@@ -201,6 +201,24 @@
           "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: one\n    does: a\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\n---\n\n# Ask\n\nThe lint drags.\n\n# one\n\n<!-- a -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
         }
       }
+    },
+    {
+      "name": "under a vehicle the routed ticket keeps its Ask and every chapter, off the schema under the method root",
+      "argv": [
+        "route",
+        "slow-lint",
+        "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"says yes or no\",\"by\":\"person\"}]"
+      ],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"says yes or no\",\"by\":\"person\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\n  - name: sign\n    does: says yes or no\n    by: person\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes the change -->\n\n# sign\n\n<!-- says yes or no -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      },
+      "vehicle": true
     }
   ]
 }

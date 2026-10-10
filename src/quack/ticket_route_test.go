@@ -21,6 +21,7 @@ type jsCase struct {
 	Files   map[string]*string `json:"files"`
 	History *jsHistory         `json:"history"`
 	Bare    bool               `json:"bare"`
+	Vehicle bool               `json:"vehicle"`
 	Want    struct {
 		Code  int                `json:"code"`
 		Out   string             `json:"out"`
@@ -70,6 +71,14 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()
+			// A vehicle case holds the schemas under the method root and every other file under a work root apart. [[spec/tickets/route-keeps-its-chapters]]
+			work, at := root, func(path string) string { return root }
+			if one.Vehicle {
+				work = t.TempDir()
+				at = func(path string) string {
+					return map[bool]string{true: root, false: work}[strings.HasPrefix(path, "spec/schemas/")]
+				}
+			}
 			repo := standsInRepo(t, root)
 			history := one.History
 			if history == nil {
@@ -90,11 +99,11 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 			}
 			for path, text := range files {
 				if text != nil {
-					seedFile(t, root, path, *text)
+					seedFile(t, at(path), path, *text)
 				}
 			}
 			t.Setenv("QUACKITECT_ROOT", root)
-			t.Setenv(workRootVar, "")
+			t.Setenv(workRootVar, map[bool]string{true: work}[one.Vehicle])
 			words := append([]string{"ticket"}, one.Argv...)
 			_, verb := twinOf(words, registry)
 			if verb == nil {
@@ -115,7 +124,7 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 				if !changed {
 					want = was
 				}
-				got, stands := readIn(root, path)
+				got, stands := readIn(at(path), path)
 				switch {
 				case want == nil && stands:
 					t.Errorf("%s stands, and the JS leaves none", path)
