@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 85acbcf71ae83e3dd1cb7c3bdc2d549f8b8d0c5c
+    hash_after: 85acbcf71ae83e3dd1cb7c3bdc2d549f8b8d0c5c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "  104.5  in all"
+    inputs:
+      - name: ask
+        hash: 3884ef18ef1a17ee
+        size: 445
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/dispatch_write_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`carried` in `src/branches/dispatch.go` pushes each new work branch before the write commit that marks its group. A refused write left the branch standing bare, and `opensOf` skips a branched group, so no later run marked it. `remarksOf` in `src/branches/dispatch_write.go` now names each open group whose branch stands while trunk's copy carries no marker. The write commit marks those beside the groups it opens, and pushes no branch for them. Every path that opens a work branch marks trunk, so a bare branch means a lost marker write.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the next run marks a group whose branch stands
+- the change reveals no cleanup
+- the fact stands once: `remarksOf` alone names the bare groups
 
 # Discussion
 

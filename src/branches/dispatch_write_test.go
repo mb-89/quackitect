@@ -179,6 +179,28 @@ func TestDispatchOpensABranchForAReadyGroupOnMainAndLeavesABranchedOneAlone(t *t
 	}
 }
 
+// A run whose write comes back refused leaves the group's branch standing bare, and the next run marks the group and moves no branch. [[spec/tickets/dispatch-remarks-branched-groups]]
+func TestARefusedWriteMarksTheGroupNextRun(t *testing.T) {
+	t.Parallel()
+	one := dpTree(t, map[string]string{"new-group": groupNote})
+	one.peOriginRefuses(func(ref, _ string) bool { return strings.HasPrefix(ref, "refs/heads/claude/") })
+	if code := one.dpRun(); code != codeRed {
+		t.Fatalf("the refused run answers %d", code)
+	}
+	opened := one.peOriginTip(workBranch + "new-group")
+	if opened == "" {
+		t.Fatal("the refused run pushes no work/new-group")
+	}
+	one.peOriginRefuses(func(string, string) bool { return false })
+	one.dpGreen()
+	if fieldOf(one.dpWritten("new-group"), cloudMark) != "true" {
+		t.Fatal("the next run leaves the group bare of its marker")
+	}
+	if one.peOriginTip(workBranch+"new-group") != opened {
+		t.Fatal("the next run moves work/new-group")
+	}
+}
+
 func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})

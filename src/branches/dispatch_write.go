@@ -8,6 +8,7 @@ package branches
 import (
 	"encoding/json"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,6 +59,20 @@ func opensOf(read workRead, standing, trunkTickets map[string]string) []string {
 	for _, one := range read.Loose {
 		if isGroup(one.Text) && fieldOf(one.Text, "state") != closedState && fieldOf(one.Text, cloudMark) != "true" &&
 			!branched[one.Name] && !parents[one.Name] && len(waitsIn(one.Text, standing, trunkTickets)) == 0 {
+			out = append(out, one.Name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Each open group whose branch stands while trunk's copy carries no marker. A write refused after its branch push leaves one, and the next write marks it. [[spec/tickets/dispatch-remarks-branched-groups]]
+func remarksOf(read workRead) []string {
+	texts := trunkOf(read.Loose)
+	out := []string{}
+	for _, one := range read.Stand {
+		text := texts[one.Name]
+		if isGroup(text) && fieldOf(text, "state") != closedState && fieldOf(text, cloudMark) != "true" {
 			out = append(out, one.Name)
 		}
 	}
@@ -163,7 +178,7 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 		out[ticketAt(name)] = withField(texts[name], "state", closedState)
 	}
 	// The cloud marker rides this commit in place of marksTrunk and openGroup, because both of those push main. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
-	for _, name := range plan.Opens {
+	for _, name := range append(slices.Clone(plan.Opens), remarksOf(read)...) {
 		out[ticketAt(name)] = withField(texts[name], cloudMark, "true")
 	}
 	return out, ""
