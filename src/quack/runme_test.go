@@ -29,11 +29,17 @@ func runmeRoot(t *testing.T) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	files := map[string]string{
+	plant(t, root, map[string]string{
 		"RUNME.sh":                  string(shim),
 		"install.sh":                "#!/usr/bin/env sh\n",
 		".se/.runtime/bin/se-index": "#!/bin/sh\nprintf '%s\\n' \"$*\"\n",
-	}
+	})
+	return root
+}
+
+// Writes each file under root, its folders first. [[spec/tickets/setup-install-path-stands]]
+func plant(t *testing.T, root string, files map[string]string) {
+	t.Helper()
 	for name, text := range files {
 		at := filepath.Join(root, filepath.FromSlash(name))
 		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
@@ -43,7 +49,28 @@ func runmeRoot(t *testing.T) string {
 			t.Fatal(err)
 		}
 	}
-	return root
+}
+
+// Runs the script under sh in root with the env and arguments, and answers its exit code, stdout with root as <root>, and stderr. [[spec/tickets/setup-install-path-stands]]
+func runSh(t *testing.T, root string, env []string, args ...string) (int, string, string) {
+	t.Helper()
+	shell, err := exec.LookPath("sh")
+	if err != nil {
+		t.Skip("sh stands nowhere on this box")
+	}
+	cmd := exec.Command(shell, args...) // level0: FixtureOutsideHome - the case runs the real script under sh, as a box does.
+	cmd.Dir, cmd.Env = root, env
+	var out, errs strings.Builder
+	cmd.Stdout, cmd.Stderr = &out, &errs
+	code := 0
+	if err := cmd.Run(); err != nil {
+		var failed *exec.ExitError
+		if !errors.As(err, &failed) {
+			t.Fatal(err)
+		}
+		code = failed.ExitCode()
+	}
+	return code, strings.ReplaceAll(out.String(), root, "<root>"), errs.String()
 }
 
 // A PATH folder linking the tools RUNME.sh calls, and no editor. Windows takes the tools' own folders, since a linked Git tool finds no msys DLL beside the link. [[spec/tickets/bare-runme-exits-clean]]
@@ -73,25 +100,8 @@ func runmePath(t *testing.T) string {
 // Runs RUNME.sh bare under the variables named, and answers its exit code, stdout and stderr. [[spec/tickets/bare-runme-exits-clean]]
 func runBare(t *testing.T, env ...string) (int, string, string) {
 	t.Helper()
-	shell, err := exec.LookPath("sh")
-	if err != nil {
-		t.Skip("sh stands nowhere on this box")
-	}
 	root := runmeRoot(t)
-	cmd := exec.Command(shell, filepath.Join(root, "RUNME.sh")) // level0: FixtureOutsideHome - the case runs the real RUNME.sh under sh, as a box does.
-	cmd.Dir = root
-	cmd.Env = append([]string{"PATH=" + runmePath(t), "HOME=" + t.TempDir()}, env...) // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
-	var out, errs strings.Builder
-	cmd.Stdout, cmd.Stderr = &out, &errs
-	code := 0
-	if err := cmd.Run(); err != nil {
-		var failed *exec.ExitError
-		if !errors.As(err, &failed) {
-			t.Fatal(err)
-		}
-		code = failed.ExitCode()
-	}
-	return code, strings.ReplaceAll(out.String(), root, "<root>"), errs.String()
+	return runSh(t, root, append([]string{"PATH=" + runmePath(t), "HOME=" + t.TempDir()}, env...), filepath.Join(root, "RUNME.sh")) // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
 }
 
 // A bare RUNME.sh on a cloud box with no editor hands help to the binary and exits 0. [[spec/tickets/bare-runme-exits-clean]]
@@ -125,41 +135,19 @@ const (
 // Runs RUNME.sh branch beat in a root whose stamp answers code, or whose binary stands missing where code is empty, with a go on the PATH. It answers the exit, stdout, stderr and whether the install ran. [[spec/tickets/runme-installs-when-stale]]
 func runVerbOver(t *testing.T, code string) (int, string, string, bool) {
 	t.Helper()
-	shell, err := exec.LookPath("sh")
-	if err != nil {
-		t.Skip("sh stands nowhere on this box")
-	}
 	root := runmeRoot(t)
 	goAt := t.TempDir() // level0: FixtureOutsideHome - each run links a go of its own, so the stale check runs.
-	files := map[string]string{"install.sh": staleInstall, ".se/.runtime/bin/se-index": staleIndex, ".se/.runtime/fresh-code": code}
-	for name, text := range files {
-		if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(name)), []byte(text), 0o755); err != nil {
-			t.Fatal(err)
-		}
-	}
+	plant(t, root, map[string]string{"install.sh": staleInstall, ".se/.runtime/bin/se-index": staleIndex, ".se/.runtime/fresh-code": code})
+	plant(t, goAt, map[string]string{"go": "#!/bin/sh\nexit 0\n"})
 	if code == "" {
 		if err := os.Remove(filepath.Join(root, ".se", ".runtime", "bin", "se-index")); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(goAt, "go"), []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	cmd := exec.Command(shell, filepath.Join(root, "RUNME.sh"), "branch", "beat") // level0: FixtureOutsideHome - the case runs the real RUNME.sh under sh, as the Stop hook does.
-	cmd.Dir = root
-	cmd.Env = []string{"PATH=" + goAt + string(os.PathListSeparator) + runmePath(t), "HOME=" + t.TempDir()} // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
-	var out, errs strings.Builder
-	cmd.Stdout, cmd.Stderr = &out, &errs
-	exit := 0
-	if err := cmd.Run(); err != nil {
-		var failed *exec.ExitError
-		if !errors.As(err, &failed) {
-			t.Fatal(err)
-		}
-		exit = failed.ExitCode()
-	}
+	env := []string{"PATH=" + goAt + string(os.PathListSeparator) + runmePath(t), "HOME=" + t.TempDir()} // level0: FixtureOutsideHome - the run takes a fresh HOME, so no box's own settings reach it.
+	exit, out, errs := runSh(t, root, env, filepath.Join(root, "RUNME.sh"), "branch", "beat")
 	_, marked := os.Stat(filepath.Join(root, "installed"))
-	return exit, strings.ReplaceAll(out.String(), root, "<root>"), errs.String(), marked == nil
+	return exit, out, errs, marked == nil
 }
 
 // The Stop hook runs a verb each turn, so a verb on a fresh binary pays the stamp check alone. [[spec/tickets/runme-installs-when-stale]]
@@ -185,5 +173,22 @@ func TestAMissingOrStaleBinaryRunsTheInstallOnStderr(t *testing.T) {
 		if !installed || code != one.exit || out != one.out || !strings.Contains(errs, "installing\n") {
 			t.Errorf("%s installs %v, answers %d, %q, %q", one.name, installed, code, out, errs)
 		}
+	}
+}
+
+// The claude.ai setup script runs src/scripts/install.sh, so the shim there reaches the root install with every argument. [[spec/tickets/setup-install-path-stands]]
+func TestTheOldInstallPathRunsTheRootInstall(t *testing.T) {
+	t.Parallel()
+	root := runmeRoot(t)
+	shim, err := os.ReadFile(filepath.Join("..", "scripts", "install.sh"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	plant(t, root, map[string]string{"install.sh": "#!/usr/bin/env sh\nprintf '%s\\n' \"$#:$*\" > \"${0%/*}/reached\"\n", "src/scripts/install.sh": string(shim)})
+	if code, _, errs := runSh(t, root, os.Environ(), filepath.Join(root, "src", "scripts", "install.sh"), "boot", "two words"); code != 0 {
+		t.Fatalf("the shim answers %d, %q", code, errs)
+	}
+	if said, err := os.ReadFile(filepath.Join(root, "reached")); err != nil || string(said) != "2:boot two words\n" {
+		t.Errorf("the root install reads %q, %v", said, err)
 	}
 }
