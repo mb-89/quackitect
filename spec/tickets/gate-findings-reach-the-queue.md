@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: af50e45e3390c84c
         size: 648
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: a0059cbd9051d729a3fadc74ea78c3025a12c9cf
+    hash_after: a0059cbd9051d729a3fadc74ea78c3025a12c9cf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: a2bdbd277d1fdbf7
+        size: 1364
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/pull/pull_gate_group_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_gate_group_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The reject lands, copies `children` as `children-2` and mints no child, so the case fails on its first read of `fix-one`. The group fixture needs a `split` step under `on_fail` and a Discussion chapter before the hand-back takes it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- both done_when lines meet the one case, which rejects twice
+- the case drives the cloud pull fakes, so it reaches no real door
 
 # gate
 
