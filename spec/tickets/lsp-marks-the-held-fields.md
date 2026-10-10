@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 288bd7f98dadc7406e3e76cd68072869a4b8de05
+    hash_after: 288bd7f98dadc7406e3e76cd68072869a4b8de05
+    inputs:
+      - name: ask
+        hash: ffba78493145a405
+        size: 933
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -168,38 +177,70 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The server marks the fields a person's hold still wants, answers their hover, and moves the cursor on a new take. The rules of `src/extension/lib/fields.js` move into Go unchanged. For the shape, see [[spec/design_output/lsp#a-take-marks-the-fields]].
+
+- `src/modules/lsp/marks.go` ports `marksIn` and `hoverOf` as pure functions over the drawing and the hold.
+- The `Tickets` port gains `Drawn`, the drawing of a path off `tickets/drawn/<path>`.
+- `drawn` in `lsp.go` adds the marks to the rows it publishes, as hints with the code `HeldField`.
+- The hover answers the mark's text on a marked line, and the term hover elsewhere.
+- `initialize` learns the person's holds, and a commit naming `holds/standing` answers `window/showDocument` for each new take with a mark.
+- `lspTickets` in `src/quack/lsp.go` fills `Drawn` off the store.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/lsp.go` `Handle`, at `initialize` and `hover`
+- `src/modules/lsp/lsp.go` `drawn`, which every publish calls
+- `src/modules/lsp/lsp.go` `Listen`, whose commit hook sends the cursor moves
+- `src/modules/lsp/lenses.go` `Tickets`, which gains `Drawn`
+- `src/modules/lsp/lenses_test.go` `heard.tickets`, the fake filling the port
+- `src/quack/lsp.go` `lspTickets`, which fills the port
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/marks_test.go` `TestAHeldLeafMarksItsUnfilledFields`
+- `src/modules/lsp/marks_test.go` `TestATicketHeldByNoPersonCarriesNoMark`
+- `src/modules/lsp/marks_test.go` `TestAMarkedLineHoversWhatTheFieldAsks`
+- `src/modules/lsp/marks_test.go` `TestAnUnmarkedLineHoversTheTerm`
+- `src/modules/lsp/marks_test.go` `TestANewTakeShowsTheFirstMark`
+- `src/modules/lsp/marks_test.go` `TestAHoldStandingAtTheStartShowsNothing`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/marks.go`
+- `src/modules/lsp/marks_test.go`
+- `src/modules/lsp/lsp.go`
+- `src/modules/lsp/lenses.go`
+- `src/modules/lsp/lenses_test.go`
+- `src/quack/lsp.go`
+- `spec/design_output/lsp.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, and `fields.js`, `drawn.go` and the publish path checked there
+- the callers list names every caller of the port, the publish and the hover
+- every done_when line meets a case in `marks_test.go`, and the check line meets `./RUNME.sh check`
+- the approach adds no config key
 
 ## tests-red
 
