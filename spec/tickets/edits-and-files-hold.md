@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box a5167492d95e · claude-code-remote
     hash_before: d8d35fc1b144fd4c530e0874c8dd90fdea019c8c
     session: cse_01Q81whv9ndwkuBwHR3RFoDm
+  - step: sync
+    hand: box a5167492d95e · claude-code-remote · helper-12
+    hash_before: 52844a46301b7959c7bf47fdd7fc8ed0fe3c500b
+    hash_after: 52844a46301b7959c7bf47fdd7fc8ed0fe3c500b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/edits-and-files-hold already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -102,8 +111,9 @@ The edits module keeps every text it means to keep and undoes every apply it jou
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
