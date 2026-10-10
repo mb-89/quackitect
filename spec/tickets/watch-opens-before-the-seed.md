@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: bb8cd9fdcd266830de2b1c8b20c8482c710add59
+    hash_after: bb8cd9fdcd266830de2b1c8b20c8482c710add59
+    inputs:
+      - name: ask
+        hash: d73aa2d684b2b6ee
+        size: 398
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,51 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+seedsIn opens the watch first, through from.Changes, with a hand that holds each change in a list under a mutex while the seed runs. The walk and its commits then run as seed-survives-bad-files leaves them. Once the seed's last commit lands, seedsIn drains the held list in the order the watch heard it, committing each change through the same value Start builds, and flips the hand to commit live. The drain takes the list under the lock and commits outside it, looping until the list stands empty, and sets live inside the lock on that empty read, so no change slips between the drain and the flip. A seed that fails stops the watch before it returns its error. Start and the drain share one helper turning a heard change into its commit, so the value a change takes stands in one place. The Seeds comment drops the line where a change during the walk loses to the walk's older read.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go Seeds, through seedsIn
+- src/quack/modules.go the files module wiring, through Seeds
+- src/modules/files/files_test.go TestASeedPastItsCapCommitsInBatches and TestARefusedFileLeavesTheSeedAndTheWatchStanding, through seedsIn
+- src/modules/files/files_test.go the Start cases, through Start, whose behaviour stays
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go TestAChangeHeardDuringTheSeedLandsLast: the seed's commit pushes an edit of one seeded file and a delete of another through the FakeWatch, and after seedsIn returns the edit reads its new text and the deleted file reads empty
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go
+- src/modules/files/files_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: seedsIn, Seeds, Start, FakeWatch.Changes and FakeWatch.Push stand as the approach reads them
+- callers: Seeds has the module wiring in src/quack/modules.go as its one caller outside the tests, and seedsIn has Seeds and the two seed cases
+- done_when: the ask's one line meets TestAChangeHeardDuringTheSeedLandsLast
+- config: the approach adds no config key
 
 ## tests-red
 
