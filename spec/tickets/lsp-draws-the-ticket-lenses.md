@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,15 @@ record:
         hash: 7b9463b115145ef1
         size: 23526
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: ef904c05d6ec492fd53a2ae872005d1007cdfa7b
+    hash_after: 28f0e575677b24393662c0c765197e9e82d050b5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -335,14 +344,19 @@ Every done_when line meets a case in src/modules/lsp/lenses_test.go, the check l
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/lsp/lenses.go src/modules/lsp/lenses_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches lenses.go and lenses_test.go alone, both in the ask's size
+- the ticket port reaches the actions and the disk, and the fake in lenses_test.go stands for it
+- the header of lenses.go names the approach through its ticket link
+- the press words and the command name stand once, in lenses.go
 
 ## tests-green
 
