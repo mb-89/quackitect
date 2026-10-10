@@ -5,8 +5,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 import (
 	// level0: OutsideInDoors - the case writes the config into a temp root and hands the real streams, the doors' own test
 	"io"
-	"os" // level0: OutsideInDoors - the cases write a config into a root of their own, which pullHere reads off the real disk
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -69,14 +67,8 @@ func TestThePullTakesItsCapAndMarginOffTheConfig(t *testing.T) {
 	t.Setenv(workRootVar, "")
 	t.Setenv("SE_PULL_CAP", "")
 	t.Setenv("SE_PULL_MARGIN", "650")
-	if err := os.MkdirAll(filepath.Join(root, "spec", "config"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	tracked := `{"pull": {"cap": 9000, "margin": 700}}`
-	if err := os.WriteFile(filepath.Join(root, "spec", "config", "level0.json"), []byte(tracked), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	it, code := pullHere(func() (string, error) { return root, nil }, func(string) git.Repo { return nil }, os.Stdout, os.Stderr)
+	seedFile(t, root, "spec/config/level0.json", `{"pull": {"cap": 9000, "margin": 700}}`)
+	it, code := pullHere(func() (string, error) { return root, nil }, func(string) git.Repo { return nil }, io.Discard, io.Discard)
 	if code != 0 {
 		t.Fatalf("the pull builds with the code %d", code)
 	}
@@ -89,12 +81,7 @@ func TestThePullTakesItsCapAndMarginOffTheConfig(t *testing.T) {
 func TestPullHereRefusesABrokenTrackedConfig(t *testing.T) {
 	root := t.TempDir() // level0: FixtureOutsideHome - the case writes its own config into a root of its own
 	t.Setenv(workRootVar, "")
-	if err := os.MkdirAll(filepath.Join(root, "spec", "config"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(root, "spec", "config", "level0.json"), []byte(`{"work": {"failsBeforePerson": 3,}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	seedFile(t, root, "spec/config/level0.json", `{"work": {"failsBeforePerson": 3,}}`)
 	var errs strings.Builder
 	it, code := pullHere(func() (string, error) { return root, nil }, func(string) git.Repo { return nil }, io.Discard, &errs)
 	if it != nil || code != exitFailed || !strings.Contains(errs.String(), "level0.json") {

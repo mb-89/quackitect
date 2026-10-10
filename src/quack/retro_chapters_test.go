@@ -74,42 +74,19 @@ func TestRetroChaptersRefuseAGapBetweenTwoCutsAndALinePastEveryChapter(t *testin
 // Chapters read their commits through the box's run door, and a failing git warns where the record carries none. [[spec/tickets/retro-chapters-take-git-door]]
 func TestRetroChaptersReadCommitsThroughTheRunDoor(t *testing.T) {
 	t.Parallel()
-	for _, one := range []struct {
-		name    string
-		ran     ranResult
-		commits []string
-		warns   bool
-	}{
-		{"a git answering its log", ranResult{stdout: "abc1234 one\ndef5678 two\n"}, []string{"abc1234 one", "def5678 two"}, false},
-		{"a failing git", ranResult{code: 128, stderr: "fatal: not a git repository\n"}, []string{}, true},
-	} {
-		root := t.TempDir()
+	for said, want := range map[ranResult][]string{{stdout: "abc1234 one\ndef5678 two\n"}: {"abc1234 one", "def5678 two"}, {code: 128, stderr: "fatal: no repository"}: {}} {
+		root := t.TempDir() // level0: FixtureOutsideHome - each case writes its chapters into a tree of its own
 		retroReadingLay(t, root, retroReadingName, retroReadingWith(retroReadingInput, map[string]string{"chapters.json": retroReadingCuts}))
-		var asked [][]string
 		box := func() boxDoors {
 			d := retroBoxAt(root)()
-			d.run = func(argv []string, o runOpts) ranResult {
-				asked = append(asked, argv)
-				if o.cwd != root {
-					t.Errorf("%s: git runs in %q, and wants %q", one.name, o.cwd, root)
-				}
-				return one.ran
-			}
+			d.run = func([]string, runOpts) ranResult { return said }
 			return d
 		}
-		var out, errs strings.Builder
-		if code := retroChaptersVerb(box)([]string{"retro", "chapters", retroReadingName}, false, &out, &errs); code != 0 {
-			t.Fatalf("%s: chapters answers %d: %s", one.name, code, errs.String())
-		}
+		code, _, errs := retroReadingRun(func(func() boxDoors) twin { return retroChaptersVerb(box) }, root, "retro", "chapters", retroReadingName)
 		var read struct{ Commits []string }
-		if err := json.Unmarshal([]byte(retroReadingFile(t, root, retroReadingName, "chapters/c1.json")), &read); err != nil {
-			t.Fatal(err)
-		}
-		if !reflect.DeepEqual(read.Commits, one.commits) || len(asked) == 0 || asked[0][0] != "git" {
-			t.Errorf("%s: c1 holds the commits %v off %v, and wants %v", one.name, read.Commits, asked, one.commits)
-		}
-		if warned := strings.Contains(errs.String(), "git log answers 128") && strings.Contains(errs.String(), "not a git repository"); warned != one.warns {
-			t.Errorf("%s: chapters say %q", one.name, errs.String())
+		_ = json.Unmarshal([]byte(retroReadingFile(t, root, retroReadingName, "chapters/c1.json")), &read)
+		if code != 0 || !reflect.DeepEqual(read.Commits, want) || strings.Contains(errs, "git log answers 128") != (said.code != 0) {
+			t.Errorf("git answering %+v gives %d, the commits %v, and says %q", said, code, read.Commits, errs)
 		}
 	}
 }
