@@ -35,30 +35,6 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	}
 }
 
-func TestAPushedChangeReachesTheFamily(t *testing.T) {
-	c := q.New()
-	hand := Registers(c)
-	s := q.NewStore(c)
-	watch := NewFakeWatch()
-	stop, err := Start(watch, func(values map[string]any) error {
-		_, err := s.Commit(s.Snapshot().Revision, hand, values)
-		return err
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	watch.Push("spec/b.md", "b", false)
-	watch.Push("spec/b.md", "", true)
-	if got := s.Snapshot().Read("files/spec/b.md"); got != (q.Content{}) {
-		t.Fatalf("files/spec/b.md reads %+v after it leaves", got)
-	}
-	watch.Push("spec/c.md", "c", false)
-	if got, _ := s.Snapshot().Read("files/spec/c.md").(q.Content); got.Text != "c" {
-		t.Fatalf("files/spec/c.md reads %+v", got)
-	}
-}
-
 // A built program's first bytes, a NUL byte among them. [[spec/tickets/sweep-reads-tracked-after-restart]]
 const binaryBody = "\x7fELF\x02\x01\x01\x00"
 

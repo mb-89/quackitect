@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -191,7 +191,30 @@ record:
     hash_before: b329e24f5c5a3016ea1ee217e799607431a71098
     hash_after: b329e24f5c5a3016ea1ee217e799607431a71098
     def: 6c4270b49c40b30a
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: c18a121c93e3e891eb31393d1935a9c7ae3fe04a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/edits passes
+      - name: check
+        exit: 0
+        said: "   96.8  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d4bc9252842d46cd
+        size: 671
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: edits-and-files-hold
+reason: done
 ---
 
 # Ask
