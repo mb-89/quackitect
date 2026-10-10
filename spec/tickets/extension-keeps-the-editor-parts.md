@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -191,6 +191,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 6ecd29b5fafc295f520696b50db0fda8187150e8
+    hash_after: 6ecd29b5fafc295f520696b50db0fda8187150e8
+    inputs:
+      - name: ask
+        hash: 04f8ac725844fe5e
+        size: 1012
+      - name: implement/tests-green
+        hash: 6be6b28b88ef2887
+        size: 1122
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -448,8 +461,9 @@ The Go language server now draws the ticket buttons and the held-field marks, so
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass: the ask names no view, since a VS Code user sees the same buttons and marks. Every done_when line holds on 909511bd4, by the grep, the deletion, the green cases and the check at 0.
 
 # Discussion
 
