@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 18a5b9b7df4d1843
         size: 1074
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: b06b7a2dedfb09fc4214d1c487a22687d3eba3a8
+    hash_after: b06b7a2dedfb09fc4214d1c487a22687d3eba3a8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 7e005849172a56f2
+        size: 2824
+    def: 08e16d07b0de477c
+    frozen:
+      - path: src/pull/pull_stale_test.go
+        hash: aa273832af6fad50
 ---
 
 # Ask
@@ -239,26 +255,33 @@ Without the pull change, every open standard ticket past the gate goes back to t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_stale_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/pull_stale_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both pull cases fail on their own assertion. A ticket on the old hash goes back to the gate at its first pull, since the reworded gate moves its def. That holds at tests-green and past it. The evidence-move case passes, and guards the stale read the change keeps. Surprise: the bare pull reroutes through the queue scan, so no hand-back is needed to see the fault.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the two pull lines meet the two red cases, and the evidence case guards the rest
+- the route line, the gate line and the check line stand as checkpoints the change answers
+- the example line meets TestEveryExampleHoldsItsSteps once pull-tests-green.md lands at the change
+- the doors: the cases run on cloudPull, a fake disk and a fake git, with the process read off the fake disk
 
 # gate
 
