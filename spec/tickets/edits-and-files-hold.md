@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box a5167492d95e · claude-code-remote
@@ -115,6 +115,22 @@ record:
     hand: box a5167492d95e · claude-code-remote · helper-15
     hash_before: 30993860f7055b11390b61fa04fcd986339b5495
     hash_after: 30993860f7055b11390b61fa04fcd986339b5495
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/edits-and-files-hold already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 602b0febc4ae825f
+        size: 216
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box a5167492d95e · claude-code-remote · helper-17
+    hash_before: 049975a3c7dc2fb1f60e651a437b00f7fe9d3567
+    hash_after: 049975a3c7dc2fb1f60e651a437b00f7fe9d3567
     answered:
       - name: sync/sync
         exit: 0
@@ -189,8 +205,7 @@ The edits module keeps every text it means to keep and undoes every apply it jou
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- files-start-stands-unused: files.Start in src/modules/files/watch.go has no caller left, since seedsIn commits through commitsHeard, and its one test TestAPushedChangeReachesTheFamily left in the a-part-written-apply-undoes tests-green commit; delete Start, or give it back a caller and its case
+accept
 
 # retro
 
