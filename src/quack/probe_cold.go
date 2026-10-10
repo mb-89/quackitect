@@ -76,9 +76,10 @@ var (
 // The port the cold server stands on, past the base, so a server a desk runs keeps its own. [[spec/design_output/level0#the-cold-probe]]
 func coldPort(pid int) int { return portBase + portPast + pid%portSpread }
 
-// The stream the client writes under stream-json: the tools at init, the texts and calls of the session's own, and the result. [[spec/design_output/level0#the-cold-probe]]
+// The stream the client writes under stream-json: the tools at init, the texts and calls of the session's own, the results and prompts it reads, and the result. [[spec/design_output/level0#the-cold-probe]] [[spec/tickets/the-clear-runs-live-remote]]
 type coldSteps struct {
 	tools, texts, called []string
+	results, prompts     []string
 	result               string
 }
 
@@ -99,6 +100,10 @@ func stepsOf(stream string) coldSteps {
 		if one.text("type") == "result" {
 			steps.result = one.text("result")
 		}
+		if one.text("type") == "user" && !yaml.Truthy(one["parent_tool_use_id"]) {
+			steps.reads(one)
+			continue
+		}
 		if one.text("type") != "assistant" || yaml.Truthy(one["parent_tool_use_id"]) {
 			continue
 		}
@@ -117,11 +122,44 @@ func stepsOf(stream string) coldSteps {
 	return steps
 }
 
-// One check of the cold probe, whether it passes, and what shows it. [[spec/design_output/level0#the-cold-probe]]
+// A user message the session reads: a prompt as text, or a tool's result. [[spec/tickets/the-clear-runs-live-remote]]
+func (steps *coldSteps) reads(one probeRow) {
+	message, _ := one["message"].(map[string]any)
+	if text, ok := message["content"].(string); ok {
+		steps.prompts = append(steps.prompts, text)
+		return
+	}
+	parts, _ := message["content"].([]any)
+	for _, each := range parts {
+		part, _ := each.(map[string]any)
+		switch probeRow(part).text("type") {
+		case "text":
+			steps.prompts = append(steps.prompts, probeRow(part).text("text"))
+		case "tool_result":
+			steps.results = append(steps.results, resultText(part["content"]))
+		}
+	}
+}
+
+// A tool result's content, a text or a list of text parts, as one text. [[spec/tickets/the-clear-runs-live-remote]]
+func resultText(content any) string {
+	if text, ok := content.(string); ok {
+		return text
+	}
+	parts, _ := content.([]any)
+	var out []string
+	for _, each := range parts {
+		part, _ := each.(map[string]any)
+		out = append(out, probeRow(part).text("text"))
+	}
+	return strings.Join(out, "\n")
+}
+
+// One check of the cold probe, whether it passes, whether it passes on a warning, and what shows it. [[spec/design_output/level0#the-cold-probe]]
 type coldCheck struct {
-	check    string
-	pass     bool
-	evidence string
+	check      string
+	pass, warn bool
+	evidence   string
 }
 
 // Reads the log rows and the stream for every check, in order. [[spec/design_output/level0#the-cold-probe]]
@@ -309,6 +347,9 @@ func coldLines(checks []coldCheck) []string {
 		if one.pass {
 			word = "PASS"
 		}
+		if one.pass && one.warn {
+			word = "WARN"
+		}
 		out[i] = word + " " + one.check + ": " + one.evidence
 	}
 	return out
@@ -397,14 +438,8 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 		return exitFailed
 	}
 	carriesLogin(d, config)
-	ran := d.run(clientArgv(client, filepath.Join(box.tree, filepath.FromSlash(pluginFolder))), runOpts{
-		cwd: box.tree,
-		env: map[string]string{
-			"CLAUDE_CODE_REMOTE": "true",
-			"CLAUDE_CONFIG_DIR":  config,
-			"SE_BRIDGE_PORT":     strconv.Itoa(box.port),
-		},
-		timeout: probeWait,
+	ran := d.run(clientArgv(client, coldPrompt, filepath.Join(box.tree, filepath.FromSlash(pluginFolder))), runOpts{
+		cwd: box.tree, env: coldEnv(config, box.port), timeout: probeWait,
 	})
 	if ran.missing {
 		say("claude stands nowhere, so this box probes no cold start.")
@@ -413,7 +448,8 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 	if ran.fault != "" {
 		say("The client stops: " + ran.fault + ".")
 	}
-	checks := readsCold(probeRows(d.disk, filepath.Join(box.tree, filepath.FromSlash(sessionLog))), stepsOf(ran.stdout))
+	rows := probeRows(d.disk, filepath.Join(box.tree, filepath.FromSlash(sessionLog)))
+	checks := readsCold(rows, stepsOf(ran.stdout))
 	for _, line := range coldLines(checks) {
 		say(line)
 	}
@@ -425,7 +461,22 @@ func coldRun(d boxDoors, client string, say func(string), box coldBox) int {
 			return exitFailed
 		}
 	}
+	// The clear runs on a start road that holds, since a fall before it decides nothing of the clear. [[spec/tickets/the-clear-runs-live-remote]]
+	cleared := coldClear(d, client, box, config, len(rows))
+	say(coldLines([]coldCheck{cleared})[0])
+	if !cleared.pass {
+		return exitFailed
+	}
 	return 0
+}
+
+// The variables both client runs take: a remote box, the fresh config folder, and the port the clone's hook reads. [[spec/design_output/level0#the-cold-probe]]
+func coldEnv(config string, port int) map[string]string {
+	return map[string]string{
+		"CLAUDE_CODE_REMOTE": "true",
+		"CLAUDE_CONFIG_DIR":  config,
+		"SE_BRIDGE_PORT":     strconv.Itoa(port),
+	}
 }
 
 // The desk's login rides into the fresh config folder, so the client signs in and reads nothing else of the desk. The folder goes with the probe. [[spec/design_output/level0#the-cold-probe]]
@@ -469,9 +520,9 @@ func takesDelta(d boxDoors, box coldBox, say func(string)) bool {
 	return false
 }
 
-// The client's argv for the cold run, its stream as JSON lines. [[spec/design_output/level0#the-cold-probe]]
-func clientArgv(client, plugin string) []string {
-	return []string{client, "-p", coldPrompt, "--plugin-dir", plugin, "--output-format", "stream-json", "--verbose", "--permission-mode", "auto"}
+// The client's argv for a cold run, its stream as JSON lines. [[spec/design_output/level0#the-cold-probe]]
+func clientArgv(client, prompt, plugin string) []string {
+	return []string{client, "-p", prompt, "--plugin-dir", plugin, "--output-format", "stream-json", "--verbose", "--permission-mode", "auto"}
 }
 
 // The index the start road launched stands over the clone, so the probe stops it with the index's own stop. [[spec/design_output/level0#the-cold-probe]]
