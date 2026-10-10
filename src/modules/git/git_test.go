@@ -111,6 +111,14 @@ func TestTheBatchReadsEachPayloadAndNothingForAMissingObject(t *testing.T) {
 	}
 }
 
+// A payload cut short keeps what the batch carries, as every reader of the one framer reads it. [[spec/tickets/git-parsers-stand-once]]
+func TestAShortPayloadKeepsWhatTheBatchCarries(t *testing.T) {
+	got := framed([]byte("aaa blob 3\nxyz\nbbb blob 6\nab"), 2)
+	if len(got) != 2 || got[0] != "xyz" || got[1] != "ab" {
+		t.Fatalf("the batch reads %q", got)
+	}
+}
+
 // The log lists the newest commit first, so a path added twice keeps its newest second, and a blank line reads as nothing. [[spec/tickets/verbs-queue-order]]
 func TestTheAgesKeepEachPathsNewestAdd(t *testing.T) {
 	said := stoodIn("200\n\nspec/tickets/again.md\n100\n\nspec/tickets/again.md\nspec/tickets/once.md\n")

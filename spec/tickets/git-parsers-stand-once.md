@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 6f5066e5cc08f412
         size: 362
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 21fb177845655f51c5651067bbad0f11642a4165
+    hash_after: 21fb177845655f51c5651067bbad0f11642a4165
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/git fails
+    inputs:
+      - name: design/draft
+        hash: 42901e755d3d884e
+        size: 1691
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,31 @@ One added-at parser and one batch framer stand in the git module. addedIn(said, 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/git
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion: framed reads the short payload as empty, where ShowMany keeps the two bytes the batch carries. The two framers answer one stream two ways, which is the drift the finding names. The parser copies agree on every ASCII path, so the case for them stands green and guards the move onto one parser.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the short-payload case fails today, and the one framer turns it green
+- doors: the case reads a stream held in memory, and reaches no door
 
 # gate
 
