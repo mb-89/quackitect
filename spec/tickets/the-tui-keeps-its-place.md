@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,28 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box a84d8c0a18eb · claude-code-remote
+    hash_before: d869a52db357f0699ed591366d3af6c0ec4324f4
+    hash_after: d869a52db357f0699ed591366d3af6c0ec4324f4
+    inputs:
+      - name: retro/write
+        hash: f2d2de55203a4261
+        size: 2465
+      - name: [[spec/tickets/open-edits-outlive-redraws]]
+        hash: 97110e026beedf1c
+        size: 671
+      - name: [[spec/tickets/a-filter-keeps-the-cursor]]
+        hash: ae3a3ee001420f25
+        size: 508
+      - name: [[spec/tickets/a-redraw-keeps-the-sort]]
+        hash: 2e7172410cde3169
+        size: 396
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 7c1b55b24304355c
+        size: 3362
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -288,20 +310,26 @@ The run read as a hand-back loop more than a build. Three of the four refusals c
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 21:02 the level0 server dropped, so the patch door and the pull tool stood absent
+- the box held no gh CLI, so the pull request goes through the GitHub connector
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 21:19 a conflict at sync in `src/quack/check.go` and its test, taken from main
+- 21:12 the commit hook refusing code with no staged test
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
 
 # Discussion
 
