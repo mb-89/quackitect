@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,21 @@ record:
         hash: 7b9463b115145ef1
         size: 23526
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: de416554c3459eef8c1b25f60d7be35139b8b448
+    hash_after: de416554c3459eef8c1b25f60d7be35139b8b448
+    inputs:
+      - name: design/draft
+        hash: 2216d27f4e7eebfc
+        size: 2351
+      - name: design/tests-red
+        hash: 4466b101c4de7b5b
+        size: 780
+      - name: [[spec/design_output/lsp]]
+        hash: 7b9463b115145ef1
+        size: 23526
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -305,8 +320,11 @@ The replay recording held the old capabilities, so it went red with the new init
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+Every done_when line meets a case in src/modules/lsp/lenses_test.go, the check line meets ./RUNME.sh check, and the wiring in a5f3264d8 runs the approach as written: the press and the save beside the frame loop, the refresh on a commit naming the two values, and the port filled off the store and the manager.
 
 # implement
 
