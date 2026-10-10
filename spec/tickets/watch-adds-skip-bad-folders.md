@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: edits-and-files-hold
 parent: seed-survives-bad-files
+record:
+  - step: do
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: f8a68a08170744c96c17b83b045b09c2f7c312f4
+    hash_after: f8a68a08170744c96c17b83b045b09c2f7c312f4
+reason: became
+successors: [seed-survives-bad-files]
 ---
 
 # Ask
