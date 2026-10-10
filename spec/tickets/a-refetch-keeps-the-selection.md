@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 387899b5aa82aee5
         size: 429
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box b0a22705166b · claude-code-remote
+    hash_before: edf84e991a2fc5fdce267748696849fb343d688f
+    hash_after: edf84e991a2fc5fdce267748696849fb343d688f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/registry fails
+    inputs:
+      - name: design/draft
+        hash: 63f22dba3ab08a50
+        size: 808
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -222,26 +235,31 @@ The fetched case of `Tab.Update` in `src/tui/registry/tab.go` reads the selected
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/registry/tab_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestARefetchKeepsTheSelectedName fails on its assertion: with config/depth selected, a refetch with a name above it moves the cursor to config/arrives.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when test fails on its own assertion, and the check line waits on tests-green
+- the case reads the registry through its Fake, which its contract suite holds
 
 # gate
 

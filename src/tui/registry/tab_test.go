@@ -128,6 +128,18 @@ func TestATabTakesOnlyItsOwnFetch(t *testing.T) {
 	}
 }
 
+// A name arriving above the selection leaves the cursor on the name it stood on. [[spec/tickets/a-refetch-keeps-the-selection]]
+func TestARefetchKeepsTheSelectedName(t *testing.T) {
+	tab := Index(Fake{Values: map[string]any{NamesName: fakeNames}})
+	m := drawn(t, tab, frame.PaneShut)
+	tab.Move(&m, 1)
+	rows := []Row{{"name": "work/open-tasks"}, {"name": "config/arrives"}, {"name": "config/depth"}}
+	tab.Update(&m, fetched{tab: tab.name, rows: rows})
+	if said := tab.Selected(&m); said != "config/depth" {
+		t.Fatalf("the cursor stays on config/depth across the refetch, and stands on %q", said)
+	}
+}
+
 // The filter line narrows the rows, and the cursor moves inside what stays. [[spec/design_output/model#the-registry-tabs]]
 func TestTheFilterLineNarrowsTheRowsAndTheCursorMovesInThem(t *testing.T) {
 	tab := Index(Fake{Values: map[string]any{NamesName: fakeNames}})
