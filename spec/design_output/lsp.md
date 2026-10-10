@@ -472,3 +472,50 @@ index holds. Where the value of such a key differs, it draws
 
 A person edits what they like, so the hint refuses nothing, and stands off
 the Problems panel.
+
+# A ticket carries its buttons
+
+`lensesOf` in `src/modules/lsp/lenses.go` reads a ticket's text and the
+standing holds, and answers `textDocument/codeLens` at the first line:
+
+| the ticket | the buttons |
+|---|---|
+| open, held by no hand | take, at its step |
+| open, at a step for another hand | a line naming that hand |
+| held by a person | pass, fail and drop, or back on a verdict leaf |
+| held by another hand | a line naming the hand and the step |
+| past open, or held by the cloud | none |
+
+A press runs `quackitect.ticket` through `workspace/executeCommand`:
+
+1. A hand-back writes the open buffer to its file, so the pull reads what the editor holds.
+2. The server calls `ticket/pull` as a person, through the manager.
+3. `window/logMessage` carries the command line and its output.
+4. `window/showMessage` carries the answer word, at warning on a refusal.
+5. `workspace/codeLens/refresh` asks the editor for the buttons again.
+
+A fail with no reason runs nothing, and its message names the command line.
+A client whose middleware asks the reason sends it as the fourth argument.
+
+A commit naming `holds/standing` or `tickets/cloud` sends the refresh too. A
+save over a ticket naming a process and carrying no route runs `ticket/fill`.
+The listener runs a press and a save beside its frame loop, so a long pull
+leaves the hover and the buttons answering.
+
+# A take marks the fields
+
+`marksIn` in `src/modules/lsp/marks.go` reads a ticket's drawing and the
+person's holds, and marks each field the held leaf still wants:
+
+| the server answers | with |
+|---|---|
+| the publish of a held ticket | a hint at each unfilled field's line, code `HeldField` |
+| a hover on a marked line | the leaf's work, the field's name, form and ask, and its items |
+| a hover on any other line | the term hover |
+| a commit adding a person's hold | `window/showDocument` at the first mark of the new take |
+
+The drawing comes off `tickets/drawn/<path>` through the `Tickets` port, as
+the holds do. The server learns the holds standing at `initialize`, so a hold
+standing at the start moves no cursor. A ticket the person holds no step of
+carries no mark. The client's middleware draws a `HeldField` hint as the
+underline, and leaves it off the Problems panel.

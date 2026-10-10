@@ -9,13 +9,15 @@ import "encoding/json"
 // The characters an editor asks for a completion again on. [[spec/design_output/lsp#the-completion-reads-the-schema]]
 var Triggers = []string{":", " ", "#", "["}
 
-// What initialize announces: full-text sync, and the four features the check module reads. [[spec/tickets/lsp-module-serves-the-features]]
+// What initialize announces: full-text sync with the text of each save, the four features the check module reads, and the buttons over a ticket with the command they run. [[spec/tickets/lsp-module-serves-the-features]] [[spec/tickets/lsp-draws-the-ticket-lenses]]
 var capabilities = map[string]any{
-	"textDocumentSync":     syncFull,
-	"documentLinkProvider": map[string]any{"resolveProvider": false},
-	"completionProvider":   map[string]any{"triggerCharacters": Triggers},
-	"foldingRangeProvider": true,
-	"hoverProvider":        true,
+	"textDocumentSync":       map[string]any{"openClose": true, "change": syncFull, "save": map[string]any{"includeText": true}},
+	"codeLensProvider":       map[string]any{"resolveProvider": false},
+	"executeCommandProvider": map[string]any{"commands": []string{TicketCommand}},
+	"documentLinkProvider":   map[string]any{"resolveProvider": false},
+	"completionProvider":     map[string]any{"triggerCharacters": Triggers},
+	"foldingRangeProvider":   true,
+	"hoverProvider":          true,
 }
 
 // A feature's answer over the tree at the file and the cursor a request names, and the empty answer where the request names no file of the tree. The caller holds the lock. [[spec/tickets/lsp-module-serves-the-features]]

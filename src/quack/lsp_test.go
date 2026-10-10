@@ -12,11 +12,57 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"quackitect/src/modules/check"
+	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/lsp"
+	"quackitect/src/modules/tickets"
 	"quackitect/src/q"
 )
+
+// The marks read a ticket's drawing under the name the tickets module projects it at. [[spec/tickets/lsp-marks-the-held-fields]]
+func TestTheMarksReadTheDrawingTheTicketsModuleProjects(t *testing.T) {
+	t.Parallel()
+	if want := "tickets/" + tickets.DrawnPort + "/"; drawnTickets != want {
+		t.Fatalf("the marks read the drawing under %q, and the tickets module projects it under %q", drawnTickets, want)
+	}
+}
+
+// A press answers as the extension's index door read a post: the output on an end, the handle past the wait, and the fault on a refusal. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+func TestAPressAnswersAsTheIndexDoorDid(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		says string
+		said manager.Answer
+		err  error
+		want lsp.Ran
+	}{
+		{says: "an end hands its output", said: manager.Answer{Result: "work\n  the next leaf\n"}, want: lsp.Ran{Out: "work\n  the next leaf\n"}},
+		{says: "a run past the wait names its handle", said: manager.Answer{Running: true, Handle: "op-1"}, want: lsp.Ran{Out: "wait\nticket/pull runs on at op-1"}},
+		{says: "a refusal hands its fault", said: manager.Answer{Error: "refused\n  the step stands for agent"}, want: lsp.Ran{Code: 1, Err: "refused\n  the step stands for agent"}},
+		{says: "a call that fails hands its error", err: io.ErrUnexpectedEOF, want: lsp.Ran{Code: 1, Err: io.ErrUnexpectedEOF.Error()}},
+	} {
+		if got := ranOf("ticket/pull", one.said, one.err); got != one.want {
+			t.Errorf("%s: the press reads %+v, and wants %+v", one.says, got, one.want)
+		}
+	}
+}
+
+// A hand-back writes the buffer to the file under the root. [[spec/tickets/lsp-draws-the-ticket-lenses]]
+func TestTheBufferLandsUnderTheRoot(t *testing.T) {
+	t.Parallel()
+	var at, text string
+	write := func(path string, data []byte, _ os.FileMode) error {
+		at, text = path, string(data)
+		return nil
+	}
+	none := func(string, any, string, time.Duration) (manager.Answer, error) { return manager.Answer{}, nil }
+	ports := lspTickets("/tree", nil, none, write)
+	if err := ports.Save("spec/tickets/one.md", "the approach"); err != nil || at != filepath.Join("/tree", "spec", "tickets", "one.md") || text != "the approach" {
+		t.Fatalf("the save writes %q at %q, %v", text, at, err)
+	}
+}
 
 // The lsp module reads the check module's rules through the ports quack wires, so a text fault reaches it as check draws it. [[spec/tickets/lsp-module-draws-the-tools]]
 func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
