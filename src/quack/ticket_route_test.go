@@ -71,12 +71,12 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()
-			// A vehicle case holds the schemas under the method root and every other file under a work root apart. [[spec/tickets/route-keeps-its-chapters]]
+			// A vehicle case holds the schemas and the processes under the method root, and every other file under a work root apart. [[spec/tickets/route-keeps-its-chapters]] [[spec/tickets/ticket-verbs-read-method-routes]]
 			work, at := root, func(path string) string { return root }
 			if one.Vehicle {
 				work = t.TempDir()
 				at = func(path string) string {
-					return map[bool]string{true: root, false: work}[strings.HasPrefix(path, "spec/schemas/")]
+					return map[bool]string{true: root, false: work}[strings.HasPrefix(path, "spec/schemas/") || strings.HasPrefix(path, "spec/processes/")]
 				}
 			}
 			repo := standsInRepo(t, root)

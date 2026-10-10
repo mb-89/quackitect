@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: b506441e9f8fd28c
         size: 631
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: dfab5999c60feed58f64e317e4d3f09654083128
+    hash_after: dfab5999c60feed58f64e317e4d3f09654083128
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 36b75deaec55f13b
+        size: 1875
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -227,26 +240,33 @@ A helper `methodDisk` beside `workDisk` in `src/quack/ticket_set.go` answers the
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/ticket_fill_test.go src/quack/ticket_update_test.go src/quack/ticket_set_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_fill_test.go
+- src/quack/ticket_update_test.go
+- src/quack/ticket_set_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Fill and update refuse under a vehicle on the schema the work root lacks. Set and urgent refuse that the key stands in no ticket's front. Each vehicle case copies a passing case of its verb, so the case differs from it by the two roots alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets its failing vehicle case, one a verb, and urgent rides beside set
+- the cases reach git through the fake repository the harness stands in, and the disk through two temp roots
 
 # gate
 

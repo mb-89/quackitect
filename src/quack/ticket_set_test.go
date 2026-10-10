@@ -101,6 +101,21 @@ func TestTicketSet(t *testing.T) {
 			t.Fatalf("set group shut answers %d, %q, %q, and writes %q", code, out, errs, got)
 		}
 	})
+	// [[spec/tickets/ticket-verbs-read-method-routes]]
+	t.Run("under a vehicle set and urgent weigh the value against the schema under the method root", func(t *testing.T) {
+		method, work := t.TempDir(), t.TempDir()
+		seedFile(t, method, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+		seedFile(t, work, aThing, editCaseTicket(""))
+		t.Setenv(workRootVar, work)
+		for _, argv := range [][]string{{"ticket", "set", "a-thing", "group", "a-group"}, {"ticket", "urgent", "a-thing"}} {
+			if code, _, errs := runsApart(t, method, false, argv...); code != 0 {
+				t.Errorf("%v answers %d, %q", argv, code, errs)
+			}
+		}
+		if got, _ := readIn(work, aThing); !strings.Contains(got, "\ngroup: a-group\n") || !strings.Contains(got, "\nurgent: true\n") {
+			t.Errorf("the work root holds %q", got)
+		}
+	})
 	t.Run("set names the call it needs where a word is missing", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		for _, one := range []struct {
