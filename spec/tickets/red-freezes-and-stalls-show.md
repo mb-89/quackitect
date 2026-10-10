@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box cc2a5a1dc9c0 · claude-code-remote
     hash_before: 210710e158d1bd945b3c4a5eb0777c0478d8efb0
     session: cse_01HuedT1uwwN1DNnMT5J3koj
+  - step: sync
+    hand: box cc2a5a1dc9c0 · claude-code-remote
+    hash_before: a2a91c4847141a0f6184692e892a5a9ce104cd83
+    hash_after: f066d7b4421d00821f04f293aaf4f6094dcf1564
+    answered:
+      - name: sync
+        exit: 0
+        said: work/red-freezes-and-stalls-show already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -106,8 +115,9 @@ Done when every child closes through the command it names.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
