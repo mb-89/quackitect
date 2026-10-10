@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: b96fc02951e431853584a7eb8dd0487ed14703ab
+    hash_after: b96fc02951e431853584a7eb8dd0487ed14703ab
+    inputs:
+      - name: ask
+        hash: 05102c0dd70b91fe
+        size: 600
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -156,38 +165,49 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+byPattern expands each match through a pure jsTemplate(replacement, shape). It reads the replacement as JavaScript does and writes a Go template. The table: a double dollar stays one dollar, and dollar-ampersand takes the whole match. Dollar and one or two digits takes the group of the longest number the pattern holds, read as JavaScript reads it, and stands literal where the pattern holds no such group. Dollar and a name in angle brackets takes the named group where the pattern holds one. Every other dollar stands literal. The dollar-backtick and dollar-quote forms, the text before and after the match, refuse the op with a reason, since Go regexp holds no place for them. Both the patch regex op and the replace sweep reach byPattern, so one change covers both.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/edits/apply.go oneOp, through byPattern
+- src/modules/edits/edits.go the replace sweep, whose regex ops reach byPattern through Applied
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/edits/apply_test.go, the case where a JavaScript replacement keeps the group, the whole match and a lone dollar
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/edits/apply.go
+- src/modules/edits/apply_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: byPattern, Compiled, oneOp and the sweep at edits.go stand as the approach reads them
+- callers: oneOp is byPattern's one caller, and the sweep reaches it through Applied
+- done_when: the one case decides both lines
+- config: the approach adds no key
 
 ## tests-red
 
