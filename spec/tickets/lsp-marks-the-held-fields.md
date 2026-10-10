@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -215,6 +215,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: 2b4c64e0e9e48a8ea3f16912776e2e44b78320df
+    hash_after: 2b4c64e0e9e48a8ea3f16912776e2e44b78320df
+    inputs:
+      - name: ask
+        hash: ffba78493145a405
+        size: 933
+      - name: implement/tests-green
+        hash: da0dc9a4e0cd6006
+        size: 1033
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -456,8 +469,11 @@ accept
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+
+The ask names no view, since a VS Code user sees the same marks. The box decides this person step under the cloud rule, and the mark cases stand for the read.
 
 # Discussion
 
