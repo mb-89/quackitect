@@ -38,8 +38,10 @@ func TestAServerStandingBeforeTheCheckAnswersAfterIt(t *testing.T) {
 	}
 	stop()
 	_ = run.Wait()
-	if err := syscall.Kill(pid, 0); err != nil {
-		t.Errorf("the door fell with the child the check gave up on: %v", err)
+	// A killed door stands a zombie until a wait reaps it, and kill(pid, 0) passes a zombie, so the case asks wait4 without hanging, which answers 0 for a running door alone. [[spec/tickets/a-killed-door-reads-dead]]
+	var status syscall.WaitStatus
+	if ended, err := syscall.Wait4(pid, &status, syscall.WNOHANG, nil); ended != 0 || err != nil {
+		t.Errorf("the door fell with the child the check gave up on: %d, %v, %v", ended, status, err)
 	}
 }
 

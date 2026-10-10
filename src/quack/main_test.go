@@ -29,6 +29,21 @@ var sharedFolder = qtest.Shared(func() string {
 	return dir
 })
 
+// The road a spawned test binary takes in place of the tests, which the contract build sets, and nil elsewhere. [[spec/tickets/quack-tests-remove-their-folders]]
+var asSpawned func()
+
+// Runs the tests and removes the folders they built, in every build, so a plain run leaves TMPDIR as it found it. [[spec/tickets/quack-tests-remove-their-folders]]
+func TestMain(m *testing.M) {
+	if asSpawned != nil {
+		asSpawned()
+	}
+	code := m.Run()
+	for _, dir := range buildDirs.dirs {
+		os.RemoveAll(dir)
+	}
+	os.Exit(code)
+}
+
 // The tree's own wiring file, read once a package run. [[spec/design_output/model#the-wiring-file]]
 var wiringText = qtest.Shared(func() string {
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))

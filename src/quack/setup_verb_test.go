@@ -231,13 +231,14 @@ func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
-	hq1SeedDisk(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
+	hq1SeedDisk(t, d.disk, d.root, map[string]string{setupClient: "{}", toolsFile: "{}", webviewPackage: `{"devDependencies": {"playwright-core": "1.63.0"}}`})
 	runner.answers["npx"] = ranResult{code: 1}
 	runner.answers["code --list-extensions"] = ranResult{stdout: strings.Join(editorExtensions, "\n")}
 	if code := setupVerb(d, nil); code != 0 {
 		t.Fatalf("the setup answers %d", code)
 	}
-	if at := slices.Index(lines(), "npx --yes playwright-core install chromium"); at < 0 || runner.opts[at].cwd != filepath.Join(d.root, "src", "extension", "webview") {
+	// npx fetches the playwright-core the webview pins, not the newest. [[spec/tickets/runme-installs-when-stale]]
+	if at := slices.Index(lines(), "npx --yes playwright-core@1.63.0 install chromium"); at < 0 || runner.opts[at].cwd != filepath.Join(d.root, "src", "extension", "webview") {
 		t.Errorf("the want downloads not: %v", lines())
 	}
 	if !saidLine(out, "browser:") || !saidLine(out, "  no browser here") {
