@@ -50,7 +50,7 @@ func TestWholeAfterAppliesEachEdit(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/level0#the-path-a-rule-reads]]
+// [[spec/design_output/level0#the-path-a-rule-reads]] [[spec/tickets/write-door-paths-clean]]
 func TestRelativeToReadsEitherSeparatorAndEitherDriveCase(t *testing.T) {
 	const root = "C:/Users/one/Desktop/ai/quackitect-v5"
 	for _, one := range []struct{ root, path, want string }{
@@ -61,6 +61,11 @@ func TestRelativeToReadsEitherSeparatorAndEitherDriveCase(t *testing.T) {
 		{"", "spec/guidance/a.md", "spec/guidance/a.md"},
 		{root, "spec/guidance/a.md", "spec/guidance/a.md"},
 		{root + "/", root + "/README.md", "README.md"},
+		{root, "C:/Users/one/Desktop/ai//quackitect-v5/README.md", "README.md"},
+		{root, root + "//spec/./guidance/a.md", "spec/guidance/a.md"},
+		{root, root + "/spec/../AGENTS.md", "AGENTS.md"},
+		{root, root + "/../elsewhere/a.md", "C:/Users/one/Desktop/ai/elsewhere/a.md"},
+		{"/tree", "/tree//AGENTS.md", "AGENTS.md"},
 	} {
 		if got := RelativeTo(one.root, one.path); got != one.want {
 			t.Errorf("RelativeTo(%q, %q) reads %q, want %q", one.root, one.path, got, one.want)

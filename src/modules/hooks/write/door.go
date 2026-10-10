@@ -4,6 +4,7 @@
 package write
 
 import (
+	pathpkg "path"
 	"regexp"
 	"strings"
 )
@@ -59,10 +60,10 @@ func PathOf(e map[string]any) string {
 	return textIn(e["notebook_path"])
 }
 
-// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. [[spec/design_output/level0#the-write-door]]
+// A path under the root, relative to it, and any other path as it stands, as relativeTo in src/modules/check/paths.go reads it. Both stand cleaned first, so a doubled slash, a dot segment or a .. inside the tree reads as the tree's own path. [[spec/design_output/level0#the-write-door]] [[spec/tickets/write-door-paths-clean]]
 func RelativeTo(root, path string) string {
-	said := strings.ReplaceAll(path, "\\", "/")
-	at := strings.TrimRight(strings.ReplaceAll(root, "\\", "/"), "/")
+	said := cleaned(path)
+	at := strings.TrimRight(cleaned(root), "/")
 	if at == "" {
 		return said
 	}
@@ -70,6 +71,14 @@ func RelativeTo(root, path string) string {
 		return said[len(under):]
 	}
 	return said
+}
+
+// A path with forward slashes and its doubled slashes, dot segments and .. folded, and an empty path empty. [[spec/tickets/write-door-paths-clean]]
+func cleaned(path string) string {
+	if path == "" {
+		return ""
+	}
+	return pathpkg.Clean(strings.ReplaceAll(path, "\\", "/"))
 }
 
 // Whether a path relative to the root stands outside the tree. [[spec/design_output/level0#the-write-door]]
