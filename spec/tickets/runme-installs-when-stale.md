@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tests-and-ci-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a0570abbc0d0408b
         size: 1881
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box af15433560d6 · claude-code-remote · gate-helper
+    hash_before: 1f9818fd93ca413514fcbe539933bb3f05720209
+    hash_after: 1f9818fd93ca413514fcbe539933bb3f05720209
+    inputs:
+      - name: design/draft
+        hash: a0570abbc0d0408b
+        size: 1881
+      - name: design/tests-red
+        hash: 2c7612fc04dadb2e
+        size: 831
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -279,8 +291,16 @@ The fresh case installs and prints installing on stdout ahead of the verb line, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: RUNME.sh gates install.sh on a missing binary or a stale `stamp fresh se-index`, the same check index_here runs, and sends the install stdout to stderr
+- the redirect sits in RUNME.sh, not install.sh, which keeps the boot word printing on stdout for the SessionStart hook
+- done_when 1 and 2 are decided by TestAVerbOnAFreshBinarySkipsTheInstall and TestAMissingOrStaleBinaryRunsTheInstallOnStderr, red on their own assertions
+- done_when 3 is decided by the same test, which reads the install line on stderr and stdout carrying only the verb line
+- done_when 4 is decided by TestTheSetupResolvesABrowserAsAWant, red on the unpinned npx line; the webview package.json pins playwright-core 1.63.0
+- fixed in place: gofmt alignment of the exit field in TestAMissingOrStaleBinaryRunsTheInstallOnStderr
+- for implement: TestOnWindowsTheSetupReachesNpmNpxAndCodeThroughCmd seeds no webview package and expects the unpinned line, so the change either falls back to unpinned or updates that row
 
 # implement
 

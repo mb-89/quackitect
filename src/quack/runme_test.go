@@ -176,7 +176,7 @@ func TestAMissingOrStaleBinaryRunsTheInstallOnStderr(t *testing.T) {
 	t.Parallel()
 	for _, one := range []struct {
 		name, code, out string
-		exit          int
+		exit            int
 	}{
 		{"a stale stamp", "1", "verb <root>/src/scripts branch beat\n", 0},
 		{"a missing binary", "", "", 2},
