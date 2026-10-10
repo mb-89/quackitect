@@ -119,8 +119,12 @@ func TestARedPassFreezesItsRedFiles(t *testing.T) {
 	t.Parallel()
 	it := frozenBox(t)
 	text, _ := it.Disk.Read("spec/tickets/alpha.md")
-	if !strings.Contains(text, "frozen:") || !strings.Contains(text, HashText(frozenText)) {
-		t.Fatalf("the red pass freezes no hash of %s:\n%s", frozenFile, text)
+	var rows []map[string]string
+	for _, entry := range recordIn(text) {
+		rows = append(rows, rowsUnder(entry, frozenField)...)
+	}
+	if len(rows) != 1 || rows[0]["path"] != frozenFile || rows[0]["hash"] != HashText(frozenText) {
+		t.Fatalf("the red pass freezes %v, and wants one row naming %s and its hash:\n%s", rows, frozenFile, text)
 	}
 }
 

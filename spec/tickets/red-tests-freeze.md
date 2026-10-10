@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: gate
 steps:
   - name: design
     steps:
@@ -259,6 +259,19 @@ record:
     skipped: true
     kept: 3dad4a713612b3ecbb4d8e6feeb7778ae52b5516
     why: its red tests stand as 3dad4a713 landed them, and a later leaf passed since
+  - step: design/draft-2
+    hand: box b9ccbd72b78d · claude-code-remote · greener
+    hash_before: 4591c100e6543e7377c10ccd23d783f40c936f69
+    hash_after: 4591c100e6543e7377c10ccd23d783f40c936f69
+    inputs:
+      - name: ask
+        hash: 271bbec27388e167
+        size: 1143
+    def: 05d09c51410ea2a3
+  - step: design/tests-red-2
+    skipped: true
+    kept: fa373a55832fcf68718f742babf7529ea9de3769
+    why: its red tests stand as fa373a558 landed them, and a later leaf passed since
 group: red-freezes-and-stalls-show
 ---
 
