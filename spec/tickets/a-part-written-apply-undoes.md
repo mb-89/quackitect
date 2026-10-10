@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 899317d2c93210e8
         size: 426
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: b19049a0d791da6ced29abeeda29b072bbeed36e
+    hash_after: b19049a0d791da6ced29abeeda29b072bbeed36e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/edits fails
+    inputs:
+      - name: design/draft
+        hash: a98648b614bc9a9a
+        size: 1144
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -216,26 +229,31 @@ When a put fails after another put lands, writes() rewrites the journal entry to
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion, with the refusal the finding names: undo refused, d.txt moves since the apply. The batch writes a.txt, fails to make the folder for b/c.txt, and never reaches d.txt. What surprises me: the born file that failed leaves nothing on disk, so the only refusal comes from the file the batch did not reach.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the part-written case fails on its assertion, and the same case decides the line
+- doors: the case runs on a temp folder through Outside, the module's own disk door, as the standing edits cases do
 
 # gate
 

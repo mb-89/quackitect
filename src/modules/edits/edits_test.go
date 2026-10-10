@@ -40,3 +40,30 @@ func TestAPatchLandsTheTextTheDoorAnswers(t *testing.T) {
 		t.Errorf("a refusing door answers %v", err)
 	}
 }
+
+// A put failing after another lands leaves an undo that puts the tree back. [[spec/tickets/a-part-written-apply-undoes]]
+func TestAPartWrittenApplyUndoes(t *testing.T) {
+	root := t.TempDir()
+	for name, text := range map[string]string{"a.txt": "a\n", "b": "b\n", "d.txt": "d\n"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	from := Outside{Root: root, Now: func() time.Time { return time.Unix(0, 0) }}
+	_, err := from.patches(Patch{Ops: []Op{
+		{File: "a.txt", Old: "a", New: "A"},
+		{File: "b/c.txt", Op: "create", New: "c\n"},
+		{File: "d.txt", Old: "d", New: "D"},
+	}})
+	if err == nil || !strings.Contains(err.Error(), "part written") {
+		t.Fatalf("a put failing past the first answers %v", err)
+	}
+	if _, err := from.undoes(Undo{}); err != nil {
+		t.Fatalf("the undo the error names refuses: %v", err)
+	}
+	for name, text := range map[string]string{"a.txt": "a\n", "b": "b\n", "d.txt": "d\n"} {
+		if got, _ := os.ReadFile(filepath.Join(root, name)); string(got) != text {
+			t.Errorf("%s reads %q after the undo, and wants %q", name, got, text)
+		}
+	}
+}
