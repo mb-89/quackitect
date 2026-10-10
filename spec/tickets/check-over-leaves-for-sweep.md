@@ -29,16 +29,16 @@ group: checks-and-index-read-right
 step: do
 record:
   - step: do
-    hand: box 22efbd3bb307 · claude-code-remote
-    hash_before: 182ac5f7cfea9ea73f5ec1a2ef92a479c9af7983
-    hash_after: 1fdd7d180f36546302da28e6d97e5573e5ced9a6
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 1fdd7d180f36546302da28e6d97e5573e5ced9a6
+    hash_after: f3dbc522beff1ecc06a4764b65a8c9d89bd35e55
     answered:
       - name: tests
         exit: 0
         said: green, src/modules/check passes; green, src/imports passes
       - name: check
         exit: 0
-        said: "   89.4  in all"
+        said: "   65.7  in all"
     inputs:
       - name: ask
         hash: 705d213c3d2ec3bf
@@ -84,17 +84,19 @@ done_when:
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-`Rules` owns the check's rules alone. `Checker.Over`, its `readers` map, `restatedOver`, `copiesOver` and `installerSpellsNoFolder` leave, since no production front called them, and `privateFolderOwned` already reads the installer. The engine-field hint lived in `Over` alone, so `Sweep` takes it through `engineSweep`, and `TestTheSweepHintsAnEngineFieldABufferRewrites` failed red before. The export file keeps only the aliases a file reads. The two cases that read `Over` read the sweep for their file.
+`Checker.Over` and its `readers` map go, so `Rules` alone names the check rules. The engine-field hint joins `Rules` as `engineSweep`, so the editor sweep draws it. The two tests read the sweep filtered by file, and `export.go` keeps only the aliases another package imports.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change follows the ask, and keeps the engine hint the spec names by moving it into the sweep
-- the design lines naming `Over` in `spec/design_output/lsp.md` move to the sweep in the same change
-- each rule stands in `Rules` once
+- the change follows the ask, and moves `engineFaults` into `Rules` since `Over` alone reached it
+- the stale `Whole` in the lsp design note reads `Sweep`
+- the rule list stands in `Rules` alone
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Two boxes work this leaf at once, since the dispatch fires a second box onto the branch. The merge keeps this close, and takes the filter's parentheses from the first box into `src/imports/example_schema_test.go`.
