@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
 depends_on: ["lsp-draws-the-ticket-lenses", "lsp-marks-the-held-fields"]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -172,6 +172,25 @@ record:
         exit: 0
         said: "src/quack/voice_verb.go:27:1 ExampleCovers: ./RUNME.sh voice stands in no example's interface. Write an example under sp"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c729ff43c0cb · claude-code-remote
+    hash_before: e262f76c48abf1bbdb0f282c5e2f58a7ef24fc3b
+    hash_after: e262f76c48abf1bbdb0f282c5e2f58a7ef24fc3b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "   76.5  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f52be5635d5f5eac
+        size: 992
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -384,26 +403,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/lsp.test.js test/level0/route-host.test.js test/level0/sidebar.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go language server now draws the ticket buttons and the held-field marks, so the VS Code extension keeps only what LSP holds no word for: the language client, its middleware, the route inset, the sidebar and the status bar. The client's middleware asks the reason before a fail reaches the server, saves the ticket before a hand-back, and draws each HeldField hint as the underline instead of a Problems row. The sidebar and the route host run the server's quackitect.ticket command through door.executes. lib/fields.js, editor-fields.js and the lens draw code leave with their tests, so one copy of the buttons and marks stands, in the server.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's files and three Go pointer comments the gate named
+- door.executes and door.marksFields stand in each fake door the tests read
+- lib/lsp.js points the middleware at spec/design_output/lsp
+- spec/design_output/extension.md points at the lsp note and restates nothing
 
 # accept
 
