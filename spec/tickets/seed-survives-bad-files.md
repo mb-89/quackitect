@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 40bf0155ca80610fd8f2d80f618d32ef64ead013
+    hash_after: 2dcf73b4a0c8401e1ae2366e20cf94457ca083ae
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   98.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 75c3daf71d1621ba
+        size: 657
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The seed now survives a bad path. A walk error under the root costs that path alone, and only an error at the root ends the walk. A batch the commit refuses commits again file by file, and a file refused on its own, such as one past the bus cap, drops out of the seed. The watch then starts whatever the seed met. Before, any walk error or one oversized file stopped the seed, and the files family got nothing for the life of the index. The quack dump test now waits for the index to answer the standing file before it dumps. The watch hands that late folder in, so a dump racing it answered a different prefix.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: watch.go and files_test.go under the ask, and dump_test.go, which the group's watch change made race
+- doors: the refusing commit and the walk error come through fakes
+- comment: walkPast, landEach and heardStanding each point at this ticket
+- one place: walkPast owns the past-a-path rule, and the standing wait stands in one helper
 
 # accept
 
