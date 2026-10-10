@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 00979d2d29da2fb082d0ee6784a2f8b7406f9835
+    hash_after: 00979d2d29da2fb082d0ee6784a2f8b7406f9835
+    inputs:
+      - name: ask
+        hash: cdba6b0cba744e65
+        size: 492
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -156,38 +165,50 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Standing takes its walk errors through a pure walkPast(root, at, err). An error at the root still ends the walk and reaches the seed, since a missing root seeds nothing. An error under the root, a folder gone or refusing its read among them, costs that path alone, and the walk goes on. In seedsIn, a batch the commit refuses commits again a file at a time, and a file the commit refuses alone drops out of the seed. The watch then starts whatever the seed met, so the live changes still flow. The seed reads no new size limit, since the commit's own refusal names the file past the bus cap.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go seedsIn, through Standing
+- src/modules/files/watch.go Seeds, which src/quack/modules.go starts as the files module
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/files/files_test.go, the case where the commit refuses one file and the rest seed and the watch starts
+- src/modules/files/files_test.go, the case where walkPast lets the walk go on past a nested path and ends it at the root
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go
+- src/modules/files/files_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: Standing, seedsIn, Seeds and Start stand as the approach reads them
+- callers: Standing has the seed as its one caller, and Seeds has the module wiring
+- done_when: the two cases decide the two lines
+- config: the approach adds no key
 
 ## tests-red
 
