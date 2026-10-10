@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: lsp-takes-the-lenses
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -172,6 +172,21 @@ record:
     skipped: true
     kept: a47be9d5bb6f9d9db64af39e712b71716e7478cb
     why: its red tests stand as a47be9d5b landed them, and a later leaf passed since
+  - step: gate
+    hand: box c729ff43c0cb · claude-code-remote · helper-8
+    hash_before: f2d22f4856c012450ed8754b41e7f48b19a73b6f
+    hash_after: f2d22f4856c012450ed8754b41e7f48b19a73b6f
+    inputs:
+      - name: design/draft
+        hash: db15050ce46efa69
+        size: 2286
+      - name: design/tests-red
+        hash: c039c52697b89698
+        size: 735
+      - name: [[spec/design_output/lsp]]
+        hash: c6a62e22f17c2c6a
+        size: 24410
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -328,9 +343,9 @@ The mark, the marked hover and the new take fail on their own assertions against
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-pass with findings
-- the-client-drops-fields-js: the approach leaves the breaks line open: `src/extension/lib/fields.js` and `marksFields` in `src/extension/editor-fields.js` stay a second reader of `tickets/drawn` and the holds, and no file under `src/extension` stands in size, so the HeldField middleware the design note names lands nowhere
-- the-marks-note-names-marksin: the design note names `marksOf` where the approach ports `marksIn` from `fields.js`, and the implement step names the function once in both
+accept
+- the approach ports marksIn and hoverOf into Go, and both closed points stand answered.
+- each done_when line meets a case in src/modules/lsp/marks_test.go, and the check line meets ./RUNME.sh check.
 
 # implement
 
