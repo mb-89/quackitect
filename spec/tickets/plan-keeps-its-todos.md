@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: e89f530a7b39e5c7a987e684d5222c7fa137b2d1
+    hash_after: e89f530a7b39e5c7a987e684d5222c7fa137b2d1
+    inputs:
+      - name: ask
+        hash: d80404492aa4c870
+        size: 765
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -158,38 +167,52 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Three changes in `src/modules/plans/plans.go`. `Registers` adds `q.Writes()` to the plan action, so every call takes a record and a wait and the book runs two calls one after the other. `plans` refuses a read error other than not-exist, checked through `errors.Is` against `fs.ErrNotExist`, and writes nothing. `planOf` answers a fault where the text holds more than white space and reads as no JSON object, and `plans` refuses on that fault and writes nothing. A missing or blank file still reads as an empty plan.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/modules.go` registers `plans.Registers`
+- `src/quack/accepts.go` calls `plans.Accept` over `plansOutside`
+- `src/modules/plans/plans.go` `plans` calls `planOf`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/plans/plans_test.go` `TestAPlanFileReadingAsNoObjectRefusesAndStands`
+- `src/modules/plans/plans_test.go` `TestAReadErrorPastNotExistRefuses`
+- `src/modules/plans/plans_test.go` `TestTheModuleRegistersThePlanTool`, which also asserts the action declares its writes
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/plans/plans.go`
+- `src/modules/plans/plans_test.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `plans.go`, `plans_test.go`, `src/quack/plans.go`, `src/quack/accepts.go` and `q.Writes` in `src/q/q.go` stand opened, and each claim checked there
+- the callers list names the registration, the accept and the one reader of `planOf`
+- each done_when line names its case under tests
+- the approach adds no config key
 
 ## tests-red
 
