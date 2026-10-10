@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 82aed49ef512b1c02fb745c80d19c88accd96deb
+    hash_after: 82aed49ef512b1c02fb745c80d19c88accd96deb
+    inputs:
+      - name: ask
+        hash: 3a2ac63c047b0776
+        size: 375
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,48 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+In Start's send, a read that answers an error leaves its port out of that tick. The port then commits nothing, last[port] keeps the value it sent before, and the index keeps the last good value until a read succeeds. A read answering no trunk, which Trunk already turns into an empty list with no error, still commits as it does. The empty defaults Registers declares still stand for a box whose first read fails.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/git/git.go Start, which src/quack wires as the git module's start
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_test.go, the case where a tick whose tips read fails commits nothing and the tips stand
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/git/git.go
+- src/modules/git/git_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: Start, send, Tips, Trunk, Stood, Tracked and Registers stand as the approach reads them
+- callers: Start is the one function the change touches, and its one caller is the module's wiring
+- done_when: the failed-read case decides the one line
+- config: the approach adds no key
 
 ## tests-red
 
