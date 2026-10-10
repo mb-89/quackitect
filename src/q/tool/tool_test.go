@@ -173,3 +173,23 @@ func TestTheRunningLineNamesTheFractionTheTimeAndTheHandle(t *testing.T) {
 		}
 	}
 }
+
+// The input of the fake action mark, which carries the person mark as the verbs do. [[spec/tickets/v1-takes-a-run-secret]]
+type personIn struct {
+	Args   []string `json:"args"`
+	Person bool     `json:"person,omitempty"`
+}
+
+// An agent's call over MCP or the hook door drops the person mark, so the verb keeps the harness variables. [[spec/tickets/v1-takes-a-run-secret]]
+func TestAnAgentsCallDropsThePersonMark(t *testing.T) {
+	c := q.New()
+	q.ActionIn(c, "mark", func(personIn) []q.Request { return nil })
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatal(faults)
+	}
+	in, err := Input(q.NewStore(c), "mark", map[string]any{"args": []any{"x"}, "person": true})
+	said, _ := in.(personIn)
+	if err != nil || said.Person || len(said.Args) != 1 {
+		t.Fatalf("the input reads %+v, err %v, and wants the args with no person mark", in, err)
+	}
+}

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: a1a49db99274ebf0
         size: 955
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: bd9051c2752fe56122667870344787db072c2a82
+    hash_after: bd9051c2752fe56122667870344787db072c2a82
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 1ff232507d954dbf
+        size: 2979
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -245,26 +258,35 @@ The sidebar and the lens of the extension read the secret through `indexDoor` in
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/index src/q/tool src/modules/hooks test/level0/editor-doors.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/secret_test.go
+- src/q/tool/tool_test.go
+- src/modules/hooks/command/findings_test.go
+- src/modules/hooks/hooks_test.go
+- test/level0/editor-doors.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each test fails on its own assertion. A person post with no secret answers 200 over `/v1`, and the legacy port answers its `files` call to a caller holding no secret. The standing file stands at 644, and no secret file stands. The tool input keeps `person: true` past the agent's call. The bless guard passes a `cat` of the secret's path, and the door passes a Read of it. The index door sends no secret header. One surprise: the legacy port answers whole file listings to any local caller, so the secret gates every legacy call, as the ask says.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a test above that fails on its own assertion
+- the index tests run on the fake network and the fake manager, the tool test on a fresh catalog, the hook tests on `holdDoor`, and the extension test on the fake disk and the fake http
 
 # gate
 
