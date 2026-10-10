@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box c729ff43c0cb · claude-code-remote
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: 700d94c4a3d795912e3578a5cab78d320b8dbf44
     hash_after: 700d94c4a3d795912e3578a5cab78d320b8dbf44
+  - step: accept
+    hand: box c729ff43c0cb · claude-code-remote · helper-6
+    hash_before: a6fbdbc31bbb0bd078780a01cdec9e975f0b6fad
+    hash_after: a6fbdbc31bbb0bd078780a01cdec9e975f0b6fad
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lsp-takes-the-lenses already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 63a403de5b0c670a
+        size: 315
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -164,8 +180,22 @@ goal: `se-index lsp` draws the buttons over a ticket and runs their press. It ma
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- lensesOf in lenses.go draws take, other hand, pass, fail, drop, back, cloud and closed as the JS did.
+- A press posts ticket/pull as a person, logs the line, toasts the word, and refreshes.
+- A fail with no reason runs nothing, and the message names the command line.
+- A hand-back saves through the middleware, and the server writes the buffer too.
+- The fill on save moved to textDocument/didSave, and its refusal warns.
+- marksIn and hoverOf in marks.go match the deleted fields.js, field for field.
+- A new take sends window/showDocument, and a hold at start moves no cursor.
+- The middleware draws HeldField as the underline and keeps it off Problems.
+- Route host and sidebar presses run the server's command, and pullsNext still reads word.
+- lib/fields.js and editor-fields.js stand deleted, with their tests.
+- No pointer names the removed functions or the old extension anchors.
+- lsp.md and extension.md name the server and the middleware once each.
+- The check runs green and exits 0.
 
 # retro
 
