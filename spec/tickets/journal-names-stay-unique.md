@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 0643c3848fc12caf
         size: 1419
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-5
+    hash_before: 73d86da46fd8f5b298c59d800e48d6a95518323f
+    hash_after: c4832da06571e0786781a3159bb6d408fa4a9584
+    inputs:
+      - name: design/draft
+        hash: 0643c3848fc12caf
+        size: 1419
+      - name: design/tests-red
+        hash: 687470fd48202cca
+        size: 483
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,11 @@ The case fails on its own assertion: two patches at one clock reading leave one 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- journal-note-names-the-count: spec/design_output/apply.md#the-entry-names-its-time says nothing holds a counter, and FreeName counts in the padding digits, so the note takes the change and the draft size leaves that file out
+- free-name-reads-missing-folder: the taken check reads an absent journal folder as nothing taken, since the first apply on a root meets no folder before put makes it
 
 # implement
 
