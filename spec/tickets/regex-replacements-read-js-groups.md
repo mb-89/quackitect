@@ -1,0 +1,398 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it", "every config key the approach adds names each default file it lands in"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: c671f20a6ae2a4a6
+group: edits-and-files-hold
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: b96fc02951e431853584a7eb8dd0487ed14703ab
+    hash_after: b96fc02951e431853584a7eb8dd0487ed14703ab
+    inputs:
+      - name: ask
+        hash: 05102c0dd70b91fe
+        size: 600
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: 20cc7fdbf37e6727d0c1a5ed6a787ae804ef2283
+    hash_after: 20cc7fdbf37e6727d0c1a5ed6a787ae804ef2283
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/edits fails
+    inputs:
+      - name: design/draft
+        hash: f4fad5fd663b1692
+        size: 1463
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box a5167492d95e · claude-code-remote · helper-6
+    hash_before: 73d86da46fd8f5b298c59d800e48d6a95518323f
+    hash_after: 73d86da46fd8f5b298c59d800e48d6a95518323f
+    inputs:
+      - name: design/draft
+        hash: f4fad5fd663b1692
+        size: 1463
+      - name: design/tests-red
+        hash: 10b99cf2cbf3a2ce
+        size: 684
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a5167492d95e · claude-code-remote · helper-13
+    hash_before: 33d62e65e8df19dcbbd226defa78d56f0cab4733
+    hash_after: e27482205c5073f4b2c8bc3613a75a8be77b9f0c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: ac6c19ee5697644dae237a6abc59c607d3cef7d1
+    hash_after: ac6c19ee5697644dae237a6abc59c607d3cef7d1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/edits passes
+      - name: check
+        exit: 0
+        said: "   96.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 10b99cf2cbf3a2ce
+        size: 684
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+A regex replacement written the JavaScript way, such as `$1px` or `$&`, expands to the group it names, so the patch regex op and the replace sweep keep the text they match instead of deleting it.
+
+Go reads `$1px` as a group named `1px`, which expands empty, so the replace sweep silently deletes the matched number in every file a glob reaches, and `$&` lands as a literal.
+
+- `./RUNME.sh branch test src/modules/edits` passes a case where `(\d+)px` with `$1rem` over `a 12px b` gives `a 12rem b`
+- the same suite passes a case where `$&` expands to the whole match and `$$` to one dollar
+
+none
+
+none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+byPattern expands each match through a pure jsTemplate(replacement, shape). It reads the replacement as JavaScript does and writes a Go template. The table: a double dollar stays one dollar, and dollar-ampersand takes the whole match. Dollar and one or two digits takes the group of the longest number the pattern holds, read as JavaScript reads it, and stands literal where the pattern holds no such group. Dollar and a name in angle brackets takes the named group where the pattern holds one. Every other dollar stands literal. The dollar-backtick and dollar-quote forms, the text before and after the match, refuse the op with a reason, since Go regexp holds no place for them. Both the patch regex op and the replace sweep reach byPattern, so one change covers both.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- src/modules/edits/apply.go oneOp, through byPattern
+- src/modules/edits/edits.go the replace sweep, whose regex ops reach byPattern through Applied
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- src/modules/edits/apply_test.go, the case where a JavaScript replacement keeps the group, the whole match and a lone dollar
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- src/modules/edits/apply.go
+- src/modules/edits/apply_test.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- opened: byPattern, Compiled, oneOp and the sweep at edits.go stand as the approach reads them
+- callers: oneOp is byPattern's one caller, and the sweep reaches it through Applied
+- done_when: the one case decides both lines
+- config: the approach adds no key
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/modules/edits/apply_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+The case fails on its own assertion, and reproduces the finding: the replacement $1rem over a 12px b gives a and b with the number gone, and no error. The whole-match form lands as a literal, a named group lands as a literal, and a dollar naming no group deletes itself and the word after it. A double dollar already reads as one dollar, since Go and JavaScript agree there.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- done_when: the case holds both lines, and each row fails on its own assertion today but the double dollar
+- doors: the case runs Applied over text held in memory, and reaches no door
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+pass
+
+- the approach answers the ask: one change in byPattern covers the patch regex op through oneOp and the replace sweep through Applied, and both callers stand as the draft names them
+- the red case in apply_test.go decides both done_when lines, and fails on its own assertion today for every row but the double dollar
+- for the builder, in place: dollar-zero and dollar-zero-zero stand literal, as JavaScript reads them, since Go numbers the whole match as group zero and a plain group lookup would expand it
+- for the builder, in place: dollar and a name in angle brackets stands literal where the pattern holds no named group, and expands empty where the pattern holds named groups but not that one, as JavaScript reads it
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint src/modules/edits/apply.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- files: only src/modules/edits/apply.go changes, inside the draft size
+- doors: jsTemplate is pure and reaches no door, so needs no fake
+- approach: jsTemplate and jsGroup comments point at the ticket naming the approach
+- one place: the JavaScript dollar table stands in jsTemplate alone
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/modules/edits
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+A regex replacement now reads its template as JavaScript reads it. Groups, the whole match and named groups expand, a group the pattern lacks stays literal, and the text before or after the match is refused by name. Before, the Go template rules ate the dollar forms the agent writes.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- files: the change stays in apply.go, beside its test
+- doors: the case reaches no door
+- comment: each new line points at this ticket
+- one place: the template reading stands in one function
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
