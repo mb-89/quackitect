@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 1742510cd5248fb3e816c441f20f9ff6ce0c32ae
+    hash_after: 27f986ab2902bb1c862214a425eacf622109405a
+    inputs:
+      - name: ask
+        hash: 0ed00b31dadca36d
+        size: 761
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -157,38 +166,60 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two changes. `ReRouted` in `src/modules/check/rerouted.go` answers an error where the schema stands nil, and writes no text. `ticket route` and `ticket update` read the ticket schema off the method root through `rootsOf`, as the pull and the mint do, and stop on that error with exit failed before any write. The three other callers guard a nil schema already, and take the error as their guard. The processes `ticket update` reads stay with the sibling `ticket-verbs-read-method-routes`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/ticket_route.go` `ticketRoute`
+- `src/quack/ticket_update.go` `ticketUpdate`
+- `src/pull/pull_stale.go` the stale route write
+- `src/pull/pull_person.go` `reRouted`
+- `src/branches/escalate.go` the person step insert
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/quack/ticket_route_test.go` a vehicle case under `TestTicketRoute`, the method and the work root in two temp folders
+- `src/modules/check/rerouted_test.go` a nil schema row under `TestReRouted`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/check/rerouted.go`
+- `src/modules/check/rerouted_test.go`
+- `src/modules/check/reroute_test.go`
+- `src/quack/ticket_route.go`
+- `src/quack/ticket_update.go`
+- `src/quack/ticket_route_test.go`
+- `src/pull/pull_stale.go`
+- `src/pull/pull_person.go`
+- `src/branches/escalate.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `ReRouted`, both verbs, `ticketSchema`, `workDisk`, `rootsOf` and the three other callers stand opened, and each claim checked there
+- the callers list names every caller of `ReRouted` and of `ticketSchema`
+- each done_when line names its case under tests
+- the approach adds no config key
 
 ## tests-red
 
