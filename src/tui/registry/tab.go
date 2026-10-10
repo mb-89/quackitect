@@ -147,7 +147,7 @@ func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 		}
 		t.Err = msg.err
 		if msg.err == nil {
-			t.All = msg.rows
+			t.take(msg.rows)
 		}
 		t.Rebuild(m.Rows())
 		m.LoadPane()
@@ -160,6 +160,21 @@ func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 		return true, t.fetch()
 	}
 	return false, nil
+}
+
+// New rows take the place of the old, and the selection follows its name into them, so a name arriving above it moves nothing. [[spec/tickets/a-refetch-keeps-the-selection]]
+func (t *Tab) take(rows []Row) {
+	kept := ""
+	if t.Sel >= 0 && t.Sel < len(t.All) {
+		kept = t.All[t.Sel].text("name")
+	}
+	t.All, t.Sel = rows, -1
+	for at, one := range rows {
+		if kept != "" && one.text("name") == kept {
+			t.Sel = at
+			break
+		}
+	}
 }
 
 // The rows the filter keeps, with the selection held on its row where that row stays. [[spec/design_output/model#the-registry-tabs]]

@@ -4,8 +4,6 @@
 // [[spec/design_output/extension#it-starts-silent]]
 
 const { SCHEMA, sidebarOf } = require("./sidebar.js");
-const { fieldMarksOf } = require("./lib/fields.js");
-const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { FLIP, routeHostOf } = require("./lib/route-host.js");
 const { BURST, settled } = require("./lib/settle.js");
@@ -38,41 +36,20 @@ async function activate(context, given, load) {
     shown = now;
   });
 
-  // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-  const tickets = ticketLensOf(door);
-  door.registers(COMMAND, tickets.took);
-  // The lens, the marks and the drawing wake on the index values they read. [[spec/tickets/the-lens-reads-v1]]
-  door.index?.watch(tickets.names, () => door.lensChanged?.());
-  // The drawing over a ticket, and its flip beside the ticket's buttons. [[spec/tickets/the-inset-folds-the-frontmatter]]
+  // The drawing over a ticket and its flip, and the server draws the ticket's buttons and marks. [[spec/tickets/the-inset-folds-the-frontmatter]] [[spec/design_output/lsp#a-ticket-carries-its-buttons]]
   const route = routeHostOf(door);
   door.index?.watch(route.names, () => route.refreshed());
   door.registers(FLIP, (path) => {
     route.flipped(path);
     door.lensChanged?.();
   });
-  door.lenses?.({
-    ...tickets,
-    lenses: async (path, text) => [
-      ...route.lenses(path),
-      ...(await tickets.lenses(path, text)),
-    ],
-  });
-  // [[spec/design_output/extension#a-take-marks-the-fields]]
-  const fields = door.marksFields ? fieldMarksOf(door) : null;
-  if (fields) {
-    await fields.starts();
-    door.index?.watch(fields.names, () => fields.held());
-  }
+  door.lenses?.({ lenses: async (path) => route.lenses(path) });
   door.onEditors?.(async (path, text) => {
-    await Promise.all([route.opened(path, text), fields?.sees(path, text)]);
+    await route.opened(path, text);
     door.lensChanged?.();
   });
-  door.onChange?.((path, text) =>
-    Promise.all([route.changed(path, text), fields?.sees(path, text)]),
-  );
+  door.onChange?.((path, text) => route.changed(path, text));
   door.onTheme?.(() => route.themed());
-  // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
-  door.onSave?.(tickets.saved);
 
   // [[spec/design_output/extension#runme-opens-the-panel]]
   if ((await door.read(SHOW)).trim()) {

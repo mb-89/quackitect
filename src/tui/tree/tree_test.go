@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
 
 	"quackitect/src/tui/draw"
@@ -288,6 +289,129 @@ func TestARedrawKeepsTheGroupsAPersonOpened(t *testing.T) {
 	want := "a note|the window|the tree|the rows"
 	if got := strings.Join(namesOf(now), "|"); got != want {
 		t.Fatalf("a row arriving above shuts and opens nothing, and the rows read %q", got)
+	}
+}
+
+// The held row is found among the rows the filter keeps, as takes lays the line on after the carry. [[spec/tickets/a-filter-keeps-the-cursor]]
+func TestARedrawUnderAFilterKeepsTheCursor(t *testing.T) {
+	t.Parallel()
+	queued := []Item{item("a", "open", ""), item("b", "open", ""), item("q1", "open", "1"), item("c", "open", ""), item("q2", "open", "2"), item("q3", "open", "3")}
+	was := NewTree(columns(), queued, true)
+	if err := was.Filtering("says: /./"); err != nil {
+		t.Fatal(err)
+	}
+	was.MoveTo(1)
+	now := NewTree(columns(), append([]Item{item("d", "open", "")}, queued...), true)
+	now.Carry(was)
+	if !now.Narrowed() {
+		t.Fatal("the carry keeps the filter the old tree held")
+	}
+	if err := now.Filtering("says: /./"); err != nil {
+		t.Fatal(err)
+	}
+	if held := now.Selected(); held == nil || held.Name != "q2" {
+		t.Fatalf("the cursor stays on q2 under the filter, and stands on %v", held)
+	}
+}
+
+// A redraw builds the tree under the base sort, and the sort a press set stands over it. [[spec/tickets/a-redraw-keeps-the-sort]]
+func TestARedrawKeepsTheSortAPersonSet(t *testing.T) {
+	t.Parallel()
+	based := func() *Tree {
+		out := NewTree(columns(), []Item{item("b", "open", "1"), item("a", "open", "2")}, true)
+		out.Sorted([]Sort{{Key: "says"}})
+		return out
+	}
+	was := based()
+	was.Sorted(nil)
+	was.SortOn("name")
+	now := based()
+	now.Carry(was)
+	if got := now.SortSays(); got != was.SortSays() {
+		t.Fatalf("the sort stays %q across a redraw, and reads %q", was.SortSays(), got)
+	}
+	if got := strings.Join(namesOf(now), "|"); got != "a|b" {
+		t.Fatalf("the rows keep the order by name, and read %q", got)
+	}
+	was.Sorted(nil)
+	cleared := based()
+	cleared.Carry(was)
+	if got := cleared.SortSays(); got != "" {
+		t.Fatalf("a sort the person cleared stays cleared across a redraw, and reads %q", got)
+	}
+}
+
+// The edit follows its row by name, where a row arrives above it. [[spec/tickets/open-edits-outlive-redraws]]
+func TestARedrawKeepsAnOpenEdit(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("hi")})
+	now := NewTree(columns(), []Item{item("new", "open", ""), item("one", "open", ""), item("two", "open", "")}, true)
+	now.Carry(was)
+	if !now.Editing() || now.Typed() != "hi" {
+		t.Fatalf("the edit stands open with hi across the redraw, and editing reads %v with %q", now.Editing(), now.Typed())
+	}
+	now.Take()
+	if said := ValueOf(now.Items[2], "says"); said != "hi" {
+		t.Fatalf("the take writes two, and two says %q while new says %q", said, ValueOf(now.Items[0], "says"))
+	}
+}
+
+// A fill after a redraw reaches the rows a person marked, by name. [[spec/tickets/open-edits-outlive-redraws]]
+func TestARedrawKeepsTheMarksAFillReaches(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", ""), item("three", "open", "")}, true)
+	was.MoveTo(0)
+	was.Mark()
+	was.MoveTo(2)
+	was.Mark()
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("x")})
+	now := NewTree(columns(), []Item{item("new", "open", ""), item("one", "open", ""), item("two", "open", ""), item("three", "open", "")}, true)
+	now.Carry(was)
+	now.Fill()
+	said := []string{}
+	for _, one := range now.Items {
+		said = append(said, one.Name+"="+ValueOf(one, "says"))
+	}
+	if got := strings.Join(said, "|"); got != "new=|one=x|two=|three=x" {
+		t.Fatalf("the fill reaches one and three alone, and the rows read %q", got)
+	}
+}
+
+// A mark whose row left keeps the fill off the rows nobody marked. [[spec/tickets/open-edits-outlive-redraws]]
+func TestAFillAfterEveryMarkedRowLeftWritesNothing(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Mark()
+	was.MoveTo(0)
+	was.Open(2)
+	was.Typing(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("x")})
+	now := NewTree(columns(), []Item{item("one", "open", "")}, true)
+	now.Carry(was)
+	if !now.Editing() {
+		t.Fatal("the edit on one stands open across the redraw")
+	}
+	now.Fill()
+	if said := ValueOf(now.Items[0], "says"); said != "" || len(now.Written()) != 0 {
+		t.Fatalf("the fill reaches no row nobody marked, and one says %q", said)
+	}
+}
+
+// A take whose row left the view writes nothing, and names the row with the reason. [[spec/tickets/open-edits-outlive-redraws]]
+func TestATakeOnARowThatLeftSaysSo(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{item("one", "open", ""), item("two", "open", "")}, true)
+	was.MoveTo(1)
+	was.Open(2)
+	now := NewTree(columns(), []Item{item("one", "open", "")}, true)
+	now.Carry(was)
+	left := now.Take()
+	if len(left) != 1 || left[0] != "two" || now.Refused() != RowLeft || len(now.Written()) != 0 {
+		t.Fatalf("the take names two with the reason it left, and names %v with %q", left, now.Refused())
 	}
 }
 

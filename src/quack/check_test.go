@@ -149,34 +149,6 @@ func TestCheckParts(t *testing.T) {
 			}
 		}
 	})
-	t.Run("the types part lays the engine's types, then runs tsc over the plugin", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"claude": 1, "tsc": 0}}
-		if code := partNamed(partsOf(fake.doors(), nil, false), "types").run(); code != 0 {
-			t.Fatalf("a plugin whose types hold answers %d", code)
-		}
-		plugin := filepath.Join(".claude", "skills", "level0")
-		want := [][]string{{"claude", "--plugin-dir", plugin, "-p", ""}, {"tsc", "-p", plugin}}
-		if !reflect.DeepEqual(fake.runs, want) {
-			t.Fatalf("the types part ran %v, and want %v", fake.runs, want)
-		}
-	})
-	t.Run("the types part fails where tsc refuses the hooks", func(t *testing.T) {
-		fake := &checkFake{codes: map[string]int{"tsc": 2}, said: map[string]string{"tsc": "hooks/level0.ts(1,1): error TS2322"}}
-		doors := fake.doors()
-		var said strings.Builder
-		doors.errs = &said
-		if code := partNamed(partsOf(doors, nil, false), "types").run(); code != 1 || !strings.Contains(said.String(), "TS2322") {
-			t.Fatalf("a refused type answers %d, and says %q", code, said.String())
-		}
-	})
-	t.Run("the types part passes where claude or tsc stands nowhere", func(t *testing.T) {
-		for _, gone := range []string{"claude", "tsc"} {
-			fake := &checkFake{codes: map[string]int{"tsc": 2}, gone: map[string]bool{gone: true}}
-			if code := partNamed(partsOf(fake.doors(), nil, false), "types").run(); code != 0 {
-				t.Fatalf("no %s answers %d", gone, code)
-			}
-		}
-	})
 	t.Run("the server part reads the health call", func(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()

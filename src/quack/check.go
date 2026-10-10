@@ -30,6 +30,7 @@ const (
 	indexFile   = runtimeDir + "/index.json"
 	reporter    = "test/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
+	laidTypes   = pluginDir + "/.claude-plugin/types/tsconfig.json"
 	installer   = "install.sh"
 )
 
@@ -359,6 +360,11 @@ func typesHold(d checkDoors) int {
 	plugin := filepath.FromSlash(pluginDir)
 	if _, _, err := d.run([]string{"claude", "--plugin-dir", plugin, "-p", ""}, nil, true); err != nil {
 		fmt.Fprintln(d.out, "claude stands nowhere, so no types are laid and the hooks go untyped here.")
+		return 0
+	}
+	// The plugin's tsconfig extends the laid one, which sets noEmit, so tsc over a plugin with none writes JavaScript beside the hooks. [[spec/tickets/level0-hooks-move-to-typescript]]
+	if d.text(laidTypes) == "" {
+		fmt.Fprintln(d.out, "claude laid no types here, so the hooks go untyped here.")
 		return 0
 	}
 	code, said, err := d.run([]string{"tsc", "-p", plugin}, nil, true)
