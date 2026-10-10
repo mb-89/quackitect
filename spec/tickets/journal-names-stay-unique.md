@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: edits-and-files-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a5167492d95e · claude-code-remote
+    hash_before: d35fd9c6b51161591e17094ebe337b96932ed005
+    hash_after: d35fd9c6b51161591e17094ebe337b96932ed005
+    inputs:
+      - name: ask
+        hash: ef340abe75ddfe64
+        size: 307
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -155,38 +164,53 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A pure FreeName(at, taken) in journal.go names an entry. It keeps the stamp's seventeen digits and counts in the three padding digits, taking the first name the journal folder does not hold. A second entry in one millisecond lands as the next count, and it sorts after the first, so NewestOn still reads the newest last. Each of the three writers passes a taken check over its own journal folder through its own disk door: the edits writes, the split verb and the rename verb. A check and a write in two processes in one millisecond still meet, and that window is far narrower than the overwrite every same-millisecond pair meets today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits.go Outside.writes
+- src/quack/verb_split.go the split's journal entry
+- src/quack/rename.go the rename's journal entry
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits_test.go, the case where two patches at one clock reading leave two entries, and the undo takes back the second
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/edits/journal.go
+- src/modules/edits/edits.go
+- src/modules/edits/edits_test.go
+- src/quack/verb_split.go
+- src/quack/rename.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: NameOf, writes, put, NewestOn and both quack writers stand as the approach reads them
+- callers: the grep for NameOf names the three writers, and the list carries each
+- done_when: the two-patch case decides the one line
+- config: the approach adds no key
 
 ## tests-red
 
