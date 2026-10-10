@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 76efb2bbee77b96a
         size: 1322
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6150d1759159 · claude-code-remote · helper-4
+    hash_before: c7e42c53968728aad0aa6030f355f43619706ab0
+    hash_after: c7e42c53968728aad0aa6030f355f43619706ab0
+    inputs:
+      - name: design/draft
+        hash: 76efb2bbee77b96a
+        size: 1322
+      - name: design/tests-red
+        hash: ece152b88e9d8b30
+        size: 377
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -277,8 +289,9 @@ The refusal ends on the bare line that the session log holds the output, with no
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
