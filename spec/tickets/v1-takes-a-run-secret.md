@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 5e456c3ab73a09d0f186aeab61003599f05b28f9
+    hash_after: 5e456c3ab73a09d0f186aeab61003599f05b28f9
+    inputs:
+      - name: ask
+        hash: a1a49db99274ebf0
+        size: 955
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -160,38 +169,74 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The index mints a run secret as it opens its doors, and writes it into `.se/.runtime/person.json` at mode 0600. `stands` in `src/index/door.go` writes `index.json` at 0600 too, since it carries the bus token.
+
+A post marks a person only where it carries the secret:
+
+- `/v1`: `acts` in `src/index/actions.go` refuses a body holding `person: true` with 403 where the header `X-Quack-Person` lacks the secret, and serves it where it matches
+- the legacy port: `took` in `src/index/door.go` reads the same header, and refuses a call whose params hold `person: true` without it
+- the hook door and the MCP server: `tool.Input` in `src/q/tool/tool.go` drops the person field, so an agent's call keeps the harness variables
+- the lens: `lspTickets` runs in process behind its token line, and keeps the mark
+
+The sidebar and the lens of the extension read the secret through `indexDoor` in `src/extension/editor-index.js`, and send the header on each post. The agent's doors refuse the file: `BlessGuard` in `src/modules/hooks/command/guards.go` takes `person.json` beside `bless.json`, and `refuses` in `src/modules/hooks/hooks.go` refuses a `Read` naming it. A post without the mark still runs as it runs today, so the TUI and the CLI stand.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/index/actions.go` `acts`, called by `servesActions`
+- `src/index/door.go` `took`, the legacy port's handler, and `stands`, called by `opensOn`
+- `src/q/tool/tool.go` `Input`, called by `calls` in `src/modules/hooks/hooks.go` and `calls` in `src/modules/mcp/mcp.go`
+- `src/extension/editor-index.js` `indexDoor`, called by `src/extension/sidebar.js` and `src/extension/lib/lens.js` `actsOn`
+- `src/modules/hooks/command/guards.go` `BlessGuard`, called by `commands` in `src/modules/hooks/hooks.go`
+- `src/modules/hooks/hooks.go` `refuses`, called by `Hook`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/index/actions_test.go` `TestAPersonPostWithoutTheRunSecretMeetsARefusal`
+- `src/index/door_test.go` `TestTheLegacyPortRefusesAPersonCallWithoutTheRunSecret`
+- `src/q/tool/tool_test.go` `TestAnAgentsCallDropsThePersonMark`
+- `src/modules/hooks/command/guards_test.go` `TestTheBlessGuardRefusesTheRunSecret`
+- `src/modules/hooks/hooks_test.go` `TestTheDoorRefusesAReadOfTheRunSecret`
+- `src/index/door_test.go` `TestTheStandingAndTheSecretStandAtOwnerMode`
+- `test/extension` the index door sends the secret header on a person post
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/index/actions.go`
+- `src/index/door.go`
+- `src/index/secret.go`
+- `src/q/tool/tool.go`
+- `src/modules/hooks/hooks.go`
+- `src/modules/hooks/command/guards.go`
+- `src/extension/editor-index.js`
+- and the test file beside each
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, off a search of the person mark through the index, the doors and the extension
+- the callers list names the caller of each changed function
+- each done line names its test above, and the sidebar and the lens line names the extension test
+- the approach adds no config key
 
 ## tests-red
 
