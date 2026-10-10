@@ -17,6 +17,23 @@ The documents:
 - **[COMPARE.md](COMPARE.md)** compares this design with the owner's existing system. It was written
   only after this design was finished.
 
+## Results at a glance (details in EVAL.md)
+
+- **The mechanisms work.** 74 tests cover each single-agent failure mode against the real engine, hooks and
+  verifiers: false "done", test tampering, crashes, zombies, spins, early stops, merge conflicts and
+  unanswered questions. A randomized simulation of 2,750 tickets checks the engine's invariants.
+- **They also work against a real model.** Real Claude Code sessions (haiku) ran tickets through hx-0 with
+  the hooks installed:
+  - the briefs were delivered, the gates held, and handovers resumed cut-off work
+  - the stall ladder reached the "owner"
+  - the review gate caught a real latent bug
+  - three defects that unit tests had missed were found and fixed
+- **But hx did not beat a single agent on small tickets, and should not be used for them.** Both
+  solved 7/7. hx cost 2.2× (2.7× with forced interruptions). Route small tickets through the cheap paths.
+- **The claim to test next.** On long, failure-prone tickets, the model predicts +20 points of correctness
+  at roughly equal cost per correct ticket, and about 40% fewer owner interactions. EVAL §2 is the
+  protocol (about 40–100 paired tickets) that would confirm or kill it.
+
 ## Quick start (standard library only, Python 3.11+, git)
 
 ```bash
