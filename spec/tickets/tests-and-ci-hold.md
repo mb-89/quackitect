@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box 54da26a4513f · claude-code-remote
     hash_before: 6a8096513ee31671921dfdac6de6cb726765a1a2
     session: cse_01Q7UDWbx2giXnR9StfsDJWS
+  - step: sync
+    hand: box 54da26a4513f · claude-code-remote
+    hash_before: 978e23642af86bccd18ce3c1f32293acf4c02c1a
+    hash_after: b534144665e4d91743775aefe6a15a04e7136588
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tests-and-ci-hold took 88 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -103,8 +112,9 @@ goal: A new cloud box starts installed through the old setup path. Origin names 
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
