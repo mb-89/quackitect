@@ -95,9 +95,10 @@ func (one *Tree) Exists(path string) bool {
 	return one.source.Exists(slashed(path))
 }
 
+// The names under a folder ending in end. The folder's trailing slash goes, so every source answers the same. [[spec/tickets/group-rule-fires-in-sweep]]
 func (one *Tree) Names(folder, end string) []string {
 	out := []string{}
-	for _, name := range one.source.Names(slashed(folder)) {
+	for _, name := range one.source.Names(strings.TrimSuffix(slashed(folder), "/")) {
 		if strings.HasSuffix(name, end) {
 			out = append(out, name)
 		}
