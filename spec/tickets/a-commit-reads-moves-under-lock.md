@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-tui-keeps-its-place
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a4e3f6e6ac30b957
         size: 1074
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b0a22705166b · claude-code-remote · helper-4
+    hash_before: df0bbcd65bc939a65684c4f2ad5751463b64a204
+    hash_after: df0bbcd65bc939a65684c4f2ad5751463b64a204
+    inputs:
+      - name: design/draft
+        hash: a4e3f6e6ac30b957
+        size: 1074
+      - name: design/tests-red
+        hash: 1df1c2ab9a2c23a3
+        size: 476
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -269,8 +281,9 @@ TestACommitMovesAgainstTheValueItReplaces fails on its assertion: the stubbed co
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
