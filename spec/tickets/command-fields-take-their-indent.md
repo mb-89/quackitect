@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: 8a0ee1e4072968e7cd5fd4ebfc872891af7f1a77
+    hash_after: 8a0ee1e4072968e7cd5fd4ebfc872891af7f1a77
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   95.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: a00f2535094647ec
+        size: 402
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -328,26 +351,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/pull/pull_indent_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A hand-back now writes each row of a field the leaf names under `form: command` trimmed and indented four spaces, whatever indent the hand passes. The commit hook reads an indented row as a test the ticket carries, so a bare `go test` line no longer slips past it. Every other form writes as before, and the runs read the same trimmed line.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/pull/pull_chapter.go` and `src/pull/pull_back.go`, the files the draft names
+- the change reaches no door, and the case drives the cloud pull fakes
+- each new function and the constant point at this ticket
+- the indent stands once, in `src/pull/pull_chapter.go`
 
 # accept
 
