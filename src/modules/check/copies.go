@@ -132,14 +132,3 @@ func renamed(one *ast.FuncDecl) {
 		return true
 	})
 }
-
-// The copies a Go file holds, off the pass over every Go text. [[spec/tickets/shared-helpers-stand-once]]
-func copiesOver(tree *Tree, where string) []Finding {
-	out := []Finding{}
-	for _, said := range helperCopies(tree) {
-		if said.File == where {
-			out = append(out, said)
-		}
-	}
-	return out
-}

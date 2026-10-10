@@ -43,7 +43,7 @@ func Offers(tree *Tree, path string, line, character int) []Completion {
 	row := rows[line]
 	cut := byteAt(row, character)
 	here := typing{tree: tree, path: path, rows: rows, line: line, before: row[:cut], after: row[cut:],
-		front: ReadNote(text).Front.Said, schemas: SchemasIn(tree)}
+		front: readNote(text).Front.Said, schemas: SchemasIn(tree)}
 	here.schema = here.schemas.Get(KindOf(text))
 	if here.schema == nil {
 		here.schema = GovernorOf(here.schemas, path)
@@ -236,7 +236,7 @@ func (one typing) pointerOffers(from int) []Completion {
 		}
 		return out
 	}
-	at := PlacesIn(one.tree).FileOf(name)
+	at := placesIn(one.tree).FileOf(name)
 	if !strings.HasSuffix(at, ".md") {
 		return out
 	}
@@ -270,7 +270,7 @@ func (one typing) chapterOffers() []Completion {
 		return out
 	}
 	held := map[string]bool{}
-	for _, section := range SectionsOf(one.rows) {
+	for _, section := range sectionsOf(one.rows) {
 		if section.Level == level && section.Line-1 != one.line {
 			held[section.Header] = true
 		}

@@ -41,8 +41,8 @@ func TestTheExampleSchemaRefusesAnExampleOutOfShape(t *testing.T) {
 	} {
 		tree := check.TreeOver("/tree", check.Texts{"spec/schemas/example.schema.yaml": string(schema), one.path: one.text})
 		got := []string{}
-		for _, found := range check.CheckerOver(tree, 0, 0).Over(one.path) {
-			if strings.HasPrefix(found.Rule, "Schema.") || strings.HasPrefix(found.Rule, "Example.") {
+		for _, found := range check.CheckerOver(tree, 0, 0).Sweep() {
+			if found.File == one.path && strings.HasPrefix(found.Rule, "Schema.") || strings.HasPrefix(found.Rule, "Example.") {
 				got = append(got, found.Rule)
 			}
 		}

@@ -77,11 +77,6 @@ func privateFolderOwned(tree *Tree) []Finding {
 	return out
 }
 
-// The editor draws the rule under the installer it holds. [[spec/design_output/tree#the-rules-over-two-files]]
-func installerSpellsNoFolder(tree *Tree) []Finding {
-	return spelledOver(tree, Install)
-}
-
 // [[spec/design_input/the-runtime-files-stand-apart]]
 func spelledOver(tree *Tree, path string) []Finding {
 	out := []Finding{}
