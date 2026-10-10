@@ -144,7 +144,8 @@ func (it *It) passed(who *Who, one *Held, leaf *Leaf, held Hold, answered []Answ
 		tip = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", tip),
-		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)))
+		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)),
+		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))))
 	changes := append([]string{"passes " + leaf.Path}, also.changes...)
 	one.Text = it.stepOn(one, leaf, text, &changes, also.stays)
 	if finding := it.landed(one, changes, also.wrote); finding != "" {

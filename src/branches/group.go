@@ -229,6 +229,7 @@ func entryField(entry *yaml.Doc, key string) string {
 // The take standing open: the last record item with hash_before and no hash_after. [[spec/design_output/work#held-derives-from-the-record]]
 type hold struct {
 	Step, Hand, HashBefore string
+	Over                   bool
 }
 
 // The open take, or nil where every take stands closed. [[spec/design_output/work#held-derives-from-the-record]]
@@ -246,7 +247,14 @@ func heldIn(text string) *hold {
 		Step:       bare(yaml.AsString(held.Get("step"))),
 		Hand:       bare(yaml.AsString(held.Get("hand"))),
 		HashBefore: bare(yaml.AsString(held.Get("hash_before"))),
+		Over:       yaml.Truthy(held.Get(overField)),
 	}
+}
+
+// Whether the open take took the hold over from another hand. [[spec/design_output/work#a-live-hold-stalls]]
+func OverIn(text string) bool {
+	held := heldIn(text)
+	return held != nil && held.Over
 }
 
 // The hand of the open take, or nothing where every take stands closed. [[spec/tickets/git-hooks-run-in-go]]
