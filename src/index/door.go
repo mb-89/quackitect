@@ -83,6 +83,8 @@ type door struct {
 	touched map[string]bool
 	retrack bool
 	replan  bool
+	// The watch lost events, so the next settle sweeps the whole tree. [[spec/tickets/door-guards-watch-and-drain]]
+	resweep bool
 	// Git's list as the last sweep or retrack read it, so a change reads it and spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
 	tracked func(rel string) bool
 
@@ -272,8 +274,9 @@ func opensOn(clock q.Clock, listens func(network, address string) (net.Listener,
 	one.v1 = v1
 
 	eyes, err := watches(root, one)
-	if err == nil {
-		one.eyes = eyes
+	one.eyes = eyes
+	if err != nil {
+		fmt.Fprintln(stderr, "the index watches part of the tree, and its clock sweeps the rest:", err)
 	}
 	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
 	stop := func() {
@@ -375,9 +378,13 @@ func (one *door) settles() {
 		return
 	}
 	one.heard.Lock()
-	paths, retrack, replan := named(one.touched), one.retrack, one.replan
-	one.touched, one.retrack, one.replan = map[string]bool{}, false, false
+	paths, retrack, replan, resweep := named(one.touched), one.retrack, one.replan, one.resweep
+	one.touched, one.retrack, one.replan, one.resweep = map[string]bool{}, false, false, false
 	one.heard.Unlock()
+	if resweep {
+		one.resweeps()
+		return
+	}
 	moved := 0
 	// A plan write moves no row, and counts one so the work tab reads its todos again. [[spec/design_output/index#the-index-fires-on-change]]
 	if replan {
@@ -505,6 +512,10 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// A value or tickets call drains the scheduler before the guard, since the drain reads the store alone, so the work loop renews the lease past it. [[spec/tickets/door-guards-watch-and-drain]]
+	if drains := one.drains; drains != nil && drainsFirst(said.Method) {
+		drains()
+	}
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	one.settles()

@@ -37,10 +37,6 @@ func (one *door) answers(said call) (any, error) {
 		}
 		return nil, errorOf("no name called " + asked.Name)
 	case "value":
-		// A reader beside the old path compares the settled value, so the scheduler drains first. [[spec/tickets/open-tasks-run-in-shadow]]
-		if one.drains != nil {
-			one.drains()
-		}
 		if value := one.store.Snapshot().Read(asked.Name); value != nil {
 			return value, nil
 		}
@@ -78,9 +74,6 @@ func (one *door) answers(said call) (any, error) {
 		return Dangling(one.db)
 	case "tickets":
 		// The tickets module the wiring loads answers the list, and a catalog loading none answers it empty. [[spec/tickets/tickets-becomes-a-module]]
-		if one.drains != nil {
-			one.drains()
-		}
 		if value := one.store.Snapshot().Read(TicketsName); value != nil {
 			return value, nil
 		}
@@ -103,4 +96,13 @@ func (one *door) answers(said call) (any, error) {
 		return map[string]any{"root": one.root, "files": files}, nil
 	}
 	return nil, errorOf("no method called " + said.Method)
+}
+
+// The methods reading the settled store, which took drains for before the guard. A reader beside the old path compares the settled value. [[spec/tickets/open-tasks-run-in-shadow]]
+func drainsFirst(method string) bool {
+	switch strings.ToLower(method) {
+	case "value", "tickets":
+		return true
+	}
+	return false
 }

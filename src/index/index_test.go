@@ -5,8 +5,10 @@ package index // level0: InPackageTest - it declares the shared tree helpers, an
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -367,5 +369,35 @@ func TestTheSweepWritesEveryLineHoldingTextUnderItsNumber(t *testing.T) {
 	want := []string{"src/a.js:1:one", "src/a.js:4:four", "src/a.js:5:five", "src/b.js:2:second"}
 	if strings.Join(said, " ") != strings.Join(want, " ") {
 		t.Fatalf("the sweep writes the rows %v, and wants %v", said, want)
+	}
+}
+
+// An adder refusing one folder, as a full inotify table refuses the next. [[spec/tickets/door-guards-watch-and-drain]]
+type refusingAdder struct {
+	refuse string
+	added  []string
+}
+
+func (one *refusingAdder) Add(path string) error {
+	if path == one.refuse {
+		return errors.New("no space left on device")
+	}
+	one.added = append(one.added, path)
+	return nil
+}
+
+// A folder the watch fails to add leaves every other folder watched, and the walk names the failure. [[spec/tickets/door-guards-watch-and-drain]]
+// level0: FixtureOutsideHome - the case writes its own tree
+func TestAFailedWatchKeepsTheOtherFolders(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "a/one.md", "one\n")
+	write(t, root, "b/two.md", "two\n")
+	eyes := &refusingAdder{refuse: filepath.Join(root, "a")}
+	if err := folders(root, root, eyes); err == nil {
+		t.Fatal("the walk answers no error over a folder the watch refused")
+	}
+	if !slices.Contains(eyes.added, filepath.Join(root, "b")) {
+		t.Fatalf("the watch stands on %v, and wants b past the refused a", eyes.added)
 	}
 }
