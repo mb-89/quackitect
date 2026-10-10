@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 3669a3657c0b01a4
         size: 1149
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6150d1759159 · claude-code-remote · helper-4
+    hash_before: 1b9e659108fe2c080d5ed5ea9dee4506688f163c
+    hash_after: c1d49048693551b46ec818462b1491c503d3564d
+    inputs:
+      - name: design/draft
+        hash: 3669a3657c0b01a4
+        size: 1149
+      - name: design/tests-red
+        hash: a00f2535094647ec
+        size: 402
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -271,8 +283,9 @@ The bare field lands bare under `## tests`, so the case fails on its own asserti
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
