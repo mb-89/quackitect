@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tickets-keep-their-chapters
 step: do
+record:
+  - step: do
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: b02c81ce9c78c734362db256efa0b9e8874c3ac8
+    hash_after: 817782a6ac598042d69f3b41d1effab6899d42ad
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   65.8  in all"
+    inputs:
+      - name: ask
+        hash: 3453e9e87970bdce
+        size: 443
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ A note named with a slash lands in a folder the pull never lists, and one named 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/ticket_note_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The note verb in `src/quack/ticket_note.go` holds the path it writes to `pull.NewTicketPath`, after the cap cuts the name and before anything prints or writes. A name holding a slash or two dots now refuses with exit usage, where it landed a note in a folder the pull never lists or an `.md` file in the source tree. The case `note refuses a name past the flat pattern, and writes nothing` runs `a/b` and `../../src/quack/x`, and asserts the answer and that neither path stands.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask
+- no cleanup stands past the change
+- the pattern stands once, in `src/pull/edit.go`, and the note verb calls it
 
 # Discussion
 
