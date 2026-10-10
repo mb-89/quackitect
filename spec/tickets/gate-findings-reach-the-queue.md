@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6150d1759159 · claude-code-remote
+    hash_before: dc964595ab4910b588eea388d48bf65cb2b95718
+    hash_after: dc964595ab4910b588eea388d48bf65cb2b95718
+    inputs:
+      - name: ask
+        hash: af50e45e3390c84c
+        size: 648
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -164,38 +173,51 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`rejected` in `src/pull/pull_gate.go` takes a road of its own on a group whose route holds a `by: children` step. Each finding row of the reject, written as a ticket name and its line, mints an open child in the group on the trivial route, with no `todo` tag. The group writes the reject entry, goes back to its `children` step and waits there. It copies nothing, so a second reject takes the same road. A reject naming no ticket on a row is refused, and the hold stands. The cap in `acceptCapped` still turns a reject past it into a question. `minted` in `src/pull/pull_writes.go` lends the loop that builds the children, cut into a helper both call.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_back.go`, `handBack`, the one caller of `rejected`
+- `src/pull/pull_writes.go`, `minted`, which shares the child-building helper
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_gate_group_test.go`, `TestARejectAtAGroupsAcceptMintsItsFindings`, over two rejects in a row
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/pull/pull_gate.go`
+- `src/pull/pull_writes.go`
+- `src/pull/pull_gate_group_test.go`
+- `spec/design_output/pull.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `rejected`, `reworked`, `minted`, `childrenWaiting`, `VerdictIn` and `handBack` stand opened, and the claims hold there
+- the callers come off a search over `src`
+- both done_when cases meet the named test
+- the approach adds no config key
 
 ## tests-red
 
