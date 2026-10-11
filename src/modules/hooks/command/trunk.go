@@ -94,15 +94,25 @@ func pushRefsOf(words []string) ([]string, bool) {
 		return nil, false
 	}
 	var named []string
+	remote := false
 	for i := 1; i < len(rest); i++ {
-		if pushValued[rest[i]] {
+		word := rest[i]
+		// A --repo names the remote, so every plain word past it is a ref. [[spec/tickets/trunk-push-reads-repo-flag]]
+		remote = remote || word == repoFlag || strings.HasPrefix(word, repoFlag+"=")
+		if pushValued[word] {
 			i++
-		} else if !strings.HasPrefix(rest[i], "-") {
-			named = append(named, rest[i])
+		} else if !strings.HasPrefix(word, "-") {
+			named = append(named, word)
 		}
+	}
+	if remote {
+		return named, true
 	}
 	return named[min(1, len(named)):], true
 }
+
+// The push flag naming the remote in place of the first plain word. [[spec/tickets/trunk-push-reads-repo-flag]]
+const repoFlag = "--repo"
 
 // Whether a push's ref words name the trunk as their destination. [[spec/tickets/trunk-push-reads-the-refspec]]
 func pushesTrunk(command string) bool {

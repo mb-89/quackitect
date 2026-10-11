@@ -91,6 +91,9 @@ func TestLandsOnTrunkReadsTheBridgesLanding(t *testing.T) {
 		{"git --git-dir .git push origin main", "work/a", HowPush},
 		{"git push -o ci.skip origin main", "work/a", HowPush},
 		{"git push origin HEAD:work/a", "main", ""},
+		{"git push --repo=origin main", "work/a", HowPush},
+		{"git push --repo origin main", "work/a", HowPush},
+		{"git push --repo=origin work/a", "work/a", ""},
 	} {
 		if got := LandsOnTrunk(one.command, one.branch); got != one.want {
 			t.Errorf("LandsOnTrunk(%q, %s) reads %q, want %q", one.command, one.branch, got, one.want)
