@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 fix: true
 cloud: true
 record:
@@ -144,6 +144,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 05c4736f6ff2 · claude-code-remote
+    hash_before: dfbb69a3edb790b29f734e3a44098c445d32cf67
+    hash_after: dfbb69a3edb790b29f734e3a44098c445d32cf67
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -225,38 +237,52 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/wal-case-opens-a-copy]] closes on the fix standing on main, with its case and the check green
+- the group syncs main in, and the sync resolves its own conflict on the group ticket
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the fix stood on the branch already, so the step took evidence alone, because the ticket discussion named the commit
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 07:19 UTC the do step refused `go test` as the tests evidence, since a field expecting green wants the tree's test verb
+- 07:21 UTC the accept gate refused --pass, since its verdict field decides, while the hand-back hint names --pass on every leaf
+- the level0 tool server dropped after the take, so every hand-back ran through the command line
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the hand-back hint drops --pass on a leaf holding a verdict field, in `src/pull/pull_chapter.go`
+- the refusal of a green field names `./RUNME.sh test <path>` as the command it takes, in `src/pull/pull_accept.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The dispatch named work/check-notices-leave-the-cap, but its one child waits at an owner read, so the take handed this fix group instead. The group held one ticket whose fix had already merged, so the run recorded evidence and moved the group through its route.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in its ticket, and the retro points at it
+- the retro adds no number
+- the change writes no header
+- the chapter carries the two refusals with their times, and no owner prompt came
+- the chapter names the box by role alone
 
 ## cloud
 
