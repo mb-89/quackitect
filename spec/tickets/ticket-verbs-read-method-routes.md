@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: gate
 steps:
   - name: design
     steps:
@@ -53,8 +54,8 @@ steps:
             form: text
             says: what you see, and what surprises you
   - name: gate
-    gate: does the approach answer the ask, and does a red test decide every done_when line
-    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    gate: does the approach break a rule of the ask, and does a red test decide every done_when line
+    does: reads the design phase for the rules of the ask it breaks, fixes what it finds within its own diff, names the rest as points, and leaves the rest of the ask alone
     not: design/draft
     tags: ["review"]
     input: ["design/draft", "design/tests-red"]
@@ -76,7 +77,7 @@ steps:
             expects: 0
             says: the tree builds and lints
       - name: tests-green
-        does: makes the tests pass
+        does: makes the change the ask names, with the red tests as its floor, so a rule of the ask lands where no red test names it
         input: design/tests-red
         to: retro
         evidence:
@@ -115,9 +116,7 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: c671f20a6ae2a4a6
-group: tickets-keep-their-chapters
-step: gate
+process_hash: 3fd2a7591c5044cf
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +143,7 @@ record:
         hash: 36b75deaec55f13b
         size: 1875
     def: 08e16d07b0de477c
+group: tickets-keep-their-chapters
 ---
 
 # Ask
