@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 315928370a951c33ec6bff13368a00e6fafad8f5
+    hash_after: 315928370a951c33ec6bff13368a00e6fafad8f5
+    inputs:
+      - name: retro/write
+        hash: a631c108eb10dc12
+        size: 4329
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -326,20 +336,30 @@ The group was a list of independent findings, so it ran as twenty small loops: r
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 21:40 UTC: the level0 MCP server, which dropped after the take, so the patch door and the ticket tools ran through the shell verbs
+- no host the proxy refused, no right the platform refused, and no install
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit door refusing the model trailer
+- the cold probe failing on a branch an earlier probe clone pushed into the box tree
+- the ratio guard on `src/quack` after the merge of main
+- a staged lint reading a partial tree once, right after the index rebuilt
+- a merge of main with no conflict, twice
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- no handover, since the group reaches done in this session
 
 # Discussion
 
