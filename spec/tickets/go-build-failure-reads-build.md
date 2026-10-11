@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -167,7 +167,30 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: b891f1f88e10c04c66341145adcd894466ca47c7
+    hash_after: b891f1f88e10c04c66341145adcd894466ca47c7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "   92.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 0c9c9ee5f01d6b9e
+        size: 564
+    def: ebccfd52b1111bbe
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: branches-and-pull-report-truly
+reason: done
 ---
 
 # Ask
@@ -326,26 +349,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/port_f_testverb_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A Go package that fails to build prints FAIL beside a build or setup mark, and the test verb read that run as an assertion, so a test calling a missing function passed the tests-red gate. The verb now reads a build mark before any FAIL line, so such a run reads build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/branches/test.go alone, which the ask names
+- the change reaches no door, so it needs no fake
+- the header of the word function names the approach
+- the build mark stands in one pattern alone
 
 # accept
 
