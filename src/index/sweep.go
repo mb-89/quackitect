@@ -180,7 +180,13 @@ func refresh(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool, was st
 			return false, err
 		}
 	}
-	return true, one(tx, abs, rel, info, tracked)
+	wrote, err := one(tx, abs, rel, info, tracked)
+	// A known file the read now fails on leaves its row, once, so the next sweep finds nothing to move. [[spec/tickets/sweep-counts-written-rows]]
+	if !wrote && known && err == nil {
+		_, err = tx.Exec(`DELETE FROM file WHERE path = ?`, rel)
+		return err == nil, err
+	}
+	return wrote, err
 }
 
 // The rows a file writes beside its own: the note, its links, its body and its lines. [[spec/design_output/index#a-change-moves-its-rows]]

@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os" // level0: OutsideInDoors - the case links a folder into its own tree, which no door makes
 	"path/filepath"
 	"slices"
 	"strings"
@@ -464,5 +465,27 @@ func TestOpenRebuildsACorruptFile(t *testing.T) {
 	var count int
 	if err := db.QueryRow(`SELECT count(*) FROM file`).Scan(&count); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// A linked folder reads as no file, so a second sweep over a still tree moves nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: FixtureOutsideHome - the case writes and sweeps its own tree
+func TestASweepOverAnUnreadableEntryMovesNothing(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "elsewhere/one.md", "one\n")
+	if err := os.Symlink(filepath.Join(root, "elsewhere"), filepath.Join(root, "linked")); err != nil {
+		t.Skip("this box makes no link:", err)
+	}
+	db, err := Open(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, _, err := Sweep(db, root); err != nil {
+		t.Fatal(err)
+	}
+	if _, moved, err := Sweep(db, root); err != nil || moved != 0 {
+		t.Fatalf("a second sweep over a still tree moves %d (%v), and wants none", moved, err)
 	}
 }
