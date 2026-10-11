@@ -1,0 +1,126 @@
+diff --git a/src/quack/verbs.go b/src/quack/verbs.go
+index eac78c0..411ef5a 100644
+--- a/src/quack/verbs.go
++++ b/src/quack/verbs.go
+@@ -17,6 +17,7 @@ import (
+ 	"time"
+ 
+ 	"quackitect/src/index"
++	logmodule "quackitect/src/modules/log"
+ 	"quackitect/src/modules/migration"
+ 	verbsmodule "quackitect/src/modules/verbs"
+ )
+@@ -190,9 +191,23 @@ func sliceMode(root, key string) string {
+ 	return mode
+ }
+ 
+-// Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
+-func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
++// The key the log's floor reads off the config, read again at each row as the JavaScript writers read it. [[spec/design_output/log#what-a-box-writes]]
++const logLevelKey = "log.level"
++
++// Keeps a row at or above the floor and drops one below it, as writes in log.js decides: a level nobody knows, or a floor nobody sets, ranks as info. [[spec/design_output/log#what-a-box-writes]]
++func keepsFloor(floor string, write func(row map[string]any) error) func(row map[string]any) error {
+ 	return func(row map[string]any) error {
++		level, _ := row["level"].(string)
++		if logmodule.Rank(level) < logmodule.Rank(floor) {
++			return nil
++		}
++		return write(row)
++	}
++}
++
++// Appends one row to the session log under the root, stamped as the log writes its rows, and only where the floor under the root keeps it. [[spec/design_output/log#what-one-line-looks-like]]
++func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
++	write := func(row map[string]any) error {
+ 		row["at"] = now().UTC().Format(logStamp)
+ 		line, err := json.Marshal(row)
+ 		if err != nil {
+@@ -210,6 +225,9 @@ func appendsRow(root string, now func() time.Time) func(row map[string]any) erro
+ 		_, err = file.Write(append(line, '\n'))
+ 		return err
+ 	}
++	return func(row map[string]any) error {
++		return keepsFloor(sliceMode(root, logLevelKey), write)(row)
++	}
+ }
+ 
+ // The road over the real doors: each verb's program under node, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/cli-js-leaves]] [[spec/tickets/quack-registers-each-verb]]
+diff --git a/src/quack/verbs_test.go b/src/quack/verbs_test.go
+index e7e1098..a47183b 100644
+--- a/src/quack/verbs_test.go
++++ b/src/quack/verbs_test.go
+@@ -190,3 +190,73 @@ func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
+ 		t.Fatal("run, which the verb's program lacks, runs in the verb's program")
+ 	}
+ }
++
++// The floor keeps a row at its level and above, and drops one below it, and a level nobody knows or a floor nobody sets ranks as info. [[spec/design_output/log#what-a-box-writes]]
++func TestTheFloorKeepsRowsAtAndAboveIt(t *testing.T) {
++	cases := []struct {
++		floor, level string
++		kept         bool
++	}{
++		{"info", "debug", false},
++		{"info", "info", true},
++		{"info", "warn", true},
++		{"warn", "info", false},
++		{"warn", "error", true},
++		{"error", "warn", false},
++		{"fatal", "error", false},
++		{"fatal", "fatal", true},
++		{"", "debug", false},
++		{"", "info", true},
++		{"info", "nobody-knows", true},
++		{"nobody-knows", "debug", false},
++		{"info", "", true},
++	}
++	for _, one := range cases {
++		var got []map[string]any
++		write := keepsFloor(one.floor, func(row map[string]any) error {
++			got = append(got, row)
++			return nil
++		})
++		if err := write(map[string]any{"level": one.level, "said": "x"}); err != nil {
++			t.Fatal(err)
++		}
++		if kept := len(got) == 1; kept != one.kept {
++			t.Errorf("floor %q keeps a %q row %v, and wants %v", one.floor, one.level, kept, one.kept)
++		}
++	}
++}
++
++// A lint's passing row, at debug, stays off the session log under a floor of info, reaches it once the floor drops to debug, and a warning reaches it under either. [[spec/design_output/log#which-kind-says-what]]
++func TestTheSessionLogHoldsNoRowBelowTheFloor(t *testing.T) {
++	root := t.TempDir()
++	at := filepath.Join(root, "spec", "config")
++	if err := os.MkdirAll(at, 0o755); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"log": {"level": "info"}}`), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	write := appendsRow(root, time.Now)
++	if err := write(map[string]any{"level": "debug", "kind": "vale", "said": "the rules pass over ."}); err != nil {
++		t.Fatal(err)
++	}
++	logged := filepath.Join(root, filepath.FromSlash(sessionLog))
++	if body, _ := os.ReadFile(logged); len(body) != 0 {
++		t.Fatalf("a debug row under an info floor lands as %q", body)
++	}
++	if err := write(map[string]any{"level": "warn", "kind": "vale", "said": "1 line(s) break a rule"}); err != nil {
++		t.Fatal(err)
++	}
++	if body, _ := os.ReadFile(logged); !strings.Contains(string(body), `"level":"warn"`) {
++		t.Fatalf("a warn row under an info floor lands as %q, and wants it kept", body)
++	}
++	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"log": {"level": "debug"}}`), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	if err := write(map[string]any{"level": "debug", "kind": "vale", "said": "the rules pass over ."}); err != nil {
++		t.Fatal(err)
++	}
++	if body, _ := os.ReadFile(logged); !strings.Contains(string(body), `"level":"debug"`) {
++		t.Fatalf("a debug row under a debug floor lands as %q, and wants it kept: the floor is read per row", body)
++	}
++}

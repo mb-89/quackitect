@@ -1,0 +1,116 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "cd /tmp/qb/sonnet-1/tui-swap-fails-loud__plain+stop__s1/quackitect/src/quack && grep -n \"tuiAside\\b\" *.go | head -3; sed -n 40,125p tui_verb_test.go",
+  "python3 - <<'E'\nimport re\np='tui_verb.go'\ns=open(p).read()\ns=s.replace('''\t\t\texe, why = tuiViewerOf(d)\n\t\t}''','''\t\t\tvar err error\n\t\t\texe, why, err = tuiViewerOf(d)\n\t\t\tif err != nil {\n\t\t\t\tfmt.Fprintln(errs, err)\n\t\t\t\treturn exitFailed\n\t\t\t}\n\t\t}''')\ns=s.replace('func tuiViewerOf(d tuiDoors) (string, str",
+  "git diff | grep '^[+-]' ; go vet . 2>&1 | head",
+  "python3 - <<'E'\np='tui_verb_test.go'\ns=open(p).read()\ns=s.replace('exe, why := tuiViewerOf(box.doors())','exe, why, _ := tuiViewerOf(box.doors())')\ns=s.replace('if exe, why := tuiViewerOf(box.doors());','if exe, why, _ := tuiViewerOf(box.doors());')\ns=s.replace('exe, _ := tuiViewerOf(','exe, _, _ :=",
+  "cd /tmp/qb/sonnet-1/tui-swap-fails-loud__plain+stop__s1/quackitect && git add -A && git commit -qm \"tui: a failed viewer swap fails loud instead of printing plain rows\n\nCo-Authored-By: Claude Sonnet 5.5 <<redacted:git-email>>\" && git log --oneline|head -1"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "A",
+   "src/quack/quack"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.11889,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "e4ccb3b2276200d605857a68753b80a68f4848c7",
+ "finished": "2026-10-11T05:15:03Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  3.73291015625,
+  11.08935546875,
+  11.78369140625
+ ],
+ "model": "claude-sonnet-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 1,
+  "models": {}
+ },
+ "run": "tui-swap-fails-loud__plain+stop__s1",
+ "scratch": "/tmp/qb/sonnet-1/tui-swap-fails-loud__plain+stop__s1",
+ "secs": 72.0,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 146461,
+  "cache_write": 17471,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.1188921,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 68747,
+  "ended_on_question": false,
+  "final_text": "When the fresh viewer fails to swap in, `tui` now prints the error and exits with `exitFailed`. It no longer falls back to the plain rows plus the \"needs Go\" note. I ran `go test .` in `src/quack`, and it passes. I did not run `./RUNME.sh check` or the full `go test ./...`.\n\n- **Signature:** `tuiViewerOf` now returns `(string, string, error)`, in `src/quack/tui_verb.go`. A swap failure returns the error as the third value. Build failures and stamp-write problems still come back as the second value (the \"why\" text).\n- **Verb:** `tuiVerb` prints that error and stops.\n- **Tests:** I updated the existing `tuiViewerOf` callers for the third return value. A new test, `TestTuiSwapFailureFailsLoudInsteadOfPlainRows`, holds every aside name so the swap fails. It checks that `tuiViewerOf` returns an error and that the verb exits with `exitFailed`, writes to the error stream, and prints no \"needs Go\" note.\n\nThe change is committed on the current branch as `5f4e9f2`.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 16,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-sonnet-5-5": {
+    "cache_read": 146461,
+    "cache_write": 17471,
+    "cost": 0.1188921,
+    "in": 16,
+    "out": 3433
+   }
+  },
+  "models": {
+   "claude-sonnet-5-5": 8
+  },
+  "output_tokens": 498,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.1,
+   "seven_day": 0.09
+  },
+  "result_subtype": "success",
+  "result_turns": 9,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 8,
+  "tools": {
+   "Bash": 5,
+   "Grep": 1,
+   "Read": 2
+  },
+  "turns": 8,
+  "usage_by_model": {
+   "claude-sonnet-5-5": [
+    16,
+    498,
+    17471,
+    146461
+   ]
+  }
+ },
+ "setup_secs": 20.5,
+ "start_commit": "061eb386c93875a85b82fd8429cb5b0ecf205985",
+ "start_tree": "3b4b1ccb510ca11ae12e20599dd15e7fed85923b",
+ "started": "2026-10-11T05:13:29Z",
+ "status": "ran",
+ "ticket": "tui-swap-fails-loud",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

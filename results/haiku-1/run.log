@@ -67,3 +67,9 @@
 2026-10-11T04:40:44Z proc-empty-argv-never-starts__v5__s1                                   ran $0.025 118.0s turns=33 cap=False end=success rl={'five_hour': 0.06, 'seven_day': 0.08}
 2026-10-11T04:40:44Z proc-empty-argv-never-starts__plain+stop__s1                           ran $0.010 842.9s turns=17 cap=False end=success rl={'five_hour': 0.07, 'seven_day': 0.08}
 2026-10-11T04:40:44Z proc-empty-argv-never-starts__plain__s1                                ran $0.011 428.2s turns=15 cap=False end=success rl={'five_hour': 0.07, 'seven_day': 0.08}
+2026-10-11T05:26:25Z set-refuses-closed-group__v5__s1                                       ran $0.033 2702.8s turns=34 cap=True end=error_during_execution rl={'five_hour': 0.1, 'seven_day': 0.09}
+2026-10-11T05:44:23Z set-refuses-closed-group__plain+stop__s1                               ran $0.012 1066.8s turns=14 cap=False end=success rl={'five_hour': 0.12, 'seven_day': 0.1}
+2026-10-11T05:51:57Z set-refuses-closed-group__plain__s1                                    ran $0.011 430.3s turns=14 cap=False end=success rl={'five_hour': 0.12, 'seven_day': 0.1}
+2026-10-11T06:06:02Z lint-row-keeps-floor__plain__s1                                        ran $0.044 833.0s turns=42 cap=False end=success rl={'five_hour': 0.14, 'seven_day': 0.1}
+2026-10-11T06:52:13Z lint-row-keeps-floor__v5__s1                                           ran $0.311 2702.6s turns=98 cap=True end=error_during_execution rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T06:58:27Z lint-row-keeps-floor__plain+stop__s1                                   ran $0.017 354.7s turns=15 cap=False end=success rl={'five_hour': 0.18, 'seven_day': 0.11}

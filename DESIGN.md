@@ -62,8 +62,9 @@ A ticket becomes a candidate when all of these hold:
 
 ## 3. Graders, and the flake control
 
-`validate.py` builds three trees per candidate in temporary worktrees of a mirror (never the
-owner's checkout) and runs `go test -json -count=1` over the packages the hidden tests live in:
+`validate.py` builds three trees per candidate from a mirror (never the owner's checkout), each a
+fresh one-commit repository exactly like the grader's (some tests ask git for the tracked files),
+and runs `go test -json -count=1` over the packages the hidden tests live in:
 
 | tree | gives |
 |---|---|
@@ -75,22 +76,40 @@ owner's checkout) and runs `go test -json -count=1` over the packages the hidden
 - **PASS_TO_PASS**: tests passing on base, on base+hidden and on the solution.
 - **Flaky**: a test whose outcome differs between reps of one tree. It grades nothing.
 
-Validation runs every tree three times for the frozen set (`--reps 3`). A task is kept when
-FAIL_TO_PASS is not empty and the base builds. A task whose solution leaves some other test of
-the package red keeps it out of both lists.
+Every candidate ran once to select the set; every task that was run then ran three times more
+(`--reps 3`, `data/validation-3rep.jsonl`), and `refresh_graders.py` laid those lists onto
+`tasks.jsonl` without touching anything an agent sees. Of the first fourteen tasks, the three-rep
+lists matched the one-rep lists on thirteen; one PASS_TO_PASS test came out flaky and left. A task
+is kept when FAIL_TO_PASS is not empty and the base builds. A test the solution leaves red stays
+out of both lists.
 
 **Hidden grade of a run.** The agent's final tree (committed or not, untracked files included;
-for v5 the work branch's tip where the session ended elsewhere), then in every hidden package
-the test files go back to the base's (the agent's own test files there are dropped, so a
-duplicate test name cannot break the build), and the hidden tests are laid on. Pass = every
-FAIL_TO_PASS and every PASS_TO_PASS test passes.
+for v5 the work branch's tip where the session ended elsewhere) is saved as `final.patch` against
+the tree the agent started from. The grade applies that patch to the base, leaving out ticket
+files (v5's bookkeeping sits on setup commits the base lacks), then in every hidden package the
+test files go back to the base's (the agent's own test files there are dropped, so a duplicate
+test name cannot break the build), the hidden tests are laid on, and the whole tree is committed
+once. Pass = every FAIL_TO_PASS and every PASS_TO_PASS test passes. Grading from the published
+patch means anyone can grade a run again (`grade.py --regrade-hidden`). Both measured batches
+were graded that way after their sessions; the patch grade agreed with the grade taken as each
+run finished on 50 of 51 runs, and the one difference was the early grader's (a tree without a
+git repository, where some tests ask git for the tracked files; fixed before the regrade).
 
 **Full check of a run.** `./RUNME.sh check` on the agent's final tree as it left it, installed
 the way CI installs it (claude-code 2.1.291 on `PATH` for the types and plugin parts, stdin
 closed), compared with the same check on the base (cached per task). The base check is green on
-every task where it was measured, so `check green` reads directly. To keep the machine's four
-cores for the agents, the check runs on every hidden-pass run, and on the rest only where time
-allows (`grade.py --check pass|all`).
+every task where it was measured, so `check green` reads directly. The check runs on every
+hidden-pass run (`grade.py --check pass`; `all` adds the rest), after the sessions, one at a
+time on the idle machine (`grade.py --checks-only`).
+
+The check has its own flakes, and they follow load: its Vale rules give up after two seconds and
+its git helpers carry a wait bound. The first checks, run beside a live session at a load
+average near 25, came out red on exactly those (`VoiceParagraph.Vocabulary: did not finish within
+2s`, `exec: WaitDelay expired`) for trees that were fine. So a red check is run again, up to three
+attempts: the run counts green if any attempt is green, and its red parts are the parts red in
+every attempt. Every attempt is kept in `grade.json` with the load it started at, the lines that
+made it red (the check's own list of red cases, lint findings, failed tests, build errors, steps
+that timed out) and whether a timeout was among them.
 
 ## 4. Fairness: interface notes and a screen
 
@@ -107,6 +126,12 @@ changes that the hidden tests mention (`select_tasks.py`, with the `sigs/` helpe
 guesses a name. Every arm gets the same note: plain in its prompt, v5 inside the ticket's ask.
 This follows SWE-bench Pro's interface specifications. Notes over 2,500 characters drop the task.
 
+One gap, found while the first batch ran: the frozen set's notes print a constant as
+`const HandOfItsOwn`, without its value, and six of the sixty tasks have one. Where a hidden test
+reads the constant's text, an agent that names the constant right but words it differently still
+fails. The `sigs` helper now prints a constant's value; `tasks.jsonl` was left as frozen, so the
+batches stay comparable, and a newly mined set gets the values.
+
 `verify.py` then screens each task the way SWE-bench Verified screened its issues (OpenAI,
 2024): a model reader (Opus, no tools, one call per task, cost logged) sees the ask, the note,
 the hidden test diff and the reference change, and rates *spec* (can the ask be followed to a
@@ -122,8 +147,9 @@ all tasks and on the verified subset, so a reader can see whether the label move
 | git objects reachable from the checkout | each run's origin is a fresh repository holding one commit: the base tree (plus v5's setup commits). No history, no other refs, no packs from the mirror |
 | the hidden tests | they are the solution's test files; the base carries the old versions, or none |
 | the network | no WebFetch or WebSearch tool; GitHub URLs rewritten to an invalid host in the run's git config; the parent session's `gh` client and GitHub tokens stripped from the environment; every tool input scanned for the upstream's name and GitHub hosts (`leak_flags` per run, reported) |
-| the filesystem | every session runs in private mount and PID namespaces (`sandbox.sh`): an empty tmpfs covers the scratchpads (the mirror with full history, the task files, every report), the owner's checkout at `/home/user/quackitect`, the parent session's transcripts and config, and every other run of the batch. The agent's `pgrep` and `pkill` see its own processes alone |
+| the filesystem | every session runs in private mount and PID namespaces (`sandbox.sh`): an empty tmpfs covers the scratchpads (the mirror with full history, the task files, every report), the owner's checkout at `/home/user/quackitect`, the parent session's transcripts and config, and every other run of the batch. The agent's `pgrep` and `pkill` see its own processes alone. PID 1 of the namespace is `reaper.py`, which reaps orphans as an init does: without it, a stopped index server lingers as a zombie and the repository's own contract test ("a stopped index leaves no se-index process") fails for a reason no real box has |
 | memory across runs | each run has its own `HOME` and `CLAUDE_CONFIG_DIR`; nothing persists between runs |
+| secrets in the published files | `scrub.py --fix` replaces e-mail addresses and the values of the session's id, account and token variables before every push (the repository's own tests print the box's session id into test output), and `publish.sh` refuses to push on any hit left |
 
 The pilot found the filesystem route was real: an unsandboxed agent wrote files two levels up
 its tree, into the folder that held the mirror, and a plain agent's `pgrep -f "RUNME.sh check"`
@@ -154,6 +180,12 @@ marker on `main`); `cloud prompt the-bench-work`. The task's ticket keeps its ow
 or standard) as it stood at the base; the interface note, where there is one, is appended to its
 ask. The agent's box then clones the origin and starts on `main`, as a fired routine does.
 
+Bases before 2026-10-06 predate two of those verbs' current forms: their `mint` takes no
+`--goal` (the group's goal goes in as `--Ask`), and `cloud prompt` does not exist (the box prompt
+is then the same text `cloud prompt` prints on later trees). `dryseed.py` ran this setup for all
+sixty tasks without an agent; all sixty came up with the group open and `work/the-bench-work` on
+origin (`data/v5-setup-dryrun*.jsonl`).
+
 The work skill's last steps (open a pull request through the GitHub connector, subscribe to its
 activity) cannot run here: there is no GitHub. A session that ends on that is not counted as
 needing the owner.
@@ -166,8 +198,10 @@ The agent runs on `--model`. Its subagents too:
   so a Task call naming `opus` still runs on it. `CLAUDE_CODE_SUBAGENT_MODEL` alone does not
   override a named model (measured);
 - v5: level0's helper tiers (`helper.find/change/decide`; the shipped defaults are haiku/opus/opus)
-  are set to the arm's model through the config's environment layer (`SE_HELPER_*`), and level0's
-  own door refuses an `Agent` call naming any other model. The aliases stay unpinned there,
+  are set to the arm's model with the tree's own config verb in the box's config layer
+  (`./RUNME.sh config helper.<tier> <model>`, as the owner's config commands do; the
+  `SE_HELPER_*` variables would do the same, and the pilot showed them leaking into a test of the
+  config reader), and level0's own door refuses an `Agent` call naming any other model. The aliases stay unpinned there,
   because the commit door's cold probe starts a client of its own on the client's default model;
   the pilot showed that probe failing its canary check when forced onto Haiku, so pinning it would
   break v5's commit door for a reason the shipped harness never meets.
@@ -191,10 +225,12 @@ before the measured one taught:
 | plain arms before the `git-hooks` skip | `./RUNME.sh` re-installed v5's git hooks under the plain agent | no: `results/_excluded/haiku-1-githooks` |
 | **two sessions at once, unpinned (four shared cores)** | a session waiting on the model leaves the cores to the other; both checking at once is the worst case | **the measured batches** |
 
-So the measured batches run two sessions at a time; the arms of one task start together, so they
-share the hour and the load; hidden grading runs at `nice 19` in the sessions' idle time; the full
-checks wait for an idle machine (`grade.py --checks-only`), one at a time; and a janitor empties
-the shared Go build cache below 8 GB free. The runs are isolated in state (own tree, origin,
+So the measured batches run two sessions at a time: the Haiku batch ran two of its own at once
+(the arms of a task back to back, in a shuffled order, so they share the hour and the load) until
+the Sonnet batch started, and from then on one Haiku and one Sonnet session ran side by side.
+Hidden grading runs at `nice 19` in the sessions' idle time; the full checks wait for the idle
+machine after the sessions (`grade.py --checks-only`), one at a time; and a janitor empties the
+shared Go build cache below 8 GB free. The runs are isolated in state (own tree, origin,
 HOME, config, TMPDIR, mount and PID namespace; index servers on random ports; the Go cache is
 content-addressed and safe to share). What they share is CPU and disk, which is why parallelism
 stops at two. Wall-clock carries that noise; every arm meets it alike.
@@ -210,14 +246,14 @@ turn cap and no budget cap: the question includes how long each arm runs when no
 | metric | definition |
 |---|---|
 | resolved | the hidden grade passes (§3) |
-| check green | `./RUNME.sh check` exits 0 on the agent's final tree |
-| cost | the session's `total_cost_usd` (the client's list-price accounting, subagents included) + metered nested calls |
+| check green | `./RUNME.sh check` exits 0 on the agent's final tree, in any of up to three attempts on the idle machine (§3) |
+| cost | the session's `total_cost_usd` (the client's list-price accounting, subagents included) + metered nested calls. Per million tokens (input, output, cache write, cache read): Haiku 5.5 $0.10, $0.50, $0.20, $0.01; Sonnet 5.5 $2, $10, $4, $0.20, each read back exactly off the client's own `costUSD` |
 | tokens | input, output, cache read, cache write, from the stream |
 | wall-clock | session start to end, setup excluded |
 | turns, tool calls | assistant messages of the main thread; tool calls of all threads |
 | files outside scope | changed files (tickets and `.se/` left out) whose directory the true change never touched; reported for all files and for non-test code |
 | needs owner | the session ended on a question, on a level0 stop reason that hands the step to the owner (`the-owner-holds-the-step`, `a-wrong-answer-leaves-the-box`), at the cap, with an error, or with no code change |
-| harness events | stop-hook blocks, door refusals, ticket files written, commits |
+| harness events | stop-hook blocks (a "Stop hook feedback" turn), door refusals (an errored tool call carrying level zero's words: "names no ticket", "Level zero refuses", "The engine asks"...), ticket files written, commits; for v5 also where the task's ticket and the group stood at the end (`v5state.py`), and the share of cost, time and turns spent on tickets other than the task's and the group's, each call put on the ticket it names (`growth.py`) |
 
 ## 8. Statistics
 
@@ -236,15 +272,21 @@ turn cap and no budget cap: the question includes how long each arm runs when no
 
   | discordant share p_d | tasks to detect δ = 10 pts | 15 pts | 20 pts | 30 pts |
   |---|---|---|---|---|
-  | 0.2 | 155 | 66 | 35 | 13 |
-  | 0.3 | 236 | 103 | 56 | 23 |
-  | 0.4 | 316 | 139 | 76 | 32 |
+  | 0.2 | 155 | 68 | 37 | 15 |
+  | 0.3 | 234 | 103 | 57 | 24 |
+  | 0.4 | 312 | 138 | 77 | 33 |
 
   The frozen set (§2) holds what the repository's recent history gives under the rules, a few
   dozen tasks, so this benchmark detects a large difference in resolve rate (about 20 to 30
-  points, depending on the discordance the runs show; RESULTS.md reports the detectable effect
-  at the sample actually run) and any cost difference of the size B and C saw (2–4×): the log
-  cost ratio's spread across tasks is small next to log 2.
+  points at the full set, depending on the discordance the runs show) and any cost difference
+  of the size B and C saw (2–4×): the log cost ratio's spread across tasks is small next to
+  log 2.
+
+  At the samples actually run, solving the same formula for δ: twelve paired tasks with the
+  discordance Haiku showed between plain and v5 (p_d = 0.33) detect δ ≈ 42 points (33 at
+  p_d = 0.2, 46 at 0.4); five tasks detect δ ≈ 56 points at p_d = 0.33 and 75 at the 0.6
+  Sonnet's plain and v5 showed. Only a very large difference in resolve rate could show at this
+  n; cost and time differences of 2× or more show easily.
 
 ## 9. Running it again
 
@@ -253,12 +295,18 @@ with `BENCH_WORK`); runs live under `/tmp/qb`, never in the owner's checkout.
 
 **One command, the frozen set:**
 
-    python3 bench.py run --name <batch> [--model haiku] [--arms plain,v5,plain+stop] [--seeds 1] [--jobs 3]
+    python3 bench.py run --name <batch> [--model haiku] [--arms plain,v5,plain+stop] [--seeds 1] [--jobs 2]
 
 It fetches the mirror, installs the pinned check client, runs every task of `tasks.jsonl` in
-every arm (interleaved, so drift hits all arms alike), grades as runs finish, and writes
+every arm (task by task in the file's order, best-specified first, the arms of a task in a
+shuffled order, two sessions at a time, 45-minute cap), grades the hidden tests as runs finish,
+then runs the full checks one at a time on the idle machine (up to three attempts while red),
+records where each v5 run left its tickets, deletes the scratch trees, and writes
 `results/<batch>/REPORT.md` (the tables of RESULTS.md, for that batch). A stopped batch resumes:
-finished runs are skipped. `--only t1,t2` runs a subset.
+finished runs are skipped. `--only t1,t2` runs a subset. `results_md.py --batch results/<a>
+--batch results/<b>` rebuilds the generated half of RESULTS.md (tables per batch and subset,
+per-run notes, the cost log); `activity.py`, `growth.py` and `v5state.py` give the tables of
+"What v5 does with the time and money".
 
 **A change against its baseline.** The v5 arm runs the harness that stands *at each task's
 base*, so a change to v5 reaches the frozen tasks only where it lands at the base. Two ways:
@@ -291,9 +339,17 @@ and `costlog.jsonl` records every call's cost.
 | `transcript.py` | stream-json → the run's numbers |
 | `grade.py` | hidden grade, check, scope (§3, §7) |
 | `report.py`, `stats.py` | tables and paired statistics (§8) |
+| `results_md.py`, `notes.py`, `checks.py`, `costs.py` | the generated half of RESULTS.md: tables, per-run notes, the full checks, the cost log |
+| `activity.py`, `growth.py`, `v5state.py` | where tool calls went by kind; the share of a v5 session spent on tickets outside the task; where each v5 run left the task's ticket and the group |
+| `dryseed.py` | the v5 setup on every task without an agent (§6) |
+| `refresh_graders.py`, `refold.py` | lay three-rep grader lists onto `tasks.jsonl`; fold transcripts again after `transcript.py` changes |
+| `reaper.py`, `janitor.sh`, `stop.py`, `peek.py` | the sandbox's init; keeping the disk; stopping a batch; a look at a live run |
+| `scrub.py`, `publish.sh` | redaction before every push; the push to `bench/2026-10-10` (no force) |
 | `tasks.jsonl` | the frozen task set |
 | `verdicts.jsonl` | the screen's labels |
-| `results/<batch>/` | `batch.json`, `costlog.jsonl`, and per run `meta.json`, `grade.json`, `prompt.txt`, `final.patch`, `transcript.jsonl.gz` |
+| `results/<batch>/` | `batch.json`, `run.log`, `grade.log`, `costlog.jsonl`, `growth.json`, and per run `meta.json`, `grade.json` (hidden grade, check attempts, scope), `prompt.txt`, `final.patch` (gzipped past 5 MB), `transcript.jsonl.gz`, and for v5 `v5state.json` |
+| `results/_excluded/` | the batches §6.2 set aside, each with its `WHY.txt` |
+| `data/` | the mining, validation and v5-setup dry-run outputs (`publish.sh` copies them in) |
 | `costlog.jsonl` | every model call this benchmark paid for, across batches |
 
 ## 11. Threats to validity

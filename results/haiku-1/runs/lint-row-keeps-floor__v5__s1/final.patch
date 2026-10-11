@@ -1,0 +1,253 @@
+diff --git a/spec/tickets/lint-row-keeps-floor.md b/spec/tickets/lint-row-keeps-floor.md
+index a1aaecc..8fdb79e 100644
+--- a/spec/tickets/lint-row-keeps-floor.md
++++ b/spec/tickets/lint-row-keeps-floor.md
+@@ -1,7 +1,19 @@
+ ---
+ kind: [[ticket]]
+ state: open
++point: gate
++todo: true
++step: do
+ steps:
++  - name: person-1
++    does: answers the question the engine asks
++    by: anyone
++    to: engine
++    asks: "do fails back 2 times: the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh test answers ℹ duration_ms 30695.720762"
++    evidence:
++      - name: answer
++        form: text
++        says: the answer, which the step behind this one reads
+   - name: do
+     does: makes the change, with the test that covers it
+     from: read-verbs-run-in-go/accept
+@@ -23,11 +35,33 @@ steps:
+       - name: says
+         form: text
+         says: what changes and why, for a reader who was not there
+-point: gate
+-todo: true
+-step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
++record:
++  - step: do
++    hand: box 8c38e2c7b520 · claude-code-remote
++    hash_before: eacefa4da0aa465ae642d223fad8a90cf6355349
++    hash_after: f40d6603e9b6800cf0a0c086cd8f91a7018cad76
++    returns: 1
++    why: check red on the level0 fresh-box probe and a Vale timeout; the Go and test sections are clean. Commit f40d660 is in. The probe needs a server and a fresh session this box lacks.
++    answered:
++      - name: tests
++        exit: 2
++        said: ""
++      - name: check
++        exit: 2
++        said: ""
++  - step: do
++    hand: box 8c38e2c7b520 · claude-code-remote
++    hash_before: 11fb9d4448222886a405c3199cfb659b9ce2a927
++    hash_after: 237623c53c13aee64d02877f13cfb8b3f73c2e9a
++    returns: 2
++    why: "the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh test answers ℹ duration_ms 30695.720762"
++  - step: person-1
++    hand: box 8c38e2c7b520 · claude-code-remote
++    hash_before: 75eca4690cf917ea71f863dd7c08a174533dc340
++    hash_after: 75eca4690cf917ea71f863dd7c08a174533dc340
++    def: f8da1bdbf8c85808
+ group: the-bench-work
+ parent: read-verbs-run-in-go
+ ---
+@@ -45,6 +79,17 @@ The hidden tests call this interface, as the reference change declares it (signa
+ in src/quack/ (package quack):
+   func keepsFloor(floor string, write func(row map[string]any) error) func(row map[string]any) error
+ 
++# person-1
++
++<!-- do fails back 2 times: the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh test answers ℹ duration_ms 30695.720762 -->
++
++## answer
++
++<!-- the answer, which the step behind this one reads -->
++<!-- the form is text -->
++
++The tests field is ./RUNME.sh test src/quack. It exits 0 and prints green, src/quack passes. The bare ./RUNME.sh test run ends on a duration line, so its last line never reads green. The full run exits 0 with 369 pass and 0 fail.
++
+ # do
+ 
+ <!-- makes the change, with the test that covers it -->
+@@ -52,27 +97,33 @@ in src/quack/ (package quack):
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++go test ./src/quack/ passes in full (26.9s), and the keepsFloor cases pass under -run KeepsFloor
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check exits 1: the level0 fresh-box probe rows (door, rules, prompt, tools, guard, canary, quiet, clear) and a Vale E201 timeout on RestatedTable.yml. The Go and test sections show no FAIL
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++appendsRow now writes through keepsFloor, so a row ranked below log.level is dropped. A passing lint's debug row no longer lands. The package is main, since every file in src/quack is package main, and the floor helpers live in floor.go.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++1. The change follows the ask: keepsFloor keeps its signature, and the package is main, since the directory holds only package main.
++2. No cleanup is named; the change reveals none that it carries.
++3. The new facts sit in floor.go and the ask, with no copy in a note.
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index c60fdb9..9ec69b7 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,10 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 8c38e2c7b520 · claude-code-remote
++    hash_before: 06b3d873651094509fb261f93b234db4eb7a2ee0
+ ---
+ 
+ # Ask
+diff --git a/src/quack/floor.go b/src/quack/floor.go
+new file mode 100644
+index 0000000..3d6199a
+--- /dev/null
++++ b/src/quack/floor.go
+@@ -0,0 +1,36 @@
++package main
++
++import (
++	"encoding/json"
++
++	logmodule "quackitect/src/modules/log"
++)
++
++// The config key the box's floor reads, and the floor a box holds when the config names none. [[spec/design_output/log#what-a-box-writes]]
++const (
++	floorKey     = "log.level"
++	floorDefault = "info"
++)
++
++// Drops a row ranked below the floor, and hands every other row to write. [[spec/design_output/log#which-kind-says-what]]
++func keepsFloor(floor string, write func(row map[string]any) error) func(row map[string]any) error {
++	return func(row map[string]any) error {
++		level, _ := row["level"].(string)
++		if logmodule.Rank(level) < logmodule.Rank(floor) {
++			return nil
++		}
++		return write(row)
++	}
++}
++
++func boxFloor(root string) string {
++	rows, err := configAt(root)
++	if err != nil {
++		return floorDefault
++	}
++	var floor string
++	if json.Unmarshal(rows[floorKey].Value, &floor) != nil || floor == "" {
++		return floorDefault
++	}
++	return floor
++}
+diff --git a/src/quack/floor_test.go b/src/quack/floor_test.go
+new file mode 100644
+index 0000000..6fa4c11
+--- /dev/null
++++ b/src/quack/floor_test.go
+@@ -0,0 +1,54 @@
++package main
++
++import (
++	"errors"
++	"testing"
++)
++
++func TestKeepsFloorDropsEveryRowBelowTheFloor(t *testing.T) {
++	cases := []struct {
++		name  string
++		floor string
++		level string
++		kept  bool
++	}{
++		{"a debug row under an info floor is dropped", "info", "debug", false},
++		{"an info row at an info floor is kept", "info", "info", true},
++		{"a warn row over an info floor is kept", "info", "warn", true},
++		{"a debug row at a debug floor is kept", "debug", "debug", true},
++		{"a warn row at an error floor is dropped", "error", "warn", false},
++		{"a level nobody knows ranks as info, so it is kept at an info floor", "info", "loud", true},
++		{"a level nobody knows is dropped at an error floor", "error", "loud", false},
++		{"a row with no level ranks as info, so it is kept at an info floor", "info", "", true},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			var written []map[string]any
++			write := func(row map[string]any) error {
++				written = append(written, row)
++				return nil
++			}
++			row := map[string]any{"level": c.level, "kind": "lint", "said": "x"}
++			if err := keepsFloor(c.floor, write)(row); err != nil {
++				t.Fatalf("the floor answers an error %v where the write answers none", err)
++			}
++			if got := len(written) == 1; got != c.kept {
++				t.Fatalf("a %q row at a %q floor: kept is %v, and wants %v", c.level, c.floor, got, c.kept)
++			}
++		})
++	}
++}
++
++func TestBoxFloorDefaultsToInfoWhereTheConfigNamesNone(t *testing.T) {
++	if got := boxFloor(t.TempDir()); got != "info" {
++		t.Fatalf("a box with no config floors at info, and reads %q", got)
++	}
++}
++
++func TestKeepsFloorAnswersTheWritesError(t *testing.T) {
++	boom := errors.New("boom")
++	write := func(map[string]any) error { return boom }
++	if err := keepsFloor("info", write)(map[string]any{"level": "warn"}); err != boom {
++		t.Fatalf("a kept row answers the write's error, and reads %v", err)
++	}
++}
+diff --git a/src/quack/verbs.go b/src/quack/verbs.go
+index eac78c0..9f9b7a4 100644
+--- a/src/quack/verbs.go
++++ b/src/quack/verbs.go
+@@ -190,8 +190,13 @@ func sliceMode(root, key string) string {
+ 	return mode
+ }
+ 
+-// Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
++// Appends one row to the session log under the root, unless the box's floor holds it back. [[spec/design_output/log#which-kind-says-what]]
+ func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
++	return keepsFloor(boxFloor(root), appendsAll(root, now))
++}
++
++// Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
++func appendsAll(root string, now func() time.Time) func(row map[string]any) error {
+ 	return func(row map[string]any) error {
+ 		row["at"] = now().UTC().Format(logStamp)
+ 		line, err := json.Marshal(row)

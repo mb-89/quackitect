@@ -1,0 +1,57 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T07:15:32Z",
+ "hidden": {
+  "f2p": [
+   170,
+   171
+  ],
+  "f2p_failed": [
+   "src/quack:TestCheckVerb"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "tail": "[src/quack:TestCheckVerb]\n--- PASS: TestCheckVerb/a_run_past_its_budget_warns_in_the_log,_naming_its_time (0.00s)\n--- PASS: TestCheckVerb/under_--errors_the_run_prints_the_red_cases_and_findings_alone (0.00s)\n    check_test.go:385: the run answers 0, \"The red list stands apart until its tests-green closes: test/level0/a.test.js\\nThe server stands at http://127.0.0.1:6510/health.\\nThe check names no red case and no finding at error.\\n\"\n--- FAIL: TestCheckVerb/a_green_run_under_--errors_prints_the_no-red_line_alone,_past_the_parts'_own_lines (0.00s)\n--- PASS: TestCheckVerb/the_stamp_counts_the_warnings_the_lint_leaves (0.00s)\n--- FAIL: TestCheckVerb (0.01s)\nFAIL\nFAIL\tquackitect/src/quack\t17.522s"
+ },
+ "hidden_first": {
+  "f2p": [
+   170,
+   171
+  ],
+  "f2p_failed": [
+   "src/quack:TestCheckVerb"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "secs": 38.7,
+  "tail": "[src/quack:TestCheckVerb]\n--- PASS: TestCheckVerb/a_run_past_its_budget_warns_in_the_log,_naming_its_time (0.00s)\n--- PASS: TestCheckVerb/under_--errors_the_run_prints_the_red_cases_and_findings_alone (0.00s)\n    check_test.go:385: the run answers 0, \"The red list stands apart until its tests-green closes: test/level0/a.test.js\\nThe server stands at http://127.0.0.1:6510/health.\\nThe check names no red case and no finding at error.\\n\"\n--- FAIL: TestCheckVerb/a_green_run_under_--errors_prints_the_no-red_line_alone,_past_the_parts'_own_lines (0.01s)\n--- PASS: TestCheckVerb/the_stamp_counts_the_warnings_the_lint_leaves (0.01s)\n--- FAIL: TestCheckVerb (0.03s)\nFAIL\nFAIL\tquackitect/src/quack\t28.071s"
+ },
+ "regraded": "2026-10-11T08:12:59Z",
+ "run": "check-errors-names-the-part__v5__s1",
+ "scope": {
+  "code_files": 2,
+  "files": 6,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 3,
+  "test_files": 1,
+  "tickets_written": 3
+ },
+ "status": "graded"
+}

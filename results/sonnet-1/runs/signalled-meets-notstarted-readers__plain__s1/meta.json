@@ -1,0 +1,124 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git log --oneline | head -5 && ls && grep -n \"voiceRunsValeOver\" -r src | head; grep -n \"ShellOver\" -r src | head",
+  "sed -n 15,30p src/proc/proc.go; sed -n 105,135p src/proc/proc.go; sed -n 155,185p src/quack/voice_verb_test.go; sed -n 35,65p src/pull/shell_test.go; grep -rn \"Shell(\" src/pull/*.go | grep -v _test | head",
+  "sed -n 90,125p src/pull/pull_commands.go; sed -n 80,106p src/proc/proc.go",
+  "python3 - <<'E'\np='src/quack/voice_verb.go'\ns=open(p).read()\ns=s.replace('''a run that cannot start answers its fault. [[''','''a run that cannot start, or that a signal ends, answers its fault, since a killed Vale leaves no whole output. [[''')\ns=s.replace('''\t\tif said.Code == proc.NotStarted {\n\t\t\t",
+  "sed -n 1,20p src/quack/voice_verb.go",
+  "sed -i 's/^\\t\"os\"$/\\t\"os\"\\n\\t\"strings\"/' src/quack/voice_verb.go && gofmt -l src; go test ./... 2>&1 | tail -15; ./RUNME.sh check 2>&1 | tail -15",
+  "go test ./src/quack 2>&1 | grep -v \"^ok\" | head -30; ./RUNME.sh check 2>&1 | grep -iE \"fail|size|callers|\u2717|error\" | head",
+  "git stash -q && go test ./src/quack 2>&1 | grep -c \"^--- FAIL\"; git stash pop -q && go test ./src/quack 2>&1 | grep -c \"^--- FAIL\"; go test ./src/quack ./src/pull -run 'Signal|Shell|Vale' 2>&1 | tail -5",
+  "go test ./src/quack -run 'TestVoiceRunsVale' -v 2>&1 | grep -E \"^(---|ok|FAIL)\"; git add -A && git commit -qm \"Read Signalled at its spot: Vale's signalled run is a fault, the shell's is its exit\n\nCo-Authored-By: Claude Sonnet 5.5 <<redacted:git-email>>\" && git log --oneline | head -1"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/pull/door.go"
+  ],
+  [
+   "M",
+   "src/pull/shell_test.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.15715,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "5c1b46edcee0eb7964f70e78f4882535be6cb8e4",
+ "finished": "2026-10-11T08:07:53Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  6.39599609375,
+  9.50634765625,
+  13.412109375
+ ],
+ "model": "claude-sonnet-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 6,
+  "models": {}
+ },
+ "run": "signalled-meets-notstarted-readers__plain__s1",
+ "scratch": "/tmp/qb/sonnet-1/signalled-meets-notstarted-readers__plain__s1",
+ "secs": 400.1,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 190580,
+  "cache_write": 24303,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.15715400000000004,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 396941,
+  "ended_on_question": false,
+  "final_text": "I decided each reader separately, added a test for each, and committed. Eight tests in `src/quack/spawns_runner_test.go` fail, but they fail the same way without my change. I didn't investigate why. I also didn't confirm whether `./RUNME.sh check` passes. It ran 154s against its 120s budget, and I only grepped its output for failures. `go test ./src/pull` passes, and so do the new and neighbouring Vale tests.\n\n- **`voiceRunsValeOver`** (`src/quack/voice_verb.go`): a run a signal ends now answers a fault, so the code -2 doesn't slip through as output with no fault. A killed Vale leaves partial output, so I treated it as a failure. The fault reads `vale: a signal ended the run: <stderr>`. The new test is `TestVoiceRunsValeAnswersAFaultForAValeASignalEnds`.\n- **`ShellOver`** (`src/pull/door.go`): I left the behaviour alone, so a signalled line answers its output and exit -2 with no fault. The command runner records that exit and checks it against the field's `expects`, so a signalled line fails there instead of aborting the evidence run. I only added a doc comment saying so. The new test is `TestTheShellReadsALineASignalEndsAsItsExitWithNoFault`.\n\nI didn't touch the size or callers-line limits you mentioned.\n\nThe commit is `fb3feec`.",
+  "hook_denials": 0,
+  "input_tokens": 22,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-sonnet-5-5": {
+    "cache_read": 190580,
+    "cache_write": 24303,
+    "cost": 0.15715400000000004,
+    "in": 22,
+    "out": 4084
+   }
+  },
+  "models": {
+   "claude-sonnet-5-5": 11
+  },
+  "output_tokens": 614,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.23,
+   "seven_day": 0.13
+  },
+  "result_subtype": "success",
+  "result_turns": 13,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 12,
+  "tools": {
+   "Bash": 9,
+   "Grep": 1,
+   "Read": 2
+  },
+  "turns": 11,
+  "usage_by_model": {
+   "claude-sonnet-5-5": [
+    22,
+    614,
+    24303,
+    190580
+   ]
+  }
+ },
+ "setup_secs": 14.3,
+ "start_commit": "3d532942a9ee1be75a3e05256c84cfb1af2f342a",
+ "start_tree": "0fba1cd8a489d5684539ab83964f419877aba048",
+ "started": "2026-10-11T08:00:58Z",
+ "status": "ran",
+ "ticket": "signalled-meets-notstarted-readers",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

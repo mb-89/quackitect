@@ -1,0 +1,34 @@
+diff --git a/src/quack/verb_index.go b/src/quack/verb_index.go
+index 25f12bb..60ad603 100644
+--- a/src/quack/verb_index.go
++++ b/src/quack/verb_index.go
+@@ -37,6 +37,11 @@ func indexSays(ask asker, words []string, out, errs io.Writer) int {
+ 		fmt.Fprintln(errs, err)
+ 		return exitFailed
+ 	}
++	// why prints the tree the design input draws, as se-index does. [[spec/design_output/model#quack-why]]
++	if found, ok := said.(map[string]any); ok && words[0] == "why" {
++		fmt.Fprintln(out, found["text"])
++		return 0
++	}
+ 	text, err := json.MarshalIndent(said, "", "  ")
+ 	if err != nil {
+ 		fmt.Fprintln(errs, err)
+diff --git a/src/quack/verb_index_test.go b/src/quack/verb_index_test.go
+index 6d0c461..4cd01c5 100644
+--- a/src/quack/verb_index_test.go
++++ b/src/quack/verb_index_test.go
+@@ -39,6 +39,13 @@ func TestIndexVerb(t *testing.T) {
+ 			t.Fatalf("index asks %v, and wants call value {}", asked)
+ 		}
+ 	})
++	t.Run("why prints the text of its tree, not JSON", func(t *testing.T) {
++		asked := [][]string{}
++		code, out, _ := runsTwin(indexVerb(askHolding(map[string]any{"text": "a\n  b"}, nil, &asked)), "index", "why", "x")
++		if code != 0 || out != "a\n  b\n" {
++			t.Fatalf("index why answers %d, %q, and wants the tree text", code, out)
++		}
++	})
+ 	t.Run("a fault prints on the error stream and exits 1", func(t *testing.T) {
+ 		code, out, errs := runsTwin(indexVerb(askHolding(nil, errors.New("no door"), &[][]string{})), "index")
+ 		if code != exitFailed || out != "" || !strings.Contains(errs, "no door") {

@@ -1,0 +1,64 @@
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index 2b0d338..9377e41 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,10 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 61b4a89f63d8 · claude-code-remote
++    hash_before: 8b3eb972e0864e3b0a28d409f71550489184407f
+ ---
+ 
+ # Ask
+diff --git a/src/quack/ticket_set.go b/src/quack/ticket_set.go
+index df9e9e5..fb40758 100644
+--- a/src/quack/ticket_set.go
++++ b/src/quack/ticket_set.go
+@@ -70,6 +70,13 @@ func ticketWritten(disk pull.Disk, at, key, value string, dry bool, out, errs io
+ 	if value == "" || value == pull.FlagOff {
+ 		written, err = pull.WithoutField(text, key)
+ 	}
++	if err == nil && key == pull.GroupField {
++		// [[spec/design_output/pull#a-closed-group-takes-no-child]]
++		if why := pull.ClosedGroup(disk, written); why != "" {
++			fmt.Fprintln(errs, why)
++			return exitUsage
++		}
++	}
+ 	if err == nil && !dry {
+ 		err = disk.Write(at, written)
+ 	}
+diff --git a/src/quack/ticket_set_test.go b/src/quack/ticket_set_test.go
+index 488f566..085afaf 100644
+--- a/src/quack/ticket_set_test.go
++++ b/src/quack/ticket_set_test.go
+@@ -145,3 +145,26 @@ func TestTicketSet(t *testing.T) {
+ 		}
+ 	})
+ }
++
++func TestTicketSetRefusesClosedGroup(t *testing.T) {
++	shut := "---\nkind: [[ticket]]\nstate: closed\nsteps:\n  - name: do\n    does: makes the change\nstep: do\n---\n\n# Ask\n\nA group.\n"
++	t.Run("set refuses a closed group and writes nothing", func(t *testing.T) {
++		root := editCaseTree(t, "a-thing")
++		seedsFile(t, root, "spec/tickets/shut.md", shut)
++		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "shut")
++		if code != exitUsage || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") {
++			t.Fatalf("set answers %d, %q, %q", code, out, errs)
++		}
++		if got, _ := readsBack(t, root, aThing); strings.Contains(got, "group: shut") {
++			t.Fatalf("the ticket took the closed group: %q", got)
++		}
++	})
++	t.Run("set writes a group that stands open", func(t *testing.T) {
++		root := editCaseTree(t, "a-thing")
++		seedsFile(t, root, "spec/tickets/open-one.md", strings.Replace(shut, "state: closed", "state: open", 1))
++		code, _, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "open-one")
++		if got, _ := readsBack(t, root, aThing); code != 0 || errs != "" || !strings.Contains(got, "\ngroup: open-one\n") {
++			t.Fatalf("set answers %d, %q; the ticket holds %q", code, errs, got)
++		}
++	})
++}

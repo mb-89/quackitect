@@ -1,1 +1,16 @@
 15 runs, 1 at a time, 4 cores each
+2026-10-11T04:47:15Z hand-spawn-skips-session-tag__plain+stop__s1                           ran $0.133 354.9s turns=9 cap=False end=success rl={'five_hour': 0.08, 'seven_day': 0.09}
+2026-10-11T04:51:49Z hand-spawn-skips-session-tag__plain__s1                                ran $0.093 246.2s turns=7 cap=False end=success rl={'five_hour': 0.08, 'seven_day': 0.09}
+2026-10-11T05:13:29Z hand-spawn-skips-session-tag__v5__s1                                   ran $1.177 1255.2s turns=95 cap=False end=success rl={'five_hour': 0.09, 'seven_day': 0.09}
+2026-10-11T05:15:03Z tui-swap-fails-loud__plain+stop__s1                                    ran $0.119 72.0s turns=8 cap=False end=success rl={'five_hour': 0.1, 'seven_day': 0.09}
+2026-10-11T05:16:26Z tui-swap-fails-loud__plain__s1                                         ran $0.133 68.0s turns=8 cap=False end=success rl={'five_hour': 0.1, 'seven_day': 0.09}
+2026-10-11T06:02:08Z tui-swap-fails-loud__v5__s1                                            ran $0.531 2701.4s turns=76 cap=True end=success rl={'five_hour': 0.13, 'seven_day': 0.1}
+2026-10-11T06:44:08Z index-why-prints-text__v5__s1                                          ran $1.203 2475.1s turns=96 cap=False end=success rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T06:45:23Z index-why-prints-text__plain+stop__s1                                  ran $0.090 58.1s turns=6 cap=False end=success rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T06:46:28Z index-why-prints-text__plain__s1                                       ran $0.061 46.0s turns=5 cap=False end=success rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T06:47:44Z check-errors-names-the-part__plain+stop__s1                            ran $0.111 60.1s turns=6 cap=False end=success rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T06:52:54Z check-errors-names-the-part__plain__s1                                 ran $0.133 290.3s turns=7 cap=False end=success rl={'five_hour': 0.17, 'seven_day': 0.11}
+2026-10-11T07:15:10Z check-errors-names-the-part__v5__s1                                    ran $0.975 1291.7s turns=62 cap=False end=success rl={'five_hour': 0.19, 'seven_day': 0.11}
+2026-10-11T08:00:58Z signalled-meets-notstarted-readers__v5__s1                             ran $1.119 2702.2s turns=78 cap=True end=error_during_execution rl={'five_hour': 0.23, 'seven_day': 0.13}
+2026-10-11T08:07:53Z signalled-meets-notstarted-readers__plain__s1                          ran $0.157 400.1s turns=11 cap=False end=success rl={'five_hour': 0.23, 'seven_day': 0.13}
+2026-10-11T08:09:28Z signalled-meets-notstarted-readers__plain+stop__s1                     ran $0.080 76.0s turns=7 cap=False end=success rl={'five_hour': 0.23, 'seven_day': 0.13}

@@ -1,0 +1,9 @@
+{
+ "run": "lint-row-keeps-floor__v5__s1",
+ "task_state": "open",
+ "task_step": "do",
+ "group_state": "open",
+ "group_step": "sync",
+ "other_tickets_touched": [],
+ "other_tickets_closed": []
+}

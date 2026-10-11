@@ -1,0 +1,87 @@
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..2620caf 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,23 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// A verb through quack's own road. A quiet run holds the verb's output, and a red one sends it to the error stream, so the part says why it failed. [[spec/tickets/the-verbs-need-no-wrapper]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		code, said, err := run(append(slices.Clone(road), words...), env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 {
++			if said = strings.TrimSpace(said); said != "" {
++				fmt.Fprintln(errs, said)
++			}
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {
+diff --git a/src/quack/verbover_test.go b/src/quack/verbover_test.go
+new file mode 100644
+index 0000000..c338ce4
+--- /dev/null
++++ b/src/quack/verbover_test.go
+@@ -0,0 +1,37 @@
++package main
++
++import (
++	"errors"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func TestVerbOver(t *testing.T) {
++	var got []string
++	run := func(code int, said string, err error) func(argv, env []string, quiet bool) (int, string, error) {
++		return func(argv, env []string, quiet bool) (int, string, error) {
++			got = argv
++			return code, said, err
++		}
++	}
++	t.Run("a quiet red verb says why on the error stream", func(t *testing.T) {
++		var errs strings.Builder
++		code := verbOver(run(1, "doors: bad\n", nil), []string{"q", "verb"}, nil, &errs)([]string{"doors"}, true)
++		if code != 1 || errs.String() != "doors: bad\n" || !reflect.DeepEqual(got, []string{"q", "verb", "doors"}) {
++			t.Fatalf("code %d, errs %q, argv %v", code, errs.String(), got)
++		}
++	})
++	t.Run("a quiet green verb says nothing", func(t *testing.T) {
++		var errs strings.Builder
++		if code := verbOver(run(0, "fine", nil), nil, nil, &errs)([]string{"x"}, true); code != 0 || errs.Len() != 0 {
++			t.Fatalf("code %d, errs %q", code, errs.String())
++		}
++	})
++	t.Run("a verb that cannot start names the fault", func(t *testing.T) {
++		var errs strings.Builder
++		if code := verbOver(run(0, "", errors.New("gone")), nil, nil, &errs)([]string{"x"}, false); code != exitFailed || errs.String() != "gone\n" {
++			t.Fatalf("code %d, errs %q", code, errs.String())
++		}
++	})
++}

@@ -2,9 +2,9 @@
 """One command: run the benchmark on the frozen task set, grade it, and print the tables.
 
   python3 bench.py run --name <batch> [--model haiku] [--arms plain,v5,plain+stop] [--seeds 1]
-                       [--jobs 3] [--only t1,t2] [--wall 2400]
-      runs every task of tasks.jsonl in every arm, grades as runs finish, writes
-      results/<batch>/REPORT.md
+                       [--jobs 2] [--only t1,t2] [--wall 2700] [--check pass|all|none]
+      runs every task of tasks.jsonl in every arm, grades the hidden tests as runs finish, then
+      runs the full checks one at a time on the idle machine, and writes results/<batch>/REPORT.md
 
   python3 bench.py compare --baseline <batch A> --candidate <batch B> [--arm v5]
       a change against its baseline: the same arm on the same tasks, paired by task
@@ -56,11 +56,13 @@ def cmd_run(a):
     tasks = os.path.join(HERE, a.tasks)
     runner = [PY, os.path.join(HERE, "run.py"), "--tasks", tasks, "--batch", batch, "--repo", qk,
               "--model", a.model, "--arms", a.arms, "--seeds", str(a.seeds), "--first-seed", str(a.first_seed),
-              "--jobs", str(a.jobs), "--wall", str(a.wall), "--budget", str(a.budget)]
+              "--jobs", str(a.jobs), "--wall", str(a.wall), "--budget", str(a.budget),
+              "--cpus-per-run", "4", "--keep-order"]
     if a.only:
         runner += ["--only", a.only]
+    # hidden tests as runs finish; the full checks wait for an idle machine (DESIGN.md §3, §6.2)
     grader = [PY, os.path.join(HERE, "grade.py"), "--tasks", tasks, "--batch", batch, "--repo", qk,
-              "--check", a.check, "--jobs", "1", "--watch"]
+              "--check", "none", "--jobs", "1", "--watch", "--keep"]
     os.makedirs(batch, exist_ok=True)
     with open(os.path.join(batch, "run.log"), "a") as rl, open(os.path.join(batch, "grade.log"), "a") as gl:
         r = subprocess.Popen(runner, stdout=rl, stderr=subprocess.STDOUT)
@@ -68,7 +70,15 @@ def cmd_run(a):
         r.wait()
         g.wait()
     subprocess.run([PY, os.path.join(HERE, "grade.py"), "--tasks", tasks, "--batch", batch, "--repo", qk,
-                    "--check", a.check, "--jobs", "1"])
+                    "--check", "none", "--jobs", "1", "--keep"])
+    if a.check != "none":
+        subprocess.run([PY, os.path.join(HERE, "grade.py"), "--tasks", tasks, "--batch", batch, "--repo", qk,
+                        "--checks-only", "--check", a.check, "--reps", "3", "--nice", "0"]
+                       + (["--only", a.only] if a.only else []))
+    # where each v5 run left its tickets, read off the scratch trees before they go
+    subprocess.run([PY, os.path.join(HERE, "v5state.py"), "--batch", batch])
+    subprocess.run([PY, os.path.join(HERE, "grade.py"), "--tasks", tasks, "--batch", batch, "--repo", qk,
+                    "--cleanup", "--check", a.check])
     subprocess.run([PY, os.path.join(HERE, "report.py"), "--tasks", tasks, "--batch", batch,
                     "--verdicts", os.path.join(HERE, "verdicts.jsonl"), "--out", os.path.join(batch, "REPORT.md")])
 
@@ -115,9 +125,9 @@ def main():
     r.add_argument("--arms", default="plain,v5,plain+stop")
     r.add_argument("--seeds", type=int, default=1)
     r.add_argument("--first-seed", type=int, default=1)
-    r.add_argument("--jobs", type=int, default=3)
+    r.add_argument("--jobs", type=int, default=2, help="sessions at once (two on four cores, DESIGN.md §6.2)")
     r.add_argument("--only", default="")
-    r.add_argument("--wall", type=int, default=2400)
+    r.add_argument("--wall", type=int, default=2700)
     r.add_argument("--budget", type=float, default=0)
     r.add_argument("--check", default="pass", choices=["all", "pass", "none"])
     c = sub.add_parser("compare")

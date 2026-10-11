@@ -1,0 +1,53 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T06:58:46Z",
+ "hidden": {
+  "f2p": [
+   168,
+   168
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   168,
+   168
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "secs": 31.8,
+  "tail": ""
+ },
+ "regraded": "2026-10-11T07:04:40Z",
+ "run": "lint-row-keeps-floor__plain+stop__s1",
+ "scope": {
+  "code_files": 2,
+  "files": 3,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 3,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

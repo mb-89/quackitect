@@ -1,0 +1,198 @@
+{
+ "arm": "v5",
+ "bash_tail": [
+  "for i in $(seq 1 85); do if grep -q \"^check-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check3.txt 2>/dev/null; then break; fi; sleep 2; done; tail -3 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check3.txt; echo \"FAIL lines: $(grep -c '^FAIL' /tmp/qb/haiku-1/lint-row-keeps-floor__v5",
+  "cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1 && grep -n -i \"fail\\|\u2716\\|error\\|warning\" tmp/check3.txt | grep -v \"\u2714\" | head -30",
+  "cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1 && grep -n -i \"fail\\|\u2716\\|error\\|warning\" tmp/check3.txt | grep -v \"\u2714\" | head -30",
+  "f=$(grep -rl \"reads the same by its absolute path\" test/ 2>/dev/null | head -1); echo \"file=$f\"; node --test \"$f\" 2>&1 | grep -E \"^# (pass|fail)|not ok|exit\" | head -8",
+  "./RUNME.sh check > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check4.txt 2>&1; echo \"check-exit=$?\" >> /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check4.txt; echo done",
+  "for i in $(seq 1 85); do if grep -q \"^check-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check4.txt 2>/dev/null; then break; fi; sleep 2; done; tail -1 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check4.txt; grep -n \"^\u2716\\|\u2139 fail\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check4",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"go test ./src/quack/ -run KeepsFloor|BoxFloor passes, and go test ./src/quack/ passes in full. go vet is clean.\", \"check\": \"./RUNME.sh check exits 0 on commit 237623c, with 0 failing JS tests.\", \"says\": \"appendsRow writes throug",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"go test ./src/quack/\", \"check\": \"./RUNME.sh check\", \"says\": \"appendsRow writes through keepsFloor, so a row ranked below log.level is dropped, and a passing lint debug row no longer lands. boxFloor reads log.level and defaults t",
+  "for i in $(seq 1 85); do if grep -q \"^exit=\\|exited with code\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/claude-0/-tmp-qb-haiku-1-lint-row-keeps-floor--v5--s1-quackitect/2a16cb3a-7bb7-48cb-aba3-2ea869b084d5/tasks/b1qxhln38.output 2>/dev/null; then break; fi; sleep 2; done; tail -c 1200 /tmp/q",
+  "./RUNME.sh check > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check5.txt 2>&1; echo \"check-exit=$?\" >> /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check5.txt; echo written",
+  "for i in $(seq 1 85); do if grep -q \"^check-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check5.txt 2>/dev/null; then break; fi; sleep 2; done; tail -1 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check5.txt; grep -n \"^\u2716\\|^FAIL\\|\u2139 fail\\|Error\\|exit 2\" /tmp/qb/haiku-1/lint-row-keeps-fl",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"go test ./src/quack/\", \"check\": \"./RUNME.sh check\", \"says\": \"appendsRow writes through keepsFloor, so a row ranked below log.level is dropped, and a passing lint debug row no longer lands. boxFloor reads log.level and defaults t",
+  "for i in $(seq 1 85); do if grep -q \"^pass-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass.txt 2>/dev/null; then break; fi; sleep 2; done; tail -12 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass.txt",
+  "cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1 && tail -25 tmp/check5.txt; echo ----; tail -5 tmp/pass.txt",
+  "ps -eo pid,etime,cmd | grep -E \"RUNME|quack|vale|node --test\" | grep -v grep | head -20; echo \"---\"; cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/quackitect && git status --short && git log --oneline -1",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"go test ./src/quack/\", \"check\": \"./RUNME.sh check\", \"says\": \"appendsRow writes through keepsFloor, so a row ranked below log.level is dropped, and a passing lint debug row no longer lands. boxFloor reads log.level and defaults t",
+  "for i in $(seq 1 85); do if grep -q \"^pass-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass2.txt 2>/dev/null; then break; fi; sleep 2; done; tail -8 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass2.txt",
+  "./RUNME.sh test --help 2>&1 | head -12; echo ---; ./RUNME.sh branch test --help 2>&1 | head -8",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"./RUNME.sh test\", \"check\": \"./RUNME.sh check\", \"says\": \"appendsRow writes through keepsFloor, so a row ranked below log.level is dropped, and a passing lint debug row no longer lands. boxFloor reads log.level and defaults to inf",
+  "for i in $(seq 1 85); do if grep -q \"^pass-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass3.txt 2>/dev/null; then break; fi; sleep 2; done; tail -8 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/pass3.txt",
+  "cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1 && head -c 2500 tmp/pass3.txt",
+  "sed -n 1,60p spec/tickets/lint-row-keeps-floor.md | grep -n -A12 \"person-1\" | head -40; echo ---; ./RUNME.sh ticket pull --help 2>&1 | head -5",
+  "timeout 110 ./RUNME.sh test > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/test.txt 2>&1; echo \"test-exit=$?\"; tail -6 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/test.txt",
+  "timeout 110 ./RUNME.sh test > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/test.txt 2>&1; echo \"test-exit=$?\"; tail -6 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/test.txt",
+  "timeout 110 ./RUNME.sh test src/quack > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/testq.txt 2>&1; echo \"exit=$?\"; tail -3 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/testq.txt",
+  "./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"answer\": \"The tests field is ./RUNME.sh test src/quack. It exits 0 and prints green, src/quack passes. The bare ./RUNME.sh test run ends on a duration line, so its last line never reads green. The full run exits 0 with 369 pass and 0 fai",
+  "cd /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1 && head -c 600 tmp/person1.txt",
+  "./RUNME.sh check > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt 2>&1; c=$?; echo \"check-exit=$c\" >> /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt; if [ $c -eq 0 ]; then ./RUNME.sh ticket pull lint-row-keeps-floor --pass --fields '{\"tests\": \"./RUNME.sh test src/quack\", \"c",
+  "./RUNME.sh check > /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt 2>&1; echo \"check-exit=$?\" >> /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt; echo done",
+  "for i in $(seq 1 85); do if grep -q \"^check-exit=\" /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt 2>/dev/null; then break; fi; sleep 2; done; tail -1 /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp/check6.txt; echo \"fails: $(grep -c '^\u2716' /tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1/tmp"
+ ],
+ "branch_at_end": "work/the-bench-work",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "spec/tickets/lint-row-keeps-floor.md"
+  ],
+  [
+   "M",
+   "spec/tickets/the-bench-work.md"
+  ],
+  [
+   "A",
+   "src/quack/floor.go"
+  ],
+  [
+   "A",
+   "src/quack/floor_test.go"
+  ],
+  [
+   "M",
+   "src/quack/verbs.go"
+  ]
+ ],
+ "commits_made": 8,
+ "cost_total": 0.8899,
+ "exit": 0,
+ "final_from": "working tree on work/the-bench-work",
+ "final_tree": "88244e11a2cad0315a81935506b80f204b59ea7c",
+ "finished": "2026-10-11T06:52:13Z",
+ "install_rc": 0,
+ "install_tail": "the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n\nconfig helper.find haiku: rc=0 editor-client: the language client the extension starts the server through\n  installing the language client\nhelper.find is \"haiku\" in .se/.runtime/config.json.\n\nconfig helper.change haiku: rc=0 helper.change is \"haiku\" in .se/.runtime/config.json.\n\nconfig helper.decide haiku: rc=0 helper.decide is \"haiku\" in .se/.runtime/config.json.\n",
+ "killed_at_cap": true,
+ "load_end": [
+  26.90576171875,
+  19.58642578125,
+  19.59326171875
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 4,
+  "cost": 0.57899,
+  "files": 51,
+  "models": {
+   "claude-sonnet-5-5": 0.57899
+  }
+ },
+ "run": "lint-row-keeps-floor__v5__s1",
+ "scratch": "/tmp/qb/haiku-1/lint-row-keeps-floor__v5__s1",
+ "secs": 2702.6,
+ "seed": 1,
+ "seed_info": {
+  "group_state": "open",
+  "origin_heads": [
+   "main",
+   "work/the-bench-work"
+  ],
+  "setup_steps": [
+   {
+    "out": "Installing what this tree needs.\ngit-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery\n  pointing git at .githooks\neditor-client: the language client the extension starts the server through\n  installing the language client\nReady.\nspec/tickets/lint-row-keeps-floor.md carries group: the-bench-work.\n",
+    "rc": 0,
+    "verb": "ticket set lint-row-keeps-floor group the-bench-work"
+   },
+   {
+    "out": "goal names no field of a ticket note. It takes kind, state, reason, urgent, point, todo, step, steps, process, process_hash, record, group, parent, depends_on, enabled_by, fix, cloud, successors, Ask, , Discussion.\n",
+    "rc": 2,
+    "verb": "mint ticket spec/tickets/the-bench-work.md --process=group --goal=the lint row goes through appendsRow in src/quack/verbs.go, which writes below the log.level floor, so every passing lint appends a de"
+   },
+   {
+    "out": "ma.Placeholder: improve still carries the placeholder mint writes. Say what stands there.\nspec/tickets/the-bench-work.md:171:1: Schema.Placeholder: thoughts still carries the placeholder mint writes. Say what stands there.\nspec/tickets/the-bench-work.md:177:1: Schema.Placeholder: checked still carries the placeholder mint writes. Say what stands there.\nspec/tickets/the-bench-work.md:187:1: Schema.Placeholder: lacked still carries the placeholder mint writes. Say what stands there.\nspec/tickets/the-bench-work.md:193:1: Schema.Placeholder: met still carries the placeholder mint writes. Say what stands there.\nspec/tickets/the-bench-work.md:199:1: Schema.Placeholder: left still carries the placeholder mint writes. Say what stands there.\nWrite it, then run ./RUNME.sh lint to read what is left.\n",
+    "rc": 0,
+    "verb": "mint ticket spec/tickets/the-bench-work.md --process=group --Ask=the lint row goes through appendsRow in src/quack/verbs.go, which writes below the log.level floor, so every passing lint appends a deb"
+   },
+   {
+    "out": "spec/tickets/the-bench-work.md stands open at sync, and the pull hands it out.\nspec/tickets/the-bench-work.md holds an Ask that breaks a rule of form, and it lands. Leave the lines as they stand, and carry on:\n  line 89 breaks Sentence: A sentence holds 25 words. Cut this one in two.\n  line 89 breaks Vocabulary: appendsrow stands outside the words this tree writes. Write a core word, or add appendsrow to spec/vocabulary/terms.yml with one line that says what it means.\n",
+    "rc": 0,
+    "verb": "ticket open the-bench-work"
+   },
+   {
+    "out": "work/the-bench-work stands at todo in the cloud, carrying spec/tickets/the-bench-work.md.\nRun ./RUNME.sh cloud trigger to fire a box at it.\n",
+    "rc": 0,
+    "verb": "branch open the-bench-work"
+   },
+   {
+    "out": "Usage: ./RUNME.sh cloud <verb>\n\n  trigger       the routine that works a branch, and what stands free\n",
+    "rc": 2,
+    "verb": "cloud prompt the-bench-work"
+   }
+  ]
+ },
+ "session": {
+  "api_errors": 0,
+  "cache_read": 7946478,
+  "cache_write": 118679,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.31090550000000006,
+  "cost_estimated": false,
+  "door_refusals": 8,
+  "duration_ms": 2681866,
+  "ended_on_question": false,
+  "final_text": "The gate refused a landing that runs after a check without `&&`. I'll run the check alone first, in the background.",
+  "hook_denials": 0,
+  "input_tokens": 200,
+  "is_error": true,
+  "leak_flags": [],
+  "mcp_calls": 17,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 7946478,
+    "cache_write": 118679,
+    "cost": 0.31090550000000006,
+    "in": 200,
+    "out": 51264
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 98
+  },
+  "output_tokens": 878,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.17,
+   "seven_day": 0.11
+  },
+  "result_subtype": "error_during_execution",
+  "result_turns": 110,
+  "skill_calls": [
+   "work"
+  ],
+  "stop_hook_blocks": 2,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 105,
+  "tools": {
+   "Bash": 72,
+   "Grep": 4,
+   "Read": 7,
+   "Skill": 1,
+   "ToolSearch": 3,
+   "Write": 1,
+   "mcp__level0__index_ticket_pull": 4,
+   "mcp__level0__patch": 9,
+   "mcp__level0__plan": 4
+  },
+  "turns": 98,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    200,
+    878,
+    118679,
+    7946478
+   ]
+  }
+ },
+ "setup_secs": 58.7,
+ "start_commit": "b786ab7f561c6708c1a3290244a761ac5ca4a1f9",
+ "start_tree": "e5af490bad30cdd5d5b70dcb567489be3b9c4579",
+ "started": "2026-10-11T06:06:02Z",
+ "status": "ran",
+ "ticket": "lint-row-keeps-floor",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

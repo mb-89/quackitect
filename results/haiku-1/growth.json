@@ -1,0 +1,224 @@
+[
+ {
+  "run": "check-errors-names-the-part__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 1555,
+  "other_turns": 0,
+  "turns": 99,
+  "by_ticket_secs": {
+   "check-errors-names-the-part": 1555
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "example-retro-gaps-shown-name__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 1537,
+  "other_turns": 0,
+  "turns": 112,
+  "by_ticket_secs": {
+   "example-retro-gaps-shown-name": 1285,
+   "the-bench-work": 253
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "go-pull-desk-remedy-once__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 2586,
+  "other_turns": 0,
+  "turns": 89,
+  "by_ticket_secs": {
+   "go-pull-desk-remedy-once": 2586
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "hand-spawn-skips-session-tag__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 989,
+  "other_turns": 0,
+  "turns": 81,
+  "by_ticket_secs": {
+   "hand-spawn-skips-session-tag": 748,
+   "the-bench-work": 240
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "index-why-prints-text__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 2577,
+  "other_turns": 0,
+  "turns": 149,
+  "by_ticket_secs": {
+   "index-why-prints-text": 2577
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "lint-row-keeps-floor__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 2618,
+  "other_turns": 0,
+  "turns": 98,
+  "by_ticket_secs": {
+   "lint-row-keeps-floor": 2592,
+   "the-bench-work": 26
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "proc-empty-argv-never-starts__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 92,
+  "other_turns": 0,
+  "turns": 33,
+  "by_ticket_secs": {
+   "proc-empty-argv-never-starts": 92
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "set-refuses-closed-group__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 2325,
+  "other_turns": 0,
+  "turns": 34,
+  "by_ticket_secs": {
+   "set-refuses-closed-group": 2325
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "signalled-meets-notstarted-readers__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 1182,
+  "other_turns": 0,
+  "turns": 217,
+  "by_ticket_secs": {
+   "signalled-meets-notstarted-readers": 1157,
+   "the-bench-work": 24
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "standing-pull-takes-auto-merge__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 2018,
+  "other_turns": 0,
+  "turns": 130,
+  "by_ticket_secs": {
+   "standing-pull-takes-auto-merge": 1794,
+   "the-bench-work": 224
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "tui-swap-fails-loud__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "open",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 1066,
+  "other_turns": 0,
+  "turns": 81,
+  "by_ticket_secs": {
+   "tui-swap-fails-loud": 1066
+  },
+  "batch": "haiku-1"
+ },
+ {
+  "run": "vale-retries-its-timeout__v5__s1",
+  "others": [],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.0,
+  "other_secs": 0,
+  "session_secs": 1907,
+  "other_turns": 0,
+  "turns": 108,
+  "by_ticket_secs": {
+   "vale-retries-its-timeout": 1831,
+   "the-bench-work": 76
+  },
+  "batch": "haiku-1"
+ }
+]

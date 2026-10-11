@@ -36,6 +36,10 @@ def main():
             parts.append("")
         parts.append(f"#### {name}: every run\n")
         parts.append(run(["notes.py", "--tasks", "tasks.jsonl", "--batch", b]))
+    parts.append("## Full checks\n")
+    parts.append("`./RUNME.sh check` on the final tree of every run that passed its hidden tests, after the "
+                 "sessions, one at a time, up to three attempts while red (DESIGN.md §3).\n")
+    parts.append(run(["checks.py"] + a.batch))
     parts.append("## Cost log\n")
     parts.append("Every model call this benchmark paid for, from `costlog.jsonl` (excluded batches and probes "
                  "included: the money was spent).\n")

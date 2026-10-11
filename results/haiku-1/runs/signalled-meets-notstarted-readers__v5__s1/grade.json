@@ -17,7 +17,7 @@
    "src/pull": "ok",
    "src/quack": "fail"
   },
-  "tail": "program's streams and code\n--- FAIL: TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv (0.00s)\n[src/quack:TestTheBranchTakeRunsTheRoadOnTheCallersStreams]\n    spawns_runner_test.go:75: the take answers 1 and writes \"\", \"\", and wants 2 and the road's streams\n--- FAIL: TestTheBranchTakeRunsTheRoadOnTheCallersStreams (0.00s)\n[src/quack:TestARoadVerbAnswersItsStreamsAsOneText]\n    spawns_runner_test.go:60: the road answers 1, \"roadVerbOver runs no road yet\", and wants 3 and both streams as one text\n--- FAIL: TestARoadVerbAnswersItsStreamsAsOneText (0.00s)\n[src/quack:TestToolRunsHandsTheStreamsThrough]\n    spawns_runner_test.go:43: a tool run answers 1 and writes \"\", \"\", and wants 3 and the tool's streams\n--- FAIL: TestToolRunsHandsTheStreamsThrough (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t11.816s"
+  "tail": "program's streams and code\n--- FAIL: TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv (0.00s)\n[src/quack:TestTheBranchTakeRunsTheRoadOnTheCallersStreams]\n    spawns_runner_test.go:75: the take answers 1 and writes \"\", \"\", and wants 2 and the road's streams\n--- FAIL: TestTheBranchTakeRunsTheRoadOnTheCallersStreams (0.00s)\n[src/quack:TestARoadVerbAnswersItsStreamsAsOneText]\n    spawns_runner_test.go:60: the road answers 1, \"roadVerbOver runs no road yet\", and wants 3 and both streams as one text\n--- FAIL: TestARoadVerbAnswersItsStreamsAsOneText (0.01s)\n[src/quack:TestToolRunsHandsTheStreamsThrough]\n    spawns_runner_test.go:43: a tool run answers 1 and writes \"\", \"\", and wants 3 and the tool's streams\n--- FAIL: TestToolRunsHandsTheStreamsThrough (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t20.540s"
  },
  "hidden_first": {
   "f2p": [
@@ -38,7 +38,7 @@
   "secs": 56.2,
   "tail": "adsRunmeUnderTheRootAndItsEnv]\n    spawns_runner_test.go:90: the run answers {out: errs: code:1}, and wants the program's streams and code\n--- FAIL: TestARetroMintRunReadsRunmeUnderTheRootAndItsEnv (0.00s)\n[src/quack:TestValeHeardOverTheDoorReadsTheTextAsTheFile]\n    spawns_runner_test.go:113: an unread Vale answers {rows:[] stands:false ran:false why:no vale stands here}, and wants it standing, unread, with its stderr as why\n--- FAIL: TestValeHeardOverTheDoorReadsTheTextAsTheFile (0.00s)\n[src/quack:TestTheBranchTakeRunsTheRoadOnTheCallersStreams]\n    spawns_runner_test.go:75: the take answers 1 and writes \"\", \"\", and wants 2 and the road's streams\n--- FAIL: TestTheBranchTakeRunsTheRoadOnTheCallersStreams (0.00s)\n[src/quack:TestARoadVerbAnswersItsStreamsAsOneText]\n    spawns_runner_test.go:60: the road answers 1, \"roadVerbOver runs no road yet\", and wants 3 and both streams as one text\n--- FAIL: TestARoadVerbAnswersItsStreamsAsOneText (0.00s)\n[src/quack:TestToolRunsHandsTheStreamsThrough]\n    spawns_runner_test.go:43: a tool run answers 1 and writes \"\", \"\", and wants 3 and the tool's streams\n--- FAIL: TestToolRunsHandsTheStreamsThrough (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t29.858s"
  },
- "regraded": "2026-10-11T04:38:15Z",
+ "regraded": "2026-10-11T07:11:06Z",
  "run": "signalled-meets-notstarted-readers__v5__s1",
  "scope": {
   "code_files": 2,

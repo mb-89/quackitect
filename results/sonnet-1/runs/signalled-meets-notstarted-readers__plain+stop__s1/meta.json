@@ -1,0 +1,119 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "sed -i 's/if said.Code == proc.NotStarted {/if said.Code == proc.NotStarted || said.Code == proc.Signalled {/' src/quack/voice_verb.go src/pull/door.go && sed -n 155,185p src/quack/voice_verb_test.go; sed -n 35,65p src/pull/shell_test.go",
+  "cat >> src/quack/voice_verb_test.go <<'EOF'\n\nfunc TestVoiceRunsValeAnswersAFaultForAValeASignalEnds(t *testing.T) {\n\tt.Parallel()\n\tfake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {\n\t\treturn proc.Said{Err: \"killed\", Code: proc.Signalled}\n\t}}}\n\tsaid,",
+  "go test ./src/quack -run 'Voice' 2>&1 | tail -5; git stash -q; go test ./src/quack 2>&1 | grep -c '^--- FAIL'; git stash pop -q; go test ./src/quack 2>&1 | grep -c '^--- FAIL'",
+  "git add -A && git commit -qm \"Read Signalled as a fault in voiceRunsValeOver and ShellOver\n\nCo-Authored-By: Claude Sonnet 5.5 <<redacted:git-email>>\" && git log --oneline | head -1"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/pull/door.go"
+  ],
+  [
+   "M",
+   "src/pull/shell_test.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.08003,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "f9e8e8398329a4b9e7939cd17769c8ce2a3030bf",
+ "finished": "2026-10-11T08:09:28Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  4.8271484375,
+  8.2978515625,
+  12.6064453125
+ ],
+ "model": "claude-sonnet-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 1,
+  "models": {}
+ },
+ "run": "signalled-meets-notstarted-readers__plain+stop__s1",
+ "scratch": "/tmp/qb/sonnet-1/signalled-meets-notstarted-readers__plain+stop__s1",
+ "secs": 76.0,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 106377,
+  "cache_write": 11879,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.0800317,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 73924,
+  "ended_on_question": false,
+  "final_text": "`voiceRunsValeOver` (src/quack/voice_verb.go) and `ShellOver` (src/pull/door.go) now treat `proc.Signalled` like `NotStarted`. A run that a signal ends answers a fault again, not code -2 with no fault. I did not run `./RUNME.sh check`.\n\nI added one test for each reader, and both pass. Each feeds a `FakeRunner` program that answers `Signalled` and checks that an error comes back. The new tests are in `src/quack/voice_verb_test.go` and `src/pull/shell_test.go`. The `src/pull` package passes. The change is committed as 34cf580.\n\n`go test ./src/quack` has 8 failing tests, including `TestToolRunsHandsTheStreamsThrough` and `TestARoadVerbAnswersItsStreamsAsOneText`. The same 8 fail with my change stashed, so they were failing already and I left them alone.\n\nI did not touch the ticket's remarks about file size or the callers line, since those aren't code.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 14,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-sonnet-5-5": {
+    "cache_read": 106377,
+    "cache_write": 11879,
+    "cost": 0.0800317,
+    "in": 14,
+    "out": 2185
+   }
+  },
+  "models": {
+   "claude-sonnet-5-5": 7
+  },
+  "output_tokens": 500,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.23,
+   "seven_day": 0.13
+  },
+  "result_subtype": "success",
+  "result_turns": 9,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 8,
+  "tools": {
+   "Bash": 4,
+   "Grep": 1,
+   "Read": 3
+  },
+  "turns": 7,
+  "usage_by_model": {
+   "claude-sonnet-5-5": [
+    14,
+    500,
+    11879,
+    106377
+   ]
+  }
+ },
+ "setup_secs": 18.0,
+ "start_commit": "3d532942a9ee1be75a3e05256c84cfb1af2f342a",
+ "start_tree": "0fba1cd8a489d5684539ab83964f419877aba048",
+ "started": "2026-10-11T08:07:53Z",
+ "status": "ran",
+ "ticket": "signalled-meets-notstarted-readers",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

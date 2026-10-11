@@ -1,0 +1,84 @@
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..23a356e 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,21 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// A verb through quack's own road over the run door. A quiet red run leaves what the verb said on the error stream, so the part's failure keeps its reason. [[spec/design_output/work#the-battery-answers-first]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		code, said, err := run(append(slices.Clone(road), words...), env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 && strings.TrimSpace(said) != "" {
++			fmt.Fprintln(errs, strings.TrimSpace(said))
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {
+diff --git a/src/quack/verbover_test.go b/src/quack/verbover_test.go
+new file mode 100644
+index 0000000..5b227a8
+--- /dev/null
++++ b/src/quack/verbover_test.go
+@@ -0,0 +1,36 @@
++package main
++
++import (
++	"bytes"
++	"slices"
++	"strings"
++	"testing"
++)
++
++// A quiet red verb leaves its words on the error stream; a quiet green one and a loud red one leave none. [[spec/design_output/work#the-battery-answers-first]]
++func TestVerbOverQuietRedSaysWhy(t *testing.T) {
++	var got []string
++	run := func(code int, said string) func(argv, env []string, quiet bool) (int, string, error) {
++		return func(argv, env []string, quiet bool) (int, string, error) {
++			got = argv
++			return code, said, nil
++		}
++	}
++	cases := []struct {
++		code  int
++		quiet bool
++		want  string
++	}{{1, true, "why it failed\n"}, {0, true, ""}, {1, false, ""}}
++	for _, c := range cases {
++		var errs bytes.Buffer
++		code := verbOver(run(c.code, "why it failed\n"), []string{"self", "verb"}, nil, &errs)([]string{"lint", "."}, c.quiet)
++		if code != c.code || errs.String() != c.want || !slices.Equal(got, []string{"self", "verb", "lint", "."}) {
++			t.Errorf("code %d quiet %v: got %d %q %v", c.code, c.quiet, code, errs.String(), got)
++		}
++	}
++	var errs bytes.Buffer
++	failing := func(argv, env []string, quiet bool) (int, string, error) { return 0, "", bytes.ErrTooLarge }
++	if verbOver(failing, nil, nil, &errs)(nil, true) != exitFailed || !strings.Contains(errs.String(), "too large") {
++		t.Errorf("a start fault is said: %q", errs.String())
++	}
++}

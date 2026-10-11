@@ -32,3 +32,9 @@
 2026-10-11T04:18:11Z proc-empty-argv-never-starts__v5__s1                                   graded hidden=False f2p=[0, 4] p2p=[1, 1] check=None new_red=None outside=0
 2026-10-11T04:24:15Z vale-retries-its-timeout__v5__s1                                       graded hidden=True f2p=[23, 23] p2p=[0, 0] check=None new_red=None outside=0
 2026-10-11T04:31:47Z proc-empty-argv-never-starts__plain__s1                                graded hidden=True f2p=[4, 4] p2p=[1, 1] check=None new_red=None outside=0
+2026-10-11T05:28:10Z set-refuses-closed-group__v5__s1                                       graded hidden=True f2p=[1, 1] p2p=[486, 486] check=None new_red=None outside=0
+2026-10-11T05:45:50Z set-refuses-closed-group__plain+stop__s1                               graded hidden=True f2p=[1, 1] p2p=[486, 486] check=None new_red=None outside=0
+2026-10-11T05:52:59Z set-refuses-closed-group__plain__s1                                    graded hidden=True f2p=[1, 1] p2p=[486, 486] check=None new_red=None outside=0
+2026-10-11T06:07:11Z lint-row-keeps-floor__plain__s1                                        graded hidden=True f2p=[168, 168] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T06:53:16Z lint-row-keeps-floor__v5__s1                                           graded hidden=True f2p=[168, 168] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T06:59:23Z lint-row-keeps-floor__plain+stop__s1                                   graded hidden=True f2p=[168, 168] p2p=[0, 0] check=None new_red=None outside=0

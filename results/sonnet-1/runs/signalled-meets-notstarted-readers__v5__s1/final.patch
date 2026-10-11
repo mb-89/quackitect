@@ -1,0 +1,261 @@
+diff --git a/spec/tickets/quack-spawns-all-take-the-runner.md b/spec/tickets/quack-spawns-all-take-the-runner.md
+index b846ac0..7e37065 100644
+--- a/spec/tickets/quack-spawns-all-take-the-runner.md
++++ b/spec/tickets/quack-spawns-all-take-the-runner.md
+@@ -413,3 +413,5 @@ accept with points
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
++
++spawn-stubs-match-the-draft settles the shape: `toolRunsOver(run proc.Runner, in io.Reader)` and `tuiLaunchOver(run proc.Runner, in io.Reader)` stand as the tests-red stubs write them. The input is an argument so the two cases in src/quack/spawns_runner_test.go drive it. The implement step passes `Streams{In: in, Out: out, Err: errs}`, and `toolRuns` and `tuiLaunch` bind `proc.Real` and `os.Stdin` at their call sites. Where the draft reads `toolRunsOver(run)` with `Streams{In: os.Stdin}`, read this shape.
+diff --git a/spec/tickets/signalled-meets-notstarted-readers.md b/spec/tickets/signalled-meets-notstarted-readers.md
+index 39653dc..26b613d 100644
+--- a/spec/tickets/signalled-meets-notstarted-readers.md
++++ b/spec/tickets/signalled-meets-notstarted-readers.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,30 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ parent: quack-spawns-all-take-the-runner
++record:
++  - step: do
++    hand: box 53a0c9ad914c · claude-code-remote
++    hash_before: 3ccb8c30758c34921187c2a3d0a931794ad260f3
++    hash_after: 17641ffa5979fa580bca9a2fb1d0fa8b41258228
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/proc passes; green, src/pull passes; green, src/quack passes
++      - name: check
++        exit: 0
++        said: green
++    inputs:
++      - name: ask
++        hash: 133868c6a0ab1ec6
++        size: 327
++    def: 10d1e4d8ece57c93
++reason: done
+ ---
+ 
+ # Ask
+@@ -47,27 +65,33 @@ parent: quack-spawns-all-take-the-runner
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch test src/proc/proc_test.go src/pull/shell_test.go src/quack/voice_verb_test.go
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check > /dev/null 2>&1 && echo green
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++Said gains Fault, which answers the fault of a run that never started or that a signal ended, and nil otherwise. voiceRunsValeOver and ShellOver call it, so a run that answers Signalled now answers a fault as one that never started did before. A signalled run with no stderr takes a fixed fault text. Tests: Fault over five runs in src/proc, and one signalled case each for the voice and shell readers. Other failures in src/proc and src/quack (stream and signal-production cases) stand on the base before this change.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask: each reader decided at its spot, and both answer a fault
++- the cleanup is in the change: the two unused imports left
++- the fault rule stands once in Said.Fault, and both readers call it
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index 19239e9..55d7880 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,10 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 53a0c9ad914c · claude-code-remote
++    hash_before: e85b76fd373e375ee7dad46bd8fe7578b4c461c5
+ ---
+ 
+ # Ask
+diff --git a/src/proc/proc.go b/src/proc/proc.go
+index d664f6a..b531685 100644
+--- a/src/proc/proc.go
++++ b/src/proc/proc.go
+@@ -26,9 +26,10 @@ const Signalled = -2
+ 
+ // The faults a run answers where the halt stands before it, the halt ends it, or it passes its wait. [[spec/design_output/doors#the-process-door]]
+ const (
+-	haltedBefore = "proc: the halt stands, so the run never starts"
+-	haltEndsRun  = "proc: the halt ends the run"
+-	pastItsWait  = "proc: the run passes its wait"
++	endedOnSignal = "proc: a signal ends the run"
++	haltedBefore  = "proc: the halt stands, so the run never starts"
++	haltEndsRun   = "proc: the halt ends the run"
++	pastItsWait   = "proc: the run passes its wait"
+ )
+ 
+ // What either runner answers a command naming no program. [[spec/design_output/doors#the-process-door]]
+@@ -58,6 +59,19 @@ type Said struct {
+ 	Code int
+ }
+ 
++// The fault of a run that never started or that a signal ended, and nil for any other run. [[spec/tickets/signalled-meets-notstarted-readers]]
++func (one Said) Fault() error {
++	switch {
++	case one.Code == NotStarted:
++		return errors.New(one.Err)
++	case one.Code == Signalled && one.Err == "":
++		return errors.New(endedOnSignal)
++	case one.Code == Signalled:
++		return errors.New(one.Err)
++	}
++	return nil
++}
++
+ // The door: one run of one command. [[spec/design_output/doors#the-process-door]]
+ type Runner func(Command) Said
+ 
+diff --git a/src/proc/proc_test.go b/src/proc/proc_test.go
+new file mode 100644
+index 0000000..e66ce8c
+--- /dev/null
++++ b/src/proc/proc_test.go
+@@ -0,0 +1,27 @@
++package proc
++
++import "testing"
++
++func TestASaidRunCarriesAFaultOnlyWhereItNeverStartedOrASignalEndedIt(t *testing.T) {
++	t.Parallel()
++	cases := []struct {
++		name  string
++		said  Said
++		fault string
++	}{
++		{"a run that never starts", Said{Err: "no program", Code: NotStarted}, "no program"},
++		{"a run a signal ends", Said{Err: "killed", Code: Signalled}, "killed"},
++		{"a run a signal ends with no stderr", Said{Code: Signalled}, endedOnSignal},
++		{"a nonzero exit", Said{Err: "warned", Code: 3}, ""},
++		{"a clean run", Said{Out: "said"}, ""},
++	}
++	for _, one := range cases {
++		fault := one.said.Fault()
++		switch {
++		case one.fault == "" && fault != nil:
++			t.Errorf("%s carries the fault %v, and wants none", one.name, fault)
++		case one.fault != "" && (fault == nil || fault.Error() != one.fault):
++			t.Errorf("%s carries %v, and wants the fault %q", one.name, fault, one.fault)
++		}
++	}
++}
+diff --git a/src/pull/door.go b/src/pull/door.go
+index 3afc944..f0f1aa4 100644
+--- a/src/pull/door.go
++++ b/src/pull/door.go
+@@ -5,7 +5,6 @@
+ package pull
+ 
+ import (
+-	"errors"
+ 	"os"
+ 	"path/filepath"
+ 	"sort"
+@@ -156,8 +155,8 @@ func (one TreeDisk) Remove(path string) error { return one.Tree.Remove(path) }
+ func ShellOver(run proc.Runner, root string) Shell {
+ 	return func(line string) (string, int, error) {
+ 		said := run(proc.Command{Argv: []string{"sh", "-c", line}, Dir: root})
+-		if said.Code == proc.NotStarted {
+-			return "", 0, errors.New(said.Err)
++		if fault := said.Fault(); fault != nil {
++			return "", 0, fault
+ 		}
+ 		return said.Out, said.Code, nil
+ 	}
+diff --git a/src/pull/shell_test.go b/src/pull/shell_test.go
+index c777693..7dd6627 100644
+--- a/src/pull/shell_test.go
++++ b/src/pull/shell_test.go
+@@ -55,4 +55,10 @@ func TestTheShellRunsALineThroughShInTheRootAndReadsAProgramThatNeverStartsAsAFa
+ 	if _, _, err := ShellOver(nobody.Run, "the/root")("echo said"); err == nil {
+ 		t.Error("the shell reads a program that never starts as no fault")
+ 	}
++	killed := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said {
++		return proc.Said{Code: proc.Signalled}
++	}}}
++	if _, _, err := ShellOver(killed.Run, "the/root")("sleep 9"); err == nil {
++		t.Error("the shell reads a run a signal ends as no fault")
++	}
+ }
+diff --git a/src/quack/voice_verb.go b/src/quack/voice_verb.go
+index 6b1e838..851b736 100644
+--- a/src/quack/voice_verb.go
++++ b/src/quack/voice_verb.go
+@@ -4,7 +4,6 @@
+ package main
+ 
+ import (
+-	"errors"
+ 	"io"
+ 	"os"
+ 	"time"
+@@ -69,8 +68,8 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
+ func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
+ 	return func(argv []string, cwd string) (string, error) {
+ 		said := run(proc.Command{Argv: argv, Dir: cwd})
+-		if said.Code == proc.NotStarted {
+-			return "", errors.New(said.Err)
++		if fault := said.Fault(); fault != nil {
++			return "", fault
+ 		}
+ 		return said.Out, nil
+ 	}
+diff --git a/src/quack/voice_verb_test.go b/src/quack/voice_verb_test.go
+index 27ee4b6..1515563 100644
+--- a/src/quack/voice_verb_test.go
++++ b/src/quack/voice_verb_test.go
+@@ -169,6 +169,17 @@ func TestVoiceRunsValeKeepsTheOutputOfAFailedExit(t *testing.T) {
+ 	}
+ }
+ 
++func TestVoiceRunsValeAnswersAFaultForAValeASignalEnds(t *testing.T) {
++	t.Parallel()
++	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
++		return proc.Said{Out: "{}\n", Code: proc.Signalled}
++	}}}
++	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
++	if err == nil || said != "" {
++		t.Fatalf("a Vale a signal ends answers %q %v, and wants a fault", said, err)
++	}
++}
++
+ func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
+ 	t.Parallel()
+ 	fake := &proc.FakeRunner{}

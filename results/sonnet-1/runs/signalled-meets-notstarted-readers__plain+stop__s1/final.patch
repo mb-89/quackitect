@@ -1,0 +1,63 @@
+diff --git a/src/pull/door.go b/src/pull/door.go
+index 3afc944..6cc7757 100644
+--- a/src/pull/door.go
++++ b/src/pull/door.go
+@@ -156,7 +156,7 @@ func (one TreeDisk) Remove(path string) error { return one.Tree.Remove(path) }
+ func ShellOver(run proc.Runner, root string) Shell {
+ 	return func(line string) (string, int, error) {
+ 		said := run(proc.Command{Argv: []string{"sh", "-c", line}, Dir: root})
+-		if said.Code == proc.NotStarted {
++		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
+ 			return "", 0, errors.New(said.Err)
+ 		}
+ 		return said.Out, said.Code, nil
+diff --git a/src/pull/shell_test.go b/src/pull/shell_test.go
+index c777693..8eb3585 100644
+--- a/src/pull/shell_test.go
++++ b/src/pull/shell_test.go
+@@ -56,3 +56,13 @@ func TestTheShellRunsALineThroughShInTheRootAndReadsAProgramThatNeverStartsAsAFa
+ 		t.Error("the shell reads a program that never starts as no fault")
+ 	}
+ }
++
++func TestTheShellReadsARunASignalEndsAsAFault(t *testing.T) {
++	t.Parallel()
++	sh := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said {
++		return proc.Said{Err: "killed", Code: proc.Signalled}
++	}}}
++	if _, _, err := ShellOver(sh.Run, "the/root")("sleep 9"); err == nil {
++		t.Error("the shell reads a run a signal ends as no fault")
++	}
++}
+diff --git a/src/quack/voice_verb.go b/src/quack/voice_verb.go
+index 6b1e838..36441aa 100644
+--- a/src/quack/voice_verb.go
++++ b/src/quack/voice_verb.go
+@@ -69,7 +69,7 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
+ func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
+ 	return func(argv []string, cwd string) (string, error) {
+ 		said := run(proc.Command{Argv: argv, Dir: cwd})
+-		if said.Code == proc.NotStarted {
++		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
+ 			return "", errors.New(said.Err)
+ 		}
+ 		return said.Out, nil
+diff --git a/src/quack/voice_verb_test.go b/src/quack/voice_verb_test.go
+index 27ee4b6..d305e59 100644
+--- a/src/quack/voice_verb_test.go
++++ b/src/quack/voice_verb_test.go
+@@ -178,3 +178,14 @@ func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
+ 		t.Fatalf("a Vale that never starts answers %q %v, and wants the fault %q", said, err, want)
+ 	}
+ }
++
++func TestVoiceRunsValeAnswersAFaultForAValeASignalEnds(t *testing.T) {
++	t.Parallel()
++	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
++		return proc.Said{Err: "killed", Code: proc.Signalled}
++	}}}
++	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
++	if err == nil || said != "" {
++		t.Fatalf("a Vale a signal ends answers %q %v, and wants a fault", said, err)
++	}
++}

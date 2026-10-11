@@ -109,6 +109,13 @@ def tree_from_patch(repo, task, patch_path, dest):
     patch_path = os.path.abspath(patch_path)
     export(repo, task["base"], dest)
     sh(["git", "init", "-q"], cwd=dest)
+    if not os.path.exists(patch_path) and os.path.exists(patch_path + ".gz"):
+        # a patch past 5 MB is published gzipped (publish.sh)
+        import gzip
+        plain = os.path.join(os.path.dirname(dest), "final.patch")
+        with gzip.open(patch_path + ".gz", "rb") as src, open(plain, "wb") as out:
+            shutil.copyfileobj(src, out)
+        patch_path = plain
     if os.path.getsize(patch_path) == 0:
         return True
     r = sh(["git", "apply", "--whitespace=nowarn", "--exclude=spec/tickets/*", "--exclude=.se/*", patch_path],
@@ -148,8 +155,34 @@ def run_check(tree, env, timeout=1800):
             out, code = str(x.stdout or "")[-5000:] + "TIMEOUT", -1
     arms.stop_servers(tree)
     red = sorted(set(RED_RE.findall(out)))
+    findings = findings_of(out)
     return {"exit": code, "red": red, "secs": round(time.time() - t0, 1), "install_rc": rc,
-            "tail": out[-2500:]}
+            "findings": findings[:60], "n_findings": len(findings),
+            "timeouts": any(TIMEOUT_RE.search(f) for f in findings) or code == -1, "tail": out[-2500:]}
+
+
+# a part that went red because something took too long: the machine's load, not the change
+TIMEOUT_RE = re.compile(r"did not finish within|WaitDelay expired|deadline exceeded|TIMEOUT|timed out")
+
+
+def findings_of(out):
+    """What made a part red: the check's own list of red cases, a lint finding
+    (file:line[:col]: Rule: ...), a failed Go test, a build error, a step that timed out."""
+    found, in_red = [], False
+    for ln in out.splitlines():
+        s = ln.strip()
+        if s.startswith("The red cases:"):
+            in_red = True
+            continue
+        if in_red:
+            if s and ln[:1] in (" ", "\t"):
+                found.append(s)
+                continue
+            in_red = False
+        if (re.match(r"^\S+:\d+(:\d+)?:? [A-Za-z][\w./-]*:", s) or ln.startswith("--- FAIL")
+                or "[build failed]" in ln or TIMEOUT_RE.search(s) or s.endswith("answers red, and the parts beside it ran on.")):
+            found.append(s)
+    return [f[:240] for f in found]
 
 
 def check_env(workdir):
@@ -251,6 +284,38 @@ def grade_one(repo, task, run_dir, check_mode, keep):
     return g
 
 
+def attempts_of(g):
+    """The check's attempts so far (a check recorded before attempts were kept is one attempt)."""
+    c = g.get("check") or {}
+    if "attempts" in c:
+        return list(c["attempts"])
+    if c:
+        return [{"exit": c["exit"], "red": c["red"], "secs": c.get("secs"), "load_start": None,
+                 "findings_new": c.get("findings_new", []), "timeouts": None, "tail": c.get("tail", ""),
+                 "when": c.get("when")}]
+    return []
+
+
+def need_attempt(g, reps):
+    """Another attempt is due while no attempt came out green and fewer than reps were made."""
+    att = attempts_of(g)
+    return not att or (not any(x["exit"] == 0 for x in att) and len(att) < reps)
+
+
+def fold_check(att, bc):
+    """Green if any attempt came out green: a red that does not come back on an idle machine is
+    the machine's. Red parts are the ones red in every attempt."""
+    green = any(x["exit"] == 0 for x in att)
+    red = [] if green else sorted(set.intersection(*[set(x["red"]) for x in att]))
+    new_red = sorted(set(red) - set(bc["red"]))
+    last = att[-1]
+    return {"exit": 0 if green else last["exit"], "red": red, "base_red": bc["red"], "base_exit": bc["exit"],
+            "new_red": new_red, "pass": green, "flaky": green and any(x["exit"] != 0 for x in att),
+            "no_regression": not new_red and (green or bc["exit"] != 0),
+            "findings_new": last.get("findings_new", []), "secs": last.get("secs"), "tail": last.get("tail", ""),
+            "attempts": att, "when": last.get("when")}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tasks", required=True)
@@ -264,9 +329,12 @@ def main():
                     help="run the deferred full checks: every graded run that the --check mode selects and "
                          "that has no check yet (needs the run's scratch tree), on an idle machine")
     ap.add_argument("--cleanup", action="store_true", help="delete the scratch trees of fully graded runs")
+    ap.add_argument("--only", default="", help="comma-separated tasks for --checks-only")
     ap.add_argument("--regrade-hidden", action="store_true",
                     help="grade the hidden tests again from each run's final.patch (after tasks.jsonl changed)")
     ap.add_argument("--nice", type=int, default=19, help="grade at low priority, in the sessions' idle time")
+    ap.add_argument("--reps", type=int, default=3,
+                    help="--checks-only: attempts at most per run while none comes out green (default 3)")
     a = ap.parse_args()
     os.nice(a.nice)
     os.makedirs(os.path.join(WORK, "tmp"), exist_ok=True)
@@ -282,25 +350,31 @@ def main():
             if g.get("status") != "graded":
                 continue
             want = a.check == "all" or (a.check == "pass" and (g.get("hidden") or {}).get("pass"))
-            if a.checks_only and want and "check" not in g:
+            if a.only and rid.split("__")[0] not in a.only.split(","):
+                want = False
+            if a.checks_only and want and need_attempt(g, a.reps):
                 t = tasks[rid.split("__")[0]]
                 run_repo = os.path.join(meta["scratch"], "quackitect")
                 if not os.path.isdir(run_repo):
                     print(f"{rid}: scratch tree gone, no check", flush=True)
                     continue
-                wd = tempfile.mkdtemp(prefix="ck-", dir=os.path.join(WORK, "tmp"))
-                try:
-                    bc = base_check(a.repo, t)
-                    ac = agent_check(t, run_repo, meta["final_tree"], meta["start_commit"], wd)
-                finally:
-                    shutil.rmtree(wd, ignore_errors=True)
-                new_red = sorted(set(ac["red"]) - set(bc["red"]))
-                g["check"] = {"exit": ac["exit"], "red": ac["red"], "base_red": bc["red"], "base_exit": bc["exit"],
-                              "new_red": new_red, "pass": ac["exit"] == 0,
-                              "no_regression": not new_red and (ac["exit"] == 0 or bc["exit"] != 0),
-                              "secs": ac["secs"], "tail": ac["tail"][-1500:], "when": now()}
-                write_json(gp, g)
-                print(f"{now()} {rid:70s} check={ac['exit'] == 0} red={ac['red']} base_red={bc['red']}", flush=True)
+                while need_attempt(g, a.reps):
+                    load = open("/proc/loadavg").read().split()[0]
+                    wd = tempfile.mkdtemp(prefix="ck-", dir=os.path.join(WORK, "tmp"))
+                    try:
+                        bc = base_check(a.repo, t)
+                        ac = agent_check(t, run_repo, meta["final_tree"], meta["start_commit"], wd)
+                    finally:
+                        shutil.rmtree(wd, ignore_errors=True)
+                    base_f = set(bc.get("findings", []))
+                    att = attempts_of(g) + [{
+                        "exit": ac["exit"], "red": ac["red"], "secs": ac["secs"], "load_start": float(load),
+                        "findings_new": [f for f in ac.get("findings", []) if f not in base_f][:40],
+                        "timeouts": ac.get("timeouts"), "tail": ac["tail"][-1500:], "when": now()}]
+                    g["check"] = fold_check(att, bc)
+                    write_json(gp, g)
+                    print(f"{now()} {rid:70s} attempt {len(att)} load {load} check={ac['exit'] == 0} "
+                          f"red={ac['red']} base_red={bc['red']} timeouts={ac.get('timeouts')}", flush=True)
             if a.cleanup and (not want or "check" in g):
                 shutil.rmtree(meta["scratch"], ignore_errors=True)
         return

@@ -1,0 +1,15 @@
+2026-10-11T04:47:36Z hand-spawn-skips-session-tag__plain+stop__s1                           graded hidden=True f2p=[257, 257] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T04:52:14Z hand-spawn-skips-session-tag__plain__s1                                graded hidden=False f2p=[255, 257] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T05:13:51Z hand-spawn-skips-session-tag__v5__s1                                   graded hidden=True f2p=[257, 257] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T05:16:06Z tui-swap-fails-loud__plain+stop__s1                                    graded hidden=False f2p=[439, 440] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T05:17:22Z tui-swap-fails-loud__plain__s1                                         graded hidden=True f2p=[440, 440] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T06:03:36Z tui-swap-fails-loud__v5__s1                                            graded hidden=False f2p=[439, 440] p2p=[0, 0] check=None new_red=None outside=1
+2026-10-11T06:45:29Z index-why-prints-text__v5__s1                                          graded hidden=True f2p=[1, 1] p2p=[166, 166] check=None new_red=None outside=0
+2026-10-11T06:46:33Z index-why-prints-text__plain+stop__s1                                  graded hidden=True f2p=[1, 1] p2p=[166, 166] check=None new_red=None outside=0
+2026-10-11T06:47:50Z index-why-prints-text__plain__s1                                       graded hidden=True f2p=[1, 1] p2p=[166, 166] check=None new_red=None outside=0
+2026-10-11T06:49:01Z check-errors-names-the-part__plain+stop__s1                            graded hidden=False f2p=[170, 171] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T06:53:32Z check-errors-names-the-part__plain__s1                                 graded hidden=False f2p=[170, 171] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T07:16:17Z check-errors-names-the-part__v5__s1                                    graded hidden=False f2p=[170, 171] p2p=[0, 0] check=None new_red=None outside=0
+2026-10-11T08:02:17Z signalled-meets-notstarted-readers__v5__s1                             graded hidden=True f2p=[2, 2] p2p=[519, 519] check=None new_red=None outside=2
+2026-10-11T08:08:43Z signalled-meets-notstarted-readers__plain__s1                          graded hidden=False f2p=[0, 2] p2p=[519, 519] check=None new_red=None outside=0
+2026-10-11T08:10:06Z signalled-meets-notstarted-readers__plain+stop__s1                     graded hidden=True f2p=[2, 2] p2p=[519, 519] check=None new_red=None outside=0

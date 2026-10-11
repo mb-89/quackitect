@@ -1,0 +1,131 @@
+[
+ {
+  "run": "check-errors-names-the-part__v5__s1",
+  "others": [
+   "check-reads-the-road-root"
+  ],
+  "others_closed": [
+   "check-reads-the-road-root"
+  ],
+  "others_from_backlog": [
+   "check-reads-the-road-root"
+  ],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.109,
+  "other_secs": 280,
+  "session_secs": 1263,
+  "other_turns": 7,
+  "turns": 62,
+  "by_ticket_secs": {
+   "check-errors-names-the-part": 789,
+   "check-reads-the-road-root": 280,
+   "the-bench-work": 194
+  },
+  "batch": "sonnet-1"
+ },
+ {
+  "run": "hand-spawn-skips-session-tag__v5__s1",
+  "others": [
+   "hand-line-stands-twice"
+  ],
+  "others_closed": [],
+  "others_from_backlog": [],
+  "others_minted": [
+   "hand-line-stands-twice"
+  ],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.127,
+  "other_secs": 183,
+  "session_secs": 1230,
+  "other_turns": 9,
+  "turns": 95,
+  "by_ticket_secs": {
+   "hand-spawn-skips-session-tag": 868,
+   "the-bench-work": 140,
+   "kit-drops-the-own-spawn": 40,
+   "hand-line-stands-twice": 183
+  },
+  "batch": "sonnet-1"
+ },
+ {
+  "run": "index-why-prints-text__v5__s1",
+  "others": [
+   "lint-row-keeps-floor"
+  ],
+  "others_closed": [
+   "lint-row-keeps-floor"
+  ],
+  "others_from_backlog": [
+   "lint-row-keeps-floor"
+  ],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.287,
+  "other_secs": 477,
+  "session_secs": 2435,
+  "other_turns": 28,
+  "turns": 96,
+  "by_ticket_secs": {
+   "index-why-prints-text": 1170,
+   "lint-row-keeps-floor": 477,
+   "the-bench-work": 788
+  },
+  "batch": "sonnet-1"
+ },
+ {
+  "run": "signalled-meets-notstarted-readers__v5__s1",
+  "others": [
+   "quack-spawns-all-take-the-runner",
+   "spawn-stubs-match-the-draft"
+  ],
+  "others_closed": [],
+  "others_from_backlog": [
+   "quack-spawns-all-take-the-runner",
+   "spawn-stubs-match-the-draft"
+  ],
+  "others_minted": [],
+  "group_state": "open",
+  "task_state": "closed",
+  "other_cost_share": 0.155,
+  "other_secs": 171,
+  "session_secs": 2503,
+  "other_turns": 9,
+  "turns": 78,
+  "by_ticket_secs": {
+   "signalled-meets-notstarted-readers": 2315,
+   "the-bench-work": 17,
+   "spawn-stubs-match-the-draft": 171
+  },
+  "batch": "sonnet-1"
+ },
+ {
+  "run": "tui-swap-fails-loud__v5__s1",
+  "others": [
+   "vehicle-test-comment-current"
+  ],
+  "others_closed": [
+   "vehicle-test-comment-current"
+  ],
+  "others_from_backlog": [
+   "vehicle-test-comment-current"
+  ],
+  "others_minted": [],
+  "group_state": "closed",
+  "task_state": "closed",
+  "other_cost_share": 0.167,
+  "other_secs": 831,
+  "session_secs": 2677,
+  "other_turns": 14,
+  "turns": 76,
+  "by_ticket_secs": {
+   "tui-swap-fails-loud": 1540,
+   "vehicle-test-comment-current": 831,
+   "the-bench-work": 305
+  },
+  "batch": "sonnet-1"
+ }
+]

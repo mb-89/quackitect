@@ -3,13 +3,12 @@
  "graded": "2026-10-11T04:18:07Z",
  "hidden": {
   "f2p": [
-   1,
+   2,
    4
   ],
   "f2p_failed": [
    "src/proc:TestACommandNamingNoProgramAnswersNotStarted",
-   "src/proc:TestARunReadsItsInput",
-   "src/proc:TestARunStandsInItsFolder"
+   "src/proc:TestARunReadsItsInput"
   ],
   "p2p": [
    1,
@@ -20,7 +19,7 @@
   "pkgs": {
    "src/proc": "fail"
   },
-  "tail": "[src/proc:TestACommandNamingNoProgramAnswersNotStarted]\nquackitect/src/proc.TestACommandNamingNoProgramAnswersNotStarted(0xc000130700)\n\t/tmp/claude-0/-home-user/<redacted:CLAUDE_CODE_SESSION_ID>/scratchpad/bw/tmp/rg-nhm3r5xj/hidden/src/proc/proc_contract_test.go:83 +0x295\ntesting.tRunner(0xc000130700, 0x59bdc0)\n\t/usr/local/go1.24.7/src/testing/testing.go:1792 +0xf4\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go1.24.7/src/testing/testing.go:1851 +0x413\nFAIL\tquackitect/src/proc\t0.008s"
+  "tail": "[src/proc:TestACommandNamingNoProgramAnswersNotStarted]\nquackitect/src/proc.TestACommandNamingNoProgramAnswersNotStarted(0xc0000b0700)\n\t/tmp/claude-0/-home-user/<redacted:CLAUDE_CODE_SESSION_ID>/scratchpad/bw/tmp/rg-7hu7pg3_/hidden/src/proc/proc_contract_test.go:83 +0x295\ntesting.tRunner(0xc0000b0700, 0x59bdc0)\n\t/usr/local/go1.24.7/src/testing/testing.go:1792 +0xf4\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go1.24.7/src/testing/testing.go:1851 +0x413\nFAIL\tquackitect/src/proc\t0.021s"
  },
  "hidden_first": {
   "f2p": [
@@ -45,7 +44,7 @@
   "secs": 0.6,
   "tail": "[src/proc:TestACommandNamingNoProgramAnswersNotStarted]\nquackitect/src/proc.TestACommandNamingNoProgramAnswersNotStarted(0xc000082fc0)\n\t/tmp/claude-0/-home-user/<redacted:CLAUDE_CODE_SESSION_ID>/scratchpad/bw/tmp/g-mp_t1ooe/hidden/src/proc/proc_contract_test.go:83 +0x295\ntesting.tRunner(0xc000082fc0, 0x59bdc0)\n\t/usr/local/go1.24.7/src/testing/testing.go:1792 +0xf4\ncreated by testing.(*T).Run in goroutine 1\n\t/usr/local/go1.24.7/src/testing/testing.go:1851 +0x413\nFAIL\tquackitect/src/proc\t0.018s"
  },
- "regraded": "2026-10-11T04:37:01Z",
+ "regraded": "2026-10-11T07:06:21Z",
  "run": "proc-empty-argv-never-starts__v5__s1",
  "scope": {
   "code_files": 0,

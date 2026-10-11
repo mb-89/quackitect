@@ -1,0 +1,8 @@
+tuiVerb prints the plain rows and asks for Go when the fresh viewer fails to swap in, on a box that holds Go, where tui.js failed loud
+
+The hidden tests call this interface, as the reference change declares it (signatures only; keep these names, parameters and results):
+
+in src/quack/ (package quack):
+  func tuiViewerOf(d tuiDoors) (string, string, error)    // changed
+
+Make this change in the repository in your working directory (a Go project; `go test ./...` runs the Go tests and `./RUNME.sh check` runs the repository's full check). Add or update tests for the change, and commit your work on the current branch when you are done.

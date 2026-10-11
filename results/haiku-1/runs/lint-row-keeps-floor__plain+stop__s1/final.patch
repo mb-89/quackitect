@@ -1,0 +1,131 @@
+diff --git a/src/quack/verb_lint.go b/src/quack/verb_lint.go
+index 0bec149..44c3343 100644
+--- a/src/quack/verb_lint.go
++++ b/src/quack/verb_lint.go
+@@ -54,7 +54,7 @@ func lintHere() (lintDoors, error) {
+ 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
+ 		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
+ 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
+-		log:   appendsRow(root, time.Now),
++		log:   keepsFloor(logFloor(root), appendsRow(root, time.Now)),
+ 		now:   time.Now,
+ 	}, nil
+ }
+diff --git a/src/quack/verbs.go b/src/quack/verbs.go
+index eac78c0..6bc51b9 100644
+--- a/src/quack/verbs.go
++++ b/src/quack/verbs.go
+@@ -17,6 +17,7 @@ import (
+ 	"time"
+ 
+ 	"quackitect/src/index"
++	logmodule "quackitect/src/modules/log"
+ 	"quackitect/src/modules/migration"
+ 	verbsmodule "quackitect/src/modules/verbs"
+ )
+@@ -212,6 +213,30 @@ func appendsRow(root string, now func() time.Time) func(row map[string]any) erro
+ 	}
+ }
+ 
++// The log's floor under the root, off the config's log.level, and empty where nothing answers it, which ranks as info. [[spec/design_output/log#what-a-box-writes]]
++func logFloor(root string) string {
++	rows, err := configAt(root)
++	if err != nil {
++		return ""
++	}
++	var floor string
++	if json.Unmarshal(rows["log.level"].Value, &floor) != nil {
++		return ""
++	}
++	return floor
++}
++
++// Writes a row only where its level stands at the floor or above it, as the JavaScript log door writes its rows. [[spec/design_output/log#what-a-box-writes]]
++func keepsFloor(floor string, write func(row map[string]any) error) func(row map[string]any) error {
++	return func(row map[string]any) error {
++		level, _ := row["level"].(string)
++		if logmodule.Rank(level) < logmodule.Rank(floor) {
++			return nil
++		}
++		return write(row)
++	}
++}
++
+ // The road over the real doors: each verb's program under node, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/cli-js-leaves]] [[spec/tickets/quack-registers-each-verb]]
+ func verbRoad(scripts string, argv []string) int {
+ 	root, err := index.Root()
+diff --git a/src/quack/verbs_test.go b/src/quack/verbs_test.go
+index e7e1098..61b1753 100644
+--- a/src/quack/verbs_test.go
++++ b/src/quack/verbs_test.go
+@@ -4,6 +4,7 @@
+ package main
+ 
+ import (
++	"errors"
+ 	"fmt"
+ 	"io"
+ 	"os"
+@@ -190,3 +191,62 @@ func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
+ 		t.Fatal("run, which the verb's program lacks, runs in the verb's program")
+ 	}
+ }
++
++// The floor reads the log's level off the config under the root. [[spec/design_output/log#what-a-box-writes]]
++func TestTheFloorReadsTheLogLevelOffTheTrackedFile(t *testing.T) {
++	root := t.TempDir()
++	at := filepath.Join(root, "spec", "config")
++	if err := os.MkdirAll(at, 0o755); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"log": {"level": "warn"}}`), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	if said := logFloor(root); said != "warn" {
++		t.Fatalf("the root reads %q, and wants warn", said)
++	}
++}
++
++// A row writes only where its level stands at the floor or above it, and an unknown floor reads as info. [[spec/design_output/log#what-a-box-writes]]
++func TestKeepsFloorWritesOnlyRowsAtOrAboveTheFloor(t *testing.T) {
++	cases := []struct {
++		floor, level string
++		kept         bool
++	}{
++		{"info", "debug", false},
++		{"info", "info", true},
++		{"warn", "debug", false},
++		{"warn", "info", false},
++		{"warn", "warn", true},
++		{"warn", "fatal", true},
++		{"debug", "debug", true},
++		{"", "debug", false},
++		{"", "info", true},
++		{"nonsense", "debug", false},
++	}
++	for _, one := range cases {
++		var rows []map[string]any
++		write := keepsFloor(one.floor, func(row map[string]any) error {
++			rows = append(rows, row)
++			return nil
++		})
++		if err := write(map[string]any{"level": one.level, "kind": "vale"}); err != nil {
++			t.Fatal(err)
++		}
++		if got := len(rows) == 1; got != one.kept {
++			t.Fatalf("floor %q, level %q: kept %v, wants %v", one.floor, one.level, got, one.kept)
++		}
++	}
++}
++
++// A row the floor drops answers no error and reaches no writer, and a row it keeps reaches the writer's error. [[spec/tickets/read-verbs-port-to-go]]
++func TestKeepsFloorPassesTheWritersError(t *testing.T) {
++	fault := errors.New("disk full")
++	write := keepsFloor("info", func(map[string]any) error { return fault })
++	if err := write(map[string]any{"level": "debug"}); err != nil {
++		t.Fatalf("a dropped row answers %v", err)
++	}
++	if err := write(map[string]any{"level": "warn"}); err != fault {
++		t.Fatalf("a kept row answers %v, and wants the writer's fault", err)
++	}
++}

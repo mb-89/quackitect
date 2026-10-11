@@ -1,4 +1,20 @@
 {
+ "check": {
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 1,
+  "new_red": [
+   "rules"
+  ],
+  "no_regression": false,
+  "pass": false,
+  "red": [
+   "rules"
+  ],
+  "secs": 176.1,
+  "tail": "er\t0.034s\nok  \tquackitect/src/proc\t0.152s\nok  \tquackitect/src/projection\t0.008s\nok  \tquackitect/src/prose\t0.186s\nok  \tquackitect/src/pull\t0.066s\nok  \tquackitect/src/q\t0.916s\nok  \tquackitect/src/q/qtest\t0.006s\nok  \tquackitect/src/q/tool\t0.014s\nok  \tquackitect/src/quack\t17.851s\nok  \tquackitect/src/ticket\t0.024s\nok  \tquackitect/src/tui\t0.283s\nok  \tquackitect/src/tui/draw\t0.070s\nok  \tquackitect/src/tui/frame\t0.010s\nok  \tquackitect/src/tui/log\t0.125s\nok  \tquackitect/src/tui/registry\t0.034s\nok  \tquackitect/src/tui/tree\t0.009s\nok  \tquackitect/src/tui/tutorial\t0.018s\nok  \tquackitect/src/tui/work\t0.102s\nok  \tquackitect/src/vehicle\t1.997s\nok  \tquackitect/src/voice\t0.008s\nok  \tquackitect/src/watcher\t1.950s\nok  \tquackitect/src/watcher/watchertest\t0.035s\nok  \tquackitect/src/yaml\t0.007s\n\nThe check's parts, in seconds:\n   96.3  go\n   42.8  rules\n   28.9  tests\n   11.0  level0\n    7.5  ready\n    2.2  plugin\n    1.3  projections\n    0.0  doors\n    0.0  server\n  143.8  in all\nThis box names no home folder, so the trust flag has no file.\nVale reads no file, so every rule it holds stands unchecked: exit status 2: {\n  \"Line\": 4,\n  \"Path\": \"/tmp/claude-0/-home-user/<redacted:CLAUDE_CODE_SESSION_ID>/scratchpad/bw/tmp/ck-fw40dyif/quackitect/spec/config/styles/VoiceParagraph/Vocabulary.yml\",\n  \"Text\": \"VoiceParagraph.Vocabulary: did not finish within 2s\",\n  \"Code\": \"E201\",\n  \"Span\": 10\n}\nVale read no file, so every rule it holds stands unchecked.\nrules answers red, and the parts beside it ran on.\n",
+  "when": "2026-10-11T07:38:44Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T03:57:55Z",
  "hidden": {
@@ -36,7 +52,7 @@
   "secs": 5.4,
   "tail": ""
  },
- "regraded": "2026-10-11T04:34:26Z",
+ "regraded": "2026-10-11T07:01:13Z",
  "run": "example-retro-gaps-shown-name__plain__s1",
  "scope": {
   "code_files": 1,

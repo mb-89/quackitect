@@ -21,6 +21,9 @@ for f in candidates2.jsonl:candidates.jsonl val2.jsonl:validation-1rep.jsonl val
   [ -f "$work/$src" ] && cp "$work/$src" "data/$dst"
 done
 rm -rf __pycache__ sigs/benchsigs
+# a run's patch past 5 MB (an agent that committed a built binary) goes up gzipped;
+# grade.py --regrade-hidden reads final.patch.gz as well
+find results -name final.patch -size +5M -exec gzip -9 {} \;
 
 python3 scrub.py --fix "$here"
 

@@ -1,0 +1,81 @@
+diff --git a/src/pull/door.go b/src/pull/door.go
+index 3afc944..e024852 100644
+--- a/src/pull/door.go
++++ b/src/pull/door.go
+@@ -152,7 +152,7 @@ func (one TreeDisk) Write(path, text string) error { return one.Tree.Write(path,
+ 
+ func (one TreeDisk) Remove(path string) error { return one.Tree.Remove(path) }
+ 
+-// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program fails to start. [[spec/design_output/doors#the-process-door]]
++// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program fails to start. A line a signal ends answers proc.Signalled as its exit, with no fault, for the command's own expectation to judge. [[spec/design_output/doors#the-process-door]]
+ func ShellOver(run proc.Runner, root string) Shell {
+ 	return func(line string) (string, int, error) {
+ 		said := run(proc.Command{Argv: []string{"sh", "-c", line}, Dir: root})
+diff --git a/src/pull/shell_test.go b/src/pull/shell_test.go
+index c777693..b3202af 100644
+--- a/src/pull/shell_test.go
++++ b/src/pull/shell_test.go
+@@ -56,3 +56,14 @@ func TestTheShellRunsALineThroughShInTheRootAndReadsAProgramThatNeverStartsAsAFa
+ 		t.Error("the shell reads a program that never starts as no fault")
+ 	}
+ }
++
++func TestTheShellReadsALineASignalEndsAsItsExitWithNoFault(t *testing.T) {
++	t.Parallel()
++	sh := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said {
++		return proc.Said{Out: "part\n", Code: proc.Signalled}
++	}}}
++	out, exit, err := ShellOver(sh.Run, "the/root")("kill -TERM $$")
++	if out != "part\n" || exit != proc.Signalled || err != nil {
++		t.Errorf("the shell answers %q, %d, %v, and wants the signalled exit with no fault", out, exit, err)
++	}
++}
+diff --git a/src/quack/voice_verb.go b/src/quack/voice_verb.go
+index 6b1e838..8618b5a 100644
+--- a/src/quack/voice_verb.go
++++ b/src/quack/voice_verb.go
+@@ -7,6 +7,7 @@ import (
+ 	"errors"
+ 	"io"
+ 	"os"
++	"strings"
+ 	"time"
+ 
+ 	"quackitect/src/index"
+@@ -65,13 +66,16 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
+ 	}
+ }
+ 
+-// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
++// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start, or that a signal ends, answers its fault, since a killed Vale leaves no whole output. [[spec/tickets/quack-spawns-meet-fake-process]]
+ func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
+ 	return func(argv []string, cwd string) (string, error) {
+ 		said := run(proc.Command{Argv: argv, Dir: cwd})
+ 		if said.Code == proc.NotStarted {
+ 			return "", errors.New(said.Err)
+ 		}
++		if said.Code == proc.Signalled {
++			return "", errors.New("vale: a signal ended the run: " + strings.TrimSpace(said.Err))
++		}
+ 		return said.Out, nil
+ 	}
+ }
+diff --git a/src/quack/voice_verb_test.go b/src/quack/voice_verb_test.go
+index 27ee4b6..40662fe 100644
+--- a/src/quack/voice_verb_test.go
++++ b/src/quack/voice_verb_test.go
+@@ -178,3 +178,14 @@ func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
+ 		t.Fatalf("a Vale that never starts answers %q %v, and wants the fault %q", said, err, want)
+ 	}
+ }
++
++func TestVoiceRunsValeAnswersAFaultForAValeASignalEnds(t *testing.T) {
++	t.Parallel()
++	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
++		return proc.Said{Out: "{", Err: "killed", Code: proc.Signalled}
++	}}}
++	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
++	if err == nil || !strings.Contains(err.Error(), "killed") || said != "" {
++		t.Fatalf("a Vale a signal ends answers %q %v, and wants a fault", said, err)
++	}
++}

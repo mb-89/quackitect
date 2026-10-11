@@ -1,0 +1,119 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; cat src/modules/hooks/spawn.go; grep -n \"spawnPrompt\" -B3 -A25 src/pull/pull_branch.go | head -80; ls src/q; cat .se/tickets/kit-drops-the-own-spawn* | head -40",
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; head -20 src/pull/pull_branch.go; grep -rn '\"quackitect/src/q\"' src/pull src/modules/hooks | head -5; head -30 src/q/q.go; grep -n \"func Test\" src/modules/hooks/spawn_test.go; sed -n 1,60p src/modules/hooks/spawn_test.go",
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; sed -n 115,200p src/modules/hooks/spawn_test.go; go list -deps ./src/q | grep quackitect",
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; \ncat >> src/q/q.go <<'EOF'\n\n// The words a pulled hand's prompt opens on, before the name it pulls under. [[spec/design_output/pull#a-hand-of-its-own]]\nconst HandOfItsOwn = \"You are a hand of your own on this box, named \"\nEOF\npy",
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; sleep 100; cat /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/tmp/claude-0/*/*/tasks/bws1n343i.output | tail -20",
+  "cd /tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1/quackitect; git add -A && git commit -qm \"Leave a pulled hand's spawn untagged where the own field is dropped\n\nCo-Authored-By: Claude Sonnet 5.5 <<redacted:git-email>>\" && git log --oneline | head -1"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/modules/hooks/spawn.go"
+  ],
+  [
+   "M",
+   "src/modules/hooks/spawn_test.go"
+  ],
+  [
+   "M",
+   "src/pull/pull_branch.go"
+  ],
+  [
+   "M",
+   "src/q/q.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.09336,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "a2b41ccb52c17a17c6093e36b0f6da34be59d281",
+ "finished": "2026-10-11T04:51:49Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  2.6396484375,
+  10.32861328125,
+  12.310546875
+ ],
+ "model": "claude-sonnet-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 5,
+  "models": {}
+ },
+ "run": "hand-spawn-skips-session-tag__plain__s1",
+ "scratch": "/tmp/qb/sonnet-1/hand-spawn-skips-session-tag__plain__s1",
+ "secs": 246.2,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 107184,
+  "cache_write": 13804,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.09336240000000001,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 244145,
+  "ended_on_question": false,
+  "final_text": "A spawn whose prompt opens on the pull's hand line now gets no session tag, with or without the `own` field. The spawn test passes, `./RUNME.sh check` exits 0, and the change is committed.\n\n- **Shared line:** `q.HandOfItsOwn` in `src/q/q.go` holds the opening of the hand line. `spawnPrompt` in `src/pull/pull_branch.go` now builds its first line from it.\n- **Spawn answer:** `src/modules/hooks/spawn.go` skips the tag when `own` is set or the trimmed prompt starts with that line.\n- **Test:** a new case in `src/modules/hooks/spawn_test.go` posts a spawn with the hand line and no `own` field. It reads no tag.\n\nThe new test case only checks that no tag is added. It does not check that the prompt comes through unchanged.\n\nI couldn't find `.se/tickets/kit-drops-the-own-spawn`, so I worked from your description alone.",
+  "hook_denials": 0,
+  "input_tokens": 14,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-sonnet-5-5": {
+    "cache_read": 107184,
+    "cache_write": 13804,
+    "cost": 0.09336240000000001,
+    "in": 14,
+    "out": 2740
+   }
+  },
+  "models": {
+   "claude-sonnet-5-5": 7
+  },
+  "output_tokens": 383,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.08,
+   "seven_day": 0.09
+  },
+  "result_subtype": "success",
+  "result_turns": 7,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 6,
+  "tools": {
+   "Bash": 6
+  },
+  "turns": 7,
+  "usage_by_model": {
+   "claude-sonnet-5-5": [
+    14,
+    383,
+    13804,
+    107184
+   ]
+  }
+ },
+ "setup_secs": 27.1,
+ "start_commit": "b0f5ab50cb6bd6d07dc9749730820e51aef7eaa1",
+ "start_tree": "837472a9f12574deaf93d08773ec45fc8db631a2",
+ "started": "2026-10-11T04:47:15Z",
+ "status": "ran",
+ "ticket": "hand-spawn-skips-session-tag",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

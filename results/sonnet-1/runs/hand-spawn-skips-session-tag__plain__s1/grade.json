@@ -1,0 +1,63 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T04:52:06Z",
+ "hidden": {
+  "f2p": [
+   255,
+   257
+  ],
+  "f2p_failed": [
+   "src/pull:TestTheHandPromptOpensOnTheHandLine",
+   "src/q:TestTheHandLineTakesANameAfterIt"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/modules/hooks": "ok",
+   "src/pull": "fail",
+   "src/q": "fail"
+  },
+  "tail": "[src/pull:TestTheHandPromptOpensOnTheHandLine]\n    pull_test.go:341: the prompt opens on \"You are a hand of your own on this box, named helper-1, and you work one step of one ticket.\"\n--- FAIL: TestTheHandPromptOpensOnTheHandLine (0.00s)\n[src/q:TestTheHandLineTakesANameAfterIt]\n    event_test.go:16: the hand line reads \"You are a hand of your own on this box, named \"\n--- FAIL: TestTheHandLineTakesANameAfterIt (0.00s)\nFAIL\nFAIL\tquackitect/src/pull\t0.044s\nFAIL\nFAIL\tquackitect/src/q\t0.145s"
+ },
+ "hidden_first": {
+  "f2p": [
+   255,
+   257
+  ],
+  "f2p_failed": [
+   "src/pull:TestTheHandPromptOpensOnTheHandLine",
+   "src/q:TestTheHandLineTakesANameAfterIt"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/modules/hooks": "ok",
+   "src/pull": "fail",
+   "src/q": "fail"
+  },
+  "secs": 5.6,
+  "tail": "[src/pull:TestTheHandPromptOpensOnTheHandLine]\n    pull_test.go:341: the prompt opens on \"You are a hand of your own on this box, named helper-1, and you work one step of one ticket.\"\n--- FAIL: TestTheHandPromptOpensOnTheHandLine (0.00s)\n[src/q:TestTheHandLineTakesANameAfterIt]\n    event_test.go:16: the hand line reads \"You are a hand of your own on this box, named \"\n--- FAIL: TestTheHandLineTakesANameAfterIt (0.00s)\nFAIL\nFAIL\tquackitect/src/pull\t0.080s\nFAIL\nFAIL\tquackitect/src/q\t0.194s"
+ },
+ "regraded": "2026-10-11T08:13:34Z",
+ "run": "hand-spawn-skips-session-tag__plain__s1",
+ "scope": {
+  "code_files": 3,
+  "files": 4,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 4,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

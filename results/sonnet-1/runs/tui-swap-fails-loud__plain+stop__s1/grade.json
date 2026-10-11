@@ -1,0 +1,57 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T05:15:21Z",
+ "hidden": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTwinGoldens"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "tail": "he file holds 799. Split it by topic.} {src/modules/queue/testdata/queue.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 6209. Split it by topic.} {src/quack/quack FileCeiling 1 A file holds 600 lines, and the file holds 152731. Split it by topic.} {src/quack/testdata/readers.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 1937. Split it by topic.} {src/quack/testdata/readers.schema.json FileCeiling 1 A f\nile holds 600 lines, and the file holds 731. Split it by topic.} {src/quack/testdata/tree.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 5209. Split it by topic.}]. Run go test ./src/quack -run TestTwinGoldens -twins, and read the difference at the merge\n--- FAIL: TestTwinGoldens (7.59s)\nFAIL\nFAIL\tquackitect/src/quack\t27.896s"
+ },
+ "hidden_first": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTwinGoldens"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "secs": 40.7,
+  "tail": ".md FileCeiling 1 A file holds 600 lines, and the file holds 704. Split it by topic.} {spec/tickets/verbs-read-two-roots.md FileCeiling 1 A file holds 600 lines, and the file holds 674. Split it by topic.} {spec/vocabulary/core.yml FileCeiling 1 A file holds 600 lines, and the file holds 19534. Split it by topic.} {src/extension/webview/package-lock.json FileCeiling 1 A file holds 600 lines, and the file holds 799. Split it by topic.} {src/modules/queue/testdata/queue.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 6209. Split it by topic.} {src/quack/quack FileCeiling 1 A file holds 600 lines, and the file holds 152731. Split it by topic.} {src/quack/testdata/readers.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 1937. Split it by topic.} {src/quack/testdata/readers.schema.json FileCeiling 1 A f\nile holds 600 lines, and the file holds 731. Split it by topic.} {src/quack/testdata/tree.golden.json FileCeiling 1 A file holds 600 lines, and the file holds 5209. Split it by topic.}]. Run go test ./src/quack -run TestTwinGoldens -twins, and read the difference at the merge\n--- FAIL: TestTwinGoldens (8.73s)\nFAIL\nFAIL\tquackitect/src/quack\t32.687s"
+ },
+ "regraded": "2026-10-11T08:16:52Z",
+ "run": "tui-swap-fails-loud__plain+stop__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 3,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 1,
+  "outside": [],
+  "own_files": 3,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

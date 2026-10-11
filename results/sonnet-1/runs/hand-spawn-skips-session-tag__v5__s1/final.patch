@@ -1,0 +1,563 @@
+diff --git a/spec/tickets/hand-line-stands-twice.md b/spec/tickets/hand-line-stands-twice.md
+new file mode 100644
+index 0000000..c1fd041
+--- /dev/null
++++ b/spec/tickets/hand-line-stands-twice.md
+@@ -0,0 +1,76 @@
++---
++kind: [[ticket]]
++state: draft
++steps:
++  - name: do
++    does: makes the change, with the test that covers it
++    from: anyone
++    by: anyone
++    to: retro
++    input: ask
++    tags: ["code", "testing"]
++    needs: ["branch test"]
++    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
++    evidence:
++      - name: tests
++        form: command
++        expects: green
++        says: the tests that cover the change, or the check where it touches no code
++      - name: check
++        form: command
++        expects: 0
++        says: the check is green on the commit
++      - name: says
++        form: text
++        says: what changes and why, for a reader who was not there
++process: [[spec/processes/trivial]]
++process_hash: 2b5ab398855a1aba
++---
++
++# Ask
++
++<!-- gain, as text: what is gained by doing it, and not only what it does -->
++<!-- breaks, as text: what breaks if it is never done -->
++<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
++
++gain: The hand line the pull spawn script writes stands once, so the Go pull and the script cannot drift apart.
++
++breaks: The script `src/scripts/pull-spawn.js` carries its own copy of the line `q.HandOfItsOwn` holds. A change to one leaves the spawn answer reading a line the script no longer writes.
++
++done_when:
++- the script reads the line from one source with the Go constant, decided by `./RUNME.sh check`
++- `./RUNME.sh check` exits 0
++
++view: none
++
++# do
++
++<!-- makes the change, with the test that covers it -->
++
++## tests
++
++<!-- the tests that cover the change, or the check where it touches no code -->
++
++<!-- the form is command -->
++
++## check
++
++<!-- the check is green on the commit -->
++
++<!-- the form is command -->
++
++## says
++
++<!-- what changes and why, for a reader who was not there -->
++
++<!-- the form is text -->
++
++## checked
++
++<!-- one line per item of the checklist, on how you take it into account -->
++
++<!-- the form is checklist -->
++
++# Discussion
++
++<!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/hand-spawn-skips-session-tag.md b/spec/tickets/hand-spawn-skips-session-tag.md
+index 6db6714..9133a33 100644
+--- a/spec/tickets/hand-spawn-skips-session-tag.md
++++ b/spec/tickets/hand-spawn-skips-session-tag.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ step: do
++record:
++  - step: do
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: 8c406bb0740e484fe2ec162afafd5b2f9d6c807f
++    hash_after: 03da050a1b9a5ab4413ba885e1fedda8f99cadbf
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/modules/hooks passes; green, src/pull passes; green, src/q passes
++      - name: check
++        exit: 0
++        said: "   69.2  in all"
++    inputs:
++      - name: ask
++        hash: 6c4061e29f351bd2
++        size: 922
++    def: df12650931d480c9
++reason: done
+ ---
+ 
+ # Ask
+@@ -60,27 +78,33 @@ in src/q/ (package q):
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch test
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++q.HandOfItsOwn names the words the pull hand prompt opens on. The pull writes its prompt from it, and the spawn answer in src/modules/hooks/spawn.go adds no session tag to a prompt opening on it, own field or none. A hand the pull spawns then keeps the --as its prompt gives.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask: the spawn answer leaves the hand-line prompt untagged, and a case in spawn_test.go feeds it with no own field
++- the hand line stood in the Go pull code alone and now stands once in q; the JavaScript copy in src/scripts/pull-spawn.js is left alone
++- the line stands in q.HandOfItsOwn alone, and the pull and the spawn answer read it
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index ec1e804..29f096f 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: sync
+     does: takes trunk into the branch, so the box works on the latest
+@@ -83,8 +83,87 @@ steps:
+             says: every person step parked, every ticket minted with no group, and what the handover says
+ process: [[spec/processes/group]]
+ process_hash: d9f9539fef3ec913
+-step: sync
+-cloud: true
++step: retro/cloud
++record:
++  - step: sync
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: 40061f96c837d4afab1dbcc76093b20217be0460
++    hash_after: 84396bf9e319ec3ac4d566841a60197b35df3aa8
++    model: claude-sonnet-5-5
++    cost: 3
++    final: the spawn answer leaves the pull's hand-line prompt untagged, check green
++  - step: sync
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: a114733817bfc3e8dc74fef2cf3f8afa4d05e771
++    hash_after: a114733817bfc3e8dc74fef2cf3f8afa4d05e771
++    answered:
++      - name: sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    def: 8a9850a81227554b
++  - step: split
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: b1c25ec3cae3199fd01fad1c5dc6c44b7035a03f
++    hash_after: b1c25ec3cae3199fd01fad1c5dc6c44b7035a03f
++    inputs:
++      - name: ask
++        hash: 92f06230e991b6b1
++        size: 741
++    def: 19b6849b1f151cd5
++  - step: children
++    hand: the engine
++    hash_before: 72b6c1e0680c95316b53f491f037cfb24204d164
++    hash_after: 72b6c1e0680c95316b53f491f037cfb24204d164
++  - step: accept
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: f77158f4f4c8f883009ac919eb4e4efa676d5da9
++    hash_after: f77158f4f4c8f883009ac919eb4e4efa676d5da9
++    answered:
++      - name: sync/sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    inputs:
++      - name: ask
++        hash: 92f06230e991b6b1
++        size: 741
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++    def: 07c43ae7253713ec
++  - step: retro/notes
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: 012ba415dd1734040324d3d8c0325f704e7756c9
++    hash_after: 012ba415dd1734040324d3d8c0325f704e7756c9
++    answered:
++      - name: drained
++        exit: 0
++        said: .se/tickets holds no open note, so the box leaves nothing behind.
++    def: cb5a549f0e587fc2
++  - step: retro/write
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: 1e68588ed6fa03ad35682466357a0dc9eb57165c
++    hash_after: 1e68588ed6fa03ad35682466357a0dc9eb57165c
++    inputs:
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++      - name: retro/notes
++        hash: 310d2ddd3fe31ac9
++        size: 36
++    def: e7ed0badf886b5b5
++  - step: retro/cloud
++    hand: box 7b9429949d92 · claude-code-remote
++    hash_before: 62a5f616038b8077db7148ae89d67acd955c25eb
++    hash_after: 62a5f616038b8077db7148ae89d67acd955c25eb
++    inputs:
++      - name: retro/write
++        hash: e116f76fa2cd8c45
++        size: 965
++      - name: [[spec/design_output/pull]]
++        hash: 1aec3576bd619abb
++        size: 47537
++    def: 4da1ca5da87d5bbc
++reason: done
+ ---
+ 
+ # Ask
+@@ -109,9 +188,10 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ## sync
+ 
+ <!-- branch sync, so the branch carries trunk -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch sync
++
+ # split
+ 
+ <!-- reads the standing children, and mints more where the goal needs them, each naming this group -->
+@@ -119,15 +199,21 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ## children
+ 
+ <!-- every child as a link, one a line, with its process -->
+-
+ <!-- the form is list -->
+ 
++- [[hand-spawn-skips-session-tag]] (trivial, closed)
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the one child is a single small review
++- the child covers the whole ask
++- no child waits on another
++- there are no siblings to read from
++- the diff stays within one review
++
+ # children
+ 
+ # accept
+@@ -137,9 +223,10 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ## verdict
+ 
+ <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+-
+ <!-- the form is verdict -->
+ 
++accept
++
+ # retro
+ 
+ ## notes
+@@ -149,9 +236,10 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ### drained
+ 
+ <!-- retro notes, which passes when the private folder is empty -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh retro notes
++
+ ## write
+ 
+ <!-- writes the retro over the box's own window -->
+@@ -159,39 +247,51 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ### done
+ 
+ <!-- what was done, one line a ticket or a thing -->
+-
+ <!-- the form is list -->
+ 
++- hand-spawn-skips-session-tag: the spawn answer leaves a prompt opening on q.HandOfItsOwn untagged, with tests in hooks, pull and q
++
+ ### well
+ 
+ <!-- what went well, and what made it go well -->
+-
+ <!-- the form is list -->
+ 
++- the ask named the files and the done_when lines, so the change stayed small
++- the failing build and the parallel-test guard came back from the check at once
++
+ ### badly
+ 
+ <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
+-
+ <!-- the form is list -->
+ 
++- the commit door wanted a test beside each changed code file, which cost two extra test files
++- a mint_note call and a model trailer both met refusals before the right form was found
++
+ ### improve
+ 
+ <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
+-
+ <!-- the form is list -->
+ 
++- fold the JavaScript hand line of the pull spawn script into the one Go constant, see [[spec/design_output/pull#a-hand-of-its-own]]
++
+ ### thoughts
+ 
+ <!-- what the thoughts say that the actions do not, off the transcript -->
+-
+ <!-- the form is text -->
+ 
++The cloud box has no home folder and the index server dropped one call, so a retry through the shell landed the hand-back.
++
+ ### checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the result covers the ask
++- the notes were drained
++- no script was written
++- the thoughts name what stays open
++- the improve line names one follow-up
++
+ ## cloud
+ 
+ <!-- names what the box lacked, met and leaves for a person -->
+@@ -199,21 +299,24 @@ from: [[.se/tickets/kit-drops-the-own-spawn]]
+ ### lacked
+ 
+ <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
+-
+ <!-- the form is list -->
+ 
++- a home folder, so the trust flag has no file
++
+ ### met
+ 
+ <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
+-
+ <!-- the form is list -->
+ 
++- the index server refused one connection during a hand-back, and the shell verb landed it
++
+ ### left
+ 
+ <!-- every person step parked, every ticket minted with no group, and what the handover says -->
+-
+ <!-- the form is list -->
+ 
++- nothing for a person
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/src/modules/hooks/spawn.go b/src/modules/hooks/spawn.go
+index ccb6a0e..b174e45 100644
+--- a/src/modules/hooks/spawn.go
++++ b/src/modules/hooks/spawn.go
+@@ -10,6 +10,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/modules/hooks/brief"
++	"quackitect/src/q"
+ 	"quackitect/src/yaml"
+ )
+ 
+@@ -23,7 +24,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
+ 	}
+ 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
+ 	tag := ""
+-	if !yaml.Truthy(post.E[ownField]) {
++	if !yaml.Truthy(post.E[ownField]) && !strings.HasPrefix(strings.TrimSpace(textOf(post.E, "prompt")), q.HandOfItsOwn) {
+ 		tag = spawnTagOf(disk{root})
+ 	}
+ 	if layer == "" && tag == "" {
+diff --git a/src/modules/hooks/spawn_test.go b/src/modules/hooks/spawn_test.go
+index 9ca74b5..65a9a14 100644
+--- a/src/modules/hooks/spawn_test.go
++++ b/src/modules/hooks/spawn_test.go
+@@ -7,6 +7,8 @@ import (
+ 	"encoding/json"
+ 	"os"
+ 	"testing"
++
++	"quackitect/src/q"
+ )
+ 
+ // The case table the JavaScript builders write. [[spec/tickets/spawn-answers-off-the-door]]
+@@ -117,6 +119,14 @@ func TestASpawnOfAKindTakesThatKindsLayer(t *testing.T) {
+ 	}
+ }
+ 
++// [[spec/design_output/pull#a-hand-of-its-own]]
++func promptOf(set string) string {
++	if set == "" {
++		return "work one step"
++	}
++	return set
++}
++
+ // A helper's spawn opens on the hand of the session the session file names, and the wrapper's own spawn and a box naming no session take no line. [[spec/design_output/pull#a-hand-of-its-own]]
+ // level0: FixtureOutsideHome - each case seeds the session file into a tree of its own.
+ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+@@ -126,11 +136,13 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+ 		session string
+ 		own     bool
+ 		want    string
++		prompt  string
+ 	}{
+-		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, tag + "\n\nwork one step"},
+-		{"the wrapper's own spawn", `{"id":"s7"}`, true, ""},
+-		{"a box carrying no session file", "", false, ""},
+-		{"a session file naming no id", `{"harness":"claude-code"}`, false, ""},
++		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, tag + "\n\nwork one step", ""},
++		{"the wrapper's own spawn", `{"id":"s7"}`, true, "", ""},
++		{"a hand of its own with no own field", `{"id":"s7"}`, false, "", q.HandOfItsOwn + ", named h1, and you work one step."},
++		{"a box carrying no session file", "", false, "", ""},
++		{"a session file naming no id", `{"harness":"claude-code"}`, false, "", ""},
+ 	} {
+ 		t.Run(one.name, func(t *testing.T) {
+ 			files := map[string]string{}
+@@ -140,7 +152,7 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+ 			root := treeOf(t, files, "")
+ 			door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
+ 			said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: map[string]any{
+-				"session_id": "s1", "prompt": "work one step", "own": one.own,
++				"session_id": "s1", "prompt": promptOf(one.prompt), "own": one.own,
+ 			}})
+ 			if err != nil {
+ 				t.Fatal(err)
+diff --git a/src/pull/pull_branch.go b/src/pull/pull_branch.go
+index d5aaa2c..bd86069 100644
+--- a/src/pull/pull_branch.go
++++ b/src/pull/pull_branch.go
+@@ -8,6 +8,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/failure"
++	"quackitect/src/q"
+ )
+ 
+ // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+@@ -90,7 +91,7 @@ func spawnPrompt(ticket string, leaf *Leaf, name string) string {
+ 		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
+ 	}
+ 	return strings.Join([]string{
+-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
++		fmt.Sprintf("%s, named %s, and you work one step of one ticket.", q.HandOfItsOwn, name),
+ 		"",
+ 		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
+ 		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",
+diff --git a/src/pull/pull_spawn_prompt_test.go b/src/pull/pull_spawn_prompt_test.go
+new file mode 100644
+index 0000000..f4ae086
+--- /dev/null
++++ b/src/pull/pull_spawn_prompt_test.go
+@@ -0,0 +1,18 @@
++// The prompt a hand of its own takes opens on the line the spawn answer reads.
++// [[spec/design_output/pull#a-hand-of-its-own]]
++package pull // level0: InPackageTest - reaches the unexported spawnPrompt
++
++import (
++	"strings"
++	"testing"
++
++	"quackitect/src/q"
++)
++
++func TestASpawnPromptOpensOnTheHandLineTheSpawnAnswerReads(t *testing.T) {
++	t.Parallel()
++	got := spawnPrompt("a-ticket", &Leaf{Entry: Entry{Path: "do"}}, "h1")
++	if !strings.HasPrefix(got, q.HandOfItsOwn+", named h1") {
++		t.Fatalf("the prompt opens on %q, and wants the line %q", strings.SplitN(got, "\n", 2)[0], q.HandOfItsOwn)
++	}
++}
+diff --git a/src/q/hand_test.go b/src/q/hand_test.go
+new file mode 100644
+index 0000000..74cb5d3
+--- /dev/null
++++ b/src/q/hand_test.go
+@@ -0,0 +1,17 @@
++// The hand line stands open at its end, so the pull continues it with the hand's name.
++// [[spec/design_output/pull#a-hand-of-its-own]]
++package q_test
++
++import (
++	"strings"
++	"testing"
++
++	"quackitect/src/q"
++)
++
++func TestTheHandLineEndsOnNoPunctuation(t *testing.T) {
++	t.Parallel()
++	if q.HandOfItsOwn == "" || strings.ContainsAny(q.HandOfItsOwn[len(q.HandOfItsOwn)-1:], ".,:;!?") {
++		t.Fatalf("the hand line %q is empty or ends on punctuation", q.HandOfItsOwn)
++	}
++}
+diff --git a/src/q/q.go b/src/q/q.go
+index 10fb2bc..dc1d6a7 100644
+--- a/src/q/q.go
++++ b/src/q/q.go
+@@ -17,6 +17,9 @@ type provider int
+ // The mark a q tag carries after its name where the input reads with no writer. [[spec/tickets/the-config-module-resolves-layers]]
+ const optionalMark = "optional"
+ 
++// The words a hand of its own opens its prompt on, which the pull writes and the spawn answer reads to leave the hand untagged. [[spec/tickets/hand-spawn-skips-session-tag]]
++const HandOfItsOwn = "You are a hand of your own on this box"
++
+ const (
+ 	out provider = iota
+ 	derived

@@ -1,0 +1,59 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T06:02:22Z",
+ "hidden": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 0\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\\nGo builds the viewer these rows open in. Install Go, and run this again.\\n\"\n        errs \"rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo1338898868/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo1338898868/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.01s)\nFAIL\nFAIL\tquackitect/src/quack\t24.230s"
+ },
+ "hidden_first": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "secs": 66.6,
+  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 0\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\\nGo builds the viewer these rows open in. Install Go, and run this again.\\n\"\n        errs \"rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo3610598407/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo3610598407/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.01s)\nFAIL\nFAIL\tquackitect/src/quack\t54.906s"
+ },
+ "regraded": "2026-10-11T08:18:06Z",
+ "run": "tui-swap-fails-loud__v5__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 6,
+  "n_outside": 1,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [
+   "src/modules/verbs/vehicle_test.go"
+  ],
+  "own_files": 3,
+  "test_files": 2,
+  "tickets_written": 3
+ },
+ "status": "graded"
+}

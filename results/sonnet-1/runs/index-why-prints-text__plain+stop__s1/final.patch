@@ -1,0 +1,34 @@
+diff --git a/src/quack/verb_index.go b/src/quack/verb_index.go
+index 25f12bb..d7e584b 100644
+--- a/src/quack/verb_index.go
++++ b/src/quack/verb_index.go
+@@ -37,6 +37,11 @@ func indexSays(ask asker, words []string, out, errs io.Writer) int {
+ 		fmt.Fprintln(errs, err)
+ 		return exitFailed
+ 	}
++	// why prints the tree its answer draws, as se-index prints it. [[spec/design_output/model#quack-why]]
++	if found, ok := said.(map[string]any); ok && words[0] == "why" {
++		fmt.Fprintln(out, found["text"])
++		return 0
++	}
+ 	text, err := json.MarshalIndent(said, "", "  ")
+ 	if err != nil {
+ 		fmt.Fprintln(errs, err)
+diff --git a/src/quack/verb_index_test.go b/src/quack/verb_index_test.go
+index 6d0c461..28042a0 100644
+--- a/src/quack/verb_index_test.go
++++ b/src/quack/verb_index_test.go
+@@ -32,6 +32,13 @@ func TestIndexVerb(t *testing.T) {
+ 			t.Fatalf("index answers %d, %q, asked %v, and wants standing printed indented", code, out, asked)
+ 		}
+ 	})
++	t.Run("why prints the text of its tree, not JSON", func(t *testing.T) {
++		asked := [][]string{}
++		code, out, _ := runsTwin(indexVerb(askHolding(map[string]any{"text": "a\n└ b"}, nil, &asked)), "index", "why", "x")
++		if code != 0 || out != "a\n└ b\n" {
++			t.Fatalf("index why answers %d, %q, and wants the tree text", code, out)
++		}
++	})
+ 	t.Run("the words pass to the index whole", func(t *testing.T) {
+ 		asked := [][]string{}
+ 		runsTwin(indexVerb(askHolding([]any{}, nil, &asked)), "index", "call", "value", "{}")

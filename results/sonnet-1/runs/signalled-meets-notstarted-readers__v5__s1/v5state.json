@@ -1,0 +1,11 @@
+{
+ "run": "signalled-meets-notstarted-readers__v5__s1",
+ "task_state": "closed",
+ "task_step": "do",
+ "group_state": "open",
+ "group_step": "sync",
+ "other_tickets_touched": [
+  "quack-spawns-all-take-the-runner"
+ ],
+ "other_tickets_closed": []
+}

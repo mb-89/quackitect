@@ -18,7 +18,7 @@
   "pkgs": {
    "src/quack": "fail"
   },
-  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 0\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\\nGo builds the viewer these rows open in. Install Go, and run this again.\\n\"\n        errs \"rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo2689501086/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo2689501086/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t23.991s"
+  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 0\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\\nGo builds the viewer these rows open in. Install Go, and run this again.\\n\"\n        errs \"rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo1711296185/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo1711296185/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t40.649s"
  },
  "hidden_first": {
   "f2p": [
@@ -40,7 +40,7 @@
   "secs": 66.8,
   "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 0\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\\nGo builds the viewer these rows open in. Install Go, and run this again.\\n\"\n        errs \"rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo3519543766/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo3519543766/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.01s)\nFAIL\nFAIL\tquackitect/src/quack\t48.212s"
  },
- "regraded": "2026-10-11T04:40:15Z",
+ "regraded": "2026-10-11T07:14:18Z",
  "run": "tui-swap-fails-loud__v5__s1",
  "scope": {
   "code_files": 1,

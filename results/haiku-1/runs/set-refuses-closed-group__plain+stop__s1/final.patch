@@ -1,0 +1,50 @@
+diff --git a/src/quack/ticket_set.go b/src/quack/ticket_set.go
+index df9e9e5..85ea119 100644
+--- a/src/quack/ticket_set.go
++++ b/src/quack/ticket_set.go
+@@ -70,6 +70,11 @@ func ticketWritten(disk pull.Disk, at, key, value string, dry bool, out, errs io
+ 	if value == "" || value == pull.FlagOff {
+ 		written, err = pull.WithoutField(text, key)
+ 	}
++	// [[spec/design_output/pull#a-closed-group-takes-no-child]]
++	if why := pull.ClosedGroup(disk, written); key == pull.GroupField && why != "" && err == nil {
++		fmt.Fprintln(errs, why)
++		return exitUsage
++	}
+ 	if err == nil && !dry {
+ 		err = disk.Write(at, written)
+ 	}
+diff --git a/src/quack/ticket_set_test.go b/src/quack/ticket_set_test.go
+index 488f566..937d7ff 100644
+--- a/src/quack/ticket_set_test.go
++++ b/src/quack/ticket_set_test.go
+@@ -137,6 +137,29 @@ func TestTicketSet(t *testing.T) {
+ 			}
+ 		}
+ 	})
++	t.Run("set refuses a closed group, and writes nothing, dry or not", func(t *testing.T) {
++		root := editCaseTree(t, "a-thing")
++		seedsFile(t, root, "spec/tickets/shut.md", strings.Replace(editCaseTicket(""), "state: open", "state: closed", 1))
++		seedsFile(t, root, "spec/tickets/open.md", editCaseTicket(""))
++		for _, dry := range []bool{false, true} {
++			code, out, errs := runsApart(t, root, dry, "ticket", "set", "a-thing", "group", "shut")
++			if got, _ := readsBack(t, root, aThing); code != 2 || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") || got != editCaseTicket("") {
++				t.Fatalf("dry %v: set a closed group answers %d, %q, %q, and writes %q", dry, code, out, errs, got)
++			}
++		}
++	})
++	t.Run("set takes an open group, and clearing the group is never refused", func(t *testing.T) {
++		root := editCaseTree(t, "a-thing")
++		seedsFile(t, root, "spec/tickets/open.md", editCaseTicket(""))
++		if code, out, _ := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "open"); code != 0 || out != "spec/tickets/a-thing.md carries group: open.\n" {
++			t.Fatalf("set an open group answers %d, %q", code, out)
++		}
++		seedsFile(t, root, "spec/tickets/shut.md", strings.Replace(editCaseTicket(""), "state: open", "state: closed", 1))
++		seedsFile(t, root, aThing, editCaseTicket("group: shut\n"))
++		if code, _, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", ""); code != 0 || errs != "" {
++			t.Fatalf("clear a closed group answers %d, %q", code, errs)
++		}
++	})
+ 	t.Run("a dry run says what it writes, and writes nothing", func(t *testing.T) {
+ 		root := editCaseTree(t, "a-thing")
+ 		code, out, _ := runsApart(t, root, true, "ticket", "set", "a-thing", "group", "a-group")

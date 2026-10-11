@@ -1,0 +1,13 @@
+{
+ "run": "index-why-prints-text__v5__s1",
+ "task_state": "closed",
+ "task_step": "do",
+ "group_state": "closed",
+ "group_step": "retro/cloud",
+ "other_tickets_touched": [
+  "lint-row-keeps-floor"
+ ],
+ "other_tickets_closed": [
+  "lint-row-keeps-floor"
+ ]
+}

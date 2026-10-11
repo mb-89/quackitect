@@ -1,0 +1,53 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T05:16:36Z",
+ "hidden": {
+  "f2p": [
+   440,
+   440
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   440,
+   440
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "secs": 39.1,
+  "tail": ""
+ },
+ "regraded": "2026-10-11T08:17:31Z",
+ "run": "tui-swap-fails-loud__plain__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 2,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 2,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

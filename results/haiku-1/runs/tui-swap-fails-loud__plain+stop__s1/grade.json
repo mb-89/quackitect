@@ -40,7 +40,7 @@
   "secs": 54.7,
   "tail": "[src/quack:TestTwinGoldens]\n    check_twins_test.go:202: git lists no tracked file: exit status 128\n--- FAIL: TestTwinGoldens (0.00s)\n[src/quack:TestEveryCodecRoundTripsItsCommittedFiles]\n    codec_test.go:89: exit status 128\n--- FAIL: TestEveryCodecRoundTripsItsCommittedFiles (0.00s)\n[src/quack:TestABrokenFileFailsItsRoundTrip]\n    codec_test.go:96: exit status 128\n--- FAIL: TestABrokenFileFailsItsRoundTrip (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t34.016s"
  },
- "regraded": "2026-10-11T04:39:07Z",
+ "regraded": "2026-10-11T07:12:25Z",
  "run": "tui-swap-fails-loud__plain+stop__s1",
  "scope": {
   "code_files": 1,

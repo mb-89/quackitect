@@ -84,7 +84,7 @@
   "secs": 3.6,
   "tail": "# quackitect/src/modules/hooks [quackitect/src/modules/hooks.test]\nsrc/modules/hooks/spawn_test.go:135:78: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/modules/hooks [build failed]\n# quackitect/src/pull [quackitect/src/pull.test]\nsrc/pull/pull_test.go:340:81: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/pull [build failed]\n# quackitect/src/q_test [quackitect/src/q.test]\nsrc/q/event_test.go:15:25: undefined: q.HandOfItsOwn\nsrc/q/event_test.go:16:40: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/q [build failed]"
  },
- "regraded": "2026-10-11T04:35:35Z",
+ "regraded": "2026-10-11T07:02:28Z",
  "run": "hand-spawn-skips-session-tag__v5__s1",
  "scope": {
   "code_files": 1,

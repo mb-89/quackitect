@@ -1,0 +1,553 @@
+diff --git a/spec/tickets/check-errors-names-the-part.md b/spec/tickets/check-errors-names-the-part.md
+index a36f1d0..7a4fbc5 100644
+--- a/spec/tickets/check-errors-names-the-part.md
++++ b/spec/tickets/check-errors-names-the-part.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,30 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ parent: check-verbs-run-in-go
++record:
++  - step: do
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: ceb7553035c5eb419ccdfd743890e2fec20b8205
++    hash_after: 3630ecafa6015de401d0635547d5b8d72710854e
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/quack passes
++      - name: check
++        exit: 0
++        said: "   85.8  in all"
++    inputs:
++      - name: ask
++        hash: 9f24fb645946dac6
++        size: 423
++    def: 10060d5272d03a03
++reason: done
+ ---
+ 
+ # Ask
+@@ -52,27 +70,33 @@ in src/quack/ (package quack):
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh test src/quack/check_test.go
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++A verb part run quietly under check --errors kept its output and dropped it when red, so the part gave no reason. verbOver now hands a red quiet verb output to errs. The check points errs at its stdout under --errors, so the merge reads every part line.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask: verbOver has the declared signature
++- no cleanup revealed; d.verb now calls verbOver
++- each fact stands once, in verbOver and the work design note it points at
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/check-reads-the-road-root.md b/spec/tickets/check-reads-the-road-root.md
+index 9f6b9d0..6f204b2 100644
+--- a/spec/tickets/check-reads-the-road-root.md
++++ b/spec/tickets/check-reads-the-road-root.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,30 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: check-verbs-run-in-go
+ parent: check-verbs-run-in-go
++record:
++  - step: do
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: ef22f6d805fdd75eb31e6326f1874a518e4ee6e8
++    hash_after: 7c0df9c3f41c2e182c7d107e061737e333e8b3cf
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/quack passes
++      - name: check
++        exit: 0
++        said: "   67.1  in all"
++    inputs:
++      - name: ask
++        hash: 47caab1ef205f92e
++        size: 112
++    def: 10060d5272d03a03
++reason: done
+ ---
+ 
+ # Ask
+@@ -47,27 +65,33 @@ checkDoorsOf takes its root off QUACKITECT_ROOT, so a review the index starts ch
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh test src/quack/check_test.go
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++checkDoorsOf already takes its root from index.Root, which reads QUACKITECT_ROOT before the working directory. TestCheckDoorsRoot pins that, so the check follows the root the index hands it.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the ask is met by the standing code, and a test now pins it
++- no cleanup revealed
++- no fact added
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index e28edff..77629cd 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: sync
+     does: takes trunk into the branch, so the box works on the latest
+@@ -82,8 +82,81 @@ steps:
+             says: every person step parked, every ticket minted with no group, and what the handover says
+ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+-step: sync
+-cloud: true
++step: retro/cloud
++record:
++  - step: sync
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: 978d69218797f6052261cdc7d793ff3d17a45faa
++    hash_after: e2cdf5e07cccd4a79df7fe05bb6ee86e93e5f87e
++  - step: sync
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: b33ef18b92de7dbe3e2faad0c646f5d920b7984e
++    hash_after: b33ef18b92de7dbe3e2faad0c646f5d920b7984e
++    answered:
++      - name: sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    def: 8a9850a81227554b
++  - step: split
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: 4ae40eb0e2cbb9ea467ca5e793cf19084b4be197
++    hash_after: 4ae40eb0e2cbb9ea467ca5e793cf19084b4be197
++    inputs:
++      - name: ask
++        hash: 9026a413d865506c
++        size: 103
++    def: cb8f90bc86fc7d39
++  - step: children
++    hand: the engine
++    hash_before: 1bd6de037fe8de0985580d55b8d1b72206aa2863
++    hash_after: 1bd6de037fe8de0985580d55b8d1b72206aa2863
++  - step: accept
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: 3ecef9732a912a8d40b0c212260ddb2558b52e72
++    hash_after: 3ecef9732a912a8d40b0c212260ddb2558b52e72
++    answered:
++      - name: sync/sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    inputs:
++      - name: ask
++        hash: 9026a413d865506c
++        size: 103
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++    def: 07c43ae7253713ec
++  - step: retro/notes
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: f30cefb2ae4ca9919bf4401895aab6a9f6fe0ede
++    hash_after: f30cefb2ae4ca9919bf4401895aab6a9f6fe0ede
++    answered:
++      - name: drained
++        exit: 0
++        said: .se/tickets holds no open note, so the box leaves nothing behind.
++    def: cb5a549f0e587fc2
++  - step: retro/write
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: 839ec10d8efcdf736ca555419161fb424fb1dad1
++    hash_after: 839ec10d8efcdf736ca555419161fb424fb1dad1
++    inputs:
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++      - name: retro/notes
++        hash: 310d2ddd3fe31ac9
++        size: 36
++    def: 1246a42e29e7ae98
++  - step: retro/cloud
++    hand: box ec99ffa9c05a · claude-code-remote
++    hash_before: dfdc2c69a1a1efd64364bc6110f46d024ff40938
++    hash_after: dfdc2c69a1a1efd64364bc6110f46d024ff40938
++    inputs:
++      - name: retro/write
++        hash: 2fa4f6e6bc5efec4
++        size: 1790
++    def: 4da1ca5da87d5bbc
++reason: done
+ ---
+ 
+ # Ask
+@@ -97,9 +170,10 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ## sync
+ 
+ <!-- branch sync, so the branch carries trunk -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch sync
++
+ # split
+ 
+ <!-- reads the standing children, and mints more where the goal needs them, each naming this group -->
+@@ -107,15 +181,19 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ## children
+ 
+ <!-- every child as a link, one a line, with its process -->
+-
+ <!-- the form is list -->
+ 
++- [[check-errors-names-the-part]] with process trivial
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the one child is a single small change to one verb and its test
++- the child covers the goal whole: a red quiet part names why it failed, and part lines reach stdout
++- no child waits on another
++
+ # children
+ 
+ # accept
+@@ -125,9 +203,10 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ## verdict
+ 
+ <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+-
+ <!-- the form is verdict -->
+ 
++accept. The diff is verbOver, the errs-to-out switch under --errors, and tests for both. A red quiet verb part now names why it failed, and part lines reach the output the merge reads.
++
+ # retro
+ 
+ ## notes
+@@ -137,9 +216,10 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ### drained
+ 
+ <!-- retro notes, which passes when the private folder is empty -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh retro notes
++
+ ## write
+ 
+ <!-- writes the retro over the box's own window -->
+@@ -147,39 +227,58 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ### done
+ 
+ <!-- what was done, one line a ticket or a thing -->
+-
+ <!-- the form is list -->
+ 
++- check-errors-names-the-part: verbOver hands a red quiet verb output to errs, and check --errors points errs at the output stream the merge reads
++- check-reads-the-road-root: a test pins the check root to the index root variable, since the standing code already honoured it
++
+ ### well
+ 
+ <!-- what went well, and what made it go well -->
+-
+ <!-- the form is list -->
+ 
++- the ask carried the exact signature, so the change and its test went in one pass
++- the cases drove verbOver through a fake run, so no process started
++
+ ### badly
+ 
+ <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
+-
+ <!-- the form is list -->
+ 
++- the Edit tool was refused three times at the start, because the write door wants a ticket; the patch tool fixed it
++- the first patch missed its anchor by one tab of indent
++- the pull handed a ticket of another group, check-reads-the-road-root, and the ask there was already met by standing code
++- the first hand-back of the tests step failed, because the evidence field wants the command and not a sentence
++- the stop hook and the engine plan question each cost a turn, since the plan tool stood unloaded
++- the owner sent no prompt in the run beyond the opening one
++
+ ### improve
+ 
+ <!-- how each bad line stops happening, named by its home -->
+-
+ <!-- the form is list -->
+ 
++- the work skill names the patch tool and the plan tool up front, home: .claude/skills/work/SKILL.md
++- the ask of a ticket says whether its claim already holds, home: the ticket ask schema
++- the pull refuses to hand a ticket outside the branch group, home: spec/guidance/cloud/cloud
++
+ ### thoughts
+ 
+ <!-- what the thoughts say that the actions do not, off the transcript -->
+-
+ <!-- the form is text -->
+ 
++The ask read as a defect in two places, and the signature gave the shape of the fix. The second ticket looked like a defect and turned out to be met, so a test was the honest change.
++
+ ### checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- every fact stands once: the design note owns the battery, and the code points at it
++- no number added
++- no header counts anything
++- owner prompts and errors are listed in badly; the run holds one owner prompt
++- the chapter names roles and no box
++
+ ## cloud
+ 
+ <!-- names what the box lacked, met and leaves for a person -->
+@@ -187,21 +286,28 @@ under --errors a quiet red part drops why it failed, and part lines reach the st
+ ### lacked
+ 
+ <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
+-
+ <!-- the form is list -->
+ 
++- the plan tool stood unloaded at the first patch, so the engine refused the write until I loaded it
++
+ ### met
+ 
+ <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
+-
+ <!-- the form is list -->
+ 
++- the write door refused Edit and asked for a ticket on the first write
++- the landing guard refused a command joined to a commit or a pull with a semicolon or a pipe
++- a hand-back of a command field refuses a sentence, and wants the command
++
+ ### left
+ 
+ <!-- every person step parked, every ticket minted with no group, and what the handover says -->
+-
+ <!-- the form is list -->
+ 
++- no person step parked
++- no ticket minted outside the group
++- check-reads-the-road-root belongs to the group check-verbs-run-in-go and closed in this branch
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/src/quack/check.go b/src/quack/check.go
+index 41e9942..3ff3536 100644
+--- a/src/quack/check.go
++++ b/src/quack/check.go
+@@ -105,9 +105,12 @@ func init() { register("check", checkVerb(checkDoorsOf)) }
+ // The check over the doors: the parts in order, each timed, then the red cases and findings at error under --errors, or the parts' table, then the stamp. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/the-verbs-need-no-wrapper]]
+ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
+ 	return func(argv []string, _ bool, out, errs io.Writer) int {
+-		d := doorsOf(out, errs)
+ 		words := argv[1:]
+ 		quiet := slices.Contains(words, errorsFlag)
++		if quiet {
++			errs = out
++		}
++		d := doorsOf(out, errs)
+ 		_ = os.Remove(d.at(lintFile))
+ 		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
+ 		lines := d.text(timesFile)
+diff --git a/src/quack/check_test.go b/src/quack/check_test.go
+index 47f2fb4..631d4d4 100644
+--- a/src/quack/check_test.go
++++ b/src/quack/check_test.go
+@@ -393,6 +393,73 @@ func TestCheckVerb(t *testing.T) {
+ 	})
+ }
+ 
++func TestCheckDoorsRoot(t *testing.T) {
++	t.Run("the check stands over the root QUACKITECT_ROOT names", func(t *testing.T) {
++		root := t.TempDir()
++		t.Setenv("QUACKITECT_ROOT", root)
++		if got := checkDoorsOf(io.Discard, io.Discard).root; filepath.Clean(got) != filepath.Clean(root) {
++			t.Fatalf("the check stands over %q, and wants %q", got, root)
++		}
++	})
++}
++
++func TestVerbOver(t *testing.T) {
++	ran := func(code int, said string, quiet bool) (int, string, [][]string) {
++		var argvs [][]string
++		run := func(argv, _ []string, _ bool) (int, string, error) {
++			argvs = append(argvs, argv)
++			return code, said, nil
++		}
++		var errs strings.Builder
++		got := verbOver(run, []string{"quack", "verb"}, nil, &errs)([]string{"doors"}, quiet)
++		return got, errs.String(), argvs
++	}
++	t.Run("a quiet red part hands its output to errs", func(t *testing.T) {
++		code, errs, argvs := ran(1, "src/a.js: broken\n", true)
++		if code != 1 || strings.TrimSpace(errs) != "src/a.js: broken" || !reflect.DeepEqual(argvs, [][]string{{"quack", "verb", "doors"}}) {
++			t.Fatalf("the part answers %d, %q, %v", code, errs, argvs)
++		}
++	})
++	t.Run("a quiet green part says nothing", func(t *testing.T) {
++		if code, errs, _ := ran(0, "fine", true); code != 0 || errs != "" {
++			t.Fatalf("the part answers %d, %q", code, errs)
++		}
++	})
++	t.Run("a loud red part leaves its output to the screen", func(t *testing.T) {
++		if code, errs, _ := ran(1, "shown", false); code != 1 || errs != "" {
++			t.Fatalf("the part answers %d, %q", code, errs)
++		}
++	})
++	t.Run("a run that cannot start names its fault", func(t *testing.T) {
++		var errs strings.Builder
++		run := func(argv, _ []string, _ bool) (int, string, error) { return 0, "", errors.New("not found") }
++		if code := verbOver(run, nil, nil, &errs)([]string{"doors"}, true); code != exitFailed || !strings.Contains(errs.String(), "not found") {
++			t.Fatalf("the part answers %d, %q", code, errs.String())
++		}
++	})
++	t.Run("under --errors the check sends part lines to stdout", func(t *testing.T) {
++		fake := &checkFake{}
++		doors := fake.doors()
++		doors.root = t.TempDir()
++		var out, errs strings.Builder
++		doors.errs = &errs
++		doors.verb = func(words []string, _ bool) int { return 0 }
++		doors.run = func(argv, _ []string, _ bool) (int, string, error) {
++			if argv[0] == "go" {
++				return 1, "--- FAIL: TestX (0.00s)\n", nil
++			}
++			return 0, "", nil
++		}
++		checkVerb(func(o, e io.Writer) checkDoors {
++			doors.out, doors.errs = o, e
++			return doors
++		})([]string{"check", "--errors"}, false, &out, &errs)
++		if !strings.Contains(out.String(), "--- FAIL: TestX") || errs.String() != "" {
++			t.Fatalf("stdout %q, stderr %q", out.String(), errs.String())
++		}
++	})
++}
++
+ func TestTestVerb(t *testing.T) {
+ 	t.Run("named files go to branch test under a fresh tally", func(t *testing.T) {
+ 		fake := &checkFake{}
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..3dc1370 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,21 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// A verb through quack's own road. A quiet run keeps its output, and a red one hands it to errs, so the part names why it failed. [[spec/design_output/work#the-battery-answers-first]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		code, said, err := run(append(slices.Clone(road), words...), env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 && strings.TrimSpace(said) != "" {
++			fmt.Fprintln(errs, strings.TrimSpace(said))
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {
