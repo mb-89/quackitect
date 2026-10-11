@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change with tests covering every rule of the ask, commits both on a clean tree, and stops once they pass
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2a00b62f7c4bc60b
 step: do
 group: loose-fixes-0032249
+record:
+  - step: do
+    hand: box 05c4736f6ff2 · claude-code-remote
+    hash_before: 5d2be8cff4ee9eea1bfc2e4115e20bf17a29dbff
+    hash_after: 5d2be8cff4ee9eea1bfc2e4115e20bf17a29dbff
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "   76.1  in all"
+    inputs:
+      - name: ask
+        hash: 8942f4d0ccdbb49a
+        size: 490
+    def: 56b47f508ed740df
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,33 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/index
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The case copies the index and its journal while its first handle stands open, closes that handle, and opens the copy, so Windows meets no held file at the rebuild. The fix reached main before this group opened, so this step records its evidence.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the case opens a copy and closes the first handle first
+- no cleanup surfaced
+- no new fact lands
+- the case and the check pass, and the working code stays as it stands
 
 # Discussion
 
