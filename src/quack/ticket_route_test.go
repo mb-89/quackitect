@@ -1,6 +1,7 @@
 // The route verb writes the steps past the pointer and answers JSON on both
 // roads, each case a tree, the words it runs and what the verb answers, kept
-// in testdata/ticket_route.json.
+// in testdata/ticket_route.json. A vehicle case reads the schema off the
+// method root, and keeps the text of every chapter.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
@@ -21,6 +22,7 @@ type jsCase struct {
 	Files   map[string]*string `json:"files"`
 	History *jsHistory         `json:"history"`
 	Bare    bool               `json:"bare"`
+	Vehicle bool               `json:"vehicle"`
 	Want    struct {
 		Code  int                `json:"code"`
 		Out   string             `json:"out"`
@@ -70,7 +72,24 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()
+			// A vehicle case holds the schemas and the processes under the method root, and every other file under a work root apart. [[spec/tickets/route-keeps-its-chapters]] [[spec/tickets/ticket-verbs-read-method-routes]]
+			work, at := root, func(path string) string { return root }
+			if one.Vehicle {
+				work = t.TempDir()
+				at = func(path string) string {
+					return map[bool]string{true: root, false: work}[strings.HasPrefix(path, "spec/schemas/") || strings.HasPrefix(path, "spec/processes/")]
+				}
+			}
 			repo := standsInRepo(t, root)
+			// A vehicle case reads the process history off the method root alone. [[spec/tickets/update-case-splits-repos]]
+			if inner := standingRepo; one.Vehicle {
+				standingRepo = func(asked string) git.Repo {
+					if asked != root {
+						t.Errorf("git runs over %s, and the history stands under the method root %s", asked, root)
+					}
+					return inner(asked)
+				}
+			}
 			history := one.History
 			if history == nil {
 				history = held.History
@@ -90,32 +109,26 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 			}
 			for path, text := range files {
 				if text != nil {
-					seedFile(t, root, path, *text)
+					seedFile(t, at(path), path, *text)
 				}
 			}
-			t.Setenv("QUACKITECT_ROOT", root)
-			t.Setenv(workRootVar, "")
-			words := append([]string{"ticket"}, one.Argv...)
-			_, verb := twinOf(words, registry)
-			if verb == nil {
-				t.Fatalf("the registry holds no Go answer for %s", strings.Join(words, " "))
-			}
-			var out, errs strings.Builder
-			if code := verb(words, false, &out, &errs); code != one.Want.Code {
+			t.Setenv(workRootVar, map[bool]string{true: work}[one.Vehicle])
+			code, out, errs := runsApart(t, root, false, append([]string{"ticket"}, one.Argv...)...)
+			if code != one.Want.Code {
 				t.Errorf("the verb answers %d, and the JS answers %d", code, one.Want.Code)
 			}
-			if out.String() != one.Want.Out {
-				t.Errorf("the verb prints\n%q\nand the JS prints\n%q", out.String(), one.Want.Out)
+			if out != one.Want.Out {
+				t.Errorf("the verb prints\n%q\nand the JS prints\n%q", out, one.Want.Out)
 			}
-			if errs.String() != one.Want.Errs {
-				t.Errorf("the verb says\n%q\nand the JS says\n%q", errs.String(), one.Want.Errs)
+			if errs != one.Want.Errs {
+				t.Errorf("the verb says\n%q\nand the JS says\n%q", errs, one.Want.Errs)
 			}
 			for path, was := range files {
 				want, changed := one.Want.Files[path]
 				if !changed {
 					want = was
 				}
-				got, stands := readIn(root, path)
+				got, stands := readIn(at(path), path)
 				switch {
 				case want == nil && stands:
 					t.Errorf("%s stands, and the JS leaves none", path)

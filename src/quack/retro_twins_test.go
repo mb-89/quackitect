@@ -4,41 +4,15 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
-	"encoding/json"
-	"fmt"
-	"path/filepath"
 	"strings"
 	"testing"
 
-	"quackitect/src/index"
-	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
 
-// A door holding tickets/all as the case seeds it, and the V1 answering its base. [[spec/tickets/retro-verbs-become-actions]]
+// A door holding tickets/all as the case seeds it. [[spec/tickets/retro-verbs-become-actions]]
 func notesTree(t *testing.T, rows []ticket.Ticket) func() (string, error) {
-	t.Helper()
-	root := t.TempDir()
-	c := q.New()
-	hand := q.OutIn(c, "tickets/all", []ticket.Ticket{}, q.Doc("the tickets as the case seeds them"))
-	seeds := func(_ string, commit index.Commit) (func(), error) {
-		return func() {}, commit(hand, map[string]any{"tickets/all": rows})
-	}
-	stop, _, err := index.Serve(wall, root, filepath.Join(t.TempDir(), "index.db"), c, seeds)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(stop)
-	body, err := realDisk().read(filepath.Join(root, index.Runtime, "index.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var standing index.Standing
-	if err := json.Unmarshal(body, &standing); err != nil {
-		t.Fatal(err)
-	}
-	base := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1)
-	return func() (string, error) { return base, nil }
+	return seededTree(t, "tickets/all", []ticket.Ticket{}, rows)
 }
 
 var notesRows = []ticket.Ticket{

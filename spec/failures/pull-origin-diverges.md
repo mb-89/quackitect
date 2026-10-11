@@ -1,7 +1,7 @@
 ---
 kind: [[failure]]
 level: error
-remedies: ["Run git pull --rebase origin <branch>, then pull again."]
+remedies: ["Commit or stash the edits in the tree, run git pull --rebase origin <branch>, then pull again."]
 ---
 
 # When

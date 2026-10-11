@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"quackitect/src/q/qtest"
 )
 
 const editorTestID = "quackitect.quackitect"
@@ -187,14 +190,6 @@ func TestTheListItReplacesStandsBesideIt(t *testing.T) {
 	}
 }
 
-func TestTheEntryWritesItsInstallTimeInDecimalDigits(t *testing.T) {
-	t.Parallel()
-	entry := editorEntry(editorTestID, "0.1.0", "/x/"+editorTestID+"-0.1.0", 1759590000123)
-	if got := editorListText([]*ordered{entry}); !strings.Contains(got, `"installedTimestamp":1759590000123,`) {
-		t.Errorf("the entry reads\n%s", got)
-	}
-}
-
 func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
 	t.Parallel()
 	folder := "/home/user/.vscode/extensions"
@@ -208,6 +203,7 @@ func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
 func TestTheLinkVerbLinksAndListsTheTreesSidebar(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
+	d.clock = qtest.NewFake(time.UnixMilli(1759590000123))
 	home := "/home/one"
 	hq1SeedDisk(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
 	hq1SeedDisk(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
@@ -220,6 +216,9 @@ func TestTheLinkVerbLinksAndListsTheTreesSidebar(t *testing.T) {
 	}
 	if want := "quackitect.quackitect: the link went in.\nquackitect.quackitect: the entry went in.\n"; out.String() != want {
 		t.Errorf("the link says\n%s", out)
+	}
+	if list := d.disk.text(filepath.Join(home, ".vscode", "extensions", editorList)); !strings.Contains(list, `"installedTimestamp":1759590000123,`) {
+		t.Errorf("the list stamps no install time the fake clock stands at, in its 13 digits:\n%s", list)
 	}
 	d.env = func(string) string { return "" }
 	if editorLink(d, false) {

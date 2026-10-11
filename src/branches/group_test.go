@@ -154,24 +154,33 @@ func TestASpanAndAnAgeReadInTheirUnits(t *testing.T) {
 	}
 }
 
-// A dependency list drops its brackets, its quotes and the branch prefix. [[spec/design_output/work#the-mark-and-what-waits]]
-func TestADependencyReadsBare(t *testing.T) {
-	t.Parallel()
-	text := "---\ndepends_on: [\"work/a\", b]\n---\n"
-	if got := dependsOnText(text); !slices.Equal(got, []string{"a", "b"}) {
-		t.Fatalf("the waits read %v", got)
-	}
-	listed := "---\ndepends_on:\n  - c\n  - 'd'\nstate: open\n---\n"
-	if got := dependsOnText(listed); !slices.Equal(got, []string{"c", "d"}) {
-		t.Fatalf("the listed waits read %v", got)
-	}
-}
-
 // A hash_after reading false leaves the take open, as JavaScript reads the field. [[spec/tickets/shared-helpers-stand-once]]
 func TestAHashAfterReadingFalseLeavesTheTakeOpen(t *testing.T) {
 	t.Parallel()
 	taken := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "abc"}, {Key: "hash_after", Value: "false"}})
 	if take := heldIn(taken); take == nil || take.HashBefore != "abc" {
 		t.Fatalf("the take holds %+v", take)
+	}
+}
+
+// Every spelling of depends_on reads the same names, bare of the branch prefix. [[spec/tickets/depends-on-reads-one-parser]]
+func TestEveryDependsOnSpellingReadsOneWay(t *testing.T) {
+	t.Parallel()
+	for _, spelled := range []string{
+		"depends_on: [alpha, \"work/beta\"]\n",
+		"depends_on: alpha, work/beta\n",
+		"depends_on:\n  - alpha\n  - 'work/beta'\n",
+		"depends_on: [alpha,\n  work/beta]\n",
+		"depends_on: []\n",
+		"",
+	} {
+		text := "---\nkind: [[ticket]]\n" + spelled + "state: open\n---\n\n# Ask\n"
+		want := []string{"alpha", "beta"}
+		if !strings.Contains(spelled, "alpha") {
+			want = nil
+		}
+		if got := dependsOn(frontOf(text)); !slices.Equal(got, want) {
+			t.Errorf("the front of %q reads %q", spelled, got)
+		}
 	}
 }

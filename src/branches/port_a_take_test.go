@@ -65,6 +65,18 @@ func TestPATakeKeepsTheTag(t *testing.T) {
 	}
 }
 
+// A switch git refuses leaves every parked note as the hand left it. [[spec/tickets/failed-switch-keeps-parked-notes]]
+func TestARefusedSwitchKeepsTheParkedNotes(t *testing.T) {
+	t.Parallel()
+	one := paParkedTree(t)
+	if one.d.onBranch("work/nowhere") {
+		t.Fatal("the switch to a branch nobody holds lands")
+	}
+	if said := one.read(paParkedAt); said != paParked {
+		t.Fatalf("the parked note reads %q after the refused switch", said)
+	}
+}
+
 // An untagged change still stops a take, and the tagged one beside it changes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAUntaggedChangeStopsTake(t *testing.T) {
 	t.Parallel()

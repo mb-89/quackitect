@@ -186,12 +186,27 @@ func mapAt(rows []row, one *cursor, indent int, path string) any {
 		at := Keyed(path, key)
 		one.mark(at, held.line)
 		if rest := strings.TrimSpace(pair[2]); rest != "" {
-			out.Set(key, scalar(rest))
+			out.Set(key, scalar(flowJoined(rows, one, held.indent, rest)))
 			continue
 		}
 		out.Set(key, under(rows, one, held.indent, at))
 	}
 	return out
+}
+
+// A flow list open at its row's end takes each deeper row until its bracket closes. [[spec/tickets/depends-on-reads-one-parser]]
+func flowJoined(rows []row, one *cursor, indent int, rest string) string {
+	if !strings.HasPrefix(rest, "[") || strings.HasSuffix(rest, "]") {
+		return rest
+	}
+	for one.at < len(rows) && rows[one.at].indent > indent {
+		rest += " " + rows[one.at].said
+		one.at++
+		if strings.HasSuffix(rest, "]") {
+			break
+		}
+	}
+	return rest
 }
 
 func listAt(rows []row, one *cursor, indent int, path string) any {
@@ -315,8 +330,13 @@ func flowItems(inside string) []string {
 	out := []string{}
 	var held strings.Builder
 	var quote rune
+	escaped := false
 	for _, char := range inside {
 		switch {
+		// An escaped quote stays inside its item, as QuotedWhole reads it. [[spec/tickets/flow-items-skip-escaped-quotes]]
+		case quote == '"' && (escaped || char == '\\'):
+			held.WriteRune(char)
+			escaped = !escaped
 		case quote != 0:
 			held.WriteRune(char)
 			if char == quote {
@@ -339,10 +359,50 @@ func unquote(said string) string {
 	bare := strings.TrimSpace(said)
 	quoted := (strings.HasPrefix(bare, `"`) && strings.HasSuffix(bare, `"`)) ||
 		(strings.HasPrefix(bare, `'`) && strings.HasSuffix(bare, `'`))
-	if quoted && len(bare) > 1 {
-		return bare[1 : len(bare)-1]
+	if !quoted || len(bare) < 2 {
+		return bare
 	}
-	return bare
+	// A whole quote reads as the text the front writer encodes, so a rewrite keeps it. [[spec/tickets/quoted-fronts-round-trip]]
+	if decoded, ok := Unescaped(bare); ok && bare[0] == '"' {
+		return decoded
+	}
+	if bare[0] == '\'' && QuotedWhole(bare) {
+		return strings.ReplaceAll(bare[1:len(bare)-1], "''", "'")
+	}
+	return bare[1 : len(bare)-1]
+}
+
+// The text inside a double-quoted value, where the value is one whole quote holding no escape past the four the writer writes. the one decoder the reader and the front writer share. [[spec/tickets/go-writes-the-frontmatter]] [[spec/tickets/quoted-fronts-round-trip]]
+func Unescaped(value string) (string, bool) {
+	if len(value) < 2 || !strings.HasSuffix(value, `"`) {
+		return "", false
+	}
+	var out strings.Builder
+	inside := value[1 : len(value)-1]
+	for at := 0; at < len(inside); at++ {
+		switch inside[at] {
+		case '"':
+			return "", false
+		case '\\':
+			if at+1 >= len(inside) {
+				return "", false
+			}
+			at++
+			switch inside[at] {
+			case '\\', '"':
+				out.WriteByte(inside[at])
+			case 'n':
+				out.WriteByte('\n')
+			case 'r':
+				out.WriteByte('\r')
+			default:
+				return "", false
+			}
+		default:
+			out.WriteByte(inside[at])
+		}
+	}
+	return out.String(), true
 }
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]

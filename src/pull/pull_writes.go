@@ -120,13 +120,13 @@ type childrenSaid struct{ open, dropped, all []string }
 func childrenSay(all []*Held, name string) childrenSaid {
 	out := childrenSaid{open: []string{}, dropped: []string{}, all: []string{}}
 	for _, one := range all {
-		if one.Private || FieldOf(one.Text, GroupField) != name {
+		if one.Private || one.Field(GroupField) != name {
 			continue
 		}
 		out.all = append(out.all, one.Name)
-		if FieldOf(one.Text, "state") != Closed {
+		if one.Field("state") != Closed {
 			out.open = append(out.open, one.Name)
-		} else if FieldOf(one.Text, "reason") == "dropped" {
+		} else if one.Field("reason") == "dropped" {
 			out.dropped = append(out.dropped, one.Name)
 		}
 	}
@@ -339,9 +339,14 @@ func (it *It) failed(who *Who, one *Held, leaf *Leaf, held Hold, reason string, 
 
 // [[spec/design_output/pull#became]]
 func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor string, answered []Answered, also more) int {
+	// A note becomes the tracked ticket of its name, so the successor is another file, and the ticket in hand is none. [[spec/tickets/became-refuses-itself]]
 	stands := false
 	for _, each := range TicketsHere(it.Disk) {
-		stands = stands || each.Name == successor
+		stands = stands || (each.Name == successor && each.Path != one.Path)
+	}
+	if !stands && successor == one.Name {
+		it.Refuse(failure.Raise(it.Failures, "pull-becomes-itself", one.Name+" becomes no successor of its own. Name the ticket it becomes."))
+		return 1
 	}
 	if !stands {
 		it.Refuse(failure.Raise(it.Failures, "pull-successor-nowhere", fmt.Sprintf("%s stands nowhere yet. Mint it, then hand back --became %s.", successor, successor)))
@@ -421,13 +426,18 @@ func (it *It) unlanded(one *Held, leaf *Leaf, finding string) int {
 }
 
 func unlandedRows(one *Held, leaf *Leaf, finding string) []string {
+	return append(refusedRows(finding), "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+}
+
+// The rows a refused commit names, under the line saying nothing lands. [[spec/tickets/take-back-reports-refusals]]
+func refusedRows(finding string) []string {
 	rows := []string{"the hook refuses the commit, so nothing lands:"}
 	for _, row := range strings.Split(finding, "\n") {
 		if row != "" {
 			rows = append(rows, row)
 		}
 	}
-	return append(rows, "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+	return rows
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
