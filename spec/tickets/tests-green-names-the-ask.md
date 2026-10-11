@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -167,7 +167,33 @@ record:
         exit: 0
         said: "   73.4  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 2efa41ef18e0b9e7f9c20667072adab151d512c7
+    hash_after: 2efa41ef18e0b9e7f9c20667072adab151d512c7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   74.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 56fb3f5adf2f128b
+        size: 882
+    def: ebccfd52b1111bbe
+    reopen:
+      - path: src/pull/pull_stale_test.go
+        why: the serial guard asks t.Parallel at the top of each case, and no assertion moves
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: handovers-and-light-work
+reason: done
 ---
 
 # Ask
@@ -347,26 +373,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_stale_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A reword of a route leaf in its does or gate keeps the step of every open ticket. Before, the pull sent each ticket past a reworded leaf back to it. The pull now compares a moved leaf with the ticket copy, and a passed leaf keeps its wording. The leaf at the step takes the new wording. The standard route has tests-green make the change the ask names, with the red tests as its floor. The gate and its review rule read the rules of the ask the work breaks. A new example shows the hand-out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the golden the reworded route mints again
+- the pull cases and the example run on fakes
+- the comments point at the design note chapter
+- wordingFields names the keys once
 
 # accept
 
