@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -146,6 +146,18 @@ record:
     frozen:
       - path: src/quack/verb_mint_light_test.go
         hash: 2bdabddefdbca065
+  - step: gate
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 2dc55bc6bb86d5327bb80a591efe65648dd09728
+    hash_after: 2dc55bc6bb86d5327bb80a591efe65648dd09728
+    inputs:
+      - name: design/draft
+        hash: 629f9b2b6b972396
+        size: 2693
+      - name: design/tests-red
+        hash: 6aed32223962e7cb
+        size: 933
+    def: 7cea74295027d571
 group: handovers-and-light-work
 ---
 
@@ -288,8 +300,13 @@ The trivial hash moves, so an open trivial ticket at `do` takes the new route at
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+- The approach breaks no rule of the ask. The trivial route gains the stopping line, a mint with no --process takes it through one constant, and the tickets guidance names who takes it.
+- A red test decides every done_when line. The light case in src/quack/verb_mint_light_test.go fails on its own assertion. The standard case now stands as one assertion in the first mint subtest of src/quack/verb_mint_test.go, where reworded-input-keeps-the-step moved it, so the draft tests list names a stale test name and the guard still holds.
+- The ask names mint-light.md, and the draft lands pull-light.md, since the example harness wires no mint. I take that departure, and the implementer records it under says.
 
 # implement
 
