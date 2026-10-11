@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: ab2e1e1551e664fe
         size: 1595
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1ad094d8843c · claude-code-remote · helper-4
+    hash_before: 50466109d3ce2e5315788b355ba20c83541d23bc
+    hash_after: 50466109d3ce2e5315788b355ba20c83541d23bc
+    inputs:
+      - name: design/draft
+        hash: ab2e1e1551e664fe
+        size: 1595
+      - name: design/tests-red
+        hash: 266fbcd3763fadef
+        size: 705
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,12 @@ Under a vehicle the route writes the front alone, since the work root holds no s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- update-keeps-chapters-under-vehicle: the ask names ticket update beside ticket route, and the draft changes both. But no case runs `ticket update` under a vehicle, so nothing proves the update keeps its chapters. Add a vehicle case to `testdata/ticket_update.json` once the sibling `ticket-verbs-read-method-routes` lands its process reads.
+- vehicle-case-seeds-chapter-text: the vehicle case seeds `slow-lint.md` with text under the Ask alone, and its `draft`, `review` and `do` chapters stand empty. The case proves the headings come back, not that a written chapter keeps its words. Seed text under `draft` and want it back.
+- ask-names-the-check-package: the second `done_when` line runs `go test ./src/check`, a package the tree lacks. The test stands in `./src/modules/check`, so the line should name that path.
 
 # implement
 
