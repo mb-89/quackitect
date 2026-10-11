@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 6992b742589d73fd7ee7375ab8039794684a6211
+    hash_after: 6992b742589d73fd7ee7375ab8039794684a6211
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/plans passes
+      - name: check
+        exit: 0
+        said: "   62.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f0e8a649612f1266
+        size: 574
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/plans
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The plan action registers with `q.Writes()`, so the book runs two plan calls one after the other and the second reads what the first wrote. The plan refuses a read failing past a missing file, and a non-blank file reading as no plan object, and writes nothing over it. A missing or blank file still reads as an empty plan. The three red cases of `src/modules/plans/plans_test.go` pass.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `plans.go` and its test alone
+- the read and the write reach the outside through the module's `Outside`, which the tests fake
+- the comment above the read in `plans` names the approach
+- the refusal text stands once, in `errNoObject`
 
 # accept
 
