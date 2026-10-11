@@ -1,8 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 point: gate
-todo: true
+todo: false
 step: do
 steps:
   - name: do
@@ -30,6 +30,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2a00b62f7c4bc60b
 group: tickets-keep-their-chapters
 parent: route-keeps-its-chapters
+record:
+  - step: do
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: f68ef2456a96d0a940d5c1a4ef70712613d03829
+    hash_after: f68ef2456a96d0a940d5c1a4ef70712613d03829
+    why: ticket-verbs-read-method-routes answers this ask
+reason: answered
 ---
 
 # Ask
