@@ -65,6 +65,8 @@ type answer struct {
 }
 
 type door struct {
+	// The run's secret, which a person's post and every call to the first port carry. [[spec/tickets/v1-takes-a-run-secret]]
+	secret string
 	// The bus the manager runs, which the standing file names. [[spec/design_output/model#the-standing-file]]
 	bus   *Bus
 	db    *sql.DB
@@ -211,6 +213,12 @@ func opensOn(clock q.Clock, listens func(network, address string) (net.Listener,
 
 	one := &door{clock: clock, db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), commit: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
+	// The run's secret stands before any door serves, so no call meets a door without one. [[spec/tickets/v1-takes-a-run-secret]]
+	secret, err := mintsSecret()
+	if err != nil {
+		return failed(err)
+	}
+	one.secret = secret
 	one.store = q.NewStore(catalog)
 	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
 	one.store.OnCommit(func(values map[string]any) {
@@ -332,7 +340,15 @@ func (one *door) stands(listen net.Listener) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
+	secret, err := json.Marshal(secretBody{Secret: one.secret})
+	if err != nil {
+		return err
+	}
+	// The secret stands before the standing file, so a caller reading the port finds the secret beside it. [[spec/tickets/v1-takes-a-run-secret]]
+	if err := writesOwned(SecretPath(one.root), append(secret, '\n')); err != nil {
+		return err
+	}
+	return writesOwned(standingPath(one.root), append(said, '\n'))
 }
 
 // A path the watch names. Git's own index turns the tracked flags, the plan counts a tick, and every other path the walk stands off moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
@@ -493,6 +509,12 @@ func (one *door) awaits(w http.ResponseWriter, r *http.Request, said call) {
 }
 
 func (one *door) took(w http.ResponseWriter, r *http.Request) {
+	// The first port answers reads of the whole tree and stops the door, so every call carries the run's secret. [[spec/tickets/v1-takes-a-run-secret]]
+	if !one.holdsSecret(r.Header.Get(PersonHeader)) {
+		w.WriteHeader(http.StatusUnauthorized)
+		writes(w, answer{Error: "the call carries no run secret"})
+		return
+	}
 	var said call
 	if err := json.NewDecoder(r.Body).Decode(&said); err != nil {
 		writes(w, answer{Error: "the call reads as no JSON", ID: said.ID})
@@ -553,6 +575,7 @@ func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
 func lstatOf(path string) (fs.FileInfo, error)    { return os.Lstat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
+func chmodOf(path string, mode fs.FileMode) error { return os.Chmod(path, mode) }
 func chtimesOf(path string, at, mod time.Time) error {
 	return os.Chtimes(path, at, mod)
 }

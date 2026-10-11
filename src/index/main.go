@@ -301,8 +301,14 @@ func postsWithin(standing Standing, argv []string, span time.Duration) (answer, 
 	}
 
 	client := &http.Client{Timeout: span, Transport: doorTransport}
-	said, err := client.Post(
-		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
+	request, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), bytes.NewReader(body))
+	if err != nil {
+		return answer{}, err
+	}
+	// The first port takes a call carrying the run's secret alone. [[spec/tickets/first-port-client-sends-secret]]
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set(PersonHeader, SecretOf(standing.Root))
+	said, err := client.Do(request)
 	if err != nil {
 		return answer{}, err
 	}
