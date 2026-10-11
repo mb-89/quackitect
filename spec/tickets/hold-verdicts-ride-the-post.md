@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: ab7a3cb34f35539c33dda6132bca71de40199fc1
+    hash_after: ab7a3cb34f35539c33dda6132bca71de40199fc1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "   98.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e2a4e5279ba1fd3f
+        size: 790
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/hooks/holds_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`writes` reads the holds fold under the door's lock as it lands the event, and answers it as `ownLanding`. `held` and `drops` read that value, in place of a second snapshot and the session's current place. A helper's post between a call's write and its verdict then leaves the call's stop refusal standing. A refused post landing after a passing call hands the call none of its verdict. The red case passes, beside the borrowed case. The fix landed in d8d441a98, and the other fold readers followed in `hook-folds-read-landed-place`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hook door's files alone: `hooks.go`, `holds.go` and their test
+- the change reaches the store and the config through the door's fakes
+- the comment over `ownLanding` names the approach
+- the landed value stands once, as `ownLanding` in `holds.go`
 
 # accept
 
