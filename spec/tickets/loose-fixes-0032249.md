@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 fix: true
 cloud: true
 record:
@@ -100,6 +100,18 @@ record:
         exit: 0
         said: work/loose-fixes-0032249 already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 05c4736f6ff2 · claude-code-remote
+    hash_before: ef9ccfa4152aef76928fc80f35f1f91e24d97403
+    hash_after: ef9ccfa4152aef76928fc80f35f1f91e24d97403
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 4fda339dd698ce5e
+        size: 13377
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -133,14 +145,20 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/wal-case-opens-a-copy]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is a single test case, small enough to review whole
+- the child is the one loose agent ticket on main, so it covers the goal
+- no child waits on another
+- no child reads from a sibling
+- the diff carries ticket evidence alone, well inside one review
 
 # children
 
