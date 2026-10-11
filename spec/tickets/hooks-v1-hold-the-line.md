@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box d5540c8b5530 · claude-code-remote
@@ -103,6 +103,15 @@ record:
         exit: 0
         said: work/hooks-v1-hold-the-line took 166 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 4467ed989ba2fc2054e49678426ede76a9c47257
+    hash_after: 4467ed989ba2fc2054e49678426ede76a9c47257
+    inputs:
+      - name: ask
+        hash: 8cf71ae9d5dce05d
+        size: 453
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -127,14 +136,44 @@ Every confirmed finding of the review fleet over main at bf1dad88b stands fixed 
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/brief-waits-for-a-pass]], trivial
+- [[spec/tickets/calls-test-sends-secret]], trivial
+- [[spec/tickets/dispatch-skips-fork-pulls]], trivial
+- [[spec/tickets/door-lock-holds-commit-alone]], trivial
+- [[spec/tickets/draft-names-red-tests]], trivial
+- [[spec/tickets/fill-gate-stands-once]], trivial
+- [[spec/tickets/first-port-client-sends-secret]], trivial
+- [[spec/tickets/github-writes-leave-the-allowlist]], trivial
+- [[spec/tickets/hold-verdict-borrowed-case-tested]], trivial
+- [[spec/tickets/hold-verdicts-ride-the-post]], standard
+- [[spec/tickets/hook-folds-read-landed-place]], trivial
+- [[spec/tickets/legacy-gate-matches-draft]], trivial
+- [[spec/tickets/person-drop-folds-case]], trivial
+- [[spec/tickets/pkill-recovery-takes-plain-paths]], trivial
+- [[spec/tickets/read-door-matches-absolute-path]], trivial
+- [[spec/tickets/secret-post-serves-test]], trivial
+- [[spec/tickets/shell-write-paths-clean]], trivial
+- [[spec/tickets/standing-chmods-existing-file]], trivial
+- [[spec/tickets/trunk-push-reads-the-refspec]], trivial
+- [[spec/tickets/types-wait-for-laid-types]], trivial
+- [[spec/tickets/v1-gate-reads-decoded-input]], trivial
+- [[spec/tickets/v1-takes-a-run-secret]], standard
+- [[spec/tickets/verdict-test-takes-landed-value]], trivial
+- [[spec/tickets/version-guard-skips-git-options]], trivial
+- [[spec/tickets/write-door-paths-clean]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is a one-module fix with its test, or a standard design under its own review
+- the children cover every confirmed finding the ask names, and the review points of the two designs
+- the review points of a design land before its build, and the pull hands them first
+- each review point names the design it reads, and lands before that design's build
+- the group's diff stands as one review, since each child is a small fix
 
 # children
 
