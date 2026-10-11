@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -167,7 +167,34 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: c0fe1a89bcdf81d45c80a9d374f8ac0eddb273b9
+    hash_after: c0fe1a89bcdf81d45c80a9d374f8ac0eddb273b9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   71.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 6aed32223962e7cb
+        size: 933
+    def: ebccfd52b1111bbe
+    reopen:
+      - path: src/quack/verb_mint_light_test.go
+        why: a sibling rewrote it after the freeze, and its t.Parallel beside the t.Setenv in runsVerb panicked before the assertion ran, so the case drops t.Parallel and keeps every assertion
+    next: accept reads the diff, then view, then the group reaches accept
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: handovers-and-light-work
+reason: done
 ---
 
 # Ask
@@ -313,8 +340,8 @@ The trivial hash moves, so an open trivial ticket at `do` takes the new route at
 
 accept
 
-- The approach breaks no rule of the ask. The trivial route gains the stopping line, a mint with no --process takes it through one constant, and the tickets guidance names who takes it.
-- A red test decides every done_when line. The light case in src/quack/verb_mint_light_test.go fails on its own assertion. The standard case now stands as one assertion in the first mint subtest of src/quack/verb_mint_test.go, where reworded-input-keeps-the-step moved it, so the draft tests list names a stale test name and the guard still holds.
+- The approach breaks no rule of the ask. The trivial route gains the stopping line. A bare mint takes it through one constant, and the guidance names who takes it.
+- A red test decides every done_when line. The light case in src/quack/verb_mint_light_test.go fails on its own assertion. The standard case stands as one assertion in the first mint subtest of `src/quack/verb_mint_test.go`. A sibling moved it there, so the draft names a stale test and the guard still holds.
 - The ask names mint-light.md, and the draft lands pull-light.md, since the example harness wires no mint. I take that departure, and the implementer records it under says.
 
 # implement
@@ -335,10 +362,10 @@ accept
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the files the draft names, and the two sibling examples whose alpha hand-back now meets the trivial route
+- the change touches the files the draft names, and two sibling examples whose alpha now meets the trivial route
 - the change reaches no new door, and the mint reads the disk it read before
 - each change carries a comment linking the ticket
-- the light route stands once, as pull.LightRoute, and the mint and the finding route both read it
+- the light route stands once, as `pull.LightRoute`, and the mint and the finding route both read it
 
 ## tests-green
 
@@ -347,26 +374,37 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/quack/verb_mint_light_test.go src/quack/verb_mint_test.go src/pull
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A ticket minted with no `--process` now takes the trivial route, the light one. Its one step carries the stopping line: stop when the tests cover every rule of the ask and pass, and leave working code alone. The route name stands once, as `pull.LightRoute`, read by the mint and by the route a finding child takes. Rule 6 of the tickets guidance names the tickets that take it, and the rationale carries the clean-room measure.
+
+The ask names `mint-light.md`, and the example harness wires no mint, so `pull-light.md` shows the pull handing out a trivial leaf with its stopping line. Alpha in the harness names the trivial route on a stale hash, so the pull takes the shipped route in. Two sibling examples hand alpha back, so each now carries the check and the checklist lines the trivial route asks.
+
+The red light test panicked on `t.Parallel` beside `t.Setenv`, so it drops `t.Parallel` under a reopen. The minted golden and the projected output style follow the route and the guidance.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, the two sibling examples alpha meets, the golden and the projection
+- the change reaches no new door
+- each change carries a comment linking the ticket
+- the light route stands once, as `pull.LightRoute`
 
 # accept
 
