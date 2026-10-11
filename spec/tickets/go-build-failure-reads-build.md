@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -146,6 +146,18 @@ record:
     frozen:
       - path: src/branches/port_f_testverb_test.go
         hash: a3ded3187aa2d933
+  - step: gate
+    hand: box 8339730da099 · claude-code-remote · helper-4
+    hash_before: 0361b36a8fd884622a916b73af8f3317efb9d95d
+    hash_after: 0361b36a8fd884622a916b73af8f3317efb9d95d
+    inputs:
+      - name: design/draft
+        hash: 1afb7bffaada5615
+        size: 1291
+      - name: design/tests-red
+        hash: 0c9c9ee5f01d6b9e
+        size: 564
+    def: 7cea74295027d571
 group: branches-and-pull-report-truly
 ---
 
@@ -271,8 +283,9 @@ The case fails on the second run: the stdout and stderr a real build failure pri
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
