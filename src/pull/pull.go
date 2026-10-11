@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"quackitect/src/failure"
@@ -145,16 +146,17 @@ type ToolAnswer struct {
 	Spawn  string `json:"spawn,omitempty"`
 }
 
-// The tool's answer off the pull's text: a spawn answer hands the rows past its first blank row as the hand's prompt. [[spec/design_output/pull#a-hand-of-its-own]]
+// The tool's answer off the pull's text: a spawn answer, past any work lines a hand-back prints first, hands the rows past its first blank row as the hand's prompt. [[spec/tickets/tool-pull-finds-the-spawn]]
 func ToolAnswerOf(text string) ToolAnswer {
 	said := ToolAnswer{Result: text}
 	rows := strings.Split(text, "\n")
-	if strings.TrimSpace(rows[0]) != spawn {
+	from := slices.IndexFunc(rows, func(row string) bool { return strings.TrimSpace(row) == spawn })
+	if from < 0 {
 		return said
 	}
-	for at, row := range rows {
+	for at, row := range rows[from:] {
 		if row == "" {
-			said.Spawn = strings.TrimSpace(strings.Join(rows[at+1:], "\n"))
+			said.Spawn = strings.TrimSpace(strings.Join(rows[from+at+1:], "\n"))
 			break
 		}
 	}
