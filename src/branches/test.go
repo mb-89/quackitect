@@ -33,6 +33,7 @@ var (
 	goTest     = regexp.MustCompile(`^src/.*_test\.go$`)
 	srcFolder  = regexp.MustCompile(`^src/[^.]*$`)
 	goFail     = regexp.MustCompile(`(?m)^(---\s+)?FAIL`)
+	goBuild    = regexp.MustCompile(`\[(build|setup) failed\]`)
 	goError    = regexp.MustCompile(`[Ee]rror|cannot|undefined`)
 	testFunc   = regexp.MustCompile(`(?m)^func (Test\w+)\(`)
 	notOK      = regexp.MustCompile(`(?m)^\s*not ok \d+ - (.+)$`)
@@ -178,13 +179,13 @@ func (d *Doors) goTestNames(paths []string) []string {
 	return out
 }
 
-// The word a Go run answers: green, assertion or build. [[spec/design_output/pull#the-test-verb]]
+// The word a Go run answers: green, assertion or build, where a build mark reads build before any FAIL line. [[spec/design_output/pull#the-test-verb]] [[spec/tickets/go-build-failure-reads-build]]
 func goSays(ran Said, where string) string {
 	out := ran.Out + "\n" + ran.Err
 	if ran.OK {
 		return "green, " + where + " passes"
 	}
-	if goFail.MatchString(out) {
+	if goFail.MatchString(out) && !goBuild.MatchString(out) {
 		return "assertion, a test of " + where + " fails"
 	}
 	line := "the run answers nothing"
