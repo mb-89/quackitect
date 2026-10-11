@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 5acf98339716e8071901cc105bd389eb1fb8607e
+    hash_after: 06e503b306afb3f4b0aaa10408d70be1162eeece
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   96.4  in all"
+    inputs:
+      - name: ask
+        hash: 3f235727368d49ac
+        size: 399
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull tool answer now finds the spawn row anywhere in the pull text, not on the first line alone. A hand-back prints its work lines before a spawn answer, so the hook in pull-tool.ts now spawns the hand there too.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the named test passes, and the check answers 0
+- the cleanup the change reveals: none past the one function
+- every fact stands in one place: the spawn row is read in ToolAnswerOf alone
 
 # Discussion
 
