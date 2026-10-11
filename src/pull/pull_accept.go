@@ -23,10 +23,10 @@ const (
 func acceptWaits(one *Held, all []*Held) string {
 	open := []string{}
 	for _, held := range all {
-		if held.Name == one.Name || FieldOf(held.Text, "state") == Closed {
+		if held.Name == one.Name || held.Field("state") == Closed {
 			continue
 		}
-		if FieldOf(held.Text, "parent") == one.Name || FieldOf(held.Text, GroupField) == one.Name {
+		if held.Field("parent") == one.Name || held.Field(GroupField) == one.Name {
 			open = append(open, held.Name)
 		}
 	}

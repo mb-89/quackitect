@@ -183,7 +183,13 @@ func (d *Doors) leaves(branch, at, says string, moved []string, final front.Orde
 	_ = d.write(at, now)
 	_ = d.Repo.Add([]string{at})
 	d.marks(name, false)
-	_, _ = d.Repo.Commit(branch+": the box leaves", nil)
+	wrote := []string{at}
+	for _, one := range moved {
+		wrote = append(wrote, ticketAt(one))
+	}
+	if !d.commitsOrStops(branch+": the box leaves", wrote) {
+		return codeRed
+	}
 	if !d.push(branch) {
 		return codeRed
 	}

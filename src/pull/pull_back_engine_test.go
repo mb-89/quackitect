@@ -69,6 +69,20 @@ func TestTheHandOnAGroupsBranchTakesBackNoLeafAnotherHandPassed(t *testing.T) {
 	}
 }
 
+// A take-back the commit refuses names the refusal and pushes nothing, and the ticket stays shut. [[spec/tickets/take-back-reports-refusals]]
+func TestARefusedTakeBackSaysTheRefusal(t *testing.T) {
+	t.Parallel()
+	it, errs := closedPull(t, "work/g")
+	must(t, it.Disk.Write("src/a.go", "<<<<<<< ours\npackage a\n"))
+	code := it.Pulling([]string{"pull", "g", "--back", "children"})
+	if code != 1 || !strings.Contains(errs(), "the hook refuses the commit, so nothing lands:") || strings.Contains(errs(), "stands at children again") {
+		t.Fatalf("the take-back answers %d:\n%s", code, errs())
+	}
+	if text, _ := it.Disk.Read("spec/tickets/g.md"); FieldOf(text, "state") == Open {
+		t.Fatalf("g stands open after a refused take-back:\n%s", text)
+	}
+}
+
 func TestAHandOffTheGroupsBranchTakesBackNoLeafTheEnginePassed(t *testing.T) {
 	t.Parallel()
 	it, errs := closedPull(t, "main")

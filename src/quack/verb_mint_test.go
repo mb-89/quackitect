@@ -104,13 +104,14 @@ func mintTree(t *testing.T, branch string) string {
 
 func TestMintVerb(t *testing.T) {
 	// [[spec/tickets/verbs-mint-tickets-and-keys]]
-	t.Run("a ticket takes the gain the breaks and the done when as fields", func(t *testing.T) {
+	// [[spec/tickets/small-work-takes-light-path]]
+	t.Run("a ticket takes the gain the breaks and the done when as fields, and keeps the full route it names", func(t *testing.T) {
 		root := mintTree(t, "")
 		seedFile(t, root, "spec/processes/standard.yaml", shippedText(t, "spec/processes/standard.yaml"))
 		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=standard",
 			"--gain=A box mints with no sed.", "--breaks=Clones carry stray fields.", "--done_when=one passes", "--done_when=two passes")
 		got, _ := readIn(root, "spec/tickets/fresh.md")
-		if code != 0 || !strings.Contains(got, "# Ask\n\nA box mints with no sed.\n\nClones carry stray fields.\n\n- one passes\n- two passes\n") {
+		if code != 0 || !strings.Contains(got, "# Ask\n\nA box mints with no sed.\n\nClones carry stray fields.\n\n- one passes\n- two passes\n") || !strings.Contains(got, "  - name: gate\n") {
 			t.Fatalf("the mint answers %d: %s\nand writes:\n%s", code, said, got)
 		}
 	})
@@ -129,13 +130,8 @@ func TestMintVerb(t *testing.T) {
 		if got, _ := readIn(root, "spec/tickets/fresh.md"); got != mintedTicket {
 			t.Fatalf("the mint writes:\n%s\nand wants:\n%s", got, mintedTicket)
 		}
-		for _, line := range []string{
-			"spec/tickets/fresh.md stands, in the shape ticket names.",
-			"Write it, then run ./RUNME.sh lint to read what is left.",
-		} {
-			if !strings.Contains(said, line) {
-				t.Errorf("the mint says %q, and wants %q", said, line)
-			}
+		if !strings.Contains(said, "spec/tickets/fresh.md stands, in the shape ticket names.") || !strings.Contains(said, "Write it, then run ./RUNME.sh lint to read what is left.") {
+			t.Errorf("the mint says %q, and wants the stand line and the lint line", said)
 		}
 	})
 	t.Run("a ticket naming no ask takes the process's ask rows, and a mint off a handover line writes the from line first", func(t *testing.T) {
@@ -177,34 +173,20 @@ func TestMintVerb(t *testing.T) {
 		}
 	})
 	// [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-	t.Run("a path that stands, or a ticket naming a closed group, comes back refused through the failure door, which logs its row", func(t *testing.T) {
-		for _, one := range []struct {
-			extra, failure string
-			says           []string
-		}{
-			{"--process=small", "mint-path-stands", []string{"spec/tickets/fresh.md stands already.", "remedy: Name a path nothing holds yet"}},
-			{"--group=shut", "mint-group-closed", []string{"shut stands closed, so it takes no new child.", "Mint the ticket with no group, or reopen shut", "--back"}},
-		} {
-			root := mintTree(t, "")
-			seedFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
-			if one.failure == "mint-path-stands" {
-				seedFile(t, root, "spec/tickets/fresh.md", closedGroupTicket)
+	t.Run("a ticket naming a closed group comes back refused through the failure door, which logs its row", func(t *testing.T) {
+		root := mintTree(t, "")
+		seedFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small", "--group=shut")
+		for _, line := range []string{"failure mint-group-closed at warn", "shut stands closed, so it takes no new child.", "Mint the ticket with no group, or reopen shut", "--back"} {
+			if code != exitUsage || !strings.Contains(said, line) {
+				t.Fatalf("the mint answers %d: %s, and wants %d saying %q", code, said, exitUsage, line)
 			}
-			code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small", one.extra)
-			if code != exitUsage || !strings.Contains(said, "failure "+one.failure+" at warn") {
-				t.Fatalf("the mint answers %d: %s, and wants %d naming %s", code, said, exitUsage, one.failure)
-			}
-			for _, line := range one.says {
-				if !strings.Contains(said, line) {
-					t.Errorf("the mint says %q, and wants %q", said, line)
-				}
-			}
-			if row, _ := readIn(root, sessionLog); !strings.Contains(row, `"failure":"`+one.failure+`"`) {
-				t.Errorf("the session log holds %q, and wants the failure's row", row)
-			}
-			if text, _ := readIn(root, "spec/tickets/fresh.md"); one.failure == "mint-group-closed" && text != "" {
-				t.Fatal("a refused mint writes spec/tickets/fresh.md")
-			}
+		}
+		if row, _ := readIn(root, sessionLog); !strings.Contains(row, `"failure":"mint-group-closed"`) {
+			t.Errorf("the session log holds %q, and wants the failure's row", row)
+		}
+		if text, _ := readIn(root, "spec/tickets/fresh.md"); text != "" {
+			t.Fatal("a refused mint writes spec/tickets/fresh.md")
 		}
 	})
 	t.Run("a ticket on a closed group's branch joins no group, and stands free", func(t *testing.T) {

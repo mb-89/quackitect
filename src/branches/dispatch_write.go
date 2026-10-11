@@ -8,6 +8,7 @@ package branches
 import (
 	"encoding/json"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,6 +59,20 @@ func opensOf(read workRead, standing, trunkTickets map[string]string) []string {
 	for _, one := range read.Loose {
 		if isGroup(one.Text) && fieldOf(one.Text, "state") != closedState && fieldOf(one.Text, cloudMark) != "true" &&
 			!branched[one.Name] && !parents[one.Name] && len(waitsIn(one.Text, standing, trunkTickets)) == 0 {
+			out = append(out, one.Name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Each open group whose branch stands while trunk's copy carries no marker. A write refused after its branch push leaves one, and the next write marks it. [[spec/tickets/dispatch-remarks-branched-groups]]
+func remarksOf(read workRead) []string {
+	texts := trunkOf(read.Loose)
+	out := []string{}
+	for _, one := range read.Stand {
+		text := texts[one.Name]
+		if isGroup(text) && fieldOf(text, "state") != closedState && fieldOf(text, cloudMark) != "true" {
 			out = append(out, one.Name)
 		}
 	}
@@ -120,6 +135,15 @@ func fixName(words int, main, parent string) string {
 	return cutTo(strings.Join(parts, "-"), words)
 }
 
+// A name another ticket holds gives its last kept word up to a counter, so it stays under the cap and stands alone. [[spec/tickets/fix-group-names-stay-unique]]
+func freeName(name string, words int, taken map[string]bool) string {
+	out := name
+	for count := 2; taken[out]; count++ {
+		out = cutTo(name, max(words-1, 0)) + "-" + strconv.Itoa(count)
+	}
+	return out
+}
+
 var nameJoins = regexp.MustCompile(`[-_.]+`)
 
 // A name past its cap of words keeps its first ones. [[spec/tickets/prose-verbs-land-first-try]]
@@ -147,8 +171,13 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 	out := map[string]string{}
 	texts := trunkOf(read.Loose)
 	// Each bundle becomes a fix group under its parent. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+	taken := map[string]bool{}
+	for name := range texts {
+		taken[name] = true
+	}
 	for _, one := range plan.Bundles {
-		name := fixName(d.nameWords(), main, one.Parent)
+		name := freeName(fixName(d.nameWords(), main, one.Parent), d.nameWords(), taken)
+		taken[name] = true
 		text, why := d.fixGroup(name, one.Parent)
 		if why != "" {
 			return nil, why
@@ -163,7 +192,7 @@ func (d *Doors) writesOf(plan *dispatchPlan, read workRead, main string) (map[st
 		out[ticketAt(name)] = withField(texts[name], "state", closedState)
 	}
 	// The cloud marker rides this commit in place of marksTrunk and openGroup, because both of those push main. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
-	for _, name := range plan.Opens {
+	for _, name := range append(slices.Clone(plan.Opens), remarksOf(read)...) {
 		out[ticketAt(name)] = withField(texts[name], cloudMark, "true")
 	}
 	return out, ""

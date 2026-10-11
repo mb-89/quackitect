@@ -291,7 +291,7 @@ func (d *Doors) carried(plan *dispatchPlan, read workRead) int {
 	if state.State != writeFree {
 		return codeOK
 	}
-	if len(plan.Bundles) == 0 && len(plan.Opens) == 0 && len(plan.Closes) == 0 {
+	if len(plan.Bundles) == 0 && len(plan.Opens) == 0 && len(plan.Closes) == 0 && len(remarksOf(read)) == 0 {
 		plan.Write.State = "nothing"
 		return codeOK
 	}

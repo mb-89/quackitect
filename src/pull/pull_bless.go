@@ -175,9 +175,7 @@ func (it *It) blessHolds(one *Held) *Held {
 		if !verdict || blessedAt(kept, gate) {
 			continue
 		}
-		one.Text = withField(kept, "step", gate.Path)
-		one.Front = FrontOf(one.Text)
-		it.landedAlone(one, []string{fmt.Sprintf("waits at %s again, because an edit strips its bless", gate.Path)})
+		it.movedAlone(one, withField(kept, "step", gate.Path), []string{fmt.Sprintf("waits at %s again, because an edit strips its bless", gate.Path)})
 		return one
 	}
 	return one

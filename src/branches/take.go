@@ -263,14 +263,17 @@ func (d *Doors) onBranch(branch string) bool {
 	for _, one := range parked {
 		_ = d.Repo.Restore(one.Name)
 	}
+	// The parked notes come back whether the switch lands or refuses. [[spec/tickets/failed-switch-keeps-parked-notes]]
+	defer func() {
+		for _, one := range parked {
+			_ = d.write(one.Name, one.Text)
+		}
+	}()
 	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
 	if !d.Repo.IsAncestor("origin/"+branch, "HEAD") {
 		_ = d.Repo.ResetTo("origin/"+branch, true)
-	}
-	for _, one := range parked {
-		_ = d.write(one.Name, one.Text)
 	}
 	return true
 }
@@ -304,8 +307,10 @@ func (d *Doors) claimGroup(one stand) int {
 	role := roleOf(hand)
 	from, base := handedOver(was, role, before)
 	entry := front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}
+	var left, handover []string
 	if from != "" {
 		entry = append(entry, front.Pair{Key: overField, Value: true})
+		left, handover = d.leftBy(one.Name, was, before)
 	}
 	_ = d.write(at, withEntry(base, entry))
 	_ = d.Repo.Add([]string{at})
@@ -324,9 +329,11 @@ func (d *Doors) claimGroup(one stand) int {
 		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(one.Branch)))
 		return codeRed
 	}
-	d.writeBeat(one.Name, role, false)
+	d.writeBeat(one.Name, role, false, nil)
 	if from != "" {
+		d.say("%s", strings.Join(left, "\n"))
 		d.takesRescue(one)
+		d.say("%s\n", strings.Join(handover, "\n"))
 	}
 	if d.sync() == codeRed {
 		d.raises(failure.Raise(d.Failures, "take-sync-conflict", "Resolve the conflict on "+one.Branch+" and commit it, then work the ask below."))

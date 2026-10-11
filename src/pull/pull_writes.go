@@ -15,9 +15,11 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The route a finding's child follows, and the words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
+// The light route a ticket minted with no process and a finding's child follow. [[spec/tickets/small-work-takes-light-path]]
+const LightRoute = "trivial"
+
+// The words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
 const (
-	childRoute = "trivial"
 	pointField = "point"
 	gatePoint  = "gate"
 )
@@ -118,13 +120,13 @@ type childrenSaid struct{ open, dropped, all []string }
 func childrenSay(all []*Held, name string) childrenSaid {
 	out := childrenSaid{open: []string{}, dropped: []string{}, all: []string{}}
 	for _, one := range all {
-		if one.Private || FieldOf(one.Text, GroupField) != name {
+		if one.Private || one.Field(GroupField) != name {
 			continue
 		}
 		out.all = append(out.all, one.Name)
-		if FieldOf(one.Text, "state") != Closed {
+		if one.Field("state") != Closed {
 			out.open = append(out.open, one.Name)
-		} else if FieldOf(one.Text, "reason") == "dropped" {
+		} else if one.Field("reason") == "dropped" {
 			out.dropped = append(out.dropped, one.Name)
 		}
 	}
@@ -145,7 +147,7 @@ func (it *It) passed(who *Who, one *Held, leaf *Leaf, held Hold, answered []Answ
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", tip),
 		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)),
-		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))))
+		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))), pair(nextField, nextIn(it.Argv)))
 	changes := append([]string{"passes " + leaf.Path}, also.changes...)
 	one.Text = it.stepOn(one, leaf, text, &changes, also.stays)
 	if finding := it.landed(one, changes, also.wrote); finding != "" {
@@ -232,7 +234,7 @@ type mintedChild struct{ at, text string }
 
 // A child a finding on the trivial route, in the ticket's group, standing as the caller asks, or why one mints nothing. [[spec/design_output/pull#a-finding-rides-out]]
 func (it *It) childrenOf(one *Held, leaf *Leaf, findings []Finding, standsAs map[string]any) ([]mintedChild, []string, string) {
-	route, why := ProcessAt(it.methodDisk(), childRoute)
+	route, why := ProcessAt(it.methodDisk(), LightRoute)
 	if why != "" {
 		return nil, nil, why
 	}
@@ -305,7 +307,7 @@ func (it *It) failed(who *Who, one *Held, leaf *Leaf, held Hold, reason string, 
 		after = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("returns", returns), pair("why", reason), pair("answered", answeredRows(answered)))
+		pair("returns", returns), pair("why", reason), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	changes := []string{fmt.Sprintf("fails %s back to %s", leaf.Path, back)}
 	one.Text = withField(withField(text, "step", back), "state", Open)
 	// At the cap a person step goes in before the target, asking the reason, so it rides the fail commit. [[spec/design_output/pull#the-fail]]
@@ -337,9 +339,14 @@ func (it *It) failed(who *Who, one *Held, leaf *Leaf, held Hold, reason string, 
 
 // [[spec/design_output/pull#became]]
 func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor string, answered []Answered, also more) int {
+	// A note becomes the tracked ticket of its name, so the successor is another file, and the ticket in hand is none. [[spec/tickets/became-refuses-itself]]
 	stands := false
 	for _, each := range TicketsHere(it.Disk) {
-		stands = stands || each.Name == successor
+		stands = stands || (each.Name == successor && each.Path != one.Path)
+	}
+	if !stands && successor == one.Name {
+		it.Refuse(failure.Raise(it.Failures, "pull-becomes-itself", one.Name+" becomes no successor of its own. Name the ticket it becomes."))
+		return 1
 	}
 	if !stands {
 		it.Refuse(failure.Raise(it.Failures, "pull-successor-nowhere", fmt.Sprintf("%s stands nowhere yet. Mint it, then hand back --became %s.", successor, successor)))
@@ -349,7 +356,7 @@ func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor strin
 	if !one.Private {
 		after = it.tipOf()
 	}
-	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after), pair("answered", answeredRows(answered)))
+	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	one.Text = withField(shut(text, FrontOf(text), "became"), "successors", "["+successor+"]")
 	if finding := it.landed(one, append([]string{"closes became " + successor}, also.changes...), also.wrote); finding != "" {
 		for _, at := range also.wrote {
@@ -384,7 +391,7 @@ func (it *It) answeredBy(who *Who, one *Held, leaf *Leaf, held Hold, answerer st
 		after = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("why", answerer+" answers this ask"), pair("answered", answeredRows(answered)))
+		pair("why", answerer+" answers this ask"), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	one.Text = shut(text, FrontOf(text), "answered")
 	if finding := it.landed(one, []string{"closes answered by " + answerer}, nil); finding != "" {
 		return it.unlanded(one, leaf, finding)
@@ -419,13 +426,18 @@ func (it *It) unlanded(one *Held, leaf *Leaf, finding string) int {
 }
 
 func unlandedRows(one *Held, leaf *Leaf, finding string) []string {
+	return append(refusedRows(finding), "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+}
+
+// The rows a refused commit names, under the line saying nothing lands. [[spec/tickets/take-back-reports-refusals]]
+func refusedRows(finding string) []string {
 	rows := []string{"the hook refuses the commit, so nothing lands:"}
 	for _, row := range strings.Split(finding, "\n") {
 		if row != "" {
 			rows = append(rows, row)
 		}
 	}
-	return append(rows, "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+	return rows
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
