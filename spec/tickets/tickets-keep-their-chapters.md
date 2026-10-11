@@ -89,6 +89,10 @@ record:
     hand: box 1ad094d8843c · claude-code-remote
     hash_before: ae593fa2d17311934d06ff060af81be1119801ad
     session: cse_014h3ELHfUoTwWwQ5ViaSZix
+    hash_after: 748eccfccd036da152a77242d7ace4ba4a5757e6
+    model: claude-opus-5-5
+    cost: 0
+    final: "RECEIPT: branch=work/tickets-keep-their-chapters prompted=no canary=no"
   - step: sync
     hand: box 1ad094d8843c · claude-code-remote
     hash_before: 18e32c356c39acc9a0d9765b96e065092e550fa0
