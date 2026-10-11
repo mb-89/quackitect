@@ -1,4 +1,30 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": 5.55,
+    "red": [],
+    "secs": 183.6,
+    "tail": "gicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:564:62: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n  110.4  go\n   57.9  level0\n   29.9  rules\n   28.1  tests\n    0.5  plugin\n    0.2  projections\n    0.0  doors\n    0.0  server\n  169.1  in all\n\nWarning: the check took 169.1s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   20.7  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   11.6  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    4.2  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    1.8  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes\n    1.8  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+    "timeouts": false,
+    "when": "2026-10-11T09:21:57Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 183.6,
+  "tail": "gicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:564:62: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n  110.4  go\n   57.9  level0\n   29.9  rules\n   28.1  tests\n    0.5  plugin\n    0.2  projections\n    0.0  doors\n    0.0  server\n  169.1  in all\n\nWarning: the check took 169.1s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   20.7  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   11.6  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    4.2  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    1.8  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes\n    1.8  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+  "when": "2026-10-11T09:21:57Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T05:26:51Z",
  "hidden": {

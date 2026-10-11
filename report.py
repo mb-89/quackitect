@@ -51,6 +51,8 @@ def load_runs(batch):
             "resolved": bool(h.get("pass")) if h else None,
             "f2p_frac": (h["f2p"][0] / h["f2p"][1]) if h and h.get("f2p") and h["f2p"][1] else None,
             "check_pass": c.get("pass") if c else None,
+            # ready to merge: the hidden tests pass and the repository's own check is green
+            "mergeable": (None if not h else (False if not h.get("pass") else (c.get("pass") if c else None))),
             "check_ok": c.get("no_regression") if c else None,
             "cost": m.get("cost_total", s.get("cost")), "cost_session": s.get("cost"),
             "cost_nested": (m.get("nested") or {}).get("cost", 0.0),
@@ -63,8 +65,22 @@ def load_runs(batch):
             "needs_owner": asked or stuck, "leaks": s.get("leak_flags") or [],
             "stop_hook_blocks": s.get("stop_hook_blocks"), "door_refusals": s.get("door_refusals"),
             "commits": m.get("commits_made"), "final_text": (s.get("final_text") or "")[-300:],
+            **tokens_of(s),
         })
     return rows
+
+
+def tokens_of(s):
+    """Tokens of the session, all models: the client's own totals off its result line, or the
+    per-message usage where the session was killed before it wrote one."""
+    mu = s.get("model_usage") or {}
+    if mu:
+        return {"tok_in": sum(v.get("in", 0) for v in mu.values()), "tok_out": sum(v.get("out", 0) for v in mu.values()),
+                "tok_cache_write": sum(v.get("cache_write", 0) for v in mu.values()),
+                "tok_cache_read": sum(v.get("cache_read", 0) for v in mu.values())}
+    u = s.get("usage_by_model") or {}
+    return {"tok_in": sum(v[0] for v in u.values()), "tok_out": sum(v[1] for v in u.values()),
+            "tok_cache_write": sum(v[2] for v in u.values()), "tok_cache_read": sum(v[3] for v in u.values())}
 
 
 def fmt(x, nd=2, pct=False):
@@ -85,9 +101,10 @@ def per_task(rows, arm, key, agg=stats.mean):
 
 
 def overview(rows, arms):
-    out = ["| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min "
-           "| mean turns | mean tool calls | files outside scope | needs owner | killed at cap |",
-           "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    out = ["| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ "
+           "| mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope "
+           "| needs owner | killed at cap |",
+           "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for arm in arms:
         rs = [r for r in rows if r["arm"] == arm and r["status"] == "ran"]
         if not rs:
@@ -98,7 +115,10 @@ def overview(rows, arms):
         mins = [r["secs"] / 60 for r in rs if r["secs"]]
         out.append(
             f"| {arm} | {len(rs)} | {sum(res)}/{len(res)} ({fmt(stats.mean(res) if res else None, pct=True)}) "
-            f"| {sum(chk)}/{len(chk)} | {fmt(stats.mean(cost), 3)} | {fmt(stats.median(cost), 3)} "
+            f"| {sum(chk)}/{len(chk)} "
+            f"| {(str(sum(1 for r in rs if r['mergeable'])) + '/' + str(len(rs))) if all(r['mergeable'] is not None for r in rs) else 'checks pending'} "
+            f"| {fmt(stats.mean(cost), 3)} | {fmt(stats.median(cost), 3)} "
+            f"| {stats.mean([r['tok_out'] for r in rs]) / 1e3:.1f}k / {stats.mean([r['tok_cache_read'] for r in rs]) / 1e6:.2f}M "
             f"| {fmt(stats.mean(mins), 1)} | {fmt(stats.median(mins), 1)} "
             f"| {fmt(stats.mean([r['turns'] for r in rs if r['turns']]), 0)} "
             f"| {fmt(stats.mean([r['tool_calls'] for r in rs if r['tool_calls'] is not None]), 0)} "
@@ -121,6 +141,9 @@ def compare(rows, a, b, tasks=None):
     ta, tb = per_task(rows, a, "turns"), per_task(rows, b, "turns")
     ct = [t for t in common if t in ta and t in tb and ta[t] > 0 and tb[t] > 0]
     d_turns = [math.log(tb[t] / ta[t]) for t in ct]
+    ma, mb = per_task(rows, a, "mergeable"), per_task(rows, b, "mergeable")
+    cm = [t for t in common if t in ma and t in mb]
+    d_merge = [mb[t] - ma[t] for t in cm] if len(cm) == len(common) else []
     # McNemar on seed 1
     s1 = {}
     for r in rows:
@@ -137,6 +160,11 @@ def compare(rows, a, b, tasks=None):
         "resolve_ci": stats.bootstrap_ci(d_res), "resolve_p": stats.sign_flip_p(d_res),
         "mcnemar": {"b_only": b_only, "a_only": a_only, "p": p_mc, "pairs": len(pairs)},
         "discordant_share": disc,
+        "merge_a": stats.mean([ma[t] for t in cm]) if d_merge else None,
+        "merge_b": stats.mean([mb[t] for t in cm]) if d_merge else None,
+        "merge_diff": stats.mean(d_merge) if d_merge else None,
+        "merge_ci": stats.bootstrap_ci(d_merge) if d_merge else (float("nan"), float("nan")),
+        "merge_p": stats.sign_flip_p(d_merge) if d_merge else None,
         "cost_ratio": math.exp(stats.mean(d_cost)) if d_cost else None,
         "cost_ci": tuple(math.exp(x) for x in stats.bootstrap_ci(d_cost)) if d_cost else None,
         "cost_p": stats.sign_flip_p(d_cost) if d_cost else None,
@@ -176,8 +204,9 @@ def mechanics(rows, arms):
 
 def compare_table(results):
     out = ["| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) "
+           "| resolved and check green (A → B), B − A, 95% CI, p "
            "| cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |",
-           "|---|---|---|---|---|---|---|---|---|---|---|"]
+           "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in results:
         if not r["n_tasks"]:
             continue
@@ -188,6 +217,9 @@ def compare_table(results):
             f"| {fmt(r['resolve_diff'] * 100 if r['resolve_diff'] is not None else None, 0)} pts "
             f"[{fmt(ci[0] * 100, 0)}, {fmt(ci[1] * 100, 0)}] | {fmt(r['resolve_p'], 3)} "
             f"| {mc['b_only']} / {mc['a_only']}, p={fmt(mc['p'], 3)} "
+            + (f"| {fmt(r['merge_a'], pct=True)} → {fmt(r['merge_b'], pct=True)}, {fmt(r['merge_diff'] * 100, 0)} pts "
+               f"[{fmt(r['merge_ci'][0] * 100, 0)}, {fmt(r['merge_ci'][1] * 100, 0)}], p={fmt(r['merge_p'], 3)} "
+               if r.get("merge_diff") is not None else "| (checks pending) ") +
             f"| {fmt(r['cost_ratio'])}× [{fmt(r['cost_ci'][0]) if r['cost_ci'] else '–'}, {fmt(r['cost_ci'][1]) if r['cost_ci'] else '–'}] "
             f"| {fmt(r['cost_p'], 3)} "
             f"| {fmt(r['time_ratio'])}× [{fmt(r['time_ci'][0]) if r['time_ci'] else '–'}, {fmt(r['time_ci'][1]) if r['time_ci'] else '–'}] "

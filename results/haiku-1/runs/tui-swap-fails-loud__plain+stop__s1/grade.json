@@ -1,4 +1,64 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [
+     "src/quack/tui_verb.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 633. Split it by topic.",
+     "src/quack/tui_verb.go:345:11: MagicNumber: 100 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:347:11: MagicNumber: 200 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:349:11: MagicNumber: 200 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:351:10: MagicNumber: 1000 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:486:36: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:486:40: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:487:37: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:487:41: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:513:36: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:513:40: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:514:69: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:529:49: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:555:42: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:556:47: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+     "src/quack/tui_verb.go:558:73: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json."
+    ],
+    "load_start": 7.46,
+    "red": [],
+    "secs": 185.4,
+    "tail": "/voice/voice.go:564:62: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\ntest/contract/cli-verbs.test.js:7:1: correctness/noUnusedImports: Several of these imports are unused.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n  114.0  go\n   53.4  level0\n   29.5  rules\n   27.1  tests\n    0.5  plugin\n    0.3  projections\n    0.1  doors\n    0.0  server\n  171.6  in all\n\nWarning: the check took 171.6s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   19.6  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   10.9  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    2.5  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    2.2  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\n    2.1  test/contract/runme-road.test.js ./RUNME.sh hands config to its program, which names the verbs slice at its built-in new\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+    "timeouts": false,
+    "when": "2026-10-11T09:50:29Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [
+   "src/quack/tui_verb.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 633. Split it by topic.",
+   "src/quack/tui_verb.go:345:11: MagicNumber: 100 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:347:11: MagicNumber: 200 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:349:11: MagicNumber: 200 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:351:10: MagicNumber: 1000 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:486:36: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:486:40: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:487:37: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:487:41: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:513:36: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:513:40: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:514:69: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:529:49: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:555:42: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:556:47: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.",
+   "src/quack/tui_verb.go:558:73: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json."
+  ],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 185.4,
+  "tail": "/voice/voice.go:564:62: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\ntest/contract/cli-verbs.test.js:7:1: correctness/noUnusedImports: Several of these imports are unused.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n  114.0  go\n   53.4  level0\n   29.5  rules\n   27.1  tests\n    0.5  plugin\n    0.3  projections\n    0.1  doors\n    0.0  server\n  171.6  in all\n\nWarning: the check took 171.6s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   19.6  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   10.9  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    2.5  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    2.2  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\n    2.1  test/contract/runme-road.test.js ./RUNME.sh hands config to its program, which names the verbs slice at its built-in new\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+  "when": "2026-10-11T09:50:29Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T00:31:04Z",
  "hidden": {

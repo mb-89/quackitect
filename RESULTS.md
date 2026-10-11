@@ -17,8 +17,9 @@ expensive and 2 to 13 times slower than a plain session. What helps is a stoppin
 | Haiku 5.5, 12 tasks × 3 arms | plain | plain + stop rule | v5 |
 |---|---|---|---|
 | hidden tests pass | 10/12 | **12/12** | 8/12 |
-| full check green, of the runs that passed | pending | pending | pending |
+| full check green, of the runs that passed | 10/10 | 12/12 | 8/8 |
 | mean cost per task | $0.027 | **$0.020** | $0.501 |
+| mean session tokens, output / cache read | 14k / 1.1M | 11k / 0.67M | 47k / 9.0M |
 | mean wall-clock | 13.1 min | **10.1 min** | 29.7 min |
 | mean turns / tool calls | 25 / 26 | 20 / 21 | 103 / 91 |
 | ended needing the owner | 0/12 | 0/12 | 10/12 |
@@ -28,8 +29,9 @@ expensive and 2 to 13 times slower than a plain session. What helps is a stoppin
 | Sonnet 5.5, 5 tasks × 3 arms | plain | plain + stop rule | v5 |
 |---|---|---|---|
 | hidden tests pass | 2/5 | **3/5** | **3/5** |
-| full check green, of the runs that passed | pending | pending | pending |
+| full check green, of the runs that passed | 2/2 | 3/3 | 3/3 |
 | mean cost per task | $0.115 | **$0.107** | $1.264 |
+| mean session tokens, output / cache read | 2.9k / 0.13M | 2.6k / 0.11M | 22k / 4.5M |
 | mean wall-clock | 3.5 min | **2.1 min** | 34.8 min |
 | mean turns / tool calls | 8 / 8 | 7 / 7 | 81 / 79 |
 | ended needing the owner | 0/5 | 0/5 | 2/5 |
@@ -42,7 +44,8 @@ The Sonnet tasks are the first five of the Haiku twelve.
    95% bootstrap CI −50 to +17; exact sign-flip p = 0.63) and 4 fewer than plain with the stopping
    rule (all four discordant tasks went to plain+stop; exact p = 0.125). With Sonnet, v5 resolved
    one more than plain (3/5 against 2/5; +20 points, CI −40 to +80, p = 1.0) and exactly the three
-   plain+stop resolved.
+   plain+stop resolved. Every resolved tree, in every arm, also passes the repository's full check
+   (below), so the check changes none of this.
 2. **Cost and time: v5 costs about 16× plain with Haiku** (geometric mean of per-task ratios, 95%
    CI 9.4× to 26×, p < 0.001) **and 21× plain+stop; with Sonnet 11× plain** (CI 7.0× to 18.6×)
    **and 12× plain+stop**. It takes 2.1× and 2.8× the wall-clock with Haiku (p = 0.015 and 0.014),
@@ -72,8 +75,34 @@ The Sonnet tasks are the first five of the Haiku twelve.
 
 ## The full check
 
-Pending: the checks run after the sessions, one at a time on the idle machine (DESIGN.md §3); this
-section fills when they finish.
+`./RUNME.sh check` is the repository's own gate: CI runs it on every pull request, and auto-merge
+waits on it. It ran on the final tree of every run that passed its hidden tests, after the
+sessions, one at a time on the idle machine, with up to three attempts while red (DESIGN.md §3).
+
+| full check green, of the runs that passed | plain | plain + stop rule | v5 |
+|---|---|---|---|
+| Haiku | 10/10 | 12/12 | 8/8 |
+| Sonnet | 2/2 | 3/3 | 3/3 |
+
+**Every tree that passed its hidden tests also passes the full check, in every arm.** So
+"resolved and check green" equals "resolved", and the check does not separate v5 from the plain
+arms on this work: v5's commit door holds each of its commits to a green check, and the plain
+arms' trees came out green without that door.
+
+Two trees needed a second attempt. Haiku's plain and plain+stop trees of
+example-retro-gaps-shown-name were first checked beside a live Sonnet session (load average above
+20) and went red on Vale's two-second rule bound (`VoiceParagraph.Vocabulary: did not finish
+within 2s`) and, for plain+stop, on a git wait bound (`exec: WaitDelay expired`); on the idle
+machine both were green. That load flake is the repository's own: the base of
+vale-retries-its-timeout, the ticket that fixes it, checks red on `rules` for the same reason (the
+one base of the twelve that is not green), and every arm's tree of that task checks green. It is
+also the red that v5 sessions met mid-session and chased, since v5's door wants the check green
+before a commit (the index-why session under "What v5 does with the time and money").
+
+Two machine faults were taken out of the record and the checks run again: the cached base check of
+go-pull-desk-remedy-once met the Go build cache being emptied under it, and when the box restarted
+mid-pass, the checks still running failed at the Vale download because the session's proxy had
+moved. Neither touched an agent's tree (DESIGN.md §3).
 
 ## What v5 does with the time and money
 
@@ -147,7 +176,9 @@ it names, as level zero makes every call name one):
 | Sonnet | tui-swap-fails-loud | v5 | `TestTuiFailedSwapFailsTheVerbAndAsksNotForGo`: the verb answers 0 where the test wants it to fail, as Haiku's v5 run; then the session closed the group, worked a backlog ticket and hit the cap opening the pull request |
 
 Every other run passed every FAIL_TO_PASS and PASS_TO_PASS test of its task. No run touched
-GitHub or the upstream (`leak_flags` empty in every transcript).
+GitHub or the upstream (`leak_flags` empty in every transcript). The outward reaches were v5's
+own last step: six v5 sessions that reached the pull request ran `gh pr create`, `gh pr list` or
+`gh auth status` (two Haiku, four Sonnet), in a sandbox with no `gh` and no route to GitHub.
 
 ## Threats to validity
 
@@ -194,11 +225,11 @@ mined after the change, plain arms as the control).
 
 #### haiku-1, all: Overview (all tasks: 12, runs: 36)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 12 | 10/12 (83%) | 1/2 | 0.027 | 0.025 | 13.1 | 11.1 | 25 | 26 | 0.2 | 0/12 | 0/12 |
-| plain+stop | 12 | 12/12 (100%) | 2/2 | 0.020 | 0.019 | 10.1 | 8.4 | 20 | 21 | 0.0 | 0/12 | 0/12 |
-| v5 | 12 | 8/12 (67%) | 1/1 | 0.501 | 0.409 | 29.7 | 29.4 | 103 | 91 | 0.3 | 10/12 | 4/12 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 12 | 10/12 (83%) | 10/10 | 10/12 | 0.027 | 0.025 | 14.2k / 1.09M | 13.1 | 11.1 | 25 | 26 | 0.2 | 0/12 | 0/12 |
+| plain+stop | 12 | 12/12 (100%) | 12/12 | 12/12 | 0.020 | 0.019 | 11.4k / 0.67M | 10.1 | 8.4 | 20 | 21 | 0.0 | 0/12 | 0/12 |
+| v5 | 12 | 8/12 (67%) | 8/8 | 8/12 | 0.501 | 0.409 | 47.2k / 9.04M | 29.7 | 29.4 | 103 | 91 | 0.3 | 10/12 | 4/12 |
 
 #### What the harness did
 
@@ -210,11 +241,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 12 | 83% → 67% | -17 pts [-50, 17] | 0.625 | 1 / 3, p=0.625 | 15.77× [9.41, 26.00] | 0.000 | 2.07× [1.27, 3.17] | 0.015 | 3.98× |
-| plain+stop vs plain | 12 | 83% → 100% | 17 pts [0, 42] | 0.500 | 2 / 0, p=0.500 | 0.75× [0.62, 0.91] | 0.021 | 0.74× [0.51, 1.08] | 0.157 | 0.80× |
-| v5 vs plain+stop | 12 | 100% → 67% | -33 pts [-58, -8] | 0.125 | 0 / 4, p=0.125 | 20.97× [11.95, 35.67] | 0.000 | 2.80× [1.37, 5.21] | 0.014 | 4.98× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 12 | 83% → 67% | -17 pts [-50, 17] | 0.625 | 1 / 3, p=0.625 | 83% → 67%, -17 pts [-50, 17], p=0.625 | 15.77× [9.41, 26.00] | 0.000 | 2.07× [1.27, 3.17] | 0.015 | 3.98× |
+| plain+stop vs plain | 12 | 83% → 100% | 17 pts [0, 42] | 0.500 | 2 / 0, p=0.500 | 83% → 100%, 17 pts [0, 42], p=0.500 | 0.75× [0.62, 0.91] | 0.021 | 0.74× [0.51, 1.08] | 0.157 | 0.80× |
+| v5 vs plain+stop | 12 | 100% → 67% | -33 pts [-58, -8] | 0.125 | 0 / 4, p=0.125 | 100% → 67%, -33 pts [-58, -8], p=0.125 | 20.97× [11.95, 35.67] | 0.000 | 2.80× [1.37, 5.21] | 0.014 | 4.98× |
 
 #### Power at this sample
 
@@ -242,11 +273,11 @@ mined after the change, plain arms as the control).
 
 #### haiku-1, verified: Overview (verified tasks: 12, runs: 36)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 12 | 10/12 (83%) | 1/2 | 0.027 | 0.025 | 13.1 | 11.1 | 25 | 26 | 0.2 | 0/12 | 0/12 |
-| plain+stop | 12 | 12/12 (100%) | 2/2 | 0.020 | 0.019 | 10.1 | 8.4 | 20 | 21 | 0.0 | 0/12 | 0/12 |
-| v5 | 12 | 8/12 (67%) | 1/1 | 0.501 | 0.409 | 29.7 | 29.4 | 103 | 91 | 0.3 | 10/12 | 4/12 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 12 | 10/12 (83%) | 10/10 | 10/12 | 0.027 | 0.025 | 14.2k / 1.09M | 13.1 | 11.1 | 25 | 26 | 0.2 | 0/12 | 0/12 |
+| plain+stop | 12 | 12/12 (100%) | 12/12 | 12/12 | 0.020 | 0.019 | 11.4k / 0.67M | 10.1 | 8.4 | 20 | 21 | 0.0 | 0/12 | 0/12 |
+| v5 | 12 | 8/12 (67%) | 8/8 | 8/12 | 0.501 | 0.409 | 47.2k / 9.04M | 29.7 | 29.4 | 103 | 91 | 0.3 | 10/12 | 4/12 |
 
 #### What the harness did
 
@@ -258,11 +289,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 12 | 83% → 67% | -17 pts [-50, 17] | 0.625 | 1 / 3, p=0.625 | 15.77× [9.41, 26.00] | 0.000 | 2.07× [1.27, 3.17] | 0.015 | 3.98× |
-| plain+stop vs plain | 12 | 83% → 100% | 17 pts [0, 42] | 0.500 | 2 / 0, p=0.500 | 0.75× [0.62, 0.91] | 0.021 | 0.74× [0.51, 1.08] | 0.157 | 0.80× |
-| v5 vs plain+stop | 12 | 100% → 67% | -33 pts [-58, -8] | 0.125 | 0 / 4, p=0.125 | 20.97× [11.95, 35.67] | 0.000 | 2.80× [1.37, 5.21] | 0.014 | 4.98× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 12 | 83% → 67% | -17 pts [-50, 17] | 0.625 | 1 / 3, p=0.625 | 83% → 67%, -17 pts [-50, 17], p=0.625 | 15.77× [9.41, 26.00] | 0.000 | 2.07× [1.27, 3.17] | 0.015 | 3.98× |
+| plain+stop vs plain | 12 | 83% → 100% | 17 pts [0, 42] | 0.500 | 2 / 0, p=0.500 | 83% → 100%, 17 pts [0, 42], p=0.500 | 0.75× [0.62, 0.91] | 0.021 | 0.74× [0.51, 1.08] | 0.157 | 0.80× |
+| v5 vs plain+stop | 12 | 100% → 67% | -33 pts [-58, -8] | 0.125 | 0 / 4, p=0.125 | 100% → 67%, -33 pts [-58, -8], p=0.125 | 20.97× [11.95, 35.67] | 0.000 | 2.80× [1.37, 5.21] | 0.014 | 4.98× |
 
 #### Power at this sample
 
@@ -290,11 +321,11 @@ mined after the change, plain arms as the control).
 
 #### haiku-1, behavioral: Overview (behavioral tasks: 6, runs: 18)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 6 | 5/6 (83%) | 0/0 | 0.018 | 0.018 | 14.0 | 11.4 | 18 | 18 | 0.0 | 0/6 | 0/6 |
-| plain+stop | 6 | 6/6 (100%) | 0/0 | 0.018 | 0.015 | 12.7 | 15.3 | 21 | 21 | 0.0 | 0/6 | 0/6 |
-| v5 | 6 | 5/6 (83%) | 0/0 | 0.558 | 0.542 | 31.9 | 39.5 | 109 | 94 | 0.5 | 5/6 | 3/6 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 6 | 5/6 (83%) | 5/5 | 5/6 | 0.018 | 0.018 | 9.6k / 0.62M | 14.0 | 11.4 | 18 | 18 | 0.0 | 0/6 | 0/6 |
+| plain+stop | 6 | 6/6 (100%) | 6/6 | 6/6 | 0.018 | 0.015 | 10.2k / 0.65M | 12.7 | 15.3 | 21 | 21 | 0.0 | 0/6 | 0/6 |
+| v5 | 6 | 5/6 (83%) | 5/5 | 5/6 | 0.558 | 0.542 | 44.7k / 10.28M | 31.9 | 39.5 | 109 | 94 | 0.5 | 5/6 | 3/6 |
 
 #### What the harness did
 
@@ -306,11 +337,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 6 | 83% → 83% | 0 pts [-50, 50] | 1.000 | 1 / 1, p=1.000 | 21.06× [7.81, 48.49] | 0.031 | 1.87× [0.79, 4.19] | 0.281 | 4.92× |
-| plain+stop vs plain | 6 | 83% → 100% | 17 pts [0, 50] | 1.000 | 1 / 0, p=1.000 | 0.93× [0.79, 1.09] | 0.500 | 0.84× [0.45, 1.58] | 0.688 | 1.04× |
-| v5 vs plain+stop | 6 | 100% → 83% | -17 pts [-50, 0] | 1.000 | 0 / 1, p=1.000 | 22.56× [8.01, 59.78] | 0.031 | 2.24× [0.58, 8.23] | 0.375 | 4.71× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 6 | 83% → 83% | 0 pts [-50, 50] | 1.000 | 1 / 1, p=1.000 | 83% → 83%, 0 pts [-50, 50], p=1.000 | 21.06× [7.81, 48.49] | 0.031 | 1.87× [0.79, 4.19] | 0.281 | 4.92× |
+| plain+stop vs plain | 6 | 83% → 100% | 17 pts [0, 50] | 1.000 | 1 / 0, p=1.000 | 83% → 100%, 17 pts [0, 50], p=1.000 | 0.93× [0.79, 1.09] | 0.500 | 0.84× [0.45, 1.58] | 0.688 | 1.04× |
+| v5 vs plain+stop | 6 | 100% → 83% | -17 pts [-50, 0] | 1.000 | 0 / 1, p=1.000 | 100% → 83%, -17 pts [-50, 0], p=1.000 | 22.56× [8.01, 59.78] | 0.031 | 2.24× [0.58, 8.23] | 0.375 | 4.71× |
 
 #### Power at this sample
 
@@ -332,11 +363,11 @@ mined after the change, plain arms as the control).
 
 #### haiku-1, interface: Overview (interface tasks: 6, runs: 18)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 6 | 5/6 (83%) | 1/2 | 0.037 | 0.033 | 12.2 | 11.1 | 32 | 34 | 0.3 | 0/6 | 0/6 |
-| plain+stop | 6 | 6/6 (100%) | 2/2 | 0.021 | 0.021 | 7.6 | 7.3 | 19 | 20 | 0.0 | 0/6 | 0/6 |
-| v5 | 6 | 3/6 (50%) | 1/1 | 0.444 | 0.373 | 27.5 | 26.4 | 96 | 88 | 0.2 | 5/6 | 1/6 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 6 | 5/6 (83%) | 5/5 | 5/6 | 0.037 | 0.033 | 18.9k / 1.56M | 12.2 | 11.1 | 32 | 34 | 0.3 | 0/6 | 0/6 |
+| plain+stop | 6 | 6/6 (100%) | 6/6 | 6/6 | 0.021 | 0.021 | 12.5k / 0.69M | 7.6 | 7.3 | 19 | 20 | 0.0 | 0/6 | 0/6 |
+| v5 | 6 | 3/6 (50%) | 3/3 | 3/6 | 0.444 | 0.373 | 49.6k / 7.80M | 27.5 | 26.4 | 96 | 88 | 0.2 | 5/6 | 1/6 |
 
 #### What the harness did
 
@@ -348,11 +379,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 6 | 83% → 50% | -33 pts [-67, 0] | 0.500 | 0 / 2, p=0.500 | 11.81× [9.03, 15.55] | 0.031 | 2.29× [1.79, 2.86] | 0.031 | 3.22× |
-| plain+stop vs plain | 6 | 83% → 100% | 17 pts [0, 50] | 1.000 | 1 / 0, p=1.000 | 0.61× [0.47, 0.78] | 0.031 | 0.65× [0.45, 0.96] | 0.156 | 0.61× |
-| v5 vs plain+stop | 6 | 100% → 50% | -50 pts [-83, -17] | 0.250 | 0 / 3, p=0.250 | 19.48× [15.23, 29.36] | 0.031 | 3.49× [2.48, 4.98] | 0.031 | 5.27× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 6 | 83% → 50% | -33 pts [-67, 0] | 0.500 | 0 / 2, p=0.500 | 83% → 50%, -33 pts [-67, 0], p=0.500 | 11.81× [9.03, 15.55] | 0.031 | 2.29× [1.79, 2.86] | 0.031 | 3.22× |
+| plain+stop vs plain | 6 | 83% → 100% | 17 pts [0, 50] | 1.000 | 1 / 0, p=1.000 | 83% → 100%, 17 pts [0, 50], p=1.000 | 0.61× [0.47, 0.78] | 0.031 | 0.65× [0.45, 0.96] | 0.156 | 0.61× |
+| v5 vs plain+stop | 6 | 100% → 50% | -50 pts [-83, -17] | 0.250 | 0 / 3, p=0.250 | 100% → 50%, -50 pts [-83, -17], p=0.250 | 19.48× [15.23, 29.36] | 0.031 | 3.49× [2.48, 4.98] | 0.031 | 5.27× |
 
 #### Power at this sample
 
@@ -380,48 +411,48 @@ mined after the change, plain arms as the control).
 | check-errors-names-the-part | plain | yes | 171/171 | green | success | 0.039 (0.000) | 8 | 29 |  |
 | check-errors-names-the-part | v5 | no | 170/171 | – | the-owner-holds-the-step | 0.315 (0.000) | 27 | 99 | TestCheckVerb/a green run under --errors prints the no-red line alone, past the parts' own lines: the run answers 0, "The red list stands apart until its tests-green closes: test/level0/a.test.js\nThe server stands at http://127.0.0.1:6510/health.\nThe check n |
 | example-retro-gaps-shown-name | plain+stop | yes | 50/50 | green (attempt 2 of 2) | success | 0.011 (0.000) | 7 | 10 |  |
-| example-retro-gaps-shown-name | plain | yes | 50/50 | red: rules (1 attempts) | success | 0.020 (0.000) | 19 | 26 |  |
+| example-retro-gaps-shown-name | plain | yes | 50/50 | green (attempt 2 of 2) | success | 0.020 (0.000) | 19 | 26 |  |
 | example-retro-gaps-shown-name | v5 | yes | 50/50 | green | the-work-stands-complete | 0.196 (0.000) | 26 | 112 |  |
-| go-pull-desk-remedy-once | plain+stop | yes | 1/1 | – | success | 0.032 (0.000) | 16 | 37 |  |
-| go-pull-desk-remedy-once | plain | yes | 1/1 | – | success | 0.025 (0.000) | 23 | 28 |  |
-| go-pull-desk-remedy-once | v5 | yes | 1/1 | – | cap | 0.386 (0.000) | 45 | 89 |  |
-| hand-spawn-skips-session-tag | plain+stop | yes | 257/257 | – | success | 0.019 (0.000) | 7 | 19 |  |
-| hand-spawn-skips-session-tag | plain | yes | 257/257 | – | success | 0.023 (0.000) | 8 | 21 |  |
+| go-pull-desk-remedy-once | plain+stop | yes | 1/1 | green | success | 0.032 (0.000) | 16 | 37 |  |
+| go-pull-desk-remedy-once | plain | yes | 1/1 | green | success | 0.025 (0.000) | 23 | 28 |  |
+| go-pull-desk-remedy-once | v5 | yes | 1/1 | green | cap | 0.386 (0.000) | 45 | 89 |  |
+| hand-spawn-skips-session-tag | plain+stop | yes | 257/257 | green | success | 0.019 (0.000) | 7 | 19 |  |
+| hand-spawn-skips-session-tag | plain | yes | 257/257 | green | success | 0.023 (0.000) | 8 | 21 |  |
 | hand-spawn-skips-session-tag | v5 | no | 0/257 | – | the-owner-holds-the-step | 0.296 (0.162) | 17 | 81 | TestACallTakesTheDefaultWaitOffItsKey, TestACallsArgumentsSpreadOnTheEventReachTheAction, TestAClearOpensTheDebtAgain failed |
-| index-why-prints-text | plain+stop | yes | 1/1 | – | success | 0.006 (0.000) | 2 | 8 |  |
-| index-why-prints-text | plain | yes | 1/1 | – | success | 0.009 (0.000) | 6 | 11 |  |
-| index-why-prints-text | v5 | yes | 1/1 | – | cap | 0.857 (0.140) | 45 | 149 |  |
-| lint-row-keeps-floor | plain+stop | yes | 168/168 | – | success | 0.017 (0.000) | 6 | 15 |  |
-| lint-row-keeps-floor | plain | yes | 168/168 | – | success | 0.044 (0.000) | 14 | 42 |  |
-| lint-row-keeps-floor | v5 | yes | 168/168 | – | cap | 0.890 (0.579) | 45 | 98 |  |
-| proc-empty-argv-never-starts | plain+stop | yes | 4/4 | – | success | 0.010 (0.000) | 14 | 17 |  |
-| proc-empty-argv-never-starts | plain | yes | 4/4 | – | success | 0.011 (0.000) | 7 | 15 |  |
+| index-why-prints-text | plain+stop | yes | 1/1 | green | success | 0.006 (0.000) | 2 | 8 |  |
+| index-why-prints-text | plain | yes | 1/1 | green | success | 0.009 (0.000) | 6 | 11 |  |
+| index-why-prints-text | v5 | yes | 1/1 | green | cap | 0.857 (0.140) | 45 | 149 |  |
+| lint-row-keeps-floor | plain+stop | yes | 168/168 | green | success | 0.017 (0.000) | 6 | 15 |  |
+| lint-row-keeps-floor | plain | yes | 168/168 | green | success | 0.044 (0.000) | 14 | 42 |  |
+| lint-row-keeps-floor | v5 | yes | 168/168 | green | cap | 0.890 (0.579) | 45 | 98 |  |
+| proc-empty-argv-never-starts | plain+stop | yes | 4/4 | green | success | 0.010 (0.000) | 14 | 17 |  |
+| proc-empty-argv-never-starts | plain | yes | 4/4 | green | success | 0.011 (0.000) | 7 | 15 |  |
 | proc-empty-argv-never-starts | v5 | no | 2/4 | – | success | 0.025 (0.000) | 2 | 33 | no code change |
-| set-refuses-closed-group | plain+stop | yes | 1/1 | – | success | 0.012 (0.000) | 18 | 14 |  |
-| set-refuses-closed-group | plain | yes | 1/1 | – | success | 0.011 (0.000) | 7 | 14 |  |
-| set-refuses-closed-group | v5 | yes | 1/1 | – | cap | 0.244 (0.211) | 45 | 34 |  |
-| signalled-meets-notstarted-readers | plain+stop | yes | 2/2 | – | success | 0.019 (0.000) | 9 | 17 |  |
+| set-refuses-closed-group | plain+stop | yes | 1/1 | green | success | 0.012 (0.000) | 18 | 14 |  |
+| set-refuses-closed-group | plain | yes | 1/1 | green | success | 0.011 (0.000) | 7 | 14 |  |
+| set-refuses-closed-group | v5 | yes | 1/1 | green | cap | 0.244 (0.211) | 45 | 34 |  |
+| signalled-meets-notstarted-readers | plain+stop | yes | 2/2 | green | success | 0.019 (0.000) | 9 | 17 |  |
 | signalled-meets-notstarted-readers | plain | no | 0/2 | – | success | 0.025 (0.000) | 16 | 20 | TestVoiceRunsValeAnswersTheFaultOfAValeASignalEnds: a Vale a signal ends answers "" vale ends by a signal: killed, and wants the fault killed |
-| signalled-meets-notstarted-readers | v5 | yes | 2/2 | – | the-owner-holds-the-step | 1.138 (0.000) | 20 | 217 |  |
-| standing-pull-takes-auto-merge | plain+stop | yes | 1/1 | – | success | 0.028 (0.000) | 18 | 32 |  |
-| standing-pull-takes-auto-merge | plain | yes | 1/1 | – | success | 0.027 (0.000) | 24 | 23 |  |
-| standing-pull-takes-auto-merge | v5 | yes | 1/1 | – | the-work-stands-complete | 0.698 (0.000) | 34 | 130 |  |
-| tui-swap-fails-loud | plain+stop | yes | 440/440 | – | success | 0.026 (0.000) | 10 | 20 |  |
+| signalled-meets-notstarted-readers | v5 | yes | 2/2 | green | the-owner-holds-the-step | 1.138 (0.000) | 20 | 217 |  |
+| standing-pull-takes-auto-merge | plain+stop | yes | 1/1 | green | success | 0.028 (0.000) | 18 | 32 |  |
+| standing-pull-takes-auto-merge | plain | yes | 1/1 | green | success | 0.027 (0.000) | 24 | 23 |  |
+| standing-pull-takes-auto-merge | v5 | yes | 1/1 | green | the-work-stands-complete | 0.698 (0.000) | 34 | 130 |  |
+| tui-swap-fails-loud | plain+stop | yes | 440/440 | green | success | 0.026 (0.000) | 10 | 20 |  |
 | tui-swap-fails-loud | plain | no | 439/440 | – | success | 0.027 (0.000) | 7 | 19 | TestTuiFailedSwapFailsTheVerbAndAsksNotForGo: code 1 out ".se/.log/session.jsonl\n03:04:05.678 warn  note   hello\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\n03:04:05.678 info  status plain\n undefined |
 | tui-swap-fails-loud | v5 | no | 439/440 | – | the-owner-holds-the-step | 0.431 (0.152) | 18 | 81 | TestTuiFailedSwapFailsTheVerbAndAsksNotForGo: code 0 out ".se/.log/session.jsonl\n03:04:05.678 warn  note   hello\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\n03:04:05.678 info  status plain\n undefined |
-| vale-retries-its-timeout | plain+stop | yes | 23/23 | – | success | 0.031 (0.000) | 8 | 30 |  |
-| vale-retries-its-timeout | plain | yes | 23/23 | – | success | 0.068 (0.000) | 16 | 55 |  |
-| vale-retries-its-timeout | v5 | yes | 23/23 | – | the-owner-holds-the-step | 0.537 (0.000) | 32 | 108 |  |
+| vale-retries-its-timeout | plain+stop | yes | 23/23 | green | success | 0.031 (0.000) | 8 | 30 |  |
+| vale-retries-its-timeout | plain | yes | 23/23 | green | success | 0.068 (0.000) | 16 | 55 |  |
+| vale-retries-its-timeout | v5 | yes | 23/23 | green | the-owner-holds-the-step | 0.537 (0.000) | 32 | 108 |  |
 
 ## Batch `sonnet-1`
 
 #### sonnet-1, all: Overview (all tasks: 5, runs: 15)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 5 | 2/5 (40%) | 0/0 | 0.115 | 0.133 | 3.5 | 4.1 | 8 | 8 | 0.0 | 0/5 | 0/5 |
-| plain+stop | 5 | 3/5 (60%) | 0/0 | 0.107 | 0.111 | 2.1 | 1.2 | 7 | 7 | 0.0 | 0/5 | 0/5 |
-| v5 | 5 | 3/5 (60%) | 0/0 | 1.264 | 1.292 | 34.8 | 41.3 | 81 | 79 | 0.6 | 2/5 | 2/5 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 5 | 2/5 (40%) | 2/2 | 2/5 | 0.115 | 0.133 | 2.9k / 0.13M | 3.5 | 4.1 | 8 | 8 | 0.0 | 0/5 | 0/5 |
+| plain+stop | 5 | 3/5 (60%) | 3/3 | 3/5 | 0.107 | 0.111 | 2.6k / 0.11M | 2.1 | 1.2 | 7 | 7 | 0.0 | 0/5 | 0/5 |
+| v5 | 5 | 3/5 (60%) | 3/3 | 3/5 | 1.264 | 1.292 | 22.2k / 4.54M | 34.8 | 41.3 | 81 | 79 | 0.6 | 2/5 | 2/5 |
 
 #### What the harness did
 
@@ -433,11 +464,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 11.06× [6.98, 18.60] | 0.062 | 12.68× [5.11, 31.61] | 0.062 | 10.92× |
-| plain+stop vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 0.96× [0.68, 1.32] | 0.875 | 0.60× [0.28, 1.29] | 0.500 | 0.97× |
-| v5 vs plain+stop | 5 | 60% → 60% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 11.57× [7.94, 16.18] | 0.062 | 21.24× [8.35, 39.05] | 0.062 | 11.31× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 40% → 60%, 20 pts [-40, 80], p=1.000 | 11.06× [6.98, 18.60] | 0.062 | 12.68× [5.11, 31.61] | 0.062 | 10.92× |
+| plain+stop vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 40% → 60%, 20 pts [-40, 80], p=1.000 | 0.96× [0.68, 1.32] | 0.875 | 0.60× [0.28, 1.29] | 0.500 | 0.97× |
+| v5 vs plain+stop | 5 | 60% → 60% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 60% → 60%, 0 pts [0, 0], p=1.000 | 11.57× [7.94, 16.18] | 0.062 | 21.24× [8.35, 39.05] | 0.062 | 11.31× |
 
 #### Power at this sample
 
@@ -458,11 +489,11 @@ mined after the change, plain arms as the control).
 
 #### sonnet-1, verified: Overview (verified tasks: 5, runs: 15)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 5 | 2/5 (40%) | 0/0 | 0.115 | 0.133 | 3.5 | 4.1 | 8 | 8 | 0.0 | 0/5 | 0/5 |
-| plain+stop | 5 | 3/5 (60%) | 0/0 | 0.107 | 0.111 | 2.1 | 1.2 | 7 | 7 | 0.0 | 0/5 | 0/5 |
-| v5 | 5 | 3/5 (60%) | 0/0 | 1.264 | 1.292 | 34.8 | 41.3 | 81 | 79 | 0.6 | 2/5 | 2/5 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 5 | 2/5 (40%) | 2/2 | 2/5 | 0.115 | 0.133 | 2.9k / 0.13M | 3.5 | 4.1 | 8 | 8 | 0.0 | 0/5 | 0/5 |
+| plain+stop | 5 | 3/5 (60%) | 3/3 | 3/5 | 0.107 | 0.111 | 2.6k / 0.11M | 2.1 | 1.2 | 7 | 7 | 0.0 | 0/5 | 0/5 |
+| v5 | 5 | 3/5 (60%) | 3/3 | 3/5 | 1.264 | 1.292 | 22.2k / 4.54M | 34.8 | 41.3 | 81 | 79 | 0.6 | 2/5 | 2/5 |
 
 #### What the harness did
 
@@ -474,11 +505,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 11.06× [6.98, 18.60] | 0.062 | 12.68× [5.11, 31.61] | 0.062 | 10.92× |
-| plain+stop vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 0.96× [0.68, 1.32] | 0.875 | 0.60× [0.28, 1.29] | 0.500 | 0.97× |
-| v5 vs plain+stop | 5 | 60% → 60% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 11.57× [7.94, 16.18] | 0.062 | 21.24× [8.35, 39.05] | 0.062 | 11.31× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 40% → 60%, 20 pts [-40, 80], p=1.000 | 11.06× [6.98, 18.60] | 0.062 | 12.68× [5.11, 31.61] | 0.062 | 10.92× |
+| plain+stop vs plain | 5 | 40% → 60% | 20 pts [-40, 80] | 1.000 | 2 / 1, p=1.000 | 40% → 60%, 20 pts [-40, 80], p=1.000 | 0.96× [0.68, 1.32] | 0.875 | 0.60× [0.28, 1.29] | 0.500 | 0.97× |
+| v5 vs plain+stop | 5 | 60% → 60% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 60% → 60%, 0 pts [0, 0], p=1.000 | 11.57× [7.94, 16.18] | 0.062 | 21.24× [8.35, 39.05] | 0.062 | 11.31× |
 
 #### Power at this sample
 
@@ -499,11 +530,11 @@ mined after the change, plain arms as the control).
 
 #### sonnet-1, behavioral: Overview (behavioral tasks: 2, runs: 6)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 2 | 1/2 (50%) | 0/0 | 0.109 | 0.109 | 3.7 | 3.7 | 8 | 10 | 0.0 | 0/2 | 0/2 |
-| plain+stop | 2 | 2/2 (100%) | 0/0 | 0.085 | 0.085 | 1.1 | 1.1 | 6 | 6 | 0.0 | 0/2 | 0/2 |
-| v5 | 2 | 2/2 (100%) | 0/0 | 1.506 | 1.506 | 43.1 | 43.1 | 87 | 86 | 1.0 | 1/2 | 1/2 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 2 | 1/2 (50%) | 1/1 | 1/2 | 0.109 | 0.109 | 2.8k / 0.13M | 3.7 | 3.7 | 8 | 10 | 0.0 | 0/2 | 0/2 |
+| plain+stop | 2 | 2/2 (100%) | 2/2 | 2/2 | 0.085 | 0.085 | 1.8k / 0.09M | 1.1 | 1.1 | 6 | 6 | 0.0 | 0/2 | 0/2 |
+| v5 | 2 | 2/2 (100%) | 2/2 | 2/2 | 1.506 | 1.506 | 25.8k / 5.46M | 43.1 | 43.1 | 87 | 86 | 1.0 | 1/2 | 1/2 |
 
 #### What the harness did
 
@@ -515,11 +546,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 2 | 50% → 100% | 50 pts [0, 100] | 1.000 | 1 / 0, p=1.000 | 15.17× [8.19, 28.08] | 0.500 | 19.06× [6.75, 53.81] | 0.500 | 11.67× |
-| plain+stop vs plain | 2 | 50% → 100% | 50 pts [0, 100] | 1.000 | 1 / 0, p=1.000 | 0.87× [0.51, 1.47] | 1.000 | 0.49× [0.19, 1.26] | 1.000 | 0.87× |
-| v5 vs plain+stop | 2 | 100% → 100% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 17.53× [16.08, 19.11] | 0.500 | 38.92× [35.56, 42.60] | 0.500 | 13.35× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 2 | 50% → 100% | 50 pts [0, 100] | 1.000 | 1 / 0, p=1.000 | 50% → 100%, 50 pts [0, 100], p=1.000 | 15.17× [8.19, 28.08] | 0.500 | 19.06× [6.75, 53.81] | 0.500 | 11.67× |
+| plain+stop vs plain | 2 | 50% → 100% | 50 pts [0, 100] | 1.000 | 1 / 0, p=1.000 | 50% → 100%, 50 pts [0, 100], p=1.000 | 0.87× [0.51, 1.47] | 1.000 | 0.49× [0.19, 1.26] | 1.000 | 0.87× |
+| v5 vs plain+stop | 2 | 100% → 100% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 100% → 100%, 0 pts [0, 0], p=1.000 | 17.53× [16.08, 19.11] | 0.500 | 38.92× [35.56, 42.60] | 0.500 | 13.35× |
 
 #### Power at this sample
 
@@ -537,11 +568,11 @@ mined after the change, plain arms as the control).
 
 #### sonnet-1, interface: Overview (interface tasks: 3, runs: 9)
 
-| arm | runs | resolved | check green (of measured) | mean $ | median $ | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| plain | 3 | 1/3 (33%) | 0/0 | 0.120 | 0.133 | 3.4 | 4.1 | 7 | 7 | 0.0 | 0/3 | 0/3 |
-| plain+stop | 3 | 1/3 (33%) | 0/0 | 0.121 | 0.119 | 2.7 | 1.2 | 8 | 8 | 0.0 | 0/3 | 0/3 |
-| v5 | 3 | 1/3 (33%) | 0/0 | 1.102 | 1.292 | 29.2 | 21.5 | 78 | 75 | 0.3 | 1/3 | 1/3 |
+| arm | runs | resolved | check green (of measured) | resolved and check green | mean $ | median $ | mean tokens out / cache read | mean min | median min | mean turns | mean tool calls | files outside scope | needs owner | killed at cap |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 3 | 1/3 (33%) | 1/1 | 1/3 | 0.120 | 0.133 | 3.0k / 0.14M | 3.4 | 4.1 | 7 | 7 | 0.0 | 0/3 | 0/3 |
+| plain+stop | 3 | 1/3 (33%) | 1/1 | 1/3 | 0.121 | 0.119 | 3.2k / 0.13M | 2.7 | 1.2 | 8 | 8 | 0.0 | 0/3 | 0/3 |
+| v5 | 3 | 1/3 (33%) | 1/1 | 1/3 | 1.102 | 1.292 | 19.8k / 3.93M | 29.2 | 21.5 | 78 | 75 | 0.3 | 1/3 | 1/3 |
 
 #### What the harness did
 
@@ -553,11 +584,11 @@ mined after the change, plain arms as the control).
 
 #### Paired comparisons (B against A, per task; seeds averaged)
 
-| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
-|---|---|---|---|---|---|---|---|---|---|---|
-| v5 vs plain | 3 | 33% → 33% | 0 pts [-100, 100] | 1.000 | 1 / 1, p=1.000 | 8.96× [5.23, 14.13] | 0.250 | 9.66× [4.45, 39.73] | 0.250 | 10.45× |
-| plain+stop vs plain | 3 | 33% → 33% | 0 pts [-100, 100] | 1.000 | 1 / 1, p=1.000 | 1.02× [0.83, 1.43] | 1.000 | 0.68× [0.21, 1.44] | 1.000 | 1.03× |
-| v5 vs plain+stop | 3 | 33% → 33% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 8.77× [5.84, 11.68] | 0.250 | 14.18× [3.54, 37.52] | 0.250 | 10.12× |
+| comparison | tasks | resolved (A → B) | B − A, 95% CI | p (sign-flip) | McNemar seed 1 (B only / A only, p) | resolved and check green (A → B), B − A, 95% CI, p | cost B/A, 95% CI | p | wall-clock B/A, 95% CI | p | turns B/A |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| v5 vs plain | 3 | 33% → 33% | 0 pts [-100, 100] | 1.000 | 1 / 1, p=1.000 | 33% → 33%, 0 pts [-100, 100], p=1.000 | 8.96× [5.23, 14.13] | 0.250 | 9.66× [4.45, 39.73] | 0.250 | 10.45× |
+| plain+stop vs plain | 3 | 33% → 33% | 0 pts [-100, 100] | 1.000 | 1 / 1, p=1.000 | 33% → 33%, 0 pts [-100, 100], p=1.000 | 1.02× [0.83, 1.43] | 1.000 | 0.68× [0.21, 1.44] | 1.000 | 1.03× |
+| v5 vs plain+stop | 3 | 33% → 33% | 0 pts [0, 0] | 1.000 | 0 / 0, p=1.000 | 33% → 33%, 0 pts [0, 0], p=1.000 | 8.77× [5.84, 11.68] | 0.250 | 14.18× [3.54, 37.52] | 0.250 | 10.12× |
 
 #### Power at this sample
 
@@ -581,17 +612,17 @@ mined after the change, plain arms as the control).
 | check-errors-names-the-part | plain+stop | no | 170/171 | – | success | 0.111 (0.000) | 1 | 6 | TestCheckVerb/a green run under --errors prints the no-red line alone, past the parts' own lines: the run answers 0, "The red list stands apart until its tests-green closes: test/level0/a.test.js\nThe server stands at http://127.0.0.1:6510/health.\nThe check n |
 | check-errors-names-the-part | plain | no | 170/171 | – | success | 0.133 (0.000) | 5 | 7 | TestCheckVerb/a green run under --errors prints the no-red line alone, past the parts' own lines: the run answers 0, "The red list stands apart until its tests-green closes: test/level0/a.test.js\nThe server stands at http://127.0.0.1:6510/health.\nThe check n |
 | check-errors-names-the-part | v5 | no | 170/171 | – | the-work-stands-complete | 1.292 (0.318) | 22 | 62 | TestCheckVerb/a green run under --errors prints the no-red line alone, past the parts' own lines: the run answers 0, "The red list stands apart until its tests-green closes: test/level0/a.test.js\nThe server stands at http://127.0.0.1:6510/health.\nThe check n |
-| hand-spawn-skips-session-tag | plain+stop | yes | 257/257 | – | success | 0.133 (0.000) | 6 | 9 |  |
+| hand-spawn-skips-session-tag | plain+stop | yes | 257/257 | green | success | 0.133 (0.000) | 6 | 9 |  |
 | hand-spawn-skips-session-tag | plain | no | 255/257 | – | success | 0.093 (0.000) | 4 | 7 | TestTheHandPromptOpensOnTheHandLine: the prompt opens on "You are a hand of your own on this box, named helper-1, and you work one step of one ticket." |
-| hand-spawn-skips-session-tag | v5 | yes | 257/257 | – | the-work-stands-complete | 1.319 (0.143) | 21 | 95 |  |
-| index-why-prints-text | plain+stop | yes | 1/1 | – | success | 0.090 (0.000) | 1 | 6 |  |
-| index-why-prints-text | plain | yes | 1/1 | – | success | 0.061 (0.000) | 1 | 5 |  |
-| index-why-prints-text | v5 | yes | 1/1 | – | the-work-stands-complete | 1.725 (0.522) | 41 | 96 |  |
-| signalled-meets-notstarted-readers | plain+stop | yes | 2/2 | – | success | 0.080 (0.000) | 1 | 7 |  |
+| hand-spawn-skips-session-tag | v5 | yes | 257/257 | green | the-work-stands-complete | 1.319 (0.143) | 21 | 95 |  |
+| index-why-prints-text | plain+stop | yes | 1/1 | green | success | 0.090 (0.000) | 1 | 6 |  |
+| index-why-prints-text | plain | yes | 1/1 | green | success | 0.061 (0.000) | 1 | 5 |  |
+| index-why-prints-text | v5 | yes | 1/1 | green | the-work-stands-complete | 1.725 (0.522) | 41 | 96 |  |
+| signalled-meets-notstarted-readers | plain+stop | yes | 2/2 | green | success | 0.080 (0.000) | 1 | 7 |  |
 | signalled-meets-notstarted-readers | plain | no | 0/2 | – | success | 0.157 (0.000) | 7 | 11 | TestTheShellRunsALineThroughShInTheRootAndReadsAProgramThatNeverStartsAsAFault, TestVoiceRunsValeAnswersTheFaultOfAValeASignalEnds failed |
-| signalled-meets-notstarted-readers | v5 | yes | 2/2 | – | cap | 1.287 (0.168) | 45 | 78 |  |
+| signalled-meets-notstarted-readers | v5 | yes | 2/2 | green | cap | 1.287 (0.168) | 45 | 78 |  |
 | tui-swap-fails-loud | plain+stop | no | 439/440 | – | success | 0.119 (0.000) | 1 | 8 | TestTwinGoldens failed |
-| tui-swap-fails-loud | plain | yes | 440/440 | – | success | 0.133 (0.000) | 1 | 8 |  |
+| tui-swap-fails-loud | plain | yes | 440/440 | green | success | 0.133 (0.000) | 1 | 8 |  |
 | tui-swap-fails-loud | v5 | no | 439/440 | – | cap | 0.694 (0.163) | 45 | 76 | TestTuiFailedSwapFailsTheVerbAndAsksNotForGo: code 0 out ".se/.log/session.jsonl\n03:04:05.678 warn  note   hello\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\n03:04:05.678 info  status plain\n undefined |
 
 ## Full checks
@@ -600,16 +631,12 @@ mined after the change, plain arms as the control).
 
 | batch | arm | hidden-pass runs | check measured | green | green only on a later attempt | red |
 |---|---|---|---|---|---|---|
-| haiku-1 | plain | 10 | 2 | 1 | 0 | 1 |
-| haiku-1 | plain+stop | 12 | 2 | 2 | 1 | 0 |
-| haiku-1 | v5 | 8 | 1 | 1 | 0 | 0 |
-| sonnet-1 | plain | 2 | 0 | 0 | 0 | 0 |
-| sonnet-1 | plain+stop | 3 | 0 | 0 | 0 | 0 |
-| sonnet-1 | v5 | 3 | 0 | 0 | 0 | 0 |
-
-| batch | task | arm | red in every attempt | attempts (load at start) | what made it red (last attempt) |
-|---|---|---|---|---|---|
-| haiku-1 | example-retro-gaps-shown-name | plain | rules | 1 (None) |  |
+| haiku-1 | plain | 10 | 10 | 10 | 1 | 0 |
+| haiku-1 | plain+stop | 12 | 12 | 12 | 1 | 0 |
+| haiku-1 | v5 | 8 | 8 | 8 | 0 | 0 |
+| sonnet-1 | plain | 2 | 2 | 2 | 0 | 0 |
+| sonnet-1 | plain+stop | 3 | 3 | 3 | 0 | 0 |
+| sonnet-1 | v5 | 3 | 3 | 3 | 0 | 0 |
 
 ## Cost log
 

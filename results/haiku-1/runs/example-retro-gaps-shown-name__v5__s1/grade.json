@@ -1,8 +1,22 @@
 {
  "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": null,
+    "red": [],
+    "secs": 204.4,
+    "tail": "ame it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:583:62: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:672:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 618. Split it by topic.\ntest/level0/outside-hand.test.js:14:1: correctness/noUnusedVariables: This variable CLOUD is unused.\n\nThe check's parts, in seconds:\n  150.6  rules\n  103.7  go\n   18.6  tests\n    9.0  level0\n    6.1  ready\n    2.1  plugin\n    0.3  projections\n    0.0  doors\n    0.0  server\n  184.4  in all\n\nWarning: the check took 184.4s, past its budget of 150.0s under battery.budget. rules took the most. The slowest cases:\n    4.6  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree\n    4.4  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes\n    3.3  test/contract/index.test.js a stopped index leaves no se-index process past the case\n    2.0  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes\n    1.9  test/contract/vale-fix.test.js a contraction is written out, and the line keeps its case\nThis box names no home folder, so the trust flag has no file.\n",
+    "timeouts": null,
+    "when": "2026-10-11T07:42:15Z"
+   }
+  ],
   "base_exit": 0,
   "base_red": [],
   "exit": 0,
+  "findings_new": [],
+  "flaky": false,
   "new_red": [],
   "no_regression": true,
   "pass": true,

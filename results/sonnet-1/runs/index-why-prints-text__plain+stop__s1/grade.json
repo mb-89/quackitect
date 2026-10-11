@@ -1,4 +1,30 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": 8.43,
+    "red": [],
+    "secs": 148.8,
+    "tail": "s a half that says what the thing is not.\nspec/tickets/the-verbs-run-in-go.md:236:52: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/ticket-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/window-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\n\nThe check's parts, in seconds:\n   96.4  level0\n   50.8  go\n   44.5  tests\n   42.8  rules\n    0.5  plugin\n    0.3  projections\n    0.1  server\n    0.0  doors\n  139.0  in all\n\nWarning: the check took 139.0s, past its budget of 120.0s under battery.budget. level0 took the most. The slowest cases:\n   30.1  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   16.6  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    7.3  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    5.3  test/contract/doctor-browser.test.js the doctor prints a browser row carrying the resolver's answer\n    3.4  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\nVale is missing. Run ./RUNME.sh once and it installs.\nNo markdown file stands under nothing.\n",
+    "timeouts": false,
+    "when": "2026-10-11T10:08:47Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 148.8,
+  "tail": "s a half that says what the thing is not.\nspec/tickets/the-verbs-run-in-go.md:236:52: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/ticket-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/window-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\n\nThe check's parts, in seconds:\n   96.4  level0\n   50.8  go\n   44.5  tests\n   42.8  rules\n    0.5  plugin\n    0.3  projections\n    0.1  server\n    0.0  doors\n  139.0  in all\n\nWarning: the check took 139.0s, past its budget of 120.0s under battery.budget. level0 took the most. The slowest cases:\n   30.1  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   16.6  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    7.3  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    5.3  test/contract/doctor-browser.test.js the doctor prints a browser row carrying the resolver's answer\n    3.4  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\nVale is missing. Run ./RUNME.sh once and it installs.\nNo markdown file stands under nothing.\n",
+  "when": "2026-10-11T10:08:47Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T06:45:59Z",
  "hidden": {

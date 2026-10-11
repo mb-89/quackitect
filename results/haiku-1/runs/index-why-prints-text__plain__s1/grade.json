@@ -1,4 +1,36 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [
+     "src/quack/verb_index.go:33:70: Hedge: Cut the hedge 'rather'. Say the thing, or name the measure.",
+     "src/quack/verb_index.go:33:70: Antithesis: Say what is. 'rather than' opens a half that says what the thing is not."
+    ],
+    "load_start": 8.88,
+    "red": [],
+    "secs": 147.2,
+    "tail": "s. Cut this one in two.\nspec/tickets/window-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nsrc/quack/verb_index.go:33:70: Hedge: Cut the hedge 'rather'. Say the thing, or name the measure.\nsrc/quack/verb_index.go:33:70: Antithesis: Say what is. 'rather than' opens a half that says what the thing is not.\n\nThe check's parts, in seconds:\n   94.6  level0\n   49.6  go\n   43.8  tests\n   40.6  rules\n    0.8  plugin\n    0.3  projections\n    0.1  server\n    0.0  doors\n  135.1  in all\n\nWarning: the check took 135.1s, past its budget of 120.0s under battery.budget. level0 took the most. The slowest cases:\n   18.9  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n   14.3  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n    6.4  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    6.3  test/contract/doctor-browser.test.js the doctor prints a browser row carrying the resolver's answer\n    4.6  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\nVale is missing. Run ./RUNME.sh once and it installs.\nNo markdown file stands under nothing.\n",
+    "timeouts": false,
+    "when": "2026-10-11T08:46:46Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [
+   "src/quack/verb_index.go:33:70: Hedge: Cut the hedge 'rather'. Say the thing, or name the measure.",
+   "src/quack/verb_index.go:33:70: Antithesis: Say what is. 'rather than' opens a half that says what the thing is not."
+  ],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 147.2,
+  "tail": "s. Cut this one in two.\nspec/tickets/window-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two.\nsrc/quack/verb_index.go:33:70: Hedge: Cut the hedge 'rather'. Say the thing, or name the measure.\nsrc/quack/verb_index.go:33:70: Antithesis: Say what is. 'rather than' opens a half that says what the thing is not.\n\nThe check's parts, in seconds:\n   94.6  level0\n   49.6  go\n   43.8  tests\n   40.6  rules\n    0.8  plugin\n    0.3  projections\n    0.1  server\n    0.0  doors\n  135.1  in all\n\nWarning: the check took 135.1s, past its budget of 120.0s under battery.budget. level0 took the most. The slowest cases:\n   18.9  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n   14.3  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n    6.4  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    6.3  test/contract/doctor-browser.test.js the doctor prints a browser row carrying the resolver's answer\n    4.6  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\nVale is missing. Run ./RUNME.sh once and it installs.\nNo markdown file stands under nothing.\n",
+  "when": "2026-10-11T08:46:46Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T01:04:29Z",
  "hidden": {

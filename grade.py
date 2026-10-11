@@ -158,7 +158,21 @@ def run_check(tree, env, timeout=1800):
     findings = findings_of(out)
     return {"exit": code, "red": red, "secs": round(time.time() - t0, 1), "install_rc": rc,
             "findings": findings[:60], "n_findings": len(findings),
-            "timeouts": any(TIMEOUT_RE.search(f) for f in findings) or code == -1, "tail": out[-2500:]}
+            "timeouts": any(TIMEOUT_RE.search(f) for f in findings) or code == -1,
+            "infra": infra_of(out), "tail": out[-2500:]}
+
+
+def infra_of(out):
+    """A check the machine broke, not the tree: a full disk, the shared Go build cache emptied
+    under a running build (the janitor's doing), or the install's tool download cut off (the
+    session's proxy moved when the box restarted). Such a result is never kept as an attempt."""
+    if "no space left on device" in out:
+        return "disk full"
+    if re.search(r"go-build/\S+: no such file or directory", out):
+        return "Go build cache emptied mid-build"
+    if re.search(r"curl: \(\d+\) (Failed to connect|Could not resolve|Recv failure|Connection reset)", out):
+        return "the install's download failed (no network or proxy)"
+    return None
 
 
 # a part that went red because something took too long: the machine's load, not the change
@@ -208,7 +222,7 @@ def base_check(repo, task):
         res = run_check(tree, check_env(wd))
     finally:
         shutil.rmtree(wd, ignore_errors=True)
-    if "no space left on device" not in res.get("tail", ""):
+    if not res.get("infra"):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         write_json(path, res)
     return res
@@ -333,6 +347,8 @@ def main():
     ap.add_argument("--regrade-hidden", action="store_true",
                     help="grade the hidden tests again from each run's final.patch (after tasks.jsonl changed)")
     ap.add_argument("--nice", type=int, default=19, help="grade at low priority, in the sessions' idle time")
+    ap.add_argument("--refold-checks", action="store_true",
+                    help="fold each run's check attempts again against the cached base checks")
     ap.add_argument("--reps", type=int, default=3,
                     help="--checks-only: attempts at most per run while none comes out green (default 3)")
     a = ap.parse_args()
@@ -341,6 +357,7 @@ def main():
     tasks = {t["ticket"]: t for t in read_jsonl(a.tasks)}
     runs_root = os.path.join(a.batch, "runs")
     if a.checks_only or a.cleanup:
+        infra_seen = {}
         for rid in sorted(os.listdir(runs_root)):
             d = os.path.join(runs_root, rid)
             gp, mp = os.path.join(d, "grade.json"), os.path.join(d, "meta.json")
@@ -366,6 +383,13 @@ def main():
                         ac = agent_check(t, run_repo, meta["final_tree"], meta["start_commit"], wd)
                     finally:
                         shutil.rmtree(wd, ignore_errors=True)
+                    if ac.get("infra") or bc.get("infra"):
+                        print(f"{now()} {rid}: the machine broke the check ({ac.get('infra') or bc.get('infra')}); "
+                              f"no attempt counted", flush=True)
+                        if infra_seen.setdefault(rid, 0) >= 2:
+                            break
+                        infra_seen[rid] += 1
+                        continue
                     base_f = set(bc.get("findings", []))
                     att = attempts_of(g) + [{
                         "exit": ac["exit"], "red": ac["red"], "secs": ac["secs"], "load_start": float(load),
@@ -377,6 +401,23 @@ def main():
                           f"red={ac['red']} base_red={bc['red']} timeouts={ac.get('timeouts')}", flush=True)
             if a.cleanup and (not want or "check" in g):
                 shutil.rmtree(meta["scratch"], ignore_errors=True)
+        return
+    if a.refold_checks:
+        # fold every run's check attempts again against the base check now cached (computing a
+        # base check that is missing, e.g. after a broken one was deleted)
+        for rid in sorted(os.listdir(runs_root)):
+            gp = os.path.join(runs_root, rid, "grade.json")
+            t = tasks.get(rid.split("__")[0])
+            if not t or not os.path.exists(gp):
+                continue
+            g = json.load(open(gp))
+            if not g.get("check"):
+                continue
+            bc = base_check(a.repo, t)
+            old = (g["check"].get("base_exit"), g["check"].get("base_red"))
+            g["check"] = fold_check(attempts_of(g), bc)
+            write_json(gp, g)
+            print(f"{rid:70s} base {old} -> {(bc['exit'], bc['red'])} pass={g['check']['pass']}", flush=True)
         return
     if a.regrade_hidden:
         for rid in sorted(os.listdir(runs_root)):

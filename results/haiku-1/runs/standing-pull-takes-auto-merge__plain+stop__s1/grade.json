@@ -1,4 +1,30 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": 12.13,
+    "red": [],
+    "secs": 164.6,
+    "tail": "k at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:674:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 625. Split it by topic.\ntest/level0/index-tools.test.js:95:1: correctness/noUnusedFunctionParameters: This parameter argv is unused.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n   63.0  go\n   55.0  rules\n   32.8  tests\n   11.6  level0\n    0.5  plugin\n    0.2  projections\n    0.0  doors\n    0.0  server\n  151.6  in all\n\nWarning: the check took 151.6s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   24.1  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   12.9  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    9.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    1.9  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree\n    1.8  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+    "timeouts": false,
+    "when": "2026-10-11T09:38:36Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 164.6,
+  "tail": "k at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice.go:674:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this file, or under spec/config/level0.json.\nsrc/voice/voice_test.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 625. Split it by topic.\ntest/level0/index-tools.test.js:95:1: correctness/noUnusedFunctionParameters: This parameter argv is unused.\ntest/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused.\n\nThe check's parts, in seconds:\n   63.0  go\n   55.0  rules\n   32.8  tests\n   11.6  level0\n    0.5  plugin\n    0.2  projections\n    0.0  doors\n    0.0  server\n  151.6  in all\n\nWarning: the check took 151.6s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   24.1  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines\n   12.9  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    9.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n    1.9  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree\n    1.8  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\n",
+  "when": "2026-10-11T09:38:36Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T02:21:09Z",
  "hidden": {

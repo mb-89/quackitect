@@ -98,7 +98,8 @@ git repository, where some tests ask git for the tracked files; fixed before the
 **Full check of a run.** `./RUNME.sh check` on the agent's final tree as it left it, installed
 the way CI installs it (claude-code 2.1.291 on `PATH` for the types and plugin parts, stdin
 closed), compared with the same check on the base (cached per task). The base check is green on
-every task where it was measured, so `check green` reads directly. The check runs on every
+every measured task but one: vale-retries-its-timeout, whose base goes red on `rules` under load,
+the very flake that ticket fixes. So `check green` reads directly. The check runs on every
 hidden-pass run (`grade.py --check pass`; `all` adds the rest), after the sessions, one at a
 time on the idle machine (`grade.py --checks-only`).
 
@@ -109,7 +110,13 @@ average near 25, came out red on exactly those (`VoiceParagraph.Vocabulary: did 
 attempts: the run counts green if any attempt is green, and its red parts are the parts red in
 every attempt. Every attempt is kept in `grade.json` with the load it started at, the lines that
 made it red (the check's own list of red cases, lint findings, failed tests, build errors, steps
-that timed out) and whether a timeout was among them.
+that timed out) and whether a timeout was among them. A check the machine broke is not kept as an
+attempt: a full disk, the shared Go build cache emptied under a running build by the janitor of
+§6.2, or the install's tool download cut off. Two of those happened while the checks ran: one
+cached base check met the janitor, and when the box restarted mid-pass its proxy moved, so the
+checks still running failed at the Vale download in a tenth of a second. Those results were
+dropped and the checks run again (`grade.py --refold-checks` folds every run's attempts against
+the base checks as they stand).
 
 ## 4. Fairness: interface notes and a screen
 
@@ -247,6 +254,7 @@ turn cap and no budget cap: the question includes how long each arm runs when no
 |---|---|
 | resolved | the hidden grade passes (§3) |
 | check green | `./RUNME.sh check` exits 0 on the agent's final tree, in any of up to three attempts on the idle machine (§3) |
+| resolved and check green | both: the change works and the tree passes the repository's own check, as its CI asks (the check is measured on every resolved run, so this is defined on every run; paired like the resolve rate) |
 | cost | the session's `total_cost_usd` (the client's list-price accounting, subagents included) + metered nested calls. Per million tokens (input, output, cache write, cache read): Haiku 5.5 $0.10, $0.50, $0.20, $0.01; Sonnet 5.5 $2, $10, $4, $0.20, each read back exactly off the client's own `costUSD` |
 | tokens | input, output, cache read, cache write, from the stream |
 | wall-clock | session start to end, setup excluded |

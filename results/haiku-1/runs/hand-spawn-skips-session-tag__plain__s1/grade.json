@@ -1,4 +1,30 @@
 {
+ "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": 8.4,
+    "red": [],
+    "secs": 105.8,
+    "tail": "t it.\nspec/tickets/start-refusal-stops-trial.md:41:236: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:33:144: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:73:1: Markup: A heading holds 5 words, and this one holds 7. Cut it, and let the prose carry the rest.\nspec/tickets/the-clear-runs-live-remote.md:75:66: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:87:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:87:182: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:89:338: Antithesis: Say what is. 'never' opens a half that says what the thing is not.\nspec/tickets/the-dead-bridge-tests-leave.md:45:182: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds 25. Cut it.\n\nThe check's parts, in seconds:\n   56.0  rules\n   53.0  go\n   22.1  changed\n   20.4  tests\n   15.9  types\n    9.2  plugin-tests\n    7.3  level0\n    6.3  ready\n    1.7  plugin\n    1.2  guards\n    0.4  projections\n    0.1  doors\n    0.0  server\n   90.0  in all\nThis box names no home folder, so the trust flag has no file.\nNo merge base with origin/main stands here, so the changed files are HEAD's own commit's and the working tree's.\n",
+    "timeouts": false,
+    "when": "2026-10-11T08:39:23Z"
+   }
+  ],
+  "base_exit": 0,
+  "base_red": [],
+  "exit": 0,
+  "findings_new": [],
+  "flaky": false,
+  "new_red": [],
+  "no_regression": true,
+  "pass": true,
+  "red": [],
+  "secs": 105.8,
+  "tail": "t it.\nspec/tickets/start-refusal-stops-trial.md:41:236: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:33:144: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:73:1: Markup: A heading holds 5 words, and this one holds 7. Cut it, and let the prose carry the rest.\nspec/tickets/the-clear-runs-live-remote.md:75:66: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:87:1: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:87:182: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-clear-runs-live-remote.md:89:338: Antithesis: Say what is. 'never' opens a half that says what the thing is not.\nspec/tickets/the-dead-bridge-tests-leave.md:45:182: Sentence: A sentence holds 25 words. Cut this one in two.\nspec/tickets/the-dead-bridge-tests-leave.md:47:1: ListItem: A sentence in a list item holds 20 words, and this one holds 25. Cut it.\n\nThe check's parts, in seconds:\n   56.0  rules\n   53.0  go\n   22.1  changed\n   20.4  tests\n   15.9  types\n    9.2  plugin-tests\n    7.3  level0\n    6.3  ready\n    1.7  plugin\n    1.2  guards\n    0.4  projections\n    0.1  doors\n    0.0  server\n   90.0  in all\nThis box names no home folder, so the trust flag has no file.\nNo merge base with origin/main stands here, so the changed files are HEAD's own commit's and the working tree's.\n",
+  "when": "2026-10-11T08:39:23Z"
+ },
  "empty_change": false,
  "graded": "2026-10-11T00:20:27Z",
  "hidden": {

@@ -1,8 +1,22 @@
 {
  "check": {
+  "attempts": [
+   {
+    "exit": 0,
+    "findings_new": [],
+    "load_start": null,
+    "red": [],
+    "secs": 322.6,
+    "tail": "tence: A sentence holds 25 words. Cut this one in two.\nsrc/quack/check.go:111:1: CodeComment: Code carries no comment here. Write a header of at most five lines at the top, a pointer to a design output, or a suppression naming its rule.\nsrc/quack/check.go:364:1: CodeComment: Code carries no comment here. Write a header of at most five lines at the top, a pointer to a design output, or a suppression naming its rule.\n\nThe check's parts, in seconds:\n  136.0  go\n  118.8  level0\n  112.2  rules\n   53.0  tests\n    1.6  plugin\n    0.7  projections\n    0.2  doors\n    0.0  server\n  303.9  in all\n\nWarning: the check took 303.9s, past its budget of 120.0s under battery.budget. go took the most. The slowest cases:\n   19.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index\n   11.5  test/contract/one-reading.test.js the lint reads each row of the sweep once\n    7.3  test/contract/doctor-browser.test.js the doctor prints a browser row carrying the resolver's answer\n    5.4  test/contract/runme-road.test.js ./RUNME.sh hands config to its program, which names the verbs slice at its built-in new\n    4.5  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one\na-child carries 1 person steps already, so split it: hand back --became <ticket>.\nThis box names no home folder, so the trust flag has no file.\nVale is missing. Run ./RUNME.sh once and it installs.\nNo markdown file stands under nothing.\n",
+    "timeouts": null,
+    "when": "2026-10-11T07:27:33Z"
+   }
+  ],
   "base_exit": 0,
   "base_red": [],
   "exit": 0,
+  "findings_new": [],
+  "flaky": false,
   "new_red": [],
   "no_regression": true,
   "pass": true,
