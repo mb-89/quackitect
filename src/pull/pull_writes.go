@@ -15,9 +15,11 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The route a finding's child follows, and the words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
+// The light route a ticket minted with no process and a finding's child follow. [[spec/tickets/small-work-takes-light-path]]
+const LightRoute = "trivial"
+
+// The words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
 const (
-	childRoute = "trivial"
 	pointField = "point"
 	gatePoint  = "gate"
 )
@@ -145,7 +147,7 @@ func (it *It) passed(who *Who, one *Held, leaf *Leaf, held Hold, answered []Answ
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", tip),
 		pair("answered", answeredRows(answered)), pair("inputs", it.inputsOf(one.Text, leaf)), pair("def", defOf(leaf)),
-		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))))
+		pair(frozenField, it.frozenOf(one.Text, leaf)), pair(reopenField, reopenRows(reopensIn(it.Argv))), pair(nextField, nextIn(it.Argv)))
 	changes := append([]string{"passes " + leaf.Path}, also.changes...)
 	one.Text = it.stepOn(one, leaf, text, &changes, also.stays)
 	if finding := it.landed(one, changes, also.wrote); finding != "" {
@@ -232,7 +234,7 @@ type mintedChild struct{ at, text string }
 
 // A child a finding on the trivial route, in the ticket's group, standing as the caller asks, or why one mints nothing. [[spec/design_output/pull#a-finding-rides-out]]
 func (it *It) childrenOf(one *Held, leaf *Leaf, findings []Finding, standsAs map[string]any) ([]mintedChild, []string, string) {
-	route, why := ProcessAt(it.methodDisk(), childRoute)
+	route, why := ProcessAt(it.methodDisk(), LightRoute)
 	if why != "" {
 		return nil, nil, why
 	}
@@ -305,7 +307,7 @@ func (it *It) failed(who *Who, one *Held, leaf *Leaf, held Hold, reason string, 
 		after = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("returns", returns), pair("why", reason), pair("answered", answeredRows(answered)))
+		pair("returns", returns), pair("why", reason), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	changes := []string{fmt.Sprintf("fails %s back to %s", leaf.Path, back)}
 	one.Text = withField(withField(text, "step", back), "state", Open)
 	// At the cap a person step goes in before the target, asking the reason, so it rides the fail commit. [[spec/design_output/pull#the-fail]]
@@ -349,7 +351,7 @@ func (it *It) became(who *Who, one *Held, leaf *Leaf, held Hold, successor strin
 	if !one.Private {
 		after = it.tipOf()
 	}
-	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after), pair("answered", answeredRows(answered)))
+	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	one.Text = withField(shut(text, FrontOf(text), "became"), "successors", "["+successor+"]")
 	if finding := it.landed(one, append([]string{"closes became " + successor}, also.changes...), also.wrote); finding != "" {
 		for _, at := range also.wrote {
@@ -384,7 +386,7 @@ func (it *It) answeredBy(who *Who, one *Held, leaf *Leaf, held Hold, answerer st
 		after = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("why", answerer+" answers this ask"), pair("answered", answeredRows(answered)))
+		pair("why", answerer+" answers this ask"), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	one.Text = shut(text, FrontOf(text), "answered")
 	if finding := it.landed(one, []string{"closes answered by " + answerer}, nil); finding != "" {
 		return it.unlanded(one, leaf, finding)

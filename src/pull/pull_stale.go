@@ -6,6 +6,7 @@ package pull
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode/utf16"
@@ -254,7 +255,7 @@ func (it *It) processRead(one *Held) {
 		there := false
 		for _, each := range fresh {
 			if each.Path == leaves[i].Path && each.Leaf {
-				there = HashOf(each.Said) == def
+				there = HashOf(each.Said) == def || sameButWording(each.Said, leaves[i].Said)
 				break
 			}
 		}
@@ -270,6 +271,9 @@ func (it *It) processRead(one *Held) {
 			return
 		}
 		route = steps
+		if lastOf(one.Text, StepPathOf(frontDoc)) == nil {
+			route = freshAtStep(route, held.Route, StepPathOf(frontDoc))
+		}
 	}
 	schema := it.ticketSchema()
 	if schema == nil {
@@ -288,6 +292,37 @@ func (it *It) processRead(one *Held) {
 		said += ", and goes back to " + moved.Path
 	}
 	it.landedAlone(one, []string{said})
+}
+
+// The keys a reword moves, which leave the answer a passed leaf gave standing. [[spec/design_output/pull#an-input-marks-its-steps]]
+var wordingFields = []string{"does", "gate"}
+
+// Whether two leaves differ in their wording alone. [[spec/design_output/pull#an-input-marks-its-steps]]
+func sameButWording(a, b *yaml.Doc) bool {
+	bare := func(said *yaml.Doc) *yaml.Doc {
+		out := yaml.New()
+		for _, key := range said.Keys() {
+			if !slices.Contains(wordingFields, key) {
+				out.Set(key, said.Get(key))
+			}
+		}
+		return out
+	}
+	return SameStep(bare(a), bare(b))
+}
+
+// The route with the leaf at the step taking the fresh wording, where it moved in its wording alone. [[spec/design_output/pull#an-input-marks-its-steps]]
+func freshAtStep(route, fresh []any, step string) []any {
+	said := map[string]*yaml.Doc{}
+	for _, one := range EntriesIn(fresh) {
+		said[one.Path] = one.Said
+	}
+	return copiedRoute(route, "", func(one any, path string) any {
+		if was, ok := said[path]; ok && path == step && sameButWording(yaml.AsDoc(one), was) {
+			return was
+		}
+		return one
+	})
 }
 
 // Every leaf before the step whose inputs moved takes a stale entry, and the first takes the step. [[spec/design_output/pull#an-input-marks-its-steps]]

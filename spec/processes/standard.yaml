@@ -79,8 +79,8 @@ steps:
             form: text
             says: what you see, and what surprises you
   - name: gate
-    gate: does the approach answer the ask, and does a red test decide every done_when line
-    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    gate: does the approach break a rule of the ask, and does a red test decide every done_when line
+    does: reads the design phase for the rules of the ask it breaks, fixes what it finds within its own diff, names the rest as points, and leaves the rest of the ask alone
     not: design/draft
     tags: [review]
     input: [design/draft, design/tests-red]
@@ -106,7 +106,7 @@ steps:
             expects: 0
             says: the tree builds and lints
       - name: tests-green
-        does: makes the tests pass
+        does: makes the change the ask names, with the red tests as its floor, so a rule of the ask lands where no red test names it
         input: design/tests-red
         to: retro
         evidence:

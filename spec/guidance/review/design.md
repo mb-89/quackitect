@@ -6,7 +6,7 @@ rationale: [[spec/rationales/design-review]]
 
 # Actionables
 
-1. Read the approach against the ask, and name each `done_when` line it leaves unmet.
+1. Read the approach against the ask. Name each rule of the ask it breaks and each `done_when` line it leaves unmet, and leave the rest alone.
 2. Fail on a fundamental fault alone: a broken approach, an unmet goal, a goal making no sense, a clash. A fail spends a round, so a fault the builder fixes in place rides to the build. *
 3. Answer `pass with findings` on any other structural finding, one row a finding, written `- <child-name>: <finding>`. Each row mints a child ticket and the parent goes on, so a gap the parent survives costs no round. *
 4. Name each child the way the hand-back takes it. [[spec/design_output/pull#a-finding-rides-out]]
