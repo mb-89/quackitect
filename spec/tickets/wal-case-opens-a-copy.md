@@ -74,3 +74,9 @@ done_when:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The fix lands on `work/checks-and-index-read-right` as `72925ad7`, and the check answers green on the merge head. The queue binds that box to its closed group, so the `do` step waits for a hand on `main`. Its evidence:
+
+- tests: `go test ./src/index -run TestOpenClearsTheWalAndShm`
+- check: `./RUNME.sh check`
+- says: the case copies the index and its journal while its first handle stands open, closes that handle, and opens the copy
