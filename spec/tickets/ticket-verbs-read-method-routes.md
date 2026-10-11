@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -155,6 +155,15 @@ record:
         hash: f15c88258f49a9bf
         size: 699
     def: 7cea74295027d571
+  - step: implement/change
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 18adec0aa9b3197d53b7a918b74a47eeb3b35f5b
+    hash_after: 18adec0aa9b3197d53b7a918b74a47eeb3b35f5b
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/ticket_update.go:22:1 ExampleCovers: ./RUNME.sh ticket update stands in no example's interface. Write an examp"
+    def: f150b8c0dc20fe45
 group: tickets-keep-their-chapters
 ---
 
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/quack/ticket_fill.go src/quack/ticket_update.go src/quack/ticket_set.go src/quack/ticket_urgent.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four verbs, the shared helper and the harness, which the draft sizes
+- the cases reach the disk under two temp roots, and git through the harness fake, which now refuses a root past the method root
+- the comment in each verb names the approach
+- each verb reads the method root through methodDisk or it.Method, and the ticket through the work disk
 
 ## tests-green
 
