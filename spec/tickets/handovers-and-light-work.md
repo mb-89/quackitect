@@ -89,6 +89,10 @@ record:
     hand: box 56610d6296ee · claude-code-remote
     hash_before: 64a23851cd86ae3a93b4bcb97d3053b4dc353a29
     session: cse_01MrTLCrMVwxLu7iw5LcpUqQ
+    hash_after: 78e866baf027e6127ce25e643a7048755721ca28
+    model: claude-opus-5-5
+    cost: 0
+    final: work/handovers-and-light-work stands done, and its pull request waits on CI with auto-merge on.
   - step: sync
     hand: box 56610d6296ee · claude-code-remote
     hash_before: 8b7dd86c82a8473a254ca824144f1217f358ad02
