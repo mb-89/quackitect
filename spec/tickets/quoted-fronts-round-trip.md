@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: f659931c04d059b7
         size: 1258
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1ad094d8843c · claude-code-remote · helper-4
+    hash_before: 1b9fba7c02683bafc2b17a58e09199a4205082a8
+    hash_after: 1b9fba7c02683bafc2b17a58e09199a4205082a8
+    inputs:
+      - name: design/draft
+        hash: f659931c04d059b7
+        size: 1258
+      - name: design/tests-red
+        hash: 76cf9dbe4344220b
+        size: 561
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -267,8 +279,12 @@ The scalar read strips the quotes and keeps every escape, so a backslash doubles
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- one-quote-decoder-for-fronts: src/front/mint.go unescaped already decodes the four escapes Quote writes; the new decode in yaml.unquote restates that fact, and adds \t, which unescaped refuses. Keep one decoder (yaml exports it, mint calls it) and add src/front/mint.go to size.
+- flow-items-skip-escaped-quotes: scalar runs unquote over each flow item, but flowItems ends a quote at a backslash-escaped quote, so an item holding \" followed by a comma splits apart. QuotedWhole skips escapes and flowItems should too, with a yaml_test case.
+- yaml-readers-past-the-front: the callers list names only scalar, note.Read and front.Set, but every yaml.Read and ReadLines caller (tickets.go, sync.go, check/schema.go, drawn.go, guidance.go and the others) now gets decoded values. The one quoted backslash value in spec today is the why of a record in spec/tickets/a-check-finds-every-writer.md, which now reads correctly. Name these callers. scalar is called from mapAt and listAt, not from block.
 
 # implement
 
