@@ -62,3 +62,16 @@ func TestTheNextHandOutShowsTheNextLine(t *testing.T) {
 		t.Fatalf("the hand-out shows no next line:\n%s", said)
 	}
 }
+
+// A gate reject with --next writes the line on the entry the gate writes. [[spec/tickets/gate-next-line-test]]
+func TestAGateHandBackWritesItsNextLine(t *testing.T) {
+	t.Parallel()
+	it := greenBox(t)
+	pulled(t, it)
+	if code, said := pulled(t, it, "alpha", "--fields", `{"verdict":"reject\n- the work stands short"}`, "--next", nextLine); code != 0 {
+		t.Fatalf("the reject answers %d:\n%s", code, said)
+	}
+	if text := alphaText(it); !strings.Contains(text, "next: "+nextLine) {
+		t.Fatalf("the gate entry carries no next line:\n%s", text)
+	}
+}
