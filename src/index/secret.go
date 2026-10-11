@@ -33,7 +33,7 @@ type secretBody struct {
 	Secret string `json:"secret"`
 }
 
-// A fresh secret, hex over random bytes. [[spec/tickets/v1-takes-a-run-secret]]
+// A fresh secret, hex over random bytes. The door mints it before any door serves, so no call meets a door without one. [[spec/tickets/v1-takes-a-run-secret]]
 func mintsSecret() (string, error) {
 	raw := make([]byte, secretBytes)
 	if _, err := rand.Read(raw); err != nil {
@@ -80,3 +80,23 @@ func MarksPerson(input any) bool {
 	field := value.FieldByName(personKey)
 	return field.IsValid() && field.Kind() == reflect.Bool && field.Bool()
 }
+
+// Writes the secret's file, before the standing file, so a caller reading the port finds the secret beside it. [[spec/tickets/v1-takes-a-run-secret]]
+func (one *door) standsSecret() error {
+	body, err := json.Marshal(secretBody{Secret: one.secret})
+	if err != nil {
+		return err
+	}
+	return writesOwned(SecretPath(one.root), append(body, '\n'))
+}
+
+// The status and the reason a call to the first port meets where it carries no run secret, or none. The port answers reads of the whole tree and stops the door, so every call carries it. [[spec/tickets/v1-takes-a-run-secret]]
+func (one *door) callRefusal(said string) (int, string) {
+	if one.holdsSecret(said) {
+		return 0, ""
+	}
+	return unauthorized, "the call carries no run secret"
+}
+
+// The status a call carrying no run secret meets. [[spec/tickets/v1-takes-a-run-secret]]
+const unauthorized = 401

@@ -215,12 +215,9 @@ func opensOn(clock q.Clock, listens func(network, address string) (net.Listener,
 
 	one := &door{clock: clock, db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), commit: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	// The run's secret stands before any door serves, so no call meets a door without one. [[spec/tickets/v1-takes-a-run-secret]]
-	secret, err := mintsSecret()
-	if err != nil {
+	if one.secret, err = mintsSecret(); err != nil {
 		return failed(err)
 	}
-	one.secret = secret
 	one.store = q.NewStore(catalog)
 	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
 	one.store.OnCommit(func(values map[string]any) {
@@ -343,12 +340,7 @@ func (one *door) stands(listen net.Listener) error {
 	if err != nil {
 		return err
 	}
-	secret, err := json.Marshal(secretBody{Secret: one.secret})
-	if err != nil {
-		return err
-	}
-	// The secret stands before the standing file, so a caller reading the port finds the secret beside it. [[spec/tickets/v1-takes-a-run-secret]]
-	if err := writesOwned(SecretPath(one.root), append(secret, '\n')); err != nil {
+	if err := one.standsSecret(); err != nil {
 		return err
 	}
 	return writesOwned(standingPath(one.root), append(said, '\n'))
@@ -516,10 +508,9 @@ func (one *door) awaits(w http.ResponseWriter, r *http.Request, said call) {
 }
 
 func (one *door) took(w http.ResponseWriter, r *http.Request) {
-	// The first port answers reads of the whole tree and stops the door, so every call carries the run's secret. [[spec/tickets/v1-takes-a-run-secret]]
-	if !one.holdsSecret(r.Header.Get(PersonHeader)) {
-		w.WriteHeader(http.StatusUnauthorized)
-		writes(w, answer{Error: "the call carries no run secret"})
+	if code, why := one.callRefusal(r.Header.Get(PersonHeader)); code != 0 {
+		w.WriteHeader(code)
+		writes(w, answer{Error: why})
 		return
 	}
 	var said call

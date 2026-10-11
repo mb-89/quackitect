@@ -93,7 +93,7 @@ func TestTheFirstPortRefusesACallWithoutTheRunSecret(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if said.StatusCode != statusUnauthorized {
+	if said.StatusCode != statusUnauthorized || !strings.Contains(string(said.Body), "carries no run secret") {
 		t.Fatalf("a call to the first port with no secret answers %d: %s", said.StatusCode, said.Body)
 	}
 }

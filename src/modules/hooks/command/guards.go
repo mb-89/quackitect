@@ -19,8 +19,8 @@ var (
 	clearsAll  = regexp.MustCompile(`\benv\s+(?:-\S+\s+)*(?:-i|--ignore-environment)\b|\bdelete\s+process\.env\s*;|os\.environ\.clear\(`)
 )
 
-// The run's secret, off SecretFile in src/index/secret.go under the folder src/modules/check/folders.go owns, and the refusal a command or a read reaching it meets. [[spec/tickets/v1-takes-a-run-secret]]
-var SecretName = regexp.MustCompile(`person\.json`)
+// The run's secret, off SecretFile in src/index/secret.go under the folder src/modules/check/folders.go owns: its name, a glob inside the runtime folder, or the runtime folder or .se named whole, and the refusal a command or a read reaching it meets. [[spec/tickets/v1-takes-a-run-secret]]
+var SecretName = regexp.MustCompile(`person\.json|\.se[/\\]\.runtime[/\\][^\s'"]*[*?\[{]|(?:^|[\s'"=(])(?:[\w.~-]*[/\\])*\.se(?:[/\\]\.runtime)?[/\\]?(?:\*[^\s'"]*)?(?:$|[\s'";|&)])`)
 
 // The refusal names the file under the folder src/modules/check/folders.go owns. [[spec/tickets/v1-takes-a-run-secret]]
 const SecretRefusal = ".se/.runtime/person.json holds the run's secret, which marks a person's post. The sidebar and the lens read it, and an agent reads it nowhere."

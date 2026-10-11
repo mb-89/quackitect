@@ -403,6 +403,13 @@ func TestTheDoorRefusesAReadOfTheRunSecret(t *testing.T) {
 			t.Fatalf("the door passes a Read of the run's secret at %s", path)
 		}
 	}
+	// [[spec/tickets/secret-guard-reads-folder-globs]]
+	for _, e := range []map[string]any{{"tool": "Grep", "pattern": "secret", "path": ".se/.runtime"}, {"tool": "Grep", "pattern": "x", "path": "/home/user/tree/.se/"}, {"tool": "Glob", "pattern": ".se/.runtime/*"}} {
+		e["session_id"] = "s1"
+		if said := refusalOf(hooks(t, door, Post{Event: toolEvent, E: e})); said == "" {
+			t.Fatalf("the door passes %v, a reach into the run's secret", e)
+		}
+	}
 	if said := refusalOf(hooks(t, door, read("spec/a.md"))); said != "" {
 		t.Fatalf("the door refuses a Read of spec/a.md: %s", said)
 	}

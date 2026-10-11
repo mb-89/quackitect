@@ -110,6 +110,17 @@ func TestTheBlessGuardReadsTheBlessAndTheHand(t *testing.T) {
 			t.Fatalf("the bless guard passes %q, a read of the run's secret", command)
 		}
 	}
+	// [[spec/tickets/secret-guard-reads-folder-globs]]
+	for _, command := range []string{"cat .se/.runtime/*", "cat .se/.runtime/p*.json", "grep -r . .se/.runtime/", "grep -r token .se", "tar c /home/user/tree/.se/.runtime | cat"} {
+		if said := BlessGuard(command, nil); said == "" {
+			t.Fatalf("the bless guard passes %q, a reach into the run's secret", command)
+		}
+	}
+	for _, command := range []string{"pkill -f .se/.runtime/bin/se-index", "cat .se/.runtime/tools.json", "ls .se/tickets", "cat .se/HANDOVER.md"} {
+		if said := BlessGuard(command, nil); said != "" {
+			t.Fatalf("the bless guard refuses %q: %s", command, said)
+		}
+	}
 	if said := BlessGuard("ls", nil); said != "" {
 		t.Fatalf("the bless guard says %q over a read", said)
 	}
