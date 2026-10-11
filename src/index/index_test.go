@@ -428,7 +428,7 @@ func TestFindTakesPunctuatedWords(t *testing.T) {
 	}
 }
 
-// A rebuild clears the old file's -wal and -shm with it, so the new file replays no journal of the door before, which still holds them. [[spec/design_output/index#the-door-owns-the-database]]
+// A rebuild clears the old file's -wal and -shm with it, so the new file replays no journal of the door before. The case opens a copy, since Windows removes no file a handle holds. [[spec/design_output/index#the-door-owns-the-database]]
 // level0: FixtureOutsideHome - the case opens and writes its own index
 func TestOpenClearsTheWalAndShm(t *testing.T) {
 	t.Parallel()
@@ -441,7 +441,14 @@ func TestOpenClearsTheWalAndShm(t *testing.T) {
 	if _, _, err := Sweep(old, root); err != nil {
 		t.Fatal(err)
 	}
-	db, err := Open(t.TempDir(), at)
+	copied := filepath.Join(t.TempDir(), "index.db")
+	for _, end := range []string{"", "-wal", "-shm"} {
+		if body, err := os.ReadFile(at + end); err == nil {
+			write(t, filepath.Dir(copied), "index.db"+end, string(body))
+		}
+	}
+	old.Close()
+	db, err := Open(t.TempDir(), copied)
 	if err != nil {
 		t.Fatal(err)
 	}
