@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box d5540c8b5530 · claude-code-remote
@@ -124,6 +124,22 @@ record:
       - name: sync/sync
         exit: 0
         said: work/hooks-v1-hold-the-line took 95 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 8cf71ae9d5dce05d
+        size: 453
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 59618d3672545fade8dd443bf22e2dc206d753a8
+    hash_after: 59618d3672545fade8dd443bf22e2dc206d753a8
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/hooks-v1-hold-the-line already carries every commit on main.
     inputs:
       - name: ask
         hash: 8cf71ae9d5dce05d
@@ -206,9 +222,9 @@ Every confirmed finding of the review fleet over main at bf1dad88b stands fixed 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- secret-guard-reads-folder-globs: `BlessGuard` and `readsSecret` match the literal `person.json` alone. A `cat .se/.runtime/*` or a Grep on the runtime folder still reads the secret.
-- trunk-push-reads-repo-flag: `pushRefsOf` drops the first plain word as the remote. Where `--repo` names the remote, `git push --repo=origin main` reads as no trunk push.
+accept
+
+The diff since the last verdict fixes both points: `SecretName` refuses a glob or a folder reaching the run's secret, and `pushRefsOf` reads `--repo`. Each carries its test, and the probe's clone takes an origin of its own.
 
 # retro
 
