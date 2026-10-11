@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: design/draft
 steps:
   - name: design
     steps:
@@ -155,6 +155,9 @@ record:
         hash: 266fbcd3763fadef
         size: 705
     def: dc4904ab364efa10
+  - step: design/draft
+    hand: the engine
+    stale: ask
 group: tickets-keep-their-chapters
 ---
 
