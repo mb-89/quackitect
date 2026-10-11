@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,6 +155,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: bf0d19c8f24cef0ce7cf83d82e2fcb54d3a2ee33
+    hash_after: bf0d19c8f24cef0ce7cf83d82e2fcb54d3a2ee33
+    inputs:
+      - name: retro/write
+        hash: deff169f5acb5eb8
+        size: 1748
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -292,20 +302,24 @@ The ask's done lines both held before the session began, so the work was verifyi
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- at take: the level0 MCP server disconnected, so every verb ran through `./RUNME.sh`
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the check ran past its time budget, and passed
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted
 
 # Discussion
 
