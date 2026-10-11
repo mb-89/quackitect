@@ -94,6 +94,8 @@ record:
     hand: box f9a277082525 · claude-code-remote
     hash_before: 4dc63da0d338931233fc9995be3b9251fc2d3fd7
     session: cse_01VvZM1WiDGrRL4iW4UyEegN
+    hash_after: b0528a4ece142dae7484b8d4c6999fe86e4d0ce8
+    final: "work/hooks-v1-hold-the-line stands done: every finding fixed with its test, and both designs built past their review points."
   - step: sync
     hand: box f9a277082525 · claude-code-remote
     hash_before: 8b4daae494750e4c5036fdfa36a42170dc943e2f
