@@ -89,6 +89,10 @@ record:
     hand: box f689bbb375f6 · claude-code-remote
     hash_before: 7388a284eb61da57ea9233b10034dde3da03024b
     session: cse_018wkr3ZZD91bVtBerPg7zA3
+    hash_after: 8619469182513d7037d2065a3950bafc686226d5
+    model: claude-opus-5-5
+    cost: 0
+    final: "RECEIPT: branch=work/checks-and-index-read-right prompted=no canary=no"
   - step: sync
     hand: box f689bbb375f6 · claude-code-remote
     hash_before: 52efc15164d74ff70dcac424e1219e838dcbd1c3
