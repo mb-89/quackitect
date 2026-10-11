@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: branches-and-pull-report-truly
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 72558ea6e15ed54d
         size: 552
     def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 43422fcda3a8dd7166138e38dfd6c1b5489bc601
+    hash_after: 43422fcda3a8dd7166138e38dfd6c1b5489bc601
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 1afb7bffaada5615
+        size: 1291
+    def: 08e16d07b0de477c
+    frozen:
+      - path: src/branches/port_f_testverb_test.go
+        hash: a3ded3187aa2d933
 ---
 
 # Ask
@@ -222,26 +238,31 @@ from: none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/port_f_testverb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/port_f_testverb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on the second run: the stdout and stderr a real build failure prints read assertion, as the ask says. A scratch module showed the shape: stdout carries `FAIL <pkg> [build failed]`, and stderr carries the compiler's line under a `#` head.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when line on `TestPFGoSaysItsWord` meets a test that fails on its own assertion
+- the case reaches no door, since `goSays` reads a run's text alone
 
 # gate
 
@@ -322,3 +343,5 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's callers line names `branchTest`. The one caller of `goSays` is `testVerb` in `src/branches/test.go`.
