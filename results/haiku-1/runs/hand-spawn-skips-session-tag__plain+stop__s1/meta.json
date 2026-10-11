@@ -1,0 +1,130 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "git status --short && git branch --show-current && ls && cat RUNME.sh 2>/dev/null | head -60 && ls src src/q src/pull src/modules/hooks 2>&1; cat src/modules/hooks/spawn.go; cat src/pull/pull_branch.go; ls .se/tickets 2>&1 | head; cat .se/tickets/kit-drops-the-own-spawn* 2>/dev/null",
+  "git status --short; ls spec/tickets | grep -i -E 'own|spawn' ; cat spec/tickets/kit-drops-the-own-spawn* 2>/dev/null; cat src/modules/hooks/spawn_test.go; grep -rn \"HandOfItsOwn\\|hand-of-its-own\\|\\\"own\\\"\" --include=*.go --include=*.md --include=*.js . | grep -v node_modules | head -40; grep -n \"own\"",
+  "cat spec/tickets/hand-spawn-skips-session-tag.md; grep -rn \"HandOfItsOwn\\|hand-of-its-own\\|handOfItsOwn\" src/q | head; grep -rn \"const \" src/q/*.go | grep -v _test | head -30; grep -n \"own\\|Own\" src/q/*.go | head -20; cat src/q/looks.go | head -40; ls src/q/qtest src/q/tool",
+  "grep -rln '\"quackitect/src/q\"' src | head -30; echo ---; sed -n 1,30p src/pull/pull.go | grep -n import -A12; echo ---; grep -n \"quackitect\" src/q/*.go | grep -v _test; echo ---; grep -n \"check)\\|test)\" -A6 RUNME.sh | head -40; git log --oneline | head -3",
+  "git status --short | head; (go test ./src/modules/hooks/ ./src/pull/ ./src/q/ 2>&1 | tail -5)",
+  "gofmt -l src/q src/pull src/modules/hooks; go vet ./src/q/ ./src/pull/ ./src/modules/hooks/ && go test ./src/modules/hooks/ ./src/pull/ ./src/q/ 2>&1 | tail -20; ./RUNME.sh test src/modules/hooks/spawn_test.go 2>&1 | tail -15; echo \"test exit=$?\"",
+  "git stash push -q -- src/modules/hooks/spawn.go && go test ./src/modules/hooks/ -run TestASpawnOfAHandOfItsOwn 2>&1 | tail -6; git stash pop -q && git status --short && go test ./src/modules/hooks/ -run TestASpawnOfAHandOfItsOwn -v 2>&1 | grep -E \"^(=== RUN|--- |ok|FAIL)\" ",
+  "./RUNME.sh check > /tmp/qb/haiku-1/check.log 2>&1; echo \"check exit=$?\"; tail -25 /tmp/qb/haiku-1/check.log",
+  "grep -n -i \"red\\|fail\\|FAIL\\|^[a-z-]*:.*exit\" /tmp/qb/haiku-1/check.log | grep -v \"spec/tickets\" | head -30; grep -c \"\" /tmp/qb/haiku-1/check.log; grep -o \"^[^ :]*\\.md\" /tmp/qb/haiku-1/check.log | sort | uniq -c | sort -rn | head; git status --short",
+  "grep -n \"\u2718\\|\u2717\\|not ok\\|^[A-Za-z].*red\" /tmp/qb/haiku-1/check.log | head -20; grep -n \"spec/tickets/hand-spawn-skips-session-tag.md\" /tmp/qb/haiku-1/check.log; grep -n \"^.*:[0-9]*:[0-9]*:\" /tmp/qb/haiku-1/check.log | grep -v \"spec/tickets/\" | head",
+  "git stash push -u -q && ./RUNME.sh check > /tmp/qb/haiku-1/check-base.log 2>&1; echo \"base check exit=$?\"; git stash pop -q && git status --short; grep -c \"spec/tickets/\" /tmp/qb/haiku-1/check-base.log; tail -3 /tmp/qb/haiku-1/check-base.log",
+  "cd /tmp/qb/haiku-1 && diff <(grep -v \"ms)\" check-base.log | sed 's/([0-9.]*s)//' ) <(grep -v \"ms)\" check.log | sed 's/([0-9.]*s)//') | head -60",
+  "grep -n \"refuse mode\" -B3 -A3 /tmp/qb/haiku-1/check.log | head -30; grep -rn \"in refuse mode\\|refuse mode\" --include=*.go --include=*.js --include=*.sh --include=*.md . 2>/dev/null | grep -v node_modules | head; grep -rn \"level0: \" --include=*_test.go src | head -5",
+  "./RUNME.sh check > /tmp/qb/haiku-1/check2.log 2>&1; echo \"check exit=$?\"; grep -n \"fixture:\" /tmp/qb/haiku-1/check2.log; tail -2 /tmp/qb/haiku-1/check2.log; gofmt -l src; go test ./src/modules/hooks/ ./src/pull/ ./src/q/ 2>&1 | tail -3",
+  "git add src/q/hand.go src/pull/pull_branch.go src/modules/hooks/spawn.go src/modules/hooks/spawn_test.go && git commit -q -F - <<'EOF'\nSpawn answer leaves a hand of its own untagged\n\nThe pull writes a hand of its own a prompt that opens on a fixed hand\nline, and the spawn answer tagged every spawn w"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/modules/hooks/spawn.go"
+  ],
+  [
+   "M",
+   "src/modules/hooks/spawn_test.go"
+  ],
+  [
+   "M",
+   "src/pull/pull_branch.go"
+  ],
+  [
+   "A",
+   "src/q/hand.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.01895,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "eeb636b11893356ef77b22f7b0bf5c0cba293b20",
+ "finished": "2026-10-11T00:19:10Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  12.310546875,
+  13.18798828125,
+  12.68212890625
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 13,
+  "models": {}
+ },
+ "run": "hand-spawn-skips-session-tag__plain+stop__s1",
+ "scratch": "/tmp/qb/haiku-1/hand-spawn-skips-session-tag__plain+stop__s1",
+ "secs": 412.5,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 596934,
+  "cache_write": 35101,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.01895134,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 409132,
+  "ended_on_question": false,
+  "final_text": "The spawn answer no longer tags a hand of its own with the session's hand. Committed as `23d4245` on `main`, which is the branch you were on; I didn't create a new branch.\n\n- **Shared constant:** `src/q/hand.go` adds `const HandOfItsOwn = \"You are a hand of your own on this box\"`. The pull's `spawnPrompt` in `src/pull/pull_branch.go` now builds its opening line from it.\n- **Spawn answer:** `src/modules/hooks/spawn.go` skips the session tag when the prompt starts with `q.HandOfItsOwn`, as well as when the `own` field is set. I matched on the opening phrase rather than the whole line, so the tag stays off whatever follows it.\n- **Test:** `TestASpawnOfAHandOfItsOwnTakesNoSessionTag` in `spawn_test.go` covers a hand-line spawn with no `own` field and with `own` set. The no-`own` case fails against the old `spawn.go` and passes with the fix.\n- **Results:** `./RUNME.sh test src/modules/hooks/spawn_test.go` is green, the `hooks`, `pull` and `q` Go packages pass, and `./RUNME.sh check` exits 0.\n\nThe first `check` run failed on a fixture guard that wanted a `level0: FixtureOutsideHome` marker on the new test. The existing spawn test already carries that marker, so I added it to mine.\n\nThe commit message ends with the Co-Authored-By line from the attribution reminder. I did not open a pull request.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 38,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 596934,
+    "cache_write": 35101,
+    "cost": 0.01895134,
+    "in": 38,
+    "out": 11916
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 19
+  },
+  "output_tokens": 145,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.28,
+   "seven_day": 0.01
+  },
+  "result_subtype": "success",
+  "result_turns": 25,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 24,
+  "tools": {
+   "Bash": 15,
+   "Edit": 8,
+   "Write": 1
+  },
+  "turns": 19,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    38,
+    145,
+    35101,
+    596934
+   ]
+  }
+ },
+ "setup_secs": 8.8,
+ "start_commit": "b0f5ab50cb6bd6d07dc9749730820e51aef7eaa1",
+ "start_tree": "837472a9f12574deaf93d08773ec45fc8db631a2",
+ "started": "2026-10-11T00:12:08Z",
+ "status": "ran",
+ "ticket": "hand-spawn-skips-session-tag",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

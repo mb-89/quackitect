@@ -1,0 +1,130 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status && git branch --show-current && git log --oneline -5 && ls src/modules/check/ && cat src/modules/check/export.go && grep -rn \"shownNames\\|ShownNames\\|Shown\\b\" --include=*.go . | head -50",
+  "cat src/modules/check/coverage.go && grep -rn \"shown\\b\" src/modules/check/*.go | head -30 && grep -rn \"ShownNames\\|shownNames\\|coverage\" --include=* -r . 2>/dev/null | grep -v \"^./.git/\" | head -40; ls; cat RUNME.sh | head -60",
+  "cat spec/tickets/example-retro-gaps-shown-name.md; grep -rn \"ExampleCovers\\|exampleCovers\" --include=*.go . | head; grep -rln \"shownNames\\|Shown\\b\" spec/ | head",
+  "cat src/modules/check/example_test.go | head -120; grep -n \"func coveredTree\" -A25 src/modules/check/*_test.go | head -40",
+  "sed -i 's/^func shownNames(tree \\*Tree)/func ShownNames(tree *Tree)/; s/shown := shownNames(tree)/shown := ShownNames(tree)/' src/modules/check/coverage.go && sed -i 's/shownNames to `Shown`/shownNames to `ShownNames`/' spec/tickets/example-retro-counts-gaps.md && git diff --stat && grep -n \"ShownNa",
+  "go vet ./src/modules/check/ && go test ./src/modules/check/ -run 'ShownNames|ExampleCovers|AVerbNoExample|ATabNoExample' -v 2>&1 | tail -20; go test ./... 2>&1 | tail -30",
+  "go test ./... 2>&1 | grep -E \"^(FAIL|ok|---)\" | grep -v \"^ok\" ; git stash -q && go test ./src/quack/ -run 'RetroGaps|Retro' 2>&1 | tail -3; git stash pop -q && git status --short",
+  "git stash -q && go test ./src/quack/ -run 'TestRetroGaps' 2>&1 | grep -E \"^--- FAIL\"; git stash pop -q; (./RUNME.sh check 2>&1 | tail -15); echo \"exit=$?\"",
+  "git status --short && git stash list | head -3",
+  "sleep 100; cat /tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-example-retro-gaps-shown-name--plain--s1-quackitect/2fc9d804-05bb-4399-92f4-fd6e15d3341a/tasks/b1zet4jjw.output | tail -20",
+  "ps -eo pid,etime,args | grep -E \"RUNME|go test|se-index|node\" | grep -v grep | head",
+  "until ! pgrep -f \"se-index verb .*src/scripts check\" >/dev/null; do sleep 2; done; echo done",
+  "sleep 1; echo waiting",
+  "timeout 110 sh -c 'until ! pgrep -f \"se-index verb .*src/scripts check\" >/dev/null; do sleep 2; done'; pgrep -f \"se-index verb .*src/scripts check\" >/dev/null && echo still-running || echo finished",
+  "./RUNME.sh check > /tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-example-retro-gaps-shown-name--plain--s1-quackitect/2fc9d804-05bb-4399-92f4-fd6e15d3341a/scratchpad/check.txt 2>&1; echo \"EXIT=$?\"",
+  "timeout 110 sh -c 'until grep -q EXIT= /tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-example-retro-gaps-shown-name--plain--s1-quackitect/2fc9d804-05bb-4399-92f4-fd6e15d3341a/tasks/bxg26qrrh.output 2>/dev/null; do sleep 2; done'; tail -3 /tmp/qb/haiku-1/example",
+  "timeout 115 sh -c 'until grep -q \"EXIT=\" /tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-example-retro-gaps-shown-name--plain--s1-quackitect/2fc9d804-05bb-4399-92f4-fd6e15d3341a/tasks/bxg26qrrh.output; do sleep 3; done'; grep -h \"EXIT=\" /tmp/qb/haiku-1/example-r",
+  "timeout 115 sh -c 'until grep -q \"EXIT=\" /tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-example-retro-gaps-shown-name--plain--s1-quackitect/2fc9d804-05bb-4399-92f4-fd6e15d3341a/tasks/bxg26qrrh.output; do sleep 3; done'; grep -h \"EXIT=\" /tmp/qb/haiku-1/example-r",
+  "git add src/modules/check/coverage.go src/modules/check/example_test.go spec/tickets/example-retro-counts-gaps.md && git commit -q -F - <<'EOF'\ncheck: export ShownNames instead of renaming to Shown\n\nThe draft renamed shownNames to Shown, but export.go already exports the\nconstant Shown, so that rena"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "spec/tickets/example-retro-counts-gaps.md"
+  ],
+  [
+   "M",
+   "src/modules/check/coverage.go"
+  ],
+  [
+   "M",
+   "src/modules/check/example_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.01969,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "cc74f80635ff959ec6d241a071976f132019354f",
+ "finished": "2026-10-11T03:57:40Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  13.21044921875,
+  14.66015625,
+  18.013671875
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 4,
+  "models": {}
+ },
+ "run": "example-retro-gaps-shown-name__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/example-retro-gaps-shown-name__plain__s1",
+ "secs": 1145.2,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 810641,
+  "cache_write": 34002,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.01968621,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 3896,
+  "ended_on_question": false,
+  "final_text": "That notification is for the background poller I started earlier to wait on the first `./RUNME.sh check` run. It was stopped at its time limit and is not needed. The check result is already confirmed: the rerun, which I captured directly, exited 0. The work is committed as `a64596b` on `main`, and nothing else is outstanding.",
+  "hook_denials": 0,
+  "input_tokens": 54,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 810641,
+    "cache_write": 34002,
+    "cost": 0.01968621,
+    "in": 54,
+    "out": 9548
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 26
+  },
+  "output_tokens": 245,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.05,
+   "seven_day": 0.08
+  },
+  "result_subtype": "success",
+  "result_turns": 1,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 24,
+  "tools": {
+   "Bash": 19,
+   "Edit": 2,
+   "Read": 3
+  },
+  "turns": 26,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    54,
+    245,
+    34002,
+    810641
+   ]
+  }
+ },
+ "setup_secs": 28.1,
+ "start_commit": "efc94673f5fdb0686912cc04d1363c4e050c8533",
+ "start_tree": "8f6c23eb6b13d1540a64a82e561bcadf1a47160d",
+ "started": "2026-10-11T03:38:05Z",
+ "status": "ran",
+ "ticket": "example-retro-gaps-shown-name",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

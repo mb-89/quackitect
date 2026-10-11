@@ -1,0 +1,141 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "grep -c \"^ok\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-vale-retries-its-timeout--plain--s1-quackitect/616b2f9b-73d7-47d8-8b62-51ec77d2b67a/tasks/b3utbn7i8.output; grep -n \"FAIL\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-v",
+  "sed -n 80,140p test/contract/ruled.js",
+  "mkdir -p /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/stress && for i in $(seq 1 12); do (.se/.runtime/bin/vale --config=.vale.ini --output=JSON --no-exit --path=spec/rationales/arguing.md > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/stress/out$i.json 2>/tmp/qb/haiku-1/vale-r",
+  "rm -rf /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/stress && mkdir -p /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/stress && for i in $(seq 1 16); do (.se/.runtime/bin/vale --config=.vale.ini --output=JSON --no-exit spec/rationales/arguing.md > /tmp/qb/haiku-1/vale-retries-its",
+  "(./RUNME.sh check > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log 2>&1; echo \"exit $?\" >> /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log)",
+  "timeout 115 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log; do sleep 3; done'; grep -n \"^exit\\|red cases\\|^  test/\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log | head -30",
+  "timeout 115 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log; do sleep 3; done'; grep -n \"^exit\\|red cases\\|^  test/\\|in all\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check3.log | head -30",
+  "cat src/doors/proc.js | head -60",
+  "grep -n \"node\\b\\|--test\\|env\\|concurrency\\|SE_\" src/scripts/battery.js | head -40",
+  "grep -rln \"contract\" src/scripts/*.js | head; grep -rn \"\\-\\-test\" src/scripts/*.js | head -10",
+  "grep -n \"contract\\|spawn\\|node\\|env\" src/scripts/cli-check.js | head -40",
+  "grep -rln \"vale.ini\\|spec/config\\|styles\" test/ | head -20; echo ---; grep -rn \"write(.*\\(vale.ini\\|styles\\|config\\)\" test/ | cut -c1-220 | head -20",
+  "sed -n 75,100p test/level0/vale-rows.test.js; echo ---; grep -rn \"ROOT\\b\" test/level0/vale-rows.test.js | head -5; grep -rln \"tempDir\\|tmp\" test/level0/*.js | head -3",
+  "(timeout 600 node --test --test-reporter=tap test/contract/*.test.js > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract.log 2>&1; echo \"exit $?\" >> /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract.log)",
+  "timeout 115 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract.log; do sleep 3; done'; grep -n \"^not ok\\|^# fail\\|^# pass\\|^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract.log | head -20",
+  "(go test ./... > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/gomix.log 2>&1 &) ; (timeout 600 node --test --test-reporter=tap test/contract/*.test.js > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract2.log 2>&1; echo \"exit $?\" >> /tmp/qb/haiku-1/vale-retries-its-timeout__",
+  "timeout 118 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract2.log; do sleep 3; done'; grep -n \"^not ok\\|^# fail\\|^# pass\\|^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/contract2.log | head",
+  "sed -n 25,60p src/scripts/work-test.js",
+  "grep -rn \"test/contract\\|contract/\" src/scripts/*.js src/scripts/*.sh 2>/dev/null | grep -v \"^.*//\" | head; grep -rln \"\\.test\\.js\" src/scripts src/engine 2>/dev/null | head",
+  "grep -n \"CONTRACT_TESTS\" -A12 src/scripts/cli-doors.js | head -60; grep -rn \"CONTRACT_TESTS\" src --include=*.js | head",
+  "grep -rn \"contract\\|\\\"--test\\\"\" src/quack/battery.go src/quack/*.go 2>/dev/null | grep -v _test | head -12",
+  "sed -n 86,130p src/quack/check.go; sed -n 475,500p src/quack/check.go",
+  "sed -n 439,474p src/quack/check.go | cut -c1-400",
+  "R=$(pwd); for i in 1 2 3 4 5; do .se/.runtime/bin/vale --output=line --no-exit \"$R/spec/rationales/arguing.md\" >/dev/null 2>/tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/e.txt; a=$?; .se/.runtime/bin/vale --output=line --no-exit \"$R/spec/design_output/level0.md\" >/dev/null 2>&1; b=$?; echo",
+  "cp test/contract/vale-paths.test.js /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/vale-paths.orig.js && python3 - <<'EOF'\nimport re\np=\"test/contract/vale-paths.test.js\"\ns=open(p).read()\ns=s.replace('  assert.equal(ran.exitCode, 0, `vale ran not: ${why}`);','  assert.equal(ran.exitCode, 0, ",
+  "timeout 118 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check4.log; do sleep 3; done'; grep -n \"^exit\\|RAW=\\|^  test/\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check4.log | cut -c1-900 | head",
+  "cp /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/vale-paths.orig.js test/contract/vale-paths.test.js && git status --short && git diff --stat && grep -n \"red cases\\|in all\\|^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check4.log | head; tail -4 /tmp/qb/haiku-1/vale-retrie",
+  "(./RUNME.sh check > /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check5.log 2>&1; echo \"exit $?\" >> /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check5.log)",
+  "timeout 118 bash -c 'until grep -q \"^exit\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check5.log; do sleep 3; done'; grep -n \"^exit\\|red cases\\|^  test/\" /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1/tmp/check5.log | head; tail -3 /tmp/qb/haiku-1/vale-retries-its-timeout__plain__s",
+  "git status --short && git add src/modules/lsp/tools.go src/modules/lsp/tools_test.go test/contract/ruled.js && git commit -q -F - <<'EOF'\nRetry Vale runs on E201 so a loaded box reads the rules\n\nA script rule under the parts' load passes Vale's own cap, which Vale\nnames E201. The lint then read no f"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/modules/lsp/tools.go"
+  ],
+  [
+   "M",
+   "src/modules/lsp/tools_test.go"
+  ],
+  [
+   "M",
+   "test/contract/ruled.js"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.0675,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "acf08a87b507484f15fc73f437c38c85ebb55902",
+ "finished": "2026-10-11T04:14:57Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  17.49072265625,
+  20.70556640625,
+  23.70703125
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 7,
+  "models": {}
+ },
+ "run": "vale-retries-its-timeout__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/vale-retries-its-timeout__plain__s1",
+ "secs": 989.8,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 3456539,
+  "cache_write": 85037,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.06749729000000002,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 986323,
+  "ended_on_question": false,
+  "final_text": " fake runner can now answer E201 a set number of times before the real answer. Two new cases:\n  - E201 once, then rows: rows are drawn, with exactly two Vale runs and no fault.\n  - E201 every time: the run stops at `valeTries` and draws `ValeRuns`.\n- **`test/contract/ruled.js`**: the shared Vale helper for the rule contract tests ran Vale once with no retry. This is what turned the paragraph tests red under load, so it gets the same bounded retry as the vale-paths case.\n\n**Verification**\n- `go test` on the lsp package passes, including the new cases. `gofmt` and `go vet` are clean.\n- I ran `go test ./...` directly rather than through `./RUNME.sh test`, so the done-when command itself is not exercised.\n- `./RUNME.sh check` exits 0 on the committed tree.\n\n**Open issue: `vale-paths.test.js:74` flakes under the check**\n- Under the check it failed with \"vale ran not: exit 2\" and empty stdout and stderr, in the baseline and in two runs with the change. It passed in the fourth run, and every run was green when executed alone.\n- It is not an E201, so the retry does not cover it. I did not widen the retry to silent failures because I have no evidence for that cause.\n- I could not reproduce it by running all contract files together, alongside `go test`, or with 16 parallel Vale runs. A temporary diagnostic on the failure message did not show anything either, and I reverted it.\n- Next step if it recurs: capture the raw process result from inside the check run, not from a standalone one.",
+  "hook_denials": 0,
+  "input_tokens": 110,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 3456539,
+    "cache_write": 85037,
+    "cost": 0.06749729000000002,
+    "in": 110,
+    "out": 31827
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 55
+  },
+  "output_tokens": 557,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.06,
+   "seven_day": 0.08
+  },
+  "result_subtype": "success",
+  "result_turns": 60,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 59,
+  "tools": {
+   "Bash": 51,
+   "Edit": 7,
+   "Grep": 1
+  },
+  "turns": 55,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    110,
+    557,
+    85037,
+    3456539
+   ]
+  }
+ },
+ "setup_secs": 46.0,
+ "start_commit": "8659b3f1f3ac8c84e6f7c540f188a1455f1d8b1e",
+ "start_tree": "f516a909e248219a0ec96d0ecc94ed3eac82bffe",
+ "started": "2026-10-11T03:57:40Z",
+ "status": "ran",
+ "ticket": "vale-retries-its-timeout",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

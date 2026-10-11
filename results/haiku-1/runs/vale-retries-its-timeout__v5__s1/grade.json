@@ -1,0 +1,53 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T04:24:11Z",
+ "hidden": {
+  "f2p": [
+   23,
+   23
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/modules/lsp": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   23,
+   23
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/modules/lsp": "ok"
+  },
+  "secs": 1.6,
+  "tail": ""
+ },
+ "regraded": "2026-10-11T04:40:29Z",
+ "run": "vale-retries-its-timeout__v5__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 4,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 2,
+  "test_files": 1,
+  "tickets_written": 2
+ },
+ "status": "graded"
+}

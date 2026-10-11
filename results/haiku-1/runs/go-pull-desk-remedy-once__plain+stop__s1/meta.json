@@ -1,0 +1,140 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "git status --short && git branch --show-current && cat src/pull/pull_branch.go && cat src/failure/raise.go && grep -rn \"deskRefused\\|TestDeskTakePrintsTheRemedyOnce\" --include=*.go . ; ls; cat RUNME.sh | head -50",
+  "cat src/branches/take_failure_test.go && grep -rn \"func (it \\*It) Refuse\" -A12 src/ && grep -rn \"desk-works-on-trunk\" src spec | head; ls src/pull; sed -n 180,200p src/pull/pull.go; grep -rn \"Take(\" src/branches/*.go | grep -v _test | head -5",
+  "grep -rn \"desk-works-on-trunk\" -B6 -A4 src/branches/*.go | grep -v _test; cat src/pull/pull_failure_test.go | head -80; grep -n \"func.*Fake\\|func (.*) Node\" -A3 src/failure/*.go | head -30; grep -n \"Failures\" src/pull/pull.go | head -5",
+  "grep -n \"func deskPull\\|func cloudPull\\|func .*Pull(t\\|func newPull\\|func gitIn\" -A8 src/pull/*_test.go | head -80; grep -n \"branchTaken\" src/pull/*.go; sed -n 80,140p src/pull/pull_failure_test.go",
+  "sed -n 200,215p src/pull/pull.go; sed -n 258,280p src/pull/pull.go; grep -n \"Cloud\" src/pull/pull_test.go | head -5",
+  "sed -n 212,228p src/pull/pull_test.go; go test ./src/pull/ -run 'Desk|Refusals' -v 2>&1 | tail -5",
+  "go test ./src/pull/ -run 'TestDeskPullPrintsTheRemedyOnce' -v 2>&1 | tail -20; go vet ./src/pull/ && go test ./... 2>&1 | tail -15",
+  "sleep 100; cat /tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/tasks/bu4flq2hd.output | tail -30",
+  "sed -n 116,134p src/pull/pull_test.go; grep -n \"it.Take\\b\\|Take:\" src/pull/*.go | grep -v _test",
+  "timeout 110 go test ./src/pull/ -run 'TestDeskPullPrintsTheRemedyOnce' -v 2>&1 | tail -12",
+  "git stash push -q -- src/pull/pull.go src/pull/pull_branch.go && (timeout 100 go test ./src/pull/ -run TestDeskPullPrintsTheRemedyOnce 2>&1 | grep -E \"prints the remedy|FAIL|ok\" | head -5); git stash pop -q && git status --short",
+  "git stash push -q -- src/pull/pull.go src/pull/pull_branch.go && (timeout 100 go test ./src/pull/ -run TestDeskPullPrintsTheRemedyOnce 2>&1 | grep -E \"prints the remedy|FAIL|ok\" | head -6); git stash pop -q && timeout 100 go test ./src/pull/ -run TestDeskPullPrintsTheRemedyOnce 2>&1 | tail -2; git s",
+  "gofmt -l src/pull/ ; go vet ./src/pull/ && timeout 500 go test ./... 2>&1 | tail -25",
+  "grep -n \"check\" RUNME.sh | head; ls src/scripts | head -30",
+  "grep -rn \"\\\"check\\\"\" src/scripts/verbs/ src/scripts/*.js 2>/dev/null | head -5; ls src/scripts/verbs | grep -i check",
+  "sleep 5; echo wait",
+  "timeout 110 go test ./src/pull/... ./src/branches/... ./src/failure/... 2>&1 | tail -8",
+  "timeout 110 go test ./src/branches/ -run 'TestDeskTakePrintsTheRemedyOnce' 2>&1 | grep -E \"^\\s*--- |times\" ; git stash -q && timeout 100 go test ./src/branches/ -run TestDeskTakePrintsTheRemedyOnce 2>&1 | tail -2; git stash pop -q; git status --short",
+  "grep -E \"^(ok|FAIL|---)\" /tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/tasks/berrsew2t.output | head -40; gofmt -l src/pull/; echo gofmt-done",
+  "grep -E \"^(ok|FAIL)\\s\" /tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/tasks/berrsew2t.output | grep -v cached; git stash -q && (timeout 110 go test ./src/quack/ -run TestCo",
+  "timeout 115 go test ./src/pull/ 2>&1 | tail -3",
+  "timeout 550 ./RUNME.sh check > /tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/scratchpad/check.log 2>&1; echo \"exit=$?\"; tail -25 /tmp/qb/haiku-1/go-pull-desk-remedy-once__",
+  "L=/tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/scratchpad/check.log; grep -n \"pull\\.go\\|pull_branch\\|pull_failure_test\\|FAIL\\|fail\" $L | head; wc -l $L; git stash -q && (",
+  "S=/tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/scratchpad; norm(){ sed -E 's/\\([0-9.]+(ms|s|\u00b5s)\\)//; s/[0-9]+\\.[0-9]+  //; /took|in all|budget/d' \"$1\"; }; diff <(norm $S/",
+  "sed -n 66,76p src/pull/pull_branch.go",
+  "S=/tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/scratchpad; timeout 500 ./RUNME.sh check > $S/check2.log 2>&1; echo \"exit=$?\"; grep -n \"pull_branch\\|pull_failure\\|pull.go\"",
+  "S=/tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-go-pull-desk-remedy-once--plain-stop--s1-quackitect/23ffc4ad-2752-4e7a-a7a3-99ba1a18dcdf/scratchpad; norm(){ sed -E 's/\\([0-9.]+(ms|s|\u00b5s)\\)//; s/[0-9]+\\.[0-9]+  //; /took|in all|budget|duration_ms|^ok|\\[no tests/",
+  "git add src/pull/pull.go src/pull/pull_branch.go src/pull/pull_failure_test.go && git commit -q -m \"$(cat <<'EOF'\nPrint the desk-works-on-trunk remedy once on a desk pull\n\ndeskRefused passed the remedy as a second said line, and the failure\nnode carries the same remedy, so the Go pull printed it twi"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/pull/pull.go"
+  ],
+  [
+   "M",
+   "src/pull/pull_branch.go"
+  ],
+  [
+   "M",
+   "src/pull/pull_failure_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.03182,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "244fae6dae03831c38aa83f5af96b47a3df1d17f",
+ "finished": "2026-10-11T03:02:41Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  27.00390625,
+  22.6494140625,
+  17.24365234375
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 10,
+  "models": {}
+ },
+ "run": "go-pull-desk-remedy-once__plain+stop__s1",
+ "scratch": "/tmp/qb/haiku-1/go-pull-desk-remedy-once__plain+stop__s1",
+ "secs": 989.9,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 1365294,
+  "cache_write": 46896,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.03182054,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 986742,
+  "ended_on_question": false,
+  "final_text": ": `deskRefused` no longer passes the remedy as a said line, and it no longer takes a `name` argument, which only existed to build that remedy. The node's remedy from `failure.Raise` is the only copy printed.\n- `src/pull/pull.go`: updated the one other caller to the new signature. The two callers are the ones in `pull.go` and `pull_branch.go`; I didn't find a separate callers list to update.\n- `src/pull/pull_failure_test.go`: new `TestDeskPullPrintsTheRemedyOnce`, with two cases: a desk pull on a work branch, and a desk pull naming a group on trunk. It counts `git switch main` in the output, so it catches the duplicate even though the old remedy text differed.\n\n**Verification**\n- The new test fails on the old code (2 prints in both cases) and passes with the fix.\n- `go test ./src/pull/` passes.\n- `./RUNME.sh check` exits 0. Its lint shows no new findings after one fix I made to a comment placement; the findings now match the clean tree.\n\n**Not fixed: `take.go`**\n- `src/branches`'s `TestDeskTakePrintsTheRemedyOnce` fails on the clean tree too, because `deskRefusal` in `take.go` still embeds the remedy in its message. The same one-line fix would apply there, but you asked for the pull only, so I left it alone.\n- `go test ./...` also has a pre-existing failure in `src/quack` (`TestCommitVerbDesk`), which fails on the clean tree too.\n\nBecause `go test ./...` isn't fully green, I have not written TASK COMPLETE. If you want take fixed too, say so and I'll make the same change there.",
+  "hook_denials": 0,
+  "input_tokens": 74,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 1365294,
+    "cache_write": 46896,
+    "cost": 0.03182054,
+    "in": 74,
+    "out": 17562
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 37
+  },
+  "output_tokens": 330,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.49,
+   "seven_day": 0.07
+  },
+  "result_subtype": "success",
+  "result_turns": 40,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 39,
+  "tools": {
+   "Bash": 28,
+   "Edit": 8,
+   "Monitor": 1,
+   "Read": 2
+  },
+  "turns": 37,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    74,
+    330,
+    46896,
+    1365294
+   ]
+  }
+ },
+ "setup_secs": 19.0,
+ "start_commit": "cb6e6c6d0bb27b83881f1a949b180419d2726061",
+ "start_tree": "7069a74fe1a0b0b39c6030db4e1d194605d483ce",
+ "started": "2026-10-11T02:45:51Z",
+ "status": "ran",
+ "ticket": "go-pull-desk-remedy-once",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

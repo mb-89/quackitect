@@ -1,0 +1,59 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T00:38:28Z",
+ "hidden": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 1\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\"\n        errs \"the fresh viewer fails to swap in: rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo842447553/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo842447553/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t23.719s"
+ },
+ "hidden_first": {
+  "f2p": [
+   439,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "secs": 67.9,
+  "tail": "[src/quack:TestTuiFailedSwapFailsTheVerbAndAsksNotForGo]\n    tui_verb_test.go:315: code 1\n        out \".se/.log/session.jsonl\\n03:04:05.678 warn  note   hello\\n             1=1.5 2=two detail=d list=1,,2,3 obj=[object Object] n=null b=true big=1e+21 small=1e-7\\n03:04:05.678 info  status plain\\n undefined undefined no at\\n\"\n        errs \"the fresh viewer fails to swap in: rename /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo4151809245/001/.se/.runtime/bin/logview /tmp/TestTuiFailedSwapFailsTheVerbAndAsksNotForGo4151809245/001/.se/.runtime/bin/logview.old: file exists\\n\"\n--- FAIL: TestTuiFailedSwapFailsTheVerbAndAsksNotForGo (0.03s)\nFAIL\nFAIL\tquackitect/src/quack\t47.229s"
+ },
+ "regraded": "2026-10-11T04:39:41Z",
+ "run": "tui-swap-fails-loud__plain__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 3,
+  "n_outside": 1,
+  "n_outside_code": 0,
+  "non_go": 1,
+  "outside": [
+   "spec/design_output/tui.md"
+  ],
+  "own_files": 3,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

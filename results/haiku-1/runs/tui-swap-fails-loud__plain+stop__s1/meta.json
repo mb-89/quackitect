@@ -1,0 +1,121 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "git status --short && git branch --show-current && git log --oneline -5 && grep -rn \"tuiViewerOf\\|tuiDoors\" --include=*.go . | head -50",
+  "grep -rln \"tui.js\\|tui-build\" --exclude-dir=.git . | head; ls; sed -n 1,80p RUNME.sh | head -80; grep -rn \"swap\" --include=*.js --exclude-dir=node_modules . | head -20",
+  "cat src/scripts/tui-build.js; cat spec/tickets/tui-swap-fails-loud.md; grep -n \"swap\\|loud\" spec/design_output/tui.md | head -30",
+  "grep -rn \"exitFailed\\s*=\" src/quack/*.go | head -3; go version; git -C . diff --stat",
+  "sed -n 74,82p src/quack/tui_verb.go | cat -A | cut -c1-90; sed -n 194,217p src/quack/tui_verb.go | cat -A | cut -c1-80",
+  "f=src/quack/tui_verb_test.go && perl -0pi -e 's/exe, why := tuiViewerOf\\(box\\.doors\\(\\)\\)/exe, why, err := tuiViewerOf(box.doors())\\n\\tif err != nil {\\n\\t\\tt.Fatal(err)\\n\\t}/g; s/if exe, why := tuiViewerOf\\(box\\.doors\\(\\)\\); exe != box\\.exe\\(\\) \\|\\| why != \"\"/if exe, why, err := tuiViewerOf(box.door",
+  "sed -n 248,256p src/quack/tui_verb_test.go; echo ---; sed -n 272,282p src/quack/tui_verb_test.go; echo ---; sed -n 335,365p src/quack/tui_verb_test.go",
+  "perl -0pi -e 's/if (exe, why, err := tuiViewerOf\\(box\\.doors\\(\\)\\))\\n\\tif err != nil \\{\\n\\t\\tt\\.Fatal\\(err\\)\\n\\t\\}; (.*?) \\{\\n/$1\\n\\tif err != nil {\\n\\t\\tt.Fatal(err)\\n\\t}\\n\\tif $2 {\\n/g' src/quack/tui_verb_test.go && sed -n 272,282p src/quack/tui_verb_test.go && gofmt -l src/quack/; go vet ./src/qu",
+  "sed -n 345,352p src/quack/tui_verb_test.go",
+  "git status --short && git diff --stat && grep -n \"TestTuiSwapFailureFailsLoud\" -A 8 src/quack/tui_verb_test.go && grep -n \"exe, why, err = tuiViewerOf\\|exe, why, err := \" src/quack/tui_verb_test.go",
+  "gofmt -w src/quack/tui_verb_test.go && go vet ./src/quack/ && go test ./src/quack/ -run 'Tui' -v 2>&1 | tail -60",
+  "go test ./... 2>&1 | tail -30; echo \"GO EXIT $?\"; timeout 580 ./RUNME.sh check 2>&1 | tail -40; echo \"CHECK EXIT ${PIPESTATUS[0]}\"",
+  "timeout 300 ./RUNME.sh check 2>&1 | grep -i \"tui_verb\\|quack/\" | head; echo \"exit-grep-done\"",
+  "git add src/quack/tui_verb.go src/quack/tui_verb_test.go && git commit -q -F - <<'EOF'\ntui: a viewer that fails to swap in stops the verb loud\n\ntuiViewerOf now returns an error as its third result. A fresh build that\nlands but cannot swap in (or the rename that steps the old binary aside)\nwas report"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/quack/tui_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.02635,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "9ca41b223727c5307142c9d04c433cfeef5cb7b0",
+ "finished": "2026-10-11T00:30:42Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  14.28076171875,
+  16.10986328125,
+  14.3544921875
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 6,
+  "models": {}
+ },
+ "run": "tui-swap-fails-loud__plain+stop__s1",
+ "scratch": "/tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1",
+ "secs": 606.7,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 849838,
+  "cache_write": 51364,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.026352680000000007,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 604923,
+  "ended_on_question": false,
+  "final_text": "`tuiViewerOf` now returns `(string, string, error)`. A fresh viewer build that fails to swap in makes the verb print the fault to stderr and exit 1, instead of printing the plain rows and asking for Go. That matches `tui-build.js`, which throws at the same point.\n\n- **Change:** `src/quack/tui_verb.go`. The swap failure is the new error result. `tuiVerb` reports it and returns `exitFailed`.\n- **Tests:** `src/quack/tui_verb_test.go`. All existing call sites are updated to the three results. `TestTuiSwapFailureFailsLoud` forces the swap to fail by making the old binary's aside names folders, then checks for exit 1, empty stdout, non-empty stderr, no launch, and no stamp.\n- **Checks:** `go test ./...` passes. `./RUNME.sh check` exits 0. Its lint output has warnings, but none are new. `tui_verb.go` was already over the 600-line file ceiling and is now 633 lines.\n- **Commit:** `4158f6e` on `main`, which is the current branch. You asked for the current branch, so I committed there. Since `main` is the default branch, you may prefer a feature branch.\n\nDecisions I made:\n- The mkdir and stamp-write failures after a successful swap keep their old behaviour: the viewer runs and the error is printed. The JS twin throws on those too, so say if you want them to fail loud as well.\n- The failed-build-with-old-binary path and the no-Go path are unchanged.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 40,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 849838,
+    "cache_write": 51364,
+    "cost": 0.026352680000000007,
+    "in": 40,
+    "out": 15155
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 20
+  },
+  "output_tokens": 154,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.29,
+   "seven_day": 0.01
+  },
+  "result_subtype": "success",
+  "result_turns": 25,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 24,
+  "tools": {
+   "Bash": 14,
+   "Edit": 8,
+   "Read": 2
+  },
+  "turns": 20,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    40,
+    154,
+    51364,
+    849838
+   ]
+  }
+ },
+ "setup_secs": 12.1,
+ "start_commit": "061eb386c93875a85b82fd8429cb5b0ecf205985",
+ "start_tree": "3b4b1ccb510ca11ae12e20599dd15e7fed85923b",
+ "started": "2026-10-11T00:20:23Z",
+ "status": "ran",
+ "ticket": "tui-swap-fails-loud",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

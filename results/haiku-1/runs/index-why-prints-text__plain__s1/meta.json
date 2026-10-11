@@ -1,0 +1,115 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status && git branch --show-current && cat src/quack/verb_index.go && ls src/quack && cat RUNME.sh | head -60",
+  "cat src/quack/verb_index_test.go; grep -rn \"why\" --include=*.go src | grep -v _test | head -40; grep -rln \"why\" src/scripts | head -20",
+  "ls src/scripts/verbs | head -80; grep -rn \"why\" src/scripts/verbs/index.js src/scripts/index*.js 2>/dev/null | head -30; grep -rln \"'why'\\|\\\"why\\\"\" src/scripts src/index 2>/dev/null | head",
+  "grep -n \"why\" src/index/answers.go src/index/main.go | head -40; grep -rn \"se-index\\|indexSays\\|index why\\|why.*text\\|text.*why\" src/scripts/*.js src/scripts/verbs/*.js src/quack/*.go 2>/dev/null | head -30",
+  "sed -n 150,260p src/index/main.go; sed -n 290,330p src/index/main.go; cat src/index/answers.go | head -60",
+  "sed -n 1,30p src/quack/verb_find.go; grep -n \"twin\\b\" src/quack/registry.go | head; grep -rn \"index\" spec/design_output/model.md 2>/dev/null | grep -i why | head -5; grep -rln \"quack-why\" spec | head",
+  "python3 - <<'EOF'\nimport re\np='src/quack/verb_index.go'\ns=open(p).read()\ns=s.replace('''// Prints the index's answer to the words indented two spaces, as se-index prints it, and its fault on the error stream. [[spec/tickets/read-verbs-port-to-go]]\nfunc indexSays(ask asker, words []string, out, errs ",
+  "go test ./... 2>&1 | tail -30; echo \"---\"; timeout 550 ./RUNME.sh check 2>&1 | tail -40; echo \"exit=$?\"",
+  "timeout 550 ./RUNME.sh check > /tmp/qb/haiku-1/index-why-prints-text__plain__s1/tmp/check.log 2>&1; echo \"exit=$?\"; grep -E \"^\u2716|^\u2139 (fail|pass)|FAIL\" /tmp/qb/haiku-1/index-why-prints-text__plain__s1/tmp/check.log | head -20",
+  "git add src/quack/verb_index.go src/quack/verb_index_test.go && git commit -q -F - <<'EOF'\nindex why prints the tree's text, not JSON\n\nse-index prints the text of a why answer. The Go index verb printed every\nanswer as JSON, so index why printed its tree as a JSON object. indexSays\nnow prints the te"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/quack/verb_index.go"
+  ],
+  [
+   "M",
+   "src/quack/verb_index_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.00905,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "417e6c75ddc3240efa8ead4e06ab37126889ea70",
+ "finished": "2026-10-11T01:04:11Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  17.60400390625,
+  19.79052734375,
+  19.1435546875
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 5,
+  "models": {}
+ },
+ "run": "index-why-prints-text__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/index-why-prints-text__plain__s1",
+ "secs": 382.8,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 224850,
+  "cache_write": 21350,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.0090542,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 379901,
+  "ended_on_question": false,
+  "final_text": "`index why` now prints the tree's text, as `se-index` does, instead of a JSON object. The change is committed as `ac33242` on `main`, which is the branch you were on.\n\n**The change** is in `src/quack/verb_index.go`. `indexSays` checks whether the first word is `why` and the answer is a map. If so, it prints the map's `text` field. Every other answer still prints as indented JSON. The rule is shared with `find`, `links` and `notes`, but none of them send `why` as their first word, so they are unaffected.\n\n**Tests** are in `src/quack/verb_index_test.go`. A new case checks that `index why a` prints the text and asks the index for `why a`. The existing JSON and fault cases still pass.\n\n**Verification:**\n- `go test ./...` passes in every package.\n- `./RUNME.sh check` passed on the second run: 2519 and 369 tests, 0 failures. The first run had one Vale test time out after 2 seconds under load. It was not related to this change and did not recur.\n\nI committed on `main` because you asked for the current branch. The repo's default guidance is to branch first, so move the commit if you'd rather it land on a feature branch.",
+  "hook_denials": 0,
+  "input_tokens": 22,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 224850,
+    "cache_write": 21350,
+    "cost": 0.0090542,
+    "in": 22,
+    "out": 5067
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 11
+  },
+  "output_tokens": 94,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.36,
+   "seven_day": 0.03
+  },
+  "result_subtype": "success",
+  "result_turns": 11,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 10,
+  "tools": {
+   "Bash": 10
+  },
+  "turns": 11,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    22,
+    94,
+    21350,
+    224850
+   ]
+  }
+ },
+ "setup_secs": 15.6,
+ "start_commit": "f208acabf23bb74a6d3c11d72278258a6f6d2066",
+ "start_tree": "4f7d000cc0dd2988dd5ef4e975754e492dae9313",
+ "started": "2026-10-11T00:57:32Z",
+ "status": "ran",
+ "ticket": "index-why-prints-text",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

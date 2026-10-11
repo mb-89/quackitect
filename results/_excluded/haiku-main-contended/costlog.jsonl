@@ -1,0 +1,1 @@
+{"arm": "plain+stop", "batch": "haiku-main", "cache_read": 1329170, "cache_write": 53112, "cost_usd": 0.03493, "estimated": false, "model": "claude-haiku-5-5", "nested_calls": 0, "nested_cost_usd": 0.0, "run": "hand-spawn-skips-session-tag__plain+stop__s1", "secs": 946.5, "tokens_in": 64, "tokens_out": 281, "when": "2026-10-10T22:58:59Z"}

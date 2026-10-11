@@ -1,0 +1,53 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T04:33:02Z",
+ "hidden": {
+  "f2p": [
+   4,
+   4
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   1,
+   1
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/proc": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   4,
+   4
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   1,
+   1
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/proc": "ok"
+  },
+  "secs": 0.3,
+  "tail": ""
+ },
+ "regraded": "2026-10-11T04:36:53Z",
+ "run": "proc-empty-argv-never-starts__plain+stop__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 2,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 2,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

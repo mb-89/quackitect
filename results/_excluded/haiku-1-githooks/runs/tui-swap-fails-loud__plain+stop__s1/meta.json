@@ -1,0 +1,120 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "git status --short && git branch --show-current && git log --oneline | head -5 && ls src/quack/ && grep -rn \"tuiViewerOf\\|tuiDoors\" --include=*.go . | head -50",
+  "sed -n 1,260p src/quack/tui_verb.go",
+  "sed -n 540,620p src/quack/tui_verb.go && echo ---- && cat src/quack/tui_verb_test.go",
+  "grep -rln \"tui.js\\|tui-build\" --exclude-dir=.git . | head -20; find . -name \"tui.js\" -not -path \"./.git/*\" | head; grep -rn \"rename\\|swap\" $(find . -name \"tui*.js\" -not -path \"./.git/*\" -not -path \"*/node_modules/*\") | head -30; grep -rn \"Install Go\\|go builds no viewer\\|tuiNeedsGo\\|fails, so the la",
+  "cat src/scripts/tui-build.js; echo ----; cat spec/tickets/tui-swap-fails-loud.md; echo ----; grep -n \"swap\\|fails loud\\|Go\" spec/design_output/tui.md | head -40; echo ----; grep -n \"tuiNeedsGo\\|Install Go\\|plain\\|swap\" src/scripts/cli-check.js | head; echo ----; cat RUNME.sh | head -60",
+  "cd /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/quackitect/src/quack && python3 - <<'EOF'\nimport re\np='tui_verb_test.go'\ns=open(p).read()\nreps=[\n(\"exe, why := tuiViewerOf(box.doors())\\n\\tif exe != box.exe() || why != \\\"\\\" {\",\"exe, why, err := tuiViewerOf(box.doors())\\n\\tif err != nil || exe !",
+  "sed -n 246,256p tui_verb_test.go; echo ...; sed -n 334,346p tui_verb_test.go; echo ...; git -C /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/quackitect status --short",
+  "cd /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/quackitect && sed -i 's/^\\t\"errors\"\\n\\t\"io\"/&/' src/quack/tui_verb_test.go && python3 - <<'EOF'\np='src/quack/tui_verb_test.go'\ns=open(p).read()\ns=s.replace('import (\\n\\t\"errors\"\\n\\t\"io\"\\n','import (\\n\\t\"errors\"\\n\\t\"fmt\"\\n\\t\"io\"\\n',1)\ns=s.replace",
+  "mkdir -p /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/tmp/rn && cd /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/tmp/rn && rm -rf * && mkdir -p a/logview.old && echo x > a/logview.old/held && echo bin > a/logview && cat > /tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/tmp/rn/main_t",
+  "S=/tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1/tmp/claude-0/-tmp-qb-haiku-1-tui-swap-fails-loud--plain-stop--s1-quackitect/5bf3c1c8-6bde-4f72-b29f-e462e2f65440/scratchpad/rn2 && mkdir -p $S/a/logview.old && cd $S && echo x > a/logview.old/held && echo bin > a/logview && printf 'module rn\\n\\ng",
+  "cat > src/quack/zz_debug_test.go <<'EOF'\npackage main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n\t\"path/filepath\"\n\t\"testing\"\n)\n\nfunc TestZZDebug(t *testing.T) {\n\tbox := tuiBoxAt(t)\n\ttuiWrites(t, box.root, map[string]string{\".se/.runtime/bin/logview\": \"old binary\"})\n\tfor n := range tuiAside {\n\t\tname := box.exe() + \".old",
+  "python3 - <<'EOF'\np='src/quack/tui_verb_test.go'\ns=open(p).read()\nold='''\tfor n := range tuiAside {\n\t\tname := box.exe() + \".old\"\n\t\tif n > 0 {\n\t\t\tname = fmt.Sprintf(\"%s%d\", name, n)\n\t\t}\n\t\ttuiWrites(t, box.root, map[string]string{name + \"/held\": \"held\"})\n\t}'''\nnew='''\tfor n := range tuiAside {\n\t\tname ",
+  "go test ./... 2>&1 | tail -15; echo \"GO EXIT $?\"; timeout 500 ./RUNME.sh check 2>&1 | tail -25; echo \"CHECK EXIT ${PIPESTATUS[0]}\"",
+  "git add src/quack/tui_verb.go src/quack/tui_verb_test.go && git commit -q -F - <<'EOF'\nquack tui: a failed viewer swap fails loud\n\ntuiViewerOf returned the swap error as the reason to run plain, so on a\nbox that holds Go the verb printed the rows and asked for Go. tui.js lets\nthe swap throw, so the "
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/quack/tui_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.02173,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "9adc234fb8af6f9d5397f0b272483c5de57f88cf",
+ "finished": "2026-10-10T23:41:57Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  4.63525390625,
+  10.197265625,
+  15.88818359375
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 5,
+  "models": {}
+ },
+ "run": "tui-swap-fails-loud__plain+stop__s1",
+ "scratch": "/tmp/qb/haiku-1/tui-swap-fails-loud__plain+stop__s1",
+ "secs": 548.1,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 541294,
+  "cache_write": 44014,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.021725239999999996,
+  "cost_estimated": false,
+  "door_refusals": 1,
+  "duration_ms": 545466,
+  "ended_on_question": false,
+  "final_text": "A failed viewer swap now fails loud instead of printing the plain rows and asking for Go. The change is committed on `main` as `319be33`.\n\n- **Signature:** `tuiViewerOf(d tuiDoors) (string, string, error)`. The third result is the new error, returned for a failed swap and for a failed stamp write after a swap.\n- **Behaviour:** `tuiVerb` prints the error to stderr and exits with `exitFailed` when that error is set. It never reaches the plain rows or the Go message.\n- **Stamp write:** I made a failed stamp write after a swap fail loud too, to match `tui.js`, where that write throws. Say if you'd rather keep the old behaviour there.\n- **Test:** `TestTuiSwapFailureFailsLoud` blocks the rename by filling the old-binary names with non-empty folders. It checks that the verb exits failed, prints no rows, and never says \"Install Go\". The existing `tuiViewerOf` call sites are updated to the three results.\n\n`go test ./...` passes, and `./RUNME.sh check` exits 0. The check printed lint findings in `src/voice/voice.go` and two JS test files; I didn't touch those files, so they predate this change.\n\nI left one related case alone because it's outside the ask: a build that fails to compile with Go installed still prints the plain rows with the \"Install Go\" line. That message is misleading there too.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 30,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 541294,
+    "cache_write": 44014,
+    "cost": 0.021725239999999996,
+    "in": 30,
+    "out": 15013
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 15
+  },
+  "output_tokens": 112,
+  "permission_denials": 1,
+  "rate_limit": {
+   "five_hour": 0.22,
+   "seven_day": 0.52
+  },
+  "result_subtype": "success",
+  "result_turns": 19,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 18,
+  "tools": {
+   "Bash": 14,
+   "Edit": 4
+  },
+  "turns": 15,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    30,
+    112,
+    44014,
+    541294
+   ]
+  }
+ },
+ "setup_secs": 18.0,
+ "start_commit": "061eb386c93875a85b82fd8429cb5b0ecf205985",
+ "start_tree": "3b4b1ccb510ca11ae12e20599dd15e7fed85923b",
+ "started": "2026-10-10T23:32:31Z",
+ "status": "ran",
+ "ticket": "tui-swap-fails-loud",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

@@ -1,0 +1,239 @@
+diff --git a/.claude/skills/level0/lib/paragraph-rules.js b/.claude/skills/level0/lib/paragraph-rules.js
+index 7d1b703..138bdbb 100644
+--- a/.claude/skills/level0/lib/paragraph-rules.js
++++ b/.claude/skills/level0/lib/paragraph-rules.js
+@@ -64,18 +64,17 @@ const WORDS = [
+   "",
+ ];
+ 
+-// The longest run of words two places share. [[spec/design_output/lsp#a-second-copy-draws]]
++// Whether two places share a run of want words, stopping at the first. [[spec/design_output/lsp#a-second-copy-draws]]
+ const RUN = [
+-  "run := func(a, b) {",
+-  "  most := 0",
+-  "  for i := 0; i < len(a); i++ {",
+-  "    for j := 0; j < len(b); j++ {",
++  "run := func(a, b, want) {",
++  "  for i := 0; i+want <= len(a); i++ {",
++  "    for j := 0; j+want <= len(b); j++ {",
+   "      n := 0",
+-  "      for i+n < len(a) && j+n < len(b) && a[i+n] == b[j+n] { n = n + 1 }",
+-  "      if n > most { most = n }",
++  "      for n < want && a[i+n] == b[j+n] { n = n + 1 }",
++  "      if n == want { return true }",
+   "    }",
+   "  }",
+-  "  return most",
++  "  return false",
+   "}",
+   "",
+ ];
+@@ -131,7 +130,7 @@ function walk(most) {
+     "  for row in near {",
+     "    mine := wordsOf(row.said)",
+     "    for cell in cells {",
+-    `      if run(mine, cell) >= ${most} {`,
++    `      if run(mine, cell, ${most}) {`,
+     "        matches = append(matches, {",
+     "          begin: row.begin,",
+     "          end: row.end,",
+diff --git a/spec/config/styles/VoiceParagraph/RestatedTable.yml b/spec/config/styles/VoiceParagraph/RestatedTable.yml
+index 0d4165c..77328d2 100644
+--- a/spec/config/styles/VoiceParagraph/RestatedTable.yml
++++ b/spec/config/styles/VoiceParagraph/RestatedTable.yml
+@@ -97,16 +97,15 @@ script: |
+     return text.fields(clean)
+   }
+ 
+-  run := func(a, b) {
+-    most := 0
+-    for i := 0; i < len(a); i++ {
+-      for j := 0; j < len(b); j++ {
++  run := func(a, b, want) {
++    for i := 0; i+want <= len(a); i++ {
++      for j := 0; j+want <= len(b); j++ {
+         n := 0
+-        for i+n < len(a) && j+n < len(b) && a[i+n] == b[j+n] { n = n + 1 }
+-        if n > most { most = n }
++        for n < want && a[i+n] == b[j+n] { n = n + 1 }
++        if n == want { return true }
+       }
+     }
+-    return most
++    return false
+   }
+ 
+   aside := func(line) {
+@@ -153,7 +152,7 @@ script: |
+     for row in near {
+       mine := wordsOf(row.said)
+       for cell in cells {
+-        if run(mine, cell) >= 6 {
++        if run(mine, cell, 6) {
+           matches = append(matches, {
+             begin: row.begin,
+             end: row.end,
+diff --git a/spec/tickets/index-why-prints-text.md b/spec/tickets/index-why-prints-text.md
+index 8cd92e8..1e30511 100644
+--- a/spec/tickets/index-why-prints-text.md
++++ b/spec/tickets/index-why-prints-text.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,36 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ parent: read-verbs-run-in-go
++record:
++  - step: do
++    hand: box 7a22ed8cc155 · claude-code-remote
++    hash_before: 5c8337040ec11440aea89594e1d9947845979a02
++    hash_after: 5c8337040ec11440aea89594e1d9947845979a02
++    returns: 1
++    why: "the hand-back met refused 5 times: check under do expects exit 0, and ./RUNME.sh check answers 1:    84.6  in all"
++  - step: do
++    hand: box 7a22ed8cc155 · claude-code-remote
++    hash_before: 3f7f37d7316c7c9add3b19a04fd552f60cfc366d
++    hash_after: 0b430ce63855f118120106bd3ae495f0276f5379
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/quack passes
++      - name: check
++        exit: 0
++        said: "   85.7  in all"
++    inputs:
++      - name: ask
++        hash: a5c6aaec9008bc3e
++        size: 150
++    def: b523d80c2c6f4b51
++reason: done
+ ---
+ 
+ # Ask
+@@ -47,27 +71,33 @@ indexSays in src/quack/verb_index.go prints every answer as JSON, where se-index
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++    ./RUNME.sh branch test src/quack/verb_index_test.go
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++    ./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++index why printed the answer as JSON, because indexSays in src/quack/verb_index.go marshals every answer. A why answer now prints its tree text, as src/index/main.go does for se-index. TestIndexVerb covers the case. The check was red on a Vale script timeout under load, so the restated-table rule now stops at its first shared run, and a test calls the generator for it.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++the change follows the ask: indexSays prints the tree text of a why answer, as se-index does
++the cleanup: the restated-table helper, a timeout source, is in its own commit 0b430ce
++every fact stands in one place: the comment in verb_index.go points at spec/design_output/model#quack-why
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index c3e3ba3..5704308 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,10 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 7a22ed8cc155 · claude-code-remote
++    hash_before: 1a96b79f04c56728ae6173a447ab7253c32af68c
+ ---
+ 
+ # Ask
+diff --git a/src/quack/verb_index.go b/src/quack/verb_index.go
+index 25f12bb..5993b3f 100644
+--- a/src/quack/verb_index.go
++++ b/src/quack/verb_index.go
+@@ -37,6 +37,11 @@ func indexSays(ask asker, words []string, out, errs io.Writer) int {
+ 		fmt.Fprintln(errs, err)
+ 		return exitFailed
+ 	}
++	// why prints the tree the design input draws, as se-index does. [[spec/design_output/model#quack-why]]
++	if found, ok := said.(map[string]any); ok && len(words) > 0 && words[0] == "why" {
++		fmt.Fprintln(out, found["text"])
++		return 0
++	}
+ 	text, err := json.MarshalIndent(said, "", "  ")
+ 	if err != nil {
+ 		fmt.Fprintln(errs, err)
+diff --git a/src/quack/verb_index_test.go b/src/quack/verb_index_test.go
+index 6d0c461..84dfad6 100644
+--- a/src/quack/verb_index_test.go
++++ b/src/quack/verb_index_test.go
+@@ -39,6 +39,13 @@ func TestIndexVerb(t *testing.T) {
+ 			t.Fatalf("index asks %v, and wants call value {}", asked)
+ 		}
+ 	})
++	t.Run("why prints the tree text, as se-index does", func(t *testing.T) {
++		asked := [][]string{}
++		code, out, _ := runsTwin(indexVerb(askHolding(map[string]any{"text": "a = 1"}, nil, &asked)), "index", "why", "a")
++		if code != 0 || out != "a = 1\n" {
++			t.Fatalf("index why answers %d, %q, and wants the tree text printed", code, out)
++		}
++	})
+ 	t.Run("a fault prints on the error stream and exits 1", func(t *testing.T) {
+ 		code, out, errs := runsTwin(indexVerb(askHolding(nil, errors.New("no door"), &[][]string{})), "index")
+ 		if code != exitFailed || out != "" || !strings.Contains(errs, "no door") {
+diff --git a/test/level0/paragraph.test.js b/test/level0/paragraph.test.js
+index 807c048..b1b15d8 100644
+--- a/test/level0/paragraph.test.js
++++ b/test/level0/paragraph.test.js
+@@ -18,6 +18,7 @@ import {
+   staleIn,
+   writesOf,
+ } from "../../.claude/skills/level0/lib/projection.js";
++import { restatedTable } from "../../.claude/skills/level0/lib/paragraph-rules.js";
+ import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
+ import { fakeDisk } from "../../src/doors/fake/disk.js";
+ 
+@@ -168,6 +169,14 @@ test("every layer takes its rule file, and the answer register takes its own", (
+   ]);
+ });
+ 
++// [[spec/design_output/lsp#a-second-copy-draws]]
++test("the restated-table rule asks whether a run of words is shared, and stops at the first", () => {
++  const rule = restatedTable({ table: 6, prose: [] });
++  assert.match(rule, /run := func\(a, b, want\)/);
++  assert.match(rule, /if run\(mine, cell, 6\) \{/);
++  assert.doesNotMatch(rule, /most := 0/);
++});
++
+ // [[spec/design_output/projection#a-layer-writes-two-files]]
+ test("the requirement register takes the modal rule in its own variant", () => {
+   const files = drawn();

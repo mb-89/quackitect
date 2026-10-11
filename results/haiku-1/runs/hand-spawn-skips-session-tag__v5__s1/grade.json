@@ -1,0 +1,101 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T00:37:00Z",
+ "hidden": {
+  "f2p": [
+   0,
+   257
+  ],
+  "f2p_failed": [
+   "src/modules/hooks:TestACallTakesTheDefaultWaitOffItsKey",
+   "src/modules/hooks:TestACallsArgumentsSpreadOnTheEventReachTheAction",
+   "src/modules/hooks:TestAClearOpensTheDebtAgain",
+   "src/modules/hooks:TestACompactionOpensTheDebtAgain",
+   "src/modules/hooks:TestAContextReadLogsTheBlocksItHands",
+   "src/modules/hooks:TestADescribeOfAnotherToolPasses",
+   "src/modules/hooks:TestADescribeOfBashAnswersTheVerbLine",
+   "src/modules/hooks:TestADoorWithNoGitOrVoiceReadsNeither",
+   "src/modules/hooks:TestADoorWithNoIndexPassesGrepAndGlob",
+   "src/modules/hooks:TestAGlobAnswersTheIndexsPaths",
+   "src/modules/hooks:TestAGrepAnswersTheIndexsLines",
+   "src/modules/hooks:TestAGrepCountsAndListsFilesAsTheBridgeSays",
+   "src/modules/hooks:TestAGrepOnAnAbsolutePathPasses",
+   "src/modules/hooks:TestAGrepTheIndexRefusesPassesToTheDisk",
+   "src/modules/hooks:TestAGrepTypeReadsAsItsGlob",
+   "src/modules/hooks:TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown",
+   "src/modules/hooks:TestAHeldCallAsksBackForRows",
+   "src/modules/hooks:TestAHelpersHandBackLandsAsAnAgentRowAndPasses",
+   "src/modules/hooks:TestAHelpersLogCallLandsItsRowToo",
+   "src/modules/hooks:TestAHelpersPromptKeepsNoQuestion"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "": "build-fail",
+   "src/modules/hooks": "build-fail",
+   "src/pull": "build-fail",
+   "src/q": "build-fail"
+  },
+  "tail": "# quackitect/src/modules/hooks [quackitect/src/modules/hooks.test]\nsrc/modules/hooks/spawn_test.go:135:78: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/modules/hooks [build failed]\n# quackitect/src/pull [quackitect/src/pull.test]\nsrc/pull/pull_test.go:340:81: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/pull [build failed]\n# quackitect/src/q_test [quackitect/src/q.test]\nsrc/q/event_test.go:15:25: undefined: q.HandOfItsOwn\nsrc/q/event_test.go:16:40: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/q [build failed]"
+ },
+ "hidden_first": {
+  "f2p": [
+   0,
+   257
+  ],
+  "f2p_failed": [
+   "src/modules/hooks:TestACallTakesTheDefaultWaitOffItsKey",
+   "src/modules/hooks:TestACallsArgumentsSpreadOnTheEventReachTheAction",
+   "src/modules/hooks:TestAClearOpensTheDebtAgain",
+   "src/modules/hooks:TestACompactionOpensTheDebtAgain",
+   "src/modules/hooks:TestAContextReadLogsTheBlocksItHands",
+   "src/modules/hooks:TestADescribeOfAnotherToolPasses",
+   "src/modules/hooks:TestADescribeOfBashAnswersTheVerbLine",
+   "src/modules/hooks:TestADoorWithNoGitOrVoiceReadsNeither",
+   "src/modules/hooks:TestADoorWithNoIndexPassesGrepAndGlob",
+   "src/modules/hooks:TestAGlobAnswersTheIndexsPaths",
+   "src/modules/hooks:TestAGrepAnswersTheIndexsLines",
+   "src/modules/hooks:TestAGrepCountsAndListsFilesAsTheBridgeSays",
+   "src/modules/hooks:TestAGrepOnAnAbsolutePathPasses",
+   "src/modules/hooks:TestAGrepTheIndexRefusesPassesToTheDisk",
+   "src/modules/hooks:TestAGrepTypeReadsAsItsGlob",
+   "src/modules/hooks:TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown",
+   "src/modules/hooks:TestAHeldCallAsksBackForRows",
+   "src/modules/hooks:TestAHelpersHandBackLandsAsAnAgentRowAndPasses",
+   "src/modules/hooks:TestAHelpersLogCallLandsItsRowToo",
+   "src/modules/hooks:TestAHelpersPromptKeepsNoQuestion"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "": "build-fail",
+   "src/modules/hooks": "build-fail",
+   "src/pull": "build-fail",
+   "src/q": "build-fail"
+  },
+  "secs": 3.6,
+  "tail": "# quackitect/src/modules/hooks [quackitect/src/modules/hooks.test]\nsrc/modules/hooks/spawn_test.go:135:78: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/modules/hooks [build failed]\n# quackitect/src/pull [quackitect/src/pull.test]\nsrc/pull/pull_test.go:340:81: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/pull [build failed]\n# quackitect/src/q_test [quackitect/src/q.test]\nsrc/q/event_test.go:15:25: undefined: q.HandOfItsOwn\nsrc/q/event_test.go:16:40: undefined: q.HandOfItsOwn\nFAIL\tquackitect/src/q [build failed]"
+ },
+ "regraded": "2026-10-11T04:35:35Z",
+ "run": "hand-spawn-skips-session-tag__v5__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 4,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 2,
+  "test_files": 1,
+  "tickets_written": 2
+ },
+ "status": "graded"
+}

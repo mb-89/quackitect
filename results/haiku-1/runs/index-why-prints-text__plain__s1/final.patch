@@ -1,0 +1,46 @@
+diff --git a/src/quack/verb_index.go b/src/quack/verb_index.go
+index 25f12bb..f5ffce0 100644
+--- a/src/quack/verb_index.go
++++ b/src/quack/verb_index.go
+@@ -30,13 +30,21 @@ func indexVerb(ask asker) twin {
+ 	}
+ }
+ 
+-// Prints the index's answer to the words indented two spaces, as se-index prints it, and its fault on the error stream. [[spec/tickets/read-verbs-port-to-go]]
++// The word that asks the index for a tree, which prints as its text rather than as JSON. [[spec/design_output/model#quack-why]]
++const whyWord = "why"
++
++// Prints the index's answer to the words indented two spaces, as se-index prints it, and its fault on the error stream. A why answer prints its text, as se-index prints it. [[spec/tickets/read-verbs-port-to-go]]
+ func indexSays(ask asker, words []string, out, errs io.Writer) int {
+ 	said, err := ask(words...)
+ 	if err != nil {
+ 		fmt.Fprintln(errs, err)
+ 		return exitFailed
+ 	}
++	// why prints the tree the design input draws. [[spec/design_output/model#quack-why]]
++	if found, ok := said.(map[string]any); ok && len(words) > 0 && words[0] == whyWord {
++		fmt.Fprintln(out, found["text"])
++		return 0
++	}
+ 	text, err := json.MarshalIndent(said, "", "  ")
+ 	if err != nil {
+ 		fmt.Fprintln(errs, err)
+diff --git a/src/quack/verb_index_test.go b/src/quack/verb_index_test.go
+index 6d0c461..947d90c 100644
+--- a/src/quack/verb_index_test.go
++++ b/src/quack/verb_index_test.go
+@@ -39,6 +39,14 @@ func TestIndexVerb(t *testing.T) {
+ 			t.Fatalf("index asks %v, and wants call value {}", asked)
+ 		}
+ 	})
++	t.Run("a why answer prints its text, not JSON", func(t *testing.T) {
++		asked := [][]string{}
++		said := map[string]any{"name": "a", "text": "a\n└─ b\n"}
++		code, out, _ := runsTwin(indexVerb(askHolding(said, nil, &asked)), "index", "why", "a")
++		if code != 0 || out != "a\n└─ b\n\n" || strings.Join(asked[0], " ") != "why a" {
++			t.Fatalf("index answers %d, %q, asked %v, and wants the why text printed", code, out, asked)
++		}
++	})
+ 	t.Run("a fault prints on the error stream and exits 1", func(t *testing.T) {
+ 		code, out, errs := runsTwin(indexVerb(askHolding(nil, errors.New("no door"), &[][]string{})), "index")
+ 		if code != exitFailed || out != "" || !strings.Contains(errs, "no door") {

@@ -1,0 +1,3 @@
+run the work skill
+Your group: the-bench-work. Its child tickets stand under spec/tickets: proc-empty-argv-never-starts.
+Its route: sync, split, children, accept, retro.

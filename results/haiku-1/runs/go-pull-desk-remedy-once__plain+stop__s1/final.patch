@@ -1,0 +1,86 @@
+diff --git a/src/pull/pull.go b/src/pull/pull.go
+index 5828e8a..e04815c 100644
+--- a/src/pull/pull.go
++++ b/src/pull/pull.go
+@@ -188,7 +188,7 @@ func (it *It) Pull(argv []string) int {
+ 	onTrunk := branch == Trunk
+ 	// A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
+ 	if !it.Cloud && strings.HasPrefix(branch, WorkBranch) {
+-		return it.deskRefused("the pull hands nothing out on "+branch, "")
++		return it.deskRefused("the pull hands nothing out on " + branch)
+ 	}
+ 	if !onTrunk && !strings.HasPrefix(branch, WorkBranch) {
+ 		it.Refuse(failure.Raise(it.Failures, "pull-branch-off-road",
+diff --git a/src/pull/pull_branch.go b/src/pull/pull_branch.go
+index 6a1da58..5cc0abd 100644
+--- a/src/pull/pull_branch.go
++++ b/src/pull/pull_branch.go
+@@ -58,7 +58,7 @@ func (it *It) branchTaken(named string) int {
+ 		return it.Take(named)
+ 	}
+ 	if named != "" {
+-		return it.deskRefused("the pull takes no branch for "+named, named)
++		return it.deskRefused("the pull takes no branch for " + named)
+ 	}
+ 	if it.Ready != nil && it.Ready() {
+ 		return 0
+@@ -66,14 +66,10 @@ func (it *It) branchTaken(named string) int {
+ 	return -1
+ }
+ 
+-// [[spec/design_output/work#a-desk-works-on-trunk]]
+-func (it *It) deskRefused(what, name string) int {
+-	if name == "" {
+-		name = "<name>"
+-	}
++// The message carries no remedy, since the node desk-works-on-trunk holds it and the door prints it once. [[spec/design_output/work#a-desk-works-on-trunk]]
++func (it *It) deskRefused(what string) int {
+ 	it.Refuse(failure.Raise(it.Failures, "desk-works-on-trunk",
+-		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what),
+-		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name)))
++		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what)))
+ 	return 2
+ }
+ 
+diff --git a/src/pull/pull_failure_test.go b/src/pull/pull_failure_test.go
+index 959add0..f28dc07 100644
+--- a/src/pull/pull_failure_test.go
++++ b/src/pull/pull_failure_test.go
+@@ -54,6 +54,37 @@ func TestAPullOffMainAndOffAWorkBranchRaisesPullBranchOffRoad(t *testing.T) {
+ 	}
+ }
+ 
++// The desk pull's refusal prints the node's remedy once, as the take does. [[spec/tickets/the-twins-leave-whole]]
++func TestDeskPullPrintsTheRemedyOnce(t *testing.T) {
++	t.Parallel()
++	remedy := "Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge g."
++	cases := []struct {
++		name  string
++		argv  []string
++		trunk bool
++	}{
++		{"a desk pull on a work branch", []string{"pull"}, false},
++		{"a desk pull naming a group on trunk", []string{"pull", "g"}, true},
++	}
++	for _, one := range cases {
++		t.Run(one.name, func(t *testing.T) {
++			t.Parallel()
++			it, errs, _ := raisingPull(t, failure.Node{ID: "desk-works-on-trunk", Level: "warn", Remedies: []string{remedy}})
++			it.Cloud = false
++			if one.trunk {
++				gitIn(t, it.Root, "switch", "-q", "main")
++				it.Take = func(string) int { return 0 }
++			}
++			if code := it.Pulling(one.argv); code != 2 {
++				t.Fatalf("the pull answers %d:\n%s", code, errs())
++			}
++			if count := strings.Count(errs(), "git switch main"); count != 1 {
++				t.Fatalf("the pull prints the remedy %d times:\n%s", count, errs())
++			}
++		})
++	}
++}
++
+ func TestRefusalsNameTheirIds(t *testing.T) {
+ 	t.Parallel()
+ 	cases := []struct {

@@ -1,0 +1,35 @@
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index 6dea4fe..411b4d2 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,10 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 54f9e0e97ef5 · claude-code-remote
++    hash_before: 0393d33c4c3a49dc747cc3ec7b6861d688f70cda
+ ---
+ 
+ # Ask
+diff --git a/src/proc/proc_contract_test.go b/src/proc/proc_contract_test.go
+index c72957a..4f6dd91 100644
+--- a/src/proc/proc_contract_test.go
++++ b/src/proc/proc_contract_test.go
+@@ -77,6 +77,15 @@ func TestARunReadsTheEnvPastTheBoxs(t *testing.T) {
+ 	}
+ }
+ 
++func TestACommandNamingNoProgramNeverStarts(t *testing.T) {
++	t.Parallel()
++	for name, run := range runners() {
++		if said := run(Command{}); said.Code != NotStarted || said.Err == "" {
++			t.Errorf("the %s runner answers %+v", name, said)
++		}
++	}
++}
++
+ func TestAProgramNobodyTaughtNeverStarts(t *testing.T) {
+ 	t.Parallel()
+ 	for name, run := range runners() {

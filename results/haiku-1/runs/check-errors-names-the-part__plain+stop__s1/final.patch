@@ -1,0 +1,198 @@
+diff --git a/src/quack/check.go b/src/quack/check.go
+index 41e9942..71c8a81 100644
+--- a/src/quack/check.go
++++ b/src/quack/check.go
+@@ -108,6 +108,10 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
+ 		d := doorsOf(out, errs)
+ 		words := argv[1:]
+ 		quiet := slices.Contains(words, errorsFlag)
++		if quiet {
++			// The parts' passing lines stay off the stdout the merge hands on; red lines reach errs. [[spec/tickets/the-verbs-need-no-wrapper]]
++			d.out = io.Discard
++		}
+ 		_ = os.Remove(d.at(lintFile))
+ 		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
+ 		lines := d.text(timesFile)
+@@ -346,7 +350,7 @@ func goGate(d checkDoors, quiet bool, skip []string) int {
+ 	argv := append(append([]string{"go", "test", "-tags", contractTag}, skip...), "./...")
+ 	code, said, err := d.run(argv, []string{noCgo}, quiet)
+ 	if err != nil {
+-		fmt.Fprintln(d.out, "go stands nowhere, so the check refuses: run ./RUNME.sh tools, or install Go.")
++		fmt.Fprintln(d.errs, "go stands nowhere, so the check refuses: run ./RUNME.sh tools, or install Go.")
+ 		return 1
+ 	}
+ 	if code != 0 {
+@@ -363,7 +367,7 @@ func goGate(d checkDoors, quiet bool, skip []string) int {
+ 	faults := 0
+ 	for _, name := range strings.Split(listed, "\n") {
+ 		if name = strings.TrimSpace(name); name != "" {
+-			fmt.Fprintf(d.out, "%s: Gofmt: the file reads another way than the formatter writes it.\n", name)
++			fmt.Fprintf(d.errs, "%s: Gofmt: the file reads another way than the formatter writes it.\n", name)
+ 			faults++
+ 		}
+ 	}
+diff --git a/src/quack/check_test.go b/src/quack/check_test.go
+index 47f2fb4..bb3c8c9 100644
+--- a/src/quack/check_test.go
++++ b/src/quack/check_test.go
+@@ -375,6 +375,28 @@ func TestCheckVerb(t *testing.T) {
+ 			t.Fatalf("the stamp reads %s, and wants the unrun parts", stamp)
+ 		}
+ 	})
++	t.Run("under --errors a red part's lines reach the error stream, and no part line reaches stdout", func(t *testing.T) {
++		fake := &checkFake{}
++		doors := fake.doors()
++		doors.root = t.TempDir()
++		doors.run = func(argv, env []string, _ bool) (int, string, error) {
++			if argv[0] == "gofmt" {
++				return 0, "src/one/one.go\n", nil
++			}
++			return 0, "", nil
++		}
++		var out, errs strings.Builder
++		code := checkVerb(func(o, e io.Writer) checkDoors { doors.out, doors.errs = o, e; return doors })([]string{"check", "--errors"}, false, &out, &errs)
++		if code != 1 {
++			t.Fatalf("the run answers %d, and wants the gofmt fault red", code)
++		}
++		if strings.TrimSpace(out.String()) != noErrors {
++			t.Fatalf("stdout reads %q, and wants only %q", out.String(), noErrors)
++		}
++		if !strings.Contains(errs.String(), "src/one/one.go: Gofmt:") {
++			t.Fatalf("the error stream reads %q, and wants the gofmt fault", errs.String())
++		}
++	})
+ 	t.Run("the stamp counts the warnings the lint leaves", func(t *testing.T) {
+ 		fake := &checkFake{}
+ 		doors := fake.doors()
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..6750d2f 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,22 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// A verb run through quack's own road: the road and the words as argv, and under quiet a red verb's said reaches the error stream, so the why is not dropped. [[spec/tickets/the-verbs-need-no-wrapper]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		argv := append(append([]string{}, road...), words...)
++		code, said, err := run(argv, env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 && strings.TrimSpace(said) != "" {
++			fmt.Fprintln(errs, strings.TrimRight(said, "\n"))
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {
+diff --git a/src/quack/verbover_test.go b/src/quack/verbover_test.go
+new file mode 100644
+index 0000000..64ff868
+--- /dev/null
++++ b/src/quack/verbover_test.go
+@@ -0,0 +1,83 @@
++// The verb road in Go: the road and the words as argv, and a quiet red verb's
++// why reaching the error stream.
++// [[spec/tickets/the-verbs-need-no-wrapper]]
++package main
++
++import (
++	"errors"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++// [[spec/tickets/the-verbs-need-no-wrapper]]
++func TestVerbOver(t *testing.T) {
++	road := []string{"/bin/quack", "verb", "src/scripts"}
++	env := []string{"SE_LINT_FOUND=x"}
++
++	t.Run("the road and the words make the argv, with the env", func(t *testing.T) {
++		var gotArgv, gotEnv []string
++		run := func(argv, env []string, quiet bool) (int, string, error) {
++			gotArgv, gotEnv = argv, env
++			return 0, "", nil
++		}
++		verb := verbOver(run, road, env, &strings.Builder{})
++		if code := verb([]string{"lint", "src/quack"}, false); code != 0 {
++			t.Fatalf("a green verb answers %d", code)
++		}
++		if want := []string{"/bin/quack", "verb", "src/scripts", "lint", "src/quack"}; !reflect.DeepEqual(gotArgv, want) {
++			t.Fatalf("the argv reads %v, and want %v", gotArgv, want)
++		}
++		if !reflect.DeepEqual(gotEnv, env) {
++			t.Fatalf("the env reads %v, and want %v", gotEnv, env)
++		}
++	})
++	t.Run("the road is not changed by a run", func(t *testing.T) {
++		run := func(argv, env []string, quiet bool) (int, string, error) { return 0, "", nil }
++		verb := verbOver(run, road, env, &strings.Builder{})
++		verb([]string{"doors"}, false)
++		verb([]string{"project", "--check"}, false)
++		if want := []string{"/bin/quack", "verb", "src/scripts"}; !reflect.DeepEqual(road, want) {
++			t.Fatalf("the road reads %v, and want %v", road, want)
++		}
++	})
++	t.Run("under quiet a red verb's why reaches the error stream", func(t *testing.T) {
++		run := func(argv, env []string, quiet bool) (int, string, error) {
++			return 1, "src/quack/a.go:3: the lint refuses this\n", nil
++		}
++		var errs strings.Builder
++		verb := verbOver(run, road, env, &errs)
++		if code := verb([]string{"lint"}, true); code != 1 {
++			t.Fatalf("a red verb answers %d", code)
++		}
++		if got := errs.String(); got != "src/quack/a.go:3: the lint refuses this\n" {
++			t.Fatalf("the error stream reads %q", got)
++		}
++	})
++	t.Run("not under quiet, a red verb's said is not repeated on the error stream", func(t *testing.T) {
++		run := func(argv, env []string, quiet bool) (int, string, error) {
++			return 1, "already on the screen\n", nil
++		}
++		var errs strings.Builder
++		verb := verbOver(run, road, env, &errs)
++		if code := verb([]string{"lint"}, false); code != 1 {
++			t.Fatalf("a red verb answers %d", code)
++		}
++		if errs.Len() != 0 {
++			t.Fatalf("the error stream reads %q, and want nothing", errs.String())
++		}
++	})
++	t.Run("a verb that will not start says so, and answers failed", func(t *testing.T) {
++		run := func(argv, env []string, quiet bool) (int, string, error) {
++			return 0, "", errors.New("no such road")
++		}
++		var errs strings.Builder
++		verb := verbOver(run, road, env, &errs)
++		if code := verb([]string{"doors"}, false); code != exitFailed {
++			t.Fatalf("a verb that will not start answers %d", code)
++		}
++		if !strings.Contains(errs.String(), "no such road") {
++			t.Fatalf("the error stream reads %q", errs.String())
++		}
++	})
++}

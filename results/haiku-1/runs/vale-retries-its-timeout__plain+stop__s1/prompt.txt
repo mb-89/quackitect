@@ -1,0 +1,16 @@
+The rules part runs Vale beside every other part, and a script rule under that load passes Vale's own cap, which Vale names E201. The lint then reads no file and turns the check red on a sound tree. The Vale run in the lint module goes again on E201, a bounded number of times, as the contract case on Vale paths does.
+
+- gain: the check reads the tree's rules, and not the box's load
+- breaks: a sound tree goes red under the parts running at once, and the push waits on a rerun
+- done_when:
+  - `./RUNME.sh test src/modules/lsp/tools_test.go` passes a case where Vale answers E201 once, then rows
+  - `./RUNME.sh check` answers 0
+
+The hidden tests call this interface, as the reference change declares it (signatures only; keep these names, parameters and results):
+
+in src/modules/lsp/ (package lsp):
+  const valeTries
+
+Make this change in the repository in your working directory (a Go project; `go test ./...` runs the Go tests and `./RUNME.sh check` runs the repository's full check). Add or update tests for the change, and commit your work on the current branch when you are done.
+
+Stop rule: as soon as tests cover every point of the ask and all pass, commit, and end your reply with the line TASK COMPLETE. Do not refactor or polish working code. Commit before every risky change.

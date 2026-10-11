@@ -1,0 +1,111 @@
+{
+ "arm": "plain+stop",
+ "bash_tail": [
+  "git status --short && git branch --show-current && cat src/quack/verb_index.go && ls src/quack && grep -rn \"se-index\\|why\" --include=*.go -l . | head -50",
+  "cat src/quack/verb_index_test.go; grep -rn \"se-index\" --include=*.go --include=*.sh . | head -20; grep -rn \"func Ask\\|\\\"why\\\"\" src/index/*.go | head; grep -n \"func.*[Ww]hy\\|Text\\|text\" src/index/answers.go | head -40",
+  "sed -n 160,230p src/index/main.go; sed -n 290,340p src/index/main.go; sed -n 1,80p src/index/answers.go; cat src/quack/verb_links.go | head -60",
+  "gofmt -l src/quack; go test ./src/quack/ -run 'TestIndexVerb|TestLinks|TestNotes|TestFind' -v 2>&1 | tail -30 && go test ./... 2>&1 | tail -30",
+  "go test ./... 2>&1 | grep -c FAIL; git add src/quack/verb_index.go src/quack/verb_index_test.go && git commit -q -m \"$(printf 'index: why prints the text of its answer\\n\\nThe index verb printed every answer as JSON, so index why printed its\\ntree as a JSON object. se-index prints the text of a why a"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/quack/verb_index.go"
+  ],
+  [
+   "M",
+   "src/quack/verb_index_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.00603,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "f2dafd7e658db9b05317846aa6c40aedd9242212",
+ "finished": "2026-10-11T00:57:32Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  11.6708984375,
+  16.72509765625,
+  18.125
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 1,
+  "models": {}
+ },
+ "run": "index-why-prints-text__plain+stop__s1",
+ "scratch": "/tmp/qb/haiku-1/index-why-prints-text__plain+stop__s1",
+ "secs": 90.0,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 140359,
+  "cache_write": 15615,
+  "claimed_complete": true,
+  "compactions": 0,
+  "cost": 0.00602719,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 86961,
+  "ended_on_question": false,
+  "final_text": "`index why` now prints the tree's text, as `se-index` does, instead of the JSON object.\n\n- **Fix:** in `indexSays` (`src/quack/verb_index.go`), when the first word is `why` and the answer is a map, it prints the `text` field. Other verbs and answers still print as indented JSON.\n- **Test:** a new case in `src/quack/verb_index_test.go` checks that `index why t/n` prints the text and asks the index `why t/n`. I did not run it against the old code to confirm it failed before the change.\n- **Results:** `go test ./...` passes with no failures. I did not run `./RUNME.sh check`.\n- **Commit:** `abc4396` on `main`, with the Co-Authored-By line from the reminder.\n\nTASK COMPLETE",
+  "hook_denials": 0,
+  "input_tokens": 16,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 140359,
+    "cache_write": 15615,
+    "cost": 0.00602719,
+    "in": 16,
+    "out": 2998
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 8
+  },
+  "output_tokens": 100,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.34,
+   "seven_day": 0.03
+  },
+  "result_subtype": "success",
+  "result_turns": 8,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 7,
+  "tools": {
+   "Bash": 5,
+   "Edit": 2
+  },
+  "turns": 8,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    16,
+    100,
+    15615,
+    140359
+   ]
+  }
+ },
+ "setup_secs": 20.5,
+ "start_commit": "f208acabf23bb74a6d3c11d72278258a6f6d2066",
+ "start_tree": "4f7d000cc0dd2988dd5ef4e975754e492dae9313",
+ "started": "2026-10-11T00:55:41Z",
+ "status": "ran",
+ "ticket": "index-why-prints-text",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

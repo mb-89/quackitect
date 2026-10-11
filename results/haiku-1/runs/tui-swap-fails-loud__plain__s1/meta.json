@@ -1,0 +1,123 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status && git log --oneline | head -5 && ls && ls src/quack && cat RUNME.sh | head -60",
+  "cat src/quack/tui_verb_test.go && ls src/scripts | grep -i tui; cat src/scripts/tui.js 2>/dev/null | head -150",
+  "cat src/scripts/tui-build.js; echo ----; grep -n -i -A12 \"the-verb-builds-it\" spec/design_output/tui.md | head -120",
+  "grep -rn -i \"swap\\|fails loud\\|asks for Go\\|Install Go\" spec/design_output/tui.md spec/design_output/*.md | head -20; which go node; go version; grep -n \"exitFailed\\s*=\" -r src/quack | head -3",
+  "sed -n '73,78p' src/quack/tui_verb.go | cat -A | cut -c1-80",
+  "sed -i 's/\\(exe, [a-z_]*\\) := tuiViewerOf/\\1, _ := tuiViewerOf/g' src/quack/tui_verb_test.go && grep -n \"tuiViewerOf\" src/quack/tui_verb_test.go && gofmt -l src/quack/ ; cd src/quack && go vet . 2>&1 | head -20",
+  "cd /tmp/qb/haiku-1/tui-swap-fails-loud__plain__s1/quackitect && sed -i 's/^\\t\"errors\"$/\\t\"errors\"\\n\\t\"fmt\"/' src/quack/tui_verb_test.go && gofmt -l src/quack; go test ./src/quack/ -run 'Tui' -v 2>&1 | tail -60",
+  "git diff --stat && git diff src/quack/tui_verb_test.go | head -30 && (go test ./... 2>&1 | tail -40)",
+  "go test ./... 2>&1 | grep -v '^ok' | head; echo \"exit-filter-done\"; grep -n \"^check\\|^  check\\|check)\" RUNME.sh | head; timeout 900 ./RUNME.sh check > /tmp/qb/haiku-1/tui-swap-fails-loud__plain__s1/tmp/check.log 2>&1; echo \"check exit $?\"; tail -30 /tmp/qb/haiku-1/tui-swap-fails-loud__plain__s1/tmp/",
+  "sed -n 355,372p spec/design_output/tui.md",
+  "git add src/quack/tui_verb.go src/quack/tui_verb_test.go spec/design_output/tui.md && git commit -q -F - <<'EOF'\ntui: a viewer that fails to swap in prints the rows and fails loud\n\ntuiViewerOf returned a swap failure as text, so tuiVerb read it like a\nbox without Go and asked for Go on a box that ho"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "spec/design_output/tui.md"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/tui_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.02695,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "84d5977e816ebfa6250646c7136a32d205fb05f1",
+ "finished": "2026-10-11T00:38:20Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  13.38671875,
+  13.61376953125,
+  13.6962890625
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 4,
+  "models": {}
+ },
+ "run": "tui-swap-fails-loud__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/tui-swap-fails-loud__plain__s1",
+ "secs": 446.5,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 852521,
+  "cache_write": 53730,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.026953009999999996,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 443633,
+  "ended_on_question": false,
+  "final_text": "The swap failure now prints the plain rows and fails loud, without asking for Go. The change is committed on `main` (`fad999a`), since you asked for the current branch.\n\n**What changed**\n- `tuiViewerOf` in `src/quack/tui_verb.go` now returns `(string, string, error)`. A fresh build that can't swap in returns an error, which is the only case that does. A failed build, a missing Go, and a stamp-write failure keep their existing messages and results.\n- `tuiVerb` prints the error to stderr, prints the session rows without the \"Install Go\" line, and exits 1.\n- Tests: call sites are updated to the three results, and `TestTuiSwapFailurePrintsTheRowsAndFailsLoud` covers the swap failure. It holds the binary path and its aside names as non-empty folders so the rename fails.\n- `spec/design_output/tui.md` has a row for the new case.\n\n**Choices I made**\n- Exit code 1 for the swap failure, to match \"failed loud\". If you'd rather it exit 0 with a warning, that's a one-line change.\n- On a swap failure, `tuiViewerOf` returns no binary, so the verb doesn't fall back to the old one.\n\n**Checks**\n- `go test ./...` passes for every package.\n- `./RUNME.sh check` exits 0. Its lint output shows warnings in `src/voice/voice.go` and two JS test files, which I didn't touch. The check took 259s against a 120s budget.\n- I didn't update the ticket `spec/tickets/tui-swap-fails-loud.md`.",
+  "hook_denials": 0,
+  "input_tokens": 38,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 852521,
+    "cache_write": 53730,
+    "cost": 0.026953009999999996,
+    "in": 38,
+    "out": 15356
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 19
+  },
+  "output_tokens": 139,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.31,
+   "seven_day": 0.02
+  },
+  "result_subtype": "success",
+  "result_turns": 22,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 21,
+  "tools": {
+   "Bash": 11,
+   "Edit": 7,
+   "Grep": 1,
+   "Read": 2
+  },
+  "turns": 19,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    38,
+    139,
+    53730,
+    852521
+   ]
+  }
+ },
+ "setup_secs": 10.6,
+ "start_commit": "061eb386c93875a85b82fd8429cb5b0ecf205985",
+ "start_tree": "3b4b1ccb510ca11ae12e20599dd15e7fed85923b",
+ "started": "2026-10-11T00:30:42Z",
+ "status": "ran",
+ "ticket": "tui-swap-fails-loud",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

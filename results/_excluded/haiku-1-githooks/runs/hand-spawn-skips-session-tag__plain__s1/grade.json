@@ -1,0 +1,40 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-10T23:32:38Z",
+ "hidden": {
+  "f2p": [
+   255,
+   257
+  ],
+  "f2p_failed": [
+   "src/pull:TestTheHandPromptOpensOnTheHandLine",
+   "src/q:TestTheHandLineTakesANameAfterIt"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/modules/hooks": "ok",
+   "src/pull": "fail",
+   "src/q": "fail"
+  },
+  "secs": 8.0,
+  "tail": "FAIL\nFAIL\tquackitect/src/pull\t0.073s\nFAIL\nFAIL\tquackitect/src/q\t0.208s"
+ },
+ "run": "hand-spawn-skips-session-tag__plain__s1",
+ "scope": {
+  "code_files": 3,
+  "files": 6,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 6,
+  "test_files": 3,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

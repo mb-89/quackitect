@@ -1,0 +1,31 @@
+diff --git a/src/proc/proc.go b/src/proc/proc.go
+index a4e2a6f..4ac4e80 100644
+--- a/src/proc/proc.go
++++ b/src/proc/proc.go
+@@ -33,6 +33,9 @@ type Runner func(Command) Said
+ 
+ // The real runner, through exec. [[spec/design_output/doors#the-process-door]]
+ func Real(one Command) Said {
++	if len(one.Argv) == 0 {
++		return Said{Err: "proc: a command names no program", Code: NotStarted}
++	}
+ 	cmd := exec.Command(one.Argv[0], one.Argv[1:]...)
+ 	cmd.Dir = one.Dir
+ 	cmd.Env = append(cmd.Environ(), one.Env...)
+diff --git a/src/proc/proc_contract_test.go b/src/proc/proc_contract_test.go
+index c72957a..bd0aa42 100644
+--- a/src/proc/proc_contract_test.go
++++ b/src/proc/proc_contract_test.go
+@@ -85,3 +85,12 @@ func TestAProgramNobodyTaughtNeverStarts(t *testing.T) {
+ 		}
+ 	}
+ }
++
++func TestACommandNamingNoProgramNeverStarts(t *testing.T) {
++	t.Parallel()
++	for name, run := range runners() {
++		if said := run(Command{}); said.Code != NotStarted || said.Err == "" {
++			t.Errorf("the %s runner answers %+v", name, said)
++		}
++	}
++}

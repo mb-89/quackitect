@@ -1,0 +1,1 @@
+two sessions pinned to two cores each: the check's timing-bound plugin tests ran past their 5-second limit on two cores, which v5 then chased; the batch switched to two unpinned sessions (four shared cores) before more runs finished

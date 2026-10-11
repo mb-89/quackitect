@@ -1,0 +1,116 @@
+diff --git a/src/branches/dispatch_done_test.go b/src/branches/dispatch_done_test.go
+index f92515a..b4e99fb 100644
+--- a/src/branches/dispatch_done_test.go
++++ b/src/branches/dispatch_done_test.go
+@@ -65,7 +65,7 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
+ 	t.Parallel()
+ 	one := dfDoneTree(t)
+ 	hub := newHub()
+-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": map[string]any{"merge_method": "merge"}, "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
+ 	one.out.Reset()
+ 	Dispatch(one.d, hub.send, []string{"--fire"})
+ 	// The red fire lists every open pull request first, so the test reads the head lists alone. [[spec/tickets/ci-reds-name-their-cases]]
+@@ -87,3 +87,44 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
+ 		t.Fatalf("the dispatch prints %s", one.out.String())
+ 	}
+ }
++
++// A standing pull request whose auto_merge stands unset takes auto-merge on, and posts no second one. [[spec/tickets/standing-pull-takes-auto-merge]]
++func TestDispatchTakesAutoMergeOnAStandingPullRequestWhereItIsUnset(t *testing.T) {
++	t.Parallel()
++	one := dfDoneTree(t)
++	hub := newHub()
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": nil, "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
++	one.out.Reset()
++	if code := Dispatch(one.d, hub.send, []string{"--fire"}); code != codeOK {
++		t.Fatalf("the run answers %d: %s", code, one.out.String())
++	}
++	if posted := hub.pullsSent("POST"); len(posted) != 0 {
++		t.Fatalf("the dispatch posts %d pull request(s)", len(posted))
++	}
++	var merges []dfSent
++	for _, said := range hub.sent {
++		if said.URL == dfAPI+"/graphql" {
++			merges = append(merges, said)
++		}
++	}
++	if len(merges) != 1 {
++		t.Fatalf("the dispatch merges %d", len(merges))
++	}
++	dpSame(t, dfBody(t, merges[0])["variables"].(map[string]any)["id"], "PR_7")
++	holds(t, one.out.String(), "https://github.example/"+dfRepo+"/pull/7")
++}
++
++// A standing pull request already carrying auto_merge is left as it stands, and no merge is sent. [[spec/tickets/standing-pull-takes-auto-merge]]
++func TestDispatchLeavesAutoMergeAloneOnAStandingPullRequestWhereItIsOn(t *testing.T) {
++	t.Parallel()
++	one := dfDoneTree(t)
++	hub := newHub()
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": map[string]any{"merge_method": "merge"}, "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
++	one.out.Reset()
++	Dispatch(one.d, hub.send, []string{"--fire"})
++	for _, said := range hub.sent {
++		if said.URL == dfAPI+"/graphql" {
++			t.Fatalf("the dispatch merges a pull request already on auto-merge: %s", one.out.String())
++		}
++	}
++}
+diff --git a/src/branches/dispatch_fire.go b/src/branches/dispatch_fire.go
+index 81814c7..9d1a30d 100644
+--- a/src/branches/dispatch_fire.go
++++ b/src/branches/dispatch_fire.go
+@@ -322,8 +322,10 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 		return refusedPull(out, "The pull request list", listed)
+ 	}
+ 	var pulls []struct {
+-		URL  string `json:"html_url"`
+-		Head struct {
++		URL       string `json:"html_url"`
++		NodeID    string `json:"node_id"`
++		AutoMerge any    `json:"auto_merge"`
++		Head      struct {
+ 			Ref string `json:"ref"`
+ 		} `json:"head"`
+ 	}
+@@ -333,7 +335,10 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 	for _, one := range pulls {
+ 		if one.Head.Ref == branch {
+ 			out.State, out.URL = "standing", one.URL
+-			return codeOK
++			if one.AutoMerge != nil {
++				return codeOK
++			}
++			return enableMerge(send, gh, one.NodeID, out)
+ 		}
+ 	}
+ 	made := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]string{
+@@ -347,9 +352,14 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 	}
+ 	pull := readOf(made)
+ 	out.State, out.URL = "opened", jsonText(pull["html_url"])
++	return enableMerge(send, gh, jsonText(pull["node_id"]), out)
++}
++
++// Turns auto-merge on for a pull request by its node id, with the merge method MERGE, and names the refusal on the row where GitHub gives one. [[spec/tickets/standing-pull-takes-auto-merge]]
++func enableMerge(send Send, gh hub, id string, out *pullRow) int {
+ 	merge := sent(send, gh.API+"/graphql", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]any{
+ 		"query":     autoMerge,
+-		"variables": map[string]any{"id": pull["node_id"]},
++		"variables": map[string]any{"id": id},
+ 	})})
+ 	errs, _ := readOf(merge)["errors"].([]any)
+ 	if okOf(merge) && len(errs) == 0 {
+diff --git a/src/branches/dispatch_fire_test.go b/src/branches/dispatch_fire_test.go
+index 5436dbc..cfe2d44 100644
+--- a/src/branches/dispatch_fire_test.go
++++ b/src/branches/dispatch_fire_test.go
+@@ -324,7 +324,7 @@ func TestDispatchOpensTheWriteBranchsPullRequestOnPullTokenWithAutoMerge(t *test
+ func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
+ 	t.Parallel()
+ 	hub := newHub()
+-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": map[string]any{"merge_method": "merge"}, "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
+ 	plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "standing"})
+ 	dfFired(hub, plan, nil)
+ 	for _, one := range hub.sent {

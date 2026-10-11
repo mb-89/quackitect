@@ -1,0 +1,133 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status --short && git branch --show-current && git log --oneline -5 && grep -rn \"Signalled\\|NotStarted\" --include=*.go . | head -80",
+  "cat src/quack/voice_verb.go; echo ----; cat src/pull/door.go; echo ----; cat RUNME.sh | head -60",
+  "cat src/proc/proc.go; echo ----; sed -n 130,175p src/quack/spawns_runner_test.go; echo ----; sed -n 60,85p src/quack/voice_verb.go; echo ----; sed -n 150,175p src/pull/door.go; echo; grep -rn \"ShellOver\\|voiceRunsValeOver\" --include=*.go . ; ls src/quack src/pull",
+  "grep -rln \"Signalled\\|signal\" spec 2>/dev/null | head; grep -rn -i \"signal\" spec/tickets/quack-spawns-all-take-the-runner* spec/tickets/quack-spawns-meet-fake-process* 2>/dev/null | head -30; sed -n 150,190p src/quack/voice_verb_test.go; cat src/pull/shell_test.go | sed -n 30,70p",
+  "sed -n 200,215p spec/tickets/quack-spawns-all-take-the-runner.md; echo ...; sed -n 235,262p spec/tickets/quack-spawns-all-take-the-runner.md; echo ...; sed -n 335,350p spec/tickets/quack-spawns-all-take-the-runner.md; echo ...; sed -n 40,60p src/quack/spawndoors.go 2>/dev/null; grep -n \"Signalled\\|s",
+  "go test ./src/proc/ ./src/pull/ ./src/quack/ 2>&1 | tail -40; grep -rn \"\\.Shell(\\|Shell func\\|type Shell\" src/pull/*.go | head",
+  "cat >> src/quack/voice_verb_test.go <<'EOF'\n\nfunc TestVoiceRunsValeAnswersTheFaultOfAValeEndedBySignal(t *testing.T) {\n\tt.Parallel()\n\tfake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {\n\t\treturn proc.Said{Out: \"{\", Err: \"killed\", Code: proc.Signalled",
+  "sed -n 160,200p src/quack/voice_verb_test.go",
+  "gofmt -l src/quack src/pull; go test ./src/quack/ -run 'TestVoiceRuns' -v 2>&1 | tail -12; go test ./src/pull/ 2>&1 | tail -3",
+  "timeout 900 ./RUNME.sh check > /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1/tmp/check.log 2>&1; echo exit=$?; tail -30 /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1/tmp/check.log",
+  "go test ./... 2>&1 | grep -v \"^ok\\|no test files\" | grep -E \"^(--- FAIL|FAIL|ok|panic)\" | head -40",
+  "git stash -q && go test ./src/imports/ ./src/proc/ ./src/quack/ 2>&1 | grep -E \"^(--- FAIL|FAIL|ok)\" ; git stash pop -q && git status --short",
+  "sleep 100; tail -15 /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-signalled-meets-notstarted-readers--plain--s1-quackitect/2bd839f6-65d1-4c54-9c5e-eb999a19bb50/tasks/bkwzxnwih.output",
+  "pgrep -af \"RUNME|se-index|go test\" | head -5; echo; cd /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1/quackitect && sed -n 1,40p src/scripts/check.sh 2>/dev/null | head -40; ls src/scripts | head -30",
+  "for i in $(seq 1 110); do pgrep -f \"RUNME.sh check\" >/dev/null || break; sleep 5; done; pgrep -f \"RUNME.sh check\" >/dev/null && echo STILL_RUNNING || echo DONE; cat /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1/tmp/check.log | tail -40",
+  "cd /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1 && grep -n \"voice_verb\\|pull/door\\|shell_test\\|quack/voice_verb_test\" tmp/check.log | head; grep -inE \"^(FAIL|not ok)|failed|exit=\" tmp/check.log | head -20; grep -c . tmp/check.log; head -5 tmp/check.log",
+  "cd /tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1 && grep -n -iE \"red list|tests-green|passed|failing|\u2718|not ok|check (failed|passed|stands)\" tmp/check.log | head -20; grep -c \"\u2718\" tmp/check.log; tail -3 tmp/check.log",
+  "git add src/pull/door.go src/pull/shell_test.go src/quack/voice_verb.go src/quack/voice_verb_test.go && git commit -q -F - <<'EOF'\nRead Signalled as a fault in voiceRunsValeOver and ShellOver\n\nA run a signal ends answers Signalled, not NotStarted. Both readers\nchecked only NotStarted, so a signal's "
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/pull/door.go"
+  ],
+  [
+   "M",
+   "src/pull/shell_test.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb.go"
+  ],
+  [
+   "M",
+   "src/quack/voice_verb_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.02481,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "9d4710415052a15a8363638600e7b3edea85cfe7",
+ "finished": "2026-10-11T02:02:31Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  15.8681640625,
+  16.59326171875,
+  20.9970703125
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 4,
+  "models": {}
+ },
+ "run": "signalled-meets-notstarted-readers__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/signalled-meets-notstarted-readers__plain__s1",
+ "secs": 941.8,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 778986,
+  "cache_write": 46852,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.024806759999999997,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 939658,
+  "ended_on_question": false,
+  "final_text": "nd answers its fault.\n- **`ShellOver`** (`src/pull/door.go`): a signal end answers an error reading `shell line ends by a signal: <stderr>`, with code 0 as the other fault paths do. The doc comment is updated to match.\n\nI kept the prior behaviour, a fault, rather than mapping the signal to exit code 1 as `serveRuns` and `tuiLaunch` do. The ticket leaves the choice to the builder. `ShellOver` returns a fault for `NotStarted`, so the fault keeps its behaviour. The two readers differ only in the message wording.\n\n**Tests**\n- `TestVoiceRunsValeAnswersTheFaultOfAValeEndedBySignal` in `src/quack/voice_verb_test.go`.\n- `TestTheShellAnswersTheFaultOfALineEndedBySignal` in `src/pull/shell_test.go`.\n\nBoth pass. The signal end is taught through `proc.FakeRunner` in each test.\n\n**Test results**\n- `go test ./...` fails in `src/imports`, `src/proc` and `src/quack`. The same tests fail on the base commit: the stream and spawn cases the ticket marks as red. I did not change them.\n- `./RUNME.sh check` ran to completion. Its lint findings are all in other files; none are in the four I changed. I did not confirm an overall pass, since the red tests above are still failing.\n\n**Not changed**\n- `src/proc/proc.go`'s `runUnder` still returns `NotStarted` for a signal-killed process, so the real runner does not produce `Signalled` yet. The readers now handle it either way, and the producer belongs to the proc ticket.\n- I did not touch the ticket note, the size of either file, or add any callers line.",
+  "hook_denials": 0,
+  "input_tokens": 40,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 778986,
+    "cache_write": 46852,
+    "cost": 0.024806759999999997,
+    "in": 40,
+    "out": 15285
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 20
+  },
+  "output_tokens": 142,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.44,
+   "seven_day": 0.05
+  },
+  "result_subtype": "success",
+  "result_turns": 23,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 22,
+  "tools": {
+   "Bash": 18,
+   "Edit": 3,
+   "Read": 1
+  },
+  "turns": 20,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    40,
+    142,
+    46852,
+    778986
+   ]
+  }
+ },
+ "setup_secs": 36.3,
+ "start_commit": "3d532942a9ee1be75a3e05256c84cfb1af2f342a",
+ "start_tree": "0fba1cd8a489d5684539ab83964f419877aba048",
+ "started": "2026-10-11T01:46:11Z",
+ "status": "ran",
+ "ticket": "signalled-meets-notstarted-readers",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

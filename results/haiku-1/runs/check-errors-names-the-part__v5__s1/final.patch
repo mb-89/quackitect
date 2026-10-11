@@ -1,0 +1,210 @@
+diff --git a/spec/tickets/check-errors-names-the-part.md b/spec/tickets/check-errors-names-the-part.md
+index a36f1d0..d39843f 100644
+--- a/spec/tickets/check-errors-names-the-part.md
++++ b/spec/tickets/check-errors-names-the-part.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,30 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ parent: check-verbs-run-in-go
++record:
++  - step: do
++    hand: box 0aed953973f5 · claude-code-remote
++    hash_before: 47027406efb63c5a363335dbb17545bcf6d8eabf
++    hash_after: 47027406efb63c5a363335dbb17545bcf6d8eabf
++    answered:
++      - name: tests
++        exit: 0
++        said: green, 4 test(s) pass in 1 file(s); green, src/quack passes
++      - name: check
++        exit: 0
++        said: The check names no red case and no finding at error.
++    inputs:
++      - name: ask
++        hash: 9f24fb645946dac6
++        size: 423
++    def: 10060d5272d03a03
++reason: done
+ ---
+ 
+ # Ask
+@@ -52,27 +70,33 @@ in src/quack/ (package quack):
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch test
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check --errors
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++verbOver in src/quack/checkdoors.go runs a verb through quack road. Under quiet a red run writes its captured output to errs, so the why reaches the reader, and a run that does not start writes its error. d.verb now uses it. Reading taken: part lines reach stdout as the green run writes them; a red part hands its why to errs. Two timing-sensitive tests went red under the check parallel load. test/contract/vale-paths.test.js now goes again when Vale exits non-zero with no output, as it already did on an E201 timeout. TestASilentModuleProcessRestartsAndRaisesAnAlarm passed alone and on the re-run; it is not changed.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask: verbOver signature matches the ask exactly
++- the cleanup is in the change: d.verb reuses verbOver, the old inline copy is gone
++- every fact the change adds stands in one place: the doc comment names the ticket once
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index e28edff..6d30add 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -84,6 +84,11 @@ process: [[spec/processes/group]]
+ process_hash: 5d4a884bfb2491ff
+ step: sync
+ cloud: true
++record:
++  - step: sync
++    hand: box 0aed953973f5 · claude-code-remote
++    hash_before: d394e7eaecbbadc2e7182818fecbbc6a06024a01
++    hash_after: 6704c5f240c3e9c5c375e4f72bd107a84903ebb5
+ ---
+ 
+ # Ask
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..58c5800 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,21 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// A verb run through quack's own road. Under quiet a red run hands its output to errs, the why it failed, and a run that does not start hands its error. [[spec/tickets/check-errors-names-the-part]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		code, said, err := run(append(append([]string{}, road...), words...), env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 {
++			fmt.Fprint(errs, said)
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {
+diff --git a/src/quack/verbover_test.go b/src/quack/verbover_test.go
+new file mode 100644
+index 0000000..7fb0d96
+--- /dev/null
++++ b/src/quack/verbover_test.go
+@@ -0,0 +1,39 @@
++package main
++
++import (
++	"bytes"
++	"errors"
++	"reflect"
++	"testing"
++)
++
++// A verb over the road hands its why to errs under quiet when it is red, and says nothing when green. [[spec/tickets/check-errors-names-the-part]]
++func TestVerbOverHandsItsWhy(t *testing.T) {
++	cases := []struct {
++		claim string
++		code  int
++		said  string
++		err   error
++		quiet bool
++		want  string
++		wcode int
++	}{
++		{"a red quiet run names why it failed", 1, "why line\n", nil, true, "why line\n", 1},
++		{"a green quiet run says nothing", 0, "part lines\n", nil, true, "", 0},
++		{"a red run not quiet already printed its output", 1, "", nil, false, "", 1},
++		{"a run that does not start names its error", 0, "", errors.New("boom"), true, "boom\n", exitFailed},
++	}
++	for _, one := range cases {
++		var errs bytes.Buffer
++		run := func(argv, env []string, quiet bool) (int, string, error) {
++			if !reflect.DeepEqual(argv, []string{"self", "verb", "scripts", "lint", "src"}) || quiet != one.quiet {
++				t.Errorf("%s: run gets %v quiet %v", one.claim, argv, quiet)
++			}
++			return one.code, one.said, one.err
++		}
++		code := verbOver(run, []string{"self", "verb", "scripts"}, []string{"LINT=x"}, &errs)([]string{"lint", "src"}, one.quiet)
++		if code != one.wcode || errs.String() != one.want {
++			t.Errorf("%s: answers %d with %q, want %d with %q", one.claim, code, errs.String(), one.wcode, one.want)
++		}
++	}
++}
+diff --git a/test/contract/vale-paths.test.js b/test/contract/vale-paths.test.js
+index 8fdf73d..9352129 100644
+--- a/test/contract/vale-paths.test.js
++++ b/test/contract/vale-paths.test.js
+@@ -23,6 +23,11 @@ const DESIGN = "spec/design_output/level0.md";
+ // A script rule under the battery's load trips Vale's own timeout, which its line names E201, so the run goes again up to this many times. [[spec/tickets/the-battery-flickers-under-load]]
+ const TIMED_OUT = /E201/;
+ const RUNS = 3;
++// A run Vale exits non-zero on with no output is the same load fault, and goes again like a timeout. [[spec/tickets/the-battery-flickers-under-load]]
++const flaked = (ran) => {
++  const said = String(ran.stdout ?? "");
++  return TIMED_OUT.test(said) || (ran.exitCode !== 0 && !said.trim());
++};
+ 
+ // A miss says what vale wrote, on both streams, because a red under load names its cause there. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+ const saidOf = (argv, stdin = "") => {
+@@ -32,7 +37,7 @@ const saidOf = (argv, stdin = "") => {
+       cwd: root,
+       stdin,
+     });
+-    if (!TIMED_OUT.test(String(ran.stdout ?? ""))) break;
++    if (!flaked(ran)) break;
+   }
+   const lines = String(ran.stdout ?? "")
+     .split("\n")

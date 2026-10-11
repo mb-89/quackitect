@@ -1,0 +1,75 @@
+diff --git a/spec/tickets/example-retro-counts-gaps.md b/spec/tickets/example-retro-counts-gaps.md
+index 2332e94..fd84b55 100644
+--- a/spec/tickets/example-retro-counts-gaps.md
++++ b/spec/tickets/example-retro-counts-gaps.md
+@@ -209,11 +209,11 @@ A new verb, `./RUNME.sh retro gaps`, prints both counts the audit asks for, each
+ | count | source | each item |
+ |---|---|---|
+ | features with no example | the coverage guard: `check.ExampleCovers`, the rule exported under its own name | `./RUNME.sh <verb>` and the file and line registering it |
+-| tests beside a shown verb | `check.Shown` names every verb an example shows, and the verb reads the `src/quack` file registering each, then every `Test` function in the `_test.go` file beside it | the test file and the test name |
++| tests beside a shown verb | `check.ShownNames` names every verb an example shows, and the verb reads the `src/quack` file registering each, then every `Test` function in the `_test.go` file beside it | the test file and the test name |
+ 
+ The second count names candidates. A test standing beside a verb an example shows asserts that verb again, or holds an edge the command line cannot reach. The auditor reads each one and keeps it or cuts it, per [[spec/guidance/code/tests]] rule 1.
+ 
+-The verb stands in `src/quack/retro_gaps.go`, registered as `retro gaps`, over `retroRoot` as `retro audit` is. It reads the tree through `lintTree(root)`, whose paths git lists, since `rootDisk` lists none. `src/modules/check/coverage.go` renames `exampleCovers` to `ExampleCovers` and `shownNames` to `Shown`, so one place owns each count. The audit step in `spec/processes/retro.yaml` adds `retro gaps` under `needs`, and its examples item names the verb. `retro_usage.go` lists the verb.
++The verb stands in `src/quack/retro_gaps.go`, registered as `retro gaps`, over `retroRoot` as `retro audit` is. It reads the tree through `lintTree(root)`, whose paths git lists, since `rootDisk` lists none. `src/modules/check/coverage.go` renames `exampleCovers` to `ExampleCovers` and `shownNames` to `ShownNames`, so one place owns each count. The audit step in `spec/processes/retro.yaml` adds `retro gaps` under `needs`, and its examples item names the verb. `retro_usage.go` lists the verb.
+ 
+ Assumed: a report at exit 0 serves the audit better than a gate, since a test beside a shown verb is a candidate, and a gate on it refuses every edge test.
+ 
+@@ -223,7 +223,7 @@ Assumed: a report at exit 0 serves the audit better than a gate, since a test be
+ <!-- the form is list -->
+ 
+ - src/modules/check/checker.go Rules, which lists exampleCovers
+-- src/modules/check/coverage.go exampleCovers, which calls shownNames
++- src/modules/check/coverage.go exampleCovers, which calls ShownNames
+ - src/modules/check/example_test.go TestAVerbNoExampleNamesTakesAWarning and TestATabNoExampleNamesTakesAWarning, which call exampleCovers
+ - src/quack/retro_usage.go retroUsageVerb, which lists the retro verbs
+ - spec/processes/retro.yaml the audit step
+@@ -262,7 +262,7 @@ Assumed: a report at exit 0 serves the audit better than a gate, since a test be
+ <!-- the form is checklist -->
+ 
+ - opened: coverage.go, checker.go Rules, retro_audit.go, retro_audit_test.go, retro_home.go retroRoot, verb_lint.go lintTree, writedoor.go rootDisk, the audit step of retro.yaml and audit guidance rule 6
+-- callers: a grep for shownNames and exampleCovers names each line, and retro_usage.go registers the retro usage
++- callers: a grep for ShownNames and exampleCovers names each line, and retro_usage.go registers the retro usage
+ - done_when 1 and 3: the two retro_gaps_test.go cases on a planted temp tree, which hand the verb a Texts tree so no git runs
+ - done_when 2: the retro.yaml diff, read at accept
+ - done_when 4: ./RUNME.sh check at tests-green
+diff --git a/src/modules/check/coverage.go b/src/modules/check/coverage.go
+index 7f37a83..33e4a06 100644
+--- a/src/modules/check/coverage.go
++++ b/src/modules/check/coverage.go
+@@ -33,7 +33,7 @@ var (
+ )
+ 
+ // The names every example shows under interface. [[spec/design_output/examples#the-checks]]
+-func shownNames(tree *Tree) map[string]bool {
++func ShownNames(tree *Tree) map[string]bool {
+ 	out := map[string]bool{}
+ 	for _, path := range tree.Paths() {
+ 		if !exampleAt.MatchString(path) {
+@@ -49,7 +49,7 @@ func shownNames(tree *Tree) map[string]bool {
+ 
+ // Each verb and tab no example names under interface. [[spec/design_output/examples#the-checks]]
+ func exampleCovers(tree *Tree) []Finding {
+-	shown := shownNames(tree)
++	shown := ShownNames(tree)
+ 	out := []Finding{}
+ 	for _, path := range tree.Paths() {
+ 		name := strings.TrimPrefix(path, quackAt)
+diff --git a/src/modules/check/example_test.go b/src/modules/check/example_test.go
+index d56c0ef..3423134 100644
+--- a/src/modules/check/example_test.go
++++ b/src/modules/check/example_test.go
+@@ -102,3 +102,12 @@ func TestAnUnderGlobMatchesATailOfThePath(t *testing.T) {
+ 		}
+ 	}
+ }
++
++// ShownNames holds the verb and tab the example names under interface, and no other name. [[spec/design_output/examples#the-checks]]
++func TestShownNamesHoldsTheInterfaceOfEachExample(t *testing.T) {
++	t.Parallel()
++	got := ShownNames(coveredTree(nil))
++	if !got["ticket pull"] || !got["tui log"] || len(got) != 2 {
++		t.Fatalf("the example names %v, and wants ticket pull and tui log only", got)
++	}
++}

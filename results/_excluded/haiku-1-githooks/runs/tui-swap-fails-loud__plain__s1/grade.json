@@ -1,0 +1,41 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T00:04:25Z",
+ "hidden": {
+  "f2p": [
+   437,
+   440
+  ],
+  "f2p_failed": [
+   "src/quack:TestABrokenFileFailsItsRoundTrip",
+   "src/quack:TestEveryCodecRoundTripsItsCommittedFiles",
+   "src/quack:TestTwinGoldens"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "src/quack": "fail"
+  },
+  "secs": 36.7,
+  "tail": "[src/quack:TestTwinGoldens]\n    check_twins_test.go:202: git lists no tracked file: exit status 128\n--- FAIL: TestTwinGoldens (0.00s)\n[src/quack:TestEveryCodecRoundTripsItsCommittedFiles]\n    codec_test.go:89: exit status 128\n--- FAIL: TestEveryCodecRoundTripsItsCommittedFiles (0.00s)\n[src/quack:TestABrokenFileFailsItsRoundTrip]\n    codec_test.go:96: exit status 128\n--- FAIL: TestABrokenFileFailsItsRoundTrip (0.00s)\nFAIL\nFAIL\tquackitect/src/quack\t24.919s"
+ },
+ "run": "tui-swap-fails-loud__plain__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 3,
+  "n_outside": 1,
+  "n_outside_code": 0,
+  "non_go": 1,
+  "outside": [
+   "spec/design_output/tui.md"
+  ],
+  "own_files": 3,
+  "test_files": 1,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

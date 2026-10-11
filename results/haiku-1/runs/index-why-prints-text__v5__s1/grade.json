@@ -1,0 +1,57 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-11T01:24:48Z",
+ "hidden": {
+  "f2p": [
+   1,
+   1
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   166,
+   166
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   1,
+   1
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   166,
+   166
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/quack": "ok"
+  },
+  "secs": 46.0,
+  "tail": ""
+ },
+ "regraded": "2026-10-11T04:36:50Z",
+ "run": "index-why-prints-text__v5__s1",
+ "scope": {
+  "code_files": 1,
+  "files": 7,
+  "n_outside": 3,
+  "n_outside_code": 0,
+  "non_go": 3,
+  "outside": [
+   ".claude/skills/level0/lib/paragraph-rules.js",
+   "spec/config/styles/VoiceParagraph/RestatedTable.yml",
+   "test/level0/paragraph.test.js"
+  ],
+  "own_files": 5,
+  "test_files": 1,
+  "tickets_written": 2
+ },
+ "status": "graded"
+}

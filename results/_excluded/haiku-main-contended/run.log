@@ -1,0 +1,2 @@
+180 runs, 3 at a time
+2026-10-10T22:58:59Z hand-spawn-skips-session-tag__plain+stop__s1                           ran $0.035 946.5s turns=32 cap=False end=success rl={'five_hour': 0.12, 'seven_day': 0.5}

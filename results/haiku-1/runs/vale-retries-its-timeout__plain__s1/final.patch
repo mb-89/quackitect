@@ -1,0 +1,147 @@
+diff --git a/src/modules/lsp/tools.go b/src/modules/lsp/tools.go
+index bce4af6..396d47c 100644
+--- a/src/modules/lsp/tools.go
++++ b/src/modules/lsp/tools.go
+@@ -38,6 +38,12 @@ var (
+ 	proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
+ )
+ 
++// The code Vale names when a script rule passes its own cap, which a run under the parts' load does, and the runs a Vale run takes before it gives up on that code. The contract case on Vale paths takes the same count. [[spec/tickets/vale-retries-its-timeout]]
++const (
++	valeTimeout = "E201"
++	valeTries   = 3
++)
++
+ // A tool run: the folder, the input, the binary and its words. The door runs one, and a case hands in its own. [[spec/tickets/lsp-module-draws-the-tools]]
+ type Runner func(dir, input, name string, argv ...string) (string, error)
+ 
+@@ -214,14 +220,26 @@ func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
+ 	return one.vetoes(tree, heard)
+ }
+ 
++// A Vale run goes again while Vale names its timeout, up to valeTries runs, and the last answer stands. [[spec/tickets/vale-retries-its-timeout]]
+ func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
+ 	out, err := one.Run(one.Root, input, one.Vale, argv...)
++	for at := 1; at < valeTries && timedOut(out, err); at++ {
++		out, err = one.Run(one.Root, input, one.Vale, argv...)
++	}
+ 	if err != nil {
+ 		return nil, err.Error()
+ 	}
+ 	return one.valeRowsOf(out)
+ }
+ 
++// Whether a run's answer or its error names Vale's timeout. [[spec/tickets/vale-retries-its-timeout]]
++func timedOut(stdout string, err error) bool {
++	if err != nil && strings.Contains(err.Error(), valeTimeout) {
++		return true
++	}
++	return strings.Contains(stdout, valeTimeout)
++}
++
+ func (one *Tools) valeFault(why string) Finding {
+ 	return Finding{File: one.Config, Rule: ValeRuns, Line: 1, Column: 1, Message: "Vale reads no file, so every rule it holds stands unchecked: " + why, Severity: severe, Source: fromVale}
+ }
+diff --git a/src/modules/lsp/tools_test.go b/src/modules/lsp/tools_test.go
+index e4347c6..931b8e3 100644
+--- a/src/modules/lsp/tools_test.go
++++ b/src/modules/lsp/tools_test.go
+@@ -20,6 +20,8 @@ type fakeTools struct {
+ 	says  map[string]string
+ 	fails map[string]error
+ 	calls []string
++	// The Vale runs that answer E201 before the rest answer as says names. [[spec/tickets/vale-retries-its-timeout]]
++	timeouts int
+ }
+ 
+ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, error) {
+@@ -29,9 +31,26 @@ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, erro
+ 	if err := one.fails[name]; err != nil {
+ 		return "", err
+ 	}
++	if name == "vale" && one.timeouts > 0 {
++		one.timeouts--
++		return `{"Code": "E201", "Text": "a script rule passed its cap"}`, nil
++	}
+ 	return one.says[name], nil
+ }
+ 
++// The Vale runs the fake took, which a case reads to count the goes again. [[spec/tickets/vale-retries-its-timeout]]
++func (one *fakeTools) valeRuns() int {
++	one.mu.Lock()
++	defer one.mu.Unlock()
++	runs := 0
++	for _, call := range one.calls {
++		if strings.HasPrefix(call, "vale ") {
++			runs++
++		}
++	}
++	return runs
++}
++
+ // A tree over the texts git tracks, each buffer an editor holds over its file. [[spec/tickets/lsp-module-draws-the-tools]]
+ type fakeTree struct {
+ 	texts map[string]string
+@@ -258,6 +277,32 @@ func TestTheTenseReaderDropsAPastRow(t *testing.T) {
+ 	}
+ }
+ 
++func TestAValeTimeoutGoesAgainAndDrawsTheRows(t *testing.T) {
++	fake := &fakeTools{timeouts: 1, says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
++	drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md")
++	if !holds(drawn, "vale", "Sentence") {
++		t.Fatalf("the file draws %+v, and wants the Vale row once Vale answers past its timeout", drawn)
++	}
++	if holds(drawn, "vale", "ValeRuns") {
++		t.Fatalf("the file draws %+v, and wants no ValeRuns fault for a timeout that passes", drawn)
++	}
++	if runs := fake.valeRuns(); runs != 2 {
++		t.Fatalf("vale runs %d times, and wants 2: the timeout, then the rows", runs)
++	}
++}
++
++func TestAValeTimeoutGivesUpAfterValeTries(t *testing.T) {
++	fake := &fakeTools{timeouts: valeTries + 1, says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
++		t.Fatalf("the config draws %+v, and wants ValeRuns once every run times out", drawn)
++	}
++	if runs := fake.valeRuns(); runs != valeTries {
++		t.Fatalf("vale runs %d times, and wants %d, the bound", runs, valeTries)
++	}
++}
++
+ func TestAValeFaultDrawsValeRuns(t *testing.T) {
+ 	fake := &fakeTools{fails: map[string]error{"vale": errors.New("E100 the config breaks")}}
+ 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
+diff --git a/test/contract/ruled.js b/test/contract/ruled.js
+index 72b29b7..dcd1eef 100644
+--- a/test/contract/ruled.js
++++ b/test/contract/ruled.js
+@@ -13,6 +13,9 @@ import { readTools, whereIs } from "../../src/engine/tools.js";
+ 
+ export const NOTE = "notes.md";
+ const CONFIG = ".vale.ini";
++// A script rule under the battery's load trips Vale's own timeout, which its answer names E201, so the run goes again up to this many times, as the vale-paths case does. [[spec/tickets/vale-retries-its-timeout]]
++const TIMED_OUT = /E201/;
++const RUNS = 3;
+ 
+ // A text under the path Vale reads it at, because the path picks the section. [[spec/design_output/doors#a-door-reads-the-outside]]
+ export const at = (text, where) => ({ text, where });
+@@ -99,10 +102,11 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
+ 
+   // One run over the folder, and the findings a probe. [[spec/design_output/doors#one-contract-test-per-door]]
+   const linted = (batch, folder) => {
+-    const ran = run(
+-      [config, "--output=JSON", "--no-exit", ...batch.map((_, i) => `p${i}`)],
+-      folder,
+-    );
++    const argv = [config, "--output=JSON", "--no-exit", ...batch.map((_, i) => `p${i}`)];
++    let ran = run(argv, folder);
++    for (let at = 1; at < RUNS && TIMED_OUT.test(String(ran.stdout ?? "")); at++) {
++      ran = run(argv, folder);
++    }
+     const fault = faultIn(ran.stdout);
+     if (fault || (ran.exitCode !== 0 && !ran.stdout)) {
+       throw new Error(`vale ran not: ${fault || ran.stderr || "it answered nothing"}`);

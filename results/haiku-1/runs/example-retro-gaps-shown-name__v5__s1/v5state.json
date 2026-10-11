@@ -1,0 +1,9 @@
+{
+ "run": "example-retro-gaps-shown-name__v5__s1",
+ "task_state": "closed",
+ "task_step": "do",
+ "group_state": "closed",
+ "group_step": "retro/cloud",
+ "other_tickets_touched": [],
+ "other_tickets_closed": []
+}

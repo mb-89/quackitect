@@ -1,0 +1,21 @@
+gain: A hand the pull spawns reads its own name alone, so it pulls under `--as` as its prompt says.
+
+breaks: The live kit drops the `own` field the pull tool sets, so the spawn answer in `src/modules/hooks/spawn.go` tags the hand as the session's hand. The tag tells it to pull under no `--as`, against the prompt.
+
+done_when:
+- the spawn answer leaves a spawn untagged where its prompt opens on the hand line `spawnPrompt` in `src/pull/pull_branch.go` writes, `own` field or none
+- a case in `src/modules/hooks/spawn_test.go` feeds a spawn with that line and no `own` field and reads no tag, decided by `./RUNME.sh test src/modules/hooks/spawn_test.go`
+- `./RUNME.sh check` exits 0
+
+view: none
+
+from: [[.se/tickets/kit-drops-the-own-spawn]]
+
+The hidden tests call this interface, as the reference change declares it (signatures only; keep these names, parameters and results):
+
+in src/q/ (package q):
+  const HandOfItsOwn
+
+Make this change in the repository in your working directory (a Go project; `go test ./...` runs the Go tests and `./RUNME.sh check` runs the repository's full check). Add or update tests for the change, and commit your work on the current branch when you are done.
+
+Stop rule: as soon as tests cover every point of the ask and all pass, commit, and end your reply with the line TASK COMPLETE. Do not refactor or polish working code. Commit before every risky change.

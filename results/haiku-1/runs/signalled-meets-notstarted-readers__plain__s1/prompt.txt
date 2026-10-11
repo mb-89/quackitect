@@ -1,0 +1,3 @@
+`Signalled` moves a run a signal ends off `NotStarted`, so `voiceRunsValeOver` in src/quack/voice_verb.go and `ShellOver` in src/pull/door.go answer code -2 with no fault where they answered the fault before. Neither file stands in size, and voice_verb.go stands in no callers line. The builder decides each reader at its spot.
+
+Make this change in the repository in your working directory (a Go project; `go test ./...` runs the Go tests and `./RUNME.sh check` runs the repository's full check). Add or update tests for the change, and commit your work on the current branch when you are done.

@@ -1,0 +1,170 @@
+diff --git a/src/quack/check.go b/src/quack/check.go
+index 41e9942..a0557a9 100644
+--- a/src/quack/check.go
++++ b/src/quack/check.go
+@@ -108,6 +108,10 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
+ 		d := doorsOf(out, errs)
+ 		words := argv[1:]
+ 		quiet := slices.Contains(words, errorsFlag)
++		// Under --errors a part's own lines reach the error stream, so the stdout the merge hands on holds the red rows alone.
++		if quiet {
++			d.out = errs
++		}
+ 		_ = os.Remove(d.at(lintFile))
+ 		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
+ 		lines := d.text(timesFile)
+@@ -351,11 +355,19 @@ func goGate(d checkDoors, quiet bool, skip []string) int {
+ 	}
+ 	if code != 0 {
+ 		if quiet {
++			rows := []string{}
+ 			for _, row := range strings.Split(said, "\n") {
+ 				if goFailRow.MatchString(row) {
+-					fmt.Fprintln(d.errs, strings.TrimSpace(row))
++					rows = append(rows, strings.TrimSpace(row))
+ 				}
+ 			}
++			// A red run with no failing test, such as a build that breaks, keeps its whole output as the why.
++			if len(rows) == 0 && strings.TrimSpace(said) != "" {
++				rows = append(rows, strings.TrimSpace(said))
++			}
++			for _, row := range rows {
++				fmt.Fprintln(d.errs, row)
++			}
+ 		}
+ 		return code
+ 	}
+diff --git a/src/quack/check_test.go b/src/quack/check_test.go
+index 47f2fb4..1d1133b 100644
+--- a/src/quack/check_test.go
++++ b/src/quack/check_test.go
+@@ -268,6 +268,87 @@ func TestGoGate(t *testing.T) {
+ 	})
+ }
+ 
++func TestVerbOver(t *testing.T) {
++	t.Run("the words join the road, and the env and the quiet flag pass through", func(t *testing.T) {
++		var argv, env []string
++		var quiet bool
++		run := func(a, e []string, q bool) (int, string, error) { argv, env, quiet = a, e, q; return 0, "", nil }
++		road := []string{"quack", "verb", "scripts"}
++		verb := verbOver(run, road, []string{"LINT=found"}, io.Discard)
++		if code := verb([]string{"lint", "src"}, true); code != 0 {
++			t.Fatalf("a green run answers %d", code)
++		}
++		if !reflect.DeepEqual(argv, []string{"quack", "verb", "scripts", "lint", "src"}) || !reflect.DeepEqual(env, []string{"LINT=found"}) || !quiet {
++			t.Fatalf("the run reached %v under %v, quiet %v", argv, env, quiet)
++		}
++		if !reflect.DeepEqual(road, []string{"quack", "verb", "scripts"}) {
++			t.Fatalf("the road reads %v after the run", road)
++		}
++	})
++	t.Run("a quiet red run writes its why to the error stream", func(t *testing.T) {
++		run := func([]string, []string, bool) (int, string, error) { return 1, "src/a.go: it broke\n", nil }
++		var errs strings.Builder
++		if code := verbOver(run, []string{"quack"}, nil, &errs)([]string{"lint"}, true); code != 1 {
++			t.Fatalf("a red run answers %d", code)
++		}
++		if errs.String() != "src/a.go: it broke\n" {
++			t.Fatalf("the error stream reads %q", errs.String())
++		}
++	})
++	t.Run("a quiet green run keeps its output off the error stream", func(t *testing.T) {
++		run := func([]string, []string, bool) (int, string, error) { return 0, "chatter\n", nil }
++		var errs strings.Builder
++		if code := verbOver(run, []string{"quack"}, nil, &errs)([]string{"lint"}, true); code != 0 || errs.Len() != 0 {
++			t.Fatalf("a green run answers %d, and the error stream reads %q", code, errs.String())
++		}
++	})
++	t.Run("a run that is not quiet writes nothing itself", func(t *testing.T) {
++		run := func([]string, []string, bool) (int, string, error) { return 1, "said\n", nil }
++		var errs strings.Builder
++		if code := verbOver(run, []string{"quack"}, nil, &errs)([]string{"lint"}, false); code != 1 || errs.Len() != 0 {
++			t.Fatalf("a loud red run answers %d, and the error stream reads %q", code, errs.String())
++		}
++	})
++	t.Run("a run that cannot start names the error, and fails", func(t *testing.T) {
++		run := func([]string, []string, bool) (int, string, error) { return 0, "", errors.New("no quack") }
++		var errs strings.Builder
++		if code := verbOver(run, []string{"quack"}, nil, &errs)([]string{"lint"}, true); code != exitFailed || errs.String() != "no quack\n" {
++			t.Fatalf("the run answers %d, and the error stream reads %q", code, errs.String())
++		}
++	})
++}
++
++func TestCheckQuietStreams(t *testing.T) {
++	t.Run("a quiet red build keeps its output as the why, where no test failed", func(t *testing.T) {
++		fake := &checkFake{codes: map[string]int{"go": 1}, said: map[string]string{"go": "# quackitect/src/quack\nsrc/quack/a.go:3: undefined: x\n"}}
++		doors := fake.doors()
++		var errs strings.Builder
++		doors.errs = &errs
++		if code := goGate(doors, true, nil); code != 1 {
++			t.Fatalf("a red build answers %d", code)
++		}
++		if errs.String() != "# quackitect/src/quack\nsrc/quack/a.go:3: undefined: x\n" {
++			t.Fatalf("the error stream reads %q", errs.String())
++		}
++	})
++	t.Run("under --errors a part's own line reaches the error stream, and stdout holds the rows alone", func(t *testing.T) {
++		fake := &checkFake{said: map[string]string{"gofmt": "src/a.go\n"}}
++		doors := fake.doors()
++		doors.root = t.TempDir()
++		var out, errs strings.Builder
++		doorsOf := func(o, e io.Writer) checkDoors { doors.out, doors.errs = o, e; return doors }
++		if code := checkVerb(doorsOf)([]string{"check", "--errors"}, false, &out, &errs); code != 1 {
++			t.Fatalf("the check answers %d, and a gofmt fault is red", code)
++		}
++		if strings.TrimSpace(out.String()) != noErrors {
++			t.Fatalf("the stdout reads %q, and wants the rows alone", out.String())
++		}
++		if !strings.Contains(errs.String(), "src/a.go: Gofmt:") {
++			t.Fatalf("the error stream reads %q, and wants the gofmt line", errs.String())
++		}
++	})
++}
++
+ func TestTestArgv(t *testing.T) {
+ 	root, err := filepath.Abs(filepath.Join("..", ".."))
+ 	if err != nil {
+diff --git a/src/quack/checkdoors.go b/src/quack/checkdoors.go
+index 129aa51..362fbb9 100644
+--- a/src/quack/checkdoors.go
++++ b/src/quack/checkdoors.go
+@@ -55,14 +55,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 		}
+ 		return 0, said.String(), err
+ 	}
+-	d.verb = func(words []string, quiet bool) int {
+-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
+-		if err != nil {
+-			fmt.Fprintln(errs, err)
+-			return exitFailed
+-		}
+-		return code
+-	}
++	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
+ 	d.get = func(where string) ([]byte, error) {
+ 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
+ 		if err != nil {
+@@ -86,6 +79,21 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
+ 	return d
+ }
+ 
++// The verb door over a run: the words join the road and run under the env, and a quiet run that answers red writes what it said to the error stream, where its why stands. A run that cannot start is named there too. [[spec/tickets/check-errors-names-the-part]]
++func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
++	return func(words []string, quiet bool) int {
++		code, said, err := run(slices.Concat(road, words), env, quiet)
++		if err != nil {
++			fmt.Fprintln(errs, err)
++			return exitFailed
++		}
++		if quiet && code != 0 && strings.TrimSpace(said) != "" {
++			fmt.Fprintln(errs, strings.TrimSpace(said))
++		}
++		return code
++	}
++}
++
+ // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]
+ func surveyAt(root string) map[string]string {
+ 	var said map[string]struct {

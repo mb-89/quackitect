@@ -1,0 +1,1 @@
+three sessions at once, unpinned, beside the validation: load average past 40, checks timing out, a full disk; see DESIGN.md 6.2

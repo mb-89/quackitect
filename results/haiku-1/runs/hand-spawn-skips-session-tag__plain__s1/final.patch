@@ -1,0 +1,91 @@
+diff --git a/src/modules/hooks/spawn.go b/src/modules/hooks/spawn.go
+index ccb6a0e..537cd3b 100644
+--- a/src/modules/hooks/spawn.go
++++ b/src/modules/hooks/spawn.go
+@@ -10,6 +10,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/modules/hooks/brief"
++	"quackitect/src/q"
+ 	"quackitect/src/yaml"
+ )
+ 
+@@ -23,7 +24,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
+ 	}
+ 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
+ 	tag := ""
+-	if !yaml.Truthy(post.E[ownField]) {
++	if !yaml.Truthy(post.E[ownField]) && !strings.HasPrefix(textOf(post.E, "prompt"), q.HandOfItsOwn) {
+ 		tag = spawnTagOf(disk{root})
+ 	}
+ 	if layer == "" && tag == "" {
+diff --git a/src/modules/hooks/spawn_test.go b/src/modules/hooks/spawn_test.go
+index 9ca74b5..164fee3 100644
+--- a/src/modules/hooks/spawn_test.go
++++ b/src/modules/hooks/spawn_test.go
+@@ -7,6 +7,8 @@ import (
+ 	"encoding/json"
+ 	"os"
+ 	"testing"
++
++	"quackitect/src/q"
+ )
+ 
+ // The case table the JavaScript builders write. [[spec/tickets/spawn-answers-off-the-door]]
+@@ -157,3 +159,22 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+ 		})
+ 	}
+ }
++
++// A helper spawn whose prompt opens on the hand of its own takes no session tag, with no own field set, so the pull's own spawn reads no --as against its prompt. [[spec/design_output/pull#a-hand-of-its-own]]
++// level0: FixtureOutsideHome - the spawn seeds the session file into a root of its own, as the case above does.
++func TestASpawnOpeningOnAHandOfItsOwnTakesNoTag(t *testing.T) {
++	prompt := q.HandOfItsOwn + ", named w1, and you work one step of one ticket."
++	root := treeOf(t, map[string]string{sessionFile: `{"id":"s7","harness":"claude-code"}`}, "")
++	door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
++	said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: map[string]any{
++		"session_id": "s1", "prompt": prompt,
++	}})
++	if err != nil {
++		t.Fatal(err)
++	}
++	for _, effect := range said.Effects {
++		if event, ok := effect.Result.(map[string]any); ok && effect.Kind == eventEffect {
++			t.Fatalf("a spawn opening on the hand of its own answers %+v, and wants no event, since no tag stands", event)
++		}
++	}
++}
+diff --git a/src/pull/pull_branch.go b/src/pull/pull_branch.go
+index d5aaa2c..bd86069 100644
+--- a/src/pull/pull_branch.go
++++ b/src/pull/pull_branch.go
+@@ -8,6 +8,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/failure"
++	"quackitect/src/q"
+ )
+ 
+ // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+@@ -90,7 +91,7 @@ func spawnPrompt(ticket string, leaf *Leaf, name string) string {
+ 		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
+ 	}
+ 	return strings.Join([]string{
+-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
++		fmt.Sprintf("%s, named %s, and you work one step of one ticket.", q.HandOfItsOwn, name),
+ 		"",
+ 		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
+ 		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",
+diff --git a/src/q/hand.go b/src/q/hand.go
+new file mode 100644
+index 0000000..52c04fe
+--- /dev/null
++++ b/src/q/hand.go
+@@ -0,0 +1,7 @@
++// The line a hand of its own opens its prompt on, which the pull writes and the
++// spawn hook reads, so a spawn carrying it takes no session tag.
++// [[spec/design_output/pull#a-hand-of-its-own]]
++package q
++
++// The opening of the hand line a pull's spawn prompt starts with; the name and the rest follow it. [[spec/design_output/pull#a-hand-of-its-own]]
++const HandOfItsOwn = "You are a hand of your own on this box"

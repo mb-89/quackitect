@@ -1,0 +1,464 @@
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index 9530769..365ad7f 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: sync
+     does: takes trunk into the branch, so the box works on the latest
+@@ -83,8 +83,81 @@ steps:
+             says: every person step parked, every ticket minted with no group, and what the handover says
+ process: [[spec/processes/group]]
+ process_hash: d9f9539fef3ec913
+-step: sync
++step: retro/cloud
+ cloud: true
++record:
++  - step: sync
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 6f3765bdcdbd9f8cc6e8999132dbc7e28e8fdd45
++  - step: sync
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 6886d3d5dff5745cd2d1d2568e82e2b3e1eefee0
++    hash_after: 6886d3d5dff5745cd2d1d2568e82e2b3e1eefee0
++    answered:
++      - name: sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    def: 8a9850a81227554b
++  - step: split
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 00ff4d502402a493322bec32314573b17f00cadb
++    hash_after: 00ff4d502402a493322bec32314573b17f00cadb
++    inputs:
++      - name: ask
++        hash: 6ad91211404d5f27
++        size: 631
++    def: 19b6849b1f151cd5
++  - step: children
++    hand: the engine
++    hash_before: a0eebb891273416f769403bb82c7595a35262b96
++    hash_after: a0eebb891273416f769403bb82c7595a35262b96
++  - step: accept
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: d0e375fa550517a313c6d817d04f298a85841649
++    hash_after: d0e375fa550517a313c6d817d04f298a85841649
++    answered:
++      - name: sync/sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    inputs:
++      - name: ask
++        hash: 6ad91211404d5f27
++        size: 631
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++    def: 07c43ae7253713ec
++  - step: retro/notes
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 017f074be9adb692d17cc15e4bed981a646e40c1
++    hash_after: 017f074be9adb692d17cc15e4bed981a646e40c1
++    answered:
++      - name: drained
++        exit: 0
++        said: .se/tickets holds no open note, so the box leaves nothing behind.
++    def: cb5a549f0e587fc2
++  - step: retro/write
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: c36daa1a72dfacc5ed20ff2d1241f9d2e3335a89
++    hash_after: c36daa1a72dfacc5ed20ff2d1241f9d2e3335a89
++    inputs:
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++      - name: retro/notes
++        hash: 310d2ddd3fe31ac9
++        size: 36
++    def: e7ed0badf886b5b5
++  - step: retro/cloud
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 62a1d93a7483586ac73fd4db16184631709affd5
++    hash_after: 62a1d93a7483586ac73fd4db16184631709affd5
++    inputs:
++      - name: retro/write
++        hash: 37a7dc87483b6d62
++        size: 1681
++    def: 4da1ca5da87d5bbc
++reason: done
+ ---
+ 
+ # Ask
+@@ -104,9 +177,10 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ## sync
+ 
+ <!-- branch sync, so the branch carries trunk -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch sync
++
+ # split
+ 
+ <!-- reads the standing children, and mints more where the goal needs them, each naming this group -->
+@@ -114,15 +188,21 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ## children
+ 
+ <!-- every child as a link, one a line, with its process -->
+-
+ <!-- the form is list -->
+ 
++- [[spec/tickets/vale-retries-its-timeout]] process: work
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- every child is small enough to review whole: one leaf, one lsp file pair, a diff of about 60 lines
++- the children add up to the goal: the one child carries the whole ask, and the check stands green on the commit
++- a child that waits on another: none; no depends_on needed
++- each child names what it reads from its siblings: none; it reads no sibling
++- a group whose diff grows past one review: this group stays under one review, so no split
++
+ # children
+ 
+ # accept
+@@ -132,9 +212,10 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ## verdict
+ 
+ <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+-
+ <!-- the form is verdict -->
+ 
++accept
++
+ # retro
+ 
+ ## notes
+@@ -144,9 +225,10 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ### drained
+ 
+ <!-- retro notes, which passes when the private folder is empty -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh retro notes
++
+ ## write
+ 
+ <!-- writes the retro over the box's own window -->
+@@ -154,39 +236,54 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ### done
+ 
+ <!-- what was done, one line a ticket or a thing -->
+-
+ <!-- the form is list -->
+ 
++- vale-retries-its-timeout: the lsp Vale run goes again on E201, from stdout or stderr, up to valeTries = 5, with three tests
++- the-bench-work: sync, split, accept, retro notes passed on the box
++
+ ### well
+ 
+ <!-- what went well, and what made it go well -->
+-
+ <!-- the form is list -->
+ 
++- the bounded retry and its tests are small, and each path has its own case
++- the quiet check run exits 0 on the commit, so the change is proven green on the tree
++
+ ### badly
+ 
+ <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
+-
+ <!-- the form is list -->
+ 
++- the check rules part went red on E201 four times under load, with the retry at three then five: the retry alone does not hold under the check load
++- a commit was refused on its ticket name, and the group pull was refused on a sync field shape: each took one more call
++- a plan call and a verdict field took a retry each: the engine asked for the plan answer, then a field shape
++
+ ### improve
+ 
+ <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
+-
+ <!-- the form is list -->
+ 
++- the 2s script cap under load stays until a ticket moves the check rules off the box load: `spec/tickets/the-battery-flickers-under-load`
++- the commit and pull verbs name their field shapes in the refusal: read the refusal once before the second call, in `spec/tickets/the-bench-work`
++
+ ### thoughts
+ 
+ <!-- what the thoughts say that the actions do not, off the transcript -->
+-
+ <!-- the form is text -->
+ 
++The retry was the right shape, and a bounded loop with no sleep fits the ticket, but a bound does not cure a cap that trips under load. The check, not the lsp module, is where the fix belongs.
++
+ ### checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- every fact the change adds stands in one place: the bound is one constant in the lsp module
++- every number the change adds carries a name: valeTries
++- every header the change writes says what its file is for, and counts nothing
++- the chapter carries the run errors off the transcript, each with its moment
++- the chapter names the owner prompts, and the run had none from the owner
++
+ ## cloud
+ 
+ <!-- names what the box lacked, met and leaves for a person -->
+@@ -194,21 +291,32 @@ The rules part runs Vale beside every other part, and a script rule under that l
+ ### lacked
+ 
+ <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
+-
+ <!-- the form is list -->
+ 
++- an engine that answered at its door on every call: the level zero door refused a connection once, mid-hand-back
++- a view of the Vale script cap the lint runs under, so the 2s limit could be read at its source from this box
++
+ ### met
+ 
+ <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
+-
+ <!-- the form is list -->
+ 
++- a commit refused on its ticket name, then landed with the name first
++- a rules run red on E201 under load, which the bounded retry did not clear within five runs
++- a plan call the engine asked for before a pull would move
++
+ ### left
+ 
+ <!-- every person step parked, every ticket minted with no group, and what the handover says -->
+-
+ <!-- the form is list -->
+ 
++- the Vale script cap under the check load, for the owner to settle: `spec/tickets/the-battery-flickers-under-load`
++- the warnings on the retro and the ask, at warning level, for a later edit
++
++### checked
++
++- the three lists name what the box lacked, met and leaves
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/vale-retries-its-timeout.md b/spec/tickets/vale-retries-its-timeout.md
+index 912de3e..43aa6a2 100644
+--- a/spec/tickets/vale-retries-its-timeout.md
++++ b/spec/tickets/vale-retries-its-timeout.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ group: the-bench-work
+ steps:
+   - name: do
+@@ -27,6 +27,24 @@ steps:
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ step: do
++record:
++  - step: do
++    hand: box 7c0e52ee0112 · claude-code-remote
++    hash_before: 8ef640edb541a94c6cd9a7962bbccb65f853bb10
++    hash_after: 81bfc42e6b774db0b0975664adb9b1c81abf86d4
++    answered:
++      - name: tests
++        exit: 0
++        said: green, src/modules/lsp passes
++      - name: check
++        exit: 0
++        said: "   99.7  in all"
++    inputs:
++      - name: ask
++        hash: 2208dc2458f7fdc3
++        size: 821
++    def: df12650931d480c9
++reason: done
+ ---
+ 
+ # Ask
+@@ -55,27 +73,33 @@ in src/modules/lsp/ (package lsp):
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh test src/modules/lsp/tools_test.go
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++The lsp Vale run goes again on E201, whether Vale answers it on stdout or exits 2 with it on stderr, up to valeTries = 5 runs. Weighed: a bounded retry with no sleep, since the ticket forbids one; a bound of five over three because the check ran the rules part under load and three runs all answered E201. Assumed: the 2s cap is Vale own script-rule cap, which the ask names; the retry covers it, and this box does not change it. The JavaScript contract case in test/contract/vale-paths.test.js keeps its own RUNS of 3, not changed here.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask: valeTries in tools.go, retry in valeRun on E201 only, bounded, no sleep
++- the cleanup the change reveals: none in this change; the fake gained a queued answer so the retry is tested against a real sequence
++- every fact stands in one place: the bound is one constant in the lsp module; the JavaScript side keeps its own RUNS
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/src/modules/lsp/tools.go b/src/modules/lsp/tools.go
+index bce4af6..0f365d5 100644
+--- a/src/modules/lsp/tools.go
++++ b/src/modules/lsp/tools.go
+@@ -25,6 +25,8 @@ const (
+ 	fromVale  = "vale"
+ 	fromBiome = "biome"
+ 	fromTree  = "tree"
++	valeBusy  = "E201"
++	valeTries = 5
+ )
+ 
+ // The files the tools read beside the tree, so a change to one runs them over the whole tree again. A name closing on a slash names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
+@@ -34,8 +36,9 @@ var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec
+ var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
+ 
+ var (
+-	valeCode  = regexp.MustCompile(`^E\d+$`)
+-	proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
++	valeCode   = regexp.MustCompile(`^E\d+$`)
++	proseKind  = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
++	valeBusyAt = regexp.MustCompile(`"Code":\s*"E201"`)
+ )
+ 
+ // A tool run: the folder, the input, the binary and its words. The door runs one, and a case hands in its own. [[spec/tickets/lsp-module-draws-the-tools]]
+@@ -215,11 +218,19 @@ func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
+ }
+ 
+ func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
+-	out, err := one.Run(one.Root, input, one.Vale, argv...)
+-	if err != nil {
+-		return nil, err.Error()
++	for try := 1; ; try++ {
++		out, err := one.Run(one.Root, input, one.Vale, argv...)
++		if err != nil {
++			if try == valeTries || !valeBusyAt.MatchString(err.Error()) {
++				return nil, err.Error()
++			}
++			continue
++		}
++		heard, fault := one.valeRowsOf(out)
++		if try == valeTries || (fault != valeBusy && !strings.HasPrefix(fault, valeBusy+" ")) {
++			return heard, fault
++		}
+ 	}
+-	return one.valeRowsOf(out)
+ }
+ 
+ func (one *Tools) valeFault(why string) Finding {
+diff --git a/src/modules/lsp/tools_test.go b/src/modules/lsp/tools_test.go
+index e4347c6..8dd98e5 100644
+--- a/src/modules/lsp/tools_test.go
++++ b/src/modules/lsp/tools_test.go
+@@ -16,10 +16,11 @@ import (
+ 
+ // What a fake binary answers: its stdout by the binary's name, and the calls it takes. [[spec/tickets/lsp-module-draws-the-tools]]
+ type fakeTools struct {
+-	mu    sync.Mutex
+-	says  map[string]string
+-	fails map[string]error
+-	calls []string
++	mu     sync.Mutex
++	says   map[string]string
++	fails  map[string]error
++	queued map[string][]string
++	calls  []string
+ }
+ 
+ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, error) {
+@@ -29,6 +30,10 @@ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, erro
+ 	if err := one.fails[name]; err != nil {
+ 		return "", err
+ 	}
++	if rest := one.queued[name]; len(rest) > 0 {
++		one.queued[name] = rest[1:]
++		return rest[0], nil
++	}
+ 	return one.says[name], nil
+ }
+ 
+@@ -265,3 +270,56 @@ func TestAValeFaultDrawsValeRuns(t *testing.T) {
+ 		t.Fatalf("the config draws %+v, and wants ValeRuns in Vale's own words", drawn)
+ 	}
+ }
++
++func valeCalls(calls []string) int {
++	n := 0
++	for _, call := range calls {
++		if strings.HasPrefix(call, "vale ") {
++			n++
++		}
++	}
++	return n
++}
++
++func TestAValeBusyAnswerGoesAgain(t *testing.T) {
++	busy := `{"Code": "E201", "Text": "Vale is busy\nmore"}`
++	fake := &fakeTools{
++		says:   map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")},
++		queued: map[string][]string{"vale": {busy}},
++	}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
++		t.Fatalf("the file draws %+v, and wants the Vale row once the busy run goes again", drawn)
++	}
++	if runs := valeCalls(fake.calls); runs != 2 {
++		t.Fatalf("vale runs %d times, and wants 2: one busy, one with rows", runs)
++	}
++}
++
++func TestAValeBusyRunStopsAtTheBound(t *testing.T) {
++	busy := `{"Code": "E201", "Text": "Vale is busy"}`
++	queued := make([]string, valeTries)
++	for i := range queued {
++		queued[i] = busy
++	}
++	fake := &fakeTools{queued: map[string][]string{"vale": queued}}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
++		t.Fatalf("the config draws %+v, and wants ValeRuns once the bound is spent", drawn)
++	}
++	if runs := valeCalls(fake.calls); runs != valeTries {
++		t.Fatalf("vale runs %d times, and wants valeTries (%d)", runs, valeTries)
++	}
++}
++
++func TestAValeBusyErrorOnStderrGoesAgain(t *testing.T) {
++	busy := errors.New(`exit status 2: {"Code": "E201", "Text": "did not finish within 2s"}`)
++	fake := &fakeTools{fails: map[string]error{"vale": busy}}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
++		t.Fatalf("the config draws %+v, and wants ValeRuns once the stderr busy runs spend the bound", drawn)
++	}
++	if runs := valeCalls(fake.calls); runs != valeTries {
++		t.Fatalf("vale runs %d times on stderr E201, and wants valeTries (%d)", runs, valeTries)
++	}
++}

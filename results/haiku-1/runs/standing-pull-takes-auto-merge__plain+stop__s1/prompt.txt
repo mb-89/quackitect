@@ -1,0 +1,5 @@
+pullOpens returns a standing pull request untouched, yet done prints it with auto-merge on. Read auto_merge off the list, and enable it where it stands unset.
+
+Make this change in the repository in your working directory (a Go project; `go test ./...` runs the Go tests and `./RUNME.sh check` runs the repository's full check). Add or update tests for the change, and commit your work on the current branch when you are done.
+
+Stop rule: as soon as tests cover every point of the ask and all pass, commit, and end your reply with the line TASK COMPLETE. Do not refactor or polish working code. Commit before every risky change.

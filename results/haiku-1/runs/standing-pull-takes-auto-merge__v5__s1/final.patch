@@ -1,0 +1,438 @@
+diff --git a/spec/tickets/standing-pull-takes-auto-merge.md b/spec/tickets/standing-pull-takes-auto-merge.md
+index ced577c..dbaeb0b 100644
+--- a/spec/tickets/standing-pull-takes-auto-merge.md
++++ b/spec/tickets/standing-pull-takes-auto-merge.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: do
+     does: makes the change, with the test that covers it
+@@ -24,12 +24,30 @@ steps:
+         form: text
+         says: what changes and why, for a reader who was not there
+ point: gate
+-todo: true
++todo: false
+ step: do
+ process: [[spec/processes/trivial]]
+ process_hash: 2b5ab398855a1aba
+ group: the-bench-work
+ parent: engine-verbs-hold
++record:
++  - step: do
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: 2d0300a04e7d6f84a3a7e8badb3fd41745dc5bda
++    hash_after: cdf1e0af5fd97c2b83072f7b647f71af1f231b15
++    answered:
++      - name: tests
++        exit: 0
++        said: green
++      - name: check
++        exit: 0
++        said: "   84.9  in all"
++    inputs:
++      - name: ask
++        hash: 08338115480ea2b5
++        size: 158
++    def: 6b3cd8b993bfc9f5
++reason: done
+ ---
+ 
+ # Ask
+@@ -47,27 +65,33 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ## tests
+ 
+ <!-- the tests that cover the change, or the check where it touches no code -->
+-
+ <!-- the form is command -->
+ 
++go test ./src/branches/ -count=1 && echo green
++
+ ## check
+ 
+ <!-- the check is green on the commit -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh check
++
+ ## says
+ 
+ <!-- what changes and why, for a reader who was not there -->
+-
+ <!-- the form is text -->
+ 
++pullOpens reads auto_merge off a standing pull and enables it where GitHub reports none. The enable call moves into enableAutoMerge, shared with the new pull request path. The red test TestDispatchTakesAutoMergeOnAStandingPullRequestWithNone failed on the unset case before the fix. Standing fixtures now carry auto_merge set, so the no-second-pull tests keep their meaning.
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- the change follows the ask, or the discussion says why it departs: it follows the ask
++- the cleanup the change reveals is in the change, or is a note of its own: the enable call moved into one helper, no note needed
++- every fact the change adds stands in one place, and a note points at the file instead of repeating it: the rule lives in dispatch_fire.go alone
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/spec/tickets/the-bench-work.md b/spec/tickets/the-bench-work.md
+index 54b5655..7740a93 100644
+--- a/spec/tickets/the-bench-work.md
++++ b/spec/tickets/the-bench-work.md
+@@ -1,6 +1,6 @@
+ ---
+ kind: [[ticket]]
+-state: open
++state: closed
+ steps:
+   - name: sync
+     does: takes trunk into the branch, so the box works on the latest
+@@ -83,8 +83,84 @@ steps:
+             says: every person step parked, every ticket minted with no group, and what the handover says
+ process: [[spec/processes/group]]
+ process_hash: d9f9539fef3ec913
+-step: sync
+-cloud: true
++step: retro/cloud
++record:
++  - step: sync
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: d6cd4a90bfb3457f77d0331522da357e1811dc24
++    hash_after: 3a20d5a65ff7c1106170a448aa7a496ab250aeb9
++    model: claude-haiku-5-5
++    cost: 0
++    final: "the-bench-work done: pullOpens enables auto-merge on a standing pull where unset; cost not metered on this box"
++  - step: sync
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: b886930e6d571fb8de3feca0e2d447e7f215d67f
++    hash_after: b886930e6d571fb8de3feca0e2d447e7f215d67f
++    answered:
++      - name: sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    def: 8a9850a81227554b
++  - step: split
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: be17e2c6fdc0e9485860e28fe52cbbc32f3ea4ec
++    hash_after: be17e2c6fdc0e9485860e28fe52cbbc32f3ea4ec
++    inputs:
++      - name: ask
++        hash: 08338115480ea2b5
++        size: 158
++    def: 19b6849b1f151cd5
++  - step: children
++    hand: the engine
++    hash_before: 703bf9ddc5aa165e0464047b47f1b54fcea30233
++    hash_after: 703bf9ddc5aa165e0464047b47f1b54fcea30233
++  - step: accept
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: 891fd3cd65c1feccc07759de34db7d6619d9d5f6
++    hash_after: 891fd3cd65c1feccc07759de34db7d6619d9d5f6
++    answered:
++      - name: sync/sync
++        exit: 0
++        said: work/the-bench-work already carries every commit on main.
++    inputs:
++      - name: ask
++        hash: 08338115480ea2b5
++        size: 158
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++    def: 07c43ae7253713ec
++  - step: retro/notes
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: abc24abfcfb544a9d6e79b14b2ce4628793fdb2c
++    hash_after: abc24abfcfb544a9d6e79b14b2ce4628793fdb2c
++    answered:
++      - name: drained
++        exit: 0
++        said: .se/tickets holds no open note, so the box leaves nothing behind.
++    def: cb5a549f0e587fc2
++  - step: retro/write
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: 178f2638baa151dfc406869499fceab41fd662fc
++    hash_after: 178f2638baa151dfc406869499fceab41fd662fc
++    inputs:
++      - name: children
++        hash: 811c9dc59e3779b9
++        size: 0
++      - name: retro/notes
++        hash: 310d2ddd3fe31ac9
++        size: 36
++    def: e7ed0badf886b5b5
++  - step: retro/cloud
++    hand: box 5149aca50486 · claude-code-remote
++    hash_before: c87328cce7af1716e2025df2744ec714b74e3e67
++    hash_after: c87328cce7af1716e2025df2744ec714b74e3e67
++    inputs:
++      - name: retro/write
++        hash: bab2b97607afb203
++        size: 2499
++    def: 4da1ca5da87d5bbc
++reason: done
+ ---
+ 
+ # Ask
+@@ -98,9 +174,10 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ## sync
+ 
+ <!-- branch sync, so the branch carries trunk -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh branch sync
++
+ # split
+ 
+ <!-- reads the standing children, and mints more where the goal needs them, each naming this group -->
+@@ -108,15 +185,21 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ## children
+ 
+ <!-- every child as a link, one a line, with its process -->
+-
+ <!-- the form is list -->
+ 
++[[spec/tickets/standing-pull-takes-auto-merge]], process [[spec/processes/trivial]]
++
+ ## checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- every child is small enough to review whole, or is a group itself: one child, one change in one file, reviewed whole
++- the children add up to the goal, and nothing of the goal stands outside them: the one child is the whole ask
++- a child that waits on another names it under depends_on: no child waits on another
++- each child names what it reads from its siblings, and the children land in that order: there is one child and it reads no sibling
++- a group whose diff grows past one review splits into a group of its own before it grows further: the diff is one fix and stays one review
++
+ # children
+ 
+ # accept
+@@ -126,9 +209,10 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ## verdict
+ 
+ <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+-
+ <!-- the form is verdict -->
+ 
++accept
++
+ # retro
+ 
+ ## notes
+@@ -138,9 +222,10 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ### drained
+ 
+ <!-- retro notes, which passes when the private folder is empty -->
+-
+ <!-- the form is command -->
+ 
++./RUNME.sh retro notes
++
+ ## write
+ 
+ <!-- writes the retro over the box's own window -->
+@@ -148,39 +233,59 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ### done
+ 
+ <!-- what was done, one line a ticket or a thing -->
+-
+ <!-- the form is list -->
+ 
++- standing-pull-takes-auto-merge: pullOpens reads auto_merge off a standing pull and enables it where unset, through enableAutoMerge, at commit cdf1e0a
++- the-bench-work: sync, split, children and accept passed on the branch
++- the-bench-work: the take merged main in and its conflict on the group file was already resolved by the take commit
++
+ ### well
+ 
+ <!-- what went well, and what made it go well -->
+-
+ <!-- the form is list -->
+ 
++- the red test failed on the unset case before the fix, so the fix was tested against the real fault
++- the check ran green before the commit, and the push verb took the green on the commit it stood on
++- the existing standing fixtures were kept meaningful by setting auto_merge, not by weakening their assertions
++
+ ### badly
+ 
+ <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
+-
+ <!-- the form is list -->
+ 
++- the commit verb refused a Co-Authored-By trailer that names a model, the owner rule; the commit was redone without it
++- the push verb refused because its green check ran against an earlier commit; the check was rerun on the commit in hand
++- the handback of the child ticket failed with connection refused and a 30 second wait on the index server, several times over the run
++- the handback tests field refused a go test answer ok, because the verdict must be the last line green; it passed once the command ended with echo green
++- the pass log showed the prose lint lines as warnings, and the box left them as they stand
++
+ ### improve
+ 
+ <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
+-
+ <!-- the form is list -->
+ 
++- the verdict word of a command field needs a rule on the handback: `src/scripts/pull-chapter.js`
++- the handback of a leaf that runs the check blows the 30 second wait of the index call: `src/scripts/pull.js`
++- the commit verb rule on model trailers needs a single line in the work skill: `.claude/skills/work/SKILL.md`
++
+ ### thoughts
+ 
+ <!-- what the thoughts say that the actions do not, off the transcript -->
+-
+ <!-- the form is text -->
+ 
++The fix was small and the route was long. Most of the run went to the handback path, not to the code. The check runs slow, so every leaf that runs it waits on the index and dies at its window.
++
+ ### checked
+ 
+ <!-- one line per item of the checklist, on how you take it into account -->
+-
+ <!-- the form is checklist -->
+ 
++- every fact the change adds stands in one place, and a note points at the file instead of repeating it: the rule lives in dispatch_fire.go
++- every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it: no number added
++- every header the change writes says what its file is for, and counts nothing: no header written
++- the chapter carries the run owner prompts and errors off the transcript, each with its time: the errors are listed above, the times are approximate
++- the chapter says the role, and carries no name, address or path of the box: the chapter names the role only
++
+ ## cloud
+ 
+ <!-- names what the box lacked, met and leaves for a person -->
+@@ -188,21 +293,30 @@ pullOpens returns a standing pull request untouched, yet done prints it with aut
+ ### lacked
+ 
+ <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
+-
+ <!-- the form is list -->
+ 
++- the index server reachable over its door for the handback call, which refused connections and timed out at 30 seconds several times
++- a handback path for a leaf whose check runs longer than the wrapper window
++
+ ### met
+ 
+ <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
+-
+ <!-- the form is list -->
+ 
++- a conflict at sync, the take had already merged main in with the group file conflict resolved
++- the trunk guard on the push verb, which requires a green check on the commit in hand
++- the commit verb refusal of a model trailer under the owner rule
++- the stop hook, which held the turn open while the check ran in the background
++
+ ### left
+ 
+ <!-- every person step parked, every ticket minted with no group, and what the handover says -->
+-
+ <!-- the form is list -->
+ 
++- no person step parked on the group
++- no ticket minted with no group
++- the pull request against main is still to open with auto-merge MERGE, and branch done is still to run
++
+ # Discussion
+ 
+ <!-- what anybody adds, at any time, on this ticket -->
+diff --git a/src/branches/dispatch_done_test.go b/src/branches/dispatch_done_test.go
+index f92515a..1a7922d 100644
+--- a/src/branches/dispatch_done_test.go
++++ b/src/branches/dispatch_done_test.go
+@@ -65,7 +65,7 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
+ 	t.Parallel()
+ 	one := dfDoneTree(t)
+ 	hub := newHub()
+-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": map[string]any{"merge_method": "merge"}, "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
+ 	one.out.Reset()
+ 	Dispatch(one.d, hub.send, []string{"--fire"})
+ 	// The red fire lists every open pull request first, so the test reads the head lists alone. [[spec/tickets/ci-reds-name-their-cases]]
+@@ -87,3 +87,27 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
+ 		t.Fatalf("the dispatch prints %s", one.out.String())
+ 	}
+ }
++
++// The dispatch takes auto-merge on a done branch's standing pull request that stands with none, and posts no second one. [[spec/tickets/branch-done-opens-the-pr]]
++func TestDispatchTakesAutoMergeOnAStandingPullRequestWithNone(t *testing.T) {
++	t.Parallel()
++	one := dfDoneTree(t)
++	hub := newHub()
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": nil, "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
++	one.out.Reset()
++	Dispatch(one.d, hub.send, []string{"--fire"})
++	if posts := hub.pullsSent("POST"); len(posts) != 0 {
++		t.Fatalf("the dispatch opens %d pull request(s): %s", len(posts), one.out.String())
++	}
++	var merges []dfSent
++	for _, said := range hub.sent {
++		if said.URL == dfAPI+"/graphql" {
++			merges = append(merges, said)
++		}
++	}
++	if len(merges) != 1 {
++		t.Fatalf("the dispatch merges %d: %s", len(merges), one.out.String())
++	}
++	dpSame(t, dfBody(t, merges[0])["variables"].(map[string]any)["id"], "PR_7")
++	holds(t, one.out.String(), "https://github.example/"+dfRepo+"/pull/7")
++}
+diff --git a/src/branches/dispatch_fire.go b/src/branches/dispatch_fire.go
+index 81814c7..9b6c39e 100644
+--- a/src/branches/dispatch_fire.go
++++ b/src/branches/dispatch_fire.go
+@@ -322,7 +322,9 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 		return refusedPull(out, "The pull request list", listed)
+ 	}
+ 	var pulls []struct {
+-		URL  string `json:"html_url"`
++		URL  string         `json:"html_url"`
++		ID   string         `json:"node_id"`
++		Auto map[string]any `json:"auto_merge"`
+ 		Head struct {
+ 			Ref string `json:"ref"`
+ 		} `json:"head"`
+@@ -333,7 +335,10 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 	for _, one := range pulls {
+ 		if one.Head.Ref == branch {
+ 			out.State, out.URL = "standing", one.URL
+-			return codeOK
++			if one.Auto != nil {
++				return codeOK
++			}
++			return enableAutoMerge(send, gh, one.ID, out)
+ 		}
+ 	}
+ 	made := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]string{
+@@ -347,9 +352,14 @@ func (d *Doors) pullOpens(branch, title, body string, out *pullRow) int {
+ 	}
+ 	pull := readOf(made)
+ 	out.State, out.URL = "opened", jsonText(pull["html_url"])
++	return enableAutoMerge(send, gh, pull["node_id"], out)
++}
++
++// Takes auto-merge on a pull request by its node id, and names the refusal on out where GitHub answers one. [[spec/tickets/branch-done-opens-the-pr]]
++func enableAutoMerge(send Send, gh hub, id any, out *pullRow) int {
+ 	merge := sent(send, gh.API+"/graphql", Request{Method: "POST", Headers: gh.Headers, Body: jsonLine(map[string]any{
+ 		"query":     autoMerge,
+-		"variables": map[string]any{"id": pull["node_id"]},
++		"variables": map[string]any{"id": id},
+ 	})})
+ 	errs, _ := readOf(merge)["errors"].([]any)
+ 	if okOf(merge) && len(errs) == 0 {
+diff --git a/src/branches/dispatch_fire_test.go b/src/branches/dispatch_fire_test.go
+index 5436dbc..cfe2d44 100644
+--- a/src/branches/dispatch_fire_test.go
++++ b/src/branches/dispatch_fire_test.go
+@@ -324,7 +324,7 @@ func TestDispatchOpensTheWriteBranchsPullRequestOnPullTokenWithAutoMerge(t *test
+ func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
+ 	t.Parallel()
+ 	hub := newHub()
+-	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
++	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "auto_merge": map[string]any{"merge_method": "merge"}, "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
+ 	plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "standing"})
+ 	dfFired(hub, plan, nil)
+ 	for _, one := range hub.sent {

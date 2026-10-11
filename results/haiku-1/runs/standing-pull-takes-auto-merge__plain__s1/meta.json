@@ -1,0 +1,126 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status --short && git branch --show-current && git log --oneline -5 && ls && grep -rn -i \"auto_merge\\|automerge\\|auto-merge\\|pullOpens\\|standing\" --include=*.go . | head -80",
+  "grep -rn -i \"auto.merge\\|automerge\\|pullopens\\|pulls\\b\" --include=*.go --include=*.js --include=*.md --include=*.sh . | grep -v node_modules | head -80; cat AGENTS.md | head -80",
+  "grep -rn \"auto_merge\\|autoMerge\\|pullOpens\\|PullOpens\\|auto-merge\" . --exclude-dir=node_modules --exclude-dir=.git | head -60",
+  "cat spec/tickets/standing-pull-takes-auto-merge.md; echo ----; sed -n 1,80p src/branches/dispatch_fire.go | head -60; echo ----; sed -n 280,420p src/branches/dispatch_fire.go",
+  "sed -n 180,215p src/branches/done.go; echo ----; grep -rn \"standing\\|enablePullRequestAutoMerge\\|graphql\" src/branches/*_test.go | head -40; echo ----; sed -n 395,470p src/branches/port_c_done_test.go",
+  "cat src/branches/dispatch_done_test.go; echo ----; grep -n \"pulls\\|node_id\\|PR_\" src/branches/*_test.go | head -40",
+  "grep -n \"func (d \\*Doors) hubOf\\|func refusedPull\\|func reasonOf\\|func jsonText\" -A3 src/branches/*.go; sed -n 320,370p src/branches/dispatch_fire_test.go; sed -n 60,100p src/branches/dispatch_fire_test.go",
+  "gofmt -l src/branches; go vet ./src/branches/ && go test ./... 2>&1 | tail -40",
+  "go test ./... 2>&1 | grep -v \"^ok\\|no test files\" | head -30; echo \"exit-filter-done\"; go test ./src/branches/ -run 'Dispatch|PC' -v 2>&1 | grep -E \"^(--- |FAIL|ok)\" | head -60; sed -n 1,200p RUNME.sh | grep -n \"check\" | head -20",
+  "timeout 580 ./RUNME.sh check > /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp/check.log 2>&1; echo \"exit $?\"; tail -40 /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp/check.log",
+  "sleep 100; tail -5 /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-standing-pull-takes-auto-merge--plain--s1-quackitect/9d676f0d-0dac-4689-be4a-c4edb8a193d6/tasks/buo4hzezr.output",
+  "tail -5 /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-standing-pull-takes-auto-merge--plain--s1-quackitect/9d676f0d-0dac-4689-be4a-c4edb8a193d6/tasks/buo4hzezr.output",
+  "until ! pgrep -f \"RUNME.sh check\" >/dev/null; do sleep 5; done; tail -30 /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp/check.log",
+  "cd /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp && tail -25 check.log; echo; grep -ci \"fail\" check.log",
+  "cd /tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1/tmp && grep -n \"branches/\\|dispatch_\" check.log | head; grep -n \"^ *[A-Za-z].*exit\\|FAIL\\|red\\b\" check.log | head -5; cd ../quackitect && git status --short",
+  "git add src/branches/dispatch_fire.go src/branches/dispatch_fire_test.go src/branches/dispatch_done_test.go && git commit -q -F - <<'EOF'\nTurn on auto-merge for a standing pull request that lacks it\n\npullOpens returned a standing pull request untouched, so done printed it\nwith auto-merge on even whe"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/branches/dispatch_done_test.go"
+  ],
+  [
+   "M",
+   "src/branches/dispatch_fire.go"
+  ],
+  [
+   "M",
+   "src/branches/dispatch_fire_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.02702,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "d7192dde766365901a713067507e20f99b27b645",
+ "finished": "2026-10-11T02:45:51Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  0.369140625,
+  2.55859375,
+  10.01416015625
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 3,
+  "models": {}
+ },
+ "run": "standing-pull-takes-auto-merge__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/standing-pull-takes-auto-merge__plain__s1",
+ "secs": 1458.8,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 1040034,
+  "cache_write": 54096,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.027023340000000003,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 3272,
+  "ended_on_question": false,
+  "final_text": "The notice is about my wait loop, not the check. That loop was stopped at its time limit, but the check had already finished with exit 0 before it, so the result stands and nothing needs re-running. The fix is still committed as 9353e15 on `main`.",
+  "hook_denials": 0,
+  "input_tokens": 48,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 1040034,
+    "cache_write": 54096,
+    "cost": 0.027023340000000003,
+    "in": 48,
+    "out": 11598
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 23
+  },
+  "output_tokens": 251,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.48,
+   "seven_day": 0.06
+  },
+  "result_subtype": "success",
+  "result_turns": 1,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 21,
+  "tools": {
+   "Bash": 16,
+   "Edit": 5
+  },
+  "turns": 23,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    48,
+    251,
+    54096,
+    1040034
+   ]
+  }
+ },
+ "setup_secs": 33.3,
+ "start_commit": "0145994ce48e78826b0def5f20492486dcf13328",
+ "start_tree": "011afa52aeab36b43ef61d2b649b02298c45fb08",
+ "started": "2026-10-11T02:20:58Z",
+ "status": "ran",
+ "ticket": "standing-pull-takes-auto-merge",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}

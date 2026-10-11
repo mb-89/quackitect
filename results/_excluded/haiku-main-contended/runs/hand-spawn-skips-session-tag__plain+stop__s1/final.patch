@@ -1,0 +1,151 @@
+diff --git a/src/modules/hooks/spawn.go b/src/modules/hooks/spawn.go
+index ccb6a0e..537cd3b 100644
+--- a/src/modules/hooks/spawn.go
++++ b/src/modules/hooks/spawn.go
+@@ -10,6 +10,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/modules/hooks/brief"
++	"quackitect/src/q"
+ 	"quackitect/src/yaml"
+ )
+ 
+@@ -23,7 +24,7 @@ func (d *Door) spawned(post Post, root string) (Effect, bool) {
+ 	}
+ 	layer := brief.LayerFor(d.treeAt(root), os.Getenv, textOf(post.E, "kind"))
+ 	tag := ""
+-	if !yaml.Truthy(post.E[ownField]) {
++	if !yaml.Truthy(post.E[ownField]) && !strings.HasPrefix(textOf(post.E, "prompt"), q.HandOfItsOwn) {
+ 		tag = spawnTagOf(disk{root})
+ 	}
+ 	if layer == "" && tag == "" {
+diff --git a/src/modules/hooks/spawn_test.go b/src/modules/hooks/spawn_test.go
+index 9ca74b5..235b401 100644
+--- a/src/modules/hooks/spawn_test.go
++++ b/src/modules/hooks/spawn_test.go
+@@ -7,6 +7,8 @@ import (
+ 	"encoding/json"
+ 	"os"
+ 	"testing"
++
++	"quackitect/src/q"
+ )
+ 
+ // The case table the JavaScript builders write. [[spec/tickets/spawn-answers-off-the-door]]
+@@ -121,16 +123,19 @@ func TestASpawnOfAKindTakesThatKindsLayer(t *testing.T) {
+ // level0: FixtureOutsideHome - each case seeds the session file into a tree of its own.
+ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+ 	const tag = "You are the hand of session s7 on this box, so you pull under no --as."
++	handLine := q.HandOfItsOwn + ", named h1, and you work one step of one ticket."
+ 	for _, one := range []struct {
+ 		name    string
+ 		session string
+ 		own     bool
++		prompt  string
+ 		want    string
+ 	}{
+-		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, tag + "\n\nwork one step"},
+-		{"the wrapper's own spawn", `{"id":"s7"}`, true, ""},
+-		{"a box carrying no session file", "", false, ""},
+-		{"a session file naming no id", `{"harness":"claude-code"}`, false, ""},
++		{"a helper of a session", `{"id":"s7","harness":"claude-code"}`, false, "work one step", tag + "\n\nwork one step"},
++		{"the wrapper's own spawn", `{"id":"s7"}`, true, "work one step", ""},
++		{"a hand of its own, no own field", `{"id":"s7"}`, false, handLine, ""},
++		{"a box carrying no session file", "", false, "work one step", ""},
++		{"a session file naming no id", `{"harness":"claude-code"}`, false, "work one step", ""},
+ 	} {
+ 		t.Run(one.name, func(t *testing.T) {
+ 			files := map[string]string{}
+@@ -139,9 +144,11 @@ func TestASpawnOpensOnTheHandOfItsSession(t *testing.T) {
+ 			}
+ 			root := treeOf(t, files, "")
+ 			door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer})
+-			said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: map[string]any{
+-				"session_id": "s1", "prompt": "work one step", "own": one.own,
+-			}})
++			payload := map[string]any{"session_id": "s1", "prompt": one.prompt}
++			if one.own {
++				payload["own"] = true
++			}
++			said, err := door.Hook(Post{Event: spawnEvent, Root: root, E: payload})
+ 			if err != nil {
+ 				t.Fatal(err)
+ 			}
+diff --git a/src/pull/pull_branch.go b/src/pull/pull_branch.go
+index d5aaa2c..bd86069 100644
+--- a/src/pull/pull_branch.go
++++ b/src/pull/pull_branch.go
+@@ -8,6 +8,7 @@ import (
+ 	"strings"
+ 
+ 	"quackitect/src/failure"
++	"quackitect/src/q"
+ )
+ 
+ // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+@@ -90,7 +91,7 @@ func spawnPrompt(ticket string, leaf *Leaf, name string) string {
+ 		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
+ 	}
+ 	return strings.Join([]string{
+-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
++		fmt.Sprintf("%s, named %s, and you work one step of one ticket.", q.HandOfItsOwn, name),
+ 		"",
+ 		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
+ 		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",
+diff --git a/src/pull/pull_branch_test.go b/src/pull/pull_branch_test.go
+new file mode 100644
+index 0000000..26180a1
+--- /dev/null
++++ b/src/pull/pull_branch_test.go
+@@ -0,0 +1,20 @@
++// The prompt a hand of its own takes, read as the spawn answer reads it: it
++// opens on the hand line the q package names. [[spec/design_output/pull#a-hand-of-its-own]]
++package pull
++
++import (
++	"strings"
++	"testing"
++
++	"quackitect/src/q"
++)
++
++// A prompt a hand of its own takes opens on q.HandOfItsOwn, and names the hand it stands as. [[spec/design_output/pull#a-hand-of-its-own]]
++func TestASpawnPromptOpensOnTheHandLine(t *testing.T) {
++	t.Parallel()
++	leaf := &Leaf{Entry: Entry{Path: "work/one"}}
++	got := spawnPrompt("ticket-one", leaf, "h1")
++	if !strings.HasPrefix(got, q.HandOfItsOwn+", named h1,") {
++		t.Fatalf("the prompt opens on %q, and wants the hand line %q", got, q.HandOfItsOwn)
++	}
++}
+diff --git a/src/q/hand.go b/src/q/hand.go
+new file mode 100644
+index 0000000..05d6363
+--- /dev/null
++++ b/src/q/hand.go
+@@ -0,0 +1,7 @@
++// The opening of the prompt a hand of its own takes, shared by the pull that
++// writes it and the door that reads it, so a spawn of that hand takes no tag.
++// [[spec/design_output/pull#a-hand-of-its-own]]
++package q
++
++// The words a hand of its own opens its prompt on, before its name. [[spec/design_output/pull#a-hand-of-its-own]]
++const HandOfItsOwn = "You are a hand of your own on this box"
+diff --git a/src/q/hand_test.go b/src/q/hand_test.go
+new file mode 100644
+index 0000000..4c0b84d
+--- /dev/null
++++ b/src/q/hand_test.go
+@@ -0,0 +1,12 @@
++// The hand line a hand of its own opens its prompt on. [[spec/design_output/pull#a-hand-of-its-own]]
++package q
++
++import "testing"
++
++// The hand line names the box, and a spawn answer reads it as the hand of its own. [[spec/design_output/pull#a-hand-of-its-own]]
++func TestTheHandLineNamesABoxHand(t *testing.T) {
++	const want = "You are a hand of your own on this box"
++	if HandOfItsOwn != want {
++		t.Fatalf("the hand line reads %q, and wants %q", HandOfItsOwn, want)
++	}
++}

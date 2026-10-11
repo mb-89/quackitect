@@ -1,0 +1,116 @@
+diff --git a/src/modules/lsp/tools.go b/src/modules/lsp/tools.go
+index bce4af6..82398ca 100644
+--- a/src/modules/lsp/tools.go
++++ b/src/modules/lsp/tools.go
+@@ -33,9 +33,13 @@ var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec
+ // The folders Vale skips, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
+ var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
+ 
++// How many runs of Vale a single input gets when a load trips its cap. [[spec/tickets/vale-retries-its-timeout]]
++const valeTries = 3
++
+ var (
+-	valeCode  = regexp.MustCompile(`^E\d+$`)
+-	proseKind = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
++	valeCode   = regexp.MustCompile(`^E\d+$`)
++	valeCapped = regexp.MustCompile(`\bE201\b`)
++	proseKind  = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
+ )
+ 
+ // A tool run: the folder, the input, the binary and its words. The door runs one, and a case hands in its own. [[spec/tickets/lsp-module-draws-the-tools]]
+@@ -214,12 +218,22 @@ func (one *Tools) vale(tree Tree, disk, held []string) []Finding {
+ 	return one.vetoes(tree, heard)
+ }
+ 
++// One Vale run, which goes again while Vale names its load cap E201, up to valeTries runs in all. [[spec/tickets/vale-retries-its-timeout]]
+ func (one *Tools) valeRun(input string, argv []string) ([]valeHeard, string) {
+-	out, err := one.Run(one.Root, input, one.Vale, argv...)
+-	if err != nil {
+-		return nil, err.Error()
++	var heard []valeHeard
++	var fault string
++	for at := 0; at < valeTries; at++ {
++		out, err := one.Run(one.Root, input, one.Vale, argv...)
++		if err != nil {
++			heard, fault = nil, err.Error()
++		} else {
++			heard, fault = one.valeRowsOf(out)
++		}
++		if !valeCapped.MatchString(fault) {
++			break
++		}
+ 	}
+-	return one.valeRowsOf(out)
++	return heard, fault
+ }
+ 
+ func (one *Tools) valeFault(why string) Finding {
+diff --git a/src/modules/lsp/tools_test.go b/src/modules/lsp/tools_test.go
+index e4347c6..4b678d8 100644
+--- a/src/modules/lsp/tools_test.go
++++ b/src/modules/lsp/tools_test.go
+@@ -265,3 +265,64 @@ func TestAValeFaultDrawsValeRuns(t *testing.T) {
+ 		t.Fatalf("the config draws %+v, and wants ValeRuns in Vale's own words", drawn)
+ 	}
+ }
++
++// A Vale that answers E201 on one run and rows on the next, the way a load trips its cap once. [[spec/tickets/vale-retries-its-timeout]]
++func TestAValeCapRetriesThenDrawsRows(t *testing.T) {
++	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
++	capped := true
++	run := fake.run
++	tools := func(dir, input, name string, argv ...string) (string, error) {
++		if name == "vale" && capped {
++			capped = false
++			fake.mu.Lock()
++			fake.calls = append(fake.calls, name+" "+strings.Join(argv, " "))
++			fake.mu.Unlock()
++			return "", errors.New("exit status 1: E201 the rule breaks under load")
++		}
++		return run(dir, input, name, argv...)
++	}
++	store, as := catalogOf(t)
++	server := New(Outside{
++		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
++		Sweep: func() any { return []Finding{} },
++		Tools: &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: tools, Check: fakeCheck},
++		Files: func() map[string]string { return map[string]string{"spec/b.md": "# B\n\nSome text\n"} },
++	})
++	var (
++		mu     sync.Mutex
++		pushed [][]byte
++	)
++	server.Pushes(func(bodies ...[]byte) {
++		mu.Lock()
++		defer mu.Unlock()
++		pushed = append(pushed, bodies...)
++	})
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
++		t.Fatalf("the closed file draws %+v after one E201, and wants its Vale row on the second run", drawn)
++	}
++	if n := valeRuns(fake.calls); n != 2 {
++		t.Fatalf("vale ran %d times, and wants 2: one capped run, then the run with rows: %q", n, fake.calls)
++	}
++}
++
++func TestAValeCapStopsAfterValeTries(t *testing.T) {
++	fake := &fakeTools{fails: map[string]error{"vale": errors.New("exit status 1: E201 the rule breaks under load")}}
++	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
++	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
++		t.Fatalf("the config draws %+v, and wants ValeRuns after the cap holds", drawn)
++	}
++	if n := valeRuns(fake.calls); n != valeTries {
++		t.Fatalf("vale ran %d times, and wants valeTries (%d): %q", n, valeTries, fake.calls)
++	}
++}
++
++// The runs of Vale among the calls a fake took, which a sweep also beside Biome. [[spec/tickets/vale-retries-its-timeout]]
++func valeRuns(calls []string) int {
++	n := 0
++	for _, call := range calls {
++		if strings.HasPrefix(call, "vale ") {
++			n++
++		}
++	}
++	return n
++}

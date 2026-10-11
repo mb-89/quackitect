@@ -1,0 +1,22 @@
+{
+ "arms": [
+  "plain",
+  "v5",
+  "plain+stop"
+ ],
+ "budget": 0,
+ "claude": "2.1.296 (Claude Code)",
+ "created": "2026-10-11T04:40:39Z",
+ "max_turns": 0,
+ "model": "claude-sonnet-5-5",
+ "seeds": 1,
+ "tasks": [
+  "hand-spawn-skips-session-tag",
+  "tui-swap-fails-loud",
+  "index-why-prints-text",
+  "check-errors-names-the-part",
+  "signalled-meets-notstarted-readers"
+ ],
+ "tools": "Bash,Read,Edit,Write,Glob,Grep,Task,Skill,ToolSearch",
+ "wall": 2700
+}

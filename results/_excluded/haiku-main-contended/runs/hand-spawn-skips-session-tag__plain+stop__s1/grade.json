@@ -1,0 +1,80 @@
+{
+ "empty_change": false,
+ "graded": "2026-10-10T22:59:16Z",
+ "hidden": {
+  "f2p": [
+   257,
+   257
+  ],
+  "f2p_failed": [],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": true,
+  "pkgs": {
+   "src/modules/hooks": "ok",
+   "src/pull": "ok",
+   "src/q": "ok"
+  },
+  "tail": ""
+ },
+ "hidden_first": {
+  "f2p": [
+   147,
+   257
+  ],
+  "f2p_failed": [
+   "src/modules/hooks:TestACallTakesTheDefaultWaitOffItsKey",
+   "src/modules/hooks:TestACallsArgumentsSpreadOnTheEventReachTheAction",
+   "src/modules/hooks:TestAClearOpensTheDebtAgain",
+   "src/modules/hooks:TestACompactionOpensTheDebtAgain",
+   "src/modules/hooks:TestAContextReadLogsTheBlocksItHands",
+   "src/modules/hooks:TestADescribeOfAnotherToolPasses",
+   "src/modules/hooks:TestADescribeOfBashAnswersTheVerbLine",
+   "src/modules/hooks:TestADoorWithNoGitOrVoiceReadsNeither",
+   "src/modules/hooks:TestADoorWithNoIndexPassesGrepAndGlob",
+   "src/modules/hooks:TestAGlobAnswersTheIndexsPaths",
+   "src/modules/hooks:TestAGrepAnswersTheIndexsLines",
+   "src/modules/hooks:TestAGrepCountsAndListsFilesAsTheBridgeSays",
+   "src/modules/hooks:TestAGrepOnAnAbsolutePathPasses",
+   "src/modules/hooks:TestAGrepTheIndexRefusesPassesToTheDisk",
+   "src/modules/hooks:TestAGrepTypeReadsAsItsGlob",
+   "src/modules/hooks:TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown",
+   "src/modules/hooks:TestAHeldCallAsksBackForRows",
+   "src/modules/hooks:TestAHelpersHandBackLandsAsAnAgentRowAndPasses",
+   "src/modules/hooks:TestAHelpersLogCallLandsItsRowToo",
+   "src/modules/hooks:TestAHelpersPromptKeepsNoQuestion"
+  ],
+  "p2p": [
+   0,
+   0
+  ],
+  "p2p_failed": [],
+  "pass": false,
+  "pkgs": {
+   "": "build-fail",
+   "src/modules/hooks": "build-fail",
+   "src/pull": "ok",
+   "src/q": "ok"
+  },
+  "secs": 17.1,
+  "tail": "# quackitect/src/modules/hooks/command\ncompile: writing output: write $WORK/b207/_pkg_.a: no space left on device\nFAIL\tquackitect/src/modules/hooks [build failed]"
+ },
+ "note": "first grade hit a full disk; graded again from final.patch",
+ "regraded": "2026-10-10T23:08:20Z",
+ "run": "hand-spawn-skips-session-tag__plain+stop__s1",
+ "scope": {
+  "code_files": 3,
+  "files": 6,
+  "n_outside": 0,
+  "n_outside_code": 0,
+  "non_go": 0,
+  "outside": [],
+  "own_files": 6,
+  "test_files": 3,
+  "tickets_written": 0
+ },
+ "status": "graded"
+}

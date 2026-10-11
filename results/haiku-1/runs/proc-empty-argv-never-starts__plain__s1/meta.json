@@ -1,0 +1,119 @@
+{
+ "arm": "plain",
+ "bash_tail": [
+  "git status && git branch --show-current && git log --oneline -5 && grep -rn \"Argv\\[0\\]\\|NotStarted\" --include=*.go . | head -50",
+  "ls src/proc && cat src/proc/proc.go && cat src/proc/proc_contract_test.go && cat RUNME.sh | head -80",
+  "gofmt -l src/proc; go test ./src/proc/ -run 'NeverStarts|Contract|ARun' -v 2>&1 | tail -30; go test ./... 2>&1 | tail -30",
+  "go test ./... 2>&1 | grep -v '^ok' | head -60",
+  "git stash -q && go test ./src/modules/index/ 2>&1 | tail -5; git stash pop -q && git status --short && go test -count=3 ./src/modules/index/ 2>&1 | tail -5",
+  "timeout 900 ./RUNME.sh check 2>&1 | tail -40; echo \"exit=$?\"",
+  "S=/tmp/qb/haiku-1/proc-empty-argv-never-starts__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-proc-empty-argv-never-starts--plain--s1-quackitect/2cc168fb-a416-4029-a802-e13c0208d5e2/scratchpad; mkdir -p \"$S\"; timeout 900 ./RUNME.sh check > \"$S/check.log\" 2>&1; echo \"exit=$?\"; grep -n -i \"fail\\|error\\|\u2717\\|no",
+  "S=/tmp/qb/haiku-1/proc-empty-argv-never-starts__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-proc-empty-argv-never-starts--plain--s1-quackitect/2cc168fb-a416-4029-a802-e13c0208d5e2/scratchpad; grep -n \"index\\|FAIL\\|go test\\|^ok\\|Lint\\|lint\" \"$S/check.log\" | grep -v \"\u2714\" | head -20; grep -n \"go test\\|go vet",
+  "grep -rn \"red list\\|red-list\\|redlist\" --include=* -i . 2>/dev/null | grep -v \"^./.git/\" | grep -v node_modules | head -20; sed -n 1,3p \"$(ls /tmp/qb/haiku-1/proc-empty-argv-never-starts__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-proc-empty-argv-never-starts--plain--s1-quackitect/2cc168fb-a416-4029-a80",
+  "grep -rln \"proc_contract_test\" .se spec 2>/dev/null | head; grep -rl \"Argv\" .se/tickets 2>/dev/null | head",
+  "cat spec/tickets/proc-contract-holds-the-folder.md; echo ----; grep -n -i \"empty\\|argv\\|never start\\|NotStarted\" spec/design_output/doors.md | head -20",
+  "cp src/proc/proc.go /tmp/qb/haiku-1/proc-empty-argv-never-starts__plain__s1/tmp/claude-0/-tmp-qb-haiku-1-proc-empty-argv-never-starts--plain--s1-quackitect/2cc168fb-a416-4029-a802-e13c0208d5e2/scratchpad/proc.go.fixed && git show HEAD:src/proc/proc.go > src/proc/proc.go && go test ./src/proc/ -run N",
+  "git add src/proc/proc.go src/proc/proc_contract_test.go && git commit -q -F - <<'EOF'\nproc: the real runner answers NotStarted for an empty argv\n\nReal indexed Argv[0] before anything else, so a command naming no program\npanicked. The fake runner already answers NotStarted with an error for that\ncase"
+ ],
+ "branch_at_end": "main",
+ "budget_cap": 0,
+ "changed": [
+  [
+   "M",
+   "src/proc/proc.go"
+  ],
+  [
+   "M",
+   "src/proc/proc_contract_test.go"
+  ]
+ ],
+ "commits_made": 1,
+ "cost_total": 0.01091,
+ "exit": 0,
+ "final_from": "working tree on main",
+ "final_tree": "39ae0434cc470bfd3a3b6f0963e491a8b9c8cafc",
+ "finished": "2026-10-11T04:31:17Z",
+ "install_rc": 0,
+ "install_tail": "n it\n  serve    the server behind the bridgehead, which stands detached, so the call returns\n  find     every line carrying the words, out of the index, or out of the session log with --log\n  vehicle  this vehicle, the project it drives, and a vehicle made elsewhere\n  stub     a bare project this vehicle drives: into <folder> [--upstream <url>]\n  notes    the notes the words belong to, ranked by name and body\n  links    what reaches a note, and what reaches nothing\n  index    the index itself: standing, reindex, or same <path>\n  rename   move a name and rewrite every reach: rename <from> <to>\n",
+ "killed_at_cap": false,
+ "load_end": [
+  8.37060546875,
+  14.8828125,
+  18.86083984375
+ ],
+ "model": "claude-haiku-5-5",
+ "nested": {
+  "calls": 0,
+  "cost": 0.0,
+  "files": 5,
+  "models": {}
+ },
+ "run": "proc-empty-argv-never-starts__plain__s1",
+ "scratch": "/tmp/qb/haiku-1/proc-empty-argv-never-starts__plain__s1",
+ "secs": 428.2,
+ "seed": 1,
+ "session": {
+  "api_errors": 0,
+  "cache_read": 313562,
+  "cache_write": 22710,
+  "claimed_complete": false,
+  "compactions": 0,
+  "cost": 0.010905620000000001,
+  "cost_estimated": false,
+  "door_refusals": 0,
+  "duration_ms": 425556,
+  "ended_on_question": false,
+  "final_text": "`proc.Real` no longer panics on an empty `Argv`. It now answers `NotStarted` with an error, the same as the fake runner. The fix is committed on `main` as `812704f`.\n\n**The change**\n- `src/proc/proc.go`: `Real` returns `Said{Err: \"proc: a command names no program\", Code: NotStarted}` when `len(one.Argv) == 0`, before it touches `Argv[0]`. The message matches the fake's.\n- `src/proc/proc_contract_test.go`: new `TestACommandNamingNoProgramNeverStarts`, which runs an empty `Command{}` through both the real and fake runners and requires `NotStarted` with a non-empty error.\n\n**Verification**\n- On the old `proc.go`, the new test panics with `slice bounds out of range [1:0]`. With the fix, `go test ./src/proc/` passes.\n- `./RUNME.sh check` exits 0. Its output says the red list (known-failing tests it tolerates) includes `src/modules/index/call_test.go`.\n- `go test ./...` fails only in `src/modules/index`, with `TestAWaitArmsItsSpanThroughTheBooksTimer` and `TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations`. Those failures also happen on the untouched base, so I left them alone.\n\n**Repo context**\n- The ticket `spec/tickets/proc-contract-holds-the-folder.md` says the empty-argv case in the real runner was left for a separate ticket (`proc-empty-argv-never-starts`). This commit is that change. I did not run the ticket workflow or edit ticket state.",
+  "hook_denials": 0,
+  "input_tokens": 30,
+  "is_error": false,
+  "leak_flags": [],
+  "mcp_calls": 0,
+  "model_usage": {
+   "claude-haiku-5-5": {
+    "cache_read": 313562,
+    "cache_write": 22710,
+    "cost": 0.010905620000000001,
+    "in": 30,
+    "out": 6450
+   }
+  },
+  "models": {
+   "claude-haiku-5-5": 15
+  },
+  "output_tokens": 129,
+  "permission_denials": 0,
+  "rate_limit": {
+   "five_hour": 0.07,
+   "seven_day": 0.08
+  },
+  "result_subtype": "success",
+  "result_turns": 16,
+  "skill_calls": [],
+  "stop_hook_blocks": 0,
+  "stop_reason_line": null,
+  "subagents": 0,
+  "tool_calls": 15,
+  "tools": {
+   "Bash": 13,
+   "Edit": 2
+  },
+  "turns": 15,
+  "usage_by_model": {
+   "claude-haiku-5-5": [
+    30,
+    129,
+    22710,
+    313562
+   ]
+  }
+ },
+ "setup_secs": 21.7,
+ "start_commit": "feac6b73e8508d39ae0e503f342536cfad554c2f",
+ "start_tree": "367a89b02c6c6f7813824628c5b478f6ddf4ec64",
+ "started": "2026-10-11T04:23:47Z",
+ "status": "ran",
+ "ticket": "proc-empty-argv-never-starts",
+ "turn_cap": 0,
+ "wall_cap": 2700
+}
