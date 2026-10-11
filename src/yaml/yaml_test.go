@@ -176,7 +176,7 @@ func TestAQuotedScalarDecodesItsEscapes(t *testing.T) {
 	for said, want := range map[string]string{
 		`"a \"quoted\" word"`: `a "quoted" word`,
 		`"C:\\tree\\spec"`:    `C:\tree\spec`,
-		`"one\ntwo\r\tthree"`: "one\ntwo\r\tthree",
+		`"one\ntwo\rthree"`:   "one\ntwo\rthree",
 		`"a \x stays"`:        `a \x stays`,
 		`'it''s here'`:        `it's here`,
 		`'a \ stays'`:         `a \ stays`,

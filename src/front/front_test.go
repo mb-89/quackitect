@@ -203,12 +203,16 @@ func bodyOf(text string) string {
 	return text
 }
 
-// A value Set writes reads back as written, so a read and a rewrite keep it. [[spec/tickets/quoted-fronts-round-trip]]
+// A value Set writes reads back as written through Normalise, so a read and a rewrite keep it. [[spec/tickets/quoted-fronts-round-trip]]
 func TestASetValueReadsBackAsWritten(t *testing.T) {
 	for _, value := range []string{`"quoted" opens it`, `path: C:\tree\spec`, `a: "b" \\ c`, "key: value", "a #hash", "one\ntwo", `'it's: here`, `ends \ `} {
 		text := "---\nkind: [[ticket]]\n---\n" + body
 		for round := 0; round < 2; round++ {
 			written, err := Set(text, "title", value)
+			if err == nil {
+				// Normalise decodes through the decoder the reader shares, so the value stands. [[spec/tickets/one-quote-decoder-for-fronts]]
+				written, err = Normalise(written)
+			}
 			if err != nil {
 				t.Fatal(err)
 			}
