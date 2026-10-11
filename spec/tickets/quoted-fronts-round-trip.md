@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 0abddb08db490b0dfaddeab188de124684979a1a
+    hash_after: 0abddb08db490b0dfaddeab188de124684979a1a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/yaml passes; green, src/front passes
+      - name: check
+        exit: 0
+        said: "   67.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 76cf9dbe4344220b
+        size: 561
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -325,26 +348,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/yaml src/front
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`unquote` in `src/yaml/yaml.go` decodes a whole double-quoted value through `Unescaped`, the decoder the front writer's mint calls too, and a whole single-quoted value turns each doubled quote into one. A value opening and closing on a quote that reads as no whole quote keeps its strip of the two ends. A front value holding a quote, a backslash or a newline now reads back as `Set` wrote it, so a rewrite no longer doubles its backslashes. The red cases of `src/yaml/yaml_test.go` and `src/front/front_test.go` pass.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the gate named
+- the change reaches no door
+- the comment in `unquote` names the approach
+- the decoder stands once, in `yaml.Unescaped`
 
 # accept
 
