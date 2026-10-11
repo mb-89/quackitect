@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 2f5fb7446fe695c266a389303e1d3420662636c3
+    hash_after: ecd1019b21820f89f05db596bbf302842860b82b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/files passes
+      - name: check
+        exit: 0
+        said: "   93.6  in all"
+    inputs:
+      - name: ask
+        hash: 9397b62fbba39a37
+        size: 461
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/files/disk_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The real disk Remove on a folder removes the empty folders under it, deepest first, before the folder itself. Doors.remove lists and removes the files, and the folder then goes whole, so git worktree add meets no standing path. A folder still holding a file stands, and its Remove answers the error.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the named test passes, and the check answers 0
+- the cleanup the change reveals: the fake disk keeps no folders, so it needs no change
+- every fact stands in one place: the folder walk lives in disk.folders alone, and Doors.remove stays untouched
 
 # Discussion
 
