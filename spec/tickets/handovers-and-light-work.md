@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box 56610d6296ee · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/handovers-and-light-work already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: a3ec645361ad13eb5bba6ed1404bd3d919aab9ac
+    hash_after: a3ec645361ad13eb5bba6ed1404bd3d919aab9ac
+    inputs:
+      - name: ask
+        hash: cb81d706e020e71f
+        size: 349
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -124,14 +133,25 @@ Done when every child closes through the command it names.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/crash-leaves-a-handover]], standard
+- [[spec/tickets/small-work-takes-light-path]], standard
+- [[spec/tickets/tests-green-names-the-ask]], standard
+- [[spec/tickets/gate-next-line-test]], trivial
+- [[spec/tickets/reworded-input-keeps-the-step]], trivial
+- [[spec/tickets/stale-callers-name-hand-out]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child holds one module or one route, and reviews whole
+- the three standard children carry the three goals, and the trivial ones carry findings their reviews minted
+- no child waits on another, so none names depends_on
+- the light route rides the tests-green reword, which landed first
+- the group diff reads in one review, so no child splits off
 
 # children
 
