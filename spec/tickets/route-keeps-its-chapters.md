@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -190,6 +190,15 @@ record:
         hash: 266fbcd3763fadef
         size: 705
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 60bbc8eca497bbd54a3ef0cdacaecf293a493135
+    hash_after: 60bbc8eca497bbd54a3ef0cdacaecf293a493135
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/ticket_update.go:22:1 ExampleCovers: ./RUNME.sh ticket update stands in no example's interface. Write an examp"
+    def: f150b8c0dc20fe45
 group: tickets-keep-their-chapters
 ---
 
@@ -337,14 +346,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/modules/check/rerouted.go src/quack/ticket_route.go src/quack/ticket_update.go src/quack/ticket_set.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes
+- the verbs reach the disk through the OS disk under two temp roots in the cases, and git through the harness fake
+- the comments on ReRoute and methodDisk name the approach
+- the refusal stands once, in ErrNoSchema
 
 ## tests-green
 
