@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -143,6 +143,18 @@ record:
         hash: 36b75deaec55f13b
         size: 1875
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1ad094d8843c · claude-code-remote · helper-4
+    hash_before: 9992e01c8db473046ead035b5665d31ba45e3708
+    hash_after: 9992e01c8db473046ead035b5665d31ba45e3708
+    inputs:
+      - name: design/draft
+        hash: 36b75deaec55f13b
+        size: 1875
+      - name: design/tests-red
+        hash: f15c88258f49a9bf
+        size: 699
+    def: 7cea74295027d571
 group: tickets-keep-their-chapters
 ---
 
@@ -275,8 +287,10 @@ Fill and update refuse under a vehicle on the schema the work root lacks. Set an
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- update-case-splits-repos: the draft hands `copiedBase` the method repository. But in the harness `standsInRepo` swaps `standingRepo` for one fake that ignores the root it gets. So the update vehicle case passes whether `repoAt` takes the method root or the work root. Let the vehicle case answer a repository a root, or hold the root `repoAt` asks for, so the case decides which history the drift reads.
 
 # implement
 
