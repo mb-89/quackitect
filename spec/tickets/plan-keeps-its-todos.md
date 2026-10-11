@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: f0e8a649612f1266
         size: 574
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 46047108a2aab9576b8c19d1d1367b084cc64eea
+    hash_after: 46047108a2aab9576b8c19d1d1367b084cc64eea
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/modules/plans/plans.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `plans.go` and its test alone
+- the read and the write reach the outside through the module's `Outside`, which the tests fake
+- the comment above the read in `plans` names the refusal the approach implements
+- the refusal text stands once, in `errNoObject`
 
 ## tests-green
 
