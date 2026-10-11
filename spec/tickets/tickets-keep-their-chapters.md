@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 1ad094d8843c · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 82e7f0765461c180bf7ab1694a80e9800d20a07d
+    hash_after: 82e7f0765461c180bf7ab1694a80e9800d20a07d
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -231,38 +243,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the trivial children close: note names stay flat, the pull reports a broken config, the red list skips failed records, retro chapters take the run door, the retro JSON and front readers merge, retro mint cleans its draft
+- the standard children close through their gates: plan-keeps-its-todos, quoted-fronts-round-trip, route-keeps-its-chapters, ticket-verbs-read-method-routes
+- each gate point closes as a child of this group, from misshapen-plan-values-refuse to update-case-splits-repos
+- probe-drops-its-stale-group stops the cold probe failing on a group branch a former probe pushed
+- src/quack folds the tests that ran one behaviour twice, so its test lines stand under its code lines with main taken in twice
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a red case before each fix caught the real fault each time, among them the vehicle route dropping every chapter
+- helpers took each gate, and their points named real gaps: one decoder, the flow split, the seeded chapter text, the repo the update case reads
+- a read-only survey helper found the folds the ratio needed, and a second helper applied them while the plan code went on beside it
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- the commit verb refused twice on pull-origin-diverges, since a stray group branch from the cold probe stood in the repository it clones
+- the ratio guard refused the chapters commit, and the folded reader merge pushed src/quack past its ratio again after the first sync
+- a gate helper pulled a ticket by name and met pull-queue-binds, then met a refused hand-back since this box held uncommitted code in the tree
+- a pkill matching its own shell line killed a running commit verb twice
+- an edit to the route ask marked its draft stale, so its design ran a second round
+- the level0 tool server stood offline the whole run, so every helper prompt named calls the helper could not make
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the probe drops the stale branch before it mints: `probe-drops-its-stale-group`
+- a fix deleting code counts the ratio before its commit, with the counter `src/imports/ratio.go` holds, and the survey road stands in `spec/guidance/code/tests.md`
+- a box commits or stashes its work before it spawns a helper, and a helper pulls with no name, as `src/pull/pull_branch.go` prompts it
+- a script waits on a log line it writes, and kills no process by pattern: `spec/guidance/cloud/cloud.md`
+- a gate point on an ask lands in the discussion, which marks no draft stale: `spec/design_output/pull.md`
+- the spawn prompt names the ./RUNME.sh call beside the tool call, so a helper works where the tool server stands offline: `src/pull/pull_branch.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The children each touched one reader, but the ratio guard tied them into one budget for src/quack: each fix that deleted code took test room from the next. Taking main in twice made it worse, since main itself stood at the ratio. The gates were worth their cost: four of their points named a gap the red tests let through.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact of the retro points at its file or ticket
+- the retro adds no number past the ones the verbs print
+- the retro writes no header
+- the errors stand with their order in the run, the owner sent no prompt past the routine
+- the retro names the role and carries no name, address or path of the box
 
 ## cloud
 
