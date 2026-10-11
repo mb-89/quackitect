@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 8339730da099 · claude-code-remote
@@ -127,6 +127,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 2fdd8b0cf27bc203d6f845ece43d629066fadd6f
+    hash_after: 2fdd8b0cf27bc203d6f845ece43d629066fadd6f
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -208,8 +217,9 @@ accept
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
