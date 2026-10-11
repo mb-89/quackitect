@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: tickets-keep-their-chapters
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 76cf9dbe4344220b
         size: 561
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: f5910878f6d16e1d58b4c329bf288c4020befc39
+    hash_after: f5910878f6d16e1d58b4c329bf288c4020befc39
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -295,14 +304,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/yaml/yaml.go src/front/mint.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/yaml/yaml.go` and `src/front/mint.go`, which the gate added to the size, and their tests
+- the change reaches no door, since the reader and the writer run over text alone
+- the comment in `unquote` names the decode the approach implements
+- the decoder stands once, in `yaml.Unescaped`
 
 ## tests-green
 
