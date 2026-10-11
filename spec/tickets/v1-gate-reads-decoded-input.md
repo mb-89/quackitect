@@ -1,8 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 point: gate
-todo: true
+todo: false
 step: do
 steps:
   - name: do
@@ -30,6 +30,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2a00b62f7c4bc60b
 group: hooks-v1-hold-the-line
 parent: v1-takes-a-run-secret
+record:
+  - step: do
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: b4ad86fa6aeb51c0504e5fe83fdcd1bde03332db
+    hash_after: b4ad86fa6aeb51c0504e5fe83fdcd1bde03332db
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "  101.6  in all"
+    inputs:
+      - name: ask
+        hash: da22da4d0da95a00
+        size: 93
+    def: be9d938c0443b338
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ parent: v1-takes-a-run-secret
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/index
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`acts` in `src/index/actions.go` reads the person mark off the decoded input through `MarksPerson`. A body marking a person in any key case then meets the gate. `TestAPersonPostWithoutTheRunSecretMeetsARefusal` posts `PERSON` and wants 403. The change landed in 9e5aadc17 and 411abd680.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the gate runs after `store.Input`, on the typed value
+- the cleanup the change reveals: none past the gate
+- the mark's reader stands once in the index, as `MarksPerson` in `src/index/secret.go`
 
 # Discussion
 
