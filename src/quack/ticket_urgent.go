@@ -35,6 +35,6 @@ func ticketUrgent(here pullOver) twin {
 		if pull.FieldOf(text, urgentKey) == pull.FlagOn {
 			flipped = pull.FlagOff
 		}
-		return ticketWritten(disk, at, urgentKey, flipped, dry, out, errs)
+		return ticketWritten(disk, pull.OSDisk{Root: it.Method}, at, urgentKey, flipped, dry, out, errs)
 	}
 }

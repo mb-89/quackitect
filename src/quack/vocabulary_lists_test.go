@@ -403,21 +403,28 @@ func mintedRoute(t *testing.T, schemas *check.Kinds, route string) string {
 // [[spec/tickets/schema-libs-leave]]
 func TestEveryShippedRouteMintsItsGolden(t *testing.T) {
 	t.Parallel()
+	schemas := shippedSchemas(t)
+	minted := []mintedEntry{}
+	for _, route := range shippedRoutes(t) {
+		minted = append(minted, mintedEntry{Route: route, Text: mintedRoute(t, schemas, route)})
+	}
+	if *update {
+		writesGolden(t, mintedGoldenAt, minted)
+		return
+	}
 	var entries []mintedEntry
 	readsGolden(t, mintedGoldenAt, &entries)
 	held := map[string]string{}
 	for _, one := range entries {
 		held[one.Route] = one.Text
 	}
-	schemas := shippedSchemas(t)
-	routes := shippedRoutes(t)
-	for _, route := range routes {
-		if got := mintedRoute(t, schemas, route); got != held[route] {
-			t.Errorf("the %s route mints\n%s\nand the golden holds\n%s", route, got, held[route])
+	for _, one := range minted {
+		if one.Text != held[one.Route] {
+			t.Errorf("the %s route mints\n%s\nand the golden holds\n%s", one.Route, one.Text, held[one.Route])
 		}
 	}
-	if len(entries) != len(routes) {
-		t.Errorf("%s holds %d routes, and the tree ships %v", mintedGoldenAt, len(entries), routes)
+	if len(entries) != len(minted) {
+		t.Errorf("%s holds %d routes, and the tree ships %d", mintedGoldenAt, len(entries), len(minted))
 	}
 }
 
@@ -446,20 +453,6 @@ func writesGolden(t *testing.T, at string, entries any) {
 	if err := os.WriteFile(at, out.Bytes(), 0o644); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// [[spec/tickets/schema-libs-leave]]
-func TestTheMintedGoldenMintsEveryRouteAgain(t *testing.T) {
-	t.Parallel()
-	if !*update {
-		t.Skip("go test ./src/quack -run TestTheMintedGoldenMintsEveryRouteAgain -update mints the golden again")
-	}
-	schemas := shippedSchemas(t)
-	entries := []mintedEntry{}
-	for _, route := range shippedRoutes(t) {
-		entries = append(entries, mintedEntry{Route: route, Text: mintedRoute(t, schemas, route)})
-	}
-	writesGolden(t, mintedGoldenAt, entries)
 }
 
 // The golden TestEveryDrawnGoldenMatchesTheProjection in src/modules/tickets reads. [[spec/tickets/branch-scripts-leave]]

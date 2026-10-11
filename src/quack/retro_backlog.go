@@ -91,7 +91,7 @@ func retroBacklogVerb(doors func() retroBacklogDoors) twin {
 
 // A backlog ticket closes on trunk and stands in no group. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroBacklogIsBacklog(text string) bool {
-	return retroCollectFieldOf(text, "state") == retroCollectClosed && !retroCollectIsGroup(text) && retroCollectFieldOf(text, retroCollectGroup) == ""
+	return retroFrontField(text, "state") == retroCollectClosed && !retroCollectIsGroup(text) && retroFrontField(text, retroCollectGroup) == ""
 }
 
 // A prose criterion is an Ask bullet naming no command in backticks. [[spec/tickets/the-retro-reads-the-backlog]]

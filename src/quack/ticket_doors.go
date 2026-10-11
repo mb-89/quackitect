@@ -66,7 +66,12 @@ func pullHere(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 			env[name] = value
 		}
 	}
-	rows, _ := configAt(method)
+	// A config that fails to parse stops the verb, so no threshold reads as zero unheard. [[spec/tickets/pull-reports-config-faults]]
+	rows, err := configAt(method)
+	if err != nil {
+		fmt.Fprintln(errs, err)
+		return nil, exitFailed
+	}
 	it := &pull.It{
 		Disk: pull.OSDisk{Root: work}, Git: repoAt(work), Now: wall.Now, Out: out, Err: errs,
 		Root: work, Method: method, Env: env, Agent: pull.AgentOf(env) != "", Cloud: pull.InCloud(env),

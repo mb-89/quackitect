@@ -180,3 +180,32 @@ func TestAQuotedItemStaysText(t *testing.T) {
 		t.Fatalf("the flow list reads %#v", tags)
 	}
 }
+
+// A quoted scalar reads as the text its quotes encode: a double-quoted escape decodes, a single-quoted doubled quote reads as one. [[spec/tickets/quoted-fronts-round-trip]]
+func TestAQuotedScalarDecodesItsEscapes(t *testing.T) {
+	t.Parallel()
+	for said, want := range map[string]string{
+		`"a \"quoted\" word"`: `a "quoted" word`,
+		`"C:\\tree\\spec"`:    `C:\tree\spec`,
+		`"one\ntwo\rthree"`:   "one\ntwo\rthree",
+		`"a \x stays"`:        `a \x stays`,
+		`'it''s here'`:        `it's here`,
+		`'a \ stays'`:         `a \ stays`,
+		`"a" and "b"`:         `a" and "b`,
+		`plain \\ text`:       `plain \\ text`,
+	} {
+		read, _ := Read("key: " + said).(*Doc)
+		if got := AsString(read.Get("key")); got != want {
+			t.Errorf("%s reads as %q, and wants %q", said, got, want)
+		}
+	}
+}
+
+// A flow item holding an escaped quote and a comma reads as one item. [[spec/tickets/flow-items-skip-escaped-quotes]]
+func TestAFlowItemKeepsAnEscapedQuote(t *testing.T) {
+	t.Parallel()
+	read, _ := Read(`key: ["a \"b, c\" d", "e"]`).(*Doc)
+	if got := AsList(read.Get("key")); !reflect.DeepEqual(got, []any{`a "b, c" d`, "e"}) {
+		t.Errorf("the flow list reads %#v", got)
+	}
+}

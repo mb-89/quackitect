@@ -164,12 +164,12 @@ func TestReRouted(t *testing.T) {
 			"---\nkind: [[ticket]]\nstate: open\n" + reroutedFront + "process_hash: fresh\nextra: kept after\n---\n" + reroutedBody},
 		{"no hash keeps the one the ticket carries", "", schema,
 			"---\nkind: [[ticket]]\nstate: open\n" + reroutedFront + "process_hash: old\nextra: kept after\n---\n" + reroutedBody},
-		{"no schema keeps the front's own order and writes no chapter", "", nil,
-			"---\nextra: kept after\nstate: open\nkind: [[ticket]]\n" + reroutedFront + "process_hash: old\n---\n"},
+		// A missing schema writes nothing, so no route drops the chapters. [[spec/tickets/route-keeps-its-chapters]]
+		{"no schema writes nothing", "", nil, ""},
 	}
 	for _, one := range cases {
 		t.Run(one.name, func(t *testing.T) {
-			if got := ReRouted(reroutedText, one.schema, route, one.hash); got != one.want {
+			if got, err := ReRoute(reroutedText, one.schema, route, one.hash); got != one.want || (err != nil) != (one.schema == nil) {
 				t.Errorf("ReRouted writes\n%s\nand the JS writes\n%s", got, one.want)
 			}
 		})

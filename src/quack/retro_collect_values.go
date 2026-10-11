@@ -7,7 +7,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"math"
 	"slices"
 	"sort"
@@ -115,55 +114,32 @@ func (o *retroCollectObject) MarshalJSON() ([]byte, error) {
 	return out.Bytes(), nil
 }
 
-// A JSON text read as JSON.parse reads it, an object keeping its key order, or false where it reads as no JSON. [[spec/guidance/retro/collect]]
+// A JSON text read through retroJSParse, the reader every retro verb shares, an object keeping its key order, or false where it reads as no JSON. [[spec/guidance/retro/collect]] [[spec/tickets/retro-json-readers-merge]]
 func retroCollectParsed(text string) (any, bool) {
-	reads := json.NewDecoder(strings.NewReader(text))
-	said, err := retroCollectDecode(reads)
-	if err != nil {
+	read, ok := retroJSParse(text)
+	if !ok {
 		return nil, false
 	}
-	if _, err := reads.Token(); err != io.EOF {
-		return nil, false
-	}
-	return said, true
+	return retroCollectOf(read), true
 }
 
-// One JSON value off the decoder. [[spec/guidance/retro/collect]]
-func retroCollectDecode(reads *json.Decoder) (any, error) {
-	token, err := reads.Token()
-	if err != nil {
-		return nil, err
-	}
-	mark, isDelim := token.(json.Delim)
-	if !isDelim {
-		return token, nil
-	}
-	if mark == '[' {
-		list := []any{}
-		for reads.More() {
-			one, err := retroCollectDecode(reads)
-			if err != nil {
-				return nil, err
-			}
-			list = append(list, one)
+// A value retroJSParse reads, its objects as collect holds them. [[spec/tickets/retro-json-readers-merge]]
+func retroCollectOf(value any) any {
+	switch held := value.(type) {
+	case *retroJSDict:
+		out := retroCollectNewObject()
+		for _, key := range held.keys {
+			out.set(key, retroCollectOf(held.values[key]))
 		}
-		_, err = reads.Token()
-		return list, err
-	}
-	object := retroCollectNewObject()
-	for reads.More() {
-		key, err := reads.Token()
-		if err != nil {
-			return nil, err
+		return out
+	case []any:
+		out := make([]any, len(held))
+		for at, one := range held {
+			out[at] = retroCollectOf(one)
 		}
-		one, err := retroCollectDecode(reads)
-		if err != nil {
-			return nil, err
-		}
-		object.set(key.(string), one)
+		return out
 	}
-	_, err = reads.Token()
-	return object, err
+	return value
 }
 
 // A value's key, where the value is an object. [[spec/guidance/retro/collect]]
