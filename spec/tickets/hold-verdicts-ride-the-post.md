@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1026d52fe5cbe103
         size: 1528
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box f9a277082525 · claude-code-remote · helper-4
+    hash_before: c7e35ecebbaf0146ffc68b183382f71f4442c22e
+    hash_after: c7e35ecebbaf0146ffc68b183382f71f4442c22e
+    inputs:
+      - name: design/draft
+        hash: 1026d52fe5cbe103
+        size: 1528
+      - name: design/tests-red
+        hash: e2a4e5279ba1fd3f
+        size: 790
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,12 @@ The test writes the main call's Read and then a helper's Grep on session s1 unde
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- verdict-test-takes-landed-value: The red test calls `held` with its present signature. The implement step rewrites that call to hand it the `landed` value `writes` answers.
+- hold-verdict-borrowed-case-tested: The red test shows the lost refusal alone. A case where the helper's call is refused and the main call passes would decide the borrowed verdict.
+- hook-folds-read-landed-place: The folds `marks`, `rows`, `repeats` and `answers` still read the session's current place. The brief and the stops read it the same way, and the draft names them outside this ask.
 
 # implement
 
