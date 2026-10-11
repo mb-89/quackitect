@@ -72,14 +72,11 @@ func rowOf(at time.Time, kind, text, detail string) LogRow {
 }
 
 // Appends the rows the holds fold names at the event's own place. A post standing in no tree writes nothing, and a failing write leaves the answer standing, as the marks do. [[spec/tickets/prompt-answers-off-the-door]]
-func (d *Door) rows(session, root string) {
+func (d *Door) rows(own ownLanding, root string) {
 	if root == "" {
 		return
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+	state, ok, seq := own.holds, own.stands, own.seq
 	if !ok || state.Said.Seq != seq || len(state.Said.Rows) == 0 {
 		return
 	}
@@ -109,14 +106,11 @@ func appendRows(at string, rows []LogRow) error {
 }
 
 // The owner's prompt the holds fold rewrites, answered as the event it arrived on, carrying the rewritten text and no before. [[spec/tickets/prompt-answers-off-the-door]]
-func (d *Door) rewrites(session string, post Post) (Effect, bool) {
+func (d *Door) rewrites(own ownLanding, post Post) (Effect, bool) {
 	if post.Event != promptEvent {
 		return Effect{}, false
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+	state, ok, seq := own.holds, own.stands, own.seq
 	if !ok || state.Said.Seq != seq || state.Said.Prompt == "" {
 		return Effect{}, false
 	}

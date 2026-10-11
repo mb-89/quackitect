@@ -169,11 +169,8 @@ func (d *Door) besideHolds(session string, event q.Event) q.Event {
 }
 
 // The after effects the brief answers the newest event with: one a block where the layer rides, each by its name, then the debt line. [[spec/tickets/brief-answers-off-the-door]]
-func (d *Door) briefs(session, root string, settings Settings) []Effect {
-	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+func (d *Door) briefs(session string, own ownLanding, root string, settings Settings) []Effect {
+	state, ok, seq := own.brief, own.briefOK, own.seq
 	if !ok || state.Said.Seq != seq {
 		return nil
 	}
@@ -219,11 +216,8 @@ var heard = map[string]string{
 }
 
 // The canary row the newest step heard: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]
-func (d *Door) repeats(session, root string) {
-	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+func (d *Door) repeats(own ownLanding, root string) {
+	state, ok, seq := own.brief, own.briefOK, own.seq
 	if !ok || state.Said.Seq != seq || state.Said.Heard == "" {
 		return
 	}

@@ -261,17 +261,17 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		return Answer{}, err
 	}
 	d.drops(own, root)
-	d.marks(session, root)
-	d.rows(session, root)
-	d.repeats(session, root)
+	d.marks(own, root)
+	d.rows(own, root)
+	d.repeats(own, root)
 	d.readsHealth(post)
 	d.hears(post)
 	effects := []Effect{}
-	if said, ok := d.rewrites(session, post); ok {
+	if said, ok := d.rewrites(own, post); ok {
 		effects = append(effects, said)
 	} else if said, ok := d.held(session, own, post, root); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.blocked(session, post); ok {
+	} else if said, ok := d.blocked(own, post); ok {
 		effects = append(effects, said)
 	} else if said, ok := d.describes(post); ok {
 		effects = append(effects, said)
@@ -282,7 +282,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		effects = append(effects, said)
 	} else if said, ok := d.reviewed(post, root); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.answers(session, post); ok {
+	} else if said, ok := d.answers(own, post); ok {
 		effects = append(effects, said)
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
@@ -303,7 +303,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	}
 	// A context read and a call passing on carry the brief. [[spec/tickets/brief-answers-off-the-door]]
 	if (post.Event == contextEvent || post.Event == toolEvent) && passesOn(effects) {
-		effects = append(effects, d.briefs(session, root, settings)...)
+		effects = append(effects, d.briefs(session, own, root, settings)...)
 	}
 	told := d.ended(session)
 	if post.Event == stopEvent {
@@ -352,12 +352,18 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	if err := store.Land(d.holdsOf(session), event); err != nil {
 		return ownLanding{}, err
 	}
-	own := ownLanding{seq: event.Seq}
-	own.holds, own.stands = store.Snapshot().Read(d.holdsOf(session)).(Holds)
 	if err := d.landsStops(session, event); err != nil {
-		return own, err
+		return ownLanding{}, err
 	}
-	return own, d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
+	if err := d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event)); err != nil {
+		return ownLanding{}, err
+	}
+	snap := store.Snapshot()
+	own := ownLanding{seq: event.Seq}
+	own.holds, own.stands = snap.Read(d.holdsOf(session)).(Holds)
+	own.stops, own.stopsOK = snap.Read(d.stopsOf(session)).(Stops)
+	own.brief, own.briefOK = snap.Read(d.briefOf(session)).(Brief)
+	return own, nil
 }
 
 func (d *Door) now() time.Time { return d.from.Clock.Now() }

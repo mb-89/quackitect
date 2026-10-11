@@ -58,14 +58,11 @@ func (state *Stops) marks() *Marks {
 }
 
 // Writes the marks the stops fold names at the event's own place. A post standing in no tree writes nothing, and a failing write leaves the answer standing, as the drops do. [[spec/tickets/cage-stop-marks-port]]
-func (d *Door) marks(session, root string) {
+func (d *Door) marks(own ownLanding, root string) {
 	if root == "" {
 		return
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.stopsOf(session)).(Stops)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+	state, ok, seq := own.stops, own.stopsOK, own.seq
 	if !ok || state.Said.Seq != seq || state.Said.Marks == nil {
 		return
 	}

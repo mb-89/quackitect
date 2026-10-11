@@ -107,18 +107,15 @@ func (state *Holds) logs(fields map[string]any, at time.Time) {
 }
 
 // The text the holds or the stops word for the session's newest call, as the tool's result. An event whose folds word none passes on. [[spec/tickets/log-report-stop-in-go]]
-func (d *Door) answers(session string, post Post) (Effect, bool) {
+func (d *Door) answers(own ownLanding, post Post) (Effect, bool) {
 	if post.Event != toolEvent {
 		return Effect{}, false
 	}
-	snap := d.from.Store.Snapshot()
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
-	if holds, ok := snap.Read(d.holdsOf(session)).(Holds); ok && holds.Said.Seq == seq && holds.Said.Result != "" {
+	seq := own.seq
+	if holds := own.holds; own.stands && holds.Said.Seq == seq && holds.Said.Result != "" {
 		return Effect{Kind: resultKind, Result: map[string]any{"result": holds.Said.Result}}, true
 	}
-	if stops, ok := snap.Read(d.stopsOf(session)).(Stops); ok && stops.Said.Seq == seq && stops.Said.Result != "" {
+	if stops := own.stops; own.stopsOK && stops.Said.Seq == seq && stops.Said.Result != "" {
 		return Effect{Kind: resultKind, Result: map[string]any{"result": stops.Said.Result}}, true
 	}
 	return Effect{}, false

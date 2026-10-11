@@ -265,3 +265,24 @@ func TestARefusedPostBetweenACallsWriteAndItsVerdictLeavesTheCallPassing(t *test
 		t.Fatalf("the post past the grace answers %+v, %v, and wants its own refusal", said, ok)
 	}
 }
+
+// A post's landing carries the holds, stops and brief folds at its own place, and a later post on the session moves none of them. [[spec/tickets/hook-folds-read-landed-place]]
+func TestALandingKeepsEveryFoldAtItsOwnPlace(t *testing.T) {
+	door := holdDoor(t, Settings{})
+	read := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Read"}})
+	own, err := door.writes("s1", read, Settings{}, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := door.writes("s1", read, Settings{}, ""); err != nil {
+		t.Fatal(err)
+	}
+	if !own.stands || !own.stopsOK || !own.briefOK {
+		t.Fatalf("the landing holds the folds %v %v %v, and wants all three", own.stands, own.stopsOK, own.briefOK)
+	}
+	for name, seq := range map[string]int64{"holds": own.holds.Said.Seq, "stops": own.stops.Said.Seq, "brief": own.brief.Said.Seq} {
+		if seq != own.seq {
+			t.Fatalf("the %s fold stands at %d, and wants the landing's own place %d", name, seq, own.seq)
+		}
+	}
+}

@@ -461,14 +461,11 @@ func (d *Door) landsStops(session string, event q.Event) error {
 }
 
 // The block the stops fold answers the newest Stop with, where it blocks, or the clear, where the conversation clears. [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/the-clear-continues-the-session]]
-func (d *Door) blocked(session string, post Post) (Effect, bool) {
+func (d *Door) blocked(own ownLanding, post Post) (Effect, bool) {
 	if post.Event != stopEvent {
 		return Effect{}, false
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.stopsOf(session)).(Stops)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+	state, ok, seq := own.stops, own.stopsOK, own.seq
 	if !ok || state.Said.Seq != seq {
 		return Effect{}, false
 	}

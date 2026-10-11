@@ -63,11 +63,15 @@ func (d *Door) holdsOf(session string) string {
 	return d.from.Bound(strings.Replace(HoldsName, sessionKey, session, 1))
 }
 
-// The event's place and the holds fold its own landing left, read under the door's lock, so a post landing after it moves neither. [[spec/tickets/hold-verdicts-ride-the-post]]
+// The event's place and the holds, stops and brief folds its own landing left, read under the door's lock, so a post landing after it moves none of them. [[spec/tickets/hold-verdicts-ride-the-post]] [[spec/tickets/hook-folds-read-landed-place]]
 type ownLanding struct {
-	seq    int64
-	holds  Holds
-	stands bool
+	seq     int64
+	holds   Holds
+	stands  bool
+	stops   Stops
+	stopsOK bool
+	brief   Brief
+	briefOK bool
 }
 
 // The effect the holds answer the event with, where they answer it: a refusal's text, or the rows a held call asks back for. A ride and a pass answer none. The verdict is the one the event's own landing left. [[spec/tickets/cage-call-holds-port]] [[spec/tickets/hold-verdicts-ride-the-post]]
