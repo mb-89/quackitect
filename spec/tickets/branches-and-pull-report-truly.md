@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box 8339730da099 · claude-code-remote
     hash_before: 8bc0fe6a95d04b62502f8563f3793623a75e0d55
     session: cse_01RM2uFRaD8apfsCAeTP7ifr
+  - step: sync
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: be7d268f318a5674c09c24d9b2a5a3f20fb49486
+    hash_after: be7d268f318a5674c09c24d9b2a5a3f20fb49486
+    answered:
+      - name: sync
+        exit: 0
+        said: work/branches-and-pull-report-truly already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -106,8 +115,9 @@ Done when every finding on the review list closes, done or with its reason.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
