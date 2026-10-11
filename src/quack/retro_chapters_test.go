@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -67,5 +68,25 @@ func TestRetroChaptersRefuseAGapBetweenTwoCutsAndALinePastEveryChapter(t *testin
 	code, _, errs = retroReadingRun(retroChaptersVerb, past, "retro", "chapters", retroReadingName)
 	if code != 1 || errs != "2 timed line(s) fall past every chapter\n" {
 		t.Fatalf("a line past every chapter answers %d, %q", code, errs)
+	}
+}
+
+// Chapters read their commits through the box's run door, and a failing git warns where the record carries none. [[spec/tickets/retro-chapters-take-git-door]]
+func TestRetroChaptersReadCommitsThroughTheRunDoor(t *testing.T) {
+	t.Parallel()
+	for said, want := range map[ranResult][]string{{stdout: "abc1234 one\ndef5678 two\n"}: {"abc1234 one", "def5678 two"}, {code: 128, stderr: "fatal: no repository"}: {}} {
+		root := t.TempDir() // level0: FixtureOutsideHome - each case writes its chapters into a tree of its own
+		retroReadingLay(t, root, retroReadingName, retroReadingWith(retroReadingInput, map[string]string{"chapters.json": retroReadingCuts}))
+		box := func() boxDoors {
+			d := retroBoxAt(root)()
+			d.run = func([]string, runOpts) ranResult { return said }
+			return d
+		}
+		code, _, errs := retroReadingRun(func(func() boxDoors) twin { return retroChaptersVerb(box) }, root, "retro", "chapters", retroReadingName)
+		var read struct{ Commits []string }
+		_ = json.Unmarshal([]byte(retroReadingFile(t, root, retroReadingName, "chapters/c1.json")), &read)
+		if code != 0 || !reflect.DeepEqual(read.Commits, want) || strings.Contains(errs, "git log answers 128") != (said.code != 0) {
+			t.Errorf("git answering %+v gives %d, the commits %v, and says %q", said, code, read.Commits, errs)
+		}
 	}
 }

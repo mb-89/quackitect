@@ -71,6 +71,8 @@ func (s *dryRun) clearRun(env map[string]string) *dryCleared {
 // The probe mints its own group, drops every park, and stands on its work branch as origin holds it, so the handover meets no work the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]] [[spec/tickets/probe-clone-drops-free-tags]]
 func grouped(d boxDoors, tree string, env map[string]string) dryRan {
 	opts := runOpts{cwd: tree, timeout: dryEventWait}
+	// A former run's client pushes the group into the repository the clone stands on, so the stale branch leaves before the pull fetches it over this one. [[spec/tickets/probe-drops-its-stale-group]]
+	d.run([]string{"git", "push", "-q", "origin", "--delete", "work/" + dryGroup}, opts)
 	minted := d.run([]string{filepath.Join(tree, "RUNME.sh"), "mint", "ticket", "spec/tickets/" + dryGroup + ".md", "--process=trivial"}, runOpts{cwd: tree, env: env, timeout: dryEventWait})
 	leaf := filepath.Join(tree, "spec", "tickets", dryLeaf+".md")
 	_ = d.disk.makeAll(filepath.Dir(leaf), 0o755)

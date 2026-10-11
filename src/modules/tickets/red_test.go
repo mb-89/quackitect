@@ -52,7 +52,30 @@ One piece of it.
 const (
 	pastRed   = "  - step: design/tests-red\n    hand: box one\n"
 	pastGreen = "  - step: implement/tests-green\n    hand: box one\n"
+	// A hand-back with --fail writes returns and why on its entry. [[spec/tickets/red-list-skips-failed-records]]
+	failedGreen = "  - step: implement/tests-green\n    hand: box one\n    hash_after: abc\n    returns: 1\n    why: the tests stay red\n"
+	failedRed   = "  - step: design/tests-red\n    hand: box one\n    hash_after: abc\n    why: no test fails\n"
 )
+
+// The front of a ticket text, between its fences. [[spec/tickets/red-list-skips-failed-records]]
+func headOf(text string) string {
+	return strings.SplitN(strings.TrimPrefix(text, "---\n"), "\n---\n", 2)[0]
+}
+
+// The progress counts a failed step as no pass, and a skipped one as a pass. [[spec/tickets/red-list-skips-failed-records]]
+func TestProgressCountsAFailedStepAsNoPass(t *testing.T) {
+	passedRed := "  - step: design/tests-red\n    hash_after: abc\n"
+	skipped := "  - step: implement/change\n    skipped: true\n    why: no change stands\n"
+	for record, want := range map[string]string{
+		passedRed + skipped:               "2/3",
+		passedRed + skipped + failedGreen: "2/3",
+		failedRed:                         "0/3",
+	} {
+		if got := progressOf(headOf(redOf(record))); got != want {
+			t.Errorf("the record\n%sreads %s, and wants %s", record, got, want)
+		}
+	}
+}
 
 func redOf(record string) string { return strings.Replace(redTicket, "%s", record, 1) }
 
@@ -88,6 +111,15 @@ func TestRedList(t *testing.T) {
 	t.Run("a skipped tests-red names none", func(t *testing.T) {
 		if got := RedList(redOf("  - step: design/tests-red\n    skipped: true\n")); len(got) != 0 {
 			t.Fatalf("a skipped tests-red reads %v, and wants none", got)
+		}
+	})
+	t.Run("a failed tests-green keeps the files, and a failed tests-red names none", func(t *testing.T) {
+		want := []string{"test/level0/one.test.js", "test/level0/two.test.js"}
+		if got := RedList(redOf(pastRed + failedGreen)); !reflect.DeepEqual(got, want) {
+			t.Fatalf("a failed tests-green reads %v, and wants %v", got, want)
+		}
+		if got := RedList(redOf(failedRed)); len(got) != 0 {
+			t.Fatalf("a failed tests-red reads %v, and wants none", got)
 		}
 	})
 	t.Run("an inserted tests-red-2 adds its own files", func(t *testing.T) {

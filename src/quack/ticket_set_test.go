@@ -75,9 +75,7 @@ func TestTicketSet(t *testing.T) {
 	})
 	t.Run("an empty value and a flag standing off drop the field", func(t *testing.T) {
 		for _, value := range [][]string{{}, {"false"}} {
-			root := t.TempDir()
-			t.Setenv(workRootVar, "")
-			seedFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+			root := editCaseTree(t)
 			seedFile(t, root, aThing, editCaseTicket("todo: true\n"))
 			code, out, _ := runsApart(t, root, false, append([]string{"ticket", "set", "a-thing", "todo"}, value...)...)
 			want := "spec/tickets/a-thing.md carries todo: " + map[int]string{0: "nothing", 1: "false"}[len(value)] + ".\n"
@@ -99,6 +97,21 @@ func TestTicketSet(t *testing.T) {
 		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "shut")
 		if got, _ := readIn(root, aThing); code != 2 || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") || got != editCaseTicket("") {
 			t.Fatalf("set group shut answers %d, %q, %q, and writes %q", code, out, errs, got)
+		}
+	})
+	// [[spec/tickets/ticket-verbs-read-method-routes]]
+	t.Run("under a vehicle set and urgent weigh the value against the schema under the method root", func(t *testing.T) {
+		method, work := t.TempDir(), t.TempDir()
+		seedFile(t, method, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+		seedFile(t, work, aThing, editCaseTicket(""))
+		t.Setenv(workRootVar, work)
+		for _, argv := range [][]string{{"ticket", "set", "a-thing", "group", "a-group"}, {"ticket", "urgent", "a-thing"}} {
+			if code, _, errs := runsApart(t, method, false, argv...); code != 0 {
+				t.Errorf("%v answers %d, %q", argv, code, errs)
+			}
+		}
+		if got, _ := readIn(work, aThing); !strings.Contains(got, "\ngroup: a-group\n") || !strings.Contains(got, "\nurgent: true\n") {
+			t.Errorf("the work root holds %q", got)
 		}
 	})
 	t.Run("set names the call it needs where a word is missing", func(t *testing.T) {

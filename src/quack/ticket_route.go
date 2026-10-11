@@ -50,8 +50,12 @@ func ticketRoute(rootOf func() (string, error)) twin {
 		if why, where := pull.RouteAheadOnly(held, steps); why != "" {
 			return routeAnswer(out, 1, "refused", why, "at", where)
 		}
-		schema := ticketSchema(disk.Root)
-		if err := disk.Write(at, check.ReRouted(text, schema, steps, "")); err != nil {
+		method, _ := methodDisk(rootOf)
+		routed, err := check.ReRoute(text, ticketSchema(method.Root), steps, "")
+		if err == nil {
+			err = disk.Write(at, routed)
+		}
+		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}

@@ -137,6 +137,23 @@
     "errs": "",
     "files": {}
    }
+  },
+  {
+   "name": "under a vehicle the fill reads the process and the schema off the method root",
+   "argv": [
+    "fill",
+    "spec/tickets/slow-lint.md"
+   ],
+   "files": {},
+   "want": {
+    "code": 0,
+    "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"process\":\"spec/processes/trivial\"}\n",
+    "errs": "",
+    "files": {
+     "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\n---\n\n# Ask\n\nThe lint drags on every save.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+    }
+   },
+   "vehicle": true
   }
  ]
 }

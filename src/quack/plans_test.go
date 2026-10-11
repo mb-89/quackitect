@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"quackitect/src/modules/hooks"
-	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/plans"
 	"quackitect/src/q"
 )
@@ -42,26 +41,10 @@ func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 	t.Parallel()
 	root, disk := "/tree", newFakeDisk()
 	hq2Seed(t, disk, filepath.Join(root, filepath.FromSlash(planFile)), `{"working":"","todos":[],"places":{},"kept":true}`)
-	c := q.New()
-	as := manager.Registers(c)
-	if one, ok := modules[plansModuleType]; ok {
-		one.registers(c)
-	}
-	store := q.NewStore(c)
-	served, err := manager.Serving(manager.Outside{
-		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
-		Steps: func(func()) {}, Clock: stillClock(),
-		Accept: plans.Accept(plansOutside(disk, root, store)),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer served.Stop()
-	said, err := served.Call(planAction, map[string]any{"working": "w", "add": []any{map[string]any{"title": "t1", "details": "d"}}}, "s1", findWait)
-	if err != nil || said.Error != "" {
-		t.Fatalf("the plan calls with %v %q, and wants an answer", err, said.Error)
-	}
-	if text := fmt.Sprint(said.Result); !strings.HasPrefix(text, "The plan stands: 1 todo(s) open, working on w.") {
+	text := servedCall(t, root, plansModuleType, func(store *q.Store) func(q.Request) (any, error) {
+		return plans.Accept(plansOutside(disk, root, store))
+	}, planAction, map[string]any{"working": "w", "add": []any{map[string]any{"title": "t1", "details": "d"}}})
+	if !strings.HasPrefix(text, "The plan stands: 1 todo(s) open, working on w.") {
 		t.Errorf("the plan answers %q, and wants it to open on the count and the work", text)
 	}
 	plan := planOn(t, disk, root)

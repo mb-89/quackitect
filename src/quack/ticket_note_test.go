@@ -208,6 +208,20 @@ func TestTicketNoteGuards(t *testing.T) {
 			t.Fatal("a refused note writes a file")
 		}
 	})
+	t.Run("note refuses a name past the flat pattern, and writes nothing", func(t *testing.T) {
+		root := noteCaseTree(t)
+		for _, name := range []string{"a/b", "../../src/quack/x"} {
+			code, out, errs := runsApart(t, root, false, "ticket", "note", name, "A line.")
+			if code != 2 || out != "" || errs != name+" stands outside the names a note takes. Name it in lower case, digits and hyphens.\n" {
+				t.Errorf("%s answers %d, %q, %q", name, code, out, errs)
+			}
+		}
+		for _, path := range []string{".se/tickets/a/b.md", "src/quack/x.md"} {
+			if _, stands := readIn(root, path); stands {
+				t.Errorf("a refused note writes %s", path)
+			}
+		}
+	})
 	t.Run("note writes under the work root, off the note process under the method root", func(t *testing.T) {
 		method, work := t.TempDir(), t.TempDir()
 		noteCaseMethod(t, method)

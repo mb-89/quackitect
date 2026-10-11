@@ -298,12 +298,15 @@ func retroMintOne(disk diskDoors, root string, run retroMintRun, ticket *retroMi
 	if err == nil {
 		err = disk.write(file, []byte(retroMintWithAsk(string(text), retroMintAskOf(*ticket))), 0o644)
 	}
+	// A refused write or open removes the draft it minted, so a rerun mints the same name, as retro new does. [[spec/tickets/retro-mint-cleans-its-draft]]
 	if err != nil {
+		_ = disk.remove(file)
 		fmt.Fprintln(errs, err)
 		return false
 	}
 	opened := run(root, []string{retroMintRunmeAt, "ticket", "open", ticket.Name}, env)
 	if opened.code != 0 {
+		_ = disk.remove(file)
 		fmt.Fprintf(errs, "%s opens not: %s %s\n", ticket.Name, strings.TrimSpace(opened.out), strings.TrimSpace(opened.errs))
 		return false
 	}

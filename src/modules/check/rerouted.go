@@ -4,6 +4,7 @@
 package check
 
 import (
+	"errors"
 	"strings"
 	"unicode"
 
@@ -12,8 +13,20 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The ticket text with the route in its front, the hash where one is named, and the chapters the route asks, each keeping what it holds. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+// The refusal where no ticket schema stands, since a body written with no schema drops every chapter. [[spec/tickets/route-keeps-its-chapters]]
+var ErrNoSchema = errors.New("the ticket schema stands nowhere under the method root, so the route writes nothing")
+
+// The text ReRoute writes, and nothing where it refuses, for a caller that guards the schema itself. [[spec/tickets/route-keeps-its-chapters]]
 func ReRouted(text string, schema *yaml.Doc, route []any, hash string) string {
+	routed, _ := ReRoute(text, schema, route, hash)
+	return routed
+}
+
+// The ticket text with the route in its front, the hash where one is named, and the chapters the route asks, each keeping what it holds, or a refusal where no schema stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+func ReRoute(text string, schema *yaml.Doc, route []any, hash string) (string, error) {
+	if schema == nil {
+		return "", ErrNoSchema
+	}
 	read := note.Read(text)
 	held := yaml.New()
 	for _, key := range read.Front.Said.Keys() {
@@ -49,7 +62,7 @@ func ReRouted(text string, schema *yaml.Doc, route []any, hash string) string {
 			rows = append(rows, "<!-- the form is "+one.form+" -->", "")
 		}
 	}
-	return jsTrimEnd(strings.Join(rows, "\n")) + "\n"
+	return jsTrimEnd(strings.Join(rows, "\n")) + "\n", nil
 }
 
 // The rows each wanted chapter takes off the text: by its chain of headings, or by its depth and header where that stands alone. [[spec/design_output/schema#the-render-follows-the-tree]]

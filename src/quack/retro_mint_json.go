@@ -4,9 +4,7 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	"io"
 	"math"
 	"strconv"
 	"strings"
@@ -23,61 +21,38 @@ type retroMintNode struct {
 	text  string
 }
 
-// Reads one JSON text, and refuses anything past its value. [[spec/guidance/retro/check]]
+// Reads one JSON text through retroJSParse, the reader every retro verb shares, and refuses anything past its value. [[spec/guidance/retro/check]] [[spec/tickets/retro-json-readers-merge]]
 func retroMintParse(text string) (*retroMintNode, error) {
-	dec := json.NewDecoder(strings.NewReader(text))
-	dec.UseNumber()
-	node, err := retroMintValue(dec)
-	if err != nil {
-		return nil, err
+	read, ok := retroJSParse(text)
+	if !ok {
+		return nil, errors.New("the text reads as no JSON")
 	}
-	if _, err := dec.Token(); !errors.Is(err, io.EOF) {
-		return nil, errors.New("the text runs past its value")
-	}
-	return node, nil
+	return retroMintNodeOf(read), nil
 }
 
-// Reads the next JSON value off the decoder. [[spec/guidance/retro/check]]
-func retroMintValue(dec *json.Decoder) (*retroMintNode, error) {
-	token, err := dec.Token()
-	if err != nil {
-		return nil, err
-	}
-	switch held := token.(type) {
-	case json.Delim:
+// A value retroJSParse reads, as a node keeping its key order. [[spec/tickets/retro-json-readers-merge]]
+func retroMintNodeOf(value any) *retroMintNode {
+	switch held := value.(type) {
+	case *retroJSDict:
+		node := &retroMintNode{kind: 'o', vals: map[string]*retroMintNode{}}
+		for _, key := range held.keys {
+			node.set(key, retroMintNodeOf(held.values[key]))
+		}
+		return node
+	case []any:
 		node := &retroMintNode{kind: 'a'}
-		if held == '{' {
-			node = &retroMintNode{kind: 'o', vals: map[string]*retroMintNode{}}
+		for _, one := range held {
+			node.items = append(node.items, retroMintNodeOf(one))
 		}
-		for dec.More() {
-			key := ""
-			if node.kind == 'o' {
-				word, err := dec.Token()
-				if err != nil {
-					return nil, err
-				}
-				key, _ = word.(string)
-			}
-			value, err := retroMintValue(dec)
-			if err != nil {
-				return nil, err
-			}
-			if node.kind == 'o' {
-				node.set(key, value)
-			} else {
-				node.items = append(node.items, value)
-			}
-		}
-		_, err := dec.Token()
-		return node, err
+		return node
 	case string:
-		return &retroMintNode{kind: 's', text: held}, nil
-	case json.Number:
-		return &retroMintNode{kind: 'n', text: held.String()}, nil
+		return &retroMintNode{kind: 's', text: held}
+	case float64:
+		return &retroMintNode{kind: 'n', text: strconv.FormatFloat(held, 'g', -1, numberBits)}
 	case bool:
-		return &retroMintNode{kind: 'b', text: strconv.FormatBool(held)}, nil
+		return &retroMintNode{kind: 'b', text: strconv.FormatBool(held)}
 	}
-	return &retroMintNode{kind: 'z'}, nil
+	return &retroMintNode{kind: 'z'}
 }
 
 // The value under a key of an object, or none. [[spec/guidance/retro/check]]
