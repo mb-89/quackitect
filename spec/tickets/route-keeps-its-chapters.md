@@ -165,7 +165,7 @@ A rerouted or updated ticket keeps its Ask and every chapter under a vehicle, be
 Under a vehicle, ticket route answers exit 0 and leaves the ticket holding only its front matter, so the Ask and every written chapter are lost without a word.
 
 - go test ./src/quack -run TestTicketRoute passes a vehicle case, with the method and the work root in separate temp dirs, where the routed note keeps its Ask text and every chapter
-- go test ./src/check -run TestReRouted passes a case where a nil schema refuses with an error and writes nothing
+- go test ./src/modules/check -run TestReRouted passes a case where a nil schema refuses with an error and writes nothing
 - ./RUNME.sh check is green
 
 none

@@ -34,11 +34,12 @@ parent: route-keeps-its-chapters
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The vehicle route case proves written chapter text survives the route, because its ticket holds text under a chapter and the case expects that text back.
 
-the vehicle case seeds `slow-lint.md` with text under the Ask alone, and its `draft`, `review` and `do` chapters stand empty. The case proves the headings come back, not that a written chapter keeps its words. Seed text under `draft` and want it back.
+A case whose chapters stand empty proves the headings come back, and a route dropping written text passes it.
+
+- go test ./src/quack -run TestTicketRouteVerb passes the vehicle case, whose ticket holds text under its draft chapter
+- ./RUNME.sh check is green
 
 # do
 

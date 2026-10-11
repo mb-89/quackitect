@@ -82,7 +82,12 @@ func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Re
 			fmt.Fprintln(errs, why)
 			return 1
 		}
-		if err := disk.Write(at, check.ReRouted(text, ticketSchema(disk.Root), steps, process.Hash)); err != nil {
+		method, _ := methodDisk(rootOf)
+		routed, err := check.ReRoute(text, ticketSchema(method.Root), steps, process.Hash)
+		if err == nil {
+			err = disk.Write(at, routed)
+		}
+		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}

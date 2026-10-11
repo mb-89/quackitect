@@ -41,6 +41,12 @@ func workDisk(rootOf func() (string, error)) (pull.OSDisk, error) {
 	return pull.OSDisk{Root: work}, err
 }
 
+// The disk under the method root, which holds the schemas and the processes a vehicle's tickets read. [[spec/tickets/route-keeps-its-chapters]]
+func methodDisk(rootOf func() (string, error)) (pull.OSDisk, error) {
+	method, _, err := rootsOf(rootOf)
+	return pull.OSDisk{Root: method}, err
+}
+
 // The ticket the first word names, and nothing where no word stands or none answers. [[spec/design_output/pull#the-private-queue]]
 func ticketNamed(disk pull.Disk, said []string) (string, bool) {
 	if wordAt(said, 0) == "" {

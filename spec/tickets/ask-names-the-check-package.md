@@ -34,11 +34,12 @@ parent: route-keeps-its-chapters
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The route ticket's ask names the package its test lives in, so its done_when line runs as written.
 
-the second `done_when` line runs `go test ./src/check`, a package the tree lacks. The test stands in `./src/modules/check`, so the line should name that path.
+The line names `./src/check`, which stands nowhere, so a hand running it meets no package.
+
+- the done_when line of route-keeps-its-chapters reads `go test ./src/modules/check -run TestReRouted`, and that command passes
+- ./RUNME.sh check is green
 
 # do
 

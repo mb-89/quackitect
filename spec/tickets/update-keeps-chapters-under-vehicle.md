@@ -34,11 +34,12 @@ parent: route-keeps-its-chapters
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+A ticket update under a vehicle keeps its Ask and every chapter, because a vehicle case runs the update over a method root and a work root apart.
 
-the ask names ticket update beside ticket route, and the draft changes both. But no case runs `ticket update` under a vehicle, so nothing proves the update keeps its chapters. Add a vehicle case to `testdata/ticket_update.json` once the sibling `ticket-verbs-read-method-routes` lands its process reads.
+The route ask covers ticket update, and no case runs it under a vehicle, so a fault there stands unseen.
+
+- go test ./src/quack -run TestTicketUpdateVerb passes a vehicle case, which ticket-verbs-read-method-routes adds with its process reads
+- ./RUNME.sh check is green
 
 # do
 

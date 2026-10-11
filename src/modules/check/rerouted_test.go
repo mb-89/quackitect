@@ -169,7 +169,7 @@ func TestReRouted(t *testing.T) {
 	}
 	for _, one := range cases {
 		t.Run(one.name, func(t *testing.T) {
-			if got := ReRouted(reroutedText, one.schema, route, one.hash); got != one.want {
+			if got, err := ReRoute(reroutedText, one.schema, route, one.hash); got != one.want || (err != nil) != (one.schema == nil) {
 				t.Errorf("ReRouted writes\n%s\nand the JS writes\n%s", got, one.want)
 			}
 		})

@@ -1,6 +1,7 @@
 // The route verb writes the steps past the pointer and answers JSON on both
 // roads, each case a tree, the words it runs and what the verb answers, kept
-// in testdata/ticket_route.json.
+// in testdata/ticket_route.json. A vehicle case reads the schema off the
+// method root, and keeps the text of every chapter.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 package main // level0: InPackageTest - a main package admits no outside test package
 
