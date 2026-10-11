@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -69,8 +70,13 @@ func splitVerb(rootOf func() (string, error), now func() time.Time, disk diskDoo
 			return exitUsage
 		}
 		for _, one := range cuts {
-			if one.path == from {
+			if splitKey(one.path) == splitKey(from) {
 				fmt.Fprintf(errs, "%s is the source and a target, so the cut writes over what it reads.\n", from)
+				return exitUsage
+			}
+			// A target outside the root lands where no undo of this tree reaches. [[spec/tickets/split-guard-cleans-paths]]
+			if key := splitKey(one.path); key == ".." || strings.HasPrefix(key, "../") || path.IsAbs(key) {
+				fmt.Fprintf(errs, "%s stands outside the tree, so the split writes nothing there.\n", one.path)
 				return exitUsage
 			}
 		}
@@ -107,7 +113,11 @@ func splitWrote(disk diskDoors, root, from, was, rest string, targets []edits.Ch
 	stamp := at.UTC().Format(isoStamp)
 	// The entry names this run, so an undo takes this cut and no other. [[spec/design_output/apply#the-journal-holds-both-halves]]
 	on := splitBy + ":" + stamp
-	where := filepath.Join(root, filepath.FromSlash(edits.Journal), edits.NameOf(stamp))
+	folder := filepath.Join(root, filepath.FromSlash(edits.Journal))
+	where := filepath.Join(folder, edits.FreeName(stamp, func(name string) bool {
+		_, err := disk.stat(filepath.Join(folder, name))
+		return err == nil
+	}))
 	if err := writesFile(disk, where, journalText(edits.JournalOf(stamp, on, splitBy, files, ""))); err != nil {
 		fmt.Fprintf(errs, "The journal would not write, so nothing did: %v\n", err)
 		return exitFailed
@@ -212,11 +222,16 @@ func splitSourceOf(said []string) string {
 	return ""
 }
 
-// The first target two cuts name, read past a leading ./ and a backslash. [[spec/design_output/level0#a-verb-cuts-the-file]]
+// A path as the disk reads it: slashed and cleaned, so ./a.go and sub/../a.go name a.go. [[spec/tickets/split-guard-cleans-paths]]
+func splitKey(said string) string {
+	return path.Clean(strings.ReplaceAll(said, `\`, "/"))
+}
+
+// The first target two cuts name, in any spelling. [[spec/design_output/level0#a-verb-cuts-the-file]]
 func splitRepeated(cuts []splitCut) string {
 	seen := map[string]bool{}
 	for _, one := range cuts {
-		key := strings.TrimPrefix(strings.ReplaceAll(one.path, `\`, "/"), "./")
+		key := splitKey(one.path)
 		if seen[key] {
 			return one.path
 		}

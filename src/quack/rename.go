@@ -72,9 +72,11 @@ func renameVerb(d landingDoors) twin {
 			return 0
 		}
 		// A module's name stands as no path, so the text flag rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
-		said := d.renaming(from, to)
+		var said renamed
 		if slices.Contains(argv, textFlag) {
 			said = d.renamingText(from, to)
+		} else {
+			said = d.renaming(from, to)
 		}
 		if said.why != "" {
 			fmt.Fprintln(errs, said.why)
@@ -322,7 +324,11 @@ func (d landingDoors) journals(from, to string, order []string, journal map[stri
 	if err := d.box.disk.makeAll(folder, renamedFolderMode); err != nil {
 		return err
 	}
-	return d.box.disk.write(filepath.Join(folder, edits.NameOf(stamp)), append(text, '\n'), renamedMode)
+	name := edits.FreeName(stamp, func(name string) bool {
+		_, err := d.box.disk.stat(filepath.Join(folder, name))
+		return err == nil
+	})
+	return d.box.disk.write(filepath.Join(folder, name), append(text, '\n'), renamedMode)
 }
 
 // Several holds name several tickets, and a move belongs to none of them alone. [[spec/tickets/journal-the-rename-verb]]

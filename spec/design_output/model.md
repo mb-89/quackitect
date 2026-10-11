@@ -1114,6 +1114,11 @@ keeps its deadline under the config key the table names.
 A run past its deadline gets cancelled, its undo steps run where it is an
 action, and the index restarts its process.
 
+An action declaring no deadline takes `watchdog.deadlineAction`, which
+`bookSettingsOf` in `src/modules/index/ops.go` reads. A writer past its
+deadline fails, and holds the writer slot until its run returns, so no second
+writer runs beside it.
+
 ## A stale mark
 
 A lease that expires marks its part stale:

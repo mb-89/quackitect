@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 153af28d261cc1982a22dcdfb99ac06b6a5c30b3
+    hash_after: 03ae43fcaf13f79746c1e50ecc108ee5da53d52e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   59.4  in all"
+    inputs:
+      - name: ask
+        hash: 217bb10ffd15b067
+        size: 528
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`NoLogDeleted` reads the JavaScript, Go and shell under `src` and `.claude`, past the Go tests, which clear their own temp logs. `deletesAt` in `src/modules/check/install.go` takes `os.Remove`, `os.RemoveAll` and `rmSync` in any case. A grep of the tracked tree with the widened patterns finds no line deleting a log, so the check raises no new row. `TestNoLogDeletedRefusesALineReachingALog` covers Go, rmSync and shell, and failed red on each before the change.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch, with the Go tests left out
+- the probe over the tree found no false row, and the check stayed green
+- the source shape stands in `sourceFile` alone
 
 # Discussion
 

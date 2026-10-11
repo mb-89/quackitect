@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 97e45157870d5eba457891fabe69810a6daf4d10
+    hash_after: a7a5ece904036867d2ce2000050bd3d9013b909c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   59.2  in all"
+    inputs:
+      - name: ask
+        hash: 08808c27d8241d40
+        size: 550
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`Tree.Names` in `src/modules/check/tree.go` trims a folder trailing slash before it asks the source, so `Texts.Names` and the disk answer alike. `groupAsksNobody` now reads the tickets in the sweep and the editor, as it did in lint. `TestGroupAsksNobodyFiresInTheSweep` failed red and passes now.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change takes the fix sketch second form, in `Tree.Names` once
+- the slash rule stands in `Tree.Names` alone
+- the check stays green with the rule live in the sweep
 
 # Discussion
 

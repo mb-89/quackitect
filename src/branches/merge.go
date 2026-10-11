@@ -49,12 +49,28 @@ func (d *Doors) marks(name string, on bool) bool {
 	return true
 }
 
+// Commits what a verb staged. A refusal takes each path the verb wrote back to HEAD's text, raises git's words, and answers false, so the verb pushes nothing. [[spec/tickets/done-refuses-on-refused-commit]]
+func (d *Doors) commitsOrStops(message string, wrote []string) bool {
+	fault := d.committed(message, nil)
+	if fault == "" {
+		return true
+	}
+	_ = d.Repo.Reset(wrote)
+	for _, at := range wrote {
+		_ = d.write(at, d.textAt("HEAD", at))
+	}
+	d.raises(failure.Raise(d.Failures, "branch-commit-refused", "The commit "+message+" came back refused, so nothing is pushed.", fault))
+	return false
+}
+
 // The marker lands on trunk once the branch stands, so a refused branch push leaves trunk bare. [[spec/tickets/groups-carry-the-cloud-marker]]
 func (d *Doors) marksTrunk(name string) bool {
 	if !d.marks(name, true) {
 		return true
 	}
-	_, _ = d.Repo.Commit(name+": opens in the cloud", nil)
+	if !d.commitsOrStops(name+": opens in the cloud", []string{ticketAt(name)}) {
+		return false
+	}
 	if d.push(trunk) {
 		return true
 	}
@@ -350,7 +366,7 @@ func closeVerb(d *Doors, name string, argv []string) int {
 		d.say("No work branch stands inside %s.", trunk)
 		return codeOK
 	}
-	shut := 0
+	shut, refused := 0, false
 	for _, branch := range wanted {
 		if !inTrunk[branch] && !forced {
 			d.warn("%s is outside %s, so closing it drops its work.", branch, trunk)
@@ -358,7 +374,10 @@ func closeVerb(d *Doors, name string, argv []string) int {
 			continue
 		}
 		if d.marks(ticketNamed(branch), false) {
-			_, _ = d.Repo.Commit(ticketNamed(branch)+": leaves the cloud", nil)
+			if !d.commitsOrStops(ticketNamed(branch)+": leaves the cloud", []string{ticketAt(ticketNamed(branch))}) {
+				refused = true
+				continue
+			}
 			if !d.push(trunk) {
 				d.warn("The push of %s comes back refused, so %s stands.", trunk, branch)
 				continue
@@ -375,7 +394,7 @@ func closeVerb(d *Doors, name string, argv []string) int {
 		d.say("%s is closed%s.", branch, unmerged)
 		shut++
 	}
-	if shut > 0 || name == "" {
+	if !refused && (shut > 0 || name == "") {
 		return codeOK
 	}
 	return codeRed

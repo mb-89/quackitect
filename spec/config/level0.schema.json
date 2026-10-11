@@ -161,6 +161,12 @@
           "default": false,
           "help": "The stronger door on a person's hand. Switched on, a person's hand-back on a tracked ticket meets a signed tip."
         },
+        "progressAfter": {
+          "type": "string",
+          "default": "30m",
+          "help": "The age of a live hold's tip past which it reads stalled. Past twice it, a first take moves the hold, and a take over hands it to a person.",
+          "unit": "a span, as 90m, 12h or 3d"
+        },
         "refusalsBeforeFail": {
           "type": "number",
           "default": 5,

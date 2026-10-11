@@ -269,7 +269,7 @@ matcher leaves out `clear`, since a clear goes on inside a living box.
 | the last beat | the hold reads |
 |---|---|
 | ends, at or past the tip's second | dead at once |
-| beats, younger than `work.beatAfter` | live, whatever the tip's age |
+| beats, younger than `work.beatAfter` | live, and it stalls where the tip's age passes `work.progressAfter` |
 | none, or older | by the tip's age against `work.staleAfter` |
 
 A beat younger than half of `work.beatAfter` writes nothing, so a beat at
@@ -284,6 +284,24 @@ and the list reads the refs it brings.
 | `branch take <name>` | refuses, naming the beat's age | takes it over |
 | `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
 | `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
+
+### A live hold stalls
+
+A beat says the box lives, and the tip says it moves. A live hold whose tip
+stands older than `work.progressAfter` stalls. `staleClaim` in
+`src/branches/beat.go` reads it.
+
+| the tip's age on a live hold | the hold reads | who acts |
+|---|---|---|
+| past `work.progressAfter` | live, and it stalls | the Stop hook asks the box for a handover, once a tip |
+| past twice it, on a first take | stale | the dispatcher fires a fresh box, which takes it over |
+| past twice it, on a take over | live and a person's | the dispatch plan names it under `stalled`, for a person |
+
+- A take over a standing hold writes `over: true` on its record entry, so the second stall reads a person's.
+- `branch list` writes `stalled` and the tip's age beside a stalled hold, and puts a person's under yours.
+- The dispatch plan lists every stalled hold under `stalled`. The dry run prints the part, and the Action reads its JSON.
+- `branch beat` prints the Stop hook's `block` answer on a hold that stalls, and keeps that tip under `.se/.runtime`.
+- The pre-push door reads a hold past twice `work.progressAfter` stale, so the fresh box's take lands.
 
 ## A red commit reaches rescue
 
@@ -301,6 +319,30 @@ The work branch stays green, so CI and the pull request read no red commit.
 
 A desk, and a branch off `work/`, write no rescue. The push door lets the red
 push through, since CI guards a work branch.
+
+## A takeover reads the beat
+
+A box dies with its runtime folder, so its beat carries what the next box
+needs. `src/branches/left.go` holds the mechanism.
+
+| what | where it stands |
+|---|---|
+| the step in hand | the file `step` on the beat: the ticket path and the step the hold names |
+| the handover | the file `HANDOVER.md` on the beat, off `.se/HANDOVER.md` where one stands |
+| the beat itself | a commit on the empty one, so the hold verdicts read its subject and its time |
+
+A take over prints a block `What the box before left:` ahead of the ask:
+
+1. the last beat's age and hand
+2. the step in hand, off the beat
+3. the last record entry of that ticket
+4. every commit since the open take's `hash_before`
+5. the rescue the take takes in
+6. the handover, or `no handover`
+
+The take reads the old beat before it writes its own. A beat inside half the
+span writes nothing, so the step can trail the hold by that much. A plain take
+prints no block.
 
 # A box leaves
 

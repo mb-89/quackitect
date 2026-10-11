@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"quackitect/src/failure"
@@ -16,7 +17,7 @@ import (
 )
 
 // The flags that take a value, so the value reads as no name, and the short hash a refusal names. [[spec/design_output/pull#a-hand-of-its-own]]
-var takes = []string{"--as", "--fail", "--became", "--answered", "--back", "--fields"}
+var takes = []string{"--as", "--fail", "--became", "--answered", "--back", "--fields", reopenFlag, nextFlag}
 
 const (
 	shortSha = 8
@@ -145,16 +146,17 @@ type ToolAnswer struct {
 	Spawn  string `json:"spawn,omitempty"`
 }
 
-// The tool's answer off the pull's text: a spawn answer hands the rows past its first blank row as the hand's prompt. [[spec/design_output/pull#a-hand-of-its-own]]
+// The tool's answer off the pull's text: a spawn answer, past any work lines a hand-back prints first, hands the rows past its first blank row as the hand's prompt. [[spec/tickets/tool-pull-finds-the-spawn]]
 func ToolAnswerOf(text string) ToolAnswer {
 	said := ToolAnswer{Result: text}
 	rows := strings.Split(text, "\n")
-	if strings.TrimSpace(rows[0]) != spawn {
+	from := slices.IndexFunc(rows, func(row string) bool { return strings.TrimSpace(row) == spawn })
+	if from < 0 {
 		return said
 	}
-	for at, row := range rows {
+	for at, row := range rows[from:] {
 		if row == "" {
-			said.Spawn = strings.TrimSpace(strings.Join(rows[at+1:], "\n"))
+			said.Spawn = strings.TrimSpace(strings.Join(rows[from+at+1:], "\n"))
 			break
 		}
 	}
@@ -400,16 +402,25 @@ func (it *It) dropped(who *Who) int {
 
 // [[spec/design_output/pull#the-pull-fetches-first]]
 func (it *It) fetched(branch string) bool {
-	_ = it.Git.Fetch(branch)
+	if err := it.Git.Fetch(branch); err != nil {
+		it.Refuse(failure.Raise(it.Failures, "pull-fetch-refused", fmt.Sprintf("The fetch of %s fails, so the pull reads no current tree.", branch), strings.TrimSpace(err.Error())))
+		return false
+	}
 	behind, ok := it.Git.Count("HEAD", "origin/"+branch)
 	if !ok || behind == 0 {
 		return true
 	}
-	if it.Git.FastForward("origin/"+branch) == nil {
+	err := it.Git.FastForward("origin/" + branch)
+	if err == nil {
 		return true
 	}
+	// Divergence takes commits on both sides, and every other refusal is git's own to name. [[spec/tickets/fetch-names-the-real-fault]]
+	if ahead, _ := it.Git.Count("origin/"+branch, "HEAD"); ahead == 0 {
+		it.Refuse(failure.Raise(it.Failures, "pull-fast-forward-refused", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and git refuses the fast-forward.", branch, behind), strings.TrimSpace(err.Error())))
+		return false
+	}
 	it.Refuse(failure.Raise(it.Failures, "pull-origin-diverges", fmt.Sprintf("origin/%s holds %d commit(s) this box lacks, and the two diverge.", branch, behind),
-		fmt.Sprintf("Run git pull --rebase origin %s, then pull again.", branch)))
+		fmt.Sprintf("Commit or stash the edits in the tree, run git pull --rebase origin %s, then pull again.", branch)))
 	return false
 }
 
@@ -451,7 +462,7 @@ func (it *It) stillHeld(held Hold) int {
 	again := "  Read them whole with " + CallOf("branch", "guidance", as...) + "."
 	rows := []string{
 		fmt.Sprintf("%s stands in your hand at %s, and one hand holds one ticket.", held.Ticket, held.Step),
-		fmt.Sprintf("Hand it back: %s, or --fail \"why\" in place of --pass.", CallOf("ticket", "pull", append(append([]string{held.Ticket}, as...), "--pass")...)),
+		fmt.Sprintf("Hand it back: %s, or --fail \"why\" in place of --pass.", it.backCall(append(append([]string{held.Ticket}, as...), "--pass")...)),
 	}
 	if why != "" {
 		names := []string{}
@@ -531,7 +542,10 @@ func (it *It) takeBack(who *Who, name, path string) int {
 	text := withEntry(one.Text, pair("step", path), pair("hand", role), pair("hash_before", tip), pair("hash_after", tip),
 		pair("returns", returnsOf(one.Front, path)+1), pair("why", "the hand takes it back"))
 	one.Text = withField(withField(text, "step", path), "state", Open)
-	it.landed(one, []string{role + " takes " + path + " back"}, nil)
+	if finding := it.landed(one, []string{role + " takes " + path + " back"}, nil); finding != "" {
+		it.Refuse(failure.Raise(it.Failures, "pull-commit-refused", append(refusedRows(finding), "", fmt.Sprintf("Fix it, and take %s back at %s again.", name, path))...))
+		return 1
+	}
 	if !one.Private {
 		if ok, why := it.pushed(who.Branch); !ok {
 			it.Refuse(failure.Raise(it.Failures, "pull-push-refused", append([]string{"The take-back stands on this box, and its push reaches no origin."}, why...)...))

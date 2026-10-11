@@ -79,6 +79,21 @@ func TestANamedBuiltInReadsItsNumber(t *testing.T) {
 }
 
 // A hold whose box stops beating reads dead before its tip goes stale, so beat-after stands shorter than stale-after. [[spec/tickets/beat-after-joins-schema]]
+// The work settings carry progress-after, a span a stalled hold reads past. [[spec/design_output/work#a-live-hold-stalls]]
+func TestProgressAfterStandsInTheWorkSettings(t *testing.T) {
+	c := q.New()
+	Of("work")(c)
+	for _, key := range c.Keys() {
+		if key.Local == "progress-after" {
+			if _, err := time.ParseDuration(strings.Trim(key.Default, `"`)); err != nil {
+				t.Fatalf("progress-after reads the built-in %s, which no span parses: %v", key.Default, err)
+			}
+			return
+		}
+	}
+	t.Fatal("the work settings carry no progress-after")
+}
+
 func TestBeatAfterStandsShorterThanStaleAfter(t *testing.T) {
 	c := q.New()
 	Of("work")(c)

@@ -76,6 +76,8 @@ func grouped(d boxDoors, tree string, env map[string]string) dryRan {
 	_ = d.disk.makeAll(filepath.Dir(leaf), 0o755)
 	_ = d.disk.write(leaf, []byte(dryLeafText), 0o644)
 	unparked(d, tree)
+	// The clone's origin is the box's own tree, so an earlier probe's pass pushed its work branch there. The drop keeps the pull from meeting that one diverging. [[spec/tickets/rename-text-moves-nothing]]
+	d.run([]string{"git", "push", "-q", "origin", "--delete", "work/" + dryGroup}, opts)
 	branched := d.run([]string{"git", "checkout", "-q", "-B", "work/" + dryGroup}, opts)
 	d.run(append(append([]string{"git"}, dryAuthor...), "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"), opts)
 	pushed := d.run([]string{"git", "update-ref", "refs/remotes/origin/work/" + dryGroup, "HEAD"}, opts)

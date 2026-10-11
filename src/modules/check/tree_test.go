@@ -106,10 +106,20 @@ func TestExtensionsOnOfferRefusesADroppedExtensionAndAStrangeFormatter(t *testin
 }
 
 func TestNoLogDeletedRefusesALineReachingALog(t *testing.T) {
-	tree := TreeOver("/tree", Texts{"src/doors/log.js": "export function log() {\n  files.remove(logFolder);\n}\n"})
-	found := noLogDeleted(tree)
-	if len(found) != 1 || found[0].Rule != "NoLogDeleted" || found[0].File != "src/doors/log.js" || found[0].Line != 2 {
-		t.Fatalf("a line deleting a log draws %+v, and wants NoLogDeleted on src/doors/log.js line 2", found)
+	for path, text := range map[string]string{
+		"src/doors/log.js":  "export function log() {\n  files.remove(logFolder);\n}\n",
+		"src/x/log.go":      "package x\n\tos.Remove(logPath)\n",
+		"src/x/all.go":      "package x\n\tos.RemoveAll(logDir)\n",
+		"src/doors/sync.js": "// clears\n  fs.rmSync(logPath);\n",
+		"src/x/clear.sh":    "#!/bin/sh\nrm -f \"$log\"\n",
+	} {
+		found := noLogDeleted(TreeOver("/tree", Texts{path: text}))
+		if len(found) != 1 || found[0].Rule != "NoLogDeleted" || found[0].File != path || found[0].Line != 2 {
+			t.Errorf("a line deleting a log draws %+v, and wants NoLogDeleted on %s line 2", found, path)
+		}
+	}
+	if found := noLogDeleted(TreeOver("/tree", Texts{"src/x/log_test.go": "package x\n\tos.Remove(logPath)\n"})); len(found) != 0 {
+		t.Errorf("a test clearing its own log draws %+v, and wants nothing", found)
 	}
 }
 

@@ -104,8 +104,11 @@ func runUnder(life context.Context, one Command) Said {
 		return Said{Out: out.String(), Err: errs.String(), Code: Signalled}
 	case exit != nil:
 		return Said{Out: out.String(), Err: errs.String(), Code: exit.ExitCode()}
+	// The run exits, and a child it starts holds the pipes past their close, so the exit stands and the output read so far with it. [[spec/tickets/proc-keeps-late-pipe-runs]]
+	case errors.Is(err, exec.ErrWaitDelay) && cmd.ProcessState != nil:
+		return Said{Out: out.String(), Err: errs.String(), Code: cmd.ProcessState.ExitCode()}
 	case err != nil:
-		return Said{Err: err.Error(), Code: NotStarted}
+		return Said{Out: out.String(), Err: err.Error(), Code: NotStarted}
 	}
 	return Said{Out: out.String(), Err: errs.String()}
 }

@@ -33,6 +33,7 @@ var (
 	goTest     = regexp.MustCompile(`^src/.*_test\.go$`)
 	srcFolder  = regexp.MustCompile(`^src/[^.]*$`)
 	goFail     = regexp.MustCompile(`(?m)^(---\s+)?FAIL`)
+	goBuild    = regexp.MustCompile(`\[(build|setup) failed\]`)
 	goError    = regexp.MustCompile(`[Ee]rror|cannot|undefined`)
 	testFunc   = regexp.MustCompile(`(?m)^func (Test\w+)\(`)
 	notOK      = regexp.MustCompile(`(?m)^\s*not ok \d+ - (.+)$`)
@@ -178,13 +179,13 @@ func (d *Doors) goTestNames(paths []string) []string {
 	return out
 }
 
-// The word a Go run answers: green, assertion or build. [[spec/design_output/pull#the-test-verb]]
+// The word a Go run answers: green, assertion or build, where a build mark reads build before any FAIL line. [[spec/design_output/pull#the-test-verb]] [[spec/tickets/go-build-failure-reads-build]]
 func goSays(ran Said, where string) string {
 	out := ran.Out + "\n" + ran.Err
 	if ran.OK {
 		return "green, " + where + " passes"
 	}
-	if goFail.MatchString(out) {
+	if goFail.MatchString(out) && !goBuild.MatchString(out) {
 		return "assertion, a test of " + where + " fails"
 	}
 	line := "the run answers nothing"
@@ -332,7 +333,7 @@ func (d *Doors) redTest(argv []string) int {
 // Each working text goes aside before HEAD's text takes its place, and a source HEAD lacks stands aside whole. [[spec/design_output/pull#a-test-proves-red]]
 func (d *Doors) setAside(sources []string) {
 	var list []aside
-	for _, one := range sources {
+	for _, one := range d.asideFiles(sources) {
 		kept := d.exists(one)
 		if kept {
 			_ = d.write(asideAt+"/"+one, d.read(one))
@@ -346,6 +347,28 @@ func (d *Doors) setAside(sources []string) {
 			d.remove(one)
 		}
 	}
+}
+
+// The files the sources name, each once: a file itself, and a folder each file under it on disk or at HEAD. [[spec/tickets/red-test-keeps-named-sources]]
+func (d *Doors) asideFiles(sources []string) []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, one := range sources {
+		paths := []string{one}
+		if _, file, _ := d.Disk.Read(one); !file {
+			atHead, _ := d.Repo.Files("HEAD", one)
+			if under := append(d.filesUnder(one), atHead...); len(under) > 0 {
+				paths = under
+			}
+		}
+		for _, path := range paths {
+			if !seen[path] {
+				seen[path] = true
+				out = append(out, path)
+			}
+		}
+	}
+	return out
 }
 
 // Puts every source set aside back, so a killed run leaves nothing behind. [[spec/design_output/pull#a-test-proves-red]]

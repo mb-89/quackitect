@@ -24,6 +24,14 @@ type heldRow struct {
 	Age    string `json:"age"`
 }
 
+// A live hold whose tip stalls past work.progressAfter, and whether it stands a person's. [[spec/design_output/work#a-live-hold-stalls]]
+type stalledRow struct {
+	Group  string `json:"group"`
+	Branch string `json:"branch"`
+	Age    string `json:"age"`
+	Person bool   `json:"person"`
+}
+
 // A group and the groups it waits on. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 type waitRow struct {
 	Group string   `json:"group"`
@@ -57,16 +65,17 @@ type writeRow struct {
 
 // The plan in the order the Action reads its JSON. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 type dispatchPlan struct {
-	Ready   []readyRow  `json:"ready"`
-	Held    []heldRow   `json:"held"`
-	Waiting []waitRow   `json:"waiting"`
-	Stuck   []stuckRow  `json:"stuck"`
-	Bundles []bundle    `json:"bundles"`
-	Opens   []string    `json:"opens"`
-	Closes  []string    `json:"closes"`
-	Person  []personRow `json:"person"`
-	Write   *writeRow   `json:"write,omitempty"`
-	Fire    *fireRow    `json:"fire,omitempty"`
+	Ready   []readyRow   `json:"ready"`
+	Held    []heldRow    `json:"held"`
+	Waiting []waitRow    `json:"waiting"`
+	Stuck   []stuckRow   `json:"stuck"`
+	Stalled []stalledRow `json:"stalled"`
+	Bundles []bundle     `json:"bundles"`
+	Opens   []string     `json:"opens"`
+	Closes  []string     `json:"closes"`
+	Person  []personRow  `json:"person"`
+	Write   *writeRow    `json:"write,omitempty"`
+	Fire    *fireRow     `json:"fire,omitempty"`
 	// The work branches at done that carry a commit main lacks, whose pull request the fire opens. [[spec/tickets/dispatch-skips-merged-done-branches]]
 	Done []string `json:"done,omitempty"`
 	// The work branches standing at done, which a red fire reads. [[spec/tickets/ci-reds-name-their-cases]]
@@ -78,6 +87,7 @@ var planParts = [][2]string{
 	{"ready", "ready groups, one worker each"},
 	{"stuck", "stuck hand-overs, one worker each"},
 	{"held", "groups a fresh hold keeps"},
+	{"stalled", "live holds whose tip stands still, a person's where a take over stalled again"},
 	{"waiting", "groups waiting on another"},
 	{"bundles", "loose agent tickets, one fix group per parent"},
 	{"opens", "groups on main that open a branch"},
@@ -106,7 +116,7 @@ func (d *Doors) planned() (*dispatchPlan, workRead) {
 	trunkTickets := trunkOf(loose)
 	free := d.freeIn(stood, standing, now, trunkTickets)
 	freed := map[string]bool{}
-	plan := &dispatchPlan{Ready: []readyRow{}, Held: []heldRow{}, Waiting: []waitRow{}, Stuck: []stuckRow{}, atDone: map[string]bool{}}
+	plan := &dispatchPlan{Ready: []readyRow{}, Held: []heldRow{}, Waiting: []waitRow{}, Stuck: []stuckRow{}, Stalled: []stalledRow{}, atDone: map[string]bool{}}
 	for _, one := range free {
 		freed[one.Branch] = true
 		plan.Ready = append(plan.Ready, readyRow{Group: one.Name, Branch: one.Branch})
@@ -114,8 +124,12 @@ func (d *Doors) planned() (*dispatchPlan, workRead) {
 	for _, one := range stood {
 		switch standing[one.Branch] {
 		case held:
+			read := d.staleClaim(one, now)
+			if read.Stalled {
+				plan.Stalled = append(plan.Stalled, stalledRow{Group: one.Name, Branch: one.Branch, Age: read.Age, Person: read.Person})
+			}
 			if !freed[one.Branch] {
-				plan.Held = append(plan.Held, heldRow{Group: one.Name, Branch: one.Branch, Age: d.staleClaim(one, now).Age})
+				plan.Held = append(plan.Held, heldRow{Group: one.Name, Branch: one.Branch, Age: read.Age})
 			}
 		case todo:
 			if waits := waitsOf(one, standing, trunkTickets); len(waits) > 0 {
@@ -277,7 +291,7 @@ func (d *Doors) carried(plan *dispatchPlan, read workRead) int {
 	if state.State != writeFree {
 		return codeOK
 	}
-	if len(plan.Bundles) == 0 && len(plan.Opens) == 0 && len(plan.Closes) == 0 {
+	if len(plan.Bundles) == 0 && len(plan.Opens) == 0 && len(plan.Closes) == 0 && len(remarksOf(read)) == 0 {
 		plan.Write.State = "nothing"
 		return codeOK
 	}
@@ -345,6 +359,14 @@ func rowsOfPart(plan *dispatchPlan, key string) []string {
 	case "held":
 		for _, one := range plan.Held {
 			out = append(out, one.Branch+", held "+one.Age)
+		}
+	case "stalled":
+		for _, one := range plan.Stalled {
+			row := one.Branch + ", still " + one.Age
+			if one.Person {
+				row += ", a person's"
+			}
+			out = append(out, row)
 		}
 	case "waiting":
 		for _, one := range plan.Waiting {

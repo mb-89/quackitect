@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 503c4287eb00f23f8307b5c1c7d39e6d3fd8ea20
+    hash_after: ddde1a268984fd07a8e6ef1571a03db01698a53a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/watcher passes
+      - name: check
+        exit: 0
+        said: "   57.8  in all"
+    inputs:
+      - name: ask
+        hash: 3d9e5a79523d7df7
+        size: 658
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/index src/watcher
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index door keeps its watch and its lease. `folders` adds every folder past one that fails and answers the first failure, so `watches` keeps the watch and `opensOn` names the failure on stderr. `watcher.Hearing` hands each fsnotify error to the door, and an overflow marks a sweep of the whole tree for the next settle. `took` drains a value or tickets call before it takes the guard, so the work loop renews the lease. Three new cases cover the failed watch, the overflow and the guard-free drain.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch for both findings
+- the watch rows in the index design note name the failure and the overflow
+- the drain rule stands in `drainsFirst` alone
 
 # Discussion
 

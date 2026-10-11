@@ -400,6 +400,14 @@ func TestThePullToolAnswersItsSpawnApart(t *testing.T) {
 	}
 }
 
+// A hand-back prints its work lines before the spawn, and the tool still finds the spawn. [[spec/tickets/tool-pull-finds-the-spawn]]
+func TestTheToolFindsTheSpawnPastTheWorkLines(t *testing.T) {
+	t.Parallel()
+	if said := ToolAnswerOf("work\n  a-child passes do.\n" + spawnAnswer); said.Spawn != "You are a hand of your own, named helper-2.\n1. Run it." {
+		t.Fatalf("a hand-back with a spawn reads %+v, and wants the hand's prompt apart", said)
+	}
+}
+
 func TestThePullSpecTakesTheFourVerdicts(t *testing.T) {
 	t.Parallel()
 	spec := PullSpec()

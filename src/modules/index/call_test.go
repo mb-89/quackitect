@@ -46,6 +46,7 @@ func held(gate chan struct{}) func(q.Request) (any, error) {
 
 func TestAQuickCallAnswersItsResultWithinTheWait(t *testing.T) {
 	b, _, _ := bookOf(t)
+	b.after = func(time.Duration) <-chan time.Time { return nil }
 	said, err := Call(b, actions(), "t/read", "a.md", "s1", quick, held(nil))
 	if err != nil {
 		t.Fatal(err)
@@ -58,20 +59,42 @@ func TestAQuickCallAnswersItsResultWithinTheWait(t *testing.T) {
 	}
 }
 
+// Waits on the book's moves until the caller's one operation meets the test. [[spec/tickets/slow-call-holds-no-timer]]
+func awaits(b *Book, caller string, holds func(Op) bool) Op {
+	for {
+		b.mu.Lock()
+		woke := b.changed
+		b.mu.Unlock()
+		if ops := b.Of(caller); len(ops) == 1 && holds(ops[0]) {
+			return ops[0]
+		}
+		<-woke
+	}
+}
+
+// The wait runs out once the first request stands done, through the book's timer, so the case reads its order of events off no wall clock. [[spec/tickets/slow-call-holds-no-timer]]
 func TestASlowCallAnswersStillRunningWithItsHandleAndFraction(t *testing.T) {
 	b, _, _ := bookOf(t)
+	fire := make(chan time.Time)
+	b.after = func(time.Duration) <-chan time.Time { return fire }
 	gate := make(chan struct{})
-	said, err := Call(b, actions(), "t/save", "a.md", "s1", slow, held(gate))
-	if err != nil {
-		t.Fatal(err)
-	}
+	answered := make(chan Answer, 1)
+	go func() {
+		said, err := Call(b, actions(), "t/save", "a.md", "s1", slow, held(gate))
+		if err != nil {
+			t.Error(err)
+		}
+		answered <- said
+	}()
+	awaits(b, "s1", func(one Op) bool { return one.Progress.Done == 1 })
+	close(fire)
+	said := <-answered
 	if !said.Running || said.Handle == "" || said.Fraction != 0.5 || said.Result != nil {
 		close(gate)
 		t.Fatalf("the call answers %+v", said)
 	}
 	close(gate)
-	one, ended := b.Wait(said.Handle, patience)
-	if !ended || one.State != Done || one.Result != "commit a.md" {
+	if one := awaits(b, "s1", func(one Op) bool { return one.State != Running }); one.State != Done || one.Result != "commit a.md" {
 		t.Fatalf("%s ends as %+v", said.Handle, one)
 	}
 }
@@ -112,5 +135,32 @@ func TestTheConfigHoldsOneActionDeadline(t *testing.T) {
 	}
 	if _, held := config.Value("../../..", "watchdog.deadlineAction"); !held {
 		t.Fatal("watchdog.deadlineAction stands nowhere")
+	}
+}
+
+// A writer past its deadline fails, and holds the writer slot until its run returns, so no second writer runs beside it. [[spec/design_output/model#one-writer-per-tree]]
+func TestAnExpiredWriterHoldsTheSlotUntilItReturns(t *testing.T) {
+	b, c, _ := bookOf(t)
+	gate := make(chan struct{})
+	first, err := Call(b, actions(), "t/save", "a.md", "s1", 0, held(gate))
+	if err != nil {
+		t.Fatal(err)
+	}
+	awaits(b, "s1", func(one Op) bool { return one.Progress.Done == 1 })
+	c.pass(2 * time.Minute)
+	if ended := b.Expire(); !slices.Equal(ended, []string{first.Handle}) {
+		t.Fatalf("the expiry ends %v, and wants the first writer", ended)
+	}
+	second, err := Call(b, actions(), "t/save", "b.md", "s1", 0, held(gate))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := stateOf(t, b, second.Handle); got != Queued {
+		close(gate)
+		t.Fatalf("the second writer stands %s while the first still runs, and wants queued", got)
+	}
+	close(gate)
+	if one, ended := b.Wait(second.Handle, patience); !ended || one.State != Done {
+		t.Fatalf("the second writer ends as %+v once the first returns", one)
 	}
 }

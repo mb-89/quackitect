@@ -99,8 +99,9 @@ another name writes. So many agents on one tree each take back their own change.
 
 ## The entry names its time
 
-The file name is the stamp, so the newest entry sorts last and nothing holds a
-counter.
+The file name is the stamp, so the newest entry sorts last. A second entry in
+one millisecond takes the next count in the padding digits past the stamp, and
+sorts after the first. For details, see [[spec/tickets/journal-names-stay-unique]].
 
 ## Drift refuses the restore
 

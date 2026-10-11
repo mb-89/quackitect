@@ -12,6 +12,9 @@ import (
 // Reads one event, and adds a folder through the watch it gets. [[spec/tickets/a-watch-stops-mid-add]]
 type Hear func(eyes *Watcher, event fsnotify.Event)
 
+// Reads one error fsnotify sends, an overflow of lost events among them. [[spec/tickets/door-guards-watch-and-drain]]
+type Lost func(err error)
+
 // The part of an fsnotify watch the loop reads, so a test hands a fake with the Windows timing. [[spec/tickets/a-watch-stops-mid-add]]
 type source struct {
 	add    func(path string) error
@@ -23,6 +26,7 @@ type source struct {
 // One goroutine drains the events into a queue with no bound, so fsnotify's reader waits on no send, and a second hands them to hear. Add and Close share one lock and a closed flag, so no Add waits on a reply a closed reader drops. [[spec/tickets/a-watch-stops-mid-add]]
 type Watcher struct {
 	from source
+	lost Lost
 
 	lock   sync.Mutex
 	closed bool
@@ -36,16 +40,19 @@ type Watcher struct {
 }
 
 // A watch over fsnotify, handing each event to hear. [[spec/tickets/a-watch-stops-mid-add]]
-func New(hear Hear) (*Watcher, error) {
+func New(hear Hear) (*Watcher, error) { return Hearing(hear, nil) }
+
+// A watch over fsnotify, handing each event to hear and each error to lost, where one stands. [[spec/tickets/door-guards-watch-and-drain]]
+func Hearing(hear Hear, lost Lost) (*Watcher, error) {
 	eyes, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
 	}
-	return over(source{eyes.Add, eyes.Close, eyes.Events, eyes.Errors}, hear), nil
+	return over(source{eyes.Add, eyes.Close, eyes.Events, eyes.Errors}, hear, lost), nil
 }
 
-func over(from source, hear Hear) *Watcher {
-	one := &Watcher{from: from, ready: make(chan struct{}, 1)}
+func over(from source, hear Hear, lost Lost) *Watcher {
+	one := &Watcher{from: from, lost: lost, ready: make(chan struct{}, 1)}
 	one.loops.Add(2)
 	go one.drains()
 	go one.hears(hear)
@@ -67,9 +74,13 @@ func (one *Watcher) drains() {
 			one.waiting = append(one.waiting, event)
 			one.queue.Unlock()
 			one.wakes()
-		case _, open := <-errs:
+		case err, open := <-errs:
 			if !open {
 				errs = nil
+				continue
+			}
+			if one.lost != nil {
+				one.lost(err)
 			}
 		}
 	}

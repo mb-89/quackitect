@@ -247,6 +247,10 @@ frontmatter:
             type: string
             description: the session the harness names the box in, per [[spec/tickets/boxes-write-their-final-record]]
 
+          over:
+            type: boolean
+            description: whether this take moves a hold another hand still held, per [[spec/design_output/work#a-live-hold-stalls]]
+
           model:
             type: string
             description: the model the box runs, as its hand-back names it
@@ -307,6 +311,46 @@ frontmatter:
                 size:
                   type: integer
                   description: the length of the text the hash reads
+
+          next:
+            type: string
+            description: the line a hand-back leaves the next hand, per [[spec/design_output/pull#the-next-line-rides-hand-backs]]
+
+          frozen:
+            type: array
+            description: one entry per red file a red leaf's pass freezes, per [[spec/design_output/pull#red-tests-freeze]]
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+                - hash
+              properties:
+                path:
+                  type: string
+                  description: the red file
+
+                hash:
+                  type: string
+                  description: the hash of its text at the red pass, or gone
+
+          reopen:
+            type: array
+            description: one entry per frozen file a pass reopens, with why, per [[spec/design_output/pull#red-tests-freeze]]
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - path
+                - why
+              properties:
+                path:
+                  type: string
+                  description: the frozen file the pass reopens
+
+                why:
+                  type: string
+                  description: why the hand changes it
 
           answered:
             type: array

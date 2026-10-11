@@ -33,3 +33,24 @@ func TestAChangedGoTestNamesItsPackage(t *testing.T) {
 		t.Fatalf("the packages read %v", got)
 	}
 }
+
+// A source named twice goes aside once, and a named folder sets each file under it aside, so every working edit comes back. [[spec/tickets/red-test-keeps-named-sources]]
+func TestRedSetsEachSourceAsideOnce(t *testing.T) {
+	t.Parallel()
+	one := newTree(t, map[string]string{"c.js": "head c\n", "lib/a.js": "head a\n", "lib/b.js": "head b\n"}).desk()
+	work := map[string]string{"c.js": "work c\n", "lib/a.js": "work a\n", "lib/new.js": "new\n"}
+	one.write(work)
+	one.d.setAside([]string{"c.js", "c.js", "lib"})
+	for path, want := range map[string]string{"c.js": "head c\n", "lib/a.js": "head a\n", "lib/b.js": "head b\n"} {
+		if got := one.read(path); got != want {
+			t.Fatalf("%s reads %q aside, and wants HEAD's text", path, got)
+		}
+	}
+	one.d.putBack()
+	work["lib/b.js"] = "head b\n"
+	for path, want := range work {
+		if got := one.read(path); got != want {
+			t.Fatalf("%s reads %q after the put back, and wants %q", path, got, want)
+		}
+	}
+}

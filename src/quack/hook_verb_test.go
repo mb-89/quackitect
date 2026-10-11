@@ -465,3 +465,25 @@ func (c *copilotDoor) ask(post hooks.Post) (hooks.Answer, error) {
 	}
 	return hooks.Answer{Effects: c.effects}, nil
 }
+
+// Pre-push reads work.progressAfter off the config: a hold whose box beats while its tip stands past twice the span takes the take, and a plain push meets the take's name. [[spec/design_output/work#a-live-hold-stalls]]
+func TestHookPrePushReadsTheProgressSpanOffTheConfig(t *testing.T) {
+	t.Parallel()
+	root, sha := heldBranch(t)
+	stampsGreen(t, root, sha)
+	beat := gitDoes(t, root, "commit-tree", "4b825dc642cb6eb9a060e54bf8d69288fbee4904", "-m", hookHolder+" beats")
+	gitDoes(t, root, "push", "-q", "origin", beat+":refs/heads/beats/x")
+	gitDoes(t, root, "fetch", "-q", "origin")
+	tip, err := strconv.ParseInt(gitDoes(t, root, "log", "-1", "--format=%ct", "origin/work/x"), 10, 64)
+	if err != nil {
+		t.Fatalf("the hold's commit time reads %v", err)
+	}
+	now := time.Unix(tip, 0).Add(3 * time.Minute)
+	if _, errs := prePushes(root, true, nil, pushLine("work/x", sha), now); !strings.Contains(errs, "stands in the hand of") {
+		t.Fatalf("pre-push under the default span answers %q, and wants the live hold kept", errs)
+	}
+	seedFile(t, root, ".se/.runtime/config.json", `{"work": {"progressAfter": "1m"}}`)
+	if _, errs := prePushes(root, true, nil, pushLine("work/x", sha), now); !strings.Contains(errs, "./RUNME.sh branch take x") {
+		t.Fatalf("pre-push under a 1m span answers %q, and wants the stalled hold left to the take", errs)
+	}
+}

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 753d678c32d20e7a06806607f771c7d25f7c654a
+    hash_after: 8006ee3ffd02427922026420677685489f911e41
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "   59.3  in all"
+    inputs:
+      - name: ask
+        hash: 2f5d8beea6a8ecb0
+        size: 514
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/index
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`TestASlowCallAnswersStillRunningWithItsHandleAndFraction` hands the book an `after` seam it fires once the first request stands done, and `awaits` reads the book moves in place of a wall wait. The quick call arms a seam that never fires, and the expired-writer case waits through `awaits` too. `go test -race -count=50` over the two named cases passes, and `-count=20` over the package passes.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch through the book seam
+- the wait helper stands in `awaits` once
+- no case in the call tests arms a wall timer for its order of events
 
 # Discussion
 

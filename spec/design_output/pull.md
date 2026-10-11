@@ -781,6 +781,7 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
 | a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+| a leaf moved in the keys `wordingFields` names in `src/pull/pull_stale.go` alone | keeps `step`, a passed leaf keeps its wording, and the leaf at `step` takes the new wording |
 
 ## Ticket links read the Ask
 
@@ -803,6 +804,35 @@ The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the chan
 - A rewind before a later leaf passes hands the leaf out, so a case the edited draft adds runs red.
 - A red commit landing no test, and a private ticket with an empty `hash_after`, keep nothing.
 - A case appended to a red file after the change lands runs green at once. The change it guards already stands.
+
+## Red tests freeze
+
+A red leaf's pass freezes its red files, so the hand making them green cannot bend them to its code. `src/pull/pull_frozen.go` holds the mechanism.
+
+| read | how |
+|---|---|
+| the freeze | the pass of a leaf `isRed` answers writes `frozen` on its entry: one `{ path, hash }` per file of its `red` list, `HashText` over the file, or `gone` |
+| the leaves it holds | a leaf holding a command field expecting `green`, and a `final` gate |
+| a moved file | the latest `frozen` row naming the path holds another hash than the file on disk |
+| the way back | `--reopen "<path>: <why>"` on the hand-back, once a file, which the pass entry keeps under `reopen` as `{ path, why }` |
+| a reopened file | a `reopen` row naming the path after its latest freeze |
+| the reviewer | a gate's hand-out lists every reopened file with its why and its leaf |
+
+- A moved file with no reopen refuses the hand-back as any refusal does, and the cap counts it.
+- A fail, a `--became` and an `--answered` skip the check, because they land no pass.
+- A record holding no `frozen` row checks nothing, so a route with no red leaf stands as it is.
+
+## The next line rides hand-backs
+
+A hand-back carries one line for a stranger, so every claim leaves a baton. `src/pull/pull_next.go` holds the mechanism.
+
+| read | how |
+|---|---|
+| the line | `--next "<line>"` on any hand-back: a pass, a fail, a gate verdict, a `--became` or an `--answered` |
+| the record | the entry the hand writes keeps it under `next` |
+| the hand-out | every hand-out of the ticket shows the latest `next` under the leaf line |
+
+A take over reads the line beside the beat. For details, see [[spec/design_output/work#a-takeover-reads-the-beat]].
 
 # Done leaves no takeable step
 

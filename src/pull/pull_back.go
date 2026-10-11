@@ -137,6 +137,12 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 	if verdictField != nil {
 		decided = VerdictIn(chapter.Fields[fieldWord(verdictField, "name")])
 	}
+	// A pass past a red leaf meets its frozen files. [[spec/design_output/pull#red-tests-freeze]]
+	if decided.Said != "fail" && !becomes {
+		if frozen := it.frozenFaults(one, leaf, reopensIn(it.Argv)); len(frozen) > 0 {
+			return it.refused(who, one, leaf, *held, frozen)
+		}
+	}
 	switch {
 	case decided.Said == "became":
 		return it.became(who, one, leaf, *held, decided.Reason, answered, more{})

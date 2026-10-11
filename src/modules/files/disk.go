@@ -65,9 +65,10 @@ func (one disk) Read(path string) (string, bool, error) {
 // Every file under the folder at any depth, by its slashed path from the root, sorted. [[spec/design_output/doors#the-git-door-carries-writes]]
 func (one disk) List(folder string) ([]string, error) {
 	out := []string{}
-	err := filepath.WalkDir(one.at(folder), func(at string, entry fs.DirEntry, err error) error {
+	top := one.at(folder)
+	err := filepath.WalkDir(top, func(at string, entry fs.DirEntry, err error) error {
 		if errors.Is(err, fs.ErrNotExist) {
-			return fs.SkipAll
+			return gone(top, at)
 		}
 		if err != nil || entry.IsDir() {
 			return err
@@ -80,11 +81,40 @@ func (one disk) List(folder string) ([]string, error) {
 	return out, err
 }
 
+// What the walk does past a path gone before its read. [[spec/tickets/disk-list-skips-gone-folders]]
+func gone(top, at string) error {
+	if at == top {
+		return fs.SkipAll
+	}
+	return nil
+}
+
+// Removes a file, or a folder once the empty folders under it go, deepest first. A folder holding a file stands. [[spec/tickets/review-clears-stale-worktree]]
 func (one disk) Remove(path string) error {
+	for _, folder := range one.folders(path) {
+		_ = os.Remove(folder)
+	}
 	if err := os.Remove(one.at(path)); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 	return nil
+}
+
+// The folders under path, deepest first, and none where path is a file or a link. [[spec/tickets/review-clears-stale-worktree]]
+func (one disk) folders(path string) []string {
+	out := []string{}
+	top := one.at(path)
+	_ = filepath.WalkDir(top, func(at string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if entry.IsDir() && at != top {
+			out = append(out, at)
+		}
+		return nil
+	})
+	sort.Sort(sort.Reverse(sort.StringSlice(out)))
+	return out
 }
 
 // The path to standing as an alias of path, a file or a folder, so a read under to reads path. [[spec/tickets/branch-verbs-meet-fake-git]]

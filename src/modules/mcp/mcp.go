@@ -10,6 +10,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -46,8 +47,10 @@ const (
 	toolsCall       = "tools/call"
 	noMethod        = -32601
 	badParams       = -32602
-	sessionHeader   = "Mcp-Session-Id"
-	schemaRefs      = "#/components/schemas/"
+	// The JSON-RPC code for a body that reads as no JSON. [[spec/tickets/mcp-cap-names-its-size]]
+	parseError    = -32700
+	sessionHeader = "Mcp-Session-Id"
+	schemaRefs    = "#/components/schemas/"
 )
 
 // The cap on a post's body, the span a request's header takes to read, the bytes of the token and of a session id, and the scheme the post carries the token under. [[spec/tickets/hooks-standing-file-names-token]]
@@ -177,7 +180,7 @@ func waits(schema map[string]any, in reflect.Type) map[string]any {
 func (s *Server) Handle(session string, body []byte) ([]byte, string) {
 	var in request
 	if err := json.Unmarshal(body, &in); err != nil {
-		return marshal(response{RPC: rpcVersion, ID: json.RawMessage("null"), Error: &rpcError{Code: badParams, Message: err.Error()}}), session
+		return marshal(response{RPC: rpcVersion, ID: json.RawMessage("null"), Error: &rpcError{Code: parseError, Message: err.Error()}}), session
 	}
 	if len(in.ID) == 0 {
 		return nil, session
@@ -287,14 +290,19 @@ func Listen(root string, server *Server) (func(), error) {
 	}, nil
 }
 
-// A post short of the token answers 401, a body past the cap 400, a notification 202, and every request its JSON-RPC answer with the session id in its header. [[spec/tickets/the-mcp-module-lands]]
+// A post short of the token answers 401, a body past the cap 413 naming the cap, a notification 202, and every request its JSON-RPC answer with the session id in its header. [[spec/tickets/the-mcp-module-lands]]
 func (s *Server) serves(token string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != bearer+token {
 			http.Error(w, "the post carries no token the standing file names", http.StatusUnauthorized)
 			return
 		}
-		body, err := io.ReadAll(io.LimitReader(r.Body, bodyCap))
+		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, bodyCap))
+		var past *http.MaxBytesError
+		if errors.As(err, &past) {
+			http.Error(w, fmt.Sprintf("the body runs past the cap of %d bytes", bodyCap), http.StatusRequestEntityTooLarge)
+			return
+		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

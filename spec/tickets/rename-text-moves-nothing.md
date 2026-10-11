@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: a9cdf17107b1aa3ed941d96fbeb6750d2163dd0f
+    hash_after: c468b439ce21ee69723822ea5775126622145045
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   62.2  in all"
+    inputs:
+      - name: ask
+        hash: 08b2685e22d007aa
+        size: 400
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`renameVerb` in `src/quack/rename.go` reads `--text` before it acts, and runs the text rewrite or the move, never both. A name that also stands as a path now stays in place, with its text rewritten and no journal entry. `TestRenameTextLeavesAnExistingPathInPlace` failed red and passes now. The commit also fixes the cold probe: its clone pushed `work/dry-probe-clears` into the box tree, so the next probe diverged and failed the commit, and the group step now drops that branch before it branches.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch
+- the probe fix rides this ticket, since the check refused this commit on it
+- the flag branch stands in `renameVerb` alone
 
 # Discussion
 

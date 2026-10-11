@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: checks-and-index-read-right
 step: do
+record:
+  - step: do
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: aade378924aad82c4fcb6fa7563eadf89abc6557
+    hash_after: 418e8b6af5482e7051f3ad97403a983d20585850
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "   62.0  in all"
+    inputs:
+      - name: ask
+        hash: 21e31757242ed53a
+        size: 592
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`codeCut` in `src/modules/check/textfaults.go` blanks strings first and cuts the trailing comment after, as `magicIn` does. A `//` inside a string now leaves the code after it, so `functionsIn` measures each function whole and `isDoor` reads a door past a URL. `TestCodeCutKeepsCodeAfterASlashedString` failed red on the old order and passes now.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the fix sketch
+- the check stays green with the longer measures
+- the order rule stands in `codeCut` alone
 
 # Discussion
 

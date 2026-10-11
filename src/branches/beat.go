@@ -4,6 +4,7 @@
 package branches
 
 import (
+	"encoding/json"
 	"slices"
 	"strconv"
 	"strings"
@@ -20,6 +21,8 @@ const (
 	endsWord  = "ends"
 	endFlag   = "--end"
 	overFlag  = "--over"
+	overField = "over"
+	askedAt   = runtimeFolder + "/stall-asked"
 )
 
 // The base and the width a beat's commit time reads in. [[spec/design_output/work#the-session-beats-its-hold]]
@@ -42,22 +45,48 @@ func beatVerb(d *Doors, _ string, argv []string) int {
 		return codeOK
 	}
 	ended := slices.Contains(argv, endFlag)
+	if !ended {
+		d.asksHandover()
+	}
 	if last, ok := d.beatsSeen()[holding.Name]; ok && !ended && !last.Ended && last.Hand == roleOf(holding.Hand) {
 		if d.nowSeconds()-last.When < d.beatSpanSeconds()/2 {
 			return codeOK
 		}
 	}
-	d.writeBeat(holding.Name, roleOf(holding.Hand), ended)
+	d.writeBeat(holding.Name, roleOf(holding.Hand), ended, d.beatFiles(holding.Hand))
 	return codeOK
 }
 
-// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. [[spec/design_output/work#the-session-beats-its-hold]]
-func (d *Doors) writeBeat(group, hand string, ended bool) bool {
+// Prints the Stop hook's block asking for a handover where the tip this box stands on stalls past work.progressAfter, once a tip. [[spec/design_output/work#a-live-hold-stalls]]
+func (d *Doors) asksHandover() {
+	tip := d.head()
+	when, ok := d.Repo.When(tip)
+	span := d.progressSpan()
+	now := d.nowSeconds()
+	if !ok || span <= 0 || now == 0 || now-when <= span || strings.TrimSpace(d.read(askedAt)) == tip {
+		return
+	}
+	said, err := json.Marshal(map[string]string{
+		"decision": "block",
+		"reason":   "The tip stands still past work.progressAfter, so this hold stalls. Commit what stands and write a handover, then run ./RUNME.sh branch release.",
+	})
+	if err != nil {
+		return
+	}
+	_ = d.write(askedAt, tip)
+	d.say("%s", said)
+}
+
+// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. The files ride a commit on the empty one. [[spec/design_output/work#the-session-beats-its-hold]] [[spec/design_output/work#a-takeover-reads-the-beat]]
+func (d *Doors) writeBeat(group, hand string, ended bool, files map[string]string) bool {
 	word := beatsWord
 	if ended {
 		word = endsWord
 	}
 	commit, err := d.Repo.EmptyCommit(hand + " " + word)
+	if err == nil && len(files) > 0 {
+		commit, err = d.Repo.CommitFiles(commit, files, hand+" "+word)
+	}
 	if err != nil {
 		return d.beatFails(group, err.Error())
 	}
@@ -117,6 +146,34 @@ func HoldStale(tip int64, beatRow string, now, stale, span int64) bool {
 	return now-tip > stale
 }
 
+// What a live hold's tip age says past the progress span: stalled past it, and past twice it stale on a first take or a person's on a take over. [[spec/design_output/work#a-live-hold-stalls]]
+func stallOf(age, span int64, over bool) (stalled, stale, person bool) {
+	if span <= 0 || age <= span {
+		return false, false, false
+	}
+	if age <= 2*span {
+		return true, false, false
+	}
+	return true, !over, over
+}
+
+// Whether a hold whose box still beats stalls past twice the progress span on a first take, so a take moves it, off the beat row of %ct and %s, and whether the open take took it over. [[spec/design_output/work#a-live-hold-stalls]]
+func HoldStalled(tip int64, beatRow string, now, span, progress int64, over bool) bool {
+	at, subject, ok := strings.Cut(strings.TrimSpace(beatRow), " ")
+	if !ok {
+		return false
+	}
+	when, err := strconv.ParseInt(at, timeBase, timeBits)
+	if err != nil {
+		return false
+	}
+	if _, live := beatVerdict(beatOf(when, subject), tip, now, span); !live {
+		return false
+	}
+	_, stale, _ := stallOf(now-tip, progress, over)
+	return stale
+}
+
 // The branch a beat stands on. [[spec/design_output/work#the-session-beats-its-hold]]
 func BeatBranch(group string) string { return beatsOn + group }
 
@@ -155,6 +212,8 @@ func (d *Doors) staleClaim(one stand, now int64) claim {
 			read.Stale, read.Live = dead, live
 			if live {
 				read.Beat = aged(now - last.When)
+				read.Stalled, read.Stale, read.Person = stallOf(held, d.progressSpan(), OverIn(one.Ticket))
+				read.Live = !read.Stale
 			}
 			return read
 		}

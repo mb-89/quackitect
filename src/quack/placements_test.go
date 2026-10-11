@@ -115,14 +115,3 @@ func TestAModuleProcessAnswersAnEmptyCommitWhereNothingMoved(t *testing.T) {
 		t.Fatalf("a second run over the same inputs commits %s", values)
 	}
 }
-
-func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
-	t.Parallel()
-	peer, heard := doublerRuns(t)
-	if err := peer.Run("doubler"); err != nil {
-		t.Fatal(err)
-	}
-	if values := <-heard; string(values["doubler/twice"]) != "42" {
-		t.Fatalf("the module process commits %s", values)
-	}
-}

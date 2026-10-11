@@ -130,7 +130,7 @@ func todoOf(doc *yaml.Doc) string {
 	return text
 }
 
-// The tickets one waits for, a list or one line, each bare of brackets and quotes. [[spec/design_output/work#the-mark-and-what-waits]]
+// The tickets one waits for, a list or one line, each bare of brackets, quotes and the branch prefix. Every reader of depends_on comes here. [[spec/tickets/depends-on-reads-one-parser]]
 func dependsOn(doc *yaml.Doc) []string {
 	var out []string
 	if doc == nil {
@@ -138,10 +138,7 @@ func dependsOn(doc *yaml.Doc) []string {
 	}
 	for _, line := range yaml.StringsOf(doc.Get("depends_on")) {
 		for _, part := range strings.Split(line, ",") {
-			one := strings.TrimSpace(part)
-			one = strings.TrimSuffix(strings.TrimPrefix(one, "["), "]")
-			one = strings.TrimSpace(trimQuote(one))
-			if one != "" {
+			if one := groupNamed(part); one != "" {
 				out = append(out, one)
 			}
 		}
@@ -229,6 +226,7 @@ func entryField(entry *yaml.Doc, key string) string {
 // The take standing open: the last record item with hash_before and no hash_after. [[spec/design_output/work#held-derives-from-the-record]]
 type hold struct {
 	Step, Hand, HashBefore string
+	Over                   bool
 }
 
 // The open take, or nil where every take stands closed. [[spec/design_output/work#held-derives-from-the-record]]
@@ -246,7 +244,14 @@ func heldIn(text string) *hold {
 		Step:       bare(yaml.AsString(held.Get("step"))),
 		Hand:       bare(yaml.AsString(held.Get("hand"))),
 		HashBefore: bare(yaml.AsString(held.Get("hash_before"))),
+		Over:       yaml.Truthy(held.Get(overField)),
 	}
+}
+
+// Whether the open take took the hold over from another hand. [[spec/design_output/work#a-live-hold-stalls]]
+func OverIn(text string) bool {
+	held := heldIn(text)
+	return held != nil && held.Over
 }
 
 // The hand of the open take, or nothing where every take stands closed. [[spec/tickets/git-hooks-run-in-go]]

@@ -10,6 +10,23 @@ import (
 	"quackitect/src/failure"
 )
 
+// The ticket in hand names itself as its successor and stays open, and a note of its name in the private folder takes the became. [[spec/tickets/became-refuses-itself]]
+func TestATicketBecomesAnotherFile(t *testing.T) {
+	t.Parallel()
+	it := alphaInHand(t)
+	stood, _ := it.Disk.Read("spec/tickets/alpha.md")
+	if code, said := pulled(t, it, "alpha", "--became", "alpha"); code != 1 || !strings.Contains(said, "alpha becomes no successor of its own") {
+		t.Fatalf("the became answers %d, and wants the self refused:\n%s", code, said)
+	}
+	if now, _ := it.Disk.Read("spec/tickets/alpha.md"); now != stood {
+		t.Fatalf("the ticket reads\n%s\nand wants it as it stood", now)
+	}
+	must(t, it.Disk.Write(Notes+"/alpha.md", "---\nstate: open\n---\n"))
+	if code, said := pulled(t, it, "alpha", "--became", "alpha"); code != 0 || !strings.Contains(said, "alpha closes became alpha") {
+		t.Fatalf("the became onto the note answers %d:\n%s", code, said)
+	}
+}
+
 // The cloud pull over a fake registry, and the failure ids its log takes. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
 func raisingPull(t *testing.T, nodes ...failure.Node) (*It, func() string, *[]string) {
 	t.Helper()
