@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box 1ad094d8843c · claude-code-remote
     hash_before: ae593fa2d17311934d06ff060af81be1119801ad
     session: cse_014h3ELHfUoTwWwQ5ViaSZix
+  - step: sync
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 18e32c356c39acc9a0d9765b96e065092e550fa0
+    hash_after: 7ae85faa755af1d7b1b2e7300288a1a7d711b414
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tickets-keep-their-chapters took 61 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -102,8 +111,9 @@ The ticket verbs keep what a ticket holds. route, update, fill, set and note rea
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
