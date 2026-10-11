@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -158,6 +158,15 @@ record:
         hash: 6aed32223962e7cb
         size: 933
     def: 7cea74295027d571
+  - step: implement/change
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 9426c4261bee7a785d0682619c26aee344467638
+    hash_after: 9426c4261bee7a785d0682619c26aee344467638
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: handovers-and-light-work
 ---
 
@@ -317,14 +326,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint spec/guidance/tickets.md spec/rationales/tickets.md spec/processes/trivial.yaml src/quack/verb_mint.go src/pull/pull_writes.go src/quack/examples_harness_test.go spec/examples/110_tickets/pull-light.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and the two sibling examples whose alpha hand-back now meets the trivial route
+- the change reaches no new door, and the mint reads the disk it read before
+- each change carries a comment linking the ticket
+- the light route stands once, as pull.LightRoute, and the mint and the finding route both read it
 
 ## tests-green
 

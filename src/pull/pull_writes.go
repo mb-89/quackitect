@@ -15,9 +15,11 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The route a finding's child follows, and the words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
+// The light route a ticket minted with no process and a finding's child follow. [[spec/tickets/small-work-takes-light-path]]
+const LightRoute = "trivial"
+
+// The words a gate's point carries. [[spec/design_output/pull#a-finding-rides-out]]
 const (
-	childRoute = "trivial"
 	pointField = "point"
 	gatePoint  = "gate"
 )
@@ -232,7 +234,7 @@ type mintedChild struct{ at, text string }
 
 // A child a finding on the trivial route, in the ticket's group, standing as the caller asks, or why one mints nothing. [[spec/design_output/pull#a-finding-rides-out]]
 func (it *It) childrenOf(one *Held, leaf *Leaf, findings []Finding, standsAs map[string]any) ([]mintedChild, []string, string) {
-	route, why := ProcessAt(it.methodDisk(), childRoute)
+	route, why := ProcessAt(it.methodDisk(), LightRoute)
 	if why != "" {
 		return nil, nil, why
 	}

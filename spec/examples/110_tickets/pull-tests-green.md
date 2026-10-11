@@ -16,7 +16,7 @@ A box takes the leaf of alpha.
 The box passes alpha, and the answer hands out beta at tests-green. The leaf makes the change the ask names, and reads the red tests as its floor.
 
 ```sh
-./RUNME.sh ticket pull alpha --pass --fields '{"tests": "echo green", "says": "the change"}'
+./RUNME.sh ticket pull alpha --pass --fields '{"tests": "echo green", "check": "echo ok", "checked": "- the ask\n- no cleanup\n- one place\n- the stop", "says": "the change"}'
 # expect: exit 0
 # expect: says "beta at implement/tests-green"
 # expect: says "makes the change the ask names, with the red tests as its floor"

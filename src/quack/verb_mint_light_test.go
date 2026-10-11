@@ -8,7 +8,6 @@ import (
 
 // level0: FixtureOutsideHome - the mint reads the shipped trivial route off a tree of its own
 func TestAMintWithNoProcessTakesTheTrivialRoute(t *testing.T) {
-	t.Parallel()
 	root := mintTree(t, "")
 	seedFile(t, root, "spec/processes/trivial.yaml", shippedText(t, "spec/processes/trivial.yaml"))
 	code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--gain=A fix lands in one step.", "--breaks=It pays for the full route.", "--done_when=one passes")
