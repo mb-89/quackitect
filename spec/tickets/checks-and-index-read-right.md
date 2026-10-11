@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box f689bbb375f6 · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: f5dbe99cc1650108c787f9969093024484860fe6
+    hash_after: f5dbe99cc1650108c787f9969093024484860fe6
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -228,38 +240,84 @@ accept: every child closes through its named case, each red before its fix but `
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `check-over-leaves-for-sweep`: `Rules` alone names the check rules, and the engine-field hint reaches the sweep
+- `check-tree-drops-dead-caches`: the tree keeps the memo one sweep reuses
+- `code-cut-blanks-strings-first`: a slashed string keeps the code after it
+- `dead-anchor-reads-pointers-once`: one rule reads a pointer's chapter
+- `door-guards-watch-and-drain`: the door keeps its watch, sweeps on overflow, and drains outside its guard
+- `find-quotes-its-words`: a search reads its words as text
+- `glob-reads-whole-runes`: a glob reads letters past ASCII whole
+- `group-rule-fires-in-sweep`: the group rule reads the tickets in every source
+- `index-actions-carry-a-deadline`: a hung writer ends and holds its slot until its run returns
+- `index-open-clears-its-companions`: a corrupt index rebuilds
+- `loaded-keys-writers-by-instance`: each instance takes its own writer
+- `mcp-cap-names-its-size`: a body past the cap answers 413
+- `no-log-deleted-reads-go`: the log guard reads Go and shell
+- `proc-keeps-late-pipe-runs`: a run whose child holds the pipe keeps its exit
+- `rename-text-moves-nothing`: a text rename moves no file, and the cold probe drops the branch an earlier clone left
+- `slow-call-holds-no-timer`: the call cases read no wall clock
+- `split-guard-cleans-paths`: split refuses its source in any spelling
+- `sweep-counts-written-rows`: a sweep counts the rows it writes
+- `take-back-names-failed-reset`: a take-back the reset refuses names the commit
+- `v1-client-carries-a-bound`: a read to a wedged index ends on an error
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- each child opened on a red case, so every fix but one meets a fault it saw fail first
+- the review file on the `review/` branch carried a fix sketch a finding, so each child started from a traced path
+- the commit verb's check caught a gofmt slip, a file past the ceiling and a ratio overrun before any push
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 21:40 UTC: the level0 MCP server dropped after the take, so every write ran through Edit and Bash in place of the patch door
+- 21:45 UTC: the first commit carried the model trailer, which the commit door refuses
+- 21:58 UTC: an appended case read off gofmt, and the commit went red on it
+- 22:12 UTC: a staged lint refused `EveryNamedPathStands` on tracked paths right after the index rebuilt, and the same lint alone passed, one occurrence with its cause unproven
+- 22:21 UTC: a glob case of mine wanted `[!x]` to refuse `!`, a wrong claim the run caught
+- 22:33 UTC: the replay of an old journal did not reproduce, so `TestOpenClearsTheWalAndShm` passes on the old code too
+- 23:00 UTC: the cold probe failed twice on `work/dry-probe-clears`, a branch an earlier probe clone pushed into the box tree
+- 00:39 UTC: the merge of main put `src/quack` past the ratio guard, since main stood eight lines under it
+- no owner prompt reached the run
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the MCP drop: `spec/guidance/working.md` names the fallback for rule 13 where the server stands gone
+- the trailer: `.claude/skills/work/SKILL.md` names the trailer rule beside the commit step
+- gofmt: `src/quack/commit.go` runs the formatter over the staged Go before the lint
+- the staged lint: `src/quack/commit.go` asks the lint once the index answers ready
+- the glob case: `spec/guidance/code/testing.md` rule 5 holds, since the red run caught it
+- the journal replay: `src/index/index.go` keeps the removal, and the case stays as the guard
+- the probe branch: `src/quack/probe_clear.go` drops it before it branches
+- the ratio: `src/branches` runs the ratio guard in the sync, so the merge names the overrun
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The group was a list of independent findings, so it ran as twenty small loops: read the sketch, write the red case, fix, commit through the verb. The commit check takes three to fifteen minutes, which set the pace more than the fixes did. Two faults the check met belonged to no ticket: the probe branch leak and the ratio overrun after the merge, and both stood in the way of the hand-back, so both got fixed here.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in its code or its design note, and the retro points at the file
+- the retro adds no number beyond the times
+- the retro writes no file header
+- the badly list carries each error with its time, and names that no owner prompt came
+- the chapter names the agent and the box by role alone
 
 ## cloud
 
