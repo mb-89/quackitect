@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -164,7 +164,30 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: ce7b3091a2c8f38a49e68f474f5854099b397fed
+    hash_after: ce7b3091a2c8f38a49e68f474f5854099b397fed
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s); green, src/index passes; green, src/q/tool passes; green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "  101.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e69a77163dae225d
+        size: 1109
+    def: ebccfd52b1111bbe
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: hooks-v1-hold-the-line
+reason: done
 ---
 
 # Ask
@@ -359,26 +382,41 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/index src/q/tool src/modules/hooks test/level0/editor-doors.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index mints a secret as its doors open. It writes the secret into `.se/.runtime/person.json` at mode 600, and the standing file at the same mode.
+
+- `/v1`: a post whose decoded input marks a person runs where it carries the secret in `X-Quack-Person`, and meets 403 otherwise
+- the first port: every call carries the secret, since the port answers reads of the whole tree, and its client sends it
+- the agent's calls over MCP and the hook door: `tool.Input` clears the mark, so the verb keeps the harness variables
+- the agent's doors: Bash, Read, Grep and Glob refuse the secret's file
+- the sidebar and the lens: the extension's index door sends the secret, and the lens runs in process behind its token line
+
+The build landed in 9e5aadc17 and 411abd680. While the hook door stands down, Read passes unguarded, so the secret's guard there rests on the door standing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft and its review name
+- the tests reach the network, the disk and the store through the fakes alone
+- the header comment of `src/index/secret.go` names the approach
+- the secret's path and header stand once in `src/index/secret.go`, and each copy names it
 
 # accept
 
