@@ -540,7 +540,10 @@ func (it *It) takeBack(who *Who, name, path string) int {
 	text := withEntry(one.Text, pair("step", path), pair("hand", role), pair("hash_before", tip), pair("hash_after", tip),
 		pair("returns", returnsOf(one.Front, path)+1), pair("why", "the hand takes it back"))
 	one.Text = withField(withField(text, "step", path), "state", Open)
-	it.landed(one, []string{role + " takes " + path + " back"}, nil)
+	if finding := it.landed(one, []string{role + " takes " + path + " back"}, nil); finding != "" {
+		it.Refuse(failure.Raise(it.Failures, "pull-commit-refused", append(refusedRows(finding), "", fmt.Sprintf("Fix it, and take %s back at %s again.", name, path))...))
+		return 1
+	}
 	if !one.Private {
 		if ok, why := it.pushed(who.Branch); !ok {
 			it.Refuse(failure.Raise(it.Failures, "pull-push-refused", append([]string{"The take-back stands on this box, and its push reaches no origin."}, why...)...))

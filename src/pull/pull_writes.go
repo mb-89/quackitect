@@ -424,13 +424,18 @@ func (it *It) unlanded(one *Held, leaf *Leaf, finding string) int {
 }
 
 func unlandedRows(one *Held, leaf *Leaf, finding string) []string {
+	return append(refusedRows(finding), "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+}
+
+// The rows a refused commit names, under the line saying nothing lands. [[spec/tickets/take-back-reports-refusals]]
+func refusedRows(finding string) []string {
 	rows := []string{"the hook refuses the commit, so nothing lands:"}
 	for _, row := range strings.Split(finding, "\n") {
 		if row != "" {
 			rows = append(rows, row)
 		}
 	}
-	return append(rows, "", fmt.Sprintf("Fix it, and %s stays in hand at %s.", one.Name, leaf.Path))
+	return rows
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
