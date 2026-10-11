@@ -264,9 +264,9 @@ accept
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- at take: the dispatch payload named work/windows-check-holds, and `branch take` handed work/loose-fixes-07307ae; the session took the branch the engine handed
-- at do: the first hand-back of `do` was refused, because the tests field carried the command's output in place of the bare command
-- at pull: the child ticket stood open on main after its fix merged, so a box spent a session closing it
+- at take: the dispatch payload named `work/windows-check-holds`, and `branch take` handed this group. The session took the group the engine handed.
+- at do: the pull refused the first hand-back. The tests field carried the command's output in place of the bare command.
+- at pull: the child ticket stood open on main after its fix merged. A box spent a session to close it.
 
 ### improve
 
@@ -282,17 +282,17 @@ accept
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The ask's done lines both held before the session began, so the work was verifying them rather than changing code. The dispatch payload and the engine disagreed on the branch; the payload is data, the engine's take is the verb the prompt names, so the session followed the engine.
+Both done lines of the ask held before the session began. So the work verified them, and changed no code. The dispatch payload and the engine named two branches. The payload is data, and the prompt names the take verb, so the session followed the engine.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the retro adds no fact standing elsewhere; it points at the commit and the files
+- the retro adds no fact standing elsewhere. It points at the commit and the files
 - the retro adds no number
 - the change writes no file header
-- the chapter carries the run's errors with the step each met; no owner prompt arrived during the run
+- the chapter carries the run's errors with the step each met. No owner prompt arrived during the run
 - the chapter names the role alone
 
 ## cloud
