@@ -84,3 +84,20 @@ func TestTheHandOutReadsFieldsOffTheParsedFront(t *testing.T) {
 		t.Fatalf("the moved text reads state %q", got)
 	}
 }
+
+// A hand the owner sends into a person's step reads a hand-back carrying the owner's word, and that call lands. [[spec/tickets/owner-says-hand-back-holds]]
+func TestAnOwnerSentHandBacksWithThePrintedCall(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	must(t, it.Disk.Write("spec/tickets/alpha.md", strings.Replace(childTicket, "    to: retro\n", "    to: retro\n    by: person\n", 1)))
+	code, said := pulled(t, it, "--owner-says")
+	if code != 0 || !strings.Contains(said, "alpha at do") {
+		t.Fatalf("the owner's pull answers %d:\n%s", code, said)
+	}
+	if !strings.Contains(said[strings.LastIndex(said, "Hand it back"):], "--owner-says") {
+		t.Fatalf("the printed hand-back carries no --owner-says:\n%s", said)
+	}
+	if code, said := pulled(t, it, "alpha", "--pass", "--fields", alphaFields, "--owner-says"); code != 0 || !strings.Contains(said, "alpha passes do") {
+		t.Fatalf("the printed hand-back answers %d:\n%s", code, said)
+	}
+}

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: branches-and-pull-report-truly
 step: do
+record:
+  - step: do
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: c635090d3aedd0f3df32d1e7936bae583536c73a
+    hash_after: c635090d3aedd0f3df32d1e7936bae583536c73a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   99.7  in all"
+    inputs:
+      - name: ask
+        hash: 0027332a1d7a50d3
+        size: 442
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/pull/pull_hand_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A pull run with `--owner-says` holds its step under the hand carrying the owner's word. The hand-back it printed carried no `--owner-says`, so that call found no hold. `backCall` in `src/pull/pull_chapter.go` now prints every hand-back call, and adds `--owner-says` where the pull ran with it. The chapter's two calls and the call `pull-hand-holds` prints read through it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the owner's hand hands back with the call the pull prints
+- the change reveals no cleanup
+- the fact stands once: `backCall` alone writes a printed hand-back call
 
 # Discussion
 

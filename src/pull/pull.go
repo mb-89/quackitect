@@ -460,7 +460,7 @@ func (it *It) stillHeld(held Hold) int {
 	again := "  Read them whole with " + CallOf("branch", "guidance", as...) + "."
 	rows := []string{
 		fmt.Sprintf("%s stands in your hand at %s, and one hand holds one ticket.", held.Ticket, held.Step),
-		fmt.Sprintf("Hand it back: %s, or --fail \"why\" in place of --pass.", CallOf("ticket", "pull", append(append([]string{held.Ticket}, as...), "--pass")...)),
+		fmt.Sprintf("Hand it back: %s, or --fail \"why\" in place of --pass.", it.backCall(append(append([]string{held.Ticket}, as...), "--pass")...)),
 	}
 	if why != "" {
 		names := []string{}
