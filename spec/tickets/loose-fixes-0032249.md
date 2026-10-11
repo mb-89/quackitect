@@ -85,6 +85,7 @@ process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 step: sync
 fix: true
+cloud: true
 record:
   - step: sync
     hand: box 05c4736f6ff2 · claude-code-remote
