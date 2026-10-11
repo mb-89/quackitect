@@ -355,3 +355,17 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The quote decode reaches every reader of `yaml.Read` and `ReadLines`, and `scalar` runs under `mapAt` and `listAt`. Each reader past the front, by what it reads:
+
+| reader | reads |
+|---|---|
+| `src/note/note.go` | every note's front, which the front writer quotes |
+| `src/pull/process.go`, `src/pull/route.go`, `src/pull/edit.go` | the processes and a route, whose values hold no quoted backslash |
+| `src/modules/check/schema.go`, `src/modules/check/features.go` | the schemas, whose values hold no quoted backslash |
+| `src/modules/tickets/tickets.go`, `src/modules/tickets/drawn.go`, `src/modules/hooks/command/ticket.go`, `src/tui/work/workedit.go` | ticket fronts, where a record `why` in `spec/tickets/a-check-finds-every-writer.md` now reads as written |
+| `src/branches/sync.go`, `src/branches/group.go`, `src/branches/escalate.go`, `src/branches/guidance.go`, `src/branches/dispatch_write.go` | ticket fronts, guidance fronts and the dispatch plan |
+| `src/q/wiring.go`, `src/modules/views/views.go`, `src/tui/tree/base.go`, `src/owns/owns.go`, `src/modules/guidance/guidance.go` | the wiring, the views, the owns files and the guidance, whose values hold no quoted backslash |
+| `src/prose/lemma.go`, `src/quack/prose.go`, `src/rules/scripts_paragraph.go`, `src/rules/scripts_paragraph_vocabulary.go` | the vocabulary and the paragraph schema, whose values hold no quoted backslash |
+
+`git grep -n "yaml.Read\|yaml.ReadLines" -- src` lists them. The Vale styles read through `gopkg.in/yaml.v3`, which the change leaves alone.
