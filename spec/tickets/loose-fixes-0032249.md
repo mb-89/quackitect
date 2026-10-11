@@ -85,12 +85,15 @@ process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 step: retro/cloud
 fix: true
-cloud: true
 record:
   - step: sync
     hand: box 05c4736f6ff2 · claude-code-remote
     hash_before: f3f63063b8f2c311bf487752207439a096fdf961
     session: cse_01H2kW6pjRfTnoLoJ5T2hs9w
+    hash_after: 93ec6a37749570148241289846245470e160f0b6
+    model: claude-opus-5-5
+    cost: 2
+    final: "RECEIPT: branch=work/loose-fixes-0032249 prompted=no canary=no"
   - step: sync
     hand: box 05c4736f6ff2 · claude-code-remote
     hash_before: 3dc4ab864d7a51c18b0c2abe11aaf97c4c0cac6e
