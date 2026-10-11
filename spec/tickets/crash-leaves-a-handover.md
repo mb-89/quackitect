@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -191,6 +191,24 @@ record:
     skipped: true
     kept: 2f31f89ef9b0342fc9e602c9060999437e9520ae
     why: its red tests stand as 2f31f89ef landed them, and a later leaf passed since
+  - step: gate
+    hand: box 2b095da7efc0 · claude-code-remote · helper-9
+    hash_before: 4a1952d2870f6f191564a8b7c72aba664f9e2583
+    hash_after: 4a1952d2870f6f191564a8b7c72aba664f9e2583
+    inputs:
+      - name: design/draft
+        hash: 6b62e90910e5f0c3
+        size: 3863
+      - name: design/tests-red
+        hash: 32543ca5851fb50e
+        size: 907
+      - name: [[spec/design_output/work]]
+        hash: c71349082e42de77
+        size: 46951
+      - name: [[spec/design_output/pull]]
+        hash: f27a57a71a8e52ed
+        size: 50309
+    def: dc4904ab364efa10
 group: handovers-and-light-work
 ---
 
@@ -344,7 +362,8 @@ Every new take case fails on its own assertion. The take over prints the rescue 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept
+accept with points
+- gate-next-line-test: the draft writes next on the gate verdict entries in src/pull/pull_gate.go, and no case in src/pull/pull_next_test.go hands a gate verdict back with --next
 
 # implement
 
