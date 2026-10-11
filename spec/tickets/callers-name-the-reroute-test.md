@@ -34,11 +34,12 @@ parent: route-keeps-its-chapters
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The route ticket names every caller of `ReRouted`, its second test among them, so a reviewer weighs each.
 
-the callers list leaves out `src/modules/check/reroute_test.go`, which still calls `ReRouted`. Name it beside the three guarded callers.
+A caller left out of the list meets a signature change with no review.
+
+- the discussion of route-keeps-its-chapters names `src/modules/check/reroute_test.go` beside the three guarded callers
+- ./RUNME.sh check is green
 
 # do
 

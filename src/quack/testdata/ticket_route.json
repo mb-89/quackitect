@@ -221,6 +221,23 @@
         }
       },
       "vehicle": true
+    },
+    {
+      "name": "a route with no ticket schema under the method root refuses, and writes nothing",
+      "argv": [
+        "route",
+        "slow-lint",
+        "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"says yes or no\",\"by\":\"person\"}]"
+      ],
+      "files": {
+        "spec/schemas/ticket.schema.yaml": null
+      },
+      "want": {
+        "code": 1,
+        "out": "",
+        "errs": "the ticket schema stands nowhere under the method root, so the route writes nothing\n",
+        "files": {}
+      }
     }
   ]
 }

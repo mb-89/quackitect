@@ -34,11 +34,12 @@ parent: route-keeps-its-chapters
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+A route run with no ticket schema under the method root refuses at the verb and leaves the ticket as it stood, so the refusal reaches the hand who runs the route.
 
-the ask says a missing schema refuses at the verb. `TestReRouted` proves the refusal in `ReRoute` alone. No case in `testdata/ticket_route.json` or `ticket_update.json` runs the verb with no schema under the method root. Add one that wants exit failed, the `ErrNoSchema` words and the ticket unchanged.
+A refusal proven inside `ReRoute` alone leaves the verb's exit and words unread, and a verb dropping the error passes every case.
+
+- go test ./src/quack -run TestTicketRouteVerb passes a case with no schema under the method root, which wants exit failed, the `ErrNoSchema` words and the ticket unchanged
+- ./RUNME.sh check is green
 
 # do
 

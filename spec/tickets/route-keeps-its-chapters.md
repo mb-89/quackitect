@@ -397,3 +397,10 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`ReRouted` keeps four callers past the two verbs, and each reads it as the text `ReRoute` writes:
+
+- `src/pull/pull_stale.go`, which guards a nil schema before the call
+- `src/pull/pull_person.go`, which guards a nil schema before the call
+- `src/branches/escalate.go`, which guards a nil schema before the call
+- `src/modules/check/reroute_test.go`, which hands it a whole schema
