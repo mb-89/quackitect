@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: branches-and-pull-report-truly
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 423b3e221ae4d1d65aa1749e3a4d669cd93eb0e5
+    hash_after: 423b3e221ae4d1d65aa1749e3a4d669cd93eb0e5
+    inputs:
+      - name: ask
+        hash: 72558ea6e15ed54d
+        size: 552
+    def: c01ae0f2ace0cecb
 ---
 
 # Ask
@@ -163,38 +172,48 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`goSays` in `src/branches/test.go` reads the build fault first. A package that fails to build prints `FAIL <pkg> [build failed]` on stdout, or `[setup failed]` where its imports fail, and the compiler's line on stderr. A new pattern `goBuildFail` matches those two marks, and a run matching it reads build, naming the first line `goError` finds. A run with no build mark and a `FAIL` line reads assertion as before. In a run over many packages, one package that builds not makes the run read build, so the tests-red gate takes a run whose every failure is an assertion.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/test.go: `branchTest`, the one call of `goSays` over each Go module the change names
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/port_f_testverb_test.go: `TestPFGoSaysItsWord` takes the stdout and stderr a real build failure prints, and a run mixing an assertion with a build failure
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/test.go
+- src/branches/port_f_testverb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `goSays`, `goFail` and `goError` stand opened in `src/branches/test.go`, and a scratch module showed what `go test` prints on a build failure
+- the callers list holds the one call at `src/branches/test.go`
+- the done_when line names `TestPFGoSaysItsWord`
+- the approach adds no config key
 
 ## tests-red
 
