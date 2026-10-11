@@ -116,6 +116,22 @@ record:
     hand: the engine
     hash_before: 9ec8265d853dbb3c4c5c6130c13efdc97219de8a
     hash_after: 9ec8265d853dbb3c4c5c6130c13efdc97219de8a
+  - step: accept
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 5f48dbaac9ee2a0a86aa964e371f8bee0e7e699b
+    hash_after: 74039601a973db0129a59f3013fd6e42a69d929f
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/hooks-v1-hold-the-line took 95 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 8cf71ae9d5dce05d
+        size: 453
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -188,8 +204,11 @@ Every confirmed finding of the review fleet over main at bf1dad88b stands fixed 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- secret-guard-reads-folder-globs: `BlessGuard` and `readsSecret` match the literal `person.json` alone. A `cat .se/.runtime/*` or a Grep on the runtime folder still reads the secret.
+- trunk-push-reads-repo-flag: `pushRefsOf` drops the first plain word as the remote. Where `--repo` names the remote, `git push --repo=origin main` reads as no trunk push.
 
 # retro
 
