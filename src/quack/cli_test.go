@@ -5,7 +5,6 @@ package main // level0: InPackageTest - a main package admits no outside test pa
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -142,15 +141,7 @@ func slowTree(t *testing.T) (string, *hq1Slow) {
 		t.Fatal(err)
 	}
 	t.Cleanup(stop)
-	body, err := realDisk().read(filepath.Join(root, index.Runtime, "index.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var standing index.Standing
-	if err := json.Unmarshal(body, &standing); err != nil {
-		t.Fatal(err)
-	}
-	return fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1), slow
+	return hq3V1Of(t, root), slow
 }
 
 // Runs one command of the tree, and answers its exit code, its standard output and its standard error. [[spec/tickets/the-quack-cli-gets-generated]]

@@ -60,8 +60,8 @@ func (one fakeReads) Find(words string, _ int) ([]index.Hit, error) {
 	return one.hits, nil
 }
 
-// Calls an action by name through the manager over the root and the reads, as the index does, and answers what the caller reads: the result, the error, or the refusal of the call. [[spec/tickets/find-and-wait-in-go]]
-func servedCall(t *testing.T, root, kind string, reads index.Reads, name string, input any) string {
+// Calls an action by name through the manager over the root and the accept the store hands, as the index does, and answers what the caller reads: the result, the error, or the refusal of the call. [[spec/tickets/find-and-wait-in-go]]
+func servedCall(t *testing.T, root, kind string, accept func(*q.Store) func(q.Request) (any, error), name string, input any) string {
 	t.Helper()
 	c := q.New()
 	as := manager.Registers(c)
@@ -72,7 +72,7 @@ func servedCall(t *testing.T, root, kind string, reads index.Reads, name string,
 	served, err := manager.Serving(manager.Outside{
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
 		Steps: func(func()) {}, Clock: stillClock(),
-		Accept: accepts(root, store, reads),
+		Accept: accept(store),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -91,7 +91,7 @@ func servedCall(t *testing.T, root, kind string, reads index.Reads, name string,
 // Calls the find over the root and the reads. [[spec/tickets/find-and-wait-in-go]]
 func findCall(t *testing.T, root string, reads index.Reads, input any) string {
 	t.Helper()
-	return servedCall(t, root, searchModuleType, reads, findAction, input)
+	return servedCall(t, root, searchModuleType, func(store *q.Store) func(q.Request) (any, error) { return accepts(root, store, reads) }, findAction, input)
 }
 
 // [[spec/tickets/find-and-wait-in-go]]

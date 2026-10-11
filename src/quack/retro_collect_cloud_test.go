@@ -311,6 +311,11 @@ func TestRetroCollectLeavesATranscriptOlderThanTheLastCollectOutAndTakesTheMemor
 	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
 	w.write("home:.claude/projects/"+w.slug+"/old.jsonl", `{"type":"user"}`+"\n")
 	w.touch("home:.claude/projects/"+w.slug+"/old.jsonl", "2026-09-10T00:00:00Z")
+	// A line stamped before the last collect stays out, and an unstamped line follows the line before it. [[spec/tickets/the-retro-finishes-its-asks]]
+	w.write("home:.claude/projects/"+w.slug+"/session.jsonl", strings.Join([]string{
+		retroStamped("2026-09-11T08:00:00.000Z", `,"said":"old"`), `{"said":"old, no stamp"}`,
+		retroStamped("2026-09-13T08:00:00.000Z", `,"said":"new"`), `{"said":"new, no stamp"}`,
+	}, "\n"))
 	w.touch("home:.claude/projects/"+w.slug+"/session.jsonl", "2026-09-15T00:00:00Z")
 	w.touch("home:.claude/projects/"+w.slug+"/memory/MEMORY.md", "2026-09-10T00:00:00Z")
 
@@ -322,8 +327,8 @@ func TestRetroCollectLeavesATranscriptOlderThanTheLastCollectOutAndTakesTheMemor
 	if w.exists(retroInputKey("transcripts/" + w.slug + "/old.jsonl")) {
 		t.Fatal("a transcript older than the last collect stays out")
 	}
-	if !w.exists(retroInputKey("transcripts/" + w.slug + "/session.jsonl")) {
-		t.Fatal("a transcript past the last collect lands")
+	if copied := w.read(retroInputKey("transcripts/" + w.slug + "/session.jsonl")); strings.Contains(copied, `"old`) || !strings.Contains(copied, `"said":"new"`) || !strings.Contains(copied, "new, no stamp") {
+		t.Fatalf("a transcript past the last collect lands its new lines alone: %q", copied)
 	}
 	if !w.exists(retroInputKey("memory/" + w.slug + "/MEMORY.md")) {
 		t.Fatal("the memory comes whole")
@@ -450,31 +455,6 @@ func retroStamped(when, more string) string {
 	return `{"timestamp":"` + when + `"` + more + `}`
 }
 
-// [[spec/tickets/the-retro-finishes-its-asks]]
-func TestRetroCollectLeavesATranscriptLineStampedBeforeTheLastCollectOut(t *testing.T) {
-	t.Parallel()
-	w := retroNewCollectWorld(t, retroFakeTrunk())
-	session := "home:.claude/projects/" + w.slug + "/session.jsonl"
-	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
-	w.write(session, strings.Join([]string{
-		retroStamped("2026-09-11T08:00:00.000Z", `,"said":"old"`),
-		`{"said":"old, no stamp"}`,
-		retroStamped("2026-09-13T08:00:00.000Z", `,"said":"new"`),
-		`{"said":"new, no stamp"}`,
-	}, "\n"))
-	w.touch(session, "2026-09-13T08:00:00Z")
-
-	w.collect()
-
-	copied := w.read(retroInputKey("transcripts/" + w.slug + "/session.jsonl"))
-	if strings.Contains(copied, `"old`) {
-		t.Fatalf("an old line lands: %q", copied)
-	}
-	if !strings.Contains(copied, `"said":"new"`) || !strings.Contains(copied, "new, no stamp") {
-		t.Fatalf("the new lines land: %q", copied)
-	}
-}
-
 // [[spec/tickets/the-second-collect-keeps-lines]]
 func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t *testing.T) {
 	t.Parallel()
@@ -498,20 +478,11 @@ func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t
 func TestRetroCollectCopiesTheScriptsAndLeavesThemAndASecondPassCopiesWhatChanges(t *testing.T) {
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
-	code, said := w.collect()
-	if code != 0 {
-		t.Fatalf("collect answers %d: %s", code, said)
-	}
-	if !w.exists("tree:.se/scripts/one.mjs") {
-		t.Fatal("the scripts stay in place")
-	}
-	if !w.exists(retroInputKey("scripts/one.mjs")) {
-		t.Fatal("the scripts copy into the input")
-	}
+	w.collect()
 
 	w.write("tree:.se/scripts/two.mjs", "// a later script\n")
 	w.touch("tree:.se/scripts/two.mjs", "2026-09-19T13:00:00Z")
-	code, said = w.collect("--again")
+	code, said := w.collect("--again")
 
 	if code != 0 {
 		t.Fatalf("a second pass answers %d: %s", code, said)

@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"quackitect/src/yaml"
 )
 
 // A value off JSON: an object keeps the order of its keys, and a number keeps its digits. [[spec/tickets/go-writes-the-frontmatter]]
@@ -212,7 +214,7 @@ func canonical(value string) string {
 	case link.MatchString(value):
 		return value
 	case strings.HasPrefix(value, `"`):
-		if said, ok := unescaped(value); ok {
+		if said, ok := yaml.Unescaped(value); ok {
 			return Quote(said)
 		}
 		return value
@@ -225,37 +227,4 @@ func canonical(value string) string {
 		return value
 	}
 	return Quote(value)
-}
-
-// The text inside a double-quoted value, where the value is one whole quote holding no escape past the four the writer writes. [[spec/tickets/go-writes-the-frontmatter]]
-func unescaped(value string) (string, bool) {
-	if len(value) < 2 || !strings.HasSuffix(value, `"`) {
-		return "", false
-	}
-	var out strings.Builder
-	inside := value[1 : len(value)-1]
-	for at := 0; at < len(inside); at++ {
-		switch inside[at] {
-		case '"':
-			return "", false
-		case '\\':
-			if at+1 >= len(inside) {
-				return "", false
-			}
-			at++
-			switch inside[at] {
-			case '\\', '"':
-				out.WriteByte(inside[at])
-			case 'n':
-				out.WriteByte('\n')
-			case 'r':
-				out.WriteByte('\r')
-			default:
-				return "", false
-			}
-		default:
-			out.WriteByte(inside[at])
-		}
-	}
-	return out.String(), true
 }

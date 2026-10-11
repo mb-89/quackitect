@@ -413,9 +413,12 @@ func retroJSToNumber(value any) float64 {
 			}
 			return math.Inf(1)
 		}
-		if strings.ContainsAny(strings.ToLower(text), "abcdfghijklmnopqrstuvwxyz_") {
-			if n, err := strconv.ParseUint(strings.ToLower(text)[2:], retroJSHexBase, numberBits); strings.HasPrefix(strings.ToLower(text), "0x") && err == nil {
-				return float64(n)
+		if lower := strings.ToLower(text); strings.ContainsAny(lower, "abcdfghijklmnopqrstuvwxyz_") {
+			// The prefix stands before the slice, so a one-letter text reads as NaN. [[spec/tickets/js-number-reads-one-letter]]
+			if hex, ok := strings.CutPrefix(lower, "0x"); ok {
+				if n, err := strconv.ParseUint(hex, retroJSHexBase, numberBits); err == nil {
+					return float64(n)
+				}
 			}
 			return math.NaN()
 		}

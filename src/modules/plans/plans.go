@@ -7,7 +7,9 @@ package plans
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"regexp"
 	"sort"
 	"strconv"
@@ -57,7 +59,7 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.ActionIn(c, Module+"/"+setVerb, func(in tool.Plan) []q.Request {
 			return []q.Request{{Module: Module, Verb: setVerb, Args: in, NoUndo: noUndo}}
-		}, q.Doc("Answers the engine's three questions: what you work on now, which todos you finished, and which you add. A todo is a title and a detail line, placed in the queue at a digit, and it stands in the work tab beside the tickets. Write a note or a ticket for anything that travels or carries detail, and a todo for the small thing you do next."), q.ToolName(tool.PlanTool), q.IO()),
+		}, q.Doc("Answers the engine's three questions: what you work on now, which todos you finished, and which you add. A todo is a title and a detail line, placed in the queue at a digit, and it stands in the work tab beside the tickets. Write a note or a ticket for anything that travels or carries detail, and a todo for the small thing you do next."), q.ToolName(tool.PlanTool), q.Writes(), q.IO()),
 	)
 }
 
@@ -74,8 +76,15 @@ func Accept(from Outside) func(q.Request) (any, error) {
 
 // The tool: the finished leave, the new land at their place, and the working one is written down. The answer names the place each new todo takes. [[spec/design_output/stop#the-plan]]
 func (from Outside) plans(in tool.Plan) (string, error) {
-	before, _ := from.Read()
-	plan := planOf(before)
+	// A read that fails past a missing file, or a text reading as no JSON object, refuses and writes nothing, so no todo gets written over. [[spec/tickets/plan-keeps-its-todos]]
+	before, err := from.Read()
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return "", err
+	}
+	plan, err := planOf(before)
+	if err != nil {
+		return "", err
+	}
 	done := map[string]bool{}
 	for _, one := range in.Done {
 		if title := strings.TrimSpace(one); title != "" {
@@ -222,12 +231,21 @@ type planFile struct {
 	rest    []keyed
 }
 
-// The plan off its text, and an empty one where the text reads as no object. [[spec/design_output/stop#the-plan]]
-func planOf(text string) planFile {
+// The plan file refused where its text holds more than white space and reads as no JSON object, or a known key holds another shape. [[spec/tickets/plan-keeps-its-todos]] [[spec/tickets/misshapen-plan-values-refuse]]
+var errNoObject = errors.New("the plan file reads as no JSON object of the plan's shape, so the plan writes nothing over it. Mend or remove the plan file, then plan again")
+
+// The plan off its text, an empty one where the text stands blank, and a refusal where it reads as no object. [[spec/design_output/stop#the-plan]]
+func planOf(text string) (planFile, error) {
 	empty := planFile{places: json.RawMessage("{}")}
+	if strings.TrimSpace(text) == "" {
+		return empty, nil
+	}
+	if !json.Valid([]byte(text)) {
+		return empty, errNoObject
+	}
 	dec := json.NewDecoder(strings.NewReader(text))
 	if open, err := dec.Token(); err != nil || open != json.Delim('{') {
-		return empty
+		return empty, errNoObject
 	}
 	out := empty
 	for dec.More() {
@@ -235,28 +253,39 @@ func planOf(text string) planFile {
 		name, ok := key.(string)
 		var raw json.RawMessage
 		if err != nil || !ok || dec.Decode(&raw) != nil {
-			return empty
+			return empty, errNoObject
 		}
+		// A known key holding another shape refuses as the whole file does, so no todo gets written over. [[spec/tickets/misshapen-plan-values-refuse]]
 		switch name {
 		case workingKey:
-			json.Unmarshal(raw, &out.working)
+			if json.Unmarshal(raw, &out.working) != nil {
+				return empty, errNoObject
+			}
 		case todosKey:
 			var todos []json.RawMessage
-			json.Unmarshal(raw, &todos)
+			if json.Unmarshal(raw, &todos) != nil {
+				return empty, errNoObject
+			}
 			for _, one := range todos {
 				var titled struct {
 					Title string `json:"title"`
 				}
-				json.Unmarshal(one, &titled)
+				if json.Unmarshal(one, &titled) != nil {
+					return empty, errNoObject
+				}
 				out.todos = append(out.todos, held{title: titled.Title, raw: one})
 			}
 		case placesKey:
+			var places map[string]json.RawMessage
+			if json.Unmarshal(raw, &places) != nil {
+				return empty, errNoObject
+			}
 			out.places = raw
 		default:
 			out.rest = append(out.rest, keyed{key: name, raw: raw})
 		}
 	}
-	return out
+	return out, nil
 }
 
 // The file as the bridge writes it: the working, todos and places keys first, every other key after in its place, two spaces deep, with no HTML escape and a closing newline. [[spec/design_output/stop#the-plan]]

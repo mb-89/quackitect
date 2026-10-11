@@ -9,8 +9,6 @@ import (
 	"math"
 	"path/filepath"
 	"strings"
-
-	"quackitect/src/proc"
 )
 
 // The cuts a hand writes, and the folder each chapter's lines land in. [[spec/guidance/retro/chapter]]
@@ -110,16 +108,19 @@ func retroPlaced(cuts []retroCut, files []retroTimedFile) (map[string]*retroHeld
 	return held, outside
 }
 
-// The commits of a chapter's window, each as its short hash and subject. [[spec/guidance/retro/chapter]]
-func retroCommitsIn(root, from, to string) []any {
-	said := proc.Real(proc.Command{Argv: []string{"git", "log", "--format=%h %s", "--since=" + from, "--until=" + to}, Dir: root})
+// The commits of a chapter's window through the box's run door, each as its short hash and subject, and the warning a failing git leaves where none read. [[spec/guidance/retro/chapter]] [[spec/tickets/retro-chapters-take-git-door]]
+func retroCommitsIn(run func([]string, runOpts) ranResult, root, from, to string) ([]any, string) {
+	said := run([]string{"git", "log", "--format=%h %s", "--since=" + from, "--until=" + to}, runOpts{cwd: root})
 	out := []any{}
-	for _, line := range strings.Split(retroJSTrim(said.Out), "\n") {
+	if said.code != 0 || said.missing {
+		return out, fmt.Sprintf("git log answers %d over %s to %s, so the chapter carries no commits: %s", said.code, from, to, strings.TrimSpace(orElse(said.stderr, said.fault)))
+	}
+	for _, line := range strings.Split(retroJSTrim(said.stdout), "\n") {
 		if line != "" {
 			out = append(out, line)
 		}
 	}
-	return out
+	return out, ""
 }
 
 // The verb: refuses a gap, an overlap or a line past every chapter, and writes each chapter's lines. [[spec/guidance/retro/chapter]]
@@ -167,7 +168,11 @@ func retroChaptersVerb(box func() boxDoors) twin {
 				}
 				lines.set(path, ranges)
 			}
-			record := retroJSObject("id", one.id, "title", one.title, "from", from, "to", to, "lines", lines, "commits", retroCommitsIn(base, from, to))
+			commits, warned := retroCommitsIn(d.run, base, from, to)
+			if warned != "" {
+				fmt.Fprintln(errs, warned)
+			}
+			record := retroJSObject("id", one.id, "title", one.title, "from", from, "to", to, "lines", lines, "commits", commits)
 			if err := retroJSWrite(disk, filepath.Join(home, retroChaptersFolder, one.id+".json"), record); err != nil {
 				fmt.Fprintln(errs, err)
 				return 1

@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"quackitect/src/note"
-	"quackitect/src/yaml"
 )
 
 // The name a retro's ticket and the group of its improvements open on. [[spec/design_input/the-agent-pulls-tickets]]
@@ -31,11 +30,11 @@ func retroScoreVerb(box func() boxDoors) twin {
 		rows := []row{}
 		d := box()
 		for _, one := range retroScoreNotes(d.disk, retroRootOf(d)) {
-			group := retroScoreField(one.text, "group")
+			group := retroFrontField(one.text, "group")
 			if strings.HasPrefix(one.name, retroScoreRetro) || !strings.HasPrefix(group, retroScoreRetro) {
 				continue
 			}
-			state := retroScoreField(one.text, "state")
+			state := retroFrontField(one.text, "state")
 			if state == "" {
 				state = openRow
 			}
@@ -78,13 +77,19 @@ func retroScoreNotes(disk diskDoors, root string) []retroScoreNote {
 	return out
 }
 
-// A frontmatter field as fieldOf in src/branches/group.go reads it: trimmed, its link brackets off, and empty where it stands nowhere. [[spec/design_output/work#a-group-is-a-ticket]]
-func retroScoreField(text, key string) string {
-	said := note.FrontOf(yaml.SplitLines(text)).Said.Get(key)
+// A field of a note's front, bare of its link marks, as fieldOf in src/branches/group.go reads it: the one front reader the retro verbs share. [[spec/design_output/work#a-group-is-a-ticket]] [[spec/tickets/retro-json-readers-merge]]
+func retroFrontField(text, key string) string {
+	said := note.Read(text).Front.Said.Get(key)
 	if said == nil {
 		return ""
 	}
-	bare := strings.TrimSpace(fmt.Sprint(said))
+	bare := strings.TrimSpace(retroCollectText(said))
 	bare = strings.TrimSuffix(strings.TrimPrefix(bare, "[["), "]]")
 	return strings.TrimSpace(bare)
+}
+
+// The process a note names, as the last part of its link, so a short link and a whole path read alike. [[spec/tickets/retro-json-readers-merge]]
+func retroProcessOf(text string) string {
+	process := retroFrontField(text, "process")
+	return process[strings.LastIndex(process, "/")+1:]
 }

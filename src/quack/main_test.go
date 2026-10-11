@@ -177,43 +177,9 @@ func awaits(t *testing.T, committed <-chan struct{}, want map[string]string) {
 	}
 }
 
-// The wiring loads the queue beside the tickets, and the queue answers a place for the open ticket they read. [[spec/tickets/the-queue-becomes-a-module]]
-func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
-	t.Parallel()
-	w := q.Wiring{
-		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
-		Wires: map[string]string{
-			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName, "tickets.trunk": trunkName, "tickets.branched": "tickets/branched",
-			"queue.rows": "tickets/all", "queue.plan": "files/.se/.runtime/plan.json", "queue.cloud": "tickets/cloud",
-			"queue.stood": q.BuiltIn, "queue.minute": "clock/minute",
-		},
-	}
-	c := q.New()
-	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
-	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
-	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
-	noTips(c)
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	s := q.NewStore(c)
-	text := "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nOne thing.\n"
-	if _, err := s.Commit(0, files, map[string]any{"files/spec/tickets/one.md": q.Content{Hash: "h", Text: text}}); err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{"tickets/all", "tickets/branched", "tickets/cloud", "queue/places"} {
-		if err := s.Run(name); err != nil {
-			t.Fatalf("the run of %s answers %v", name, err)
-		}
-	}
-	if said, _ := s.Snapshot().Read("queue/places").(map[string]string); said["one"] != "1" {
-		t.Fatalf("queue/places reads %v", said)
-	}
-}
-
-// The wiring loads tickets, the queue and the work module, and work/open-tasks counts a fake tree of tickets: a marked group and its child stand on the cloud, a closed ticket takes no place, and the free one counts. [[spec/tickets/open-tasks-come-from-work]]
-func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
-	t.Parallel()
+// A store over the tree's tickets, queue and work modules, and the writers of the files, minute, config and stood days a case seeds them with. [[spec/tickets/open-tasks-come-from-work]]
+func queueStore(t *testing.T) (s *q.Store, files, minute, resolved, stood q.Writer) {
+	t.Helper()
 	all := treeWiring(t)
 	w := q.Wiring{Wires: all.Wires}
 	for _, one := range all.Instances {
@@ -222,14 +188,21 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 		}
 	}
 	c := q.New()
-	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
-	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
-	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	files = q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	minute = q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
+	resolved = q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	stood = q.OutIn(c, stoodName, map[string]int64{}, q.Doc("the second each ticket path came in"))
 	noTips(c)
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
-	s := q.NewStore(c)
+	return q.NewStore(c), files, minute, resolved, stood
+}
+
+// The wiring loads tickets, the queue and the work module, and work/open-tasks counts a fake tree of tickets: a marked group and its child stand on the cloud, a closed ticket takes no place, and the free one counts. [[spec/tickets/open-tasks-come-from-work]]
+func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
+	t.Parallel()
+	s, files, _, _, _ := queueStore(t)
 	ticketOf := func(front string) q.Content {
 		return q.Content{Hash: front, Text: "---\nkind: [[ticket]]\n" + front + "---\n\n# Ask\n\nA thing.\n"}
 	}

@@ -44,6 +44,8 @@ func ticketFill(rootOf func() (string, error)) twin {
 			fmt.Fprintf(errs, "%s names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md\n", nameOr(said, "ticket fill"))
 			return exitUsage
 		}
+		// The processes and the schemas stand under the method root, and the ticket under the work root. [[spec/tickets/ticket-verbs-read-method-routes]]
+		method, _ := methodDisk(rootOf)
 		text, _ := disk.Read(at)
 		read := note.Read(text)
 		held := read.Front.Said
@@ -52,7 +54,7 @@ func ticketFill(rootOf func() (string, error)) twin {
 			return 0
 		}
 		if strings.TrimSpace(yaml.AsString(held.Get("process"))) == "" {
-			_, why := pull.ProcessAt(disk, "")
+			_, why := pull.ProcessAt(method, "")
 			fmt.Fprintln(errs, why)
 			return exitUsage
 		}
@@ -65,8 +67,8 @@ func ticketFill(rootOf func() (string, error)) twin {
 				fields[header] = written
 			}
 		}
-		schemas := check.SchemasIn(check.TreeOver(disk.Root, rootDisk{disk.Root}))
-		if why := withRoute(disk, schemas.Get(ticketKind), fields); why != "" {
+		schemas := check.SchemasIn(check.TreeOver(method.Root, rootDisk{method.Root}))
+		if why := withRoute(method, schemas.Get(ticketKind), fields); why != "" {
 			fmt.Fprintln(errs, why)
 			return exitUsage
 		}
