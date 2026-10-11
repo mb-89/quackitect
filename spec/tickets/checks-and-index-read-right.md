@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box f689bbb375f6 · claude-code-remote
     hash_before: 7388a284eb61da57ea9233b10034dde3da03024b
     session: cse_018wkr3ZZD91bVtBerPg7zA3
+  - step: sync
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 52efc15164d74ff70dcac424e1219e838dcbd1c3
+    hash_after: f8e208ee80963ece302b9faa3eda0efee29fb1ac
+    answered:
+      - name: sync
+        exit: 0
+        said: work/checks-and-index-read-right already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -102,8 +111,9 @@ The check rules fire where their notes say and read only what they name, and the
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 

@@ -11,25 +11,16 @@ import (
 
 // A read to a wedged index ends on an error within the bound it carries. [[spec/tickets/v1-client-carries-a-bound]]
 func TestTheV1ClientCarriesABound(t *testing.T) {
-	t.Parallel()
 	wedged, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer wedged.Close()
-	go func() {
-		for {
-			if _, err := wedged.Accept(); err != nil {
-				return
-			}
-		}
-	}()
 	asked, err := http.NewRequest(http.MethodGet, "http://"+wedged.Addr().String()+"/v1/values/x", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	var said any
-	if err := answers(asked, &said, 50*time.Millisecond); err == nil {
+	if err := answers(asked, new(any), 50*time.Millisecond); err == nil {
 		t.Fatal("a read to a wedged index answers no error")
 	}
 }

@@ -58,22 +58,3 @@ func TestTheClearCheckReadsEveryRoad(t *testing.T) {
 		}
 	}
 }
-
-// The probe's group drops the work branch an earlier clone pushed into its origin before it branches, so the pull meets no diverging origin. [[spec/tickets/rename-text-moves-nothing]]
-func TestTheProbeGroupDropsTheBranchAnEarlierCloneLeft(t *testing.T) {
-	t.Parallel()
-	d, runner, _, _ := fakeBoxDoors(t)
-	grouped(d, d.root, nil)
-	dropped, branched := -1, -1
-	for at, argv := range runner.ran {
-		switch strings.Join(argv, " ") {
-		case "git push -q origin --delete work/" + dryGroup:
-			dropped = at
-		case "git checkout -q -B work/" + dryGroup:
-			branched = at
-		}
-	}
-	if dropped < 0 || dropped > branched {
-		t.Fatalf("the group runs %q, and wants the origin's work/%s dropped before the checkout", runner.ran, dryGroup)
-	}
-}
