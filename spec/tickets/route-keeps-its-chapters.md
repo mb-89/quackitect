@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -178,6 +178,18 @@ record:
     skipped: true
     kept: ca6940d705586fd74d18608ab30c92cb76210740
     why: its red tests stand as ca6940d70 landed them, and a later leaf passed since
+  - step: gate
+    hand: box 1ad094d8843c · claude-code-remote · helper-10
+    hash_before: 023f94c6d594c3c0ba3799143f89b561f4d01ae4
+    hash_after: 023f94c6d594c3c0ba3799143f89b561f4d01ae4
+    inputs:
+      - name: design/draft
+        hash: 1f7c907400ef88cc
+        size: 2022
+      - name: design/tests-red
+        hash: 266fbcd3763fadef
+        size: 705
+    def: dc4904ab364efa10
 group: tickets-keep-their-chapters
 ---
 
@@ -313,9 +325,8 @@ Under a vehicle the route writes the front alone, since the work root holds no s
 <!-- the form is verdict -->
 
 accept with points
-- update-keeps-chapters-under-vehicle: the ask names ticket update beside ticket route, and the draft changes both. But no case runs `ticket update` under a vehicle, so nothing proves the update keeps its chapters. Add a vehicle case to `testdata/ticket_update.json` once the sibling `ticket-verbs-read-method-routes` lands its process reads.
-- vehicle-case-seeds-chapter-text: the vehicle case seeds `slow-lint.md` with text under the Ask alone, and its `draft`, `review` and `do` chapters stand empty. The case proves the headings come back, not that a written chapter keeps its words. Seed text under `draft` and want it back.
-- ask-names-the-check-package: the second `done_when` line runs `go test ./src/check`, a package the tree lacks. The test stands in `./src/modules/check`, so the line should name that path.
+- route-refuses-without-a-schema: the ask says a missing schema refuses at the verb. `TestReRouted` proves the refusal in `ReRoute` alone. No case in `testdata/ticket_route.json` or `ticket_update.json` runs the verb with no schema under the method root. Add one that wants exit failed, the `ErrNoSchema` words and the ticket unchanged.
+- callers-name-the-reroute-test: the callers list leaves out `src/modules/check/reroute_test.go`, which still calls `ReRouted`. Name it beside the three guarded callers.
 
 # implement
 
