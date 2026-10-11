@@ -46,6 +46,7 @@ var plantedTickets = map[string]string{
 	"spec/tickets/g.md":         "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nA group of one change.\n",
 	"spec/tickets/alpha.md":     "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: tests\n        form: command\n        expects: green\n        says: the tests\n      - name: says\n        form: text\n        says: what changes\nprocess: [[spec/processes/small]]\ngroup: g\n---\n\n# Ask\n\nSome change the owner asks for.\n\n# do\n\n<!-- makes the change -->\n\n## tests\n\n<!-- the tests -->\n\n## says\n\n<!-- what changes -->\n\n# Discussion\n",
 	"spec/processes/small.yaml": "steps: []\n",
+	"spec/tickets/beta.md":      "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: implement\n    steps:\n      - name: tests-green\n        does: makes the tests pass\n        input: design/tests-red\n        to: retro\n        evidence:\n          - name: tests\n            form: command\n            expects: green\n            says: the same tests pass\n          - name: check\n            form: command\n            expects: 0\n            says: the check is green on the commit\n          - name: says\n            form: text\n            says: what changes and why, for a reader who was not there\nprocess: [[spec/processes/standard]]\nprocess_hash: \"abcdabcdabcdabcd\"\ngroup: g\nstep: implement/tests-green\n---\n\n# Ask\n\nA rule the owner names.\n",
 	".gitignore":                ".se/\n",
 }
 

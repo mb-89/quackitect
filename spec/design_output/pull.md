@@ -781,6 +781,7 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
 | a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+| a leaf moved in the keys `wordingFields` names in `src/pull/pull_stale.go` alone | keeps `step`, a passed leaf keeps its wording, and the leaf at `step` takes the new wording |
 
 ## Ticket links read the Ask
 

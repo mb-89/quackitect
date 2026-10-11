@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: handovers-and-light-work
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 56fb3f5adf2f128b
         size: 882
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: 40b6d2c488d382cfc942d8e4ebaa34a21f1bb9c6
+    hash_after: 40b6d2c488d382cfc942d8e4ebaa34a21f1bb9c6
+    answered:
+      - name: lint
+        exit: 0
+        said: "   73.4  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -317,14 +326,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the golden the reworded route mints again
+- the pull cases run on the fake disk and git of cloudPull, and the example on the harness fakes
+- the comments on wordingFields, sameButWording and freshAtStep point at the design note chapter the table row joins
+- wordingFields names the keys once, and the design note points at it
 
 ## tests-green
 
