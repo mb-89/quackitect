@@ -15,7 +15,7 @@ import (
 func freeIn(all []*Held) []*Held {
 	out := []*Held{}
 	for _, one := range all {
-		if !one.Private && FieldOf(one.Text, GroupField) == "" && !IsGroup(one.Text) {
+		if !one.Private && one.Field(GroupField) == "" && !one.IsGroup() {
 			out = append(out, one)
 		}
 	}
@@ -33,7 +33,7 @@ func (it *It) cutForGroups(all []*Held) {
 		stands[head] = true
 	}
 	for _, one := range all {
-		if one.Private || !IsGroup(one.Text) || FieldOf(one.Text, "state") != Open {
+		if one.Private || !one.IsGroup() || one.Field("state") != Open {
 			continue
 		}
 		branch := WorkBranch + one.Name
@@ -53,7 +53,7 @@ func (it *It) cutForGroups(all []*Held) {
 // A group a pull names on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
 func (it *It) namedGroup(name string) string {
 	for _, one := range TicketsHere(it.Disk) {
-		if !one.Private && one.Name == name && IsGroup(one.Text) {
+		if !one.Private && one.Name == name && one.IsGroup() {
 			return name
 		}
 	}

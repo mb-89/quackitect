@@ -130,7 +130,7 @@ func (it *It) ticketsHere() []*Held {
 func taggedIn(list []*Held, group string) []*Held {
 	out := []*Held{}
 	for _, one := range list {
-		named := FieldOf(one.Text, GroupField)
+		named := one.Field(GroupField)
 		if todoOf(one.Front) != "" && (group == "" || named == "" || named == group) {
 			out = append(out, one)
 		}
@@ -160,7 +160,7 @@ func (it *It) sorted(list, all []*Held) []*Held {
 					fails++
 				}
 			}
-			out = append(out, queue.Row{Name: one.Name, Path: one.Path, Urgent: FieldOf(one.Text, "urgent") == "true", DependsOn: dependsOn(one.Front), Fails: fails})
+			out = append(out, queue.Row{Name: one.Name, Path: one.Path, Urgent: one.Field("urgent") == "true", DependsOn: dependsOn(one.Front), Fails: fails})
 		}
 		return out
 	}
@@ -348,7 +348,7 @@ func (it *It) takeable(one *Held, all []*Held, group string) bool {
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 func (it *It) offer(who *Who, one *Held, all []*Held) offered {
-	state := FieldOf(one.Text, "state")
+	state := one.Field("state")
 	if state == Closed {
 		return offered{}
 	}
@@ -391,7 +391,7 @@ func (it *It) offer(who *Who, one *Held, all []*Held) offered {
 func (it *It) closedHere(all []*Held, dep string) bool {
 	for _, one := range all {
 		if one.Name == dep {
-			return FieldOf(one.Text, "state") == Closed
+			return one.Field("state") == Closed
 		}
 	}
 	said, ok := it.Git.Show("origin/"+Trunk, Tickets+"/"+dep+".md")

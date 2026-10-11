@@ -118,13 +118,13 @@ type childrenSaid struct{ open, dropped, all []string }
 func childrenSay(all []*Held, name string) childrenSaid {
 	out := childrenSaid{open: []string{}, dropped: []string{}, all: []string{}}
 	for _, one := range all {
-		if one.Private || FieldOf(one.Text, GroupField) != name {
+		if one.Private || one.Field(GroupField) != name {
 			continue
 		}
 		out.all = append(out.all, one.Name)
-		if FieldOf(one.Text, "state") != Closed {
+		if one.Field("state") != Closed {
 			out.open = append(out.open, one.Name)
-		} else if FieldOf(one.Text, "reason") == "dropped" {
+		} else if one.Field("reason") == "dropped" {
 			out.dropped = append(out.dropped, one.Name)
 		}
 	}
