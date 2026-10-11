@@ -186,12 +186,27 @@ func mapAt(rows []row, one *cursor, indent int, path string) any {
 		at := Keyed(path, key)
 		one.mark(at, held.line)
 		if rest := strings.TrimSpace(pair[2]); rest != "" {
-			out.Set(key, scalar(rest))
+			out.Set(key, scalar(flowJoined(rows, one, held.indent, rest)))
 			continue
 		}
 		out.Set(key, under(rows, one, held.indent, at))
 	}
 	return out
+}
+
+// A flow list open at its row's end takes each deeper row until its bracket closes. [[spec/tickets/depends-on-reads-one-parser]]
+func flowJoined(rows []row, one *cursor, indent int, rest string) string {
+	if !strings.HasPrefix(rest, "[") || strings.HasSuffix(rest, "]") {
+		return rest
+	}
+	for one.at < len(rows) && rows[one.at].indent > indent {
+		rest += " " + rows[one.at].said
+		one.at++
+		if strings.HasSuffix(rest, "]") {
+			break
+		}
+	}
+	return rest
 }
 
 func listAt(rows []row, one *cursor, indent int, path string) any {

@@ -89,11 +89,32 @@ func gone(top, at string) error {
 	return nil
 }
 
+// Removes a file, or a folder once the empty folders under it go, deepest first. A folder holding a file stands. [[spec/tickets/review-clears-stale-worktree]]
 func (one disk) Remove(path string) error {
+	for _, folder := range one.folders(path) {
+		_ = os.Remove(folder)
+	}
 	if err := os.Remove(one.at(path)); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 	return nil
+}
+
+// The folders under path, deepest first, and none where path is a file or a link. [[spec/tickets/review-clears-stale-worktree]]
+func (one disk) folders(path string) []string {
+	out := []string{}
+	top := one.at(path)
+	_ = filepath.WalkDir(top, func(at string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if entry.IsDir() && at != top {
+			out = append(out, at)
+		}
+		return nil
+	})
+	sort.Sort(sort.Reverse(sort.StringSlice(out)))
+	return out
 }
 
 // The path to standing as an alias of path, a file or a folder, so a read under to reads path. [[spec/tickets/branch-verbs-meet-fake-git]]

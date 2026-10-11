@@ -150,8 +150,15 @@ func TestPFGoSaysItsWord(t *testing.T) {
 	if got := goSays(Said{Code: 1, Out: "--- FAIL: TestOne\nFAIL\n"}, "src/tui"); got != "assertion, a test of src/tui fails" {
 		t.Fatalf("a failing run reads %q", got)
 	}
-	if got := goSays(Said{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"}, "src/tui"); got != "build, because src/tui builds not: ./work.go:9:2: undefined: nothing" {
-		t.Fatalf("a broken build reads %q", got)
+	// Each run as go test prints it, a package that builds not marking stdout with build failed. [[spec/tickets/go-build-failure-reads-build]]
+	for _, ran := range []Said{
+		{Code: 1, Err: "./work.go:9:2: undefined: nothing\n"},
+		{Code: 1, Out: "FAIL\tquackitect/src/tui [build failed]\nFAIL\n", Err: "# quackitect/src/tui [quackitect/src/tui.test]\n./work.go:9:2: undefined: nothing\n"},
+		{Code: 1, Out: "--- FAIL: TestOne\nFAIL\nFAIL\tquackitect/src/tui/a\t0.01s\nFAIL\tquackitect/src/tui/b [build failed]\n", Err: "./work.go:9:2: undefined: nothing\n"},
+	} {
+		if got := goSays(ran, "src/tui"); got != "build, because src/tui builds not: ./work.go:9:2: undefined: nothing" {
+			t.Fatalf("a broken build reads %q", got)
+		}
 	}
 }
 

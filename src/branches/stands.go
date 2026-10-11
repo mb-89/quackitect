@@ -110,50 +110,13 @@ func shutBy(text string, shared map[string]any) string {
 // A dependency waits while its branch stands, and one on no branch waits while trunk's copy stands short of closed. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 func waitingOn(text string, standing map[string]string, trunkTickets map[string]string) []string {
 	var out []string
-	for _, name := range dependsOnText(text) {
+	for _, name := range dependsOn(frontOf(text)) {
 		status, stands := standing[workBranch+name]
 		switch {
 		case status == todo || status == held || status == done:
 			out = append(out, name)
 		case stands && status != "":
 		case trunkTickets[name] != "" && fieldOf(trunkTickets[name], "state") != closedState:
-			out = append(out, name)
-		}
-	}
-	return out
-}
-
-// The groups a ticket depends on, off the raw front rows, each bare of its branch prefix. [[spec/design_output/work#the-mark-and-what-waits]]
-func dependsOnText(text string) []string {
-	rows := splitRows(text)
-	if strings.TrimSpace(rows[0]) != frontFence {
-		return nil
-	}
-	var raw []string
-	reading := false
-	for _, row := range rows[1:] {
-		if strings.TrimSpace(row) == frontFence {
-			break
-		}
-		if rest, ok := strings.CutPrefix(row, "depends_on:"); ok {
-			reading = true
-			raw = append(raw, strings.Split(rest, ",")...)
-			continue
-		}
-		if !reading {
-			continue
-		}
-		if item := strings.TrimSpace(row); strings.HasPrefix(item, "- ") {
-			raw = append(raw, strings.TrimSpace(item[2:]))
-			continue
-		}
-		if strings.TrimSpace(row) != "" {
-			reading = false
-		}
-	}
-	var out []string
-	for _, one := range raw {
-		if name := groupNamed(one); name != "" {
 			out = append(out, name)
 		}
 	}

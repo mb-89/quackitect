@@ -108,9 +108,9 @@ func (it *It) workAnswer(one *Held, leaf *Leaf) string {
 	rows = append(rows, it.notesSaid(it.notesOf(one.Text, leaf))...)
 	rows = append(rows, "")
 	if leaf.holdsForm("verdict") != nil {
-		rows = append(rows, fmt.Sprintf("Hand it back with %s, and the verdict field decides.", CallOf("ticket", "pull", one.Name, "--fields", "<json>")))
+		rows = append(rows, fmt.Sprintf("Hand it back with %s, and the verdict field decides.", it.backCall(one.Name, "--fields", "<json>")))
 	} else {
-		rows = append(rows, fmt.Sprintf("Hand it back: %s, or --fail \"why\", --became <ticket> or --answered <ticket> in place of --pass.", CallOf("ticket", "pull", one.Name, "--pass", "--fields", "<json>")))
+		rows = append(rows, fmt.Sprintf("Hand it back: %s, or --fail \"why\", --became <ticket> or --answered <ticket> in place of --pass.", it.backCall(one.Name, "--pass", "--fields", "<json>")))
 	}
 	return strings.Join(rows, "\n")
 }
@@ -583,4 +583,12 @@ func (it *It) findingFaults(said Verdict, where string) []string {
 		seen[one.Name] = true
 	}
 	return out
+}
+
+// The hand-back call, carrying the owner's word where the hold stands under it. [[spec/tickets/owner-says-hand-back-holds]]
+func (it *It) backCall(words ...string) string {
+	if it.OwnerSays {
+		words = append(words, "--owner-says")
+	}
+	return CallOf("ticket", "pull", words...)
 }

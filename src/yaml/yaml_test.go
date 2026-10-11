@@ -121,6 +121,17 @@ func TestReadYamlHoldsTheShape(t *testing.T) {
 	}
 }
 
+// A flow list open at its row's end reads on across the deeper rows, and the key after it reads as its own. [[spec/tickets/depends-on-reads-one-parser]]
+func TestAFlowListReadsAcrossRows(t *testing.T) {
+	said := AsDoc(Read("waits: [one,\n  'two',\n  three]\nnext: on\n"))
+	if got := StringsOf(said.Get("waits")); !reflect.DeepEqual(got, []string{"one", "two", "three"}) {
+		t.Errorf("the list reads %q", got)
+	}
+	if AsString(said.Get("next")) != "on" {
+		t.Errorf("the key after reads %v", said.Get("next"))
+	}
+}
+
 func TestReadYamlKeepsTheOrder(t *testing.T) {
 	said := AsDoc(Read("one: 1\ntwo: 2\nthree: 3\n"))
 	want := []string{"one", "two", "three"}
