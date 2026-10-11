@@ -53,7 +53,7 @@ func beatVerb(d *Doors, _ string, argv []string) int {
 			return codeOK
 		}
 	}
-	d.writeBeat(holding.Name, roleOf(holding.Hand), ended)
+	d.writeBeat(holding.Name, roleOf(holding.Hand), ended, d.beatFiles(holding.Hand))
 	return codeOK
 }
 
@@ -77,13 +77,16 @@ func (d *Doors) asksHandover() {
 	d.say("%s", said)
 }
 
-// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. [[spec/design_output/work#the-session-beats-its-hold]]
-func (d *Doors) writeBeat(group, hand string, ended bool) bool {
+// Pushes the beat by force to origin and keeps the ref here, and logs a refusal, since nobody reads a Stop hook's lines. The files ride a commit on the empty one. [[spec/design_output/work#the-session-beats-its-hold]] [[spec/design_output/work#a-takeover-reads-the-beat]]
+func (d *Doors) writeBeat(group, hand string, ended bool, files map[string]string) bool {
 	word := beatsWord
 	if ended {
 		word = endsWord
 	}
 	commit, err := d.Repo.EmptyCommit(hand + " " + word)
+	if err == nil && len(files) > 0 {
+		commit, err = d.Repo.CommitFiles(commit, files, hand+" "+word)
+	}
 	if err != nil {
 		return d.beatFails(group, err.Error())
 	}

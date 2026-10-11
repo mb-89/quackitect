@@ -73,6 +73,10 @@ func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo, 
 			}
 			handed = append(handed, one)
 		}
+		// [[spec/tickets/small-work-takes-light-path]]
+		if kind == ticketKind && !namesProcess(handed) {
+			handed = append(handed, "--process="+pull.LightRoute)
+		}
 		// [[spec/tickets/verbs-mint-tickets-and-keys]]
 		handed, said, ask := askFlags(pull.OSDisk{Root: method}, handed)
 		fields, why := fieldsIn(handed, schema)
@@ -211,6 +215,16 @@ func askFlags(disk pull.Disk, words []string) ([]string, map[string][]string, []
 		said[name] = append(said[name], pair[2])
 	}
 	return rest, said, held.Ask
+}
+
+// Whether the words name a process. [[spec/tickets/small-work-takes-light-path]]
+func namesProcess(words []string) bool {
+	for _, word := range words {
+		if pair := fieldFlag.FindStringSubmatch(word); pair != nil && check.SlugOf(pair[1]) == "process" {
+			return true
+		}
+	}
+	return false
 }
 
 // Copies the route, its hash and the process's ask in where the fields name a process and the schema takes steps, off ProcessAt in src/pull/process.go. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

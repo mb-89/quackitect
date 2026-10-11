@@ -33,7 +33,7 @@ func (it *It) rejected(who *Who, one *Held, leaf *Leaf, held Hold, reason string
 		after = it.tipOf()
 	}
 	one.Text = withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("returns", round), pair("why", reason), pair("answered", answeredRows(answered)))
+		pair("returns", round), pair("why", reason), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	first, names := it.reworked(one, leaf.Path, round)
 	if first == "" {
 		it.Refuse(failure.Raise(it.Failures, "pull-reject-no-phase", leaf.Path+" stands after no phase, so a reject puts nothing in again."))
@@ -80,7 +80,7 @@ func (it *It) rejectedToChildren(who *Who, one *Held, leaf *Leaf, held Hold, rea
 		after = it.tipOf()
 	}
 	text := withEntry(one.Text, pair("step", leaf.Path), pair("hand", RoleOf(who.Hand)), pair("hash_before", held.Hash), pair("hash_after", after),
-		pair("returns", returnsOf(one.Front, leaf.Path)+1), pair("why", reason), pair("answered", answeredRows(answered)))
+		pair("returns", returnsOf(one.Front, leaf.Path)+1), pair("why", reason), pair("answered", answeredRows(answered)), pair(nextField, nextIn(it.Argv)))
 	one.Text = withField(withField(text, "step", children), "state", Open)
 	wrote := it.wroteChildren(built)
 	changes := []string{"rejects at " + leaf.Path, "mints " + strings.Join(names, ", "), "returns to " + children}
