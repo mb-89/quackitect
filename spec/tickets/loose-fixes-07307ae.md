@@ -85,6 +85,11 @@ process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 step: sync
 fix: true
+record:
+  - step: sync
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 6114e1b57607fa9531039d82a2025cbd496e6b93
+    session: cse_017FNkXMH7nY7T7zaGxxFrAi
 ---
 
 # Ask
