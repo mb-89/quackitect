@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: ece074629334ff52d873f4ba79d2948b312515a3
+    hash_after: ece074629334ff52d873f4ba79d2948b312515a3
+    inputs:
+      - name: retro/write
+        hash: be7262c3f79b6c34
+        size: 3015
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -311,20 +321,28 @@ The run held to one ticket at a time, and the slow part was the harness rather t
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- no tool, host, right or install was missing on this run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a sync with main past the cold path at 00:44, which landed clean
+- the ratio guard at 00:20, cleared by folding two tests into one
+- the stop hook holding the turn while a helper ran, from 00:31 to 00:55
+- the door on git stash and on a pull joined to a command before it
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the handover names the pull request against main as the last step
 
 # Discussion
 
