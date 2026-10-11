@@ -85,6 +85,7 @@ process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
 step: sync
 fix: true
+cloud: true
 ---
 
 # Ask
