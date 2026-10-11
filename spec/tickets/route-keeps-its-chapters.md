@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -171,6 +171,9 @@ record:
     skipped: true
     kept: ca6940d705586fd74d18608ab30c92cb76210740
     why: its red tests stand as ca6940d70 landed them, and a later leaf passed since
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 group: tickets-keep-their-chapters
 ---
 
