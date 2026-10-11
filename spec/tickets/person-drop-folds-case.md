@@ -1,8 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 point: gate
-todo: true
+todo: false
 step: do
 steps:
   - name: do
@@ -30,6 +30,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2a00b62f7c4bc60b
 group: hooks-v1-hold-the-line
 parent: v1-takes-a-run-secret
+record:
+  - step: do
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 53d63007e1350c930240c5c3f375317a75feca88
+    hash_after: 53d63007e1350c930240c5c3f375317a75feca88
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q/tool passes
+      - name: check
+        exit: 0
+        said: "   99.0  in all"
+    inputs:
+      - name: ask
+        hash: 5f7023c3be17af3b
+        size: 103
+    def: be9d938c0443b338
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ parent: v1-takes-a-run-secret
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/q/tool
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`tool.Input` clears the person mark on the decoded input, in place of a key of the raw map. A key in any case, `Person` or `PERSON`, then drops. `TestAnAgentsCallDropsThePersonMark` holds the three spellings. The change landed in 9e5aadc17 and 411abd680.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the mark clears off the decoded value, as `unmarked` in `src/q/tool/tool.go` reads it
+- the cleanup the change reveals: the field name stands again in `tool.go`, since q imports no index, and the comment names the twin
+- the field name stands as `personField`, beside a pointer at `MarksPerson`
 
 # Discussion
 
