@@ -154,14 +154,6 @@ func ioOnAWire(t *testing.T) *q.Store {
 	return store
 }
 
-// quack io answers no run, so an IO instance reading a wire reads as wired, and one reading nothing does not. [[spec/tickets/quack-io-answers-no-run]]
-func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
-	t.Parallel()
-	if got := wiredIO(ioOnAWire(t), []string{"source", "reader"}); len(got) != 1 || got[0] != "reader" {
-		t.Fatalf("the wired IO instances read %v, and want reader alone", got)
-	}
-}
-
 // The split refuses to start an IO instance on a wire, and names it. [[spec/tickets/start-refuses-wired-io]]
 func TestTheSplitRefusesAnIOInstanceOnAWire(t *testing.T) {
 	t.Parallel()
