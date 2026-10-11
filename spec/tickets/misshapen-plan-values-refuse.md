@@ -34,11 +34,12 @@ parent: plan-keeps-its-todos
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The plan file keeps every todo where a known key holds a value of the wrong shape, because the plan refuses such a file as it refuses one reading as no JSON object.
 
-planOf drops the json.Unmarshal errors on the working, todos and places values, so a file such as {"todos":{}} still reads as zero todos and the next call writes over them; refuse that file the way the draft refuses one reading as no JSON object
+A plan file whose `todos` key holds an object reads as zero todos, so the next plan call writes over every todo the file held.
+
+- go test ./src/modules/plans passes a case where a file holding a `todos` object, a `working` number and a `places` list each refuse and stand unchanged
+- ./RUNME.sh check is green
 
 # do
 

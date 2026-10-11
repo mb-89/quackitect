@@ -184,3 +184,13 @@ func TestAReadErrorPastNotExistRefuses(t *testing.T) {
 		t.Errorf("a refused call writes %q", file.text)
 	}
 }
+
+// A known key holding a value of the wrong shape refuses the call, and the file stands as it was. [[spec/tickets/misshapen-plan-values-refuse]]
+func TestAPlanKeyOfTheWrongShapeRefusesAndStands(t *testing.T) {
+	for _, text := range []string{`{"working":"","todos":{"title":"kept"},"places":{}}`, `{"working":3,"todos":[],"places":{}}`, `{"working":"","todos":[],"places":[]}`} {
+		file := &fakePlan{text: text}
+		if _, err := Accept(file.outside(0))(q.Request{Module: Module, Verb: setVerb, Args: tool.Plan{Add: []tool.PlanTodo{{Title: "new"}}}}); err == nil || file.text != text {
+			t.Errorf("%s answers %v, and stands as %q", text, err, file.text)
+		}
+	}
+}
