@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -155,6 +155,15 @@ record:
         hash: e69a77163dae225d
         size: 1109
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 28eb8b7e7177839f32461e43c03ab570025d3e9d
+    hash_after: 28eb8b7e7177839f32461e43c03ab570025d3e9d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: hooks-v1-hold-the-line
 ---
 
@@ -329,14 +338,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/index/secret.go src/index/door.go src/index/actions.go src/index/main.go src/q/tool/tool.go src/modules/hooks/secret.go src/modules/hooks/hooks.go src/modules/hooks/command/guards.go src/extension/editor-index.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft and its review points name: the index's doors and client, the tool input, the hook door's guards and the extension's index door
+- the change reaches the network, the disk and the store through the index's fakes, `holdDoor`, and the extension's fake disk and fake http
+- the header comment of `src/index/secret.go` names the approach: the run's secret gates a person's post and the first port
+- the secret's path and header stand once in `src/index/secret.go`, and each copy names it
 
 ## tests-green
 
