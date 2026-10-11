@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 8339730da099 · claude-code-remote
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: 65da5b1220a2aaf9716263804690505dd3056946
     hash_after: 65da5b1220a2aaf9716263804690505dd3056946
+  - step: accept
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: dfc432f4bfb2c1b11f5f1d3ccce4aa958a392488
+    hash_after: dfc432f4bfb2c1b11f5f1d3ccce4aa958a392488
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/branches-and-pull-report-truly already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b4fb32242a53e4b3
+        size: 443
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -179,8 +195,9 @@ Done when every finding on the review list closes, done or with its reason.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
