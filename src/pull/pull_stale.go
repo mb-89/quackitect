@@ -286,12 +286,11 @@ func (it *It) processRead(one *Held) {
 	if len(check.CheckNote(text, schema, one.Path)) > 0 {
 		return
 	}
-	one.Text, one.Front = text, FrontOf(text)
 	said := "takes " + held.Name + " again"
 	if moved != nil {
 		said += ", and goes back to " + moved.Path
 	}
-	it.landedAlone(one, []string{said})
+	it.movedAlone(one, text, []string{said})
 }
 
 // The keys a reword moves, which leave the answer a passed leaf gave standing. [[spec/design_output/pull#an-input-marks-its-steps]]
@@ -359,9 +358,7 @@ func (it *It) inputRead(one *Held) {
 		text = withEntry(text, pair("step", leaf.path), pair("hand", Engine), pair("stale", strings.Join(leaf.moved, ", ")))
 		paths = append(paths, leaf.path)
 	}
-	one.Text = withField(text, "step", stale[0].path)
-	one.Front = FrontOf(one.Text)
-	it.landedAlone(one, []string{fmt.Sprintf("marks %s stale, and goes back to %s", strings.Join(paths, ", "), stale[0].path)})
+	it.movedAlone(one, withField(text, "step", stale[0].path), []string{fmt.Sprintf("marks %s stale, and goes back to %s", strings.Join(paths, ", "), stale[0].path)})
 }
 
 // [[spec/design_output/pull#an-input-marks-its-steps]]

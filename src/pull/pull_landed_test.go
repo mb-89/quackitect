@@ -231,6 +231,40 @@ func TestAFailedFastForwardNamesGitsReason(t *testing.T) {
 	}
 }
 
+// A ticket past a bless gate whose verdict carries no bless, so the strip moves it back. [[spec/tickets/engine-repairs-keep-refusals]]
+const unblessedTicket = `---
+kind: [[ticket]]
+state: open
+steps:
+  - name: review
+    gate: does it hold
+    bless: true
+  - name: do
+    does: makes it
+step: do
+record:
+  - step: review
+    hand: box 1
+    verdict: accept
+---
+
+# Ask
+
+A change.
+`
+
+// An engine repair the commit refuses leaves the ticket in hand as the disk holds it. [[spec/tickets/engine-repairs-keep-refusals]]
+func TestARefusedRepairKeepsTheTicketAsItStands(t *testing.T) {
+	t.Parallel()
+	it, _, _ := cloudPull(t)
+	must(t, it.Disk.Write("spec/tickets/alpha.md", unblessedTicket))
+	it.Git = refusedCommitRepo{Repo: it.Git}
+	one := &Held{Name: "alpha", Path: "spec/tickets/alpha.md", Text: unblessedTicket, Front: FrontOf(unblessedTicket)}
+	if got := it.blessHolds(one); got.Text != unblessedTicket || StepPathOf(got.Front) != "do" {
+		t.Fatalf("the refused strip leaves the ticket at %s:\n%s", StepPathOf(got.Front), got.Text)
+	}
+}
+
 // A git door whose commit the hook refuses. [[spec/tickets/engine-landings-report-refusals]]
 type refusedCommitRepo struct{ git.Repo }
 
