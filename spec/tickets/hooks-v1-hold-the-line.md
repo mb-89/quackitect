@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box d5540c8b5530 · claude-code-remote
@@ -148,6 +148,15 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: dcef559104d239cbce22d57b21d2dd7ebe154e86
+    hash_after: dcef559104d239cbce22d57b21d2dd7ebe154e86
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -235,8 +244,9 @@ The diff since the last verdict fixes both points: `SecretName` refuses a glob o
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
