@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -158,6 +158,15 @@ record:
         hash: 0c9c9ee5f01d6b9e
         size: 564
     def: 7cea74295027d571
+  - step: implement/change
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: 17b0c8899fd2db5b1f2a78234dba7b29db643baf
+    hash_after: 16e4877d415ca47c2e3a7b13ad1f77b032f5f1fc
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: branches-and-pull-report-truly
 ---
 
@@ -296,14 +305,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint --changed --strict
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/branches/test.go alone, which the ask names
+- the change reaches no door, so it needs no fake
+- the goSays header names the approach: a build mark reads build before any FAIL line
+- the build mark stands in the goBuild pattern alone
 
 ## tests-green
 
