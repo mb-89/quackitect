@@ -46,6 +46,8 @@ func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Re
 			fmt.Fprintf(errs, "%s names no ticket under %s or %s.\n", said[0], pull.Notes, pull.Tickets)
 			return exitUsage
 		}
+		// The processes, their history and the schema stand under the method root, and the ticket under the work root. [[spec/tickets/ticket-verbs-read-method-routes]]
+		method, _ := methodDisk(rootOf)
 		text, _ := disk.Read(at)
 		held := note.Read(text).Front.Said
 		carried, asked := yaml.AsString(held.Get("process")), false
@@ -55,7 +57,7 @@ func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Re
 				break
 			}
 		}
-		process, why := pull.ProcessAt(disk, carried)
+		process, why := pull.ProcessAt(method, carried)
 		if why != "" {
 			fmt.Fprintln(errs, why)
 			return exitUsage
@@ -67,7 +69,7 @@ func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Re
 		}
 		// A person's edit past the reached leaves stops the copy, unless --over says to write over it. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
 		if !slices.Contains(words, overFlag) {
-			base, found := copiedBase(repoAt(disk.Root), yaml.AsString(held.Get("process")), hash, disk)
+			base, found := copiedBase(repoAt(method.Root), yaml.AsString(held.Get("process")), hash, method)
 			if !found {
 				fmt.Fprintf(errs, "The process version %s copied stands nowhere in the history, so any drift stays unread. Run it again with %s to copy the new route over the route as it stands.\n", at, overFlag)
 				return 1
@@ -82,7 +84,6 @@ func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Re
 			fmt.Fprintln(errs, why)
 			return 1
 		}
-		method, _ := methodDisk(rootOf)
 		routed, err := check.ReRoute(text, ticketSchema(method.Root), steps, process.Hash)
 		if err == nil {
 			err = disk.Write(at, routed)

@@ -31,7 +31,7 @@ func ticketSet(here pullOver) twin {
 			fmt.Fprintf(errs, "%s needs a ticket, a field and a value: ./RUNME.sh ticket set slow-lint group a-group\n", nameOr(said, "ticket set"))
 			return exitUsage
 		}
-		return ticketWritten(disk, at, said[1], strings.Join(said[2:], " "), dry, out, errs)
+		return ticketWritten(disk, pull.OSDisk{Root: it.Method}, at, said[1], strings.Join(said[2:], " "), dry, out, errs)
 	}
 }
 
@@ -64,9 +64,10 @@ func nameOr(said []string, verb string) string {
 }
 
 // One field written, or dropped where the value is empty or a flag standing off. A dry run says so and writes nothing. [[spec/tickets/go-writes-the-frontmatter]]
-func ticketWritten(disk pull.Disk, at, key, value string, dry bool, out, errs io.Writer) int {
+func ticketWritten(disk, method pull.Disk, at, key, value string, dry bool, out, errs io.Writer) int {
 	text, _ := disk.Read(at)
-	schema, _ := disk.Read(ticketSchemaAt)
+	// The schema stands under the method root, and the ticket under the work root. [[spec/tickets/ticket-verbs-read-method-routes]]
+	schema, _ := method.Read(ticketSchemaAt)
 	if why := pull.Weighs(schema, key, value); why != "" {
 		fmt.Fprintln(errs, why)
 		return exitUsage

@@ -81,6 +81,15 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 				}
 			}
 			repo := standsInRepo(t, root)
+			// A vehicle case reads the process history off the method root alone. [[spec/tickets/update-case-splits-repos]]
+			if inner := standingRepo; one.Vehicle {
+				standingRepo = func(asked string) git.Repo {
+					if asked != root {
+						t.Errorf("git runs over %s, and the history stands under the method root %s", asked, root)
+					}
+					return inner(asked)
+				}
+			}
 			history := one.History
 			if history == nil {
 				history = held.History

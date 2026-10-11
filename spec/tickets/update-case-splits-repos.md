@@ -34,11 +34,12 @@ parent: ticket-verbs-read-method-routes
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The update vehicle case decides which history the drift reads, because the case harness refuses a git read over any root past the method root.
 
-the draft hands `copiedBase` the method repository. But in the harness `standsInRepo` swaps `standingRepo` for one fake that ignores the root it gets. So the update vehicle case passes whether `repoAt` takes the method root or the work root. Let the vehicle case answer a repository a root, or hold the root `repoAt` asks for, so the case decides which history the drift reads.
+The harness hands one fake repository whatever root a verb asks for, so a vehicle update reading the work root's history passes as one reading the method root's.
+
+- go test ./src/quack -run TestTicketUpdateVerb passes, and fails where `ticket update` hands `copiedBase` the work root's repository
+- ./RUNME.sh check is green
 
 # do
 
