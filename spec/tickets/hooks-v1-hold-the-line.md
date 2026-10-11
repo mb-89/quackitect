@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d5540c8b5530 · claude-code-remote
@@ -157,6 +157,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: f584a595b765192f954325e921602ff2a48433b4
+    hash_after: f584a595b765192f954325e921602ff2a48433b4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -255,38 +267,70 @@ The diff since the last verdict fixes both points: `SecretName` refuses a glob o
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `dispatch-skips-fork-pulls`: the dispatch acts on pull requests whose head stands in this repository
+- `door-lock-holds-commit-alone`: the field readers run before the hook door's lock
+- `fill-gate-stands-once`: `fills` is the one gate over the fill
+- `github-writes-leave-the-allowlist`: the settings deny the server-commit tools and `gh api` merges
+- `pkill-recovery-takes-plain-paths`: a recovery `pkill` takes a plain path alone
+- `shell-write-paths-clean`: `Clean` folds dot segments
+- `trunk-push-reads-the-refspec` and `trunk-push-reads-repo-flag`: the trunk guard reads each push's destination
+- `version-guard-skips-git-options`: git's valued options read past, and pre-push refuses a version rewrite
+- `write-door-paths-clean` and `types-wait-for-laid-types`: main's twin fixes stand after the merges
+- `hold-verdicts-ride-the-post` and its points: every fold reader reads the place its own event landed
+- `v1-takes-a-run-secret` and its points: a verb runs as a person where its caller carries the run's secret
+- `secret-guard-reads-folder-globs`: the agent's doors refuse a glob or a folder reaching the secret
+- the probe's clone takes a bare origin of its own
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a red test before each fix caught the case it named, since each test failed first
+- helper reviews at each gate found real holes: the case-folded person key, the 644 standing file, the `--repo` flag
+- one explore helper mapped the person mark across the index, the doors and the extension before the draft
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 2026-10-10T21:20Z: the first sync merge conflicted with main in `check.go`, where both sides fixed the laid types
+- 2026-10-10T21:56Z: the hand-back of `dispatch-skips-fork-pulls` committed six other tickets' code in its pass commit
+- 2026-10-10T22:30Z: the cold probe's clear check failed, and its clone pushed `work/dry-probe-clears` back into the source checkout
+- 2026-10-11T00:40Z: a helper ran `branch sync` beside the box's own sync, and stopped on the open merge
+- 2026-10-11T02:20Z: the cold probe failed three times running once main's pull refused a failed fetch, until the clone took its own origin
+- 2026-10-11T01:50Z: the run-secret build met the ceiling of `door.go` and `hooks.go`, and the door rule refused `net/http` in a new file
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the box applies a code change only once its ticket stands in hand, since a pass commits the whole tree: `spec/guidance/cloud/cloud.md`
+- the probe's clone takes an origin of its own: `src/quack/probe_clear.go`
+- a helper's prompt forbids `branch sync` and merges: `.claude/skills/work/SKILL.md`
+- a file near its ceiling takes a new topic in a file of its own from the start: `spec/guidance/code/testing.md`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask read as many small fixes, and two of them were designs. The run secret touched the index, three doors and the extension, and a review point surfaced at every layer. The cold probe cost the most time. It drives a live client, so a fault in its own setup read at first as a flaky model, and only a second failure on the same remedy pointed at the fetch.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in its file, and the retro points at the file
+- the change adds the secret's length and mode, each named once in `src/index/secret.go`
+- each new file opens on what it is for
+- the run took no owner prompt, since a schedule fired it, and the errors stand with their times
+- the chapter names the box by role alone
 
 ## cloud
 
