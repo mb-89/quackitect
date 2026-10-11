@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 65ef41734dc39d242035f4f751a5337252d761f1
+    hash_after: 65ef41734dc39d242035f4f751a5337252d761f1
+    inputs:
+      - name: retro/write
+        hash: 80c45b489715ad67
+        size: 2118
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -294,20 +304,26 @@ The ask names mint-light.md, and the harness wires no mint, so the example shows
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the level0 tool server, gone at the take, so every verb ran through RUNME.sh
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit hook, which refused a code change in src/pull with no test beside it
+- no trunk guard, no sync conflict and no cap
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the handover says the group stands done and its pull request carries auto-merge
 
 # Discussion
 
