@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -169,6 +169,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: c7d8c5f339b60c72662a716c472912458b6ac399
+    hash_after: c7d8c5f339b60c72662a716c472912458b6ac399
+    inputs:
+      - name: retro/write
+        hash: f8dfe8ff711927ed
+        size: 3419
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -339,20 +349,28 @@ The ask read as many small fixes, and two of them were designs. The run secret t
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 2026-10-10T21:20Z: the level0 tool server stood disconnected, so every verb ran through `./RUNME.sh` in place of its tool
+- 2026-10-10T21:40Z: the box's local `main` stood far behind origin, and the cold probe's clone read it
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 2026-10-10T21:20Z: a conflict at the first sync, in `check.go` and its test
+- 2026-10-11T00:30Z: a conflict at a later sync, in the write door and its test
+- 2026-10-10T22:30Z: the cold probe's clear check, red on this box until the clone took its own origin
+- 2026-10-11T00:50Z: the ratio guard over `src/quack`, which the merge of main tipped
+- 2026-10-11T02:00Z: the line ceiling over `door.go` and `hooks.go`
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- the group's pull request against main, which lands on auto-merge once its check reads green
 
 # Discussion
 
