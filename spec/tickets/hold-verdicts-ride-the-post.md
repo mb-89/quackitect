@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: e2a4e5279ba1fd3f
         size: 790
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 4036222115838f58d1a26a69520ce2c6ee00cdf5
+    hash_after: 4036222115838f58d1a26a69520ce2c6ee00cdf5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/modules/hooks/hooks.go src/modules/hooks/holds.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `hooks.go`, `holds.go` and `holds_test.go` for this ask, and the fold readers under `hook-folds-read-landed-place`
+- the change reaches the store and the config through the door's fakes in `holdDoor`
+- the comment over `ownLanding` names the approach: the folds its own landing left, read under the lock
+- the landed value stands once, as `ownLanding`, and the fix landed in d8d441a98
 
 ## tests-green
 
