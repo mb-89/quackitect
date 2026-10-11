@@ -138,9 +138,28 @@ func Input(store *q.Store, action string, args map[string]any) (any, error) {
 		if body, err = json.Marshal(bare); err != nil {
 			return nil, err
 		}
-		return store.Input(action, body)
+		input, err = store.Input(action, body)
 	}
-	return input, err
+	return unmarked(input), err
+}
+
+// The field a person mark stands under, which MarksPerson in src/index/secret.go reads too. q imports no index, so the name stands again here. [[spec/tickets/v1-takes-a-run-secret]]
+const personField = "Person"
+
+// The input with its person mark cleared, read off the decoded value, so a key in any case drops. An agent's call over MCP or the hook door then keeps the harness variables. [[spec/tickets/v1-takes-a-run-secret]] [[spec/tickets/person-drop-folds-case]]
+func unmarked(input any) any {
+	value := reflect.ValueOf(input)
+	if value.Kind() != reflect.Struct {
+		return input
+	}
+	field := value.FieldByName(personField)
+	if !field.IsValid() || field.Kind() != reflect.Bool || !field.Bool() {
+		return input
+	}
+	copied := reflect.New(value.Type()).Elem()
+	copied.Set(value)
+	copied.FieldByName(personField).SetBool(false)
+	return copied.Interface()
 }
 
 // The arguments a call carries: the map nested under the input, or the fields the action's input declares where the host spreads them on the event beside its tool, with the wait, the plan and a bare input. [[spec/tickets/the-bridge-server-leaves]]

@@ -366,8 +366,6 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	return own, nil
 }
 
-func (d *Door) now() time.Time { return d.from.Clock.Now() }
-
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 	action, ok := tool.Action(d.from.Store, textOf(e, "tool"))
@@ -412,6 +410,10 @@ func (d *Door) refuses(post Post, root string, settings Settings) string {
 	}
 	if write.Writes(textOf(post.E, "tool")) {
 		return d.writeDoor(post.E, root)
+	}
+	// A read of the run's secret meets its refusal, by any path that names the file. [[spec/tickets/v1-takes-a-run-secret]] [[spec/tickets/read-door-matches-absolute-path]]
+	if readsSecret(post.E) {
+		return command.SecretRefusal
 	}
 	return d.commands(post, root, settings)
 }

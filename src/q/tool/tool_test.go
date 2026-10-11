@@ -192,4 +192,10 @@ func TestAnAgentsCallDropsThePersonMark(t *testing.T) {
 	if err != nil || said.Person || len(said.Args) != 1 {
 		t.Fatalf("the input reads %+v, err %v, and wants the args with no person mark", in, err)
 	}
+	// [[spec/tickets/person-drop-folds-case]]
+	for _, key := range []string{"Person", "PERSON"} {
+		if in, err := Input(q.NewStore(c), "mark", map[string]any{key: true}); err != nil || in.(personIn).Person {
+			t.Fatalf("the key %s reads %+v, err %v, and wants no person mark", key, in, err)
+		}
+	}
 }

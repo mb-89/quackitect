@@ -122,3 +122,5 @@ func (d *Door) rewrites(own ownLanding, post Post) (Effect, bool) {
 	event["text"] = state.Said.Prompt
 	return Effect{Kind: eventKind, Result: event}, true
 }
+
+func (d *Door) now() time.Time { return d.from.Clock.Now() }

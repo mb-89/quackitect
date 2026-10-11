@@ -19,6 +19,12 @@ var (
 	clearsAll  = regexp.MustCompile(`\benv\s+(?:-\S+\s+)*(?:-i|--ignore-environment)\b|\bdelete\s+process\.env\s*;|os\.environ\.clear\(`)
 )
 
+// The run's secret, off SecretFile in src/index/secret.go under the folder src/modules/check/folders.go owns, and the refusal a command or a read reaching it meets. [[spec/tickets/v1-takes-a-run-secret]]
+var SecretName = regexp.MustCompile(`person\.json`)
+
+// The refusal names the file under the folder src/modules/check/folders.go owns. [[spec/tickets/v1-takes-a-run-secret]]
+const SecretRefusal = ".se/.runtime/person.json holds the run's secret, which marks a person's post. The sidebar and the lens read it, and an agent reads it nowhere."
+
 // The refusal a command reaching the bless or the hand's variables meets, or nothing; read hands the text of each script it runs. [[spec/design_output/pull#the-bless]]
 func BlessGuard(command string, read func(path string) string) string {
 	texts := []string{command}
@@ -30,6 +36,9 @@ func BlessGuard(command string, read func(path string) string) string {
 	for _, text := range texts {
 		if blessName.MatchString(text) {
 			return blessFile + " is the owner's word on who blesses, and the sidebar button alone writes it. An agent reads and writes it nowhere."
+		}
+		if SecretName.MatchString(text) {
+			return SecretRefusal
 		}
 	}
 	var hit []string

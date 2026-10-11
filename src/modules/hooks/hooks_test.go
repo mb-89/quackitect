@@ -398,8 +398,10 @@ func TestTheDoorRefusesAReadOfTheRunSecret(t *testing.T) {
 	read := func(path string) Post {
 		return Post{Event: toolEvent, E: map[string]any{"tool": "Read", "file_path": path, "session_id": "s1"}}
 	}
-	if said := refusalOf(hooks(t, door, read(".se/.runtime/person.json"))); said == "" {
-		t.Fatal("the door passes a Read of the run's secret")
+	for _, path := range []string{".se/.runtime/person.json", "/home/user/tree/.se/.runtime/person.json", `C:\tree\.se\.runtime\person.json`} {
+		if said := refusalOf(hooks(t, door, read(path))); said == "" {
+			t.Fatalf("the door passes a Read of the run's secret at %s", path)
+		}
 	}
 	if said := refusalOf(hooks(t, door, read("spec/a.md"))); said != "" {
 		t.Fatalf("the door refuses a Read of spec/a.md: %s", said)

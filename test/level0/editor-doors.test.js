@@ -218,8 +218,12 @@ test("the index door sends the run's secret on a post", async () => {
     }),
     http: web,
   };
-  await indexDoor(WORK, doors).acts("ticket/pull", { args: [], person: true });
+  const door = indexDoor(WORK, doors);
+  await door.acts("ticket/pull", { args: [], person: true });
   assert.equal(web.sent[0].headers["x-quack-person"], "s3cret");
+  // The bless button posts through calls. [[spec/tickets/calls-test-sends-secret]]
+  await door.calls("ticket/pull", { agent: true, person: true });
+  assert.equal(web.sent[1].headers["x-quack-person"], "s3cret");
 });
 
 function warned(run) {
