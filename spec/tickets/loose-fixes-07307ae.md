@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 fix: true
 record:
   - step: sync
@@ -143,6 +143,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: ac6829582919c9415259a1005d39746c33e2286a
+    hash_after: ac6829582919c9415259a1005d39746c33e2286a
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -224,38 +236,54 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `secret-mode-holds-on-windows` closed on evidence: its fix stood on main in 7dd2535a1, and pull request 155 merged green on windows-latest
+- the group passed sync, split, accept and notes with no code change
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the fix stood on main already, so the step needed a test run and a check alone
+- the accept gate named the exact diff range, so the review read two ticket files
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- at take: the dispatch payload named work/windows-check-holds, and `branch take` handed work/loose-fixes-07307ae; the session took the branch the engine handed
+- at do: the first hand-back of `do` was refused, because the tests field carried the command's output in place of the bare command
+- at pull: the child ticket stood open on main after its fix merged, so a box spent a session closing it
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- `branch take` reads the branch the fire payload names before it picks a free one: `.claude/skills/work/SKILL.md` step 1
+- the command form takes the bare command, and the hand-back's prompt shows one: `spec/processes/trivial.yaml`
+- a fix commit naming its ticket closes the ticket in the same group: `spec/processes/trivial.yaml`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask's done lines both held before the session began, so the work was verifying them rather than changing code. The dispatch payload and the engine disagreed on the branch; the payload is data, the engine's take is the verb the prompt names, so the session followed the engine.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro adds no fact standing elsewhere; it points at the commit and the files
+- the retro adds no number
+- the change writes no file header
+- the chapter carries the run's errors with the step each met; no owner prompt arrived during the run
+- the chapter names the role alone
 
 ## cloud
 
