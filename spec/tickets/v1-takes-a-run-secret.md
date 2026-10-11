@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: c671f20a6ae2a4a6
 group: hooks-v1-hold-the-line
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1ff232507d954dbf
         size: 2979
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box f9a277082525 · claude-code-remote · helper-4
+    hash_before: bb7dcd40c354532a4db75a1a480cc9313723d4ac
+    hash_after: bb7dcd40c354532a4db75a1a480cc9313723d4ac
+    inputs:
+      - name: design/draft
+        hash: 1ff232507d954dbf
+        size: 2979
+      - name: design/tests-red
+        hash: e69a77163dae225d
+        size: 1109
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -295,8 +307,18 @@ Each test fails on its own assertion. A person post with no secret answers 200 o
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- secret-post-serves-test: No red test posts the secret and expects 200, so the second `done_when` line stands undecided.
+- person-drop-folds-case: `tool.Input` drops the `person` key, but `json.Unmarshal` folds case, so `Person` still marks a person.
+- v1-gate-reads-decoded-input: `acts` should read the decoded input's mark, since a raw key check misses `PERSON` and alike.
+- first-port-client-sends-secret: The red test gates every first-port call, so `postsWithin` in `src/index/main.go` must send the secret.
+- legacy-gate-matches-draft: The draft gates marked legacy calls alone, while the test refuses every call, so one of them moves.
+- standing-chmods-existing-file: `os.WriteFile` keeps an old file's mode, so an existing `index.json` stays 0644 without a chmod.
+- calls-test-sends-secret: The extension test drives `acts` alone, while the bless button posts through `calls`.
+- read-door-matches-absolute-path: The `Read` test names a relative path, and an agent's `Read` names an absolute one.
+- draft-names-red-tests: The draft's test files and names differ from the red ones, so the draft should name them.
 
 # implement
 
