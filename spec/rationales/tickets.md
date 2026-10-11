@@ -41,6 +41,11 @@ A one-line config change the owner ordered took the standard route by habit.
 It ran a draft, a review and a build, and each step cost a session. The trivial
 route carries the ask as its design, so one step lands the line.
 
+Clean rooms B and C measured the full harness costing a multiple of the tokens
+on tasks up to an hour. A single agent told when to stop matched its quality. So a mint with no process takes the trivial route, and its step
+carries the stopping line. An agent with no stopping line polishes working code
+past the ask.
+
 ## 7. The owner's view decides done
 
 A ticket changing the sidebar closed on a count verb and a test over a fake. The
