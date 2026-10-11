@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: gate
 steps:
   - name: design
     steps:
@@ -158,6 +158,19 @@ record:
   - step: design/draft
     hand: the engine
     stale: ask
+  - step: design/draft
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 3b1377138fffb0fea5cf4b42a0d7df0cf5d3922f
+    hash_after: 3b1377138fffb0fea5cf4b42a0d7df0cf5d3922f
+    inputs:
+      - name: ask
+        hash: 3e3db88775c09a0a
+        size: 769
+    def: c01ae0f2ace0cecb
+  - step: design/tests-red
+    skipped: true
+    kept: ca6940d705586fd74d18608ab30c92cb76210740
+    why: its red tests stand as ca6940d70 landed them, and a later leaf passed since
 group: tickets-keep-their-chapters
 ---
 
@@ -196,7 +209,7 @@ none
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-Two changes. `ReRouted` in `src/modules/check/rerouted.go` answers an error where the schema stands nil, and writes no text. `ticket route` and `ticket update` read the ticket schema off the method root through `rootsOf`, as the pull and the mint do, and stop on that error with exit failed before any write. The three other callers guard a nil schema already, and take the error as their guard. The processes `ticket update` reads stay with the sibling `ticket-verbs-read-method-routes`.
+`ReRoute` in `src/modules/check/rerouted.go` writes the rerouted text, and answers `ErrNoSchema` where the schema stands nil, writing nothing. `ReRouted` stays as the text `ReRoute` writes, for the three callers that guard a nil schema themselves. `ticket route` and `ticket update` read the ticket schema off the method root through `methodDisk`, beside `workDisk`, and stop on the refusal before any write. The processes `ticket update` reads stay with the sibling `ticket-verbs-read-method-routes`. The change stands in 476871014, and the ask's done_when line now names `./src/modules/check`.
 
 ### callers
 
@@ -215,14 +228,16 @@ Two changes. `ReRouted` in `src/modules/check/rerouted.go` answers an error wher
 <!-- the form is list -->
 
 - `src/quack/ticket_route_test.go` a vehicle case under `TestTicketRoute`, the method and the work root in two temp folders
-- `src/modules/check/rerouted_test.go` a nil schema row under `TestReRouted`
+- `src/modules/check/rerouted_test.go` the nil schema row under `TestReRouted`, which calls `ReRoute`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- the gate's point on the update case: the sibling's vehicle update case answers it, and update-keeps-chapters-under-vehicle closes answered by that sibling
+- the gate's point on the seeded text: the vehicle route case seeds text under the draft chapter and expects it back
+- the gate's point on the package: the done_when line names `./src/modules/check`
 
 ### size
 
@@ -231,13 +246,11 @@ Two changes. `ReRouted` in `src/modules/check/rerouted.go` answers an error wher
 
 - `src/modules/check/rerouted.go`
 - `src/modules/check/rerouted_test.go`
-- `src/modules/check/reroute_test.go`
 - `src/quack/ticket_route.go`
 - `src/quack/ticket_update.go`
+- `src/quack/ticket_set.go`
 - `src/quack/ticket_route_test.go`
-- `src/pull/pull_stale.go`
-- `src/pull/pull_person.go`
-- `src/branches/escalate.go`
+- `src/quack/testdata/ticket_route.json`
 
 ### checked
 
