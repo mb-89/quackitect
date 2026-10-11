@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 56610d6296ee · claude-code-remote
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: 729ce862adaf6185c7eb4ef379add527e5bce0c9
     hash_after: 729ce862adaf6185c7eb4ef379add527e5bce0c9
+  - step: accept
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 8267311f767162528d8942c2f5a703a14f65b2cc
+    hash_after: 8267311f767162528d8942c2f5a703a14f65b2cc
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/handovers-and-light-work already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: cb81d706e020e71f
+        size: 349
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -166,8 +182,14 @@ Done when every child closes through the command it names.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+- A dying box leaves a handover: the beat carries the held step and the handover, and a takeover prints them with the record and the commits since the take.
+- Small work takes the light route: a mint with no process lands on the trivial route, whose step carries the stopping line.
+- The tests-green hand aims at the ask, with the red tests as its floor, in the standard route.
+- The check answers green on the head, and every child closes through its own route.
 
 # retro
 
