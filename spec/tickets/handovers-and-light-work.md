@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 56610d6296ee · claude-code-remote
@@ -136,6 +136,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 9725f9055556062ea08c9825e7d65fadd6d24e50
+    hash_after: 9725f9055556062ea08c9825e7d65fadd6d24e50
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -220,38 +232,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `small-work-takes-light-path`: a mint with no process takes the trivial route, whose step carries the stopping line
+- the gate of `small-work-takes-light-path`, read against the code it names
+- the group sync, split and accept
+- the minted golden and the projected output style, which followed the route and the guidance
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the stale-hash pattern beta already used carried alpha onto the trivial route, so the example needed no new harness verb
+- the pull named each missing field on refusal, so each fix took one turn
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- at the take, the level0 tool server disconnected, so every verb ran through RUNME.sh
+- at implement/change, the frozen red test panicked on t.Parallel beside the t.Setenv in runsVerb, since a sibling rewrote it after the freeze
+- at implement/change, the lint named mint unshown until the index took the new example in
+- at implement/change, the commit hook refused a rename in src/pull with no test beside it
+- at the hand-backs, the pull refused a missing checked field twice and a verdict flag once
+- no owner prompt turned this run
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- the panic: the red step runs its own case before its pass, `spec/processes/standard.yaml`
+- the stale index: lint reindexes the paths it names, `src/modules/check/coverage.go`
+- the rename refusal: the gate names the test beside each package a draft touches, `spec/guidance/review/design.md`
+- the checked refusals: the hand-out prints the checklist above the fields, `src/pull/pull_chapter.go`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask names mint-light.md, and the harness wires no mint, so the example shows the pull side of the light route. Moving alpha onto the trivial route cost two sibling examples a checklist each. A separate planted ticket cost a harness change, so the checklist lines won. The red test came in broken by a sibling, and the reopen carried the fix in the open.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the light route name stands once, as `pull.LightRoute`
+- the change adds no number
+- the new example header says what it shows
+- the run met no owner prompt, and each error carries its step
+- the chapter names roles alone
 
 ## cloud
 
