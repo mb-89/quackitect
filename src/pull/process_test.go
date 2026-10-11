@@ -104,9 +104,9 @@ func TestGroups(t *testing.T) {
 	})
 	t.Run("a box's ticket joins its group, and the group itself and a person's process stay out", func(t *testing.T) {
 		for _, one := range []struct{ group, process, branch, name, want string }{
-			{"", "spec/processes/trivial", "work/big", "fix", "big"},
-			{"other", "spec/processes/trivial", "work/big", "fix", "other"},
-			{"", "spec/processes/trivial", "main", "fix", ""},
+			{"", "spec/processes/" + LightRoute, "work/big", "fix", "big"},
+			{"other", "spec/processes/" + LightRoute, "work/big", "fix", "other"},
+			{"", "spec/processes/" + LightRoute, "main", "fix", ""},
 			{"", "spec/processes/group", "work/big", "big", ""},
 			{"", "[[spec/processes/person]]", "work/big", "fix", ""},
 		} {

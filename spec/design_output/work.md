@@ -320,6 +320,30 @@ The work branch stays green, so CI and the pull request read no red commit.
 A desk, and a branch off `work/`, write no rescue. The push door lets the red
 push through, since CI guards a work branch.
 
+## A takeover reads the beat
+
+A box dies with its runtime folder, so its beat carries what the next box
+needs. `src/branches/left.go` holds the mechanism.
+
+| what | where it stands |
+|---|---|
+| the step in hand | the file `step` on the beat: the ticket path and the step the hold names |
+| the handover | the file `HANDOVER.md` on the beat, off `.se/HANDOVER.md` where one stands |
+| the beat itself | a commit on the empty one, so the hold verdicts read its subject and its time |
+
+A take over prints a block `What the box before left:` ahead of the ask:
+
+1. the last beat's age and hand
+2. the step in hand, off the beat
+3. the last record entry of that ticket
+4. every commit since the open take's `hash_before`
+5. the rescue the take takes in
+6. the handover, or `no handover`
+
+The take reads the old beat before it writes its own. A beat inside half the
+span writes nothing, so the step can trail the hold by that much. A plain take
+prints no block.
+
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
