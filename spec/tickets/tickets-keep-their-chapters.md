@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,16 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: f47dac14ceee79c6dbc318ffcff6de17a6d35989
+    hash_after: f47dac14ceee79c6dbc318ffcff6de17a6d35989
+    inputs:
+      - name: retro/write
+        hash: f7f104748f7f01fb
+        size: 3254
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -309,20 +319,29 @@ The children each touched one reader, but the ratio guard tied them into one bud
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the level0 tool server stood offline from the first take to the end, so the box called each verb through ./RUNME.sh
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the cold probe failed on pull-origin-diverges where a stray probe branch stood, until probe-drops-its-stale-group landed
+- an add and add conflict at the first sync, in src/quack/check_types_test.go, taken as main writes it
+- the ratio guard on src/quack, at the chapters commit and after the first sync
+- the commit door asking for a staged test beside each code file, at the quote and the route commits
+- a gofmt finding on a one-line function literal in a probe case
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, and the owner-read steps the box skipped as a cloud box decides them
+- no ticket stands minted with no group
+- the box writes no handover past this retro, and the pull request carries the branch to main
 
 # Discussion
 
