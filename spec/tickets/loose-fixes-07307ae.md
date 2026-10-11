@@ -90,6 +90,10 @@ record:
     hand: box eadcbe7c1a3d · claude-code-remote
     hash_before: 6114e1b57607fa9531039d82a2025cbd496e6b93
     session: cse_017FNkXMH7nY7T7zaGxxFrAi
+    hash_after: e7b107e0cbeb38ea9455a33e3b57a2c482672f64
+    model: claude-opus-5-5
+    cost: 0
+    final: The group closed its one child on evidence, and the check exits 0.
   - step: sync
     hand: box eadcbe7c1a3d · claude-code-remote
     hash_before: b9e57dccc30f2013f15e1660a72c04669f4124dd
