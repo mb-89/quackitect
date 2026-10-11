@@ -315,8 +315,13 @@ func flowItems(inside string) []string {
 	out := []string{}
 	var held strings.Builder
 	var quote rune
+	escaped := false
 	for _, char := range inside {
 		switch {
+		// An escaped quote stays inside its item, as QuotedWhole reads it. [[spec/tickets/flow-items-skip-escaped-quotes]]
+		case quote == '"' && (escaped || char == '\\'):
+			held.WriteRune(char)
+			escaped = !escaped
 		case quote != 0:
 			held.WriteRune(char)
 			if char == quote {

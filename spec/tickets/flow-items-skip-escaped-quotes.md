@@ -34,11 +34,12 @@ parent: quoted-fronts-round-trip
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+A flow list item holding an escaped quote reads as one item, because the flow split skips an escaped quote as `QuotedWhole` does.
 
-scalar runs unquote over each flow item, but flowItems ends a quote at a backslash-escaped quote, so an item holding \" followed by a comma splits apart. QuotedWhole skips escapes and flowItems should too, with a yaml_test case.
+An item holding an escaped quote and then a comma splits into two items, so a list field reads back with an item the writer never wrote.
+
+- go test ./src/yaml passes a case where a flow item holding an escaped quote and a comma reads as one item
+- ./RUNME.sh check is green
 
 # do
 

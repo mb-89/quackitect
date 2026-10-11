@@ -34,11 +34,12 @@ parent: quoted-fronts-round-trip
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+Every reader of `yaml.Read` and `ReadLines` stands named as a caller the quote decode reaches, so a reviewer weighs each reader the change moves.
 
-the callers list names only scalar, note.Read and front.Set, but every yaml.Read and ReadLines caller (tickets.go, sync.go, check/schema.go, drawn.go, guidance.go and the others) now gets decoded values. The one quoted backslash value in spec today is the why of a record in spec/tickets/a-check-finds-every-writer.md, which now reads correctly. Name these callers. scalar is called from mapAt and listAt, not from block.
+The draft named three callers, and a reader past the front that holds a quoted backslash value reads it differently with no review.
+
+- `git grep -n "yaml.Read\|yaml.ReadLines" -- src` lists each caller, and the discussion of quoted-fronts-round-trip names them with what each now reads
+- ./RUNME.sh check is green
 
 # do
 

@@ -34,11 +34,12 @@ parent: quoted-fronts-round-trip
 
 # Ask
 
-<!-- gain, as text: what is gained by doing it, and not only what it does -->
-<!-- breaks, as text: what breaks if it is never done -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+The front writer and the yaml reader decode a quoted value through one function, so a fix to the escapes reaches both.
 
-src/front/mint.go unescaped already decodes the four escapes Quote writes; the new decode in yaml.unquote restates that fact, and adds \t, which unescaped refuses. Keep one decoder (yaml exports it, mint calls it) and add src/front/mint.go to size.
+Two decoders of the same four escapes drift apart, and a value one decodes and the other refuses reads back changed.
+
+- go test ./src/yaml ./src/front passes, with `yaml.Unescaped` the one decoder and `src/front/mint.go` calling it
+- ./RUNME.sh check is green
 
 # do
 

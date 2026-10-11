@@ -189,3 +189,12 @@ func TestAQuotedScalarDecodesItsEscapes(t *testing.T) {
 		}
 	}
 }
+
+// A flow item holding an escaped quote and a comma reads as one item. [[spec/tickets/flow-items-skip-escaped-quotes]]
+func TestAFlowItemKeepsAnEscapedQuote(t *testing.T) {
+	t.Parallel()
+	read, _ := Read(`key: ["a \"b, c\" d", "e"]`).(*Doc)
+	if got := AsList(read.Get("key")); !reflect.DeepEqual(got, []any{`a "b, c" d`, "e"}) {
+		t.Errorf("the flow list reads %#v", got)
+	}
+}
