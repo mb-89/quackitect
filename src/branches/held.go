@@ -86,7 +86,9 @@ func (d *Doors) letGo(branch, name, here string, final front.Ordered) int {
 	if from != "" {
 		says = role + " frees it from " + from
 	}
-	_, _ = d.Repo.Commit(branch+": "+says, nil)
+	if !d.commitsOrStops(branch+": "+says, []string{at}) {
+		return codeRed
+	}
 	if !d.push(branch) {
 		return codeRed
 	}

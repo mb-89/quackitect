@@ -130,7 +130,7 @@ func todoOf(doc *yaml.Doc) string {
 	return text
 }
 
-// The tickets one waits for, a list or one line, each bare of brackets and quotes. [[spec/design_output/work#the-mark-and-what-waits]]
+// The tickets one waits for, a list or one line, each bare of brackets, quotes and the branch prefix. Every reader of depends_on comes here. [[spec/tickets/depends-on-reads-one-parser]]
 func dependsOn(doc *yaml.Doc) []string {
 	var out []string
 	if doc == nil {
@@ -138,10 +138,7 @@ func dependsOn(doc *yaml.Doc) []string {
 	}
 	for _, line := range yaml.StringsOf(doc.Get("depends_on")) {
 		for _, part := range strings.Split(line, ",") {
-			one := strings.TrimSpace(part)
-			one = strings.TrimSuffix(strings.TrimPrefix(one, "["), "]")
-			one = strings.TrimSpace(trimQuote(one))
-			if one != "" {
+			if one := groupNamed(part); one != "" {
 				out = append(out, one)
 			}
 		}

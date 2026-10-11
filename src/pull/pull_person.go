@@ -19,8 +19,9 @@ func (it *It) repairPersonSteps(who *Who) {
 		if put == "" {
 			continue
 		}
-		one.Text = put
-		it.landedAlone(one, []string{"a person step names the engine as its reader"})
+		if it.movedAlone(one, put, []string{"a person step names the engine as its reader"}) != "" {
+			continue
+		}
 		if !one.Private {
 			it.pushed(who.Branch)
 		}

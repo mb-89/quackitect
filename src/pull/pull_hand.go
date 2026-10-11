@@ -130,7 +130,7 @@ func (it *It) ticketsHere() []*Held {
 func taggedIn(list []*Held, group string) []*Held {
 	out := []*Held{}
 	for _, one := range list {
-		named := FieldOf(one.Text, GroupField)
+		named := one.Field(GroupField)
 		if todoOf(one.Front) != "" && (group == "" || named == "" || named == group) {
 			out = append(out, one)
 		}
@@ -160,7 +160,7 @@ func (it *It) sorted(list, all []*Held) []*Held {
 					fails++
 				}
 			}
-			out = append(out, queue.Row{Name: one.Name, Path: one.Path, Urgent: FieldOf(one.Text, "urgent") == "true", DependsOn: dependsOn(one.Front), Fails: fails})
+			out = append(out, queue.Row{Name: one.Name, Path: one.Path, Urgent: one.Field("urgent") == "true", DependsOn: dependsOn(one.Front), Fails: fails})
 		}
 		return out
 	}
@@ -348,7 +348,7 @@ func (it *It) takeable(one *Held, all []*Held, group string) bool {
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 func (it *It) offer(who *Who, one *Held, all []*Held) offered {
-	state := FieldOf(one.Text, "state")
+	state := one.Field("state")
 	if state == Closed {
 		return offered{}
 	}
@@ -391,7 +391,7 @@ func (it *It) offer(who *Who, one *Held, all []*Held) offered {
 func (it *It) closedHere(all []*Held, dep string) bool {
 	for _, one := range all {
 		if one.Name == dep {
-			return FieldOf(one.Text, "state") == Closed
+			return one.Field("state") == Closed
 		}
 	}
 	said, ok := it.Git.Show("origin/"+Trunk, Tickets+"/"+dep+".md")
@@ -457,22 +457,31 @@ func (it *It) advanced(one *Held, all []*Held) (*Leaf, string) {
 			changes = append(changes, "passes "+leaf.Path)
 		default:
 			if moved {
-				one.Text = withField(text, "step", path)
-				one.Front = FrontOf(one.Text)
-				it.landedAlone(one, changes)
+				if why := it.movedAlone(one, withField(text, "step", path), changes); why != "" {
+					return nil, why
+				}
 			}
 			return leaf, ""
 		}
 		moved, front = true, FrontOf(text)
 		if leaf.At+1 >= len(leaf.Leaves) {
-			one.Text = shut(text, front, Done)
-			one.Front = FrontOf(one.Text)
-			it.landedAlone(one, append(changes, "closes "+Done))
-			return nil, ""
+			return nil, it.movedAlone(one, shut(text, front, Done), append(changes, "closes "+Done))
 		}
 		path = leaf.Leaves[leaf.At+1].Path
 	}
 	return nil, "loops in its route"
+}
+
+// Lands the engine's step move. A refusal leaves the ticket as it stood and answers why, so a leaf goes out over a landed move alone. [[spec/tickets/engine-landings-report-refusals]]
+func (it *It) movedAlone(one *Held, text string, changes []string) string {
+	stood, front := one.Text, one.Front
+	one.Text, one.Front = text, FrontOf(text)
+	refused := it.landedAlone(one, changes)
+	if refused == "" {
+		return ""
+	}
+	one.Text, one.Front = stood, front
+	return "moves on as " + strings.Join(changes, ", ") + ", and the commit comes back refused: " + refused
 }
 
 // [[spec/design_output/pull#the-hand-rule]]

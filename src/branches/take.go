@@ -263,14 +263,17 @@ func (d *Doors) onBranch(branch string) bool {
 	for _, one := range parked {
 		_ = d.Repo.Restore(one.Name)
 	}
+	// The parked notes come back whether the switch lands or refuses. [[spec/tickets/failed-switch-keeps-parked-notes]]
+	defer func() {
+		for _, one := range parked {
+			_ = d.write(one.Name, one.Text)
+		}
+	}()
 	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
 	if !d.Repo.IsAncestor("origin/"+branch, "HEAD") {
 		_ = d.Repo.ResetTo("origin/"+branch, true)
-	}
-	for _, one := range parked {
-		_ = d.write(one.Name, one.Text)
 	}
 	return true
 }

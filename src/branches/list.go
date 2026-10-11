@@ -43,12 +43,13 @@ func list(d *Doors, _ string, argv []string) int {
 	}
 	now := d.nowSeconds()
 	all := slices.Contains(argv, "--all")
+	trunkTickets := trunkOf(loose)
 	var rows []listRow
 	for _, one := range stood {
 		if !all && standing[one.Branch] == merged {
 			continue
 		}
-		rows = append(rows, d.rowOf(one, standing, now))
+		rows = append(rows, d.rowOf(one, standing, trunkTickets, now))
 		rows = append(rows, childRows(one, all)...)
 	}
 	looseRows := looseRows(loose, all)
@@ -119,12 +120,12 @@ func padStart(said string, width int) string {
 }
 
 // A group's row: its branch, its standing, what it waits for, and its claim's age. [[spec/design_output/work#a-row-per-group]]
-func (d *Doors) rowOf(one stand, standing map[string]string, now int64) listRow {
+func (d *Doors) rowOf(one stand, standing, trunkTickets map[string]string, now int64) listRow {
 	status := standing[one.Branch]
 	if status == "" {
 		status = "no status"
 	}
-	waits := waitsOf(one, standing, nil)
+	waits := waitsOf(one, standing, trunkTickets)
 	var why []string
 	if len(waits) > 0 {
 		why = append(why, "waits for "+strings.Join(waits, ", "))
@@ -179,7 +180,7 @@ func childRows(one stand, all bool) []listRow {
 			continue
 		}
 		var waits []string
-		for _, name := range dependsOnText(child.Text) {
+		for _, name := range dependsOn(frontOf(child.Text)) {
 			if open[name] {
 				waits = append(waits, name)
 			}

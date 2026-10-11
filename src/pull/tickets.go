@@ -31,6 +31,22 @@ type Held struct {
 	Private          bool
 	// What the ticket held before a payload rode in, and the payload, which a refusal past its cap puts back. [[spec/design_output/pull#the-hand-back-refused]]
 	Stood, Payload string
+	// The text Front was parsed off, so a field reads the front until the text moves. [[spec/tickets/hand-out-reads-parsed-fronts]]
+	parsed string
+}
+
+// One field of the ticket's front as a word, read off the front parsed for its text. [[spec/tickets/hand-out-reads-parsed-fronts]]
+func (one *Held) Field(key string) string {
+	if one.Front == nil || one.parsed != one.Text {
+		one.Front, one.parsed = FrontOf(one.Text), one.Text
+	}
+	return Bare(yaml.AsString(one.Front.Get(key)))
+}
+
+// Whether the ticket runs the group route, read off its parsed front. [[spec/tickets/hand-out-reads-parsed-fronts]]
+func (one *Held) IsGroup() bool {
+	process := one.Field("process")
+	return one.Text != "" && process[strings.LastIndex(process, "/")+1:] == groupName
 }
 
 // Every ticket under the public folder, then every note under the private one. [[spec/design_output/work#a-group-is-a-ticket]]
@@ -44,7 +60,7 @@ func TicketsHere(disk Disk) []Held {
 			text, _ := disk.Read(folder + "/" + one)
 			out = append(out, Held{
 				Name: strings.TrimSuffix(one, noteEnd), Path: folder + "/" + one, Text: text,
-				Front: FrontOf(text), Private: folder == Notes,
+				Front: FrontOf(text), parsed: text, Private: folder == Notes,
 			})
 		}
 	}
@@ -75,11 +91,12 @@ func ChildrenOf(all []Held, group string) []Held {
 	names := map[string]bool{group: true}
 	for grew := true; grew; {
 		grew = false
-		for _, one := range all {
+		for at := range all {
+			one := &all[at]
 			if one.Private || names[one.Name] {
 				continue
 			}
-			if names[FieldOf(one.Text, GroupField)] {
+			if names[one.Field(GroupField)] {
 				names[one.Name] = true
 				grew = true
 			}
@@ -107,7 +124,7 @@ func EmptyGroup(disk Disk, text, name string) string {
 func GroupClosed(disk Disk, group string) bool {
 	for _, one := range TicketsHere(disk) {
 		if !one.Private && one.Name == group {
-			return FieldOf(one.Text, "state") == Closed
+			return one.Field("state") == Closed
 		}
 	}
 	return false
