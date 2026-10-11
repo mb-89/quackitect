@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -199,7 +199,30 @@ record:
         exit: 0
         said: "src/quack/ticket_update.go:22:1 ExampleCovers: ./RUNME.sh ticket update stands in no example's interface. Write an examp"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 0fdf0fa9566ba48da6a933c481fbd493621cf45c
+    hash_after: 0fdf0fa9566ba48da6a933c481fbd493621cf45c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   67.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 266fbcd3763fadef
+        size: 705
+    def: ebccfd52b1111bbe
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: tickets-keep-their-chapters
+reason: done
 ---
 
 # Ask
@@ -367,26 +390,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/modules/check src/quack/ticket_route_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+ticket route and ticket update read the ticket schema off the method root through methodDisk, beside workDisk, so a vehicle reroute keeps its Ask and the text of every chapter. ReRoute refuses with ErrNoSchema where no schema stands, and the verbs stop on it before any write, where they wrote a front with no chapters. ReRouted stays the text ReRoute writes for the three callers that guard a nil schema. The vehicle case, the no-schema case and the nil row of TestReRouted pass.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes
+- the cases reach the disk under two temp roots, and git through the harness fake
+- the comments on ReRoute and methodDisk name the approach
+- the refusal stands once, in ErrNoSchema
 
 # accept
 
