@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box f689bbb375f6 · claude-code-remote
@@ -111,6 +111,22 @@ record:
     hand: the engine
     hash_before: 8cb72e8a4966f937c8d71865315fbc6fcc1b5f6d
     hash_after: 8cb72e8a4966f937c8d71865315fbc6fcc1b5f6d
+  - step: accept
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 27b59d0c072916d4595ec170c18a3a38ad89366a
+    hash_after: 83f66f8df518c017eb3a14201283c515a5c3b4a1
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/checks-and-index-read-right took 104 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: a8db2a84f2f89dd4
+        size: 336
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -179,8 +195,9 @@ The check rules fire where their notes say and read only what they name, and the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: every child closes through its named case, each red before its fix but `TestOpenClearsTheWalAndShm`, whose replay did not reproduce, and the check answers green on the head after the merge of main
 
 # retro
 
