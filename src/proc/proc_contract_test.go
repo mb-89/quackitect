@@ -103,25 +103,22 @@ func fakeSh(one Command) Said {
 		}
 		return Said{}
 	case "printf %s \"$PROC_CONTRACT\"":
-		for _, pair := range one.Env {
-			if value, ok := strings.CutPrefix(pair, "PROC_CONTRACT="); ok {
-				return Said{Out: value}
-			}
-		}
-		return Said{}
+		return Said{Out: seenBy(one, "PROC_CONTRACT")}
 	case "printf %s \"$PROC_CONTRACT$PROC_CONTRACT_KEPT\"":
-		var said strings.Builder
-		seen := append(without(os.Environ(), one.Drop), one.Env...)
-		for _, name := range []string{"PROC_CONTRACT=", "PROC_CONTRACT_KEPT="} {
-			for _, pair := range seen {
-				if value, ok := strings.CutPrefix(pair, name); ok {
-					said.WriteString(value)
-				}
-			}
-		}
-		return Said{Out: said.String()}
+		return Said{Out: seenBy(one, "PROC_CONTRACT") + seenBy(one, "PROC_CONTRACT_KEPT")}
 	}
 	return Said{Err: "sh: the fake holds no answer to " + one.Argv[2], Code: 2}
+}
+
+// The value a run reads for the name, off the box's environment minus Drop plus Env, the last pair standing, as the real runner hands it. [[spec/tickets/the-fake-runner-drops-names]]
+func seenBy(one Command, name string) string {
+	value := ""
+	for _, pair := range append(without(os.Environ(), one.Drop), one.Env...) {
+		if held, ok := strings.CutPrefix(pair, name+"="); ok {
+			value = held
+		}
+	}
+	return value
 }
 
 // The exit codes each box answers, read as a signal's end or as a plain exit, so the Windows reading runs on every box. [[spec/tickets/the-doors-pr-goes-green]]

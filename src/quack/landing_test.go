@@ -323,6 +323,17 @@ func TestRenameMoves(t *testing.T) {
 			t.Fatalf("the closed ticket reads %q", said)
 		}
 	})
+	t.Run("two moves at one clock reading leave two journal entries", func(t *testing.T) {
+		d := renamesOver(t, map[string]string{"spec/a.md": "# A\n", "spec/b.md": "# B\n"})
+		for _, move := range [][2]string{{"spec/a.md", "spec/c.md"}, {"spec/b.md", "spec/d.md"}} {
+			if code, out, errs := runsTwin(renameVerb(d), "rename", move[0], move[1]); code != 0 {
+				t.Fatalf("rename answers %d, %q, %q", code, out, errs)
+			}
+		}
+		if entries := renameEntries(t, d); len(entries) != 2 {
+			t.Fatalf("the journal holds %d entries, and wants one a move", len(entries))
+		}
+	})
 	t.Run("a name standing as no path rewrites, and moves nothing", func(t *testing.T) {
 		d := renamesOver(t, map[string]string{"src/a.go": "quackitect/src/oldname\n"})
 		code, out, errs := runsTwin(renameVerb(d), "rename", "quackitect/src/oldname", "quackitect/src/newname", "--text")

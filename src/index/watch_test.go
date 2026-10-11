@@ -11,15 +11,17 @@ import (
 func TestTheIndexWatchStopsWhileFoldersAppear(t *testing.T) {
 	t.Parallel()
 	for round := 0; round < 20; round++ {
-		root := t.TempDir()
-		one := &door{touched: map[string]bool{}, dirty: make(chan struct{}, 1)}
-		eyes, err := watches(root, one)
-		if err != nil {
-			t.Fatal(err)
-		}
-		stop := watchertest.Appearing(root)
-		<-one.dirty
-		watchertest.Returns(t, eyes.Close)
-		stop()
+		// A hang fails through t.Fatal, which runs the round's defers alone, so the folders stop appearing before TempDir's cleanup. [[spec/tickets/appearing-stops-on-a-fatal]]
+		func() {
+			root := t.TempDir()
+			one := &door{touched: map[string]bool{}, dirty: make(chan struct{}, 1)}
+			eyes, err := watches(root, one)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer watchertest.Appearing(root)()
+			<-one.dirty
+			watchertest.Returns(t, eyes.Close)
+		}()
 	}
 }

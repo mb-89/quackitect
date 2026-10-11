@@ -257,23 +257,56 @@ func TestTheInstallRebuildsTheIndexOnlyWhereTheStampVerbReadsItStale(t *testing.
 		bootWrite(t, filepath.Join(tree, "index-copy"), stampIndex, 0o755)
 		bootWrite(t, filepath.Join(path, "go"), stampGo, 0o755)
 		bootWrite(t, filepath.Join(tree, ".se", ".runtime", "fresh-code"), one.code, 0o644)
-		run := exec.Command("sh", filepath.Join(tree, "install.sh")) // level0: FixtureOutsideHome - each install runs the real install.sh in a tree of the case's own
-		run.Dir = tree
-		run.Env = []string{
-			"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree,
-			"SE_INSTALL_SKIP=vale biome vale-ls go-modules git-hooks",
-			"STAMP_INDEX=" + filepath.Join(tree, "index-copy"), "STAMP_BUILT=" + filepath.Join(tree, "built"),
-		}
-		said, err := run.CombinedOutput()
-		if err != nil {
-			t.Fatalf("%s: the install fails: %v: %s", one.name, err, said)
-		}
+		said := installIn(t, tree, path, "SE_INSTALL_SKIP=vale biome vale-ls go-modules git-hooks",
+			"STAMP_INDEX="+filepath.Join(tree, "index-copy"), "STAMP_BUILT="+filepath.Join(tree, "built"))
 		seen, _ := os.ReadFile(filepath.Join(tree, ".se", ".runtime", "seen"))
 		asked := strings.Contains(string(seen), "stamp fresh se-index\n")
 		wrote := strings.Contains(string(seen), "stamp write se-index\n")
 		_, built := os.Stat(filepath.Join(tree, "built"))
 		if !asked || wrote != one.built || (built == nil) != one.built {
 			t.Errorf("%s: the index heard %q and built %v, and wants stamp fresh asked, the build and the write %v: %s", one.name, seen, built == nil, one.built, said)
+		}
+	}
+}
+
+// A fake curl writing down the address it fetches and writing to -o a biome that answers its version, and a fake uname answering Linux and the machine BIOME_MACHINE names. [[spec/tickets/biome-fetches-its-arch]]
+const (
+	biomeCurl  = "#!/bin/sh\nwhile [ $# -gt 0 ]; do case $1 in -o) shift; printf '#!/bin/sh\\nexit 0\\n' > \"$1\" ;; http*) printf '%s\\n' \"$1\" >> \"$BIOME_FETCHED\" ;; esac; shift; done\n"
+	biomeUname = "#!/bin/sh\ncase $1 in -m) printf '%s\\n' \"$BIOME_MACHINE\" ;; *) printf 'Linux\\n' ;; esac\n"
+)
+
+// Runs the real install.sh in the tree with the fakes in path ahead of the box PATH and the variables named, and answers what it said, failing the case where it fails. [[spec/tickets/biome-fetches-its-arch]]
+func installIn(t *testing.T, tree, path string, env ...string) string {
+	t.Helper()
+	run := exec.Command("sh", filepath.Join(tree, "install.sh")) // level0: FixtureOutsideHome - each install runs the real install.sh in a tree of the case's own
+	run.Dir = tree
+	run.Env = append([]string{"PATH=" + path + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME=" + tree}, env...)
+	said, err := run.CombinedOutput()
+	if err != nil {
+		t.Fatalf("the install fails: %v: %s", err, said)
+	}
+	return string(said)
+}
+
+func TestTheInstallFetchesTheBiomeItsMachineRuns(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct{ name, machine, standing, asset string }{
+		{"an arm Linux box fetches the arm asset", "aarch64", "", "biome-linux-arm64"},
+		{"an x86 Linux box fetches the x64 asset", "x86_64", "", "biome-linux-x64"},
+		{"a standing binary that cannot run is fetched again", "aarch64", "#!/bin/sh\nexit 126\n", "biome-linux-arm64"},
+		{"a standing binary that answers is fetched never", "aarch64", "#!/bin/sh\nexit 0\n", ""},
+	} {
+		tree := bootTree(t)
+		path := filepath.Join(tree, "path")
+		bootWrite(t, filepath.Join(path, "curl"), biomeCurl, 0o755)
+		bootWrite(t, filepath.Join(path, "uname"), biomeUname, 0o755)
+		if one.standing != "" {
+			bootWrite(t, filepath.Join(tree, ".se", ".runtime", "bin", "biome"), one.standing, 0o755)
+		}
+		said := installIn(t, tree, path, "SE_INSTALL_SKIP=go go-modules index git-hooks", "BIOME_MACHINE="+one.machine, "BIOME_FETCHED="+filepath.Join(tree, "fetched"))
+		asked, _ := os.ReadFile(filepath.Join(tree, "fetched"))
+		if got := strings.TrimSpace(string(asked)); got[strings.LastIndex(got, "/")+1:] != one.asset {
+			t.Errorf("%s: the install fetched %q, and wants the asset %q: %s", one.name, got, one.asset, said)
 		}
 	}
 }
