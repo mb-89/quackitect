@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -164,7 +164,30 @@ record:
         exit: 0
         said: "src/quack/ticket_update.go:22:1 ExampleCovers: ./RUNME.sh ticket update stands in no example's interface. Write an examp"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 02919845ad0dd170ec96828740fc5a47084a2ca2
+    hash_after: 02919845ad0dd170ec96828740fc5a47084a2ca2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   71.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f15c88258f49a9bf
+        size: 699
+    def: ebccfd52b1111bbe
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: tickets-keep-their-chapters
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/quack/ticket_fill_test.go src/quack/ticket_update_test.go src/quack/ticket_set_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+ticket fill reads processes and schemas, ticket update reads processes, their git history and the schema, and ticket set and urgent weigh a value against the schema, each off the method root. The ticket itself stays under the work root. A vehicle ticket fills, updates, sets and marks urgent as one under the self-driving tree does, where each refused. The vehicle case of each verb passes, and update-keeps-chapters-under-vehicle stands answered by the update case. It landed in 4adfab0e8.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four verbs, the shared helper and the harness, which the draft sizes
+- the cases reach the disk under two temp roots, and git through the harness fake, which now refuses a root past the method root
+- the comment in each verb names the approach
+- each verb reads the method root through methodDisk or it.Method, and the ticket through the work disk
 
 # accept
 
