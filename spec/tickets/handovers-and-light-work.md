@@ -83,12 +83,21 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box 56610d6296ee · claude-code-remote
     hash_before: 64a23851cd86ae3a93b4bcb97d3053b4dc353a29
     session: cse_01MrTLCrMVwxLu7iw5LcpUqQ
+  - step: sync
+    hand: box 56610d6296ee · claude-code-remote
+    hash_before: 8b7dd86c82a8473a254ca824144f1217f358ad02
+    hash_after: 8b7dd86c82a8473a254ca824144f1217f358ad02
+    answered:
+      - name: sync
+        exit: 0
+        said: work/handovers-and-light-work already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -104,8 +113,9 @@ Done when every child closes through the command it names.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
