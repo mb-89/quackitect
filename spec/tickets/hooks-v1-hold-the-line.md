@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 record:
   - step: sync
     hand: box d5540c8b5530 · claude-code-remote
@@ -94,6 +94,15 @@ record:
     hand: box f9a277082525 · claude-code-remote
     hash_before: 4dc63da0d338931233fc9995be3b9251fc2d3fd7
     session: cse_01VvZM1WiDGrRL4iW4UyEegN
+  - step: sync
+    hand: box f9a277082525 · claude-code-remote
+    hash_before: 8b4daae494750e4c5036fdfa36a42170dc943e2f
+    hash_after: 9bb45f463a2075f3e987af04233e62e79ae9878b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/hooks-v1-hold-the-line took 166 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -107,8 +116,9 @@ Every confirmed finding of the review fleet over main at bf1dad88b stands fixed 
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
