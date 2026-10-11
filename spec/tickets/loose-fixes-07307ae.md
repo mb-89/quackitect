@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 fix: true
 record:
   - step: sync
@@ -99,6 +99,18 @@ record:
         exit: 0
         said: The front of spec/tickets/loose-fixes-07307ae.md merges on its own.
     def: 8a9850a81227554b
+  - step: split
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 0a8dd7b2d7795cd67b2033ba2483160741df3e73
+    hash_after: 0a8dd7b2d7795cd67b2033ba2483160741df3e73
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 4fda339dd698ce5e
+        size: 13377
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -132,14 +144,20 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/secret-mode-holds-on-windows]] (trivial), closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child reviews whole: it adds no code, only evidence
+- the child is the only loose agent ticket on main naming this group, so it covers the goal
+- no child waits on another
+- no sibling reads apply
+- the diff stays at ticket files, well inside one review
 
 # children
 
