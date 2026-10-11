@@ -44,18 +44,6 @@ func (c *fakeClock) Pause(span time.Duration) {
 
 func (c *fakeClock) gone() time.Duration { return c.now.Sub(c.start) }
 
-// An outside over a temp root, the fake clock, a cap and a quiet span, with no report and every process alive. [[spec/tickets/find-and-wait-in-go]]
-func outsideOf(t *testing.T, most, quiet time.Duration) (Outside, *fakeClock) {
-	t.Helper()
-	start := time.Unix(1000, 0)
-	clock := &fakeClock{t: t, start: start, now: start}
-	return Outside{
-		Root: t.TempDir(), Now: clock.Now, Pause: clock.Pause, Most: most, Quiet: quiet,
-		Reported: func(string) bool { return false },
-		Alive:    func(int) bool { return true },
-	}, clock
-}
-
 // What the wait answers, as the caller reads it. [[spec/tickets/find-and-wait-in-go]]
 func waited(t *testing.T, from Outside, in Wait) string {
 	t.Helper()
@@ -148,6 +136,36 @@ func TestAnOutputStandsQuiet(t *testing.T) {
 	}
 	if clock.gone() != 2*time.Second {
 		t.Errorf("the wait returns after %s, and wants the quiet span of 2s", clock.gone())
+	}
+}
+
+// A path nobody wrote yet holds the quiet clock, so the wait runs to its cap and names the path. [[spec/tickets/a-missing-path-stays-unquiet]]
+func TestAMissingPathNeverReadsQuiet(t *testing.T) {
+	from, clock := outsideOf(t, 10*time.Second, 2*time.Second)
+	pid := float64(7)
+	said := waited(t, from, Wait{Output: "build.log", Pid: &pid})
+	if want := "The wait reaches its cap of 10s, and build.log stands nowhere."; said != want {
+		t.Errorf("the wait answers %q, and wants %q", said, want)
+	}
+	if clock.gone() != 10*time.Second {
+		t.Errorf("the wait returns after %s, and wants its cap of 10s", clock.gone())
+	}
+}
+
+// A path written mid-wait counts its quiet from the write. [[spec/tickets/a-missing-path-stays-unquiet]]
+func TestALatePathCountsQuietFromItsWrite(t *testing.T) {
+	from, clock := outsideOf(t, time.Minute, 2*time.Second)
+	clock.each = func(pauses int) {
+		if pauses == 3 {
+			seed(t, from.Root, "a.txt", "one\n")
+		}
+	}
+	said := waited(t, from, Wait{Files: []string{"a.txt"}})
+	if want := "The files a.txt stand quiet for 2s."; said != want {
+		t.Errorf("the wait answers %q, and wants %q", said, want)
+	}
+	if clock.gone() != 5*time.Second {
+		t.Errorf("the wait returns after %s, and wants 5s: the write at 3s, then 2s of quiet", clock.gone())
 	}
 }
 

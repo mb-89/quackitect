@@ -6,7 +6,6 @@ package check
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -30,32 +29,26 @@ type copyAt struct {
 	line       int
 }
 
-// Every body standing in an earlier package too, read once for each set of Go texts. [[spec/tickets/shared-helpers-stand-once]]
+// Every body standing in an earlier package too. [[spec/tickets/shared-helpers-stand-once]]
 func helperCopies(tree *Tree) []Finding {
 	paths := goSources(tree)
-	key := sha256.New()
+	first := map[string]copyAt{}
+	out := []Finding{}
 	for _, at := range paths {
-		key.Write([]byte(at + "\x00" + tree.Read(at) + "\x00"))
-	}
-	return tree.copiesOnce(string(key.Sum(nil)), func() []Finding {
-		first := map[string]copyAt{}
-		out := []Finding{}
-		for _, at := range paths {
-			for print, one := range bodiesIn(at, tree.Read(at)) {
-				there, held := first[print]
-				if !held {
-					first[print] = one
-					continue
-				}
-				if path.Dir(there.file) == path.Dir(at) {
-					continue
-				}
-				out = append(out, fault(HelperStandsOnce, at, one.line,
-					one.name+" copies the body of "+there.name+" in "+path.Dir(there.file)+". Call that one, and delete this copy."))
+		for print, one := range bodiesIn(at, tree.Read(at)) {
+			there, held := first[print]
+			if !held {
+				first[print] = one
+				continue
 			}
+			if path.Dir(there.file) == path.Dir(at) {
+				continue
+			}
+			out = append(out, fault(HelperStandsOnce, at, one.line,
+				one.name+" copies the body of "+there.name+" in "+path.Dir(there.file)+". Call that one, and delete this copy."))
 		}
-		return out
-	})
+	}
+	return out
 }
 
 // The tracked Go files the rule reads, past tests, drafts and test data, in path order. [[spec/tickets/shared-helpers-stand-once]]
@@ -131,15 +124,4 @@ func renamed(one *ast.FuncDecl) {
 		name.Name = place
 		return true
 	})
-}
-
-// The copies a Go file holds, off the pass over every Go text. [[spec/tickets/shared-helpers-stand-once]]
-func copiesOver(tree *Tree, where string) []Finding {
-	out := []Finding{}
-	for _, said := range helperCopies(tree) {
-		if said.File == where {
-			out = append(out, said)
-		}
-	}
-	return out
 }

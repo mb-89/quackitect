@@ -143,6 +143,8 @@ with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 |---|---|
 | a folder the walk stands off, the log among them | stands off it. The log grows a line a door call, and a watch on it moves rows for nothing. A search of the log reads the file, see [[spec/design_output/log#one-verb-reads-the-log]] |
 | the runtime folder | holds that folder alone, for the plan file. A plan write moves no row and counts one on the tick. The work tab then reads its todos again, see [[spec/design_output/stop#the-plan]] |
+| a folder it fails to add, as a full watch table refuses one | watches every other folder, and names the failure on stderr |
+| an overflow of lost events | marks a sweep of the whole tree for the next settle |
 
 A box where no watch stands still answers, out of the sweep the door makes on
 the way up and on its clock.

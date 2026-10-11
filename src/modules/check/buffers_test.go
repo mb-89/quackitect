@@ -43,3 +43,16 @@ func TestAClosedBufferLeavesItsFileRead(t *testing.T) {
 		t.Fatalf("the sweep answers %+v, and wants the dead pointer the file holds on disk", found)
 	}
 }
+
+// A buffer writing a field the verbs own draws the hint in the sweep the editor reads, and the file alone draws nothing. [[spec/design_output/lsp#an-engine-field-warns]]
+func TestABufferWritingAnEngineFieldDrawsItsHint(t *testing.T) {
+	schema := "kind: thing\nfrontmatter:\n  type: object\n  properties:\n    kind:\n      const: thing\n    state:\n      x-engine: true\nbody:\n  sections:\n    - header: A\n"
+	note := func(state string) string { return "---\nkind: thing\nstate: " + state + "\n---\n\n# A\n" }
+	files := map[string]string{"spec/schemas/thing.schema.yaml": schema, "spec/t.md": note("open")}
+	if found := sweepHeld(t, files, map[string]string{"spec/t.md": note("draft")}); !holdsRule(found, EngineOwnsField, "spec/t.md") {
+		t.Fatalf("the sweep answers %+v, and wants the hint on the state the buffer writes", found)
+	}
+	if found := sweepHeld(t, files, nil); holdsRule(found, EngineOwnsField, "spec/t.md") {
+		t.Fatalf("the sweep answers %+v, and wants nothing on a file no editor holds", found)
+	}
+}

@@ -334,19 +334,6 @@ func TestRenameMoves(t *testing.T) {
 			t.Fatalf("the journal holds %d entries, and wants one a move", len(entries))
 		}
 	})
-	t.Run("a name standing as no path rewrites, and moves nothing", func(t *testing.T) {
-		d := renamesOver(t, map[string]string{"src/a.go": "quackitect/src/oldname\n"})
-		code, out, errs := runsTwin(renameVerb(d), "rename", "quackitect/src/oldname", "quackitect/src/newname", "--text")
-		if code != 0 || !strings.Contains(out, "  src/a.go\n") {
-			t.Fatalf("rename answers %d, %q, %q", code, out, errs)
-		}
-		if said, _ := textAt(d, "src/a.go"); said != "quackitect/src/newname\n" {
-			t.Fatalf("src/a.go reads %q", said)
-		}
-		if len(renameEntries(t, d)) != 0 {
-			t.Fatal("the text rename writes a journal entry")
-		}
-	})
 }
 
 func TestRenameVerb(t *testing.T) {
@@ -415,4 +402,19 @@ func TestRenameVerb(t *testing.T) {
 			t.Fatalf("the journal holds %+v", entries)
 		}
 	})
+}
+
+// A text rename rewrites the name across the tree and names each file it writes, and a name standing as a path stays in place, with no journal entry. [[spec/design_output/index#a-rename-reaches-a-name]]
+func TestRenameTextLeavesAnExistingPathInPlace(t *testing.T) {
+	t.Parallel()
+	d := renamesOver(t, map[string]string{"spec/a.md": "# A\n", "spec/b.md": "spec/a.md\n"})
+	if code, out, errs := runsTwin(renameVerb(d), "rename", "spec/a.md", "spec/c.md", "--text"); code != 0 || !strings.Contains(out, "  spec/b.md\n") {
+		t.Fatalf("rename answers %d, %q, %q", code, out, errs)
+	}
+	if said, ok := textAt(d, "spec/a.md"); !ok || said != "# A\n" {
+		t.Fatalf("spec/a.md reads %q (%v), and wants it in place", said, ok)
+	}
+	if said, _ := textAt(d, "spec/b.md"); said != "spec/c.md\n" || len(renameEntries(t, d)) != 0 {
+		t.Fatalf("spec/b.md reads %q beside %d journal entries, and wants the text rewritten and none", said, len(renameEntries(t, d)))
+	}
 }

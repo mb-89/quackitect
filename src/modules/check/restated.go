@@ -7,7 +7,6 @@ import (
 	"quackitect/src/yaml"
 
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -65,28 +64,21 @@ func pointerFaults(tree *Tree, path string, most int) []Finding {
 // One rule standing in two guidance notes drifts, because a hand rewords one of them. [[spec/design_output/lsp#a-second-copy-draws]]
 func ruleFaults(tree *Tree, most int) []Finding {
 	held := map[string][]ruleAt{}
-	// The pairs compare again where a guidance text changes, so a keystroke in any other note pays nothing here. [[spec/design_output/lsp#a-change-reads-one-note]]
-	key := strings.Builder{}
-	key.WriteString(strconv.Itoa(most))
 	for _, path := range notesIn(tree) {
 		if strings.HasPrefix(path, guidanceIn) {
-			note := tree.parsed(path)
-			held[path] = note.rules
-			key.WriteString("\x00" + path + "\x00" + note.text)
+			held[path] = tree.parsed(path).rules
 		}
 	}
-	return tree.rulesOnce(key.String(), func() []Finding {
-		out := []Finding{}
-		for path, mine := range held {
-			for other, theirs := range held {
-				if other >= path {
-					continue
-				}
-				out = append(out, sameRules(path, mine, other, theirs, most)...)
+	out := []Finding{}
+	for path, mine := range held {
+		for other, theirs := range held {
+			if other >= path {
+				continue
 			}
+			out = append(out, sameRules(path, mine, other, theirs, most)...)
 		}
-		return out
-	})
+	}
+	return out
 }
 
 // A rule line, and its words read once, because every pair of rules compares them. [[spec/design_output/lsp#a-change-reads-one-note]]

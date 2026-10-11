@@ -5,8 +5,11 @@ package index // level0: InPackageTest - it declares the shared tree helpers, an
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"os" // level0: OutsideInDoors - the case links a folder into its own tree, which no door makes
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -367,5 +370,129 @@ func TestTheSweepWritesEveryLineHoldingTextUnderItsNumber(t *testing.T) {
 	want := []string{"src/a.js:1:one", "src/a.js:4:four", "src/a.js:5:five", "src/b.js:2:second"}
 	if strings.Join(said, " ") != strings.Join(want, " ") {
 		t.Fatalf("the sweep writes the rows %v, and wants %v", said, want)
+	}
+}
+
+// An adder refusing one folder, as a full inotify table refuses the next. [[spec/tickets/door-guards-watch-and-drain]]
+type refusingAdder struct {
+	refuse string
+	added  []string
+}
+
+func (one *refusingAdder) Add(path string) error {
+	if path == one.refuse {
+		return errors.New("no space left on device")
+	}
+	one.added = append(one.added, path)
+	return nil
+}
+
+// A folder the watch fails to add leaves every other folder watched, and the walk names the failure. [[spec/tickets/door-guards-watch-and-drain]]
+// level0: FixtureOutsideHome - the case writes its own tree
+func TestAFailedWatchKeepsTheOtherFolders(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "a/one.md", "one\n")
+	write(t, root, "b/two.md", "two\n")
+	eyes := &refusingAdder{refuse: filepath.Join(root, "a")}
+	if err := folders(root, root, eyes); err == nil {
+		t.Fatal("the walk answers no error over a folder the watch refused")
+	}
+	if !slices.Contains(eyes.added, filepath.Join(root, "b")) {
+		t.Fatalf("the watch stands on %v, and wants b past the refused a", eyes.added)
+	}
+}
+
+// A ticket id, a file name, a dotted name, a path, a quote and a bare AND each read as words, so each finds its line. [[spec/design_output/index#the-questions-it-answers]]
+// level0: FixtureOutsideHome - the case writes and sweeps its own tree
+func TestFindTakesPunctuatedWords(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "spec/punct.md", "the-sweep-prepares-once reads index.go and door.took under spec/design_output, says \"don't\", AND foo:bar\n")
+	db, err := Open(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, _, err := Sweep(db, root); err != nil {
+		t.Fatal(err)
+	}
+	for _, words := range []string{"the-sweep-prepares-once", "index.go", "door.took", "spec/design_output", `"don't"`, "AND", "foo:bar"} {
+		rows, err := Find(db, words, 0)
+		if err != nil || len(rows) == 0 {
+			t.Errorf("find %q answers %v and %v, and wants the line", words, rows, err)
+		}
+		if _, err := Notes(db, words, 0); err != nil {
+			t.Errorf("notes %q answers %v, and wants no query fault", words, err)
+		}
+	}
+}
+
+// A rebuild clears the old file's -wal and -shm with it, so the new file replays no journal of the door before. The case opens a copy, since Windows removes no file a handle holds. [[spec/design_output/index#the-door-owns-the-database]]
+// level0: FixtureOutsideHome - the case opens and writes its own index
+func TestOpenClearsTheWalAndShm(t *testing.T) {
+	t.Parallel()
+	root, at := tree(t), filepath.Join(t.TempDir(), "index.db")
+	old, err := Open(root, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer old.Close()
+	if _, _, err := Sweep(old, root); err != nil {
+		t.Fatal(err)
+	}
+	copied := filepath.Join(t.TempDir(), "index.db")
+	for _, end := range []string{"", "-wal", "-shm"} {
+		if body, err := os.ReadFile(at + end); err == nil {
+			write(t, filepath.Dir(copied), "index.db"+end, string(body))
+		}
+	}
+	old.Close()
+	db, err := Open(t.TempDir(), copied)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if n := counted(t, db, `SELECT count(*) FROM file`); n != 0 {
+		t.Fatalf("the rebuilt index replays %d row(s) off the old journal", n)
+	}
+}
+
+// A file that is no database rebuilds, so the next start opens a fresh index. [[spec/design_output/index#the-door-owns-the-database]]
+// level0: FixtureOutsideHome - the case opens and writes its own index
+func TestOpenRebuildsACorruptFile(t *testing.T) {
+	t.Parallel()
+	at := filepath.Join(t.TempDir(), "index.db")
+	write(t, filepath.Dir(at), "index.db", strings.Repeat("no database here\n", 512))
+	db, err := Open(tree(t), at)
+	if err != nil {
+		t.Fatalf("open over a corrupt file answers %v, and wants a fresh index", err)
+	}
+	defer db.Close()
+	var count int
+	if err := db.QueryRow(`SELECT count(*) FROM file`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// A linked folder reads as no file, so a second sweep over a still tree moves nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+// level0: FixtureOutsideHome - the case writes and sweeps its own tree
+func TestASweepOverAnUnreadableEntryMovesNothing(t *testing.T) {
+	t.Parallel()
+	root := tree(t)
+	write(t, root, "elsewhere/one.md", "one\n")
+	if err := os.Symlink(filepath.Join(root, "elsewhere"), filepath.Join(root, "linked")); err != nil {
+		t.Skip("this box makes no link:", err)
+	}
+	db, err := Open(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if _, _, err := Sweep(db, root); err != nil {
+		t.Fatal(err)
+	}
+	if _, moved, err := Sweep(db, root); err != nil || moved != 0 {
+		t.Fatalf("a second sweep over a still tree moves %d (%v), and wants none", moved, err)
 	}
 }

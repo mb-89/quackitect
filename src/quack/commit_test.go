@@ -6,10 +6,12 @@ package main // level0: InPackageTest - the cases drive the unexported commitVer
 
 import (
 	"encoding/json"
+	"errors"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"quackitect/src/modules/git"
 	"quackitect/src/prose"
 )
 
@@ -515,4 +517,23 @@ func TestPushVerb(t *testing.T) {
 			t.Fatalf("push answers %d, %q", code, errs)
 		}
 	})
+}
+
+// A repo whose soft reset fails, as git refuses one mid-merge. [[spec/tickets/take-back-names-failed-reset]]
+type stuckReset struct{ git.Repo }
+
+func (stuckReset) SoftReset(string) error { return errors.New("fatal: the reset stops") }
+
+// A take-back the reset refuses names the commit standing at HEAD and the command that takes it back. [[spec/tickets/take-back-names-failed-reset]]
+func TestAFailedTakeBackNamesTheCommit(t *testing.T) {
+	t.Parallel()
+	at, d, heard, _ := laidLanding(t, "src/quack/a.go", "package main\n")
+	heard.answers["probe cold"] = verbAnswer{exitFailed, "FAIL hook: no line"}
+	d.claude = filepath.Join(at.root, "README.md")
+	d.git = stuckReset{d.git}
+	code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+	head, _ := at.repo.Resolve("HEAD")
+	if code != exitFailed || strings.Contains(errs, "nothing lands") || !strings.Contains(errs, head) || !strings.Contains(errs, "git reset --soft HEAD~1") {
+		t.Fatalf("commit answers %d, %q, and wants the commit %s named with the reset that takes it back", code, errs, head)
+	}
 }

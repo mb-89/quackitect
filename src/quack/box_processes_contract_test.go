@@ -281,7 +281,7 @@ var quackBinary = sync.OnceValues(func() (string, error) {
 // The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
 var quackBuilds atomic.Int32
 
-// Two cases asking for the binary in two folders meet one build. [[spec/tickets/each-door-meets-one-test]] One folder then leaves while an index runs from the other, as TempDir's cleanup removes it. [[spec/tickets/quack-build-copies-on-windows]]
+// Two cases asking for the binary in two folders meet one build, and a tree verb over a root with no door starts this binary. [[spec/tickets/each-door-meets-one-test]] [[spec/design_output/index#a-door-comes-back]] One folder then leaves while an index runs from the other, as TempDir's cleanup removes it. [[spec/tickets/quack-build-copies-on-windows]]
 // level0: FixtureOutsideHome - the contract asks for the real quack binary in two folders of its own, to prove one go build serves both, and runs one as an index
 func TestTheQuackBinaryBuildsOnce(t *testing.T) {
 	t.Parallel()
@@ -318,19 +318,6 @@ func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 	}
 	if said, err := quack(t, bin, root, "why", "clock/minute"); err == nil {
 		t.Fatalf("the index loads a module past the manager: %s", said)
-	}
-}
-
-// A tree verb reaches /v1 before the index's own command line runs, and starts this binary where no door stands. [[spec/design_output/index#a-door-comes-back]]
-// level0: FixtureOutsideHome - the contract runs the real quack binary over a tree of its own where no door stands, so the verb starts a real index
-func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
-	t.Parallel()
-	bin := built(t, t.TempDir())
-	root := t.TempDir()
-	said, err := quack(t, bin, root, "help")
-	t.Cleanup(func() { stopped(t, bin, root) })
-	if err != nil {
-		t.Fatalf("quack help over a root with no door answers %v: %s", err, said)
 	}
 }
 

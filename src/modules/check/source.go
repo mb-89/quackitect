@@ -5,7 +5,6 @@
 package check
 
 import (
-	"errors"
 	"path"
 	"sort"
 	"strings"
@@ -18,35 +17,6 @@ type Source interface {
 	Folder(path string) bool
 	Names(folder string) []string
 	Paths() []string
-}
-
-// A tree off the index answers this, so no follower waits on it. [[spec/design_output/lsp#the-panel-follows-the-index]]
-var ErrNoIndex = errors.New("this tree reads no index")
-
-// The files the index moves since the last pull, and the ones it drops. A tree off the index moves nothing. [[spec/design_output/lsp#the-panel-follows-the-index]]
-func (one *Tree) Pulls() (moved, gone []string, err error) {
-	from, ok := one.source.(interface {
-		Pulls() ([]string, []string, error)
-	})
-	if !ok {
-		return nil, nil, nil
-	}
-	moved, gone, err = from.Pulls()
-	if len(moved)+len(gone) > 0 {
-		one.Forgets()
-	}
-	return moved, gone, err
-}
-
-// The index's tick past the one named. A tree off the index answers ErrNoIndex. [[spec/design_output/lsp#the-panel-follows-the-index]]
-func (one *Tree) Changes(since int64) (int64, error) {
-	from, ok := one.source.(interface {
-		Changes(int64) (int64, error)
-	})
-	if !ok {
-		return since, ErrNoIndex
-	}
-	return from.Changes(since)
 }
 
 // The files by slash path and their text, the shape the index mirrors. [[spec/tickets/lsp-rules-move-to-check]]

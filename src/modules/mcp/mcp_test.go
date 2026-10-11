@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -243,5 +244,29 @@ func TestTheListenAnswersAPostBehindItsToken(t *testing.T) {
 	var said map[string]any
 	if err := json.NewDecoder(posted.Body).Decode(&said); err != nil || said["result"] == nil {
 		t.Fatalf("the ping answers %+v (%v), and wants a result", said, err)
+	}
+}
+
+// A body past the cap answers 413, and the answer names the cap. [[spec/tickets/mcp-cap-names-its-size]]
+func TestABodyPastTheCapNamesTheCap(t *testing.T) {
+	one := serverOver(t, &calls{}, nil)
+	asked := httptest.NewRequest(http.MethodPost, "/mcp", bytes.NewReader(bytes.Repeat([]byte(" "), bodyCap+1)))
+	asked.Header.Set("Authorization", "Bearer t")
+	answered := httptest.NewRecorder()
+	one.server.serves("t")(answered, asked)
+	if answered.Code != http.StatusRequestEntityTooLarge || !strings.Contains(answered.Body.String(), fmt.Sprint(bodyCap)) {
+		t.Fatalf("a body past the cap answers %d %q, and wants 413 naming %d", answered.Code, answered.Body.String(), bodyCap)
+	}
+}
+
+// JSON that does not parse answers the JSON-RPC parse error. [[spec/tickets/mcp-cap-names-its-size]]
+func TestBadJSONAnswersAParseError(t *testing.T) {
+	one := serverOver(t, &calls{}, nil)
+	reply, _ := one.server.Handle("", []byte(`{"jsonrpc":`))
+	var said struct {
+		Error struct{ Code int } `json:"error"`
+	}
+	if err := json.Unmarshal(reply, &said); err != nil || said.Error.Code != -32700 {
+		t.Fatalf("bad JSON answers %s, and wants the code -32700", reply)
 	}
 }

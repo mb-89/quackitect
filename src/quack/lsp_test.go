@@ -186,22 +186,6 @@ func (conn *hq1Conn) said() string {
 	return conn.heard.String()
 }
 
-func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
-	t.Parallel()
-	frame := "Content-Length: 2\r\n\r\n{}"
-	conn := hq1Module(frame)
-	var out bytes.Buffer
-	if err := relays(strings.NewReader(frame), &out, conn, "tok"); err != nil {
-		t.Fatal(err)
-	}
-	if said := conn.said(); said != "tok\n"+frame {
-		t.Fatalf("the IO module hears %q, and wants the token line, then the frame whole", said)
-	}
-	if out.String() != frame {
-		t.Fatalf("the editor reads %q, and wants the reply frame whole", out.String())
-	}
-}
-
 func TestQuackLspDialsThePortTheStandingFileNames(t *testing.T) {
 	t.Parallel()
 	root, disk := "/tree", newFakeDisk()

@@ -233,3 +233,16 @@ func TestOfAnswersEveryOperationOfTheCaller(t *testing.T) {
 		t.Fatalf("the book answers %+v, and wants both operations of s1 by id, the ended one among them", got)
 	}
 }
+
+// An action declaring no deadline takes the book's default, so a hung one ends. [[spec/design_output/model#deadlines]]
+func TestAnActionTakesTheDefaultDeadline(t *testing.T) {
+	b, c, _ := bookOf(t)
+	b.settings.Deadline = 10 * time.Minute
+	id, err := b.Start("t/pull", "in", "s1", q.Declared{Writes: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if one, _ := b.Get(id); !one.Deadline.Equal(c.now.Add(10 * time.Minute)) {
+		t.Fatalf("the operation's deadline reads %v, and wants the default ten minutes past %v", one.Deadline, c.now)
+	}
+}

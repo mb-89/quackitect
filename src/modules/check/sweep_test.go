@@ -167,3 +167,32 @@ func TestTheSweepLeavesTheBoxRulesOut(t *testing.T) {
 		}
 	}
 }
+
+// A pointer at a heading the note lacks draws one row, and a fenced pointer and a Go string draw none. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
+func TestADeadHeadingDrawsOneRow(t *testing.T) {
+	files := map[string]string{
+		"spec/b.md":  "# B\n\n## Real\n",
+		"spec/a.md":  "# A\n\nSee [[spec/b#nope]].\n\n```\n[[spec/b#also-nope]]\n```\n",
+		"src/x/x.go": "package x\n\nvar s = \"[[spec/b#fixture]]\"\n",
+	}
+	rows := map[string]int{}
+	for _, one := range sweepOver(t, files, nil) {
+		if one.Rule == "EveryPointerResolves" {
+			rows[one.File+":"+itoa(one.Line)]++
+		}
+	}
+	if rows["spec/a.md:3"] != 1 || len(rows) != 1 {
+		t.Fatalf("the sweep draws %v, and wants one row on spec/a.md:3 alone", rows)
+	}
+}
+
+// An open group's child at a person step draws the rule in the sweep the editor reads, as it does in lint. [[spec/design_output/work#a-person-step-leaves]]
+func TestGroupAsksNobodyFiresInTheSweep(t *testing.T) {
+	files := map[string]string{
+		"spec/tickets/g.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
+		"spec/tickets/c.md": "---\nkind: [[ticket]]\nstate: open\ngroup: g\nstep: ask\nsteps:\n  - name: ask\n    by: person\n---\n\n# Ask\n",
+	}
+	if found := sweepOver(t, files, nil); !holdsRule(found, groupAsks, "spec/tickets/c.md") {
+		t.Fatalf("the sweep answers %+v, and wants %s on the child", found, groupAsks)
+	}
+}

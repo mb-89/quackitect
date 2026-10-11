@@ -50,7 +50,7 @@ The fronts below ask for a reading, and each reaches one rule set:
 | a person, at `quack sweep` | the same sweep, once the index settles |
 | `./RUNME.sh lint` | `quack sweep`, and `toolsOver` in `src/quack/verb_lint.go` beside it |
 
-`Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
+`Sweep` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
 own rules, and the tools beside them. A box whose quack answers no sweep names
 the fault in the lint, because the tree has no second road.
 
@@ -123,15 +123,13 @@ its buffer stands no more.
 
 ## A change reads one note
 
-A change to a buffer re-parses the note it changes, and reads every other note
-from what the tree holds. `parsed` in `src/modules/check/parsed.go` keeps each note's
-headings, their slugs and a guidance note's rule lines, keyed by the text they
-come from:
+Each sweep builds a fresh tree, so a tree's memo serves the rules of one sweep.
+`parsed` in `src/modules/check/parsed.go` keeps each note's headings, their
+slugs and a guidance note's rule lines, keyed by the text they come from:
 
 | what the tree holds | made again when |
 |---|---|
 | a note's parse | its text differs from the one the parse reads |
-| the pairs of guidance rules | a guidance note's text changes |
 | the list of paths | a buffer names a path the list lacks |
 
 # The server runs the tools
@@ -195,29 +193,27 @@ by writing zero.
 
 The pass reads every note, so the tree holds its findings and each front pays it
 once. A buffer the editor changes drops them, and the next ask pays again.
-`Over` hands one file its own share, and the sweep hands back the whole list.
+The sweep hands back the whole list, and a front reads its file's share off it.
 
 The Go rules carry the third rule of the set, over a line beside a table. For how it
 lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
 
 # A pointer reaches a heading
 
-A pointer names a note and a chapter, as `[[note#anchor]]`. `anchorFaults` in
-`src/modules/check/anchor.go` reads every pointer a tracked file carries. It resolves the
-note the way the restated rule does, and reads the anchor against the note's
-headings through `headingNamed`. A note that stands and holds no such heading
-draws `DeadAnchor` on the pointer's line, and the message names the anchor.
+A pointer names a note and a chapter, as `[[note#anchor]]`.
+`EveryPointerResolves` reads the anchor against the note's headings, over the
+lines it reads every pointer on. For those lines, see
+[[spec/design_output/lsp#every-pointer-resolves]].
 
 | the pointer | what draws |
 |---|---|
-| a note the tree lacks | nothing here, because the link check owns it |
+| a note the tree lacks | `EveryPointerResolves`, naming the note |
 | a heading the note holds | nothing |
-| a heading the note lacks | `DeadAnchor`, with the file, the line and the anchor |
+| a heading the note lacks | `EveryPointerResolves`, naming the chapter |
+| a pointer in a fenced block or a Go string | nothing |
 
-`Over` reads the one file the front names, and `Sweep` reads every tracked
-file, so the panel and `./RUNME.sh lint` draw the same finding. A heading
-renamed takes every pointer at the old name down at once, and the sweep names
-each one.
+A heading renamed takes every pointer at the old name down at once, and the
+sweep names each one.
 
 # A marked rule wants argument
 
