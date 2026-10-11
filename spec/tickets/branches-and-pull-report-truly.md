@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box 8339730da099 · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/branches-and-pull-report-truly already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 8339730da099 · claude-code-remote
+    hash_before: fef8eea68c534eb7f4566a7ade10f2b07340dc2a
+    hash_after: fef8eea68c534eb7f4566a7ade10f2b07340dc2a
+    inputs:
+      - name: ask
+        hash: b4fb32242a53e4b3
+        size: 443
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -126,14 +135,36 @@ Done when every finding on the review list closes, done or with its reason.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/became-refuses-itself]], trivial
+- [[spec/tickets/branch-list-reads-trunk-waits]], trivial
+- [[spec/tickets/cut-groups-check-the-push]], trivial
+- [[spec/tickets/depends-on-reads-one-parser]], trivial
+- [[spec/tickets/dispatch-remarks-branched-groups]], trivial
+- [[spec/tickets/done-refuses-on-refused-commit]], trivial
+- [[spec/tickets/engine-landings-report-refusals]], trivial
+- [[spec/tickets/failed-switch-keeps-parked-notes]], trivial
+- [[spec/tickets/fetch-names-the-real-fault]], trivial
+- [[spec/tickets/fix-group-names-stay-unique]], trivial
+- [[spec/tickets/go-build-failure-reads-build]], standard
+- [[spec/tickets/hand-out-reads-parsed-fronts]], trivial
+- [[spec/tickets/owner-says-hand-back-holds]], trivial
+- [[spec/tickets/red-test-keeps-named-sources]], trivial
+- [[spec/tickets/review-clears-stale-worktree]], trivial
+- [[spec/tickets/take-back-reports-refusals]], trivial
+- [[spec/tickets/tool-pull-finds-the-spawn]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is one change to one verb, small enough to review whole
+- the children cover each clause of the ask: build reads build, refused commits and pushes stop their verbs, edits and notes survive, the spawn reaches the tool, the owner word holds, fronts parse once
+- no child waits on another, so none names depends_on
+- no child reads a sibling, so their order is free
+- the diff stands in one review, so no child splits off
 
 # children
 
