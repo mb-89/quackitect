@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -156,6 +156,19 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 05c4736f6ff2 · claude-code-remote
+    hash_before: 28e7791da286ce555c0338ca2fe48ab53b247aec
+    hash_after: 28e7791da286ce555c0338ca2fe48ab53b247aec
+    inputs:
+      - name: retro/write
+        hash: 9e7dc1096b8a2e74
+        size: 1465
+      - name: [[spec/tickets/wal-case-opens-a-copy]]
+        hash: 8942f4d0ccdbb49a
+        size: 490
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -291,20 +304,26 @@ The dispatch named work/check-notices-leave-the-cap, but its one child waits at 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the level0 tool server, which dropped after the take, so the command line carried every verb
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at sync on the group ticket, which the sync resolved itself
+- the check ran past its time budget, and passed
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parks
+- no ticket minted
+- work/check-notices-leave-the-cap waits at design/owner-read for the owner
 
 # Discussion
 
