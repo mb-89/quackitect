@@ -7,6 +7,7 @@ package index // level0: InPackageTest - it drives the unexported opens and the 
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -115,7 +116,8 @@ func TestTheStandingAndTheSecretStandAtOwnerMode(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s stands nowhere: %v", at, err)
 		}
-		if mode := said.Mode().Perm(); mode != 0o600 {
+		// Windows keeps no owner-only mode, so a file there stands at 666 whatever its write asks. [[spec/tickets/secret-mode-holds-on-windows]]
+		if mode := said.Mode().Perm(); runtime.GOOS != "windows" && mode != 0o600 {
 			t.Fatalf("%s stands at %o, and wants 600", at, mode)
 		}
 	}
