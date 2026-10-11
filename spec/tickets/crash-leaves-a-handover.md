@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: gate
 steps:
   - name: design
     steps:
@@ -76,7 +77,7 @@ steps:
             expects: 0
             says: the tree builds and lints
       - name: tests-green
-        does: makes the tests pass
+        does: makes the change the ask names, with the red tests as its floor, so a rule of the ask lands where no red test names it
         input: design/tests-red
         to: retro
         evidence:
@@ -115,9 +116,7 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: c671f20a6ae2a4a6
-group: handovers-and-light-work
-step: gate
+process_hash: 3fd2a7591c5044cf
 record:
   - step: design/owner-read
     skipped: true
@@ -192,6 +191,7 @@ record:
     skipped: true
     kept: 2f31f89ef9b0342fc9e602c9060999437e9520ae
     why: its red tests stand as 2f31f89ef landed them, and a later leaf passed since
+group: handovers-and-light-work
 ---
 
 # Ask
