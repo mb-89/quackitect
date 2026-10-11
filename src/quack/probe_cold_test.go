@@ -113,59 +113,43 @@ func TestAWholeColdRoadPassesEveryCheck(t *testing.T) {
 	}
 }
 
-func TestEveryColdCheckFailsOnItsOwnRoad(t *testing.T) {
+func TestEveryColdCheckReadsItsOwnRoad(t *testing.T) {
 	t.Parallel()
 	refused := coldStarted()
 	refused["event"], refused["level"] = "classic.SessionStart", "warn"
 	fall := probeRow{"level": "warn", "kind": "bridge", "event": "env.get", "said": "the server answers nothing at http://127.0.0.1:6510/event"}
-	cases := []struct {
-		name, check string
-		rows        []probeRow
-		steps       coldSteps
-		evidence    string
-	}{
-		{"no bridgehead row and no context row", "hook", []probeRow{coldStands()}, coldClean(), "no session.start row"},
-		{"the bridgehead's rows alone", "server", []probeRow{coldStarted(), refused}, coldClean(), "bridgehead alone"},
-		{"a context row naming no canary block", "rules", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools"), coldHeard(heardSame)}, coldClean(), "level0-canary"},
-		{"no context row", "rules", []probeRow{coldStarted(), coldStands()}, coldClean(), "no context row"},
-		{"the pull alone", "tools", coldWhole(), stepsOf(stream(streamInit("Read", "mcp__level0__pull"), streamSaid(coldSentence+"\nTOOLS: mcp__level0__pull", nil))), "pull alone"},
-		{"no level zero tool", "tools", coldWhole(), stepsOf(stream(streamInit("Read"), streamSaid(coldSentence+"\nTOOLS: none", nil))), "no level0 tool"},
-		{"a first text opening on no canary", "canary", coldWhole(), stepsOf(stream(streamSaid("I read the README.", nil), streamSaid(coldSentence, nil))), "opens on none"},
-		{"a canary with other counts", "canary", coldWhole(), stepsOf(stream(streamSaid("level0 holds this session: 1 rules, 1 notes, the stop hook on.", nil))), "opens on other"},
-		{"a later text repeating the canary", "canary", coldWhole(), stepsOf(stream(streamSaid(coldSentence, nil), streamCalls("Read"), streamSaid(coldSentence+"\nDone.", nil))), "text 2 repeats"},
-		{"a first text saying it twice", "canary", coldWhole(), stepsOf(stream(streamSaid(coldSentence+"\nAgain: "+coldSentence, nil))), "text 1 repeats"},
-		{"a repeat row in the log", "canary", append(coldWhole(), coldHeard(heardAgain)), coldClean(), "second answer"},
-		{"a gate asking after the payment", "canary", append(coldWhole(), coldAsked()), coldClean(), "asks again after the payment"},
-		{"no level0 row", "canary", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools level0-canary")}, coldClean(), "no level0 row"},
-		{"a fall past the rules", "quiet", append(coldWhole(), fall), coldClean(), "1 row(s) say the server answers nothing"},
-	}
-	for _, one := range cases {
-		got := verdictOf(t, readsCold(one.rows, one.steps), one.check)
-		if got.pass || !strings.Contains(got.evidence, one.evidence) {
-			t.Errorf("%s: %s reads %+v", one.name, one.check, got)
-		}
-	}
-}
-
-func TestEveryColdCheckPassesOnItsOwnRoad(t *testing.T) {
-	t.Parallel()
 	down := coldStarted()
 	down["level"], down["said"] = "warn", "the bridge code fails its self-test"
 	early := probeRow{"level": "warn", "kind": "bridge", "event": "classic.SessionStart", "said": "the server answers nothing at http://127.0.0.1:6510/event"}
 	cases := []struct {
+		pass        bool
 		name, check string
 		rows        []probeRow
 		steps       coldSteps
 		evidence    string
 	}{
-		{"a bridgehead row saying the road stood down", "hook", []probeRow{down}, coldClean(), "self-test"},
-		{"a tool the session calls", "tools", coldWhole(), stepsOf(stream(streamInit("Read"), streamSaid(coldSentence, nil), streamCalls("mcp__level0__stop"))), "mcp__level0__stop"},
-		{"a gate asking before the payment", "canary", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools level0-canary"), coldAsked(), coldHeard(heardSame)}, coldClean(), "once"},
-		{"a fall before the rules", "quiet", append([]probeRow{early}, coldWhole()...), coldClean(), "no row says"},
+		{false, "no bridgehead row and no context row", "hook", []probeRow{coldStands()}, coldClean(), "no session.start row"},
+		{false, "the bridgehead's rows alone", "server", []probeRow{coldStarted(), refused}, coldClean(), "bridgehead alone"},
+		{false, "a context row naming no canary block", "rules", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools"), coldHeard(heardSame)}, coldClean(), "level0-canary"},
+		{false, "no context row", "rules", []probeRow{coldStarted(), coldStands()}, coldClean(), "no context row"},
+		{false, "the pull alone", "tools", coldWhole(), stepsOf(stream(streamInit("Read", "mcp__level0__pull"), streamSaid(coldSentence+"\nTOOLS: mcp__level0__pull", nil))), "pull alone"},
+		{false, "no level zero tool", "tools", coldWhole(), stepsOf(stream(streamInit("Read"), streamSaid(coldSentence+"\nTOOLS: none", nil))), "no level0 tool"},
+		{false, "a first text opening on no canary", "canary", coldWhole(), stepsOf(stream(streamSaid("I read the README.", nil), streamSaid(coldSentence, nil))), "opens on none"},
+		{false, "a canary with other counts", "canary", coldWhole(), stepsOf(stream(streamSaid("level0 holds this session: 1 rules, 1 notes, the stop hook on.", nil))), "opens on other"},
+		{false, "a later text repeating the canary", "canary", coldWhole(), stepsOf(stream(streamSaid(coldSentence, nil), streamCalls("Read"), streamSaid(coldSentence+"\nDone.", nil))), "text 2 repeats"},
+		{false, "a first text saying it twice", "canary", coldWhole(), stepsOf(stream(streamSaid(coldSentence+"\nAgain: "+coldSentence, nil))), "text 1 repeats"},
+		{false, "a repeat row in the log", "canary", append(coldWhole(), coldHeard(heardAgain)), coldClean(), "second answer"},
+		{false, "a gate asking after the payment", "canary", append(coldWhole(), coldAsked()), coldClean(), "asks again after the payment"},
+		{false, "no level0 row", "canary", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools level0-canary")}, coldClean(), "no level0 row"},
+		{false, "a fall past the rules", "quiet", append(coldWhole(), fall), coldClean(), "1 row(s) say the server answers nothing"},
+		{true, "a bridgehead row saying the road stood down", "hook", []probeRow{down}, coldClean(), "self-test"},
+		{true, "a tool the session calls", "tools", coldWhole(), stepsOf(stream(streamInit("Read"), streamSaid(coldSentence, nil), streamCalls("mcp__level0__stop"))), "mcp__level0__stop"},
+		{true, "a gate asking before the payment", "canary", []probeRow{coldStarted(), coldStands(), coldContext("level0-tools level0-canary"), coldAsked(), coldHeard(heardSame)}, coldClean(), "once"},
+		{true, "a fall before the rules", "quiet", append([]probeRow{early}, coldWhole()...), coldClean(), "no row says"},
 	}
 	for _, one := range cases {
 		got := verdictOf(t, readsCold(one.rows, one.steps), one.check)
-		if !got.pass || !strings.Contains(got.evidence, one.evidence) {
+		if got.pass != one.pass || !strings.Contains(got.evidence, one.evidence) {
 			t.Errorf("%s: %s reads %+v", one.name, one.check, got)
 		}
 	}

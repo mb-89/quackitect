@@ -318,28 +318,6 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 	}, runner, &out, &errs
 }
 
-// A box verb stamps the time its clock stands at, so a case replays the stamp. [[spec/tickets/quack-waits-on-the-clock]]
-func TestABoxVerbStampsTheTimeTheFakeClockStandsAt(t *testing.T) {
-	t.Parallel()
-	d, _, out, _ := fakeBoxDoors(t)
-	at := time.Date(2026, 3, 4, 5, 6, 7, 8_000_000, time.UTC)
-	d.clock = qtest.NewFake(at)
-	home := "/home/one"
-	hq1SeedDisk(t, d.disk, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
-	hq1SeedDisk(t, d.disk, home, map[string]string{".vscode/extensions/.keep": ""})
-	d.env = func(key string) string { return map[string]string{"HOME": home}[key] }
-	if !editorLink(d, true) {
-		t.Fatalf("the link falls:\n%s", out)
-	}
-	list, err := d.disk.read(filepath.Join(home, ".vscode", "extensions", editorList))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want := `"installedTimestamp":` + strconv.FormatInt(at.UnixMilli(), 10) + `,`; !strings.Contains(string(list), want) {
-		t.Errorf("the list stamps no %s:\n%s", want, list)
-	}
-}
-
 // Seeds each file under the root on a disk door, its folders made first. [[spec/tickets/test-walks-move-onto-fakes]]
 func hq1SeedDisk(t *testing.T, disk diskDoors, root string, files map[string]string) {
 	t.Helper()

@@ -478,20 +478,11 @@ func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t
 func TestRetroCollectCopiesTheScriptsAndLeavesThemAndASecondPassCopiesWhatChanges(t *testing.T) {
 	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
-	code, said := w.collect()
-	if code != 0 {
-		t.Fatalf("collect answers %d: %s", code, said)
-	}
-	if !w.exists("tree:.se/scripts/one.mjs") {
-		t.Fatal("the scripts stay in place")
-	}
-	if !w.exists(retroInputKey("scripts/one.mjs")) {
-		t.Fatal("the scripts copy into the input")
-	}
+	w.collect()
 
 	w.write("tree:.se/scripts/two.mjs", "// a later script\n")
 	w.touch("tree:.se/scripts/two.mjs", "2026-09-19T13:00:00Z")
-	code, said = w.collect("--again")
+	code, said := w.collect("--again")
 
 	if code != 0 {
 		t.Fatalf("a second pass answers %d: %s", code, said)

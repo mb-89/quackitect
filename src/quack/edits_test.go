@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/src/q"
 )
 
 // The module type the edit actions stand in, and the actions each case calls by name. [[spec/tickets/edit-tools-answer-in-go]]
@@ -54,7 +56,7 @@ func journalsIn(root string) []string {
 // Calls an edit action by name over the root. [[spec/tickets/edit-tools-answer-in-go]]
 func editCall(t *testing.T, root, name string, input any) string {
 	t.Helper()
-	return servedCall(t, root, editModuleType, nil, name, input)
+	return servedCall(t, root, editModuleType, func(store *q.Store) func(q.Request) (any, error) { return accepts(root, store, nil) }, name, input)
 }
 
 // A patch serving the open ticket, as the bridge's tool takes it. [[spec/tickets/edit-tools-answer-in-go]]

@@ -102,22 +102,16 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 					seedFile(t, at(path), path, *text)
 				}
 			}
-			t.Setenv("QUACKITECT_ROOT", root)
 			t.Setenv(workRootVar, map[bool]string{true: work}[one.Vehicle])
-			words := append([]string{"ticket"}, one.Argv...)
-			_, verb := twinOf(words, registry)
-			if verb == nil {
-				t.Fatalf("the registry holds no Go answer for %s", strings.Join(words, " "))
-			}
-			var out, errs strings.Builder
-			if code := verb(words, false, &out, &errs); code != one.Want.Code {
+			code, out, errs := runsApart(t, root, false, append([]string{"ticket"}, one.Argv...)...)
+			if code != one.Want.Code {
 				t.Errorf("the verb answers %d, and the JS answers %d", code, one.Want.Code)
 			}
-			if out.String() != one.Want.Out {
-				t.Errorf("the verb prints\n%q\nand the JS prints\n%q", out.String(), one.Want.Out)
+			if out != one.Want.Out {
+				t.Errorf("the verb prints\n%q\nand the JS prints\n%q", out, one.Want.Out)
 			}
-			if errs.String() != one.Want.Errs {
-				t.Errorf("the verb says\n%q\nand the JS says\n%q", errs.String(), one.Want.Errs)
+			if errs != one.Want.Errs {
+				t.Errorf("the verb says\n%q\nand the JS says\n%q", errs, one.Want.Errs)
 			}
 			for path, was := range files {
 				want, changed := one.Want.Files[path]

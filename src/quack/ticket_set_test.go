@@ -75,9 +75,7 @@ func TestTicketSet(t *testing.T) {
 	})
 	t.Run("an empty value and a flag standing off drop the field", func(t *testing.T) {
 		for _, value := range [][]string{{}, {"false"}} {
-			root := t.TempDir()
-			t.Setenv(workRootVar, "")
-			seedFile(t, root, "spec/schemas/ticket.schema.yaml", editCaseSchema)
+			root := editCaseTree(t)
 			seedFile(t, root, aThing, editCaseTicket("todo: true\n"))
 			code, out, _ := runsApart(t, root, false, append([]string{"ticket", "set", "a-thing", "todo"}, value...)...)
 			want := "spec/tickets/a-thing.md carries todo: " + map[int]string{0: "nothing", 1: "false"}[len(value)] + ".\n"

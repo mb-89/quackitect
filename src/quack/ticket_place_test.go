@@ -114,23 +114,7 @@ const (
 // Two open tickets tie on every term but their age. The name puts a-new first, and the day it stood puts b-old first, as the verb's program orders them. [[spec/design_output/pull#the-queue-is-a-score]]
 func TestTheWiredQueueWeighsTheDaysATicketStood(t *testing.T) {
 	t.Parallel()
-	all := treeWiring(t)
-	w := q.Wiring{Wires: all.Wires}
-	for _, one := range all.Instances {
-		if one.Module == "tickets" || one.Module == "queue" || one.Module == "work" {
-			w.Instances = append(w.Instances, one)
-		}
-	}
-	c := q.New()
-	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
-	minute := q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
-	resolved := q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
-	stood := q.OutIn(c, stoodName, map[string]int64{}, q.Doc("the second each ticket path came in"))
-	noTips(c)
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	s := q.NewStore(c)
+	s, files, minute, resolved, stood := queueStore(t)
 	now := caseMinute * 60
 	open := q.Content{Hash: "open", Text: "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA thing.\n"}
 	for _, seed := range []struct {
