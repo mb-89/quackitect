@@ -26,6 +26,7 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2a00b62f7c4bc60b
 step: do
+group: loose-fixes-07307ae
 ---
 
 # Ask
