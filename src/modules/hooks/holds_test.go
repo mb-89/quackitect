@@ -215,7 +215,7 @@ func TestTheFieldReadersRunBeforeTheDoorsLock(t *testing.T) {
 		door.mu.Unlock()
 		return ""
 	}
-	if err := door.writes("s1", Post{Event: stopEvent, E: map[string]any{"session_id": "s1"}}, Settings{}, t.TempDir()); err != nil {
+	if _, err := door.writes("s1", Post{Event: stopEvent, E: map[string]any{"session_id": "s1"}}, Settings{}, t.TempDir()); err != nil {
 		t.Fatal(err)
 	}
 	if reads == 0 || locked != 0 {
@@ -229,14 +229,39 @@ func TestAHelpersPostBetweenACallsWriteAndItsVerdictLeavesTheCallsRefusal(t *tes
 	door := holdDoor(t, settings)
 	main := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Read", "file_path": "a.md"}})
 	helper := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Grep", "agentId": "a1"}})
-	if err := door.writes("s1", main, settings, ""); err != nil {
+	own, err := door.writes("s1", main, settings, "")
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err := door.writes("s1", helper, settings, ""); err != nil {
+	if _, err := door.writes("s1", helper, settings, ""); err != nil {
 		t.Fatal(err)
 	}
-	said, ok := door.held("s1", main, "")
+	said, ok := door.held("s1", own, main, "")
 	if !ok || !strings.Contains(said.Text, "so Read is refused") {
 		t.Fatalf("the main call answers %+v, %v, and wants the refusal of Read", said, ok)
+	}
+}
+
+// A second post on the session lands refused between a call's write and its verdict, and the call passes on its own verdict. Under the finish hold the call stands within its grace, and the post past it meets the refusal. [[spec/tickets/hold-verdict-borrowed-case-tested]]
+func TestARefusedPostBetweenACallsWriteAndItsVerdictLeavesTheCallPassing(t *testing.T) {
+	settings := settingsOf(t, map[string]any{"stop.hold": "finish", "grace.finish": 2}, false)
+	door := holdDoor(t, settings)
+	read := postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Read"}})
+	if _, err := door.writes("s1", read, settings, ""); err != nil {
+		t.Fatal(err)
+	}
+	own, err := door.writes("s1", read, settings, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	late, err := door.writes("s1", postOf(holdPost{Event: toolEvent, E: map[string]any{"tool": "Grep"}}), settings, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said, ok := door.held("s1", own, read, ""); ok {
+		t.Fatalf("the call within its grace answers the later post's verdict %+v", said)
+	}
+	if said, ok := door.held("s1", late, read, ""); !ok || !strings.Contains(said.Text, "so Grep is refused") {
+		t.Fatalf("the post past the grace answers %+v, %v, and wants its own refusal", said, ok)
 	}
 }

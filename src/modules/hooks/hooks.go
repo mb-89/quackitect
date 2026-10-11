@@ -256,10 +256,11 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	post = picks(post)
 	session := d.sessionFor(post, root)
 	d.writesSession(post, root)
-	if err := d.writes(session, post, settings, root); err != nil {
+	own, err := d.writes(session, post, settings, root)
+	if err != nil {
 		return Answer{}, err
 	}
-	d.drops(session, root)
+	d.drops(own, root)
 	d.marks(session, root)
 	d.rows(session, root)
 	d.repeats(session, root)
@@ -268,7 +269,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	effects := []Effect{}
 	if said, ok := d.rewrites(session, post); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.held(session, post, root); ok {
+	} else if said, ok := d.held(session, own, post, root); ok {
 		effects = append(effects, said)
 	} else if said, ok := d.blocked(session, post); ok {
 		effects = append(effects, said)
@@ -318,7 +319,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 
 // Commits the event at the session's next place, stamped with the config its holds read, the facts the stop reads and the canary the brief reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/brief-answers-off-the-door]]
 // The field readers run before the lock, so a slow git or disk read on one post stalls no other session's call. [[spec/tickets/door-lock-holds-commit-alone]]
-func (d *Door) writes(session string, post Post, settings Settings, root string) error {
+func (d *Door) writes(session string, post Post, settings Settings, root string) (ownLanding, error) {
 	fields := fieldsOf(post)
 	fields[heldField] = heldOf(settings, root)
 	fields[stoppedField] = d.stoppedOf(post, settings, root)
@@ -339,22 +340,24 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	}
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
-		return err
+		return ownLanding{}, err
 	}
 	d.seqs[session] = event.Seq
 	delete(d.handed, session)
 	for _, fold := range store.Folds(foldsUnder) {
 		if err := store.Land(strings.Replace(fold, sessionKey, session, 1), event); err != nil {
-			return err
+			return ownLanding{}, err
 		}
 	}
 	if err := store.Land(d.holdsOf(session), event); err != nil {
-		return err
+		return ownLanding{}, err
 	}
+	own := ownLanding{seq: event.Seq}
+	own.holds, own.stands = store.Snapshot().Read(d.holdsOf(session)).(Holds)
 	if err := d.landsStops(session, event); err != nil {
-		return err
+		return own, err
 	}
-	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
+	return own, d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
 func (d *Door) now() time.Time { return d.from.Clock.Now() }
