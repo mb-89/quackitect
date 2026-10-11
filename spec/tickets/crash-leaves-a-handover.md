@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -218,7 +218,33 @@ record:
         exit: 0
         said: "   69.5  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: ede1f102657ee455ebb8e5450a8df7cd8b0fae72
+    hash_after: ede1f102657ee455ebb8e5450a8df7cd8b0fae72
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes; green, src/pull passes
+      - name: check
+        exit: 0
+        said: "   70.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 32543ca5851fb50e
+        size: 907
+    def: ebccfd52b1111bbe
+    reopen:
+      - path: src/pull/pull_next_test.go
+        why: the bare pull after a pass refuses a held leaf, so the case reads the hand-out the pass prints, and gate-next-line-test adds the gate case
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: handovers-and-light-work
+reason: done
 ---
 
 # Ask
@@ -404,26 +430,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/branches/left_test.go src/pull/pull_next_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A box taking over a dead take now prints what the box before it left: the beat, its step, its record entry, the commits since, and the handover the beat carries. A hand-back takes --next, a line for the next hand, which the record keeps on its entry and the next hand-out prints. A gate verdict carries the line too. So a crash mid-step leaves the next box what it needs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, and the example harness
+- the cases run on the fakes of src/branches and on cloudPull
+- the comments point at the design note chapters
+- nextField and nextFlag name the field and the flag once
 
 # accept
 
