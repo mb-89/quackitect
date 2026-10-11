@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box 1ad094d8843c · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/tickets-keep-their-chapters took 61 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 1ad094d8843c · claude-code-remote
+    hash_before: 6811d9b167b73b3a27870a85279eff4fbb312aba
+    hash_after: 6811d9b167b73b3a27870a85279eff4fbb312aba
+    inputs:
+      - name: ask
+        hash: a550e5c350bb2f64
+        size: 400
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -122,14 +131,43 @@ The ticket verbs keep what a ticket holds. route, update, fill, set and note rea
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/ask-names-the-check-package]] trivial, closed
+- [[spec/tickets/callers-name-the-reroute-test]] trivial, closed
+- [[spec/tickets/collect-removes-what-it-moved]] trivial, closed
+- [[spec/tickets/drop-keeps-a-broken-layer]] trivial, closed
+- [[spec/tickets/flow-items-skip-escaped-quotes]] trivial, closed
+- [[spec/tickets/js-number-reads-one-letter]] trivial, closed
+- [[spec/tickets/misshapen-plan-values-refuse]] trivial, closed
+- [[spec/tickets/note-names-stay-flat]] trivial, closed
+- [[spec/tickets/one-quote-decoder-for-fronts]] trivial, closed
+- [[spec/tickets/plan-keeps-its-todos]] standard, closed
+- [[spec/tickets/probe-drops-its-stale-group]] trivial, closed
+- [[spec/tickets/pull-reports-config-faults]] trivial, closed
+- [[spec/tickets/quoted-fronts-round-trip]] standard, closed
+- [[spec/tickets/red-list-skips-failed-records]] trivial, closed
+- [[spec/tickets/retro-chapters-take-git-door]] trivial, closed
+- [[spec/tickets/retro-json-readers-merge]] trivial, closed
+- [[spec/tickets/retro-mint-cleans-its-draft]] trivial, closed
+- [[spec/tickets/route-keeps-its-chapters]] standard, closed
+- [[spec/tickets/route-refuses-without-a-schema]] trivial, closed
+- [[spec/tickets/ticket-verbs-read-method-routes]] standard, closed
+- [[spec/tickets/update-case-splits-repos]] trivial, closed
+- [[spec/tickets/update-keeps-chapters-under-vehicle]] trivial, closed
+- [[spec/tickets/vehicle-case-seeds-chapter-text]] trivial, closed
+- [[spec/tickets/yaml-readers-past-the-front]] trivial, closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one fix a review reads whole
+- the children cover each reader the ask names: the verbs, the plan, the front quoting, the red list, the config layer and the retro verbs, and the gate points minted their own children
+- no child waits on another past update-keeps-chapters-under-vehicle, which closed answered by ticket-verbs-read-method-routes
+- route-keeps-its-chapters landed methodDisk before ticket-verbs-read-method-routes read it
+- the diff stands one review, so no child splits into a group
 
 # children
 
