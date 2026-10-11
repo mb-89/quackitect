@@ -4,10 +4,12 @@
 package index // level0: InPackageTest - it asks through the unexported posts, standingOf and stands
 
 import (
-	"encoding/json"
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
 
 	"quackitect/src/config"
 	"quackitect/src/q"
@@ -288,27 +290,6 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	<-stepped
 }
 
-// The value answer drains through the manager's settle, so a reader reads what the placed processes answer before it. [[spec/tickets/callers-name-drains-readers]]
-// level0: FixtureOutsideHome - the case starts its own door over its own catalog
-func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
-	t.Parallel()
-	catalog := q.New()
-	hand := q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
-	manage := func(_ string, store *q.Store, _ OpRows, _ Reads, _ func(func())) (Managed, error) {
-		settle := func() {
-			if _, err := store.Commit(store.Snapshot().Revision, hand, map[string]any{"t/n": 9}); err != nil {
-				t.Error(err)
-			}
-		}
-		return Managed{Stop: func() {}, Settle: settle}, nil
-	}
-	one, _ := served(t, qtest.Wall(), tree(t), catalog, manage)
-	said, err := one.answers(call{Method: "value", Params: json.RawMessage(`{"name":"t/n"}`)})
-	if err != nil || said != 9 {
-		t.Fatalf("the value answer reads %v and %v, and wants the 9 the settle commits", said, err)
-	}
-}
-
 // The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
 // level0: FixtureOutsideHome - the case starts its own door over its own catalog
 func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
@@ -337,4 +318,55 @@ func TestASwappedBinaryAsksMainForTheStop(t *testing.T) {
 	}
 	gone()
 	<-asked
+}
+
+// An overflow of lost events sweeps the whole tree on the next settle, so a row the watch misses comes back. [[spec/tickets/door-guards-watch-and-drain]]
+// level0: FixtureOutsideHome - the case starts its own door over its own tree
+func TestAnOverflowSweepsTheTreeOnTheNextSettle(t *testing.T) {
+	t.Parallel()
+	one, _ := served(t, newToldClock(), tree(t), q.New(), nil)
+	var path string
+	if err := one.db.QueryRow(`SELECT path FROM file LIMIT 1`).Scan(&path); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := one.db.Exec(`DELETE FROM file WHERE path = ?`, path); err != nil {
+		t.Fatal(err)
+	}
+	one.lost(fsnotify.ErrEventOverflow)
+	one.guard.Lock()
+	one.settles()
+	one.guard.Unlock()
+	if n := counted(t, one.db, `SELECT count(*) FROM file WHERE path = '`+path+`'`); n != 1 {
+		t.Fatalf("the settle after an overflow holds %d row(s) of %s, and wants it swept back", n, path)
+	}
+}
+
+// A value call answers what the manager's settle commits, and drains with the door guard free, so the work loop renews the lease while a slow process answers. [[spec/tickets/door-guards-watch-and-drain]]
+// level0: FixtureOutsideHome - the case starts its own door over its own catalog
+func TestAValueDrainLeavesTheGuardFree(t *testing.T) {
+	t.Parallel()
+	catalog := q.New()
+	hand := q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
+	var held atomic.Pointer[door]
+	free := make(chan bool, 1)
+	manage := func(_ string, store *q.Store, _ OpRows, _ Reads, _ func(func())) (Managed, error) {
+		settle := func() {
+			if _, err := store.Commit(store.Snapshot().Revision, hand, map[string]any{"t/n": 9}); err != nil {
+				t.Error(err)
+			}
+			if one := held.Load(); one != nil && one.guard.TryLock() {
+				one.guard.Unlock()
+				free <- true
+				return
+			}
+			free <- false
+		}
+		return Managed{Stop: func() {}, Settle: settle}, nil
+	}
+	one, standing := served(t, qtest.Wall(), tree(t), catalog, manage)
+	held.Store(one)
+	said, err := posts(standing, []string{"call", "value", `{"name":"t/n"}`})
+	if err != nil || said.Result != float64(9) || !<-free {
+		t.Fatalf("the value call answers %v and %v, and wants the 9 the settle commits, off a drain that left the guard free", said, err)
+	}
 }

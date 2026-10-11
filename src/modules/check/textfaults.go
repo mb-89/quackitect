@@ -222,9 +222,9 @@ func plainCode(line string) string {
 // The characters a comment or a string opens on, so a line holding none of them stands as it is. [[spec/tickets/check-patterns-compile-once]]
 const cutMarks = "\"'`/"
 
-// A line with its comment and its strings cut by the patterns. [[spec/design_output/level0#the-size-ceiling]]
+// A line with its strings blanked, then its comment cut, so a `//` inside a string leaves the code after it. [[spec/design_output/level0#the-size-ceiling]]
 func codeCut(line string) string {
-	return quotedAt.ReplaceAllString(trailAt.ReplaceAllString(line, ""), `""`)
+	return trailAt.ReplaceAllString(quotedAt.ReplaceAllString(line, `""`), "")
 }
 
 // A bare number carrying a meaning in a Go file, outside a constant, a string, a comment and a test. [[spec/design_output/config#the-magic-numbers-take-names]]

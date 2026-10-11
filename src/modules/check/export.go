@@ -5,78 +5,27 @@ package check
 
 // [[spec/tickets/lsp-rules-move-to-check]]
 var (
-	AnchorFaults             = anchorFaults
-	AnchorSweep              = anchorSweep
-	At                       = at
-	BiomeOnWindows           = biomeOnWindows
-	ChapterOf                = chapterOf
-	ChaptersWanted           = chaptersWanted
-	CheckNote                = checkNote
-	CheckNoteIn              = checkNoteIn
-	EveryPointerResolvesOver = everyPointerResolves
-	ExtensionsOnOffer        = extensionsOnOffer
-	Fault                    = fault
-	FrontOf                  = frontOf
-	FunctionNamed            = functionNamed
-	GoFaults                 = goFaults
-	GovernorOf               = governorOf
-	GroupAsksNobody          = groupAsksNobody
-	IsDraft                  = isDraft
-	IsHistory                = isHistory
-	IsNoteSchema             = isNoteSchema
-	Itoa                     = itoa
-	JsonFaults               = jsonFaults
-	KindOf                   = kindOf
-	Left                     = left
-	Listed                   = listed
-	MarkerLines              = markerLines
-	Matches                  = matches
-	Minted                   = mintedNote
-	NameHoldsTheWords        = nameHoldsTheWords
-	NoConflictMarkers        = noConflictMarkers
-	NoLogDeleted             = noLogDeleted
-	NoteFaults               = noteFaults
-	NothingPrivateTravels    = nothingPrivateTravels
-	OverLong                 = overLong
-	PastHistory              = pastHistory
-	PlaceholderFaults        = placeholderFaults
-	PlacesIn                 = placesIn
-	PointerEndings           = pointerEndings
-	PointersIn               = pointersIn
-	ReadNote                 = readNote
-	Readers                  = readers
-	RelativeTo               = relativeTo
-	RestatedFaults           = restatedFaults
-	SchemaFaults             = schemaFaults
-	SchemasIn                = schemasIn
-	SectionsOf               = sectionsOf
-	SettingsNameBinaries     = settingsNameBinaries
-	SharedRun                = sharedRun
-	Slashed                  = slashed
-	SlugOf                   = slugOf
-	Sorted                   = sorted
-	StrangerFault            = strangerFault
-	SurveyFindsNode          = surveyFindsNode
-	SurveyNamesInstalls      = surveyNamesInstalls
-	TextFaults               = textFaults
-	Textual                  = textual
-	UnreasonedIn             = unreasoned
-	Walked                   = walked
-	DoorsWalked              = doorsWalked
-	WordsIn                  = wordsIn
+	CheckNote         = checkNote
+	GovernorOf        = governorOf
+	IsDraft           = isDraft
+	IsNoteSchema      = isNoteSchema
+	KindOf            = kindOf
+	MarkerLines       = markerLines
+	Matches           = matches
+	Minted            = mintedNote
+	OverLong          = overLong
+	PastHistory       = pastHistory
+	PlaceholderFaults = placeholderFaults
+	RelativeTo        = relativeTo
+	SchemaFaults      = schemaFaults
+	SchemasIn         = schemasIn
+	SlugOf            = slugOf
+	StrangerFault     = strangerFault
+	SurveyFindsNode   = surveyFindsNode
+	TextFaults        = textFaults
+	UnreasonedIn      = unreasoned
+	DoorsWalked       = doorsWalked
 )
-
-// [[spec/tickets/lsp-rules-move-to-check]]
-const (
-	Closed          = closed
-	ConflictMarkers = conflictMarkers
-	Shown           = shown
-	SomeFunction    = someFunction
-	SyntaxRule      = syntaxRule
-)
-
-// [[spec/tickets/lsp-rules-move-to-check]]
-type Places = places
 
 // The note's chapters and the slug of each, which the completion offers. [[spec/tickets/lsp-rules-move-to-check]]
 func (one *Tree) Chapters(path string) ([]Section, []string) {

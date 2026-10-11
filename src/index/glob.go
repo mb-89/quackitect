@@ -6,6 +6,7 @@ package index
 import (
 	"regexp"
 	"strings"
+	"unicode/utf8"
 )
 
 func globOf(said string) (*regexp.Regexp, error) {
@@ -34,7 +35,12 @@ func globOf(said string) (*regexp.Regexp, error) {
 				rest = rest[1:]
 				continue
 			}
-			out.WriteString(rest[:shut+1])
+			// A class opening on ! negates, as the shell reads it. [[spec/tickets/glob-reads-whole-runes]]
+			class := rest[1:shut]
+			if strings.HasPrefix(class, "!") {
+				class = "^" + class[1:]
+			}
+			out.WriteString("[" + class + "]")
 			rest = rest[shut+1:]
 		case rest[0] == '{':
 			shut := strings.IndexByte(rest, '}')
@@ -46,8 +52,10 @@ func globOf(said string) (*regexp.Regexp, error) {
 			out.WriteString(alternation(rest[1:shut]))
 			rest = rest[shut+1:]
 		default:
-			out.WriteString(regexp.QuoteMeta(string(rest[0])))
-			rest = rest[1:]
+			// A whole rune, so a letter past ASCII stands as itself. [[spec/tickets/glob-reads-whole-runes]]
+			_, size := utf8.DecodeRuneInString(rest)
+			out.WriteString(regexp.QuoteMeta(rest[:size]))
+			rest = rest[size:]
 		}
 	}
 

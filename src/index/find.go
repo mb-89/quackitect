@@ -29,6 +29,15 @@ type Link struct {
 	Line   int    `json:"line"`
 }
 
+// Each word as an FTS5 string, its quotes doubled, so a dash, a dot, a slash or a bare AND reads as text and every word must stand. [[spec/tickets/find-quotes-its-words]]
+func phrased(words string) string {
+	out := []string{}
+	for _, one := range strings.Fields(words) {
+		out = append(out, `"`+strings.ReplaceAll(one, `"`, `""`)+`"`)
+	}
+	return strings.Join(out, " ")
+}
+
 func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 	if strings.TrimSpace(words) == "" {
 		return []Hit{}, nil
@@ -39,7 +48,7 @@ func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 
 	rows, err := db.Query(
 		`SELECT path, n, text, -bm25(line_text) FROM line_text
-		 WHERE line_text MATCH ? ORDER BY rank LIMIT ?`, words, limit)
+		 WHERE line_text MATCH ? ORDER BY rank LIMIT ?`, phrased(words), limit)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +76,7 @@ func Notes(db *sql.DB, words string, limit int) ([]Hit, error) {
 
 	rows, err := db.Query(
 		`SELECT path, 0, id, -bm25(note_text, 0, ?, ?) AS score FROM note_text
-		 WHERE note_text MATCH ? ORDER BY score DESC LIMIT ?`, noteNameWeight, noteBodyWeight, words, limit)
+		 WHERE note_text MATCH ? ORDER BY score DESC LIMIT ?`, noteNameWeight, noteBodyWeight, phrased(words), limit)
 	if err != nil {
 		return nil, err
 	}

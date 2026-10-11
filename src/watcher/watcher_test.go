@@ -111,7 +111,7 @@ func TestAStopReturnsWhileTheHearAdds(t *testing.T) {
 			default:
 			}
 			_ = eyes.Add(event.Name)
-		})
+		}, nil)
 		quit := make(chan struct{})
 		go func() {
 			for at := 0; ; at++ {
@@ -127,4 +127,17 @@ func TestAStopReturnsWhileTheHearAdds(t *testing.T) {
 		watchertest.Returns(t, eyes.Close)
 		close(quit)
 	}
+}
+
+// An error fsnotify sends, an overflow among them, reaches the lost hand. [[spec/tickets/door-guards-watch-and-drain]]
+func TestAnOverflowReachesTheLostHand(t *testing.T) {
+	events, errs := make(chan fsnotify.Event), make(chan error)
+	heard := make(chan error, 1)
+	eyes := over(source{func(string) error { return nil }, func() error { close(events); close(errs); return nil }, events, errs},
+		func(*Watcher, fsnotify.Event) {}, func(err error) { heard <- err })
+	errs <- fsnotify.ErrEventOverflow
+	if said := <-heard; said != fsnotify.ErrEventOverflow {
+		t.Fatalf("the lost hand hears %v, and wants the overflow", said)
+	}
+	watchertest.Returns(t, eyes.Close)
 }

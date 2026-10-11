@@ -380,14 +380,21 @@ func loaded(w q.Wiring, into *q.Catalog) ([]index.Start, map[string]q.Writer, er
 	kept := q.Wiring{Wires: w.Wires}
 	hands := map[string]q.Writer{}
 	types := map[string]func(*q.Catalog){}
+	// q.Load registers the instances in wiring order, so each type's closure takes the next name of its queue. [[spec/tickets/loaded-keys-writers-by-instance]]
+	queued := map[string][]string{}
 	for _, one := range w.Instances {
 		module, ok := modules[one.Module]
 		if !ok {
 			continue
 		}
 		kept.Instances = append(kept.Instances, one)
-		name := one.Name
-		types[one.Module] = func(c *q.Catalog) { hands[name] = module.registers(c) }
+		kind := one.Module
+		queued[kind] = append(queued[kind], one.Name)
+		types[kind] = func(c *q.Catalog) {
+			name := queued[kind][0]
+			queued[kind] = queued[kind][1:]
+			hands[name] = module.registers(c)
+		}
 	}
 	catalog, faults := q.Load(kept, types)
 	if len(faults) > 0 {

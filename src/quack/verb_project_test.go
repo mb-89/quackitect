@@ -458,3 +458,17 @@ func TestSplitVerb(t *testing.T) {
 		})
 	}
 }
+
+// A target naming the source in another spelling, or standing outside the root, stops the split, and the source keeps every line. [[spec/design_output/level0#a-verb-cuts-the-file]]
+func TestSplitRefusesItsSourceInAnySpelling(t *testing.T) {
+	t.Parallel()
+	for _, target := range []string{"./" + splitSource, "src/sub/../long.js", "../x.js", "/elsewhere/x.js"} {
+		disk := splitTree(t)
+		if code, said := hq3Splits(disk, "split", splitSource, "--to", target, "--lines", "1-2"); code != exitUsage {
+			t.Errorf("a split to %s answers %d: %s, and wants the usage code", target, code, said)
+		}
+		if got, _ := hq3ReadsBack(disk, splitSource); got != splitText {
+			t.Errorf("a split to %s leaves the source holding %q", target, got)
+		}
+	}
+}

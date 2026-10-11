@@ -100,16 +100,19 @@ func Open(root, at string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// A file that takes no shape, one that is no database among them, rebuilds as a stale one does. [[spec/tickets/index-open-clears-its-companions]]
 	if fresh(db, root) {
-		if _, err := db.Exec(shape); err != nil {
-			return nil, err
+		if _, err := db.Exec(shape); err == nil {
+			return db, setMeta(db, root)
 		}
-		return db, setMeta(db, root)
 	}
 
 	db.Close()
-	if err := removeFile(at); err != nil && !errors.Is(err, fs.ErrNotExist) {
-		return nil, err
+	// The journal and the shared memory go with the file, so the new file replays none of the old. [[spec/tickets/index-open-clears-its-companions]]
+	for _, one := range []string{at, at + "-wal", at + "-shm"} {
+		if err := removeFile(one); err != nil && !errors.Is(err, fs.ErrNotExist) {
+			return nil, err
+		}
 	}
 	db, err = sql.Open("sqlite", dsn(at))
 	if err != nil {
@@ -159,10 +162,11 @@ func relOf(root, abs string) (string, bool) {
 	return filepath.ToSlash(rel), true
 }
 
-func one(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool) error {
+// Writes the file's rows, and answers whether it wrote any. A path the read fails on, a linked folder among them, stands absent, and the next walk answers again. [[spec/tickets/sweep-counts-written-rows]]
+func one(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool) (bool, error) {
 	body, err := readFile(abs)
 	if err != nil {
-		return nil // unreadable here is absent, and the next walk answers again
+		return false, nil
 	}
 
 	sum := sha256.Sum256(body)
@@ -175,19 +179,19 @@ func one(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool) error {
 		 ON CONFLICT (path) DO UPDATE SET size = excluded.size,
 		   mtime = excluded.mtime, hash = excluded.hash, text = excluded.text, tracked = excluded.tracked`,
 		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:]), text, tracked); err != nil {
-		return err
+		return false, err
 	}
 
 	if text == "" {
-		return nil
+		return true, nil
 	}
 	if err := lines(tx, rel, text); err != nil {
-		return err
+		return true, err
 	}
 	if !strings.HasSuffix(rel, ".md") {
-		return nil
+		return true, nil
 	}
-	return note(tx, rel, text)
+	return true, note(tx, rel, text)
 }
 
 // The insert stands prepared once a file, since a file carries many lines and a fresh statement a line costs the sweep its time. [[spec/tickets/the-sweep-prepares-once]]

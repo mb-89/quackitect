@@ -265,12 +265,12 @@ func (one Stems) listed(word string, held map[string]bool) bool {
 func LinksIn(tree *Tree, path string) []DocumentLink {
 	out := []DocumentLink{}
 	text := tree.Read(path)
-	if !Textual(text) {
+	if !textual(text) {
 		return out
 	}
 	rows := yaml.SplitLines(text)
-	held := PlacesIn(tree)
-	for _, one := range PointersIn(path, rows) {
+	held := placesIn(tree)
+	for _, one := range pointersIn(path, rows) {
 		target, ok := landing(tree, held, one.Target())
 		if !ok {
 			continue
@@ -289,7 +289,7 @@ func LinksIn(tree *Tree, path string) []DocumentLink {
 }
 
 // The URI a pointer opens, and the heading's line where it names a chapter. [[spec/design_output/lsp#a-pointer-opens-its-target]]
-func landing(tree *Tree, held Places, target string) (string, bool) {
+func landing(tree *Tree, held places, target string) (string, bool) {
 	name, anchor, chaptered := strings.Cut(target, "#")
 	at := held.FileOf(name)
 	if at == "" || !held.Holds(at) {
@@ -299,7 +299,7 @@ func landing(tree *Tree, held Places, target string) (string, bool) {
 	if !chaptered {
 		return uri, true
 	}
-	found, ok := ChapterOf(tree, at, strings.TrimSpace(anchor))
+	found, ok := chapterOf(tree, at, strings.TrimSpace(anchor))
 	if !ok {
 		return "", false
 	}
@@ -308,7 +308,7 @@ func landing(tree *Tree, held Places, target string) (string, bool) {
 
 // [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
 func FoldsOf(text string) []FoldingRange {
-	front := FrontOf(strings.Split(text, "\n"))
+	front := frontOf(strings.Split(text, "\n"))
 	if !front.Stands {
 		return []FoldingRange{}
 	}
@@ -317,7 +317,7 @@ func FoldsOf(text string) []FoldingRange {
 
 // The file URI of a path, each byte a path leaves bare kept and every other written as %XX, as net/url escapes a path. [[spec/design_output/lsp#a-pointer-opens-its-target]]
 func uriOf(path string) string {
-	said := Slashed(path)
+	said := slashed(path)
 	if !strings.HasPrefix(said, "/") {
 		said = "/" + said
 	}

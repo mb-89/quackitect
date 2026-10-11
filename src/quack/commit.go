@@ -243,7 +243,14 @@ func (d landingDoors) lands(message string, paths []string, noPush bool, out, er
 	// The probe clones HEAD, so the commit lands first and leaves again on a FAIL, before any push. [[spec/design_output/level0#the-cold-probe]]
 	if len(cold) > 0 {
 		if code, said := d.verb("probe", "cold"); code != 0 {
-			d.takesBack()
+			// A reset git refuses leaves the commit at HEAD, so the verb names it and the command that takes it back. [[spec/tickets/take-back-names-failed-reset]]
+			if err := d.takesBack(); err != nil {
+				head, _ := d.git.Resolve("HEAD")
+				fmt.Fprintf(errs, "The cold probe answers FAIL on the staged change, and the commit %s still stands at HEAD, since the reset fails: %v\n", head, err)
+				fmt.Fprintln(errs, "Run git reset --soft HEAD~1 to take it back.")
+				fmt.Fprintln(errs, orNothing(said, "the probe answers nothing"))
+				return exitFailed
+			}
 			d.unstages(only)
 			fmt.Fprintln(errs, "The cold probe answers FAIL on the staged change, so nothing lands:")
 			fmt.Fprintln(errs, orNothing(said, "the probe answers nothing"))
@@ -316,12 +323,15 @@ func orNothing(said, nothing string) string {
 }
 
 // The commit leaves HEAD and its change stays staged. A merge it concluded stands open again, so the hand lands it once more. [[spec/design_output/level0#the-cold-probe]]
-func (d landingDoors) takesBack() {
+func (d landingDoors) takesBack() error {
 	theirs, merged := d.git.Resolve("HEAD^2")
-	_ = d.git.SoftReset("HEAD~1")
-	if merged {
-		_ = d.git.UpdateRef("MERGE_HEAD", theirs)
+	if err := d.git.SoftReset("HEAD~1"); err != nil {
+		return err
 	}
+	if merged {
+		return d.git.UpdateRef("MERGE_HEAD", theirs)
+	}
+	return nil
 }
 
 // A reset naming a pathspec unstages and leaves MERGE_HEAD standing, so a refused merge commit stays a merge. [[spec/design_output/work#one-verb-feeds-that-stamp]]

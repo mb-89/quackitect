@@ -72,9 +72,11 @@ func renameVerb(d landingDoors) twin {
 			return 0
 		}
 		// A module's name stands as no path, so the text flag rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
-		said := d.renaming(from, to)
+		var said renamed
 		if slices.Contains(argv, textFlag) {
 			said = d.renamingText(from, to)
+		} else {
+			said = d.renaming(from, to)
 		}
 		if said.why != "" {
 			fmt.Fprintln(errs, said.why)

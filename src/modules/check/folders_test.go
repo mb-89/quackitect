@@ -78,10 +78,9 @@ func TestInstallerHoldsTheNamesRefusesALoopApartFromItsList(t *testing.T) {
 		{"a loop naming no list", "for one in bin hold; do\n  mv \"$one\" \"$new\"\ndone\n", "names no list"},
 	} {
 		t.Run(one.name, func(t *testing.T) {
-			checker := CheckerOver(TreeOver("/tree", Texts{Install: one.text}), 0, 0)
 			said := []string{}
-			for _, found := range checker.Over(Install) {
-				if found.Rule == "InstallerHoldsTheNames" {
+			for _, found := range CheckerOver(TreeOver("/tree", Texts{Install: one.text}), 0, 0).Sweep() {
+				if found.Rule == "InstallerHoldsTheNames" && found.File == Install {
 					said = append(said, found.Message)
 				}
 			}

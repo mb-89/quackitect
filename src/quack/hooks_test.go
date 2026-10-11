@@ -290,3 +290,20 @@ func TestTheDownWordNamingNoEventPrintsTheUsage(t *testing.T) {
 		t.Fatalf("the down word with no event answers %d, %q, %q, and wants the usage naming the event it takes", code, out, errs)
 	}
 }
+
+// Two instances of one module type each take their own writer, so each commits under its own names. [[spec/tickets/loaded-keys-writers-by-instance]]
+func TestTwoInstancesOfATypeTakeTheirOwnWriters(t *testing.T) {
+	t.Parallel()
+	w := q.Wiring{Instances: []q.Instance{{Name: "one", Module: "env"}, {Name: "two", Module: "env"}}}
+	c := q.New()
+	_, hands, err := loaded(w, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := q.NewStore(c)
+	for _, name := range []string{"one", "two"} {
+		if _, err := s.Commit(s.Snapshot().Revision, hands[name], map[string]any{name + "/vars/SE_X": "x"}); err != nil {
+			t.Errorf("%s commits through its own writer and meets %v", name, err)
+		}
+	}
+}

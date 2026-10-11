@@ -151,3 +151,25 @@ func TestGrepAnswersTheMatchAlone(t *testing.T) {
 		}
 	}
 }
+
+// A letter past ASCII matches as one rune, and a bracket opening on ! negates. [[spec/design_output/index#a-glob-becomes-a-pattern]]
+func TestAGlobReadsWholeRunes(t *testing.T) {
+	t.Parallel()
+	for _, one := range []struct {
+		glob, path string
+		hits       bool
+	}{
+		{"**/café.md", "spec/café.md", true},
+		{"naïve?.go", "naïve1.go", true},
+		{"[!x].md", "a.md", true},
+		{"[!x].md", "x.md", false},
+	} {
+		fits, err := matcher(one.glob)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if fits(one.path) != one.hits {
+			t.Errorf("%s over %s answers %v, and wants %v", one.glob, one.path, !one.hits, one.hits)
+		}
+	}
+}

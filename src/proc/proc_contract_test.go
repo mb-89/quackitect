@@ -273,3 +273,10 @@ func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
 		}
 	}
 }
+
+// A run exiting zero while its child holds stderr past the pipes' close answers its code and its output, as a push leaving a helper does. [[spec/tickets/proc-keeps-late-pipe-runs]]
+func TestARunWhoseChildHoldsThePipeAnswersItsCode(t *testing.T) {
+	if said := Real(Command{Argv: []string{"sh", "-c", "echo pushed; (sleep 3 >&2 &); exit 0"}}); said.Code != 0 || said.Out != "pushed\n" {
+		t.Errorf("the real runner answers %+v, and wants code 0 and the output", said)
+	}
+}

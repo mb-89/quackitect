@@ -38,28 +38,3 @@ func (one *Tree) parsed(path string) parse {
 	one.guard.Unlock()
 	return made
 }
-
-// The pairs of guidance rules, compared again where a guidance note's text changes and read back otherwise. [[spec/design_output/lsp#a-change-reads-one-note]]
-func (one *Tree) rulesOnce(key string, pass func() []Finding) []Finding {
-	return one.keyedOnce(&one.ruleKey, &one.ruleFound, key, pass)
-}
-
-// The bodies standing in two packages, compared again where a Go text changes and read back otherwise. [[spec/tickets/shared-helpers-stand-once]]
-func (one *Tree) copiesOnce(key string, pass func() []Finding) []Finding {
-	return one.keyedOnce(&one.copyKey, &one.copyFound, key, pass)
-}
-
-// The findings a slot holds where its key matches, and a fresh pass stored there otherwise. [[spec/tickets/shared-helpers-stand-once]]
-func (one *Tree) keyedOnce(slot *string, kept *[]Finding, key string, pass func() []Finding) []Finding {
-	one.guard.Lock()
-	found, held := *kept, *slot == key
-	one.guard.Unlock()
-	if held {
-		return found
-	}
-	found = pass()
-	one.guard.Lock()
-	*slot, *kept = key, found
-	one.guard.Unlock()
-	return found
-}

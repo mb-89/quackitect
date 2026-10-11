@@ -253,7 +253,7 @@ func posts(url, prefer string, body []byte) (called, error) {
 	}
 	asked.Header.Set("Content-Type", "application/json")
 	asked.Header.Set("Prefer", prefer)
-	err = answers(asked, &said)
+	err = answers(asked, &said, answerWait)
 	return said, err
 }
 
@@ -263,12 +263,12 @@ func reads(url string, into any) error {
 	if err != nil {
 		return err
 	}
-	return answers(asked, into)
+	return answers(asked, into, answerWait)
 }
 
-// Sends the request, and decodes a success into into, or answers the problem's detail. [[spec/design_output/model#surfaces]]
-func answers(asked *http.Request, into any) error {
-	said, err := http.DefaultClient.Do(asked)
+// Sends the request within the wait, and decodes a success into into, or answers the problem's detail. A wedged index ends on an error, as every sibling door bounds its client. [[spec/tickets/v1-client-carries-a-bound]]
+func answers(asked *http.Request, into any, wait time.Duration) error {
+	said, err := (&http.Client{Timeout: wait}).Do(asked)
 	if err != nil {
 		return err
 	}

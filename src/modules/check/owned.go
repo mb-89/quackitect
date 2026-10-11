@@ -13,6 +13,15 @@ import (
 // [[spec/design_output/lsp#an-engine-field-warns]]
 const EngineOwnsField = "EngineOwnsField"
 
+// The hints over every buffer an editor holds, which the sweep runs. [[spec/design_output/lsp#an-engine-field-warns]]
+func engineSweep(tree *Tree) []Finding {
+	out := []Finding{}
+	for _, path := range tree.Buffers() {
+		out = append(out, engineFaults(tree, path)...)
+	}
+	return out
+}
+
 // A hint on each engine key the buffer writes other than the file does. A file no editor holds draws nothing. [[spec/design_output/lsp#an-engine-field-warns]]
 func engineFaults(tree *Tree, path string) []Finding {
 	if !tree.Held(path) {

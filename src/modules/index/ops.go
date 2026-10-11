@@ -59,6 +59,8 @@ type Keep interface {
 type BookSettings struct {
 	Done   time.Duration
 	Failed time.Duration
+	// The span an action declaring none ends within. [[spec/design_output/model#deadlines]]
+	Deadline time.Duration
 }
 
 type Book struct {
@@ -67,8 +69,10 @@ type Book struct {
 	keep     Keep
 	settings BookSettings
 	ops      map[string]*Op
-	count    int
-	moved    func(Op)
+	// The writers whose run still delivers, an expired one among them, which hold the writer slot. [[spec/design_output/model#one-writer-per-tree]]
+	live  map[string]bool
+	count int
+	moved func(Op)
 	// Each save closes it and lays a new one, so a waiter wakes on every move. [[spec/design_output/model#the-agent-does-not-poll]]
 	changed chan struct{}
 	// The timer a wait arms its span through: the clock's, which a case swaps. [[spec/tickets/caller-wait-meets-no-sleep]]
@@ -84,8 +88,9 @@ var moves = map[State][]State{
 // [[spec/design_output/model#what-stays-how-long]]
 func bookSettingsOf(root string) BookSettings {
 	return BookSettings{
-		Done:   time.Duration(config.Count(root, "ops.keepDone")) * time.Second,
-		Failed: time.Duration(config.Count(root, "ops.keepFailed")) * time.Second,
+		Done:     time.Duration(config.Count(root, "ops.keepDone")) * time.Second,
+		Failed:   time.Duration(config.Count(root, "ops.keepFailed")) * time.Second,
+		Deadline: time.Duration(config.Count(root, "watchdog.deadlineAction")) * time.Second,
 	}
 }
 
@@ -94,7 +99,7 @@ func NewBook(clock q.Clock, keep Keep, settings BookSettings) (*Book, error) {
 	if err != nil {
 		return nil, err
 	}
-	b := &Book{clock: clock, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{}), after: clock.After}
+	b := &Book{clock: clock, keep: keep, settings: settings, ops: map[string]*Op{}, live: map[string]bool{}, changed: make(chan struct{}), after: clock.After}
 	for _, one := range all {
 		held := one
 		b.ops[one.ID] = &held
@@ -126,8 +131,12 @@ func (b *Book) Start(action string, input any, caller string, declared q.Declare
 		Writes:  declared.Writes,
 		Started: now,
 	}
-	if declared.Deadline > 0 {
-		one.Deadline = now.Add(declared.Deadline)
+	span := declared.Deadline
+	if span <= 0 {
+		span = b.settings.Deadline
+	}
+	if span > 0 {
+		one.Deadline = now.Add(span)
 	}
 	b.ops[one.ID] = one
 	if err := b.save(one); err != nil {
@@ -143,6 +152,11 @@ func (b *Book) Start(action string, input any, caller string, declared q.Declare
 func (b *Book) Next() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	for id := range b.live {
+		if b.ops[id] != nil && b.ops[id].Writes {
+			return nil
+		}
+	}
 	var next *Op
 	for _, one := range b.ops {
 		if one.Writes && one.State == Running {
