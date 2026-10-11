@@ -83,7 +83,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: split
+step: children
 record:
   - step: sync
     hand: box f689bbb375f6 · claude-code-remote
@@ -98,6 +98,15 @@ record:
         exit: 0
         said: work/checks-and-index-read-right already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box f689bbb375f6 · claude-code-remote
+    hash_before: 517aee02d22faadcbb0262014ac2f07b71444897
+    hash_after: 517aee02d22faadcbb0262014ac2f07b71444897
+    inputs:
+      - name: ask
+        hash: a8db2a84f2f89dd4
+        size: 336
+    def: 19b6849b1f151cd5
 ---
 
 # Ask
@@ -122,14 +131,40 @@ The check rules fire where their notes say and read only what they name, and the
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-missing-path-stays-unquiet]] trivial
+- [[spec/tickets/check-over-leaves-for-sweep]] trivial
+- [[spec/tickets/check-tree-drops-dead-caches]] trivial
+- [[spec/tickets/code-cut-blanks-strings-first]] trivial
+- [[spec/tickets/dead-anchor-reads-pointers-once]] trivial
+- [[spec/tickets/door-guards-watch-and-drain]] trivial
+- [[spec/tickets/find-quotes-its-words]] trivial
+- [[spec/tickets/glob-reads-whole-runes]] trivial
+- [[spec/tickets/group-rule-fires-in-sweep]] trivial
+- [[spec/tickets/index-actions-carry-a-deadline]] trivial
+- [[spec/tickets/index-open-clears-its-companions]] trivial
+- [[spec/tickets/loaded-keys-writers-by-instance]] trivial
+- [[spec/tickets/mcp-cap-names-its-size]] trivial
+- [[spec/tickets/no-log-deleted-reads-go]] trivial
+- [[spec/tickets/proc-keeps-late-pipe-runs]] trivial
+- [[spec/tickets/rename-text-moves-nothing]] trivial
+- [[spec/tickets/slow-call-holds-no-timer]] trivial
+- [[spec/tickets/split-guard-cleans-paths]] trivial
+- [[spec/tickets/sweep-counts-written-rows]] trivial
+- [[spec/tickets/take-back-names-failed-reset]] trivial
+- [[spec/tickets/v1-client-carries-a-bound]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child holds one finding and its case, small enough to review whole
+- the children cover every finding of the review list, and the two door findings share one child
+- no child waits on another, since each touches its own code
+- no child reads a sibling, so the order of landing stands free
+- the diff stays one review, so no child splits into a group
 
 # children
 
