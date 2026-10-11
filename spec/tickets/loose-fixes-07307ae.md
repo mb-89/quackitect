@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -83,9 +83,92 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: retro/cloud
 fix: true
-cloud: true
+record:
+  - step: sync
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 6114e1b57607fa9531039d82a2025cbd496e6b93
+    session: cse_017FNkXMH7nY7T7zaGxxFrAi
+    hash_after: e7b107e0cbeb38ea9455a33e3b57a2c482672f64
+    model: claude-opus-5-5
+    cost: 0
+    final: The group closed its one child on evidence, and the check exits 0.
+  - step: sync
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: b9e57dccc30f2013f15e1660a72c04669f4124dd
+    hash_after: ed7575e23f8b0a4490983bb7d4fd19ae47a072bf
+    answered:
+      - name: sync
+        exit: 0
+        said: The front of spec/tickets/loose-fixes-07307ae.md merges on its own.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 0a8dd7b2d7795cd67b2033ba2483160741df3e73
+    hash_after: 0a8dd7b2d7795cd67b2033ba2483160741df3e73
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 4fda339dd698ce5e
+        size: 13377
+    def: 19b6849b1f151cd5
+  - step: children
+    hand: the engine
+    hash_before: 929975ed79685bf85e57b995d1d213c45e072f18
+    hash_after: 929975ed79685bf85e57b995d1d213c45e072f18
+  - step: accept
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 57fe2fb5fd3cbc934634eb45ac7a138ece8061c3
+    hash_after: 57fe2fb5fd3cbc934634eb45ac7a138ece8061c3
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/loose-fixes-07307ae already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 4fda339dd698ce5e
+        size: 13377
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: 22130ab02d66f597cbb448c2a4d208b2276fedcd
+    hash_after: 22130ab02d66f597cbb448c2a4d208b2276fedcd
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: ac6829582919c9415259a1005d39746c33e2286a
+    hash_after: ac6829582919c9415259a1005d39746c33e2286a
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: bf0d19c8f24cef0ce7cf83d82e2fcb54d3a2ee33
+    hash_after: bf0d19c8f24cef0ce7cf83d82e2fcb54d3a2ee33
+    inputs:
+      - name: retro/write
+        hash: deff169f5acb5eb8
+        size: 1748
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -108,8 +191,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
@@ -118,14 +202,20 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/secret-mode-holds-on-windows]] (trivial), closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child reviews whole: it adds no code, only evidence
+- the child is the only loose agent ticket on main naming this group, so it covers the goal
+- no child waits on another
+- no sibling reads apply
+- the diff stays at ticket files, well inside one review
 
 # children
 
@@ -136,8 +226,9 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -148,8 +239,9 @@ The source: none.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
@@ -158,38 +250,54 @@ The source: none.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `secret-mode-holds-on-windows` closed on evidence: its fix stood on main in 7dd2535a1, and pull request 155 merged green on windows-latest
+- the group passed sync, split, accept and notes with no code change
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the fix stood on main already, so the step needed a test run and a check alone
+- the accept gate named the exact diff range, so the review read two ticket files
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- at take: the dispatch payload named `work/windows-check-holds`, and `branch take` handed this group. The session took the group the engine handed.
+- at do: the pull refused the first hand-back. The tests field carried the command's output in place of the bare command.
+- at pull: the child ticket stood open on main after its fix merged. A box spent a session to close it.
 
 ### improve
 
 <!-- how each bad line stops happening, each line naming its home as a link, a ticket in backticks or a path in backticks -->
-
 <!-- the form is list -->
+
+- `branch take` reads the branch the fire payload names before it picks a free one: `.claude/skills/work/SKILL.md` step 1
+- the command form takes the bare command, and the hand-back's prompt shows one: `spec/processes/trivial.yaml`
+- a fix commit naming its ticket closes the ticket in the same group: `spec/processes/trivial.yaml`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+Both done lines of the ask held before the session began. So the work verified them, and changed no code. The dispatch payload and the engine named two branches. The payload is data, and the prompt names the take verb, so the session followed the engine.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro adds no fact standing elsewhere. It points at the commit and the files
+- the retro adds no number
+- the change writes no file header
+- the chapter carries the run's errors with the step each met. No owner prompt arrived during the run
+- the chapter names the role alone
 
 ## cloud
 
@@ -198,20 +306,24 @@ The source: none.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- at take: the level0 MCP server disconnected, so every verb ran through `./RUNME.sh`
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the check ran past its time budget, and passed
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted
 
 # Discussion
 
