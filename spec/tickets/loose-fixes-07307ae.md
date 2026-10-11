@@ -83,14 +83,22 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: d9f9539fef3ec913
-step: sync
+step: split
 fix: true
-cloud: true
 record:
   - step: sync
     hand: box eadcbe7c1a3d · claude-code-remote
     hash_before: 6114e1b57607fa9531039d82a2025cbd496e6b93
     session: cse_017FNkXMH7nY7T7zaGxxFrAi
+  - step: sync
+    hand: box eadcbe7c1a3d · claude-code-remote
+    hash_before: b9e57dccc30f2013f15e1660a72c04669f4124dd
+    hash_after: ed7575e23f8b0a4490983bb7d4fd19ae47a072bf
+    answered:
+      - name: sync
+        exit: 0
+        said: The front of spec/tickets/loose-fixes-07307ae.md merges on its own.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -113,8 +121,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
