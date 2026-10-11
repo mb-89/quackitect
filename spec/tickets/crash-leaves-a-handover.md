@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -209,6 +209,15 @@ record:
         hash: f27a57a71a8e52ed
         size: 50309
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2b095da7efc0 · claude-code-remote
+    hash_before: b0d009c3f93aa773c141e4870526262c66fc9947
+    hash_after: b0d009c3f93aa773c141e4870526262c66fc9947
+    answered:
+      - name: lint
+        exit: 0
+        said: "   69.5  in all"
+    def: f150b8c0dc20fe45
 group: handovers-and-light-work
 ---
 
@@ -376,17 +385,17 @@ accept with points
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-    ./RUNME.sh lint src/branches/left.go src/branches/beat.go src/branches/take.go src/pull/pull_next.go src/pull/pull_writes.go src/pull/pull_gate.go src/pull/pull.go src/pull/pull_chapter.go spec/schemas/ticket.schema.yaml spec/examples/110_tickets/pull-next.md src/quack/examples_harness_test.go
+    ./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change stands in the files the draft names, plus the harness fixture, whose alpha refused every hand-back
-- the take cases run on the fake tree, and the pull cases and the example on the fakes of the pull
-- each function and constant in `left.go` and `pull_next.go` points at its design section
-- the beat files and the next field stand once, in `left.go`, `pull_next.go` and the ticket schema
+- the change stands as it landed at 891e5f9c, in the files the draft sizes and the example harness
+- the take cases run on the fakes of src/branches, and the pull cases on cloudPull
+- each comment the change adds points at the design note chapter it implements
+- nextField and nextFlag name the field and the flag once, and the notes point at them
 
 ## tests-green
 
