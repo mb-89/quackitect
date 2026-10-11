@@ -39,9 +39,39 @@ func BaseName(word string) string {
 	return exeSuffix.ReplaceAllString(last, "")
 }
 
-// A path with forward slashes, and no leading ./ once. [[spec/design_output/bash#what-the-door-reads]]
+// A path with forward slashes, no leading ./ once, and its dot segments folded, so .se/../AGENTS.md reads as AGENTS.md. A segment holding a name lands nowhere the door knows, so a .. after it stands. [[spec/design_output/bash#what-the-door-reads]] [[spec/tickets/shell-write-paths-clean]]
 func Clean(path string) string {
-	return strings.TrimPrefix(strings.ReplaceAll(path, "\\", "/"), "./")
+	said := strings.TrimPrefix(strings.ReplaceAll(path, "\\", "/"), "./")
+	if said == "" {
+		return said
+	}
+	if folded := folds(said); folded != "" {
+		return folded
+	}
+	return "."
+}
+
+// The path past its . and .. segments, a .. dropping the segment before it where that segment names no variable or home. [[spec/tickets/shell-write-paths-clean]]
+func folds(path string) string {
+	var kept []string
+	for _, one := range strings.Split(path, "/") {
+		last := len(kept) - 1
+		switch {
+		case one == "." || (one == "" && last >= 0):
+		case one == ".." && last >= 0 && kept[last] != ".." && kept[last] != "" && !strings.ContainsAny(kept[last], "$%~"):
+			kept = kept[:last]
+		default:
+			kept = append(kept, one)
+		}
+	}
+	out := strings.Join(kept, "/")
+	if len(kept) == 1 && kept[0] == "" {
+		out = "/"
+	}
+	if strings.HasSuffix(path, "/") && out != "" && !strings.HasSuffix(out, "/") {
+		out += "/"
+	}
+	return out
 }
 
 // The words and operators of a command line: a quote holds its text whole, a backslash escapes the next letter, and a newline reads as a semicolon. [[spec/design_output/bash#what-the-door-reads]]

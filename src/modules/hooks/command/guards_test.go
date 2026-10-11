@@ -27,6 +27,10 @@ func TestTheVersionGuardReadsEveryVersionWrite(t *testing.T) {
 		{"git push -u origin claude/magical-euler-mi808w", "", ""},
 		{"git branch -D v4-recovered", "", ""},
 		{"git branch -D voice-recovered", "", ""},
+		{"git --git-dir .git push --force origin v4", "v4", "rewrite"},
+		{"git --work-tree . --git-dir .git push origin --delete v3", "v3", "delete"},
+		{"git -C . --namespace x branch -D v2", "v2", "delete"},
+		{"git --git-dir v4 push origin main", "", ""},
 	} {
 		said := command.VersionGuard(one.command)
 		if one.name == "" {

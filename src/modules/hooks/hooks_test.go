@@ -391,3 +391,26 @@ func TestHookPostFiresTheWatchedRow(t *testing.T) {
 		t.Fatalf("the post writes %+v, and wants one row of take-watched", rows)
 	}
 }
+
+// The agent's Read of the run's secret meets a refusal, and a Read elsewhere passes. [[spec/tickets/v1-takes-a-run-secret]]
+func TestTheDoorRefusesAReadOfTheRunSecret(t *testing.T) {
+	door := holdDoor(t, Settings{})
+	read := func(path string) Post {
+		return Post{Event: toolEvent, E: map[string]any{"tool": "Read", "file_path": path, "session_id": "s1"}}
+	}
+	for _, path := range []string{".se/.runtime/person.json", "/home/user/tree/.se/.runtime/person.json", `C:\tree\.se\.runtime\person.json`} {
+		if said := refusalOf(hooks(t, door, read(path))); said == "" {
+			t.Fatalf("the door passes a Read of the run's secret at %s", path)
+		}
+	}
+	// [[spec/tickets/secret-guard-reads-folder-globs]]
+	for _, e := range []map[string]any{{"tool": "Grep", "pattern": "secret", "path": ".se/.runtime"}, {"tool": "Grep", "pattern": "x", "path": "/home/user/tree/.se/"}, {"tool": "Glob", "pattern": ".se/.runtime/*"}} {
+		e["session_id"] = "s1"
+		if said := refusalOf(hooks(t, door, Post{Event: toolEvent, E: e})); said == "" {
+			t.Fatalf("the door passes %v, a reach into the run's secret", e)
+		}
+	}
+	if said := refusalOf(hooks(t, door, read("spec/a.md"))); said != "" {
+		t.Fatalf("the door refuses a Read of spec/a.md: %s", said)
+	}
+}

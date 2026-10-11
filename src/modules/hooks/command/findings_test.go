@@ -104,6 +104,23 @@ func TestTheBlessGuardReadsTheBlessAndTheHand(t *testing.T) {
 	if said := BlessGuard("SE_MINTED=x ./RUNME.sh ticket pull x", nil); !strings.HasPrefix(said, "SE_MINTED name the hand") {
 		t.Fatalf("the bless guard says %q over SE_MINTED", said)
 	}
+	// [[spec/tickets/v1-takes-a-run-secret]]
+	for _, command := range []string{"cat .se/.runtime/person.json", "cat /home/user/tree/.se/.runtime/person.json", "grep -r secret .se/.runtime/person.json", "python3 -c 'open(\".se/.runtime/person.json\").read()'"} {
+		if said := BlessGuard(command, nil); said == "" {
+			t.Fatalf("the bless guard passes %q, a read of the run's secret", command)
+		}
+	}
+	// [[spec/tickets/secret-guard-reads-folder-globs]]
+	for _, command := range []string{"cat .se/.runtime/*", "cat .se/.runtime/p*.json", "grep -r . .se/.runtime/", "grep -r token .se", "tar c /home/user/tree/.se/.runtime | cat"} {
+		if said := BlessGuard(command, nil); said == "" {
+			t.Fatalf("the bless guard passes %q, a reach into the run's secret", command)
+		}
+	}
+	for _, command := range []string{"pkill -f .se/.runtime/bin/se-index", "cat .se/.runtime/tools.json", "ls .se/tickets", "cat .se/HANDOVER.md"} {
+		if said := BlessGuard(command, nil); said != "" {
+			t.Fatalf("the bless guard refuses %q: %s", command, said)
+		}
+	}
 	if said := BlessGuard("ls", nil); said != "" {
 		t.Fatalf("the bless guard says %q over a read", said)
 	}

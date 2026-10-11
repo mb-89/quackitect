@@ -19,6 +19,7 @@ const (
 	briefField   = "brief"
 	contextEvent = "prompt.context"
 	compactEvent = "session.compact"
+	handedField  = "handed"
 )
 
 // What the door stamps for the fold: the counts off the notes, and the canary sentence they make. [[spec/tickets/brief-answers-off-the-door]]
@@ -51,6 +52,10 @@ func stepBrief(state Brief, event q.Event) Brief {
 	state.Said = BriefSaid{Seq: event.Seq}
 	fields := event.Fields
 	state.Stamp = stampIn(fields)
+	// The door stamps the hand-over of a layer a call carried on the session's next event. [[spec/tickets/brief-waits-for-a-pass]]
+	if handed, _ := fields[handedField].(bool); handed {
+		state.Given = true
+	}
 	if event.Hand.Agent != "" {
 		return state
 	}
@@ -114,14 +119,12 @@ func (state *Brief) turnEnds(fields map[string]any) {
 	state.Turned = true
 }
 
-// A call the holds let through takes the layer where no context read reached the session, and the debt line while the debt stands open and no hold rides the call. [[spec/design_output/level0#rules-ride-the-first-answer]]
+// A call the holds let through offers the layer where no context read reached the session, and the debt line while the debt stands open and no hold rides the call. The layer counts as given once the door hands it. [[spec/design_output/level0#rules-ride-the-first-answer]] [[spec/tickets/brief-waits-for-a-pass]]
 func (state *Brief) called(word string) {
 	if word == RefuseWord || word == HoldWord {
 		return
 	}
-	if !state.Given {
-		state.reads()
-	}
+	state.Said.Layer = !state.Given
 	state.Said.Owes = state.Owes && word == ""
 }
 
@@ -166,11 +169,8 @@ func (d *Door) besideHolds(session string, event q.Event) q.Event {
 }
 
 // The after effects the brief answers the newest event with: one a block where the layer rides, each by its name, then the debt line. [[spec/tickets/brief-answers-off-the-door]]
-func (d *Door) briefs(session, root string, settings Settings) []Effect {
-	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+func (d *Door) briefs(session string, own ownLanding, root string, settings Settings) []Effect {
+	state, ok, seq := own.brief, own.briefOK, own.seq
 	if !ok || state.Said.Seq != seq {
 		return nil
 	}
@@ -187,6 +187,12 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 		}
 		// The row naming the blocks that reach the session. [[spec/tickets/the-brief-leaves-the-bridge]]
 		d.logs(root, rowOf(d.now(), contextKind, fmt.Sprintf("%d block(s) reach the session", len(names)), strings.Join(names, " ")))
+		// [[spec/tickets/brief-waits-for-a-pass]]
+		if !state.Given {
+			d.mu.Lock()
+			d.handed[session] = true
+			d.mu.Unlock()
+		}
 	}
 	if state.Said.Owes {
 		out = append(out, Effect{Kind: afterKind, Text: brief.Owes(state.Stamp.Sentence)})
@@ -210,11 +216,8 @@ var heard = map[string]string{
 }
 
 // The canary row the newest step heard: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]
-func (d *Door) repeats(session, root string) {
-	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+func (d *Door) repeats(own ownLanding, root string) {
+	state, ok, seq := own.brief, own.briefOK, own.seq
 	if !ok || state.Said.Seq != seq || state.Said.Heard == "" {
 		return
 	}

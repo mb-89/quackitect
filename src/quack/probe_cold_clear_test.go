@@ -3,6 +3,8 @@
 package main // level0: InPackageTest - a main package admits no outside test package
 
 import (
+	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -56,5 +58,20 @@ func TestTheClearCheckReadsEveryRoad(t *testing.T) {
 		if !strings.HasPrefix(line, one.word+" clear: ") || !strings.Contains(line, one.evidence) {
 			t.Errorf("%s reads %q", one.name, line)
 		}
+	}
+}
+
+// The probe's clone takes a bare origin beside it and pushes the group's branch there, so the pull's fetch finds it and nothing reaches the source checkout. [[spec/tickets/hooks-v1-hold-the-line]]
+func TestTheProbesCloneTakesAnOriginOfItsOwn(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := fakeBoxDoors(t)
+	tree := filepath.Join("box", "tree")
+	if said := ownOrigin(d, tree, runOpts{cwd: tree}); said.code != 0 {
+		t.Fatalf("the origin answers %+v", said)
+	}
+	bare := filepath.Join("box", "origin.git")
+	want := [][]string{{"git", "init", "--quiet", "--bare", bare}, {"git", "remote", "set-url", "origin", bare}, {"git", "push", "--quiet", "origin", "HEAD:refs/heads/work/" + dryGroup}}
+	if !reflect.DeepEqual(runner.ran, want) {
+		t.Fatalf("the origin runs %v, and wants %v", runner.ran, want)
 	}
 }

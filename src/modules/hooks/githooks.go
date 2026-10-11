@@ -89,16 +89,18 @@ func (d *Door) PrePush(root string, push Push) string {
 	refs := refsIn(push.Refs)
 	var versions []string
 	var trunk []pushedRef
+	drops := false
 	for _, one := range refs {
-		if command.IsVersion(one.branch()) && one.drops() {
+		if command.IsVersion(one.branch()) && (one.drops() || d.movesVersion(root, one)) {
 			versions = append(versions, one.branch())
+			drops = drops || one.drops()
 		}
 		if one.branch() == command.Trunk {
 			trunk = append(trunk, one)
 		}
 	}
 	if len(versions) > 0 {
-		return command.VersionRefusal(versions, true)
+		return command.VersionRefusal(versions, drops)
 	}
 	if push.Cloud && len(trunk) > 0 {
 		return command.CloudLeavesTrunk()
@@ -155,6 +157,14 @@ func (d *Door) uncheckedIn(root string, refs []pushedRef, stamp string, stands b
 		return command.Unchecked(one.branch(), says)
 	}
 	return ""
+}
+
+// Whether the ref moves its branch off the commit the remote holds: the remote's tip stands, and the new tip holds it nowhere in its history. A box that lacks the remote's tip reads a rewrite, so a version branch stays shut. [[spec/tickets/version-guard-skips-git-options]]
+func (d *Door) movesVersion(root string, one pushedRef) bool {
+	if one.drops() || one.was == "" || zeroSha.MatchString(one.was) || one.was == one.sha {
+		return false
+	}
+	return strings.TrimSpace(d.git(root, "merge-base", one.was, one.sha)) != one.was
 }
 
 // Whether the tip stands on the checked commit, with every file changed since under the tickets folder. [[spec/tickets/level0-runs-on-the-door]]

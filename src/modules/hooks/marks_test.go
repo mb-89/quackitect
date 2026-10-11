@@ -138,6 +138,8 @@ func TestTheDoorReadsTheFillOnTheMainAgentsCallsAlone(t *testing.T) {
 	}{
 		{toolEvent, "", true},
 		{toolEvent, "a1", false},
+		{stopEvent, "", true},
+		{stopEvent, "a1", false},
 		{submitEvent, "", false},
 		{startEvent, "", false},
 		{turnEvent, "", false},
@@ -150,7 +152,7 @@ func TestTheDoorReadsTheFillOnTheMainAgentsCallsAlone(t *testing.T) {
 				e["agentId"] = one.agent
 			}
 			post := Post{Event: one.event, Root: root, E: e, Fill: float64(caseFill)}
-			if (filledOf(post) != nil) != one.due {
+			if (filledOf(post) != nil) != one.due || fills(post) != one.due {
 				t.Fatalf("the door reads the fill %v, and wants it read: %v", filledOf(post), one.due)
 			}
 			if _, err := marksDoor(t).Hook(post); err != nil {

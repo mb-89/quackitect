@@ -82,7 +82,7 @@ func grouped(d boxDoors, tree string, env map[string]string) dryRan {
 	d.run([]string{"git", "push", "-q", "origin", "--delete", "work/" + dryGroup}, opts)
 	branched := d.run([]string{"git", "checkout", "-q", "-B", "work/" + dryGroup}, opts)
 	d.run(append(append([]string{"git"}, dryAuthor...), "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"), opts)
-	pushed := d.run([]string{"git", "update-ref", "refs/remotes/origin/work/" + dryGroup, "HEAD"}, opts)
+	pushed := ownOrigin(d, tree, opts)
 	ran := dryRan{words: "mint " + dryGroup}
 	for _, one := range []ranResult{minted, branched, pushed} {
 		if one.code != 0 {
@@ -91,6 +91,17 @@ func grouped(d boxDoors, tree string, env map[string]string) dryRan {
 		}
 	}
 	return ran
+}
+
+// The clone takes a bare origin of its own beside it, and the group's branch stands there. The pull fetches the branch it works, and a pass pushes it, so neither reaches the source checkout. [[spec/tickets/hooks-v1-hold-the-line]]
+func ownOrigin(d boxDoors, tree string, opts runOpts) ranResult {
+	bare := filepath.Join(filepath.Dir(tree), "origin.git")
+	for _, argv := range [][]string{{"git", "init", "--quiet", "--bare", bare}, {"git", "remote", "set-url", "origin", bare}} {
+		if made := d.run(argv, opts); made.code != 0 {
+			return made
+		}
+	}
+	return d.run([]string{"git", "push", "--quiet", "origin", "HEAD:refs/heads/work/" + dryGroup}, opts)
 }
 
 // The clone carries the tickets its source box parks, and a parked ticket goes out ahead of the probe's leaf, so the clone drops every park and commits that. [[spec/tickets/prompt-flags-follow-prompt-verb]]

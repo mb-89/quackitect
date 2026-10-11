@@ -28,6 +28,7 @@ const (
 // A post of an action: its preference and its input as JSON. [[spec/design_output/model#a-caller-sets-its-wait]]
 type actionIn struct {
 	Prefer string          `header:"Prefer" doc:"wait=N, the seconds the call waits on its action, per RFC 7240"`
+	Person string          `header:"X-Quack-Person" doc:"the run's secret, which a post marking a person carries"`
 	Body   json.RawMessage `required:"false"`
 }
 
@@ -111,6 +112,10 @@ func (one *door) acts(name string, asked *actionIn) (*actionOut, error) {
 	input, err := one.store.Input(name, asked.Body)
 	if err != nil {
 		return nil, huma.Error400BadRequest(err.Error())
+	}
+	// A post marks a person where it carries the run's secret alone. [[spec/tickets/v1-takes-a-run-secret]] [[spec/tickets/v1-gate-reads-decoded-input]]
+	if MarksPerson(input) && !one.holdsSecret(asked.Person) {
+		return nil, huma.Error403Forbidden("a post marking a person carries the run's secret")
 	}
 	wait, applied := one.waitOf(asked.Prefer)
 	said, err := one.call(name, input, httpCaller, wait)

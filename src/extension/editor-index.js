@@ -6,6 +6,9 @@ const { join } = require("node:path");
 
 // The file standingPath in src/index/door.go writes, in the runtime folder src/modules/check/folders.go owns, spelled again here because the extension imports its own folder alone. [[spec/design_output/model#surfaces]]
 const STANDING = [".se", ".runtime", "index.json"];
+// The run's secret the index writes beside its standing, off SecretFile and PersonHeader in src/index/secret.go, in the runtime folder src/modules/check/folders.go owns. A post carries it so the index runs a person's verb as a person. [[spec/tickets/v1-takes-a-run-secret]]
+const SECRET = [".se", ".runtime", "person.json"];
+const PERSON_HEADER = "x-quack-person";
 // The pause before a watch opens again, since the index restarts under a window. [[spec/tickets/the-sidebar-reads-v1]]
 const REOPEN = 2000;
 // What a verb's action answers where no index stands. [[spec/tickets/the-lens-calls-actions]]
@@ -26,6 +29,19 @@ function indexDoor(root, doors) {
     } catch {
       return "";
     }
+  };
+  const secret = () => {
+    try {
+      return JSON.parse(doors.disk.read(join(root, ...SECRET)))?.secret ?? "";
+    } catch {
+      return "";
+    }
+  };
+  const posted = (input, wait) => {
+    const said = postOf(input, wait);
+    const word = secret();
+    if (word) said.headers[PERSON_HEADER] = word;
+    return said;
   };
   const answered = async (path, init) => {
     const at = base();
@@ -84,7 +100,7 @@ function indexDoor(root, doors) {
   };
 }
 
-function posted(input, wait) {
+function postOf(input, wait) {
   return {
     method: "POST",
     headers: {

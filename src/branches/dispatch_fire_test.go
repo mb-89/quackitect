@@ -111,7 +111,7 @@ func dfUpdating(t *testing.T) (*dfHub, *Doors, *strings.Builder) {
 	t.Helper()
 	hub := newHub()
 	for number, head := range map[int]string{3: "work/a", 4: "work/b", 5: "feature/x"} {
-		hub.pulls = append(hub.pulls, map[string]any{"number": number, "head": map[string]any{"ref": head}, "base": map[string]any{"ref": "main"}})
+		hub.pulls = append(hub.pulls, map[string]any{"number": number, "head": map[string]any{"ref": head, "repo": map[string]any{"full_name": dfRepo}}, "base": map[string]any{"ref": "main"}})
 	}
 	out := &strings.Builder{}
 	return hub, &Doors{Env: dfEnv(), Out: out, Errs: out}, out
@@ -200,7 +200,7 @@ func TestDispatchFiresAWorkerAtARedWorkPullRequest(t *testing.T) {
 	hub := newHub()
 	hub.checks = map[string][]string{"sha-red": {"success", "failure"}, "sha-green": {"success"}}
 	pull := func(ref, sha string, number int) map[string]any {
-		return map[string]any{"number": number, "html_url": fmt.Sprintf("https://github.example/%s/pull/%d", dfRepo, number), "head": map[string]any{"ref": ref, "sha": sha}}
+		return map[string]any{"number": number, "html_url": fmt.Sprintf("https://github.example/%s/pull/%d", dfRepo, number), "head": map[string]any{"ref": ref, "sha": sha, "repo": map[string]any{"full_name": dfRepo}}}
 	}
 	hub.pulls = append(hub.pulls, pull("work/red", "sha-red", 8), pull("work/green", "sha-green", 9), pull("claude/dispatch-abc1234", "sha-red", 10), pull("work/first", "sha-red", 11), pull("work/taken", "sha-red", 12))
 	plan := dfPlan([]string{"first"}, nil, nil, nil)
@@ -217,6 +217,28 @@ func TestDispatchFiresAWorkerAtARedWorkPullRequest(t *testing.T) {
 	holds(t, red, "work/red")
 	holds(t, red, "https://github.example/owner/repo/pull/8")
 	holds(t, red, "./RUNME.sh check")
+}
+
+// A fork's pull request named work/<group> meets no worker at its red log and no update-branch call, and a deleted fork's reads the same. [[spec/tickets/dispatch-skips-fork-pulls]]
+func TestDispatchSkipsAPullRequestWhoseHeadStandsInAFork(t *testing.T) {
+	t.Parallel()
+	fork := func(number int, ref string, repo any) map[string]any {
+		return map[string]any{"number": number, "html_url": fmt.Sprintf("https://github.example/%s/pull/%d", dfRepo, number), "head": map[string]any{"ref": ref, "sha": "sha-red", "repo": repo}, "base": map[string]any{"ref": "main"}}
+	}
+	hub := newHub()
+	hub.checks = map[string][]string{"sha-red": {"failure"}}
+	hub.pulls = append(hub.pulls, fork(8, "work/red", map[string]any{"full_name": "stranger/repo"}), fork(9, "work/gone", nil))
+	plan := dfPlan(nil, nil, nil, nil)
+	plan.atDone = map[string]bool{"work/red": true, "work/gone": true}
+	if code := dfFired(hub, plan, nil); code != codeOK || len(hub.fires()) != 0 {
+		t.Fatalf("the fire answers %d and sends %d at a fork", code, len(hub.fires()))
+	}
+	updating, d, out := dfUpdating(t)
+	updating.pulls = append(updating.pulls, fork(6, "work/c", map[string]any{"full_name": "stranger/repo"}))
+	code := Dispatch(d, updating.send, []string{"--update"})
+	if got := updating.updates(); code != codeOK || !slices.Equal(got, []string{"/pulls/3/update-branch", "/pulls/4/update-branch"}) {
+		t.Fatalf("the update answers %d and sends %v:\n%s", code, got, out)
+	}
 }
 
 func TestDispatchFiresOnceAReadyGroupAndOnceAStuckHandOver(t *testing.T) {

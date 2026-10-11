@@ -173,9 +173,9 @@ var decided = map[string]bool{
 	stopEvent: true, spawnEvent: true, "tool.describe": true, toolEvent: true, answerEvent: true,
 }
 
-// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. [[spec/design_output/stop#the-context-hands-over]]
+// The fill rides every call of the main agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. A helper's event measures the main agent's context, so it carries none. This one predicate gates the fill in Hook and in filledOf. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/fill-gate-stands-once]]
 func fills(post Post) bool {
-	return post.Event == stopEvent || post.Event == toolEvent && textOf(post.E, "agentId", "agent_id") == ""
+	return (post.Event == stopEvent || post.Event == toolEvent) && textOf(post.E, "agentId", "agent_id") == ""
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -190,6 +190,8 @@ type Door struct {
 	reviews map[string]review.Material
 	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
 	downSince time.Time
+	// The sessions a call handed the layer to, which the session's next event stamps for the brief. [[spec/tickets/brief-waits-for-a-pass]]
+	handed map[string]bool
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -219,7 +221,7 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}, handed: map[string]bool{}}
 }
 
 // The sentinel hears each post as its event and its payload in compact JSON, so a watch matches a tool's command inside it. [[spec/tickets/the-hooks-feed-the-sentinel]]
@@ -254,21 +256,22 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	post = picks(post)
 	session := d.sessionFor(post, root)
 	d.writesSession(post, root)
-	if err := d.writes(session, post, settings, root); err != nil {
+	own, err := d.writes(session, post, settings, root)
+	if err != nil {
 		return Answer{}, err
 	}
-	d.drops(session, root)
-	d.marks(session, root)
-	d.rows(session, root)
-	d.repeats(session, root)
+	d.drops(own, root)
+	d.marks(own, root)
+	d.rows(own, root)
+	d.repeats(own, root)
 	d.readsHealth(post)
 	d.hears(post)
 	effects := []Effect{}
-	if said, ok := d.rewrites(session, post); ok {
+	if said, ok := d.rewrites(own, post); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.held(session, post, root); ok {
+	} else if said, ok := d.held(session, own, post, root); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.blocked(session, post); ok {
+	} else if said, ok := d.blocked(own, post); ok {
 		effects = append(effects, said)
 	} else if said, ok := d.describes(post); ok {
 		effects = append(effects, said)
@@ -279,7 +282,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		effects = append(effects, said)
 	} else if said, ok := d.reviewed(post, root); ok {
 		effects = append(effects, said)
-	} else if said, ok := d.answers(session, post); ok {
+	} else if said, ok := d.answers(own, post); ok {
 		effects = append(effects, said)
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
@@ -300,7 +303,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	}
 	// A context read and a call passing on carry the brief. [[spec/tickets/brief-answers-off-the-door]]
 	if (post.Event == contextEvent || post.Event == toolEvent) && passesOn(effects) {
-		effects = append(effects, d.briefs(session, root, settings)...)
+		effects = append(effects, d.briefs(session, own, root, settings)...)
 	}
 	told := d.ended(session)
 	if post.Event == stopEvent {
@@ -315,7 +318,12 @@ func (d *Door) Hook(post Post) (Answer, error) {
 }
 
 // Commits the event at the session's next place, stamped with the config its holds read, the facts the stop reads and the canary the brief reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/brief-answers-off-the-door]]
-func (d *Door) writes(session string, post Post, settings Settings, root string) error {
+// The field readers run before the lock, so a slow git or disk read on one post stalls no other session's call. [[spec/tickets/door-lock-holds-commit-alone]]
+func (d *Door) writes(session string, post Post, settings Settings, root string) (ownLanding, error) {
+	fields := fieldsOf(post)
+	fields[heldField] = heldOf(settings, root)
+	fields[stoppedField] = d.stoppedOf(post, settings, root)
+	fields[briefField] = d.stampOf(settings, root)
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	store := d.from.Store
@@ -327,30 +335,36 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 		}
 	}
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
-	fields := fieldsOf(post)
-	fields[heldField] = heldOf(settings, root)
-	fields[stoppedField] = d.stoppedOf(post, settings, root)
-	fields[briefField] = d.stampOf(settings, root)
+	if d.handed[session] {
+		fields[handedField] = true
+	}
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
-		return err
+		return ownLanding{}, err
 	}
 	d.seqs[session] = event.Seq
+	delete(d.handed, session)
 	for _, fold := range store.Folds(foldsUnder) {
 		if err := store.Land(strings.Replace(fold, sessionKey, session, 1), event); err != nil {
-			return err
+			return ownLanding{}, err
 		}
 	}
 	if err := store.Land(d.holdsOf(session), event); err != nil {
-		return err
+		return ownLanding{}, err
 	}
 	if err := d.landsStops(session, event); err != nil {
-		return err
+		return ownLanding{}, err
 	}
-	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
+	if err := d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event)); err != nil {
+		return ownLanding{}, err
+	}
+	snap := store.Snapshot()
+	own := ownLanding{seq: event.Seq}
+	own.holds, own.stands = snap.Read(d.holdsOf(session)).(Holds)
+	own.stops, own.stopsOK = snap.Read(d.stopsOf(session)).(Stops)
+	own.brief, own.briefOK = snap.Read(d.briefOf(session)).(Brief)
+	return own, nil
 }
-
-func (d *Door) now() time.Time { return d.from.Clock.Now() }
 
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
@@ -396,6 +410,10 @@ func (d *Door) refuses(post Post, root string, settings Settings) string {
 	}
 	if write.Writes(textOf(post.E, "tool")) {
 		return d.writeDoor(post.E, root)
+	}
+	// A read of the run's secret meets its refusal, by any path that names the file. [[spec/tickets/v1-takes-a-run-secret]] [[spec/tickets/read-door-matches-absolute-path]]
+	if readsSecret(post.E) {
+		return command.SecretRefusal
 	}
 	return d.commands(post, root, settings)
 }

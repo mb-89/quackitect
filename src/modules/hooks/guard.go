@@ -31,6 +31,8 @@ var (
 	commitFlag = regexp.MustCompile(`(?s)^(-a|--all|-q|--quiet|--message=.*)$`)
 	pushFlag   = regexp.MustCompile(`^(-u|--set-upstream|-q|--quiet)$`)
 	killSignal = regexp.MustCompile(`^-(9|15|KILL|TERM)$`)
+	// A pkill pattern of path characters alone, so a quoted `|` or `.*` widens no match past the runtime folder. [[spec/tickets/pkill-recovery-takes-plain-paths]]
+	plainPath = regexp.MustCompile(`^[\w./-]+$`)
 )
 
 // A character outside quotes that chains, pipes, redirects, substitutes or globs, so the words it stands in run as no recovery command. A double-quoted word refuses the expanding ones. [[spec/tickets/the-cage-survives-its-index]]
@@ -171,10 +173,10 @@ func pushesWork(words []string) bool {
 	return len(named) == 2 && named[0] == "origin" && workRef.MatchString(named[1])
 }
 
-// A pkill matching the full command line against a path under the runtime folder, so it stops the stale index and nothing outside it. [[spec/tickets/the-cage-survives-its-index]]
+// A pkill matching the full command line against a plain path under the runtime folder, so it stops the stale index and nothing outside it. [[spec/tickets/the-cage-survives-its-index]] [[spec/tickets/pkill-recovery-takes-plain-paths]]
 func killsRuntime(words []string) bool {
 	named := slices.DeleteFunc(slices.Clone(words), killSignal.MatchString)
-	return len(named) == 2 && named[0] == "-f" && strings.Contains(named[1], guardRuntime+"/")
+	return len(named) == 2 && named[0] == "-f" && plainPath.MatchString(named[1]) && strings.Contains(named[1], guardRuntime+"/")
 }
 
 // The one line a guarded call meets while the hooks door stands down. [[spec/tickets/a-down-index-refuses-calls]]

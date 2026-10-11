@@ -63,16 +63,24 @@ func (d *Door) holdsOf(session string) string {
 	return d.from.Bound(strings.Replace(HoldsName, sessionKey, session, 1))
 }
 
-// The effect the holds answer the event with, where they answer it: a refusal's text, or the rows a held call asks back for. A ride and a pass answer none. [[spec/tickets/cage-call-holds-port]]
-func (d *Door) held(session string, post Post, root string) (Effect, bool) {
+// The event's place and the holds, stops and brief folds its own landing left, read under the door's lock, so a post landing after it moves none of them. [[spec/tickets/hold-verdicts-ride-the-post]] [[spec/tickets/hook-folds-read-landed-place]]
+type ownLanding struct {
+	seq     int64
+	holds   Holds
+	stands  bool
+	stops   Stops
+	stopsOK bool
+	brief   Brief
+	briefOK bool
+}
+
+// The effect the holds answer the event with, where they answer it: a refusal's text, or the rows a held call asks back for. A ride and a pass answer none. The verdict is the one the event's own landing left. [[spec/tickets/cage-call-holds-port]] [[spec/tickets/hold-verdicts-ride-the-post]]
+func (d *Door) held(session string, own ownLanding, post Post, root string) (Effect, bool) {
 	if post.Event != toolEvent && post.Event != spokeEvent {
 		return Effect{}, false
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
-	if !ok || state.Said.Seq != seq {
+	state, seq := own.holds, own.seq
+	if !own.stands || state.Said.Seq != seq {
 		return Effect{}, false
 	}
 	switch state.Said.Word {
@@ -101,16 +109,13 @@ func (d *Door) sessionFor(post Post, root string) string {
 	return session
 }
 
-// Hands each drop the holds fold names at the event's own place to the door's writer, in key order. A door with no writer writes nothing, and a failing write leaves the answer standing, as the shadow write does. [[spec/tickets/cage-hold-drops-port]]
-func (d *Door) drops(session, root string) {
+// Hands each drop the holds fold names at the event's own place to the door's writer, in key order. A door with no writer writes nothing, and a failing write leaves the answer standing, as the shadow write does. [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/hold-verdicts-ride-the-post]]
+func (d *Door) drops(own ownLanding, root string) {
 	if d.from.Drop == nil {
 		return
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
-	if !ok || state.Said.Seq != seq {
+	state := own.holds
+	if !own.stands || state.Said.Seq != own.seq {
 		return
 	}
 	keys := make([]string, 0, len(state.Said.Drops))

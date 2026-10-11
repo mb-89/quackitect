@@ -36,3 +36,23 @@ func TestBaseNameAndCleanReadAPath(t *testing.T) {
 		t.Errorf("Clean reads %q, want spec/a.md", got)
 	}
 }
+
+// A shell write's path reads with its dot segments folded, so a free prefix followed by .. lands on the prose the rule guards, and a .. after a name stands. [[spec/tickets/shell-write-paths-clean]]
+func TestAShellWriteThroughDotDotLandsOnTheGuardedProse(t *testing.T) {
+	for command, want := range map[string]string{
+		"echo x > .se/../AGENTS.md":               "AGENTS.md",
+		"echo x >> ./.se/./../AGENTS.md":          "AGENTS.md",
+		"echo x > node_modules/a/../../AGENTS.md": "AGENTS.md",
+		"echo x | tee .git/../spec/notes.md":      "spec/notes.md",
+	} {
+		said := writesAPath(command)
+		if len(said) != 1 || said[0].path != want {
+			t.Errorf("writesAPath(%q) reads %+v, want one write into %s", command, said, want)
+		}
+	}
+	for path, want := range map[string]string{".se/../AGENTS.md": "AGENTS.md", "a/..": ".", "$HOME/../.se/x": "$HOME/../.se/x", "../x": "../x", "./": ""} {
+		if got := Clean(path); got != want {
+			t.Errorf("Clean(%q) reads %q, want %q", path, got, want)
+		}
+	}
+}

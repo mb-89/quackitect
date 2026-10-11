@@ -5,7 +5,6 @@ package command
 
 import (
 	"encoding/json"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -22,13 +21,110 @@ const (
 	floatBits  = 64
 )
 
-// The words git runs behind, a name given its value, a verb's own words, a push naming the trunk, and a push's words. [[spec/tickets/a-nested-git-still-lands]]
-var (
-	prefixes   = setOf("sudo", "env", "command", "nohup", "time", "exec", "xargs")
-	verbWords  = regexp.MustCompile(`(RUNME\.(?:sh|ps1)\b)(?:[^&|;\n"']|"[^"]*"|'[^']*')*`)
-	pushesMain = regexp.MustCompile(`\bpush\b[^&|;]*\b` + Trunk + `\b`)
-	pushWords  = regexp.MustCompile(`\bpush\b([^&|;\n]*)`)
-)
+// The words git runs behind. [[spec/tickets/a-nested-git-still-lands]]
+var prefixes = setOf("sudo", "env", "command", "nohup", "time", "exec", "xargs")
+
+// Git's global options that take the next word as their value, so the word names no verb. [[spec/tickets/version-guard-skips-git-options]]
+var gitValued = setOf("-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env", "--super-prefix")
+
+// The push flags that take the next word as their value, so the word names no remote and no ref. [[spec/tickets/trunk-push-reads-the-refspec]]
+var pushValued = setOf("-o", "--push-option", "--repo", "--receive-pack", "--exec")
+
+// The branch a ref word names: past a leading +, past the colon to its destination, and past refs/heads/. [[spec/tickets/trunk-push-reads-the-refspec]]
+func destOf(ref string) string {
+	ref = strings.TrimPrefix(ref, "+")
+	if _, dest, ok := strings.Cut(ref, ":"); ok {
+		ref = dest
+	}
+	return strings.TrimPrefix(ref, "refs/heads/")
+}
+
+// The ref words of every git push a command runs, past the remote, one list a push, a sh -c body read through. [[spec/tickets/trunk-push-reads-the-refspec]]
+func pushRefsIn(text string) [][]string {
+	var out [][]string
+	var segment []string
+	read := func() {
+		if refs, ok := pushRefsOf(segment); ok {
+			out = append(out, refs)
+		}
+		for _, body := range shellBodies(segment) {
+			out = append(out, pushRefsIn(body)...)
+		}
+		segment = nil
+	}
+	for _, one := range TokensOf(text) {
+		if one.Op && breaks[one.Text] {
+			read()
+		} else if !one.Op {
+			segment = append(segment, one.Text)
+		}
+	}
+	read()
+	return out
+}
+
+// The sh -c body a segment runs, past its assignments and prefixes. [[spec/tickets/trunk-push-reads-the-refspec]]
+func shellBodies(words []string) []string {
+	at := 0
+	for at < len(words) && (assigns.MatchString(words[at]) || prefixes[BaseName(words[at])] || at > 0 && strings.HasPrefix(words[at], "-")) {
+		at++
+	}
+	if at >= len(words) || !shells[BaseName(words[at])] {
+		return nil
+	}
+	for flag := at + 1; flag+1 < len(words); flag++ {
+		if words[flag] == "-c" {
+			return []string{words[flag+1]}
+		}
+	}
+	return nil
+}
+
+// The ref words a git push segment names past its remote, and whether the segment pushes at all. [[spec/tickets/trunk-push-reads-the-refspec]]
+func pushRefsOf(words []string) ([]string, bool) {
+	at := 0
+	for at < len(words) && (assigns.MatchString(words[at]) || prefixes[BaseName(words[at])] || at > 0 && strings.HasPrefix(words[at], "-")) {
+		at++
+	}
+	if at >= len(words) || BaseName(words[at]) != "git" {
+		return nil, false
+	}
+	rest := afterGit(words[at:])
+	if first(rest) != HowPush {
+		return nil, false
+	}
+	var named []string
+	remote := false
+	for i := 1; i < len(rest); i++ {
+		word := rest[i]
+		// A --repo names the remote, so every plain word past it is a ref. [[spec/tickets/trunk-push-reads-repo-flag]]
+		remote = remote || word == repoFlag || strings.HasPrefix(word, repoFlag+"=")
+		if pushValued[word] {
+			i++
+		} else if !strings.HasPrefix(word, "-") {
+			named = append(named, word)
+		}
+	}
+	if remote {
+		return named, true
+	}
+	return named[min(1, len(named)):], true
+}
+
+// The push flag naming the remote in place of the first plain word. [[spec/tickets/trunk-push-reads-repo-flag]]
+const repoFlag = "--repo"
+
+// Whether a push's ref words name the trunk as their destination. [[spec/tickets/trunk-push-reads-the-refspec]]
+func pushesTrunk(command string) bool {
+	for _, refs := range pushRefsIn(command) {
+		for _, one := range refs {
+			if destOf(one) == Trunk {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 // Whether git commits or pushes as the command word of a segment, a sh -c body and a prefix read through. [[spec/tickets/a-nested-git-still-lands]]
 func TouchesGit(command string) (bool, bool) {
@@ -74,14 +170,8 @@ func verbsOf(words []string) []string {
 	if name != "git" {
 		return nil
 	}
-	for i := at + 1; i < len(words); i++ {
-		one := words[i]
-		if !strings.HasPrefix(one, "-") {
-			return []string{one}
-		}
-		if one == "-C" || one == "-c" {
-			i++
-		}
+	if rest := afterGit(words[at:]); len(rest) > 0 {
+		return rest[:1]
 	}
 	return nil
 }
@@ -92,11 +182,10 @@ func LandsOnTrunk(command, branch string) string {
 	if !commits && !pushes {
 		return ""
 	}
-	said := verbWords.ReplaceAllString(command, "${1}")
-	if pushes && pushesMain.MatchString(said) {
+	if pushes && pushesTrunk(command) {
 		return HowPush
 	}
-	if pushes && branch == Trunk && !namesABranch(said) {
+	if pushes && branch == Trunk && !namesABranch(command) {
 		return HowPush
 	}
 	if commits && branch == Trunk {
@@ -105,24 +194,22 @@ func LandsOnTrunk(command, branch string) string {
 	return ""
 }
 
-// A push naming no branch, or naming HEAD, pushes the branch the box stands on. [[spec/design_output/work#a-box-writes-its-branch]]
+// A push naming no branch, or naming HEAD, pushes the branch the box stands on. [[spec/design_output/work#a-box-writes-its-branch]] [[spec/tickets/trunk-push-reads-the-refspec]]
 func namesABranch(command string) bool {
-	at := pushWords.FindStringSubmatch(command)
-	if at == nil {
+	pushes := pushRefsIn(command)
+	if len(pushes) == 0 {
 		return false
 	}
-	var refs []string
-	for _, one := range strings.Fields(at[1]) {
-		if !strings.HasPrefix(one, "-") {
-			refs = append(refs, one)
+	for _, refs := range pushes {
+		named := false
+		for _, one := range refs {
+			named = named || destOf(one) != "HEAD"
+		}
+		if !named {
+			return false
 		}
 	}
-	for _, one := range refs[min(1, len(refs)):] {
-		if one != "HEAD" {
-			return true
-		}
-	}
-	return false
+	return true
 }
 
 // The message a desk refusal builds, off deskSaid in lib/cloud.js, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]

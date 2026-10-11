@@ -202,6 +202,30 @@ test("the index door posts an action through the http door, and answers its outp
   assert.equal((await none.acts("ticket/pull", {})).code, 1);
 });
 
+// A person's post carries the run's secret the index writes beside its standing, so the index runs the verb as a person. [[spec/tickets/v1-takes-a-run-secret]]
+test("the index door sends the run's secret on a post", async () => {
+  const web = fakeHttp({
+    "POST http://127.0.0.1:9/v1/actions/ticket/pull": () => ({
+      status: 200,
+      text: JSON.stringify({ result: "work" }),
+    }),
+  });
+  const doors = {
+    clock: fakeClock(),
+    disk: fakeDisk({
+      [STANDING]: JSON.stringify({ v1: 9 }),
+      "/work/.se/.runtime/person.json": JSON.stringify({ secret: "s3cret" }),
+    }),
+    http: web,
+  };
+  const door = indexDoor(WORK, doors);
+  await door.acts("ticket/pull", { args: [], person: true });
+  assert.equal(web.sent[0].headers["x-quack-person"], "s3cret");
+  // The bless button posts through calls. [[spec/tickets/calls-test-sends-secret]]
+  await door.calls("ticket/pull", { agent: true, person: true });
+  assert.equal(web.sent[1].headers["x-quack-person"], "s3cret");
+});
+
 function warned(run) {
   const lines = [];
   const was = console.warn;

@@ -407,14 +407,11 @@ func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
 	}
 }
 
-// The roads a session merges a pull request by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]]
+// The roads a session merges a pull request or commits on the server by, one a GitHub connector the box loads and the CLI, which the settings deny, and the auto-merge the work skill turns on, which they leave open. [[spec/tickets/probe-at-revision-guards-merges]] [[spec/tickets/merge-deny-every-connector]] [[spec/tickets/github-writes-leave-the-allowlist]]
 var (
-	mergeRoads = []string{
-		"mcp__github__merge_pull_request",
-		"mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
-		"Bash(gh pr merge:*)",
-	}
-	autoMerge = "enable_pr_auto_merge"
+	connectors  = []string{"mcp__github__", "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__"}
+	serverRoads = []string{"merge_pull_request", "push_files", "create_or_update_file", "delete_file"}
+	autoMerge   = "enable_pr_auto_merge"
 )
 
 func TestTheSettingsDenyTheMergeToolUnderEveryConnectorAndLeaveAutoMergeOpen(t *testing.T) {
@@ -423,22 +420,22 @@ func TestTheSettingsDenyTheMergeToolUnderEveryConnectorAndLeaveAutoMergeOpen(t *
 	if err != nil {
 		t.Fatal(err)
 	}
-	var read struct {
-		Permissions struct {
-			Deny []string `json:"deny"`
-		} `json:"permissions"`
-	}
+	var read struct{ Permissions struct{ Deny []string } }
 	if err := json.Unmarshal(text, &read); err != nil {
 		t.Fatal(err)
 	}
-	for _, road := range mergeRoads {
+	roads := []string{"Bash(gh pr merge:*)", "Bash(gh api *merge*)"}
+	for _, one := range connectors {
+		for _, tool := range serverRoads {
+			roads = append(roads, one+tool)
+		}
+	}
+	for _, road := range roads {
 		if !slices.Contains(read.Permissions.Deny, road) {
 			t.Errorf("the settings deny %v, and no %s", read.Permissions.Deny, road)
 		}
 	}
-	for _, one := range read.Permissions.Deny {
-		if strings.Contains(one, autoMerge) {
-			t.Errorf("the settings deny %s, which the work skill turns auto-merge on with", one)
-		}
+	if denied := strings.Join(read.Permissions.Deny, " "); strings.Contains(denied, autoMerge) {
+		t.Errorf("the settings deny %s, past the auto-merge the work skill turns on", denied)
 	}
 }

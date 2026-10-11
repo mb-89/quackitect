@@ -64,7 +64,14 @@
       "Artifact",
       "mcp__github__merge_pull_request",
       "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
-      "Bash(gh pr merge:*)"
+      "Bash(gh pr merge:*)",
+      "Bash(gh api *merge*)",
+      "mcp__github__push_files",
+      "mcp__github__create_or_update_file",
+      "mcp__github__delete_file",
+      "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__push_files",
+      "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__create_or_update_file",
+      "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__delete_file"
     ]
   },
   "skipAutoPermissionPrompt": true,

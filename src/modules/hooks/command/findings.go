@@ -333,13 +333,13 @@ func wordsIn(segment []Token) []string {
 	return said[at:]
 }
 
-// The words after git and its own leading flags. [[spec/design_output/bash#what-the-door-reads]]
+// The words after git and its own leading flags. [[spec/design_output/bash#what-the-door-reads]] [[spec/tickets/version-guard-skips-git-options]]
 func afterGit(words []string) []string {
 	var out []string
 	for i := 1; i < len(words); i++ {
 		one := words[i]
 		if len(out) == 0 && strings.HasPrefix(one, "-") {
-			if one == "-C" || one == "-c" {
+			if gitValued[one] {
 				i++
 			}
 			continue

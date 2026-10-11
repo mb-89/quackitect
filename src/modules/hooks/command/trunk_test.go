@@ -80,6 +80,20 @@ func TestLandsOnTrunkReadsTheBridgesLanding(t *testing.T) {
 		{"RUNME.ps1 branch open x", "main", ""},
 		{`./RUNME.sh commit "the row reads git commit; and git push origin main"`, "main", ""},
 		{`./RUNME.sh commit "the row reads git commit; and git push origin main" && git push origin main`, "work/x", HowPush},
+		{"git push origin work/fix-main-page", "work/fix-main-page", ""},
+		{"git push -u origin HEAD:work/main-menu", "work/main-menu", ""},
+		{`git commit -m "push main later" && git push origin work/a`, "work/a", ""},
+		{"git push origin HEAD:refs/heads/main", "work/a", HowPush},
+		{"git push origin +work/a:main", "work/a", HowPush},
+		{"git push origin refs/heads/main", "work/a", HowPush},
+		{"git push origin work/a main", "work/a", HowPush},
+		{"git -c x=y push origin main", "work/a", HowPush},
+		{"git --git-dir .git push origin main", "work/a", HowPush},
+		{"git push -o ci.skip origin main", "work/a", HowPush},
+		{"git push origin HEAD:work/a", "main", ""},
+		{"git push --repo=origin main", "work/a", HowPush},
+		{"git push --repo origin main", "work/a", HowPush},
+		{"git push --repo=origin work/a", "work/a", ""},
 	} {
 		if got := LandsOnTrunk(one.command, one.branch); got != one.want {
 			t.Errorf("LandsOnTrunk(%q, %s) reads %q, want %q", one.command, one.branch, got, one.want)

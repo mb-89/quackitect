@@ -401,12 +401,9 @@ func tasksRun(tasks any) bool {
 	return false
 }
 
-// The events the fill rides: every call of the agent's own, and the turn's end, which the harness measures only after the vote. [[spec/design_output/stop#the-context-hands-over]]
-var filled = map[string]bool{toolEvent: true, stopEvent: true}
-
-// The fill a post carries where the door reads it: on a filled event of the main agent. The bridgehead sends the session's fill on every event, and a helper's event measures the main agent's context, so it reads none. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+// The fill a post carries where the door reads it: on a filled event of the main agent. The bridgehead sends the session's fill on every event, and a helper's event measures the main agent's context, so it reads none. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]] [[spec/tickets/fill-gate-stands-once]]
 func filledOf(post Post) any {
-	if !filled[post.Event] || textOf(post.E, "agentId", "agent_id") != "" {
+	if !fills(post) {
 		return nil
 	}
 	return post.Fill
@@ -464,14 +461,11 @@ func (d *Door) landsStops(session string, event q.Event) error {
 }
 
 // The block the stops fold answers the newest Stop with, where it blocks, or the clear, where the conversation clears. [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/the-clear-continues-the-session]]
-func (d *Door) blocked(session string, post Post) (Effect, bool) {
+func (d *Door) blocked(own ownLanding, post Post) (Effect, bool) {
 	if post.Event != stopEvent {
 		return Effect{}, false
 	}
-	state, ok := d.from.Store.Snapshot().Read(d.stopsOf(session)).(Stops)
-	d.mu.Lock()
-	seq := d.seqs[session]
-	d.mu.Unlock()
+	state, ok, seq := own.stops, own.stopsOK, own.seq
 	if !ok || state.Said.Seq != seq {
 		return Effect{}, false
 	}
